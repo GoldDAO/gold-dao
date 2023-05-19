@@ -8,6 +8,7 @@ As the front-end will be hosted on the Internet Computer, this projects uses [Ne
 ### Dfinity SDK
 To be able to work on canisters development, or to test in a local canister execution environment, you may need to install the [Dfinity SDK](https://github.com/dfinity/sdk), and especially the [`dfx`](https://internetcomputer.org/docs/current/references/cli-reference/) CLI.
 
+### Dependencies and local scripts
 First install the dependencies with
 ```sh
 npm install
