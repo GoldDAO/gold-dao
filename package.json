@@ -1,0 +1,49 @@
+{
+  "name": "gldt-swap-frontend",
+  "version": "0.1.0",
+  "description": "GLDT page and swap canister and frontend",
+  "main": "index.js",
+  "scripts": {
+    "frontdev": "next dev",
+    "build": "npm run build:front",
+    "build:front": "next build",
+    "deploy": "echo \"This command may be replaced by the 'version' script in the future.\" && dfx identity use yumi-fundation && npm run lint && npm run build && dfx deploy --network=ic",
+    "start": "dfx start --background --clean && npm run build && dfx deploy",
+    "stop": "dfx stop",
+    "restart": "npm run stop; npm start",
+    "lint": "next lint",
+    "test": "echo \"No tests yet! Please write some unit tests!\""
+  },
+  "repository": {
+    "type": "git+ssh",
+    "url": "git@gitlab.bochslerfinance.com:gldt/gldt-swap-frontend.git"
+  },
+  "author": "Yumi Fundation",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "private": true,
+  "engines": {
+    "node": "^18.16.0",
+    "npm": "^9.5.0"
+  },
+  "browserslist": {
+    "production": [
+      "Firefox ESR",
+      "> 2%",
+      "not dead"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "next": "^13.4.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "8.40.0",
+    "eslint-config-next": "13.4.3"
+  }
+}
