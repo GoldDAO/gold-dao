@@ -1,5 +1,8 @@
 const nextConfig = {
-	output: "export"
+	output: "export",
+	compiler: {
+		styledComponents: true,
+	},
 };
 
 module.exports = nextConfig;
