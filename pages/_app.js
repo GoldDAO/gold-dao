@@ -2,14 +2,33 @@ import { Inter } from 'next/font/google';
 import './../src/css/global.css'
 import styled from 'styled-components';
 import { Box } from "@mui/system";
-import {Button} from '@mui/base';
+import { Button } from '@mui/base';
+import { Provider } from 'jotai'
+// import { createClient } from "@connect2ic/core"
+// import { defaultProviders } from "@connect2ic/core/providers"
+import "@connect2ic/core/style.css"
 
 const inter = Inter({ subsets: ['latin'] });
- 
+
+// const client = createClient({
+//   providers: defaultProviders,
+//   globalProviderConfig: {
+//     /*
+//      * Disables dev mode in production
+//      * Should be enabled when using local canisters
+//      */
+//     dev: true
+//   },
+// })
+
 export default function MyApp({ Component, pageProps }) {
   return (
     <main className={inter.className}>
-      <Component {...pageProps} />
+      <Provider
+      // client={client}
+      >
+        <Component {...pageProps} />
+      </Provider>
     </main>
   );
 }
