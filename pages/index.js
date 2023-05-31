@@ -8,8 +8,10 @@ import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
 import Dialog from "../lib/components/UI/layout/Dialog";
 import NFTsTable from "../lib/components/UI/layout/table/NFTsTable";
+import { useState } from "react";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
+	const [openCTO, setOpenCTO] = useState(false)
 	return (
 		<>
 			<Head>
@@ -18,9 +20,14 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 				<meta property={`og:description`} content={meta.description} key="title" />
 			</Head>
 			<Layout>
-				<Dialog open={true} content={<NFTsTable />} />
+				<Dialog
+					title="Select your GLD NFT(s) you want to swap for GLDT"
+					address="address"
+					open={openCTO}
+					setOpen={setOpenCTO}
+					content={<NFTsTable />} />
 				<PageContent dangerouslySetInnerHTML={{ __html: content }} />
-				<SwapCTO data={cto.data} />
+				<SwapCTO open={openCTO} setOpen={setOpenCTO} data={cto.data} />
 				<Marketcap data={marketcap.data} />
 				<Partners partners={partners} />
 			</Layout>
