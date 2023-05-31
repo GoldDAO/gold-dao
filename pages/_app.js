@@ -2,14 +2,18 @@ import { Inter } from 'next/font/google';
 import './../src/css/global.css'
 import styled from 'styled-components';
 import { Box } from "@mui/system";
-import {Button} from '@mui/base';
+import { Button } from '@mui/base';
+import { Provider } from 'jotai'
+
 
 const inter = Inter({ subsets: ['latin'] });
- 
+
 export default function MyApp({ Component, pageProps }) {
   return (
     <main className={inter.className}>
-      <Component {...pageProps} />
+      <Provider>
+        <Component {...pageProps} />
+      </Provider>
     </main>
   );
 }
