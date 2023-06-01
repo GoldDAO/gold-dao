@@ -5,6 +5,7 @@ import { Box } from "@mui/system";
 import { Button } from '@mui/base';
 import { Provider, createStore } from 'jotai'
 
+
 const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
 
