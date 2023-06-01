@@ -9,8 +9,10 @@ import Partners from "../lib/components/UI/partners";
 import Dialog from "../lib/components/UI/layout/Dialog";
 import NFTsTable from "../lib/components/UI/layout/table/NFTsTable";
 import { useState } from "react";
+import { ConnectButton } from '@connect2ic/react'
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
+
 	const [openCTO, setOpenCTO] = useState(false)
 	return (
 		<>
@@ -20,6 +22,7 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 				<meta property={`og:description`} content={meta.description} key="title" />
 			</Head>
 			<Layout>
+				<ConnectButton />
 				<Dialog
 					title="Select your GLD NFT(s) you want to swap for GLDT"
 					address="address"
@@ -37,6 +40,7 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 
 export default HomePage;
 
+
 export async function getStaticProps() {
 	const content = getMarkdownPage('home')
 	const html = await markdownToHtml(content.content)
@@ -49,7 +53,7 @@ export async function getStaticProps() {
 			meta: content.data,
 			partners: partners,
 			cto: CTO,
-			marketcap: marketcap
+			marketcap: marketcap,
 		}
 	}
 }

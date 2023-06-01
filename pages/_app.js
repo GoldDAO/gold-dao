@@ -2,36 +2,35 @@ import { Inter } from 'next/font/google';
 import './../src/css/global.css'
 import styled from 'styled-components';
 import { Box } from "@mui/system";
-import { Button } from '@mui/base';
-import { Provider } from 'jotai'
-// import { createClient } from "@connect2ic/core"
-// import { defaultProviders } from "@connect2ic/core/providers"
 import "@connect2ic/core/style.css"
+import { Provider, createStore } from 'jotai'
+import { createClient } from '@connect2ic/core'
+import { defaultProviders } from "@connect2ic/core/providers"
 
+const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
-
-// const client = createClient({
-//   providers: defaultProviders,
-//   globalProviderConfig: {
-//     /*
-//      * Disables dev mode in production
-//      * Should be enabled when using local canisters
-//      */
-//     dev: true
-//   },
-// })
+const client = createClient({
+  providers: defaultProviders,
+  globalProviderConfig: {
+    /*
+     * Disables dev mode in production
+     * Should be enabled when using local canisters
+     */
+    dev: true
+  },
+})
 
 export default function MyApp({ Component, pageProps }) {
   return (
     <main className={inter.className}>
-      <Provider
-      // client={client}
-      >
+      <Provider store={myStore}>
         <Component {...pageProps} />
       </Provider>
     </main>
   );
 }
+
+
 
 export const PageContent = styled(Box)`
   h1{
@@ -52,15 +51,3 @@ export const PageContent = styled(Box)`
   }
 `
 
-export const PrimaryButton = styled(Button)`
-    height: fit-content;
-    padding: 10px 25px;
-    background-color: #D3B872;
-    color: #fff;
-    border-radius: 10px;
-    font-size: 1em;
-    border: 0;
-    cursor: pointer;
-    outline: none;
-    box-shadow: none;
-`
