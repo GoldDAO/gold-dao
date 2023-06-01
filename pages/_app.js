@@ -19,6 +19,8 @@ export default function MyApp({ Component, pageProps }) {
   );
 }
 
+
+
 export const PageContent = styled(Box)`
   h1{
     font-weight: 300;
