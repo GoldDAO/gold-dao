@@ -10,7 +10,6 @@ const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
 
 
-
 export default function MyApp({ Component, pageProps }) {
 
   const C2ICProvider = dynamic(() => import("./../lib/components/C2ICProvider"), {

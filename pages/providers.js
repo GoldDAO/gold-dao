@@ -1,16 +1,15 @@
 import React from 'react';
-import Layout from '../lib/ components/UI/layout/Layout';
-import ProviderList from '../lib/ components/Providers';
 import { getMarkdownPage } from '../lib/utils/getMarkdown';
 import { markdownToHtml } from '../lib/utils/markdownToHtml';
 import { PageContent } from './_app';
 import { ConnectButton, ConnectDialog } from '@connect2ic/react';
+import Layout from '../lib/components/UI/layout/Layout';
 
 const Providers = ({ meta, content }) => {
     return (
         <Layout meta={{ title: meta.title, description: meta.description }}>
             <PageContent dangerouslySetInnerHTML={{ __html: content }} />
-            <ProviderList />
+            {/* <ProviderList /> */}
             <ConnectButton />
             <ConnectDialog dark={false} />
         </Layout>
