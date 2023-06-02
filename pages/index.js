@@ -12,6 +12,7 @@ import { useState } from "react";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
 	const [openCTO, setOpenCTO] = useState(false)
+
 	return (
 		<>
 			<Head>
@@ -37,7 +38,9 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 
 export default HomePage;
 
+
 export async function getStaticProps() {
+
 	const content = getMarkdownPage('home')
 	const html = await markdownToHtml(content.content)
 	const partners = await getPartners()
@@ -49,7 +52,7 @@ export async function getStaticProps() {
 			meta: content.data,
 			partners: partners,
 			cto: CTO,
-			marketcap: marketcap
+			marketcap: marketcap,
 		}
 	}
 }

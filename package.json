@@ -38,6 +38,8 @@
     ]
   },
   "dependencies": {
+    "@connect2ic/core": "^0.2.0-beta.5",
+    "@connect2ic/react": "^0.2.0-beta.5",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
@@ -48,6 +50,7 @@
     "gray-matter": "^4.0.3",
     "jotai": "^2.1.0",
     "next": "^13.4.3",
+    "next-transpile-modules": "^10.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remark": "^14.0.3",
