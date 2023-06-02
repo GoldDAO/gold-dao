@@ -6,8 +6,8 @@ import SwapCTO from "../lib/components/UI/SwapCTO";
 import Marketcap from "../lib/components/UI/Marketcap";
 import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
-import Dialog from "../lib/components/UI/layout/Dialog";
-import NFTsTable from "../lib/components/UI/layout/table/NFTsTable";
+import Dialog from "../lib/components/UI/Dialog";
+import NFTsTable from "../lib/components/UI/table/NFTsTable";
 import { useState } from "react";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
