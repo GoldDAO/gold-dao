@@ -4,32 +4,39 @@ import styled from 'styled-components';
 import { Box } from "@mui/system";
 import "@connect2ic/core/style.css"
 import { Provider, createStore } from 'jotai'
-import { createClient } from '@connect2ic/core'
-import { defaultProviders } from "@connect2ic/core/providers"
+import dynamic from 'next/dynamic';
 
 const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
-const client = createClient({
-  providers: defaultProviders,
-  globalProviderConfig: {
-    /*
-     * Disables dev mode in production
-     * Should be enabled when using local canisters
-     */
-    dev: true
-  },
-})
+
+
 
 export default function MyApp({ Component, pageProps }) {
-  return (
-    <main className={inter.className}>
-      <Provider store={myStore}>
-        <Component {...pageProps} />
-      </Provider>
-    </main>
-  );
-}
 
+  const C2ICProvider = dynamic(() => import("./../lib/components/C2ICProvider"), {
+    ssr: false,
+  });
+
+  function SafeHydrate({ children }) {
+    return (
+      <div suppressHydrationWarning>
+        {typeof window === 'undefined' ? null : children}
+      </div>
+    )
+  }
+
+  return (
+    <div className={inter.className}>
+      <Provider store={myStore}>
+        <SafeHydrate>
+          <C2ICProvider>
+            <Component {...pageProps} />
+          </C2ICProvider >
+        </SafeHydrate>
+      </Provider>
+    </div >
+  )
+}
 
 
 export const PageContent = styled(Box)`
