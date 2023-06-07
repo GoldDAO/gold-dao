@@ -3,41 +3,28 @@ import './../src/css/global.css'
 import styled from 'styled-components';
 import { Box } from "@mui/system";
 import "@connect2ic/core/style.css"
-import { Provider, createStore } from 'jotai'
+import { Provider as JotaiProvider, createStore } from 'jotai'
 import dynamic from 'next/dynamic';
 
 const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
 
-
-
 export default function MyApp({ Component, pageProps }) {
 
-  const C2ICProvider = dynamic(() => import("./../lib/components/C2ICProvider"), {
+  const C2ICProvider = dynamic(() => import("../lib/components/c2ic/C2ICProvider"), {
     ssr: false,
   });
 
-  function SafeHydrate({ children }) {
-    return (
-      <div suppressHydrationWarning>
-        {typeof window === 'undefined' ? null : children}
-      </div>
-    )
-  }
-
   return (
     <div className={inter.className}>
-      <Provider store={myStore}>
-        <SafeHydrate>
-          <C2ICProvider>
-            <Component {...pageProps} />
-          </C2ICProvider >
-        </SafeHydrate>
-      </Provider>
+      <JotaiProvider store={myStore}>
+        <C2ICProvider>
+          <Component {...pageProps} />
+        </C2ICProvider >
+      </JotaiProvider>
     </div >
   )
 }
-
 
 export const PageContent = styled(Box)`
   h1{
