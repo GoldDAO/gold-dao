@@ -8,7 +8,6 @@ import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
-
 	return (
 		<>
 			<Head>
