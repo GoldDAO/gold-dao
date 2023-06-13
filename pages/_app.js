@@ -5,7 +5,6 @@ import { Box } from "@mui/system";
 import "@connect2ic/core/style.css"
 import { Provider as JotaiProvider, createStore } from 'jotai'
 import dynamic from 'next/dynamic';
-
 const myStore = createStore()
 const inter = Inter({ subsets: ['latin'] });
 
