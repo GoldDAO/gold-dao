@@ -7,6 +7,9 @@ import Marketcap from "../lib/components/UI/Marketcap";
 import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
 import BatchOffers from "../lib/components/commands/batchOffers";
+import { formatDate, getGoldTimeserie } from "../lib/utils/getGoldPrice";
+import { useEffect } from "react";
+import Chart from "../lib/components/UI/Chart";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
 	return (
@@ -20,8 +23,8 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 				<PageContent dangerouslySetInnerHTML={{ __html: content }} />
 				<SwapContainer data={cto.data} />
 				<Marketcap data={marketcap.data} />
+				<Chart />
 				<Partners partners={partners} />
-				<BatchOffers />
 			</Layout>
 		</>
 	)
