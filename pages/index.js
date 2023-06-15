@@ -6,6 +6,7 @@ import SwapContainer from "../lib/components/UI/sequence/SwapContainer";
 import Marketcap from "../lib/components/UI/Marketcap";
 import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
+import BatchOffers from "../lib/components/commands/batchOffers";
 
 function HomePage({ content, meta, partners, cto, marketcap }) {
 	return (
@@ -20,6 +21,7 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 				<SwapContainer data={cto.data} />
 				<Marketcap data={marketcap.data} />
 				<Partners partners={partners} />
+				<BatchOffers />
 			</Layout>
 		</>
 	)
