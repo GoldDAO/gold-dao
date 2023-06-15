@@ -1,33 +1,27 @@
 import Head from "next/head";
-import Layout from "../lib/layout/Layout";
-import {remark} from 'remark'
+import Layout from "../lib/components/UI/layout/Layout";
 import { getMarkdownPage, getMarketCap, getPartners, getSwapCTO } from "../lib/utils/getMarkdown";
 import { markdownToHtml } from "../lib/utils/markdownToHtml";
-import { Box } from "@mui/system";
-import Image from "next/image";
-import Link from "next/link";
-import SwapCTO from "../lib/ components/SwapCTO";
-import Marketcap from "../lib/ components/Marketcap";
+import SwapContainer from "../lib/components/UI/sequence/SwapContainer";
+import Marketcap from "../lib/components/UI/Marketcap";
+import { PageContent } from "./_app";
+import Partners from "../lib/components/UI/partners";
+import BatchOffers from "../lib/components/commands/batchOffers";
 
-function HomePage({content, meta, partners, cto, marketcap}) {
+function HomePage({ content, meta, partners, cto, marketcap }) {
 	return (
 		<>
 			<Head>
 				<title>{meta.title}</title>
-				<meta property={`og:title`} content={meta.title} key="title" />			
-				<meta property={`og:description`} content={meta.description} key="title" />			
+				<meta property={`og:title`} content={meta.title} key="title" />
+				<meta property={`og:description`} content={meta.description} key="title" />
 			</Head>
 			<Layout>
-				<Box dangerouslySetInnerHTML={{__html: content}}></Box>
-				{partners.map((e,i) => (
-					<Box key={i}>
-						<Link href={e.url} target="_blank" referrerPolicy="noreferrer">
-							<Image width={200} height={100} src={e.logo} alt={`${e.name}'s logo`} />
-						</Link>
-					</Box>
-				))}
-				<SwapCTO data={cto.data}/>
+				<PageContent dangerouslySetInnerHTML={{ __html: content }} />
+				<SwapContainer data={cto.data} />
 				<Marketcap data={marketcap.data} />
+				<Partners partners={partners} />
+				<BatchOffers />
 			</Layout>
 		</>
 	)
@@ -35,7 +29,9 @@ function HomePage({content, meta, partners, cto, marketcap}) {
 
 export default HomePage;
 
+
 export async function getStaticProps() {
+
 	const content = getMarkdownPage('home')
 	const html = await markdownToHtml(content.content)
 	const partners = await getPartners()
@@ -47,7 +43,8 @@ export async function getStaticProps() {
 			meta: content.data,
 			partners: partners,
 			cto: CTO,
-			marketcap: marketcap
+			marketcap: marketcap,
 		}
 	}
-  }
+}
+
