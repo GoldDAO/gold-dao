@@ -20,9 +20,9 @@ function HomePage({ content, meta, partners, cto, marketcap }) {
 				<meta property={`og:description`} content={meta.description} key="title" />
 			</Head>
 			<Layout>
+				<Marketcap data={marketcap.data} />
 				<PageContent dangerouslySetInnerHTML={{ __html: content }} />
 				<SwapContainer data={cto.data} />
-				<Marketcap data={marketcap.data} />
 				<Chart />
 				<Partners partners={partners} />
 			</Layout>
