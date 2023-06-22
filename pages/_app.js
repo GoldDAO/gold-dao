@@ -3,24 +3,24 @@ import './../src/css/global.css'
 import styled from 'styled-components';
 import { Box } from "@mui/system";
 import "@connect2ic/core/style.css"
-import { Provider as JotaiProvider, createStore } from 'jotai'
 import dynamic from 'next/dynamic';
-const myStore = createStore()
+import { SafeHydrate } from '../lib/utils/SafeHydrate';
+
 const inter = Inter({ subsets: ['latin'] });
 
+const Providers = dynamic(() => import("../lib/utils/Providers"), {
+  ssr: false,
+});
+
+
 export default function MyApp({ Component, pageProps }) {
-
-  const C2ICProvider = dynamic(() => import("../lib/components/c2ic/C2ICProvider"), {
-    ssr: false,
-  });
-
   return (
     <div className={inter.className}>
-      <JotaiProvider store={myStore}>
-        <C2ICProvider>
+      <Providers>
+        <SafeHydrate>
           <Component {...pageProps} />
-        </C2ICProvider >
-      </JotaiProvider>
+        </SafeHydrate>
+      </Providers>
     </div >
   )
 }
