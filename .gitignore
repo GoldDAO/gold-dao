@@ -3,3 +3,4 @@ out/
 .npm/
 .dfx/
 .next/
+.DS_Store
