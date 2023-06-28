@@ -8,7 +8,7 @@ import { SafeHydrate } from '../lib/utils/SafeHydrate';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const Providers = dynamic(() => import("../lib/utils/Providers"), {
+const Providers = dynamic(() => import("../lib/components/c2ic/Providers"), {
   ssr: false,
 });
 
