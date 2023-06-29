@@ -13,12 +13,17 @@
 				}
 			}
 		},
-		"www": {
+		"gldt-frontend-staging": {
 			"type": "assets",
 			"source": [
 				"out"
-			],
-			"frontend": {}
+			]
+		},
+		"gldt-frontend-production": {
+			"type": "assets",
+			"source": [
+				"out"
+			]
 		}
 	}
 }

@@ -1,0 +1,168 @@
+default:
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:dfx_0.14.1@sha256:bcc4cd90374b56681f945ff61fa837c8c77bc93250cf161a37fc0c6749d4e6a6
+  tags:
+    - docker
+  before_script:
+    - dfx --version
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - api_failure
+      - runner_unsupported
+      - unknown_failure
+
+cache:
+  - key: "dfx-$CI_COMMIT_BRANCH"
+    paths:
+      - .dfx
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+###############################################################################
+# Templates
+###############################################################################
+.node template: &node_template
+  image: node:18.16-alpine
+  cache:
+  - key: "node-$CI_COMMIT_BRANCH"
+    paths:
+      - .npm/
+      - node_modules/
+      - .next/
+  before_script:
+    - apk update -q && apk add -q jq
+    - npm ci --cache .npm --prefer-offline
+
+################################################################################
+# Linters
+################################################################################
+next linter:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
+  <<: *node_template
+  script:
+    - npm run lint
+
+################################################################################
+# Tests
+################################################################################
+nextjs test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *node_template
+  script:
+    - npm run realbuild
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-TEST_BUILD"
+    paths:
+      - out/
+    expire_in: 4 hours
+
+################################################################################
+# Builds
+################################################################################
+next staging build:
+  stage: build
+  rules:
+    # - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
+  <<: *node_template
+  script:
+    - npm run realbuild:staging
+    - STAGING_URL=https://$(jq -r '."gldt-staging".ic' canister_ids.json).icp0.io
+    - echo "STAGING_ENVIRONMENT_URL=$STAGING_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-STAGING_BUILD-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - out/
+    reports:
+      dotenv: deploy.env
+    expire_in: 1 day
+  environment:
+    name: staging
+    action: prepare
+
+next production build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+  <<: *node_template
+  script:
+    - npm run realbuild
+    - PRODUCTION_URL=https://$(jq -r '."gldt-production".ic' canister_ids.json).icp0.io
+    - echo "PRODUCTION_ENVIRONMENT_URL=$PRODUCTION_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - out/
+    reports:
+      dotenv: deploy.env
+    expire_in: 6 months
+  environment:
+    name: production
+    action: prepare
+
+################################################################################
+# Deployments
+################################################################################
+local:
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  dependencies:
+    - nextjs test build
+  before_script:
+    - dfx --version
+    - dfx start --background
+  script:
+    - dfx deploy -y --no-wallet gldt-frontend-staging
+  after_script:
+    - cat canisters_ids.json
+    - dfx stop
+
+staging:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
+    # - if: $CI_COMMIT_REF_NAME == "develop"
+  dependencies:
+    - next staging build
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+  script:
+    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet -y gldt-frontend-staging
+  after_script:
+    - echo "Staging environment will be accessible on ${STAGING_ENVIRONMENT_URL}"
+  environment:
+    name: staging
+    url: $STAGING_ENVIRONMENT_URL
+    action: start
+
+production:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+  dependencies:
+    - next production build
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity whoami
+  script:
+    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt-frontend-production
+    - echo "TODO continue with updating DNS redirection using Gandi API"
+  environment:
+    name: production
+    url: $PRODUCTION_ENVIRONMENT_URL
+    action: start

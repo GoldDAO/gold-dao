@@ -4,5 +4,11 @@
     },
     "internet_identity": {
         "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+    },
+    "gldt-frontend-staging": {
+        "ic": "ebrqv-vaaaa-aaaal-qb6zq-cai"
+    },
+    "gldt-frontend-production": {
+        "ic": "maz3v-6aaaa-aaaak-qcgpq-cai"
     }
 }
