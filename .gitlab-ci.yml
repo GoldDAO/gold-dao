@@ -46,8 +46,7 @@ next linter:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    # - if: $CI_COMMIT_REF_NAME == "develop"
-    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
+    - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
     - npm run lint
@@ -74,12 +73,11 @@ nextjs test build:
 next staging build:
   stage: build
   rules:
-    # - if: $CI_COMMIT_REF_NAME == "develop"
-    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
+    - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
     - npm run realbuild:staging
-    - STAGING_URL=https://$(jq -r '."gldt-staging".ic' canister_ids.json).icp0.io
+    - STAGING_URL=https://$(jq -r '."gldt-frontend-staging".ic' canister_ids.json).icp0.io
     - echo "STAGING_ENVIRONMENT_URL=$STAGING_URL" > deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-STAGING_BUILD-${CI_COMMIT_SHORT_SHA}"
@@ -99,7 +97,7 @@ next production build:
   <<: *node_template
   script:
     - npm run realbuild
-    - PRODUCTION_URL=https://$(jq -r '."gldt-production".ic' canister_ids.json).icp0.io
+    - PRODUCTION_URL=https://$(jq -r '."gldt-frontend-production".ic' canister_ids.json).icp0.io
     - echo "PRODUCTION_ENVIRONMENT_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
@@ -133,8 +131,7 @@ local:
 staging:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "8-setup-cicd-pipeline"
-    # - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop"
   dependencies:
     - next staging build
   before_script:
