@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 const Ruban = () => {
 
     useEffect(() => {
-        console.log('process.env.NETWORK', process.env.NETWORK)
     }, [process.env.NETWORK])
     if (process.env.NETWORK !== 'production') {
         return (

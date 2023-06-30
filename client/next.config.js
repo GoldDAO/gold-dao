@@ -1,28 +1,8 @@
+const path = require('path');
+const env = require('dotenv').config({
+	path: path.resolve(__dirname, './../.env'),
+})
 const CanisterIds = require('./../canister_ids.json')
-// const fs = require('fs');
-
-
-let NETWORK
-
-// fs.readFile('./../.env', 'utf8', (err, data) => {
-// 	if (err) {
-// 		console.error('An error occured when reading .env file:', err);
-// 		return;
-// 	}
-
-
-// 	const envVariables = data.split('\n');
-// 	envVariables.forEach((envVariable) => {
-// 		const [key, value] = envVariable.split('=');
-// 		if (key && value) {
-// 			const formatedValue = value.trim()
-// 			const formatedKey = key.trim()
-// 			console.log('NEXT_PUBLIC_DFX_NETWORK' === formatedKey)
-// 		};
-
-// 	});
-
-// });
 
 const GLDNFT_CANISTER_IDS =
 	process.env.NEXT_PUBLIC_DFX_NETWORK === "local" ?
@@ -47,7 +27,7 @@ const nextConfig = {
 		GLDNFT_CANISTER_IDS,
 		YUMI_KYC_CANISTER_ID: CanisterIds.yumi_kyc.ic,
 		ICP_LEDGER_CANISTER_ID: CanisterIds.icp_ledger.ic,
-		NETWORK
+		NETWORK: env.parsed.NEXT_PUBLIC_DFX_NETWORK
 	},
 	images: { unoptimized: true },
 };
