@@ -16,7 +16,7 @@
 		"www": {
 			"type": "assets",
 			"source": [
-				"out"
+				"client/out"
 			],
 			"frontend": {}
 		}

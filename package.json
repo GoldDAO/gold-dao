@@ -8,14 +8,17 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "frontdev": "cd ./packages/client/ && npm run develop",
-        "frontbuild": "cd ./packages/client/ && npm run build:front",
+        "front:dev": "cd ./client/ && npm run develop && cd ..",
+        "build": "npm run build:front && npm run build:back",
+        "build:front": "cd ./client/ && npm run build && cd ..",
+        "build:back": "cd ./canister/ && echo \"This command need to be replaced\" && cd .. ",
         "deploy": "echo \"This command may be replaced by the 'version' script in the future.\" && dfx identity use yumi-fundation && npm run lint && npm run build && dfx deploy --network=ic",
-        "start": "cd packages/client && dfx start --background --clean && npm run build && dfx deploy",
-        "stop": "cd packages/client && dfx stop",
-        "restart": "cd packages/client npm run stop; npm start",
-        "frontlint": "cd packages/client next lint",
-        "test": "echo \"No tests yet! Please write some unit tests!\""
+        "start": "dfx stop && dfx start --background --clean && dfx deploy",
+        "stop": "dfx stop",
+        "restart": "cd client npm run stop; npm start && cd ..",
+        "front:lint": "cd client next lint && cd ..",
+        "test": "echo \"No tests yet! Please write some unit tests!\"",
+        "postinstall": "cd ./client && npm install && cd ../canister && npm install && cd .."
     },
     "devDependencies": {
         "eslint": "8.40.0"
