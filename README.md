@@ -1,43 +1,40 @@
-# GLDT swap
-This repository contains the source code for the GLDT page frontend, including swap interface, and the swap canister.  
-As the front-end will be hosted on the Internet Computer, this projects uses [NextJS](https://nextjs.org/docs) and bundles a full static website with [client-side fetching](https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side).
+# GLDT SWAP MONOREPO
 
-> :bulb: This project uses the [`pages` routing](https://nextjs.org/docs/getting-started/project-structure#pages-routing-conventions), and not the [`app` routing that just went out of beta](https://nextjs.org/blog/next-13-4#nextjs-app-router).
+## Project Structure:
 
-## Development
-### Dfinity SDK
-To be able to work on canisters development, or to test in a local canister execution environment, you may need to install the [Dfinity SDK](https://github.com/dfinity/sdk), and especially the [`dfx`](https://internetcomputer.org/docs/current/references/cli-reference/) CLI.
+- `Client`: Contain the Next.js application
+- `Canister`: Contain the source code of the GLDT Canister
 
-### Dependencies and local scripts
-First install the dependencies with
-```sh
-npm install
-```
-Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
-```sh
-npm run frontdev
-```
-or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
-```sh
-npm start
-```
-And if you want to see some changes in the code, run
-```sh
-npm run restart
-```
-Once you finished your work, simply type `npm run stop` to stop the local canister execution.
+## How to install and execute the app
 
-## Deployment
-TBD
+1. Clone this repository: `git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap`
+2. Install the dependencies. (inside folder root)`npm install`
 
-### Keys management
-TBD
+## Scripts:
 
-...
+### Start Next development server:
+
+- `npm run frontdev`
+
+the app will be available at `localhost:3000`
+
+### Build Next frontend:
+
+- `npm run frontbuild`
+
+### Deploy and start/stop/restart the app localy:
+
+- `npm run start`
+- `npm run stop`
+- `npm run restart`
+
+the app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
+⚠️ ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
 
 ## TODO
+
 - [x] Scaffold project for selected development frameworks
-- [ ] Initialize basic CI/CD (lint, test build, etc)
+- [x] Initialize basic CI/CD (lint, test build, etc)
 - [ ] Write CONTRIBUTING guide
 - [ ] Setup keys management
 - [ ] Update this README
