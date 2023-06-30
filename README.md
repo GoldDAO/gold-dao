@@ -14,19 +14,31 @@
 
 ### Start Next development server:
 
-- `npm run frontdev`
+```sh
+npm run frontdev
+```
 
 the app will be available at `localhost:3000`
 
 ### Build Next frontend:
 
-- `npm run frontbuild`
+```sh
+npm run frontbuild
+```
 
 ### Deploy and start/stop/restart the app localy:
 
-- `npm run start`
-- `npm run stop`
-- `npm run restart`
+```sh
+npm run start
+```
+
+```sh
+npm run stop
+```
+
+```sh
+npm run restart
+```
 
 the app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
 ⚠️ ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
