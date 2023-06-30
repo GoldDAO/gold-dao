@@ -7,6 +7,7 @@ import { PageContent } from "./_app";
 import Partners from "../lib/components/UI/partners";
 import Chart from "../lib/components/UI/Chart";
 import dynamic from 'next/dynamic'
+import { useEffect } from "react";
 
 function Home({ content, meta, partners, cto, marketcap }) {
 

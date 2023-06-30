@@ -2,10 +2,44 @@
     "internet_identity": {
         "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
-    "gldt-frontend-staging": {
+    "gldt_frontend_staging": {
         "ic": "ebrqv-vaaaa-aaaal-qb6zq-cai"
     },
-    "gldt-frontend-production": {
+    "gldt_frontend_production": {
         "ic": "maz3v-6aaaa-aaaak-qcgpq-cai"
+    },
+    "gldnft_backend_staging": {
+        "1g": {
+            "ic": "obapm-2iaaa-aaaak-qcgca-cai"
+        },
+        "10g": {
+            "ic": "xyo2o-gyaaa-aaaal-qb55a-cai"
+        },
+        "100g": {
+            "ic": ""
+        },
+        "1000g": {
+            "ic": ""
+        }
+    },
+    "gldnft_backend_production": {
+        "1g": {
+            "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+        },
+        "10g": {
+            "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+        },
+        "100g": {
+            "ic": "rzhfjc-liaaa-aaaal-acgja-cai"
+        },
+        "1000g": {
+            "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+        }
+    },
+    "icp_ledger": {
+        "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },
+    "yumi_kyc": {
+        "ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
     }
 }
