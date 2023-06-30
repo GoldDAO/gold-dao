@@ -4,3 +4,8 @@ out/
 .dfx/
 .next/
 .DS_Store
+**/node_modules
+**/.dfx
+**/.npm
+**/out
+**/.next

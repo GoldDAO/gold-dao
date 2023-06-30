@@ -16,14 +16,9 @@
 		"gldt-frontend-staging": {
 			"type": "assets",
 			"source": [
-				"out"
-			]
-		},
-		"gldt-frontend-production": {
-			"type": "assets",
-			"source": [
-				"out"
-			]
+				"client/out"
+			],
+			"frontend": {}
 		}
 	}
 }
