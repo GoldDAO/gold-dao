@@ -9,6 +9,7 @@ import { setGetUserAtom } from '../../../states/user';
 import dynamic from 'next/dynamic';
 import { appStatusAtom } from '../../../states/appStatus';
 import { Typography } from '@mui/material';
+import Ruban from './Ruban';
 
 const C2icButton = dynamic(() => import('./../../c2ic/C2icButton'), {
     ssr: false,
@@ -21,8 +22,11 @@ const Wallet = dynamic(() => import('./../wallet/Wallet'), {
 const Header = () => {
     const [user,] = useAtom(setGetUserAtom)
     const [status,] = useAtom(appStatusAtom)
+
+
     return (
         <HeaderContainer as="header" >
+            <Ruban />
             <Nav as="nav" sx={{ display: 'flex', justifyContent: 'space-between', }}>
                 <Link href="/" >
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />

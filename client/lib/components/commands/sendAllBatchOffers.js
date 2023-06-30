@@ -5,7 +5,8 @@ import { cartAtom } from '../../states/cart';
 import { Principal } from '@dfinity/principal';
 import { useCanister, useWallet } from '@connect2ic/react';
 import MainButton from '../UI/button/Buttons';
-import { GLDT_CANISTER_ID, ICP_LEDGER_CANISTER_ID, YUMI_KYC_CANISTER_ID } from '../../../src/constant';
+
+
 
 
 export const SendBatchOffersButton = () => {
@@ -23,6 +24,10 @@ export const SendBatchOffersButton = () => {
     const goldNft10gCart = []
     const goldNft100gCart = []
     const goldNft1000gCart = []
+
+    const YUMI_KYC_CANISTER_ID = process.env.YUMI_KYC_CANISTER_ID
+    const ICP_LEDGER_CANISTER_ID = process.env.ICP_LEDGER_CANISTER_ID
+
 
     const payload = (e) => {
         return (
