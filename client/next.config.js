@@ -27,7 +27,7 @@ const nextConfig = {
 		GLDNFT_CANISTER_IDS,
 		YUMI_KYC_CANISTER_ID: CanisterIds.yumi_kyc.ic,
 		ICP_LEDGER_CANISTER_ID: CanisterIds.icp_ledger.ic,
-		NETWORK: env.parsed.NEXT_PUBLIC_DFX_NETWORK
+		NETWORK: env.parsed.DFX_NETWORK
 	},
 	images: { unoptimized: true },
 };

@@ -10,8 +10,9 @@ const Ruban = () => {
             <Box
                 sx={{
                     position: 'fixed',
+                    paddingTop: "3px",
                     width: '100vw',
-                    height: '50px',
+                    height: '60px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
