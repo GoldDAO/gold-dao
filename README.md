@@ -7,15 +7,32 @@
 
 ## How to install and execute the app
 
-1. Clone this repository: `git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap`
-2. Install the dependencies. (inside folder root)`npm install`
+1. Clone this repository:
+
+```sh
+git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+```
+
+2. Install the dependencies.
+
+```sh
+npm install
+```
+
+3. Create .env file at the root of the project, and paste
+
+```sh
+DFX_NETWORK = 'local'
+```
 
 ## Scripts:
 
 ### Start Next development server:
 
+launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/)
+
 ```sh
-npm run frontdev
+npm run front:dev
 ```
 
 the app will be available at `localhost:3000`
@@ -23,10 +40,12 @@ the app will be available at `localhost:3000`
 ### Build Next frontend:
 
 ```sh
-npm run frontbuild
+npm run build:front
 ```
 
 ### Deploy and start/stop/restart the app localy:
+
+Deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
 
 ```sh
 npm run start
@@ -40,9 +59,9 @@ npm run stop
 npm run restart
 ```
 
-- the app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
+The app will be available at `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/`
 
-- ⚠️ ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
+#### ⚠️ Ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
 
 ## TODO
 

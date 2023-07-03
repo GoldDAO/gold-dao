@@ -1,9 +1,8 @@
-import { NFT_10_CANISTER_ID } from "../../../../constant.js";
 import { Actor } from "@dfinity/agent";
 import { idlFactory } from "../Gold_NFT.did.js";
 export { idlFactory };
 
-export const canisterId = NFT_10_CANISTER_ID
+export const canisterId = process.env.GLDNFT_CANISTER_IDS['10g'].ic
 
 export const createActor = (canisterId, agent) => {
     return Actor.createActor(idlFactory, {
