@@ -7,14 +7,17 @@
 
 ## How to install and execute the app
 
-1. Clone this repository: ```sh
-   git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+1. Clone this repository:
 
-````
+```sh
+   git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+```
+
 2. Install the dependencies.
+
 ```sh
 npm install
-````
+```
 
 3. Create .env file at the root of the project, create a variable called `DFX_NETWORK` with 'local' as value.
 
@@ -52,9 +55,8 @@ npm run stop
 npm run restart
 ```
 
-- the app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
-
-- ⚠️ ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
+The app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
+⚠️ Ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
 
 ## TODO
 
