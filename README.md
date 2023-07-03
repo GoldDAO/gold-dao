@@ -19,7 +19,11 @@ git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
 npm install
 ```
 
-3. Create .env file at the root of the project, create a variable called `DFX_NETWORK` with 'local' as value.
+3. Create .env file at the root of the project, and paste
+
+```sh
+DFX_NETWORK = 'local'
+```
 
 ## Scripts:
 
