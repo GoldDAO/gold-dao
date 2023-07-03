@@ -10,7 +10,7 @@
 1. Clone this repository:
 
 ```sh
-   git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
 ```
 
 2. Install the dependencies.
@@ -56,7 +56,8 @@ npm run restart
 ```
 
 The app will be available at `http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/`
-⚠️ Ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
+
+#### ⚠️ Ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
 
 ## TODO
 
