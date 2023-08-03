@@ -10,10 +10,6 @@
   "author": "Yumi Fundation",
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
-  "engines": {
-    "node": "^18.16.0",
-    "npm": "^9.5.0"
-  },
   "scripts": {
     "develop": "next dev",
     "build": "next build",
