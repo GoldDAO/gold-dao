@@ -18,7 +18,7 @@
         "restart": "cd client npm run stop; npm start && cd ..",
         "front:lint": "cd client next lint && cd ..",
         "test": "echo \"No tests yet! Please write some unit tests!\"",
-        "postinstall": "cd ./client && npm install && cd ../canister && npm install && cd .."
+        "postinstall": "cd ./client && npm install && cd .."
     },
     "devDependencies": {
         "eslint": "8.40.0"
