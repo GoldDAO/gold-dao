@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "canisters": {
+    "gldt": {
+      "package": "gldt",
+      "candid": "src/gldt.did",
+      "type": "rust"
+    },
+    "ledger": {
+      "type": "custom",
+      "candid": "ledger.did",
+      "wasm": "ledger.wasm"
+    }
+  },
+  "defaults": {
+    "replica": {
+      "subnet_type": "system"
+    }
+  }
+}
