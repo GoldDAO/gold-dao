@@ -18,7 +18,8 @@
     "develop": "next dev",
     "build": "next build",
     "build:front": "npm run build",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "echo 'Frontend project has been installed'"
   },
   "browserslist": {
     "production": [
