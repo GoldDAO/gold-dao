@@ -10,15 +10,12 @@
   "author": "Yumi Fundation",
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
-  "engines": {
-    "node": "^18.16.0",
-    "npm": "^9.5.0"
-  },
   "scripts": {
     "develop": "next dev",
     "build": "next build",
     "build:front": "npm run build",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "echo 'Frontend project has been installed'"
   },
   "browserslist": {
     "production": [

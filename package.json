@@ -12,15 +12,20 @@
         "build": "npm run build:front && npm run build:back",
         "build:front": "cd ./client/ && npm run build && cd ..",
         "build:back": "cd ./canister/ && echo \"This command need to be replaced\" && cd .. ",
+        "lint": "npm run lint:front",
+        "lint:front": "cd client && npm run lint && cd ..",
         "deploy": "echo \"This command may be replaced by the 'version' script in the future.\" && dfx identity use yumi-fundation && npm run lint && npm run build && dfx deploy --network=ic",
         "start": "dfx stop && dfx start --background --clean && dfx deploy",
         "stop": "dfx stop",
-        "restart": "cd client npm run stop; npm start && cd ..",
-        "front:lint": "cd client next lint && cd ..",
+        "restart": "cd client && npm run stop; npm start && cd ..",
         "test": "echo \"No tests yet! Please write some unit tests!\"",
-        "postinstall": "cd ./client && npm install && cd ../canister && npm install && cd .."
+        "postinstall": "cd ./client && npm install && cd .."
     },
     "devDependencies": {
         "eslint": "8.40.0"
+    },
+    "engines": {
+        "node": "^18.16.0",
+        "npm": "^9.5.0"
     }
 }
