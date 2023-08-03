@@ -14,7 +14,7 @@ default:
       - unknown_failure
 
 cache:
-  - key: "dfx-$CI_COMMIT_BRANCH"
+  - key: "dfx-$CI_COMMIT_REF_SLUG"
     paths:
       - .dfx
 
@@ -30,7 +30,7 @@ stages:
 .node template: &node_template
   image: node:18.16-alpine
   cache:
-  - key: "node-$CI_COMMIT_BRANCH"
+  - key: "node-$CI_COMMIT_REF_SLUG"
     paths:
       - .npm/
       - node_modules/
