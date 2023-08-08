@@ -62,6 +62,13 @@ nextjs test build:
   script:
     - npm run build:front
 
+.canister test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - npm run build:back
+
 ################################################################################
 # Builds
 ################################################################################
