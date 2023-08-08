@@ -60,7 +60,7 @@ nextjs test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *node_template
   script:
-    - npm run realbuild
+    - npm run build:front
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-TEST_BUILD"
     paths:
