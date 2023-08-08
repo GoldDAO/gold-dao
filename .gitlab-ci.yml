@@ -61,11 +61,6 @@ nextjs test build:
   <<: *node_template
   script:
     - npm run build:front
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-TEST_BUILD"
-    paths:
-      - out/
-    expire_in: 4 hours
 
 ################################################################################
 # Builds
