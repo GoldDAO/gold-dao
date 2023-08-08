@@ -12,9 +12,7 @@
   "private": true,
   "scripts": {
     "develop": "next dev",
-    "build": "echo \"Please use the 'realbuild' script (this is to avoid dfx to be able to call for a unwanted build by itself)\"",
-    "build:front": "next build",
-    "realbuild": "npm run build:front",
+    "build": "next build",
     "lint": "next lint",
     "postinstall": "echo 'Frontend project has been installed'"
   },
