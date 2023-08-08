@@ -34,7 +34,9 @@ stages:
     paths:
       - .npm/
       - node_modules/
-      - .next/
+      - client/.next/
+      - client/.npm/
+      - client/node_modules/
   before_script:
     - apk update -q && apk add -q jq
     - npm ci --cache .npm --prefer-offline
