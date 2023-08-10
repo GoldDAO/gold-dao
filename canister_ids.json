@@ -3,45 +3,32 @@
         "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
     "gldt_frontend": {
-        "local": "ebrqv-vaaaa-aaaal-qb6zq-cai",
         "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai",
         "ic": "maz3v-6aaaa-aaaak-qcgpq-cai"
     },
     "gldt_ledger": {
-        "local": "6uad6-fqaaa-aaaam-abovq-cai",
-        "staging": "6uad6-fqaaa-aaaam-abovq-cai"
+        "staging": "6uad6-fqaaa-aaaam-abovq-cai",
+        "ic": ""
     },
     "gldt_core": {
-        "local": "m45be-jaaaa-aaaak-qcgnq-cai",
-        "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
+        "staging": "m45be-jaaaa-aaaak-qcgnq-cai",
+        "ic": ""
     },
-    "gldnft_backend_staging": {
-        "1g": {
-            "ic": "obapm-2iaaa-aaaak-qcgca-cai"
-        },
-        "10g": {
-            "ic": "xyo2o-gyaaa-aaaal-qb55a-cai"
-        },
-        "100g": {
-            "ic": "xyo2o-gyaaa-aaaal-qb55a-cai"
-        },
-        "1000g": {
-            "ic": "xyo2o-gyaaa-aaaal-qb55a-cai"
-        }
+    "gldnft_backend_1g": {
+        "staging": "obapm-2iaaa-aaaak-qcgca-cai",
+        "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
     },
-    "gldnft_backend_production": {
-        "1g": {
-            "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
-        },
-        "10g": {
-            "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
-        },
-        "100g": {
-            "ic": "rzhfjc-liaaa-aaaal-acgja-cai"
-        },
-        "1000g": {
-            "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
-        }
+    "gldnft_backend_10g": {
+        "staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
+        "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+    },
+    "gldnft_backend_100g": {
+        "staging": "",
+        "ic": "zhfjc-liaaa-aaaal-acgja-cai"
+    },
+    "gldnft_backend_1000g": {
+        "staging": "",
+        "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
     },
     "icp_ledger": {
         "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
