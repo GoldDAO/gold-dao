@@ -4,7 +4,7 @@ const env = require('dotenv').config({
 });
 const CanisterIds = require('./../canister_ids.json');
 
-const canisterKey = process.env.DFX_NETWORK === 'production' ? 'ic' : 'staging';
+const canisterKey = process.env.DFX_NETWORK || 'staging'; // takes "staging" for develop and staging environment and "ic" for production environment
 const GLDNFT_CANISTER_IDS = {
   '1g': CanisterIds.gldnft_backend_1g[canisterKey],
   '10g': CanisterIds.gldnft_backend_10g[canisterKey],
@@ -23,7 +23,7 @@ const nextConfig = {
     GLDNFT_CANISTER_IDS,
     YUMI_KYC_CANISTER_ID: CanisterIds.yumi_kyc.ic,
     ICP_LEDGER_CANISTER_ID: CanisterIds.icp_ledger.ic,
-    NETWORK: process.env.DFX_NETWORK ? process.env.DFX_NETWORK : 'staging',
+    DFX_NETWORK: process.env.DFX_NETWORK,
   },
   images: { unoptimized: true },
 };
