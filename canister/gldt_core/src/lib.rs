@@ -540,7 +540,7 @@ dfx build gldt
 dfx canister install gldt --argument '(opt record {gldt_ledger_canister_id=principal "'$(dfx canister id ledger)'"; gldt_nft_canister_ids=vec{record { principal "'$(dfx identity get-principal)'"; record { grams=10}}}})' --mode=reinstall
 
 // Copy ledger.wasm to the right place first...
-dfx deploy ledger --argument '(record{minting_account="'$(dfx ledger account-id --of-canister gldt)'"; send_whitelist=vec{}; initial_values=vec{}})' --mode=reinstall 
+dfx deploy ledger --argument '(record{minting_account="'$(dfx ledger account-id --of-canister gldt)'"; send_whitelist=vec{}; initial_values=vec{}})' --mode=reinstall
 
 // Try it out
 dfx canister call gldt request_offer '(record {nft_id = "test2"; requested_memo=(2:nat64); to_subaccount = blob "abcdefghijklmnopqrstuvxyz1234567"})'

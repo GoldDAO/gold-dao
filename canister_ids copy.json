@@ -3,16 +3,13 @@
         "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
     "gldt_frontend": {
-        "local": "ebrqv-vaaaa-aaaal-qb6zq-cai",
         "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai",
         "ic": "maz3v-6aaaa-aaaak-qcgpq-cai"
     },
     "gldt_ledger": {
-        "local": "6uad6-fqaaa-aaaam-abovq-cai",
         "staging": "6uad6-fqaaa-aaaam-abovq-cai"
     },
     "gldt_core": {
-        "local": "m45be-jaaaa-aaaak-qcgnq-cai",
         "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
     },
     "gldnft_backend_staging": {

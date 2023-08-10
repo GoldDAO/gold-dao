@@ -8,13 +8,13 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [build-dependencies]
-candid = "0.7.4"
+candid = { version = "0.9.3", features = ["parser"] }
 
 [dependencies]
-candid = "0.7.4"
-ic-cdk = "0.3.3"
-ic-cdk-macros = "0.3.3"
-ic-ledger-types = "0.1.0"
+candid = { version = "0.9.3", features = ["parser"] }
+ic-cdk = "0.10.0"
+ic-cdk-macros = "0.7.1"
+ic-ledger-types = "0.7.0"
 serde = "1.0.126"
 serde_derive = "1.0.126"
 

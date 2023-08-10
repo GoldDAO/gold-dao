@@ -13,12 +13,31 @@
 				}
 			}
 		},
-		"gldt-frontend-staging": {
+		"gldt_frontend": {
 			"type": "assets",
 			"source": [
 				"client/out"
 			],
 			"frontend": {}
+		},
+		"gldt_core": {
+			"type": "rust",
+			"candid": "canister/gldt_core/src/gldt.did",
+			"declarations": {
+				"output": "canister/declarations/"
+			},
+			"package": "gldt"
+		},
+		"gldt_ledger": {
+			"type": "custom",
+			"candid": "canister/gldt_ledger/ledger.did",
+			"wasm": "canister/gldt_ledger/ledger.wasm"
 		}
+},
+"networks": {
+	"staging": {
+		"providers": ["https://icp0.io"],
+		"type": "persistent"
 	}
+}
 }

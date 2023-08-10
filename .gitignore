@@ -10,3 +10,5 @@ out/
 **/out
 **/.next
 .env
+canister/gldt_core/target
+target
