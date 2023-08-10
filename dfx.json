@@ -18,6 +18,10 @@
 			"source": [
 				"client/out"
 			],
+			"build": [
+				"npm run postinstall",
+				"npm run build:front"
+			],
 			"frontend": {}
 		},
 		"gldt_core": {
