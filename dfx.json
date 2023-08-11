@@ -36,12 +36,66 @@
 			"type": "custom",
 			"candid": "canister/gldt_ledger/ledger.did",
 			"wasm": "canister/gldt_ledger/ledger.wasm"
+		},
+		"gldnft_backend_1g": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "obapm-2iaaa-aaaak-qcgca-cai",
+        	"ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+				}
+			}
+		},
+		"gldnft_backend_10g": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
+					"ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+				}
+			}
+		},
+		"gldnft_backend_100g": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "zhfjc-liaaa-aaaal-acgja-cai"
+				}
+			}
+		},
+		"gldnft_backend_1000g": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+				}
+			}
+		},
+		"icp_ledger": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+				}
+			}
+		},
+		"yumi_kyc": {
+			"type": "custom",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
+				}
+			}
 		}
-},
-"networks": {
-	"staging": {
-		"providers": ["https://icp0.io"],
-		"type": "persistent"
+	},
+	"networks": {
+		"staging": {
+			"providers": ["https://icp0.io"],
+			"type": "persistent"
+		}
 	}
-}
 }
