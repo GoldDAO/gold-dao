@@ -27,6 +27,8 @@
 		},
 		"gldnft_backend_1g": {
 			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
 			"remote": {
 				"id": {
 					"staging": "obapm-2iaaa-aaaak-qcgca-cai",
@@ -36,6 +38,8 @@
 		},
 		"gldnft_backend_10g": {
 			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
 			"remote": {
 				"id": {
 					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
@@ -45,6 +49,8 @@
 		},
 		"gldnft_backend_100g": {
 			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
 			"remote": {
 				"id": {
 					"staging": "",
@@ -54,6 +60,8 @@
 		},
 		"gldnft_backend_1000g": {
 			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
 			"remote": {
 				"id": {
 					"staging": "",
