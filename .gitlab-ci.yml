@@ -104,7 +104,7 @@ next staging build:
     - STAGING_URL=https://$(jq -r '."gldt-frontend-staging".ic' canister_ids.json).icp0.io
     - echo "STAGING_ENVIRONMENT_URL=$STAGING_URL" > deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-STAGING_BUILD-${CI_COMMIT_SHORT_SHA}"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_STAGING_BUILD"
     paths:
       - out/
     reports:
@@ -124,7 +124,7 @@ next production build:
     - PRODUCTION_URL=https://$(jq -r '."gldt-frontend-production".ic' canister_ids.json).icp0.io
     - echo "PRODUCTION_ENVIRONMENT_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend"
     paths:
       - out/
     reports:
@@ -133,6 +133,18 @@ next production build:
   environment:
     name: production
     action: prepare
+
+canister build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+  <<: *rust_template
+  script: 
+    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
+    paths:
+      - canister/declarations/
 
 ################################################################################
 # Deployments
@@ -158,11 +170,12 @@ staging:
     - if: $CI_COMMIT_REF_NAME == "develop"
   dependencies:
     - next staging build
+    - canister build
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
   script:
-    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet -y gldt-frontend-staging
+    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet -y
   after_script:
     - echo "Staging environment will be accessible on ${STAGING_ENVIRONMENT_URL}"
   environment:
@@ -176,6 +189,7 @@ production:
     - if: $CI_COMMIT_REF_NAME == "master"
   dependencies:
     - next production build
+    - canister build
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
