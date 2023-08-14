@@ -1,18 +1,6 @@
 {
 	"__0": "GLDT.org static website with swap canister",
 	"canisters": {
-		"internet_identity": {
-			"__0": "The development build of Internet Identity. For more information, see https://github.com/dfinity/internet-identity#build-features-and-flavors",
-			"type": "custom",
-			"candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-			"wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
-			"__1": "Internet Identity canister to use in production (on the IC):",
-			"remote": {
-				"id": {
-					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-				}
-			}
-		},
 		"gldt_frontend": {
 			"type": "assets",
 			"source": [
@@ -70,24 +58,6 @@
 				"id": {
 					"staging": "",
 					"ic": "7i7jl-6qaaa-aaaam-abjma-cai"
-				}
-			}
-		},
-		"icp_ledger": {
-			"type": "custom",
-			"remote": {
-				"id": {
-					"staging": "",
-					"ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-				}
-			}
-		},
-		"yumi_kyc": {
-			"type": "custom",
-			"remote": {
-				"id": {
-					"staging": "",
-					"ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
 				}
 			}
 		}
