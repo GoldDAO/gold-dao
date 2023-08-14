@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.14.2@sha256:2f6ea99b4186b7f0df81ccc7d7020025b53dfaca4e23ffb6f158c1eeb955e384
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.14.3@sha256:ae4a62ea83e1eaaebab3e5186b2a3b67ba8d45951719b6acdda5fa7bcd13376e
   tags:
     - docker
   before_script:
