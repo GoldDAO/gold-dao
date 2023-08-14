@@ -41,6 +41,15 @@ stages:
     - apk update -q && apk add -q jq
     - npm ci --cache .npm --prefer-offline
 
+.rust template: &rust_template
+  image: rust:1-alpine
+  cache:
+  - key: "rust-$CI_COMMIT_REF_SLUG"
+    paths:
+      - canister/gldt_core/target
+  before_script:
+    - rustup target add wasm32-unknown-unknown
+
 ################################################################################
 # Linters
 ################################################################################
@@ -52,6 +61,15 @@ next linter:
   <<: *node_template
   script:
     - npm run lint
+
+rust lint:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  script:
+    - cargo check
 
 ################################################################################
 # Tests
