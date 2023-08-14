@@ -90,6 +90,11 @@ canister test build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
+    paths:
+      - canister/declarations/
+    expire_in: 1 day
 
 ################################################################################
 # Builds
@@ -145,6 +150,7 @@ canister build:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
       - canister/declarations/
+    expire_in: 6 months
 
 ################################################################################
 # Deployments
@@ -155,7 +161,7 @@ local:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   dependencies:
     - nextjs test build
-    - canister build
+    - canister test build
   before_script:
     - dfx --version
     - dfx start --background
