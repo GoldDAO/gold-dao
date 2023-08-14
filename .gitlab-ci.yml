@@ -155,11 +155,12 @@ local:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   dependencies:
     - nextjs test build
+    - canister build
   before_script:
     - dfx --version
     - dfx start --background
   script:
-    - dfx deploy -y --no-wallet gldt-frontend-staging
+    - dfx deploy -y --no-wallet
   after_script:
     - cat canisters_ids.json
     - dfx stop
