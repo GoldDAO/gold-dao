@@ -1,24 +1,80 @@
 {
 	"__0": "GLDT.org static website with swap canister",
 	"canisters": {
-		"internet_identity": {
-			"__0": "The development build of Internet Identity. For more information, see https://github.com/dfinity/internet-identity#build-features-and-flavors",
-			"type": "custom",
-			"candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-			"wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
-			"__1": "Internet Identity canister to use in production (on the IC):",
-			"remote": {
-				"id": {
-					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-				}
-			}
-		},
-		"gldt-frontend-staging": {
+		"gldt_frontend": {
 			"type": "assets",
 			"source": [
 				"client/out"
 			],
+			"build": [
+				"npm run postinstall",
+				"npm run build:front"
+			],
 			"frontend": {}
+		},
+		"gldt_core": {
+			"type": "rust",
+			"candid": "canister/gldt_core/src/gldt.did",
+			"declarations": {
+				"output": "canister/declarations/"
+			},
+			"package": "gldt",
+			"optimize": "cycles"
+		},
+		"gldt_ledger": {
+			"type": "custom",
+			"candid": "canister/gldt_ledger/ledger.did",
+			"wasm": "canister/gldt_ledger/ledger.wasm"
+		},
+		"gldnft_backend_1g": {
+			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
+			"remote": {
+				"id": {
+					"staging": "obapm-2iaaa-aaaak-qcgca-cai",
+        	"ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+				}
+			}
+		},
+		"gldnft_backend_10g": {
+			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
+			"remote": {
+				"id": {
+					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
+					"ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+				}
+			}
+		},
+		"gldnft_backend_100g": {
+			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "zhfjc-liaaa-aaaal-acgja-cai"
+				}
+			}
+		},
+		"gldnft_backend_1000g": {
+			"type": "custom",
+			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"wasm": "",
+			"remote": {
+				"id": {
+					"staging": "",
+					"ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+				}
+			}
+		}
+	},
+	"networks": {
+		"staging": {
+			"providers": ["https://icp0.io"],
+			"type": "persistent"
 		}
 	}
 }
