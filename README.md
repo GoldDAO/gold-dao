@@ -1,43 +1,72 @@
-# GLDT swap
-This repository contains the source code for the GLDT page frontend, including swap interface, and the swap canister.  
-As the front-end will be hosted on the Internet Computer, this projects uses [NextJS](https://nextjs.org/docs) and bundles a full static website with [client-side fetching](https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side).
+# GLDT SWAP MONOREPO
 
-> :bulb: This project uses the [`pages` routing](https://nextjs.org/docs/getting-started/project-structure#pages-routing-conventions), and not the [`app` routing that just went out of beta](https://nextjs.org/blog/next-13-4#nextjs-app-router).
+## Project Structure:
 
-## Development
-### Dfinity SDK
-To be able to work on canisters development, or to test in a local canister execution environment, you may need to install the [Dfinity SDK](https://github.com/dfinity/sdk), and especially the [`dfx`](https://internetcomputer.org/docs/current/references/cli-reference/) CLI.
+- `Client`: Contain the Next.js application
+- `Canister`: Contain the source code of the GLDT Canister
 
-### Dependencies and local scripts
-First install the dependencies with
+## How to install and execute the app
+
+1. Clone this repository:
+
+```sh
+git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+```
+
+2. Install the dependencies.
+
 ```sh
 npm install
 ```
-Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
+
+3. Create .env file at the root of the project, and paste
+
 ```sh
-npm run frontdev
+DFX_NETWORK = 'local'
 ```
-or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
+
+## Scripts:
+
+### Start Next development server:
+
+launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/)
+
 ```sh
-npm start
+npm run front:dev
 ```
-And if you want to see some changes in the code, run
+
+the app will be available at `localhost:3000`
+
+### Build Next frontend:
+
+```sh
+npm run build:front
+```
+
+### Deploy and start/stop/restart the app localy:
+
+Deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
+
+```sh
+npm run start
+```
+
+```sh
+npm run stop
+```
+
 ```sh
 npm run restart
 ```
-Once you finished your work, simply type `npm run stop` to stop the local canister execution.
 
-## Deployment
-TBD
+The app will be available at `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/`
 
-### Keys management
-TBD
-
-...
+#### ⚠️ Ressources (front, images...) will returns error 400 if access from `http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai`
 
 ## TODO
+
 - [x] Scaffold project for selected development frameworks
-- [ ] Initialize basic CI/CD (lint, test build, etc)
+- [x] Initialize basic CI/CD (lint, test build, etc)
 - [ ] Write CONTRIBUTING guide
 - [ ] Setup keys management
 - [ ] Update this README

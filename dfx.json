@@ -13,10 +13,10 @@
 				}
 			}
 		},
-		"www": {
+		"gldt-frontend-staging": {
 			"type": "assets",
 			"source": [
-				"out"
+				"client/out"
 			],
 			"frontend": {}
 		}
