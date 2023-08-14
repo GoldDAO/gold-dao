@@ -83,12 +83,13 @@ nextjs test build:
   script:
     - npm run build:front
 
-.canister test build:
+canister test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
   script:
-    - npm run build:back
+    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
 
 ################################################################################
 # Builds
