@@ -21,8 +21,8 @@ const nextConfig = {
   },
   env: {
     GLDNFT_CANISTER_IDS,
-    YUMI_KYC_CANISTER_ID: ExternalCanisterIds.canisters.yumi_kyc.remote.id.ic,
-    ICP_LEDGER_CANISTER_ID: ExternalCanisterIds.canisters.icp_ledger.remote.id.ic,
+    YUMI_KYC_CANISTER_ID: "ucs6g-wiaaa-aaaah-abwpa-cai",
+    ICP_LEDGER_CANISTER_ID: "ryjl3-tyaaa-aaaaa-aaaba-cai",
     DFX_NETWORK: process.env.DFX_NETWORK,
   },
   images: { unoptimized: true },
