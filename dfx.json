@@ -18,7 +18,8 @@
 			"declarations": {
 				"output": "canister/declarations/"
 			},
-			"package": "gldt"
+			"package": "gldt",
+			"optimize": "cycles"
 		},
 		"gldt_ledger": {
 			"type": "custom",
