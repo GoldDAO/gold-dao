@@ -26,7 +26,7 @@ function Home({ content, meta, partners, cto, marketcap }) {
                 <Marketcap data={marketcap.data} />
                 <PageContent dangerouslySetInnerHTML={{ __html: content }} />
                 <Swap data={cto.data} />
-                <Chart />
+                {/* <Chart /> */}
                 <Partners partners={partners} />
             </Layout>
         </>

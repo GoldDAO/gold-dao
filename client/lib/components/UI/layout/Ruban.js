@@ -19,7 +19,7 @@ const Ruban = () => {
                     backgroundColor: '#fff85b',
                     top: 0,
                     left: 0,
-                    zIndex: 20;
+                    zIndex: 20,
                 }}
             >
                 <Typography>
