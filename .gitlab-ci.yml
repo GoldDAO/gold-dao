@@ -48,6 +48,7 @@ stages:
     paths:
       - canister/gldt_core/target
   before_script:
+    - apk update -q && apk add --no-cache musl-dev
     - rustup target add wasm32-unknown-unknown
 
 ################################################################################
