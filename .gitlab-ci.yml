@@ -84,6 +84,9 @@ nextjs test build:
     - npm run build:front
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_TEST_BUILD"
+    paths:
+      - client/out
+    expire_in: 1 day
 
 canister test build:
   stage: test
