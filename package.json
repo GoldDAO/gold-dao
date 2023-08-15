@@ -12,7 +12,7 @@
         "build": "echo \"Please use the 'realbuild' script (this is to avoid dfx to be able to call for a unwanted build by itself)\"",
         "realbuild": "npm run build:front && npm run build:back",
         "build:front": "cd ./client/ && npm run build && cd ..",
-        "build:back": "cd ./canister/ && echo \"This command need to be replaced\" && cd .. ",
+        "build:back": "cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt",
         "lint": "npm run lint:front",
         "lint:front": "cd client && npm run lint && cd ..",
         "deploy": "echo \"This command may be replaced by the 'version' script in the future.\" && dfx identity use yumi-fundation && npm run lint && npm run build && dfx deploy --network=ic",

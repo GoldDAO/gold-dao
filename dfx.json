@@ -13,13 +13,9 @@
 			"frontend": {}
 		},
 		"gldt_core": {
-			"type": "rust",
+			"type": "custom",
 			"candid": "canister/gldt_core/src/gldt.did",
-			"declarations": {
-				"output": "canister/declarations/"
-			},
-			"package": "gldt",
-			"optimize": "cycles"
+			"wasm": "canister/target/wasm32-unknown-unknown/release/gldt.wasm"
 		},
 		"gldt_ledger": {
 			"type": "custom",
