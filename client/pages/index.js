@@ -15,6 +15,10 @@ function Home({ content, meta, partners, cto, marketcap }) {
         ssr: false,
     });
 
+    const ManageNFTsSales = dynamic(() => import('./../lib/components/UI/table/ManageNFTsSales'), {
+        ssr: false,
+    });
+
     return (
         <>
             <Head>
@@ -27,6 +31,7 @@ function Home({ content, meta, partners, cto, marketcap }) {
                 <PageContent dangerouslySetInnerHTML={{ __html: content }} />
                 <Swap data={cto.data} />
                 {/* <Chart /> */}
+                <ManageNFTsSales />
                 <Partners partners={partners} />
             </Layout>
         </>

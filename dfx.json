@@ -28,18 +28,18 @@
 		},
 		"gldnft_backend_1g": {
 			"type": "custom",
-			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
 			"wasm": "",
 			"remote": {
 				"id": {
 					"staging": "obapm-2iaaa-aaaak-qcgca-cai",
-        	"ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+					"ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
 				}
 			}
 		},
 		"gldnft_backend_10g": {
 			"type": "custom",
-			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
 			"wasm": "",
 			"remote": {
 				"id": {
@@ -50,22 +50,22 @@
 		},
 		"gldnft_backend_100g": {
 			"type": "custom",
-			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
 			"wasm": "",
 			"remote": {
 				"id": {
-					"staging": "",
+					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
 					"ic": "zhfjc-liaaa-aaaal-acgja-cai"
 				}
 			}
 		},
 		"gldnft_backend_1000g": {
 			"type": "custom",
-			"candid":"client/src/agents/declarations/NFTs/Gold_NFT.did",
+			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
 			"wasm": "",
 			"remote": {
 				"id": {
-					"staging": "",
+					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
 					"ic": "7i7jl-6qaaa-aaaam-abjma-cai"
 				}
 			}
@@ -73,7 +73,9 @@
 	},
 	"networks": {
 		"staging": {
-			"providers": ["https://icp0.io"],
+			"providers": [
+				"https://icp0.io"
+			],
 			"type": "persistent"
 		}
 	}

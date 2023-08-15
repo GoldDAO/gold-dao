@@ -35,19 +35,18 @@ const Providers = ({ children }) => {
         },
     });
 
-
     if (!client) {
         return <></>;
     }
 
     return (
-        <Connect2ICProvider client={client}>
-            <SafeHydrate>
-                <JotaiProvider store={myStore}>
+        <JotaiProvider store={myStore}>
+            <Connect2ICProvider client={client}>
+                <SafeHydrate>
                     {children}
-                </JotaiProvider>
-            </SafeHydrate>
-        </Connect2ICProvider>
+                </SafeHydrate>
+            </Connect2ICProvider>
+        </JotaiProvider>
 
     );
 };
