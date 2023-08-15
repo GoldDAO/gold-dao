@@ -89,11 +89,11 @@ canister test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
-    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+    - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
-      - canister/declarations/
+      - canister/gldt_core/target
     expire_in: 1 day
 
 ################################################################################
