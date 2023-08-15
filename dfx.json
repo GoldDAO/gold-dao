@@ -15,7 +15,7 @@
 		"gldt_core": {
 			"type": "custom",
 			"candid": "canister/gldt_core/src/gldt.did",
-			"wasm": "canister/target/wasm32-unknown-unknown/release/gldt.wasm"
+			"wasm": "canister/gldt_core/target/wasm32-unknown-unknown/release/gldt.wasm"
 		},
 		"gldt_ledger": {
 			"type": "custom",
