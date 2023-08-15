@@ -82,6 +82,8 @@ nextjs test build:
   <<: *node_template
   script:
     - npm run build:front
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_TEST_BUILD"
 
 canister test build:
   stage: test
@@ -91,7 +93,7 @@ canister test build:
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
       - canister/gldt_core/target
     expire_in: 1 day
@@ -111,7 +113,7 @@ next staging build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_STAGING_BUILD"
     paths:
-      - out/
+      - client/out
     reports:
       dotenv: deploy.env
     expire_in: 1 day
@@ -131,7 +133,7 @@ next production build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend"
     paths:
-      - out/
+      - client/out
     reports:
       dotenv: deploy.env
     expire_in: 6 months
