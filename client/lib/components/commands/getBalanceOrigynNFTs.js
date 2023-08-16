@@ -69,6 +69,7 @@ const GetBalanceOrigynNFTs = () => {
       getOnSaleNfts(nft10[i].name)
         .then(result => {
           if (result.ok.current_sale.length > 0) {
+            console.log('result.ok.current_sale', result.ok.current_sale)
             updateOnsaleNft({ name: result.ok.current_sale[0].token_id, sale_id: result.ok.current_sale[0].sale_id, unit: 'g', weight: 10 })
           }
         })
