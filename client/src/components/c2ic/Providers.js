@@ -14,8 +14,6 @@ const myStore = createStore();
 
 const Providers = ({ children }) => {
   const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
-  whitelist.push(process.env.GLDT_CANISTER_ID)
-  console.log('whitelist', whitelist)
 
   let client = createClient({
     canisters: gldNftCanisters,
