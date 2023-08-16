@@ -11,4 +11,8 @@ export const navigation = [
     //     label: 'How it works',
     //     path: '/how-it-works',
     // }  
+    {
+        label: 'Manage my Nft',
+        path: '/manage',
+    }
 ]

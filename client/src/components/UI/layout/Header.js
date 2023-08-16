@@ -27,11 +27,11 @@ const Header = () => {
     return (
         <HeaderContainer as="header" >
             <Ruban />
-            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'space-between', }}>
+            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                 <Link href="/" >
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
-                <Box as="ul" sx={{ display: 'flex' }}>
+                <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
                         <Box key={i} as="li"><Link href={`${e.path}`}>{e.label}</Link></Box>
                     ))}
@@ -50,6 +50,7 @@ export default Header;
 
 const Nav = styled('nav')`
     display: flex;
+    margin-top: 50px;
     justify-content: space-between;
     ul{
         li{
@@ -66,5 +67,4 @@ const HeaderContainer = styled('header')`
     border-bottom: 1px solid #D3B872;
     justify-content: space-between;
     align-items: center;
-
 `

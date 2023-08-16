@@ -7,7 +7,6 @@ import { PageContent } from './_app';
 import Partners from '@/components/UI/partners';
 import Chart from '@/components/UI/Chart';
 import dynamic from 'next/dynamic';
-import { useEffect } from 'react';
 
 function Home({ content, meta, partners, cto, marketcap }) {
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
@@ -16,6 +15,7 @@ function Home({ content, meta, partners, cto, marketcap }) {
   const ManageNFTsSales = dynamic(() => import('@/components/UI/table/ManageNFTsSales'), {
     ssr: false,
   });
+
 
   return (
     <>
@@ -28,8 +28,7 @@ function Home({ content, meta, partners, cto, marketcap }) {
         <Marketcap data={marketcap.data} />
         <PageContent dangerouslySetInnerHTML={{ __html: content }} />
         <Swap data={cto.data} />
-        <ManageNFTsSales />
-        {/* <Chart /> */}
+        <Chart />
         <Partners partners={partners} />
       </Layout>
     </>

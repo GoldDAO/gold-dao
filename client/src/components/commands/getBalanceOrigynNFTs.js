@@ -48,34 +48,34 @@ const GetBalanceOrigynNFTs = () => {
     }
   }, [appStatus]);
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    async function getOnSaleNfts(token_id, g) {
-      const res = await Promise.all(weights.map(async (e, i) => {
-        if (g === parseInt(e.slice(0, -1))) {
-          return actors[i].nft_origyn(token_id);
-        }
-      }));
-      const tokenOnSale = res.filter(element => element !== undefined);
-      if (tokenOnSale[0].ok.current_sale.length > 0) {
-        return {
-          name: token_id,
-          weight: g,
-          sale_status: Object.keys(tokenOnSale[0].ok.current_sale[0].sale_type.auction.status[0])
-        }
-      }
-    }
+  //   async function getOnSaleNfts(token_id, g) {
+  //     const res = await Promise.all(weights.map(async (e, i) => {
+  //       if (g === parseInt(e.slice(0, -1))) {
+  //         return actors[i].nft_origyn(token_id);
+  //       }
+  //     }));
+  //     const tokenOnSale = res.filter(element => element !== undefined);
+  //     if (tokenOnSale[0].ok.current_sale.length > 0) {
+  //       return {
+  //         name: token_id,
+  //         weight: g,
+  //         sale_status: Object.keys(tokenOnSale[0].ok.current_sale[0].sale_type.auction.status[0])
+  //       }
+  //     }
+  //   }
 
-    async function fetchAndProcessOnSaleNFTs() {
-      const onSaleNFTs = [];
-      for (const item of gld) {
-        const tokenOnSale = await getOnSaleNfts(item.name, item.weight);
-        onSaleNFTs.push(tokenOnSale);
-      }
-      setOnSalesNfts(onSaleNFTs)
-    }
-    fetchAndProcessOnSaleNFTs();
-  }, [gld])
+  //   async function fetchAndProcessOnSaleNFTs() {
+  //     const onSaleNFTs = [];
+  //     for (const item of gld) {
+  //       const tokenOnSale = await getOnSaleNfts(item.name, item.weight);
+  //       onSaleNFTs.push(tokenOnSale);
+  //     }
+  //     setOnSalesNfts(onSaleNFTs)
+  //   }
+  //   fetchAndProcessOnSaleNFTs();
+  // }, [gld])
 
   return null;
 };
