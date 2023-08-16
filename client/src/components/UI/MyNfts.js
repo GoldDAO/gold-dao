@@ -26,9 +26,9 @@ const MyNfts = ({ data }) => {
           return {
             weight: nft.weight,
             name: nft.name,
-            status: res?.ok?.current_sale[0]?.sale_type.auction.status.open
-              ? res?.ok?.current_sale
-              : undefined,
+            on_sale:
+              res?.ok?.current_sale[0]?.sale_type.auction.status.open === null ? true : false,
+            status: res?.ok?.current_sale[0],
           };
         }),
       );
@@ -59,8 +59,8 @@ const MyNfts = ({ data }) => {
             // console.log(nft);
             return (
               <li key={nft.name}>
-                {nft.name}, {nft.weight}g, {nft.status ? 'On sale' : 'Not on sale'}
-                {nft.status && (
+                {nft.name}, {nft.weight}g, {nft.on_sale ? 'On sale' : 'Not on sale'}
+                {nft.on_sale && (
                   <button key={nft.name} id={nft.weight + '_' + nft.name} onClick={unlistHandler}>
                     Unlist
                   </button>
