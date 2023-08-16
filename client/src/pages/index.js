@@ -7,7 +7,7 @@ import { PageContent } from './_app';
 import Partners from '@/components/UI/partners';
 import Chart from '@/components/UI/Chart';
 import dynamic from 'next/dynamic';
-import { useEffect } from 'react';
+// import MyNfts from '@/components/UI/MyNfts';
 // import NFTsSaleInfos from '@/components/commands/saleInfoBatchNftOrigyn';
 
 function Home({ content, meta, partners, cto, marketcap }) {
@@ -15,6 +15,9 @@ function Home({ content, meta, partners, cto, marketcap }) {
     ssr: false,
   });
   const NFTsSaleInfos = dynamic(() => import('@/components/commands/saleInfoBatchNftOrigyn'), {
+    ssr: false,
+  });
+  const MyNfts = dynamic(() => import('@/components/UI/MyNfts'), {
     ssr: false,
   });
 
@@ -29,8 +32,9 @@ function Home({ content, meta, partners, cto, marketcap }) {
         <Marketcap data={marketcap.data} />
         <PageContent dangerouslySetInnerHTML={{ __html: content }} />
         <NFTsSaleInfos />
+        <MyNfts />
         <Swap data={cto.data} />
-        {/* <Chart /> */}
+        <Chart />
         <Partners partners={partners} />
       </Layout>
     </>
