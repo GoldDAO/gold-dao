@@ -47,10 +47,10 @@ export const SendBatchOffersButton = () => {
                 token: {
                   ic: {
                     standard: { Ledger: null },
-                    canister: Principal.fromText(ICP_LEDGER_CANISTER_ID),
+                    canister: Principal.fromText(process.env.GLDT_LEDGER_CANISTER_ID),
                     decimals: 8,
                     fee: [10000],
-                    symbol: 'ICP',
+                    symbol: 'GLDT',
                     id: [],
                   },
                 },
