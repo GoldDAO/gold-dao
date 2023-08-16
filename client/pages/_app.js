@@ -1,17 +1,16 @@
 import { Inter } from 'next/font/google';
-import './../src/css/global.css'
+import '@/css/global.css';
 import styled from 'styled-components';
-import { Box } from "@mui/system";
-import "@connect2ic/core/style.css"
+import { Box } from '@mui/system';
+import '@connect2ic/core/style.css';
 import dynamic from 'next/dynamic';
-import { SafeHydrate } from '../lib/utils/SafeHydrate';
+import { SafeHydrate } from '@/utils/SafeHydrate';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const Providers = dynamic(() => import("../lib/components/c2ic/Providers"), {
+const Providers = dynamic(() => import('@/components/c2ic/Providers'), {
   ssr: false,
 });
-
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -21,13 +20,13 @@ export default function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         </SafeHydrate>
       </Providers>
-    </div >
-  )
+    </div>
+  );
 }
 
 export const PageContent = styled(Box)`
   position: relative;
-  h1{
+  h1 {
     mix-blend-mode: difference;
     font-weight: 300;
     padding: 26px 0;
@@ -35,59 +34,57 @@ export const PageContent = styled(Box)`
     max-width: 1200px;
     line-height: 1.05em;
     font-size: 5.4em;
-    @media (max-width: 1140px){
+    @media (max-width: 1140px) {
       line-height: 1em;
       font-size: 4.4em;
       padding-top: 20px;
       padding-bottom: 14px;
     }
-    @media (max-width: 840px){
+    @media (max-width: 840px) {
       line-height: 1em;
       font-size: 3em;
     }
-    @media (max-width: 480px){
+    @media (max-width: 480px) {
       line-height: 1em;
       font-size: 2.3em;
     }
   }
-  h2{
+  h2 {
     font-weight: 300;
     font-size: 2em;
     padding: 26px 0;
     color: #333;
-    @media (max-width: 1140px){
+    @media (max-width: 1140px) {
       font-size: 1.8em;
     }
-    @media (max-width: 840px){
+    @media (max-width: 840px) {
       font-size: 1.4em;
       padding: 15px 0;
     }
-    @media (max-width: 480px){
+    @media (max-width: 480px) {
       font-size: 1.2em;
       padding: 10px 0;
     }
   }
-  p{
+  p {
     color: #333;
     font-weight: 300;
     line-height: 1.4em;
     padding: 26px 0;
-    max-width: 1200px
-    @media (max-width: 1140px){
+    max-width: 1200px;
+    @media (max-width: 1140px) {
     }
-    @media (max-width: 840px){
+    @media (max-width: 840px) {
       font-size: 1em;
       padding: 15px 0;
-
     }
-    @media (max-width: 480px){
-      font-size: .8em;
+    @media (max-width: 480px) {
+      font-size: 0.8em;
       padding: 10px 0;
-
     }
   }
 
-  // &:before{ 
+  // &:before{
   //   width: 600px;
   //   height: 600px;
   //   content: "";
@@ -100,5 +97,4 @@ export const PageContent = styled(Box)`
   //   opacity: .2;
   //   mix-blend-mode: difference;
   // }
-`
-
+`;
