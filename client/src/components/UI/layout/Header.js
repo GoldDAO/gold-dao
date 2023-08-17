@@ -22,8 +22,6 @@ const Wallet = dynamic(() => import('./../wallet/Wallet'), {
 const Header = () => {
     const [user,] = useAtom(setGetUserAtom)
     const [status,] = useAtom(appStatusAtom)
-
-
     return (
         <HeaderContainer as="header" >
             <Ruban />

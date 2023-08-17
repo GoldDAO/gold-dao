@@ -12,6 +12,7 @@ import { Button, Table, TableBody, TableCell, TableRow, Typography } from '@mui/
 import Image from 'next/image';
 import { useNft } from '@/hooks/useNFTs';
 import { setGetUserAtom } from '@/states/user';
+import { CancelsaleButton } from '@/components/commands/cancelSale';
 
 const MyNfts = () => {
 
@@ -41,17 +42,11 @@ const MyNfts = () => {
         </StyledTableCell>
         <StyledTableCell key="item">
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <CancelsaleButton token_id={row.name} weight={row.weight} />
+            {row.status &&
+              <CancelsaleButton token_id={row.name} weight={row.weight} />}
           </Box>
         </StyledTableCell>
       </StyledTableRow>
-    )
-  }
-  const CancelsaleButton = ({ token_id, weight }) => {
-    return (
-      <Button onClick={() => { }}>
-        Cancel Sale
-      </Button >
     )
   }
   return (
