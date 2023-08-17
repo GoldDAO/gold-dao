@@ -12,7 +12,7 @@ export const navigation = [
     //     path: '/how-it-works',
     // }  
     {
-        label: 'Manage my Nft',
-        path: '/manage',
+        label: 'My Nft',
+        path: '/my-nfts',
     }
 ]

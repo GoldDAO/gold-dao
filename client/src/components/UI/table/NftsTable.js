@@ -10,43 +10,19 @@ import { gldNftCanisters } from '@/services/agents';
 import medium from './../../../../public/images/gold/100g.png'
 import { Button, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
+import { useNft } from '@/hooks/useNFTs';
+import { setGetUserAtom } from '@/states/user';
 
-const MyNfts = ({ data }) => {
-  const [gldNfts] = useAtom(gldNftAtom);
-  const [nfts, setNfts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+const MyNfts = () => {
 
   const weights = Object.keys(gldNftCanisters);
-  const actors = weights.map((w) => useCanister(w)[0]);
+  const actors = weights.map((w) => useCanister(w, { mode: 'anonymous' })[0]);
+  const nfts = useNft(actors)
 
   useEffect(() => {
-    const getNftStatus = async () => {
-      setIsLoading(true);
-      const res = await Promise.all(
-        gldNfts.map(async (nft, i) => {
-          const ind = weights.indexOf(nft.weight + 'g');
-          const res = await actors[ind]?.nft_origyn(nft.name);
-          console.log(res?.ok?.current_sale[0]?.sale_type.auction.status.open, 'res?.ok?.current_sale[0]?.sale_type.auction.status.open');
-          return {
-            weight: nft.weight,
-            name: nft.name,
-            status: res?.ok?.current_sale[0]?.sale_type.auction.status.open === null
-              ? res?.ok?.current_sale
-              : undefined,
-          };
-        }),
-      );
-      setNfts(res);
-      setIsLoading(false);
-    };
-    getNftStatus();
-  }, [gldNfts]);
+    console.log('nfts', nfts)
+  }, [nfts])
 
-  const unlistHandler = async (token_id, weight) => {
-    const ind = weights.indexOf(weight + 'g');
-    const res = await actors[ind]?.sale_batch_nft_origyn([{ end_sale: token_id }]);
-    console.log(res);
-  };
 
   const Row = ({ row, }) => {
     return (
@@ -72,42 +48,27 @@ const MyNfts = ({ data }) => {
     )
   }
   const CancelsaleButton = ({ token_id, weight }) => {
-    console.log('token_id, weight', token_id, weight)
     return (
-      <Button onClick={() => unlistHandler(token_id, weight)}>
+      <Button onClick={() => { }}>
         Cancel Sale
       </Button >
     )
   }
-
   return (
-    <>
-      {isLoading ? (
-        <p>Loading nfts...</p>
-      ) : (
-        <Box sx={{ width: '100%' }}>
-          <StyledTable>
-            <TableBody>
-              {nfts.map((nft) => {
-                // console.log(nft);
-                return (
-                  <Row
-                    row={nft}
-                  />
-                  // <li key={nft.name}>
-                  //   {nft.status && (
-                  //     <button key={nft.name} id={nft.weight + '_' + nft.name} onClick={unlistHandler}>
-                  //       Unlist
-                  //     </button>
-                  //   )}
-                  // </li>
-                );
-              })}
-            </TableBody>
-          </StyledTable >
-        </Box>
-      )}
-    </>
+    <Box sx={{ width: '100%' }}>
+      <StyledTable>
+        <TableBody>
+          {nfts.nfts &&
+            nfts.nfts.map((nft) => {
+              return (
+                <Row
+                  row={nft}
+                />
+              );
+            })}
+        </TableBody>
+      </StyledTable >
+    </Box>
   );
 };
 
