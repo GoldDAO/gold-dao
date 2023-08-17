@@ -1,6 +1,6 @@
-import { useCanister } from "@connect2ic/react";
 import MainButton from "../UI/button/Buttons";
 import { gldNftCanisters } from "@/services/agents";
+import { useAllCanisters } from "@/hooks/useAllCanisters";
 
 const weights = Object.keys(gldNftCanisters);
 
@@ -12,7 +12,7 @@ const unlistHandler = async (token_id, weight, actors) => {
 
 
 export const CancelsaleButton = ({ token_id, weight, }) => {
-    const actors = weights.map((w) => useCanister(w)[0]);
+    const actors = useAllCanisters()
     return (
         <MainButton label="Cancel Sale" actors={actors} action={() => unlistHandler(token_id, weight, actors)} />
     )

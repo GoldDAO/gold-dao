@@ -13,6 +13,7 @@ import { gldNftCanisters } from '@/services/agents/';
 const myStore = createStore();
 
 const Providers = ({ children }) => {
+
   const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
 
   let client = createClient({

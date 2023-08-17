@@ -92,7 +92,6 @@ const C2icButton = () => {
 
   useEffect(() => {
     setAppStatus(status.idle);
-    console.log('appstatus', appstatus);
   }, [status]);
 
   useEffect(() => {

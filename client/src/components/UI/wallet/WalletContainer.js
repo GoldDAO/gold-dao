@@ -8,26 +8,13 @@ import { useBalance, useWallet } from '@connect2ic/react';
 import { CloseButton } from '../button/Buttons';
 
 const WalletContainer = ({ user, open, setOpen }) => {
-    const [assets, { refetch, error }] = useBalance()
-    const [wallet] = useWallet()
-
-    useEffect(() => {
-        console.log('wallet', wallet)
-    }, [wallet])
-
-    useEffect(() => {
-        console.log('assets', assets)
-    }, [assets])
-
     return (
         <WalletBox open={open} onClose={() => setOpen(false)}>
             <Address address={user.principal} />
             <BalanceContainer>
                 <Box >
                     <Typography sx={{ fontSize: '16px', fontWeight: 500, color: "#626263" }}>GLDT Balance</Typography>
-                    {/* <RefreshButton /> */}
                 </Box>
-                {/* <Balance>{assets[0]}</Balance> */}
             </BalanceContainer>
             <LogoutButton />
         </WalletBox >

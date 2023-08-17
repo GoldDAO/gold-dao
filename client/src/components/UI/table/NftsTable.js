@@ -13,25 +13,21 @@ import Image from 'next/image';
 import { useNft } from '@/hooks/useNFTs';
 import { setGetUserAtom } from '@/states/user';
 import { CancelsaleButton } from '@/components/commands/cancelSale';
+import { useAllCanisters } from '@/hooks/useAllCanisters';
 
 const MyNfts = () => {
 
   const weights = Object.keys(gldNftCanisters);
-  const actors = weights.map((w) => useCanister(w, { mode: 'anonymous' })[0]);
+  const actors = useAllCanisters()
   const nfts = useNft(actors)
 
-  useEffect(() => {
-    console.log('nfts', nfts)
-  }, [nfts])
-
-
-  const Row = ({ row, }) => {
+  const Row = ({ row }) => {
     return (
-      <StyledTableRow key={row.name}>
+      <StyledTableRow>
         <StyledTableCell key="weight" padding="checkbox">
           {row.weight} {row.unit}
         </StyledTableCell>
-        <StyledTableCell key="item">
+        <StyledTableCell >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Image src={medium} alt={"NFT IMAGE"} />
             <ItemName>{row.name}</ItemName>
@@ -40,7 +36,7 @@ const MyNfts = () => {
         <StyledTableCell>
           {row.status ? 'On sale' : 'Not on sale'}
         </StyledTableCell>
-        <StyledTableCell key="item">
+        <StyledTableCell>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {row.status &&
               <CancelsaleButton token_id={row.name} weight={row.weight} />}
@@ -54,9 +50,10 @@ const MyNfts = () => {
       <StyledTable>
         <TableBody>
           {nfts.nfts &&
-            nfts.nfts.map((nft) => {
+            nfts.nfts.map((nft, i) => {
               return (
                 <Row
+                  key={i}
                   row={nft}
                 />
               );

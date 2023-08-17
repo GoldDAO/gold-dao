@@ -6,13 +6,14 @@ import { Principal } from '@dfinity/principal';
 import { useCanister, useWallet } from '@connect2ic/react';
 import MainButton from '@/components/UI/button/Buttons';
 import { gldNftCanisters } from '@/services/agents';
+import { useAllCanisters } from '@/hooks/useAllCanisters';
 
 export const SendBatchOffersButton = () => {
   const [wallet] = useWallet();
   const [cart] = useAtom(cartAtom);
 
   const weights = Object.keys(gldNftCanisters);
-  const actors = weights.map((w) => useCanister(w)[0]);
+  const actors = useAllCanisters()
 
   const salePrice = 100 * 10 ** 8;
 
