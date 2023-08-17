@@ -12,7 +12,8 @@ function Home({ content, meta, partners, cto, marketcap }) {
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
     ssr: false,
   });
-  const ManageNFTsSales = dynamic(() => import('@/components/UI/table/ManageNFTsSales'), {
+
+  const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
     ssr: false,
   });
 
@@ -29,6 +30,7 @@ function Home({ content, meta, partners, cto, marketcap }) {
         <PageContent dangerouslySetInnerHTML={{ __html: content }} />
         <Swap data={cto.data} />
         <Chart />
+        <MyNfts />
         <Partners partners={partners} />
       </Layout>
     </>

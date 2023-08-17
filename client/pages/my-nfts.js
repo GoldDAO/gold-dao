@@ -3,11 +3,11 @@ import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import React from 'react';
 
-const MyNfts = dynamic(() => import('@/components/UI/table/MyNfts'), {
+const MyNftsTable = dynamic(() => import('@/components/UI/table/NftsTable'), {
     ssr: false,
 });
 
-const ManageNft = () => {
+const MyNfts = () => {
     return (
         <>
             <Head>
@@ -16,10 +16,10 @@ const ManageNft = () => {
                 <meta property={`og:description`} content={meta.description} key="title" /> */}
             </Head>
             <Layout>
-                <MyNfts />
+                <MyNftsTable />
             </Layout>
         </>
     );
 };
 
-export default ManageNft;
+export default MyNfts;

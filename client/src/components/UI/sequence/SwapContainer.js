@@ -7,7 +7,7 @@ import MainButton from '../button/Buttons';
 import ConfirmDialog from './ConfirmDialog';
 import { cartAtom, getTotalCartWeightAtom } from '@/states/cart';
 import Dialog from '../Dialog';
-import NFTsTable from '../table/NFTsTable';
+import NftsTable from '../table/NftsTable';
 import { userAtom } from '@/states/user';
 import { useDialog } from '@connect2ic/react';
 import { Button, Typography } from '@mui/material';
@@ -117,7 +117,7 @@ const SwapContainer = ({ data }) => {
             open={openCTO}
             setOpen={setOpenCTO}
             isButton={true}
-            content={<NFTsTable />}
+            content={<NftsTable />}
           />
         )}
         <ConfirmDialog total={total} open={validationDialog} setOpen={setValidationDialog} />
