@@ -16,7 +16,10 @@ const MyNfts = () => {
                 <meta property={`og:description`} content={meta.description} key="title" /> */}
             </Head>
             <Layout>
-                <MyNftsTable />
+                <MyNftsTable
+                    selectable={false}
+                    hasControls={true}
+                />
             </Layout>
         </>
     );

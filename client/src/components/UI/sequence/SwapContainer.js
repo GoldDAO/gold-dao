@@ -10,7 +10,7 @@ import Dialog from './Dialog';
 import NftsTable from '../table/NftsTable';
 import { userAtom } from '@/states/user';
 import { useDialog } from '@connect2ic/react';
-import { Button, Typography } from '@mui/material';
+import { Button, Checkbox, Typography } from '@mui/material';
 import { SectionTitle } from '../styled/common';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -117,7 +117,10 @@ const SwapContainer = ({ data }) => {
             open={openCTO}
             setOpen={setOpenCTO}
             isButton={true}
-            content={<NftsTable />}
+            content={<NftsTable
+              selectable={true}
+              hasControls={false}
+            />}
           />
         )}
         <ConfirmDialog total={total} open={validationDialog} setOpen={setValidationDialog} />
@@ -155,6 +158,9 @@ const SwapCard = styled(Box)`
     margin: 40px auto;
   }
 `;
+
+const StyledCheckbox = styled(Checkbox)`
+`
 
 const GLDNFT = styled(Box)`
   background-color: #fff;

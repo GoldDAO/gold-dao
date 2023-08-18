@@ -29,8 +29,8 @@ export const removeAllItemsInCartAtom = atom(null, (_get, set) => {
   set(cartAtom, removeAllCartItems());
 });
 
-export const addAllItemsAtom = atom(null, (get, set) => {
-  set(cartAtom, get(gldNftAtom));
+export const addAllItemsAtom = atom(null, (get, set, items) => {
+  set(cartAtom, items);
 });
 
 export const getTotalCartWeight = (cart) =>
