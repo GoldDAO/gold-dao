@@ -6,14 +6,16 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 const NftControls = ({ onSale, token_id, weight }) => {
-    const [isOnSale, setIsOnSale] = useState(onSale)
+
+    const [isOnSale, setIsOnSale] = useState(onSale ? true : false)
+
     return (
         <Box>
-            <NftStatus onSale={onSale} >
+            <NftStatus onSale={isOnSale} >
                 {isOnSale ? 'On Sale' : 'not on sale'}
             </NftStatus>
-            {onSale &&
-                <CancelsaleButton token_id={token_id} weight={weight} />
+            {isOnSale &&
+                <CancelsaleButton token_id={token_id} weight={weight} setIsOnSale={setIsOnSale} />
             }
         </Box>
     );

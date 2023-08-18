@@ -10,10 +10,9 @@ const weights = Object.keys(gldNftCanisters);
 
 
 
-export const CancelsaleButton = ({ token_id, weight }) => {
+export const CancelsaleButton = ({ token_id, weight, setIsOnSale }) => {
     const actors = useAllCanisters()
     const [open, setOpen] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
 
     const handleClose = () => {
         setOpen(false)
@@ -25,6 +24,7 @@ export const CancelsaleButton = ({ token_id, weight }) => {
         console.log(res);
         if (res[0].ok) {
             setOpen(true)
+            setIsOnSale(false)
         }
     };
 
