@@ -2,10 +2,10 @@ import Head from 'next/head';
 import Layout from '@/components/UI/layout/Layout';
 import { getMarkdownPage, getMarketCap, getPartners, getSwapCTO } from '@/utils/getMarkdown';
 import { markdownToHtml } from '@/utils/markdownToHtml';
-import Marketcap from '@/components/UI/Marketcap';
+import Marketcap from '@/components/UI/sections/Marketcap';
 import { PageContent } from './_app';
-import Partners from '@/components/UI/partners';
-import Chart from '@/components/UI/Chart';
+import Partners from '@/components/UI/sections/partners';
+import Chart from '@/components/UI/sections/Chart';
 import dynamic from 'next/dynamic';
 
 function Home({ content, meta, partners, cto, marketcap }) {

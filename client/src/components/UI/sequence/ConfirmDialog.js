@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomDialog from '../Dialog';
-import { SendBatchOffersButton } from '../../commands/sendAllBatchOffers';
+import CustomDialog from './Dialog';
+import { SendBatchOffersButton } from './../../commands/SendAllBatchOffers';
 import { Box } from '@mui/material';
 import Image from 'next/image';
 

@@ -10,10 +10,10 @@ import { gldNftCanisters } from '@/services/agents';
 import medium from './../../../../public/images/gold/100g.png'
 import { Button, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
-import { useNft } from '@/hooks/useNFTs';
+import { useNft } from '@/components/commands/hooks/useNFTs';
 import { setGetUserAtom } from '@/states/user';
-import { CancelsaleButton } from '@/components/commands/cancelSale';
-import { useAllCanisters } from '@/hooks/useAllCanisters';
+import { CancelsaleButton } from '@/components/commands/CancelSale';
+import { useAllCanisters } from '@/components/commands/hooks/useAllCanisters';
 
 const MyNfts = () => {
 

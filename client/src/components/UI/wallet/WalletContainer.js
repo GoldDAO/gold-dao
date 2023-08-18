@@ -1,7 +1,7 @@
 import { Box, Dialog, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import Address from '../Address';
+import Address from './Address';
 import LogoutButton from '../button/Logout';
 import RefreshButton from '../button/Refresh';
 import { useBalance, useWallet } from '@connect2ic/react';

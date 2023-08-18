@@ -6,12 +6,12 @@ import { useAtom } from 'jotai';
 import MainButton from '../button/Buttons';
 import ConfirmDialog from './ConfirmDialog';
 import { cartAtom, getTotalCartWeightAtom } from '@/states/cart';
-import Dialog from '../Dialog';
+import Dialog from './Dialog';
 import NftsTable from '../table/NftsTable';
 import { userAtom } from '@/states/user';
 import { useDialog } from '@connect2ic/react';
 import { Button, Typography } from '@mui/material';
-import { SectionTitle } from '../common';
+import { SectionTitle } from '../styled/common';
 
 const inter = Inter({ subsets: ['latin'] });
 

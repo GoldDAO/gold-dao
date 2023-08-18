@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Box } from "@mui/system";
 import styled from 'styled-components';
-import { SectionTitle } from './common';
+import { SectionTitle } from './../styled/common';
 
 const Partners = ({ partners }) => {
 

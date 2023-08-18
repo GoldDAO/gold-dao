@@ -1,6 +1,6 @@
 import MainButton from "../UI/button/Buttons";
 import { gldNftCanisters } from "@/services/agents";
-import { useAllCanisters } from "@/hooks/useAllCanisters";
+import { useAllCanisters } from "@/components/commands/hooks/useAllCanisters";
 
 const weights = Object.keys(gldNftCanisters);
 
