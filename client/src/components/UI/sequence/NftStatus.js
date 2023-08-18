@@ -1,4 +1,4 @@
-import { CancelsaleButton } from '@/components/commands/CancelSale';
+import { CancelsaleButton } from '@/services/commands/CancelSale';
 import { Box } from '@mui/material';
 import React from 'react';
 import styled from 'styled-components';

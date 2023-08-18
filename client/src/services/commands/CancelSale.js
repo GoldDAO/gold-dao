@@ -1,6 +1,6 @@
-import MainButton from "../UI/button/Buttons";
+import MainButton from "../../components/UI/button/Buttons";
 import { gldNftCanisters } from "@/services/agents";
-import { useAllCanisters } from "@/components/commands/hooks/useAllCanisters";
+import { useAllCanisters } from "@/services/commands/hooks/useAllCanisters";
 import { IconButton } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 
