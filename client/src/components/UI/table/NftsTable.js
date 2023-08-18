@@ -64,7 +64,11 @@ const MyNfts = ({ hasControls, selectable }) => {
         </StyledTableHead>
         <TableBody>
           {nfts.isLoading ?
-            <Box>fetching nfts....</Box>
+            <StyledTableRow sx={{
+              height: '500px'
+            }}>
+              fetching nfts....
+            </StyledTableRow>
             :
             nfts?.nfts?.map((nft, i) => {
               return (
