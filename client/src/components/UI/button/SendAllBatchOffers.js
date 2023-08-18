@@ -6,7 +6,7 @@ import { Principal } from '@dfinity/principal';
 import { useCanister, useWallet } from '@connect2ic/react';
 import MainButton from '@/components/UI/button/Buttons';
 import { gldNftCanisters } from '@/services/agents';
-import { useAllCanisters } from '@/services/commands/hooks/useAllCanisters';
+import { useAllCanisters } from '@/components/hooks/useAllCanisters';
 
 export const SendBatchOffersButton = () => {
   const [wallet] = useWallet();

@@ -5,6 +5,7 @@ import { useCanister } from "@connect2ic/react";
 export const useAllCanisters = () => {
 
     const weights = Object.keys(gldNftCanisters);
+
     const actor1 = useCanister(weights[0])[0]
     const actor10 = useCanister(weights[1])[0]
     const actor100 = useCanister(weights[2])[0]
@@ -14,6 +15,7 @@ export const useAllCanisters = () => {
         actor1,
         actor10
     ]
+
     const prodActors = [
         actor1,
         actor10,

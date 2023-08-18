@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'react';
-import { gldNftAtom } from '@/states/nfts';
 import { useAtom } from 'jotai';
 import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
-import { useCanister, useWallet } from '@connect2ic/react';
-import { gldNftCanisters } from '@/services/agents';
 import medium from './../../../../public/images/gold/100g.png'
-import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Checkbox, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
-import { useNft } from '@/services/commands/hooks/useNFTs';
-import { setGetUserAtom } from '@/states/user';
-import { CancelsaleButton } from '@/services/commands/CancelSale';
-import { useAllCanisters } from '@/services/commands/hooks/useAllCanisters';
+import { useNft } from '@/components/hooks/useNFTs';
+import { useAllCanisters } from '@/components/hooks/useAllCanisters';
 import NftControls from '../sequence/NftStatus';
 import { addAllItemsAtom, addCartItemAtom, getCartAtom, removeAllItemsInCartAtom, removeCartItemByIdAtom } from '@/states/cart';
 
@@ -24,7 +19,7 @@ const MyNfts = ({ hasControls, selectable }) => {
   const [cart,] = useAtom(getCartAtom)
   const [, removeAllItems] = useAtom(removeAllItemsInCartAtom)
   const [, addAllNFTsInCart] = useAtom(addAllItemsAtom)
-  const [isAllSelected, setIsAllSelected] = useState(false)
+  const [isAllSelected,] = useState(false)
 
   const tableHead = [
     {
@@ -36,41 +31,33 @@ const MyNfts = ({ hasControls, selectable }) => {
       label: 'name'
     },
   ]
-
-
-  return (
-    <Box sx={{ width: '100%' }}>
-      <StyledTable>
-        <StyledTableHead>
-          <StyledTableRow>
-            {selectable &&
-              <StyledTableCell padding="checkbox">
-                <StyledCheckbox
-                  onChange={(e) => {
-                    e.target.checked ?
-                      addAllNFTsInCart(nfts.nfts)
-                      :
-                      removeAllItems()
-                  }}
-                  inputProps={{ 'aria-label': 'select all NFTs', }}
-                />
-              </StyledTableCell>}
-            {tableHead.map((e, i) => (
-              <StyledTableCell key={e.key} >
-                {e.label}
-              </StyledTableCell>
-            ))}
-          </StyledTableRow>
-        </StyledTableHead>
-        <TableBody>
-          {nfts.isLoading ?
-            <StyledTableRow sx={{
-              height: '500px'
-            }}>
-              fetching nfts....
+  if (!nfts.isLoading) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <StyledTable>
+          <StyledTableHead>
+            <StyledTableRow>
+              {selectable &&
+                <StyledTableCell padding="checkbox">
+                  <StyledCheckbox
+                    onChange={(e) => {
+                      e.target.checked ?
+                        addAllNFTsInCart(nfts.nfts)
+                        :
+                        removeAllItems()
+                    }}
+                    inputProps={{ 'aria-label': 'select all NFTs', }}
+                  />
+                </StyledTableCell>}
+              {tableHead.map((e, i) => (
+                <StyledTableCell key={e.key} >
+                  {e.label}
+                </StyledTableCell>
+              ))}
             </StyledTableRow>
-            :
-            nfts?.nfts?.map((nft, i) => {
+          </StyledTableHead>
+          <TableBody>
+            {nfts?.nfts?.map((nft, i) => {
               return (
                 <Row
                   cart={cart}
@@ -82,10 +69,25 @@ const MyNfts = ({ hasControls, selectable }) => {
                 />
               );
             })}
-        </TableBody>
-      </StyledTable >
-    </Box>
-  );
+          </TableBody>
+        </StyledTable >
+      </Box>
+    );
+  } else if (nfts.isLoading) {
+    return (
+      <Box sx={{
+        width: '100%',
+        height: '500px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column'
+      }}>
+        <CircularProgress />
+        <Typography sx={{ marginTop: '20px' }}>Loading Nfts...</Typography>
+      </Box>
+    )
+  }
 };
 
 export default MyNfts;

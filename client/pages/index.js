@@ -7,8 +7,11 @@ import { PageContent } from './_app';
 import Partners from '@/components/UI/sections/partners';
 import Chart from '@/components/UI/sections/Chart';
 import dynamic from 'next/dynamic';
+import { useCanister } from '@connect2ic/react';
 
 function Home({ content, meta, partners, cto, marketcap }) {
+
+
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
     ssr: false,
   });

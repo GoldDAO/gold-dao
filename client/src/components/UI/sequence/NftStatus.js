@@ -1,13 +1,16 @@
-import { CancelsaleButton } from '@/services/commands/CancelSale';
+import { CancelsaleButton } from '@/components/UI/button/CancelSale';
 import { Box } from '@mui/material';
 import React from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const NftControls = ({ onSale, token_id, weight }) => {
+    const [isOnSale, setIsOnSale] = useState(onSale)
     return (
         <Box>
-            <NftStatus onSale={onSale}>
-                {onSale ? 'On Sale' : 'not on sale'}
+            <NftStatus onSale={onSale} >
+                {isOnSale ? 'On Sale' : 'not on sale'}
             </NftStatus>
             {onSale &&
                 <CancelsaleButton token_id={token_id} weight={weight} />
