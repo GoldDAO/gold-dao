@@ -209,6 +209,13 @@ fn init(conf: Option<Conf>) {
     }
 }
 
+#[query]
+#[candid_method(query)]
+fn get_conf() -> Conf {
+    ic_cdk::println!("INFO: get_conf");
+    SERVICE.with(|s| s.borrow_mut().conf.clone())
+}
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
 pub struct OfferRequest {
     nft_id: NftId,
@@ -474,6 +481,7 @@ pub struct SaleStatusShared {
 #[update]
 #[candid_method(update)]
 async fn notify_sale_nft_origyn(args: SubscriberNotification) -> () {
+    ic_cdk::println!("Sale notifcation: {:?}", args);
     let subaccount: [u8; 32] = args
         .escrow_info
         .account
@@ -516,7 +524,7 @@ fn check_candid_interface() {
 
     service_compatible(
         CandidSource::Text(&new_interface),
-        CandidSource::File(Path::new("src/gldt.did")),
+        CandidSource::File(Path::new("src/gldt_core.did")),
     )
     .unwrap();
 }

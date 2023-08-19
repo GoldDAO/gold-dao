@@ -1,82 +1,86 @@
 {
-	"__0": "GLDT.org static website with swap canister",
-	"canisters": {
-		"gldt_frontend": {
-			"type": "assets",
-			"source": [
-				"client/out"
-			],
-			"build": [
-				"npm run postinstall",
-				"npm run build:front"
-			],
-			"frontend": {}
-		},
-		"gldt_core": {
-			"type": "rust",
-			"candid": "canister/gldt_core/src/gldt.did",
-			"declarations": {
-				"output": "canister/declarations/"
-			},
-			"package": "gldt",
-			"optimize": "cycles"
-		},
-		"gldt_ledger": {
-			"type": "custom",
-			"candid": "canister/gldt_ledger/ledger.did",
-			"wasm": "canister/gldt_ledger/ledger.wasm"
-		},
-		"gldnft_backend_1g": {
-			"type": "custom",
-			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
-			"wasm": "",
-			"remote": {
-				"id": {
-					"staging": "obapm-2iaaa-aaaak-qcgca-cai",
-					"ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
-				}
-			}
-		},
-		"gldnft_backend_10g": {
-			"type": "custom",
-			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
-			"wasm": "",
-			"remote": {
-				"id": {
-					"staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
-					"ic": "sy3ra-iqaaa-aaaao-aixda-cai"
-				}
-			}
-		},
-		"gldnft_backend_100g": {
-			"type": "custom",
-			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
-			"wasm": "",
-			"remote": {
-				"id": {
-					"staging": "",
-					"ic": "zhfjc-liaaa-aaaal-acgja-cai"
-				}
-			}
-		},
-		"gldnft_backend_1000g": {
-			"type": "custom",
-			"candid": "client/src/agents/declarations/NFTs/Gold_NFT.did",
-			"wasm": "",
-			"remote": {
-				"id": {
-					"staging": "",
-					"ic": "7i7jl-6qaaa-aaaam-abjma-cai"
-				}
-			}
-		}
-	},
-	"networks": {
-		"staging": {
-			"providers": [
-				"https://icp0.io"
-			],
-			"type": "persistent"
-		}
-	}
+  "__0": "GLDT.org static website with swap canister",
+  "canisters": {
+    "gldt_frontend": {
+      "type": "assets",
+      "source": ["client/out"],
+      "build": ["npm run postinstall", "npm run build:front"],
+      "frontend": {}
+    },
+    "gldt_core": {
+      "type": "rust",
+      "candid": "canister/gldt_core/src/gldt_core.did",
+      "declarations": {
+        "output": "canister/gldt_core/declarations/"
+      },
+      "package": "gldt_core",
+      "optimize": "cycles"
+    },
+    "gldt_ledger": {
+      "type": "custom",
+      "candid": "canister/gldt_ledger/ledger.did",
+      "wasm": "canister/gldt_ledger/ledger.wasm"
+    },
+    "yumi_kyc": {
+      "type": "custom",
+      "candid": "canister/yumi_kyc/kyc.did",
+      "wasm": "canister/yumi_kyc/kyc.wasm",
+      "remote": {
+        "id": {
+          "staging": "2qft3-raaaa-aaaag-qci4a-cai",
+          "ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
+        }
+      }
+    },
+    "gldnft_backend_1g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "remote": {
+        "id": {
+          "staging": "obapm-2iaaa-aaaak-qcgca-cai",
+          "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+        }
+      }
+    },
+    "gldnft_backend_10g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "remote": {
+        "id": {
+          "staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
+          "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+        }
+      }
+    },
+    "gldnft_backend_100g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "remote": {
+        "id": {
+          "staging": "zhfjc-liaaa-aaaal-acgja-cai",
+          "ic": "zhfjc-liaaa-aaaal-acgja-cai"
+        }
+      }
+    },
+    "gldnft_backend_1000g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "remote": {
+        "id": {
+          "staging": "7i7jl-6qaaa-aaaam-abjma-cai",
+          "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+        }
+      }
+    }
+  },
+  "networks": {
+    "staging": {
+      "providers": ["https://icp0.io"],
+      "type": "persistent"
+    }
+  }
 }
