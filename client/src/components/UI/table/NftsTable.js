@@ -54,6 +54,11 @@ const MyNfts = ({ hasControls, selectable }) => {
                   {e.label}
                 </StyledTableCell>
               ))}
+              {hasControls &&
+                <StyledTableCell key='controls' >
+                  Status
+                </StyledTableCell>
+              }
             </StyledTableRow>
           </StyledTableHead>
           <TableBody>
