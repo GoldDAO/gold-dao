@@ -24,7 +24,6 @@ const Header = () => {
     const [status,] = useAtom(appStatusAtom)
     return (
         <HeaderContainer as="header" >
-            {/* <Ruban /> */}
             <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end', }}>
                 <Link href="/" >
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />

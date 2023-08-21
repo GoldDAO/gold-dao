@@ -33,7 +33,6 @@ function Home({ content, meta, partners, cto, marketcap }) {
         <PageContent dangerouslySetInnerHTML={{ __html: content }} />
         <Swap data={cto.data} />
         <Chart />
-        <MyNfts />
         <Partners partners={partners} />
       </Layout>
     </>
