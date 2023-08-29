@@ -37,7 +37,7 @@ const tableHead = [
 
 const NFTTable = () => {
   const [allNfts] = useAtom(setGetGldNftsAtom);
-  console.log(allNfts);
+  // console.log(allNfts);
   //   const [allNfts] = useAtom(getAllNftsAtom);
 
   const [cart] = useAtom(getCartAtom);
@@ -45,9 +45,9 @@ const NFTTable = () => {
   const [, addAllNFTsInCart] = useAtom(addAllItemsAtom);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
-  useEffect(() => {
-    console.log('allNfts', allNfts);
-  }, [allNfts]);
+  // useEffect(() => {
+  //   console.log('allNfts', allNfts);
+  // }, [allNfts]);
 
   useEffect(() => {
     if (cart.length === allNfts.length) {

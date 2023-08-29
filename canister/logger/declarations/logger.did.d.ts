@@ -21,12 +21,6 @@ export type CanisterLogResponse = { 'messagesInfo' : CanisterLogMessagesInfo } |
 export interface CanisterMetrics { 'data' : CanisterMetricsData }
 export type CanisterMetricsData = { 'hourly' : Array<HourlyMetricsData> } |
   { 'daily' : Array<DailyMetricsData> };
-export type CollectMetricsRequestType = { 'force' : null } |
-  { 'normal' : null };
-export interface Conf {
-  'gldt_nft_canister_ids' : Array<[Principal, NftCanisterConf]>,
-  'gldt_ledger_canister_id' : Principal,
-}
 export interface DailyMetricsData {
   'updateCalls' : bigint,
   'canisterHeapMemorySize' : NumericEntity,
@@ -66,21 +60,6 @@ export interface GetMetricsParameters {
   'granularity' : MetricsGranularity,
   'dateFromMillis' : bigint,
 }
-export interface GldtNft {
-  'requested_memo' : bigint,
-  'older_record' : [] | [GldtNft],
-  'to_subaccount' : Uint8Array | number[],
-  'minted' : [] | [GldtNftMinted],
-  'grams' : number,
-  'gldt_nft_canister_id' : Principal,
-  'gldt_minting_timestamp_seconds' : bigint,
-}
-export interface GldtNftBurned { 'burn_block_height' : bigint }
-export interface GldtNftMinted {
-  'mint_block_height' : bigint,
-  'last_audited_timestamp_seconds' : bigint,
-  'burned' : [] | [GldtNftBurned],
-}
 export interface HourlyMetricsData {
   'updateCalls' : BigUint64Array | bigint[],
   'canisterHeapMemorySize' : BigUint64Array | bigint[],
@@ -88,17 +67,11 @@ export interface HourlyMetricsData {
   'canisterMemorySize' : BigUint64Array | bigint[],
   'timeMillis' : bigint,
 }
-export interface InfoRequest {
-  'nft_id' : string,
-  'source_canister' : Principal,
-}
 export interface LogMessageData { 'timeNanos' : bigint, 'message' : string }
 export type MetricsGranularity = { 'hourly' : null } |
   { 'daily' : null };
 export interface MetricsRequest { 'parameters' : GetMetricsParameters }
 export interface MetricsResponse { 'metrics' : [] | [CanisterMetrics] }
-export interface NftCanisterConf { 'grams' : number }
-export interface NftInfo { 'info' : [] | [GldtNft] }
 export interface NumericEntity {
   'avg' : bigint,
   'max' : bigint,
@@ -106,17 +79,6 @@ export interface NumericEntity {
   'first' : bigint,
   'last' : bigint,
 }
-export interface Offer { 'block_height' : bigint, 'tokens_minted' : Tokens }
-export interface OfferRequest {
-  'nft_id' : string,
-  'requested_memo' : bigint,
-  'to_subaccount' : Uint8Array | number[],
-}
-export type Result = { 'Ok' : null } |
-  { 'Err' : string };
-export type Result_1 = { 'Ok' : Offer } |
-  { 'Err' : string };
-export interface SaleStatusShared { 'token_id' : string }
 export interface StatusRequest {
   'memory_size' : boolean,
   'cycles' : boolean,
@@ -127,27 +89,10 @@ export interface StatusResponse {
   'cycles' : [] | [bigint],
   'heap_memory_size' : [] | [bigint],
 }
-export interface SubAccountInfo { 'account' : SubAccoutInfo2 }
-export interface SubAccoutInfo2 { 'sub_account' : Uint8Array | number[] }
-export interface SubscriberNotification {
-  'sale' : SaleStatusShared,
-  'escrow_info' : SubAccountInfo,
-}
-export interface Tokens { 'e8s' : bigint }
-export interface UpdateInformationRequest {
-  'metrics' : [] | [CollectMetricsRequestType],
-}
 export interface _SERVICE {
   'getCanistergeekInformation' : ActorMethod<
     [GetInformationRequest],
     GetInformationResponse
   >,
-  'get_conf' : ActorMethod<[], Conf>,
-  'nft_info' : ActorMethod<[InfoRequest], NftInfo>,
-  'notify_sale_nft_origyn' : ActorMethod<[SubscriberNotification], Result>,
-  'request_offer' : ActorMethod<[OfferRequest], Result_1>,
-  'updateCanistergeekInformation' : ActorMethod<
-    [UpdateInformationRequest],
-    undefined
-  >,
+  'log_message' : ActorMethod<[string], undefined>,
 }

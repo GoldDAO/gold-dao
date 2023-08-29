@@ -10,5 +10,9 @@
   "gldt_core": {
     "staging": "m45be-jaaaa-aaaak-qcgnq-cai",
     "ic": ""
+  },
+  "logger": {
+    "staging": "xu52p-3yaaa-aaaal-qcb2q-cai",
+    "ic": ""
   }
 }

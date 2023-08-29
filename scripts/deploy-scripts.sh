@@ -6,19 +6,17 @@ dfx canister create gldt_core
 
 # Replace "--network staging" with "--network local" for local development
 # 2. deploy gldt ledger
-dfx deploy gldt_ledger --network local --argument '(record{minting_account="'"$(dfx ledger account-id --network local --of-canister gldt_core)"'"; send_whitelist=vec{}; initial_values=vec{}})'
-dfx deploy gldt_ledger --network staging --argument '(record{minting_account="'"$(dfx ledger account-id --network staging --of-canister gldt_core)"'"; send_whitelist=vec{}; initial_values=vec{}})'
+# dfx deploy gldt_ledger --network local --argument '(record{minting_account="'"$(dfx ledger account-id --network local --of-canister gldt_core)"'"; send_whitelist=vec{}; initial_values=vec{}})'
+# dfx deploy gldt_ledger --network staging --argument '(record{minting_account="'"$(dfx ledger account-id --network staging --of-canister gldt_core)"'"; send_whitelist=vec{}; initial_values=vec{}})'
+./scripts/deploy-ledger.sh
+
 
 # 3. deploy gldt core
-dfx deploy gldt_core --network local --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network local gldt_ledger)"'";
-  gldt_nft_canister_ids=vec{
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}};
-    }})'
 dfx deploy gldt_core --network staging --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
   gldt_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
     record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}};
+    record { principal "'"$(dfx identity get-principal)"'"; record { grams=100}};
     }})'
 
 # 4. deploy gldt frontend
@@ -74,7 +72,14 @@ dfx canister call gldt_core --network local nft_info '(record {source_canister =
 
 dfx canister call gldt_core --network local request_offer '(record {nft_id = "gold-067883"; to_subaccount = vec {0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0}; requested_memo = 0})'
 
+dfx canister call gldt_core --network staging notify_sale_nft_origyn '(record {sale = record { token_id = "gold_1234"}; escrow_info = record { account = record {sub_account=blob "abcdefghijklmnopqrstuvxyz1234567"}}})'
 
+
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx canister id --network staging gldt_core)"'";})'
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx identity get-principal)"'"; subaccount = opt blob "abcdefghijklmnopqrstuvxyz1234567"})'
+
+
+dfx canister call --network staging gldt_ledger get_blocks '(record {start= record { blocks= vec {0}} ;length=2})'
 
 # Notes
 #

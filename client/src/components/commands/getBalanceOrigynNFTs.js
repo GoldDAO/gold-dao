@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useAtom } from 'jotai';
@@ -6,29 +5,32 @@ import { Principal } from '@dfinity/principal';
 import { setGetGldNftsAtom } from '../../states/nfts';
 import { appStatusAtom } from '../../states/appStatus';
 import { useCanister, useWallet } from '@connect2ic/react';
-import { onSaleNft10Atom, onSaleNftAtom, updateOnsaleNft, updateOnsaleNftAtom } from '../../states/onSalesNfts';
+import {
+  onSaleNft10Atom,
+  onSaleNftAtom,
+  updateOnsaleNft,
+  updateOnsaleNftAtom,
+} from '../../states/onSalesNfts';
 import { gldNftCanisters } from '@/services/agents';
-
 
 const GetBalanceOrigynNFTs = () => {
   const [appStatus] = useAtom(appStatusAtom);
   const [gld, setGldNfts] = useAtom(setGetGldNftsAtom);
   const [wallet] = useWallet();
   const weights = Object.keys(gldNftCanisters);
-  const [onSalesNfts, setOnSalesNfts] = useAtom(onSaleNftAtom)
+  const [onSalesNfts, setOnSalesNfts] = useAtom(onSaleNftAtom);
 
   const actors = weights.map((w) => useCanister(w, { mode: 'anonymous' })[0]);
 
-
-  useEffect(() => {
-    console.log('actors', actors)
-  }, [actors])
+  // useEffect(() => {
+  //   console.log('actors', actors);
+  // }, [actors]);
 
   useEffect(() => {
     if (appStatus === 'connected') {
       try {
         const getNFTBalance = async () => {
-          console.log('actors', actors)
+          // console.log('actors', actors)
           const nft_promises = actors.map((actor) =>
             actor.balance_of_nft_origyn({
               principal: Principal.fromText(wallet.principal),

@@ -19,7 +19,7 @@ export const SendBatchOffersButton = () => {
   const gldNftCart = {};
 
   const YUMI_KYC_CANISTER_ID = process.env.YUMI_KYC_CANISTER_ID;
-  const ICP_LEDGER_CANISTER_ID = process.env.ICP_LEDGER_CANISTER_ID;
+  // const ICP_LEDGER_CANISTER_ID = process.env.ICP_LEDGER_CANISTER_ID;
 
   const payload = (e) => {
     return {
@@ -46,7 +46,7 @@ export const SendBatchOffersButton = () => {
               {
                 token: {
                   ic: {
-                    standard: { Ledger: null },
+                    standard: { ICRC1: null },
                     canister: Principal.fromText(process.env.GLDT_LEDGER_CANISTER_ID),
                     decimals: 8,
                     fee: [10000],
@@ -74,8 +74,10 @@ export const SendBatchOffersButton = () => {
     const res = await Promise.all(
       weights.map((w, i) => {
         const w_int = +w.slice(0, -1);
-        if (gldNftCart[w_int]) return actors[i].market_transfer_batch_nft_origyn(gldNftCart[w_int]);
-        else return undefined;
+        if (gldNftCart[w_int]) {
+          console.log(gldNftCart[w_int]);
+          return actors[i].market_transfer_batch_nft_origyn(gldNftCart[w_int]);
+        } else return undefined;
       }),
     );
     console.log('res', res);

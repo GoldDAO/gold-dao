@@ -9,13 +9,13 @@ import Chart from '@/components/UI/Chart';
 import dynamic from 'next/dynamic';
 
 function Home({ content, meta, partners, cto, marketcap }) {
+  console.log('YUMI_KYC_CANISTER_ID', process.env.YUMI_KYC_CANISTER_ID);
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
     ssr: false,
   });
   const ManageNFTsSales = dynamic(() => import('@/components/UI/table/ManageNFTsSales'), {
     ssr: false,
   });
-
 
   return (
     <>
