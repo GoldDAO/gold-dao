@@ -34,7 +34,7 @@ const MyNfts = ({ hasControls, selectable }) => {
   if (!nfts.isLoading) {
     return (
       <Box sx={{ width: '100%' }}>
-        <StyledTable>cleaning
+        <StyledTable>
           <StyledTableHead>
             <StyledTableRow>
               {selectable &&

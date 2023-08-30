@@ -6,6 +6,7 @@ export const useAllCanisters = () => {
 
     const weights = Object.keys(gldNftCanisters);
 
+    console.log('weights', weights)
     const actor1 = useCanister(weights[0])[0]
     const actor10 = useCanister(weights[1])[0]
     const actor100 = useCanister(weights[2])[0]
@@ -23,5 +24,5 @@ export const useAllCanisters = () => {
         actor1000,
     ]
 
-    return process.env.DFX_NETWORK === 'production' ? prodActors : stagingActors
+    return process.env.DFX_NETWORK === 'ic' ? prodActors : stagingActors
 }

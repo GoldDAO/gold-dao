@@ -14,5 +14,9 @@ export const navigation = [
     {
         label: 'My Nft',
         path: '/my-nfts',
+    },
+    {
+        label: 'Transactions',
+        path: '/transactions',
     }
 ]

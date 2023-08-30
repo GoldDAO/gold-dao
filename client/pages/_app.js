@@ -16,7 +16,7 @@ const Providers = dynamic(() => import('@/components/c2ic/Providers'), {
 export default function MyApp({ Component, pageProps }) {
   return (
     <div className={inter.className}>
-      {process.env.DFX_NETWORK !== 'production' &&
+      {process.env.DFX_NETWORK !== 'ic' &&
         <Ruban />
       }
       <Providers>

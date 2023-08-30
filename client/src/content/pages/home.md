@@ -1,7 +1,8 @@
-f---
+---
 title: GLTD Swap
 description: GLTD Swap Meta Description
 ---
+
 # Gold. Blockchain. Secure. Stable. Simple.
 
 ## GLDT is a token backed 100% by physical gold

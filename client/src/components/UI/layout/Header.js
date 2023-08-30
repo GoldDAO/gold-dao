@@ -28,12 +28,11 @@ const Header = () => {
                 <Link href="/" >
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
-                {user.isConnected &&
-                    <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
-                        {navigation.map((e, i) => (
-                            <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}><Link href={`${e.path}`}>{e.label}</Link></Box>
-                        ))}
-                    </Box>}
+                <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
+                    {navigation.map((e, i) => (
+                        <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}><Link href={`${e.path}`}>{e.label}</Link></Box>
+                    ))}
+                </Box>
             </Nav>
             <Box sx={{ position: 'relative' }}>
                 {status === 'connected' &&
