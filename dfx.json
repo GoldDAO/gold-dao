@@ -3,8 +3,13 @@
   "canisters": {
     "gldt_frontend": {
       "type": "assets",
-      "source": ["client/out"],
-      "build": ["npm run postinstall", "npm run build:front"],
+      "source": [
+        "client/out"
+      ],
+      "build": [
+        "npm run postinstall",
+        "npm run build:front"
+      ],
       "frontend": {}
     },
     "gldt_core": {
@@ -93,7 +98,9 @@
   },
   "networks": {
     "staging": {
-      "providers": ["https://icp0.io"],
+      "providers": [
+        "https://icp0.io"
+      ],
       "type": "persistent"
     }
   }

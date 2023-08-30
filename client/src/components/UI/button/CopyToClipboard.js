@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SnackBarFeedback from '../feedback/SnackBar';
 
 
 const CopyToClipboard = ({ text }) => {
@@ -31,11 +32,7 @@ const CopyToClipboard = ({ text }) => {
       >
         <ThemedContentCopyIcon />
       </ThemedIconButton>
-      <CustomSnackBar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success">
-          Address copied to the clipboard
-        </Alert>
-      </CustomSnackBar>
+      <SnackBarFeedback open={open} handleClose={handleClose} text="Address copied to the clipboard" />
     </>
   );
 };
