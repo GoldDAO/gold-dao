@@ -9,14 +9,13 @@ import { useEffect } from 'react';
 
 const TransactionsTable = () => {
     const [currentPage, setCurrentPage] = useState(0)
-
     const [rowsPerPage, setRowsPerPage] = useState(5)
-
+    const [loading, setLoading] = useState(true)
     const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage)
 
     useEffect(() => {
-        console.log('currentPage', currentPage)
-    }, [currentPage])
+        transactions ? setLoading(false) : setLoading(true)
+    }, [transactions])
 
     useEffect(() => {
         console.log('rowsPerPage', rowsPerPage)
@@ -37,40 +36,54 @@ const TransactionsTable = () => {
         'Amount',
         'To'
     ]
-    return (
-        <Box sx={{ width: '100%' }}>
-            <StyledTable>
-                <StyledTableHead>
-                    <StyledTableRow>
-                        {tableHead.map((e, i) => {
+    if (!loading) {
+        return (
+            <Box sx={{ width: '100%' }}>
+                <StyledTable>
+                    <StyledTableHead>
+                        <StyledTableRow>
+                            {tableHead.map((e, i) => {
+                                return (
+                                    <StyledTableCell key={i} >
+                                        {e}
+                                    </StyledTableCell>
+                                )
+                            })}
+                        </StyledTableRow>
+                    </StyledTableHead>
+                    <TableBody>
+                        {transactions?.map((e, i) => {
                             return (
-                                <StyledTableCell key={i} >
-                                    {e}
-                                </StyledTableCell>
-                            )
+                                <Row
+                                    key={i}
+                                    row={e}
+                                />
+                            );
                         })}
-                    </StyledTableRow>
-                </StyledTableHead>
-                <TableBody>
-                    {transactions?.map((e, i) => {
-                        return (
-                            <Row
-                                key={i}
-                                row={e}
-                            />
-                        );
-                    })}
-                </TableBody>
-            </StyledTable >
-            <TablePagination
-                rowsPerPageOptions={[5, 15, 25]}
-                component="div"
-                count={parseInt(max?.log_length)}
-                rowsPerPage={rowsPerPage}
-                page={currentPage}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+                    </TableBody>
+                </StyledTable >
+                <TablePagination
+                    rowsPerPageOptions={[5, 15, 25]}
+                    component="div"
+                    count={parseInt(max?.log_length)}
+                    rowsPerPage={rowsPerPage}
+                    page={currentPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Box>
+        )
+    } else return (
+        <Box sx={{
+            width: '100%',
+            height: '500px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column'
+        }}>
+            <CircularProgress />
+            <Typography sx={{ marginTop: '20px' }}>Loading transactions...</Typography>
         </Box>
     )
 }
