@@ -9,13 +9,11 @@ const queryTransaction = async (actor, rowsPerPage, currentPage) => {
 }
 
 export const useGldtLedgerTransactions = (rowsPerPage, currentPage) => {
-    console.log('rowsPerPage, currentPage', rowsPerPage, currentPage)
     const [transactions, setTransactions] = useState([]);
     const gldtLedgerActor = useCanister('gldtLedgerCanister')
 
 
     useEffect(() => {
-        console.log('transactions', transactions)
     }, [transactions])
     useEffect(() => {
         const fetchTransactions = async () => {

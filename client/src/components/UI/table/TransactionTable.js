@@ -6,6 +6,7 @@ import { useGldtLedgerTransactions } from '@/components/hooks/useGLDT';
 import { Principal } from '@dfinity/principal';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Timestamp from '../tooltip/timestamp';
 
 const TransactionsTable = () => {
     const [currentPage, setCurrentPage] = useState(0)
@@ -17,9 +18,6 @@ const TransactionsTable = () => {
         transactions ? setLoading(false) : setLoading(true)
     }, [transactions])
 
-    useEffect(() => {
-        console.log('rowsPerPage', rowsPerPage)
-    }, [rowsPerPage])
     const handleChangePage = (e, newPage) => {
         setCurrentPage(newPage);
     };
@@ -36,6 +34,7 @@ const TransactionsTable = () => {
         'Amount',
         'To'
     ]
+
     if (!loading) {
         return (
             <Box sx={{ width: '100%' }}>
@@ -101,13 +100,18 @@ const Row = ({ row }) => {
     return (
         <StyledTableRow>
             {Object.keys(formatedRow).map((e, i) => {
+                console.log('formatedRow[e]', e, formatedRow[e])
                 return (
-                    <StyledTableCell key={i}>
-                        {formatedRow[e]}
+                    < StyledTableCell key={i} >
+                        {e === 'Timestamp' ?
+                            <Timestamp timestamp={formatedRow[e]} />
+                            :
+                            formatedRow[e]
+                        }
                     </StyledTableCell>
                 )
             })}
-        </StyledTableRow>
+        </StyledTableRow >
     )
 }
 
