@@ -11,7 +11,6 @@ import { useCanister } from '@connect2ic/react';
 
 function Home({ content, meta, partners, cto, marketcap }) {
 
-
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
     ssr: false,
   });

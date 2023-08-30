@@ -2,7 +2,6 @@ import { Box, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 
 const Ruban = () => {
-  useEffect(() => { }, [process.env.DFX_NETWORK]);
   if (process.env.DFX_NETWORK !== 'ic') {
     return (
       <Box
