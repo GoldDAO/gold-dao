@@ -22,18 +22,15 @@ const Wallet = dynamic(() => import('./../wallet/Wallet'), {
 const Header = () => {
     const [user,] = useAtom(setGetUserAtom)
     const [status,] = useAtom(appStatusAtom)
-
-
     return (
         <HeaderContainer as="header" >
-            <Ruban />
-            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end', }}>
                 <Link href="/" >
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
-                        <Box key={i} as="li"><Link href={`${e.path}`}>{e.label}</Link></Box>
+                        <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}><Link href={`${e.path}`}>{e.label}</Link></Box>
                     ))}
                 </Box>
             </Nav>
@@ -50,7 +47,7 @@ export default Header;
 
 const Nav = styled('nav')`
     display: flex;
-    margin-top: 50px;
+    width: 80%;
     justify-content: space-between;
     ul{
         li{

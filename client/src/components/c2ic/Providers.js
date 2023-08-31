@@ -8,15 +8,20 @@ import { SafeHydrate } from '@/utils/SafeHydrate';
 import dynamic from 'next/dynamic';
 import '@connect2ic/core/style.css';
 
-import { gldNftCanisters } from '@/services/agents/';
+import { gldNftCanisters, gldtLedgerCanister } from '@/services/agents/';
 
 const myStore = createStore();
 
 const Providers = ({ children }) => {
-  const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
 
+  const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
+  whitelist.push(gldtLedgerCanister.canisterId)
+  const canisters = {
+    ...gldNftCanisters,
+    gldtLedgerCanister
+  }
   let client = createClient({
-    canisters: gldNftCanisters,
+    canisters,
     providers: defaultProviders,
     globalProviderConfig: {
       host: 'https://icp0.io',

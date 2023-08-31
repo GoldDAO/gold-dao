@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import React, { useEffect } from 'react';
 import { setGetUserAtom } from '@/states/user';
 import { appStatusAtom } from '@/states/appStatus';
-import GetBalanceOrigynNFTs from '../commands/getBalanceOrigynNFTs';
 import { emptyAllNftsAtom } from '@/states/nfts';
 import { removeAllItemsInCartAtom } from '@/states/cart';
 
@@ -93,7 +92,6 @@ const C2icButton = () => {
 
   useEffect(() => {
     setAppStatus(status.idle);
-    console.log('appstatus', appstatus);
   }, [status]);
 
   useEffect(() => {
@@ -126,7 +124,6 @@ const C2icButton = () => {
           </Typography>
         )}
         <ConnectDialog />
-        {isConnected && <GetBalanceOrigynNFTs />}
       </>
     </Box>
   );

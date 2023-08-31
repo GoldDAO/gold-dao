@@ -2,12 +2,10 @@ import { Box, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 
 const Ruban = () => {
-  useEffect(() => {}, [process.env.DFX_NETWORK]);
   if (process.env.DFX_NETWORK !== 'ic') {
     return (
       <Box
         sx={{
-          position: 'fixed',
           paddingTop: '3px',
           width: '100vw',
           height: '60px',

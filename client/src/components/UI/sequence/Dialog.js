@@ -2,15 +2,15 @@ import { Dialog, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
-import MainButton, { CloseButton } from './button/Buttons';
-import Address from './Address';
+import MainButton, { CloseButton } from '../button/Buttons';
+import Address from '../wallet/Address';
 import { useAtom } from 'jotai';
 import { cartAtom } from '@/states/cart';
 
 const CustomDialog = ({ content, open, setOpen, title, address, children, isButton }) => {
   const [cart] = useAtom(cartAtom);
   return (
-    <StyledModal open={open} onClose={() => {}}>
+    <StyledModal open={open} onClose={() => { }}>
       <StyledModalHead>
         <ModalLabel>
           <Typography>{title}</Typography>

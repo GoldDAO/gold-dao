@@ -2,18 +2,19 @@ import Head from 'next/head';
 import Layout from '@/components/UI/layout/Layout';
 import { getMarkdownPage, getMarketCap, getPartners, getSwapCTO } from '@/utils/getMarkdown';
 import { markdownToHtml } from '@/utils/markdownToHtml';
-import Marketcap from '@/components/UI/Marketcap';
+import Marketcap from '@/components/UI/sections/Marketcap';
 import { PageContent } from './_app';
-import Partners from '@/components/UI/partners';
-import Chart from '@/components/UI/Chart';
+import Partners from '@/components/UI/sections/partners';
+import Chart from '@/components/UI/sections/Chart';
 import dynamic from 'next/dynamic';
+import { useCanister } from '@connect2ic/react';
 
 function Home({ content, meta, partners, cto, marketcap }) {
-  console.log('YUMI_KYC_CANISTER_ID', process.env.YUMI_KYC_CANISTER_ID);
   const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
     ssr: false,
   });
-  const ManageNFTsSales = dynamic(() => import('@/components/UI/table/ManageNFTsSales'), {
+
+  const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
     ssr: false,
   });
 

@@ -1,7 +1,7 @@
 import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
-import CopyToClipboard from './button/CopyToClipboard';
+import CopyToClipboard from '../button/CopyToClipboard';
 import {
     Typography,
 } from '@mui/material';
