@@ -1,7 +1,17 @@
 import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
-import { Checkbox, CircularProgress, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import {
+    Checkbox,
+    CircularProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TablePagination,
+    TableRow,
+    Typography,
+} from '@mui/material';
 import { useGldtLedgerTransactions } from '@/components/hooks/useGLDT';
 import { Principal } from '@dfinity/principal';
 import { useState } from 'react';
@@ -9,15 +19,15 @@ import { useEffect } from 'react';
 import Timestamp from '../tooltip/timestamp';
 
 const TransactionsTable = () => {
-    const [currentPage, setCurrentPage] = useState(0)
-    const [rowsPerPage, setRowsPerPage] = useState(5)
-    const [loading, setLoading] = useState(true)
-    const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage)
+    const [currentPage, setCurrentPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [loading, setLoading] = useState(true);
+    const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage);
 
     useEffect(() => {
-        transactions ? setLoading(false) : setLoading(true)
-        console.log('transactions', transactions)
-    }, [transactions])
+        transactions ? setLoading(false) : setLoading(true);
+        console.log('transactions', transactions);
+    }, [transactions]);
 
     const handleChangePage = (e, newPage) => {
         setCurrentPage(newPage);
@@ -29,13 +39,7 @@ const TransactionsTable = () => {
     };
 
     // const tableHead = [Object.keys(transactions[0] ? transactions[0] : [])]
-    const tableHead = [
-        'Kind',
-        'Timestamp',
-        'Amount',
-        'To',
-        'Subaccount'
-    ]
+    const tableHead = ['Kind', 'Timestamp', 'Amount', 'From', 'To'];
 
     if (!loading) {
         return (
@@ -44,26 +48,16 @@ const TransactionsTable = () => {
                     <StyledTableHead>
                         <StyledTableRow>
                             {tableHead.map((e, i) => {
-                                return (
-                                    <StyledTableCell key={i}>
-                                        {e}
-                                    </StyledTableCell>
-                                )
+                                return <StyledTableCell key={i}>{e}</StyledTableCell>;
                             })}
                         </StyledTableRow>
                     </StyledTableHead>
                     <TableBody>
                         {transactions?.map((e, i) => {
-                            return (
-                                <Row
-                                    key={i}
-                                    row={e}
-                                />
-                            );
-
+                            return <Row key={i} row={e} />;
                         })}
                     </TableBody>
-                </StyledTable >
+                </StyledTable>
                 <TablePagination
                     rowsPerPageOptions={[5, 15, 25]}
                     component="div"
@@ -74,45 +68,71 @@ const TransactionsTable = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Box>
-        )
-    } else return (
-        <Box sx={{
-            width: '100%',
-            height: '500px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column'
-        }}>
-            <CircularProgress />
-            <Typography sx={{ marginTop: '20px' }}>Loading transactions...</Typography>
-        </Box>
-    )
-}
+        );
+    } else
+        return (
+            <Box
+                sx={{
+                    width: '100%',
+                    height: '500px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                }}
+            >
+                <CircularProgress />
+                <Typography sx={{ marginTop: '20px' }}>Loading transactions...</Typography>
+            </Box>
+        );
+};
 
 export default TransactionsTable;
 
-
 const Row = ({ row }) => {
-    let formatedRow
+    let formatedRow;
     switch (row.kind) {
         case 'mint':
             formatedRow = {
                 Kind: row.kind,
                 Timestamp: parseInt(row.timestamp),
                 Amount: (parseInt(row.mint[0].amount) / 100000000).toFixed(2),
-                To: Principal.fromUint8Array(row.mint[0].to.owner._arr).toString(),
-                Subaccount: Principal.fromUint8Array(row.mint[0].to.subaccount[0]).toString(),
-            }
+                From: 'Minting Account',
+                To: (
+                    <>
+                        <p>
+                            Principal:{' '}
+                            {Principal.fromUint8Array(row.mint[0].to.owner._arr).toString()}
+                        </p>
+                        <p>Subaccount: [{row.mint[0].to.subaccount[0].join(', ')}]</p>
+                    </>
+                ),
+            };
             break;
         case 'transfer':
             formatedRow = {
                 Kind: row.kind,
                 Timestamp: parseInt(row.timestamp),
                 Amount: (parseInt(row.transfer[0].amount) / 100000000).toFixed(2),
-                To: Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString(),
-                Subaccount: Principal.fromUint8Array(row.transfer[0].to.subaccount[0]).toString(),
-            }
+                From: (
+                    <>
+                        <p>
+                            Principal:{' '}
+                            {Principal.fromUint8Array(row.transfer[0].from.owner._arr).toString()}
+                        </p>
+                        <p>Subaccount: [{row.transfer[0].from.subaccount[0].join(', ')}]</p>
+                    </>
+                ),
+                To: (
+                    <>
+                        <p>
+                            Principal:{' '}
+                            {Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString()}
+                        </p>
+                        <p>Subaccount: [{row.transfer[0].to.subaccount[0].join(', ')}]</p>
+                    </>
+                ),
+            };
             break;
     }
 
@@ -120,41 +140,33 @@ const Row = ({ row }) => {
         <StyledTableRow>
             {Object.keys(formatedRow).map((e, i) => {
                 return (
-                    < StyledTableCell key={i} >
-                        {e === 'Timestamp' ?
+                    <StyledTableCell key={i}>
+                        {e === 'Timestamp' ? (
                             <Timestamp timestamp={formatedRow[e]} />
-                            :
+                        ) : (
                             formatedRow[e]
-                        }
+                        )}
                     </StyledTableCell>
-                )
+                );
             })}
-        </StyledTableRow >
-    )
-}
+        </StyledTableRow>
+    );
+};
 
-
-const StyledTableRow = styled(TableRow)`
-  `
-const StyledCheckbox = styled(Checkbox)`
-  `
+const StyledTableRow = styled(TableRow)``;
+const StyledCheckbox = styled(Checkbox)``;
 
 const StyledTableHead = styled(TableHead)`
-      font-weight: 600;
-  `
+    font-weight: 600;
+`;
 const StyledTableCell = styled(TableCell)`
-      font-weight: inherit;
-  `
+    font-weight: inherit;
+`;
 
-const StyledTable = styled(Table)`
-  
-  `
+const StyledTable = styled(Table)``;
 const ItemName = styled(Typography)`
-      height: 100%;
-      align-items: center;
-      display: inline-flex;
-      padding-left: 16px;
-  
-  `
-
-
+    height: 100%;
+    align-items: center;
+    display: inline-flex;
+    padding-left: 16px;
+`;
