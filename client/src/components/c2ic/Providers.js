@@ -13,13 +13,12 @@ import { gldNftCanisters, gldtLedgerCanister } from '@/services/agents/';
 const myStore = createStore();
 
 const Providers = ({ children }) => {
-
   const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
-  whitelist.push(gldtLedgerCanister.canisterId)
+  whitelist.push(gldtLedgerCanister.canisterId);
   const canisters = {
     ...gldNftCanisters,
-    gldtLedgerCanister
-  }
+    gldtLedgerCanister,
+  };
   let client = createClient({
     canisters,
     providers: defaultProviders,

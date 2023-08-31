@@ -12,13 +12,13 @@ const TooltipContent = ({ timestamp }) => {
     const hours = Math.floor(seconds / (60 * 60)) % 24;
     const minutes = Math.floor(seconds / 60) % 60;
 
-    const daysStr = days > 0 ? days.toString().padStart(2, '0') + 'd ' : '';
+    const daysStr = days > 0 ? days.toString().padStart(2, '0') : '0';
     const hoursStr = hours.toString().padStart(2, '0');
     const minutesStr = minutes.toString().padStart(2, '0');
 
     return (
         <>
-            {hoursStr} hours, {minutesStr} minutes ago
+            {daysStr} days, {hoursStr} hours, {minutesStr} minutes ago
         </>
     );
 };
