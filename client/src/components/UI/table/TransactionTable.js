@@ -16,6 +16,7 @@ const TransactionsTable = () => {
 
     useEffect(() => {
         transactions ? setLoading(false) : setLoading(true)
+        console.log('transactions', transactions)
     }, [transactions])
 
     const handleChangePage = (e, newPage) => {
@@ -32,7 +33,8 @@ const TransactionsTable = () => {
         'Kind',
         'Timestamp',
         'Amount',
-        'To'
+        'To',
+        'Subaccount'
     ]
 
     if (!loading) {
@@ -43,7 +45,7 @@ const TransactionsTable = () => {
                         <StyledTableRow>
                             {tableHead.map((e, i) => {
                                 return (
-                                    <StyledTableCell key={i} >
+                                    <StyledTableCell key={i}>
                                         {e}
                                     </StyledTableCell>
                                 )
@@ -58,6 +60,7 @@ const TransactionsTable = () => {
                                     row={e}
                                 />
                             );
+
                         })}
                     </TableBody>
                 </StyledTable >
@@ -91,16 +94,31 @@ export default TransactionsTable;
 
 
 const Row = ({ row }) => {
-    const formatedRow = {
-        Kind: row.kind,
-        Timestamp: parseInt(row.timestamp),
-        Amount: parseInt(row.mint[0].amount),
-        To: Principal.fromUint8Array(row.mint[0].to.owner._arr).toString()
+    let formatedRow
+    switch (row.kind) {
+        case 'mint':
+            formatedRow = {
+                Kind: row.kind,
+                Timestamp: parseInt(row.timestamp),
+                Amount: (parseInt(row.mint[0].amount) / 100000000).toFixed(2),
+                To: Principal.fromUint8Array(row.mint[0].to.owner._arr).toString(),
+                Subaccount: Principal.fromUint8Array(row.mint[0].to.subaccount[0]).toString(),
+            }
+            break;
+        case 'transfer':
+            formatedRow = {
+                Kind: row.kind,
+                Timestamp: parseInt(row.timestamp),
+                Amount: (parseInt(row.transfer[0].amount) / 100000000).toFixed(2),
+                To: Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString(),
+                Subaccount: Principal.fromUint8Array(row.transfer[0].to.subaccount[0]).toString(),
+            }
+            break;
     }
+
     return (
         <StyledTableRow>
             {Object.keys(formatedRow).map((e, i) => {
-                console.log('formatedRow[e]', e, formatedRow[e])
                 return (
                     < StyledTableCell key={i} >
                         {e === 'Timestamp' ?

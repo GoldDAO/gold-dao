@@ -6,7 +6,6 @@ export const useAllCanisters = () => {
 
     const weights = Object.keys(gldNftCanisters);
 
-    console.log('weights', weights)
     const actor1 = useCanister(weights[0])[0]
     const actor10 = useCanister(weights[1])[0]
     const actor100 = useCanister(weights[2])[0]
