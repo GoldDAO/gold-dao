@@ -25,3 +25,16 @@ dfx deploy --network ${NETWORK} gldt_ledger --argument "(variant {Init = record 
     cycles_for_archive_creation = opt 10_000_000_000_000;
   }
 }})"
+
+
+
+# # to deploy rosetta API
+# docker run \
+#     --interactive \
+#     --tty \
+#     --publish 8081:8080 \
+#     --rm \
+#     dfinity/rosetta-api:latest \
+#     --canister-id 6uad6-fqaaa-aaaam-abovq-cai \
+#     --ic-url "https://icp0.io" \
+#     -t GLDT

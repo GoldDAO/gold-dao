@@ -33,14 +33,14 @@ dfx canister call --network staging yumi_kyc setKycAccess '(variant {Gold}, vari
 dfx canister call --network staging yumi_kyc setKycAccess '(variant {Gold}, variant {Tier2} ,variant{Pass} )'  &&
 dfx canister call --network staging yumi_kyc setKycAccess '(variant {Gold}, variant {Tier3} ,variant{Pass} )'
 dfx canister call --network staging yumi_kyc getAllKycAccess
-## b. update KYC status of all GLD NFT canisters
+## b. update KYC status of the GLDT canister
 dfx canister call --network staging yumi_kyc batch_update_kyc_status '(vec {
-  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; }}};
-  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; }}}
+  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "'"$(dfx canister id --network staging gldt_core)"'"; }}}
   })'
 # c. Add your wallets to KYC canister
 dfx canister call --network staging yumi_kyc batch_update_kyc_status '(vec {
-  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe"; }}}
+  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe"; }}};
+  record { kycLevel= variant {Tier3}; account = variant {ICRC1 = record { owner = principal "xtjhb-skaw3-4ljsp-34fxx-epade-cbgz5-eq3dc-zvr3t-mdywz-ueocs-5qe"; }}}
   })'
 dfx canister call --network staging yumi_kyc getAllKycStatus
 # d. set the routers for gold channels for the GLD NFT canisters
@@ -79,7 +79,12 @@ dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner
 dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx identity get-principal)"'"; subaccount = opt blob "abcdefghijklmnopqrstuvxyz1234567"})'
 
 
+
 dfx canister call --network staging gldt_ledger get_blocks '(record {start= record { blocks= vec {0}} ;length=2})'
+dfx canister call --network staging gldt_ledger get_data_certificate
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record { owner = principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; subaccount = opt blob "?–üÏYM<ðz·l°Û_ðf<ÍÈAW‹¾âhŽ"})'
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record { owner = principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'";})'
+
 
 # Notes
 #

@@ -26,7 +26,7 @@ const TransactionsTable = () => {
 
     useEffect(() => {
         transactions ? setLoading(false) : setLoading(true);
-        console.log('transactions', transactions);
+        // console.log('transactions', transactions);
     }, [transactions]);
 
     const handleChangePage = (e, newPage) => {
@@ -96,7 +96,7 @@ const Row = ({ row }) => {
             formatedRow = {
                 Kind: row.kind,
                 Timestamp: parseInt(row.timestamp),
-                Amount: (parseInt(row.mint[0].amount) / 100000000).toFixed(2),
+                Amount: (parseInt(row.mint[0].amount) / 10 ** 8).toFixed(8),
                 From: 'Minting Account',
                 To: (
                     <>
@@ -113,7 +113,7 @@ const Row = ({ row }) => {
             formatedRow = {
                 Kind: row.kind,
                 Timestamp: parseInt(row.timestamp),
-                Amount: (parseInt(row.transfer[0].amount) / 100000000).toFixed(2),
+                Amount: (parseInt(row.transfer[0].amount) / 10 ** 8).toFixed(8),
                 From: (
                     <>
                         <p>
@@ -129,7 +129,13 @@ const Row = ({ row }) => {
                             Principal:{' '}
                             {Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString()}
                         </p>
-                        <p>Subaccount: [{row.transfer[0].to.subaccount[0].join(', ')}]</p>
+                        <p>
+                            Subaccount: [
+                            {row.transfer[0].to.subaccount[0]
+                                ? row.transfer[0].to.subaccount[0].join(', ')
+                                : ''}
+                            ]
+                        </p>
                     </>
                 ),
             };

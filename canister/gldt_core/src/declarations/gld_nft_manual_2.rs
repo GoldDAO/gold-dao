@@ -1383,19 +1383,19 @@ pub enum TransactionID__1 {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct DepositDetail {
-    token: TokenSpec__1,
-    trx_id: Option<TransactionID__1>,
-    seller: Account,
-    buyer: Account,
-    amount: candid::Nat,
-    sale_id: Option<String>,
+    pub token: TokenSpec__1,
+    pub trx_id: Option<TransactionID__1>,
+    pub seller: Account,
+    pub buyer: Account,
+    pub amount: candid::Nat,
+    pub sale_id: Option<String>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct EscrowRequest {
-    token_id: String,
-    deposit: DepositDetail,
-    lock_to_date: Option<candid::Int>,
+    pub token_id: String,
+    pub deposit: DepositDetail,
+    pub lock_to_date: Option<candid::Int>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]

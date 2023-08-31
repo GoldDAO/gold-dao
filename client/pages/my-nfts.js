@@ -11,8 +11,8 @@ const MyNftsTable = dynamic(() => import('@/components/UI/table/NftsTable'), {
 });
 
 const MyNfts = () => {
-    const [user] = useAtom(userAtom)
-    console.log('user', user)
+    const [user] = useAtom(userAtom);
+    // console.log('user', user)
     return (
         <>
             <Head>
@@ -21,15 +21,11 @@ const MyNfts = () => {
                 <meta property={`og:description`} content={meta.description} key="title" /> */}
             </Head>
             <Layout>
-                {user.isConnected ?
-                    <MyNftsTable
-                        selectable={false}
-                        hasControls={true}
-                    /> :
-                    <Box>
-                        Please connect your wallet
-                    </Box>
-                }
+                {user.isConnected ? (
+                    <MyNftsTable selectable={false} hasControls={true} />
+                ) : (
+                    <Box>Please connect your wallet</Box>
+                )}
             </Layout>
         </>
     );
