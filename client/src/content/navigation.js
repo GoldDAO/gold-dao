@@ -12,11 +12,15 @@ export const navigation = [
     //     path: '/how-it-works',
     // }  
     {
-        label: 'My Nft',
+        label: 'My Nfts',
         path: '/my-nfts',
     },
     {
         label: 'Transactions',
         path: '/transactions',
+    },
+    {
+        label: 'Nfts Breakdown',
+        path: '/nfts-breakdown',
     }
 ]
