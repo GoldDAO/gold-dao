@@ -8,17 +8,23 @@ import { SafeHydrate } from '@/utils/SafeHydrate';
 import dynamic from 'next/dynamic';
 import '@connect2ic/core/style.css';
 
-import { gldNftCanisters, gldtLedgerCanister } from '@/services/agents/';
+import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
 
 const myStore = createStore();
+
+console.log('gldtCoreCanister', gldtCoreCanister)
 
 const Providers = ({ children }) => {
   const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
   whitelist.push(gldtLedgerCanister.canisterId);
+  whitelist.push(gldtCoreCanister.canisterId);
   const canisters = {
     ...gldNftCanisters,
     gldtLedgerCanister,
+    gldtCoreCanister
   };
+
+  console.log('canisters', canisters)
   let client = createClient({
     canisters,
     providers: defaultProviders,
