@@ -4,4 +4,5 @@
 #![allow(non_camel_case_types)]
 #![allow(unused)]
 #[rustfmt::skip]
-pub mod gld_nft_manual_2;
+pub mod gld_nft;
+pub mod icrc1;
