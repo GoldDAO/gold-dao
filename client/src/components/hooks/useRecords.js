@@ -6,10 +6,9 @@ export const useRecords = (rowsPerPage, currentPage) => {
     const [records, setRecords] = useState([]);
     const [total, setTotal] = useState();
     const gldtCoreActor = useCanister('gldtCoreCanister')
-    currentPage = currentPage > 0 ? currentPage + 1 : currentPage
     useEffect(() => {
         const fetchRecords = async () => {
-            const fetchedRecords = await queryRecords(gldtCoreActor, rowsPerPage, currentPage);
+            const fetchedRecords = await queryRecords(gldtCoreActor, rowsPerPage, currentPage)
             setRecords(fetchedRecords.records);
             setTotal(fetchedRecords.total)
         };
@@ -19,6 +18,12 @@ export const useRecords = (rowsPerPage, currentPage) => {
 }
 
 const queryRecords = async (actor, rowsPerPage, currentPage) => {
-    const records = await Promise.resolve(actor[0].get_records({ page: [currentPage], limit: [rowsPerPage] }))
+    const { total } = await actor[0].get_records({ page: [], limit: [] })
+    const lastpage = parseInt(parseInt(total) / rowsPerPage)
+    const records = await Promise.resolve(actor[0].get_records({
+        page: [
+            lastpage - currentPage
+        ], limit: [rowsPerPage]
+    }))
     return { records: records.data[0].reverse(), total: records.total }
 }
