@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, Tooltip } from '@mui/material';
-
+import moment from 'moment';
 
 const TooltipContent = ({ timestamp }) => {
     const now = new Date();
     const then = new Date(timestamp);
-    console.log('then', then)
+    console.log('then', then);
     const seconds = Math.floor((now - then) / 1000);
 
     const days = Math.floor(seconds / (24 * 60 * 60));
@@ -24,25 +24,12 @@ const TooltipContent = ({ timestamp }) => {
 };
 
 const Timestamp = ({ timestamp }) => {
-    const date = new Date(timestamp / 1000000);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-
-    const dateFormated = `${day.toString().padStart(2, '0')}/${month
-        .toString()
-        .padStart(2, '0')}/${year} ${hours.toString().padStart(2, '0')}:${minutes
-            .toString()
-            .padStart(2, '0')}`;
-
+    const timestampSeconds = timestamp / 10 ** 6;
     return (
-        <Tooltip
-            sx={{ fontSize: '1em' }}
-            title={<TooltipContent timestamp={timestamp / 1000000} />}
-        >
-            <Box style={{ fontSize: '1em', margin: 0 }}>{dateFormated}</Box>
+        <Tooltip sx={{ fontSize: '1em' }} title={<TooltipContent timestamp={timestampSeconds} />}>
+            <Box style={{ fontSize: '1em', margin: 0 }}>
+                {moment(timestampSeconds).format('DD/MM/YYYY hh:mm:ss.SSS')}
+            </Box>
         </Tooltip>
     );
 };
