@@ -1,5 +1,6 @@
 import { createActor, idlFactory } from './declarations/GLD NFT';
 import { createActor as createGLDTLedgerActor, idlFactory as idlGLDTLedgerFactory } from './declarations/GLDT LEDGER';
+import { createActor as createGLDTCoreActor, idlFactory as idlGLDTCoreFactory } from './declarations/GLDT CORE';
 
 const GLDNFT_CANISTER_IDS = process.env.GLDNFT_CANISTER_IDS || {};
 
@@ -18,3 +19,10 @@ export const gldtLedgerCanister = {
   createActor: createGLDTLedgerActor,
   idlFactory: idlGLDTLedgerFactory
 };
+
+
+export const gldtCoreCanister = {
+  canisterId: process.env.GLDT_CANISTER_ID,
+  createActor: createGLDTCoreActor,
+  idlFactory: idlGLDTCoreFactory
+}
