@@ -1,0 +1,26 @@
+[package]
+name = "gldt_core"
+version = "0.1.0"
+edition = "2021"
+
+## See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+candid = { version = "0.8.4" }
+ic-cdk-bindgen = "0.1.0"
+
+[dependencies]
+candid = { version = "0.8.4"}
+ic-cdk = "0.9.2"
+ic-cdk-macros = "0.7.1"
+ic-ledger-types = "0.7.0"
+icrc-ledger-types = "0.1.0"
+serde = "1.0.126"
+serde_derive = "1.0.126"
+serde_bytes = "0.11.12"
+canistergeek_ic_rust = "0.3.3"
+
+[dev-dependencies]
+tempfile = "3.2.0"
