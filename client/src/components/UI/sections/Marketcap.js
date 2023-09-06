@@ -4,6 +4,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
+import MarketCapToolTip from '../tooltip/marketcapTooltip';
 
 const Marketcap = ({ data }) => {
     const totalSupply = useTotalSupply();
@@ -18,7 +19,7 @@ const Marketcap = ({ data }) => {
         >
             <MarketCapContainer>
                 <p style={{ fontWeight: 300 }}>{data.label} : </p>
-                <p style={{ color: '#D3B872' }}>&nbsp;{(totalSupply * gprice).toFixed(2)} USD</p>
+                <MarketCapToolTip marketcap={(totalSupply * gprice).toFixed(2)} />
             </MarketCapContainer>
         </Box>
     );

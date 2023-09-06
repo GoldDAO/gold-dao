@@ -5,7 +5,6 @@ import moment from 'moment';
 const TooltipContent = ({ timestamp }) => {
     const now = new Date();
     const then = new Date(timestamp);
-
     const seconds = Math.floor((now - then) / 1000);
     const days = Math.floor(seconds / (24 * 60 * 60));
     const hours = Math.floor(seconds / (60 * 60)) % 24;
