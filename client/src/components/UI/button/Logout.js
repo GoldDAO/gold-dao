@@ -6,9 +6,12 @@ import { userAtom } from '../../../states/user';
 import styled from 'styled-components';
 
 const LogoutButton = () => {
-    const [user, setUser] = useAtom(userAtom)
+    const [user, setUser] = useAtom(userAtom);
     return (
-        <LogOut onClick={() => user.disconnect()}><LogoutIcon /><div>Logout</div></LogOut >
+        <LogOut onClick={() => user.disconnect()}>
+            <LogoutIcon />
+            <div>Logout</div>
+        </LogOut>
     );
 };
 
@@ -18,20 +21,20 @@ const LogOut = styled(Button)`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    &.MuiButtonBase-root{
+    &.MuiButtonBase-root {
         display: flex;
         align-items: center;
         justify-content: flex-end;
     }
-    svg{
+    svg {
         color: #000;
         fill: #000;
         width: 20px;
         margin-right: 10px;
     }
-    div{
+    div {
         color: #000;
         font-size: 16px;
         text-transform: lowercase;
     }
-`
+`;

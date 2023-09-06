@@ -12,40 +12,40 @@ import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/service
 
 const myStore = createStore();
 
-console.log('gldtCoreCanister', gldtCoreCanister)
+console.log('gldtCoreCanister', gldtCoreCanister);
 
 const Providers = ({ children }) => {
-  const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
-  whitelist.push(gldtLedgerCanister.canisterId);
-  whitelist.push(gldtCoreCanister.canisterId);
-  const canisters = {
-    ...gldNftCanisters,
-    gldtLedgerCanister,
-    gldtCoreCanister
-  };
+    const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
+    whitelist.push(gldtLedgerCanister.canisterId);
+    whitelist.push(gldtCoreCanister.canisterId);
+    const canisters = {
+        ...gldNftCanisters,
+        gldtLedgerCanister,
+        gldtCoreCanister,
+    };
 
-  console.log('canisters', canisters)
-  let client = createClient({
-    canisters,
-    providers: defaultProviders,
-    globalProviderConfig: {
-      host: 'https://icp0.io',
-      dev: false,
-      whitelist,
-    },
-  });
+    console.log('canisters', canisters);
+    let client = createClient({
+        canisters,
+        providers: defaultProviders,
+        globalProviderConfig: {
+            host: 'https://icp0.io',
+            dev: false,
+            whitelist,
+        },
+    });
 
-  if (!client) {
-    return <></>;
-  }
+    if (!client) {
+        return <></>;
+    }
 
-  return (
-    <Connect2ICProvider client={client}>
-      <SafeHydrate>
-        <JotaiProvider store={myStore}>{children}</JotaiProvider>
-      </SafeHydrate>
-    </Connect2ICProvider>
-  );
+    return (
+        <Connect2ICProvider client={client}>
+            <SafeHydrate>
+                <JotaiProvider store={myStore}>{children}</JotaiProvider>
+            </SafeHydrate>
+        </Connect2ICProvider>
+    );
 };
 
 export default Providers;

@@ -9,51 +9,51 @@ import dynamic from 'next/dynamic';
 import { useCanister } from '@connect2ic/react';
 
 function Home({ content, meta, partners, cto, marketcap }) {
-  const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
-    ssr: false,
-  });
+    const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
+        ssr: false,
+    });
 
-  const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
-    ssr: false,
-  });
+    const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
+        ssr: false,
+    });
 
-  const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
-    ssr: false,
-  });
+    const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
+        ssr: false,
+    });
 
-  return (
-    <>
-      <Head>
-        <title>{meta.title}</title>
-        <meta property={`og:title`} content={meta.title} key="title" />
-        <meta property={`og:description`} content={meta.description} key="title" />
-      </Head>
-      <Layout>
-        <Marketcap data={marketcap.data} />
-        <PageContent dangerouslySetInnerHTML={{ __html: content }} />
-        <Swap data={cto.data} />
-        <Chart />
-        <Partners partners={partners} />
-      </Layout>
-    </>
-  );
+    return (
+        <>
+            <Head>
+                <title>{meta.title}</title>
+                <meta property={`og:title`} content={meta.title} key="title" />
+                <meta property={`og:description`} content={meta.description} key="title" />
+            </Head>
+            <Layout>
+                <Marketcap data={marketcap.data} />
+                <PageContent dangerouslySetInnerHTML={{ __html: content }} />
+                <Swap data={cto.data} />
+                <Chart />
+                <Partners partners={partners} />
+            </Layout>
+        </>
+    );
 }
 
 export default Home;
 
 export async function getStaticProps() {
-  const content = getMarkdownPage('home');
-  const html = await markdownToHtml(content.content);
-  const partners = await getPartners();
-  const CTO = await getSwapCTO();
-  const marketcap = await getMarketCap();
-  return {
-    props: {
-      content: html,
-      meta: content.data,
-      partners: partners,
-      cto: CTO,
-      marketcap: marketcap,
-    },
-  };
+    const content = getMarkdownPage('home');
+    const html = await markdownToHtml(content.content);
+    const partners = await getPartners();
+    const CTO = await getSwapCTO();
+    const marketcap = await getMarketCap();
+    return {
+        props: {
+            content: html,
+            meta: content.data,
+            partners: partners,
+            cto: CTO,
+            marketcap: marketcap,
+        },
+    };
 }

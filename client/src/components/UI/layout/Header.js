@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { navigation } from '../../../../src/content/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import styled from 'styled-components'
+import styled from 'styled-components';
 import { useAtom } from 'jotai';
 import { setGetUserAtom } from '../../../states/user';
 import dynamic from 'next/dynamic';
@@ -18,26 +18,26 @@ const Wallet = dynamic(() => import('./../wallet/Wallet'), {
     ssr: false,
 });
 
-
 const Header = () => {
-    const [user,] = useAtom(setGetUserAtom)
-    const [status,] = useAtom(appStatusAtom)
+    const [user] = useAtom(setGetUserAtom);
+    const [status] = useAtom(appStatusAtom);
     return (
-        <HeaderContainer as="header" >
-            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end', }}>
-                <Link href="/" >
+        <HeaderContainer as="header">
+            <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Link href="/">
                     <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
-                        <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}><Link href={`${e.path}`}>{e.label}</Link></Box>
+                        <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}>
+                            <Link href={`${e.path}`}>{e.label}</Link>
+                        </Box>
                     ))}
                 </Box>
             </Nav>
             <Box sx={{ position: 'relative' }}>
-                {status === 'connected' &&
-                    <Wallet />}
-                < C2icButton />
+                {status === 'connected' && <Wallet />}
+                <C2icButton />
             </Box>
         </HeaderContainer>
     );
@@ -49,19 +49,19 @@ const Nav = styled('nav')`
     display: flex;
     width: 80%;
     justify-content: space-between;
-    ul{
-        li{
+    ul {
+        li {
             padding: 0 20px;
             text-decoration: none;
             list-style: none;
         }
     }
-`
+`;
 
 const HeaderContainer = styled('header')`
     display: flex;
     padding-bottom: 20px;
-    border-bottom: 1px solid #D3B872;
+    border-bottom: 1px solid #d3b872;
     justify-content: space-between;
     align-items: center;
-`
+`;
