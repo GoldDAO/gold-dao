@@ -7,7 +7,6 @@ const TooltipContent = ({ timestamp }) => {
     const then = new Date(timestamp);
     console.log('then', then);
     const seconds = Math.floor((now - then) / 1000);
-
     const days = Math.floor(seconds / (24 * 60 * 60));
     const hours = Math.floor(seconds / (60 * 60)) % 24;
     const minutes = Math.floor(seconds / 60) % 60;
