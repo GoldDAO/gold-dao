@@ -3,17 +3,18 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Address from './Address';
 import LogoutButton from '../button/Logout';
-import RefreshButton from '../button/Refresh';
-import { useBalance, useWallet } from '@connect2ic/react';
-import { CloseButton } from '../button/Buttons';
+import useGLDTbalance from '@/components/hooks/useGLDTbalance';
 
 const WalletContainer = ({ user, open, setOpen }) => {
+  const balance = useGLDTbalance()
+
   return (
     <WalletBox open={open} onClose={() => setOpen(false)}>
       <Address address={user.principal} />
       <BalanceContainer>
         <Box >
           <Typography sx={{ fontSize: '16px', fontWeight: 500, color: "#626263" }}>GLDT Balance</Typography>
+          <Box> {balance} </Box>
         </Box>
       </BalanceContainer>
       <LogoutButton />
