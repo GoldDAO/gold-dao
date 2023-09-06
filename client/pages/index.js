@@ -2,7 +2,6 @@ import Head from 'next/head';
 import Layout from '@/components/UI/layout/Layout';
 import { getMarkdownPage, getMarketCap, getPartners, getSwapCTO } from '@/utils/getMarkdown';
 import { markdownToHtml } from '@/utils/markdownToHtml';
-import Marketcap from '@/components/UI/sections/Marketcap';
 import { PageContent } from './_app';
 import Partners from '@/components/UI/sections/partners';
 import Chart from '@/components/UI/sections/Chart';
@@ -15,6 +14,10 @@ function Home({ content, meta, partners, cto, marketcap }) {
   });
 
   const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
+    ssr: false,
+  });
+
+  const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
     ssr: false,
   });
 
