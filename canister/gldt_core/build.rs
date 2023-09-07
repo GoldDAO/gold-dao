@@ -1,4 +1,4 @@
-use ic_cdk_bindgen::{ Builder, Config };
+// use ic_cdk_bindgen::{ Builder, Config };
 
 /// activate this for debugging
 // macro_rules! p {
@@ -29,7 +29,7 @@ fn set_env_vars() {
 }
 
 pub fn main() {
-    // set_env_vars();
+    set_env_vars();
     // let mut builder = Builder::new();
 
     // let gld_nft = Config::new("gld_nft");

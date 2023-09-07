@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [build-dependencies]
 candid = { version = "0.8.4" }
-ic-cdk-bindgen = "0.1.0"
+# ic-cdk-bindgen = "0.1.0"
 
 [dependencies]
 candid = { version = "0.8.4"}

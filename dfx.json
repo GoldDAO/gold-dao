@@ -11,11 +11,11 @@
       "type": "rust",
       "candid": "canister/gldt_core/src/gldt_core.did",
       "declarations": {
-        "output": "canister/gldt_core/declarations/"
+        "output": "canister/declarations/gldt_core/"
       },
       "package": "gldt_core",
       "optimize": "cycles",
-      "build": "npm run build:back"
+      "build": ["npm run build:back"]
     },
     "gldt_ledger": {
       "type": "custom",
