@@ -168,7 +168,6 @@ local:
     - dfx --version
     - dfx start --background
   script:
-    - cargo locate-project
     - dfx deploy -y --no-wallet gldt_core
     # - dfx deploy -y --no-wallet gldt_frontend
   after_script:
