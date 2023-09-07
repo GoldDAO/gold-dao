@@ -89,7 +89,7 @@ canister test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
-    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt_core
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
@@ -144,8 +144,8 @@ canister build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
   <<: *rust_template
-  script: 
-    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+  script:
+    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt_core
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
