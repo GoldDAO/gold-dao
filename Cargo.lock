@@ -144,10 +144,10 @@ dependencies = [
  "crc32fast",
  "data-encoding",
  "hex",
- "lalrpop 0.19.12",
- "lalrpop-util 0.19.12",
+ "lalrpop",
+ "lalrpop-util",
  "leb128",
- "logos 0.12.1",
+ "logos",
  "num-bigint",
  "num-traits",
  "num_enum 0.5.11",
@@ -173,10 +173,7 @@ dependencies = [
  "crc32fast",
  "data-encoding",
  "hex",
- "lalrpop 0.20.0",
- "lalrpop-util 0.20.0",
  "leb128",
- "logos 0.13.0",
  "num-bigint",
  "num-traits",
  "num_enum 0.6.1",
@@ -433,7 +430,6 @@ dependencies = [
  "candid 0.8.4",
  "canistergeek_ic_rust",
  "ic-cdk 0.9.2",
- "ic-cdk-bindgen",
  "ic-cdk-macros 0.7.1",
  "ic-ledger-types",
  "icrc-ledger-types",
@@ -522,15 +518,6 @@ dependencies = [
  "ic0",
  "serde",
  "serde_bytes",
-]
-
-[[package]]
-name = "ic-cdk-bindgen"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5412b8b7def6a88203b824ca77e9c1edb1b4d2ea7b678311800b2666c71e9384"
-dependencies = [
- "candid 0.9.3",
 ]
 
 [[package]]
@@ -647,33 +634,10 @@ dependencies = [
  "ena",
  "is-terminal",
  "itertools",
- "lalrpop-util 0.19.12",
+ "lalrpop-util",
  "petgraph",
  "regex",
  "regex-syntax 0.6.29",
- "string_cache",
- "term",
- "tiny-keccak",
- "unicode-xid",
-]
-
-[[package]]
-name = "lalrpop"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da4081d44f4611b66c6dd725e6de3169f9f63905421e8626fcb86b6a898998b8"
-dependencies = [
- "ascii-canvas",
- "bit-set",
- "diff",
- "ena",
- "is-terminal",
- "itertools",
- "lalrpop-util 0.20.0",
- "petgraph",
- "pico-args",
- "regex",
- "regex-syntax 0.7.4",
  "string_cache",
  "term",
  "tiny-keccak",
@@ -685,15 +649,6 @@ name = "lalrpop-util"
 version = "0.19.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3c48237b9604c5a4702de6b824e02006c3214327564636aef27c1028a8fa0ed"
-dependencies = [
- "regex",
-]
-
-[[package]]
-name = "lalrpop-util"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f35c735096c0293d313e8f2a641627472b83d01b937177fe76e5e2708d31e0d"
 dependencies = [
  "regex",
 ]
@@ -744,30 +699,7 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bf8b031682c67a8e3d5446840f9573eb7fe26efe7ec8d195c9ac4c0647c502f1"
 dependencies = [
- "logos-derive 0.12.1",
-]
-
-[[package]]
-name = "logos"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c000ca4d908ff18ac99b93a062cb8958d331c3220719c52e77cb19cc6ac5d2c1"
-dependencies = [
- "logos-derive 0.13.0",
-]
-
-[[package]]
-name = "logos-codegen"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc487311295e0002e452025d6b580b77bb17286de87b57138f3b5db711cded68"
-dependencies = [
- "beef",
- "fnv",
- "proc-macro2",
- "quote",
- "regex-syntax 0.6.29",
- "syn 2.0.29",
+ "logos-derive",
 ]
 
 [[package]]
@@ -782,15 +714,6 @@ dependencies = [
  "quote",
  "regex-syntax 0.6.29",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "logos-derive"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbfc0d229f1f42d790440136d941afd806bc9e949e2bcb8faa813b0f00d1267e"
-dependencies = [
- "logos-codegen",
 ]
 
 [[package]]
@@ -931,12 +854,6 @@ checksum = "b6796ad771acdc0123d2a88dc428b5e38ef24456743ddb1744ed628f9815c096"
 dependencies = [
  "siphasher",
 ]
-
-[[package]]
-name = "pico-args"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5be167a7af36ee22fe3115051bc51f6e6c7054c9348e28deb4f49bd6f705a315"
 
 [[package]]
 name = "precomputed-hash"
