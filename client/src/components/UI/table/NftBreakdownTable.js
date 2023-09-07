@@ -25,7 +25,7 @@ const NftBreakdownTable = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [loading, setLoading] = useState(false);
 
-    const records = useRecords(rowsPerPage, currentPage,)
+    const records = useRecords(rowsPerPage, currentPage);
 
     // useEffect(() => {
     //     records ? setLoading(false) : setLoading(true);
@@ -40,7 +40,16 @@ const NftBreakdownTable = () => {
         setCurrentPage(0);
     };
 
-    const tableHead = ['Nft ID', 'Record Type', 'grams', 'Minting TimeStamp', 'GLDT Minted', 'Receiving Account', 'GLDNFT Canister', 'Block'];
+    const tableHead = [
+        'Nft ID',
+        'Record Type',
+        'grams',
+        'Minting TimeStamp',
+        'GLDT Minted',
+        'Receiving Account',
+        'GLDNFT Canister',
+        'Block',
+    ];
 
     if (!loading) {
         return (
@@ -91,8 +100,17 @@ const NftBreakdownTable = () => {
 export default NftBreakdownTable;
 
 const Row = ({ row }) => {
-    console.log('row', row)
-    const tableHead = ['Nft ID', 'Record Type', 'grams', 'Minting TimeStamp', 'GLDT Minted', 'Receiving Account', 'GLDNFT Canister', 'Block'];
+    console.log('row', row);
+    const tableHead = [
+        'Nft ID',
+        'Record Type',
+        'grams',
+        'Minting TimeStamp',
+        'GLDT Minted',
+        'Receiving Account',
+        'GLDNFT Canister',
+        'Block',
+    ];
     const formatedRow = {
         nft_id: row.nft_id,
         record_type: row.record_type,
@@ -102,7 +120,7 @@ const Row = ({ row }) => {
         receiving_account: row.receiving_account,
         gld_nft_canister_id: row.gld_nft_canister_id,
         block_height: row.block_height,
-    }
+    };
     return (
         <StyledTableRow>
             {Object.keys(formatedRow).map((e, i) => {
@@ -110,7 +128,10 @@ const Row = ({ row }) => {
                     case 'receiving_account':
                         return (
                             <StyledTableCell key={e}>
-                                <p>Principal:{Principal.fromUint8Array(formatedRow[e].owner._arr).toString()}</p>
+                                <p>
+                                    Principal:
+                                    {Principal.fromUint8Array(formatedRow[e].owner._arr).toString()}
+                                </p>
                                 <p>SubAccount: [{formatedRow[e].subaccount[0]?.join(', ')}]</p>
                             </StyledTableCell>
                         );
@@ -128,14 +149,12 @@ const Row = ({ row }) => {
                         );
                     default:
                         return (
-                            <StyledTableCell key={e}>
-                                {formatedRow[e].toString()}
-                            </StyledTableCell>
-                        )
+                            <StyledTableCell key={e}>{formatedRow[e].toString()}</StyledTableCell>
+                        );
                 }
             })}
         </StyledTableRow>
-    )
+    );
 };
 
 const StyledTableRow = styled(TableRow)``;

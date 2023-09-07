@@ -17,7 +17,7 @@ const NftBreakdown = () => {
             </Head>
             <Layout>
                 <NftBreakdownTable />
-            </Layout >
+            </Layout>
         </>
     );
 };

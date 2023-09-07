@@ -10,4 +10,4 @@ const RefreshButton = () => {
     );
 };
 
-export default RefreshButton; 
+export default RefreshButton;
