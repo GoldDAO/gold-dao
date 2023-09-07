@@ -226,20 +226,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "canistergeek_ic_rust"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3779d292ee1d74c762a293ec8295f34eb526e02fcc40638b79d37855dac97a3f"
-dependencies = [
- "candid 0.9.3",
- "chrono",
- "ic-cdk 0.10.0",
- "num-bigint",
- "num-traits",
- "serde",
-]
-
-[[package]]
 name = "cc"
 version = "1.0.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -445,7 +431,7 @@ name = "gldt_core"
 version = "0.1.0"
 dependencies = [
  "candid 0.8.4",
- "canistergeek_ic_rust 0.3.3",
+ "canistergeek_ic_rust",
  "ic-cdk 0.9.2",
  "ic-cdk-bindgen",
  "ic-cdk-macros 0.7.1",
@@ -751,20 +737,6 @@ name = "log"
 version = "0.4.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
-
-[[package]]
-name = "logger"
-version = "0.1.0"
-dependencies = [
- "candid 0.9.3",
- "canistergeek_ic_rust 0.4.2",
- "ic-cdk 0.10.0",
- "ic-cdk-macros 0.7.1",
- "ic-ledger-types",
- "serde",
- "serde_derive",
- "tempfile",
-]
 
 [[package]]
 name = "logos"
