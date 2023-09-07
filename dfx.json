@@ -14,7 +14,8 @@
         "output": "canister/gldt_core/declarations/"
       },
       "package": "gldt_core",
-      "optimize": "cycles"
+      "optimize": "cycles",
+      "build": "npm run build:back"
     },
     "gldt_ledger": {
       "type": "custom",
