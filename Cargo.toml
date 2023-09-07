@@ -1,2 +1,2 @@
 [workspace]
-members = ["canister/gldt_core", "canister/logger"]
+members = ["canister/gldt_core"]
