@@ -1,4 +1,4 @@
-use ic_cdk_bindgen::{ Builder, Config };
+// use ic_cdk_bindgen::{ Builder, Config };
 
 /// activate this for debugging
 // macro_rules! p {
@@ -27,9 +27,8 @@ fn set_env_vars() {
     // );
     // std::env::set_var("CANISTER_CANDID_PATH_gldt_ledger", "../gldt_ledger/gldt_ledger.did");
 }
-
 pub fn main() {
-    // set_env_vars();
+    set_env_vars();
     // let mut builder = Builder::new();
 
     // let gld_nft = Config::new("gld_nft");

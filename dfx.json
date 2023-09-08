@@ -26,15 +26,6 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz"
     },
-    "logger": {
-      "type": "rust",
-      "candid": "canister/logger/src/logger.did",
-      "declarations": {
-        "output": "canister/logger/declarations/"
-      },
-      "package": "logger",
-      "optimize": "cycles"
-    },
     "yumi_kyc": {
       "type": "custom",
       "candid": "canister/yumi_kyc/kyc.did",

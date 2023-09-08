@@ -19,7 +19,7 @@ function generate_did() {
 }
 
 # The list of canisters of your project, comma separated, e.g. CANISTERS=gldt_core,gldt_ledger,...
-CANISTERS=gldt_core,logger
+CANISTERS=gldt_core
 
 for canister in $(echo $CANISTERS | sed "s/,/ /g")
 do
