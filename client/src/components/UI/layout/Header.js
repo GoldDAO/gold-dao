@@ -25,7 +25,7 @@ const Header = () => {
         <HeaderContainer as="header">
             <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Link href="/">
-                    <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
+                    <Image width={115} height={50} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
@@ -59,9 +59,8 @@ const Nav = styled('nav')`
 `;
 
 const HeaderContainer = styled('header')`
+    grid-column: span 12;
     display: flex;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #d3b872;
     justify-content: space-between;
     align-items: center;
 `;

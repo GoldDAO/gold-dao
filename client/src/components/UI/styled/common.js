@@ -2,9 +2,7 @@ import styled from 'styled-components';
 
 export const SectionTitle = styled('h3')`
     color: #333;
-    font-weight: 300;
     padding-bottom: 15px;
-    border-bottom: 1px solid #d3b872;
     font-size: 2em;
     padding: 80px 0 15px 0;
     margin-bottom: 80px;

@@ -17,7 +17,7 @@ import {
 import Image from 'next/image';
 import { useNft } from '@/components/hooks/useNFTs';
 import { useAllCanisters } from '@/components/hooks/useAllCanisters';
-import NftControls from '../sequence/NftStatus';
+import NftControls from './NftStatus';
 import {
     addAllItemsAtom,
     addCartItemAtom,

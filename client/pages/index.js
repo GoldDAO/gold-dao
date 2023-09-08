@@ -7,19 +7,17 @@ import Partners from '@/components/UI/sections/partners';
 import Chart from '@/components/UI/sections/Chart';
 import dynamic from 'next/dynamic';
 import { useCanister } from '@connect2ic/react';
+import TextSection from '@/components/UI/sections/TextSection;';
+import Yumi from '@/components/UI/sections/Yumi';
 
 function Home({ content, meta, partners, cto, marketcap }) {
-    const Swap = dynamic(() => import('@/components/UI/sequence/SwapContainer'), {
+    const Banner = dynamic(() => import('@/components/UI/sections/Banner'), {
         ssr: false,
     });
 
-    const MyNfts = dynamic(() => import('@/components/UI/table/NftsTable'), {
-        ssr: false,
-    });
-
-    const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
-        ssr: false,
-    });
+    const textTitle = 'Gold. Blockchain. Secure. Stable. Simple.';
+    const textContent =
+        'GLDT is a stablecoin that is 100% backed by physical gold, making it a secure and reliable investment option in the world of cryptocurrency. GLDT is only minted when a GLD NFT is swapped, ensuring that it is fully backed by physical gold held in secure vaults in Switzerland.';
 
     return (
         <>
@@ -29,11 +27,14 @@ function Home({ content, meta, partners, cto, marketcap }) {
                 <meta property={`og:description`} content={meta.description} key="title" />
             </Head>
             <Layout>
-                <Marketcap data={marketcap.data} />
-                <PageContent dangerouslySetInnerHTML={{ __html: content }} />
-                <Swap data={cto.data} />
-                <Chart />
+                <Banner />
+                <TextSection title={textTitle} content={textContent} />
+                <Yumi />
                 <Partners partners={partners} />
+                {/* <Marketcap data={marketcap.data} /> */}
+                {/* <PageContent dangerouslySetInnerHTML={{ __html: content }} /> */}
+                {/* <Swap data={cto.data} /> */}
+                {/* <Chart /> */}
             </Layout>
         </>
     );

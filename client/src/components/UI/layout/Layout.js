@@ -2,13 +2,22 @@ import { Box } from '@mui/system';
 import React from 'react';
 import Header from './Header';
 import styled from 'styled-components';
+import Grid from '../grid/Grid';
+import Footer from './Footer';
 
 const Layout = ({ children }) => {
     return (
-        <LayoutContainer>
-            <Header />
-            <ContentContainer>{children}</ContentContainer>
-        </LayoutContainer>
+        <>
+            <LayoutContainer>
+                <Grid>
+                    <Header />
+                    <ContentContainer>
+                        <Grid>{children}</Grid>
+                    </ContentContainer>
+                </Grid>
+            </LayoutContainer>
+            <Footer />
+        </>
     );
 };
 
@@ -27,6 +36,7 @@ const LayoutContainer = styled(Box)`
     }
 `;
 const ContentContainer = styled(Box)`
+    grid-column: span 12;
     padding-top: 40px;
     @media (max-width: 1140px) {
         padding-top: 30px;
