@@ -593,9 +593,9 @@ pub enum Errors {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct OrigynError {
     pub text: String,
-    error: Errors,
-    number: u32,
-    flag_point: String,
+    pub error: Errors,
+    pub number: u32,
+    pub flag_point: String,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -1611,9 +1611,9 @@ pub enum BidResponse_txn_type {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct BidResponse {
     token_id: String,
-    txn_type: BidResponse_txn_type,
+    pub txn_type: BidResponse_txn_type,
     timestamp: candid::Int,
-    index: candid::Nat,
+    pub index: candid::Nat,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -1869,9 +1869,12 @@ pub struct EndSaleResponse {
     index: candid::Nat,
 }
 
-// #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-// pub enum Result { ok(Box<ManageSaleResponse>), err(OrigynError) }
-// pub type DistributeSaleResponse = Vec<Result>;
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub enum Result1 {
+    ok(Box<ManageSaleResponse>),
+    err(OrigynError),
+}
+pub type DistributeSaleResponse = Vec<Result1>;
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum ManageSaleResponse {
     bid(BidResponse),
@@ -1881,7 +1884,7 @@ pub enum ManageSaleResponse {
     ask_subscribe(AskSubscribeResponse),
     end_sale(EndSaleResponse),
     refresh_offers(Vec<EscrowRecord>),
-    // distribute_sale(DistributeSaleResponse),
+    distribute_sale(DistributeSaleResponse),
     open_sale(bool),
 }
 
@@ -2745,6 +2748,7 @@ impl SERVICE {
         ic_cdk::call(self.0, "sale_info_secure_nft_origyn", (arg0,)).await
     }
     pub async fn sale_nft_origyn(&self, arg0: ManageSaleRequest) -> Result<(ManageSaleResult,)> {
+        // pub async fn sale_nft_origyn(&self, arg0: ManageSaleRequest) -> Result<()> {
         ic_cdk::call(self.0, "sale_nft_origyn", (arg0,)).await
     }
     pub async fn set_data_harvester(&self, arg0: candid::Nat) -> Result<()> {

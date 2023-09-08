@@ -13,11 +13,15 @@ dfx canister create gldt_core
 
 # 3. deploy gldt core
 dfx deploy gldt_core --network staging --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
-  gldt_nft_canister_ids=vec{
+  gld_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
     record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}};
     record { principal "'"$(dfx identity get-principal)"'"; record { grams=100}};
     }})'
+dfx deploy gldt_core --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
+  gld_nft_canister_ids=vec{
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}}
+  }})'
 
 # 4. deploy gldt frontend
 dfx deploy gldt_frontend --network local
@@ -68,11 +72,11 @@ dfx canister call --network local yumi_kyc setRouter '(principal "jf4o7-6zzxo-5n
 
 # test calls
 
-dfx canister call gldt_core --network local nft_info '(record {source_canister = principal "xyo2o-gyaaa-aaaal-qb55a-cai"; nft_id = "gold-067883";})'
-
+dfx canister call gldt_core --network staging nft_info '(record {source_canister = principal "obapm-2iaaa-aaaak-qcgca-cai"; nft_id = "gold-013052";})'
 dfx canister call gldt_core --network local request_offer '(record {nft_id = "gold-067883"; to_subaccount = vec {0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0}; requested_memo = 0})'
-
 dfx canister call gldt_core --network staging notify_sale_nft_origyn '(record {sale = record { token_id = "gold_1234"}; escrow_info = record { account = record {sub_account=blob "abcdefghijklmnopqrstuvxyz1234567"}}})'
+
+
 
 
 dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx canister id --network staging gldt_core)"'";})'
@@ -90,8 +94,5 @@ dfx canister call --network staging gldt_ledger icrc1_balance_of '(record { owne
 #
 # 1. Generate .did file for gldt_core canister
 #   Since gldt_core is written in rust, the .did file needs to be generated manually.
-#   For this, deploy the canister locally and then run `dfx canister call gldt_cor __get_candid_interface_tmp_hack > canister/gldt_core/declarations/gldt_core_tmp.did`
-#   Then go into the file and pick the relevant new lines and copy/paste them into the existing gldt_core.did file.
-#   This is very hacky but dfinity hasn't released an automatic generator for rust canisters yet.
-#   This should hopefully come soon. https://forum.dfinity.org/t/automatically-generate-candid-from-rust-sources/5924/50
-#
+#   run the script `./scripts/generate-did.sh` to generate the .did file and
+#   automatically create the js and ts bindings.

@@ -108,21 +108,24 @@ export const idlFactory = ({ IDL }) => {
     'version' : IDL.Opt(IDL.Nat),
   });
   const GetRecordsRequest = IDL.Record({
-    'page' : IDL.Opt(IDL.Nat64),
-    'limit' : IDL.Opt(IDL.Nat64),
+    'page' : IDL.Opt(IDL.Nat32),
+    'limit' : IDL.Opt(IDL.Nat32),
   });
+  const RecordType = IDL.Variant({ 'Burn' : IDL.Null, 'Mint' : IDL.Null });
   const Account = IDL.Record({
     'owner' : IDL.Principal,
     'subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
   const GldtRecord = IDL.Record({
     'nft_id' : IDL.Text,
-    'gldt_minted' : IDL.Nat,
-    'record_type' : IDL.Text,
-    'receiving_account' : Account,
+    'record_type' : RecordType,
+    'memo' : IDL.Vec(IDL.Nat8),
+    'num_tokens' : IDL.Nat,
+    'escrow_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'counterparty' : Account,
     'grams' : IDL.Nat16,
-    'gldt_minting_timestamp_seconds' : IDL.Nat64,
-    'index' : IDL.Nat,
+    'timestamp' : IDL.Nat64,
+    'nft_sale_id' : IDL.Text,
     'gld_nft_canister_id' : IDL.Principal,
     'block_height' : IDL.Nat,
   });
@@ -130,25 +133,43 @@ export const idlFactory = ({ IDL }) => {
     'total' : IDL.Nat64,
     'data' : IDL.Opt(IDL.Vec(GldtRecord)),
   });
+  const GetStatusRequest = IDL.Record({
+    'nft_id' : IDL.Text,
+    'gld_nft_canister_id' : IDL.Principal,
+    'sale_id' : IDL.Text,
+  });
+  const SwappingStates = IDL.Variant({
+    'Burned' : IDL.Null,
+    'Initialised' : IDL.Null,
+    'Swapped' : IDL.Null,
+    'Finalised' : IDL.Null,
+    'Minted' : IDL.Null,
+  });
+  const GetStatusResponse = IDL.Record({ 'status' : IDL.Opt(SwappingStates) });
+  const Result = IDL.Variant({ 'Ok' : GetStatusResponse, 'Err' : IDL.Text });
   const InfoRequest = IDL.Record({
     'nft_id' : IDL.Text,
     'source_canister' : IDL.Principal,
   });
   const GldtBurned = IDL.Record({ 'burn_block_height' : IDL.Nat64 });
   const GldtMinted = IDL.Record({
+    'num_tokens' : IDL.Nat,
     'mint_block_height' : IDL.Nat,
     'last_audited_timestamp_seconds' : IDL.Nat64,
     'burned' : IDL.Opt(GldtBurned),
   });
+  const GldtSwapped = IDL.Record({ 'index' : IDL.Nat, 'sale_id' : IDL.Text });
   GldNft.fill(
     IDL.Record({
       'requested_memo' : IDL.Vec(IDL.Nat8),
       'older_record' : IDL.Opt(GldNft),
       'to_subaccount' : IDL.Vec(IDL.Nat8),
       'minted' : IDL.Opt(GldtMinted),
+      'swapped' : IDL.Opt(GldtSwapped),
       'receiving_account' : Account,
       'grams' : IDL.Nat16,
       'gldt_minting_timestamp_seconds' : IDL.Nat64,
+      'nft_sale_id' : IDL.Text,
       'gld_nft_canister_id' : IDL.Principal,
     })
   );
@@ -367,23 +388,7 @@ export const idlFactory = ({ IDL }) => {
     'seller' : Account_1,
     'escrow_info' : SubAccountInfo,
   });
-  const Result = IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text });
-  const OfferRequest = IDL.Record({
-    'nft_id' : IDL.Text,
-    'requested_memo' : IDL.Vec(IDL.Nat8),
-    'to_subaccount' : IDL.Vec(IDL.Nat8),
-    'receiving_account' : Account,
-  });
-  const BidRequest = IDL.Record({
-    'broker_id' : IDL.Opt(IDL.Principal),
-    'escrow_receipt' : EscrowReceipt,
-    'sale_id' : IDL.Text,
-  });
-  const Offer = IDL.Record({
-    'block_height' : IDL.Nat,
-    'tokens_minted' : IDL.Nat,
-  });
-  const Result_1 = IDL.Variant({ 'Ok' : Offer, 'Err' : IDL.Text });
+  const Result_1 = IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text });
   const CollectMetricsRequestType = IDL.Variant({
     'force' : IDL.Null,
     'normal' : IDL.Null,
@@ -392,7 +397,7 @@ export const idlFactory = ({ IDL }) => {
     'metrics' : IDL.Opt(CollectMetricsRequestType),
   });
   return IDL.Service({
-    'get_canistergeek_information' : IDL.Func(
+    'getCanistergeekInformation' : IDL.Func(
         [GetInformationRequest],
         [GetInformationResponse],
         ['query'],
@@ -403,13 +408,17 @@ export const idlFactory = ({ IDL }) => {
         [GetRecordsResponse],
         ['query'],
       ),
+    'get_status_of_swap' : IDL.Func([GetStatusRequest], [Result], ['query']),
     'nft_info' : IDL.Func([InfoRequest], [NftInfo], []),
-    'notify_sale_nft_origyn' : IDL.Func([SubscriberNotification], [Result], []),
-    'request_offer' : IDL.Func([OfferRequest, BidRequest], [Result_1], []),
-    'update_canistergeek_information' : IDL.Func(
+    'notify_sale_nft_origyn' : IDL.Func(
+        [SubscriberNotification],
+        [Result_1],
+        [],
+      ),
+    'updateCanistergeekInformation' : IDL.Func(
         [UpdateInformationRequest],
         [],
-        ['query'],
+        [],
       ),
   });
 };

@@ -79,11 +79,6 @@ export interface AuctionStateShared {
 export type AuctionStateShared_status = { 'closed' : null } |
   { 'open' : null } |
   { 'not_started' : null };
-export interface BidRequest {
-  'broker_id' : [] | [Principal],
-  'escrow_receipt' : EscrowReceipt,
-  'sale_id' : string,
-}
 export type Box = { 'Int' : bigint } |
   { 'Map' : Array<[Box, Box]> } |
   { 'Nat' : bigint } |
@@ -216,40 +211,52 @@ export interface GetMetricsParameters {
   'dateFromMillis' : bigint,
 }
 export interface GetRecordsRequest {
-  'page' : [] | [bigint],
-  'limit' : [] | [bigint],
+  'page' : [] | [number],
+  'limit' : [] | [number],
 }
 export interface GetRecordsResponse {
   'total' : bigint,
   'data' : [] | [Array<GldtRecord>],
 }
+export interface GetStatusRequest {
+  'nft_id' : string,
+  'gld_nft_canister_id' : Principal,
+  'sale_id' : string,
+}
+export interface GetStatusResponse { 'status' : [] | [SwappingStates] }
 export interface GldNft {
   'requested_memo' : Uint8Array | number[],
   'older_record' : [] | [GldNft],
   'to_subaccount' : Uint8Array | number[],
   'minted' : [] | [GldtMinted],
+  'swapped' : [] | [GldtSwapped],
   'receiving_account' : Account,
   'grams' : number,
   'gldt_minting_timestamp_seconds' : bigint,
+  'nft_sale_id' : string,
   'gld_nft_canister_id' : Principal,
 }
 export interface GldtBurned { 'burn_block_height' : bigint }
 export interface GldtMinted {
+  'num_tokens' : bigint,
   'mint_block_height' : bigint,
   'last_audited_timestamp_seconds' : bigint,
   'burned' : [] | [GldtBurned],
 }
 export interface GldtRecord {
   'nft_id' : string,
-  'gldt_minted' : bigint,
-  'record_type' : string,
-  'receiving_account' : Account,
+  'record_type' : RecordType,
+  'memo' : Uint8Array | number[],
+  'num_tokens' : bigint,
+  'escrow_subaccount' : [] | [Uint8Array | number[]],
+  'counterparty' : Account,
   'grams' : number,
-  'gldt_minting_timestamp_seconds' : bigint,
-  'index' : bigint,
+  'timestamp' : bigint,
+  'nft_sale_id' : string,
   'gld_nft_canister_id' : Principal,
   'block_height' : bigint,
 }
+export interface GldtSwapped { 'index' : bigint, 'sale_id' : string }
 export interface HourlyMetricsData {
   'updateCalls' : BigUint64Array | bigint[],
   'canisterHeapMemorySize' : BigUint64Array | bigint[],
@@ -288,13 +295,6 @@ export interface NumericEntity {
   'first' : bigint,
   'last' : bigint,
 }
-export interface Offer { 'block_height' : bigint, 'tokens_minted' : bigint }
-export interface OfferRequest {
-  'nft_id' : string,
-  'requested_memo' : Uint8Array | number[],
-  'to_subaccount' : Uint8Array | number[],
-  'receiving_account' : Account,
-}
 export type PricingConfigShared__1 = { 'ask' : [] | [Array<AskFeature>] } |
   { 'extensible' : CandyShared } |
   { 'instant' : null } |
@@ -304,9 +304,11 @@ export interface PropertyShared {
   'name' : string,
   'immutable' : boolean,
 }
-export type Result = { 'Ok' : string } |
+export type RecordType = { 'Burn' : null } |
+  { 'Mint' : null };
+export type Result = { 'Ok' : GetStatusResponse } |
   { 'Err' : string };
-export type Result_1 = { 'Ok' : Offer } |
+export type Result_1 = { 'Ok' : string } |
   { 'Err' : string };
 export interface SaleStatusShared {
   'token_id' : string,
@@ -342,22 +344,27 @@ export interface SubscriberNotification {
   'seller' : Account_1,
   'escrow_info' : SubAccountInfo,
 }
+export type SwappingStates = { 'Burned' : null } |
+  { 'Initialised' : null } |
+  { 'Swapped' : null } |
+  { 'Finalised' : null } |
+  { 'Minted' : null };
 export type TokenSpec = { 'ic' : ICTokenSpec } |
   { 'extensible' : CandyShared };
 export interface UpdateInformationRequest {
   'metrics' : [] | [CollectMetricsRequestType],
 }
 export interface _SERVICE {
-  'get_canistergeek_information' : ActorMethod<
+  'getCanistergeekInformation' : ActorMethod<
     [GetInformationRequest],
     GetInformationResponse
   >,
   'get_conf' : ActorMethod<[], Conf>,
   'get_records' : ActorMethod<[GetRecordsRequest], GetRecordsResponse>,
+  'get_status_of_swap' : ActorMethod<[GetStatusRequest], Result>,
   'nft_info' : ActorMethod<[InfoRequest], NftInfo>,
-  'notify_sale_nft_origyn' : ActorMethod<[SubscriberNotification], Result>,
-  'request_offer' : ActorMethod<[OfferRequest, BidRequest], Result_1>,
-  'update_canistergeek_information' : ActorMethod<
+  'notify_sale_nft_origyn' : ActorMethod<[SubscriberNotification], Result_1>,
+  'updateCanistergeekInformation' : ActorMethod<
     [UpdateInformationRequest],
     undefined
   >,
