@@ -10,17 +10,21 @@ export const navigation = [
     // {
     //     label: 'How it works',
     //     path: '/how-it-works',
-    // }  
+    // }
     {
         label: 'My Nfts',
         path: '/my-nfts',
     },
     {
-        label: 'Transactions',
-        path: '/transactions',
+        label: 'Ongoing Swaps',
+        path: '/ongoing-swaps',
     },
-    {
-        label: 'Nfts Breakdown',
-        path: '/nfts-breakdown',
-    }
-]
+    // {
+    //     label: 'Transactions',
+    //     path: '/transactions',
+    // },
+    // {
+    //     label: 'Nfts Breakdown',
+    //     path: '/nfts-breakdown',
+    // }
+];

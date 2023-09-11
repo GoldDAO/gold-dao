@@ -8,8 +8,7 @@ import MainButton from '@/components/UI/button/Buttons';
 import { gldNftCanisters } from '@/services/agents';
 import { useAllCanisters } from '@/components/hooks/useAllCanisters';
 
-export const SendBatchOffersButton = () => {
-    const [wallet] = useWallet();
+export const SendBatchOffersButton = ({ handleNext, setRes }) => {
     const [cart] = useAtom(cartAtom);
 
     const weights = Object.keys(gldNftCanisters);
@@ -20,7 +19,6 @@ export const SendBatchOffersButton = () => {
     const gldNftCart = {};
 
     const YUMI_KYC_CANISTER_ID = process.env.YUMI_KYC_CANISTER_ID;
-    // const ICP_LEDGER_CANISTER_ID = process.env.ICP_LEDGER_CANISTER_ID;
 
     const payload = (e) => {
         const salePrice = e.weight * priceRatio;
@@ -74,7 +72,8 @@ export const SendBatchOffersButton = () => {
         }
     });
 
-    const handleButton = async () => {
+    const handleButton = async (e) => {
+        e.preventDefault();
         const res = await Promise.all(
             weights.map((w, i) => {
                 const w_int = +w.slice(0, -1);
@@ -84,8 +83,16 @@ export const SendBatchOffersButton = () => {
                 } else return undefined;
             }),
         );
-        console.log('res', res);
+        setRes(res);
     };
 
-    return <MainButton label="Confirm" action={handleButton} />;
+    return (
+        <MainButton
+            label="Confirm"
+            action={(e) => {
+                handleNext();
+                handleButton(e);
+            }}
+        />
+    );
 };

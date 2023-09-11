@@ -7,6 +7,8 @@ import { theme } from '@/theme/theme';
 import { useDialog } from '@connect2ic/react';
 import SequenceSteps from '../sequence/steps/SequenceSteps';
 import { useState } from 'react';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/states/user';
 
 const Banner = () => {
     return (
@@ -85,14 +87,19 @@ const PageTitle = styled(Box)`
 const CallToAction = () => {
     const { open } = useDialog();
     const [isOpen, setIsOpen] = useState(false);
-    console.log('isOpen', isOpen);
+    const [user] = useAtom(userAtom);
+
     return (
         <CallToActionContainer>
             <Circle>
                 <Typography as="h3">
                     Swap your <Name>GLDNFT</Name> for <Name>GLDT</Name>
                 </Typography>
-                <MainButton action={() => setIsOpen(!isOpen)}>
+                <MainButton
+                    action={() => {
+                        user.isConnected ? setIsOpen(!isOpen) : open();
+                    }}
+                >
                     Start swapping my
                     <Name style={{ color: theme.colors.white }}>&nbsp;GLDNFTs</Name>
                 </MainButton>
