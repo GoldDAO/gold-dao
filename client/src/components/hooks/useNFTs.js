@@ -25,13 +25,12 @@ export const useNft = (actors) => {
     const [user] = useAtom(setGetUserAtom);
     const [nfts, setNfts] = useState([]);
     const [isLoading, setLoading] = useState(false);
-    const [, setOnSale] = useAtom(updateOnsaleNftAtom);
     useEffect(() => {
         if (user.principal && actors) {
             setLoading(true);
             queryNfts(user.principal, actors)
                 .then((result) => {
-                    getNftWithStatus(result, actors, setOnSale).then((result) => {
+                    getNftWithStatus(result, actors).then((result) => {
                         setNfts(result);
                         setLoading(false);
                     });
@@ -44,19 +43,12 @@ export const useNft = (actors) => {
     return { nfts, isLoading };
 };
 
-const getNftWithStatus = async (nfts, actors, setOnSale) => {
+const getNftWithStatus = async (nfts, actors) => {
     const weights = Object.keys(gldNftCanisters);
     const res = await Promise.all(
         nfts.map(async (nft, i) => {
             const ind = weights.indexOf(nft.weight + 'g');
             const res = await actors[ind]?.nft_origyn(nft.name);
-            if (res?.ok?.current_sale[0]?.sale_type.auction.status.open === null) {
-                setOnSale({
-                    weight: nft.weight,
-                    name: nft.name,
-                    status: res?.ok?.current_sale[0]?.sale_type.auction.status.open,
-                });
-            }
             return {
                 weight: nft.weight,
                 name: nft.name,
@@ -64,6 +56,7 @@ const getNftWithStatus = async (nfts, actors, setOnSale) => {
                     res?.ok?.current_sale[0]?.sale_type.auction.status.open === null
                         ? res?.ok?.current_sale
                         : undefined,
+                sale_id: res.ok?.current_sale[0]?.sale_id,
             };
         }),
     );
@@ -72,18 +65,14 @@ const getNftWithStatus = async (nfts, actors, setOnSale) => {
 
 export const useOngoingSwaps = (actors) => {
     const [user] = useAtom(setGetUserAtom);
-    const [nfts, setNfts] = useState([]);
     const [isLoading, setLoading] = useState(false);
-    const [onSale, setOnSale] = useAtom(updateOnsaleNftAtom);
-    const [, emptyOnSale] = useAtom(emptyOnGoingAtom);
-
+    const [onSale, setOnSale] = useState([]);
     useEffect(() => {
         if (user.principal && actors) {
             setLoading(true);
-            emptyOnSale();
             queryNfts(user.principal, actors)
                 .then((result) => {
-                    getOngoingSwapNft(result, actors, setOnSale).then((result) => {
+                    getOngoingSwapNft(result, actors).then((result) => {
                         setOnSale(result);
                         setLoading(false);
                     });
@@ -93,29 +82,26 @@ export const useOngoingSwaps = (actors) => {
                 });
         }
     }, [user]);
+
+    console.log('useOngoingSwaps', onSale);
     return { onSale, isLoading };
 };
 
-const getOngoingSwapNft = async (nfts, actors, setOnSale) => {
-    console.log('nftsResult', nfts);
+const getOngoingSwapNft = async (nfts, actors) => {
     const weights = Object.keys(gldNftCanisters);
-
-    const res = await Promise.all(
+    const nftsRes = await Promise.all(
         nfts.map(async (nft, i) => {
             const ind = weights.indexOf(nft.weight + 'g');
             const res = await actors[ind]?.nft_origyn(nft.name);
-            if (res?.ok?.current_sale[0]?.sale_type.auction.status.open === null) {
-                // swaps.push({
-                //     weight: nft.weight,
-                //     name: nft.name,
-                //     status: res?.ok?.current_sale[0]?.sale_type.auction.status.open,
-                // });
-                setOnSale({
+            if (res?.ok[0]?.current_sale[0]?.sale_type.auction.status.open === null) {
+                return {
                     weight: nft.weight,
                     name: nft.name,
-                    status: res?.ok?.current_sale[0]?.sale_type.auction.status.open,
-                });
+                    sale_id: res.ok.current_sale[0].sale_id,
+                };
             }
         }),
     );
+    console.log('nftsRes', nftsRes);
+    return nftsRes;
 };

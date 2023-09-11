@@ -1,6 +1,4 @@
 import Layout from '@/components/UI/layout/Layout';
-import { useAllCanisters } from '@/components/hooks/useAllCanisters';
-import { useOngoingSwaps } from '@/components/hooks/useNFTs';
 import { onSaleNftAtom } from '@/states/onSalesNfts';
 import { userAtom } from '@/states/user';
 import { Box } from '@mui/material';
@@ -17,13 +15,7 @@ const OngoingSwapsTable = dynamic(() => import('@/components/UI/table/OngoingSwa
 const OngoingSwaps = () => {
     const [user] = useAtom(userAtom);
     const [onSale] = useAtom(onSaleNftAtom);
-    const actors = useAllCanisters();
-    const nfts = useOngoingSwaps(actors);
-
-    useEffect(() => {
-        console.log(' onSale', onSale);
-    }, [onSale]);
-
+    console.log('onSale', onSale);
     return (
         <>
             <Head>
