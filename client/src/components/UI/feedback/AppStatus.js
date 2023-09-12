@@ -1,22 +1,34 @@
 import { userAtom } from '@/states/user';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useAtom } from 'jotai';
-import { initialize } from 'next/dist/server/lib/render-server';
 import React from 'react';
 import { useEffect } from 'react';
 import { CustomCircularProgress } from '../styled/common';
 
 const AppStatus = () => {
-    const { isConnecting, isDisconnecting, isIdle, isInitializing } = useAtom(userAtom);
+    const { isConnecting, isDisconnecting, isIdle, isInitializing, isConnected } =
+        useAtom(userAtom);
+    const user = useAtom(userAtom);
+    console.log('user', user);
     return (
-        <Box>
-            <CustomCircularProgress />
-            <>
-                {isIdle && 'Idle'}
-                {isInitializing && 'Initializing'}
-                {isDisconnecting && 'Disconnecting'}
-                {isConnecting && 'Connecting'}
-            </>
+        <Box sx={{ gridColumn: 'span 12' }}>
+            {isIdle ||
+                isInitializing ||
+                isDisconnecting ||
+                (isConnecting && (
+                    <>
+                        <CustomCircularProgress />
+                        <Typography>
+                            {isIdle && 'Idle'}
+                            {isInitializing && 'Initializing'}
+                            {isDisconnecting && 'Disconnecting'}
+                            {isConnecting && 'Connecting'}
+                        </Typography>
+                    </>
+                ))}
+            {!isConnected && (
+                <Typography sx={{ width: '100%' }}>Please connect your wallet</Typography>
+            )}
         </Box>
     );
 };

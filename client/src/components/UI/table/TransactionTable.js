@@ -45,18 +45,18 @@ const TransactionsTable = () => {
 
     if (!loading) {
         return (
-            <Box sx={{ gridColumn: 'span 12' }}>
+            <TableContainer sx={{ gridColumn: 'span 12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
                             {tableHead.map((e, i) => {
-                                return <StyledTableCell key={i}>{e}</StyledTableCell>;
+                                return <StyledTableCell key={e}>{e}</StyledTableCell>;
                             })}
                         </StyledTableRow>
                     </StyledTableHead>
                     <TableBody>
                         {transactions?.map((e, i) => {
-                            return <Row key={i} row={e} />;
+                            return <Row key={tableHead[i]} row={e} />;
                         })}
                     </TableBody>
                 </StyledTable>
@@ -69,7 +69,7 @@ const TransactionsTable = () => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Box>
+            </TableContainer>
         );
     } else
         return (
@@ -165,20 +165,39 @@ const Row = ({ row }) => {
     );
 };
 
-const StyledTableRow = styled(TableRow)``;
+const TableContainer = styled(Box)`
+    border-radius: 20px;
+    grid-column: 1/13;
+    border: 1px solid ${theme.colors.gold};
+`;
+
+const StyledTableRow = styled(TableRow)`
+    width: 100%;
+`;
 const StyledCheckbox = styled(Checkbox)``;
 
 const StyledTableHead = styled(TableHead)`
-    font-weight: 600;
+    font-weight: 400;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    background-color: ${theme.colors.grey};
 `;
 const StyledTableCell = styled(TableCell)`
     font-weight: inherit;
 `;
 
-const StyledTable = styled(Table)``;
+const StyledTable = styled(Table)`
+    border-radius: 20px;
+`;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;
     display: inline-flex;
     padding-left: 16px;
+`;
+
+const CustomTableBody = styled(TableBody)`
+    height: 400px;
+    overflow: scroll;
+    display: block;
 `;

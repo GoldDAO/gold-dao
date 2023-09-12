@@ -1,4 +1,7 @@
+import AppStatus from '@/components/UI/feedback/AppStatus';
 import Layout from '@/components/UI/layout/Layout';
+import TextSection from '@/components/UI/sections/TextSection;';
+import { SectionTitle } from '@/components/UI/styled/common';
 import { onSaleNftAtom } from '@/states/onSalesNfts';
 import { userAtom } from '@/states/user';
 import { Box } from '@mui/material';
@@ -28,7 +31,7 @@ const OngoingSwaps = () => {
                         <OngoingSwapsTable on_sale={onSale} />
                     </>
                 ) : (
-                    <Box>Please connect your wallet</Box>
+                    <AppStatus />
                 )}
             </Layout>
         </>

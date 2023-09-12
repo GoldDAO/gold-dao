@@ -115,7 +115,7 @@ const MyNfts = ({ hasControls, selectable }) => {
 
 export default MyNfts;
 
-const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
+const Row = ({ row, hasControls, selectable, isAllSelected, cart, tableKey }) => {
     const [, setCartItem] = useAtom(addCartItemAtom);
     const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
     const [isInCart, setIsInCart] = useState(false);
@@ -142,22 +142,23 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
                 {row.weight}g
             </StyledTableCell>
             <StyledTableCell key="name">
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Image src={medium} alt={'NFT IMAGE'} />
                     <ItemName>{row.name}</ItemName>
                 </Box>
             </StyledTableCell>
-            <StyledTableCell>
-                {hasControls && (
+            {hasControls && (
+                <StyledTableCell key="controls">
                     <NftControls token_id={row.name} weight={row.weight} onSale={row.status} />
-                )}
-            </StyledTableCell>
+                </StyledTableCell>
+            )}
         </StyledTableRow>
     );
 };
 
 const TableContainer = styled(Box)`
     border-radius: 20px;
+    grid-column: 1/13;
     border: 1px solid ${theme.colors.gold};
 `;
 
@@ -183,11 +184,14 @@ const StyledCheckbox = styled(Checkbox)``;
 
 const StyledTableHead = styled(TableHead)`
     font-weight: 400;
+    width: 100%;
     border-radius: 20px 20px 0 0;
+    display: table-header-group;
     background-color: ${theme.colors.grey};
 `;
 const StyledTableCell = styled(TableCell)`
     font-weight: inherit;
+    display: table-cell;
 `;
 
 const StyledTable = styled(Table)`
