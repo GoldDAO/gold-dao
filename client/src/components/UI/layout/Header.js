@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { appStatusAtom } from '../../../states/appStatus';
 import { Typography } from '@mui/material';
 import Ruban from './Ruban';
+import { theme } from '@/theme/theme';
 
 const C2icButton = dynamic(() => import('./../../c2ic/C2icButton'), {
     ssr: false,
@@ -30,7 +31,12 @@ const Header = () => {
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
                         <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}>
-                            <Link href={`${e.path}`}>{e.label}</Link>
+                            <Link
+                                style={{ textDecoration: 'none', color: theme.colors.black }}
+                                href={`${e.path}`}
+                            >
+                                {e.label}
+                            </Link>
                         </Box>
                     ))}
                 </Box>

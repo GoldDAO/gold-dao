@@ -2,13 +2,19 @@ import React from 'react';
 import { Button } from '@mui/material';
 import styled from 'styled-components';
 import { IconButton } from '@mui/material';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import CloseIcon from '@mui/icons-material/Close';
 import { Children } from 'react';
 import { theme } from '@/theme/theme';
 
-const MainButton = ({ label, isInactive, action, style, children }) => {
+const MainButton = ({ label, isInactive, action, style, children, secondary }) => {
     return (
-        <StyledButton disabled={isInactive} onClick={action} style={style}>
+        <StyledButton
+            secondary={secondary}
+            isInactive={isInactive}
+            disabled={isInactive}
+            onClick={action}
+            style={style}
+        >
             {label && label}
             {children && children}
         </StyledButton>
@@ -20,8 +26,10 @@ export default MainButton;
 const StyledButton = styled(Button)`
     &.MuiButton-root {
         text-transform: capitalize;
-        background-color: ${theme.colors.gold};
-        color: #fff;
+        background-color: ${(props) =>
+            props.isInactive ? '#E3E3E3' : props.secondary ? 'transparent' : theme.colors.gold};
+        border: ${(props) => (props.secondary ? `1px solid ${theme.colors.gold}` : 'none')};
+        color: ${(props) => (props.secondary ? theme.colors.gold : theme.colors.white)};
         padding: 8px 40px;
         border-radius: 8px;
         &:hover {
@@ -32,7 +40,7 @@ const StyledButton = styled(Button)`
 export const CloseButton = ({ setClose }) => {
     return (
         <IconButton onClick={setClose}>
-            <HighlightOffIcon />
+            <CloseIcon />
         </IconButton>
     );
 };

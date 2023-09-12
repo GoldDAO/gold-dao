@@ -1,3 +1,4 @@
+import AppStatus from '@/components/UI/feedback/AppStatus';
 import Layout from '@/components/UI/layout/Layout';
 import { onSaleNftAtom } from '@/states/onSalesNfts';
 import { userAtom } from '@/states/user';
@@ -28,7 +29,7 @@ const MyNfts = () => {
                         <MyNftsTable selectable={false} hasControls={true} />
                     </>
                 ) : (
-                    <Box>Please connect your wallet</Box>
+                    <AppStatus />
                 )}
             </Layout>
         </>

@@ -7,7 +7,7 @@ import { theme } from '@/theme/theme';
 
 const Yumi = () => {
     return (
-        <YumiBanner href="#">
+        <YumiBanner href="https://yumi.io/" target="_blank">
             <Image src={YumiLogo} width={200} height={50} alt="Yumi marketplace logo" />
             <Box>
                 <Typography>You don’t have any GLDNFT ?</Typography>
@@ -23,15 +23,22 @@ const YumiBanner = styled(Link)`
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-column: 2/12;
+    text-decoration: none;
+    color: ${theme.colors.black};
     background-color: ${theme.colors.grey};
-    border: 1px solid ${theme.colors.black};
+    border: 1px solid ${theme.colors.gold};
     border-radius: 20px;
     align-items: center;
+    transition: 200ms all;
     padding: 40px;
     img {
         grid-column: 1/3;
     }
     div {
         grid-column: 4/11;
+    }
+    &:hover {
+        box-shadow: 0px 4px 56px 0px rgba(0, 0, 0, 0.05);
+        background-color: ${theme.colors.white};
     }
 `;

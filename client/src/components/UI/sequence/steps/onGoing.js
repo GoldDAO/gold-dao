@@ -1,33 +1,36 @@
-import { Check, ClearAll, Savings, ScreenshotMonitor, Assignment } from '@mui/icons-material';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { CustomCircularProgress } from '../../styled/common';
+import { Box, Typography } from '@mui/material';
 
 const OnGoing = ({ res }) => {
     return (
         <Box>
             {res ? (
-                res[0].map((e, i) => {
-                    return (
-                        <>
-                            <Box sx={{ display: 'flex' }}>
-                                <CheckCircleIcon />
-                                <Typography>{e.ok.token_id}</Typography>
-                            </Box>
-                            <Box>
-                                <Typography>
-                                    Transaction Sent with success, You can follow the process
-                                    on&nbsp;
-                                    <Link href="/ongoing-swaps">Ongoing Swaps Page</Link>
-                                </Typography>
-                            </Box>
-                        </>
-                    );
-                })
+                <>
+                    {res.map((e, i) => {
+                        return e?.map((el, i) => {
+                            if (el.ok) {
+                                return (
+                                    <>
+                                        <Box sx={{ display: 'flex' }}>
+                                            <CheckCircleIcon />
+                                            <Typography>{el.ok?.token_id}</Typography>
+                                        </Box>
+                                    </>
+                                );
+                            }
+                        });
+                    })}
+                    <Typography>
+                        You can follow the process on{' '}
+                        <Link href="/ongoing-swaps">Your ongoing Swap</Link>
+                    </Typography>
+                </>
             ) : (
                 <>
-                    <CircularProgress />
+                    <CustomCircularProgress />
                     <Typography>Sending Transaction</Typography>
                 </>
             )}

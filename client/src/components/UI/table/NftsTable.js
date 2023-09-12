@@ -25,6 +25,8 @@ import {
     removeAllItemsInCartAtom,
     removeCartItemByIdAtom,
 } from '@/states/cart';
+import { theme } from '@/theme/theme';
+import { CustomCircularProgress } from '../styled/common';
 
 const MyNfts = ({ hasControls, selectable }) => {
     const actors = useAllCanisters();
@@ -47,12 +49,12 @@ const MyNfts = ({ hasControls, selectable }) => {
     ];
     if (!nfts.isLoading) {
         return (
-            <Box sx={{ gridColumn: '1/12' }}>
+            <TableContainer sx={{ gridColumn: '1/12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
                             {selectable && (
-                                <StyledTableCell padding="checkbox">
+                                <StyledTableCell padding="checkbox" key="checkbox">
                                     <StyledCheckbox
                                         onChange={(e) => {
                                             e.target.checked
@@ -71,7 +73,7 @@ const MyNfts = ({ hasControls, selectable }) => {
                             )}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <TableBody>
+                    <CustomTableBody>
                         {nfts?.nfts?.map((nft, i) => {
                             return (
                                 <Row
@@ -84,15 +86,15 @@ const MyNfts = ({ hasControls, selectable }) => {
                                 />
                             );
                         })}
-                    </TableBody>
+                    </CustomTableBody>
                 </StyledTable>
-            </Box>
+            </TableContainer>
         );
     } else if (nfts.isLoading) {
         return (
             <Box
                 sx={{
-                    width: '100%',
+                    gridColumn: 'span 12',
                     height: '500px',
                     display: 'flex',
                     alignItems: 'center',
@@ -100,8 +102,12 @@ const MyNfts = ({ hasControls, selectable }) => {
                     flexDirection: 'column',
                 }}
             >
-                <CircularProgress />
-                <Typography sx={{ marginTop: '20px' }}>Loading Nfts...</Typography>
+                <CustomCircularProgress />
+                <Typography
+                    sx={{ marginTop: '20px', fontStyle: 'italic', color: theme.colors.darkgrey }}
+                >
+                    Loading Nfts...
+                </Typography>
             </Box>
         );
     }
@@ -122,7 +128,7 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
     return (
         <StyledTableRow>
             {selectable && (
-                <StyledTableCell padding="checkbox">
+                <StyledTableCell key="checkbox" padding="checkbox">
                     <StyledCheckbox
                         onChange={(e) => {
                             e.target.checked ? setCartItem(row) : removeItemFromCart(row.name);
@@ -133,9 +139,9 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
                 </StyledTableCell>
             )}
             <StyledTableCell key="weight" padding="checkbox">
-                {row.weight} {row.unit}
+                {row.weight}g
             </StyledTableCell>
-            <StyledTableCell>
+            <StyledTableCell key="name">
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Image src={medium} alt={'NFT IMAGE'} />
                     <ItemName>{row.name}</ItemName>
@@ -149,6 +155,11 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
         </StyledTableRow>
     );
 };
+
+const TableContainer = styled(Box)`
+    border-radius: 20px;
+    border: 1px solid ${theme.colors.gold};
+`;
 
 const MarketCapContainer = styled(Box)`
     font-size: 1em;
@@ -164,20 +175,33 @@ const MarketCapContainer = styled(Box)`
         width: 100%;
     }
 `;
-const StyledTableRow = styled(TableRow)``;
+const StyledTableRow = styled(TableRow)`
+    display: table;
+    width: 100%;
+`;
 const StyledCheckbox = styled(Checkbox)``;
 
 const StyledTableHead = styled(TableHead)`
-    font-weight: 600;
+    font-weight: 400;
+    border-radius: 20px 20px 0 0;
+    background-color: ${theme.colors.grey};
 `;
 const StyledTableCell = styled(TableCell)`
     font-weight: inherit;
 `;
 
-const StyledTable = styled(Table)``;
+const StyledTable = styled(Table)`
+    border-radius: 20px;
+`;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;
     display: inline-flex;
     padding-left: 16px;
+`;
+
+const CustomTableBody = styled(TableBody)`
+    height: 400px;
+    overflow: scroll;
+    display: block;
 `;

@@ -4,19 +4,19 @@ import styled from 'styled-components';
 import CopyToClipboard from '../button/CopyToClipboard';
 import { Typography } from '@mui/material';
 
-const Address = ({ address }) => {
+const Address = ({ address, copyBtn }) => {
     const firstChars = (str) => str.slice(0, 5);
     const lastChars = (str) => str.slice(-3);
 
     return (
         <AddressBox>
-            <AddressLabel>Wallet address</AddressLabel>
+            <AddressLabel>Connected Principal</AddressLabel>
             {address && (
                 <>
-                    <Typography sx={{ display: 'inline' }}>
+                    <Typography sx={{ display: 'inline', paddingLeft: '20px' }}>
                         {firstChars(address) + '...' + lastChars(address)}
                     </Typography>
-                    <CopyToClipboard text={address} />
+                    {copyBtn && <CopyToClipboard text={address} />}
                 </>
             )}
         </AddressBox>
@@ -26,11 +26,13 @@ const Address = ({ address }) => {
 export default Address;
 
 const AddressBox = styled(Box)`
-    color: #616161
+    color: #616161;
+    display: flex;
+    align-items: center;
     font-size: 14px;
 `;
 
 const AddressLabel = styled(Typography)`
-    font-weight: 600;
+    font-weight: 400;
     color: #616161;
 `;

@@ -15,7 +15,7 @@ const CustomDialog = ({ content, open, setOpen, title, address, children, isButt
         <StyledModal open={open} onClose={() => {}}>
             <StyledModalHead>
                 <ModalLabel>
-                    <Typography>{title}</Typography>
+                    <Typography as="h4">{title}</Typography>
                     <CloseButton setClose={() => setOpen(false)} />
                 </ModalLabel>
                 {address && <Address address={address} />}

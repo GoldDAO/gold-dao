@@ -15,7 +15,6 @@ const OngoingSwapsTable = dynamic(() => import('@/components/UI/table/OngoingSwa
 const OngoingSwaps = () => {
     const [user] = useAtom(userAtom);
     const [onSale] = useAtom(onSaleNftAtom);
-    console.log('onSale', onSale);
     return (
         <>
             <Head>

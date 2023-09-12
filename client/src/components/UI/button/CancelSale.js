@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { gldNftCanisters } from "@/services/agents";
-import { useAllCanisters } from "@/components/hooks/useAllCanisters";
-import { CircularProgress, IconButton } from "@mui/material";
+import { useState, useEffect } from 'react';
+import { gldNftCanisters } from '@/services/agents';
+import { useAllCanisters } from '@/components/hooks/useAllCanisters';
+import { CircularProgress, IconButton } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
-import SnackBarFeedback from "@/components/UI/feedback/SnackBar";
-import styled from "styled-components";
-
+import SnackBarFeedback from '@/components/UI/feedback/SnackBar';
+import styled from 'styled-components';
+import { CustomCircularProgress } from '../styled/common';
 
 export const CancelsaleButton = ({ token_id, weight, setIsOnSale, setFeedback }) => {
     const actors = useAllCanisters();
@@ -16,7 +16,7 @@ export const CancelsaleButton = ({ token_id, weight, setIsOnSale, setFeedback })
 
     const unlistHandler = async (token_id, weight, actors) => {
         const ind = weights.indexOf(weight + 'g');
-        setIsLoading(true)
+        setIsLoading(true);
         const res = await actors[ind]?.sale_batch_nft_origyn([{ end_sale: token_id }]);
         console.log(res);
         if (res[0].ok) {
@@ -28,23 +28,26 @@ export const CancelsaleButton = ({ token_id, weight, setIsOnSale, setFeedback })
         setFeedback(true);
         setIsOnSale(false);
         setIsLoading(false);
-    }
+    };
 
     return (
         <>
-            {isLoading ?
+            {isLoading ? (
                 <SmallCircularProgress />
-                :
-                <IconButton label="Cancel Sale" onClick={() => unlistHandler(token_id, weight, actors)}>
+            ) : (
+                <IconButton
+                    label="Cancel Sale"
+                    onClick={() => unlistHandler(token_id, weight, actors)}
+                >
                     <CancelIcon />
                 </IconButton>
-            }
+            )}
         </>
-    )
-}
+    );
+};
 
-const SmallCircularProgress = styled(CircularProgress)`
+const SmallCircularProgress = styled(CustomCircularProgress)`
     width: 25px !important;
     height: 25px !important;
     margin-left: 10px;
-`
+`;

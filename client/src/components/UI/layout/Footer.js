@@ -9,7 +9,7 @@ const Footer = () => {
 export default Footer;
 
 const FooterContainer = styled('footer')`
-    height: 300px;
+    height: 250px;
     background-color: ${theme.colors.grey};
-    border-top: 1px solid ${theme.colors.black};
+    border-top: 1px solid ${theme.colors.gold};
 `;

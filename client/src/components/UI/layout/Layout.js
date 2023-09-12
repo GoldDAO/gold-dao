@@ -7,7 +7,7 @@ import Footer from './Footer';
 
 const Layout = ({ children }) => {
     return (
-        <>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <LayoutContainer>
                 <Grid>
                     <Header />
@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
                 </Grid>
             </LayoutContainer>
             <Footer />
-        </>
+        </Box>
     );
 };
 
@@ -25,6 +25,7 @@ export default Layout;
 
 const LayoutContainer = styled(Box)`
     padding: 40px 60px;
+    flex-grow: 1;
     @media (max-width: 1140px) {
         padding: 30px 60px;
     }

@@ -19,10 +19,10 @@ export const navigation = [
         label: 'Ongoing Swaps',
         path: '/ongoing-swaps',
     },
-    // {
-    //     label: 'Transactions',
-    //     path: '/transactions',
-    // },
+    {
+        label: 'Transactions',
+        path: '/transactions',
+    },
     // {
     //     label: 'Nfts Breakdown',
     //     path: '/nfts-breakdown',

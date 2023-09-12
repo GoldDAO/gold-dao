@@ -17,6 +17,8 @@ import { Principal } from '@dfinity/principal';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Timestamp from '../tooltip/timestamp';
+import { CustomCircularProgress } from '../styled/common';
+import { theme } from '@/theme/theme';
 
 const TransactionsTable = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -43,7 +45,7 @@ const TransactionsTable = () => {
 
     if (!loading) {
         return (
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ gridColumn: 'span 12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
@@ -73,7 +75,7 @@ const TransactionsTable = () => {
         return (
             <Box
                 sx={{
-                    width: '100%',
+                    gridColumn: 'span 12',
                     height: '500px',
                     display: 'flex',
                     alignItems: 'center',
@@ -81,8 +83,12 @@ const TransactionsTable = () => {
                     flexDirection: 'column',
                 }}
             >
-                <CircularProgress />
-                <Typography sx={{ marginTop: '20px' }}>Loading transactions...</Typography>
+                <CustomCircularProgress />
+                <Typography
+                    sx={{ marginTop: '20px', fontStyle: 'italic', color: theme.colors.darkgrey }}
+                >
+                    Loading transactions...
+                </Typography>
             </Box>
         );
 };

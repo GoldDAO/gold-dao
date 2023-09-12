@@ -1,3 +1,5 @@
+import { theme } from '@/theme/theme';
+import { CircularProgress } from '@mui/material';
 import styled from 'styled-components';
 
 export const SectionTitle = styled('h3')`
@@ -22,4 +24,8 @@ export const SectionTitle = styled('h3')`
         margin-bottom: 20px;
         padding-bottom: 10px;
     }
+`;
+
+export const CustomCircularProgress = styled(CircularProgress)`
+    color: ${theme.colors.gold};
 `;

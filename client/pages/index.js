@@ -9,6 +9,8 @@ import dynamic from 'next/dynamic';
 import { useCanister } from '@connect2ic/react';
 import TextSection from '@/components/UI/sections/TextSection;';
 import Yumi from '@/components/UI/sections/Yumi';
+import { CustomCircularProgress } from '@/components/UI/styled/common';
+import AppStatus from '@/components/UI/feedback/AppStatus';
 
 function Home({ content, meta, partners, cto, marketcap }) {
     const Banner = dynamic(() => import('@/components/UI/sections/Banner'), {
@@ -31,10 +33,6 @@ function Home({ content, meta, partners, cto, marketcap }) {
                 <TextSection title={textTitle} content={textContent} />
                 <Yumi />
                 <Partners partners={partners} />
-                {/* <Marketcap data={marketcap.data} /> */}
-                {/* <PageContent dangerouslySetInnerHTML={{ __html: content }} /> */}
-                {/* <Swap data={cto.data} /> */}
-                {/* <Chart /> */}
             </Layout>
         </>
     );
