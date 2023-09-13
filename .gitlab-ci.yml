@@ -53,6 +53,7 @@ stages:
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
+    - alias ic-wasm=.cargo/bin/ic-wasm
 
 ################################################################################
 # Linters
@@ -98,11 +99,10 @@ canister test build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked --future-incompat-report -p gldt_core
-    - .cargo/bin/ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
+    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
     - gzip -c canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm >canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
   after_script:
     - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
-
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
@@ -160,7 +160,7 @@ canister build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt_core
-    - .cargo/bin/ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
+    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
     - gzip -c canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm >canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
