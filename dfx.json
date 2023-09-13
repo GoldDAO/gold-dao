@@ -3,23 +3,19 @@
   "canisters": {
     "gldt_frontend": {
       "type": "assets",
-      "source": [
-        "client/out"
-      ],
-      "build": [
-        "npm run postinstall",
-        "npm run build:front"
-      ],
+      "source": ["client/out"],
+      "build": ["npm run postinstall", "npm run build:front"],
       "frontend": {}
     },
     "gldt_core": {
       "type": "rust",
       "candid": "canister/gldt_core/src/gldt_core.did",
       "declarations": {
-        "output": "canister/gldt_core/declarations/"
+        "output": "canister/declarations/gldt_core/"
       },
       "package": "gldt_core",
-      "optimize": "cycles"
+      "optimize": "cycles",
+      "build": ["npm run build:back"]
     },
     "gldt_ledger": {
       "type": "custom",
@@ -89,9 +85,7 @@
   },
   "networks": {
     "staging": {
-      "providers": [
-        "https://icp0.io"
-      ],
+      "providers": ["https://icp0.io"],
       "type": "persistent"
     }
   }
