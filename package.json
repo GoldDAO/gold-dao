@@ -22,7 +22,7 @@
     "stop": "dfx stop",
     "restart": "cd client && npm run stop; npm start && cd ..",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
-    "postinstall": "cd ./client && npm install && cd ..; cargo install ic-wasm"
+    "postinstall": "cd ./client && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm)'"
   },
   "devDependencies": {
     "eslint": "8.40.0"
