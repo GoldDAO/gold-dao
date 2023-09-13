@@ -93,6 +93,8 @@ canister test build:
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked --future-incompat-report -p gldt_core
     - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o gldt_core_canister.wasm shrink --optimize O3
+  after_script:
+    - ic-wasm canister/gld_nft/gldt_core/gldt_core_canister.wasm info
 
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
