@@ -8,11 +8,9 @@
       "frontend": {}
     },
     "gldt_core": {
-      "type": "rust",
+      "type": "custom",
       "candid": "canister/gldt_core/src/gldt_core.did",
-      "declarations": {
-        "output": "canister/declarations/gldt_core/"
-      },
+      "wasm": "canister/gld_nft/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
       "package": "gldt_core",
       "optimize": "cycles",
       "build": ["npm run build:back"]

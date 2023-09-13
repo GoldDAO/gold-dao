@@ -92,7 +92,8 @@ canister test build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked --future-incompat-report -p gldt_core
-    - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o gldt_core_canister.wasm shrink --optimize O3
+    - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o canister/gld_nft/gldt_core/gldt_core_canister.wasm shrink --optimize O3
+    - gzip -c canister/gld_nft/gldt_core/gldt_core_canister.wasm >canister/gld_nft/gldt_core/gldt_core_canister.wasm.gz
   after_script:
     - ic-wasm canister/gld_nft/gldt_core/gldt_core_canister.wasm info
 
@@ -100,6 +101,7 @@ canister test build:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
       - canister/gld_nft/gldt_core/gldt_core_canister.wasm
+      - canister/gld_nft/gldt_core/gldt_core_canister.wasm.gz
     expire_in: 1 day
 
 ################################################################################
@@ -151,12 +153,13 @@ canister build:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
   <<: *rust_template
   script:
-    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt_core
+    - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked -p gldt_core
+    - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o canister/gld_nft/gldt_core/gldt_core_canister.wasm shrink --optimize O3
+    - gzip -c canister/gld_nft/gldt_core/gldt_core_canister.wasm >canister/gld_nft/gldt_core/gldt_core_canister.wasm.gz
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/declarations/
-      - target/
+      - canister/gld_nft/gldt_core/gldt_core_canister.wasm.gz
     expire_in: 6 months
 
 ################################################################################
