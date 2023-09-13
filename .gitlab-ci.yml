@@ -46,10 +46,12 @@ stages:
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
+      - ~/.cargo
       - canister/gldt_core/target
   before_script:
     - apk update -q && apk add --no-cache musl-dev
     - rustup target add wasm32-unknown-unknown
+    - cargo install ic-wasm
 
 ################################################################################
 # Linters
@@ -89,7 +91,9 @@ canister test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
-    - cargo build --target wasm32-unknown-unknown --release --locked -p gldt
+    - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked -p gldt_core
+    - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o gldt_core_canister.wasm shrink --optimize O3
+
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
