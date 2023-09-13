@@ -32,15 +32,18 @@ const RefreshButton = ({
 
     const refreshStatus = async () => {
         setStatusLoading(true);
-        const res = await actor[0].get_status_of_swap({
-            nft_id: token_id,
-            gld_nft_canister_id: Principal.fromText(gldNftCanisters[`${g}g`].canisterId),
-            sale_id: sale_id,
-        });
-        if (res) {
-            setStatus(Object.keys(res?.Ok?.status[0])[0]);
-            setStatusLoading(false);
+        if (status !== 'Swapped') {
+            const res = await actor[0].get_status_of_swap({
+                nft_id: token_id,
+                gld_nft_canister_id: Principal.fromText(gldNftCanisters[`${g}g`].canisterId),
+                sale_id: sale_id,
+            });
+            if (res.Ok.status[0]) {
+                setStatus(Object.keys(res?.Ok?.status[0])[0]);
+                setStatusLoading(false);
+            }
         }
+        setStatusLoading(false);
     };
 
     return !isLoading ? (

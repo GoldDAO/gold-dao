@@ -46,7 +46,7 @@ const Row = ({ token_id, g, gldt, sale_id }) => {
             </StyledTableCell>
             <StyledTableCell
                 key="status"
-                sx={{ height: '100px', display: 'flex', alignItems: 'center' }}
+                sx={{ height: '100px', display: 'flex', alignItems: 'center', borderBottom: 0 }}
             >
                 <RefreshButton
                     isLoading={statusLoading}
