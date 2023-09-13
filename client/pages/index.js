@@ -36,7 +36,7 @@ function Home({ meta, partners }) {
                 <Yumi />
                 <Marketcap />
                 <Partners partners={partners} />
-                <Chart />
+                {/* <Chart /> */}
             </Layout>
         </>
     );
