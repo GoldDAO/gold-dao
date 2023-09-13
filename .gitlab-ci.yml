@@ -46,12 +46,13 @@ stages:
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
-      - /usr/local/cargo
+      - .cargo
       - canister/gldt_core/target
   before_script:
     - apk update -q && apk add --no-cache musl-dev build-base
     - rustup target add wasm32-unknown-unknown
-    - cargo install ic-wasm
+    - mkdir -pv .cargo
+    - cargo install -q --root .cargo ic-wasm
 
 ################################################################################
 # Linters
