@@ -46,7 +46,7 @@ stages:
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
-      - ~/.cargo
+      - /usr/local/cargo
       - canister/gldt_core/target
   before_script:
     - apk update -q && apk add --no-cache musl-dev build-base
