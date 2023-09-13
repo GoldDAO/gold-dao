@@ -91,7 +91,7 @@ canister test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
-    - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked -p gldt_core
+    - cargo build --target wasm32-unknown-unknown --target-dir canister/gld_nft/gldt_core --release --locked --future-incompat-report -p gldt_core
     - ic-wasm canister/gld_nft/gldt_core/gldt_core.wasm -o gldt_core_canister.wasm shrink --optimize O3
 
   artifacts:
