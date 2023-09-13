@@ -13,3 +13,4 @@ out/
 canister/gldt_core/target
 canister/declarations
 target
+.vscode
