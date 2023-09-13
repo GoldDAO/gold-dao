@@ -4,16 +4,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
 import medium from './../../../../public/images/gold/100g.png';
-import {
-    Checkbox,
-    CircularProgress,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Typography,
-} from '@mui/material';
+import { Checkbox, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useNft } from '@/components/hooks/useNFTs';
 import { useAllCanisters } from '@/components/hooks/useAllCanisters';
@@ -26,7 +17,15 @@ import {
     removeCartItemByIdAtom,
 } from '@/states/cart';
 import { theme } from '@/theme/theme';
-import { CustomCircularProgress } from '../styled/common';
+import {
+    CustomCircularProgress,
+    CustomTableBody,
+    StyledTable,
+    StyledTableCell,
+    StyledTableHead,
+    StyledTableRow,
+    TableContainer,
+} from '../styled/common';
 
 const MyNfts = ({ hasControls, selectable }) => {
     const actors = useAllCanisters();
@@ -142,8 +141,8 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart, tableKey }) =>
                 {row.weight}g
             </StyledTableCell>
             <StyledTableCell key="name">
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Image src={medium} alt={'NFT IMAGE'} />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Image src={medium} alt={'NFT IMAGE'} width={50} />
                     <ItemName>{row.name}</ItemName>
                 </Box>
             </StyledTableCell>
@@ -155,12 +154,6 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart, tableKey }) =>
         </StyledTableRow>
     );
 };
-
-const TableContainer = styled(Box)`
-    border-radius: 20px;
-    grid-column: 1/13;
-    border: 1px solid ${theme.colors.gold};
-`;
 
 const MarketCapContainer = styled(Box)`
     font-size: 1em;
@@ -176,27 +169,7 @@ const MarketCapContainer = styled(Box)`
         width: 100%;
     }
 `;
-const StyledTableRow = styled(TableRow)`
-    display: table;
-    width: 100%;
-`;
-const StyledCheckbox = styled(Checkbox)``;
 
-const StyledTableHead = styled(TableHead)`
-    font-weight: 400;
-    width: 100%;
-    border-radius: 20px 20px 0 0;
-    display: table-header-group;
-    background-color: ${theme.colors.grey};
-`;
-const StyledTableCell = styled(TableCell)`
-    font-weight: inherit;
-    display: table-cell;
-`;
-
-const StyledTable = styled(Table)`
-    border-radius: 20px;
-`;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;
@@ -204,8 +177,4 @@ const ItemName = styled(Typography)`
     padding-left: 16px;
 `;
 
-const CustomTableBody = styled(TableBody)`
-    height: 400px;
-    overflow: scroll;
-    display: block;
-`;
+const StyledCheckbox = styled(Checkbox)``;

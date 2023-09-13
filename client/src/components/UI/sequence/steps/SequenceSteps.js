@@ -119,7 +119,7 @@ const SequenceSteps = ({ open, setOpen }) => {
         return <Summary open={open} setOpen={setOpen} />;
     } else if (currentStep === 2) {
         return (
-            <CustomDialog open={open} setOpen={setOpen}>
+            <CustomDialog open={open} setOpen={setOpen} title="Processing Swaps...">
                 <OnGoing res={res} />
             </CustomDialog>
         );

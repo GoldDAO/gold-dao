@@ -25,7 +25,7 @@ const Header = () => {
     return (
         <HeaderContainer as="header">
             <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Link href="/">
+                <Link href="/" ac>
                     <Image width={115} height={50} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>

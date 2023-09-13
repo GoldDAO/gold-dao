@@ -13,10 +13,10 @@ const Address = ({ address, copyBtn }) => {
             <AddressLabel>Connected Principal</AddressLabel>
             {address && (
                 <>
-                    <Typography sx={{ display: 'inline', paddingLeft: '20px' }}>
+                    <Typography sx={{ display: 'inline', fontSize: '16px' }}>
                         {firstChars(address) + '...' + lastChars(address)}
+                        {copyBtn && <CopyToClipboard text={address} />}
                     </Typography>
-                    {copyBtn && <CopyToClipboard text={address} />}
                 </>
             )}
         </AddressBox>
@@ -28,11 +28,12 @@ export default Address;
 const AddressBox = styled(Box)`
     color: #616161;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     font-size: 14px;
 `;
 
 const AddressLabel = styled(Typography)`
     font-weight: 400;
     color: #616161;
+    font-size: 16px;
 `;

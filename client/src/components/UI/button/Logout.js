@@ -27,13 +27,13 @@ const LogOut = styled(Button)`
         justify-content: flex-end;
     }
     svg {
-        color: #000;
-        fill: #000;
+        color: #242424;
+        fill: #242424;
         width: 20px;
         margin-right: 10px;
     }
     div {
-        color: #000;
+        color: #242424;
         font-size: 16px;
         text-transform: lowercase;
     }

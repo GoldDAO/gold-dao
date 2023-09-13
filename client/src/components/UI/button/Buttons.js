@@ -32,7 +32,9 @@ const StyledButton = styled(Button)`
         color: ${(props) => (props.secondary ? theme.colors.gold : theme.colors.white)};
         padding: 8px 40px;
         border-radius: 8px;
+        transition: 200ms all;
         &:hover {
+            box-shadow: 0px 4px 30px 0px rgba(211, 184, 114, 0.2);
         }
     }
 `;

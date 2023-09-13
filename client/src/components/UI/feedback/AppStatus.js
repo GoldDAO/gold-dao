@@ -26,7 +26,7 @@ const AppStatus = () => {
                         </Typography>
                     </>
                 ))}
-            {!isConnected && (
+            {!isConnected && !isInitializing && (
                 <Typography sx={{ width: '100%' }}>Please connect your wallet</Typography>
             )}
         </Box>

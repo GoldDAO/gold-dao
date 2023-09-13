@@ -17,7 +17,6 @@ const OngoingSwapsTable = dynamic(() => import('@/components/UI/table/OngoingSwa
 
 const OngoingSwaps = () => {
     const [user] = useAtom(userAtom);
-    const [onSale] = useAtom(onSaleNftAtom);
     return (
         <>
             <Head>
@@ -28,7 +27,7 @@ const OngoingSwaps = () => {
             <Layout>
                 {user.isConnected ? (
                     <>
-                        <OngoingSwapsTable on_sale={onSale} />
+                        <OngoingSwapsTable />
                     </>
                 ) : (
                     <AppStatus />

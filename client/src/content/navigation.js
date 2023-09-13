@@ -15,10 +15,10 @@ export const navigation = [
         label: 'My Nfts',
         path: '/my-nfts',
     },
-    {
-        label: 'Ongoing Swaps',
-        path: '/ongoing-swaps',
-    },
+    // {
+    //     label: 'Ongoing Swaps',
+    //     path: '/ongoing-swaps',
+    // },
     {
         label: 'Transactions',
         path: '/transactions',

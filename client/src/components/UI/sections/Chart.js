@@ -30,7 +30,7 @@ const Chart = () => {
     }, []);
 
     return (
-        <Box sx={{ padding: '40px 0' }}>
+        <Box sx={{ padding: '40px 0', gridColumn: 'span 12' }}>
             <ChartHeader>
                 <ChartTitle>Gold Price</ChartTitle>
                 <Typography sx={{ fontSize: '14px', paddingTop: '15px' }}>XAU:USD</Typography>

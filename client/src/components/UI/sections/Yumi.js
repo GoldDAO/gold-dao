@@ -38,7 +38,7 @@ const YumiBanner = styled(Link)`
         grid-column: 4/11;
     }
     &:hover {
-        box-shadow: 0px 4px 56px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0px 4px 56px 0px rgba(211, 184, 114, 0.2);
         background-color: ${theme.colors.white};
     }
 `;

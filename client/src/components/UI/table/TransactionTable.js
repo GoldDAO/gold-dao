@@ -17,7 +17,15 @@ import { Principal } from '@dfinity/principal';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Timestamp from '../tooltip/timestamp';
-import { CustomCircularProgress } from '../styled/common';
+import {
+    CustomCircularProgress,
+    CustomTableBody,
+    StyledTable,
+    StyledTableCell,
+    StyledTableHead,
+    StyledTableRow,
+    TableContainer,
+} from '../styled/common';
 import { theme } from '@/theme/theme';
 
 const TransactionsTable = () => {
@@ -54,11 +62,11 @@ const TransactionsTable = () => {
                             })}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <TableBody>
+                    <CustomTableBody>
                         {transactions?.map((e, i) => {
                             return <Row key={tableHead[i]} row={e} />;
                         })}
-                    </TableBody>
+                    </CustomTableBody>
                 </StyledTable>
                 <TablePagination
                     rowsPerPageOptions={[5, 15, 25]}
@@ -165,39 +173,9 @@ const Row = ({ row }) => {
     );
 };
 
-const TableContainer = styled(Box)`
-    border-radius: 20px;
-    grid-column: 1/13;
-    border: 1px solid ${theme.colors.gold};
-`;
-
-const StyledTableRow = styled(TableRow)`
-    width: 100%;
-`;
-const StyledCheckbox = styled(Checkbox)``;
-
-const StyledTableHead = styled(TableHead)`
-    font-weight: 400;
-    width: 100%;
-    border-radius: 20px 20px 0 0;
-    background-color: ${theme.colors.grey};
-`;
-const StyledTableCell = styled(TableCell)`
-    font-weight: inherit;
-`;
-
-const StyledTable = styled(Table)`
-    border-radius: 20px;
-`;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;
     display: inline-flex;
     padding-left: 16px;
-`;
-
-const CustomTableBody = styled(TableBody)`
-    height: 400px;
-    overflow: scroll;
-    display: block;
 `;

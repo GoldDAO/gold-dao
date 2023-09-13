@@ -82,6 +82,34 @@ const PageTitle = styled(Box)`
         left: 480px;
         top: -200px;
     }
+    @media (max-width: 1832px) {
+        ::after {
+            content: '';
+            display: block;
+            position: absolute;
+            background-image: url(/images/banner/ingot.svg);
+            background-repeat: no-repeat;
+            background-size: 96%;
+            background-position: center;
+            top: -250px;
+            width: 500px;
+            left: 100px;
+            height: 500px;
+        }
+        ::before {
+            content: '';
+            display: block;
+            position: absolute;
+            background-image: url(/images/banner/small_arrow.svg);
+            background-repeat: no-repeat;
+            background-size: 96%;
+            background-position: center;
+            width: 300px;
+            height: 300px;
+            left: 480px;
+            top: -300px;
+        }
+    }
 `;
 
 const CallToAction = () => {
@@ -120,6 +148,7 @@ const Circle = styled(Box)`
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    border-radius: 50%;
     ::after {
         content: '';
         display: block;

@@ -6,9 +6,16 @@ import Partners from '@/components/UI/sections/partners';
 import dynamic from 'next/dynamic';
 import TextSection from '@/components/UI/sections/TextSection;';
 import Yumi from '@/components/UI/sections/Yumi';
+import { gldNftCanisters } from '@/services/agents';
+import { CustomCircularProgress } from '@/components/UI/styled/common';
+import Chart from '@/components/UI/sections/Chart';
 
 function Home({ meta, partners }) {
     const Banner = dynamic(() => import('@/components/UI/sections/Banner'), {
+        ssr: false,
+    });
+
+    const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
         ssr: false,
     });
 
@@ -27,7 +34,9 @@ function Home({ meta, partners }) {
                 <Banner />
                 <TextSection title={textTitle} content={textContent} />
                 <Yumi />
+                <Marketcap />
                 <Partners partners={partners} />
+                <Chart />
             </Layout>
         </>
     );

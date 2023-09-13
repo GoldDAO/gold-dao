@@ -10,10 +10,10 @@ const WalletContainer = ({ user, open, setOpen }) => {
 
     return (
         <WalletBox open={open} onClose={() => setOpen(false)}>
-            <Address address={user.principal} />
+            <Address address={user.principal} copyBtn />
             <BalanceContainer>
                 <Box>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 500, color: '#626263' }}>
+                    <Typography sx={{ fontSize: '14px', fontWeight: 500, color: '#626263' }}>
                         GLDT Balance
                     </Typography>
                     <Box> {balance} </Box>

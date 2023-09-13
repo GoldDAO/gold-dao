@@ -7,6 +7,7 @@ import { defaultProviders } from '@connect2ic/core/providers';
 import { SafeHydrate } from '@/utils/SafeHydrate';
 import dynamic from 'next/dynamic';
 import '@connect2ic/core/style.css';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
 
@@ -39,12 +40,20 @@ const Providers = ({ children }) => {
         return <></>;
     }
 
+    const theme = createTheme({
+        typography: {
+            fontFamily: ['Inter', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
+        },
+    });
+
     return (
-        <Connect2ICProvider client={client}>
-            <SafeHydrate>
-                <JotaiProvider store={myStore}>{children}</JotaiProvider>
-            </SafeHydrate>
-        </Connect2ICProvider>
+        <ThemeProvider theme={theme}>
+            <Connect2ICProvider client={client}>
+                <SafeHydrate>
+                    <JotaiProvider store={myStore}>{children}</JotaiProvider>
+                </SafeHydrate>
+            </Connect2ICProvider>
+        </ThemeProvider>
     );
 };
 
