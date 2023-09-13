@@ -93,16 +93,16 @@ canister test build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked --future-incompat-report -p gldt_core
-    - .cargo/bin/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
-    - gzip -c canister/gldt_core/target/gldt_core_canister.wasm >canister/gldt_core/target/gldt_core_canister.wasm.gz
+    - .cargo/bin/ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
+    - gzip -c canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm >canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
   after_script:
-    - ic-wasm canister/gldt_core/target/gldt_core_canister.wasm info
+    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
 
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST"
     paths:
-      - canister/gldt_core/target/gldt_core_canister.wasm
-      - canister/gldt_core/target/gldt_core_canister.wasm.gz
+      - canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm
+      - canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
     expire_in: 1 day
 
 ################################################################################
@@ -155,12 +155,12 @@ canister build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt_core
-    - .cargo/bin/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
-    - gzip -c canister/gldt_core/target/gldt_core_canister.wasm >canister/gldt_core/target/gldt_core_canister.wasm.gz
+    - .cargo/bin/ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core.wasm -o canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm shrink --optimize O3
+    - gzip -c canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm >canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/gldt_core/target/gldt_core_canister.wasm.gz
+      - canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz
     expire_in: 6 months
 
 ################################################################################
