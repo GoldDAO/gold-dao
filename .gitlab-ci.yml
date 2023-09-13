@@ -52,7 +52,7 @@ stages:
     - apk update -q && apk add --no-cache musl-dev build-base
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm && ls -lah .cargo/
+    - cargo install -q --root .cargo ic-wasm && ls -lah .cargo/bin/
 
 ################################################################################
 # Linters
@@ -93,7 +93,7 @@ canister test build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked --future-incompat-report -p gldt_core
-    - .cargo/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
+    - .cargo/bin/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
     - gzip -c canister/gldt_core/target/gldt_core_canister.wasm >canister/gldt_core/target/gldt_core_canister.wasm.gz
   after_script:
     - ic-wasm canister/gldt_core/target/gldt_core_canister.wasm info
@@ -155,7 +155,7 @@ canister build:
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt_core
-    - .cargo/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
+    - .cargo/bin/ic-wasm canister/gldt_core/target/gldt_core.wasm -o canister/gldt_core/target/gldt_core_canister.wasm shrink --optimize O3
     - gzip -c canister/gldt_core/target/gldt_core_canister.wasm >canister/gldt_core/target/gldt_core_canister.wasm.gz
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
