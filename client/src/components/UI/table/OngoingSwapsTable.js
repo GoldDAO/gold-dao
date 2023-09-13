@@ -29,11 +29,25 @@ const Row = ({ token_id, g, gldt, sale_id }) => {
     const [statusLoading, setStatusLoading] = useState(true);
 
     return (
-        <StyledTableRow>
-            <StyledTableCell key="token_id">{token_id}</StyledTableCell>
-            <StyledTableCell key="weight">{g}</StyledTableCell>
-            <StyledTableCell key="GLDT">{g * 100}</StyledTableCell>
-            <StyledTableCell key="status">
+        <StyledTableRow
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+            }}
+        >
+            <StyledTableCell key="token_id" sx={{ borderBottom: 0 }}>
+                {token_id}
+            </StyledTableCell>
+            <StyledTableCell key="weight" sx={{ borderBottom: 0 }}>
+                {g}
+            </StyledTableCell>
+            <StyledTableCell key="GLDT" sx={{ borderBottom: 0 }}>
+                {g * 100}
+            </StyledTableCell>
+            <StyledTableCell
+                key="status"
+                sx={{ height: '100px', display: 'flex', alignItems: 'center' }}
+            >
                 <RefreshButton
                     isLoading={statusLoading}
                     status={status}

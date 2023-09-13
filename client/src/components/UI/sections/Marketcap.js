@@ -20,7 +20,7 @@ const Marketcap = () => {
         >
             <MarketCapContainer>
                 <p style={{ fontWeight: 300 }}>GLDT Marketcap: </p>
-                <MarketCapToolTip marketcap={(totalSupply * gprice).toFixed(2)} />
+                <MarketCapToolTip marketcap={((totalSupply * gprice) / 100).toFixed(2)} />
             </MarketCapContainer>
         </Box>
     );

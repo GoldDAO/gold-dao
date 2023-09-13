@@ -20,21 +20,21 @@ const SummaryTable = ({ g, nfts }) => {
                     <SummaryTableRow>
                         <SummaryTableCell>Nfts</SummaryTableCell>
                         <SummaryTableCell style={{ width: 'fit-content' }}>
-                            {nfts.map((e) => (
-                                <>{e.name + ', '}</>
+                            {nfts.map((e, i) => (
+                                <>{(i > 0 ? ', ' : '') + e.name}</>
                             ))}
                         </SummaryTableCell>
                     </SummaryTableRow>
                     <SummaryTableRow>
-                        <SummaryTableCell>Minted</SummaryTableCell>
+                        <SummaryTableCell>Minted tokens</SummaryTableCell>
                         <SummaryTableCell>{minted} GLDT</SummaryTableCell>
                     </SummaryTableRow>
                     <SummaryTableRow>
-                        <SummaryTableCell>Estimated Fees</SummaryTableCell>
+                        <SummaryTableCell>Minting fees</SummaryTableCell>
                         <SummaryTableCell>{fees} GLDT</SummaryTableCell>
                     </SummaryTableRow>
                     <SummaryTableRow>
-                        <SummaryTableCell>Estimated Revenue</SummaryTableCell>
+                        <SummaryTableCell>Received tokens</SummaryTableCell>
                         <SummaryTableCell>{gldtTotal} GLDT</SummaryTableCell>
                     </SummaryTableRow>
                 </Table>

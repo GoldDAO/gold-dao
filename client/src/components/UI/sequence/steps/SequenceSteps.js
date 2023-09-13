@@ -87,7 +87,7 @@ const SequenceSteps = ({ open, setOpen }) => {
         return (
             <CustomDialog open={open} setOpen={setOpen} title="Exchange your GLDNFT for GLDT">
                 <SequenceHeader />
-                <MyNfts selectable={true} />
+                <MyNfts selectable={true} height="300px" />
                 <Controls disable={cart.length > 0 ? false : true} />
             </CustomDialog>
         );

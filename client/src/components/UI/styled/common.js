@@ -91,9 +91,12 @@ export const ItemName = styled(Typography)`
 `;
 
 export const CustomTableBody = styled(TableBody)`
-    height: 400px;
+    height: ${(props) => {
+        console.log('props.height', props);
+        return props.height ? props.height : '300px';
+    }};
+    flex-grow: 1;
     overflow: scroll;
-
     display: block;
     width: 100%;
 `;

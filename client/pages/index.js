@@ -18,7 +18,7 @@ function Home({ meta, partners }) {
 
     const textTitle = 'Gold. Blockchain. Secure. Stable. Simple.';
     const textContent =
-        'GLDT is a stablecoin that is 100% backed by physical gold, making it a secure and reliable investment option in the world of cryptocurrency. GLDT is only minted when a GLD NFT is swapped, ensuring that it is fully backed by physical gold held in secure vaults in Switzerland.';
+        'GLDT is a token that is 100% backed by physical gold, making it a secure and reliable asset in the world of cryptocurrency. GLDT is only minted when a GLD NFT is swapped, ensuring that it is fully backed by physical gold held in secure vaults in Switzerland.';
 
     return (
         <>

@@ -5,7 +5,7 @@ const MarketCapContent = ({ marketcap }) => {
     return (
         <Tooltip
             sx={{ fontSize: '1em' }}
-            title={<TooltipContent data={{ locked: 'x', unlocked: 'y' }} />}
+            // title={<TooltipContent data={{ locked: 'x', unlocked: 'y' }} />}
         >
             <Box style={{ fontSize: '1em', margin: 0 }}>
                 &nbsp;

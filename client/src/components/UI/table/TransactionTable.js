@@ -30,7 +30,7 @@ import { theme } from '@/theme/theme';
 
 const TransactionsTable = () => {
     const [currentPage, setCurrentPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [loading, setLoading] = useState(true);
     const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage);
 
@@ -62,7 +62,7 @@ const TransactionsTable = () => {
                             })}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <CustomTableBody>
+                    <CustomTableBody height="600px">
                         {transactions?.map((e, i) => {
                             return <Row key={tableHead[i]} row={e} />;
                         })}
@@ -118,7 +118,6 @@ const Row = ({ row }) => {
                             Principal:{' '}
                             {Principal.fromUint8Array(row.mint[0].to.owner._arr).toString()}
                         </p>
-                        <p>Subaccount: [{row.mint[0].to.subaccount[0].join(', ')}]</p>
                     </>
                 ),
             };
@@ -131,25 +130,13 @@ const Row = ({ row }) => {
                 From: (
                     <>
                         <p>
-                            Principal:{' '}
                             {Principal.fromUint8Array(row.transfer[0].from.owner._arr).toString()}
                         </p>
-                        <p>Subaccount: [{row.transfer[0].from.subaccount[0].join(', ')}]</p>
                     </>
                 ),
                 To: (
                     <>
-                        <p>
-                            Principal:{' '}
-                            {Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString()}
-                        </p>
-                        <p>
-                            Subaccount: [
-                            {row.transfer[0].to.subaccount[0]
-                                ? row.transfer[0].to.subaccount[0].join(', ')
-                                : ''}
-                            ]
-                        </p>
+                        <p>{Principal.fromUint8Array(row.transfer[0].to.owner._arr).toString()}</p>
                     </>
                 ),
             };

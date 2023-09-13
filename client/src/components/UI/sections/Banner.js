@@ -38,7 +38,7 @@ const BannerContainer = styled(Box)`
     grid-template-columns: repeat(12, 1fr);
 `;
 
-const PageTitle = styled(Box)`
+export const PageTitle = styled(Box)`
     height: fit-content;
     font-size: 64px;
     position: relative;

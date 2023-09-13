@@ -7,6 +7,7 @@ import { Principal } from '@dfinity/principal';
 import { OneK } from '@mui/icons-material';
 import { useEffect } from 'react';
 import { CustomCircularProgress } from '../styled/common';
+import { useState } from 'react';
 
 const RefreshButton = ({
     token_id,
@@ -18,12 +19,13 @@ const RefreshButton = ({
     status,
 }) => {
     const actor = useCanister('gldtCoreCanister');
-
     useEffect(() => {
         setStatusLoading(false);
         refreshStatus();
         const loop = setInterval(() => {
-            refreshStatus();
+            if (status !== 'Swapped') {
+                refreshStatus();
+            }
         }, 2500);
         return () => clearInterval(loop);
     }, []);

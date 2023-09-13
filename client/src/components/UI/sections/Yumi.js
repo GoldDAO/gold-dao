@@ -7,7 +7,10 @@ import { theme } from '@/theme/theme';
 
 const Yumi = () => {
     return (
-        <YumiBanner href="https://yumi.io/" target="_blank">
+        <YumiBanner
+            href="https://tppkg-ziaaa-aaaal-qatrq-cai.raw.ic0.app/gold/nfts"
+            target="_blank"
+        >
             <Image src={YumiLogo} width={200} height={50} alt="Yumi marketplace logo" />
             <Box>
                 <Typography>You don’t have any GLDNFT ?</Typography>

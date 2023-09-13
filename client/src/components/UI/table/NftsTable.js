@@ -27,7 +27,7 @@ import {
     TableContainer,
 } from '../styled/common';
 
-const MyNfts = ({ hasControls, selectable }) => {
+const MyNfts = ({ hasControls, selectable, height }) => {
     const actors = useAllCanisters();
     const nfts = useNft(actors);
 
@@ -72,7 +72,7 @@ const MyNfts = ({ hasControls, selectable }) => {
                             )}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <CustomTableBody>
+                    <CustomTableBody height={height ? height : '600px'}>
                         {nfts?.nfts?.map((nft, i) => {
                             return (
                                 <Row
@@ -94,7 +94,7 @@ const MyNfts = ({ hasControls, selectable }) => {
             <Box
                 sx={{
                     gridColumn: 'span 12',
-                    height: '500px',
+                    height: '350px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
