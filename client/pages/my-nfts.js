@@ -1,14 +1,10 @@
 import AppStatus from '@/components/UI/feedback/AppStatus';
 import Layout from '@/components/UI/layout/Layout';
-import TextSection from '@/components/UI/sections/TextSection;';
-import { onSaleNftAtom } from '@/states/onSalesNfts';
 import { userAtom } from '@/states/user';
-import { Box } from '@mui/material';
 import { useAtom } from 'jotai';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import React from 'react';
-import { useEffect } from 'react';
 
 const MyNftsTable = dynamic(() => import('@/components/UI/table/NftsTable'), {
     ssr: false,

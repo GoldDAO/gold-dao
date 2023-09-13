@@ -17,18 +17,17 @@ export const getGoldTimeserie = async () => {
 };
 
 const formatGoldTimeserie = (data) => {
-    // const dates = Object.keys(data);
-    // const formatedTimeserie = [];
-    // dates.map((e) => {
-    //     const ratio = data[e].XAU * gMultiplier;
-    //     formatedTimeserie.push({
-    //         date: e,
-    //         XAU: 1,
-    //         USD: roundToNDigits(data[e].USD / ratio, 2),
-    //     });
-    // });
-    // return formatedTimeserie;
-    return data;
+    const dates = Object.keys(data);
+    const formatedTimeserie = [];
+    dates.map((e) => {
+        const ratio = data[e].XAU * gMultiplier;
+        formatedTimeserie.push({
+            date: e,
+            XAU: 1,
+            USD: roundToNDigits(data[e].USD / ratio, 2),
+        });
+    });
+    return formatedTimeserie;
 };
 
 export const formatDate = (timestamp) => {
