@@ -52,7 +52,7 @@ stages:
     - apk update -q && apk add --no-cache musl-dev build-base
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm && ls -lah .cargo/bin/
+    - cargo install -q --root .cargo ic-wasm
 
 ################################################################################
 # Linters
