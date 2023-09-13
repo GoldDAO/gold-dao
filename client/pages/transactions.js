@@ -7,9 +7,7 @@ const TransactionsTable = dynamic(() => import('@/components/UI/table/Transactio
     ssr: false,
 });
 
-
 const Transactions = () => {
-
     return (
         <>
             <Head>

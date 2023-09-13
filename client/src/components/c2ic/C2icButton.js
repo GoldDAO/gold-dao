@@ -6,6 +6,7 @@ import { setGetUserAtom } from '@/states/user';
 import { appStatusAtom } from '@/states/appStatus';
 import { emptyAllNftsAtom } from '@/states/nfts';
 import { removeAllItemsInCartAtom } from '@/states/cart';
+import { theme } from '@/theme/theme';
 
 const C2icButton = () => {
     const [, setUser] = useAtom(setGetUserAtom);
@@ -106,10 +107,12 @@ const C2icButton = () => {
                 {appstatus === 'idle' && (
                     <ConnectButton
                         style={{
-                            backgroundColor: '#D3B872',
+                            backgroundColor: 'transparent',
+                            color: theme.colors.gold,
+                            border: `1px solid ${theme.colors.gold}`,
                             borderRadius: '10px',
+                            padding: '10px 30px',
                             fontSize: '20px',
-                            textTransform: 'uppercase',
                         }}
                     />
                 )}

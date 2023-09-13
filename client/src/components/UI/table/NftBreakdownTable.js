@@ -19,6 +19,7 @@ import Timestamp from '../tooltip/timestamp';
 import { useCanister } from '@connect2ic/react';
 import { gldtCoreCanister } from '@/services/agents';
 import { useRecords } from '@/components/hooks/useRecords';
+import { CustomCircularProgress } from '../styled/common';
 
 const NftBreakdownTable = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -26,10 +27,6 @@ const NftBreakdownTable = () => {
     const [loading, setLoading] = useState(false);
 
     const records = useRecords(rowsPerPage, currentPage);
-
-    // useEffect(() => {
-    //     records ? setLoading(false) : setLoading(true);
-    // }, [records]);
 
     const handleChangePage = (e, newPage) => {
         setCurrentPage(newPage);
@@ -53,7 +50,7 @@ const NftBreakdownTable = () => {
 
     if (!loading) {
         return (
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ gridColumn: 'span 12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
@@ -91,8 +88,12 @@ const NftBreakdownTable = () => {
                     flexDirection: 'column',
                 }}
             >
-                <CircularProgress />
-                <Typography sx={{ marginTop: '20px' }}>Loading Nfts...</Typography>
+                <CustomCircularProgress />
+                <Typography
+                    sx={{ marginTop: '20px', fontStyle: 'italic', color: theme.colors.darkgrey }}
+                >
+                    Loading Nfts...
+                </Typography>
             </Box>
         );
 };
@@ -100,7 +101,6 @@ const NftBreakdownTable = () => {
 export default NftBreakdownTable;
 
 const Row = ({ row }) => {
-    console.log('row', row);
     const tableHead = [
         'Nft ID',
         'Record Type',

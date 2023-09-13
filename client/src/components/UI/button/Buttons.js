@@ -2,12 +2,21 @@ import React from 'react';
 import { Button } from '@mui/material';
 import styled from 'styled-components';
 import { IconButton } from '@mui/material';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import CloseIcon from '@mui/icons-material/Close';
+import { Children } from 'react';
+import { theme } from '@/theme/theme';
 
-const MainButton = ({ label, isInactive, action, style }) => {
+const MainButton = ({ label, isInactive, action, style, children, secondary }) => {
     return (
-        <StyledButton disabled={isInactive} onClick={action} style={style}>
-            {label}
+        <StyledButton
+            secondary={secondary}
+            isInactive={isInactive}
+            disabled={isInactive}
+            onClick={action}
+            style={style}
+        >
+            {label && label}
+            {children && children}
         </StyledButton>
     );
 };
@@ -16,26 +25,25 @@ export default MainButton;
 
 const StyledButton = styled(Button)`
     &.MuiButton-root {
-        max-width: 289px;
-        min-width: 289px;
         text-transform: capitalize;
-        background-color: #313131;
-        color: #fff;
-        border: 1px solid #313131;
-        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        background-color: ${(props) =>
+            props.isInactive ? '#E3E3E3' : props.secondary ? 'transparent' : theme.colors.gold};
+        border: ${(props) => (props.secondary ? `1px solid ${theme.colors.gold}` : 'none')};
+        color: ${(props) => (props.secondary ? theme.colors.gold : theme.colors.white)};
+        padding: 8px 40px;
         border-radius: 8px;
-        &:hover{
-            box-shadow: none;
-            border: 1px solid #5b5858;
-            background-color: #313131;
+        transition: 200ms all;
+        &:hover {
+            box-shadow: 0px 4px 30px 0px rgba(211, 184, 114, 0.2);
         }
     }
-
-`
+`;
 
 export const CloseButton = ({ setClose }) => {
     return (
-        <IconButton onClick={setClose}><HighlightOffIcon /></IconButton>
+        <IconButton onClick={setClose}>
+            <CloseIcon />
+        </IconButton>
     );
 };
 
@@ -51,7 +59,7 @@ export const StyledPrimaryButton = styled(Button)`
     &.MuiButton-root {
         height: fit-content;
         padding: 9px 25px 5px 25px;
-        background-color: #D3B872;
+        background-color: #d3b872;
         color: #fff;
         border-radius: 10px;
         font-size: 1em;
@@ -59,10 +67,9 @@ export const StyledPrimaryButton = styled(Button)`
         cursor: pointer;
         outline: none;
         box-shadow: none;
-        &:hover{
+        &:hover {
             box-shadow: none;
-            background-color: #D3B872;
+            background-color: #d3b872;
         }
     }
-`
-
+`;

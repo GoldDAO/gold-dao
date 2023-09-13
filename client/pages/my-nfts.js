@@ -1,6 +1,6 @@
+import AppStatus from '@/components/UI/feedback/AppStatus';
 import Layout from '@/components/UI/layout/Layout';
 import { userAtom } from '@/states/user';
-import { Box } from '@mui/material';
 import { useAtom } from 'jotai';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
@@ -12,7 +12,7 @@ const MyNftsTable = dynamic(() => import('@/components/UI/table/NftsTable'), {
 
 const MyNfts = () => {
     const [user] = useAtom(userAtom);
-    // console.log('user', user)
+
     return (
         <>
             <Head>
@@ -22,9 +22,11 @@ const MyNfts = () => {
             </Head>
             <Layout>
                 {user.isConnected ? (
-                    <MyNftsTable selectable={false} hasControls={true} />
+                    <>
+                        <MyNftsTable selectable={false} hasControls={true} />
+                    </>
                 ) : (
-                    <Box>Please connect your wallet</Box>
+                    <AppStatus />
                 )}
             </Layout>
         </>

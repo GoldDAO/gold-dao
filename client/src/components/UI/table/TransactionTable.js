@@ -17,6 +17,16 @@ import { Principal } from '@dfinity/principal';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Timestamp from '../tooltip/timestamp';
+import {
+    CustomCircularProgress,
+    CustomTableBody,
+    StyledTable,
+    StyledTableCell,
+    StyledTableHead,
+    StyledTableRow,
+    TableContainer,
+} from '../styled/common';
+import { theme } from '@/theme/theme';
 
 const TransactionsTable = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -43,20 +53,20 @@ const TransactionsTable = () => {
 
     if (!loading) {
         return (
-            <Box sx={{ width: '100%' }}>
+            <TableContainer sx={{ gridColumn: 'span 12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
                             {tableHead.map((e, i) => {
-                                return <StyledTableCell key={i}>{e}</StyledTableCell>;
+                                return <StyledTableCell key={e}>{e}</StyledTableCell>;
                             })}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <TableBody>
+                    <CustomTableBody>
                         {transactions?.map((e, i) => {
-                            return <Row key={i} row={e} />;
+                            return <Row key={tableHead[i]} row={e} />;
                         })}
-                    </TableBody>
+                    </CustomTableBody>
                 </StyledTable>
                 <TablePagination
                     rowsPerPageOptions={[5, 15, 25]}
@@ -67,13 +77,13 @@ const TransactionsTable = () => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Box>
+            </TableContainer>
         );
     } else
         return (
             <Box
                 sx={{
-                    width: '100%',
+                    gridColumn: 'span 12',
                     height: '500px',
                     display: 'flex',
                     alignItems: 'center',
@@ -81,8 +91,12 @@ const TransactionsTable = () => {
                     flexDirection: 'column',
                 }}
             >
-                <CircularProgress />
-                <Typography sx={{ marginTop: '20px' }}>Loading transactions...</Typography>
+                <CustomCircularProgress />
+                <Typography
+                    sx={{ marginTop: '20px', fontStyle: 'italic', color: theme.colors.darkgrey }}
+                >
+                    Loading transactions...
+                </Typography>
             </Box>
         );
 };
@@ -159,17 +173,6 @@ const Row = ({ row }) => {
     );
 };
 
-const StyledTableRow = styled(TableRow)``;
-const StyledCheckbox = styled(Checkbox)``;
-
-const StyledTableHead = styled(TableHead)`
-    font-weight: 600;
-`;
-const StyledTableCell = styled(TableCell)`
-    font-weight: inherit;
-`;
-
-const StyledTable = styled(Table)``;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;

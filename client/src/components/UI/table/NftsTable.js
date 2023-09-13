@@ -4,20 +4,11 @@ import { Box } from '@mui/system';
 import React from 'react';
 import styled from 'styled-components';
 import medium from './../../../../public/images/gold/100g.png';
-import {
-    Checkbox,
-    CircularProgress,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Typography,
-} from '@mui/material';
+import { Checkbox, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useNft } from '@/components/hooks/useNFTs';
 import { useAllCanisters } from '@/components/hooks/useAllCanisters';
-import NftControls from '../sequence/NftStatus';
+import NftControls from './NftStatus';
 import {
     addAllItemsAtom,
     addCartItemAtom,
@@ -25,6 +16,16 @@ import {
     removeAllItemsInCartAtom,
     removeCartItemByIdAtom,
 } from '@/states/cart';
+import { theme } from '@/theme/theme';
+import {
+    CustomCircularProgress,
+    CustomTableBody,
+    StyledTable,
+    StyledTableCell,
+    StyledTableHead,
+    StyledTableRow,
+    TableContainer,
+} from '../styled/common';
 
 const MyNfts = ({ hasControls, selectable }) => {
     const actors = useAllCanisters();
@@ -47,12 +48,12 @@ const MyNfts = ({ hasControls, selectable }) => {
     ];
     if (!nfts.isLoading) {
         return (
-            <Box sx={{ width: '100%' }}>
+            <TableContainer sx={{ gridColumn: '1/12' }}>
                 <StyledTable>
                     <StyledTableHead>
                         <StyledTableRow>
                             {selectable && (
-                                <StyledTableCell padding="checkbox">
+                                <StyledTableCell padding="checkbox" key="checkbox">
                                     <StyledCheckbox
                                         onChange={(e) => {
                                             e.target.checked
@@ -71,7 +72,7 @@ const MyNfts = ({ hasControls, selectable }) => {
                             )}
                         </StyledTableRow>
                     </StyledTableHead>
-                    <TableBody>
+                    <CustomTableBody>
                         {nfts?.nfts?.map((nft, i) => {
                             return (
                                 <Row
@@ -84,15 +85,15 @@ const MyNfts = ({ hasControls, selectable }) => {
                                 />
                             );
                         })}
-                    </TableBody>
+                    </CustomTableBody>
                 </StyledTable>
-            </Box>
+            </TableContainer>
         );
     } else if (nfts.isLoading) {
         return (
             <Box
                 sx={{
-                    width: '100%',
+                    gridColumn: 'span 12',
                     height: '500px',
                     display: 'flex',
                     alignItems: 'center',
@@ -100,8 +101,12 @@ const MyNfts = ({ hasControls, selectable }) => {
                     flexDirection: 'column',
                 }}
             >
-                <CircularProgress />
-                <Typography sx={{ marginTop: '20px' }}>Loading Nfts...</Typography>
+                <CustomCircularProgress />
+                <Typography
+                    sx={{ marginTop: '20px', fontStyle: 'italic', color: theme.colors.darkgrey }}
+                >
+                    Loading Nfts...
+                </Typography>
             </Box>
         );
     }
@@ -109,7 +114,7 @@ const MyNfts = ({ hasControls, selectable }) => {
 
 export default MyNfts;
 
-const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
+const Row = ({ row, hasControls, selectable, isAllSelected, cart, tableKey }) => {
     const [, setCartItem] = useAtom(addCartItemAtom);
     const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
     const [isInCart, setIsInCart] = useState(false);
@@ -122,7 +127,7 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
     return (
         <StyledTableRow>
             {selectable && (
-                <StyledTableCell padding="checkbox">
+                <StyledTableCell key="checkbox" padding="checkbox">
                     <StyledCheckbox
                         onChange={(e) => {
                             e.target.checked ? setCartItem(row) : removeItemFromCart(row.name);
@@ -133,19 +138,19 @@ const Row = ({ row, hasControls, selectable, isAllSelected, cart }) => {
                 </StyledTableCell>
             )}
             <StyledTableCell key="weight" padding="checkbox">
-                {row.weight} {row.unit}
+                {row.weight}g
             </StyledTableCell>
-            <StyledTableCell>
+            <StyledTableCell key="name">
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Image src={medium} alt={'NFT IMAGE'} />
+                    <Image src={medium} alt={'NFT IMAGE'} width={50} />
                     <ItemName>{row.name}</ItemName>
                 </Box>
             </StyledTableCell>
-            <StyledTableCell>
-                {hasControls && (
+            {hasControls && (
+                <StyledTableCell key="controls">
                     <NftControls token_id={row.name} weight={row.weight} onSale={row.status} />
-                )}
-            </StyledTableCell>
+                </StyledTableCell>
+            )}
         </StyledTableRow>
     );
 };
@@ -164,20 +169,12 @@ const MarketCapContainer = styled(Box)`
         width: 100%;
     }
 `;
-const StyledTableRow = styled(TableRow)``;
-const StyledCheckbox = styled(Checkbox)``;
 
-const StyledTableHead = styled(TableHead)`
-    font-weight: 600;
-`;
-const StyledTableCell = styled(TableCell)`
-    font-weight: inherit;
-`;
-
-const StyledTable = styled(Table)``;
 const ItemName = styled(Typography)`
     height: 100%;
     align-items: center;
     display: inline-flex;
     padding-left: 16px;
 `;
+
+const StyledCheckbox = styled(Checkbox)``;

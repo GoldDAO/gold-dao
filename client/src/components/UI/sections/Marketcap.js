@@ -6,19 +6,20 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import MarketCapToolTip from '../tooltip/marketcapTooltip';
 
-const Marketcap = ({ data }) => {
+const Marketcap = () => {
     const totalSupply = useTotalSupply();
     const gprice = 61.78;
     return (
         <Box
             sx={{
+                gridColumn: 'span 12',
                 width: '100%',
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'center',
             }}
         >
             <MarketCapContainer>
-                <p style={{ fontWeight: 300 }}>{data.label} : </p>
+                <p style={{ fontWeight: 300 }}>GLDT Marketcap: </p>
                 <MarketCapToolTip marketcap={(totalSupply * gprice).toFixed(2)} />
             </MarketCapContainer>
         </Box>
@@ -32,6 +33,7 @@ const MarketCapContainer = styled(Box)`
     background-color: #f7f7f7;
     width: fit-content;
     padding: 20px;
+    grid-column: span 12;
     border-radius: 10px;
     display: flex;
     @media (max-width: 940px) {

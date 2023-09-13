@@ -6,14 +6,16 @@ import MainButton, { CloseButton } from '../button/Buttons';
 import Address from '../wallet/Address';
 import { useAtom } from 'jotai';
 import { cartAtom } from '@/states/cart';
+import { useEffect } from 'react';
 
 const CustomDialog = ({ content, open, setOpen, title, address, children, isButton }) => {
     const [cart] = useAtom(cartAtom);
+
     return (
         <StyledModal open={open} onClose={() => {}}>
             <StyledModalHead>
                 <ModalLabel>
-                    <Typography>{title}</Typography>
+                    <Typography as="h4">{title}</Typography>
                     <CloseButton setClose={() => setOpen(false)} />
                 </ModalLabel>
                 {address && <Address address={address} />}

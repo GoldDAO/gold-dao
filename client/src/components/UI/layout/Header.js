@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { appStatusAtom } from '../../../states/appStatus';
 import { Typography } from '@mui/material';
 import Ruban from './Ruban';
+import { theme } from '@/theme/theme';
 
 const C2icButton = dynamic(() => import('./../../c2ic/C2icButton'), {
     ssr: false,
@@ -24,13 +25,18 @@ const Header = () => {
     return (
         <HeaderContainer as="header">
             <Nav as="nav" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Link href="/">
-                    <Image width={190} height={80} src="/images/logo.svg" alt="GLDT Logo" />
+                <Link href="/" ac>
+                    <Image width={115} height={50} src="/images/logo.svg" alt="GLDT Logo" />
                 </Link>
                 <Box as="ul" sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
                     {navigation.map((e, i) => (
                         <Box key={i} as="li" sx={{ alignItems: 'center', display: 'flex' }}>
-                            <Link href={`${e.path}`}>{e.label}</Link>
+                            <Link
+                                style={{ textDecoration: 'none', color: theme.colors.black }}
+                                href={`${e.path}`}
+                            >
+                                {e.label}
+                            </Link>
                         </Box>
                     ))}
                 </Box>
@@ -59,9 +65,8 @@ const Nav = styled('nav')`
 `;
 
 const HeaderContainer = styled('header')`
+    grid-column: span 12;
     display: flex;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #d3b872;
     justify-content: space-between;
     align-items: center;
 `;
