@@ -287,7 +287,8 @@ type PricingConfigShared__1 = variant {
 type PropertyShared = record { value : Box; name : text; immutable : bool };
 type RecordType = variant { Burn; Mint };
 type Result = variant { Ok : GetStatusResponse; Err : text };
-type Result_1 = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok : GetRecordsResponse; Err : text };
+type Result_2 = variant { Ok : text; Err : text };
 type SaleStatusShared = record {
   token_id : text;
   sale_type : SaleStatusShared_sale_type;
@@ -340,7 +341,8 @@ service : (opt Conf) -> {
   get_conf : () -> (Conf);
   get_records : (GetRecordsRequest) -> (GetRecordsResponse) query;
   get_status_of_swap : (GetStatusRequest) -> (Result) query;
+  get_swaps_by_user : (opt Account, opt nat32, opt nat32) -> (Result_1) query;
   nft_info : (InfoRequest) -> (NftInfo);
-  notify_sale_nft_origyn : (SubscriberNotification) -> (Result_1);
+  notify_sale_nft_origyn : (SubscriberNotification) -> (Result_2);
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();
 }

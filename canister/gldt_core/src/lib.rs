@@ -20,22 +20,22 @@
 //!
 //!
 //! ```
-//! NFT                  GLDT            Ledger
-//!  |                    |                |
-//!  | offer request (1)  |                |
-//!  +------------------->|                |
-//!  |                    |   mint (2)     |
-//!  |                    +--------------->|
-//!  |                    |                |
-//!  |                    |<---------------+
-//!  |                    |                |
-//!  |<-------------------+                +---+
-//!  |        offer       |                |   | transact (3b)
-//!  |                    |                |<--+
-//!  +---+                |                |
-//!  |   | accept (3a)    |                |
-//!  |<--+                |                |
-//!  |                    |                |
+//! NFT                  GLDT               Ledger
+//!  |                    |                   |
+//!  |    notify (1)      |                   |
+//!  +------------------->|                   |
+//!  |                    | mint request (2)  |
+//!  |                    +------------------>|
+//!  |                    |                   |
+//!  |<---------------------------------------+
+//!  |                    |                   |
+//!  |<-------------------+                   |
+//!  |        accept      |                   |
+//!  |                    |                   |
+//!  +---+                |                   |
+//!  |   | accept (3a)    |                   |
+//!  |<--+                |                   |
+//!  |                    |                   |
 //! ```
 //!
 //! The lifecycle of one NFT is as follows.
@@ -227,6 +227,12 @@ pub struct GldNft {
 enum RecordType {
     Mint,
     Burn,
+}
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+enum RecordStatus {
+    Success,
+    Failed,
+    Ongoing,
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
@@ -923,6 +929,39 @@ enum SwappingStates {
     Swapped,
     Burned,
     Finalised,
+}
+
+#[query]
+fn get_swaps_by_user(
+    account: Option<Account>,
+    page: Option<u32>,
+    limit: Option<u32>
+) -> Result<GetRecordsResponse, String> {
+    let principal = match account {
+        Some(a) => a.owner,
+        None => api::caller(),
+    };
+    let page = page.unwrap_or(0);
+    let limit = match limit {
+        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        None => 10,
+    };
+    let res: GetRecordsResponse = SERVICE.with(|s| {
+        let records = &s.borrow().records;
+        let start = page * limit;
+        let user_records = records.values().filter(|x| x.counterparty.owner == principal);
+        let total = user_records.clone().fold(0, |count, _| count + 1) as u64;
+        let paginated_records = user_records
+            .skip(start as usize)
+            .take(limit as usize)
+            .cloned()
+            .collect();
+        return GetRecordsResponse {
+            total,
+            data: Some(paginated_records),
+        };
+    });
+    return Ok(res);
 }
 
 #[query]

@@ -308,7 +308,9 @@ export type RecordType = { 'Burn' : null } |
   { 'Mint' : null };
 export type Result = { 'Ok' : GetStatusResponse } |
   { 'Err' : string };
-export type Result_1 = { 'Ok' : string } |
+export type Result_1 = { 'Ok' : GetRecordsResponse } |
+  { 'Err' : string };
+export type Result_2 = { 'Ok' : string } |
   { 'Err' : string };
 export interface SaleStatusShared {
   'token_id' : string,
@@ -362,8 +364,12 @@ export interface _SERVICE {
   'get_conf' : ActorMethod<[], Conf>,
   'get_records' : ActorMethod<[GetRecordsRequest], GetRecordsResponse>,
   'get_status_of_swap' : ActorMethod<[GetStatusRequest], Result>,
+  'get_swaps_by_user' : ActorMethod<
+    [[] | [Account], [] | [number], [] | [number]],
+    Result_1
+  >,
   'nft_info' : ActorMethod<[InfoRequest], NftInfo>,
-  'notify_sale_nft_origyn' : ActorMethod<[SubscriberNotification], Result_1>,
+  'notify_sale_nft_origyn' : ActorMethod<[SubscriberNotification], Result_2>,
   'updateCanistergeekInformation' : ActorMethod<
     [UpdateInformationRequest],
     undefined

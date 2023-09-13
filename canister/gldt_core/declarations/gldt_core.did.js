@@ -147,6 +147,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const GetStatusResponse = IDL.Record({ 'status' : IDL.Opt(SwappingStates) });
   const Result = IDL.Variant({ 'Ok' : GetStatusResponse, 'Err' : IDL.Text });
+  const Result_1 = IDL.Variant({ 'Ok' : GetRecordsResponse, 'Err' : IDL.Text });
   const InfoRequest = IDL.Record({
     'nft_id' : IDL.Text,
     'source_canister' : IDL.Principal,
@@ -388,7 +389,7 @@ export const idlFactory = ({ IDL }) => {
     'seller' : Account_1,
     'escrow_info' : SubAccountInfo,
   });
-  const Result_1 = IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text });
+  const Result_2 = IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text });
   const CollectMetricsRequestType = IDL.Variant({
     'force' : IDL.Null,
     'normal' : IDL.Null,
@@ -409,10 +410,15 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'get_status_of_swap' : IDL.Func([GetStatusRequest], [Result], ['query']),
+    'get_swaps_by_user' : IDL.Func(
+        [IDL.Opt(Account), IDL.Opt(IDL.Nat32), IDL.Opt(IDL.Nat32)],
+        [Result_1],
+        ['query'],
+      ),
     'nft_info' : IDL.Func([InfoRequest], [NftInfo], []),
     'notify_sale_nft_origyn' : IDL.Func(
         [SubscriberNotification],
-        [Result_1],
+        [Result_2],
         [],
       ),
     'updateCanistergeekInformation' : IDL.Func(
