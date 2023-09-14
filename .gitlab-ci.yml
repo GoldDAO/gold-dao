@@ -205,13 +205,13 @@ frontend:
     - if: $CI_COMMIT_REF_NAME == "develop"
       needs: ["next staging build"]
       variables:
-        TARGET_NETWORK = staging
-        ENVIRONMENT_NAME = "frontend staging"
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "frontend staging"
     - if: $CI_COMMIT_TAG =~ '/^front-v\d+\.\d+\.\d+$/'
       needs: ["next production build"]
       variables:
-        TARGET_NETWORK = ic
-        ENVIRONMENT_NAME = "frontend production"
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "frontend production"
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
@@ -228,12 +228,12 @@ gldt core:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       variables:
-        TARGET_NETWORK = staging
-        ENVIRONMENT_NAME = "core staging"
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "core staging"
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
       variables:
-        TARGET_NETWORK = ic
-        ENVIRONMENT_NAME = "core production"
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "core production"
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
@@ -250,13 +250,13 @@ gldt ledger:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       variables:
-        TARGET_NETWORK = staging
-        ENVIRONMENT_NAME = "ledger staging"
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "ledger staging"
     - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
       when: manual
       variables:
-        TARGET_NETWORK = ic
-        ENVIRONMENT_NAME = "core production"
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "core production"
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
