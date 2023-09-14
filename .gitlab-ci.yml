@@ -64,7 +64,8 @@ next linter:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - **/*.js
+        - "client/*.{js,json}"
+        - "client/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
@@ -74,6 +75,9 @@ rust lint:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
@@ -139,6 +143,9 @@ next production build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "client/*.{js,json}"
+        - "client/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   <<: *node_template
   script:
     - npm run realbuild
@@ -158,7 +165,11 @@ next production build:
 canister build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
   <<: *rust_template
   script:
     - cargo build --target wasm32-unknown-unknown --target-dir canister/gldt_core/target --release --locked -p gldt_core
@@ -190,7 +201,7 @@ local:
     - cat canister_ids.json
     - dfx stop
 
-staging:
+.staging:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
@@ -201,7 +212,7 @@ staging:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
   script:
-    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet -y
+    - dfx deploy --network staging --identity gitlab-ci-gldt --no-wallet -y
   after_script:
     - echo "Staging environment will be accessible on ${STAGING_ENVIRONMENT_URL}"
   environment:
@@ -209,13 +220,11 @@ staging:
     url: $STAGING_ENVIRONMENT_URL
     action: start
 
-production:
+.production:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
-  dependencies:
-    - next production build
-    - canister build
+      needs: ["next production build"]
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
