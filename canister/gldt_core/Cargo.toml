@@ -15,12 +15,9 @@ candid = { version = "0.9.6" }
 candid = { version = "0.9.6"}
 ic-cdk = "0.10.0"
 ic-cdk-macros = "0.7.1"
-ic-ledger-types = "0.7.0"
 icrc-ledger-types = "0.1.0"
 serde = "1.0.126"
 serde_derive = "1.0.126"
 serde_bytes = "0.11.12"
 canistergeek_ic_rust = "0.4.2"
-
-[dev-dependencies]
-tempfile = "3.2.0"
+clippy="0.0.302"

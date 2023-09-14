@@ -152,12 +152,12 @@ pub struct GldtBurned {
 }
 
 /// Record of information about an NFT for which GLDT has been minted.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Default)]
 pub struct GldtMinted {
     /// Block height when the GLDT was minted. Must be non-zero and
     /// point to a block with a minting transaction with the right
     /// number of tokens and subaccount.
-    mint_block_height: BlockIndex,
+    mint_block_height: Option<BlockIndex>,
 
     /// The last timestamp when this NFT was audited, i.e., when it
     /// was verified that this NFT belongs to this canister, or zero
@@ -171,18 +171,7 @@ pub struct GldtMinted {
 
     /// The number of tokens that were minted. Added for completeness
     /// but it should alway be 1g : 100 GLDT
-    num_tokens: NumTokens,
-}
-
-impl Default for GldtMinted {
-    fn default() -> Self {
-        GldtMinted {
-            mint_block_height: Nat::from(0),
-            last_audited_timestamp_seconds: 0,
-            burned: None,
-            num_tokens: Nat::from(0),
-        }
-    }
+    num_tokens: Option<NumTokens>,
 }
 
 /// Record of information about an NFT that has been successfully swapped for GLDT.
@@ -287,7 +276,7 @@ thread_local! {
 
 #[ic_cdk_macros::pre_upgrade]
 fn pre_upgrade() {
-    log_message(format!("executing pre_upgrade"));
+    log_message("executing pre_upgrade".to_string());
 
     // canister geek data
     let monitor_stable_data = canistergeek_ic_rust::monitor::pre_upgrade_stable_data();
@@ -317,10 +306,14 @@ fn post_upgrade() {
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
-        Err(_) => {}
+        Err(_) => {
+            // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
+            // and the state to be restored.
+            api::trap("Failed to restore from stable memory. Reverting upgrade.");
+        }
     }
 
-    log_message(format!("executed post_upgrade"));
+    log_message("executed post_upgrade".to_string());
 }
 
 #[init]
@@ -358,7 +351,7 @@ fn get_records(req: GetRecordsRequest) -> GetRecordsResponse {
         Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
         None => 10,
     };
-    let res: GetRecordsResponse = SERVICE.with(|s| {
+    SERVICE.with(|s| {
         let records = &mut s.borrow_mut().records;
         let start = page * limit;
         let paginated_records = records
@@ -367,14 +360,13 @@ fn get_records(req: GetRecordsRequest) -> GetRecordsResponse {
             .take(limit as usize)
             .cloned()
             .collect();
-        return GetRecordsResponse { total: records.len() as u64, data: Some(paginated_records) };
-    });
-    return res;
+        GetRecordsResponse { total: records.len() as u64, data: Some(paginated_records) }
+    })
 }
 
 #[update]
 fn get_conf() -> Conf {
-    log_message(format!("INFO :: get_conf"));
+    log_message("INFO :: get_conf".to_string());
     SERVICE.with(|s| s.borrow_mut().conf.clone())
 }
 
@@ -395,11 +387,12 @@ type TransferResult = Result<BlockIndex, TransferError>;
 async fn nft_info(args: InfoRequest) -> NftInfo {
     log_message(format!("INFO :: nft_info. Arguments: {:?}", args));
     SERVICE.with(|s| NftInfo {
-        info: s
-            .borrow()
-            .registry.get(&(args.source_canister, args.nft_id))
-            .map(|x| x.clone()),
+        info: s.borrow().registry.get(&(args.source_canister, args.nft_id)).cloned(),
     })
+}
+
+fn calculate_tokens_from_weight(grams: u16) -> NumTokens {
+    NumTokens::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY)
 }
 
 fn delete_nft_entry_from_list(nft_id: &NftId) -> Result<(), String> {
@@ -408,8 +401,24 @@ fn delete_nft_entry_from_list(nft_id: &NftId) -> Result<(), String> {
         let registry = &mut s.borrow_mut().registry;
         match registry.entry((the_caller, nft_id.to_string())) {
             btree_map::Entry::Occupied(o) => {
-                o.remove_entry();
-                Ok(())
+                let (key, _) = o.remove_entry();
+                if key.0 == the_caller && key.1 == *nft_id {
+                    log_message(
+                        format!(
+                            "INFO :: delete_nft_entry_from_list :: deleted entry for key {:?}",
+                            key
+                        )
+                    );
+                    Ok(())
+                } else {
+                    Err(
+                        format!(
+                            "ERROR :: delete_nft_entry_from_list :: key mismatch. Expected {:?}, received {:?}",
+                            (the_caller, nft_id),
+                            key
+                        )
+                    )
+                }
             }
             _ => Err(format!("NFT ID {} not found in list.", nft_id)),
         }
@@ -423,21 +432,26 @@ async fn accept_offer(
 ) -> Result<GldtSwapped, String> {
     let num_tokens = (match swap_info.minted {
         Some(t) => {
-            let num_tokens_expected =
-                (swap_info.grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY;
-            if t.num_tokens != num_tokens_expected {
-                Err(
-                    format!(
-                        "Invalid number of tokens to accept offer. Expected {}, received {}.",
-                        num_tokens_expected,
-                        t.num_tokens
-                    )
-                )
-            } else {
-                Ok(t.num_tokens)
+            let num_tokens_expected = calculate_tokens_from_weight(swap_info.grams);
+            match t.num_tokens {
+                Some(num_tokens) => {
+                    if num_tokens != num_tokens_expected {
+                        Err(
+                            format!(
+                                "Invalid number of tokens to accept offer. Expected {}, received {:?}.",
+                                num_tokens_expected,
+                                num_tokens
+                            )
+                        )
+                    } else {
+                        Ok(num_tokens)
+                    }
+                }
+                None => Err("Invalid number of tokens to accept offer. Received None.".to_string()),
             }
         }
-        None => Err("Invalid number of tokens to accept offer.".to_string()),
+        None =>
+            Err("Missing information about minted tokens. Cancelling accept_offer.".to_string()),
     })?;
     let bid = BidRequest {
         broker_id: None,
@@ -450,7 +464,7 @@ async fn accept_offer(
             amount: num_tokens,
         },
     };
-    let service = gld_nft::SERVICE(swap_info.gld_nft_canister_id);
+    let service = gld_nft::Service(swap_info.gld_nft_canister_id);
     log_message(format!("Placing bid with arguments {:?}", bid));
     match service.sale_nft_origyn(ManageSaleRequest::bid(bid)).await {
         Ok((res,)) => {
@@ -462,7 +476,7 @@ async fn accept_offer(
                         ManageSaleResponse::bid(bid) => {
                             let sale_id = match bid.txn_type {
                                 BidResponse_txn_type::sale_ended { sale_id, .. } =>
-                                    sale_id.unwrap_or_else(|| "".to_string()),
+                                    sale_id.unwrap_or_default(),
                                 _ => "".to_string(),
                             };
                             (sale_id, bid.index)
@@ -475,7 +489,7 @@ async fn accept_offer(
                     })
                 }
                 ManageSaleResult::err(err) => {
-                    log_message(format!("Error response: ManageSaleResult : {}", err.text.clone()));
+                    log_message(format!("Error response: ManageSaleResult : {}", err.text));
                     Err(err.text)
                 }
             }
@@ -507,17 +521,13 @@ async fn validate_inputs(
                     )
                 })?;
 
-            Ok((
-                gld_nft_canister_id.clone(),
-                gld_nft_conf.clone(),
-                conf.gldt_ledger_canister_id.clone(),
-            ))
+            Ok((*gld_nft_canister_id, gld_nft_conf.clone(), conf.gldt_ledger_canister_id))
         }
     )?;
 
     // verify nft_id
     let nft_id = args.sale.token_id.clone();
-    if nft_id.clone().is_empty() {
+    if nft_id.is_empty() {
         return Err(String::from("NFT ID cannot be empty"));
     }
 
@@ -536,13 +546,13 @@ async fn validate_inputs(
     };
 
     // verify seller acount as ICRC1 account
-    let seller_icrc1: Account = (match args.seller.clone() {
+    let seller_icrc1: Account = (match args.seller {
         OrigynAccount::principal(p) =>
             Ok(Account {
-                owner: p.clone(),
+                owner: p,
                 subaccount: None,
             }),
-        _ => { Err(format!("No valid account found for seller.")) }
+        _ => { Err("No valid account found for seller.".to_string()) }
     })?;
 
     // extract token information and config and verify if it is valid
@@ -569,9 +579,7 @@ async fn validate_inputs(
     }
 
     // 100 tokens per gram.
-    let tokens_minted: NumTokens = NumTokens::from(
-        GLDT_SUBDIVIDABLE_BY * (gld_nft_conf.grams as u64) * 100
-    );
+    let tokens_minted = calculate_tokens_from_weight(gld_nft_conf.grams);
     // validate amount information
     (match config {
         PricingConfigShared__1::ask(Some(features)) => {
@@ -613,7 +621,7 @@ async fn validate_inputs(
 }
 
 async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, String> {
-    let num_tokens = Nat::from(swap_info.grams.clone()) * GLDT_PRICE_RATIO * GLDT_SUBDIVIDABLE_BY;
+    let num_tokens = calculate_tokens_from_weight(swap_info.grams);
 
     let transfer_args = TransferArg {
         memo: Some(swap_info.requested_memo),
@@ -630,7 +638,7 @@ async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, Str
         s.borrow().conf.gldt_ledger_canister_id
     });
 
-    let service = icrc1::SERVICE(gldt_ledger_canister_id);
+    let service = icrc1::Service(gldt_ledger_canister_id);
 
     // let result: TransferResult = match icrc1_transfer(transfer_args.clone()).await {
     let result: TransferResult = match service.icrc1_transfer(transfer_args.clone()).await {
@@ -665,10 +673,10 @@ async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, Str
         )
     );
     Ok(GldtMinted {
-        mint_block_height: block_height,
+        mint_block_height: Some(block_height),
         last_audited_timestamp_seconds: 0,
         burned: None,
-        num_tokens,
+        num_tokens: Some(num_tokens),
     })
 }
 
@@ -701,7 +709,7 @@ fn update_registry(
 
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((entry.gld_nft_canister_id.clone(), nft_id.clone())) {
+        match registry.entry((entry.gld_nft_canister_id, nft_id.clone())) {
             btree_map::Entry::Vacant(v) => {
                 if let RegistryUpdateType::Init = entry_type {
                     v.insert(entry.clone());
@@ -822,7 +830,7 @@ fn update_registry(
                                 // this path should never be reached
                                 log_message(
                                     format!(
-                                        "WARNING: offer for NFT {} with block height {} - inactive entry overwritten {:?}",
+                                        "WARNING: offer for NFT {} with block height {:?} - inactive entry overwritten {:?}",
                                         nft_id,
                                         block_height,
                                         minted
@@ -837,10 +845,10 @@ fn update_registry(
                                     // TODO: also, the GLDTs are minted to a subaccount that is controlled by GLDT, so user has no access.
                                     log_message(
                                         format!(
-                                            "ERROR: possible double minting for NFT {}; tokens minted to {:?} at block height {}, previous record indicating minting at block height {}",
+                                            "ERROR: possible double minting for NFT {}; tokens minted to {:?} at block height {:?}, previous record indicating minting at block height {:?}",
                                             nft_id,
                                             entry.to_subaccount,
-                                            block_height.clone(),
+                                            block_height,
                                             minted.mint_block_height
                                         )
                                     );
@@ -901,8 +909,11 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
             escrow_subaccount: Some(swap_info.to_subaccount),
             nft_sale_id: swap_info.nft_sale_id,
             grams: swap_info.grams,
-            num_tokens: swap_info.minted.clone().unwrap_or_default().num_tokens,
-            block_height: swap_info.minted.clone().unwrap_or_default().mint_block_height,
+            num_tokens: swap_info.minted.clone().unwrap_or_default().num_tokens.unwrap_or_default(),
+            block_height: swap_info.minted
+                .clone()
+                .unwrap_or_default()
+                .mint_block_height.unwrap_or_default(),
             memo: swap_info.requested_memo,
         };
         records.insert(new_index, new_record);
@@ -956,12 +967,12 @@ fn get_swaps_by_user(
             .take(limit as usize)
             .cloned()
             .collect();
-        return GetRecordsResponse {
+        GetRecordsResponse {
             total,
             data: Some(paginated_records),
-        };
+        }
     });
-    return Ok(res);
+    Ok(res)
 }
 
 #[query]
@@ -984,7 +995,7 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
                 )
             })?;
 
-        let entry = registry.get(&(req.gld_nft_canister_id.clone(), req.nft_id.clone()));
+        let entry = registry.get(&(req.gld_nft_canister_id, req.nft_id.clone()));
         let res = match entry {
             None => GetStatusResponse { status: None },
             Some(entry) => {
@@ -1041,7 +1052,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
     // STEP 3 : mint GLDT to escrow address and then swap GLDTs and NFTs
     //          Careful after this point as tokens are being minted and transfers take place.
     //          First step: mint the tokens to the escrow account.
-    let res = match mint_tokens(nft_id.clone(), swap_info.clone()).await {
+    match mint_tokens(nft_id.clone(), swap_info.clone()).await {
         Ok(gldt_minted) => {
             let updated_swap_info_minted = GldNft {
                 minted: Some(gldt_minted),
@@ -1071,7 +1082,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         nft_id.clone(),
                         updated_swap_info_swapped.clone()
                     )?;
-                    add_record(nft_id.clone(), updated_swap_info_swapped.clone())?;
+                    add_record(nft_id.clone(), updated_swap_info_swapped)?;
                     let msg = format!("INFO :: accept_offer :: {}", "success");
                     log_message(msg.clone());
                     Ok(msg)
@@ -1092,8 +1103,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
             // Case: What happens if the minting fails and the NFT stays listed? Can we let the frontend
             // call directly the GLDT canister with the notify method if the values are correct?
         }
-    };
-    return res;
+    }
 }
 
 // for monitoring during development
@@ -1107,7 +1117,7 @@ async fn get_canistergeek_information(
 #[update(name = "updateCanistergeekInformation")]
 pub async fn update_canistergeek_information(
     request: canistergeek_ic_rust::api_type::UpdateInformationRequest
-) -> () {
+) {
     canistergeek_ic_rust::update_information(request);
 }
 
