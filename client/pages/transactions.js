@@ -29,7 +29,8 @@ export default Transactions;
 
 const PageTitle = styled(Box)`
     height: fit-content;
-    font-size: 64px;
+    font-size: 48px;
+    font-weight: 300;
     position: relative;
     grid-column: span 12;
     width: 100%;

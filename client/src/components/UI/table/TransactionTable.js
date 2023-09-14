@@ -49,7 +49,7 @@ const TransactionsTable = () => {
     };
 
     // const tableHead = [Object.keys(transactions[0] ? transactions[0] : [])]
-    const tableHead = ['Kind', 'Timestamp', 'Amount', 'From', 'To'];
+    const tableHead = ['Type', 'Timestamp', 'Amount', 'From', 'To'];
 
     if (!loading) {
         return (
@@ -114,10 +114,7 @@ const Row = ({ row }) => {
                 From: 'Minting Account',
                 To: (
                     <>
-                        <p>
-                            Principal:{' '}
-                            {Principal.fromUint8Array(row.mint[0].to.owner._arr).toString()}
-                        </p>
+                        <p>{Principal.fromUint8Array(row.mint[0].to.owner._arr).toString()}</p>
                     </>
                 ),
             };
