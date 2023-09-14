@@ -18,7 +18,7 @@
     "lint": "npm run lint:front",
     "lint:front": "cd client && npm run lint && cd ..",
     "deploy": "npm run lint && dfx deploy --network staging",
-    "start": "dfx stop && dfx start --background --clean && npm run lint && dfx deploy",
+    "start": "dfx stop && dfx start --background --clean && npm run lint && dfx deploy --no-wallet",
     "stop": "dfx stop",
     "restart": "cd client && npm run stop; npm start && cd ..",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
