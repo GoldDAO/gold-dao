@@ -2,6 +2,7 @@ default:
   image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.14.3@sha256:ae4a62ea83e1eaaebab3e5186b2a3b67ba8d45951719b6acdda5fa7bcd13376e
   tags:
     - docker
+  interruptible: true
   before_script:
     - dfx --version
   retry:
@@ -62,6 +63,8 @@ next linter:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - **/*.js
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
