@@ -50,14 +50,12 @@ stages:
       - .cargo
       - canister/gldt_core/target
   before_script:
-    - apk update -q && apk add --no-cache musl-dev build-base
+    - apk update -q && apk add --no-cache musl-dev build-base curl bash
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
     - alias ic-wasm=.cargo/bin/ic-wasm
-    - wget https://github.com/bytecodealliance/wasmtime/releases/download/v12.0.2/wasmtime-v12.0.2-aarch64-linux.tar.xz
-    - tar -xvf wasmtime-v12.0.2-aarch64-linux.tar.xz
-    - alias wasmtime=wasmtime-v12.0.2-aarch64-linux/wasmtime
+    - curl https://wasmtime.dev/install.sh -sSf | bash
 
 ################################################################################
 # Linters
