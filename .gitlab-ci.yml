@@ -50,12 +50,12 @@ stages:
       - .cargo
       - canister/gldt_core/target
   before_script:
-    - apk update -q && apk add --no-cache musl-dev build-base
+    - apk update -q && apk add --no-cache musl-dev build-base curl
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
     - alias ic-wasm=.cargo/bin/ic-wasm
-    - curl https://wasmtime.dev/install.sh -sSf | bash
+    - curl https://wasmtime.dev/install.sh -sSf | sh
 
 ################################################################################
 # Linters
