@@ -184,7 +184,7 @@ canister build:
 ################################################################################
 # Deployments
 ################################################################################
-local:
+local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -199,7 +199,7 @@ local:
     - cat canister_ids.json
     - dfx stop
 
-frontend:
+gldt frontend:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
