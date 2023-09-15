@@ -10,6 +10,7 @@ out/
 **/out
 **/.next
 .env
+target
 canister/gldt_core/target
 canister/gldt_core/declarations
 canister/gldt_core/src/gldt_core.did
