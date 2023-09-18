@@ -54,7 +54,7 @@ stages:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm && ln .cargo/bin/ic-wasm ic-wasm
+    - cargo install -q --root .cargo ic-wasm && export PATH="$PWD/.cargo/bin:$PATH"
     - |
       WASMTIME_VERSION=v12.0.2
       if ([ -e .wasmtime/bin/wasmtime ]); then
@@ -65,7 +65,7 @@ stages:
         tar -xvf "wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz" && \
           mv wasmtime-${WASMTIME_VERSION}-aarch64-linux/* .wasmtime/bin/ && rm -rf wasmtime-*
       fi
-      ln .wasmtime/bin/wasmtime wasmtime
+      export PATH="$PWD/.wasmtime/bin:$PATH"
 
 ################################################################################
 # Linters
