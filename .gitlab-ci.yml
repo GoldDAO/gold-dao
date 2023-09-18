@@ -43,7 +43,7 @@ stages:
     - npm ci --cache .npm --prefer-offline
 
 .rust template: &rust_template
-  image: rust:1-alpine
+  image: rust:slim-bookworm
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
@@ -51,7 +51,7 @@ stages:
       - canister/gldt_core/target
       - .wasmtime/bin
   before_script:
-    - apk update -q && apk add --no-cache musl-dev build-base
+#    - apk update -q && apk add --no-cache musl-dev build-base
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
