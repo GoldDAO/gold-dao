@@ -103,7 +103,6 @@ canister test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
-    - source .bashrc
     - scripts/build-canister.sh gldt_core
     - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
     - scripts/generate-did.sh gldt_core
@@ -139,7 +138,6 @@ canister build:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
   <<: *rust_template
   script:
-    - source .bashrc
     - scripts/build-canister.sh gldt_core
     - scripts/generate-did.sh gldt_core
   artifacts:
