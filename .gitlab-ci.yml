@@ -44,8 +44,6 @@ stages:
 
 .rust template: &rust_template
   image: rust:1-alpine
-  variables:
-    WASMTIME_VERSION = v12.0.2
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
@@ -58,6 +56,7 @@ stages:
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
     - alias ic-wasm=.cargo/bin/ic-wasm
+    - WASMTIME=v12.0.2
     - |
       if ([ -d .wasmtime/bin ]); then
         echo "wasmtime already installed"
