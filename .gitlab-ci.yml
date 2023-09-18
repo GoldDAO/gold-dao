@@ -44,18 +44,30 @@ stages:
 
 .rust template: &rust_template
   image: rust:1-alpine
+  variables:
+    WASMTIME_VERSION = v12.0.2
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
       - .cargo
       - canister/gldt_core/target
+      - .wasmtime/bin
   before_script:
-    - apk update -q && apk add --no-cache musl-dev build-base curl bash && echo "# Generated for wasmtime" > $HOME/.bashrc
+    - apk update -q && apk add --no-cache musl-dev build-base
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
     - alias ic-wasm=.cargo/bin/ic-wasm
-    - curl https://wasmtime.dev/install.sh -sSf | bash
+    - |
+      if ([ -d .wasmtime/bin ]); then
+        echo "wasmtime already installed"
+      else
+        wget "https://github.com/bytecodealliance/wasmtime/releases/download/${WASMTIME_VERSION}/wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz"
+        mkdir -pv .wasmtime/bin
+        tar -xvf "wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz" && \
+          mv "wasmtime-${WASMTIME_VERSION}-aarch64-linux/*" .wasmtime/bin/ && rm wasmtime-*
+      fi
+    - alias wasmtime=.wasmtime/bin/wasmtime
 
 ################################################################################
 # Linters
