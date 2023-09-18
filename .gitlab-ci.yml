@@ -55,7 +55,7 @@ stages:
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
-    - alias ic-wasm=.cargo/bin/ic-wasm
+    - echo "alias ic-wasm=.cargo/bin/ic-wasm" >> .bashrc
     - WASMTIME_VERSION=v12.0.2
     - |
       if ([ -d .wasmtime/bin ]); then
@@ -66,7 +66,7 @@ stages:
         tar -xvf "wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz" && \
           mv "wasmtime-${WASMTIME_VERSION}-aarch64-linux/*" .wasmtime/bin/ && rm wasmtime-*
       fi
-    - alias wasmtime=.wasmtime/bin/wasmtime
+    - echo "alias wasmtime=.wasmtime/bin/wasmtime" >> .bashrc
 
 ################################################################################
 # Linters
