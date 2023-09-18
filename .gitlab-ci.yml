@@ -51,7 +51,7 @@ stages:
       - canister/gldt_core/target
       - .wasmtime/bin
   before_script:
-#    - apk update -q && apk add --no-cache musl-dev build-base
+    - apt update > /dev/null && apt install -y gcc > /dev/null
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm
