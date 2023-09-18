@@ -57,13 +57,13 @@ stages:
     - cargo install -q --root .cargo ic-wasm && ln .cargo/bin/ic-wasm ic-wasm
     - |
       WASMTIME_VERSION=v12.0.2
-      if ([ -d .wasmtime/bin ]); then
+      if ([ -e .wasmtime/bin/wasmtime ]); then
         echo "wasmtime already installed"
       else
         wget "https://github.com/bytecodealliance/wasmtime/releases/download/${WASMTIME_VERSION}/wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz"
         mkdir -pv .wasmtime/bin
         tar -xvf "wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz" && \
-          mv "wasmtime-${WASMTIME_VERSION}-aarch64-linux/*" .wasmtime/bin/ && rm wasmtime-*
+          mv wasmtime-${WASMTIME_VERSION}-aarch64-linux/* .wasmtime/bin/ && rm wasmtime-*
       fi
       ln .wasmtime/bin/wasmtime wasmtime
 
