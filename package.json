@@ -12,7 +12,8 @@
     "build": "echo \"Please use the 'realbuild' script (this is to avoid dfx to be able to call for a unwanted build by itself)\"",
     "realbuild": "npm run build:back && npm run build:front",
     "build:front": "cd ./client/ && npm run build && cd ..",
-    "build:back": "scripts/build-canister.sh gldt_core && scripts/generate-did.sh gldt_core",
+    "build:back": "scripts/build-canister.sh gldt_core && npm run build:candid",
+    "build:candid": "scripts/generate-did.sh gldt_core",
     "lint": "npm run lint:front",
     "lint:front": "cd client && npm run lint && cd ..",
     "deploy": "npm run lint && dfx deploy --no-wallet",
@@ -20,7 +21,7 @@
     "stop": "dfx stop",
     "restart": "cd client && npm run stop; npm start && cd ..",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
-    "postinstall": "cd ./client && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm)'"
+    "postinstall": "cd ./client && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
     "eslint": "8.40.0"

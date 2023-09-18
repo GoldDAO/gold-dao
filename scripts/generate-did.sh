@@ -61,12 +61,15 @@ else
   exit 1
 fi
 
+cargo build --target wasm32-unknown-unknown --target-dir canister/$1/target \
+  --release --locked --features "ic-cdk/wasi" -p $1
+
 defaultpath="canister/$1/src"
 did_path="${outpath:-$defaultpath}"
 if [[ $dryrun -eq 1 ]]; then
   echo "This would be written to ${did_path}/${1}.did :"
-  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm"
+  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm"
 else
-  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm" > "$did_path/$1.did" &&
+  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" > "$did_path/$1.did" &&
   dfx generate $1
 fi

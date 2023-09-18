@@ -8,16 +8,20 @@
     },
     "gldt_core": {
       "type": "custom",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_core/declarations"
+      },
       "candid": "canister/gldt_core/src/gldt_core.did",
       "wasm": "canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
       "package": "gldt_core",
-      "optimize": "cycles",
       "build": ["npm run build:back"]
     },
     "gldt_frontend": {
       "type": "assets",
       "source": ["client/out"],
-      "build": ["npm run postinstall", "npm run build:front"],
+      "build": ["npm run postinstall", "npm run build:candid", "npm run build:front"],
       "frontend": {}
     },
     "yumi_kyc": {
