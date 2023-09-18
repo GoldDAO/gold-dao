@@ -67,6 +67,7 @@ stages:
           mv "wasmtime-${WASMTIME_VERSION}-aarch64-linux/*" .wasmtime/bin/ && rm wasmtime-*
       fi
     - echo "alias wasmtime=.wasmtime/bin/wasmtime" >> .bashrc
+    - source .bashrc
 
 ################################################################################
 # Linters
