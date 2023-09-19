@@ -68,5 +68,7 @@ if [[ $dryrun -eq 1 ]]; then
   candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null
 else
   candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null > $did_path/$1.did || true &&
-  dfx generate $1
+  if [[ ! $CI ]]; then
+    dfx generate $1
+  fi
 fi
