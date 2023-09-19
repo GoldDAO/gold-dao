@@ -109,8 +109,6 @@ generate test declarations:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       needs: ["canister test build"]
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
-      needs: ["canister build"]
   script:
     - dfx generate gldt_core
   artifacts:
@@ -154,8 +152,6 @@ canister build:
 generate declarations:
   stage: build
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["canister test build"]
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
       needs: ["canister build"]
   script:
