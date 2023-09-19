@@ -3,7 +3,7 @@
   "canisters": {
     "gldt_ledger": {
       "type": "custom",
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "candid": "canister/gldt_ledger/gldt_ledger.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
