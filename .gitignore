@@ -13,5 +13,7 @@ out/
 target
 canister/gldt_core/target
 canister/gldt_core/declarations
+canister/gldt_ledger/declarations
+canister/gld_nft/declarations
 canister/gldt_core/src/gldt_core.did
 .vscode

@@ -110,7 +110,9 @@ generate test declarations:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       needs: ["canister test build"]
   script:
-    - dfx generate gldt_core
+    - dfx generate
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
@@ -155,7 +157,9 @@ generate declarations:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
       needs: ["canister build"]
   script:
-    - dfx generate gldt_core
+    - dfx generate
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
