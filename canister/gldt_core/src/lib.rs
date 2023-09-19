@@ -863,7 +863,6 @@ fn update_registry(
                                         minted
                                     )
                                 );
-                                o.get_mut().minted = entry.minted.clone();
                             } else {
                                 // If the block heights are equal, there is no issue
                                 if minted.mint_block_height != block_height {
@@ -906,7 +905,6 @@ fn update_registry(
                                     entry.swapped.clone()
                                 )
                             );
-                            o.get_mut().swapped = entry.swapped.clone();
                         }
                     }
                 }
