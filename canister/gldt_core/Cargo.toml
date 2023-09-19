@@ -1,6 +1,7 @@
 [package]
 name = "gldt_core"
 version = "0.1.0"
+description = "Core logic canister for swapping GLD NFT to GLDT."
 edition = "2021"
 
 ## See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -8,13 +9,13 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [build-dependencies]
-candid = { version = "0.9.6" }
+# candid = { version = "0.9.6" }
 # ic-cdk-bindgen = "0.1.0"
 
 [dependencies]
 candid = { version = "0.9.6"}
-ic-cdk = "0.10.0"
-ic-cdk-macros = "0.7.1"
+ic-cdk = "0.11.0"
+ic-cdk-macros = "0.8.0"
 ic-ledger-types = "0.7.0"
 icrc-ledger-types = "0.1.0"
 serde = "1.0.126"

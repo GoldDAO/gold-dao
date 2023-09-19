@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-Generate the candid file and declarations for the mentioned canister.
+Generate the candid file and declarations for the mentioned wasm canister.
 
 =head1 SYNOPSYS
 
-generate-did [options] canister
+generate-did [options] <wasm>
 
 =head1 OPTIONS
 
@@ -27,9 +27,9 @@ EOF
 
 show_help() {
   cat << EOF
-Generate the candid file and declarations for the mentioned canister.
+Generate the candid file and declarations for the mentioned wasm canister.
 Usage:
-  generate-did [options] canister
+  generate-did [options] <wasm>
 
 Options:
   -h, --help        Show this message and exit
@@ -61,15 +61,12 @@ else
   exit 1
 fi
 
-cargo build --target wasm32-unknown-unknown --target-dir canister/$1/target \
-  --release --locked --features "ic-cdk/wasi" -p $1
-
 defaultpath="canister/$1/src"
 did_path="${outpath:-$defaultpath}"
 if [[ $dryrun -eq 1 ]]; then
-  echo "This would be written to ${did_path}/${1}.did :"
-  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm"
+  echo -e "This would be written to ${did_path}/${1}.did :\n"
+  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null
 else
-  wasmtime "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" > "$did_path/$1.did" &&
+  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null > $did_path/$1.did || true &&
   dfx generate $1
 fi

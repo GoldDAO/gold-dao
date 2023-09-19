@@ -54,18 +54,9 @@ stages:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm && export PATH="$PWD/.cargo/bin:$PATH"
-    - |
-      WASMTIME_VERSION=v12.0.2
-      if ([ -e .wasmtime/bin/wasmtime ]); then
-        echo "wasmtime already installed"
-      else
-        wget -nv "https://github.com/bytecodealliance/wasmtime/releases/download/${WASMTIME_VERSION}/wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz"
-        mkdir -pv .wasmtime/bin
-        tar -xvf "wasmtime-${WASMTIME_VERSION}-aarch64-linux.tar.xz" && \
-          mv wasmtime-${WASMTIME_VERSION}-aarch64-linux/* .wasmtime/bin/ && rm -rf wasmtime-*
-      fi
-      export PATH="$PWD/.wasmtime/bin:$PATH"
+    - cargo install -q --root .cargo ic-wasm
+    - cargo install -q --root .cargo candid-extractor
+    - export PATH="$PWD/.cargo/bin:$PATH"
 
 ################################################################################
 # Linters
