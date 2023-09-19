@@ -39,9 +39,9 @@
       "candid": "canister/yumi_kyc/kyc.did",
       "wasm": "canister/yumi_kyc/kyc.wasm",
       "declarations": {
-        "bindings": [],
+        "bindings": ["js", "did"],
         "env_override": null,
-        "output": null
+        "output": "canister/yumi_kyc/declarations"
       },
       "remote": {
         "id": {
