@@ -67,5 +67,5 @@ if [[ $dryrun -eq 1 ]]; then
   echo -e "This would be written to ${did_path}/${1}.did :\n"
   candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null
 else
-  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null > $did_path/$1.did || true &&
+  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null > $did_path/$1.did
 fi
