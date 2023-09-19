@@ -21,7 +21,7 @@
     "gldt_frontend": {
       "type": "assets",
       "source": ["client/out"],
-      "build": ["npm run postinstall", "npm run build:candid", "npm run build:front"],
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:front"],
       "frontend": {}
     },
     "yumi_kyc": {
