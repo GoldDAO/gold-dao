@@ -384,7 +384,7 @@ pub struct NftInfo {
 type TransferResult = Result<BlockIndex, TransferError>;
 
 #[update]
-async fn nft_info(args: InfoRequest) -> NftInfo {
+fn nft_info(args: InfoRequest) -> NftInfo {
     log_message(format!("INFO :: nft_info. Arguments: {:?}", args));
     SERVICE.with(|s| NftInfo {
         info: s.borrow().registry.get(&(args.source_canister, args.nft_id)).cloned(),
@@ -498,9 +498,7 @@ async fn accept_offer(
     }
 }
 
-async fn validate_inputs(
-    args: SubscriberNotification
-) -> Result<(NftId, GldNft, TokenSpec), String> {
+fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, TokenSpec), String> {
     // verify caller, only accept calls from valid gld nft canisters
     let the_caller = api::caller();
     // Extract configuration and validate caller.
@@ -1032,7 +1030,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
     canistergeek_ic_rust::monitor::collect_metrics();
 
     // STEP 1 : validate inputs
-    let (nft_id, swap_info, token_spec) = (match validate_inputs(args.clone()).await {
+    let (nft_id, swap_info, token_spec) = (match validate_inputs(args.clone()) {
         Ok(res) => Ok(res),
         Err(err) => {
             let msg = format!("ERROR :: {}", err);
