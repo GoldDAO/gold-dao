@@ -68,9 +68,6 @@ use candid::{ CandidType, Deserialize, Principal, Nat };
 use canistergeek_ic_rust::logger::log_message;
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ init, query, update, export_candid };
-// use ic_ledger_types::Block;
-// use ic_ledger_types::{AccountIdentifier, Memo, Subaccount, Tokens};
-// use ic_ledger_types::ic;
 use icrc_ledger_types::icrc1::{
     account::{ Account, Subaccount },
     transfer::{ BlockIndex, Memo, NumTokens, TransferArg, TransferError },
@@ -151,6 +148,38 @@ pub struct GldtBurned {
     burn_block_height: u64,
 }
 
+/// The number of tokens that are minted. Always needs to be a multiple of
+/// GLDT_PRICE_RATIO (100) * GLDT_SUBDIVIDABLE_BY (10**8)
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Default)]
+pub struct GldtNumTokens {
+    value: NumTokens,
+}
+
+impl GldtNumTokens {
+    pub fn new(initial_value: NumTokens) -> Result<Self, String> {
+        if !Self::is_valid(initial_value.clone()) {
+            return Err(format!("Invalid initial value for GldtNumTokens: {}", initial_value));
+        }
+        Ok(GldtNumTokens { value: initial_value })
+    }
+
+    pub fn update(&mut self, new_value: NumTokens) -> Result<(), String> {
+        if !Self::is_valid(new_value.clone()) {
+            return Err(format!("Invalid new value for GldtNumTokens: {}", new_value));
+        }
+        self.value = new_value;
+        Ok(())
+    }
+
+    pub fn get(&self) -> NumTokens {
+        self.value.clone()
+    }
+
+    fn is_valid(val: NumTokens) -> bool {
+        val % (GLDT_SUBDIVIDABLE_BY * (GLDT_PRICE_RATIO as u64)) == 0
+    }
+}
+
 /// Record of information about an NFT for which GLDT has been minted.
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Default)]
 pub struct GldtMinted {
@@ -171,7 +200,7 @@ pub struct GldtMinted {
 
     /// The number of tokens that were minted. Added for completeness
     /// but it should alway be 1g : 100 GLDT
-    num_tokens: Option<NumTokens>,
+    num_tokens: Option<GldtNumTokens>,
 }
 
 /// Record of information about an NFT that has been successfully swapped for GLDT.
@@ -245,7 +274,7 @@ pub struct GldtRecord {
     /// The number of grams that this NFT is reported to have.
     grams: NftWeight,
     /// The amount of tokens minted.
-    num_tokens: NumTokens,
+    num_tokens: GldtNumTokens,
     /// The block index on the GLDT ledger when the GLDT were minted or burned.
     block_height: BlockIndex,
     /// The memo added to the GLDT ledger on minting
@@ -391,7 +420,7 @@ fn nft_info(args: InfoRequest) -> NftInfo {
     })
 }
 
-fn calculate_tokens_from_weight(grams: u16) -> NumTokens {
+fn calculate_tokens_from_weight(grams: NftWeight) -> NumTokens {
     NumTokens::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY)
 }
 
@@ -435,7 +464,7 @@ async fn accept_offer(
             let num_tokens_expected = calculate_tokens_from_weight(swap_info.grams);
             match t.num_tokens {
                 Some(num_tokens) => {
-                    if num_tokens != num_tokens_expected {
+                    if num_tokens.get() != num_tokens_expected {
                         Err(
                             format!(
                                 "Invalid number of tokens to accept offer. Expected {}, received {:?}.",
@@ -461,7 +490,7 @@ async fn accept_offer(
             seller: OrigynAccount::principal(swap_info.receiving_account.owner),
             buyer: OrigynAccount::principal(api::id()),
             token_id: nft_id,
-            amount: num_tokens,
+            amount: num_tokens.get(),
         },
     };
     let service = gld_nft::Service(swap_info.gld_nft_canister_id);
@@ -619,11 +648,11 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
 }
 
 async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, String> {
-    let num_tokens = calculate_tokens_from_weight(swap_info.grams);
+    let num_tokens = GldtNumTokens::new(calculate_tokens_from_weight(swap_info.grams))?;
 
     let transfer_args = TransferArg {
         memo: Some(swap_info.requested_memo),
-        amount: num_tokens.clone(),
+        amount: num_tokens.get(),
         fee: None,
         from_subaccount: None,
         to: Account {
@@ -664,7 +693,7 @@ async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, Str
     log_message(
         format!(
             "INFO :: minted {} GLDT at block {} to prinicpal {} with subaccount {:?}",
-            num_tokens.clone(),
+            num_tokens.get(),
             block_height,
             transfer_args.to.owner,
             transfer_args.to.subaccount
