@@ -104,11 +104,26 @@ canister test build:
       - canister/gldt_core/src/gldt_core.did
     expire_in: 1 day
 
+generate test declarations:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      needs: ["canister test build"]
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+      needs: ["canister build"]
+  script:
+    - dfx generate gldt_core
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
+    paths:
+      - canister/gldt_core/declarations
+    expire_in: 1 day
+
 nextjs test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["canister test build", "generate declarations"]
+  needs: ["canister test build", "generate test declarations"]
   <<: *node_template
   script:
     - npm run build:front
@@ -141,16 +156,12 @@ generate declarations:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       needs: ["canister test build"]
-      variables:
-        BUILD_TYPE: "TEST"
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
       needs: ["canister build"]
-      variables:
-        BUILD_TYPE: "production"
   script:
     - dfx generate gldt_core
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-${BUILD_TYPE}-declarations"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
       - canister/gldt_core/declarations
     expire_in: 6 months
