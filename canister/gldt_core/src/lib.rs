@@ -313,8 +313,13 @@ fn pre_upgrade() {
 
     let service = SERVICE.with(|cell| cell.borrow_mut().clone());
 
-    storage::stable_save((service, monitor_stable_data, logger_stable_data)).unwrap();
-    // SERVICE.with(|cell| storage::stable_save((cell.take(),)).unwrap());
+    match storage::stable_save((service, monitor_stable_data, logger_stable_data)) {
+        Ok(_) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
+        Err(msg) =>
+            api::trap(
+                &format!("ERROR :: pre_upgrade :: failed to save stable memory. Message: {}", msg)
+            ),
+    }
 }
 
 #[ic_cdk_macros::post_upgrade]
@@ -335,10 +340,12 @@ fn post_upgrade() {
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
-        Err(_) => {
+        Err(msg) => {
             // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
             // and the state to be restored.
-            api::trap("Failed to restore from stable memory. Reverting upgrade.");
+            api::trap(
+                &format!("Failed to restore from stable memory. Reverting upgrade. Message: {}", msg)
+            );
         }
     }
 
