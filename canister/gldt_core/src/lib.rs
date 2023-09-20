@@ -75,7 +75,7 @@ use icrc_ledger_types::icrc1::{
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::btree_map;
-use std::collections::BTreeMap;
+use std::collections::{ BTreeMap, HashMap };
 use std::hash::Hash;
 
 mod declarations;
@@ -291,11 +291,12 @@ impl GldNft {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct GldtService {
     conf: Conf,
     registry: BTreeMap<(Principal, NftId), GldNft>,
     records: BTreeMap<BlockIndex, GldtRecord>,
+    records_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
 
 thread_local! {
@@ -376,7 +377,7 @@ pub struct GetRecordsRequest {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
 pub struct GetRecordsResponse {
-    total: u64,
+    total: u32,
     data: Option<Vec<GldtRecord>>,
 }
 
@@ -396,7 +397,7 @@ fn get_records(req: GetRecordsRequest) -> GetRecordsResponse {
             .take(limit as usize)
             .cloned()
             .collect();
-        GetRecordsResponse { total: records.len() as u64, data: Some(paginated_records) }
+        GetRecordsResponse { total: records.len() as u32, data: Some(paginated_records) }
     })
 }
 
@@ -948,7 +949,12 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
                 .mint_block_height.unwrap_or_default(),
             memo: swap_info.requested_memo,
         };
-        records.insert(new_index, new_record);
+        records.insert(new_index.clone(), new_record);
+
+        s.borrow_mut()
+            .records_by_user.entry(swap_info.receiving_account.owner)
+            .or_default()
+            .push(new_index)
     });
     Ok(())
 }
@@ -989,16 +995,37 @@ fn get_swaps_by_user(
         Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
         None => 10,
     };
+
+    let start = match page.checked_mul(limit) {
+        Some(v) => v,
+        None => {
+            return Err("Overflow when calculating start".to_string());
+        }
+    };
+
     let res: GetRecordsResponse = SERVICE.with(|s| {
-        let records = &s.borrow().records;
-        let start = page * limit;
-        let user_records = records.values().filter(|x| x.counterparty.owner == principal);
-        let total = user_records.clone().fold(0, |count, _| count + 1) as u64;
-        let paginated_records = user_records
-            .skip(start as usize)
-            .take(limit as usize)
-            .cloned()
-            .collect();
+        let default_vec = Vec::new();
+        let service = s.borrow();
+        let user_records_indices = (*service.records_by_user
+            .get(&principal)
+            .unwrap_or(&default_vec)).clone();
+        let total = user_records_indices.len() as u32;
+        let mut end = start + limit;
+        if end > total {
+            end = total;
+        }
+        let mut paginated_records = Vec::new();
+        for i in start..end {
+            match service.records.get(&user_records_indices[i as usize]) {
+                None => {
+                    continue;
+                }
+                Some(record) => {
+                    paginated_records.push((*record).clone());
+                }
+            }
+        }
+
         GetRecordsResponse {
             total,
             data: Some(paginated_records),
@@ -1152,19 +1179,5 @@ pub async fn update_canistergeek_information(
 ) {
     canistergeek_ic_rust::update_information(request);
 }
-
-// #[test]
-// fn check_candid_interface() {
-//     use candid::utils::{ service_compatible, CandidSource };
-//     use std::path::Path;
-
-//     candid::export_service!();
-//     let new_interface = __export_service();
-
-//     service_compatible(
-//         CandidSource::Text(&new_interface),
-//         CandidSource::File(Path::new("src/gldt_core.did"))
-//     ).unwrap();
-// }
 
 export_candid!();
