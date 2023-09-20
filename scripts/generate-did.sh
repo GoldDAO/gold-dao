@@ -1,35 +1,12 @@
 #!/usr/bin/env bash
-: << EOF
-=pod
-
-=head1 NAME
-
-Generate the candid file and declarations for the mentioned wasm canister.
-
-=head1 SYNOPSYS
-
-generate-did [options] <wasm>
-
-=head1 OPTIONS
-
--h, --help
-  Show this message and exit
-
--o, --output PATH
-  The path where to write the resulting candid file (Must be a folder)
-
--d, --dry-run
-  Only output the result, without actually writing on disk
-
-=cut
-
-EOF
 
 show_help() {
   cat << EOF
 Generate the candid file and declarations for the mentioned wasm canister.
+Must be run from the repository's root folder.
+
 Usage:
-  generate-did [options] <wasm>
+  scripts/generate-did [options] <wasm>
 
 Options:
   -h, --help        Show this message and exit
