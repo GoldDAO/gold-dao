@@ -65,7 +65,7 @@ defaultpath="canister/$1/src"
 did_path="${outpath:-$defaultpath}"
 if [[ $dryrun -eq 1 ]]; then
   echo -e "This would be written to ${did_path}/${1}.did :\n"
-  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null
+  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm"
 else
-  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" 2>/dev/null > $did_path/$1.did
+  candid-extractor "canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm" > $did_path/$1.did
 fi
