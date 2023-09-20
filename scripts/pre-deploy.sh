@@ -42,7 +42,7 @@ create_canister () {
 		CANISTER_ID=$(dfx canister id $1 --network $2)
 	else
 		echo "Error during canister creation: unknown network ${2}"
-		exit -1
+		exit 1
 	fi
 	echo $CANISTER_ID
 }
@@ -58,7 +58,7 @@ check_and_create_canister () {
 		fi
 	else
 		echo "Error: unknown network ${2}"
-		exit -1
+		exit 1
 	fi
 }
 
