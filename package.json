@@ -21,7 +21,6 @@
     "deploy": "npm run lint && source scripts/pre-deploy.sh && scripts/deploy-ledger.sh $NETWORK && scripts/deploy-gldt-core.sh $NETWORK",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
-    "restart": "cd client && npm run stop; npm start && cd ..",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
     "postinstall": "cd ./client && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
