@@ -382,22 +382,27 @@ pub struct GetRecordsResponse {
 }
 
 #[query]
-fn get_records(req: GetRecordsRequest) -> GetRecordsResponse {
+fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     let page = req.page.unwrap_or(0);
     let limit = match req.limit {
         Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
         None => 10,
     };
+    let start = match page.checked_mul(limit) {
+        Some(v) => v,
+        None => {
+            return Err("Overflow when calculating start".to_string());
+        }
+    };
     SERVICE.with(|s| {
         let records = &mut s.borrow_mut().records;
-        let start = page * limit;
         let paginated_records = records
             .values()
             .skip(start as usize)
             .take(limit as usize)
             .cloned()
             .collect();
-        GetRecordsResponse { total: records.len() as u32, data: Some(paginated_records) }
+        Ok(GetRecordsResponse { total: records.len() as u32, data: Some(paginated_records) })
     })
 }
 
@@ -1003,7 +1008,7 @@ fn get_swaps_by_user(
         }
     };
 
-    let res: GetRecordsResponse = SERVICE.with(|s| {
+    SERVICE.with(|s| {
         let default_vec = Vec::new();
         let service = s.borrow();
         let user_records_indices = (*service.records_by_user
@@ -1026,12 +1031,13 @@ fn get_swaps_by_user(
             }
         }
 
-        GetRecordsResponse {
+        let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
+
+        Ok(GetRecordsResponse {
             total,
-            data: Some(paginated_records),
-        }
-    });
-    Ok(res)
+            data,
+        })
+    })
 }
 
 #[query]
