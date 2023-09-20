@@ -49,7 +49,6 @@ stages:
     paths:
       - .cargo
       - canister/gldt_core/target
-      - .wasmtime/bin
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup target add wasm32-unknown-unknown
