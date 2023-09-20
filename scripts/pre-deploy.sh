@@ -71,6 +71,6 @@ echo -e "gldt_ledger    \033[1m${GLDT_LEDGER_ID}\033[0m${IMPORTANT_MSG}"
 export GLDT_FRONT_ID=$(check_and_create_canister gldt_frontend $NETWORK)
 echo -e "gldt_frontend  \033[1m${GLDT_FRONT_ID}\033[0m${IMPORTANT_MSG}\n"
 
-if [[ $CI ]]; then
+if [[ ($NETWORK == "staging" || $NETWORK == "ic") && $CI ]]; then
 	echo -e "\n  \033[1;5;31mIMPORTANT\033[0m  If a canister id has just been created on \033[7m${NETWORK}\033[0m. Please update and version \033[4m'canister_ids.json'\033[0m on both the \033[7m'master'\033[0m and \033[7m'develop'\033[0m branches ASAP.\n"
 fi
