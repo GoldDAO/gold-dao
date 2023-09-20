@@ -17,7 +17,7 @@
     "build:declarations": "dfx generate && mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js && mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did",
     "lint": "npm run lint:front",
     "lint:front": "cd client && npm run lint && cd ..",
-    "deploy": "npm run lint && dfx deploy --no-wallet",
+    "deploy": "npm run lint && source scripts/pre-deploy.sh && scripts/deploy-ledger.sh $NETWORK && scripts/deploy-gldt-core.sh $NETWORK",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "restart": "cd client && npm run stop; npm start && cd ..",
