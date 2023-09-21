@@ -1,19 +1,24 @@
-import Head from "next/head";
-import Layout from "../lib/components/UI/layout/Layout";
-import { getMarkdownPage, getMarketCap, getPartners, getSwapCTO } from "../lib/utils/getMarkdown";
-import { markdownToHtml } from "../lib/utils/markdownToHtml";
-import Marketcap from "../lib/components/UI/Marketcap";
-import { PageContent } from "./_app";
-import Partners from "../lib/components/UI/partners";
-import Chart from "../lib/components/UI/Chart";
-import dynamic from 'next/dynamic'
-import { useEffect } from "react";
+import Head from 'next/head';
+import Layout from '@/components/UI/layout/Layout';
+import { getMarkdownPage, getPartners } from '@/utils/getMarkdown';
+import { markdownToHtml } from '@/utils/markdownToHtml';
+import Partners from '@/components/UI/sections/partners';
+import dynamic from 'next/dynamic';
+import TextSection from '@/components/UI/sections/TextSection;';
+import Yumi from '@/components/UI/sections/Yumi';
 
-function Home({ content, meta, partners, cto, marketcap }) {
-
-    const Swap = dynamic(() => import('./../lib/components/UI/sequence/SwapContainer'), {
+function Home({ meta, partners }) {
+    const Banner = dynamic(() => import('@/components/UI/sections/Banner'), {
         ssr: false,
     });
+
+    const Marketcap = dynamic(() => import('@/components/UI/sections/Marketcap'), {
+        ssr: false,
+    });
+
+    const textTitle = 'Gold. Blockchain. Secure. Stable. Simple.';
+    const textContent =
+        'GLDT is a token that is 100% backed by physical gold, making it a secure and reliable asset in the world of cryptocurrency. GLDT is only minted when a GLD NFT is swapped, ensuring that it is fully backed by physical gold held in secure vaults in Switzerland.';
 
     return (
         <>
@@ -23,34 +28,28 @@ function Home({ content, meta, partners, cto, marketcap }) {
                 <meta property={`og:description`} content={meta.description} key="title" />
             </Head>
             <Layout>
-                <Marketcap data={marketcap.data} />
-                <PageContent dangerouslySetInnerHTML={{ __html: content }} />
-                <Swap data={cto.data} />
-                <Chart />
+                <Banner />
+                <TextSection title={textTitle} content={textContent} />
+                <Yumi />
+                <Marketcap />
                 <Partners partners={partners} />
+                {/* <Chart /> */}
             </Layout>
         </>
-    )
+    );
 }
 
 export default Home;
 
-
 export async function getStaticProps() {
-
-    const content = getMarkdownPage('home')
-    const html = await markdownToHtml(content.content)
-    const partners = await getPartners()
-    const CTO = await getSwapCTO()
-    const marketcap = await getMarketCap()
+    const content = getMarkdownPage('home');
+    const html = await markdownToHtml(content.content);
+    const partners = await getPartners();
     return {
         props: {
             content: html,
             meta: content.data,
             partners: partners,
-            cto: CTO,
-            marketcap: marketcap,
-        }
-    }
+        },
+    };
 }
-
