@@ -1,35 +1,48 @@
 {
   "__0": "GLDT.org static website with swap canister",
   "canisters": {
-    "gldt_frontend": {
-      "type": "assets",
-      "source": [
-        "client/out"
-      ],
-      "build": [
-        "npm run postinstall",
-        "npm run build:front"
-      ],
-      "frontend": {}
-    },
-    "gldt_core": {
-      "type": "rust",
-      "candid": "canister/gldt_core/src/gldt_core.did",
-      "declarations": {
-        "output": "canister/gldt_core/declarations/"
-      },
-      "package": "gldt_core",
-      "optimize": "cycles"
-    },
     "gldt_ledger": {
       "type": "custom",
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/rs/rosetta-api/icrc1/ledger/ledger.did",
-      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz"
+      "candid": "canister/gldt_ledger/gldt_ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_ledger/declarations"
+      }
+    },
+    "gldt_core": {
+      "package": "gldt_core",
+      "type": "custom",
+      "candid": "canister/gldt_core/src/gldt_core.did",
+      "wasm": "canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_core/declarations"
+      },
+      "build": ["npm run build:back"]
+    },
+    "gldt_frontend": {
+      "type": "assets",
+      "source": ["client/out"],
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:front"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {}
     },
     "yumi_kyc": {
       "type": "custom",
       "candid": "canister/yumi_kyc/kyc.did",
       "wasm": "canister/yumi_kyc/kyc.wasm",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/yumi_kyc/declarations"
+      },
       "remote": {
         "id": {
           "staging": "2qft3-raaaa-aaaag-qci4a-cai",
@@ -37,15 +50,15 @@
         }
       }
     },
-    "gld_nft": {
-      "type": "custom",
-      "candid": "canister/gld_nft/origyn_nft_reference.did",
-      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz"
-    },
     "gldnft_backend_1g": {
       "type": "custom",
       "candid": "canister/gld_nft/origyn_nft_reference.did",
       "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gld_nft/declarations"
+      },
       "remote": {
         "id": {
           "staging": "obapm-2iaaa-aaaak-qcgca-cai",
@@ -57,6 +70,11 @@
       "type": "custom",
       "candid": "canister/gld_nft/origyn_nft_reference.did",
       "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
       "remote": {
         "id": {
           "staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
@@ -68,6 +86,11 @@
       "type": "custom",
       "candid": "canister/gld_nft/origyn_nft_reference.did",
       "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
       "remote": {
         "id": {
           "staging": "zhfjc-liaaa-aaaal-acgja-cai",
@@ -79,6 +102,11 @@
       "type": "custom",
       "candid": "canister/gld_nft/origyn_nft_reference.did",
       "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
       "remote": {
         "id": {
           "staging": "7i7jl-6qaaa-aaaam-abjma-cai",
@@ -89,9 +117,7 @@
   },
   "networks": {
     "staging": {
-      "providers": [
-        "https://icp0.io"
-      ],
+      "providers": ["https://icp0.io"],
       "type": "persistent"
     }
   }
