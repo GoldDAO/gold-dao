@@ -2,7 +2,7 @@
 
 ## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
 
-if [[ $1 !~ ^(local|staging|ic)$ ]]; then
+if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
   exit 1
 fi
@@ -21,4 +21,4 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_TAG =~ ^core-v{1}[[:digit
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
       }})' --compute-evidence -y
-
+fi
