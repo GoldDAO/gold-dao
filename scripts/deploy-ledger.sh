@@ -26,7 +26,7 @@ if [[ $# -gt 0 ]]; then
         exit
         ;;
       --upgrade )
-        shift; upgrade_me=1
+        upgrade_me=1
         ;;
     esac;
     shift;
