@@ -5,23 +5,34 @@ use candid::{ Principal };
 use super::*;
 
 #[test]
-fn test_get_swaps_by_user() {
-    // init(Some(Conf::new(
-    //     Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").expect("Could not decode the principal."),
-    //     vec![
-    //         (Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), NftCanisterConf::new(1)),
-    //         (Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), NftCanisterConf::new(10))
-    //     ]
-    // )));
-
+fn test_get_swaps_by_user_1() {
     let account = Account {
         owner: Principal::anonymous(), 
         subaccount: None
     };
     
-    let _ = get_swaps_by_user(Some(account), Some(1), Some(50));
-    // assert_eq!(_, "");
+    let res = get_swaps_by_user(Some(account), Some(1), Some(50));
+
+    assert_eq!(res, "");
+
+    println!("res = {:?}", res);
+
+}
+
+
+#[test]
+fn test_get_swaps_by_user_2() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
     let _ = get_swaps_by_user(Some(account), Some(u32::MAX), Some(50));
+
+    assert_eq!(res, "");
+
+    println!("res = {:?}", res);
+
     let _ = get_swaps_by_user(Some(account), Some(1), Some(u32::MAX));
     let _ = get_swaps_by_user(Some(account), Some(1), Some(0));
     let _ = get_swaps_by_user(Some(account), None, Some(0));
@@ -29,6 +40,7 @@ fn test_get_swaps_by_user() {
     let _ = get_swaps_by_user(Some(account), None, Some(10));
     let _ = get_swaps_by_user(Some(account), Some(10), None);
 }
+
 
 #[test]
 fn test_get_status_of_swap_1() {
@@ -95,8 +107,6 @@ fn test_get_status_of_swap_3() {
     let res = get_status_of_swap(status_request.clone());
     
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
-
-
 }
 
 #[test]
@@ -118,6 +128,4 @@ fn test_get_status_of_swap_4() {
     let res = get_status_of_swap(status_request.clone());
     
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
-
-
 }
