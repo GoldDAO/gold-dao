@@ -301,39 +301,3 @@ gldt ledger:
     name: $ENVIRONMENT_NAME
     url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
-
-.staging:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  dependencies:
-    - next staging build
-    - canister build
-  before_script:
-    - dfx --version
-    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
-  script:
-    - dfx deploy --network staging --identity gitlab-ci-gldt --no-wallet -y
-  after_script:
-    - echo "Staging environment will be accessible on ${STAGING_ENVIRONMENT_URL}"
-  environment:
-    name: staging
-    url: $STAGING_ENVIRONMENT_URL
-    action: start
-
-.production:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
-      needs: ["next production build"]
-  before_script:
-    - dfx --version
-    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
-    - dfx identity whoami
-  script:
-    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt-frontend-production
-    - echo "TODO continue with updating DNS redirection using Gandi API"
-  environment:
-    name: production
-    url: $PRODUCTION_ENVIRONMENT_URL
-    action: start
