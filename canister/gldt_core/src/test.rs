@@ -13,10 +13,7 @@ fn test_get_swaps_by_user_1() {
     
     let res = get_swaps_by_user(Some(account), Some(1), Some(50));
 
-    assert_eq!(res, "");
-
-    println!("res = {:?}", res);
-
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
 }
 
 
@@ -27,20 +24,119 @@ fn test_get_swaps_by_user_2() {
         subaccount: None
     };
     
-    let _ = get_swaps_by_user(Some(account), Some(u32::MAX), Some(50));
+    let res = get_swaps_by_user(Some(account), Some(u32::MAX), Some(50));
 
-    assert_eq!(res, "");
-
-    println!("res = {:?}", res);
-
-    let _ = get_swaps_by_user(Some(account), Some(1), Some(u32::MAX));
-    let _ = get_swaps_by_user(Some(account), Some(1), Some(0));
-    let _ = get_swaps_by_user(Some(account), None, Some(0));
-    let _ = get_swaps_by_user(Some(account), Some(0), None);
-    let _ = get_swaps_by_user(Some(account), None, Some(10));
-    let _ = get_swaps_by_user(Some(account), Some(10), None);
+    assert_eq!(res, Err("Overflow when calculating start".to_string()));
 }
 
+#[test]
+fn test_get_swaps_by_user_3() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(50), Some(u32::MAX));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+
+#[test]
+fn test_get_swaps_by_user_4() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(1), Some(u32::MAX));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_5() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(u32::MAX), Some(1));
+
+    assert_eq!(res, Err("Overflow when calculating end".to_string()));
+}
+
+#[test]
+fn test_get_swaps_by_user_6() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(1), Some(0));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_7() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(0), Some(1));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_8() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), None, Some(0));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_9() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(0), None);
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_10() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), None, Some(10));
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
+
+#[test]
+fn test_get_swaps_by_user_11() {
+    let account = Account {
+        owner: Principal::anonymous(), 
+        subaccount: None
+    };
+    
+    let res = get_swaps_by_user(Some(account), Some(10), None);
+
+    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+}
 
 #[test]
 fn test_get_status_of_swap_1() {

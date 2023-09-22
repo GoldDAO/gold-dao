@@ -261,7 +261,7 @@ pub struct GldNft {
     older_record: Option<Box<GldNft>>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 enum RecordType {
     Mint,
     Burn,
@@ -274,7 +274,7 @@ enum RecordStatus {
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRecord {
     /// The type of transaction
     record_type: RecordType,
@@ -395,7 +395,7 @@ pub struct GetRecordsRequest {
     limit: Option<u32>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GetRecordsResponse {
     total: u32,
     data: Option<Vec<GldtRecord>>,
@@ -1035,7 +1035,13 @@ fn get_swaps_by_user(
             .get(&principal)
             .unwrap_or(&default_vec)).clone();
         let total = user_records_indices.len() as u32;
-        let mut end = start + limit;
+        let mut end = match start.checked_add(limit) {
+            Some(result) => result,
+            None => {
+                return Err("Overflow when calculating end".to_string());
+            }
+        };
+
         if end > total {
             end = total;
         }
