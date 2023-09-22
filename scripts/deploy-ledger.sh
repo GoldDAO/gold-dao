@@ -58,6 +58,9 @@ export ARCHIVE_CONTROLLER=$(dfx identity get-principal)
 export TOKEN_NAME="Gold token"
 export TOKEN_SYMBOL="GLDT"
 
+# The defx deploy commands below could have been regrouped into a single conditional group with variables as arguments
+# But for security and clarity reasons, they have been kept distinct, to avoid any potential unwanted execution.
+
 if [[ $1 == "local" ]]; then
   dfx canister call --network $1 gldt_ledger get_data_certificate 2>/dev/null > /dev/null
   if [[  $? -ne 0 || upgrade_me -eq 1 ]]; then
@@ -98,7 +101,7 @@ elif [[ $1 == "staging" && $CI_COMMIT_REF_NAME == "develop" ]]; then
   else
     echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
   fi
-elif [[ $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ]]; then
+elif [[ $1 == "ic" && $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ]]; then
   dfx canister call --network $1 gldt_ledger get_data_certificate 2>/dev/null > /dev/null
   if [[ $? -ne 0 || upgrade_me -eq 1 ]]; then
     dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {
