@@ -1,6 +1,38 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
+show_help() {
+  cat << EOF
+gldt_ledger canister deployment script.
+Must be run from the repository's root folder, and with a running replica if for local deployment.
+'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
+The NETWORK argument should preferably be passed from the env variable that was previously defined
+by the pre-deploy script (using the dot notation, or inside a macro deploy script).
+
+Usage:
+  scripts/deploy-ledger [options] <NETWORK>
+
+Options:
+  -h, --help        Show this message and exit
+  --upgrade         Upgrade running canister (whithout this option, it won't be deployed if already running)
+EOF
+}
+
+# TODO: add a --identity option ?? (See dfx deploy --identity)
+if [[ $# -gt 0 ]]; then
+  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
+    case $1 in
+      -h | --help )
+        show_help
+        exit
+        ;;
+      --upgrade )
+        shift; upgrade_me=true
+        ;;
+    esac;
+    shift;
+  done
+  if [[ "$1" == '--' ]]; then shift; fi
+fi
 
 if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
@@ -18,25 +50,47 @@ export TOKEN_NAME="Gold token"
 export TOKEN_SYMBOL="GLDT"
 
 if [[ $1 == "local" ]]; then
-  dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {
-    token_name = \"${TOKEN_NAME}\";
-    token_symbol = \"${TOKEN_SYMBOL}\";
-    minting_account = record {owner = principal \"${MINT_ACC}\"};
-    metadata = vec {};
-    transfer_fee = 10000;
-    initial_balances = vec {};
-    archive_options = record {
-      trigger_threshold = 2000;
-      num_blocks_to_archive = 1000;
-      controller_id = principal \"${ARCHIVE_CONTROLLER}\";
-      cycles_for_archive_creation = opt 10_000_000_000_000;
-    }
-  }})"
-elif [[ $CI_COMMIT_REF_NAME == "develop" ]]; then
-  echo "TODO: Continue with ledger deployment for staging"
-  exit 1
+  dfx canister call --network $1 gldt_ledger get_data_certificate
+  if [[ upgrade_me || $? -ne 0 ]]; then
+    dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {
+      token_name = \"${TOKEN_NAME}\";
+      token_symbol = \"${TOKEN_SYMBOL}\";
+      minting_account = record {owner = principal \"${MINT_ACC}\"};
+      metadata = vec {};
+      transfer_fee = 10000;
+      initial_balances = vec {};
+      archive_options = record {
+        trigger_threshold = 2000;
+        num_blocks_to_archive = 1000;
+        controller_id = principal \"${ARCHIVE_CONTROLLER}\";
+        cycles_for_archive_creation = opt 10_000_000_000_000;
+      }
+    }})" -y
+  else
+    echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
+  fi  
+elif [[ $1 == "staging" && $CI_COMMIT_REF_NAME == "develop" ]]; then
+  dfx canister call --network $1 gldt_ledger get_data_certificate
+  if [[ upgrade_me || $? -ne 0 ]]; then
+    dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {
+      token_name = \"${TOKEN_NAME}\";
+      token_symbol = \"${TOKEN_SYMBOL}\";
+      minting_account = record {owner = principal \"${MINT_ACC}\"};
+      metadata = vec {};
+      transfer_fee = 10000;
+      initial_balances = vec {};
+      archive_options = record {
+        trigger_threshold = 2000;
+        num_blocks_to_archive = 1000;
+        controller_id = principal \"${ARCHIVE_CONTROLLER}\";
+        cycles_for_archive_creation = opt 10_000_000_000_000;
+      }
+    }})" --no-wallet --compute-evidence  -y
+  else
+    echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
+  fi
 elif [[ $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ]]; then
-  echo "TODO: Continue with ledger deployment for staging"
+  echo "TODO: Continue with ledger deployment for production, only if non-existent"
   exit 1
 else
   echo "Error: no valid deployment conditions found."
