@@ -99,8 +99,25 @@ elif [[ $1 == "staging" && $CI_COMMIT_REF_NAME == "develop" ]]; then
     echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
   fi
 elif [[ $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ]]; then
-  echo "TODO: Continue with ledger deployment for production, only if non-existent"
-  exit 1
+  dfx canister call --network $1 gldt_ledger get_data_certificate 2>/dev/null > /dev/null
+  if [[ $? -ne 0 || upgrade_me -eq 1 ]]; then
+    dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {
+      token_name = \"${TOKEN_NAME}\";
+      token_symbol = \"${TOKEN_SYMBOL}\";
+      minting_account = record {owner = principal \"${MINT_ACC}\"};
+      metadata = vec {};
+      transfer_fee = 10000;
+      initial_balances = vec {};
+      archive_options = record {
+        trigger_threshold = 2000;
+        num_blocks_to_archive = 1000;
+        controller_id = principal \"${ARCHIVE_CONTROLLER}\";
+        cycles_for_archive_creation = opt 10_000_000_000_000;
+      }
+    }})" --no-wallet --compute-evidence  -y
+  else
+    echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
+  fi
 else
   echo "Error: no valid deployment conditions found."
   exit 3
