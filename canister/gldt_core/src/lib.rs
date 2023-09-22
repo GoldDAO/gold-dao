@@ -416,13 +416,15 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     };
     SERVICE.with(|s| {
         let records = &mut s.borrow_mut().records;
-        let paginated_records = records
+        let paginated_records : Vec<_> = records
             .values()
             .skip(start as usize)
             .take(limit as usize)
             .cloned()
             .collect();
-        Ok(GetRecordsResponse { total: records.len() as u32, data: Some(paginated_records) })
+
+        let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
+        Ok(GetRecordsResponse { total: records.len() as u32, data: data })
     })
 }
 
@@ -953,14 +955,18 @@ fn update_registry(
 /// keep track of all mints and burns for historic analysis.
 fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
     SERVICE.with(|s| {
-        let records = &mut s.borrow_mut().records;
+        let mut service = s.borrow_mut();
+        let records = &mut service.records;
         let new_index: BlockIndex = match records.last_key_value() {
             Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
             None => Nat::from(0),
         };
         let new_record = GldtRecord {
             record_type: RecordType::Mint,
+        #[cfg(not(test))]
             timestamp: api::time(),
+        #[cfg(test)]
+            timestamp: 0, // api::time only available in canister
             counterparty: swap_info.receiving_account,
             gld_nft_canister_id: swap_info.gld_nft_canister_id,
             nft_id,
@@ -976,7 +982,7 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
         };
         records.insert(new_index.clone(), new_record);
 
-        s.borrow_mut()
+        service
             .records_by_user.entry(swap_info.receiving_account.owner)
             .or_default()
             .push(new_index)
