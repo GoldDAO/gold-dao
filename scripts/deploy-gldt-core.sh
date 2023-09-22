@@ -20,5 +20,5 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     gld_nft_canister_ids=vec{
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
-      }})' --compute-evidence -y
+      }})' --no-wallet --compute-evidence -y
 fi
