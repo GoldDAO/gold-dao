@@ -4,6 +4,8 @@ use icrc_ledger_types::icrc1::{
 use candid::{ Principal };
 use super::*;
 
+
+// ------------------------- get_swaps_by_user tests --------------------------
 #[test]
 fn test_get_swaps_by_user_1() {
     let account = Account {
@@ -138,16 +140,13 @@ fn test_get_swaps_by_user_11() {
     assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
 }
 
+
+
+// ------------------------- get_status_of_swap tests -------------------------
+
+
 #[test]
 fn test_get_status_of_swap_1() {
-    // init(Some(Conf::new(
-    //     Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").expect("Could not decode the principal."),
-    //     vec![
-    //         (Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), NftCanisterConf::new(1)),
-    //         (Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), NftCanisterConf::new(10))
-    //     ]
-    // )));
-
     let status_request = GetStatusRequest {
         nft_id: "".to_string(),
         gld_nft_canister_id: Principal::anonymous(),
