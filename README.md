@@ -38,7 +38,7 @@ the app will be available at `localhost:3000`
 
 ### Build all canisters, including frontend, and generate candid files and declarations:
 ```sh
-npm run realbuild
+npm run build
 ```
 
 ## Technical documentation
