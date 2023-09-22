@@ -32,11 +32,20 @@ if [[ $# -gt 0 ]]; then
     shift;
   done
   if [[ "$1" == '--' ]]; then shift; fi
+else
+  echo "Error: missing <NETWORK> argument"
+  exit 1
 fi
 
 if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
-  exit 1
+  exit 2
+fi
+
+if [[ upgrade_me -eq 1 ]]; then
+  echo -e "\n\t\033[1;5;31mWARNING\033[0;31m  This script could re-deploy \033[1mgldt_ledger\033[0;31m on \033[7m${1}\033[0;31m !!\033[0m"
+  echo -e "\tIf this is NOT desirable, you are lucky, it did not start yet, and \033[1myou have now 20 seconds to abort (CTRL+C locally, or cancel the CI job) !\033[0m\n"
+  sleep 20s
 fi
 
 # Change the variable to the account that can mint and burn tokens.
@@ -94,5 +103,5 @@ elif [[ $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit
   exit 1
 else
   echo "Error: no valid deployment conditions found."
-  exit 1
+  exit 3
 fi
