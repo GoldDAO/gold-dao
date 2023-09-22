@@ -53,7 +53,7 @@ stages:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm candid-extractor
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
     - export PATH="$PWD/.cargo/bin:$PATH"
 
 ################################################################################
