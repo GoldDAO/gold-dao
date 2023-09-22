@@ -221,9 +221,7 @@ local deploy and tests:
     - dfx --version
     - dfx start --clean --background
   script:
-    - scripts/pre-deploy.sh
-    - dfx deploy -y --no-wallet gldt_core
-    - dfx deploy -y --no-wallet gldt_frontend
+    - scripts/local-deploy.sh
   after_script:
     - cat canister_ids.json
     - dfx stop
