@@ -15,7 +15,7 @@ Options:
 EOF
 }
 
-NETWORK="local"
+export NETWORK="local"
 
 if [[ $# -gt 0 ]]; then
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
@@ -25,7 +25,7 @@ if [[ $# -gt 0 ]]; then
         exit
         ;;
       --network )
-        shift; NETWORK=$1
+        shift; export NETWORK=$1
         ;;
     esac;
     shift;
