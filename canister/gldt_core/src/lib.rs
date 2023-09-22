@@ -120,6 +120,15 @@ pub struct Conf {
     gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
 }
 
+impl Conf {
+    pub fn new(gldt_ledger_canister_id: Principal, gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>) -> Self {
+        Self {
+            gldt_ledger_canister_id,
+            gld_nft_canister_ids,
+        }
+    }
+}
+
 /// Configuration information for a single NFT canister.
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct NftCanisterConf {
@@ -128,6 +137,12 @@ pub struct NftCanisterConf {
     /// 65kg. The largest gold bars are 400oz (~11kg) and the largest
     /// silver bars are 1000oz (~31kg).
     grams: NftWeight,
+}
+
+impl NftCanisterConf {
+    pub fn new(grams: NftWeight) -> Self {
+        Self { grams }
+    }
 }
 
 impl Default for Conf {
@@ -976,12 +991,12 @@ pub struct GetStatusRequest {
     sale_id: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GetStatusResponse {
     status: Option<SwappingStates>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 enum SwappingStates {
     Initialised,
     Minted,
@@ -1048,8 +1063,6 @@ fn get_swaps_by_user(
 #[query]
 fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String> {
     SERVICE.with(|s| {
-        let registry = &s.borrow().registry;
-
         let conf = &s.borrow().conf;
         conf.gld_nft_canister_ids
             .iter()
@@ -1064,6 +1077,8 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
                         .collect::<Vec<_>>()
                 )
             })?;
+
+        let registry = &s.borrow().registry;
 
         let entry = registry.get(&(req.gld_nft_canister_id, req.nft_id.clone()));
         let res = match entry {
@@ -1192,3 +1207,6 @@ pub async fn update_canistergeek_information(
 }
 
 export_candid!();
+
+#[cfg(test)]
+mod test;
