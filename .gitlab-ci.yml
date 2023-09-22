@@ -271,7 +271,7 @@ gldt core:
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
     - dfx identity whoami
   script:
-    - dfx deploy --network $TARGET_NETWORK --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt_core
+    - scripts/deploy-gldt-core.sh $TARGET_NETWORK
   environment:
     name: $ENVIRONMENT_NAME
     url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
@@ -296,7 +296,7 @@ gldt ledger:
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
     - dfx identity whoami
   script:
-    - dfx deploy --network $TARGET_NETWORK --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt_ledger
+    - scripts/deploy-ledger.sh $TARGET_NETWORK
   environment:
     name: $ENVIRONMENT_NAME
     url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
