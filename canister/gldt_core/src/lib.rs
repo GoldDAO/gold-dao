@@ -1091,14 +1091,16 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
             None => GetStatusResponse { status: None },
             Some(entry) => {
                 if entry.nft_sale_id == req.sale_id {
-                    if entry.minted.is_none() {
+                    if entry.minted.is_none() && entry.swapped.is_none() {
                         GetStatusResponse { status: Some(SwappingStates::Initialised) }
-                    } else if entry.swapped.is_none() {
+                    } else if !entry.minted.is_none() && entry.swapped.is_none() {
                         GetStatusResponse { status: Some(SwappingStates::Minted) }
-                    } else if entry.minted.clone().unwrap_or_default().burned.is_none() {
+                    } else if !entry.minted.is_none() && !entry.swapped.is_none() && entry.minted.clone().unwrap_or_default().burned.is_none() {
                         GetStatusResponse { status: Some(SwappingStates::Swapped) }
-                    } else {
+                    } else if !entry.minted.is_none() && !entry.swapped.is_none() && !entry.minted.clone().unwrap_or_default().burned.is_none() {
                         GetStatusResponse { status: Some(SwappingStates::Burned) }
+                    } else {
+                        return Err("Swap status is corrupted.".to_string())
                     }
                 } else {
                     GetStatusResponse { status: None }
