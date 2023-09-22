@@ -234,11 +234,13 @@ local deploy and tests:
       variables:
         TARGET_NETWORK: staging
         ENVIRONMENT_NAME: "frontend staging"
+        PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^front-v\d+\.\d+\.\d+$/'
       needs: ["next production build"]
       variables:
         TARGET_NETWORK: ic
         ENVIRONMENT_NAME: "frontend production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
@@ -257,10 +259,12 @@ gldt core:
       variables:
         TARGET_NETWORK: staging
         ENVIRONMENT_NAME: "core staging"
+        PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
         ENVIRONMENT_NAME: "core production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
   needs: ["canister build"]
   before_script:
     - dfx --version
@@ -280,11 +284,13 @@ gldt ledger:
       variables:
         TARGET_NETWORK: staging
         ENVIRONMENT_NAME: "ledger staging"
+        PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
       when: manual
       variables:
         TARGET_NETWORK: ic
-        ENVIRONMENT_NAME: "core production"
+        ENVIRONMENT_NAME: "ledger production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
