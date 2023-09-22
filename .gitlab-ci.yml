@@ -228,7 +228,7 @@ local deploy and tests:
     - cat canister_ids.json
     - dfx stop
 
-gldt frontend:
+.gldt frontend:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
