@@ -1,5 +1,5 @@
+import Layout from '@/components/layout/Layout';
 import Head from 'next/head';
-import Layout from '@/components/UI/layout/Layout';
 
 function Home({}) {
     const meta = {
