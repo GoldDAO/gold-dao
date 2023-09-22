@@ -1,5 +1,4 @@
 import { ConnectButton, ConnectDialog, useConnect, useDialog, useWallet } from '@connect2ic/react';
-import { Box, Button, Typography } from '@mui/material';
 import { useAtom } from 'jotai';
 import React, { useEffect } from 'react';
 import { setGetUserAtom } from '@/states/user';
@@ -102,7 +101,7 @@ const C2icButton = () => {
     }, [wallet, appstatus]);
 
     return (
-        <Box>
+        <div>
             <>
                 {appstatus === 'idle' && (
                     <ConnectButton
@@ -117,18 +116,18 @@ const C2icButton = () => {
                     />
                 )}
                 {appstatus !== 'connected' && appstatus !== 'idle' && (
-                    <Typography
+                    <p
                         sx={{
                             color: 'lightgray',
                             fontStyle: 'italic',
                         }}
                     >
                         {appstatus}
-                    </Typography>
+                    </p>
                 )}
                 <ConnectDialog />
             </>
-        </Box>
+        </div>
     );
 };
 
