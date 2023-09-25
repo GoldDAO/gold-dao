@@ -29,7 +29,7 @@ stages:
 # Templates
 ###############################################################################
 .node template: &node_template
-  image: node:18.16-alpine
+  image: node:lts
   cache:
   - key: "node-$CI_COMMIT_REF_SLUG"
     paths:
