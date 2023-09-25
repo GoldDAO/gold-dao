@@ -244,6 +244,7 @@ local deploy and tests:
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity use gitlab-ci-gldt
     - dfx identity whoami
   script:
     - dfx deploy --network $TARGET_NETWORK --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt_frontend
@@ -269,6 +270,7 @@ gldt core:
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity use gitlab-ci-gldt
     - dfx identity whoami
   script:
     - scripts/deploy-gldt-core.sh $TARGET_NETWORK
@@ -294,6 +296,7 @@ gldt ledger:
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity use gitlab-ci-gldt
     - dfx identity whoami
   script:
     - scripts/deploy-ledger.sh $TARGET_NETWORK
