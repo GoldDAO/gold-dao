@@ -18,6 +18,7 @@
 //! NFTs as well as the GLDT ledger, which follows the ICRC1 standard
 //! of the IC.
 //!
+//! ```text
 //! User                   NFT                  GLDT            GLDT Ledger
 //!  |     list NFT (1)     |                    |                   |
 //!  +--------------------->|                    |                   |
@@ -34,25 +35,26 @@
 //!  |                      |   | accept (4a)    |                   |
 //!  |                      |<--+                |                   |
 //!  |                      |                    |                   |
+//! ```
 //!
 //! The lifecycle of one NFT is as follows.
 //!
-//! * Swapping procedure from NFT -> GLDT
+//! * Swapping procedure from NFT => GLDT
 //!
-//! ** A user lists an NFT for sale (1) through the NFT canister.
+//!     1. A user lists an NFT for sale (1) through the NFT canister.
 //!
-//! ** Upon successful listing, the NFT canister notifies the GLDT canister
+//!     2. Upon successful listing, the NFT canister notifies the GLDT canister
 //! about the listing (2) with the public method `notify_sale_nft_origyn`
 //! which triggers the swapping sequence.
 //!
-//! ** The GLDT canister mints (3) GLDT to an escrow account on the NFT canister.
+//!     3. The GLDT canister mints (3) GLDT to an escrow account on the NFT canister.
 //! This is required for the sale to go through.
 //!
-//! ** The GLDT canister accepts the offer of the listed NFT (4).
+//!     4. The GLDT canister accepts the offer of the listed NFT (4).
 //!
-//! ** The offer is accepted (4a) on the NFT canister: the NFT now belongs
+//!     5. The offer is accepted (4a) on the NFT canister: the NFT now belongs
 //! to GLDT canister and the minted tokens on the escrow account are
-//! distributed to the "seller" (user).
+//! distributed to the `seller` (user).
 //!
 //! * The view of the ownership of NFT from the NFT canister and from
 //! the GLDT canister is periodically audited (to be implemented).
