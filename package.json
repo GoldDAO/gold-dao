@@ -10,7 +10,7 @@
   "scripts": {
     "front:dev": "cd ./client/ && npm run develop && cd ..",
     "build": "npm run build:back && npm run build:front",
-    "build:front": "echo 'cd ./client/ && npm run build && cd ..'",
+    "build:front": "cd ./client/ && npm run build && cd ..",
     "build:back": "scripts/build-canister.sh gldt_core && npm run build:candid && npm run build:declarations",
     "build:candid": "scripts/generate-did.sh gldt_core",
     "build:declarations": "dfx generate && mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js && mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did",

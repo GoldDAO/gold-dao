@@ -195,7 +195,7 @@ next production build:
   needs: ["canister build"]
   <<: *node_template
   script:
-    - npm run realbuild
+    - npm run build:back
     - PRODUCTION_URL=https://$(jq -r '."gldt_frontend".ic' canister_ids.json).icp0.io
     - echo "FRONTEND_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
