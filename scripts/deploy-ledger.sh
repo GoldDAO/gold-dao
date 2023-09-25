@@ -97,7 +97,7 @@ elif [[ $1 == "staging" && $CI_COMMIT_REF_NAME == "develop" ]]; then
         controller_id = principal \"${ARCHIVE_CONTROLLER}\";
         cycles_for_archive_creation = opt 10_000_000_000_000;
       }
-    }})" --no-wallet --compute-evidence  -y
+    }})" --no-wallet -y
   else
     echo -e "\033[31mgldt_ledger is already deployed and running on \033[7m${1}\033[0;31m with id \033[1m${GLDT_LEDGER_ID}\033[0;31m. To upgrade it, use the --upgrade option.\033[0m"
   fi
@@ -117,7 +117,7 @@ elif [[ $1 == "ic" && $CI_COMMIT_TAG =~ ^ledger-v{1}[[:digit:]]{1,2}.[[:digit:]]
         controller_id = principal \"${ARCHIVE_CONTROLLER}\";
         cycles_for_archive_creation = opt 10_000_000_000_000;
       }
-    }})" --no-wallet --compute-evidence  -y
+    }})" --no-wallet -y
   elif [[ upgrade_me -eq 1  ]]; then
     ###########################################################################################################
     echo "TODO: implement script to retrieve existing balance and reinstall passing values to initial_balances"
