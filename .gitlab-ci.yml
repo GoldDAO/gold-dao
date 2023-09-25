@@ -171,7 +171,7 @@ next staging build:
   needs: ["canister build", "generate declarations"]
   <<: *node_template
   script:
-    - npm run build:back
+    - npm run build:front
     - STAGING_URL=https://$(jq -r '."gldt_frontend".staging' canister_ids.json).icp0.io
     - echo "FRONTEND_URL=$STAGING_URL" > deploy.env
   artifacts:
@@ -195,7 +195,7 @@ next production build:
   needs: ["canister build"]
   <<: *node_template
   script:
-    - npm run build:back
+    - npm run build:front
     - PRODUCTION_URL=https://$(jq -r '."gldt_frontend".ic' canister_ids.json).icp0.io
     - echo "FRONTEND_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
