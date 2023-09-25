@@ -1,0 +1,6 @@
+[workspace]
+members = ["canister/gldt_core"]
+
+[profile.release]
+lto = "thin"
+panic = "abort"

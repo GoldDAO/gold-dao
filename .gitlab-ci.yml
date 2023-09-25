@@ -1,7 +1,8 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:dfx_0.14.1@sha256:bcc4cd90374b56681f945ff61fa837c8c77bc93250cf161a37fc0c6749d4e6a6
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.14.3@sha256:ae4a62ea83e1eaaebab3e5186b2a3b67ba8d45951719b6acdda5fa7bcd13376e
   tags:
     - docker
+  interruptible: true
   before_script:
     - dfx --version
   retry:
@@ -14,7 +15,7 @@ default:
       - unknown_failure
 
 cache:
-  - key: "dfx-$CI_COMMIT_BRANCH"
+  - key: "dfx-$CI_COMMIT_REF_SLUG"
     paths:
       - .dfx
 
@@ -30,14 +31,30 @@ stages:
 .node template: &node_template
   image: node:18.16-alpine
   cache:
-  - key: "node-$CI_COMMIT_BRANCH"
+  - key: "node-$CI_COMMIT_REF_SLUG"
     paths:
       - .npm/
       - node_modules/
-      - .next/
+      - client/.next/
+      - client/.npm/
+      - client/node_modules/
   before_script:
     - apk update -q && apk add -q jq
     - npm ci --cache .npm --prefer-offline
+
+.rust template: &rust_template
+  image: rust:slim-bookworm
+  cache:
+  - key: "rust-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .cargo
+      - canister/gldt_core/target
+  before_script:
+    - apt update > /dev/null && apt install -y wget build-essential > /dev/null
+    - rustup target add wasm32-unknown-unknown
+    - mkdir -pv .cargo
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
+    - export PATH="$PWD/.cargo/bin:$PATH"
 
 ################################################################################
 # Linters
@@ -46,43 +63,121 @@ next linter:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "client/*.{js,json}"
+        - "client/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
-    - npm run lint
+    - npm run lint:front
+
+rust lint:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  script:
+    - cargo check --target wasm32-unknown-unknown
 
 ################################################################################
 # Tests
 ################################################################################
+canister test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
+  script:
+    - scripts/build-canister.sh gldt_core
+    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
+    - scripts/generate-did.sh gldt_core
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
+    paths:
+      - canister/gldt_core/target/wasm32-unknown-unknown/release
+      - canister/gldt_core/src/gldt_core.did
+    expire_in: 1 day
+
+generate test declarations:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      needs: ["canister test build"]
+  script:
+    - dfx generate
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
+    paths:
+      - canister/**/declarations
+    expire_in: 1 day
+
 nextjs test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs: ["canister test build", "generate test declarations"]
   <<: *node_template
   script:
-    - npm run realbuild
+    - npm run build:front
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-TEST_BUILD"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend-TEST"
     paths:
-      - out/
-    expire_in: 4 hours
+      - client/out
+    expire_in: 1 day
 
 ################################################################################
 # Builds
 ################################################################################
+canister build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+  <<: *rust_template
+  script:
+    - scripts/build-canister.sh gldt_core
+    - scripts/generate-did.sh gldt_core
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
+    paths:
+      - canister/gldt_core/target/wasm32-unknown-unknown/release
+      - canister/gldt_core/src/gldt_core.did
+    expire_in: 6 months
+
+generate declarations:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+      needs: ["canister build"]
+  script:
+    - dfx generate
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
+    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
+    paths:
+      - canister/**/declarations
+    expire_in: 6 months
+
 next staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
+  needs: ["canister build", "generate declarations"]
   <<: *node_template
   script:
     - npm run realbuild:staging
-    - STAGING_URL=https://$(jq -r '."gldt-frontend-staging".ic' canister_ids.json).icp0.io
-    - echo "STAGING_ENVIRONMENT_URL=$STAGING_URL" > deploy.env
+    - STAGING_URL=https://$(jq -r '."gldt_frontend".staging' canister_ids.json).icp0.io
+    - echo "FRONTEND_URL=$STAGING_URL" > deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-STAGING_BUILD-${CI_COMMIT_SHORT_SHA}"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_STAGING_BUILD"
     paths:
-      - out/
+      - client/out
     reports:
       dotenv: deploy.env
     expire_in: 1 day
@@ -94,15 +189,19 @@ next production build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "client/*.{js,json}"
+        - "client/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+  needs: ["canister build"]
   <<: *node_template
   script:
     - npm run realbuild
-    - PRODUCTION_URL=https://$(jq -r '."gldt-frontend-production".ic' canister_ids.json).icp0.io
-    - echo "PRODUCTION_ENVIRONMENT_URL=$PRODUCTION_URL" > deploy.env
+    - PRODUCTION_URL=https://$(jq -r '."gldt_frontend".ic' canister_ids.json).icp0.io
+    - echo "FRONTEND_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend"
     paths:
-      - out/
+      - client/out
     reports:
       dotenv: deploy.env
     expire_in: 6 months
@@ -113,53 +212,92 @@ next production build:
 ################################################################################
 # Deployments
 ################################################################################
-local:
+local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  dependencies:
-    - nextjs test build
+      needs: ["canister test build", "nextjs test build"]
   before_script:
     - dfx --version
-    - dfx start --background
+    - dfx start --clean --background
   script:
-    - dfx deploy -y --no-wallet gldt-frontend-staging
+    - scripts/local-deploy.sh
   after_script:
-    - cat canisters_ids.json
+    - cat canister_ids.json
     - dfx stop
 
-staging:
+.gldt frontend:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-  dependencies:
-    - next staging build
-  before_script:
-    - dfx --version
-    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
-  script:
-    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet -y gldt-frontend-staging
-  after_script:
-    - echo "Staging environment will be accessible on ${STAGING_ENVIRONMENT_URL}"
-  environment:
-    name: staging
-    url: $STAGING_ENVIRONMENT_URL
-    action: start
-
-production:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
-  dependencies:
-    - next production build
+      needs: ["next staging build"]
+      variables:
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "frontend staging"
+        PEM_FILE: $PEM_FILE_STAGING
+    - if: $CI_COMMIT_TAG =~ '/^front-v\d+\.\d+\.\d+$/'
+      needs: ["next production build"]
+      variables:
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "frontend production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
     - dfx identity whoami
   script:
-    - dfx deploy --network ic --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt-frontend-production
-    - echo "TODO continue with updating DNS redirection using Gandi API"
+    - dfx deploy --network $TARGET_NETWORK --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt_frontend
   environment:
-    name: production
-    url: $PRODUCTION_ENVIRONMENT_URL
+    name: $ENVIRONMENT_NAME
+    url: $FRONTEND_URL
+    action: start
+
+gldt core:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      variables:
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "core staging"
+        PEM_FILE: $PEM_FILE_STAGING
+    - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
+      variables:
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "core production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
+  needs: ["canister build"]
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity whoami
+  script:
+    - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+  environment:
+    name: $ENVIRONMENT_NAME
+    url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    action: start
+
+gldt ledger:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      variables:
+        TARGET_NETWORK: staging
+        ENVIRONMENT_NAME: "ledger staging"
+        PEM_FILE: $PEM_FILE_STAGING
+    - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
+      when: manual
+      variables:
+        TARGET_NETWORK: ic
+        ENVIRONMENT_NAME: "ledger production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity whoami
+  script:
+    - scripts/deploy-ledger.sh $TARGET_NETWORK
+  environment:
+    name: $ENVIRONMENT_NAME
+    url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
