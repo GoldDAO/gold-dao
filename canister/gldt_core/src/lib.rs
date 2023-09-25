@@ -18,8 +18,6 @@
 //! NFTs as well as the GLDT ledger, which follows the ICRC1 standard
 //! of the IC.
 //!
-//!
-//! ```
 //! User                   NFT                  GLDT            GLDT Ledger
 //!  |     list NFT (1)     |                    |                   |
 //!  +--------------------->|                    |                   |
@@ -36,7 +34,6 @@
 //!  |                      |   | accept (4a)    |                   |
 //!  |                      |<--+                |                   |
 //!  |                      |                    |                   |
-//! ```
 //!
 //! The lifecycle of one NFT is as follows.
 //!
