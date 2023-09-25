@@ -9,47 +9,53 @@
 //! tied to any particular type of NFT, except for the notion of
 //! 'grams' which is tied to tokens in a ratio of one gram equals 100
 //! tokens. Thus, in principle, the same code can be used for NFT of
-//! any physical commodity measured in grams. The cansiter could
+//! any physical commodity measured in grams. The canister could be
 //! generalized further by replacing grams by some generic quantity,
 //! but doing so right now (2023) seems to have little benefit and only
 //! hamper the readability of the code.
 //!
 //! The GLDT canister collaborates with the canisters holding gold
-//! NFTs as well as the GLDT ledger, which an instance of a standard
-//! IC ledger.
+//! NFTs as well as the GLDT ledger, which follows the ICRC1 standard
+//! of the IC.
 //!
 //!
 //! ```
-//! NFT                  GLDT               Ledger
-//!  |                    |                   |
-//!  |    notify (1)      |                   |
-//!  +------------------->|                   |
-//!  |                    | mint request (2)  |
-//!  |                    +------------------>|
-//!  |                    |                   |
-//!  |<---------------------------------------+
-//!  |                    |                   |
-//!  |<-------------------+                   |
-//!  |        accept      |                   |
-//!  |                    |                   |
-//!  +---+                |                   |
-//!  |   | accept (3a)    |                   |
-//!  |<--+                |                   |
-//!  |                    |                   |
+//! User                   NFT                  GLDT            GLDT Ledger
+//!  |     list NFT (1)     |                    |                   |
+//!  +--------------------->|                    |                   |
+//!  |                      |    notify (2)      |                   |
+//!  |                      +------------------->|                   |
+//!  |                      |                    | mint request (3)  |
+//!  |                      |                    +------------------>|
+//!  |                      |<---------------------------------------+
+//!  |                      |                    |                   |
+//!  |                      |<-------------------+                   |
+//!  |                      |      accept (4)    |                   |
+//!  |                      |                    |                   |
+//!  |                      +---+                |                   |
+//!  |                      |   | accept (4a)    |                   |
+//!  |                      |<--+                |                   |
+//!  |                      |                    |                   |
 //! ```
 //!
 //! The lifecycle of one NFT is as follows.
 //!
-//! * Offer request made (1), i.e., an NFT canister requests an offer for
-//! a particular NFT.
+//! * Swapping procedure from NFT -> GLDT
 //!
-//! * An offer is made by  minting (2) tokens to an escrow account of NFT
-//! canister.
+//! ** A user lists an NFT for sale (1) through the NFT canister.
 //!
-//! * The offer is accepted (3a) on the NFT canister: the NFT now belongs
-//! to GLDT canister and the minted tokens are in
-//! circulation (3b). Alternatively, the offer is rejected and the tokens
-//! are burned.
+//! ** Upon successful listing, the NFT canister notifies the GLDT canister
+//! about the listing (2) with the public method `notify_sale_nft_origyn`
+//! which triggers the swapping sequence.
+//!
+//! ** The GLDT canister mints (3) GLDT to an escrow account on the NFT canister.
+//! This is required for the sale to go through.
+//!
+//! ** The GLDT canister accepts the offer of the listed NFT (4).
+//!
+//! ** The offer is accepted (4a) on the NFT canister: the NFT now belongs
+//! to GLDT canister and the minted tokens on the escrow account are
+//! distributed to the "seller" (user).
 //!
 //! * The view of the ownership of NFT from the NFT canister and from
 //! the GLDT canister is periodically audited (to be implemented).
