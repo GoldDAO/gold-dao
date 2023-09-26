@@ -26,3 +26,4 @@ canistergeek_ic_rust = "0.4.2"
 
 [dev-dependencies]
 clippy="0.0.302"
+tokio = { version = "1.32.0", features = ["full"] }

@@ -69,10 +69,10 @@
 //! also needs to point to the ledger canister as given by `$(dfx
 //! canister id ledger)`.
 
-use candid::{ CandidType, Deserialize, Principal, Nat };
+use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
 use ic_cdk::{ api, storage };
-use ic_cdk_macros::{ init, query, update, export_candid };
+use ic_cdk_macros::{ export_candid, init, query, update };
 use icrc_ledger_types::icrc1::{
     account::{ Account, Subaccount },
     transfer::{ BlockIndex, Memo, NumTokens, TransferArg, TransferError },
@@ -86,21 +86,21 @@ use std::hash::Hash;
 mod declarations;
 use declarations::gld_nft::{
     self,
-    ManageSaleRequest,
-    BidRequest,
-    SaleStatusShared,
     Account as OrigynAccount,
-    SubAccountInfo,
-    EscrowReceipt,
-    TokenSpec,
-    ICTokenSpec,
-    SaleStatusShared_sale_type,
-    PricingConfigShared__1,
     AskFeature,
-    ManageSaleResult,
-    ICTokenSpec_standard,
-    ManageSaleResponse,
+    BidRequest,
     BidResponse_txn_type,
+    EscrowReceipt,
+    ICTokenSpec,
+    ICTokenSpec_standard,
+    ManageSaleRequest,
+    ManageSaleResponse,
+    ManageSaleResult,
+    PricingConfigShared__1,
+    SaleStatusShared,
+    SaleStatusShared_sale_type,
+    SubAccountInfo,
+    TokenSpec,
 };
 use declarations::icrc1;
 
@@ -120,6 +120,18 @@ pub struct Conf {
     gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
 }
 
+impl Conf {
+    pub fn new(
+        gldt_ledger_canister_id: Principal,
+        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>
+    ) -> Self {
+        Self {
+            gldt_ledger_canister_id,
+            gld_nft_canister_ids,
+        }
+    }
+}
+
 /// Configuration information for a single NFT canister.
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct NftCanisterConf {
@@ -128,6 +140,12 @@ pub struct NftCanisterConf {
     /// 65kg. The largest gold bars are 400oz (~11kg) and the largest
     /// silver bars are 1000oz (~31kg).
     grams: NftWeight,
+}
+
+impl NftCanisterConf {
+    pub fn new(grams: NftWeight) -> Self {
+        Self { grams }
+    }
 }
 
 impl Default for Conf {
@@ -165,7 +183,9 @@ impl GldtNumTokens {
         if !Self::is_valid(initial_value.clone()) {
             return Err(format!("Invalid initial value for GldtNumTokens: {}", initial_value));
         }
-        Ok(GldtNumTokens { value: initial_value })
+        Ok(GldtNumTokens {
+            value: initial_value,
+        })
     }
 
     pub fn update(&mut self, new_value: NumTokens) -> Result<(), String> {
@@ -218,7 +238,7 @@ pub struct GldtSwapped {
 }
 
 /// Record of information about an NFT for which an offer has been made.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldNft {
     /// The canister ID of the Origyn NFT canister that manages this NFT.
     gld_nft_canister_id: Principal,
@@ -246,7 +266,7 @@ pub struct GldNft {
     older_record: Option<Box<GldNft>>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 enum RecordType {
     Mint,
     Burn,
@@ -259,7 +279,7 @@ enum RecordStatus {
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRecord {
     /// The type of transaction
     record_type: RecordType,
@@ -380,7 +400,7 @@ pub struct GetRecordsRequest {
     limit: Option<u32>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GetRecordsResponse {
     total: u32,
     data: Option<Vec<GldtRecord>>,
@@ -390,7 +410,9 @@ pub struct GetRecordsResponse {
 fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     let page = req.page.unwrap_or(0);
     let limit = match req.limit {
-        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        Some(val) => {
+            if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        }
         None => 10,
     };
     let start = match page.checked_mul(limit) {
@@ -401,13 +423,18 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     };
     SERVICE.with(|s| {
         let records = &mut s.borrow_mut().records;
-        let paginated_records = records
+        let paginated_records: Vec<_> = records
             .values()
             .skip(start as usize)
             .take(limit as usize)
             .cloned()
             .collect();
-        Ok(GetRecordsResponse { total: records.len() as u32, data: Some(paginated_records) })
+
+        let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
+        Ok(GetRecordsResponse {
+            total: records.len() as u32,
+            data: data,
+        })
     })
 }
 
@@ -423,7 +450,7 @@ pub struct InfoRequest {
     nft_id: NftId,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct NftInfo {
     info: Option<GldNft>,
 }
@@ -497,8 +524,9 @@ async fn accept_offer(
                 None => Err("Invalid number of tokens to accept offer. Received None.".to_string()),
             }
         }
-        None =>
-            Err("Missing information about minted tokens. Cancelling accept_offer.".to_string()),
+        None => {
+            Err("Missing information about minted tokens. Cancelling accept_offer.".to_string())
+        }
     })?;
     let bid = BidRequest {
         broker_id: None,
@@ -522,18 +550,16 @@ async fn accept_offer(
                     let (sale_id, index) = match *val {
                         ManageSaleResponse::bid(bid) => {
                             let sale_id = match bid.txn_type {
-                                BidResponse_txn_type::sale_ended { sale_id, .. } =>
-                                    sale_id.unwrap_or_default(),
+                                BidResponse_txn_type::sale_ended { sale_id, .. } => {
+                                    sale_id.unwrap_or_default()
+                                }
                                 _ => "".to_string(),
                             };
                             (sale_id, bid.index)
                         }
                         _ => ("invalid_ManageSaleResponse".to_string(), Nat::from(0)),
                     };
-                    Ok(GldtSwapped {
-                        sale_id,
-                        index,
-                    })
+                    Ok(GldtSwapped { sale_id, index })
                 }
                 ManageSaleResult::err(err) => {
                     log_message(format!("Error response: ManageSaleResult : {}", err.text));
@@ -547,7 +573,12 @@ async fn accept_offer(
 
 fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, TokenSpec), String> {
     // verify caller, only accept calls from valid gld nft canisters
+    #[cfg(not(test))]
     let the_caller = api::caller();
+
+    #[cfg(test)]
+    let the_caller = args.collection;
+
     // Extract configuration and validate caller.
     let (gld_nft_canister_id, gld_nft_conf, gldt_ledger_canister_id) = SERVICE.with(
         |s| -> Result<(Principal, NftCanisterConf, Principal), String> {
@@ -597,7 +628,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
                 owner: p,
                 subaccount: None,
             }),
-        _ => { Err("No valid account found for seller.".to_string()) }
+        _ => Err("No valid account found for seller.".to_string()),
     })?;
 
     // extract token information and config and verify if it is valid
@@ -938,14 +969,18 @@ fn update_registry(
 /// keep track of all mints and burns for historic analysis.
 fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
     SERVICE.with(|s| {
-        let records = &mut s.borrow_mut().records;
+        let mut service = s.borrow_mut();
+        let records = &mut service.records;
         let new_index: BlockIndex = match records.last_key_value() {
             Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
             None => Nat::from(0),
         };
         let new_record = GldtRecord {
             record_type: RecordType::Mint,
+            #[cfg(not(test))]
             timestamp: api::time(),
+            #[cfg(test)]
+            timestamp: 0, // api::time only available in canister
             counterparty: swap_info.receiving_account,
             gld_nft_canister_id: swap_info.gld_nft_canister_id,
             nft_id,
@@ -961,8 +996,8 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
         };
         records.insert(new_index.clone(), new_record);
 
-        s.borrow_mut()
-            .records_by_user.entry(swap_info.receiving_account.owner)
+        service.records_by_user
+            .entry(swap_info.receiving_account.owner)
             .or_default()
             .push(new_index)
     });
@@ -976,12 +1011,12 @@ pub struct GetStatusRequest {
     sale_id: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GetStatusResponse {
     status: Option<SwappingStates>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 enum SwappingStates {
     Initialised,
     Minted,
@@ -1002,7 +1037,9 @@ fn get_swaps_by_user(
     };
     let page = page.unwrap_or(0);
     let limit = match limit {
-        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        Some(val) => {
+            if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        }
         None => 10,
     };
 
@@ -1020,7 +1057,13 @@ fn get_swaps_by_user(
             .get(&principal)
             .unwrap_or(&default_vec)).clone();
         let total = user_records_indices.len() as u32;
-        let mut end = start + limit;
+        let mut end = match start.checked_add(limit) {
+            Some(result) => result,
+            None => {
+                return Err("Overflow when calculating end".to_string());
+            }
+        };
+
         if end > total {
             end = total;
         }
@@ -1038,18 +1081,13 @@ fn get_swaps_by_user(
 
         let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
 
-        Ok(GetRecordsResponse {
-            total,
-            data,
-        })
+        Ok(GetRecordsResponse { total, data })
     })
 }
 
 #[query]
 fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String> {
     SERVICE.with(|s| {
-        let registry = &s.borrow().registry;
-
         let conf = &s.borrow().conf;
         conf.gld_nft_canister_ids
             .iter()
@@ -1065,19 +1103,39 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
                 )
             })?;
 
+        let registry = &s.borrow().registry;
+
         let entry = registry.get(&(req.gld_nft_canister_id, req.nft_id.clone()));
         let res = match entry {
             None => GetStatusResponse { status: None },
             Some(entry) => {
                 if entry.nft_sale_id == req.sale_id {
-                    if entry.minted.is_none() {
-                        GetStatusResponse { status: Some(SwappingStates::Initialised) }
-                    } else if entry.swapped.is_none() {
-                        GetStatusResponse { status: Some(SwappingStates::Minted) }
-                    } else if entry.minted.clone().unwrap_or_default().burned.is_none() {
-                        GetStatusResponse { status: Some(SwappingStates::Swapped) }
+                    if entry.minted.is_none() && entry.swapped.is_none() {
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Initialised),
+                        }
+                    } else if entry.minted.is_some() && entry.swapped.is_none() {
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Minted),
+                        }
+                    } else if
+                        entry.minted.is_some() &&
+                        entry.swapped.is_some() &&
+                        entry.minted.clone().unwrap_or_default().burned.is_none()
+                    {
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Swapped),
+                        }
+                    } else if
+                        entry.minted.is_some() &&
+                        entry.swapped.is_some() &&
+                        entry.minted.clone().unwrap_or_default().burned.is_some()
+                    {
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Burned),
+                        }
                     } else {
-                        GetStatusResponse { status: Some(SwappingStates::Burned) }
+                        return Err("Swap status is corrupted.".to_string());
                     }
                 } else {
                     GetStatusResponse { status: None }
@@ -1192,3 +1250,6 @@ pub async fn update_canistergeek_information(
 }
 
 export_candid!();
+
+#[cfg(test)]
+mod test;
