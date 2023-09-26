@@ -1,25 +1,66 @@
-use icrc_ledger_types::icrc1::{
-    account::{ Account },
-};
-use candid::{ Principal };
+use crate::declarations::gld_nft::SubAccountInfo_account;
+
 use super::*;
+use candid::Principal;
+use icrc_ledger_types::icrc1::account::Account;
 
+use declarations::gld_nft::{
+    SaleStatusShared,
+    Account as OrigynAccount,
+    SubAccountInfo,
+    AuctionStateShared,
+    AuctionStateShared_status,
+    TokenSpec,
+    ICTokenSpec,
+    SaleStatusShared_sale_type,
+    PricingConfigShared__1,
+    AskFeature,
+    ICTokenSpec_standard,
+};
+use serde_bytes::ByteBuf;
 
+// --------------------------------- constants ----------------------------------
+
+const CANISTER_ID_GLDT_CORE: &str = "m45be-jaaaa-aaaak-qcgnq-cai";
+const CANISTER_ID_GLDT_LEDGER: &str = "6uad6-fqaaa-aaaam-abovq-cai";
+const CANISTER_ID_GLD_NFT_1G: &str = "obapm-2iaaa-aaaak-qcgca-cai";
+const CANISTER_ID_YUMI_KYC: &str = "2qft3-raaaa-aaaag-qci4a-cai";
+const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
 
 // --------------------------------- helpers ----------------------------------
 fn init_service() {
-    init(Some(Conf::new(
-        Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").expect("Could not decode the principal."),
-        vec![
-            (Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), NftCanisterConf::new(1)),
-            (Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), NftCanisterConf::new(10))
-        ]
-    )));
+    init(
+        Some(
+            Conf::new(
+                Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").expect(
+                    "Could not decode the principal."
+                ),
+                vec![
+                    (
+                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        NftCanisterConf::new(1),
+                    ),
+                    (
+                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        NftCanisterConf::new(10),
+                    )
+                ]
+            )
+        )
+    );
 }
 
 fn init_records() {
-    let _ = add_record("random_nft_id_1".to_string(), GldNft {
-            gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."),
+    let _ = add_record(
+        "random_nft_id_1".to_string(),
+        (GldNft {
+            gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                "Could not decode the principal."
+            ),
             to_subaccount: [0u8; 32],
             nft_sale_id: "randomSellId1".to_string(),
             grams: 1,
@@ -32,10 +73,15 @@ fn init_records() {
             minted: None,
             swapped: None,
             older_record: None,
-        }.clone());
+        }).clone()
+    );
 
-    let _ = add_record("random_nft_id_2".to_string(), GldNft {
-            gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+    let _ = add_record(
+        "random_nft_id_2".to_string(),
+        (GldNft {
+            gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                "Could not decode the principal."
+            ),
             to_subaccount: [0u8; 32],
             nft_sale_id: "randomSellId2".to_string(),
             grams: 10,
@@ -48,30 +94,127 @@ fn init_records() {
             minted: None,
             swapped: None,
             older_record: None,
-        }.clone());
+        }).clone()
+    );
+}
 
+fn dummy_sale_nft_request() -> SubscriberNotification {
+    let token = TokenSpec::ic(ICTokenSpec {
+        id: None,
+        fee: Some(Nat::from(10000)),
+        decimals: Nat::from(8),
+        canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
+            "Could not decode the principal."
+        ),
+        standard: ICTokenSpec_standard::ICRC1,
+        symbol: "GLDT".to_string(),
+    });
+    SubscriberNotification {
+        escrow_info: SubAccountInfo {
+            account_id: ByteBuf::from([
+                105, 135, 242, 243, 165, 181, 162, 160, 1, 21, 162, 41, 181, 82, 9, 143, 106, 45,
+                220, 234, 128, 124, 41, 191, 175, 77, 115, 154, 207, 39, 8, 14,
+            ]),
+            principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
+                "Could not decode the principal."
+            ),
+            account_id_text: "6987f2f3a5b5a2a00115a229b552098f6a2ddcea807c29bfaf4d739acf27080e".to_string(),
+            account: SubAccountInfo_account {
+                principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
+                    "Could not decode the principal."
+                ),
+                sub_account: ByteBuf::from([
+                    199, 215, 43, 85, 161, 120, 243, 11, 166, 239, 227, 201, 223, 184, 203, 131,
+                    205, 117, 219, 100, 109, 105, 126, 235, 115, 10, 77, 39, 179, 197, 134, 24,
+                ]),
+            },
+        },
+        sale: SaleStatusShared {
+            token_id: "Gold-00001".to_string(),
+            sale_type: SaleStatusShared_sale_type::auction(AuctionStateShared {
+                status: AuctionStateShared_status::open,
+                participants: Vec::from([
+                    (
+                        Principal::from_text(TEST_PRINCIPAL_ID).expect(
+                            "Could not decode the principal."
+                        ),
+                        candid::Int::default(),
+                    ),
+                ]),
+                token: token.clone(),
+                current_bid_amount: Nat::from(0),
+                winner: None,
+                end_date: candid::Int::default(),
+                start_date: candid::Int::default(),
+                wait_for_quiet_count: Some(Nat::from(0)),
+                current_escrow: None,
+                allow_list: None,
+                current_broker_id: None,
+                min_next_bid: Nat::from(10000000000 as u64),
+                config: PricingConfigShared__1::ask(
+                    Some(
+                        Vec::from([
+                            AskFeature::kyc(
+                                Principal::from_text(CANISTER_ID_YUMI_KYC).expect(
+                                    "Could not decode the principal."
+                                )
+                            ),
+                            AskFeature::start_price(Nat::from(10000000000 as u64)),
+                            AskFeature::reserve(Nat::from(10000000000 as u64)),
+                            AskFeature::buy_now(Nat::from(10000000000 as u64)),
+                            AskFeature::notify(
+                                Vec::from([
+                                    Principal::from_text(CANISTER_ID_GLDT_CORE).expect(
+                                        "Could not decode the principal."
+                                    ),
+                                ])
+                            ),
+                            AskFeature::token(token),
+                        ])
+                    )
+                ),
+            }),
+            broker_id: None,
+            original_broker_id: None,
+            sale_id: "9f6c0fdc44d7cca4af7f1c25fbf1e92d86c317addf53577f08d73fadfa78e93f".to_string(),
+        },
+        seller: OrigynAccount::principal(
+            Principal::from_text(
+                "mqov6-tdewf-wfzea-raa7y-kxcpv-res3j-g3dc2-wklml-eamt2-5wt7h-fae"
+            ).expect("Could not decode the principal.")
+        ),
+        collection: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+            "Could not decode the principal."
+        ),
+    }
 }
 
 // ------------------------- get_swaps_by_user tests --------------------------
 #[test]
 fn test_get_swaps_by_user_a1() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(1), Some(50));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a2() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(u32::MAX), Some(50));
 
     assert_eq!(res, Err("Overflow when calculating start".to_string()));
@@ -80,35 +223,46 @@ fn test_get_swaps_by_user_a2() {
 #[test]
 fn test_get_swaps_by_user_a3() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(50), Some(u32::MAX));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
-
 
 #[test]
 fn test_get_swaps_by_user_a4() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(1), Some(u32::MAX));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a5() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(u32::MAX), Some(1));
 
     assert_eq!(res, Err("Overflow when calculating end".to_string()));
@@ -117,222 +271,273 @@ fn test_get_swaps_by_user_a5() {
 #[test]
 fn test_get_swaps_by_user_a6() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(1), Some(0));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a7() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(0), Some(1));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a8() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), None, Some(0));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a9() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(0), None);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a10() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), None, Some(10));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_a11() {
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(10), None);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_b1() {
     init_records();
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(0), Some(50));
 
-    assert_eq!(res, Ok(
-        GetRecordsResponse { 
-            total: 2, 
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
             data: Some(
                 vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account { 
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), 
-                        nft_id: "random_nft_id_1".to_string(),
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId1".to_string(), 
-                        grams: 1, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }, 
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
+                    GldtRecord {
+                        record_type: RecordType::Mint,
+                        timestamp: 0,
                         counterparty: Account {
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
                         },
-                        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                        nft_id: "random_nft_id_2".to_string(), 
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId2".to_string(), 
-                        grams: 10, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
+                        gld_nft_canister_id: Principal::from_text(
+                            "obapm-2iaaa-aaaak-qcgca-cai"
+                        ).expect("Could not decode the principal."),
+                        nft_id: "random_nft_id_1".to_string(),
+                        escrow_subaccount: Some([0u8; 32]),
+                        nft_sale_id: "randomSellId1".to_string(),
+                        grams: 1,
+                        num_tokens: GldtNumTokens {
+                            value: Nat::from(0),
+                        },
+                        block_height: Nat::from(0),
+                        memo: Memo::from(0),
+                    },
+                    GldtRecord {
+                        record_type: RecordType::Mint,
+                        timestamp: 0,
+                        counterparty: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        nft_id: "random_nft_id_2".to_string(),
+                        escrow_subaccount: Some([0u8; 32]),
+                        nft_sale_id: "randomSellId2".to_string(),
+                        grams: 10,
+                        num_tokens: GldtNumTokens {
+                            value: Nat::from(0),
+                        },
+                        block_height: Nat::from(0),
+                        memo: Memo::from(0),
                     }
                 ]
-        ) 
-    })) 
+            ),
+        })
+    )
 }
 
 #[test]
 fn test_get_swaps_by_user_b2() {
     init_records();
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(1), Some(50));
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 2, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_swaps_by_user_b3() {
     init_records();
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(0), Some(1));
 
-    assert_eq!(res, Ok(
-        GetRecordsResponse { 
-            total: 2, 
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
             data: Some(
-                vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account { 
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), 
-                        nft_id: "random_nft_id_1".to_string(),
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId1".to_string(), 
-                        grams: 1, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }, 
-                ]
-        ) 
-    })) 
+                vec![GldtRecord {
+                    record_type: RecordType::Mint,
+                    timestamp: 0,
+                    counterparty: Account {
+                        owner: Principal::anonymous(),
+                        subaccount: Some([0u8; 32]),
+                    },
+                    gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    nft_id: "random_nft_id_1".to_string(),
+                    escrow_subaccount: Some([0u8; 32]),
+                    nft_sale_id: "randomSellId1".to_string(),
+                    grams: 1,
+                    num_tokens: GldtNumTokens {
+                        value: Nat::from(0),
+                    },
+                    block_height: Nat::from(0),
+                    memo: Memo::from(0),
+                }]
+            ),
+        })
+    )
 }
 
 #[test]
 fn test_get_swaps_by_user_b4() {
     init_records();
     let account = Account {
-        owner: Principal::anonymous(), 
-        subaccount: None
+        owner: Principal::anonymous(),
+        subaccount: None,
     };
-    
+
     let res = get_swaps_by_user(Some(account), Some(1), Some(1));
 
-    assert_eq!(res, Ok(
-        GetRecordsResponse { 
-            total: 2, 
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
             data: Some(
-                vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account {
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                        nft_id: "random_nft_id_2".to_string(), 
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId2".to_string(), 
-                        grams: 10, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }
-                ]
-        ) 
-    })) 
+                vec![GldtRecord {
+                    record_type: RecordType::Mint,
+                    timestamp: 0,
+                    counterparty: Account {
+                        owner: Principal::anonymous(),
+                        subaccount: Some([0u8; 32]),
+                    },
+                    gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    nft_id: "random_nft_id_2".to_string(),
+                    escrow_subaccount: Some([0u8; 32]),
+                    nft_sale_id: "randomSellId2".to_string(),
+                    grams: 10,
+                    num_tokens: GldtNumTokens {
+                        value: Nat::from(0),
+                    },
+                    block_height: Nat::from(0),
+                    memo: Memo::from(0),
+                }]
+            ),
+        })
+    )
 }
 
 // ------------------------- get_status_of_swap tests -------------------------
-
 
 #[test]
 fn test_get_status_of_swap_a1() {
@@ -341,10 +546,13 @@ fn test_get_status_of_swap_a1() {
         gld_nft_canister_id: Principal::anonymous(),
         sale_id: "".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Err("invalid GLD NFT canister ID: was 2vxsx-fae, expected one of []".to_string()));
+    assert_eq!(
+        res,
+        Err("invalid GLD NFT canister ID: was 2vxsx-fae, expected one of []".to_string())
+    );
 }
 
 #[test]
@@ -356,14 +564,25 @@ fn test_get_status_of_swap_a2() {
         gld_nft_canister_id: Principal::anonymous(),
         sale_id: "".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Err(format!("invalid GLD NFT canister ID: was 2vxsx-fae, expected one of {:?}",        vec![
-            Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."),
-            Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal.")
-        ]
-    )));
+    assert_eq!(
+        res,
+        Err(
+            format!(
+                "invalid GLD NFT canister ID: was 2vxsx-fae, expected one of {:?}",
+                vec![
+                    Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    )
+                ]
+            )
+        )
+    );
 }
 
 #[test]
@@ -372,12 +591,14 @@ fn test_get_status_of_swap_a3() {
 
     let status_request = GetStatusRequest {
         nft_id: "".to_string(),
-        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
-    
+
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
 }
 
@@ -387,15 +608,16 @@ fn test_get_status_of_swap_a4() {
 
     let status_request = GetStatusRequest {
         nft_id: "".to_string(),
-        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
-    
+
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
 }
-
 
 #[test]
 fn test_get_status_of_swap_b1() {
@@ -404,83 +626,123 @@ fn test_get_status_of_swap_b1() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: None,
-                swapped: None,
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: None,
+                        swapped: None,
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Ok(GetStatusResponse { status: Some(SwappingStates::Initialised) }));
+    assert_eq!(
+        res,
+        Ok(GetStatusResponse {
+            status: Some(SwappingStates::Initialised),
+        })
+    );
 }
-
 
 #[test]
 fn test_get_status_of_swap_b2() {
     init_service();
-    
+
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: Some(
-                    GldtMinted {
-                        mint_block_height: None,
-                        last_audited_timestamp_seconds: 0,
-                        burned: None,
-                        num_tokens: None
-                    }
-                ),
-                swapped: None,
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: Some(GldtMinted {
+                            mint_block_height: None,
+                            last_audited_timestamp_seconds: 0,
+                            burned: None,
+                            num_tokens: None,
+                        }),
+                        swapped: None,
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Ok(GetStatusResponse { status: Some(SwappingStates::Minted) }));
+    assert_eq!(
+        res,
+        Ok(GetStatusResponse {
+            status: Some(SwappingStates::Minted),
+        })
+    );
 }
-
 
 #[test]
 fn test_get_status_of_swap_b3() {
@@ -488,49 +750,66 @@ fn test_get_status_of_swap_b3() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: Some(
-                    GldtMinted {
-                        mint_block_height: None,
-                        last_audited_timestamp_seconds: 0,
-                        burned: None,
-                        num_tokens: None
-                    }
-                ),
-                swapped: Some(
-                    GldtSwapped {
-                        sale_id: "randomSellId".to_string(),
-                        index: Nat::from(0),
-                    }
-                ),
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: Some(GldtMinted {
+                            mint_block_height: None,
+                            last_audited_timestamp_seconds: 0,
+                            burned: None,
+                            num_tokens: None,
+                        }),
+                        swapped: Some(GldtSwapped {
+                            sale_id: "randomSellId".to_string(),
+                            index: Nat::from(0),
+                        }),
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Ok(GetStatusResponse { status: Some(SwappingStates::Swapped) }));
+    assert_eq!(
+        res,
+        Ok(GetStatusResponse {
+            status: Some(SwappingStates::Swapped),
+        })
+    );
 }
-
 
 #[test]
 fn test_get_status_of_swap_b4() {
@@ -538,49 +817,67 @@ fn test_get_status_of_swap_b4() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: Some(
-                    GldtMinted {
-                        mint_block_height: None,
-                        last_audited_timestamp_seconds: 0,
-                        burned: Some( GldtBurned {
-                            burn_block_height: 0
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: Some(GldtMinted {
+                            mint_block_height: None,
+                            last_audited_timestamp_seconds: 0,
+                            burned: Some(GldtBurned {
+                                burn_block_height: 0,
+                            }),
+                            num_tokens: None,
                         }),
-                        num_tokens: None
-                    }
-                ),
-                swapped: Some(
-                    GldtSwapped {
-                        sale_id: "randomSellId".to_string(),
-                        index: Nat::from(0),
-                    }
-                ),
-                older_record: None,
-            }.clone()); }
-            _ => { }
+                        swapped: Some(GldtSwapped {
+                            sale_id: "randomSellId".to_string(),
+                            index: Nat::from(0),
+                        }),
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
-    assert_eq!(res, Ok(GetStatusResponse { status: Some(SwappingStates::Burned) }));
+    assert_eq!(
+        res,
+        Ok(GetStatusResponse {
+            status: Some(SwappingStates::Burned),
+        })
+    );
 }
 
 #[test]
@@ -589,37 +886,52 @@ fn test_get_status_of_swap_b5() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: None,
-                swapped: Some(
-                    GldtSwapped {
-                        sale_id: "randomSellId".to_string(),
-                        index: Nat::from(0),
-                    }
-                ),
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: None,
+                        swapped: Some(GldtSwapped {
+                            sale_id: "randomSellId".to_string(),
+                            index: Nat::from(0),
+                        }),
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
     assert_eq!(res, Err("Swap status is corrupted.".to_string()));
@@ -631,44 +943,58 @@ fn test_get_status_of_swap_b6() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: Some(
-                    GldtMinted {
-                        mint_block_height: None,
-                        last_audited_timestamp_seconds: 0,
-                        burned: None,
-                        num_tokens: None
-                    }
-                ),
-                swapped: None,
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: Some(GldtMinted {
+                            mint_block_height: None,
+                            last_audited_timestamp_seconds: 0,
+                            burned: None,
+                            num_tokens: None,
+                        }),
+                        swapped: None,
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "random_nft_id_2".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
 }
-
 
 #[test]
 fn test_get_status_of_swap_b7() {
@@ -676,39 +1002,54 @@ fn test_get_status_of_swap_b7() {
     SERVICE.with(|s| {
         let registry = &mut s.borrow_mut().registry;
 
-        match registry.entry((Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."), "random_nft_id_2".to_string()).clone()) {
-            btree_map::Entry::Vacant(v) => { v.insert(GldNft {
-                gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                to_subaccount: [0u8; 32],
-                nft_sale_id: "randomSellId".to_string(),
-                grams: 10,
-                receiving_account: Account {
-                    owner: Principal::anonymous(),
-                    subaccount: Some([0u8; 32]),
-                },
-                gldt_minting_timestamp_seconds: 0,
-                requested_memo: Memo::from(0),
-                minted: Some(
-                    GldtMinted {
-                        mint_block_height: None,
-                        last_audited_timestamp_seconds: 0,
-                        burned: None,
-                        num_tokens: None
-                    }
-                ),
-                swapped: None,
-                older_record: None,
-            }.clone()); }
-            _ => { }
+        match
+            registry.entry(
+                (
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_2".to_string(),
+                ).clone()
+            )
+        {
+            btree_map::Entry::Vacant(v) => {
+                v.insert(
+                    (GldNft {
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        to_subaccount: [0u8; 32],
+                        nft_sale_id: "randomSellId".to_string(),
+                        grams: 10,
+                        receiving_account: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gldt_minting_timestamp_seconds: 0,
+                        requested_memo: Memo::from(0),
+                        minted: Some(GldtMinted {
+                            mint_block_height: None,
+                            last_audited_timestamp_seconds: 0,
+                            burned: None,
+                            num_tokens: None,
+                        }),
+                        swapped: None,
+                        older_record: None,
+                    }).clone()
+                );
+            }
+            _ => {}
         }
     });
 
     let status_request = GetStatusRequest {
         nft_id: "".to_string(),
-        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
+        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
         sale_id: "randomSellId".to_string(),
     };
-    
+
     let res = get_status_of_swap(status_request.clone());
 
     assert_eq!(res, Ok(GetStatusResponse { status: None }));
@@ -718,22 +1059,28 @@ fn test_get_status_of_swap_b7() {
 #[test]
 fn test_get_records_a1() {
     let records_request = GetRecordsRequest {
-        page: Some(1), 
-        limit: Some(50)    
+        page: Some(1),
+        limit: Some(50),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a2() {
     let records_request = GetRecordsRequest {
-        page: Some(u32::MAX), 
-        limit: Some(50)    
+        page: Some(u32::MAX),
+        limit: Some(50),
     };
-    
+
     let res = get_records(records_request);
 
     assert_eq!(res, Err("Overflow when calculating start".to_string()));
@@ -742,110 +1089,163 @@ fn test_get_records_a2() {
 #[test]
 fn test_get_records_a3() {
     let records_request = GetRecordsRequest {
-        page: Some(50), 
-        limit: Some(u32::MAX)
+        page: Some(50),
+        limit: Some(u32::MAX),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
-
 
 #[test]
 fn test_get_records_a4() {
     let records_request = GetRecordsRequest {
-        page: Some(u32::MAX), 
-        limit: Some(1)
+        page: Some(u32::MAX),
+        limit: Some(1),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a5() {
     let records_request = GetRecordsRequest {
-        page: Some(1), 
-        limit: Some(u32::MAX)
+        page: Some(1),
+        limit: Some(u32::MAX),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a6() {
     let records_request = GetRecordsRequest {
-        page: Some(1), 
-        limit: Some(0)
+        page: Some(1),
+        limit: Some(0),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a7() {
     let records_request = GetRecordsRequest {
-        page: Some(0), 
-        limit: Some(1)
+        page: Some(0),
+        limit: Some(1),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a8() {
     let records_request = GetRecordsRequest {
-        page: Some(0), 
-        limit: None
+        page: Some(0),
+        limit: None,
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a9() {
     let records_request = GetRecordsRequest {
-        page: None, 
-        limit: Some(0)
+        page: None,
+        limit: Some(0),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a10() {
     let records_request = GetRecordsRequest {
-        page: Some(10), 
-        limit: None
+        page: Some(10),
+        limit: None,
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
 fn test_get_records_a11() {
     let records_request = GetRecordsRequest {
-        page: None, 
-        limit: Some(10)
+        page: None,
+        limit: Some(10),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 0, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
 }
 
 #[test]
@@ -853,13 +1253,19 @@ fn test_get_records_b1() {
     init_records();
 
     let records_request = GetRecordsRequest {
-        page: Some(1), 
-        limit: Some(50)    
+        page: Some(1),
+        limit: Some(50),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 2, data: None }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: None,
+        })
+    );
 }
 
 #[test]
@@ -867,53 +1273,62 @@ fn test_get_records_b2() {
     init_records();
 
     let records_request = GetRecordsRequest {
-        page: Some(0), 
-        limit: Some(50)    
+        page: Some(0),
+        limit: Some(50),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 2, data: Some(
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
                 vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account { 
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), 
-                        nft_id: "random_nft_id_1".to_string(),
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId1".to_string(), 
-                        grams: 1, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }, 
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
+                    GldtRecord {
+                        record_type: RecordType::Mint,
+                        timestamp: 0,
                         counterparty: Account {
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
                         },
-                        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                        nft_id: "random_nft_id_2".to_string(), 
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId2".to_string(), 
-                        grams: 10, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
+                        gld_nft_canister_id: Principal::from_text(
+                            "obapm-2iaaa-aaaak-qcgca-cai"
+                        ).expect("Could not decode the principal."),
+                        nft_id: "random_nft_id_1".to_string(),
+                        escrow_subaccount: Some([0u8; 32]),
+                        nft_sale_id: "randomSellId1".to_string(),
+                        grams: 1,
+                        num_tokens: GldtNumTokens {
+                            value: Nat::from(0),
+                        },
+                        block_height: Nat::from(0),
+                        memo: Memo::from(0),
+                    },
+                    GldtRecord {
+                        record_type: RecordType::Mint,
+                        timestamp: 0,
+                        counterparty: Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([0u8; 32]),
+                        },
+                        gld_nft_canister_id: Principal::from_text(
+                            "xyo2o-gyaaa-aaaal-qb55a-cai"
+                        ).expect("Could not decode the principal."),
+                        nft_id: "random_nft_id_2".to_string(),
+                        escrow_subaccount: Some([0u8; 32]),
+                        nft_sale_id: "randomSellId2".to_string(),
+                        grams: 10,
+                        num_tokens: GldtNumTokens {
+                            value: Nat::from(0),
+                        },
+                        block_height: Nat::from(0),
+                        memo: Memo::from(0),
                     }
                 ]
-        ) 
- }));
+            ),
+        })
+    );
 }
 
 #[test]
@@ -921,34 +1336,40 @@ fn test_get_records_b3() {
     init_records();
 
     let records_request = GetRecordsRequest {
-        page: Some(0), 
-        limit: Some(1)    
+        page: Some(0),
+        limit: Some(1),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 2, data: Some(
-                vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account { 
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect("Could not decode the principal."), 
-                        nft_id: "random_nft_id_1".to_string(),
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId1".to_string(), 
-                        grams: 1, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }, 
-                ]
-        )  }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
+                vec![GldtRecord {
+                    record_type: RecordType::Mint,
+                    timestamp: 0,
+                    counterparty: Account {
+                        owner: Principal::anonymous(),
+                        subaccount: Some([0u8; 32]),
+                    },
+                    gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    nft_id: "random_nft_id_1".to_string(),
+                    escrow_subaccount: Some([0u8; 32]),
+                    nft_sale_id: "randomSellId1".to_string(),
+                    grams: 1,
+                    num_tokens: GldtNumTokens {
+                        value: Nat::from(0),
+                    },
+                    block_height: Nat::from(0),
+                    memo: Memo::from(0),
+                }]
+            ),
+        })
+    );
 }
 
 #[test]
@@ -956,32 +1377,52 @@ fn test_get_records_b4() {
     init_records();
 
     let records_request = GetRecordsRequest {
-        page: Some(1), 
-        limit: Some(1)    
+        page: Some(1),
+        limit: Some(1),
     };
-    
+
     let res = get_records(records_request);
 
-    assert_eq!(res, Ok(GetRecordsResponse { total: 2, data: Some(
-                vec![
-                    GldtRecord { 
-                        record_type: RecordType::Mint, 
-                        timestamp: 0, 
-                        counterparty: Account {
-                            owner: Principal::anonymous(), 
-                            subaccount: Some([0u8; 32])
-                        },
-                        gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect("Could not decode the principal."),
-                        nft_id: "random_nft_id_2".to_string(), 
-                        escrow_subaccount: Some([0u8; 32]), 
-                        nft_sale_id: "randomSellId2".to_string(), 
-                        grams: 10, 
-                        num_tokens: GldtNumTokens { 
-                            value: Nat::from(0) 
-                        }, 
-                        block_height: Nat::from(0), 
-                        memo: Memo::from(0)
-                    }
-                ]
-        )  }));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
+                vec![GldtRecord {
+                    record_type: RecordType::Mint,
+                    timestamp: 0,
+                    counterparty: Account {
+                        owner: Principal::anonymous(),
+                        subaccount: Some([0u8; 32]),
+                    },
+                    gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    nft_id: "random_nft_id_2".to_string(),
+                    escrow_subaccount: Some([0u8; 32]),
+                    nft_sale_id: "randomSellId2".to_string(),
+                    grams: 10,
+                    num_tokens: GldtNumTokens {
+                        value: Nat::from(0),
+                    },
+                    block_height: Nat::from(0),
+                    memo: Memo::from(0),
+                }]
+            ),
+        })
+    );
+}
+
+// ------------------------- notify_sale_nft_origyn tests -----------------------------
+
+#[tokio::test]
+async fn test_notify_sale_nft_origyn_a1() {
+    init_service();
+
+    let mut sale_nft_request = dummy_sale_nft_request();
+
+    sale_nft_request.sale.token_id = "".to_string();
+
+    let res = notify_sale_nft_origyn(sale_nft_request).await;
+    assert_eq!(res, Err("ERROR :: NFT ID cannot be empty".to_string()));
 }

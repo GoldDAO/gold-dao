@@ -121,7 +121,10 @@ pub struct Conf {
 }
 
 impl Conf {
-    pub fn new(gldt_ledger_canister_id: Principal, gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>) -> Self {
+    pub fn new(
+        gldt_ledger_canister_id: Principal,
+        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>
+    ) -> Self {
         Self {
             gldt_ledger_canister_id,
             gld_nft_canister_ids,
@@ -416,7 +419,7 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     };
     SERVICE.with(|s| {
         let records = &mut s.borrow_mut().records;
-        let paginated_records : Vec<_> = records
+        let paginated_records: Vec<_> = records
             .values()
             .skip(start as usize)
             .take(limit as usize)
@@ -564,7 +567,12 @@ async fn accept_offer(
 
 fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, TokenSpec), String> {
     // verify caller, only accept calls from valid gld nft canisters
+    #[cfg(not(test))]
     let the_caller = api::caller();
+
+    #[cfg(test)]
+    let the_caller = args.collection;
+
     // Extract configuration and validate caller.
     let (gld_nft_canister_id, gld_nft_conf, gldt_ledger_canister_id) = SERVICE.with(
         |s| -> Result<(Principal, NftCanisterConf, Principal), String> {
@@ -963,9 +971,9 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
         };
         let new_record = GldtRecord {
             record_type: RecordType::Mint,
-        #[cfg(not(test))]
+            #[cfg(not(test))]
             timestamp: api::time(),
-        #[cfg(test)]
+            #[cfg(test)]
             timestamp: 0, // api::time only available in canister
             counterparty: swap_info.receiving_account,
             gld_nft_canister_id: swap_info.gld_nft_canister_id,
@@ -982,8 +990,8 @@ fn add_record(nft_id: NftId, swap_info: GldNft) -> Result<(), String> {
         };
         records.insert(new_index.clone(), new_record);
 
-        service
-            .records_by_user.entry(swap_info.receiving_account.owner)
+        service.records_by_user
+            .entry(swap_info.receiving_account.owner)
             .or_default()
             .push(new_index)
     });
@@ -1101,12 +1109,20 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
                         GetStatusResponse { status: Some(SwappingStates::Initialised) }
                     } else if entry.minted.is_some() && entry.swapped.is_none() {
                         GetStatusResponse { status: Some(SwappingStates::Minted) }
-                    } else if entry.minted.is_some() && entry.swapped.is_some() && entry.minted.clone().unwrap_or_default().burned.is_none() {
+                    } else if
+                        entry.minted.is_some() &&
+                        entry.swapped.is_some() &&
+                        entry.minted.clone().unwrap_or_default().burned.is_none()
+                    {
                         GetStatusResponse { status: Some(SwappingStates::Swapped) }
-                    } else if entry.minted.is_some() && entry.swapped.is_some() && entry.minted.clone().unwrap_or_default().burned.is_some() {
+                    } else if
+                        entry.minted.is_some() &&
+                        entry.swapped.is_some() &&
+                        entry.minted.clone().unwrap_or_default().burned.is_some()
+                    {
                         GetStatusResponse { status: Some(SwappingStates::Burned) }
                     } else {
-                        return Err("Swap status is corrupted.".to_string())
+                        return Err("Swap status is corrupted.".to_string());
                     }
                 } else {
                     GetStatusResponse { status: None }

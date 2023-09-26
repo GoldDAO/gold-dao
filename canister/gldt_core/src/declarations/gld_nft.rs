@@ -844,18 +844,18 @@ pub enum AuctionStateShared_status {
 }
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct AuctionStateShared {
-    status: AuctionStateShared_status,
-    participants: Vec<(Principal, candid::Int)>,
+    pub status: AuctionStateShared_status,
+    pub participants: Vec<(Principal, candid::Int)>,
     pub token: TokenSpec,
-    current_bid_amount: candid::Nat,
-    winner: Option<Account>,
-    end_date: candid::Int,
-    start_date: candid::Int,
-    wait_for_quiet_count: Option<candid::Nat>,
-    current_escrow: Option<EscrowReceipt>,
-    allow_list: Option<Vec<(Principal, bool)>>,
-    current_broker_id: Option<Principal>,
-    min_next_bid: candid::Nat,
+    pub current_bid_amount: candid::Nat,
+    pub winner: Option<Account>,
+    pub end_date: candid::Int,
+    pub start_date: candid::Int,
+    pub wait_for_quiet_count: Option<candid::Nat>,
+    pub current_escrow: Option<EscrowReceipt>,
+    pub allow_list: Option<Vec<(Principal, bool)>>,
+    pub current_broker_id: Option<Principal>,
+    pub min_next_bid: candid::Nat,
     pub config: PricingConfigShared__1,
 }
 pub type AskConfigShared__1 = Option<Vec<AskFeature>>;
