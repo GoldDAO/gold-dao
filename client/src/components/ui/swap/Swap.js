@@ -26,6 +26,10 @@ import {
     Tag,
     TagLabel,
     TagRightIcon,
+    CircularProgress,
+    Skeleton,
+    HStack,
+    Text,
 } from '@chakra-ui/react';
 import {
     addCartItemAtom,
@@ -39,6 +43,7 @@ import { useNft } from '@/query/hooks/useNFTs';
 import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
 import { sendBatchOffer } from '@/query/sendBatchOffer';
+import Link from 'next/link';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
@@ -89,11 +94,15 @@ const Output = ({ isConnected }) => {
 };
 
 const OutputOverview = ({ isConnected }) => {
+    const [weight] = useAtom(getTotalCartWeightAtom);
+    const minted = weight * 100;
     return (
         <Card>
             <CardBody>
-                <Box>You will receive</Box>
-                <Box>GLDT</Box>
+                <HStack justifyContent="space-between">
+                    <Box>You will receive</Box>
+                    <Box>{minted}&nbsp;GLDT</Box>
+                </HStack>
             </CardBody>
         </Card>
     );
@@ -143,7 +152,7 @@ const TransactionDetailsTable = () => {
                     </Tr>
                     <Tr>
                         <Td>Fee compensation</Td>
-                        <Td>{fees} GLDT</Td>
+                        <Td>{fees} GLDT</Td> const [weight] = useAtom(getTotalCartWeightAtom);
                     </Tr>
                     <Tr>
                         <Td>Total received</Td>
@@ -156,30 +165,50 @@ const TransactionDetailsTable = () => {
 };
 
 const MyNfts = ({ isConnected }) => {
-    const actors = useAllCanisters();
-    const nfts = useNft(actors);
+    const [connected, setConnected] = useState(isConnected);
+    const [isLoading, setIsloading] = useState(false);
+    useEffect(() => {
+        setConnected(isConnected);
+    }, [isConnected]);
+
     return (
         <Accordion allowToggle>
-            <AccordionItem isDisabled={!isConnected || nfts.isLoading ? true : false}>
+            <AccordionItem isDisabled={!connected}>
                 <AccordionButton>
                     <Box>Select from my NFTs</Box>
-                    {nfts.isLoading && isConnected ? (
-                        <Box>
-                            <Spinner />
-                        </Box>
-                    ) : null}
+                    {isLoading && <Spinner size="sm" ml={'1em'} />}
                 </AccordionButton>
-                {isConnected && <MyNftsPanel nfts={nfts} />}
+                {connected && <MyNftsPanel setIsloading={setIsloading} isLoading={isLoading} />}
             </AccordionItem>
         </Accordion>
     );
 };
 
-const MyNftsPanel = ({ nfts }) => {
+const MyNftsPanel = ({ setIsloading, isLoading }) => {
+    const actors = useAllCanisters();
+    const nfts = useNft(actors);
+    const weights = [1, 10, 100, 1000];
+
+    useEffect(() => {
+        setIsloading(nfts.isLoading);
+    }, [nfts.isLoading]);
+
     return (
         <AccordionPanel>
-            {nfts.nfts.map((e, i) => (
-                <TokenTag size="sm" nft={e} key={i} />
+            {weights.map((weight, i) => (
+                <Card key={i}>
+                    <CardHeader>GLDNFT {weight}g</CardHeader>
+                    <CardBody>
+                        {isLoading ? (
+                            <SkeletonToken />
+                        ) : (
+                            nfts.nfts.map(
+                                (e, i) =>
+                                    e.weight === weight && <TokenTag size="sm" nft={e} key={i} />,
+                            )
+                        )}
+                    </CardBody>
+                </Card>
             ))}
         </AccordionPanel>
     );
@@ -190,21 +219,26 @@ const SelectedNfts = () => {
     const [weight] = useAtom(getTotalCartWeightAtom);
     return (
         <Card>
-            <CardHeader>Selected</CardHeader>
-            <CardBody>
-                {cart.length} NFTs selected, {weight} g
-            </CardBody>
+            <HStack justifyContent={'space-between'}>
+                <CardHeader>Selected</CardHeader>
+                <CardBody textAlign="right">
+                    {cart.length} NFTs selected, {weight} g
+                </CardBody>
+            </HStack>
         </Card>
     );
 };
 
 const SwapButton = ({ isConnected }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [cart] = useAtom(cartAtom);
 
     return (
         <>
-            <Button isDisabled={!isConnected} onClick={onOpen}>
-                {isConnected ? 'Swap' : 'Connect You wallet to swap'}{' '}
+            <Button isDisabled={isConnected && cart.length > 0 ? false : true} onClick={onOpen}>
+                {!isConnected && 'Connect your wallet to swap'}
+                {isConnected && cart.length > 0 && 'Swap'}
+                {isConnected && cart.length < 1 && 'Select NFTs to start swap'}
             </Button>
             <ConfirmationDialog isOpen={isOpen} onClose={onClose} onOpen={onOpen} />
         </>
@@ -214,15 +248,71 @@ const SwapButton = ({ isConnected }) => {
 const ConfirmationDialog = ({ isOpen, onClose }) => {
     const actors = useAllCanisters();
     const [cart] = useAtom(cartAtom);
+    const [weight] = useAtom(getTotalCartWeightAtom);
+    const [res, setRes] = useState();
+    const [loading, setLoading] = useState(false);
+
+    const handleBatchOffer = async () => {
+        setLoading(true);
+        const res = await sendBatchOffer(actors, cart);
+        setRes(res);
+        setLoading(false);
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Transaction confirmation</ModalHeader>
-                <TransactionDetailsTable />
-                <Button onClick={(e) => sendBatchOffer(actors, cart)}>Confirm transaction</Button>
+                {!res && !loading && (
+                        <>
+                            <Box>
+                                Send {cart.length} NFTs ,({weight} g)
+                            </Box>
+                            <Button onClick={(e) => handleBatchOffer()}>Confirm transaction</Button>
+                        </>,
+                    )}
+                {loading && <Spinner size="sm" />}
+                {res && <BatchOfferResponse />}
             </ModalContent>
         </Modal>
+    );
+};
+
+const BatchOfferResponse = ({ res, loading }) => {
+    return (
+        <>
+            {!loading ? (
+                <>
+                    {res?.map((e) => {
+                        return e?.map((e, i) => (
+                            <Box>
+                                <Box>{e.ok.token_id}</Box>
+                            </Box>
+                        ));
+                    })}
+                    <Text>
+                        Batch offer successfully sent, you can follow the progress on your
+                        <Link href={'/my-account'}> Account Page</Link>
+                    </Text>
+                </>
+            ) : (
+                <Box>
+                    <Spinner />
+                    Sending batch offer...
+                </Box>
+            )}
+        </>
+    );
+};
+
+const SkeletonToken = () => {
+    const count = 5;
+    return (
+        <HStack w={'100%'} wrap="wrap">
+            {Array.from({ length: count }).map(() => (
+                <Skeleton height="25px" minW={'100px'} maxW={'100%'} />
+            ))}
+        </HStack>
     );
 };
