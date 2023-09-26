@@ -69,10 +69,10 @@
 //! also needs to point to the ledger canister as given by `$(dfx
 //! canister id ledger)`.
 
-use candid::{ CandidType, Deserialize, Principal, Nat };
+use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
 use ic_cdk::{ api, storage };
-use ic_cdk_macros::{ init, query, update, export_candid };
+use ic_cdk_macros::{ export_candid, init, query, update };
 use icrc_ledger_types::icrc1::{
     account::{ Account, Subaccount },
     transfer::{ BlockIndex, Memo, NumTokens, TransferArg, TransferError },
@@ -86,21 +86,21 @@ use std::hash::Hash;
 mod declarations;
 use declarations::gld_nft::{
     self,
-    ManageSaleRequest,
-    BidRequest,
-    SaleStatusShared,
     Account as OrigynAccount,
-    SubAccountInfo,
-    EscrowReceipt,
-    TokenSpec,
-    ICTokenSpec,
-    SaleStatusShared_sale_type,
-    PricingConfigShared__1,
     AskFeature,
-    ManageSaleResult,
-    ICTokenSpec_standard,
-    ManageSaleResponse,
+    BidRequest,
     BidResponse_txn_type,
+    EscrowReceipt,
+    ICTokenSpec,
+    ICTokenSpec_standard,
+    ManageSaleRequest,
+    ManageSaleResponse,
+    ManageSaleResult,
+    PricingConfigShared__1,
+    SaleStatusShared,
+    SaleStatusShared_sale_type,
+    SubAccountInfo,
+    TokenSpec,
 };
 use declarations::icrc1;
 
@@ -183,7 +183,9 @@ impl GldtNumTokens {
         if !Self::is_valid(initial_value.clone()) {
             return Err(format!("Invalid initial value for GldtNumTokens: {}", initial_value));
         }
-        Ok(GldtNumTokens { value: initial_value })
+        Ok(GldtNumTokens {
+            value: initial_value,
+        })
     }
 
     pub fn update(&mut self, new_value: NumTokens) -> Result<(), String> {
@@ -236,7 +238,7 @@ pub struct GldtSwapped {
 }
 
 /// Record of information about an NFT for which an offer has been made.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldNft {
     /// The canister ID of the Origyn NFT canister that manages this NFT.
     gld_nft_canister_id: Principal,
@@ -408,7 +410,9 @@ pub struct GetRecordsResponse {
 fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     let page = req.page.unwrap_or(0);
     let limit = match req.limit {
-        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        Some(val) => {
+            if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        }
         None => 10,
     };
     let start = match page.checked_mul(limit) {
@@ -427,7 +431,10 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
             .collect();
 
         let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
-        Ok(GetRecordsResponse { total: records.len() as u32, data: data })
+        Ok(GetRecordsResponse {
+            total: records.len() as u32,
+            data: data,
+        })
     })
 }
 
@@ -443,7 +450,7 @@ pub struct InfoRequest {
     nft_id: NftId,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct NftInfo {
     info: Option<GldNft>,
 }
@@ -517,8 +524,9 @@ async fn accept_offer(
                 None => Err("Invalid number of tokens to accept offer. Received None.".to_string()),
             }
         }
-        None =>
-            Err("Missing information about minted tokens. Cancelling accept_offer.".to_string()),
+        None => {
+            Err("Missing information about minted tokens. Cancelling accept_offer.".to_string())
+        }
     })?;
     let bid = BidRequest {
         broker_id: None,
@@ -542,18 +550,16 @@ async fn accept_offer(
                     let (sale_id, index) = match *val {
                         ManageSaleResponse::bid(bid) => {
                             let sale_id = match bid.txn_type {
-                                BidResponse_txn_type::sale_ended { sale_id, .. } =>
-                                    sale_id.unwrap_or_default(),
+                                BidResponse_txn_type::sale_ended { sale_id, .. } => {
+                                    sale_id.unwrap_or_default()
+                                }
                                 _ => "".to_string(),
                             };
                             (sale_id, bid.index)
                         }
                         _ => ("invalid_ManageSaleResponse".to_string(), Nat::from(0)),
                     };
-                    Ok(GldtSwapped {
-                        sale_id,
-                        index,
-                    })
+                    Ok(GldtSwapped { sale_id, index })
                 }
                 ManageSaleResult::err(err) => {
                     log_message(format!("Error response: ManageSaleResult : {}", err.text));
@@ -622,7 +628,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
                 owner: p,
                 subaccount: None,
             }),
-        _ => { Err("No valid account found for seller.".to_string()) }
+        _ => Err("No valid account found for seller.".to_string()),
     })?;
 
     // extract token information and config and verify if it is valid
@@ -1031,7 +1037,9 @@ fn get_swaps_by_user(
     };
     let page = page.unwrap_or(0);
     let limit = match limit {
-        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        Some(val) => {
+            if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        }
         None => 10,
     };
 
@@ -1073,10 +1081,7 @@ fn get_swaps_by_user(
 
         let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
 
-        Ok(GetRecordsResponse {
-            total,
-            data,
-        })
+        Ok(GetRecordsResponse { total, data })
     })
 }
 
@@ -1106,21 +1111,29 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
             Some(entry) => {
                 if entry.nft_sale_id == req.sale_id {
                     if entry.minted.is_none() && entry.swapped.is_none() {
-                        GetStatusResponse { status: Some(SwappingStates::Initialised) }
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Initialised),
+                        }
                     } else if entry.minted.is_some() && entry.swapped.is_none() {
-                        GetStatusResponse { status: Some(SwappingStates::Minted) }
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Minted),
+                        }
                     } else if
                         entry.minted.is_some() &&
                         entry.swapped.is_some() &&
                         entry.minted.clone().unwrap_or_default().burned.is_none()
                     {
-                        GetStatusResponse { status: Some(SwappingStates::Swapped) }
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Swapped),
+                        }
                     } else if
                         entry.minted.is_some() &&
                         entry.swapped.is_some() &&
                         entry.minted.clone().unwrap_or_default().burned.is_some()
                     {
-                        GetStatusResponse { status: Some(SwappingStates::Burned) }
+                        GetStatusResponse {
+                            status: Some(SwappingStates::Burned),
+                        }
                     } else {
                         return Err("Swap status is corrupted.".to_string());
                     }
