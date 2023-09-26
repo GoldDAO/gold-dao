@@ -67,6 +67,5 @@ export const sendBatchOffer = async (actors, cart) => {
         }),
     );
 
-    console.log('res', res);
     return res;
 };
