@@ -1,10 +1,8 @@
 import { gldNftCanisters } from '@/services/agents';
-import { emptyOnGoingAtom, updateOnsaleNft, updateOnsaleNftAtom } from '@/states/onSalesNfts';
-import { setGetUserAtom } from '@/states/user';
 import { Principal } from '@dfinity/principal';
 import { useAtom } from 'jotai';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useWallet } from '@connect2ic/react';
 
 const queryNfts = async (principal, actors) => {
     const weights = Object.keys(gldNftCanisters);
@@ -22,13 +20,13 @@ const queryNfts = async (principal, actors) => {
 };
 
 export const useNft = (actors) => {
-    const [user] = useAtom(setGetUserAtom);
+    const [wallet] = useWallet();
     const [nfts, setNfts] = useState([]);
     const [isLoading, setLoading] = useState(false);
     useEffect(() => {
-        if (user.principal && actors) {
+        if (wallet?.principal && actors) {
             setLoading(true);
-            queryNfts(user.principal, actors)
+            queryNfts(wallet.principal, actors)
                 .then((result) => {
                     getNftWithStatus(result, actors).then((result) => {
                         setNfts(result);
@@ -39,7 +37,7 @@ export const useNft = (actors) => {
                     setLoading(false);
                 });
         }
-    }, [user]);
+    }, [wallet]);
     return { nfts, isLoading };
 };
 
@@ -64,13 +62,13 @@ const getNftWithStatus = async (nfts, actors) => {
 };
 
 export const useOngoingSwaps = (actors) => {
-    const [user] = useAtom(setGetUserAtom);
+    const [wallet] = useWallet();
     const [isLoading, setLoading] = useState(false);
     const [onSale, setOnSale] = useState([]);
     useEffect(() => {
-        if (user.principal && actors) {
+        if (wallet.principal && actors) {
             setLoading(true);
-            queryNfts(user.principal, actors)
+            queryNfts(wallet.principal, actors)
                 .then((result) => {
                     getOngoingSwapNft(result, actors).then((result) => {
                         setOnSale(result);
@@ -81,7 +79,7 @@ export const useOngoingSwaps = (actors) => {
                     setLoading(false);
                 });
         }
-    }, [user]);
+    }, [wallet]);
 
     console.log('useOngoingSwaps', onSale);
     return { onSale, isLoading };
