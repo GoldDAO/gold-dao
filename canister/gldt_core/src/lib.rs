@@ -107,6 +107,7 @@ use declarations::icrc1;
 
 /// Constants
 pub const GLDT_SUBDIVIDABLE_BY: u64 = 100_000_000;
+pub const GLDT_DECIMALS: u8 = 8;
 pub const GLDT_PRICE_RATIO: u8 = 100;
 pub const GLDT_TX_FEE: u64 = 10_000;
 
@@ -199,7 +200,7 @@ impl GldtTokenSpec {
         GldtTokenSpec {
             id: None,
             fee: Some(Nat::from(GLDT_TX_FEE)),
-            decimals: Nat::from(GLDT_SUBDIVIDABLE_BY),
+            decimals: Nat::from(GLDT_DECIMALS),
             canister: canister_id_ledger,
             standard: ICTokenSpec_standard::ICRC1,
             symbol: String::from("GLDT"),
