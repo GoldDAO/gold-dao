@@ -95,12 +95,13 @@ use declarations::gld_nft::{
     TokenSpec,
     ICTokenSpec,
     SaleStatusShared_sale_type,
-    PricingConfigShared__1,
+    PricingConfigShared,
     AskFeature,
     ManageSaleResult,
     ICTokenSpec_standard,
     ManageSaleResponse,
     BidResponse_txn_type,
+    DepositWithdrawDescription,
 };
 use declarations::icrc1;
 
@@ -182,6 +183,37 @@ impl GldtNumTokens {
 
     fn is_valid(val: NumTokens) -> bool {
         val % (GLDT_SUBDIVIDABLE_BY * (GLDT_PRICE_RATIO as u64)) == 0
+    }
+}
+pub struct GldtTokenSpec {
+    id: Option<Nat>,
+    fee: Option<Nat>,
+    decimals: Nat,
+    canister: Principal,
+    standard: ICTokenSpec_standard,
+    symbol: String,
+}
+
+impl GldtTokenSpec {
+    pub fn new(canister_id_ledger: Principal) -> Self {
+        GldtTokenSpec {
+            id: None,
+            fee: Some(Nat::from(GLDT_TX_FEE)),
+            decimals: Nat::from(GLDT_SUBDIVIDABLE_BY),
+            canister: canister_id_ledger,
+            standard: ICTokenSpec_standard::ICRC1,
+            symbol: String::from("GLDT"),
+        }
+    }
+    pub fn get(&self) -> TokenSpec {
+        TokenSpec::ic(ICTokenSpec {
+            id: self.id.clone(),
+            fee: self.fee.clone(),
+            decimals: self.decimals.clone(),
+            canister: self.canister.clone(),
+            standard: self.standard.clone(),
+            symbol: self.symbol.clone(),
+        })
     }
 }
 
@@ -472,11 +504,7 @@ fn delete_nft_entry_from_list(nft_id: &NftId) -> Result<(), String> {
     })
 }
 
-async fn accept_offer(
-    nft_id: NftId,
-    swap_info: GldNft,
-    token_spec: TokenSpec
-) -> Result<GldtSwapped, String> {
+async fn accept_offer(nft_id: NftId, swap_info: GldNft) -> Result<GldtSwapped, String> {
     let num_tokens = (match swap_info.minted {
         Some(t) => {
             let num_tokens_expected = calculate_tokens_from_weight(swap_info.grams);
@@ -500,6 +528,8 @@ async fn accept_offer(
         None =>
             Err("Missing information about minted tokens. Cancelling accept_offer.".to_string()),
     })?;
+    let gldt_ledger_canister_id = SERVICE.with(|s| s.borrow().conf.gldt_ledger_canister_id);
+    let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
     let bid = BidRequest {
         broker_id: None,
         sale_id: swap_info.nft_sale_id,
@@ -545,7 +575,7 @@ async fn accept_offer(
     }
 }
 
-fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, TokenSpec), String> {
+fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft), String> {
     // verify caller, only accept calls from valid gld nft canisters
     let the_caller = api::caller();
     // Extract configuration and validate caller.
@@ -605,14 +635,15 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
         SaleStatusShared_sale_type::auction(t) => (t.token, t.config),
     };
     // verify passed token info
-    let token_spec: TokenSpec = TokenSpec::ic(ICTokenSpec {
-        id: None,
-        fee: Some(Nat::from(GLDT_TX_FEE)),
-        decimals: Nat::from(8),
-        canister: gldt_ledger_canister_id,
-        standard: ICTokenSpec_standard::ICRC1,
-        symbol: String::from("GLDT"),
-    });
+    // let token_spec: TokenSpec = TokenSpec::ic(ICTokenSpec {
+    //     id: None,
+    //     fee: Some(Nat::from(GLDT_TX_FEE)),
+    //     decimals: Nat::from(8),
+    //     canister: gldt_ledger_canister_id,
+    //     standard: ICTokenSpec_standard::ICRC1,
+    //     symbol: String::from("GLDT"),
+    // });
+    let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
     if token != token_spec {
         return Err(
             format!(
@@ -627,7 +658,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
     let tokens_minted = calculate_tokens_from_weight(gld_nft_conf.grams);
     // validate amount information
     (match config {
-        PricingConfigShared__1::ask(Some(features)) => {
+        PricingConfigShared::ask(Some(features)) => {
             let mut amount: Nat = Nat::from(0);
             for feature in features {
                 if let AskFeature::buy_now(val) = feature {
@@ -662,7 +693,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft, Token
         older_record: None,
     };
 
-    Ok((nft_id, swap_info, token_spec))
+    Ok((nft_id, swap_info))
 }
 
 async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, String> {
@@ -723,6 +754,53 @@ async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, Str
         burned: None,
         num_tokens: Some(num_tokens),
     })
+}
+
+async fn withdraw_and_burn_escrow(
+    collection_id: Principal,
+    amount: GldtNumTokens
+) -> Result<(), String> {
+    let gldt_ledger_canister_id = SERVICE.with(|s| -> Principal {
+        s.borrow().conf.gldt_ledger_canister_id
+    });
+    let service_ledger = icrc1::Service(gldt_ledger_canister_id);
+    let minting_account = (match service_ledger.icrc1_minting_account().await {
+        Ok((v,)) => Ok(v),
+        Err((code, message)) => {
+            let msg = format!(
+                "Error while calling icrc1_minting_account. Code {:?}, Message: {}",
+                code,
+                message
+            );
+            Err(msg)
+        }
+    })?;
+
+    let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
+
+    let service_gldnft = gld_nft::Service(collection_id);
+    match
+        service_gldnft.sale_nft_origyn(
+            ManageSaleRequest::withdraw(
+                gld_nft::WithdrawRequest::deposit(DepositWithdrawDescription {
+                    token: token_spec,
+                    withdraw_to: OrigynAccount::principal(minting_account),
+                    buyer: OrigynAccount::principal(minting_account),
+                    amount: amount.get(),
+                })
+            )
+        ).await
+    {
+        Ok(_) => Ok(()),
+        Err((code, message)) => {
+            let msg = format!(
+                "Error while calling sale_nft_origyn. Code {:?}, Message: {}",
+                code,
+                message
+            );
+            Err(msg)
+        }
+    }
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
@@ -1102,7 +1180,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
     canistergeek_ic_rust::monitor::collect_metrics();
 
     // STEP 1 : validate inputs
-    let (nft_id, swap_info, token_spec) = (match validate_inputs(args.clone()) {
+    let (nft_id, swap_info) = (match validate_inputs(args.clone()) {
         Ok(res) => Ok(res),
         Err(err) => {
             let msg = format!("ERROR :: {}", err);
@@ -1134,18 +1212,12 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                 updated_swap_info_minted.clone()
             )?;
             // Second step: accept the offer of the listed NFT
-            match
-                accept_offer(
-                    nft_id.clone(),
-                    updated_swap_info_minted.clone(),
-                    token_spec.clone()
-                ).await
-            {
+            match accept_offer(nft_id.clone(), updated_swap_info_minted.clone()).await {
                 Ok(gldt_swapped) => {
                     // All went well and registry is updated and record is added.
                     let updated_swap_info_swapped = GldNft {
                         swapped: Some(gldt_swapped),
-                        ..updated_swap_info_minted
+                        ..updated_swap_info_minted.clone()
                     };
                     update_registry(
                         RegistryUpdateType::Swap,
@@ -1158,9 +1230,31 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                     Ok(msg)
                 }
                 Err(msg) => {
-                    log_message(format!("ERROR :: accept_offer :: {}", msg));
-                    Err(msg)
-                    // TODO: How to handle when accepting fails?
+                    // In case of a failure of the swapping after minting, the escrow is withdrawn
+                    // to the minting account to burn the tokens from circulation.
+                    log_message(
+                        format!("ERROR :: accept_offer :: Error while performing swap of GLD NFT for GLDT.
+                                Attempting to clean up and burn already minted tokens. :: {}", msg)
+                    );
+                    let amount = updated_swap_info_minted.minted
+                        .unwrap_or_default()
+                        .num_tokens.unwrap_or_default();
+                    match
+                        withdraw_and_burn_escrow(
+                            updated_swap_info_minted.gld_nft_canister_id,
+                            amount.clone()
+                        ).await
+                    {
+                        Ok(_) => {
+                            log_message(
+                                format!("Successfully burned {:?} GLDT from failed swap.", amount)
+                            );
+                        }
+                        Err(msg) => {
+                            log_message(format!("ERROR :: accept_offer :: {}", msg));
+                        }
+                    }
+                    Err("Error while swapping GLD NFT for GLDT.".to_string())
                 }
             }
         }
