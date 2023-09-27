@@ -1069,19 +1069,32 @@ enum SwappingStates {
     Finalised,
 }
 
-#[query]
-fn get_swaps_by_user(
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+struct GetSwapsRequest {
     account: Option<Account>,
     page: Option<u32>,
-    limit: Option<u32>
-) -> Result<GetRecordsResponse, String> {
-    let principal = match account {
+    limit: Option<u32>,
+}
+
+type GetSwapsResponse = GetRecordsResponse;
+
+#[query]
+fn get_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse, String> {
+    let principal = match req.account {
         Some(a) => a.owner,
         None => api::caller(),
     };
-    let page = page.unwrap_or(0);
-    let limit = match limit {
-        Some(val) => if val < 1 { 10 } else if val > 100 { 100 } else { val }
+    let page = req.page.unwrap_or(0);
+    let limit = match req.limit {
+        Some(val) => {
+            if val < 1 {
+                10
+            } else if val > 100 {
+                100
+            } else {
+                val
+            }
+        }
         None => 10,
     };
 
@@ -1115,12 +1128,13 @@ fn get_swaps_by_user(
             }
         }
 
-        let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
+        let data = if paginated_records.is_empty() {
+            None
+        } else {
+            Some(paginated_records)
+        };
 
-        Ok(GetRecordsResponse {
-            total,
-            data,
-        })
+        Ok(GetSwapsResponse { total, data })
     })
 }
 
