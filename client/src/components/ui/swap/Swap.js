@@ -44,6 +44,7 @@ import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
 import { sendBatchOffer } from '@/query/sendBatchOffer';
 import Link from 'next/link';
+import TokenSign from '../gldt/TokenSign';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
@@ -101,7 +102,7 @@ const OutputOverview = ({ isConnected }) => {
             <CardBody>
                 <HStack justifyContent="space-between">
                     <Box>You will receive</Box>
-                    <Box>{minted}&nbsp;GLDT</Box>
+                    <HStack>{minted}&nbsp;<TokenSign /></HStack>
                 </HStack>
             </CardBody>
         </Card>
@@ -144,15 +145,15 @@ const TransactionDetailsTable = () => {
                     </Tr>
                     <Tr>
                         <Td>Swapped Amount</Td>
-                        <Td>{minted} GLDT</Td>
+                        <Td>{minted} <TokenSign /></Td>
                     </Tr>
                     <Tr>
                         <Td>Conversion fee (1%)</Td>
-                        <Td>{fees} GLDT</Td>
+                        <Td>{fees} <TokenSign /></Td>
                     </Tr>
                     <Tr>
                         <Td>Fee compensation</Td>
-                        <Td>{fees} GLDT</Td> const [weight] = useAtom(getTotalCartWeightAtom);
+                        <Td>{fees} <TokenSign /></Td> 
                     </Tr>
                     <Tr>
                         <Td>Total received</Td>
