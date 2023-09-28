@@ -8,6 +8,7 @@ const TokenSign = () => {
         <HStack>
             <Image src={Logo} width={20} height={20} />
             <Text
+                borderRadius={'20px'}
                 sx={{
                     fontWeight: 500,
                     fontSize: '0.75em',

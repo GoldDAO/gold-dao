@@ -30,6 +30,7 @@ import {
     Skeleton,
     HStack,
     Text,
+    Th,
 } from '@chakra-ui/react';
 import {
     addCartItemAtom,
@@ -49,7 +50,16 @@ import TokenSign from '../gldt/TokenSign';
 const SwapInterface = () => {
     const { isConnected } = useConnect();
     return (
-        <Card>
+        <Card 
+            p={[2, 2, 2 , 4]} 
+            shadow={['md','lg']} 
+            sx={{gridColumn: 'span 12'}} 
+            bg='bg' 
+            display='grid'
+            gridTemplateRows={'repeat(1, 1fr)'}
+            gap='3'
+            borderRadius={'2xl'}
+        >
             <Input isConnected={isConnected} />
             <Output isConnected={isConnected} />
             <SwapButton isConnected={isConnected} />
@@ -69,8 +79,8 @@ const TokenTag = ({ nft, size }) => {
     }, [isSelected]);
 
     return (
-        <Tag size={size} onClick={() => setIsSelected(!isSelected)}>
-            <TagLabel>{nft.name}</TagLabel>
+        <Tag bg={isSelected ? 'lightGold' : 'white'} border='1px' borderColor={'gold'} size={size} onClick={() => setIsSelected(!isSelected)}> 
+            <TagLabel color={'black'}>{nft.name}</TagLabel>
             {isSelected && <TagCloseButton />}
         </Tag>
     );
@@ -78,7 +88,15 @@ const TokenTag = ({ nft, size }) => {
 
 const Input = ({ isConnected }) => {
     return (
-        <Card>
+        <Card 
+        bg='white'  
+        borderRadius={'lg'}
+        border="1px"
+        borderColor="border"
+        shadow={'none'}
+        p={[2,2,3,4,6]} 
+        sx={{gridTemplateRows: 'repeat(1, 1fr)'}} 
+        gap={[3]}>
             <MyNfts isConnected={isConnected} />
             <SelectedNfts isConnected={isConnected} />
         </Card>
@@ -87,7 +105,15 @@ const Input = ({ isConnected }) => {
 
 const Output = ({ isConnected }) => {
     return (
-        <Card>
+        <Card
+        border="1px"
+        borderColor="border"
+        borderRadius={'lg'}
+        bg='white'  
+        shadow={'none'}
+        p={[2,2,3,4,6]} 
+        sx={{gridTemplateRows: 'repeat(1, 1fr)'}} 
+        gap={[3]}>
             <OutputOverview isConnected={isConnected} />
             <OutputDetails isConnected={isConnected} />
         </Card>
@@ -98,11 +124,14 @@ const OutputOverview = ({ isConnected }) => {
     const [weight] = useAtom(getTotalCartWeightAtom);
     const minted = weight * 100;
     return (
-        <Card>
+        <Card
+            shadow='none'
+            border="1px"
+            borderColor="border">
             <CardBody>
                 <HStack justifyContent="space-between">
-                    <Box>You will receive</Box>
-                    <HStack>{minted}&nbsp;<TokenSign /></HStack>
+                    <Box color={isConnected ? 'black' : 'secondaryText'}>You will receive</Box>
+                    <HStack color={isConnected ? 'black' : 'secondaryText'}><Text>{minted.toString()}</Text>&nbsp;<TokenSign /></HStack>
                 </HStack>
             </CardBody>
         </Card>
@@ -112,11 +141,17 @@ const OutputOverview = ({ isConnected }) => {
 const OutputDetails = ({ isConnected }) => {
     return (
         <Accordion allowToggle>
-            <AccordionItem isDisabled={!isConnected}>
-                <AccordionButton>
+            <AccordionItem isDisabled={!isConnected}  border='0' >
+                <AccordionButton                
+                h='60px'
+                bg='bg' 
+                border='1px' 
+                borderColor='border' 
+                borderStartEndRadius={'md'} 
+                borderStartStartRadius ={'md'}>
                     <Box>Transaction Details</Box>
                 </AccordionButton>
-                <AccordionPanel>
+                <AccordionPanel bg='bg'borderEndEndRadius={'md'} borderEndStartRadius={'md'} border={'1px'} borderColor={'border'} borderTop={0}>
                     <TransactionDetailsTable />
                 </AccordionPanel>
             </AccordionItem>
@@ -129,36 +164,42 @@ const TransactionDetailsTable = () => {
     const [cart] = useAtom(getCartAtom);
 
     const minted = weight * 100;
-    const fees = weight * 100 * 0.01;
+    const fees = weight * 100 * 0.01
+
+    const Row = (props) => <Tr {...props }>{props.children}</Tr>
+
+    const Cell = ({children, r }) => <Td p={'5px'} sx={{ width: '50%'}} border={0} textAlign={r ? 'right' : 'left'} >
+        <Box sx={{display: 'flex', width: '100%', justifyContent: r ? 'flex-end' : 'flex-start'}}>{children}</Box></Td>
 
     return (
-        <TableContainer>
+        <TableContainer color={'secondaryText'} fontSize={'14px'}>
             <Table>
                 <Tbody>
-                    <Tr>
-                        <Td>Total number of NFTs selected</Td>
-                        <Td>{cart.length} NFTs</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>Total weight</Td>
-                        <Td>{weight} g</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>Swapped Amount</Td>
-                        <Td>{minted} <TokenSign /></Td>
-                    </Tr>
-                    <Tr>
-                        <Td>Conversion fee (1%)</Td>
-                        <Td>{fees} <TokenSign /></Td>
-                    </Tr>
-                    <Tr>
-                        <Td>Fee compensation</Td>
-                        <Td>{fees} <TokenSign /></Td> 
-                    </Tr>
-                    <Tr>
-                        <Td>Total received</Td>
-                        <Td>{minted}</Td>
-                    </Tr>
+                    <Row>
+                        <Cell>Total number of NFTs selected</Cell>
+                        <Cell r>{cart.length} NFTs</Cell>
+                    </Row>
+                    <Row>
+                        <Cell>Total weight</Cell>
+                        <Cell r>{weight} g</Cell>
+                    </Row>
+                    <Row>
+                        <Cell>Swapped Amount</Cell>
+                        <Cell r><HStack><Text>{minted} </Text><TokenSign /></HStack></Cell>
+                    </Row>
+                    <Row>
+                        <Cell>Conversion fee (1%)</Cell>
+                        <Cell r><HStack><Text>{fees}</Text> <TokenSign /></HStack></Cell>
+                    </Row>
+                    <Row>
+                        <Cell>Fee compensation</Cell>
+                        <Cell r><HStack><Text>{fees} </Text><TokenSign /></HStack></Cell> 
+                    </Row>
+                    <Row><Cell></Cell></Row>
+                    <Row borderTop='1px' borderColor='border' pt={2} mt={2} color='black'>
+                        <Cell>Total received</Cell>
+                        <Cell r>{minted}</Cell>
+                    </Row>
                 </Tbody>
             </Table>
         </TableContainer>
@@ -174,8 +215,14 @@ const MyNfts = ({ isConnected }) => {
 
     return (
         <Accordion allowToggle>
-            <AccordionItem isDisabled={!connected}>
-                <AccordionButton>
+            <AccordionItem isDisabled={!connected} border='0' >
+                <AccordionButton 
+                h='60px'
+                bg='bg' 
+                border='1px' 
+                borderColor='border' 
+                borderStartEndRadius={'md'} 
+                borderStartStartRadius ={'md'}>
                     <Box>Select from my NFTs</Box>
                     {isLoading && <Spinner size="sm" ml={'1em'} />}
                 </AccordionButton>
@@ -195,18 +242,30 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
     }, [nfts.isLoading]);
 
     return (
-        <AccordionPanel>
+        <AccordionPanel 
+            border={'1px'} 
+            borderColor={'border'} 
+            borderTop={0}
+            gap='2'
+            display='grid'
+            gridTemplateColumns={'repeat(2,1fr)'}
+            bg='bg' 
+            borderEndEndRadius={'md'} 
+            borderEndStartRadius={'md'}
+        >
             {weights.map((weight, i) => (
-                <Card key={i}>
-                    <CardHeader>GLDNFT {weight}g</CardHeader>
+                <Card key={i} shadow={'none'}>
+                    <CardHeader color={'secondaryText'}>GLDNFT {weight}g</CardHeader>
                     <CardBody>
                         {isLoading ? (
                             <SkeletonToken />
                         ) : (
-                            nfts.nfts.map(
+                            <HStack w={'100%'} wrap="wrap">
+                            {nfts.nfts.map(
                                 (e, i) =>
-                                    e.weight === weight && <TokenTag size="sm" nft={e} key={i} />,
-                            )
+                                    e.weight === weight && <TokenTag size="lg" nft={e} key={i} />,
+                            )}
+                            </HStack>
                         )}
                     </CardBody>
                 </Card>
@@ -215,14 +274,18 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
     );
 };
 
-const SelectedNfts = () => {
+const SelectedNfts = ({isConnected}) => {
     const [cart] = useAtom(getCartAtom);
     const [weight] = useAtom(getTotalCartWeightAtom);
     return (
-        <Card>
+        <Card
+            shadow='none'
+            border="1px"
+            borderColor="border"
+        >
             <HStack justifyContent={'space-between'}>
-                <CardHeader>Selected</CardHeader>
-                <CardBody textAlign="right">
+                <CardHeader color={isConnected ? 'black' : 'secondaryText'} >Selected</CardHeader>
+                <CardBody textAlign="right" color={'secondaryText'}>
                     {cart.length} NFTs selected, {weight} g
                 </CardBody>
             </HStack>
@@ -236,7 +299,17 @@ const SwapButton = ({ isConnected }) => {
 
     return (
         <>
-            <Button isDisabled={isConnected && cart.length > 0 ? false : true} onClick={onOpen}>
+            <Button 
+                isDisabled={isConnected && cart.length > 0 ? false : true} 
+                onClick={onOpen} 
+                color="white" 
+                bg="black" 
+                borderRadius={'500px'} 
+                h='50px' 
+                _hover={{
+                color: 'white',
+                bg: 'black'
+            }}>
                 {!isConnected && 'Connect your wallet to swap'}
                 {isConnected && cart.length > 0 && 'Swap'}
                 {isConnected && cart.length < 1 && 'Select NFTs to start swap'}

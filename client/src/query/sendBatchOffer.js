@@ -21,12 +21,6 @@ export const sendBatchOffer = async (actors, cart) => {
                                 kyc: Principal.fromText(YUMI_KYC_CANISTER_ID),
                             },
                             {
-                                start_price: salePrice,
-                            },
-                            {
-                                reserve: salePrice,
-                            },
-                            {
                                 buy_now: salePrice,
                             },
                             { notify: [Principal.fromText(process.env.GLDT_CANISTER_ID)] },
@@ -50,6 +44,7 @@ export const sendBatchOffer = async (actors, cart) => {
             },
         };
     };
+
     cart.map((e) => {
         if (gldNftCart[e.weight]) {
             gldNftCart[e.weight].push(payload(e));

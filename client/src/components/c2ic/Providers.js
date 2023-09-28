@@ -4,8 +4,9 @@ import { Provider as JotaiProvider, createStore } from 'jotai';
 import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/providers';
 import { SafeHydrate } from '@/utils/SafeHydrate';
 import '@connect2ic/core/style.css';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
 import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
+import { customTheme } from '@/theme/theme';
 
 const myStore = createStore();
 
@@ -29,8 +30,12 @@ const Providers = ({ children }) => {
         },
     });
 
+    const theme = extendTheme({
+        ...customTheme,
+    });
+
     return (
-        <ChakraProvider>
+        <ChakraProvider theme={theme}>
             <Connect2ICProvider client={client}>
                 <JotaiProvider store={myStore}>
                     <SafeHydrate>{children}</SafeHydrate>

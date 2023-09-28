@@ -10,17 +10,11 @@ const Layout = ({ children }) => {
     });
 
     return (
-        <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Container>
-                <Grid>
-                    <Header />
-                    <Box>
-                        <Grid>{children}</Grid>
-                    </Box>
-                </Grid>
-            </Container>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Header />
+            <Grid>{children}</Grid>
             <Footer />
-        </Container>
+        </Box>
     );
 };
 

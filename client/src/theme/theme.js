@@ -1,9 +1,15 @@
-export const theme = {
+export const customTheme = {
     colors: {
-        gold: '#AC8D39',
-        black: '#242424',
-        white: '#FFFFFF',
-        grey: '#FCFCFC',
-        darkgrey: '#9B9B9B',
+        transparent: 'transparent',
+        black: '#000',
+        white: '#fff',
+        bg: '#F6F6F6',
+        disableBg: '#FCFCFC',
+        disableText: '#CCCCCC',
+        secondaryText: '#9A9A9A',
+        lightGold: '#F9E4BF',
+        gold: '#D3B872',
+        lightBlack: '#2E2E2E',
+        border: '#E4E4E4',
     },
 };
