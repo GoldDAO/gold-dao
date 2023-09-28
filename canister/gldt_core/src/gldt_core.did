@@ -29,7 +29,7 @@ type AskFeature = variant {
 };
 type AskFeature_ending = variant { date : int; timeout : nat };
 type AskFeature_min_increase = variant { amount : nat; percentage : float64 };
-type AuctionConfig__1 = record {
+type AuctionConfig = record {
   start_price : nat;
   token : TokenSpec;
   reserve : opt nat;
@@ -37,9 +37,9 @@ type AuctionConfig__1 = record {
   min_increase : AskFeature_min_increase;
   allow_list : opt vec principal;
   buy_now : opt nat;
-  ending : AuctionConfig__1_ending;
+  ending : AuctionConfig_ending;
 };
-type AuctionConfig__1_ending = variant {
+type AuctionConfig_ending = variant {
   date : int;
   wait_for_quiet : record {
     max : nat;
@@ -61,7 +61,7 @@ type AuctionStateShared = record {
   allow_list : opt vec record { principal; bool };
   current_broker_id : opt principal;
   min_next_bid : nat;
-  config : PricingConfigShared__1;
+  config : PricingConfigShared;
 };
 type AuctionStateShared_status = variant { closed; open; not_started };
 type Box = variant {
@@ -209,6 +209,11 @@ type GetStatusRequest = record {
   sale_id : text;
 };
 type GetStatusResponse = record { status : opt SwappingStates };
+type GetSwapsRequest = record {
+  page : opt nat32;
+  limit : opt nat32;
+  account : opt Account;
+};
 type GldNft = record {
   requested_memo : vec nat8;
   older_record : opt GldNft;
@@ -279,11 +284,11 @@ type NumericEntity = record {
   first : nat64;
   last : nat64;
 };
-type PricingConfigShared__1 = variant {
+type PricingConfigShared = variant {
   ask : opt vec AskFeature;
   extensible : CandyShared;
   instant;
-  auction : AuctionConfig__1;
+  auction : AuctionConfig;
 };
 type PropertyShared = record { value : Box; name : text; immutable : bool };
 type RecordType = variant { Burn; Mint };
@@ -343,7 +348,7 @@ service : (opt Conf) -> {
   get_conf : () -> (Conf);
   get_records : (GetRecordsRequest) -> (Result) query;
   get_status_of_swap : (GetStatusRequest) -> (Result_1) query;
-  get_swaps_by_user : (opt Account, opt nat32, opt nat32) -> (Result) query;
+  get_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   nft_info : (InfoRequest) -> (NftInfo);
   notify_sale_nft_origyn : (SubscriberNotification) -> (Result_2);
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();
