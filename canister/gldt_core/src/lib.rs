@@ -1025,7 +1025,9 @@ fn update_registry(
 /// keep track of all mints and burns for historic analysis.
 fn add_record(nft_id: NftId, swap_info: GldNft, status: RecordStatus) -> Result<(), String> {
     SERVICE.with(|s| {
-        let records = &mut s.borrow_mut().records;
+        let mut service = s.borrow_mut();
+
+        let records = &mut service.records;
         let new_index: BlockIndex = match records.last_key_value() {
             Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
             None => Nat::from(0),
@@ -1046,8 +1048,8 @@ fn add_record(nft_id: NftId, swap_info: GldNft, status: RecordStatus) -> Result<
         };
         records.insert(new_index.clone(), new_record);
 
-        s.borrow_mut()
-            .records_by_user.entry(swap_info.receiving_account.owner)
+        service.records_by_user
+            .entry(swap_info.receiving_account.owner)
             .or_default()
             .push(new_index)
     });
