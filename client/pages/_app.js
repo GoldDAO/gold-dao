@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google';
 import '@/css/global.css';
 import '@connect2ic/core/style.css';
 import dynamic from 'next/dynamic';
-import Ruban from '@/components/ui/Ruban';
+import Ruban from '@/components/ui/header/Ruban';
 
 const inter = Inter({ subsets: ['latin'] });
 

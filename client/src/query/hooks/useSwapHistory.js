@@ -18,12 +18,14 @@ const useSwapHistory = () => {
     const { principal } = useConnect();
     const gldtCoreActor = useCanister('gldtCoreCanister');
     useEffect(() => {
-        const fetchHistory = async () => {
-            const fetchedHistory = await queryHistory(gldtCoreActor, principal);
-            setHistory(fetchedHistory);
-        };
-        fetchHistory();
-    }, []);
+        if (principal) {
+            const fetchHistory = async () => {
+                const fetchedHistory = await queryHistory(gldtCoreActor, principal);
+                setHistory(fetchedHistory);
+            };
+            fetchHistory();
+        }
+    }, [principal]);
     return history;
 };
 

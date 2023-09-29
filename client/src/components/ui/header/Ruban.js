@@ -1,5 +1,5 @@
 import { Box, Text } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const Ruban = () => {
     if (process.env.DFX_NETWORK !== 'ic') {
@@ -7,7 +7,7 @@ const Ruban = () => {
             <Box
                 sx={{
                     paddingTop: '3px',
-                    width: '100vw',
+                    width: '100%',
                     height: '40px',
                     display: 'flex',
                     alignItems: 'center',
@@ -16,6 +16,7 @@ const Ruban = () => {
                     top: 0,
                     left: 0,
                     zIndex: 20,
+                    overflow: 'hidden',
                 }}
             >
                 <Text sx={{ fontSize: '16px' }}>
