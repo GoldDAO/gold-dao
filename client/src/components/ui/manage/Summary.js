@@ -18,15 +18,16 @@ import {
     Box,
     Spinner,
     HStack,
+    Skeleton,
 } from '@chakra-ui/react';
 import { useNft } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
 import { cancelSale } from '@/query/cancelSale';
 import useSwapHistory from '@/query/hooks/useSwapHistory';
+import { useConnect } from '@connect2ic/react';
 
 const Summary = () => {
-    const actors = useAllCanisters();
-    const { nfts, isLoading } = useNft(actors);
+    const { isConnected } = useConnect();
 
     return (
         <Card
@@ -39,9 +40,9 @@ const Summary = () => {
             gap="3"
             borderRadius={'2xl'}
         >
-            <Overview nfts={nfts} isLoading={isLoading} />
-            <Mynfts nfts={nfts} actors={actors} />
-            <MyTransactions />
+            {isConnected ? <Overview connected={isConnected} /> : <Skeleton h={'100px'} />}
+            {isConnected ? <Mynfts connected={isConnected} /> : <Skeleton h={'200px'} />}
+            {isConnected ? <MyTransactions connected={isConnected} /> : <Skeleton h={'150px'} />}
         </Card>
     );
 };
@@ -52,8 +53,10 @@ const Overview = ({ nfts, isLoading }) => {
     return <Card></Card>;
 };
 
-const Mynfts = ({ nfts, isLoading, actors }) => {
+const Mynfts = ({ connected }) => {
     const weights = [1, 10, 100, 1000];
+    const actors = useAllCanisters();
+    const { nfts, isLoading } = useNft(actors);
     return (
         <Card
             bg="white"
@@ -81,7 +84,7 @@ const Mynfts = ({ nfts, isLoading, actors }) => {
                 >
                     {weights.map((weight, i) => (
                         <Card key={i} shadow={'none'} alignSelf={'flex-start'}>
-                            <AccordionItem border={0}>
+                            <AccordionItem border={0} isDisabled={isLoading}>
                                 <AccordionButton
                                     shadow={'none'}
                                     h="60px"
@@ -91,7 +94,10 @@ const Mynfts = ({ nfts, isLoading, actors }) => {
                                     borderStartEndRadius={'md'}
                                     borderStartStartRadius={'md'}
                                 >
-                                    GLDNFT {weight}g
+                                    <HStack>
+                                        <Text>GLDNFT {weight}g</Text>{' '}
+                                        {isLoading && <Spinner size="md" />}
+                                    </HStack>
                                 </AccordionButton>
                                 <AccordionPanel
                                     shadow={'none'}
@@ -102,39 +108,44 @@ const Mynfts = ({ nfts, isLoading, actors }) => {
                                     borderColor={'border'}
                                     borderTop={0}
                                 >
-                                    <Card key={i} shadow={'none'}>
-                                        <CardBody>
-                                            <TableContainer>
-                                                <Table>
-                                                    <Thead>
-                                                        <Tr>
-                                                            <Td>Token id</Td>
-                                                            <Td>weight</Td>
-                                                            <Td>Status</Td>
-                                                        </Tr>
-                                                    </Thead>
-                                                    <Tbody>
-                                                        {nfts.map((e, i) => {
-                                                            if (e.weight === weight) {
-                                                                return (
-                                                                    <Tr>
-                                                                        <Td>{e.name}</Td>
-                                                                        <Td>{e.weight}</Td>
-                                                                        <Td>
-                                                                            <SaleStatus
-                                                                                status={e.status}
-                                                                                e={e}
-                                                                            />
-                                                                        </Td>
-                                                                    </Tr>
-                                                                );
-                                                            }
-                                                        })}
-                                                    </Tbody>
-                                                </Table>
-                                            </TableContainer>
-                                        </CardBody>
-                                    </Card>
+                                    {connected && (
+                                        <Card key={i} shadow={'none'}>
+                                            <CardBody>
+                                                <TableContainer>
+                                                    <Table>
+                                                        <Thead>
+                                                            <Tr>
+                                                                <Td>Token id</Td>
+                                                                <Td>weight</Td>
+                                                                <Td>Status</Td>
+                                                            </Tr>
+                                                        </Thead>
+                                                        <Tbody>
+                                                            {!isLoading &&
+                                                                nfts.map((e, i) => {
+                                                                    if (e.weight === weight) {
+                                                                        return (
+                                                                            <Tr>
+                                                                                <Td>{e.name}</Td>
+                                                                                <Td>{e.weight}</Td>
+                                                                                <Td>
+                                                                                    <SaleStatus
+                                                                                        status={
+                                                                                            e.status
+                                                                                        }
+                                                                                        e={e}
+                                                                                    />
+                                                                                </Td>
+                                                                            </Tr>
+                                                                        );
+                                                                    }
+                                                                })}
+                                                        </Tbody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </CardBody>
+                                        </Card>
+                                    )}
                                 </AccordionPanel>
                             </AccordionItem>
                         </Card>

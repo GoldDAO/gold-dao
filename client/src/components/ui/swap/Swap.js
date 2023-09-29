@@ -33,12 +33,14 @@ import {
     Th,
     ModalBody,
     ModalFooter,
+    CheckboxIcon,
 } from '@chakra-ui/react';
 import {
     addCartItemAtom,
     cartAtom,
     getCartAtom,
     getTotalCartWeightAtom,
+    removeAllItemsInCartAtom,
     removeCartItemByIdAtom,
 } from '@/atoms/cart';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
@@ -49,9 +51,11 @@ import { sendBatchOffer } from '@/query/sendBatchOffer';
 import Link from 'next/link';
 import TokenSign from '../gldt/TokenSign';
 import Grid from '@/components/layout/Grid';
+import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
+
     return (
         <Card
             gridColumn={'3/11'}
@@ -277,7 +281,7 @@ const MyNfts = ({ isConnected }) => {
 
     return (
         <Accordion allowToggle>
-            <AccordionItem isDisabled={!connected} border="0">
+            <AccordionItem isDisabled={!connected || isLoading} border="0">
                 <AccordionButton
                     h="60px"
                     bg="bg"
@@ -387,12 +391,17 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
     const [weight] = useAtom(getTotalCartWeightAtom);
     const [res, setRes] = useState();
     const [loading, setLoading] = useState(false);
+    const [, removeAllFromCart] = useAtom(removeAllItemsInCartAtom);
 
+    useEffect(() => {
+        removeAllFromCart()
+    },[])
     const handleBatchOffer = async () => {
         setLoading(true);
         const res = await sendBatchOffer(actors, cart);
         setRes(res);
         setLoading(false);
+        removeAllFromCart()
     };
 
     return (
@@ -419,7 +428,7 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
                             <Spinner size="md" /> <Text> awaiting response...</Text>
                         </HStack>
                     )}
-                    {res && <BatchOfferResponse />}
+                    {res && <BatchOfferResponse res={res}/>}
                 </ModalBody>
                 <ModalFooter>
                     {!res &&
@@ -447,12 +456,15 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
 };
 
 const BatchOfferResponse = ({ res, loading }) => {
+
     return !loading ? (
         <>
-            {res?.map((e) => {
-                return e?.map((e, i) => (
-                    <Box>
-                        <Box>{e.ok.token_id}</Box>
+            {res?.map((el) => {
+                console.log('el', el)
+                return el?.map((e, i) => (
+                    <Box pb={'20px'}>
+                        {e.ok && <HStack><CheckCircleIcon color='green.300'/><Text>{e.ok?.token_id}</Text></HStack>}
+                        {e.err && <HStack><WarningIcon color='red.300'/><Text>{e.err?.text}</Text></HStack>}
                     </Box>
                 ));
             })}
