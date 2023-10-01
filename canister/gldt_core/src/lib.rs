@@ -715,7 +715,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft), Stri
     Ok((nft_id, swap_info))
 }
 
-async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, String> {
+async fn mint_tokens(swap_info: GldNft) -> Result<GldtMinted, String> {
     let num_tokens = GldtNumTokens::new(calculate_tokens_from_weight(swap_info.grams))?;
 
     let transfer_args = TransferArg {
@@ -735,29 +735,24 @@ async fn mint_tokens(nft_id: NftId, swap_info: GldNft) -> Result<GldtMinted, Str
 
     let service = icrc1::Service(gldt_ledger_canister_id);
 
-    // let result: TransferResult = match icrc1_transfer(transfer_args.clone()).await {
-    let result: TransferResult = match service.icrc1_transfer(transfer_args.clone()).await {
-        Ok((v,)) => v,
-        Err((code, message)) => {
-            let _ = delete_nft_entry_from_list(&nft_id);
-            return Err(
+    let result: TransferResult = (match service.icrc1_transfer(transfer_args.clone()).await {
+        Ok((v,)) => Ok(v),
+        Err((code, message)) =>
+            Err(
                 format!("Error while calling icrc1_transfer. Code {:?}, Message: {}", code, message)
-            );
-        }
-    };
-    let mint_block_height: BlockIndex = match result {
-        Ok(height) => height,
-        Err(e) => {
-            let _ = delete_nft_entry_from_list(&nft_id);
-            return Err(
+            ),
+    })?;
+    let mint_block_height: BlockIndex = (match result {
+        Ok(height) => Ok(height),
+        Err(e) =>
+            Err(
                 format!(
                     "Error while executing icrc1_transfer with args {:?}. Message: {:?}",
                     transfer_args,
                     e
                 )
-            );
-        }
-    };
+            ),
+    })?;
     log_message(
         format!(
             "INFO :: minted {} GLDT at block {} to prinicpal {} with subaccount {:?}",
@@ -1237,7 +1232,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
     // STEP 3 : mint GLDT to escrow address and then swap GLDTs and NFTs
     //          Careful after this point as tokens are being minted and transfers take place.
     //          First step: mint the tokens to the escrow account.
-    match mint_tokens(nft_id.clone(), swap_info.clone()).await {
+    match mint_tokens(swap_info.clone()).await {
         Ok(gldt_minted) => {
             swap_info.minted = Some(gldt_minted.clone());
             update_registry(RegistryUpdateType::Mint, nft_id.clone(), swap_info.clone()).map_err(

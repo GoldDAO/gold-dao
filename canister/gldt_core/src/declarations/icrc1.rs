@@ -1,7 +1,7 @@
-use candid::{ self, CandidType, Deserialize, Principal };
+use candid::{self, CandidType, Deserialize, Principal};
 use ic_cdk::api::call::CallResult;
+use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
 use serde::Serialize;
-use icrc_ledger_types::icrc1::transfer::{ TransferArg, TransferError, BlockIndex };
 
 type TransferResult = Result<BlockIndex, TransferError>;
 
