@@ -4,7 +4,8 @@ use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ Bl
 use serde::Serialize;
 use std::collections::{ BTreeMap, btree_map };
 
-use crate::types::{ NftId, GldtNumTokens };
+use crate::types::{ NftId, GldtNumTokens, NftWeight };
+use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
 pub struct Registry {
@@ -71,7 +72,7 @@ pub enum RegistryUpdateType {
     Mint,
     Swap,
     Failed,
-    // Burn,
+    Burn,
 }
 
 ///
@@ -141,6 +142,9 @@ impl SwapInfo {
     }
     pub fn get_escrow_subaccount(&self) -> Subaccount {
         self.escrow_subaccount
+    }
+    pub fn get_swap_request_timestamp(&self) -> u64 {
+        self.swap_request_timestamp
     }
     pub fn get_receiving_account(&self) -> Account {
         self.receiving_account
@@ -483,5 +487,35 @@ impl Registry {
                 Ok(())
             }
         }
+    }
+
+    pub fn get_ongoing_swaps_by_user(&self, account: Account) -> Vec<GldtRecord> {
+        let mut result = Vec::new();
+        for ((gld_nft_canister_id, nft_id), entry) in self.registry.iter() {
+            if entry.gldt_issue.receiving_account == account {
+                if entry.is_swapped() || entry.gldt_issue.did_fail() {
+                    continue;
+                }
+                result.push(
+                    GldtRecord::new(
+                        RecordType::Mint,
+                        entry.gldt_issue.get_swap_request_timestamp(),
+                        entry.gldt_issue.get_receiving_account(),
+                        *gld_nft_canister_id,
+                        (*nft_id).clone(),
+                        entry.gldt_issue.get_escrow_subaccount(),
+                        entry.gldt_issue.get_nft_sale_id(),
+                        0 as NftWeight,
+                        entry.gldt_issue.get_num_tokens(),
+                        Nat::from(0),
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
+                    )
+                );
+            }
+        }
+        result
     }
 }

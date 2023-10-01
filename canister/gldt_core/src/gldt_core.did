@@ -162,6 +162,7 @@ type DutchParams = record {
 };
 type DutchParams_decay_type = variant { flat : nat; percent : float64 };
 type DutchParams_time_unit = variant { day : nat; hour : nat; minute : nat };
+type Error = record { error_message : text; error_code : nat };
 type EscrowReceipt = record {
   token : TokenSpec;
   token_id : text;
@@ -215,9 +216,9 @@ type GetSwapsRequest = record {
   account : opt Account;
 };
 type GldtError = variant {
-  MintingError;
-  Other : record { error_message : text; error_code : nat };
-  SwappingError;
+  MintingError : opt Error;
+  Other : opt Error;
+  SwappingError : opt Error;
 };
 type GldtLedgerEntry = variant {
   Burned : GldtLedgerInfo;
@@ -227,9 +228,8 @@ type GldtLedgerInfo = record { num_tokens : GldtNumTokens; block_height : nat };
 type GldtNumTokens = record { value : nat };
 type GldtRecord = record {
   nft_id : text;
-  status : RecordStatus;
+  status : RecordStatusInfo;
   record_type : RecordType;
-  memo : vec nat8;
   num_tokens : GldtNumTokens;
   escrow_subaccount : vec nat8;
   counterparty : Account;
@@ -289,6 +289,7 @@ type PricingConfigShared = variant {
 };
 type PropertyShared = record { value : Box; name : text; immutable : bool };
 type RecordStatus = variant { Failed; Ongoing; Success };
+type RecordStatusInfo = record { status : RecordStatus; message : opt text };
 type RecordType = variant { Burn; Mint };
 type Result = variant { Ok : GetRecordsResponse; Err : text };
 type Result_1 = variant { Ok : GetStatusResponse; Err : text };

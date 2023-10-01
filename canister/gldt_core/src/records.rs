@@ -1,7 +1,7 @@
 use candid::{ CandidType, Deserialize, Principal };
 use serde::Serialize;
 use std::collections::{ BTreeMap, HashMap };
-use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ BlockIndex, Memo } };
+use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::BlockIndex };
 
 use crate::types::{ NftId, GldtNumTokens, NftWeight };
 
@@ -21,6 +21,12 @@ pub enum RecordStatus {
     Success,
     Failed,
     Ongoing,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+pub struct RecordStatusInfo {
+    pub status: RecordStatus,
+    pub message: Option<String>,
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
@@ -46,10 +52,8 @@ pub struct GldtRecord {
     num_tokens: GldtNumTokens,
     /// The block index on the GLDT ledger when the GLDT were minted or burned.
     block_height: BlockIndex,
-    /// The memo added to the GLDT ledger on minting
-    memo: Memo,
     /// The status of the record
-    status: RecordStatus,
+    status: RecordStatusInfo,
 }
 
 impl GldtRecord {
@@ -64,8 +68,7 @@ impl GldtRecord {
         grams: NftWeight,
         num_tokens: GldtNumTokens,
         block_height: BlockIndex,
-        memo: Memo,
-        status: RecordStatus
+        status: RecordStatusInfo
     ) -> Self {
         Self {
             record_type,
@@ -78,7 +81,6 @@ impl GldtRecord {
             grams,
             num_tokens,
             block_height,
-            memo,
             status,
         }
     }

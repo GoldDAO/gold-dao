@@ -65,9 +65,9 @@
 //!
 //! The GLDT ledger uses the account ID of the gldt cansiter (an
 //! instance of this code) as its 'minting account'.  Computed as
-//! `$(dfx ledger account-id --of-canister gldt)`. The GLDT canister
+//! `$(dfx ledger account-id --of-canister gldt_core)`. The GLDT canister
 //! also needs to point to the ledger canister as given by `$(dfx
-//! canister id ledger)`.
+//! canister id gldt_ledger)`.
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
@@ -122,7 +122,7 @@ use registry::{
     SwappingStates,
     GldtError,
 };
-use records::{ Records, GldtRecord, RecordStatus, RecordType };
+use records::{ Records, GldtRecord, RecordStatus, RecordStatusInfo, RecordType };
 
 /// The configuration points to the canisters that this canister
 /// collaborates with, viz., the GLDT ledger canister and the NFT
@@ -637,6 +637,7 @@ fn update_registry(
             RegistryUpdateType::Failed => {
                 registry.update_failed((gld_nft_canister_id, nft_id), entry)
             }
+            _ => Err("Invalid registry update type.".to_string()),
         }
     })
 }
@@ -648,7 +649,7 @@ fn add_record(
     nft_id: NftId,
     gld_nft_canister_id: Principal,
     swap_info: SwapInfo,
-    status: RecordStatus
+    status: RecordStatusInfo
 ) -> Result<(), String> {
     // To avoid any erros at this stage, all faulty values are set to default.
     let weight = CONF.with(|c| {
@@ -679,7 +680,6 @@ fn add_record(
             weight,
             swap_info.get_num_tokens(),
             block_height,
-            swap_info.get_requested_memo(),
             status
         );
         entries.insert(new_index.clone(), new_entry);
@@ -764,8 +764,40 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
 }
 
 #[query]
-fn get_ongoing_swaps_by_user(_req: GetSwapsRequest) -> Result<GetSwapsResponse, String> {
-    Err("Not implemented yet.".to_string())
+fn get_ongoing_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse, String> {
+    let account = match req.account {
+        Some(a) => a,
+        None => Account { owner: api::caller(), subaccount: None },
+    };
+    let page = req.page.unwrap_or(0);
+    let limit = match req.limit {
+        Some(val) => {
+            if val < 1 { 10 } else if val > 100 { 100 } else { val }
+        }
+        None => 10,
+    };
+
+    let start = match page.checked_mul(limit) {
+        Some(v) => v,
+        None => {
+            return Err("Overflow when calculating start".to_string());
+        }
+    };
+    let res = REGISTRY.with(|r| {
+        let swaps = r.borrow().get_ongoing_swaps_by_user(account);
+        GetSwapsResponse {
+            total: swaps.len() as u32,
+            data: Some(
+                swaps
+                    .iter()
+                    .skip(start as usize)
+                    .take(limit as usize)
+                    .cloned()
+                    .collect::<Vec<_>>()
+            ),
+        }
+    });
+    Ok(res)
 }
 
 #[query]
@@ -875,7 +907,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         nft_id.clone(),
                         gld_nft_canister_id,
                         swap_info.clone(),
-                        RecordStatus::Success
+                        RecordStatusInfo { status: RecordStatus::Success, message: None }
                     ).map_err(|err| {
                         log_message(format!("ERROR :: {}", err));
                         err
@@ -909,6 +941,15 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         gld_nft_canister_id,
                         swap_info.clone()
                     )?;
+                    add_record(
+                        nft_id.clone(),
+                        gld_nft_canister_id,
+                        swap_info.clone(),
+                        RecordStatusInfo {
+                            status: RecordStatus::Failed,
+                            message: Some("Error while swapping GLD NFT for GLDT.".to_string()),
+                        }
+                    )?;
                     Err("Error while swapping GLD NFT for GLDT.".to_string())
                 }
             }
@@ -922,6 +963,10 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                 gld_nft_canister_id,
                 swap_info.clone()
             )?;
+            add_record(nft_id.clone(), gld_nft_canister_id, swap_info.clone(), RecordStatusInfo {
+                status: RecordStatus::Failed,
+                message: Some("Error while minting GLDT.".to_string()),
+            })?;
             Err(msg)
         }
     }
