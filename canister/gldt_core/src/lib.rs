@@ -345,7 +345,6 @@ impl GldNft {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct GldtService {
-    registry: BTreeMap<(Principal, NftId), GldNft>,
     records: BTreeMap<BlockIndex, GldtRecord>,
     records_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
@@ -354,6 +353,7 @@ thread_local! {
     /* stable */
     static SERVICE: RefCell<GldtService> = RefCell::default();
     static CONF: RefCell<Conf> = RefCell::default();
+    static REGISTRY: RefCell<BTreeMap<(Principal, NftId), GldNft>> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -490,8 +490,8 @@ type TransferResult = Result<BlockIndex, TransferError>;
 #[update]
 fn nft_info(args: InfoRequest) -> NftInfo {
     log_message(format!("INFO :: nft_info. Arguments: {:?}", args));
-    SERVICE.with(|s| NftInfo {
-        info: s.borrow().registry.get(&(args.source_canister, args.nft_id)).cloned(),
+    REGISTRY.with(|r| NftInfo {
+        info: r.borrow().get(&(args.source_canister, args.nft_id)).cloned(),
     })
 }
 
@@ -815,13 +815,13 @@ fn update_registry(
             entry
         )
     );
-    SERVICE.with(|s| {
+    REGISTRY.with(|r| {
         // The code that follows looks rather complicated, but it is
         // almost only error checking due to the fact that we cannot be
         // sure that the canister state before and after the async call
         // match, even for the entry of the NFT being offered.
 
-        let registry = &mut s.borrow_mut().registry;
+        let registry = &mut r.borrow_mut();
 
         match registry.entry((entry.gld_nft_canister_id, nft_id.clone())) {
             btree_map::Entry::Vacant(v) => {
@@ -1119,7 +1119,7 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
 }
 
 #[query]
-fn get_ongoing_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse, String> {
+fn get_ongoing_swaps_by_user(_req: GetSwapsRequest) -> Result<GetSwapsResponse, String> {
     Err("Not implemented yet.".to_string())
 }
 
@@ -1145,11 +1145,8 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
             Ok(())
         }
     )?;
-    SERVICE.with(|s| {
-        let registry = &s.borrow().registry;
-
-        let entry = registry.get(&(req.gld_nft_canister_id, req.nft_id.clone()));
-        let res = match entry {
+    REGISTRY.with(|r| {
+        let res = match r.borrow().get(&(req.gld_nft_canister_id, req.nft_id.clone())) {
             None => GetStatusResponse { status: None },
             Some(entry) => {
                 if entry.nft_sale_id == req.sale_id {
