@@ -344,18 +344,18 @@ impl GldNft {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
-pub struct GldtService {
-    records: BTreeMap<BlockIndex, GldtRecord>,
-    records_by_user: HashMap<Principal, Vec<BlockIndex>>,
+pub struct Records {
+    entries: BTreeMap<BlockIndex, GldtRecord>,
+    entries_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
 
 type Registry = BTreeMap<(Principal, NftId), GldNft>;
 
 thread_local! {
     /* stable */
-    static SERVICE: RefCell<GldtService> = RefCell::default();
     static CONF: RefCell<Conf> = RefCell::default();
     static REGISTRY: RefCell<Registry> = RefCell::default();
+    static RECORDS: RefCell<Records> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -366,11 +366,11 @@ fn pre_upgrade() {
     let monitor_stable_data = canistergeek_ic_rust::monitor::pre_upgrade_stable_data();
     let logger_stable_data = canistergeek_ic_rust::logger::pre_upgrade_stable_data();
 
-    let service = SERVICE.with(|cell| cell.borrow().clone());
     let conf = CONF.with(|cell| cell.borrow().clone());
     let registry = REGISTRY.with(|cell| cell.borrow().clone());
+    let records = RECORDS.with(|cell| cell.borrow().clone());
 
-    match storage::stable_save((service, conf, registry, monitor_stable_data, logger_stable_data)) {
+    match storage::stable_save((conf, registry, records, monitor_stable_data, logger_stable_data)) {
         Ok(_) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -383,24 +383,24 @@ fn pre_upgrade() {
 fn post_upgrade() {
     let stable_data: Result<
         (
-            GldtService,
             Conf,
             Registry,
+            Records,
             canistergeek_ic_rust::monitor::PostUpgradeStableData,
             canistergeek_ic_rust::logger::PostUpgradeStableData,
         ),
         String
     > = storage::stable_restore();
     match stable_data {
-        Ok((service, conf, registry, monitor_stable_data, logger_stable_data)) => {
-            SERVICE.with(|cell| {
-                *cell.borrow_mut() = service;
-            });
+        Ok((conf, registry, records, monitor_stable_data, logger_stable_data)) => {
             CONF.with(|cell| {
                 *cell.borrow_mut() = conf;
             });
             REGISTRY.with(|cell| {
                 *cell.borrow_mut() = registry;
+            });
+            RECORDS.with(|cell| {
+                *cell.borrow_mut() = records;
             });
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
@@ -460,16 +460,16 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
             return Err("Overflow when calculating start".to_string());
         }
     };
-    SERVICE.with(|s| {
-        let records = &mut s.borrow_mut().records;
-        let paginated_records = records
+    RECORDS.with(|r| {
+        let entries = &r.borrow().entries;
+        let paginated_records = entries
             .values()
             .skip(start as usize)
             .take(limit as usize)
             .cloned()
             .collect();
         Ok(GetRecordsResponse {
-            total: records.len() as u32,
+            total: entries.len() as u32,
             data: Some(paginated_records),
         })
     })
@@ -1013,15 +1013,16 @@ fn update_registry(
 /// This is only called when minting or burning is finalised and is meant to
 /// keep track of all mints and burns for historic analysis.
 fn add_record(nft_id: NftId, swap_info: GldNft, status: RecordStatus) -> Result<(), String> {
-    SERVICE.with(|s| {
-        let mut service = s.borrow_mut();
+    RECORDS.with(|r| {
+        // let mut service = s.borrow_mut();
+        let mut records = r.borrow_mut();
 
-        let records = &mut service.records;
-        let new_index: BlockIndex = match records.last_key_value() {
+        let entries = &mut records.entries;
+        let new_index: BlockIndex = match entries.last_key_value() {
             Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
             None => Nat::from(0),
         };
-        let new_record = GldtRecord {
+        let new_entry = GldtRecord {
             record_type: RecordType::Mint,
             timestamp: api::time(),
             counterparty: swap_info.receiving_account,
@@ -1035,9 +1036,9 @@ fn add_record(nft_id: NftId, swap_info: GldNft, status: RecordStatus) -> Result<
             memo: swap_info.requested_memo,
             status,
         };
-        records.insert(new_index.clone(), new_record);
+        entries.insert(new_index.clone(), new_entry);
 
-        service.records_by_user
+        records.entries_by_user
             .entry(swap_info.receiving_account.owner)
             .or_default()
             .push(new_index)
@@ -1096,10 +1097,10 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
         }
     };
 
-    SERVICE.with(|s| {
+    RECORDS.with(|r| {
         let default_vec = Vec::new();
-        let service = s.borrow();
-        let user_records_indices = (*service.records_by_user
+        let records = r.borrow();
+        let user_records_indices = (*records.entries_by_user
             .get(&principal)
             .unwrap_or(&default_vec)).clone();
         let total = user_records_indices.len() as u32;
@@ -1109,7 +1110,7 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
         }
         let mut paginated_records = Vec::new();
         for i in start..end {
-            match service.records.get(&user_records_indices[i as usize]) {
+            match records.entries.get(&user_records_indices[i as usize]) {
                 None => {
                     continue;
                 }
