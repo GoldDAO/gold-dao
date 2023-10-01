@@ -345,7 +345,6 @@ impl GldNft {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct GldtService {
-    conf: Conf,
     registry: BTreeMap<(Principal, NftId), GldNft>,
     records: BTreeMap<BlockIndex, GldtRecord>,
     records_by_user: HashMap<Principal, Vec<BlockIndex>>,
@@ -354,6 +353,7 @@ pub struct GldtService {
 thread_local! {
     /* stable */
     static SERVICE: RefCell<GldtService> = RefCell::default();
+    static CONF: RefCell<Conf> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -365,8 +365,9 @@ fn pre_upgrade() {
     let logger_stable_data = canistergeek_ic_rust::logger::pre_upgrade_stable_data();
 
     let service = SERVICE.with(|cell| cell.borrow_mut().clone());
+    let conf = CONF.with(|cell| cell.borrow_mut().clone());
 
-    match storage::stable_save((service, monitor_stable_data, logger_stable_data)) {
+    match storage::stable_save((service, conf, monitor_stable_data, logger_stable_data)) {
         Ok(_) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -380,15 +381,19 @@ fn post_upgrade() {
     let stable_data: Result<
         (
             GldtService,
+            Conf,
             canistergeek_ic_rust::monitor::PostUpgradeStableData,
             canistergeek_ic_rust::logger::PostUpgradeStableData,
         ),
         String
     > = storage::stable_restore();
     match stable_data {
-        Ok((service, monitor_stable_data, logger_stable_data)) => {
+        Ok((service, conf, monitor_stable_data, logger_stable_data)) => {
             SERVICE.with(|cell| {
                 *cell.borrow_mut() = service;
+            });
+            CONF.with(|cell| {
+                *cell.borrow_mut() = conf;
             });
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
@@ -415,9 +420,9 @@ fn init(conf: Option<Conf>) {
                 conf.gld_nft_canister_ids
             )
         );
-        SERVICE.with(|s| {
-            s.borrow_mut().conf = conf;
-        })
+        CONF.with(|c| {
+            *c.borrow_mut() = conf;
+        });
     }
 }
 
@@ -466,7 +471,7 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
 #[update]
 fn get_conf() -> Conf {
     log_message("INFO :: get_conf".to_string());
-    SERVICE.with(|s| s.borrow_mut().conf.clone())
+    CONF.with(|c| c.borrow().clone())
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
@@ -494,36 +499,6 @@ fn calculate_tokens_from_weight(grams: NftWeight) -> NumTokens {
     NumTokens::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY)
 }
 
-fn delete_nft_entry_from_list(nft_id: &NftId) -> Result<(), String> {
-    let the_caller = api::caller();
-    SERVICE.with(|s| {
-        let registry = &mut s.borrow_mut().registry;
-        match registry.entry((the_caller, nft_id.to_string())) {
-            btree_map::Entry::Occupied(o) => {
-                let (key, _) = o.remove_entry();
-                if key.0 == the_caller && key.1 == *nft_id {
-                    log_message(
-                        format!(
-                            "INFO :: delete_nft_entry_from_list :: deleted entry for key {:?}",
-                            key
-                        )
-                    );
-                    Ok(())
-                } else {
-                    Err(
-                        format!(
-                            "ERROR :: delete_nft_entry_from_list :: key mismatch. Expected {:?}, received {:?}",
-                            (the_caller, nft_id),
-                            key
-                        )
-                    )
-                }
-            }
-            _ => Err(format!("NFT ID {} not found in list.", nft_id)),
-        }
-    })
-}
-
 async fn accept_offer(nft_id: NftId, swap_info: GldNft) -> Result<GldtSwapped, String> {
     let num_tokens = (match swap_info.minted {
         Some(t) => {
@@ -549,7 +524,8 @@ async fn accept_offer(nft_id: NftId, swap_info: GldNft) -> Result<GldtSwapped, S
             Err("Missing information about minted tokens. Cancelling accept_offer.".to_string())
         }
     })?;
-    let gldt_ledger_canister_id = SERVICE.with(|s| s.borrow().conf.gldt_ledger_canister_id);
+
+    let gldt_ledger_canister_id = CONF.with(|c| c.borrow().gldt_ledger_canister_id);
     let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
     let bid = BidRequest {
         broker_id: None,
@@ -598,9 +574,9 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, GldNft), Stri
     // verify caller, only accept calls from valid gld nft canisters
     let the_caller = api::caller();
     // Extract configuration and validate caller.
-    let (gld_nft_canister_id, gld_nft_conf, gldt_ledger_canister_id) = SERVICE.with(
-        |s| -> Result<(Principal, NftCanisterConf, Principal), String> {
-            let conf = &s.borrow().conf;
+    let (gld_nft_canister_id, gld_nft_conf, gldt_ledger_canister_id) = CONF.with(
+        |c| -> Result<(Principal, NftCanisterConf, Principal), String> {
+            let conf = c.borrow();
             let (gld_nft_canister_id, gld_nft_conf) = conf.gld_nft_canister_ids
                 .iter()
                 .find(|(x, _)| *x == the_caller)
@@ -729,8 +705,8 @@ async fn mint_tokens(swap_info: GldNft) -> Result<GldtMinted, String> {
         },
         created_at_time: None,
     };
-    let gldt_ledger_canister_id = SERVICE.with(|s| -> Principal {
-        s.borrow().conf.gldt_ledger_canister_id
+    let gldt_ledger_canister_id = CONF.with(|c| -> Principal {
+        c.borrow().gldt_ledger_canister_id
     });
 
     let service = icrc1::Service(gldt_ledger_canister_id);
@@ -774,8 +750,8 @@ async fn withdraw_and_burn_escrow(
     collection_id: Principal,
     amount: GldtNumTokens
 ) -> Result<(), String> {
-    let gldt_ledger_canister_id = SERVICE.with(|s| -> Principal {
-        s.borrow().conf.gldt_ledger_canister_id
+    let gldt_ledger_canister_id = CONF.with(|c| -> Principal {
+        c.borrow().gldt_ledger_canister_id
     });
     let service_ledger = icrc1::Service(gldt_ledger_canister_id);
     let minting_account = (match service_ledger.icrc1_minting_account().await {
@@ -1149,23 +1125,28 @@ fn get_ongoing_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse, S
 
 #[query]
 fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String> {
+    CONF.with(
+        |c| -> Result<(), String> {
+            c
+                .borrow()
+                .gld_nft_canister_ids.iter()
+                .find(|(x, _)| *x == req.gld_nft_canister_id)
+                .ok_or_else(|| {
+                    format!(
+                        "invalid GLD NFT canister ID: was {}, expected one of {:?}",
+                        req.gld_nft_canister_id,
+                        c
+                            .borrow()
+                            .gld_nft_canister_ids.iter()
+                            .map(|(x, _)| x)
+                            .collect::<Vec<_>>()
+                    )
+                })?;
+            Ok(())
+        }
+    )?;
     SERVICE.with(|s| {
         let registry = &s.borrow().registry;
-
-        let conf = &s.borrow().conf;
-        conf.gld_nft_canister_ids
-            .iter()
-            .find(|(x, _)| *x == req.gld_nft_canister_id)
-            .ok_or_else(|| {
-                format!(
-                    "invalid GLD NFT canister ID: was {}, expected one of {:?}",
-                    req.gld_nft_canister_id,
-                    conf.gld_nft_canister_ids
-                        .iter()
-                        .map(|(x, _)| x)
-                        .collect::<Vec<_>>()
-                )
-            })?;
 
         let entry = registry.get(&(req.gld_nft_canister_id, req.nft_id.clone()));
         let res = match entry {
