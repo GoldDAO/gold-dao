@@ -349,11 +349,13 @@ pub struct GldtService {
     records_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
 
+type Registry = BTreeMap<(Principal, NftId), GldNft>;
+
 thread_local! {
     /* stable */
     static SERVICE: RefCell<GldtService> = RefCell::default();
     static CONF: RefCell<Conf> = RefCell::default();
-    static REGISTRY: RefCell<BTreeMap<(Principal, NftId), GldNft>> = RefCell::default();
+    static REGISTRY: RefCell<Registry> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -364,10 +366,11 @@ fn pre_upgrade() {
     let monitor_stable_data = canistergeek_ic_rust::monitor::pre_upgrade_stable_data();
     let logger_stable_data = canistergeek_ic_rust::logger::pre_upgrade_stable_data();
 
-    let service = SERVICE.with(|cell| cell.borrow_mut().clone());
-    let conf = CONF.with(|cell| cell.borrow_mut().clone());
+    let service = SERVICE.with(|cell| cell.borrow().clone());
+    let conf = CONF.with(|cell| cell.borrow().clone());
+    let registry = REGISTRY.with(|cell| cell.borrow().clone());
 
-    match storage::stable_save((service, conf, monitor_stable_data, logger_stable_data)) {
+    match storage::stable_save((service, conf, registry, monitor_stable_data, logger_stable_data)) {
         Ok(_) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -382,18 +385,22 @@ fn post_upgrade() {
         (
             GldtService,
             Conf,
+            Registry,
             canistergeek_ic_rust::monitor::PostUpgradeStableData,
             canistergeek_ic_rust::logger::PostUpgradeStableData,
         ),
         String
     > = storage::stable_restore();
     match stable_data {
-        Ok((service, conf, monitor_stable_data, logger_stable_data)) => {
+        Ok((service, conf, registry, monitor_stable_data, logger_stable_data)) => {
             SERVICE.with(|cell| {
                 *cell.borrow_mut() = service;
             });
             CONF.with(|cell| {
                 *cell.borrow_mut() = conf;
+            });
+            REGISTRY.with(|cell| {
+                *cell.borrow_mut() = registry;
             });
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
