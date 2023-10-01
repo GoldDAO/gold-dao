@@ -214,25 +214,16 @@ type GetSwapsRequest = record {
   limit : opt nat32;
   account : opt Account;
 };
-type GldNft = record {
-  requested_memo : vec nat8;
-  older_record : opt GldNft;
-  to_subaccount : vec nat8;
-  minted : opt GldtMinted;
-  swapped : opt GldtSwapped;
-  receiving_account : Account;
-  grams : nat16;
-  gldt_minting_timestamp_seconds : nat64;
-  nft_sale_id : text;
-  gld_nft_canister_id : principal;
+type GldtError = variant {
+  MintingError;
+  Other : record { error_message : text; error_code : nat };
+  SwappingError;
 };
-type GldtBurned = record { burn_block_height : nat64 };
-type GldtMinted = record {
-  num_tokens : GldtNumTokens;
-  mint_block_height : nat;
-  last_audited_timestamp_seconds : nat64;
-  burned : opt GldtBurned;
+type GldtLedgerEntry = variant {
+  Burned : GldtLedgerInfo;
+  Minted : GldtLedgerInfo;
 };
+type GldtLedgerInfo = record { num_tokens : GldtNumTokens; block_height : nat };
 type GldtNumTokens = record { value : nat };
 type GldtRecord = record {
   nft_id : text;
@@ -247,6 +238,11 @@ type GldtRecord = record {
   nft_sale_id : text;
   gld_nft_canister_id : principal;
   block_height : nat;
+};
+type GldtRegistryEntry = record {
+  older_record : opt GldtRegistryEntry;
+  gldt_issue : SwapInfo;
+  gldt_redeem : opt SwapInfo;
 };
 type GldtSwapped = record { index : nat; sale_id : text };
 type HourlyMetricsData = record {
@@ -277,7 +273,7 @@ type MetricsGranularity = variant { hourly; daily };
 type MetricsRequest = record { parameters : GetMetricsParameters };
 type MetricsResponse = record { metrics : opt CanisterMetrics };
 type NftCanisterConf = record { grams : nat16 };
-type NftInfo = record { info : opt GldNft };
+type NftInfo = record { info : opt GldtRegistryEntry };
 type NumericEntity = record {
   avg : nat64;
   max : nat64;
@@ -330,6 +326,17 @@ type SubscriberNotification = record {
   sale : SaleStatusShared;
   seller : Account_1;
   escrow_info : SubAccountInfo;
+};
+type SwapInfo = record {
+  requested_memo : vec nat8;
+  ledger_entry : opt GldtLedgerEntry;
+  num_tokens : GldtNumTokens;
+  escrow_subaccount : vec nat8;
+  swapped : opt GldtSwapped;
+  receiving_account : Account;
+  swap_request_timestamp : nat64;
+  nft_sale_id : text;
+  failed : opt GldtError;
 };
 type SwappingStates = variant {
   Burned;

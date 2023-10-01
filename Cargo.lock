@@ -469,7 +469,6 @@ dependencies = [
  "clippy",
  "ic-cdk 0.11.0",
  "ic-cdk-macros 0.8.0",
- "ic-ledger-types",
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
@@ -569,21 +568,6 @@ dependencies = [
  "serde",
  "serde_tokenstream",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "ic-ledger-types"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f018f5ed6f4a51618b58b415cbecc08dd79a357a2df2e2661be2aa5ffb86630"
-dependencies = [
- "candid",
- "crc32fast",
- "hex",
- "ic-cdk 0.11.0",
- "serde",
- "serde_bytes",
- "sha2",
 ]
 
 [[package]]
