@@ -105,6 +105,8 @@ use declarations::gld_nft::{
 };
 use declarations::icrc1;
 
+mod misc;
+
 /// Constants
 pub const GLDT_SUBDIVIDABLE_BY: u64 = 100_000_000;
 pub const GLDT_DECIMALS: u8 = 8;
@@ -138,6 +140,15 @@ impl Default for Conf {
             gldt_ledger_canister_id: Principal::anonymous(),
             gld_nft_canister_ids: Vec::new(),
         }
+    }
+}
+
+impl Conf {
+    pub fn get_weight_by_collection_id(&self, collection_id: &Principal) -> Option<NftWeight> {
+        self.gld_nft_canister_ids
+            .iter()
+            .find(|(x, _)| *x == *collection_id)
+            .map(|(_, conf)| conf.grams)
     }
 }
 
