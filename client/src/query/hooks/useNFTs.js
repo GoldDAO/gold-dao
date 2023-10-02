@@ -12,23 +12,29 @@ const queryNfts = async (principal, actors) => {
         }),
     );
     const res = await Promise.all(nft_promises);
-    let nfts = [];
-    res.forEach((r, i) =>
-        nfts.push(...r.ok?.nfts.map((e) => ({ name: e, weight: +weights[i].slice(0, -1) }))),
-    );
-    return nfts;
+    let nftsArr = [];
+    let nftsByWeight = [[], [], [], []];
+    res.forEach((r, i) => {
+        nftsArr.push(...r.ok?.nfts.map((e) => ({ name: e, weight: +weights[i].slice(0, -1) }))),
+            nftsByWeight[i].push(
+                ...r.ok?.nfts.map((e) => ({ name: e, weight: +weights[i].slice(0, -1) })),
+            );
+    });
+    return { nftsArr, nftsByWeight };
 };
 
 export const useNft = (actors) => {
     const { principal } = useConnect();
     const [nfts, setNfts] = useState([]);
+    const [nftsByW, setNftsByW] = useState([]);
     const [isLoading, setLoading] = useState(false);
     useEffect(() => {
         setLoading(true);
         queryNfts(principal, actors)
             .then((result) => {
-                getNftWithStatus(result, actors).then((result) => {
-                    setNfts(result);
+                getNftWithStatus(result.nftsArr, actors).then((r) => {
+                    setNfts(r);
+                    setNftsByW(result.nftsByWeight);
                     setLoading(false);
                 });
             })
@@ -37,7 +43,7 @@ export const useNft = (actors) => {
                 setLoading(false);
             });
     }, []);
-    return { nfts, isLoading };
+    return { nfts, nftsByW, isLoading };
 };
 
 const getNftWithStatus = async (nfts, actors) => {

@@ -341,20 +341,25 @@ const MyNfts = ({ isConnected }) => {
                     <Box>Select from my NFTs</Box>
                     {isLoading && <Spinner size="sm" ml={'1em'} />}
                 </AccordionButton>
-                {connected && <MyNftsPanel setIsloading={setIsloading} isLoading={isLoading} />}
+                {connected && <MyNftsPanel setIsloading={setIsloading} />}
             </AccordionItem>
         </Accordion>
     );
 };
 
-const MyNftsPanel = ({ setIsloading, isLoading }) => {
+const MyNftsPanel = ({ setIsloading }) => {
     const actors = useAllCanisters();
-    const nfts = useNft(actors);
-    const weights = [1, 10, 100, 1000];
+    const {nftsByW, isLoading } = useNft(actors);
 
-    console.log('nfts', nfts)
+    useEffect(() =>{
+        setIsloading(isLoading)
+    },[isLoading])
 
-    return (
+    const toggleSameWeight = () => {
+
+    }
+
+    return ( 
         <AccordionPanel
             border={'1px'}
             borderColor={'border'}
@@ -367,21 +372,29 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
             borderEndStartRadius={'md'}
         >
             {!isLoading &&
-            weights.map((weight, i) =>  (
+            nftsByW.map((weight, i) =>  (
+                weight.length > 0 && 
                 <Card key={i} shadow={'none'}>
-                    <CardHeader pb='0px' color={'secondaryText'}>GLD NFTs {weight}g</CardHeader>
+                    <CardHeader 
+                    display={'flex'}
+                    justifyContent={'space-between'}  
+                    pb='0px' 
+                    color={'secondaryText'}>GLD NFTs g 
+                    {/* <Button 
+                    bg='black' 
+                    _hover={{backgroundColor: 'secondaryText'}}
+                    color='white' size={'sm'}>Select All</Button> */}
+                    </CardHeader>
                     <CardBody>
                         {isLoading ? (
                             <SkeletonToken />
                         ) : (
                             <HStack w={'100%'} wrap="wrap">
-                                {nfts.nfts.map(
+                                {weight.map(
                                     (e, i) => {
-                                        if(e.weight === weight){
                                             return (  
                                                 <TokenTag size="md" nft={e} key={i} />
                                             )
-                                        }
                                     })}
                             </HStack>
                         )}

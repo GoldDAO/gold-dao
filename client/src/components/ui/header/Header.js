@@ -35,7 +35,7 @@ const Header = () => {
                 </GridItem>
                 <GridItem gridColumn={'span 6'}>
                     {isConnected && (
-                        <Grid gridTemplateColumns={'repeat(12, 1fr)'}>
+                        <Grid gridTemplateColumns={'repeat(12, 1fr)'} alignItems={'center'}>
                             <GridItem gridColumn={'span 6'} w="fit-content">
                                 <Link href="/my-account">
                                     <Text
