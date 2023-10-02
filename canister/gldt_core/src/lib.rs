@@ -319,9 +319,8 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     })
 }
 
-#[update]
+#[query]
 fn get_conf() -> Conf {
-    log_message("INFO :: get_conf".to_string());
     CONF.with(|c| c.borrow().clone())
 }
 
