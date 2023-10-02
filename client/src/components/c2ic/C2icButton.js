@@ -3,11 +3,12 @@ import { useAtom } from 'jotai';
 import React, { useEffect } from 'react';
 import { emptyAllNftsAtom } from '@/atoms/nfts';
 import { removeAllItemsInCartAtom } from '@/atoms/cart';
+import { useRouter } from 'next/router';
 
 const C2icButton = () => {
     const [, emptyAllNfts] = useAtom(emptyAllNftsAtom);
     const [, removeAllCart] = useAtom(removeAllItemsInCartAtom);
-
+    const router = useRouter();
     const {
         principal,
         connect,
@@ -27,6 +28,7 @@ const C2icButton = () => {
         onDisconnect: () => {
             console.log('DISCONNECTED');
             removeAllCart();
+            router.push('/');
             emptyAllNfts();
         },
     });

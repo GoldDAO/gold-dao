@@ -306,6 +306,7 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
 
     useEffect(() => {
         setIsloading(nfts.isLoading);
+        console.log('nfts',)
     }, [nfts.isLoading]);
 
     return (
@@ -336,6 +337,7 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
                                 )}
                             </HStack>
                         )}
+                        {nfts.nfts.length < 1 ? <Text>No GLD NFT</Text> : ''}
                     </CardBody>
                 </Card>
             ))}

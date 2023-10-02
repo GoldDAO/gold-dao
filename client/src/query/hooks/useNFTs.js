@@ -33,6 +33,7 @@ export const useNft = (actors) => {
                 });
             })
             .catch((error) => {
+                console.log('error', error);
                 setLoading(false);
             });
     }, []);

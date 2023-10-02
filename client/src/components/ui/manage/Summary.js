@@ -20,7 +20,7 @@ import {
     HStack,
     Skeleton,
 } from '@chakra-ui/react';
-import { useNft } from '@/query/hooks/useNFTs';
+import { useNft, useOngoingSwaps } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
 import { cancelSale } from '@/query/cancelSale';
 import useSwapHistory from '@/query/hooks/useSwapHistory';
@@ -28,7 +28,6 @@ import { useConnect } from '@connect2ic/react';
 
 const Summary = () => {
     const { isConnected } = useConnect();
-
     return (
         <Card
             gridColumn={'3/11'}
@@ -185,10 +184,14 @@ const SaleStatus = ({ status, e }) => {
 
 const MyTransactions = () => {
     const history = useSwapHistory();
+    const ongoing = useOngoingSwaps();
 
     useEffect(() => {
-        console.log('history', history);
-    }, [history]);
+        if (ongoing) {
+            console.log('ongoing', ongoing);
+        }
+    }, [ongoing]);
+
     return (
         <Card
             bg="white"
@@ -237,15 +240,16 @@ const MyTransactions = () => {
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
-                                            <Tbody></Tbody>
+                                            <Tbody>{/*  */}</Tbody>
                                         </Table>
                                     </TableContainer>
                                 </CardBody>
                             </Card>
                         </AccordionPanel>
                     </AccordionItem>
-                    <AccordionItem w="100%" border={0}>
+                    <AccordionItem w="100%" border={0} isDisabled={history.isLoading}>
                         <AccordionButton
+                            isDisabled={history.isLoading}
                             h="60px"
                             bg="bg"
                             border="1px"
@@ -254,6 +258,7 @@ const MyTransactions = () => {
                             borderStartStartRadius={'md'}
                         >
                             Past transactions
+                            {history.isLoading && <Spinner size="sm" ml={'1em'} />}
                         </AccordionButton>
                         <AccordionPanel
                             bg="bg"
@@ -276,7 +281,19 @@ const MyTransactions = () => {
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
-                                            <Tbody></Tbody>
+                                            <Tbody>
+                                                {history.history?.Ok.data[0].map((e) => {
+                                                    return (
+                                                        <Tr>
+                                                            <Td>{e.nft_sale_id}</Td>
+                                                            <Td>{e.nft_id}</Td>
+                                                            <Td>{parseInt(e.timestamp)}</Td>
+                                                            <Td>GLDT</Td>
+                                                            <Td>{Object.keys(e.status.status)}</Td>
+                                                        </Tr>
+                                                    );
+                                                })}
+                                            </Tbody>
                                         </Table>
                                     </TableContainer>
                                 </CardBody>

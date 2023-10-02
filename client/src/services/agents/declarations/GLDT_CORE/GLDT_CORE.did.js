@@ -1,7 +1,7 @@
 export const idlFactory = ({ IDL }) => {
     const Box = IDL.Rec();
     const CandyShared = IDL.Rec();
-    const GldNft = IDL.Rec();
+    const GldtRegistryEntry = IDL.Rec();
     const NftCanisterConf = IDL.Record({ grams: IDL.Nat16 });
     const Conf = IDL.Record({
         gld_nft_canister_ids: IDL.Vec(IDL.Tuple(IDL.Principal, NftCanisterConf)),
@@ -108,22 +108,32 @@ export const idlFactory = ({ IDL }) => {
         logs: IDL.Opt(CanisterLogResponse),
         version: IDL.Opt(IDL.Nat),
     });
-    const GetRecordsRequest = IDL.Record({
-        page: IDL.Opt(IDL.Nat32),
-        limit: IDL.Opt(IDL.Nat32),
-    });
-    const RecordType = IDL.Variant({ Burn: IDL.Null, Mint: IDL.Null });
-    const GldtNumTokens = IDL.Record({ value: IDL.Nat });
     const Account = IDL.Record({
         owner: IDL.Principal,
         subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     });
+    const GetSwapsRequest = IDL.Record({
+        page: IDL.Opt(IDL.Nat32),
+        limit: IDL.Opt(IDL.Nat32),
+        account: IDL.Opt(Account),
+    });
+    const RecordStatus = IDL.Variant({
+        Failed: IDL.Null,
+        Ongoing: IDL.Null,
+        Success: IDL.Null,
+    });
+    const RecordStatusInfo = IDL.Record({
+        status: RecordStatus,
+        message: IDL.Opt(IDL.Text),
+    });
+    const RecordType = IDL.Variant({ Burn: IDL.Null, Mint: IDL.Null });
+    const GldtNumTokens = IDL.Record({ value: IDL.Nat });
     const GldtRecord = IDL.Record({
         nft_id: IDL.Text,
+        status: RecordStatusInfo,
         record_type: RecordType,
-        memo: IDL.Vec(IDL.Nat8),
         num_tokens: GldtNumTokens,
-        escrow_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        escrow_subaccount: IDL.Vec(IDL.Nat8),
         counterparty: Account,
         grams: IDL.Nat16,
         timestamp: IDL.Nat64,
@@ -136,6 +146,10 @@ export const idlFactory = ({ IDL }) => {
         data: IDL.Opt(IDL.Vec(GldtRecord)),
     });
     const Result = IDL.Variant({ Ok: GetRecordsResponse, Err: IDL.Text });
+    const GetRecordsRequest = IDL.Record({
+        page: IDL.Opt(IDL.Nat32),
+        limit: IDL.Opt(IDL.Nat32),
+    });
     const GetStatusRequest = IDL.Record({
         nft_id: IDL.Text,
         gld_nft_canister_id: IDL.Principal,
@@ -150,38 +164,47 @@ export const idlFactory = ({ IDL }) => {
     });
     const GetStatusResponse = IDL.Record({ status: IDL.Opt(SwappingStates) });
     const Result_1 = IDL.Variant({ Ok: GetStatusResponse, Err: IDL.Text });
-    const GetSwapsRequest = IDL.Record({
-        page: IDL.Opt(IDL.Nat32),
-        limit: IDL.Opt(IDL.Nat32),
-        account: IDL.Opt(Account),
-    });
     const InfoRequest = IDL.Record({
         nft_id: IDL.Text,
         source_canister: IDL.Principal,
     });
-    const GldtBurned = IDL.Record({ burn_block_height: IDL.Nat64 });
-    const GldtMinted = IDL.Record({
-        num_tokens: IDL.Opt(GldtNumTokens),
-        mint_block_height: IDL.Opt(IDL.Nat),
-        last_audited_timestamp_seconds: IDL.Nat64,
-        burned: IDL.Opt(GldtBurned),
+    const GldtLedgerInfo = IDL.Record({
+        num_tokens: GldtNumTokens,
+        block_height: IDL.Nat,
+    });
+    const GldtLedgerEntry = IDL.Variant({
+        Burned: GldtLedgerInfo,
+        Minted: GldtLedgerInfo,
     });
     const GldtSwapped = IDL.Record({ index: IDL.Nat, sale_id: IDL.Text });
-    GldNft.fill(
+    const Error = IDL.Record({
+        error_message: IDL.Text,
+        error_code: IDL.Nat,
+    });
+    const GldtError = IDL.Variant({
+        MintingError: IDL.Opt(Error),
+        Other: IDL.Opt(Error),
+        SwappingError: IDL.Opt(Error),
+    });
+    const SwapInfo = IDL.Record({
+        requested_memo: IDL.Vec(IDL.Nat8),
+        ledger_entry: IDL.Opt(GldtLedgerEntry),
+        num_tokens: GldtNumTokens,
+        escrow_subaccount: IDL.Vec(IDL.Nat8),
+        swapped: IDL.Opt(GldtSwapped),
+        receiving_account: Account,
+        swap_request_timestamp: IDL.Nat64,
+        nft_sale_id: IDL.Text,
+        failed: IDL.Opt(GldtError),
+    });
+    GldtRegistryEntry.fill(
         IDL.Record({
-            requested_memo: IDL.Vec(IDL.Nat8),
-            older_record: IDL.Opt(GldNft),
-            to_subaccount: IDL.Vec(IDL.Nat8),
-            minted: IDL.Opt(GldtMinted),
-            swapped: IDL.Opt(GldtSwapped),
-            receiving_account: Account,
-            grams: IDL.Nat16,
-            gldt_minting_timestamp_seconds: IDL.Nat64,
-            nft_sale_id: IDL.Text,
-            gld_nft_canister_id: IDL.Principal,
+            older_record: IDL.Opt(GldtRegistryEntry),
+            gldt_issue: SwapInfo,
+            gldt_redeem: IDL.Opt(SwapInfo),
         }),
     );
-    const NftInfo = IDL.Record({ info: IDL.Opt(GldNft) });
+    const NftInfo = IDL.Record({ info: IDL.Opt(GldtRegistryEntry) });
     const AuctionStateShared_status = IDL.Variant({
         closed: IDL.Null,
         open: IDL.Null,
@@ -412,9 +435,10 @@ export const idlFactory = ({ IDL }) => {
             ['query'],
         ),
         get_conf: IDL.Func([], [Conf], []),
+        get_historical_swaps_by_user: IDL.Func([GetSwapsRequest], [Result], ['query']),
+        get_ongoing_swaps_by_user: IDL.Func([GetSwapsRequest], [Result], ['query']),
         get_records: IDL.Func([GetRecordsRequest], [Result], ['query']),
         get_status_of_swap: IDL.Func([GetStatusRequest], [Result_1], ['query']),
-        get_swaps_by_user: IDL.Func([GetSwapsRequest], [Result], ['query']),
         nft_info: IDL.Func([InfoRequest], [NftInfo], []),
         notify_sale_nft_origyn: IDL.Func([SubscriberNotification], [Result_2], []),
         updateCanistergeekInformation: IDL.Func([UpdateInformationRequest], [], []),
