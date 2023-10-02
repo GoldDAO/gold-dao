@@ -82,14 +82,18 @@ const SwapInterface = () => {
 
 export default SwapInterface;
 
-const TokenTag = ({ nft, size }) => {
+const TokenTag = ({ nft, size, isToggle, index}) => {
     const [isSelected, setIsSelected] = useState(false);
     const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
     const [, addItemToCart] = useAtom(addCartItemAtom);
 
     useEffect(() => {
-        !isSelected ? removeItemFromCart(nft) : addItemToCart(nft);
+            !isSelected ? removeItemFromCart(nft) : addItemToCart(nft);
     }, [isSelected]);
+
+    useEffect(() => {
+            setIsSelected(isToggle[index])
+    }, [isToggle]);
 
     return (
         <Tag
@@ -350,13 +354,25 @@ const MyNfts = ({ isConnected }) => {
 const MyNftsPanel = ({ setIsloading }) => {
     const actors = useAllCanisters();
     const {nftsByW, isLoading } = useNft(actors);
+    const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
+    const [, addItemToCart] = useAtom(addCartItemAtom);
+    const [isAllSelected, setIsAllSelected] = useState([false, false, false , false])
 
     useEffect(() =>{
         setIsloading(isLoading)
     },[isLoading])
 
-    const toggleSameWeight = () => {
 
+    const selectSameWeight = (index) => {
+        const nextState = [...isAllSelected]
+        nextState[index] = true
+        setIsAllSelected(nextState)
+    }
+
+    const unSelectSameWeight = (index) => {
+        const nextState = [...isAllSelected]
+        nextState[index] = false
+        setIsAllSelected(nextState)
     }
 
     return ( 
@@ -376,14 +392,16 @@ const MyNftsPanel = ({ setIsloading }) => {
                 weight.length > 0 && 
                 <Card key={i} shadow={'none'}>
                     <CardHeader 
-                    display={'flex'}
-                    justifyContent={'space-between'}  
-                    pb='0px' 
-                    color={'secondaryText'}>GLD NFTs g 
-                    {/* <Button 
-                    bg='black' 
-                    _hover={{backgroundColor: 'secondaryText'}}
-                    color='white' size={'sm'}>Select All</Button> */}
+                        display={'flex'}
+                        justifyContent={'space-between'}  
+                        pb='0px' 
+                        color={'secondaryText'}>GLD NFTs g 
+                        <Button 
+                            onClick={() => isAllSelected[i] ? unSelectSameWeight( i) : selectSameWeight(i)}
+                            bg='black' 
+                            _hover={{backgroundColor: 'secondaryText'}}
+                            color='white' size={'sm'}>{isAllSelected[i] ? 'Unselect All' : 'Select All'}
+                        </Button>
                     </CardHeader>
                     <CardBody>
                         {isLoading ? (
@@ -391,9 +409,9 @@ const MyNftsPanel = ({ setIsloading }) => {
                         ) : (
                             <HStack w={'100%'} wrap="wrap">
                                 {weight.map(
-                                    (e, i) => {
+                                    (e, j) => {
                                             return (  
-                                                <TokenTag size="md" nft={e} key={i} />
+                                                <TokenTag size="md" nft={e} key={j} isToggle={isAllSelected} index={i}/>
                                             )
                                     })}
                             </HStack>
@@ -522,7 +540,6 @@ const BatchOfferResponse = ({ res, loading }) => {
     return !loading ? (
         <>
             {res?.map((el) => {
-                console.log('el', el)
                 return el?.map((e, i) => (
                     <Box pb={'20px'}>
                         {e.ok && <HStack><CheckCircleIcon color='green.300'/><Text>{e.ok?.token_id}</Text></HStack>}
