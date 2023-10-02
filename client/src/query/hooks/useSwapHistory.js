@@ -24,6 +24,7 @@ const useSwapHistory = () => {
             await queryHistory(gldtCoreActor, principal)
                 .then((result) => {
                     setHistory(result);
+                    console.log('historyResult', result);
                     setIsloading(false);
                 })
                 .catch((error) => {

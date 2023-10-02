@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Box, Grid, GridItem, Text } from '@chakra-ui/react';
 
 const Header = () => {
-    const { isConnected } = useConnect();
+    const { isConnected, principal } = useConnect();
     return (
         <header
             style={{

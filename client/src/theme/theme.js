@@ -14,4 +14,13 @@ export const customTheme = {
         border: '#E4E4E4',
         darkGold: '#937937',
     },
+    components: {
+        Alert: {
+            baseStyle: {
+                container: {
+                    bg: 'black',
+                },
+            },
+        },
+    },
 };

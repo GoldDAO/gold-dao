@@ -23,6 +23,7 @@ import {
     Td,
     Tr,
     useDisclosure,
+    Tooltip,
     Tag,
     TagLabel,
     TagRightIcon,
@@ -51,24 +52,29 @@ import { sendBatchOffer } from '@/query/sendBatchOffer';
 import Link from 'next/link';
 import TokenSign from '../gldt/TokenSign';
 import Grid from '@/components/layout/Grid';
-import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
+import Image from 'next/image';
+import Arrow from '/public/images/arrow.svg'
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
-
     return (
         <Card
             gridColumn={'3/11'}
             p={[2, 2, 2, 4]}
+            position={'relative'}
             shadow={['md', 'lg']}
             bg="bg"
             display="grid"
+            justifyContent={'center'}
             gridTemplateRows={'repeat(1, 1fr)'}
+            gridTemplateColumns={'repeat(1, 1fr)'}
             gap="3"
             borderRadius={'2xl'}
         >
-            <Input isConnected={isConnected} />
-            <Output isConnected={isConnected} />
+
+                <Input isConnected={isConnected} />
+                <Output isConnected={isConnected} />
             <SwapButton isConnected={isConnected} />
         </Card>
     );
@@ -118,17 +124,21 @@ const TokenTag = ({ nft, size }) => {
 const Input = ({ isConnected }) => {
     return (
         <Card
+            gridColumn={'span 1'}
             bg="white"
             borderRadius={'lg'}
+            position='relative'
             border="1px"
             borderColor="border"
             shadow={'none'}
+            w={'100%'}
             p={[2, 2, 3, 4, 6]}
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
             gap={[3]}
         >
             <MyNfts isConnected={isConnected} />
             <SelectedNfts isConnected={isConnected} />
+            <FakeArrowButton />
         </Card>
     );
 };
@@ -150,6 +160,32 @@ const Output = ({ isConnected }) => {
         </Card>
     );
 };
+
+const FakeArrowButton = () => {
+    return(
+        <Box 
+            h='45px'
+            w='45px'
+            overflow={'visible'}
+            bottom={'-28px'}
+            display={'flex'}
+            justifySelf={'center'}
+            alignSelf={'center'}
+            alignItems={'center'}
+            position={'absolute'}
+            justifyContent={'center'}
+            border={'4px'}
+            borderColor={'bg'}
+            p={0}
+            m={0}
+            borderRadius={200}
+            bg='white'
+            zIndex={2}
+        >
+            <Image width={'17px'} height={'17px'} src={Arrow} alt='arrow' />
+        </Box>
+    )
+}
 
 const OutputOverview = ({ isConnected }) => {
     const [weight] = useAtom(getTotalCartWeightAtom);
@@ -243,18 +279,26 @@ const TransactionDetailsTable = () => {
                         </Cell>
                     </Row>
                     <Row>
-                        <Cell>Conversion fee (1%)</Cell>
+                        <Cell><HStack><Text>Conversion fee (1%)</Text>
+                        <Tooltip label='A conversion fee is deducted because the NFTs are running on the Origyn NFT standard. The Origyn NFT standard inherently protects creator royalties which are 1% for the GLD NFTs. Therefore, the fees are also present for the swapping of the GLDT.' fontSize='sm'>
+                            <InfoIcon />
+                        </Tooltip>
+                         </HStack></Cell>
                         <Cell r>
                             <HStack>
-                                <Text>{fees}</Text> <TokenSign />
+                                <Text>- {fees}</Text> <TokenSign />
                             </HStack>
                         </Cell>
                     </Row>
                     <Row>
-                        <Cell>Fee compensation</Cell>
+                    <Cell><HStack><Text>Fee compensation</Text>
+                        <Tooltip label='The conversion fee of the first 100 Million GLDT swapped are refunded.' fontSize='sm'>
+                            <InfoIcon />
+                        </Tooltip>
+                         </HStack></Cell>
                         <Cell r>
                             <HStack>
-                                <Text>{fees} </Text>
+                                <Text>+ {fees} </Text>
                                 <TokenSign />
                             </HStack>
                         </Cell>
@@ -264,7 +308,11 @@ const TransactionDetailsTable = () => {
                     </Row>
                     <Row borderTop="1px" borderColor="border" pt={2} mt={2} color="black">
                         <Cell>Total received</Cell>
-                        <Cell r>{minted}</Cell>
+                        <Cell r><HStack><Text>{minted}</Text> 
+                        <Tooltip >
+                            <TokenSign />
+                        </Tooltip>
+                        </HStack></Cell>
                     </Row>
                 </Tbody>
             </Table>
@@ -304,10 +352,7 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
     const nfts = useNft(actors);
     const weights = [1, 10, 100, 1000];
 
-    useEffect(() => {
-        setIsloading(nfts.isLoading);
-        console.log('nfts',)
-    }, [nfts.isLoading]);
+    console.log('nfts', nfts)
 
     return (
         <AccordionPanel
@@ -321,23 +366,25 @@ const MyNftsPanel = ({ setIsloading, isLoading }) => {
             borderEndEndRadius={'md'}
             borderEndStartRadius={'md'}
         >
-            {weights.map((weight, i) => (
+            {!isLoading &&
+            weights.map((weight, i) =>  (
                 <Card key={i} shadow={'none'}>
-                    <CardHeader pb='0px' color={'secondaryText'}>GLDNFT {weight}g</CardHeader>
+                    <CardHeader pb='0px' color={'secondaryText'}>GLD NFTs {weight}g</CardHeader>
                     <CardBody>
                         {isLoading ? (
                             <SkeletonToken />
                         ) : (
                             <HStack w={'100%'} wrap="wrap">
                                 {nfts.nfts.map(
-                                    (e, i) =>
-                                        e.weight === weight && (
-                                            <TokenTag size="md" nft={e} key={i} />
-                                        ),
-                                )}
+                                    (e, i) => {
+                                        if(e.weight === weight){
+                                            return (  
+                                                <TokenTag size="md" nft={e} key={i} />
+                                            )
+                                        }
+                                    })}
                             </HStack>
                         )}
-                        {nfts.nfts.length < 1 ? <Text>No GLD NFT</Text> : ''}
                     </CardBody>
                 </Card>
             ))}

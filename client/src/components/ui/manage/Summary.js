@@ -20,11 +20,13 @@ import {
     HStack,
     Skeleton,
 } from '@chakra-ui/react';
-import { useNft, useOngoingSwaps } from '@/query/hooks/useNFTs';
+import { useNft } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
 import { cancelSale } from '@/query/cancelSale';
 import useSwapHistory from '@/query/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
+import useOngoingSwaps from '@/query/hooks/useOngoingSwap';
+import TokenSign from '../gldt/TokenSign';
 
 const Summary = () => {
     const { isConnected } = useConnect();
@@ -94,7 +96,7 @@ const Mynfts = ({ connected }) => {
                                     borderStartStartRadius={'md'}
                                 >
                                     <HStack>
-                                        <Text>GLDNFT {weight}g</Text>{' '}
+                                        <Text>GLD NFT {weight}g</Text>{' '}
                                         {isLoading && <Spinner size="md" />}
                                     </HStack>
                                 </AccordionButton>
@@ -208,8 +210,9 @@ const MyTransactions = () => {
             </CardHeader>
             <Accordion allowToggle>
                 <HStack wrap={'wrap'}>
-                    <AccordionItem w="100%" border={0}>
+                    <AccordionItem w="100%" border={0} isDisabled={ongoing.isLoading}>
                         <AccordionButton
+                            isDisabled={ongoing.isLoading}
                             h="60px"
                             bg="bg"
                             border="1px"
@@ -218,6 +221,7 @@ const MyTransactions = () => {
                             borderStartStartRadius={'md'}
                         >
                             Ongoing transactions
+                            {ongoing.isLoading && <Spinner size="md" />}
                         </AccordionButton>
                         <AccordionPanel
                             bg="bg"
@@ -233,14 +237,35 @@ const MyTransactions = () => {
                                         <Table>
                                             <Thead>
                                                 <Tr>
-                                                    <Td>Transaction id</Td>
+                                                    <Td>Type</Td>
+                                                    <Td>Date / time</Td>
                                                     <Td>Token id</Td>
-                                                    <Td>timestamp</Td>
-                                                    <Td>GLDT</Td>
+                                                    <Td>GLDT amount</Td>
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
-                                            <Tbody>{/*  */}</Tbody>
+                                            <Tbody>
+                                                {ongoing.ongoing?.Ok.data[0].map((e) => {
+                                                    return (
+                                                        <Tr>
+                                                            <Td>{Object.keys(e.record_type)}</Td>
+                                                            <Td>{parseInt(e.timestamp)}</Td>
+                                                            <Td>{e.nft_id}</Td>
+                                                            <Td>
+                                                                <HStack>
+                                                                    <Text>
+                                                                        {parseInt(
+                                                                            e.num_tokens.value,
+                                                                        )}
+                                                                    </Text>
+                                                                    <TokenSign />
+                                                                </HStack>
+                                                            </Td>
+                                                            <Td>{Object.keys(e.status.status)}</Td>
+                                                        </Tr>
+                                                    );
+                                                })}
+                                            </Tbody>
                                         </Table>
                                     </TableContainer>
                                 </CardBody>
@@ -274,10 +299,10 @@ const MyTransactions = () => {
                                         <Table>
                                             <Thead>
                                                 <Tr>
-                                                    <Td>Transaction id</Td>
+                                                    <Td>Type</Td>
+                                                    <Td>Date / time</Td>
                                                     <Td>Token id</Td>
-                                                    <Td>timestamp</Td>
-                                                    <Td>GLDT</Td>
+                                                    <Td>GLDT amount</Td>
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
@@ -285,10 +310,19 @@ const MyTransactions = () => {
                                                 {history.history?.Ok.data[0].map((e) => {
                                                     return (
                                                         <Tr>
-                                                            <Td>{e.nft_sale_id}</Td>
-                                                            <Td>{e.nft_id}</Td>
+                                                            <Td>{Object.keys(e.record_type)}</Td>
                                                             <Td>{parseInt(e.timestamp)}</Td>
-                                                            <Td>GLDT</Td>
+                                                            <Td>{e.nft_id}</Td>
+                                                            <Td>
+                                                                <HStack>
+                                                                    <Text>
+                                                                        {parseInt(
+                                                                            e.num_tokens.value,
+                                                                        )}
+                                                                    </Text>
+                                                                    <TokenSign />
+                                                                </HStack>
+                                                            </Td>
                                                             <Td>{Object.keys(e.status.status)}</Td>
                                                         </Tr>
                                                     );

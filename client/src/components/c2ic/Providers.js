@@ -22,7 +22,7 @@ const Providers = ({ children }) => {
 
     let client = createClient({
         canisters,
-        providers: [new InfinityWallet()],
+        providers: defaultProviders,
         globalProviderConfig: {
             host: 'https://icp0.io',
             dev: false,
