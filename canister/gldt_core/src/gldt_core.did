@@ -29,7 +29,7 @@ type AskFeature = variant {
 };
 type AskFeature_ending = variant { date : int; timeout : nat };
 type AskFeature_min_increase = variant { amount : nat; percentage : float64 };
-type AuctionConfig__1 = record {
+type AuctionConfig = record {
   start_price : nat;
   token : TokenSpec;
   reserve : opt nat;
@@ -37,9 +37,9 @@ type AuctionConfig__1 = record {
   min_increase : AskFeature_min_increase;
   allow_list : opt vec principal;
   buy_now : opt nat;
-  ending : AuctionConfig__1_ending;
+  ending : AuctionConfig_ending;
 };
-type AuctionConfig__1_ending = variant {
+type AuctionConfig_ending = variant {
   date : int;
   wait_for_quiet : record {
     max : nat;
@@ -61,7 +61,7 @@ type AuctionStateShared = record {
   allow_list : opt vec record { principal; bool };
   current_broker_id : opt principal;
   min_next_bid : nat;
-  config : PricingConfigShared__1;
+  config : PricingConfigShared;
 };
 type AuctionStateShared_status = variant { closed; open; not_started };
 type Box = variant {
@@ -162,6 +162,7 @@ type DutchParams = record {
 };
 type DutchParams_decay_type = variant { flat : nat; percent : float64 };
 type DutchParams_time_unit = variant { day : nat; hour : nat; minute : nat };
+type Error = record { error_message : text; error_code : nat };
 type EscrowReceipt = record {
   token : TokenSpec;
   token_id : text;
@@ -209,38 +210,39 @@ type GetStatusRequest = record {
   sale_id : text;
 };
 type GetStatusResponse = record { status : opt SwappingStates };
-type GldNft = record {
-  requested_memo : vec nat8;
-  older_record : opt GldNft;
-  to_subaccount : vec nat8;
-  minted : opt GldtMinted;
-  swapped : opt GldtSwapped;
-  receiving_account : Account;
-  grams : nat16;
-  gldt_minting_timestamp_seconds : nat64;
-  nft_sale_id : text;
-  gld_nft_canister_id : principal;
+type GetSwapsRequest = record {
+  page : opt nat32;
+  limit : opt nat32;
+  account : opt Account;
 };
-type GldtBurned = record { burn_block_height : nat64 };
-type GldtMinted = record {
-  num_tokens : opt GldtNumTokens;
-  mint_block_height : opt nat;
-  last_audited_timestamp_seconds : nat64;
-  burned : opt GldtBurned;
+type GldtError = variant {
+  MintingError : opt Error;
+  Other : opt Error;
+  SwappingError : opt Error;
 };
+type GldtLedgerEntry = variant {
+  Burned : GldtLedgerInfo;
+  Minted : GldtLedgerInfo;
+};
+type GldtLedgerInfo = record { num_tokens : GldtNumTokens; block_height : nat };
 type GldtNumTokens = record { value : nat };
 type GldtRecord = record {
   nft_id : text;
+  status : RecordStatusInfo;
   record_type : RecordType;
-  memo : vec nat8;
   num_tokens : GldtNumTokens;
-  escrow_subaccount : opt vec nat8;
+  escrow_subaccount : vec nat8;
   counterparty : Account;
   grams : nat16;
   timestamp : nat64;
   nft_sale_id : text;
   gld_nft_canister_id : principal;
   block_height : nat;
+};
+type GldtRegistryEntry = record {
+  older_record : opt GldtRegistryEntry;
+  gldt_issue : SwapInfo;
+  gldt_redeem : opt SwapInfo;
 };
 type GldtSwapped = record { index : nat; sale_id : text };
 type HourlyMetricsData = record {
@@ -271,7 +273,7 @@ type MetricsGranularity = variant { hourly; daily };
 type MetricsRequest = record { parameters : GetMetricsParameters };
 type MetricsResponse = record { metrics : opt CanisterMetrics };
 type NftCanisterConf = record { grams : nat16 };
-type NftInfo = record { info : opt GldNft };
+type NftInfo = record { info : opt GldtRegistryEntry };
 type NumericEntity = record {
   avg : nat64;
   max : nat64;
@@ -279,13 +281,15 @@ type NumericEntity = record {
   first : nat64;
   last : nat64;
 };
-type PricingConfigShared__1 = variant {
+type PricingConfigShared = variant {
   ask : opt vec AskFeature;
   extensible : CandyShared;
   instant;
-  auction : AuctionConfig__1;
+  auction : AuctionConfig;
 };
 type PropertyShared = record { value : Box; name : text; immutable : bool };
+type RecordStatus = variant { Failed; Ongoing; Success };
+type RecordStatusInfo = record { status : RecordStatus; message : opt text };
 type RecordType = variant { Burn; Mint };
 type Result = variant { Ok : GetRecordsResponse; Err : text };
 type Result_1 = variant { Ok : GetStatusResponse; Err : text };
@@ -324,6 +328,17 @@ type SubscriberNotification = record {
   seller : Account_1;
   escrow_info : SubAccountInfo;
 };
+type SwapInfo = record {
+  requested_memo : vec nat8;
+  ledger_entry : opt GldtLedgerEntry;
+  num_tokens : GldtNumTokens;
+  escrow_subaccount : vec nat8;
+  swapped : opt GldtSwapped;
+  receiving_account : Account;
+  swap_request_timestamp : nat64;
+  nft_sale_id : text;
+  failed : opt GldtError;
+};
 type SwappingStates = variant {
   Burned;
   Initialised;
@@ -341,9 +356,10 @@ service : (opt Conf) -> {
       GetInformationResponse,
     ) query;
   get_conf : () -> (Conf);
+  get_historical_swaps_by_user : (GetSwapsRequest) -> (Result) query;
+  get_ongoing_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_records : (GetRecordsRequest) -> (Result) query;
   get_status_of_swap : (GetStatusRequest) -> (Result_1) query;
-  get_swaps_by_user : (opt Account, opt nat32, opt nat32) -> (Result) query;
   nft_info : (InfoRequest) -> (NftInfo);
   notify_sale_nft_origyn : (SubscriberNotification) -> (Result_2);
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();

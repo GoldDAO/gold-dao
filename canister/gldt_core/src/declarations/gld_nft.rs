@@ -155,24 +155,14 @@ pub enum TransactionID {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum Account__1 {
-    account_id(String),
-    principal(Principal),
-    extensible(Box<CandyShared>),
-    account {
-        owner: Principal,
-        sub_account: Option<serde_bytes::ByteBuf>,
-    },
-}
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum EndSaleResponse_txn_type {
     escrow_deposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_network_updated {
@@ -184,9 +174,9 @@ pub enum EndSaleResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_managers_updated {
@@ -196,12 +186,12 @@ pub enum EndSaleResponse_txn_type {
     auction_bid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
     burn {
-        from: Option<Account__1>,
+        from: Option<Account>,
         extensible: Box<CandyShared>,
     },
     data {
@@ -212,32 +202,32 @@ pub enum EndSaleResponse_txn_type {
     },
     sale_ended {
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: Option<String>,
     },
     mint {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         sale: Option<EndSaleResponse_txn_type_mint_sale_inner>,
         extensible: Box<CandyShared>,
     },
     royalty_paid {
         tag: String,
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
-        receiver: Account__1,
+        receiver: Account,
         sale_id: Option<String>,
     },
     extensible(Box<CandyShared>),
     owner_transfer {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         extensible: Box<CandyShared>,
     },
     sale_opened {
@@ -254,9 +244,9 @@ pub enum EndSaleResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     deposit_withdraw {
@@ -264,14 +254,9 @@ pub enum EndSaleResponse_txn_type {
         token: TokenSpec,
         trx_id: TransactionID,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
-}
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum TokenSpec {
-    ic(ICTokenSpec),
-    extensible(Box<CandyShared>),
 }
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct EndSaleResponse {
@@ -326,9 +311,9 @@ pub enum WithdrawResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_network_updated {
@@ -340,9 +325,9 @@ pub enum WithdrawResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_managers_updated {
@@ -352,12 +337,12 @@ pub enum WithdrawResponse_txn_type {
     auction_bid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
     burn {
-        from: Option<Account__1>,
+        from: Option<Account>,
         extensible: Box<CandyShared>,
     },
     data {
@@ -368,32 +353,32 @@ pub enum WithdrawResponse_txn_type {
     },
     sale_ended {
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: Option<String>,
     },
     mint {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         sale: Option<WithdrawResponse_txn_type_mint_sale_inner>,
         extensible: Box<CandyShared>,
     },
     royalty_paid {
         tag: String,
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
-        receiver: Account__1,
+        receiver: Account,
         sale_id: Option<String>,
     },
     extensible(Box<CandyShared>),
     owner_transfer {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         extensible: Box<CandyShared>,
     },
     sale_opened {
@@ -410,9 +395,9 @@ pub enum WithdrawResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     deposit_withdraw {
@@ -420,7 +405,7 @@ pub enum WithdrawResponse_txn_type {
         token: TokenSpec,
         trx_id: TransactionID,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
 }
@@ -548,9 +533,9 @@ pub enum TransactionRecord_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_network_updated {
@@ -562,9 +547,9 @@ pub enum TransactionRecord_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_managers_updated {
@@ -574,12 +559,12 @@ pub enum TransactionRecord_txn_type {
     auction_bid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
     burn {
-        from: Option<Account__1>,
+        from: Option<Account>,
         extensible: Box<CandyShared>,
     },
     data {
@@ -590,32 +575,32 @@ pub enum TransactionRecord_txn_type {
     },
     sale_ended {
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: Option<String>,
     },
     mint {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         sale: Option<TransactionRecord_txn_type_mint_sale_inner>,
         extensible: Box<CandyShared>,
     },
     royalty_paid {
         tag: String,
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
-        receiver: Account__1,
+        receiver: Account,
         sale_id: Option<String>,
     },
     extensible(Box<CandyShared>),
     owner_transfer {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         extensible: Box<CandyShared>,
     },
     sale_opened {
@@ -632,9 +617,9 @@ pub enum TransactionRecord_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     deposit_withdraw {
@@ -642,7 +627,7 @@ pub enum TransactionRecord_txn_type {
         token: TokenSpec,
         trx_id: TransactionID,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
 }
@@ -667,8 +652,8 @@ pub struct BidRequest {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct DepositDetail {
-    pub token: TokenSpec__1,
-    pub trx_id: Option<TransactionID__1>,
+    pub token: TokenSpec,
+    pub trx_id: Option<TransactionID>,
     pub seller: Account,
     pub buyer: Account,
     pub amount: candid::Nat,
@@ -680,13 +665,6 @@ pub struct EscrowRequest {
     pub deposit: DepositDetail,
     pub lock_to_date: Option<candid::Int>,
 }
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum TransactionID__1 {
-    nat(candid::Nat),
-    text(String),
-    extensible(Box<CandyShared>),
-}
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum WithdrawRequest {
     reject(RejectDescription),
@@ -696,33 +674,14 @@ pub enum WithdrawRequest {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct ICTokenSpec__1 {
-    id: Option<candid::Nat>,
-    fee: Option<candid::Nat>,
-    decimals: candid::Nat,
-    canister: Principal,
-    standard: ICTokenSpec__1_standard,
-    symbol: String,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum TokenSpec__1 {
-    ic(ICTokenSpec__1),
+pub enum TokenSpec {
+    ic(ICTokenSpec),
     extensible(Box<CandyShared>),
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum ICTokenSpec__1_standard {
-    ICRC1,
-    EXTFungible,
-    DIP20,
-    Other(Box<CandyShared>),
-    Ledger,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct WithdrawDescription {
-    token: TokenSpec__1,
+    token: TokenSpec,
     token_id: String,
     seller: Account,
     withdraw_to: Account,
@@ -732,15 +691,15 @@ pub struct WithdrawDescription {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct DepositWithdrawDescription {
-    token: TokenSpec__1,
-    withdraw_to: Account,
-    buyer: Account,
-    amount: candid::Nat,
+    pub token: TokenSpec,
+    pub withdraw_to: Account,
+    pub buyer: Account,
+    pub amount: candid::Nat,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct RejectDescription {
-    token: TokenSpec__1,
+    token: TokenSpec,
     token_id: String,
     seller: Account,
     buyer: Account,
@@ -761,7 +720,7 @@ pub enum ManageSaleRequest {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct TokenIDFilter_tokens_item {
-    token: TokenSpec__1,
+    token: TokenSpec,
     min_amount: Option<candid::Nat>,
     max_amount: Option<candid::Nat>,
 }
@@ -784,7 +743,7 @@ pub enum TokenSpecFilter_filter_type {
 }
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct TokenSpecFilter {
-    token: TokenSpec__1,
+    token: TokenSpec,
     filter_type: TokenSpecFilter_filter_type,
 }
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -810,33 +769,6 @@ pub struct SaleStatusShared {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct AuctionConfig__1 {
-    start_price: candid::Nat,
-    token: TokenSpec__1,
-    reserve: Option<candid::Nat>,
-    start_date: candid::Int,
-    min_increase: AuctionConfig__1_min_increase,
-    allow_list: Option<Vec<Principal>>,
-    buy_now: Option<candid::Nat>,
-    ending: AuctionConfig__1_ending,
-}
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum AuctionConfig__1_min_increase {
-    amount(candid::Nat),
-    percentage(f64),
-}
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum AuctionConfig__1_ending {
-    date(candid::Int),
-    wait_for_quiet {
-        max: candid::Nat,
-        date: candid::Int,
-        fade: f64,
-        extension: u64,
-    },
-}
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum AuctionStateShared_status {
     closed,
     open,
@@ -847,24 +779,16 @@ pub struct AuctionStateShared {
     pub status: AuctionStateShared_status,
     pub participants: Vec<(Principal, candid::Int)>,
     pub token: TokenSpec,
-    pub current_bid_amount: candid::Nat,
-    pub winner: Option<Account>,
-    pub end_date: candid::Int,
-    pub start_date: candid::Int,
-    pub wait_for_quiet_count: Option<candid::Nat>,
-    pub current_escrow: Option<EscrowReceipt>,
-    pub allow_list: Option<Vec<(Principal, bool)>>,
-    pub current_broker_id: Option<Principal>,
-    pub min_next_bid: candid::Nat,
-    pub config: PricingConfigShared__1,
-}
-pub type AskConfigShared__1 = Option<Vec<AskFeature>>;
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub enum PricingConfigShared__1 {
-    ask(AskConfigShared__1),
-    extensible(Box<CandyShared>),
-    instant,
-    auction(AuctionConfig__1),
+    current_bid_amount: candid::Nat,
+    winner: Option<Account>,
+    end_date: candid::Int,
+    start_date: candid::Int,
+    wait_for_quiet_count: Option<candid::Nat>,
+    current_escrow: Option<EscrowReceipt>,
+    allow_list: Option<Vec<(Principal, bool)>>,
+    current_broker_id: Option<Principal>,
+    min_next_bid: candid::Nat,
+    pub config: PricingConfigShared,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -909,9 +833,9 @@ pub enum BidResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_network_updated {
@@ -923,9 +847,9 @@ pub enum BidResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     canister_managers_updated {
@@ -935,12 +859,12 @@ pub enum BidResponse_txn_type {
     auction_bid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
     burn {
-        from: Option<Account__1>,
+        from: Option<Account>,
         extensible: Box<CandyShared>,
     },
     data {
@@ -951,32 +875,32 @@ pub enum BidResponse_txn_type {
     },
     sale_ended {
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
         sale_id: Option<String>,
     },
     mint {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         sale: Option<BidResponse_txn_type_mint_sale_inner>,
         extensible: Box<CandyShared>,
     },
     royalty_paid {
         tag: String,
         token: TokenSpec,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
-        receiver: Account__1,
+        receiver: Account,
         sale_id: Option<String>,
     },
     extensible(Box<CandyShared>),
     owner_transfer {
-        to: Account__1,
-        from: Account__1,
+        to: Account,
+        from: Account,
         extensible: Box<CandyShared>,
     },
     sale_opened {
@@ -993,9 +917,9 @@ pub enum BidResponse_txn_type {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionID,
-        seller: Account__1,
+        seller: Account,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
     deposit_withdraw {
@@ -1003,7 +927,7 @@ pub enum BidResponse_txn_type {
         token: TokenSpec,
         trx_id: TransactionID,
         extensible: Box<CandyShared>,
-        buyer: Account__1,
+        buyer: Account,
         amount: candid::Nat,
     },
 }
