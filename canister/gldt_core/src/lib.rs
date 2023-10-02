@@ -324,15 +324,16 @@ fn get_records(req: GetRecordsRequest) -> Result<GetRecordsResponse, String> {
     };
     RECORDS.with(|r| {
         let entries = &r.borrow().entries;
-        let paginated_records = entries
+        let paginated_records: Vec<_> = entries
             .values()
             .skip(start as usize)
             .take(limit as usize)
             .cloned()
             .collect();
+        let data = if paginated_records.is_empty() { None } else { Some(paginated_records) };
         Ok(GetRecordsResponse {
             total: entries.len() as u32,
-            data: Some(paginated_records),
+            data,
         })
     })
 }
@@ -691,9 +692,15 @@ fn add_record(
             Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
             None => Nat::from(0),
         };
+
+        #[cfg(not(test))]
+        let timestamp = api::time();
+        #[cfg(test)]
+        let timestamp = 0; // api::time only available in canister
+
         let new_entry = GldtRecord::new(
             RecordType::Mint,
-            api::time(),
+            timestamp,
             swap_info.get_receiving_account(),
             gld_nft_canister_id,
             nft_id,
