@@ -14,7 +14,7 @@ pub struct Registry {
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRegistryEntry {
     /// The lifecycle of an NFT starts with the issuance of GLDT
     gldt_issue: SwapInfo,
@@ -80,7 +80,7 @@ pub enum RegistryUpdateType {
 }
 
 ///
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct SwapInfo {
     /// The sale id of the NFT listing in the GLD NFT canister
     nft_sale_id: String,
@@ -161,19 +161,19 @@ impl SwapInfo {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum GldtLedgerEntry {
     Minted(GldtLedgerInfo),
     Burned(GldtLedgerInfo),
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct Error {
     error_code: Nat,
     error_message: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum GldtError {
     /// The minting of GLDT failed.
     MintingError(Option<Error>),
@@ -234,7 +234,7 @@ impl GldtSwapped {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum SwappingStates {
     Initialised,
     Minted,

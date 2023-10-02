@@ -339,13 +339,7 @@ type SwapInfo = record {
   nft_sale_id : text;
   failed : opt GldtError;
 };
-type SwappingStates = variant {
-  Burned;
-  Initialised;
-  Swapped;
-  Finalised;
-  Minted;
-};
+type SwappingStates = variant { Burned; Initialised; Swapped; Minted };
 type TokenSpec = variant { ic : ICTokenSpec; extensible : CandyShared };
 type UpdateInformationRequest = record {
   metrics : opt CollectMetricsRequestType;
@@ -355,7 +349,7 @@ service : (opt Conf) -> {
   getCanistergeekInformation : (GetInformationRequest) -> (
       GetInformationResponse,
     ) query;
-  get_conf : () -> (Conf);
+  get_conf : () -> (Conf) query;
   get_historical_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_ongoing_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_records : (GetRecordsRequest) -> (Result) query;

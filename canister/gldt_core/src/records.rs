@@ -11,26 +11,26 @@ pub struct Records {
     pub entries_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum RecordType {
     Mint,
     Burn,
 }
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum RecordStatus {
     Success,
     Failed,
     Ongoing,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct RecordStatusInfo {
     pub status: RecordStatus,
     pub message: Option<String>,
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRecord {
     /// The type of transaction
     record_type: RecordType,
