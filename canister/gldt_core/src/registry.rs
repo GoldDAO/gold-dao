@@ -42,7 +42,11 @@ impl GldtRegistryEntry {
 
     pub fn get_status_of_swap(&self) -> SwappingStates {
         if self.is_minted() {
-            if self.is_swapped() { SwappingStates::Swapped } else { SwappingStates::Minted }
+            if self.is_swapped() {
+                if self.is_burned() { SwappingStates::Burned } else { SwappingStates::Swapped }
+            } else {
+                SwappingStates::Minted
+            }
         } else {
             SwappingStates::Initialised
         }
@@ -236,7 +240,6 @@ pub enum SwappingStates {
     Minted,
     Swapped,
     Burned,
-    Finalised,
 }
 
 impl Registry {
