@@ -21,6 +21,8 @@ import {
     Skeleton,
     AccordionIcon,
     VStack,
+    Tfoot,
+    Flex,
 } from '@chakra-ui/react';
 import { useNft } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
@@ -29,7 +31,7 @@ import useSwapHistory from '@/query/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
 import useOngoingSwaps from '@/query/hooks/useOngoingSwap';
 import TokenSign from '../gldt/TokenSign';
-import { ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, ArrowForwardIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import NFTIcon from '/public/images/sell.svg';
 import weightIcon from '/public/images/scale.svg';
 import swappedIcon from '/public/images/send_money.svg';
@@ -325,9 +327,47 @@ const SaleStatus = ({ status, e }) => {
     );
 };
 
+const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
+    return (
+        <VStack p="20px">
+            <Flex justifyContent={'space-between'} width={'100%'}>
+                <Text>Page {currentHistoryPage + 1}</Text>
+                <Text>{total} entries</Text>
+            </Flex>
+            <Flex justifyContent={'space-between'} width={'100%'}>
+                <Button
+                    bg="bg"
+                    _hover={{
+                        bg: 'border',
+                    }}
+                    isDisabled={currentHistoryPage < 1}
+                    onClick={() => setCurrentHistoryPage((prev) => prev - 1)}
+                >
+                    <ArrowBackIcon />
+                </Button>
+                <Button
+                    bg="bg"
+                    _hover={{
+                        bg: 'border',
+                    }}
+                    isDisabled={total / (currentHistoryPage + 1) < 10}
+                    onClick={() => setCurrentHistoryPage((prev) => prev + 1)}
+                >
+                    <ArrowForwardIcon />
+                </Button>
+            </Flex>
+        </VStack>
+    );
+};
+
 const MyTransactions = () => {
-    const history = useSwapHistory();
+    const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
+    const history = useSwapHistory(currentHistoryPage);
     const ongoing = useOngoingSwaps(true);
+
+    useEffect(() => {
+        console.log('history', history);
+    }, [history]);
 
     return (
         <Card
@@ -444,7 +484,11 @@ const MyTransactions = () => {
                             <Card shadow={'none'}>
                                 <CardBody p={0}>
                                     <TableContainer>
-                                        <Table>
+                                        <Table
+                                            style={{
+                                                opacity: history.isLoading ? 0.5 : 1,
+                                            }}
+                                        >
                                             <Thead>
                                                 <Tr>
                                                     <Td>Type</Td>
@@ -488,6 +532,11 @@ const MyTransactions = () => {
                                                 })}
                                             </Tbody>
                                         </Table>
+                                        <Pagination
+                                            total={history.history?.Ok?.total}
+                                            currentHistoryPage={currentHistoryPage}
+                                            setCurrentHistoryPage={setCurrentHistoryPage}
+                                        />
                                     </TableContainer>
                                 </CardBody>
                             </Card>

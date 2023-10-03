@@ -2,18 +2,18 @@ import { useCanister, useConnect } from '@connect2ic/react';
 import React, { useEffect, useState } from 'react';
 import { Principal } from '@dfinity/principal';
 
-const queryHistory = async (actor, principal) => {
+const queryHistory = async (actor, principal, page) => {
     const history = await Promise.resolve(
         actor[0].get_historical_swaps_by_user({
-            page: [],
-            limit: [],
+            page: [page],
+            limit: [10],
             account: [{ owner: Principal.fromText(principal), subaccount: [] }],
         }),
     );
     return history;
 };
 
-const useSwapHistory = () => {
+const useSwapHistory = (page) => {
     const [history, setHistory] = useState();
     const [isLoading, setIsloading] = useState(true);
     const { principal } = useConnect();
@@ -21,9 +21,10 @@ const useSwapHistory = () => {
     useEffect(() => {
         setIsloading(true);
         const fetchHistory = async () => {
-            await queryHistory(gldtCoreActor, principal)
+            await queryHistory(gldtCoreActor, principal, page)
                 .then((result) => {
                     setHistory(result);
+                    console.log('result', result);
                     setIsloading(false);
                 })
                 .catch((error) => {
@@ -31,7 +32,7 @@ const useSwapHistory = () => {
                 });
         };
         fetchHistory();
-    }, []);
+    }, [page]);
     return { history, isLoading };
 };
 
