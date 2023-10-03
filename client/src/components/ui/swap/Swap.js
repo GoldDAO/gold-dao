@@ -55,7 +55,7 @@ import TokenSign from '../gldt/TokenSign';
 import Grid from '@/components/layout/Grid';
 import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
-import Arrow from '/public/images/arrow.svg'
+import Arrow from '/public/images/arrow.svg';
 import { gldNftCanisters } from '@/services/agents';
 
 const SwapInterface = () => {
@@ -74,9 +74,8 @@ const SwapInterface = () => {
             gap="3"
             borderRadius={'2xl'}
         >
-
-                <Input isConnected={isConnected} />
-                <Output isConnected={isConnected} />
+            <Input isConnected={isConnected} />
+            <Output isConnected={isConnected} />
             <SwapButton isConnected={isConnected} />
         </Card>
     );
@@ -84,17 +83,17 @@ const SwapInterface = () => {
 
 export default SwapInterface;
 
-const TokenTag = ({ nft, size, isToggle, index}) => {
+const TokenTag = ({ nft, size, isToggle, index }) => {
     const [isSelected, setIsSelected] = useState(false);
     const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
     const [, addItemToCart] = useAtom(addCartItemAtom);
 
     useEffect(() => {
-            !isSelected ? removeItemFromCart(nft) : addItemToCart(nft);
+        !isSelected ? removeItemFromCart(nft) : addItemToCart(nft);
     }, [isSelected]);
 
     useEffect(() => {
-            setIsSelected(isToggle[index])
+        setIsSelected(isToggle[index]);
     }, [isToggle]);
 
     return (
@@ -133,7 +132,7 @@ const Input = ({ isConnected }) => {
             gridColumn={'span 1'}
             bg="white"
             borderRadius={'lg'}
-            position='relative'
+            position="relative"
             border="1px"
             borderColor="border"
             shadow={'none'}
@@ -168,10 +167,10 @@ const Output = ({ isConnected }) => {
 };
 
 const FakeArrowButton = () => {
-    return(
-        <Box 
-            h='45px'
-            w='45px'
+    return (
+        <Box
+            h="45px"
+            w="45px"
             overflow={'visible'}
             bottom={'-28px'}
             display={'flex'}
@@ -185,13 +184,13 @@ const FakeArrowButton = () => {
             p={0}
             m={0}
             borderRadius={200}
-            bg='white'
+            bg="white"
             zIndex={2}
         >
-            <Image width={'17px'} height={'17px'} src={Arrow} alt='arrow' />
+            <Image width={'17px'} height={'17px'} src={Arrow} alt="arrow" />
         </Box>
-    )
-}
+    );
+};
 
 const OutputOverview = ({ isConnected }) => {
     const [weight] = useAtom(getTotalCartWeightAtom);
@@ -212,7 +211,6 @@ const OutputOverview = ({ isConnected }) => {
 };
 
 const OutputDetails = ({ isConnected }) => {
-
     return (
         <Accordion allowToggle>
             <AccordionItem isDisabled={!isConnected} border="0">
@@ -223,7 +221,7 @@ const OutputDetails = ({ isConnected }) => {
                     borderColor="border"
                     borderStartEndRadius={'md'}
                     borderStartStartRadius={'md'}
-                    disabled='flex'
+                    disabled="flex"
                     justifyContent={'space-between'}
                 >
                     <Text>Transaction Details</Text>
@@ -289,11 +287,17 @@ const TransactionDetailsTable = () => {
                         </Cell>
                     </Row>
                     <Row>
-                        <Cell><HStack><Text>Conversion fee (1%)</Text>
-                        <Tooltip label='A conversion fee is deducted because the NFTs are running on the Origyn NFT standard. The Origyn NFT standard inherently protects creator royalties which are 1% for the GLD NFTs. Therefore, the fees are also present for the swapping of the GLDT.' fontSize='sm'>
-                            <InfoIcon />
-                        </Tooltip>
-                         </HStack></Cell>
+                        <Cell>
+                            <HStack>
+                                <Text>Conversion fee (1%)</Text>
+                                <Tooltip
+                                    label="A conversion fee is deducted because the NFTs are running on the Origyn NFT standard. The Origyn NFT standard inherently protects creator royalties which are 1% for the GLD NFTs. Therefore, the fees are also present for the swapping of the GLDT."
+                                    fontSize="sm"
+                                >
+                                    <InfoIcon />
+                                </Tooltip>
+                            </HStack>
+                        </Cell>
                         <Cell r>
                             <HStack>
                                 <Text>- {fees}</Text> <TokenSign />
@@ -301,11 +305,17 @@ const TransactionDetailsTable = () => {
                         </Cell>
                     </Row>
                     <Row>
-                    <Cell><HStack><Text>Fee compensation</Text>
-                        <Tooltip label='The conversion fee of the first 100 Million GLDT swapped are refunded.' fontSize='sm'>
-                            <InfoIcon />
-                        </Tooltip>
-                         </HStack></Cell>
+                        <Cell>
+                            <HStack>
+                                <Text>Fee compensation</Text>
+                                <Tooltip
+                                    label="The conversion fee of the first 100 Million GLDT swapped are refunded."
+                                    fontSize="sm"
+                                >
+                                    <InfoIcon />
+                                </Tooltip>
+                            </HStack>
+                        </Cell>
                         <Cell r>
                             <HStack>
                                 <Text>+ {fees} </Text>
@@ -318,11 +328,14 @@ const TransactionDetailsTable = () => {
                     </Row>
                     <Row borderTop="1px" borderColor="border" pt={2} mt={2} color="black">
                         <Cell>Total received</Cell>
-                        <Cell r><HStack><Text>{minted}</Text> 
-                        <Tooltip >
-                            <TokenSign />
-                        </Tooltip>
-                        </HStack></Cell>
+                        <Cell r>
+                            <HStack>
+                                <Text>{minted}</Text>
+                                <Tooltip>
+                                    <TokenSign />
+                                </Tooltip>
+                            </HStack>
+                        </Cell>
                     </Row>
                 </Tbody>
             </Table>
@@ -351,7 +364,7 @@ const MyNfts = ({ isConnected }) => {
                     justifyContent={'space-between'}
                 >
                     <Box>Select from my NFTs</Box>
-                    {isLoading ? <Spinner size="sm" ml={'1em'} /> : <AccordionIcon/>}
+                    {isLoading ? <Spinner size="sm" ml={'1em'} /> : <AccordionIcon />}
                 </AccordionButton>
                 {connected && <MyNftsPanel setIsloading={setIsloading} />}
             </AccordionItem>
@@ -361,28 +374,26 @@ const MyNfts = ({ isConnected }) => {
 
 const MyNftsPanel = ({ setIsloading }) => {
     const actors = useAllCanisters();
-    const {nftsByW, isLoading } = useNft(actors);
-    const [isAllSelected, setIsAllSelected] = useState([false, false, false , false])
+    const { nftsByW, isLoading } = useNft(actors);
+    const [isAllSelected, setIsAllSelected] = useState([false, false, false, false]);
 
-    useEffect(() =>{
-        setIsloading(isLoading)
-    },[isLoading])
-
-
+    useEffect(() => {
+        setIsloading(isLoading);
+    }, [isLoading]);
 
     const selectSameWeight = (index) => {
-        const nextState = [...isAllSelected]
-        nextState[index] = true
-        setIsAllSelected(nextState)
-    }
+        const nextState = [...isAllSelected];
+        nextState[index] = true;
+        setIsAllSelected(nextState);
+    };
 
     const unSelectSameWeight = (index) => {
-        const nextState = [...isAllSelected]
-        nextState[index] = false
-        setIsAllSelected(nextState)
-    }
+        const nextState = [...isAllSelected];
+        nextState[index] = false;
+        setIsAllSelected(nextState);
+    };
 
-    return ( 
+    return (
         <AccordionPanel
             border={'1px'}
             borderColor={'border'}
@@ -395,40 +406,55 @@ const MyNftsPanel = ({ setIsloading }) => {
             borderEndStartRadius={'md'}
         >
             {!isLoading &&
-            nftsByW.map((weight, i) =>  (
-                weight.length > 0 && 
-                <Card key={i} shadow={'none'}>
-                    <CardHeader 
-                        display={'flex'}
-                        justifyContent={'space-between'}  
-                        pb='0px' 
-                        color={'secondaryText'}>GLD NFTs {Object.keys(gldNftCanisters)[i]}
-                        <Button 
-                            onClick={() => isAllSelected[i] ? unSelectSameWeight( i) : selectSameWeight(i)}
-                            bg='transparent' 
-                            border={'1px'}
-                            borderColor={'black'}
-                            _hover={{backgroundColor: 'bg'}}
-                            fontWeight={400}
-                            size={'xs'}>{isAllSelected[i] ? 'Unselect All' : 'Select All'}
-                        </Button>
-                    </CardHeader>
-                    <CardBody >
-                        {isLoading ? (
-                            <SkeletonToken />
-                        ) : (
-                            <HStack w={'100%'} wrap="wrap">
-                                {weight.map(
-                                    (e, j) => {
-                                            return (  
-                                                <TokenTag size="md" nft={e} key={j} isToggle={isAllSelected} index={i}/>
-                                            )
-                                    })}
-                            </HStack>
-                        )}
-                    </CardBody>
-                </Card>
-            ))}
+                nftsByW.map(
+                    (weight, i) =>
+                        weight.length > 0 && (
+                            <Card key={i} shadow={'none'}>
+                                <CardHeader
+                                    display={'flex'}
+                                    justifyContent={'space-between'}
+                                    pb="0px"
+                                    color={'secondaryText'}
+                                >
+                                    GLD NFTs {Object.keys(gldNftCanisters)[i]}
+                                    <Button
+                                        onClick={() =>
+                                            isAllSelected[i]
+                                                ? unSelectSameWeight(i)
+                                                : selectSameWeight(i)
+                                        }
+                                        bg="transparent"
+                                        border={'1px'}
+                                        borderColor={'black'}
+                                        _hover={{ backgroundColor: 'bg' }}
+                                        fontWeight={400}
+                                        size={'xs'}
+                                    >
+                                        {isAllSelected[i] ? 'Unselect All' : 'Select All'}
+                                    </Button>
+                                </CardHeader>
+                                <CardBody>
+                                    {isLoading ? (
+                                        <SkeletonToken />
+                                    ) : (
+                                        <HStack w={'100%'} wrap="wrap">
+                                            {weight.map((e, j) => {
+                                                return (
+                                                    <TokenTag
+                                                        size="md"
+                                                        nft={e}
+                                                        key={j}
+                                                        isToggle={isAllSelected}
+                                                        index={i}
+                                                    />
+                                                );
+                                            })}
+                                        </HStack>
+                                    )}
+                                </CardBody>
+                            </Card>
+                        ),
+                )}
         </AccordionPanel>
     );
 };
@@ -484,14 +510,14 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
     const [, removeAllFromCart] = useAtom(removeAllItemsInCartAtom);
 
     useEffect(() => {
-        removeAllFromCart()
-    },[])
+        removeAllFromCart();
+    }, []);
     const handleBatchOffer = async () => {
         setLoading(true);
         const res = await sendBatchOffer(actors, cart);
         setRes(res);
         setLoading(false);
-        removeAllFromCart()
+        removeAllFromCart();
     };
 
     return (
@@ -507,7 +533,7 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
                             <Box></Box>
                             <HStack w="100%" textAlign="center" justify="center">
                                 <Text textAlign="center">
-                                    Send {weight}g of GLD NFT to receive {weight * 100} GLDT"
+                                    Send {weight}g of GLD NFT to receive {weight * 100} GLDT
                                 </Text>
                                 <TokenSign />
                             </HStack>
@@ -518,27 +544,26 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
                             <Spinner size="md" /> <Text> awaiting response...</Text>
                         </HStack>
                     )}
-                    {res && <BatchOfferResponse res={res}/>}
+                    {res && <BatchOfferResponse res={res} />}
                 </ModalBody>
                 <ModalFooter>
-                    {!res &&
-                        !loading &&(
-                            <Button
-                                w="100%"
-                                color="white"
-                                bg="black"
-                                borderRadius={'500px'}
-                                h="50px"
-                                _hover={{
-                                    color: 'white',
-                                    bg: 'black',
-                                }}
-                                _disabled={!res && !loading ? false : true}
-                                onClick={(e) => handleBatchOffer()}
-                            >
-                                Confirm transaction
-                            </Button>,
-                        )}
+                    {!res && !loading && (
+                        <Button
+                            w="100%"
+                            color="white"
+                            bg="black"
+                            borderRadius={'500px'}
+                            h="50px"
+                            _hover={{
+                                color: 'white',
+                                bg: 'black',
+                            }}
+                            _disabled={!res && !loading ? false : true}
+                            onClick={(e) => handleBatchOffer()}
+                        >
+                            Confirm transaction
+                        </Button>
+                    )}
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -546,19 +571,28 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
 };
 
 const BatchOfferResponse = ({ res, loading }) => {
-
     return !loading ? (
         <>
             {res?.map((el) => {
                 return el?.map((e, i) => (
-                    <Box pb={'20px'}>
-                        {e.ok && <HStack><CheckCircleIcon color='green.300'/><Text>{e.ok?.token_id}</Text></HStack>}
-                        {e.err && <HStack><WarningIcon color='red.300'/><Text>{e.err?.text}</Text></HStack>}
+                    <Box pb={'20px'} key={i}>
+                        {e.ok && (
+                            <HStack>
+                                <CheckCircleIcon color="green.300" />
+                                <Text>{e.ok?.token_id}</Text>
+                            </HStack>
+                        )}
+                        {e.err && (
+                            <HStack>
+                                <WarningIcon color="red.300" />
+                                <Text>{e.err?.text}</Text>
+                            </HStack>
+                        )}
                     </Box>
                 ));
             })}
             <Text>
-            Swap request successfully sent. You can follow the progress on your&nbsp;
+                Swap request successfully sent. You can follow the progress on your&nbsp;
                 <Link
                     href={'/my-account'}
                     style={{
@@ -581,8 +615,8 @@ const SkeletonToken = () => {
     const count = 5;
     return (
         <HStack w={'100%'} wrap="wrap">
-            {Array.from({ length: count }).map(() => (
-                <Skeleton height="25px" minW={'100px'} maxW={'100%'} />
+            {Array.from({ length: count }).map((e, i) => (
+                <Skeleton height="25px" minW={'100px'} maxW={'100%'} key={i} />
             ))}
         </HStack>
     );
