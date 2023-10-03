@@ -497,28 +497,54 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
     // 100 tokens per gram.
     let tokens_minted = calculate_tokens_from_weight(gld_nft_conf.grams)?;
     // validate amount information
-    (match config {
+    match config {
         PricingConfigShared::ask(Some(features)) => {
             let mut amount: Nat = Nat::from(0);
             for feature in features {
-                if let AskFeature::buy_now(val) = feature {
-                    amount = val;
+                match feature {
+                    AskFeature::buy_now(val) => {
+                        if val != tokens_minted.get() {
+                            return Err(
+                                format!(
+                                    "buy_now price doesn't match the expected value. Expected {}, received {}.",
+                                    tokens_minted.get(),
+                                    val
+                                )
+                            );
+                        }
+                    }
+                    AskFeature::notify(_) => {}
+                    AskFeature::token(val) => {
+                        if val != token_spec {
+                            return Err(
+                                format!(
+                                    "Token specification are not correct. Expected {:?}, received: {:?}",
+                                    token_spec,
+                                    token
+                                )
+                            );
+                        }
+                    }
+                    ask_feature => {
+                        return Err(
+                            format!(
+                                "Unexpected feature in asked, only token, notify and buy_now accepted and received AskFeature::{:?}",
+                                ask_feature
+                            )
+                        );
+                    }
                 }
             }
-            if amount == tokens_minted.get() {
-                Ok(amount)
-            } else {
-                Err(
-                    format!(
-                        "buy_now price doesn't match the expected value. Expected {}, received {}.",
-                        tokens_minted.get(),
-                        amount
-                    )
-                )
-            }
         }
-        _ => Err(String::from("Couldn't find buy_now price.")),
-    })?;
+        pricing_config_shared => {
+            return Err(
+                format!(
+                    "Unexpected pricing_config_shared value, only ask value is accepted and received PricingConfigShared__1::{:?}",
+                    pricing_config_shared
+                )
+            );
+        }
+    }
 
     let swap_info = SwapInfo::new(
         args.sale.sale_id,
@@ -1034,5 +1060,5 @@ fn __get_candid_interface_tmp_hack() -> String {
 
 export_candid!();
 
-// #[cfg(test)]
-// mod test;
+#[cfg(test)]
+mod test;
