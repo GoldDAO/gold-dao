@@ -2,7 +2,6 @@ const path = require('path');
 const env = require('dotenv').config({
     path: path.resolve(__dirname, './../.env'),
 });
-
 const InternalCanisterIds = require('./../canister_ids.json');
 // const GeneratedLocalCanisterIds = require('./../.dfx/local/canister_ids.json');
 const ExternalCanisterIds = require('./../dfx.json');
