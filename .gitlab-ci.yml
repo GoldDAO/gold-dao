@@ -247,7 +247,7 @@ gldt frontend:
     - dfx identity use gitlab-ci-gldt
     - dfx identity whoami
   script:
-    - dfx deploy --network $TARGET_NETWORK --identity gitlab-ci-gldt --no-wallet --compute-evidence -y gldt_frontend
+    - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_frontend
   environment:
     name: $ENVIRONMENT_NAME
     url: $FRONTEND_URL
