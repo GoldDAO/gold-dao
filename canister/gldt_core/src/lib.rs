@@ -765,8 +765,8 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
 
     RECORDS.with(|r| {
         let default_vec = Vec::new();
-        let records = r.borrow();
-        let user_records_indices = (*records.entries_by_user
+        let record_list = r.borrow();
+        let mut user_records_indices = (*record_list.entries_by_user
             .get(&principal)
             .unwrap_or(&default_vec)).clone();
         let total = user_records_indices.len() as u32;
@@ -777,12 +777,14 @@ fn get_historical_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse
             }
         };
 
+        user_records_indices.sort_by(|a, b| b.cmp(a));
+
         if end > total {
             end = total;
         }
         let mut paginated_records = Vec::new();
         for i in start..end {
-            match records.entries.get(&user_records_indices[i as usize]) {
+            match record_list.entries.get(&user_records_indices[i as usize]) {
                 None => {
                     continue;
                 }
