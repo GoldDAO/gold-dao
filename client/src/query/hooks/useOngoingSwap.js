@@ -2,10 +2,10 @@ import { useCanister, useConnect } from '@connect2ic/react';
 import React, { useEffect, useState } from 'react';
 import { Principal } from '@dfinity/principal';
 
-const queryOngoingSwaps = async (actor, principal) => {
+const queryOngoingSwaps = async (actor, principal, page) => {
     const ongoingSwaps = await Promise.resolve(
         actor[0].get_ongoing_swaps_by_user({
-            page: [],
+            page: [page],
             limit: [],
             account: [{ owner: Principal.fromText(principal), subaccount: [] }],
         }),
@@ -13,7 +13,7 @@ const queryOngoingSwaps = async (actor, principal) => {
     return ongoingSwaps;
 };
 
-const useOngoingSwaps = (repeat) => {
+const useOngoingSwaps = (repeat, page) => {
     const [ongoing, setOngoing] = useState();
     const [isLoading, setIsloading] = useState(true);
     const { principal } = useConnect();
@@ -23,7 +23,7 @@ const useOngoingSwaps = (repeat) => {
         if (repeat) {
             setInterval(() => {
                 const fetchOngoingSwaps = async () => {
-                    await queryOngoingSwaps(gldtCoreActor, principal)
+                    await queryOngoingSwaps(gldtCoreActor, principal, page)
                         .then((result) => {
                             setOngoing(result);
                             setIsloading(false);
@@ -49,7 +49,7 @@ const useOngoingSwaps = (repeat) => {
             };
             fetchOngoingSwaps();
         }
-    }, []);
+    }, [page]);
     return { ongoing, isLoading };
 };
 

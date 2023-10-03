@@ -328,6 +328,7 @@ const SaleStatus = ({ status, e }) => {
 };
 
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
+    total = total ? total : 0;
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
@@ -362,8 +363,9 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
 
 const MyTransactions = () => {
     const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
+    const [currentOngoingPage, setCurrentOngoingPage] = useState(0);
     const history = useSwapHistory(currentHistoryPage);
-    const ongoing = useOngoingSwaps(true);
+    const ongoing = useOngoingSwaps(true, currentOngoingPage);
 
     useEffect(() => {
         console.log('history', history);
@@ -421,9 +423,13 @@ const MyTransactions = () => {
                                                 </Tr>
                                             </Thead>
                                             <Tbody>
-                                                {ongoing.ongoing?.Ok.data[0].length === 0 && (
+                                                {ongoing.ongoing?.Ok.data[0].length < 1 && (
                                                     <Tr>
                                                         <Td>You have no ongoing swaps</Td>
+                                                        <Td></Td>
+                                                        <Td></Td>
+                                                        <Td></Td>
+                                                        <Td></Td>
                                                     </Tr>
                                                 )}
                                                 {ongoing.ongoing?.Ok.data[0].map((e, i) => {
@@ -454,6 +460,11 @@ const MyTransactions = () => {
                                                 })}
                                             </Tbody>
                                         </Table>
+                                        <Pagination
+                                            total={ongoing.ongoing?.Ok?.total}
+                                            currentHistoryPage={currentOngoingPage}
+                                            setCurrentHistoryPage={setCurrentOngoingPage}
+                                        />
                                     </TableContainer>
                                 </CardBody>
                             </Card>
