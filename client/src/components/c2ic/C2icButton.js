@@ -35,7 +35,9 @@ const C2icButton = () => {
 
     return (
         <>
-            <ConnectButton></ConnectButton>
+            <ConnectButton
+                style={{ border: '1px solid #000', color: '#000', backgroundColor: '#fff' }}
+            ></ConnectButton>
             <ConnectDialog />
         </>
     );
