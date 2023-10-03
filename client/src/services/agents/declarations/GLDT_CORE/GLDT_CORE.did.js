@@ -1,6 +1,7 @@
 export const idlFactory = ({ IDL }) => {
     const Box = IDL.Rec();
-    const GldNft = IDL.Rec();
+    const CandyShared = IDL.Rec();
+    const GldtRegistryEntry = IDL.Rec();
     const NftCanisterConf = IDL.Record({ grams: IDL.Nat16 });
     const Conf = IDL.Record({
         gld_nft_canister_ids: IDL.Vec(IDL.Tuple(IDL.Principal, NftCanisterConf)),
@@ -107,21 +108,32 @@ export const idlFactory = ({ IDL }) => {
         logs: IDL.Opt(CanisterLogResponse),
         version: IDL.Opt(IDL.Nat),
     });
-    const GetRecordsRequest = IDL.Record({
-        page: IDL.Opt(IDL.Nat32),
-        limit: IDL.Opt(IDL.Nat32),
-    });
-    const RecordType = IDL.Variant({ Burn: IDL.Null, Mint: IDL.Null });
     const Account = IDL.Record({
         owner: IDL.Principal,
         subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     });
+    const GetSwapsRequest = IDL.Record({
+        page: IDL.Opt(IDL.Nat32),
+        limit: IDL.Opt(IDL.Nat32),
+        account: IDL.Opt(Account),
+    });
+    const RecordStatus = IDL.Variant({
+        Failed: IDL.Null,
+        Ongoing: IDL.Null,
+        Success: IDL.Null,
+    });
+    const RecordStatusInfo = IDL.Record({
+        status: RecordStatus,
+        message: IDL.Opt(IDL.Text),
+    });
+    const RecordType = IDL.Variant({ Burn: IDL.Null, Mint: IDL.Null });
+    const GldtNumTokens = IDL.Record({ value: IDL.Nat });
     const GldtRecord = IDL.Record({
         nft_id: IDL.Text,
+        status: RecordStatusInfo,
         record_type: RecordType,
-        memo: IDL.Vec(IDL.Nat8),
-        num_tokens: IDL.Nat,
-        escrow_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        num_tokens: GldtNumTokens,
+        escrow_subaccount: IDL.Vec(IDL.Nat8),
         counterparty: Account,
         grams: IDL.Nat16,
         timestamp: IDL.Nat64,
@@ -130,8 +142,13 @@ export const idlFactory = ({ IDL }) => {
         block_height: IDL.Nat,
     });
     const GetRecordsResponse = IDL.Record({
-        total: IDL.Nat64,
+        total: IDL.Nat32,
         data: IDL.Opt(IDL.Vec(GldtRecord)),
+    });
+    const Result = IDL.Variant({ Ok: GetRecordsResponse, Err: IDL.Text });
+    const GetRecordsRequest = IDL.Record({
+        page: IDL.Opt(IDL.Nat32),
+        limit: IDL.Opt(IDL.Nat32),
     });
     const GetStatusRequest = IDL.Record({
         nft_id: IDL.Text,
@@ -146,34 +163,48 @@ export const idlFactory = ({ IDL }) => {
         Minted: IDL.Null,
     });
     const GetStatusResponse = IDL.Record({ status: IDL.Opt(SwappingStates) });
-    const Result = IDL.Variant({ Ok: GetStatusResponse, Err: IDL.Text });
+    const Result_1 = IDL.Variant({ Ok: GetStatusResponse, Err: IDL.Text });
     const InfoRequest = IDL.Record({
         nft_id: IDL.Text,
         source_canister: IDL.Principal,
     });
-    const GldtBurned = IDL.Record({ burn_block_height: IDL.Nat64 });
-    const GldtMinted = IDL.Record({
-        num_tokens: IDL.Nat,
-        mint_block_height: IDL.Nat,
-        last_audited_timestamp_seconds: IDL.Nat64,
-        burned: IDL.Opt(GldtBurned),
+    const GldtLedgerInfo = IDL.Record({
+        num_tokens: GldtNumTokens,
+        block_height: IDL.Nat,
+    });
+    const GldtLedgerEntry = IDL.Variant({
+        Burned: GldtLedgerInfo,
+        Minted: GldtLedgerInfo,
     });
     const GldtSwapped = IDL.Record({ index: IDL.Nat, sale_id: IDL.Text });
-    GldNft.fill(
+    const Error = IDL.Record({
+        error_message: IDL.Text,
+        error_code: IDL.Nat,
+    });
+    const GldtError = IDL.Variant({
+        MintingError: IDL.Opt(Error),
+        Other: IDL.Opt(Error),
+        SwappingError: IDL.Opt(Error),
+    });
+    const SwapInfo = IDL.Record({
+        requested_memo: IDL.Vec(IDL.Nat8),
+        ledger_entry: IDL.Opt(GldtLedgerEntry),
+        num_tokens: GldtNumTokens,
+        escrow_subaccount: IDL.Vec(IDL.Nat8),
+        swapped: IDL.Opt(GldtSwapped),
+        receiving_account: Account,
+        swap_request_timestamp: IDL.Nat64,
+        nft_sale_id: IDL.Text,
+        failed: IDL.Opt(GldtError),
+    });
+    GldtRegistryEntry.fill(
         IDL.Record({
-            requested_memo: IDL.Vec(IDL.Nat8),
-            older_record: IDL.Opt(GldNft),
-            to_subaccount: IDL.Vec(IDL.Nat8),
-            minted: IDL.Opt(GldtMinted),
-            swapped: IDL.Opt(GldtSwapped),
-            receiving_account: Account,
-            grams: IDL.Nat16,
-            gldt_minting_timestamp_seconds: IDL.Nat64,
-            nft_sale_id: IDL.Text,
-            gld_nft_canister_id: IDL.Principal,
+            older_record: IDL.Opt(GldtRegistryEntry),
+            gldt_issue: SwapInfo,
+            gldt_redeem: IDL.Opt(SwapInfo),
         }),
     );
-    const NftInfo = IDL.Record({ info: IDL.Opt(GldNft) });
+    const NftInfo = IDL.Record({ info: IDL.Opt(GldtRegistryEntry) });
     const AuctionStateShared_status = IDL.Variant({
         closed: IDL.Null,
         open: IDL.Null,
@@ -184,7 +215,7 @@ export const idlFactory = ({ IDL }) => {
             Int: IDL.Int,
             Map: IDL.Vec(IDL.Tuple(Box, Box)),
             Nat: IDL.Nat,
-            Set: IDL.Vec(Box),
+            Set: IDL.Vec(CandyShared),
             Nat16: IDL.Nat16,
             Nat32: IDL.Nat32,
             Nat64: IDL.Nat64,
@@ -203,7 +234,7 @@ export const idlFactory = ({ IDL }) => {
             Floats: IDL.Vec(IDL.Float64),
             Float: IDL.Float64,
             Principal: IDL.Principal,
-            Array: IDL.Vec(Box),
+            Array: IDL.Vec(CandyShared),
             Class: IDL.Vec(IDL.Record({ value: Box, name: IDL.Text, immutable: IDL.Bool })),
         }),
     );
@@ -212,32 +243,34 @@ export const idlFactory = ({ IDL }) => {
         name: IDL.Text,
         immutable: IDL.Bool,
     });
-    const CandyShared = IDL.Variant({
-        Int: IDL.Int,
-        Map: IDL.Vec(IDL.Tuple(Box, Box)),
-        Nat: IDL.Nat,
-        Set: IDL.Vec(Box),
-        Nat16: IDL.Nat16,
-        Nat32: IDL.Nat32,
-        Nat64: IDL.Nat64,
-        Blob: IDL.Vec(IDL.Nat8),
-        Bool: IDL.Bool,
-        Int8: IDL.Int8,
-        Ints: IDL.Vec(IDL.Int),
-        Nat8: IDL.Nat8,
-        Nats: IDL.Vec(IDL.Nat),
-        Text: IDL.Text,
-        Bytes: IDL.Vec(IDL.Nat8),
-        Int16: IDL.Int16,
-        Int32: IDL.Int32,
-        Int64: IDL.Int64,
-        Option: IDL.Opt(Box),
-        Floats: IDL.Vec(IDL.Float64),
-        Float: IDL.Float64,
-        Principal: IDL.Principal,
-        Array: IDL.Vec(Box),
-        Class: IDL.Vec(PropertyShared),
-    });
+    CandyShared.fill(
+        IDL.Variant({
+            Int: IDL.Int,
+            Map: IDL.Vec(IDL.Tuple(Box, Box)),
+            Nat: IDL.Nat,
+            Set: IDL.Vec(CandyShared),
+            Nat16: IDL.Nat16,
+            Nat32: IDL.Nat32,
+            Nat64: IDL.Nat64,
+            Blob: IDL.Vec(IDL.Nat8),
+            Bool: IDL.Bool,
+            Int8: IDL.Int8,
+            Ints: IDL.Vec(IDL.Int),
+            Nat8: IDL.Nat8,
+            Nats: IDL.Vec(IDL.Nat),
+            Text: IDL.Text,
+            Bytes: IDL.Vec(IDL.Nat8),
+            Int16: IDL.Int16,
+            Int32: IDL.Int32,
+            Int64: IDL.Int64,
+            Option: IDL.Opt(Box),
+            Floats: IDL.Vec(IDL.Float64),
+            Float: IDL.Float64,
+            Principal: IDL.Principal,
+            Array: IDL.Vec(CandyShared),
+            Class: IDL.Vec(PropertyShared),
+        }),
+    );
     const ICTokenSpec_standard = IDL.Variant({
         ICRC1: IDL.Null,
         EXTFungible: IDL.Null,
@@ -320,7 +353,7 @@ export const idlFactory = ({ IDL }) => {
         dutch: DutchParams,
         ending: AskFeature_ending,
     });
-    const AuctionConfig__1_ending = IDL.Variant({
+    const AuctionConfig_ending = IDL.Variant({
         date: IDL.Int,
         wait_for_quiet: IDL.Record({
             max: IDL.Nat,
@@ -329,7 +362,7 @@ export const idlFactory = ({ IDL }) => {
             extension: IDL.Nat64,
         }),
     });
-    const AuctionConfig__1 = IDL.Record({
+    const AuctionConfig = IDL.Record({
         start_price: IDL.Nat,
         token: TokenSpec,
         reserve: IDL.Opt(IDL.Nat),
@@ -337,13 +370,13 @@ export const idlFactory = ({ IDL }) => {
         min_increase: AskFeature_min_increase,
         allow_list: IDL.Opt(IDL.Vec(IDL.Principal)),
         buy_now: IDL.Opt(IDL.Nat),
-        ending: AuctionConfig__1_ending,
+        ending: AuctionConfig_ending,
     });
-    const PricingConfigShared__1 = IDL.Variant({
+    const PricingConfigShared = IDL.Variant({
         ask: IDL.Opt(IDL.Vec(AskFeature)),
         extensible: CandyShared,
         instant: IDL.Null,
-        auction: AuctionConfig__1,
+        auction: AuctionConfig,
     });
     const AuctionStateShared = IDL.Record({
         status: AuctionStateShared_status,
@@ -358,7 +391,7 @@ export const idlFactory = ({ IDL }) => {
         allow_list: IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Bool))),
         current_broker_id: IDL.Opt(IDL.Principal),
         min_next_bid: IDL.Nat,
-        config: PricingConfigShared__1,
+        config: PricingConfigShared,
     });
     const SaleStatusShared_sale_type = IDL.Variant({
         auction: AuctionStateShared,
@@ -386,7 +419,7 @@ export const idlFactory = ({ IDL }) => {
         seller: Account_1,
         escrow_info: SubAccountInfo,
     });
-    const Result_1 = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
+    const Result_2 = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
     const CollectMetricsRequestType = IDL.Variant({
         force: IDL.Null,
         normal: IDL.Null,
@@ -395,16 +428,19 @@ export const idlFactory = ({ IDL }) => {
         metrics: IDL.Opt(CollectMetricsRequestType),
     });
     return IDL.Service({
+        __get_candid_interface_tmp_hack: IDL.Func([], [IDL.Text], ['query']),
         getCanistergeekInformation: IDL.Func(
             [GetInformationRequest],
             [GetInformationResponse],
             ['query'],
         ),
         get_conf: IDL.Func([], [Conf], []),
-        get_records: IDL.Func([GetRecordsRequest], [GetRecordsResponse], ['query']),
-        get_status_of_swap: IDL.Func([GetStatusRequest], [Result], ['query']),
+        get_historical_swaps_by_user: IDL.Func([GetSwapsRequest], [Result], ['query']),
+        get_ongoing_swaps_by_user: IDL.Func([GetSwapsRequest], [Result], ['query']),
+        get_records: IDL.Func([GetRecordsRequest], [Result], ['query']),
+        get_status_of_swap: IDL.Func([GetStatusRequest], [Result_1], ['query']),
         nft_info: IDL.Func([InfoRequest], [NftInfo], []),
-        notify_sale_nft_origyn: IDL.Func([SubscriberNotification], [Result_1], []),
+        notify_sale_nft_origyn: IDL.Func([SubscriberNotification], [Result_2], []),
         updateCanistergeekInformation: IDL.Func([UpdateInformationRequest], [], []),
     });
 };

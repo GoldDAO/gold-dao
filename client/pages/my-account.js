@@ -1,21 +1,20 @@
 import Layout from '@/components/layout/Layout';
-import { useConnect } from '@connect2ic/react';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import React from 'react';
 
-function Home({}) {
-    const meta = {
-        title: 'GLDT Swap App',
-        description: 'GLDT Swap App Description',
-    };
-    const SwapInterface = dynamic(() => import('@/components/ui/swap/Swap'), {
+const MyAccount = () => {
+    const Summary = dynamic(() => import('@/components/ui/manage/Summary'), {
         ssr: false,
     });
-
+    const meta = {
+        title: 'GLDT Swap App | Manage NFTs',
+        description: 'GLDT Swap App Description',
+    };
     return (
         <>
             <Head>
-                <title>{meta.title}</title>
+                <title>{'GLDT swap | my account'}</title>
                 <meta property={`og:title`} content={meta.title} key="title" />
                 <meta property={`og:description`} content={meta.description} key="title" />
                 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
@@ -25,10 +24,10 @@ function Home({}) {
                 <meta name="theme-color" content="#ffffff" />
             </Head>
             <Layout>
-                <SwapInterface />
+                <Summary />
             </Layout>
         </>
     );
-}
+};
 
-export default Home;
+export default MyAccount;

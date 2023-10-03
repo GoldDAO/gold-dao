@@ -1,19 +1,14 @@
-import Layout from '@/components/UI/layout/Layout';
 import { createClient } from '@connect2ic/core';
 import { Connect2ICProvider } from '@connect2ic/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { defaultProviders } from '@connect2ic/core/providers';
+import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/providers';
 import { SafeHydrate } from '@/utils/SafeHydrate';
-import dynamic from 'next/dynamic';
 import '@connect2ic/core/style.css';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
 import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
+import { customTheme } from '@/theme/theme';
 
 const myStore = createStore();
-
-console.log('gldtCoreCanister', gldtCoreCanister);
 
 const Providers = ({ children }) => {
     const whitelist = Object.values(gldNftCanisters).map((canister) => canister.canisterId);
@@ -25,10 +20,9 @@ const Providers = ({ children }) => {
         gldtCoreCanister,
     };
 
-    console.log('canisters', canisters);
     let client = createClient({
         canisters,
-        providers: defaultProviders,
+        providers: [new InfinityWallet()],
         globalProviderConfig: {
             host: 'https://icp0.io',
             dev: false,
@@ -36,24 +30,18 @@ const Providers = ({ children }) => {
         },
     });
 
-    if (!client) {
-        return <></>;
-    }
-
-    const theme = createTheme({
-        typography: {
-            fontFamily: ['Inter', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
-        },
+    const theme = extendTheme({
+        ...customTheme,
     });
 
     return (
-        <ThemeProvider theme={theme}>
+        <ChakraProvider theme={theme}>
             <Connect2ICProvider client={client}>
-                <SafeHydrate>
-                    <JotaiProvider store={myStore}>{children}</JotaiProvider>
-                </SafeHydrate>
+                <JotaiProvider store={myStore}>
+                    <SafeHydrate>{children}</SafeHydrate>
+                </JotaiProvider>
             </Connect2ICProvider>
-        </ThemeProvider>
+        </ChakraProvider>
     );
 };
 
