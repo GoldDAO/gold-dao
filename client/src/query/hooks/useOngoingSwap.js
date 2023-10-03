@@ -13,25 +13,42 @@ const queryOngoingSwaps = async (actor, principal) => {
     return ongoingSwaps;
 };
 
-const useOngoingSwaps = () => {
+const useOngoingSwaps = (repeat) => {
     const [ongoing, setOngoing] = useState();
     const [isLoading, setIsloading] = useState(true);
     const { principal } = useConnect();
     const gldtCoreActor = useCanister('gldtCoreCanister');
     useEffect(() => {
         setIsloading(true);
-        const fetchOngoingSwaps = async () => {
-            await queryOngoingSwaps(gldtCoreActor, principal)
-                .then((result) => {
-                    setOngoing(result);
-                    setIsloading(false);
-                })
-                .catch((error) => {
-                    setIsloading(false);
-                    console.log('error', error);
-                });
-        };
-        fetchOngoingSwaps();
+        if (repeat) {
+            setInterval(() => {
+                const fetchOngoingSwaps = async () => {
+                    await queryOngoingSwaps(gldtCoreActor, principal)
+                        .then((result) => {
+                            setOngoing(result);
+                            setIsloading(false);
+                        })
+                        .catch((error) => {
+                            setIsloading(false);
+                            console.log('error', error);
+                        });
+                };
+                fetchOngoingSwaps();
+            }, 1000);
+        } else {
+            const fetchOngoingSwaps = async () => {
+                await queryOngoingSwaps(gldtCoreActor, principal)
+                    .then((result) => {
+                        setOngoing(result);
+                        setIsloading(false);
+                    })
+                    .catch((error) => {
+                        setIsloading(false);
+                        console.log('error', error);
+                    });
+            };
+            fetchOngoingSwaps();
+        }
     }, []);
     return { ongoing, isLoading };
 };

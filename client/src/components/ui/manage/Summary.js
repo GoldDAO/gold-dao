@@ -327,7 +327,7 @@ const SaleStatus = ({ status, e }) => {
 
 const MyTransactions = () => {
     const history = useSwapHistory();
-    const ongoing = useOngoingSwaps();
+    const ongoing = useOngoingSwaps(true);
 
     return (
         <Card
