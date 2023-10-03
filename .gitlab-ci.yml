@@ -39,7 +39,7 @@ stages:
       - client/.npm/
       - client/node_modules/
   before_script:
-    - apk update -q && apk add -q jq
+    - apt update -q > /dev/null && apt install -y jq > /dev/null
     - npm ci --cache .npm --prefer-offline
 
 .rust template: &rust_template
