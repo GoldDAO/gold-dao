@@ -18,14 +18,20 @@ const useOngoingSwaps = (repeat, page) => {
     const [isLoading, setIsloading] = useState(true);
     const { principal } = useConnect();
     const gldtCoreActor = useCanister('gldtCoreCanister');
+    const [loop, setLoop] = useState(true);
     useEffect(() => {
         setIsloading(true);
-        if (repeat) {
-            setInterval(() => {
+        let interval;
+        if (loop) {
+            interval = setInterval(() => {
                 const fetchOngoingSwaps = async () => {
                     await queryOngoingSwaps(gldtCoreActor, principal, page)
                         .then((result) => {
                             setOngoing(result);
+                            if (result.Ok.data[0].length < 1) {
+                                setLoop(false);
+                            }
+                            console.log('result.Ok.data[0].length', result.Ok.data[0].length);
                             setIsloading(false);
                         })
                         .catch((error) => {
@@ -35,12 +41,13 @@ const useOngoingSwaps = (repeat, page) => {
                 };
                 fetchOngoingSwaps();
             }, 3000);
-        } else {
+        } else if (!loop) {
             const fetchOngoingSwaps = async () => {
-                await queryOngoingSwaps(gldtCoreActor, principal)
+                await queryOngoingSwaps(gldtCoreActor, principal, page)
                     .then((result) => {
                         setOngoing(result);
                         setIsloading(false);
+                        console.log('no repeat');
                     })
                     .catch((error) => {
                         setIsloading(false);
@@ -49,7 +56,10 @@ const useOngoingSwaps = (repeat, page) => {
             };
             fetchOngoingSwaps();
         }
-    }, [page]);
+        if (interval) {
+            return () => clearInterval(interval);
+        }
+    }, [loop]);
     return { ongoing, isLoading };
 };
 
