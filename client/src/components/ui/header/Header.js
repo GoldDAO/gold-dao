@@ -29,7 +29,7 @@ const Header = () => {
                         }}
                     >
                         <Link href="/">
-                            <Image src={Logo} width={50} height={50} />
+                            <Image src={Logo} width={50} height={50} alt="gldt-token-logo" />
                         </Link>
                     </Box>
                 </GridItem>

@@ -35,6 +35,7 @@ import {
     ModalBody,
     ModalFooter,
     CheckboxIcon,
+    AccordionIcon,
 } from '@chakra-ui/react';
 import {
     addCartItemAtom,
@@ -52,9 +53,10 @@ import { sendBatchOffer } from '@/query/sendBatchOffer';
 import Link from 'next/link';
 import TokenSign from '../gldt/TokenSign';
 import Grid from '@/components/layout/Grid';
-import { CheckCircleIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg'
+import { gldNftCanisters } from '@/services/agents';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
@@ -210,6 +212,7 @@ const OutputOverview = ({ isConnected }) => {
 };
 
 const OutputDetails = ({ isConnected }) => {
+
     return (
         <Accordion allowToggle>
             <AccordionItem isDisabled={!isConnected} border="0">
@@ -220,8 +223,11 @@ const OutputDetails = ({ isConnected }) => {
                     borderColor="border"
                     borderStartEndRadius={'md'}
                     borderStartStartRadius={'md'}
+                    disabled='flex'
+                    justifyContent={'space-between'}
                 >
-                    <Box>Transaction Details</Box>
+                    <Text>Transaction Details</Text>
+                    <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel
                     bg="bg"
@@ -341,9 +347,11 @@ const MyNfts = ({ isConnected }) => {
                     borderColor="border"
                     borderStartEndRadius={'md'}
                     borderStartStartRadius={'md'}
+                    display={'flex'}
+                    justifyContent={'space-between'}
                 >
                     <Box>Select from my NFTs</Box>
-                    {isLoading && <Spinner size="sm" ml={'1em'} />}
+                    {isLoading ? <Spinner size="sm" ml={'1em'} /> : <AccordionIcon/>}
                 </AccordionButton>
                 {connected && <MyNftsPanel setIsloading={setIsloading} />}
             </AccordionItem>
@@ -354,13 +362,12 @@ const MyNfts = ({ isConnected }) => {
 const MyNftsPanel = ({ setIsloading }) => {
     const actors = useAllCanisters();
     const {nftsByW, isLoading } = useNft(actors);
-    const [, removeItemFromCart] = useAtom(removeCartItemByIdAtom);
-    const [, addItemToCart] = useAtom(addCartItemAtom);
     const [isAllSelected, setIsAllSelected] = useState([false, false, false , false])
 
     useEffect(() =>{
         setIsloading(isLoading)
     },[isLoading])
+
 
 
     const selectSameWeight = (index) => {
@@ -395,15 +402,18 @@ const MyNftsPanel = ({ setIsloading }) => {
                         display={'flex'}
                         justifyContent={'space-between'}  
                         pb='0px' 
-                        color={'secondaryText'}>GLD NFTs g 
+                        color={'secondaryText'}>GLD NFTs {Object.keys(gldNftCanisters)[i]}
                         <Button 
                             onClick={() => isAllSelected[i] ? unSelectSameWeight( i) : selectSameWeight(i)}
-                            bg='black' 
-                            _hover={{backgroundColor: 'secondaryText'}}
-                            color='white' size={'sm'}>{isAllSelected[i] ? 'Unselect All' : 'Select All'}
+                            bg='transparent' 
+                            border={'1px'}
+                            borderColor={'black'}
+                            _hover={{backgroundColor: 'bg'}}
+                            fontWeight={400}
+                            size={'xs'}>{isAllSelected[i] ? 'Unselect All' : 'Select All'}
                         </Button>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody >
                         {isLoading ? (
                             <SkeletonToken />
                         ) : (
@@ -497,7 +507,7 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
                             <Box></Box>
                             <HStack w="100%" textAlign="center" justify="center">
                                 <Text textAlign="center">
-                                    Send {cart.length} NFTs ({weight} g) and receive {weight * 100}
+                                    Send {weight}g of GLD NFT to receive {weight * 100} GLDT"
                                 </Text>
                                 <TokenSign />
                             </HStack>
@@ -548,7 +558,7 @@ const BatchOfferResponse = ({ res, loading }) => {
                 ));
             })}
             <Text>
-                Batch offer successfully sent, you can follow the progress on your&nbsp;
+            Swap request successfully sent. You can follow the progress on your&nbsp;
                 <Link
                     href={'/my-account'}
                     style={{

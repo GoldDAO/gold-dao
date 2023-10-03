@@ -6,7 +6,7 @@ import Image from 'next/image';
 const TokenSign = () => {
     return (
         <HStack>
-            <Image src={Logo} width={20} height={20} />
+            <Image src={Logo} width={20} height={20} alt="gldt-token-logo" />
             <Text
                 borderRadius={'20px'}
                 sx={{

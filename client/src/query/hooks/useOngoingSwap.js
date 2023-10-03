@@ -24,7 +24,6 @@ const useOngoingSwaps = () => {
             await queryOngoingSwaps(gldtCoreActor, principal)
                 .then((result) => {
                     setOngoing(result);
-                    console.log('result', result);
                     setIsloading(false);
                 })
                 .catch((error) => {

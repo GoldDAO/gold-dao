@@ -19,6 +19,8 @@ import {
     Spinner,
     HStack,
     Skeleton,
+    AccordionIcon,
+    VStack,
 } from '@chakra-ui/react';
 import { useNft } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
@@ -27,7 +29,12 @@ import useSwapHistory from '@/query/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
 import useOngoingSwaps from '@/query/hooks/useOngoingSwap';
 import TokenSign from '../gldt/TokenSign';
-
+import { ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import NFTIcon from '/public/images/sell.svg';
+import weightIcon from '/public/images/scale.svg';
+import swappedIcon from '/public/images/send_money.svg';
+import Image from 'next/image';
+import Timestamp from '../tooltip/timeStamp';
 const Summary = () => {
     const { isConnected } = useConnect();
     return (
@@ -50,8 +57,111 @@ const Summary = () => {
 
 export default Summary;
 
-const Overview = ({ nfts, isLoading }) => {
-    return <Card></Card>;
+const Overview = () => {
+    const actors = useAllCanisters();
+    const { nfts, isLoading } = useNft(actors);
+    const history = useSwapHistory();
+    const totalweight = nfts.reduce((ac, e) => {
+        return ac + e.weight;
+    }, 0);
+    const nftsN = nfts.length;
+
+    const totalSwap = history.history?.Ok?.data[0].reduce((ac, e) => {
+        return ac + parseInt(e.num_tokens.value) / 100000000;
+    }, 0);
+
+    const BigN = ({ children }) => {
+        return (
+            <Text fontWeight={200} fontSize={'1.6em'}>
+                {children}
+            </Text>
+        );
+    };
+    return (
+        <Card shadow={'none'} border={'1px'} borderColor={'border'} borderRadius={'lg'}>
+            <HStack
+                spacing="40px"
+                style={{
+                    opacity: isLoading ? 0.5 : 1,
+                }}
+            >
+                <Card shadow={'none'}>
+                    <CardBody>
+                        <HStack align="start">
+                            <Image
+                                alt="NFT icon"
+                                src={NFTIcon}
+                                width={'40px'}
+                                style={{
+                                    opacity: 0.5,
+                                    paddingTop: '7px',
+                                }}
+                            />
+                            <HStack>
+                                <Box>
+                                    {!isLoading ? (
+                                        <BigN>{nfts.length}</BigN>
+                                    ) : (
+                                        <Spinner size={'sm'} color="secondaryText" />
+                                    )}
+                                    <Text>Total number of NFTs</Text>
+                                </Box>
+                            </HStack>
+                        </HStack>
+                    </CardBody>
+                </Card>
+                <Card shadow={'none'}>
+                    <CardBody>
+                        <HStack align="start">
+                            <Image
+                                alt="scale icon"
+                                src={weightIcon}
+                                width={'40px'}
+                                style={{
+                                    opacity: '.5',
+                                    paddingTop: '7px',
+                                }}
+                            />
+                            <Box>
+                                {!isLoading ? (
+                                    <BigN>{totalweight} g</BigN>
+                                ) : (
+                                    <Spinner size={'sm'} color="secondaryText" />
+                                )}
+                                <Text>Total NFTs weight</Text>
+                            </Box>
+                        </HStack>
+                    </CardBody>
+                </Card>
+                <Card shadow={'none'}>
+                    <CardBody>
+                        <HStack align="start">
+                            <Image
+                                alt="swapped coins icon"
+                                src={swappedIcon}
+                                width={'40px'}
+                                style={{
+                                    paddingTop: '7px',
+                                    opacity: '.5',
+                                }}
+                            />
+                            <Box>
+                                {!isLoading ? (
+                                    <HStack>
+                                        <BigN>{totalSwap}</BigN>
+                                        <TokenSign />
+                                    </HStack>
+                                ) : (
+                                    <Spinner size={'sm'} color="secondaryText" />
+                                )}
+                                <Text>Total GLDT swapped</Text>
+                            </Box>
+                        </HStack>
+                    </CardBody>
+                </Card>
+            </HStack>
+        </Card>
+    );
 };
 
 const Mynfts = ({ connected }) => {
@@ -94,10 +204,16 @@ const Mynfts = ({ connected }) => {
                                     borderColor="border"
                                     borderStartEndRadius={'md'}
                                     borderStartStartRadius={'md'}
+                                    display={'flex'}
                                 >
-                                    <HStack>
-                                        <Text>GLD NFT {weight}g</Text>{' '}
-                                        {isLoading && <Spinner size="md" />}
+                                    <HStack
+                                        width={'100%'}
+                                        justifyContent={'space-between'}
+                                        borderStartStartRadius={'md'}
+                                    >
+                                        <Text>GLD NFT {weight}g</Text>
+
+                                        {isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                                     </HStack>
                                 </AccordionButton>
                                 <AccordionPanel
@@ -111,24 +227,22 @@ const Mynfts = ({ connected }) => {
                                 >
                                     {connected && (
                                         <Card key={i} shadow={'none'}>
-                                            <CardBody>
+                                            <CardBody p={0}>
                                                 <TableContainer>
                                                     <Table>
                                                         <Thead>
                                                             <Tr>
                                                                 <Td>Token id</Td>
-                                                                <Td>weight</Td>
                                                                 <Td>Status</Td>
                                                             </Tr>
                                                         </Thead>
-                                                        <Tbody>
+                                                        <Tbody p={0}>
                                                             {!isLoading &&
                                                                 nfts.map((e, i) => {
                                                                     if (e.weight === weight) {
                                                                         return (
-                                                                            <Tr>
+                                                                            <Tr key={i}>
                                                                                 <Td>{e.name}</Td>
-                                                                                <Td>{e.weight}</Td>
                                                                                 <Td>
                                                                                     <SaleStatus
                                                                                         status={
@@ -176,23 +290,44 @@ const SaleStatus = ({ status, e }) => {
     };
 
     return saleStatus ? (
-        <Button onClick={() => handleCancelSale(e.name, e.weight, actors)}>
-            {isLoading && <Spinner size={'sm'} />}Cancel sale
+        <Button
+            onClick={() => handleCancelSale(e.name, e.weight, actors)}
+            borderRadius={'200px'}
+            bg="white"
+            size={'sm'}
+            fontWeight={400}
+            border={'1px'}
+            borderColor={'black'}
+        >
+            {isLoading ? (
+                <Spinner size={'sm'} />
+            ) : (
+                <SmallCloseIcon
+                    border={'1px'}
+                    borderColor={'black'}
+                    borderRadius={'200px'}
+                    mr="10px"
+                />
+            )}
+            Cancel sale
         </Button>
     ) : (
-        'Not on Sale'
+        <Text
+            border={'1px'}
+            borderColor={'border'}
+            color={'secondaryText'}
+            borderRadius={'200px'}
+            p={'3px 12px'}
+            w={'fit-content'}
+        >
+            Not on Sale
+        </Text>
     );
 };
 
 const MyTransactions = () => {
     const history = useSwapHistory();
     const ongoing = useOngoingSwaps();
-
-    useEffect(() => {
-        if (ongoing) {
-            console.log('ongoing', ongoing);
-        }
-    }, [ongoing]);
 
     return (
         <Card
@@ -212,16 +347,17 @@ const MyTransactions = () => {
                 <HStack wrap={'wrap'}>
                     <AccordionItem w="100%" border={0} isDisabled={ongoing.isLoading}>
                         <AccordionButton
-                            isDisabled={ongoing.isLoading}
                             h="60px"
                             bg="bg"
                             border="1px"
                             borderColor="border"
                             borderStartEndRadius={'md'}
                             borderStartStartRadius={'md'}
+                            display={'flex'}
+                            justifyContent={'space-between'}
                         >
                             Ongoing transactions
-                            {ongoing.isLoading && <Spinner size="md" />}
+                            {ongoing.isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                         </AccordionButton>
                         <AccordionPanel
                             bg="bg"
@@ -232,31 +368,42 @@ const MyTransactions = () => {
                             borderTop={0}
                         >
                             <Card shadow={'none'}>
-                                <CardBody>
+                                <CardBody p={0}>
                                     <TableContainer>
                                         <Table>
                                             <Thead>
                                                 <Tr>
                                                     <Td>Type</Td>
-                                                    <Td>Date / time</Td>
+                                                    <Td>Date</Td>
                                                     <Td>Token id</Td>
                                                     <Td>GLDT amount</Td>
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
                                             <Tbody>
-                                                {ongoing.ongoing?.Ok.data[0].map((e) => {
+                                                {ongoing.ongoing?.Ok.data[0].length === 0 && (
+                                                    <Tr>
+                                                        <Td>You have no ongoing swaps</Td>
+                                                    </Tr>
+                                                )}
+                                                {ongoing.ongoing?.Ok.data[0].map((e, i) => {
                                                     return (
-                                                        <Tr>
+                                                        <Tr key={i}>
                                                             <Td>{Object.keys(e.record_type)}</Td>
-                                                            <Td>{parseInt(e.timestamp)}</Td>
+                                                            <Td>
+                                                                <Timestamp
+                                                                    timestamp={parseInt(
+                                                                        e.timestamp,
+                                                                    )}
+                                                                />
+                                                            </Td>
                                                             <Td>{e.nft_id}</Td>
                                                             <Td>
                                                                 <HStack>
                                                                     <Text>
                                                                         {parseInt(
                                                                             e.num_tokens.value,
-                                                                        )}
+                                                                        ) / 100000000}
                                                                     </Text>
                                                                     <TokenSign />
                                                                 </HStack>
@@ -274,16 +421,17 @@ const MyTransactions = () => {
                     </AccordionItem>
                     <AccordionItem w="100%" border={0} isDisabled={history.isLoading}>
                         <AccordionButton
-                            isDisabled={history.isLoading}
                             h="60px"
                             bg="bg"
                             border="1px"
                             borderColor="border"
                             borderStartEndRadius={'md'}
                             borderStartStartRadius={'md'}
+                            display={'flex'}
+                            justifyContent={'space-between'}
                         >
                             Past transactions
-                            {history.isLoading && <Spinner size="sm" ml={'1em'} />}
+                            {history.isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                         </AccordionButton>
                         <AccordionPanel
                             bg="bg"
@@ -294,31 +442,42 @@ const MyTransactions = () => {
                             borderTop={0}
                         >
                             <Card shadow={'none'}>
-                                <CardBody>
+                                <CardBody p={0}>
                                     <TableContainer>
                                         <Table>
                                             <Thead>
                                                 <Tr>
                                                     <Td>Type</Td>
-                                                    <Td>Date / time</Td>
+                                                    <Td>Date</Td>
                                                     <Td>Token id</Td>
                                                     <Td>GLDT amount</Td>
                                                     <Td>Status</Td>
                                                 </Tr>
                                             </Thead>
                                             <Tbody>
-                                                {history.history?.Ok.data[0].map((e) => {
+                                                {history.history?.Ok.data[0].length === 0 && (
+                                                    <Tr>
+                                                        <Td>You have no ongoing swaps</Td>
+                                                    </Tr>
+                                                )}
+                                                {history.history?.Ok.data[0].map((e, i) => {
                                                     return (
-                                                        <Tr>
+                                                        <Tr key={i}>
                                                             <Td>{Object.keys(e.record_type)}</Td>
-                                                            <Td>{parseInt(e.timestamp)}</Td>
+                                                            <Td>
+                                                                <Timestamp
+                                                                    timestamp={parseInt(
+                                                                        e.timestamp,
+                                                                    )}
+                                                                />
+                                                            </Td>
                                                             <Td>{e.nft_id}</Td>
                                                             <Td>
                                                                 <HStack>
                                                                     <Text>
                                                                         {parseInt(
                                                                             e.num_tokens.value,
-                                                                        )}
+                                                                        ) / 100000000}
                                                                     </Text>
                                                                     <TokenSign />
                                                                 </HStack>
