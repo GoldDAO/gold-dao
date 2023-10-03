@@ -34,7 +34,7 @@ const useOngoingSwaps = (repeat, page) => {
                         });
                 };
                 fetchOngoingSwaps();
-            }, 1000);
+            }, 3000);
         } else {
             const fetchOngoingSwaps = async () => {
                 await queryOngoingSwaps(gldtCoreActor, principal)
