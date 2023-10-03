@@ -27,7 +27,7 @@ import {
 import { useNft } from '@/query/hooks/useNFTs';
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
 import { cancelSale } from '@/query/cancelSale';
-import useSwapHistory from '@/query/hooks/useSwapHistory';
+import useSwapHistory, { useMaxEntry } from '@/query/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
 import useOngoingSwaps from '@/query/hooks/useOngoingSwap';
 import TokenSign from '../gldt/TokenSign';
@@ -61,14 +61,20 @@ export default Summary;
 
 const Overview = () => {
     const actors = useAllCanisters();
+    const { max } = useMaxEntry();
     const { nfts, isLoading } = useNft(actors);
-    const history = useSwapHistory();
+    const history = useSwapHistory(0, max);
+
+    useEffect(() => {
+        console.log('history', history);
+    }, [history]);
+
     const totalweight = nfts.reduce((ac, e) => {
         return ac + e.weight;
     }, 0);
     const nftsN = nfts.length;
 
-    const totalSwap = history.history?.Ok?.data[0].reduce((ac, e) => {
+    const totalSwap = history?.history?.Ok?.data[0]?.reduce((ac, e) => {
         return ac + parseInt(e.num_tokens.value) / 100000000;
     }, 0);
 
@@ -364,12 +370,8 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
 const MyTransactions = () => {
     const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
     const [currentOngoingPage, setCurrentOngoingPage] = useState(0);
-    const history = useSwapHistory(currentHistoryPage);
+    const history = useSwapHistory(currentHistoryPage, 10);
     const ongoing = useOngoingSwaps(true, currentOngoingPage);
-
-    useEffect(() => {
-        console.log('history', history);
-    }, [history]);
 
     return (
         <Card
