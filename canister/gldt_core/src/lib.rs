@@ -539,7 +539,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
         pricing_config_shared => {
             return Err(
                 format!(
-                    "Unexpected pricing_config_shared value, only ask value is accepted and received PricingConfigShared__1::{:?}",
+                    "Unexpected pricing_config_shared value, only ask value is accepted and received PricingConfigShared::{:?}",
                     pricing_config_shared
                 )
             );
