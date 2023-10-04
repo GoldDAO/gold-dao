@@ -38,15 +38,19 @@ export default function WithSubnavigation() {
                     ml={{ base: -2 }}
                     display={{ base: 'flex', md: 'none' }}
                 >
-                    <IconButton
-                        onClick={onToggle}
-                        icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-                        variant={'ghost'}
-                        aria-label={'Toggle Navigation'}
-                        _hover={{
-                            bg: 'extraLightGold',
-                        }}
-                    />
+                    {isConnected && (
+                        <IconButton
+                            onClick={onToggle}
+                            icon={
+                                isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
+                            }
+                            variant={'ghost'}
+                            aria-label={'Toggle Navigation'}
+                            _hover={{
+                                bg: 'extraLightGold',
+                            }}
+                        />
+                    )}
                 </Flex>
                 <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
                     <Link href="/">
