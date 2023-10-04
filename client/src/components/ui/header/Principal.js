@@ -12,7 +12,7 @@ const Principal = () => {
 
     return (
         principal && (
-            <HStack>
+            <HStack justifySelf={'flex-end'}>
                 <Text>
                     {firstChars}...{lastChars}
                 </Text>

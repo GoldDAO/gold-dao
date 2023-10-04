@@ -44,3 +44,12 @@ button {
     src: url(./../theme/font/Inter-Medium.ttf);
     font-weight: 500;
 }
+
+@media screen and (max-width: 792px) {
+    html {
+        font-size: 14px;
+    }
+    .connect-button {
+        padding: 5px 15px !important;
+    }
+}
