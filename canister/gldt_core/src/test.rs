@@ -1120,361 +1120,381 @@ fn test_get_status_of_swap_b7() {
 
 // // --------------------------------- get_records ----------------------------------
 // #[test]
-// fn test_get_records_a1() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(1),
-//         limit: Some(50),
-//     };
+fn test_get_records_a1() {
+    let records_request = GetRecordsRequest {
+        page: Some(1),
+        limit: Some(50),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a2() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(u32::MAX),
-//         limit: Some(50),
-//     };
+#[test]
+fn test_get_records_a2() {
+    let records_request = GetRecordsRequest {
+        page: Some(u32::MAX),
+        limit: Some(50),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(res, Err("Overflow when calculating start".to_string()));
-// }
+    assert_eq!(res, Err("Overflow when calculating start".to_string()));
+}
 
-// #[test]
-// fn test_get_records_a3() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(50),
-//         limit: Some(u32::MAX),
-//     };
+#[test]
+fn test_get_records_a3() {
+    let records_request = GetRecordsRequest {
+        page: Some(50),
+        limit: Some(u32::MAX),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a4() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(u32::MAX),
-//         limit: Some(1),
-//     };
+#[test]
+fn test_get_records_a4() {
+    let records_request = GetRecordsRequest {
+        page: Some(u32::MAX),
+        limit: Some(1),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a5() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(1),
-//         limit: Some(u32::MAX),
-//     };
+#[test]
+fn test_get_records_a5() {
+    let records_request = GetRecordsRequest {
+        page: Some(1),
+        limit: Some(u32::MAX),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a6() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(1),
-//         limit: Some(0),
-//     };
+#[test]
+fn test_get_records_a6() {
+    let records_request = GetRecordsRequest {
+        page: Some(1),
+        limit: Some(0),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a7() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(0),
-//         limit: Some(1),
-//     };
+#[test]
+fn test_get_records_a7() {
+    let records_request = GetRecordsRequest {
+        page: Some(0),
+        limit: Some(1),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a8() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(0),
-//         limit: None,
-//     };
+#[test]
+fn test_get_records_a8() {
+    let records_request = GetRecordsRequest {
+        page: Some(0),
+        limit: None,
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a9() {
-//     let records_request = GetRecordsRequest {
-//         page: None,
-//         limit: Some(0),
-//     };
+#[test]
+fn test_get_records_a9() {
+    let records_request = GetRecordsRequest {
+        page: None,
+        limit: Some(0),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a10() {
-//     let records_request = GetRecordsRequest {
-//         page: Some(10),
-//         limit: None,
-//     };
+#[test]
+fn test_get_records_a10() {
+    let records_request = GetRecordsRequest {
+        page: Some(10),
+        limit: None,
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_a11() {
-//     let records_request = GetRecordsRequest {
-//         page: None,
-//         limit: Some(10),
-//     };
+#[test]
+fn test_get_records_a11() {
+    let records_request = GetRecordsRequest {
+        page: None,
+        limit: Some(10),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 0,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 0,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_b1() {
-//     init_records();
+#[test]
+fn test_get_records_b1() {
+    init_records();
 
-//     let records_request = GetRecordsRequest {
-//         page: Some(1),
-//         limit: Some(50),
-//     };
+    let records_request = GetRecordsRequest {
+        page: Some(1),
+        limit: Some(50),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 2,
-//             data: None,
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: None,
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_b2() {
-//     init_records();
+#[test]
+fn test_get_records_b2() {
+    init_records();
 
-//     let records_request = GetRecordsRequest {
-//         page: Some(0),
-//         limit: Some(50),
-//     };
+    let records_request = GetRecordsRequest {
+        page: Some(0),
+        limit: Some(50),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 2,
-//             data: Some(
-//                 vec![
-//                     GldtRecord {
-//                         record_type: RecordType::Mint,
-//                         timestamp: 0,
-//                         counterparty: Account {
-//                             owner: Principal::anonymous(),
-//                             subaccount: Some([0u8; 32]),
-//                         },
-//                         gld_nft_canister_id: Principal::from_text(
-//                             "obapm-2iaaa-aaaak-qcgca-cai"
-//                         ).expect("Could not decode the principal."),
-//                         nft_id: "random_nft_id_1".to_string(),
-//                         escrow_subaccount: Some([0u8; 32]),
-//                         nft_sale_id: "randomSellId1".to_string(),
-//                         grams: 1,
-//                         num_tokens: GldtNumTokens {
-//                             value: Nat::from(0),
-//                         },
-//                         block_height: Nat::from(0),
-//                         memo: Memo::from(0),
-//                     },
-//                     GldtRecord {
-//                         record_type: RecordType::Mint,
-//                         timestamp: 0,
-//                         counterparty: Account {
-//                             owner: Principal::anonymous(),
-//                             subaccount: Some([0u8; 32]),
-//                         },
-//                         gld_nft_canister_id: Principal::from_text(
-//                             "xyo2o-gyaaa-aaaal-qb55a-cai"
-//                         ).expect("Could not decode the principal."),
-//                         nft_id: "random_nft_id_2".to_string(),
-//                         escrow_subaccount: Some([0u8; 32]),
-//                         nft_sale_id: "randomSellId2".to_string(),
-//                         grams: 10,
-//                         num_tokens: GldtNumTokens {
-//                             value: Nat::from(0),
-//                         },
-//                         block_height: Nat::from(0),
-//                         memo: Memo::from(0),
-//                     }
-//                 ]
-//             ),
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
+                vec![
+                    GldtRecord::new(
+                        RecordType::Mint,
+                        0,
+                        Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            ]),
+                        },
+                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        "random_nft_id_1".to_string(),
+                        [
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                        ],
+                        "randomSellId1".to_string(),
+                        0,
+                        GldtNumTokens::new(Nat::from(0)).unwrap(),
+                        Nat::from(0),
+                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                    ),
+                    GldtRecord::new(
+                        RecordType::Mint,
+                        0,
+                        Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            ]),
+                        },
+                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        "random_nft_id_2".to_string(),
+                        [
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                        ],
+                        "randomSellId2".to_string(),
+                        0,
+                        GldtNumTokens::new(Nat::from(0)).unwrap(),
+                        Nat::from(0),
+                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                    )
+                ]
+            ),
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_b3() {
-//     init_records();
+#[test]
+fn test_get_records_b3() {
+    init_records();
 
-//     let records_request = GetRecordsRequest {
-//         page: Some(0),
-//         limit: Some(1),
-//     };
+    let records_request = GetRecordsRequest {
+        page: Some(0),
+        limit: Some(1),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 2,
-//             data: Some(
-//                 vec![GldtRecord {
-//                     record_type: RecordType::Mint,
-//                     timestamp: 0,
-//                     counterparty: Account {
-//                         owner: Principal::anonymous(),
-//                         subaccount: Some([0u8; 32]),
-//                     },
-//                     gld_nft_canister_id: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-//                         "Could not decode the principal."
-//                     ),
-//                     nft_id: "random_nft_id_1".to_string(),
-//                     escrow_subaccount: Some([0u8; 32]),
-//                     nft_sale_id: "randomSellId1".to_string(),
-//                     grams: 1,
-//                     num_tokens: GldtNumTokens {
-//                         value: Nat::from(0),
-//                     },
-//                     block_height: Nat::from(0),
-//                     memo: Memo::from(0),
-//                 }]
-//             ),
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
+                vec![
+                    GldtRecord::new(
+                        RecordType::Mint,
+                        0,
+                        Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            ]),
+                        },
+                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        "random_nft_id_1".to_string(),
+                        [
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                        ],
+                        "randomSellId1".to_string(),
+                        0,
+                        GldtNumTokens::new(Nat::from(0)).unwrap(),
+                        Nat::from(0),
+                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                    )
+                ]
+            ),
+        })
+    );
+}
 
-// #[test]
-// fn test_get_records_b4() {
-//     init_records();
+#[test]
+fn test_get_records_b4() {
+    init_records();
 
-//     let records_request = GetRecordsRequest {
-//         page: Some(1),
-//         limit: Some(1),
-//     };
+    let records_request = GetRecordsRequest {
+        page: Some(1),
+        limit: Some(1),
+    };
 
-//     let res = get_records(records_request);
+    let res = get_records(records_request);
 
-//     assert_eq!(
-//         res,
-//         Ok(GetRecordsResponse {
-//             total: 2,
-//             data: Some(
-//                 vec![GldtRecord {
-//                     record_type: RecordType::Mint,
-//                     timestamp: 0,
-//                     counterparty: Account {
-//                         owner: Principal::anonymous(),
-//                         subaccount: Some([0u8; 32]),
-//                     },
-//                     gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//                         "Could not decode the principal."
-//                     ),
-//                     nft_id: "random_nft_id_2".to_string(),
-//                     escrow_subaccount: Some([0u8; 32]),
-//                     nft_sale_id: "randomSellId2".to_string(),
-//                     grams: 10,
-//                     num_tokens: GldtNumTokens {
-//                         value: Nat::from(0),
-//                     },
-//                     block_height: Nat::from(0),
-//                     memo: Memo::from(0),
-//                 }]
-//             ),
-//         })
-//     );
-// }
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: Some(
+                vec![
+                    GldtRecord::new(
+                        RecordType::Mint,
+                        0,
+                        Account {
+                            owner: Principal::anonymous(),
+                            subaccount: Some([
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            ]),
+                        },
+                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                            "Could not decode the principal."
+                        ),
+                        "random_nft_id_2".to_string(),
+                        [
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                        ],
+                        "randomSellId2".to_string(),
+                        0,
+                        GldtNumTokens::new(Nat::from(0)).unwrap(),
+                        Nat::from(0),
+                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                    )
+                ]
+            ),
+        })
+    );
+}
 
 // // ------------------------- notify_sale_nft_origyn tests -----------------------------
 
