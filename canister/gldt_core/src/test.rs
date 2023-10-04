@@ -1753,126 +1753,98 @@ fn test_get_records_b4() {
 // }
 
 // // ---------------------------------- nft_info --------------------------------
-// #[test]
-// fn test_nft_info_a1() {
-//     let info_request = InfoRequest {
-//         source_canister: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         nft_id: "random_nft_id_1".to_string(),
-//     };
+#[test]
+fn test_nft_info_a1() {
+    let info_request = InfoRequest {
+        source_canister: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+            "Could not decode the principal."
+        ),
+        nft_id: "random_nft_id_1".to_string(),
+    };
 
-//     let res = nft_info(info_request);
+    let res = nft_info(info_request);
 
-//     assert_eq!(res, NftInfo { info: None });
-// }
+    assert_eq!(res, NftInfo { info: None });
+}
 
-// #[test]
-// fn test_nft_info_a2() {
-//     init_service();
+#[test]
+fn test_nft_info_a2() {
+    init_service();
 
-//     let gldtNft = GldNft {
-//         gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         to_subaccount: [0u8; 32],
-//         nft_sale_id: "randomSellId".to_string(),
-//         grams: 10,
-//         receiving_account: Account {
-//             owner: Principal::anonymous(),
-//             subaccount: Some([0u8; 32]),
-//         },
-//         gldt_minting_timestamp_seconds: 0,
-//         requested_memo: Memo::from(0),
-//         minted: None,
-//         swapped: None,
-//         older_record: None,
-//     };
+    let swap_info = SwapInfo::new(
+        "randomSellId1".to_string(),
+        [0u8; 32],
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: Some([0u8; 32]),
+        },
+        0,
+        GldtNumTokens::new(Nat::from(0)).unwrap()
+    );
 
-//     SERVICE.with(|s| {
-//         let registry = &mut s.borrow_mut().registry;
+    REGISTRY.with(|r| {
+        let registry = &mut r.borrow_mut();
 
-//         match
-//             registry.entry(
-//                 (
-//                     Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//                         "Could not decode the principal."
-//                     ),
-//                     "random_nft_id_2".to_string(),
-//                 ).clone()
-//             )
-//         {
-//             btree_map::Entry::Vacant(v) => {
-//                 v.insert(gldtNft.clone());
-//             }
-//             _ => {}
-//         }
-//     });
+        let _ = registry.init(
+            (
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ).clone(),
+            swap_info.clone()
+        );
+    });
 
-//     let info_request = InfoRequest {
-//         source_canister: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         nft_id: "random_nft_id_2".to_string(),
-//     };
+    let info_request = InfoRequest {
+        source_canister: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
+        nft_id: "random_nft_id_1".to_string(),
+    };
 
-//     let res = nft_info(info_request);
+    let res = nft_info(info_request);
 
-//     assert_eq!(res, NftInfo {
-//         info: Some(gldtNft),
-//     });
-// }
+    assert_eq!(res, NftInfo {
+        info: Some(GldtRegistryEntry::new(swap_info)),
+    });
+}
 
-// #[test]
-// fn test_nft_info_a3() {
-//     init_service();
+#[test]
+fn test_nft_info_a3() {
+    init_service();
 
-//     let gldtNft = GldNft {
-//         gld_nft_canister_id: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         to_subaccount: [0u8; 32],
-//         nft_sale_id: "randomSellId".to_string(),
-//         grams: 10,
-//         receiving_account: Account {
-//             owner: Principal::anonymous(),
-//             subaccount: Some([0u8; 32]),
-//         },
-//         gldt_minting_timestamp_seconds: 0,
-//         requested_memo: Memo::from(0),
-//         minted: None,
-//         swapped: None,
-//         older_record: None,
-//     };
+    REGISTRY.with(|r| {
+        let registry = &mut r.borrow_mut();
 
-//     SERVICE.with(|s| {
-//         let registry = &mut s.borrow_mut().registry;
+        let _ = registry.init(
+            (
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ).clone(),
+            SwapInfo::new(
+                "randomSellId1".to_string(),
+                [0u8; 32],
+                Account {
+                    owner: Principal::anonymous(),
+                    subaccount: Some([0u8; 32]),
+                },
+                0,
+                GldtNumTokens::new(Nat::from(0)).unwrap()
+            )
+        );
+    });
 
-//         match
-//             registry.entry(
-//                 (
-//                     Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//                         "Could not decode the principal."
-//                     ),
-//                     "random_nft_id_2".to_string(),
-//                 ).clone()
-//             )
-//         {
-//             btree_map::Entry::Vacant(v) => {
-//                 v.insert(gldtNft.clone());
-//             }
-//             _ => {}
-//         }
-//     });
+    let info_request = InfoRequest {
+        source_canister: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+            "Could not decode the principal."
+        ),
+        nft_id: "random_nft_id_2".to_string(),
+    };
 
-//     let info_request = InfoRequest {
-//         source_canister: Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         nft_id: "random_nft_id_1".to_string(),
-//     };
+    let res = nft_info(info_request);
 
-//     let res = nft_info(info_request);
-
-//     assert_eq!(res, NftInfo { info: None });
-// }
+    assert_eq!(res, NftInfo { info: None });
+}
