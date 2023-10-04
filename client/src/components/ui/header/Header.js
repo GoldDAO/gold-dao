@@ -8,6 +8,8 @@ import Balance from './Balance';
 import Principal from './Principal';
 import Link from 'next/link';
 import { Box, Grid, GridItem, Text } from '@chakra-ui/react';
+import Navigation from './Navigation';
+import WithSubnavigation from './Navigation';
 
 const Header = () => {
     const { isConnected, principal } = useConnect();
@@ -17,7 +19,8 @@ const Header = () => {
                 gridColumn: 'span 12',
             }}
         >
-            <Grid p={5} gridTemplateColumns={'repeat(12, 1fr)'} alignItems={'center'}>
+            <WithSubnavigation />
+            {/* <Grid p={5} gridTemplateColumns={'repeat(12, 1fr)'} alignItems={'center'}>
                 <GridItem gridColumn={'span 2'}>
                     <Box
                         width="fit-content"
@@ -57,9 +60,8 @@ const Header = () => {
                     )}
                 </GridItem>
                 <GridItem gridColumn={'12/13'}>
-                    <C2icButton />
                 </GridItem>
-            </Grid>
+            </Grid> */}
         </header>
     );
 };

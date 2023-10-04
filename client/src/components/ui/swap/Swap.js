@@ -32,6 +32,7 @@ import {
     HStack,
     Text,
     Th,
+    Stack,
     ModalBody,
     ModalFooter,
     CheckboxIcon,
@@ -57,16 +58,19 @@ import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra
 import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg';
 import { gldNftCanisters } from '@/services/agents';
+import { cardPadding } from '@/theme/theme';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
     return (
         <Card
-            gridColumn={'3/11'}
-            p={[2, 2, 2, 4]}
+            mt="20px"
+            gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
+            p={cardPadding.xl}
             position={'relative'}
             shadow={['md', 'lg']}
             bg="bg"
+            mx={['10px', '20px', 0, 0, 0]}
             display="grid"
             justifyContent={'center'}
             gridTemplateRows={'repeat(1, 1fr)'}
@@ -102,7 +106,7 @@ const TokenTag = ({ nft, size, isToggle, index }) => {
                 bg: 'extraLightGold',
             }}
             h="30px"
-            w={'120px'}
+            minW={'120px'}
             transition=".2s all"
             cursor={'pointer'}
             bg={isSelected ? 'lightGold' : 'white'}
@@ -137,7 +141,7 @@ const Input = ({ isConnected }) => {
             borderColor="border"
             shadow={'none'}
             w={'100%'}
-            p={[2, 2, 3, 4, 6]}
+            p={cardPadding.xl}
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
             gap={[3]}
         >
@@ -156,7 +160,7 @@ const Output = ({ isConnected }) => {
             borderRadius={'lg'}
             bg="white"
             shadow={'none'}
-            p={[2, 2, 3, 4, 6]}
+            p={cardPadding.xl}
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
             gap={[3]}
         >
@@ -398,6 +402,7 @@ const MyNftsPanel = ({ setIsloading }) => {
             border={'1px'}
             borderColor={'border'}
             borderTop={0}
+            p={{ base: '10px', md: '20px' }}
             gap="2"
             display="grid"
             gridTemplateColumns={'repeat(2,1fr)'}
@@ -413,27 +418,35 @@ const MyNftsPanel = ({ setIsloading }) => {
                                 <CardHeader
                                     display={'flex'}
                                     justifyContent={'space-between'}
+                                    p={{ base: '10px', md: '20px' }}
                                     pb="0px"
                                     color={'secondaryText'}
                                 >
-                                    GLD NFTs {Object.keys(gldNftCanisters)[i]}
-                                    <Button
-                                        onClick={() =>
-                                            isAllSelected[i]
-                                                ? unSelectSameWeight(i)
-                                                : selectSameWeight(i)
-                                        }
-                                        bg="transparent"
-                                        border={'1px'}
-                                        borderColor={'black'}
-                                        _hover={{ backgroundColor: 'bg' }}
-                                        fontWeight={400}
-                                        size={'xs'}
+                                    <Stack
+                                        w={'100%'}
+                                        justifyContent={{ base: 'flex-start', md: 'space-between' }}
+                                        direction={{ base: 'column', md: 'row' }}
                                     >
-                                        {isAllSelected[i] ? 'Unselect All' : 'Select All'}
-                                    </Button>
+                                        <Text>GLD NFTs {Object.keys(gldNftCanisters)[i]}</Text>
+                                        <Button
+                                            onClick={() =>
+                                                isAllSelected[i]
+                                                    ? unSelectSameWeight(i)
+                                                    : selectSameWeight(i)
+                                            }
+                                            bg="transparent"
+                                            border={'1px'}
+                                            w="fit-content"
+                                            borderColor={'black'}
+                                            _hover={{ backgroundColor: 'bg' }}
+                                            fontWeight={400}
+                                            size={'xs'}
+                                        >
+                                            {isAllSelected[i] ? 'Unselect All' : 'Select All'}
+                                        </Button>
+                                    </Stack>
                                 </CardHeader>
-                                <CardBody>
+                                <CardBody p={{ base: '10px', md: '20px' }}>
                                     {isLoading ? (
                                         <SkeletonToken />
                                     ) : (

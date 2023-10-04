@@ -17,6 +17,7 @@ import {
     Button,
     Box,
     Spinner,
+    Stack,
     HStack,
     Skeleton,
     AccordionIcon,
@@ -37,14 +38,16 @@ import weightIcon from '/public/images/scale.svg';
 import swappedIcon from '/public/images/send_money.svg';
 import Image from 'next/image';
 import Timestamp from '../tooltip/timeStamp';
+import { cardPadding } from '@/theme/theme';
 const Summary = () => {
     const { isConnected } = useConnect();
     return (
         <Card
-            gridColumn={'3/11'}
-            p={[2, 2, 2, 4]}
+            mt="20px"
+            gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
+            p={cardPadding.xl}
             shadow={['md', 'lg']}
-            bg="bg"
+            mx={['10px', '20px', 0, 0, 0]}
             display="grid"
             gridTemplateRows={'repeat(1, 1fr)'}
             gap="3"
@@ -80,22 +83,23 @@ const Overview = () => {
 
     const BigN = ({ children }) => {
         return (
-            <Text fontWeight={200} fontSize={'1.6em'}>
+            <Text fontWeight={200} fontSize={['1.2em', '1.2em', '1.6em']}>
                 {children}
             </Text>
         );
     };
     return (
         <Card shadow={'none'} border={'1px'} borderColor={'border'} borderRadius={'lg'}>
-            <HStack
-                spacing="40px"
+            <Stack
+                spacing={{ base: 0, md: '15px' }}
+                direction={['column', 'column', 'row']}
                 style={{
                     opacity: isLoading ? 0.5 : 1,
                 }}
             >
                 <Card shadow={'none'}>
-                    <CardBody>
-                        <HStack align="start">
+                    <CardBody py={['7px', '10px', '20px']}>
+                        <HStack direction={['column', 'column', 'row']}>
                             <Image
                                 alt="NFT icon"
                                 src={NFTIcon}
@@ -105,7 +109,7 @@ const Overview = () => {
                                     paddingTop: '7px',
                                 }}
                             />
-                            <HStack>
+                            <Stack direction={['row', 'row', 'column']}>
                                 <Box>
                                     {!isLoading ? (
                                         <BigN>{nfts.length}</BigN>
@@ -114,12 +118,12 @@ const Overview = () => {
                                     )}
                                     <Text>Total number of NFTs</Text>
                                 </Box>
-                            </HStack>
+                            </Stack>
                         </HStack>
                     </CardBody>
                 </Card>
                 <Card shadow={'none'}>
-                    <CardBody>
+                    <CardBody py={['7px', '10px', '20px']}>
                         <HStack align="start">
                             <Image
                                 alt="scale icon"
@@ -142,7 +146,7 @@ const Overview = () => {
                     </CardBody>
                 </Card>
                 <Card shadow={'none'}>
-                    <CardBody>
+                    <CardBody py={['7px', '10px', '20px']}>
                         <HStack align="start">
                             <Image
                                 alt="swapped coins icon"
@@ -167,7 +171,7 @@ const Overview = () => {
                         </HStack>
                     </CardBody>
                 </Card>
-            </HStack>
+            </Stack>
         </Card>
     );
 };
@@ -187,7 +191,7 @@ const Mynfts = ({ connected }) => {
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
             gap={[3]}
         >
-            <CardHeader pl={0} py={'10px'}>
+            <CardHeader pl={0} py={{ base: '2px', md: '10px' }}>
                 <Text>My Nfts</Text>
             </CardHeader>
             <Accordion allowToggle>
@@ -197,9 +201,10 @@ const Mynfts = ({ connected }) => {
                     borderTop={0}
                     gap="2"
                     display="grid"
-                    gridTemplateColumns={'repeat(2,1fr)'}
+                    gridTemplateColumns={['repeat(1,1fr)', 'repeat(1,1fr)', 'repeat(2,1fr)']}
                     borderEndEndRadius={'md'}
                     borderEndStartRadius={'md'}
+                    direction={['column', 'column', 'column', 'column', 'column']}
                 >
                     {weights.map((weight, i) => (
                         <Card key={i} shadow={'none'} alignSelf={'flex-start'}>
@@ -384,7 +389,7 @@ const MyTransactions = () => {
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
             gap={[3]}
         >
-            <CardHeader pl={0} py={'10px'}>
+            <CardHeader pl={0} py={{ base: '2px', md: '10px' }}>
                 <Text>My Transactions</Text>
             </CardHeader>
             <Accordion allowToggle>
