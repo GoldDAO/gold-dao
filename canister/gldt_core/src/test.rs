@@ -468,15 +468,15 @@ fn test_get_historical_swaps_by_user_b1() {
                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             ]),
                         },
-                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                             "Could not decode the principal."
                         ),
-                        "random_nft_id_1".to_string(),
+                        "random_nft_id_2".to_string(),
                         [
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0,
                         ],
-                        "randomSellId1".to_string(),
+                        "randomSellId2".to_string(),
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
@@ -492,15 +492,15 @@ fn test_get_historical_swaps_by_user_b1() {
                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             ]),
                         },
-                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
                             "Could not decode the principal."
                         ),
-                        "random_nft_id_2".to_string(),
+                        "random_nft_id_1".to_string(),
                         [
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0,
                         ],
-                        "randomSellId2".to_string(),
+                        "randomSellId1".to_string(),
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
@@ -547,7 +547,7 @@ fn test_get_historical_swaps_by_user_b3() {
 
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
-        page: Some(0),
+        page: Some(1),
         limit: Some(1),
     };
 
@@ -599,7 +599,7 @@ fn test_get_historical_swaps_by_user_b4() {
 
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
-        page: Some(1),
+        page: Some(0),
         limit: Some(1),
     };
 
