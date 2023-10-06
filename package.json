@@ -9,6 +9,7 @@
   "private": true,
   "scripts": {
     "front:dev": "cd ./client/ && npm run develop && cd ..",
+    "landing:dev": "cd ./landing_page/ && npm run develop && cd ..",
     "build": "npm run build:back && npm run build:front",
     "build:front": "cd ./client/ && npm run build && cd ..",
     "build:back": "scripts/build-canister.sh gldt_core && npm run build:candid && npm run build:declarations",
