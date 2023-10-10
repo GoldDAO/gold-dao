@@ -160,7 +160,7 @@ function Home({}) {
                         justifyContent="center"
                     >
                         <Image src={Logo} width={100} />
-                        <Heading fontWeight={400} as="h1">
+                        <Heading fontWeight={400} as="h1" textAlign="center">
                             GLDT IS COMING SOON
                         </Heading>
                     </Stack>
