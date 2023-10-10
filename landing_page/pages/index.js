@@ -133,23 +133,29 @@ function Home({}) {
                     style={{
                         display: 'flex',
                         justifyContent: 'space-between',
+                        alignItems: 'center',
                     }}
                 >
                     <Image width={80} src={Logo} />
-                    <Button
-                        _hover={{
-                            bg: '#D3B872',
-                        }}
-                        py={'40px'}
-                        px="25px"
-                        bg="#D3B872"
-                        borderRadius={'30px'}
-                        fontSize={('18px', '24px')}
-                        fontWeight={'bold'}
-                        color={'#fff'}
-                    >
-                        Use GLDT
-                    </Button>
+                    <HStack spacing="50px">
+                        <Link href="#" st>
+                            <Text fontSize={TextSize}>FAQ</Text>
+                        </Link>
+                        <Button
+                            _hover={{
+                                bg: '#D3B872',
+                            }}
+                            py={'40px'}
+                            px="25px"
+                            bg="#D3B872"
+                            borderRadius={'30px'}
+                            fontSize={('18px', '24px')}
+                            fontWeight={'bold'}
+                            color={'#fff'}
+                        >
+                            Use GLDT
+                        </Button>
+                    </HStack>
                 </Box>
                 <Container maxWidth={'100%'} px={margins} my={verticalSpacing}>
                     <VStack
@@ -238,7 +244,7 @@ function Home({}) {
                             alignItems={'flex-start'}
                             direction={['column', 'column', 'row', 'row', 'row']}
                         >
-                            <Box>
+                            <Box w="100%">
                                 <Heading
                                     fontSize={mediumFontSize}
                                     mb={['20px', '30px', '30px', '50px', '50px']}
@@ -251,7 +257,7 @@ function Home({}) {
                                     seize golden opportunities in the digital financial landscape.
                                 </Text>
                             </Box>
-                            <Box>
+                            <Box w="100%">
                                 <Heading
                                     mb={['20px', '30px', '30px', '50px', '50px']}
                                     fontSize={mediumFontSize}
@@ -270,12 +276,52 @@ function Home({}) {
                             fontWeight={'bold'}
                             mt={['40px', '60px', '60px', '100px', '100px']}
                         >
-                            <HStack w="100%">
-                                <Text>1g of gold = 100</Text>
-                                <HStack>
-                                    <Text>GLDT</Text> <Image src={Logo} width={50} />
+                            <Stack
+                                alignItems={[
+                                    'center',
+                                    'center',
+                                    'center',
+                                    'space-between',
+                                    'space-between',
+                                ]}
+                                w="100%"
+                                spacing={'50px'}
+                                direction={['column', 'column', 'column', 'row', 'row']}
+                            >
+                                <Box w="100%">
+                                    <Stack
+                                        w={['100%', '100%', '100%', 'fit-content', 'fit-content']}
+                                        justifyContent="center"
+                                    >
+                                        <Button
+                                            bg="#F4F4F4"
+                                            fontSize={buttonTextSize}
+                                            borderRadius={30}
+                                            p={'35px'}
+                                            _hover={{
+                                                bg: '#f4f4f4',
+                                            }}
+                                        >
+                                            Read the whitepaper
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                                <HStack
+                                    w="100%"
+                                    justifyContent={[
+                                        'center',
+                                        'center',
+                                        'center',
+                                        'flex-start',
+                                        'flex-start',
+                                    ]}
+                                >
+                                    <Text>1g of gold = 100</Text>
+                                    <HStack>
+                                        <Text>GLDT</Text> <Image src={Logo} width={50} />
+                                    </HStack>
                                 </HStack>
-                            </HStack>
+                            </Stack>
                         </Box>
                     </Container>
                 </Box>
