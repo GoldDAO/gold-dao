@@ -931,8 +931,22 @@ pub enum BidResponse_txn_type {
         amount: candid::Nat,
     },
 }
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub enum HistoryResult {
+    ok(Vec<TransactionRecord>),
+    err(OrigynError),
+}
 pub struct Service(pub Principal);
 impl Service {
+    pub async fn history_nft_origyn(
+        &self,
+        arg0: String,
+        arg1: Option<candid::Nat>,
+        arg2: Option<candid::Nat>
+    ) -> Result<(HistoryResult,)> {
+        ic_cdk::call(self.0, "history_nft_origyn", (arg0, arg1, arg2)).await
+    }
     pub async fn sale_nft_origyn(&self, arg0: ManageSaleRequest) -> Result<(ManageSaleResult,)> {
         ic_cdk::call(self.0, "sale_nft_origyn", (arg0,)).await
     }
