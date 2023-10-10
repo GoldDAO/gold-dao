@@ -138,13 +138,16 @@ function Home({}) {
                 >
                     <Image width={80} src={Logo} />
                     <HStack spacing="50px">
-                        <Link href="#" st>
+                        <Link href="#">
                             <Text fontSize={TextSize}>FAQ</Text>
                         </Link>
                         <Button
+                            as="a"
                             _hover={{
                                 bg: '#D3B872',
                             }}
+                            target="_blank"
+                            href="https://app.gldt.org"
                             py={'40px'}
                             px="25px"
                             bg="#D3B872"
@@ -350,6 +353,9 @@ function Home({}) {
                         >
                             <Image src={Yumi} width={300} height="75px" />
                             <Button
+                                as="a"
+                                href="https://yumi.io/gold"
+                                target="_blank"
                                 mt={['20px', '20px', '20px', '0', '0']}
                                 borderRadius="30px"
                                 w={'260px'}
