@@ -34,6 +34,17 @@
       },
       "frontend": {}
     },
+    "landing_page": {
+      "type": "assets",
+      "source": ["landing_page/out"],
+      "build": ["npm run postinstall", "npm run build:landing"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {}
+    },
     "yumi_kyc": {
       "type": "custom",
       "candid": "canister/yumi_kyc/kyc.did",
