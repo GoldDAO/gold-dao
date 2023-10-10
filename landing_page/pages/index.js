@@ -202,8 +202,8 @@ function Home({}) {
                                         A token backed 100% by physical gold
                                     </Heading>
                                     <Text fontSize={TextSize}>
-                                        GLDT is more than a token; it's the new gold standard in
-                                        investment. Leveraging ICP blockchain technology, it
+                                        GLDT is more than a token; it&apos;s the new gold standard
+                                        in investment. Leveraging ICP blockchain technology, it
                                         guarantees stability akin to physical gold in a dynamic
                                         digital form. Discover transparent and secure investing with
                                         GLDT, your beacon of trust in the fluctuating world of
