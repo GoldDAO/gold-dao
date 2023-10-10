@@ -50,7 +50,7 @@ create_canister () {
 check_and_create_canister () {
 	if [[ $2 == "local" ]]; then
 		echo $(dfx canister id $1 2>/dev/null || echo $(create_canister $1 $2))
-	elif [[ ($2 == "staging" && $CI) || ($2 == "ic" && $CI_COMMIT_TAG =~ ^(ledger|core|front)-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$) ]]; then
+	elif [[ ($2 == "staging" && $CI) || ($2 == "ic" && $CI_COMMIT_TAG =~ ^(ledger|core|swap_app)-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$) ]]; then
 		if [[ $(cat canister_ids.json | jq -r .$1.$2) == "" ]]; then
 			echo $(create_canister $1 $2)
 		else
@@ -68,8 +68,8 @@ export GLDT_CORE_ID=$(check_and_create_canister gldt_core $NETWORK)
 echo -e "gldt_core      \033[1m${GLDT_CORE_ID}\033[0m${IMPORTANT_MSG}"
 export GLDT_LEDGER_ID=$(check_and_create_canister gldt_ledger $NETWORK)
 echo -e "gldt_ledger    \033[1m${GLDT_LEDGER_ID}\033[0m${IMPORTANT_MSG}"
-export GLDT_FRONT_ID=$(check_and_create_canister gldt_frontend $NETWORK)
-echo -e "gldt_frontend  \033[1m${GLDT_FRONT_ID}\033[0m${IMPORTANT_MSG}\n"
+export GLDT_FRONT_ID=$(check_and_create_canister gldt_swap_app $NETWORK)
+echo -e "gldt_swap_app  \033[1m${GLDT_FRONT_ID}\033[0m${IMPORTANT_MSG}\n"
 
 if [[ ($NETWORK == "staging" || $NETWORK == "ic") && $CI ]]; then
 	echo -e "\n  \033[1;5;31mIMPORTANT\033[0m  If a canister id has just been created on \033[7m${NETWORK}\033[0m. Please update and version \033[4m'canister_ids.json'\033[0m on both the \033[7m'master'\033[0m and \033[7m'develop'\033[0m branches ASAP.\n"

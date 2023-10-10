@@ -118,7 +118,7 @@ function Home({}) {
             w: '200px',
         },
     ];
-    if (process.env.DFX_NETWORK === 'production') {
+    if (process.env.DFX_NETWORK === 'ic') {
         return (
             <>
                 <Head>

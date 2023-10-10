@@ -2,7 +2,7 @@
 
 ## Project Structure:
 
-- [`client`](client/): Contains the NextJS frontend
+- [`swap_app`](swap_app/): Contains the NextJS frontend
 - [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core` and `gldt_ledger`, as well as other dependencies wasm files)
 
 ## How to install and execute the dapp locally
@@ -44,7 +44,7 @@ And to restart a fresh environment and redeploy all canisters, simply redo a `np
 Launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/)
 
 ```sh
-npm run front:dev
+npm run dev:swap_app
 ```
 The frontend will be available at `http://localhost:3000`
 

@@ -1,5 +1,5 @@
 {
-    "name": "client",
+    "name": "swap_app",
     "version": "0.1.0",
     "description": "GLDT page and swap canister and frontend",
     "main": "index.js",
@@ -7,7 +7,7 @@
         "type": "git+ssh",
         "url": "git@gitlab.bochslerfinance.com:gldt/gldt-swap-frontend.git"
     },
-    "author": "Yumi Fundation",
+    "author": "Victor Audetat",
     "license": "SEE LICENSE IN LICENSE.md",
     "private": true,
     "scripts": {

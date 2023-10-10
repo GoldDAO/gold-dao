@@ -1,7 +1,7 @@
 {
-  "gldt_frontend": {
+  "gldt_swap_app": {
     "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai",
-    "ic": "maz3v-6aaaa-aaaak-qcgpq-cai"
+    "ic": ""
   },
   "gldt_ledger": {
     "staging": "6uad6-fqaaa-aaaam-abovq-cai",
@@ -9,6 +9,18 @@
   },
   "gldt_core": {
     "staging": "m45be-jaaaa-aaaak-qcgnq-cai",
+    "ic": ""
+  },
+  "gldt_landing_page": {
+    "staging": "maz3v-6aaaa-aaaak-qcgpq-cai",
+    "ic": "bojx2-iaaaa-aaaag-ab3jq-cai"
+  },
+  "gldt_explorer": {
+    "staging": "o6ihl-oyaaa-aaaal-ac5oa-cai",
+    "ic": ""
+  },
+  "gldt_fee_compensation": {
+    "staging": "ccjse-eaaaa-aaaao-a2ixq-cai",
     "ic": ""
   }
 }

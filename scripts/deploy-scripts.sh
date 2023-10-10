@@ -24,8 +24,8 @@ dfx deploy gldt_core --argument '(opt record {gldt_ledger_canister_id=principal 
   }})'
 
 # 4. deploy gldt frontend
-dfx deploy gldt_frontend --network local
-dfx deploy gldt_frontend --network staging
+dfx deploy gldt_swap_app --network local
+dfx deploy gldt_swap_app --network staging
 
 ####################
 ### KYC Canister ###
