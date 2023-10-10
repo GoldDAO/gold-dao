@@ -23,7 +23,7 @@
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
-    "postinstall": "cd ./client && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
+    "postinstall": "cd ./client && npm install && cd .. && cd ./landing_page && npm install && cd ..; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
     "eslint": "8.40.0"

@@ -14,7 +14,7 @@
     "develop": "next dev",
     "build": "next build",
     "lint": "next lint",
-    "postinstall": "echo 'Frontend project has been installed'"
+    "postinstall": "echo 'landing page has been installed'"
   },
   "browserslist": {
     "production": [
