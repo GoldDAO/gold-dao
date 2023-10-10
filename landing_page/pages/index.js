@@ -297,7 +297,7 @@ function Home({}) {
                                             bg="#F4F4F4"
                                             fontSize={buttonTextSize}
                                             borderRadius={30}
-                                            p={'35px'}
+                                            p={'40px'}
                                             _hover={{
                                                 bg: '#f4f4f4',
                                             }}
