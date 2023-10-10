@@ -1,6 +1,6 @@
 {
-  "alternativeOrigins": [
-    "https://gldt.org",
-    "https://staging.gldt.org"
-  ]
+    "alternativeOrigins": [
+        "https://app.gldt.org",
+        "https://staging.app.gldt.org"
+    ]
 }
