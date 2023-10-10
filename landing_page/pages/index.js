@@ -273,7 +273,7 @@ function Home({}) {
                             <HStack w="100%">
                                 <Text>1g of gold = 100</Text>
                                 <HStack>
-                                    <Text>GLDT</Text> <Image src={Logo} width={50} sx />
+                                    <Text>GLDT</Text> <Image src={Logo} width={50} />
                                 </HStack>
                             </HStack>
                         </Box>
