@@ -5,6 +5,7 @@ import {
     Grid,
     GridItem,
     HStack,
+    Stack,
     Heading,
     Stat,
     StatGroup,
@@ -24,6 +25,7 @@ import loomis from '/public/images/partners/loomis.jpg';
 import metalor from '/public/images/partners/metalor.svg';
 import origyn from '/public/images/partners/origyn.svg';
 import Link from 'next/link';
+Stack;
 import Play from '/public/images/play.svg';
 
 function Home({}) {
@@ -32,6 +34,15 @@ function Home({}) {
         description: 'GLDT Swap Description',
     };
 
+    const margins = ['20px', '30px', '60px', '140px', '180px'];
+    const headerMargins = ['20px', '30px', '49px', '49px', '49px'];
+
+    const titleFontSize = ['40px', '60px', '60px', '80px', '96px'];
+    const subtitleFontSize = ['28px', '36px', '36px', '48px', '48px'];
+    const mediumFontSize = ['24px', '26px', '28px', '32px', '36px'];
+    const TextSize = ['18px', '18px', '20px', '22px', '24px'];
+    const buttonTextSize = ['22px', '24px', '28px', '32px', '32px'];
+    const verticalSpacing = ['60px', '80px', '80px', '140px', '180px'];
     const stats = [
         {
             label: 'USD Market Cap ',
@@ -49,11 +60,21 @@ function Home({}) {
 
     const Stats = ({ label, number }) => {
         return (
-            <Stat>
-                <StatLabel fontSize={'24px'} fontWeight={'bold'} pb="36px" m={0}>
+            <Stat display={'flex'}>
+                <StatLabel
+                    fontSize={TextSize}
+                    fontWeight={'bold'}
+                    pb={['5px', '5px', '20px', '20px', '25px']}
+                    m={0}
+                >
                     {label}
                 </StatLabel>
-                <StatNumber fontSize={'32px'} fontWeight={400} m={0}>
+                <StatNumber
+                    fontSize={mediumFontSize}
+                    fontWeight={400}
+                    m={0}
+                    pb={['15px', '15px', '25px', '0', '0']}
+                >
                     {number}
                 </StatNumber>
             </Stat>
@@ -104,8 +125,11 @@ function Home({}) {
                 <meta name="msapplication-TileColor" content="#da532c" />
                 <meta name="theme-color" content="#ffffff" />
             </Head>
-            <Box p={'50px'}>
-                <header
+            <Box>
+                <Box
+                    pt={'34px'}
+                    as="header"
+                    px={headerMargins}
                     style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -116,29 +140,32 @@ function Home({}) {
                         _hover={{
                             bg: '#D3B872',
                         }}
+                        py={'40px'}
+                        px="25px"
                         bg="#D3B872"
-                        w="161px"
-                        h="80px"
                         borderRadius={'30px'}
-                        fontSize={'24px'}
+                        fontSize={('18px', '24px')}
                         fontWeight={'bold'}
                         color={'#fff'}
                     >
                         Use GLDT
                     </Button>
-                </header>
-                <Container maxWidth={'1238px'} my="150px">
-                    <VStack alignItems={'flex-start'} spacing={'25px'}>
-                        <Heading as="h1" fontSize={'96px'} fontWeight={'bold'}>
+                </Box>
+                <Container maxWidth={'100%'} px={margins} my={verticalSpacing}>
+                    <VStack
+                        alignItems={'flex-start'}
+                        spacing={['5px', '15px', '15px', '25px', '25px']}
+                    >
+                        <Heading as="h1" fontSize={titleFontSize} fontWeight={'bold'}>
                             GLDT – The Future of Gold Investments
                         </Heading>
-                        <Heading as="h3" fontSize={'48px'} fontWeight={400}>
+                        <Heading as="h3" fontSize={subtitleFontSize} fontWeight={400}>
                             Learn how GLDT works.
                         </Heading>
                         <Button
-                            w="259px"
-                            h="95px"
-                            fontSize={'32px'}
+                            py={'40px'}
+                            px="25px"
+                            fontSize={buttonTextSize}
                             borderRadius={'30px'}
                             bg="#f4f4f4"
                             _hover={{ bg: '#f4f4f4' }}
@@ -149,21 +176,32 @@ function Home({}) {
                     </VStack>
                 </Container>
                 <Box
-                    my="150px"
+                    my={verticalSpacing}
                     as="section"
                     bg="#F4F4F4"
-                    py="120px"
-                    borderRadius={'100px 100px 0 0'}
-                    mx={'-50px'}
+                    py={verticalSpacing}
+                    borderRadius={[
+                        '30px 30px 0 0',
+                        '30px 30px 0 0',
+                        '50px 50px 0 0',
+                        '80px 80px 0 0',
+                        '100px 100px 0 0',
+                    ]}
                 >
-                    <Container maxWidth={'1238px'}>
-                        <VStack w={'100%'} spacing={'90px'}>
-                            <HStack spacing={'50px'}>
-                                <VStack w="50%" spacing={'58px'}>
-                                    <Heading fontSize={'48px'}>
+                    <Container maxWidth={'100%'} px={margins}>
+                        <VStack w={'100%'} spacing={['40px', '60px', '90px']}>
+                            <Stack
+                                spacing={['20px', '30px', '30px', '50px', '50px']}
+                                direction={['column', 'column', 'row', 'row', 'row']}
+                            >
+                                <VStack
+                                    w={['100%', '100%', '50%', '50%', '50%']}
+                                    spacing={['20px', '30px', '30px', '50px', '50px']}
+                                >
+                                    <Heading fontSize={subtitleFontSize}>
                                         A token backed 100% by physical gold
                                     </Heading>
-                                    <Text fontSize={'24px'}>
+                                    <Text fontSize={TextSize}>
                                         GLDT is more than a token; it's the new gold standard in
                                         investment. Leveraging ICP blockchain technology, it
                                         guarantees stability akin to physical gold in a dynamic
@@ -172,56 +210,89 @@ function Home({}) {
                                         decentralized finance.
                                     </Text>
                                 </VStack>
-                                <Image width={312} src={Logo} />
+                                <Box display={['none', 'none', 'block', 'block', 'block']}>
+                                    <Image width={312} src={Logo} />
+                                </Box>
+                            </Stack>
+                            <HStack w="100%">
+                                <StatGroup
+                                    w={'100%'}
+                                    display={['flex']}
+                                    flexDirection={['column', 'column', 'row', 'row', 'row']}
+                                >
+                                    {stats.map((e, i) => (
+                                        <Stats key={i} label={e.label} number={e.number} />
+                                    ))}
+                                </StatGroup>
+                                <Box display={['block', 'block', 'none', 'none', 'none']}>
+                                    <Image width={312} src={Logo} />
+                                </Box>
                             </HStack>
-
-                            <StatGroup w={'100%'}>
-                                {stats.map((e, i) => (
-                                    <Stats key={i} label={e.label} number={e.number} />
-                                ))}
-                            </StatGroup>
                         </VStack>
                     </Container>
                 </Box>
-                <Box as="section" my="150px">
-                    <Container maxWidth={'1238px'}>
-                        <HStack spacing={'50px'} alignItems={'flex-start'}>
+                <Box as="section" my={verticalSpacing}>
+                    <Container maxWidth={'100%'} px={margins}>
+                        <Stack
+                            spacing={'50px'}
+                            alignItems={'flex-start'}
+                            direction={['column', 'column', 'row', 'row', 'row']}
+                        >
                             <Box>
-                                <Heading fontSize={'36px'} mb="50px">
+                                <Heading
+                                    fontSize={mediumFontSize}
+                                    mb={['20px', '30px', '30px', '50px', '50px']}
+                                >
                                     Steadfast Stability, Golden Opportunity
                                 </Heading>
-                                <Text fontSize={'24px'}>
+                                <Text fontSize={TextSize}>
                                     With GLDT, enjoy the peace of mind that comes with a currency
                                     rooted in the tangible value of gold. Secure your assets and
                                     seize golden opportunities in the digital financial landscape.
                                 </Text>
                             </Box>
                             <Box>
-                                <Heading mb="50px" fontSize={'36px'}>
+                                <Heading
+                                    mb={['20px', '30px', '30px', '50px', '50px']}
+                                    fontSize={mediumFontSize}
+                                >
                                     Seize the Golden Standard
                                 </Heading>
-                                <Text fontSize={'24px'}>
+                                <Text fontSize={TextSize}>
                                     Invest with confidence, knowing each GLDT is backed by physical
                                     gold. Your gateway to a stable and prosperous digital economy
                                     starts with GLDT.
                                 </Text>
-                                <Box fontSize={'36px'} fontWeight={'bold'} mt="100px">
-                                    <HStack>
-                                        <Text>1g of gold = 100 GLDT</Text>
-                                        <Image src={Logo} width={50} />
-                                    </HStack>
-                                </Box>
                             </Box>
-                        </HStack>
+                        </Stack>
+                        <Box
+                            fontSize={mediumFontSize}
+                            fontWeight={'bold'}
+                            mt={['40px', '60px', '60px', '100px', '100px']}
+                        >
+                            <HStack w="100%">
+                                <Text>1g of gold = 100</Text>
+                                <HStack>
+                                    <Text>GLDT</Text> <Image src={Logo} width={50} sx />
+                                </HStack>
+                            </HStack>
+                        </Box>
                     </Container>
                 </Box>
-                <Box as="section" my="150px">
-                    <Container maxWidth={'1238px'}>
-                        <Heading fontSize={'36px'} textAlign={'center'} mb="57px">
+                <Box as="section" my={verticalSpacing}>
+                    <Container maxWidth={'100%'} px={margins}>
+                        <Heading
+                            fontSize={mediumFontSize}
+                            textAlign={'center'}
+                            mb={['20px', '30px', '30px', '40px', '57px']}
+                        >
                             Don’t own any GLD NFTs
                         </Heading>
                         <Box
+                            maxW={'824px'}
+                            wrap="wrap"
                             display={'flex'}
+                            flexDirection={['column', 'column', 'row', 'row', 'row']}
                             justifyContent={'space-between'}
                             alignItems={'center'}
                             margin={'0 auto'}
@@ -229,14 +300,18 @@ function Home({}) {
                             w={'100%'}
                             padding="61px 100px"
                             bg="#F4F4F4"
-                            borderRadius={'100px'}
+                            borderRadius={['30px', '30px', '50px', '80px', '100px ']}
                         >
                             <Image src={Yumi} width={300} height="75px" />
                             <Button
+                                mt={['20px', '20px', '20px', '0', '0']}
                                 borderRadius="30px"
                                 w={'260px'}
                                 h="83px"
-                                fontSize={'32px'}
+                                _hover={{
+                                    backgroundColor: '#D3B872',
+                                }}
+                                fontSize={buttonTextSize}
                                 fontWeight={'bold'}
                                 bg="#D3B872"
                                 color={'#fff'}
@@ -246,14 +321,23 @@ function Home({}) {
                         </Box>
                     </Container>
                 </Box>
-                <Box as="section" my="150px">
-                    <Container maxWidth={'1238px'}>
-                        <Heading fontSize={'64px'} fontWeight={'light'} color="#D3B872">
+                <Box as="section" my={verticalSpacing}>
+                    <Container maxWidth={'100%'} px={margins}>
+                        <Heading
+                            fontSize={['36px', '36px', '36px', '48px', '64px']}
+                            fontWeight={'light'}
+                            color="#D3B872"
+                        >
                             POWERED BY
                         </Heading>
-                        <HStack wrap={'wrap'} spacing={'200px'} my="75px">
+                        <HStack
+                            wrap={'wrap'}
+                            spacing={['60px', '100px', '100px', '150px', '200px']}
+                            my={['50px', '75px']}
+                            justifyContent={'center'}
+                        >
                             {partners.map((e, i) => (
-                                <Box w={e.w}>
+                                <Box w={['100px', '150px', e.w]} key={i}>
                                     <Link href={e.url}>
                                         <Image src={e.img} alt={`logo ${e.name}`} />
                                     </Link>
@@ -262,7 +346,14 @@ function Home({}) {
                         </HStack>
                     </Container>
                 </Box>
-                <footer></footer>
+                <Box
+                    as="footer"
+                    style={{
+                        width: '100%',
+                        backgroundColor: '#F4F4F4',
+                    }}
+                    h={['250px', '300px', '400px']}
+                ></Box>
             </Box>
         </>
     );
