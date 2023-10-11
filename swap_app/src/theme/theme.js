@@ -25,6 +25,26 @@ export const customTheme = {
                 padding: '10px 15px',
             },
         },
+        Tabs: {
+            baseStyle: {
+                border: 'none',
+                tablist: {
+                    borderBottom: 'none',
+                    borderColor: 'red',
+                    button: {
+                        _selected: {
+                            color: 'black',
+                            borderColor: 'bg',
+                            borderBottom: '1px',
+                        },
+                        color: 'secondaryText',
+                    },
+                },
+                tabpanel: {
+                    border: 'none',
+                },
+            },
+        },
         Alert: {
             baseStyle: {
                 container: {

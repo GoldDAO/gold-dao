@@ -49,7 +49,7 @@ import {
 import { useAllCanisters } from '@/query/hooks/useAllCanisters';
 import { useNft } from '@/query/hooks/useNFTs';
 import { useAtom } from 'jotai';
-import { useConnect } from '@connect2ic/react';
+import { useConnect, useDialog } from '@connect2ic/react';
 import { sendBatchOffer } from '@/query/sendBatchOffer';
 import Link from 'next/link';
 import TokenSign from '../gldt/TokenSign';
@@ -64,11 +64,9 @@ const SwapInterface = () => {
     const { isConnected } = useConnect();
     return (
         <Card
-            mt="20px"
             gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-            p={cardPadding.xl}
             position={'relative'}
-            shadow={['md', 'lg']}
+            shadow={['none']}
             bg="bg"
             mx={['10px', '20px', 0, 0, 0]}
             display="grid"
