@@ -43,11 +43,12 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
 fi
 
 if [[ $1 == "local" ]]; then
+# Temporarily use canister ids from staging for NFTs. Use the correct local ids when local NFT deployment will be working.
   dfx deploy gldt_core --network $1 --argument '(
   opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
   gld_nft_canister_ids=vec{
-    record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}}
     }})' --mode reinstall -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   dfx deploy gldt_core --network $1 --argument '(
