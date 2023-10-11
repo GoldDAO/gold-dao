@@ -1119,7 +1119,7 @@ fn test_get_status_of_swap_b7() {
 }
 
 // // --------------------------------- get_records ----------------------------------
-// #[test]
+#[test]
 fn test_get_records_a1() {
     let records_request = GetRecordsRequest {
         page: Some(1),
@@ -1720,17 +1720,6 @@ async fn test_notify_sale_nft_origyn_a8() {
 #[tokio::test]
 async fn test_notify_sale_nft_origyn_a9() {
     init_service();
-
-    let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-        id: None,
-        fee: Some(Nat::from(GLDT_TX_FEE)),
-        decimals: Nat::from(8),
-        canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-            "Could not decode the principal."
-        ),
-        standard: ICTokenSpec_standard::EXTFungible,
-        symbol: "GLDT".to_string(),
-    });
 
     let config: PricingConfigShared = PricingConfigShared::extensible(
         Box::new(CandyShared::Nat64(1 as u64))
