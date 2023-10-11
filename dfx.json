@@ -23,10 +23,21 @@
       },
       "build": ["npm run build:back"]
     },
-    "gldt_frontend": {
+    "gldt_swap_app": {
       "type": "assets",
-      "source": ["client/out"],
-      "build": ["npm run postinstall", "npm run build:back", "npm run build:front"],
+      "source": ["swap_app/out"],
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {}
+    },
+    "gldt_landing_page": {
+      "type": "assets",
+      "source": ["landing_page/out"],
+      "build": ["npm run postinstall", "npm run build:landing"],
       "declarations": {
         "bindings": [],
         "env_override": null,
