@@ -1,3 +1,8 @@
+#![allow(unused_imports)]
+#![allow(non_upper_case_globals)]
+#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
+
 // This is an experimental feature to generate Rust binding from Candid.
 // You may want to manually adjust some of the types.
 use candid::{ self, CandidType, Deserialize, Principal };

@@ -81,14 +81,13 @@ use serde::Serialize;
 use std::cell::RefCell;
 use std::hash::Hash;
 
-mod declarations;
-mod misc;
 mod records;
 mod registry;
-mod types;
-mod constants;
 
-use declarations::gld_nft::{
+use gldt_libs::types::{ NftId, NftWeight, GldtNumTokens, GldtTokenSpec };
+use gldt_libs::constants::*;
+
+use gldt_libs::gld_nft::{
     self,
     Account as OrigynAccount,
     AskFeature,
@@ -96,8 +95,6 @@ use declarations::gld_nft::{
     BidResponse_txn_type,
     DepositWithdrawDescription,
     EscrowReceipt,
-    ICTokenSpec,
-    ICTokenSpec_standard,
     ManageSaleRequest,
     ManageSaleResponse,
     ManageSaleResult,
@@ -105,12 +102,11 @@ use declarations::gld_nft::{
     SaleStatusShared,
     SaleStatusShared_sale_type,
     SubAccountInfo,
-    TokenSpec,
 };
-use declarations::icrc1;
+use gldt_libs::icrc1;
 
-use types::{ NftId, NftWeight, GldtNumTokens };
-use constants::*;
+// use types::{ NftId, NftWeight, GldtNumTokens };
+// use constants::*;
 use registry::{
     Registry,
     GldtLedgerInfo,
@@ -178,38 +174,6 @@ impl Conf {
             .iter()
             .find(|(x, _)| *x == *collection_id)
             .map(|(_, conf)| conf.grams)
-    }
-}
-
-pub struct GldtTokenSpec {
-    id: Option<Nat>,
-    fee: Option<Nat>,
-    decimals: Nat,
-    canister: Principal,
-    standard: ICTokenSpec_standard,
-    symbol: String,
-}
-
-impl GldtTokenSpec {
-    pub fn new(canister_id_ledger: Principal) -> Self {
-        GldtTokenSpec {
-            id: None,
-            fee: Some(Nat::from(GLDT_TX_FEE)),
-            decimals: Nat::from(GLDT_DECIMALS),
-            canister: canister_id_ledger,
-            standard: ICTokenSpec_standard::ICRC1,
-            symbol: String::from("GLDT"),
-        }
-    }
-    pub fn get(&self) -> TokenSpec {
-        TokenSpec::ic(ICTokenSpec {
-            id: self.id.clone(),
-            fee: self.fee.clone(),
-            decimals: self.decimals.clone(),
-            canister: self.canister,
-            standard: self.standard.clone(),
-            symbol: self.symbol.clone(),
-        })
     }
 }
 

@@ -1,7 +1,7 @@
 use candid::Principal;
 use canistergeek_ic_rust::logger::log_message;
 
-use crate::declarations::icrc1;
+use crate::icrc1;
 
 #[allow(dead_code)]
 pub async fn dummy_await() -> Result<(), String> {

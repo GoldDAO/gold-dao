@@ -4,7 +4,7 @@ use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ Bl
 use serde::Serialize;
 use std::collections::{ BTreeMap, btree_map };
 
-use crate::types::{ NftId, GldtNumTokens, NftWeight };
+use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
