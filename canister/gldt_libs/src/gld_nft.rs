@@ -511,7 +511,7 @@ pub struct EscrowReceipt {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct TransactionRecord {
     token_id: String,
-    txn_type: TransactionRecord_txn_type,
+    pub txn_type: TransactionRecord_txn_type,
     timestamp: candid::Int,
     index: candid::Nat,
 }
@@ -593,7 +593,7 @@ pub enum TransactionRecord_txn_type {
         extensible: Box<CandyShared>,
     },
     royalty_paid {
-        tag: String,
+        pubtag: String,
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,

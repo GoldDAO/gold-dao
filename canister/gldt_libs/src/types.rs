@@ -33,6 +33,11 @@ impl GldtNumTokens {
         })
     }
 
+    pub fn new_from_weight(weight: NftWeight) -> Result<Self, String> {
+        let value = Nat::from(weight) * (GLDT_PRICE_RATIO as u64) * (GLDT_SUBDIVIDABLE_BY as u64);
+        Self::new(value)
+    }
+
     pub fn get(&self) -> NumTokens {
         self.value.clone()
     }
@@ -63,6 +68,7 @@ impl GldtTokenSpec {
             symbol: String::from("GLDT"),
         }
     }
+
     pub fn get(&self) -> TokenSpec {
         TokenSpec::ic(ICTokenSpec {
             id: self.id.clone(),
@@ -73,4 +79,8 @@ impl GldtTokenSpec {
             symbol: self.symbol.clone(),
         })
     }
+}
+
+pub fn calculate_tokens_from_weight(grams: NftWeight) -> Result<GldtNumTokens, String> {
+    GldtNumTokens::new(Nat::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY))
 }

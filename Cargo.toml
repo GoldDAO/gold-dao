@@ -1,5 +1,5 @@
 [workspace]
-members = ["canister/gldt_core", "canister/gldt_fee_compensation", "canister/gldt_libs"]
+members = ["canister/gldt_core", "canister/gldt_fee_compensation"]
 
 [profile.release]
 lto = "thin"

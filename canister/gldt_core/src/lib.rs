@@ -84,8 +84,13 @@ use std::hash::Hash;
 mod records;
 mod registry;
 
-use gldt_libs::types::{ NftId, NftWeight, GldtNumTokens, GldtTokenSpec };
-use gldt_libs::constants::*;
+use gldt_libs::types::{
+    NftId,
+    NftWeight,
+    GldtNumTokens,
+    GldtTokenSpec,
+    calculate_tokens_from_weight,
+};
 
 use gldt_libs::gld_nft::{
     self,
@@ -103,10 +108,8 @@ use gldt_libs::gld_nft::{
     SaleStatusShared_sale_type,
     SubAccountInfo,
 };
-use gldt_libs::icrc1;
+use gldt_libs::gldt_ledger;
 
-// use types::{ NftId, NftWeight, GldtNumTokens };
-// use constants::*;
 use registry::{
     Registry,
     GldtLedgerInfo,
@@ -328,10 +331,6 @@ fn nft_info(args: InfoRequest) -> NftInfo {
     })
 }
 
-fn calculate_tokens_from_weight(grams: NftWeight) -> Result<GldtNumTokens, String> {
-    GldtNumTokens::new(Nat::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY))
-}
-
 async fn accept_offer(
     nft_id: NftId,
     gld_nft_canister_id: Principal,
@@ -460,6 +459,7 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
 
     // 100 tokens per gram.
     let tokens_minted = calculate_tokens_from_weight(gld_nft_conf.grams)?;
+
     // validate amount information
     match config {
         PricingConfigShared::ask(Some(features)) => {
@@ -544,7 +544,7 @@ async fn mint_tokens(
         c.borrow().gldt_ledger_canister_id
     });
 
-    let service = icrc1::Service(gldt_ledger_canister_id);
+    let service = gldt_ledger::Service(gldt_ledger_canister_id);
 
     let result: TransferResult = (match service.icrc1_transfer(transfer_args.clone()).await {
         Ok((v,)) => Ok(v),
@@ -583,7 +583,7 @@ async fn withdraw_and_burn_escrow(
     let gldt_ledger_canister_id = CONF.with(|c| -> Principal {
         c.borrow().gldt_ledger_canister_id
     });
-    let service_ledger = icrc1::Service(gldt_ledger_canister_id);
+    let service_ledger = gldt_ledger::Service(gldt_ledger_canister_id);
     let minting_account = (match service_ledger.icrc1_minting_account().await {
         Ok((v,)) => Ok(v),
         Err((code, message)) => {

@@ -12,17 +12,17 @@ impl CustomError {
         Self { error_type, error_message: None }
     }
 
-    pub fn new_with_message(error_type: ErrorType, error_message: &str) -> Self {
-        Self { error_type, error_message: Some(error_message.to_string()) }
+    pub fn new_with_message(error_type: ErrorType, error_message: String) -> Self {
+        Self { error_type, error_message: Some(error_message) }
     }
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum ErrorType {
-    /// The minting of GLDT failed.
+    /// An error during transfering the funds occured.
     TransferError,
-    /// The swapping of NFT for GLDT failed.
-    WrongFeeAmount,
+    /// The specified royalty fee is not the expected one.
+    InvalidRoyaltyFee,
     /// Invalid caller
     Unauthorized,
     /// Extensible error types
