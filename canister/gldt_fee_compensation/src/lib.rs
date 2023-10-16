@@ -149,9 +149,21 @@ fn init(conf: Option<Conf>) {
     MANAGERS.with(|cell| {
         *cell.borrow_mut() = vec![api::caller()];
     });
+}
 
-    // log_message("Starting cronjob".to_string());
-    // let _ = cronjob_master();
+#[query]
+fn get_gld_nft_conf() -> Vec<GldNftConf> {
+    CONF.with(|cell| cell.borrow().gld_nft_canister_conf.clone())
+}
+
+#[update]
+fn set_gld_nft_conf(gld_nft_conf: Vec<GldNftConf>) -> Result<(), CustomError> {
+    validate_caller()?;
+    CONF.with(|cell| {
+        let mut conf = cell.borrow_mut();
+        conf.gld_nft_canister_conf = gld_nft_conf;
+    });
+    Ok(())
 }
 
 /// Returns the GLDT balance of the fee compensation canister.
@@ -182,8 +194,10 @@ pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
     });
 
     if enabled {
+        // starts the job
         return cronjob_master();
     } else {
+        // deletes an existing job if running
         let timer_id = TIMER_ID.with(|cell| cell.borrow().clone());
         log_message(format!("Stopping timer with id {:?}", timer_id));
         ic_cdk_timers::clear_timer(timer_id);
@@ -214,6 +228,7 @@ fn get_timer_interval_secs() -> Result<u64, ()> {
     Ok(CONF.with(|cell| cell.borrow().timer_interval_secs))
 }
 
+/// The master job that triggers the compensation execution.
 fn cronjob_master() -> Result<(), CustomError> {
     // only run the script if it is enabled
     if !CONF.with(|cell| cell.borrow().enabled) {
@@ -230,7 +245,7 @@ fn cronjob_master() -> Result<(), CustomError> {
     );
 
     log_message(format!("Starting a periodic task with interval {interval:?}"));
-    let run = || ic_cdk::spawn(compensation_job());
+    let run = || ic_cdk::spawn(notify_compensation_job());
     let timer_id = ic_cdk_timers::set_timer_interval(interval, run);
     // store the timer_id to be able to deactivate
     TIMER_ID.with(|cell| {
@@ -248,9 +263,8 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
 }
 
 /// The fee compensation canister is checking the NFT canister for new royalty payments.
-#[update]
-async fn compensation_job() {
-    log_message("Running compensation_job()".to_string());
+async fn notify_compensation_job() {
+    log_message("Running notify_compensation_job()".to_string());
     let mut counter = 0;
     let (gld_nft_canister_conf, gldt_canister_id, gldt_ledger_canister_id) = CONF.with(|cell| {
         let conf = cell.borrow();
@@ -340,9 +354,14 @@ async fn compensation_job() {
                 });
             // Since all entries that enter here are supposed to be legit, the ones that
             // don't pass the following checks are also added to the registry for troubleshooting.
+
+            // Create an array of all transfer requests and send them in parellel
+            let mut handles = Vec::new();
             for (key, entry) in new_entries {
-                transfer_compensation(key, entry).await;
+                handles.push(transfer_compensation(key, entry));
             }
+            futures::future::join_all(handles).await;
+
             // update the last query index
             CONF.with(|cell| {
                 let mut conf = cell.borrow_mut();

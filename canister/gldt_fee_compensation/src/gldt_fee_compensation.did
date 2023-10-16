@@ -122,14 +122,15 @@ type UpdateInformationRequest = record {
 };
 service : (opt Conf) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
-  compensation_job : () -> ();
   getCanistergeekInformation : (GetInformationRequest) -> (
       GetInformationResponse,
     ) query;
   get_balance : () -> (Result);
   get_compensation_enabled : () -> (Result_1) query;
+  get_gld_nft_conf : () -> (vec GldNftConf) query;
   get_timer_interval_secs : () -> (Result_2) query;
   set_compensation_enabled : (bool) -> (Result_3);
+  set_gld_nft_conf : (vec GldNftConf) -> (Result_3);
   set_timer_interval_secs : (nat64) -> (Result_3);
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();
 }
