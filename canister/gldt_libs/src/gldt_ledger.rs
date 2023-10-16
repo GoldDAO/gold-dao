@@ -1,6 +1,9 @@
-use candid::{ self, Principal };
+use candid::{ self, Principal, Nat };
 use ic_cdk::api::call::CallResult;
-use icrc_ledger_types::icrc1::transfer::{ BlockIndex, TransferArg, TransferError };
+use icrc_ledger_types::icrc1::{
+    transfer::{ BlockIndex, TransferArg, TransferError },
+    account::Account,
+};
 
 type TransferResult = Result<BlockIndex, TransferError>;
 
@@ -11,5 +14,8 @@ impl Service {
     }
     pub async fn icrc1_minting_account(&self) -> CallResult<(Principal,)> {
         ic_cdk::call(self.0, "icrc1_minting_account", ()).await
+    }
+    pub async fn icrc1_balance_of(&self, account: Account) -> CallResult<(Nat,)> {
+        ic_cdk::call(self.0, "icrc1_balance_of", (account,)).await
     }
 }

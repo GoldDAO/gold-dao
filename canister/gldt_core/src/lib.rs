@@ -463,7 +463,6 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
     // validate amount information
     match config {
         PricingConfigShared::ask(Some(features)) => {
-            let mut amount: Nat = Nat::from(0);
             for feature in features {
                 match feature {
                     AskFeature::buy_now(val) => {

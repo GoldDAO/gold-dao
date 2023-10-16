@@ -34,7 +34,7 @@ impl GldtNumTokens {
     }
 
     pub fn new_from_weight(weight: NftWeight) -> Result<Self, String> {
-        let value = Nat::from(weight) * (GLDT_PRICE_RATIO as u64) * (GLDT_SUBDIVIDABLE_BY as u64);
+        let value = Nat::from(weight) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY;
         Self::new(value)
     }
 

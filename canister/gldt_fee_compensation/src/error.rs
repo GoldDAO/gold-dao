@@ -21,10 +21,10 @@ impl CustomError {
 pub enum ErrorType {
     /// An error during transfering the funds occured.
     TransferError,
-    /// The specified royalty fee is not the expected one.
-    InvalidRoyaltyFee,
     /// Invalid caller
     Unauthorized,
+    /// Compensation disabled
+    CompensationDisabled,
     /// Extensible error types
     Other,
 }

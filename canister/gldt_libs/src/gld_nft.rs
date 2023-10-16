@@ -593,7 +593,7 @@ pub enum TransactionRecord_txn_type {
         extensible: Box<CandyShared>,
     },
     royalty_paid {
-        pubtag: String,
+        tag: String,
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,

@@ -5,7 +5,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use crate::{ gldt_ledger, gld_nft::Account as GldNftAccount };
 
 #[allow(dead_code)]
-pub async fn dummy_await() -> Result<(), String> {
+pub async fn dummy_await() {
     let gldt_ledger_canister_id = Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").unwrap_or(
         Principal::anonymous()
     );
@@ -17,7 +17,6 @@ pub async fn dummy_await() -> Result<(), String> {
     log_message(
         format!("Received dummy await - after time {}", ic_cdk::api::time() / 1_000_000_000)
     );
-    Ok(())
 }
 
 pub fn get_principal_from_gldnft_account(account: GldNftAccount) -> Option<Principal> {

@@ -15,6 +15,8 @@ use gldt_libs::misc::{
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
 
+use ic_cdk_timers::TimerId;
+use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{ NumTokens, TransferArg };
 use serde::Serialize;
 use std::cell::RefCell;
@@ -26,7 +28,7 @@ use gldt_libs::types::{ NftWeight, GldtTokenSpec, GldtNumTokens };
 mod registry;
 mod error;
 
-use registry::{ Registry, FeeRegistryEntry };
+use registry::{ Registry, FeeRegistryEntry, RegistryStatus };
 use error::{ CustomError, ErrorType };
 
 pub type Index = Nat;
@@ -53,7 +55,7 @@ struct Conf {
     gldt_ledger_canister_id: Principal,
     /// Canister IDs of the Origyn NFT canisters that manages gold NFTs.
     /// Is a tuple of the canister ID, the weight of the NFT and the last index checked.
-    gld_nft_canister_ids: Vec<GldNftConf>,
+    gld_nft_canister_conf: Vec<GldNftConf>,
 }
 
 impl Default for Conf {
@@ -62,7 +64,7 @@ impl Default for Conf {
             timer_interval_secs: 60,
             enabled: false,
             gldt_ledger_canister_id: Principal::anonymous(),
-            gld_nft_canister_ids: Vec::new(),
+            gld_nft_canister_conf: Vec::new(),
             gldt_canister_id: Principal::anonymous(),
         }
     }
@@ -74,6 +76,7 @@ thread_local! {
     static REGISTRY: RefCell<Registry> = RefCell::default();
     static CONF: RefCell<Conf> = RefCell::default();
     static MANAGERS: RefCell<Vec<Principal>> = RefCell::default();
+    static TIMER_ID: RefCell<TimerId> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -136,32 +139,56 @@ fn post_upgrade() {
 }
 
 #[init]
-fn init(conf: Conf) {
-    CONF.with(|cell| {
-        *cell.borrow_mut() = conf.clone();
-    });
+fn init(conf: Option<Conf>) {
+    if let Some(conf) = conf {
+        CONF.with(|cell| {
+            *cell.borrow_mut() = conf.clone();
+        });
+    }
+
     MANAGERS.with(|cell| {
         *cell.borrow_mut() = vec![api::caller()];
     });
 
-    cronjob_master();
+    // log_message("Starting cronjob".to_string());
+    // let _ = cronjob_master();
 }
 
 /// Returns the GLDT balance of the fee compensation canister.
-#[query]
-fn get_balance() -> Result<(), ()> {
-    Ok(())
+#[update]
+pub async fn get_balance() -> Result<Nat, ()> {
+    let gldt_ledger_canister_id = CONF.with(|cell| cell.borrow().gldt_ledger_canister_id);
+    let service_ledger = ICRC1_service(gldt_ledger_canister_id);
+    if
+        let Ok((balance,)) = service_ledger.icrc1_balance_of(Account {
+            owner: api::id(),
+            subaccount: None,
+        }).await
+    {
+        return Ok(balance);
+    } else {
+        return Err(());
+    }
 }
 
 /// Turns the compensation on or off.
 #[update]
 pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
     validate_caller()?;
+    log_message(format!("Setting compensation enabled to {}", enabled));
     CONF.with(|cell| {
         let mut conf = cell.borrow_mut();
         conf.enabled = enabled;
     });
-    Ok(())
+
+    if enabled {
+        return cronjob_master();
+    } else {
+        let timer_id = TIMER_ID.with(|cell| cell.borrow().clone());
+        log_message(format!("Stopping timer with id {:?}", timer_id));
+        ic_cdk_timers::clear_timer(timer_id);
+        Ok(())
+    }
 }
 
 /// Gets the status of whether or not the compensation is active.
@@ -187,19 +214,29 @@ fn get_timer_interval_secs() -> Result<u64, ()> {
     Ok(CONF.with(|cell| cell.borrow().timer_interval_secs))
 }
 
-fn cronjob_master() {
+fn cronjob_master() -> Result<(), CustomError> {
     // only run the script if it is enabled
     if !CONF.with(|cell| cell.borrow().enabled) {
-        return;
+        return Err(
+            CustomError::new_with_message(
+                ErrorType::CompensationDisabled,
+                "Compensation is not enabled".to_string()
+            )
+        );
     }
     // activate the timer
     let interval = std::time::Duration::from_secs(
         CONF.with(|cell| cell.borrow().timer_interval_secs)
     );
 
-    ic_cdk::println!("Starting a periodic task with interval {interval:?}");
-    let run = || ic_cdk::spawn(compensation_cronjob());
-    ic_cdk_timers::set_timer_interval(interval, run);
+    log_message(format!("Starting a periodic task with interval {interval:?}"));
+    let run = || ic_cdk::spawn(compensation_job());
+    let timer_id = ic_cdk_timers::set_timer_interval(interval, run);
+    // store the timer_id to be able to deactivate
+    TIMER_ID.with(|cell| {
+        *cell.borrow_mut() = timer_id;
+    });
+    Ok(())
 }
 
 fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
@@ -212,179 +249,186 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
 
 /// The fee compensation canister is checking the NFT canister for new royalty payments.
 #[update]
-async fn compensation_cronjob() {
-    let (gld_nft_canister_ids, gldt_canister_id, gldt_ledger_canister_id) = CONF.with(|cell| {
+async fn compensation_job() {
+    log_message("Running compensation_job()".to_string());
+    let mut counter = 0;
+    let (gld_nft_canister_conf, gldt_canister_id, gldt_ledger_canister_id) = CONF.with(|cell| {
         let conf = cell.borrow();
-        (
-            conf.gld_nft_canister_ids.clone(),
-            conf.gldt_canister_id.clone(),
-            conf.gldt_ledger_canister_id.clone(),
-        )
+        (conf.gld_nft_canister_conf.clone(), conf.gldt_canister_id, conf.gldt_ledger_canister_id)
     });
 
     // define the constants for the check
     let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
-    for canister in gld_nft_canister_ids.into_iter() {
-        let GldNftConf { gld_nft_canister_id, weight, last_query_index } = canister;
+    for canister in gld_nft_canister_conf.into_iter() {
+        let GldNftConf { gld_nft_canister_id, weight, last_query_index } = canister.clone();
         // expected sale price is the weight of the NFT * 100
         let expected_sale_price = GldtNumTokens::new_from_weight(weight).unwrap_or_default().get();
-        // expected royalty fee is 0.5% of the sale price, also decucting the TX fee
+        // expected royalty fee is 0.5% of the sale price, plus deducting the TX fee
         let expected_royalty_fee = (expected_sale_price.clone() - GLDT_TX_FEE) / 200;
-        //
+        // calculate the compensated amount based on the sale price
         let fee_compensation = calculate_compensation(expected_sale_price.clone());
-        // 1. get historical records
         let gld_nft_service = GldNft_service(gld_nft_canister_id);
-        match
-            gld_nft_service.history_nft_origyn(
+        if
+            let Ok((HistoryResult::ok(res),)) = gld_nft_service.history_nft_origyn(
                 "".to_string(),
                 Some(last_query_index.clone()),
                 None
             ).await
         {
-            Ok((HistoryResult::ok(vec),)) => {
-                let num_new_entries = vec.len();
-                let new_entries = vec
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(idx, val)| {
-                        // extract royalty_paid transactions
-                        match &val.txn_type {
-                            TransactionRecord_txn_type::royalty_paid {
-                                pubtag,
-                                token,
-                                buyer,
-                                sale_id,
-                                seller,
-                                ..
-                            } => {
-                                // select only the one that has a tag of "com.origyn.royalty.network"
-                                if pubtag != &"com.origyn.royalty.network".to_string() {
-                                    return None;
-                                }
-                                // select only the ones where the token is GLDT
-                                if token.clone() != token_spec {
-                                    return None;
-                                }
-                                // select only the ones where the buyer is the GLDT canister
-                                if
-                                    let Some(principal) = get_principal_from_gldnft_account(
-                                        buyer.clone()
-                                    )
-                                {
-                                    if principal.to_text() != gldt_canister_id.to_text() {
-                                        return None;
-                                    }
-                                } else {
-                                    return None;
-                                }
-                                // select only the ones where the sale_id is defined
-                                let sale_id = sale_id.clone()?;
-                                // pick out the seller in icrc1 format
-                                let seller_icrc1 = convert_gld_nft_account_to_icrc1_account(
-                                    seller.clone()
-                                )?;
-                                // for all other cases, return a new entry and its key
-                                let key = (seller_icrc1, sale_id);
-                                let entry = FeeRegistryEntry::new(
-                                    fee_compensation.clone(),
-                                    gld_nft_canister_id.clone(),
-                                    api::time() / 1_000_000_000,
-                                    Nat::from(idx),
-                                    None
-                                );
-                                Some((key, entry))
+            let num_new_entries = res.len();
+            let new_entries = res
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, val)| {
+                    // extract royalty_paid transactions
+                    match &val.txn_type {
+                        TransactionRecord_txn_type::royalty_paid {
+                            tag,
+                            token,
+                            buyer,
+                            sale_id,
+                            seller,
+                            amount,
+                            ..
+                        } => {
+                            // select only the one that has a tag of "com.origyn.royalty.network"
+                            if tag != &"com.origyn.royalty.network".to_string() {
+                                return None;
                             }
-                            _ => None,
-                        }
-                    });
-                // Since all entries that enter here are supposed to be legit, the ones that
-                // don't pass the following checks are also added to the registry for troubleshooting.
-                for (key, entry) in new_entries {
-                    // create the entry to the registry and validate that the sale_id doesn't already exist
-                    let entry_added = REGISTRY.with(
-                        |cell| -> Result<(), String> {
-                            let mut registry = cell.borrow_mut();
-                            registry.init_entry(key.clone(), entry.clone())
-                        }
-                    );
-                    match entry_added {
-                        Err(msg) => {
-                            log_message(
-                                format!("WARNING :: compensation_cronjob :: failed to add entry to registry. Message: {}", msg)
-                            );
-                            continue;
-                        }
-                        Ok(_) => {}
-                    }
-                    // validate that the amount of the paid royalty is the expected value
-                    if expected_royalty_fee != entry.get_amount() {
-                        log_message(
-                            format!(
-                                "WARNING :: compensation_cronjob :: expected royalty fee of {} but got {} for sale_id {} of user {}. Adding to registry.",
-                                expected_royalty_fee,
-                                entry.get_amount(),
-                                key.1,
-                                key.0.owner.to_text()
-                            )
-                        );
-                        REGISTRY.with(|cell| {
-                            let mut registry = cell.borrow_mut();
-                            registry.update_failed(
-                                key,
-                                CustomError::new_with_message(
-                                    ErrorType::InvalidRoyaltyFee,
-                                    format!(
-                                        "Expected royalty fee of {} but got {}",
-                                        expected_royalty_fee,
-                                        entry.get_amount()
-                                    )
+                            // select only the ones where the token is GLDT
+                            if token.clone() != token_spec {
+                                return None;
+                            }
+                            // select only the ones where the buyer is the GLDT canister
+                            if
+                                let Some(principal) = get_principal_from_gldnft_account(
+                                    buyer.clone()
                                 )
-                            )
-                        });
-                        continue;
-                    }
-                    // send the transfer request
-                    let transfer_args = TransferArg {
-                        memo: None,
-                        amount: entry.get_amount(),
-                        fee: Some(Nat::from(GLDT_TX_FEE)),
-                        from_subaccount: None,
-                        to: key.0,
-                        created_at_time: None,
-                    };
-                    let gldt_ledger_service = ICRC1_service(gldt_ledger_canister_id);
-                    match gldt_ledger_service.icrc1_transfer(transfer_args).await {
-                        Ok((Ok(v),)) => {
-                            // update the entry in the registry
-                            REGISTRY.with(|cell| {
-                                let mut registry = cell.borrow_mut();
-                                registry.update_completed(key, v)
-                            });
-                        }
-                        _ => {}
-                    }
-                }
-                // update the last query index
-                CONF.with(|cell| {
-                    let mut conf = cell.borrow_mut();
-                    conf.gld_nft_canister_ids = conf.gld_nft_canister_ids
-                        .iter()
-                        .map(|canister| {
-                            if canister.gld_nft_canister_id == gld_nft_canister_id {
-                                GldNftConf {
-                                    last_query_index: last_query_index.clone() +
-                                    Nat::from(num_new_entries),
-                                    ..canister.clone()
+                            {
+                                if principal.to_text() != gldt_canister_id.to_text() {
+                                    return None;
                                 }
                             } else {
-                                canister.clone()
+                                return None;
                             }
-                        })
-                        .collect();
+                            // select only the ones where the expected royalty fee
+                            // matches the amount of the royalty fee in the entry
+                            if expected_royalty_fee != *amount {
+                                return None;
+                            }
+                            // select only the ones where the sale_id is defined
+                            let sale_id = sale_id.clone()?;
+                            // pick out the seller in icrc1 format
+                            let seller_icrc1 = convert_gld_nft_account_to_icrc1_account(
+                                seller.clone()
+                            )?;
+                            // for all other cases, return a new entry and its key
+                            let key = (seller_icrc1, sale_id);
+                            let entry = FeeRegistryEntry {
+                                amount: fee_compensation.clone(),
+                                gld_nft_canister_id,
+                                timestamp: api::time() / 1_000_000_000,
+                                history_index: Nat::from(idx),
+                                status: RegistryStatus::Ongoing,
+                                previous_entry: None,
+                                block_height: None,
+                            };
+                            Some((key, entry))
+                        }
+                        _ => None,
+                    }
                 });
+            // Since all entries that enter here are supposed to be legit, the ones that
+            // don't pass the following checks are also added to the registry for troubleshooting.
+            for (key, entry) in new_entries {
+                transfer_compensation(key, entry).await;
             }
-            _ => {}
+            // update the last query index
+            CONF.with(|cell| {
+                let mut conf = cell.borrow_mut();
+                conf.gld_nft_canister_conf = conf.gld_nft_canister_conf
+                    .iter()
+                    .map(|canister| {
+                        if canister.gld_nft_canister_id == gld_nft_canister_id {
+                            GldNftConf {
+                                last_query_index: last_query_index.clone() +
+                                Nat::from(num_new_entries),
+                                ..canister.clone()
+                            }
+                        } else {
+                            canister.clone()
+                        }
+                    })
+                    .collect();
+            });
+            counter += num_new_entries;
         };
+    }
+    log_message(format!("Scanned {} new entries for compensation.", counter));
+}
+
+async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) {
+    // create the entry to the registry and validate that the sale_id doesn't already exist
+    let entry_added = REGISTRY.with(
+        |cell| -> Result<(), String> {
+            let mut registry = cell.borrow_mut();
+            registry.init_entry(key.clone(), entry.clone())
+        }
+    );
+    if let Err(msg) = entry_added {
+        log_message(
+            format!("WARNING :: compensation_job :: failed to add entry to registry. Message: {}", msg)
+        );
+        return;
+    }
+
+    // send the transfer request
+    let transfer_args = TransferArg {
+        memo: None,
+        amount: entry.amount,
+        fee: Some(Nat::from(GLDT_TX_FEE)),
+        from_subaccount: None,
+        to: key.0,
+        created_at_time: None,
+    };
+    let gldt_ledger_canister_id = CONF.with(|cell| cell.borrow().gldt_ledger_canister_id);
+    let gldt_ledger_service = ICRC1_service(gldt_ledger_canister_id);
+    match gldt_ledger_service.icrc1_transfer(transfer_args).await {
+        Ok((Ok(v),)) => {
+            // This is the happy path. All went well when we end up here.
+            log_message(format!("Successfully transferred GLDT. Message: {:?}", v));
+            // update the entry in the registry
+            REGISTRY.with(|cell| {
+                let mut registry = cell.borrow_mut();
+                registry.update_completed(key, v)
+            });
+        }
+        Ok((Err(err),)) => {
+            // update the entry in the registry with failed
+            REGISTRY.with(|cell| {
+                let mut registry = cell.borrow_mut();
+                registry.update_failed(
+                    key,
+                    CustomError::new_with_message(
+                        ErrorType::TransferError,
+                        format!("Failed to transfer GLDT. Message: {:?}", err)
+                    )
+                )
+            });
+        }
+        Err(msg) => {
+            // update the entry in the registry with failed
+            REGISTRY.with(|cell| {
+                let mut registry = cell.borrow_mut();
+                registry.update_failed(
+                    key,
+                    CustomError::new_with_message(
+                        ErrorType::TransferError,
+                        format!("Failed to transfer GLDT. Message: {:?}", msg)
+                    )
+                )
+            });
+        }
     }
 }
 
@@ -399,4 +443,26 @@ fn validate_caller() -> Result<(), CustomError> {
     })
 }
 
+// for monitoring during development
+#[query(name = "getCanistergeekInformation")]
+async fn get_canistergeek_information(
+    request: canistergeek_ic_rust::api_type::GetInformationRequest
+) -> canistergeek_ic_rust::api_type::GetInformationResponse<'static> {
+    canistergeek_ic_rust::get_information(request)
+}
+
+#[update(name = "updateCanistergeekInformation")]
+pub async fn update_canistergeek_information(
+    request: canistergeek_ic_rust::api_type::UpdateInformationRequest
+) {
+    canistergeek_ic_rust::update_information(request);
+}
+
+/// This makes this Candid service self-describing, so that for example Candid UI, but also other
+/// tools, can seamlessly integrate with it. The concrete interface (method name etc.) is
+/// provisional, but works.
+#[query(name = "__get_candid_interface_tmp_hack")]
+fn get_candid_interface_tmp_hack() -> String {
+    include_str!("gldt_fee_compensation.did").to_string()
+}
 export_candid!();
