@@ -38,7 +38,8 @@ import weightIcon from '/public/images/scale.svg';
 import swappedIcon from '/public/images/send_money.svg';
 import Image from 'next/image';
 import Timestamp from '../tooltip/timeStamp';
-import { cardPadding } from '@/theme/theme';
+import { cardPadding } from './../../../../../ui/theme';
+
 const Summary = () => {
     const { isConnected } = useConnect();
     return (
