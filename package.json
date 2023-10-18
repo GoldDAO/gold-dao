@@ -3,9 +3,7 @@
   "description": "GLDT frontend app and GLDT canister",
   "author": "Bochsler Consulting",
   "workspaces": [
-    "landing_page",
-    "swap_app",
-    "explorer"
+    "client/*"
   ],
   "version": "0.0.0",
   "private": true,

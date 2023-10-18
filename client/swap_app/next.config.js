@@ -1,12 +1,12 @@
 const path = require('path');
 const env = require('dotenv').config({
-    path: path.resolve(__dirname, './../.env'),
+    path: path.resolve(__dirname, './../../.env'),
 });
-const InternalCanisterIds = require('./../canister_ids.json');
-// const GeneratedLocalCanisterIds = require('./../.dfx/local/canister_ids.json');
-const ExternalCanisterIds = require('./../dfx.json');
+const InternalCanisterIds = require('./../../canister_ids.json');
+// const GeneratedLocalCanisterIds = require('./../../.dfx/local/canister_ids.json');
+const ExternalCanisterIds = require('./../../dfx.json');
 
-// const toml = require('./../canister/gldt_core/Cargo.toml');
+// const toml = require('./../../canister/gldt_core/Cargo.toml');
 // const LOCAL_TESTING = false;
 
 const canisterKey = process.env.DFX_NETWORK || 'staging'; // takes "staging" for develop and staging environment and "ic" for production environment
