@@ -25,12 +25,12 @@ import {
     Tfoot,
     Flex,
 } from '@chakra-ui/react';
-import { useNft } from '@/query/hooks/useNFTs';
-import { useAllCanisters } from '@/query/hooks/useAllCanisters';
-import { cancelSale } from '@/query/cancelSale';
-import useSwapHistory, { useMaxEntry } from '@/query/hooks/useSwapHistory';
+import { useNft } from './../../../../../utils/hooks/useNFTs';
+import { useAllCanisters } from './../../../../../utils/hooks/useAllCanisters';
+import { cancelSale } from './../../../../../utils/queries/cancelSale';
+import useSwapHistory, { useMaxEntry } from './../../../../../utils/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
-import useOngoingSwaps from '@/query/hooks/useOngoingSwap';
+import useOngoingSwaps from './../../../../../utils/hooks/useOngoingSwap';
 import TokenSign from '../gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import NFTIcon from '/public/images/sell.svg';
