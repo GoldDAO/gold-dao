@@ -6,7 +6,7 @@ import { SafeHydrate } from '@/utils/SafeHydrate';
 import '@connect2ic/core/style.css';
 import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
 import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
-import { customTheme } from '@/theme/theme';
+import { customTheme } from './../../../../ui/theme';
 
 const myStore = createStore();
 
