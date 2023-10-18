@@ -58,7 +58,7 @@ import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra
 import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg';
 import { gldNftCanisters } from '@/services/agents';
-import { cardPadding } from '@/theme/theme';
+import { cardPadding } from './../../../../../ui/theme';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
