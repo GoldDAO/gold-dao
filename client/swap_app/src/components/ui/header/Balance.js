@@ -1,4 +1,4 @@
-import useGLDTbalance from './../../../../../utils/hooks/useGLDTbalance';
+import useGLDTbalance from '@utils/hooks/useGLDTbalance';
 import { useConnect } from '@connect2ic/react';
 import React from 'react';
 import TokenSign from '../gldt/TokenSign';
