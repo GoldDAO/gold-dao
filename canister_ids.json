@@ -7,6 +7,10 @@
     "staging": "6uad6-fqaaa-aaaam-abovq-cai",
     "ic": ""
   },
+  "gldt_ledger_indexer": {
+    "staging": "wusb2-uiaaa-aaaao-a2lca-cai",
+    "ic": ""
+  },
   "gldt_core": {
     "staging": "m45be-jaaaa-aaaak-qcgnq-cai",
     "ic": ""
