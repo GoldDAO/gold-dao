@@ -36,11 +36,23 @@ const Explorer = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage);
     return (
-        <VStack gridColumn={'1/13'} spacing={'100px'} my="100px">
-            <Heading fontWeight={300} as="h1">
-                GLDT Explorer
+        <VStack
+            gridColumn={['1/13', '1/13', '3/11', '3/11']}
+            my="100px"
+            alignItems={'flex-start'}
+            spacing="20px"
+        >
+            <Heading
+                fontWeight={300}
+                as="h2"
+                fontSize={'16px'}
+                w={'100%'}
+                borderBottom="1px"
+                borderBottomColor={'secondaryText'}
+            >
+                Transactions
             </Heading>
-            <Grid>
+            {/* <Grid>
                 <InputGroup
                     display={'flex'}
                     alignItems={'center'}
@@ -51,11 +63,17 @@ const Explorer = () => {
                         <Search2Icon color="gray.300" />
                     </InputRightElement>
                 </InputGroup>
-            </Grid>
-            <TableContainer width={'100%'}>
-                <Table>
+            </Grid> */}
+
+            <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
+                <Table bg="white" borderRadius={'sm'}>
                     <Thead>
-                        <Tr>
+                        <Tr
+                            fontWeight={600}
+                            color={'secondaryText'}
+                            textTransform={'uppercase'}
+                            fontSize={'12px'}
+                        >
                             <Td>Type</Td>
                             <Td>Date/hour</Td>
                             <Td>From</Td>
@@ -63,7 +81,7 @@ const Explorer = () => {
                             <Td>Amount</Td>
                         </Tr>
                     </Thead>
-                    <Tbody>
+                    <Tbody fontSize={'14px'}>
                         {transactions?.map((e, i) => {
                             return (
                                 <Tr key={i}>
@@ -101,7 +119,11 @@ const Explorer = () => {
                                     </Td>
                                     <Td>
                                         <HStack>
-                                            <Text>{parseInt(e[e.kind][0].amount).toFixed(2)}</Text>{' '}
+                                            <Text>
+                                                {(
+                                                    parseInt(e[e.kind][0].amount) / 100000000
+                                                ).toFixed(2)}
+                                            </Text>{' '}
                                             <TokenSign />
                                         </HStack>
                                     </Td>
@@ -125,14 +147,14 @@ export default Explorer;
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
     total = total ? total : 0;
     return (
-        <VStack p="20px">
+        <VStack pt="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Text>Page {currentHistoryPage + 1}</Text>
                 <Text>{total} entries</Text>
             </Flex>
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Button
-                    bg="bg"
+                    bg="white"
                     _hover={{
                         bg: 'border',
                     }}
@@ -142,7 +164,7 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
                     <ArrowBackIcon />
                 </Button>
                 <Button
-                    bg="bg"
+                    bg="white"
                     _hover={{
                         bg: 'border',
                     }}

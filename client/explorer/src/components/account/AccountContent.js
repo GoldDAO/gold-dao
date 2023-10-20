@@ -34,29 +34,58 @@ const AccountContent = ({ id }) => {
     }, 0);
 
     return (
-        <VStack alignItems={'flex-start'} gridColumn={'1/13'} spacing="100px" my="100px">
-            <HStack>
-                <Heading fontWeight={300} as="h1">
-                    <PrincipalFormat principal={id} />
-                </Heading>
+        <VStack
+            alignItems={'flex-start'}
+            gridColumn={['1/13', '1/13', '3/11', '3/11']}
+            spacing="100px"
+            my="100px"
+        >
+            <Heading fontWeight={300} as="h1">
+                <PrincipalFormat principal={id} />
+            </Heading>
+            <Card shadow={'none'} p="20px" bg="bg" w={'100%'}>
                 <HStack>
-                    <Card p="15px 20px">
+                    <Card
+                        p="15px 20px"
+                        shadow={'none'}
+                        border={'1px'}
+                        borderColor={'border'}
+                        w={'50%'}
+                    >
                         <Text>Balance</Text>
                         <HStack>
                             <Text>{balance}</Text> <TokenSign />
                         </HStack>
                     </Card>
-                    <Card p="15px 20px">
-                        <Text>Total Swaps</Text>
-                        <Text>{totalSwap ? totalSwap : 0}</Text>
+                    <Card
+                        p="15px 20px"
+                        shadow={'none'}
+                        border={'1px'}
+                        borderColor={'border'}
+                        w={'50%'}
+                    >
+                        <Text>Total Transactions</Text>
+                        <Text>{parseInt(max) || 0}</Text>
                     </Card>
                 </HStack>
-            </HStack>
+            </Card>
 
-            <TableContainer w={'100%'}>
-                <Table>
+            <TableContainer
+                width={'100%'}
+                m="0 auto"
+                p="20px"
+                bg="bg"
+                borderRadius={'md'}
+                fontSize={'16px'}
+            >
+                <Table bg="white" borderRadius={'sm'}>
                     <Thead>
-                        <Tr>
+                        <Tr
+                            fontWeight={600}
+                            color={'secondaryText'}
+                            textTransform={'uppercase'}
+                            fontSize={'12px'}
+                        >
                             <Td>Type</Td>
                             <Td>Date</Td>
                             <Td>Token id</Td>
@@ -64,7 +93,7 @@ const AccountContent = ({ id }) => {
                             <Td>Status</Td>
                         </Tr>
                     </Thead>
-                    <Tbody>
+                    <Tbody fontSize={'14px'}>
                         {history?.history?.Ok.data[0]?.length === 0 && (
                             <Tr>
                                 <Td>Empty History</Td>

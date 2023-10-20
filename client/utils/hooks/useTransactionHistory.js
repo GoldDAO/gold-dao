@@ -11,7 +11,7 @@ const queryTransaction = async (actor, rowsPerPage, currentPage) => {
 	// return { transactions, max };
 };
 
-export const useGldtLedgerTransactions = (rowsPerPage, currentPage) => {
+export const useTransactionHistory = (rowsPerPage, currentPage) => {
 	// const [transactions, setTransactions] = useState([]);
 	// const gldtLedgerActor = useCanister('gldtLedgerCanister');
 	// useEffect(() => {
