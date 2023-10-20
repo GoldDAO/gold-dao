@@ -105,7 +105,7 @@ const Explorer = () => {
                                         )}
                                     </Td>
                                     <Td>
-                                        <Linkaccound-id
+                                        <Link
                                             href={`/accound-id/${Principal.fromUint8Array(
                                                 e[e.kind][0].to.owner._arr,
                                             ).toString()}`}
