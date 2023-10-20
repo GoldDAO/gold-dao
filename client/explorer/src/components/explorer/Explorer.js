@@ -92,7 +92,7 @@ const Explorer = () => {
                                     <Td>
                                         {e.kind === 'transfer' && (
                                             <Link
-                                                href={`/accound-id/${Principal.fromUint8Array(
+                                                href={`/account/${Principal.fromUint8Array(
                                                     e[e.kind][0].from.owner._arr,
                                                 ).toString()}`}
                                             >
@@ -106,7 +106,7 @@ const Explorer = () => {
                                     </Td>
                                     <Td>
                                         <Link
-                                            href={`/accound-id/${Principal.fromUint8Array(
+                                            href={`/account/${Principal.fromUint8Array(
                                                 e[e.kind][0].to.owner._arr,
                                             ).toString()}`}
                                         >
