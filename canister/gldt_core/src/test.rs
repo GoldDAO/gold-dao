@@ -50,7 +50,10 @@ fn init_service() {
                         ),
                         NftCanisterConf::new(10),
                     )
-                ]
+                ],
+                Principal::from_text("ccjse-eaaaa-aaaao-a2ixq-cai").expect(
+                    "Could not decode the principal."
+                )
             )
         )
     );

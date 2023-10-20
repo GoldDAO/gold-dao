@@ -71,7 +71,7 @@
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
-use ic_cdk::{ api, storage };
+use ic_cdk::{ api::{ self, call::notify }, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
 use icrc_ledger_types::icrc1::{
     account::{ Account, Subaccount },
@@ -132,16 +132,20 @@ pub struct Conf {
     gldt_ledger_canister_id: Principal,
     /// Canister IDs of the Origyn NFT canisters that manages gold NFTs.
     gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
+    /// Canister ID of the fee compensation canister to cover the conversion fees.
+    gldt_fee_compensation_canister_id: Principal,
 }
 
 impl Conf {
     pub fn new(
         gldt_ledger_canister_id: Principal,
-        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>
+        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
+        gldt_fee_compensation_canister_id: Principal
     ) -> Self {
         Self {
             gldt_ledger_canister_id,
             gld_nft_canister_ids,
+            gldt_fee_compensation_canister_id,
         }
     }
 }
@@ -167,6 +171,7 @@ impl Default for Conf {
         Conf {
             gldt_ledger_canister_id: Principal::anonymous(),
             gld_nft_canister_ids: Vec::new(),
+            gldt_fee_compensation_canister_id: Principal::anonymous(),
         }
     }
 }
@@ -864,6 +869,15 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
     })
 }
 
+fn notify_fee_compensation_canister() {
+    log_message("INFO :: notify_fee_compensation_canister :: called".to_string());
+    let canister_id = CONF.with(|c| c.borrow().gldt_fee_compensation_canister_id);
+
+    if let Err(err) = notify(canister_id, "notify_compensation_job", ()) {
+        log_message(format!("ERROR :: notify_fee_compensation_canister :: {:?}", err));
+    }
+}
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct SubscriberNotification {
     escrow_info: SubAccountInfo,
@@ -938,6 +952,8 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         log_message(format!("ERROR :: {}", err));
                         err
                     });
+                    // notify the compensation canister
+                    notify_fee_compensation_canister();
                     let msg = format!("INFO :: accept_offer :: {}", "success");
                     log_message(msg.clone());
                     Ok(msg)

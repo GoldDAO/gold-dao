@@ -20,6 +20,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{ NumTokens, TransferArg };
 use serde::Serialize;
 use std::cell::RefCell;
+use std::time::Duration;
 
 use gldt_libs::gld_nft::{ Service as GldNft_service, HistoryResult, TransactionRecord_txn_type };
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
@@ -45,8 +46,10 @@ struct GldNftConf {
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
 struct Conf {
-    /// The timer interval in seconds
-    timer_interval_secs: u64,
+    /// The timer interval of the cronjob fallback in seconds
+    fallback_timer_interval_secs: u64,
+    /// The delay of the execution of the compensation in seconds
+    execution_delay_secs: u64,
     /// Whether or not the canister compensation is enabled.
     enabled: bool,
     /// The canister ID of the GLDT canister.
@@ -61,7 +64,8 @@ struct Conf {
 impl Default for Conf {
     fn default() -> Self {
         Conf {
-            timer_interval_secs: 60,
+            fallback_timer_interval_secs: 3600,
+            execution_delay_secs: 20,
             enabled: false,
             gldt_ledger_canister_id: Principal::anonymous(),
             gld_nft_canister_conf: Vec::new(),
@@ -76,7 +80,8 @@ thread_local! {
     static REGISTRY: RefCell<Registry> = RefCell::default();
     static CONF: RefCell<Conf> = RefCell::default();
     static MANAGERS: RefCell<Vec<Principal>> = RefCell::default();
-    static TIMER_ID: RefCell<TimerId> = RefCell::default();
+    static FALLBACK_TIMER_ID: RefCell<TimerId> = RefCell::default();
+    static LAST_NOTIFY_CALL_TIMESTAMP: RefCell<u64> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -198,7 +203,7 @@ pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
         return cronjob_master();
     } else {
         // deletes an existing job if running
-        let timer_id = TIMER_ID.with(|cell| cell.borrow().clone());
+        let timer_id = FALLBACK_TIMER_ID.with(|cell| cell.borrow().clone());
         log_message(format!("Stopping timer with id {:?}", timer_id));
         ic_cdk_timers::clear_timer(timer_id);
         Ok(())
@@ -211,21 +216,38 @@ fn get_compensation_enabled() -> Result<bool, ()> {
     Ok(CONF.with(|cell| cell.borrow().enabled))
 }
 
-/// Sets the timer interval of the automatic royalty payout check.
+/// Sets the fallback timer interval of the automatic royalty payout check.
 #[update]
-fn set_timer_interval_secs(timer_interval_secs: u64) -> Result<(), CustomError> {
+fn set_fallback_timer_interval_secs(fallback_timer_interval_secs: u64) -> Result<(), CustomError> {
     validate_caller()?;
     CONF.with(|cell| {
         let mut conf = cell.borrow_mut();
-        conf.timer_interval_secs = timer_interval_secs;
+        conf.fallback_timer_interval_secs = fallback_timer_interval_secs;
     });
     Ok(())
 }
 
-/// Gets the timer interval of the automatic royalty payout check.
+/// Gets the fallback timer interval of the automatic royalty payout check.
 #[query]
-fn get_timer_interval_secs() -> Result<u64, ()> {
-    Ok(CONF.with(|cell| cell.borrow().timer_interval_secs))
+fn get_fallback_timer_interval_secs() -> Result<u64, ()> {
+    Ok(CONF.with(|cell| cell.borrow().fallback_timer_interval_secs))
+}
+
+/// Sets the execution delay for the notify execution of the automatic royalty payout check.
+#[update]
+fn set_execution_delay_secs(execution_delay_secs: u64) -> Result<(), CustomError> {
+    validate_caller()?;
+    CONF.with(|cell| {
+        let mut conf = cell.borrow_mut();
+        conf.execution_delay_secs = execution_delay_secs;
+    });
+    Ok(())
+}
+
+/// Gets the execution delay for the notify execution of the automatic royalty payout check.
+#[query]
+fn get_execution_delay_secs() -> Result<u64, ()> {
+    Ok(CONF.with(|cell| cell.borrow().execution_delay_secs))
 }
 
 /// The master job that triggers the compensation execution.
@@ -241,14 +263,14 @@ fn cronjob_master() -> Result<(), CustomError> {
     }
     // activate the timer
     let interval = std::time::Duration::from_secs(
-        CONF.with(|cell| cell.borrow().timer_interval_secs)
+        CONF.with(|cell| cell.borrow().fallback_timer_interval_secs)
     );
 
     log_message(format!("Starting a periodic task with interval {interval:?}"));
-    let run = || ic_cdk::spawn(notify_compensation_job());
+    let run = || ic_cdk::spawn(run_compensation_job());
     let timer_id = ic_cdk_timers::set_timer_interval(interval, run);
     // store the timer_id to be able to deactivate
-    TIMER_ID.with(|cell| {
+    FALLBACK_TIMER_ID.with(|cell| {
         *cell.borrow_mut() = timer_id;
     });
     Ok(())
@@ -262,9 +284,43 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
     (sale_price - GLDT_TX_FEE) / 100 + 3 * GLDT_TX_FEE
 }
 
+/// The notify method which is called from the GLDT core canister to trigger the compensation.
+#[update]
+pub async fn notify_compensation_job() -> Result<(), CustomError> {
+    // only the GLDT core canister is allowed to call this method
+    if api::caller() != CONF.with(|cell| cell.borrow().gldt_canister_id) {
+        return Err(
+            CustomError::new_with_message(ErrorType::Unauthorized, "Invalid caller".to_string())
+        );
+    }
+    // only run the script if it is enabled
+    if !CONF.with(|cell| cell.borrow().enabled) {
+        return Err(CustomError::new(ErrorType::CompensationDisabled));
+    }
+    // check if the last call was more than the specified delay ago
+    let last_call_timestamp = LAST_NOTIFY_CALL_TIMESTAMP.with(|cell| cell.borrow().clone()); // in nano seconds
+    let now = api::time(); // in nano seconds
+    let threshold = CONF.with(|cell| cell.borrow().execution_delay_secs) * 1_000_000_000;
+    if last_call_timestamp + threshold > now {
+        // cancel further execution if a delayed execution is already pending
+        return Ok(());
+    }
+    // update the last call timestamp
+    LAST_NOTIFY_CALL_TIMESTAMP.with(|cell| {
+        *cell.borrow_mut() = api::time();
+    });
+    // activate the timer
+    let delay = Duration::from_secs(CONF.with(|cell| cell.borrow().execution_delay_secs));
+    log_message(format!("Starting a delayed task with delay {delay:?}"));
+    let run = || ic_cdk::spawn(run_compensation_job());
+    ic_cdk_timers::set_timer(delay, run);
+    // return Ok() as the job will finish asynchronously
+    Ok(())
+}
+
 /// The fee compensation canister is checking the NFT canister for new royalty payments.
-async fn notify_compensation_job() {
-    log_message("Running notify_compensation_job()".to_string());
+async fn run_compensation_job() {
+    log_message("Running run_compensation_job()".to_string());
     let mut counter = 0;
     let (gld_nft_canister_conf, gldt_canister_id, gldt_ledger_canister_id) = CONF.with(|cell| {
         let conf = cell.borrow();
