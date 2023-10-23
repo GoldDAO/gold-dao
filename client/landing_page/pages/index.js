@@ -25,12 +25,11 @@ import loomis from '/public/images/partners/loomis.jpg';
 import metalor from '/public/images/partners/metalor.svg';
 import origyn from '/public/images/partners/origyn.svg';
 import Link from 'next/link';
-Stack;
 import Play from '/public/images/play.svg';
+import Layout from '@/components/layout/Layout';
 
 function Home({}) {
     const margins = ['20px', '30px', '60px', '140px', '180px'];
-    const headerMargins = ['20px', '30px', '49px', '49px', '49px'];
 
     const titleFontSize = ['40px', '60px', '60px', '80px', '96px'];
     const subtitleFontSize = ['28px', '36px', '36px', '48px', '48px'];
@@ -58,7 +57,7 @@ function Home({}) {
         description: 'GLDT Token & Swap app is coming soon',
     };
 
-    const stagingMeta = {
+    const meta = {
         title: 'GLDT Swap',
         description: 'GLDT Swap Description',
     };
@@ -170,70 +169,7 @@ function Home({}) {
     } else
         return (
             <>
-                <Head>
-                    <title>{stagingMeta.title}</title>
-                    <meta property={`og:title`} content={stagingMeta.title} key="title" />
-                    <meta
-                        property={`og:description`}
-                        content={stagingMeta.description}
-                        key="title"
-                    />
-                    <link
-                        rel="apple-touch-icon"
-                        sizes="180x180"
-                        href="/favicon/apple-touch-icon.png"
-                    />
-                    <link
-                        rel="icon"
-                        type="image/png"
-                        sizes="32x32"
-                        href="/favicon/favicon-32x32.png"
-                    />
-                    <link
-                        rel="icon"
-                        type="image/png"
-                        sizes="16x16"
-                        href="/favicon/favicon-16x16.png"
-                    />
-                    <meta name="msapplication-TileColor" content="#da532c" />
-                    <meta name="theme-color" content="#ffffff" />
-                </Head>
-
-                <Box>
-                    <Box
-                        pt={'34px'}
-                        as="header"
-                        px={headerMargins}
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Image width={80} src={Logo} />
-                        <HStack spacing="50px">
-                            <Link href="#">
-                                <Text fontSize={TextSize}>FAQ</Text>
-                            </Link>
-                            <Button
-                                as="a"
-                                _hover={{
-                                    bg: '#D3B872',
-                                }}
-                                target="_blank"
-                                href="https://app.gldt.org"
-                                py={'40px'}
-                                px="25px"
-                                bg="#D3B872"
-                                borderRadius={'30px'}
-                                fontSize={('18px', '24px')}
-                                fontWeight={'bold'}
-                                color={'#fff'}
-                            >
-                                Use GLDT
-                            </Button>
-                        </HStack>
-                    </Box>
+                <Layout meta={meta}>
                     <Container maxWidth={'100%'} px={margins} my={verticalSpacing}>
                         <VStack
                             alignItems={'flex-start'}
@@ -487,7 +423,7 @@ function Home({}) {
                         }}
                         h={['250px', '300px', '400px']}
                     ></Box>
-                </Box>
+                </Layout>
             </>
         );
 }
