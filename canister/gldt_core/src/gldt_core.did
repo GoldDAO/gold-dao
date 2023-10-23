@@ -146,6 +146,7 @@ type CanisterMetricsData = variant {
 };
 type CollectMetricsRequestType = variant { force; normal };
 type Conf = record {
+  gldt_fee_compensation_canister_id : principal;
   gld_nft_canister_ids : vec record { principal; NftCanisterConf };
   gldt_ledger_canister_id : principal;
 };

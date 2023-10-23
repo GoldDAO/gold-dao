@@ -15,9 +15,10 @@ dfx canister create gldt_core
 dfx deploy gldt_core --network staging --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
   gld_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}};
-    record { principal "'"$(dfx identity get-principal)"'"; record { grams=100}};
-    }})'
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}}
+    };
+  gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network staging gldt_fee_compensation)"'"
+    })'
 dfx deploy gldt_core --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
   gld_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}}
