@@ -5,16 +5,21 @@ import { Box, HStack, Input, InputGroup, InputRightElement, Text } from '@chakra
 import Link from 'next/link';
 import { Search2Icon } from '@chakra-ui/icons';
 import SearchBar from './SearchBar';
+import Grid from '../Grid';
 const Header = () => {
     return (
-        <HStack as="header" justify={'space-between'}>
-            <Link href={'/'}>
-                <Image src={Logo} width={50} alt="logo" />
-            </Link>
-            <SearchBar />
-            {/* <Link href="/transparency">
-                <Text>Transparency</Text>
-            </Link> */}
+        <HStack as="header" justify={'space-between'} alignItems={'center'}>
+            <Grid>
+                <Link href={'/'} style={{ gridColumn: 'span 2' }}>
+                    <Image src={Logo} width={50} alt="logo" />
+                </Link>
+                <Link href="/transparency" style={{ gridColumn: 'span 4' }}>
+                    <Text>Transparency</Text>
+                </Link>
+                <Box sx={{ gridColumn: 'span 6' }}>
+                    <SearchBar />
+                </Box>
+            </Grid>
         </HStack>
     );
 };

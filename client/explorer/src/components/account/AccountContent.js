@@ -21,6 +21,7 @@ import PrincipalFormat from '../Principal';
 import Timestamp from '@ui/tooltip/timeStamp';
 import TokenSign from '@ui/gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
+import AccountTitle from './AccountTitle';
 
 const AccountContent = ({ id }) => {
     const { max } = useMaxEntry(id);
@@ -40,7 +41,13 @@ const AccountContent = ({ id }) => {
             spacing="100px"
             my="100px"
         >
-            <Heading fontWeight={300} as="h1">
+            <AccountTitle
+                data={{
+                    label: 'AccountID',
+                    id: '20e43f0bd4f09346ed0bfd7006ed3a0df564c1a1e6eb483f8315d592f872e98f',
+                }}
+            />
+            <Heading fontWeight={{}} as="h1">
                 <PrincipalFormat principal={id} />
             </Heading>
             <Card shadow={'none'} p="20px" bg="bg" w={'100%'}>
