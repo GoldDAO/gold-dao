@@ -287,6 +287,7 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
 #[update]
 pub async fn notify_compensation_job() -> Result<(), CustomError> {
+    log_message(format!("notify_compensation_job() called by {}", api::caller().to_text()));
     // only the GLDT core canister is allowed to call this method
     if api::caller() != CONF.with(|cell| cell.borrow().gldt_canister_id) {
         return Err(
