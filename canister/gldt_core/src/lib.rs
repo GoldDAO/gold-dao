@@ -493,10 +493,11 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
                             );
                         }
                     }
+                    AskFeature::kyc(_) => {}
                     ask_feature => {
                         return Err(
                             format!(
-                                "Unexpected feature in asked, only token, notify and buy_now accepted and received AskFeature::{:?}",
+                                "Unexpected feature in asked, only token, notify, kyc and buy_now accepted and received AskFeature::{:?}",
                                 ask_feature
                             )
                         );
