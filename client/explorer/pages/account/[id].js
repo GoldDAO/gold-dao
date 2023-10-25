@@ -14,7 +14,7 @@ const AccountPage = () => {
 
     return (
         <Layout>
-            <AccountContent id={query.id} />
+            <AccountContent id={query.id} subAccount={query.subaccount} />
         </Layout>
     );
 };

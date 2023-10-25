@@ -27,7 +27,7 @@ let YUMI_KYC_CANISTER_ID = ExternalCanisterIds.canisters.yumi_kyc.remote.id[cani
 //   GLDT_LEDGER_CANISTER_ID = GeneratedLocalCanisterIds.gldt_ledger['local'];
 //   YUMI_KYC_CANISTER_ID = GeneratedLocalCanisterIds.yumi_kyc['local'];
 // }
-
+const LEDGER_INDEXER = InternalCanisterIds.ledger_indexer[canisterKey];
 const nextConfig = {
     output: 'export',
     transpilePackages: ['@connect2ic/react', '@connect2ic/core'],
@@ -41,6 +41,7 @@ const nextConfig = {
         GLDT_LEDGER_CANISTER_ID,
         GLDNFT_CANISTER_IDS,
         YUMI_KYC_CANISTER_ID,
+        LEDGER_INDEXER: LEDGER_INDEXER,
         DFX_NETWORK: process.env.DFX_NETWORK,
     },
     images: { unoptimized: true },

@@ -5,6 +5,7 @@ import {
     Flex,
     HStack,
     Heading,
+    Select,
     Table,
     TableContainer,
     Tbody,
@@ -14,25 +15,60 @@ import {
     Tr,
     VStack,
 } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import useSwapHistory, { useMaxEntry } from '@utils/hooks/useSwapHistory';
+import React, { useEffect, useState } from 'react';
+import { useSubaccounts } from '@utils/hooks/ledgerIndexer/useSubaccount';
+import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
+import { useBalance } from '@utils/hooks/ledgerIndexer/useBalance';
+import { useHistory } from '@utils/hooks/ledgerIndexer/useHistory';
+import { formatAmount } from '@utils/misc/format';
 import useGLDTbalance from '@utils/hooks/useGLDTbalance';
 import PrincipalFormat from '../Principal';
 import Timestamp from '@ui/tooltip/timeStamp';
 import TokenSign from '@ui/gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import AccountTitle from './AccountTitle';
+import { buf2hex } from '@/utils/buf2hex';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { Principal } from '@dfinity/principal';
 
-const AccountContent = ({ id }) => {
-    const { max } = useMaxEntry(id);
-    console.log('max', max);
+const AccountContent = ({ id, subAccount }) => {
     const [currentPage, setCurrentPage] = useState(0);
-    const history = useSwapHistory(currentPage, 10, id);
-    const balance = useGLDTbalance(id);
+    const [currentSub, setCurrentSub] = useState();
+    const [index, setIndex] = useState({
+        last: null,
+        first: null,
+    });
+    const [last, setlast] = useState([]);
+    const [action, setAction] = useState();
+    const { history } = useHistory(id, currentPage, action, index, last, currentSub);
+    const { subaccounts } = useSubaccounts(id);
+    const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
+    const router = useRouter();
 
-    const totalSwap = history?.history?.Ok?.data[0]?.reduce((ac, e) => {
-        return ac + parseInt(e.num_tokens.value) / 100000000;
-    }, 0);
+    useEffect(() => {
+        console.log('history', history);
+        if (history?.Ok?.transactions.length > 0) {
+            setIndex({
+                last: history?.Ok?.transactions[history.Ok.transactions.length - 1].id,
+                first: history?.Ok?.transactions[0].id,
+            });
+        }
+    }, [history]);
+
+    // useEffect(() => {
+    //     last.push(history?.Ok?.transactions[history.Ok.transactions.length - 1].id);
+    // }, [history]);
+
+    const toggleChange = (e) => {
+        setCurrentSub(e.target.value);
+    };
+
+    useEffect(() => {
+        if (currentSub) {
+            router.push(`/account/${id}?subaccount=${currentSub}`);
+        }
+    }, [currentSub, id, router]);
 
     return (
         <VStack
@@ -47,6 +83,13 @@ const AccountContent = ({ id }) => {
                     id: '20e43f0bd4f09346ed0bfd7006ed3a0df564c1a1e6eb483f8315d592f872e98f',
                 }}
             />
+            <Select size="md" onChange={toggleChange} placeholder={subAccount} value={currentSub}>
+                {subaccounts.map((e, i) => (
+                    <option key={i} value={buf2hex(e)}>
+                        {buf2hex(e)}
+                    </option>
+                ))}
+            </Select>
             <Heading fontWeight={{}} as="h1">
                 <PrincipalFormat principal={id} />
             </Heading>
@@ -61,7 +104,7 @@ const AccountContent = ({ id }) => {
                     >
                         <Text>Balance</Text>
                         <HStack>
-                            <Text>{balance}</Text> <TokenSign />
+                            <Text>{formatAmount(balance)}</Text> <TokenSign />
                         </HStack>
                     </Card>
                     <Card
@@ -72,7 +115,7 @@ const AccountContent = ({ id }) => {
                         w={'50%'}
                     >
                         <Text>Total Transactions</Text>
-                        <Text>{parseInt(max) || 0}</Text>
+                        {/* <Text>{parseInt(max) || 0}</Text> */}
                     </Card>
                 </HStack>
             </Card>
@@ -93,43 +136,53 @@ const AccountContent = ({ id }) => {
                             textTransform={'uppercase'}
                             fontSize={'12px'}
                         >
+                            <Td>tx</Td>
                             <Td>Type</Td>
                             <Td>Date</Td>
-                            <Td>Token id</Td>
                             <Td>GLDT amount</Td>
-                            <Td>Status</Td>
+                            <Td>From</Td>
+                            <Td>To</Td>
                         </Tr>
                     </Thead>
                     <Tbody fontSize={'14px'}>
-                        {history?.history?.Ok.data[0]?.length === 0 && (
-                            <Tr>
-                                <Td>Empty History</Td>
-                            </Tr>
-                        )}
-                        {history?.history?.Ok.data[0]?.map((e, i) => {
+                        {history?.Ok?.transactions?.map((e, i) => {
                             return (
                                 <Tr key={i}>
-                                    <Td>{Object.keys(e.record_type)}</Td>
                                     <Td>
-                                        <Timestamp timestamp={parseInt(e.timestamp)} />
+                                        <Link href={`/transaction/${e.id}`}>{parseInt(e.id)}</Link>
                                     </Td>
-                                    <Td>{e.nft_id}</Td>
+                                    <Td>{e.transaction.kind}</Td>
+                                    <Td>
+                                        <Timestamp timestamp={parseInt(e.transaction.timestamp)} />
+                                    </Td>
                                     <Td>
                                         <HStack>
-                                            <Text>{parseInt(e.num_tokens.value) / 100000000}</Text>
+                                            <Text>
+                                                {formatAmount(e.transaction.transfer[0].amount)}
+                                            </Text>
                                             <TokenSign />
                                         </HStack>
                                     </Td>
-                                    <Td>{Object.keys(e.status.status)}</Td>
+                                    <Td>
+                                        {Principal.fromUint8Array(
+                                            e.transaction.transfer[0].from.owner._arr,
+                                        ).toString()}
+                                    </Td>
+                                    <Td>
+                                        {Principal.fromUint8Array(
+                                            e.transaction.transfer[0].to.owner._arr,
+                                        ).toString()}
+                                    </Td>
                                 </Tr>
                             );
                         })}
                     </Tbody>
                 </Table>
                 <Pagination
-                    total={parseInt(max)}
+                    total={100}
                     currentHistoryPage={currentPage}
                     setCurrentHistoryPage={setCurrentPage}
+                    setAction={setAction}
                 />
             </TableContainer>
         </VStack>
@@ -138,7 +191,7 @@ const AccountContent = ({ id }) => {
 
 export default AccountContent;
 
-const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
+const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setAction }) => {
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
@@ -152,7 +205,10 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
                         bg: 'border',
                     }}
                     isDisabled={currentHistoryPage < 1}
-                    onClick={() => setCurrentHistoryPage((prev) => prev - 1)}
+                    onClick={() => {
+                        setCurrentHistoryPage((prev) => prev - 1);
+                        setAction(-1);
+                    }}
                 >
                     <ArrowBackIcon />
                 </Button>
@@ -162,7 +218,10 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
                         bg: 'border',
                     }}
                     isDisabled={total / (currentHistoryPage + 1) < 10}
-                    onClick={() => setCurrentHistoryPage((prev) => prev + 1)}
+                    onClick={() => {
+                        setCurrentHistoryPage((prev) => prev + 1);
+                        setAction(+1);
+                    }}
                 >
                     <ArrowForwardIcon />
                 </Button>

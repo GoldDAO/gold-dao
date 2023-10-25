@@ -13,12 +13,12 @@ const Header = () => {
                 <Link href={'/'} style={{ gridColumn: 'span 2' }}>
                     <Image src={Logo} width={50} alt="logo" />
                 </Link>
-                <Link href="/transparency" style={{ gridColumn: 'span 4' }}>
+                <Link href="/transparency" style={{ gridColumn: '10/13' }}>
                     <Text>Transparency</Text>
                 </Link>
-                <Box sx={{ gridColumn: 'span 6' }}>
+                {/* <Box sx={{ gridColumn: 'span 6' }}>
                     <SearchBar />
-                </Box>
+                </Box> */}
             </Grid>
         </HStack>
     );

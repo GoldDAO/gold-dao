@@ -18,7 +18,7 @@ import {
     Tr,
     VStack,
 } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGldtLedgerTransactions } from '@utils/hooks/useGLDT';
 import Timestamp from '@ui/tooltip/timeStamp';
 import { Principal } from '@dfinity/principal';
@@ -27,14 +27,17 @@ import Link from 'next/link';
 import PrincipalFormat from '../Principal';
 import TokenSign from '@ui/gldt/TokenSign';
 import Grid from '../Grid';
+import { useCanister } from '@connect2ic/react';
+import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
+import { formatAmount } from '@utils/misc/format';
 
 const Explorer = () => {
-    const [search, setSearch] = useState();
-    const [searchResult, setSearchResult] = useState();
-    const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const { transactions, max } = useGldtLedgerTransactions(rowsPerPage, currentPage);
+    const [startingIndex, setStartingIndex] = useState(0);
+    const { blocks } = useBlock(startingIndex, rowsPerPage);
+
+    console.log('blocks', blocks);
     return (
         <VStack
             gridColumn={['1/13', '1/13', '3/11', '3/11']}
@@ -52,19 +55,6 @@ const Explorer = () => {
             >
                 Transactions
             </Heading>
-            {/* <Grid>
-                <InputGroup
-                    display={'flex'}
-                    alignItems={'center'}
-                    gridColumn={['1/12', '1/12', '2/11', '3/10']}
-                >
-                    <Input size={'lg'} borderRadius={'50px'} />
-                    <InputRightElement pointerEvents="none">
-                        <Search2Icon color="gray.300" />
-                    </InputRightElement>
-                </InputGroup>
-            </Grid> */}
-
             <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
                 <Table bg="white" borderRadius={'sm'}>
                     <Thead>
@@ -74,58 +64,85 @@ const Explorer = () => {
                             textTransform={'uppercase'}
                             fontSize={'12px'}
                         >
-                            <Td>Type</Td>
-                            <Td>Date/hour</Td>
+                            <Td>Index</Td>
+                            <Td>Date/Hour</Td>
+                            <Td>Amount</Td>
+                            <Td>Fees</Td>
                             <Td>From</Td>
                             <Td>To</Td>
-                            <Td>Amount</Td>
                         </Tr>
                     </Thead>
                     <Tbody fontSize={'14px'}>
-                        {transactions?.map((e, i) => {
+                        {blocks?.blocks?.map((e, i) => {
+                            const from = e.Map[2][1].Map[2][1].Text
+                                ? 'Minting account'
+                                : e.Map[2][1].Map[2][1].Array[0].Blob;
+                            let to;
+                            e.Map[2][1].Map.map((e, i) => {
+                                if (e[0] === 'to') {
+                                    to = e[1].Array[0].Blob;
+                                }
+                            });
                             return (
                                 <Tr key={i}>
-                                    <Td>{e.kind}</Td>
                                     <Td>
-                                        <Timestamp timestamp={parseInt(e.timestamp)} />
+                                        <Link
+                                            href={`/transaction/${
+                                                parseInt(blocks.chain_length) -
+                                                i +
+                                                startingIndex -
+                                                1
+                                            }`}
+                                        >
+                                            {parseInt(blocks.chain_length) - i + startingIndex - 1}
+                                        </Link>
                                     </Td>
                                     <Td>
-                                        {e.kind === 'transfer' && (
-                                            <Link
-                                                href={`/account/${Principal.fromUint8Array(
-                                                    e[e.kind][0].from.owner._arr,
-                                                ).toString()}`}
-                                            >
+                                        <Timestamp timestamp={parseInt(e.Map[1][1].Int)} />
+                                    </Td>
+                                    <Td>
+                                        <Text>
+                                            {formatAmount(parseInt(e.Map[2][1].Map[0][1].Int))}
+                                        </Text>
+                                        <TokenSign />
+                                    </Td>
+                                    <Td>
+                                        <Text>
+                                            {formatAmount(parseInt(e.Map[2][1].Map[1][1].Int || 0))}
+                                        </Text>
+                                        <TokenSign />
+                                    </Td>
+                                    <Td>
+                                        <Link
+                                            href={
+                                                typeof from === 'string'
+                                                    ? '#'
+                                                    : `/account/${Principal.fromUint8Array(
+                                                          from,
+                                                      ).toString()}`
+                                            }
+                                        >
+                                            {typeof from === 'string' ? (
+                                                from
+                                            ) : (
                                                 <PrincipalFormat
                                                     principal={Principal.fromUint8Array(
-                                                        e[e.kind][0].from.owner._arr,
+                                                        from,
                                                     ).toString()}
                                                 />
-                                            </Link>
-                                        )}
+                                            )}
+                                        </Link>
                                     </Td>
                                     <Td>
                                         <Link
                                             href={`/account/${Principal.fromUint8Array(
-                                                e[e.kind][0].to.owner._arr,
+                                                to,
                                             ).toString()}`}
                                         >
                                             <PrincipalFormat
-                                                principal={Principal.fromUint8Array(
-                                                    e[e.kind][0].to.owner._arr,
-                                                ).toString()}
+                                                principal={Principal.fromUint8Array(to).toString()}
                                             />
                                         </Link>
-                                    </Td>
-                                    <Td>
-                                        <HStack>
-                                            <Text>
-                                                {(
-                                                    parseInt(e[e.kind][0].amount) / 100000000
-                                                ).toFixed(2)}
-                                            </Text>{' '}
-                                            <TokenSign />
-                                        </HStack>
                                     </Td>
                                 </Tr>
                             );
@@ -133,9 +150,10 @@ const Explorer = () => {
                     </Tbody>
                 </Table>
                 <Pagination
-                    total={parseInt(max?.log_length)}
+                    total={parseInt(blocks.chain_length)}
                     currentHistoryPage={currentPage}
                     setCurrentHistoryPage={setCurrentPage}
+                    setStartingIndex={setStartingIndex}
                 />
             </TableContainer>
         </VStack>
@@ -144,7 +162,7 @@ const Explorer = () => {
 
 export default Explorer;
 
-const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
+const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setStartingIndex }) => {
     total = total ? total : 0;
     return (
         <VStack pt="20px">
@@ -159,7 +177,10 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
                         bg: 'border',
                     }}
                     isDisabled={currentHistoryPage < 1}
-                    onClick={() => setCurrentHistoryPage((prev) => prev - 1)}
+                    onClick={() => {
+                        setCurrentHistoryPage((prev) => prev - 1);
+                        setStartingIndex((prev) => prev + 10);
+                    }}
                 >
                     <ArrowBackIcon />
                 </Button>
@@ -169,7 +190,10 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
                         bg: 'border',
                     }}
                     isDisabled={total / (currentHistoryPage + 1) < 10}
-                    onClick={() => setCurrentHistoryPage((prev) => prev + 1)}
+                    onClick={() => {
+                        setCurrentHistoryPage((prev) => prev + 1);
+                        setStartingIndex((prev) => prev - 10);
+                    }}
                 >
                     <ArrowForwardIcon />
                 </Button>

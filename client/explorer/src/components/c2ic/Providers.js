@@ -4,7 +4,12 @@ import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/provide
 import { SafeHydrate } from '@/utils/SafeHydrate';
 import '@connect2ic/core/style.css';
 import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
-import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
+import {
+    gldNftCanisters,
+    gldtLedgerCanister,
+    gldtCoreCanister,
+    ledgerIndexerCanister,
+} from '@/services/agents/';
 import { customTheme } from '@ui/theme';
 
 const Providers = ({ children }) => {
@@ -14,6 +19,7 @@ const Providers = ({ children }) => {
     const canisters = {
         ...gldNftCanisters,
         gldtLedgerCanister,
+        ledgerIndexerCanister,
         gldtCoreCanister,
     };
 

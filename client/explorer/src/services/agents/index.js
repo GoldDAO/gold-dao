@@ -8,6 +8,11 @@ import {
     idlFactory as idlGLDTCoreFactory,
 } from './declarations/GLDT_CORE';
 
+import {
+    createActor as createLedgerIndexActors,
+    idlFactory as idlLedgerIndexerFactory,
+} from './declarations/LEDGER_INDEXER';
+
 const GLDNFT_CANISTER_IDS = process.env.GLDNFT_CANISTER_IDS || {};
 
 export const gldNftCanisters = {};
@@ -30,4 +35,10 @@ export const gldtCoreCanister = {
     canisterId: process.env.GLDT_CANISTER_ID,
     createActor: createGLDTCoreActor,
     idlFactory: idlGLDTCoreFactory,
+};
+
+export const ledgerIndexerCanister = {
+    canisterId: process.env.LEDGER_INDEXER,
+    createActor: createLedgerIndexActors,
+    idlFactory: idlLedgerIndexerFactory,
 };
