@@ -2,15 +2,16 @@ import { Principal } from '@dfinity/principal';
 import { useEffect, useState } from 'react';
 import { useCanister } from '@connect2ic/react';
 
-const queryHistory = async (principal, actors, currentPage, action, index, last, currentSub) => {
+const queryHistory = async (principal, actors, currentPage, action, index, last, currentSub, i) => {
 	console.log('action', action);
 	console.log('index', index);
+	console.log('i', i);
 	const start = action === -1 ? [index.first] : action === +1 ? [index.last] : [];
 	console.log('start', start);
 	const history = await Promise.resolve(actors[0]
 		.get_account_transactions({
 			max_results: 10,
-			start: start[0] ? start : [],  
+			start: currentPage > 0 ? [i[currentPage]] : i[0],  
 			account: {
 				owner: Principal.fromText(principal), 
 				subaccount: currentSub ? [Principal.fromText(currentSub)] : []
@@ -31,13 +32,13 @@ const queryHistory = async (principal, actors, currentPage, action, index, last,
 };
 
  
-export const useHistory = (principal, currentPage, action, index, last, currentSub ) => {
+export const useHistory = (principal, currentPage, action, index, last, currentSub, i ) => {
 	const actor = useCanister('ledgerIndexerCanister');
 	const [history, setHistory] = useState([]);
 	const [isLoading, setLoading] = useState(false);
 	useEffect(() => {
 		setLoading(true);
-		queryHistory(principal, actor, currentPage, action, index, last, currentSub)
+		queryHistory(principal, actor, currentPage, action, index, last, currentSub, i)
 			.then((result) => {
 				console.log('result', result);
 				setHistory(result.history);

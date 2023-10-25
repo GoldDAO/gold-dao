@@ -41,10 +41,17 @@ const AccountContent = ({ id, subAccount }) => {
     });
     const [last, setlast] = useState([]);
     const [action, setAction] = useState();
-    const { history } = useHistory(id, currentPage, action, index, last, currentSub);
+    const [i, seti] = useState([[]]);
+    const { history } = useHistory(id, currentPage, action, index, last, currentSub, i);
     const { subaccounts } = useSubaccounts(id);
     const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
     const router = useRouter();
+
+    useEffect(() => {
+        if (history?.Ok?.transactions[history.Ok.transactions.length - 1].id) {
+            i.push(parseInt(history?.Ok?.transactions[history.Ok.transactions.length - 1].id));
+        }
+    }, [history]);
 
     useEffect(() => {
         console.log('history', history);
