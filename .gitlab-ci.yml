@@ -237,7 +237,7 @@ generate declarations:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
-      needs: ["canister build"]
+      needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
@@ -399,7 +399,7 @@ local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["canister test build", "nextjs test build"]
+      needs: ["gldt_core canister build", "swap_app test build", "landing_page test build", "explorer test build"]
   before_script:
     - dfx --version
     - dfx start --clean --background
@@ -413,13 +413,13 @@ gldt frontend:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-      needs: ["next staging build"]
+      needs: ["swap_app staging build"]
       variables:
         TARGET_NETWORK: staging
         ENVIRONMENT_NAME: "frontend staging"
         PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
-      needs: ["next production build"]
+      needs: ["swap_app production build"]
       variables:
         TARGET_NETWORK: ic
         ENVIRONMENT_NAME: "frontend production"
@@ -449,7 +449,7 @@ gldt core:
         TARGET_NETWORK: ic
         ENVIRONMENT_NAME: "core production"
         PEM_FILE: $PEM_FILE_PRODUCTION
-  needs: ["canister build"]
+  needs: ["gldt_core canister build"]
   before_script:
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
