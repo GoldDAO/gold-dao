@@ -59,17 +59,41 @@ stages:
 ################################################################################
 # Linters
 ################################################################################
-next linter:
+swap_app linter:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "swap_app/*.{js,json}"
-        - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+        - "client/swap_app/*.{js,json}"
+        - "client/swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
     - npm run lint:swap_app
+
+landing_page linter:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "client/landing_page/*.{js,json}"
+        - "client/landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *node_template
+  script:
+    - npm run lint:landing_page
+
+.explorer linter:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "client/explorer/*.{js,json}"
+        - "client/explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *node_template
+  script:
+    - npm run lint:explorer
 
 rust lint:
   stage: lint
