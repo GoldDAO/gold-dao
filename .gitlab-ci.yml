@@ -127,7 +127,7 @@ gldt_core test build:
       - canister/gldt_core/src/gldt_core.did
     expire_in: 1 day
 
-.gldt_fee_compensation test build:
+gldt_fee_compensation test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -147,7 +147,7 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["canister test build"]
+      needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
@@ -158,18 +158,46 @@ generate test declarations:
       - canister/**/declarations
     expire_in: 1 day
 
-nextjs test build:
+swap_app test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["canister test build", "generate test declarations"]
+  needs: ["gldt_core test build","gldt_fee_compensation test build","generate test declarations"]
   <<: *node_template
   script:
     - npm run build:swap_app
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend-TEST"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app-TEST"
     paths:
       - swap_app/out
+    expire_in: 1 day
+
+landing_page test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs: ["gldt_core test build","generate test declarations"]
+  <<: *node_template
+  script:
+    - npm run build:landing_page
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
+    paths:
+      - landing_page/out
+    expire_in: 1 day
+
+explorer test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs: ["gldt_core test build","generate test declarations"]
+  <<: *node_template
+  script:
+    - npm run build:explorer
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer-TEST"
+    paths:
+      - explorer/out
     expire_in: 1 day
 
 ################################################################################
