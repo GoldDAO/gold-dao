@@ -220,44 +220,143 @@ generate declarations:
       - canister/**/declarations
     expire_in: 6 months
 
-next staging build:
+swap_app staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-  needs: ["canister build", "generate declarations"]
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
     - npm run build:swap_app
     - STAGING_URL=https://$(jq -r '."gldt_swap_app".staging' canister_ids.json).icp0.io
-    - echo "FRONTEND_URL=$STAGING_URL" > deploy.env
+    - echo "SWAP_APP_URL=$STAGING_URL" > swap_deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-frontend_STAGING_BUILD"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-swap_app_STAGING_BUILD"
     paths:
       - swap_app/out
     reports:
       dotenv: deploy.env
     expire_in: 1 day
   environment:
-    name: staging
+    name: swap_app
+    deployment_tier: staging
     action: prepare
 
-next production build:
+landing staging build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
+  <<: *node_template
+  script:
+    - npm run build:landing
+    - STAGING_URL=https://$(jq -r '."gldt_landing_page".staging' canister_ids.json).icp0.io
+    - echo "LANDING_URL=$STAGING_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
+    paths:
+      - landing/out
+    reports:
+      dotenv: deploy.env
+    expire_in: 1 day
+  environment:
+    name: landing
+    deployment_tier: staging
+    action: prepare
+
+explorer staging build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
+  <<: *node_template
+  script:
+    - npm run build:explorer
+    - STAGING_URL=https://$(jq -r '."gldt_explorer".staging' canister_ids.json).icp0.io
+    - echo "EXPLORER_URL=$STAGING_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
+    paths:
+      - explorer/out
+    reports:
+      dotenv: deploy.env
+    expire_in: 1 day
+  environment:
+    name: explorer
+    deployment_tier: staging
+    action: prepare
+
+swap_app production build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
       changes:
         - "swap_app/*.{js,json}"
         - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["canister build"]
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
     - npm run build:swap_app
     - PRODUCTION_URL=https://$(jq -r '."gldt_swap_app".ic' canister_ids.json).icp0.io
-    - echo "FRONTEND_URL=$PRODUCTION_URL" > deploy.env
+    - echo "SWAP_APP_URL=$PRODUCTION_URL" > deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-frontend"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
     paths:
       - swap_app/out
+    reports:
+      dotenv: deploy.env
+    expire_in: 6 months
+  environment:
+    name: production
+    action: prepare
+
+landing_page production build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "landing_page/*.{js,json}"
+        - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
+  <<: *node_template
+  script:
+    - npm run build:landing_page
+    - PRODUCTION_URL=https://$(jq -r '."gldt_landing_page".ic' canister_ids.json).icp0.io
+    - echo "LANDING_URL=$PRODUCTION_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page"
+    paths:
+      - landing_page/out
+    reports:
+      dotenv: deploy.env
+    expire_in: 6 months
+  environment:
+    name: production
+    action: prepare
+
+explorer production build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "explorer/*.{js,json}"
+        - "explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+  # TODO: add "gldt_fee_compensation canister build" as needed ?
+  needs: ["gldt_core canister build", "generate declarations"]
+  <<: *node_template
+  script:
+    - npm run build:explorer
+    - PRODUCTION_URL=https://$(jq -r '."gldt_explorer".ic' canister_ids.json).icp0.io
+    - echo "EXPLORER_URL=$PRODUCTION_URL" > deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
+    paths:
+      - explorer/out
     reports:
       dotenv: deploy.env
     expire_in: 6 months
