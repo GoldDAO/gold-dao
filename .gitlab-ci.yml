@@ -51,6 +51,7 @@ stages:
       - canister/gldt_core/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
+    - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
@@ -105,7 +106,7 @@ rust lint:
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
-    - cargo check --target wasm32-unknown-unknown
+    - cargo clippy
 
 ################################################################################
 # Tests

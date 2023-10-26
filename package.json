@@ -18,8 +18,9 @@
     "build:back": "scripts/build-canister.sh gldt_core && npm run build:candid && npm run build:declarations",
     "build:candid": "scripts/generate-did.sh gldt_core",
     "build:declarations": "dfx generate && mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js && mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did",
-    "lint": "npm run lint:back && npm run lint:swap_app",
-    "lint:back": "cargo check",
+    "lint": "npm run lint:back && npm run lint:frontends",
+    "lint:back": "cargo clippy",
+    "lint:frontends": "npm run lint:swap_app && npm run lint:landing && npm run lint:explorer",
     "lint:swap_app": "npm run --workspace swap_app lint",
     "lint:landing": "npm run --workspace landing_page lint",
     "lint:explorer": "npm run --workspace explorer lint",
@@ -27,7 +28,7 @@
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
-    "postinstall": "echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
+    "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
     "eslint": "8.40.0"
