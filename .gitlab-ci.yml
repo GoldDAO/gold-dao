@@ -190,7 +190,7 @@ gldt_core canister build:
       - canister/gldt_core/src/gldt_core.did
     expire_in: 6 months
 
-.gldt_fee_compensation canister build:
+gldt_fee_compensation canister build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
