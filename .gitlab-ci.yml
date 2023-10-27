@@ -266,10 +266,10 @@ swap_app staging build:
     paths:
       - swap_app/out
     reports:
-      dotenv: deploy.env
+      dotenv: swap_deploy.env
     expire_in: 1 day
   environment:
-    name: swap_app
+    name: swap app
     deployment_tier: staging
     action: prepare
 
@@ -283,16 +283,16 @@ landing staging build:
   script:
     - npm run build:landing
     - STAGING_URL=https://$(jq -r '."gldt_landing_page".staging' canister_ids.json).icp0.io
-    - echo "LANDING_URL=$STAGING_URL" > deploy.env
+    - echo "LANDING_URL=$STAGING_URL" > landing_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
     paths:
       - landing/out
     reports:
-      dotenv: deploy.env
+      dotenv: landing_deploy.env
     expire_in: 1 day
   environment:
-    name: landing
+    name: landing page
     deployment_tier: staging
     action: prepare
 
@@ -306,13 +306,13 @@ explorer staging build:
   script:
     - npm run build:explorer
     - STAGING_URL=https://$(jq -r '."gldt_explorer".staging' canister_ids.json).icp0.io
-    - echo "EXPLORER_URL=$STAGING_URL" > deploy.env
+    - echo "EXPLORER_URL=$STAGING_URL" > explorer_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
     paths:
       - explorer/out
     reports:
-      dotenv: deploy.env
+      dotenv: explorer_deploy.env
     expire_in: 1 day
   environment:
     name: explorer
@@ -332,16 +332,17 @@ swap_app production build:
   script:
     - npm run build:swap_app
     - PRODUCTION_URL=https://$(jq -r '."gldt_swap_app".ic' canister_ids.json).icp0.io
-    - echo "SWAP_APP_URL=$PRODUCTION_URL" > deploy.env
+    - echo "SWAP_APP_URL=$PRODUCTION_URL" > swap_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
     paths:
       - swap_app/out
     reports:
-      dotenv: deploy.env
+      dotenv: swap_deploy.env
     expire_in: 6 months
   environment:
-    name: production
+    name: swap app
+    deployment_tier: production
     action: prepare
 
 landing_page production build:
@@ -357,16 +358,17 @@ landing_page production build:
   script:
     - npm run build:landing_page
     - PRODUCTION_URL=https://$(jq -r '."gldt_landing_page".ic' canister_ids.json).icp0.io
-    - echo "LANDING_URL=$PRODUCTION_URL" > deploy.env
+    - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page"
     paths:
       - landing_page/out
     reports:
-      dotenv: deploy.env
+      dotenv: landing_deploy.env
     expire_in: 6 months
   environment:
-    name: production
+    name: landing page
+    deployment_tier: production
     action: prepare
 
 explorer production build:
@@ -382,16 +384,17 @@ explorer production build:
   script:
     - npm run build:explorer
     - PRODUCTION_URL=https://$(jq -r '."gldt_explorer".ic' canister_ids.json).icp0.io
-    - echo "EXPLORER_URL=$PRODUCTION_URL" > deploy.env
+    - echo "EXPLORER_URL=$PRODUCTION_URL" > explorer_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
     paths:
       - explorer/out
     reports:
-      dotenv: deploy.env
+      dotenv: explorer_deploy.env
     expire_in: 6 months
   environment:
-    name: production
+    name: explorer
+    deployment_tier: production
     action: prepare
 
 ################################################################################
@@ -411,20 +414,20 @@ local deploy and tests:
     - cat canister_ids.json
     - dfx stop
 
-gldt frontend:
+swap app:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       needs: ["swap_app staging build"]
       variables:
         TARGET_NETWORK: staging
-        ENVIRONMENT_NAME: "frontend staging"
+        ENVIRONMENT_TIER: "staging"
         PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
       needs: ["swap_app production build"]
       variables:
         TARGET_NETWORK: ic
-        ENVIRONMENT_NAME: "frontend production"
+        ENVIRONMENT_TIER: "production"
         PEM_FILE: $PEM_FILE_PRODUCTION
   before_script:
     - dfx --version
@@ -434,8 +437,37 @@ gldt frontend:
   script:
     - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_swap_app
   environment:
-    name: $ENVIRONMENT_NAME
-    url: $FRONTEND_URL
+    name: swap app
+    deployment_tier: $ENVIRONMENT_TIER
+    url: $SWAP_APP_URL
+    action: start
+
+landing page:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      needs: ["landing_page staging build"]
+      variables:
+        TARGET_NETWORK: staging
+        ENVIRONMENT_TIER: "staging"
+        PEM_FILE: $PEM_FILE_STAGING
+    - if: $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
+      needs: ["landing_page production build"]
+      variables:
+        TARGET_NETWORK: ic
+        ENVIRONMENT_TIER: "production"
+        PEM_FILE: $PEM_FILE_PRODUCTION
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity use gitlab-ci-gldt
+    - dfx identity whoami
+  script:
+    - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_landing_page
+  environment:
+    name: landing page
+    deployment_tier: $ENVIRONMENT_TIER
+    url: $LANDING_URL
     action: start
 
 gldt core:
@@ -444,12 +476,12 @@ gldt core:
     - if: $CI_COMMIT_REF_NAME == "develop"
       variables:
         TARGET_NETWORK: staging
-        ENVIRONMENT_NAME: "core staging"
+        ENVIRONMENT_TIER: "staging"
         PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
-        ENVIRONMENT_NAME: "core production"
+        ENVIRONMENT_TIER: "production"
         PEM_FILE: $PEM_FILE_PRODUCTION
   needs: ["gldt_core canister build"]
   before_script:
@@ -460,7 +492,8 @@ gldt core:
   script:
     - scripts/deploy-gldt-core.sh $TARGET_NETWORK
   environment:
-    name: $ENVIRONMENT_NAME
+    name: gldt_core
+    deployment_tier: $ENVIRONMENT_TIER
     url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
 
