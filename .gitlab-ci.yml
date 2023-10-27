@@ -434,7 +434,7 @@ swap app staging:
     CANISTER_NAME: "swap_app"
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-      needs: ["${CANISTER_NAME} staging build"]
+      needs: ["swap_app staging build"]
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: $PEM_FILE_STAGING
@@ -449,8 +449,8 @@ swap app production:
   variables:
     CANISTER_NAME: "swap_app"
   rules:
-    - if: $CI_COMMIT_TAG =~ '/^${CANISTER_NAME}-v\d+\.\d+\.\d+$/'
-      needs: ["${CANISTER_NAME} production build"]
+    - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
+      needs: ["swap_app production build"]
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: $PEM_FILE_PRODUCTION
