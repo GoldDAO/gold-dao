@@ -49,6 +49,7 @@ stages:
     paths:
       - .cargo
       - canister/gldt_core/target
+      - canister/gldt_fee_compensation/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup component add clippy
