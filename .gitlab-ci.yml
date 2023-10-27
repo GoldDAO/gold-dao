@@ -104,7 +104,7 @@ rust lint:
       changes:
         - "Cargo.{lock,toml}"
         - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}""
+        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
