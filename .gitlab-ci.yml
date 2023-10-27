@@ -35,9 +35,9 @@ stages:
     paths:
       - .npm/
       - node_modules/
-      - swap_app/.next/
-      - swap_app/.npm/
-      - swap_app/node_modules/
+      - client/**/.next/
+      - client/**/.npm/
+      - client/**/node_modules/
   before_script:
     - apt update -q > /dev/null && apt install -y jq > /dev/null
     - npm ci --cache .npm --prefer-offline
