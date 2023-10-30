@@ -129,7 +129,7 @@ gldt_core test build:
       - canister/gldt_core/src/gldt_core.did
     expire_in: 1 day
 
-gldt_fee_compensation test build:
+.gldt_fee_compensation test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -149,7 +149,8 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build","gldt_fee_compensation test build"]
+      # TODO: Add "gldt_fee_compensation test build"
+      needs: ["gldt_core test build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
@@ -220,7 +221,7 @@ gldt_core canister build:
       - canister/gldt_core/src/gldt_core.did
     expire_in: 6 months
 
-gldt_fee_compensation canister build:
+.gldt_fee_compensation canister build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
@@ -239,7 +240,8 @@ generate declarations:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
-      needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
+      # TODO: Add "gldt_fee_compensation canister build"
+      needs: ["gldt_core canister build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
@@ -254,7 +256,6 @@ swap_app staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
@@ -277,7 +278,6 @@ landing_page staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["generate declarations"]
   <<: *node_template
   script:
@@ -300,7 +300,6 @@ explorer staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["generate declarations"]
   <<: *node_template
   script:
@@ -326,7 +325,6 @@ swap_app production build:
       changes:
         - "swap_app/*.{js,json}"
         - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
@@ -352,7 +350,6 @@ landing_page production build:
       changes:
         - "landing_page/*.{js,json}"
         - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
@@ -378,7 +375,6 @@ explorer production build:
       changes:
         - "explorer/*.{js,json}"
         - "explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  # TODO: add "gldt_fee_compensation canister build" as needed ?
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
@@ -532,7 +528,7 @@ gldt core:
     url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
 
-gldt fee compensation staging:
+.gldt fee compensation staging:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
@@ -550,7 +546,7 @@ gldt fee compensation staging:
     url: https://$(jq -r '."gldt_fee_compensation".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
 
-gldt fee compensation:
+.gldt fee compensation:
   stage: deploy
   rules:
     - if: $CI_COMMIT_TAG =~ '/^fee_compensation-v\d+\.\d+\.\d+$/'
