@@ -164,7 +164,7 @@ swap_app test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build","gldt_fee_compensation test build","generate test declarations"]
+  needs: ["gldt_core test build","generate test declarations"]
   <<: *node_template
   script:
     - npm run build:swap_app
@@ -178,7 +178,7 @@ landing_page test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build","generate test declarations"]
+  needs: ["generate test declarations"]
   <<: *node_template
   script:
     - npm run build:landing_page
@@ -192,7 +192,7 @@ explorer test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build","generate test declarations"]
+  needs: ["generate test declarations"]
   <<: *node_template
   script:
     - npm run build:explorer
@@ -278,7 +278,7 @@ landing_page staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
   # TODO: add "gldt_fee_compensation canister build" as needed ?
-  needs: ["gldt_core canister build", "generate declarations"]
+  needs: ["generate declarations"]
   <<: *node_template
   script:
     - npm run build:landing
@@ -301,7 +301,7 @@ explorer staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
   # TODO: add "gldt_fee_compensation canister build" as needed ?
-  needs: ["gldt_core canister build", "generate declarations"]
+  needs: ["generate declarations"]
   <<: *node_template
   script:
     - npm run build:explorer
