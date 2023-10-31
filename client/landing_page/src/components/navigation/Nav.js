@@ -19,7 +19,9 @@ const Nav = () => {
                 alignItems: 'center',
             }}
         >
-            <Image width={80} src={Logo} alt="logo" />
+            <Link href="/">
+                <Image width={80} src={Logo} alt="logo" />
+            </Link>
             <HStack spacing="50px">
                 <Link href="/FAQ">
                     <Text fontSize={TextSize}>FAQ</Text>

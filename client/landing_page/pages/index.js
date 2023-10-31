@@ -13,6 +13,7 @@ import {
     StatNumber,
     Text,
     VStack,
+    Accordion,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import Logo from '/public/images/logo.svg';
@@ -27,10 +28,11 @@ import origyn from '/public/images/partners/origyn.svg';
 import Link from 'next/link';
 import Play from '/public/images/play.svg';
 import Layout from '@/components/layout/Layout';
+import Question from '@/components/FAQ/Question';
+import Q from './../src/components/FAQ/content.json';
 
 function Home({}) {
     const margins = ['20px', '30px', '60px', '140px', '180px'];
-
     const titleFontSize = ['40px', '60px', '60px', '80px', '96px'];
     const subtitleFontSize = ['28px', '36px', '36px', '48px', '48px'];
     const mediumFontSize = ['24px', '26px', '28px', '32px', '36px'];
@@ -258,91 +260,87 @@ function Home({}) {
                                 direction={['column', 'column', 'row', 'row', 'row']}
                             >
                                 <Box w="100%">
-                                    <Heading
-                                        fontSize={mediumFontSize}
-                                        mb={['20px', '30px', '30px', '50px', '50px']}
+                                    <VStack
+                                        w={['100%', '100%', '100%', 'fit-content', 'fit-content']}
+                                        justifyContent="center"
                                     >
-                                        Steadfast Stability, Golden Opportunity
-                                    </Heading>
-                                    <Text fontSize={TextSize}>
-                                        With GLDT, enjoy the peace of mind that comes with a
-                                        currency rooted in the tangible value of gold. Secure your
-                                        assets and seize golden opportunities in the digital
-                                        financial landscape.
-                                    </Text>
-                                </Box>
-                                <Box w="100%">
-                                    <Heading
-                                        mb={['20px', '30px', '30px', '50px', '50px']}
-                                        fontSize={mediumFontSize}
-                                    >
-                                        Seize the Golden Standard
-                                    </Heading>
-                                    <Text fontSize={TextSize}>
-                                        Invest with confidence, knowing each GLDT is backed by
-                                        physical gold. Your gateway to a stable and prosperous
-                                        digital economy starts with GLDT.
-                                    </Text>
-                                </Box>
-                            </Stack>
-                            <Box
-                                fontSize={mediumFontSize}
-                                fontWeight={'bold'}
-                                mt={['40px', '60px', '60px', '100px', '100px']}
-                            >
-                                <Stack
-                                    alignItems={[
-                                        'center',
-                                        'center',
-                                        'center',
-                                        'space-between',
-                                        'space-between',
-                                    ]}
-                                    w="100%"
-                                    spacing={'50px'}
-                                    direction={['column', 'column', 'column', 'row', 'row']}
-                                >
-                                    <Box w="100%">
-                                        <Stack
-                                            w={[
-                                                '100%',
-                                                '100%',
-                                                '100%',
-                                                'fit-content',
-                                                'fit-content',
-                                            ]}
-                                            justifyContent="center"
+                                        <Heading
+                                            fontSize={mediumFontSize}
+                                            mb={['20px', '30px', '30px', '50px', '50px']}
                                         >
-                                            <Button
-                                                bg="#F4F4F4"
-                                                fontSize={buttonTextSize}
-                                                borderRadius={30}
-                                                p={'40px'}
-                                                _hover={{
-                                                    bg: '#f4f4f4',
-                                                }}
-                                            >
-                                                Read the whitepaper
-                                            </Button>
-                                        </Stack>
+                                            Steadfast Stability, Golden Opportunity
+                                        </Heading>
+                                        <Text fontSize={TextSize}>
+                                            With GLDT, enjoy the peace of mind that comes with a
+                                            currency rooted in the tangible value of gold. Secure
+                                            your assets and seize golden opportunities in the
+                                            digital financial landscape.
+                                        </Text>
+                                        <Button
+                                            mt="35px"
+                                            bg="#F4F4F4"
+                                            fontSize={buttonTextSize}
+                                            borderRadius={30}
+                                            p={'40px'}
+                                            _hover={{
+                                                bg: '#f4f4f4',
+                                            }}
+                                        >
+                                            Read the whitepaper
+                                        </Button>
+                                    </VStack>
+                                </Box>
+                                <VStack>
+                                    <Box w="100%">
+                                        <Heading
+                                            mb={['20px', '30px', '30px', '50px', '50px']}
+                                            fontSize={mediumFontSize}
+                                        >
+                                            Seize the Golden Standard
+                                        </Heading>
+                                        <Text fontSize={TextSize}>
+                                            Invest with confidence, knowing each GLDT is backed by
+                                            physical gold. Your gateway to a stable and prosperous
+                                            digital economy starts with GLDT.
+                                        </Text>
                                     </Box>
-                                    <HStack
-                                        w="100%"
-                                        justifyContent={[
-                                            'center',
-                                            'center',
-                                            'center',
-                                            'flex-start',
-                                            'flex-start',
-                                        ]}
+                                    <Box
+                                        fontSize={mediumFontSize}
+                                        fontWeight={'bold'}
+                                        mt={['40px', '60px', '60px', '100px', '100px']}
                                     >
-                                        <Text>1g of gold = 100</Text>
-                                        <HStack>
-                                            <Text>GLDT</Text> <Image src={Logo} width={50} />
-                                        </HStack>
-                                    </HStack>
-                                </Stack>
-                            </Box>
+                                        <VStack
+                                            alignItems={[
+                                                'center',
+                                                'center',
+                                                'center',
+                                                'space-between',
+                                                'space-between',
+                                            ]}
+                                            w="100%"
+                                            spacing={'50px'}
+                                            direction={['column', 'column', 'column', 'row', 'row']}
+                                        >
+                                            <HStack
+                                                w="100%"
+                                                justifyContent={[
+                                                    'center',
+                                                    'center',
+                                                    'center',
+                                                    'flex-start',
+                                                    'flex-start',
+                                                ]}
+                                            >
+                                                <Text>1g of gold = 100</Text>
+                                                <HStack>
+                                                    <Text>GLDT</Text>{' '}
+                                                    <Image src={Logo} width={50} />
+                                                </HStack>
+                                            </HStack>
+                                        </VStack>
+                                    </Box>
+                                </VStack>
+                            </Stack>
                         </Container>
                     </Box>
                     <Box as="section" my={verticalSpacing}>
@@ -415,14 +413,46 @@ function Home({}) {
                             </HStack>
                         </Container>
                     </Box>
-                    <Box
-                        as="footer"
-                        style={{
-                            width: '100%',
-                            backgroundColor: '#F4F4F4',
-                        }}
-                        h={['250px', '300px', '400px']}
-                    ></Box>
+                    <Box>
+                        <Box m="0 auto" px={margins} pb={verticalSpacing}>
+                            <Heading
+                                as="h4"
+                                fontSize={mediumFontSize}
+                                pb="40px"
+                                textAlign={'center'}
+                            >
+                                Frequently Asked Questions
+                            </Heading>
+                            <Accordion allowToggle>
+                                {Q.map((e, i) => {
+                                    if (i < 3) {
+                                        return <Question key={i} q={e.q} r={e.r} />;
+                                    }
+                                })}
+                            </Accordion>
+                            <Stack>
+                                <Button
+                                    w={'fit-content'}
+                                    as="a"
+                                    color={'#000'}
+                                    _hover={{
+                                        bg: '#F4F4F4',
+                                    }}
+                                    target="_blank"
+                                    href="/FAQ"
+                                    py={'40px'}
+                                    px="25px"
+                                    bg="#F4F4F4"
+                                    borderRadius={'30px'}
+                                    fontSize={('18px', '24px')}
+                                    fontWeight={'bold'}
+                                    m="40px auto"
+                                >
+                                    View more FAQs
+                                </Button>
+                            </Stack>
+                        </Box>
+                    </Box>
                 </Layout>
             </>
         );
