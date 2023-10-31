@@ -48,7 +48,7 @@ const AccountContent = ({ id, subAccount }) => {
     const router = useRouter();
 
     useEffect(() => {
-        if (history?.Ok?.transactions[history.Ok.transactions.length - 1].id) {
+        if (history?.Ok?.transactions[history?.Ok?.transactions?.length - 1]?.id) {
             i.push(parseInt(history?.Ok?.transactions[history.Ok.transactions.length - 1].id));
         }
     }, [history]);
