@@ -268,12 +268,27 @@ fn cronjob_master() -> Result<(), CustomError> {
 
     log_message(format!("Starting a periodic task with interval {interval:?}"));
     let run = || ic_cdk::spawn(run_compensation_job());
-    let timer_id = ic_cdk_timers::set_timer_interval(interval, run);
-    // store the timer_id to be able to deactivate
-    FALLBACK_TIMER_ID.with(|cell| {
-        *cell.borrow_mut() = timer_id;
-    });
-    Ok(())
+
+    let current_time = api::time();
+
+    match current_time.checked_add(interval.as_secs()) {
+        Some(_) => {
+            let timer_id: TimerId = ic_cdk_timers::set_timer_interval(interval, run);
+
+            FALLBACK_TIMER_ID.with(|cell| {
+                *cell.borrow_mut() = timer_id;
+            });
+            Ok(())
+        }
+        None => {
+            Err(
+                CustomError::new_with_message(
+                    ErrorType::Other,
+                    "Fatal error: interval + current_time > u64 MAX.".to_string()
+                )
+            )
+        }
+    }
 }
 
 fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
