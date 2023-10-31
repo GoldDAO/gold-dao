@@ -24,6 +24,7 @@ const Layout = ({ children, meta }) => {
             <Box pb="0">
                 {children}
                 <Box
+                    mt="80px"
                     as="footer"
                     style={{
                         width: '100%',

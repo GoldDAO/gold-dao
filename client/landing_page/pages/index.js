@@ -30,6 +30,7 @@ import Play from '/public/images/play.svg';
 import Layout from '@/components/layout/Layout';
 import Question from '@/components/FAQ/Question';
 import Q from './../src/components/FAQ/content.json';
+import dynamic from 'next/dynamic';
 
 function Home({}) {
     const margins = ['20px', '30px', '60px', '140px', '180px'];
@@ -39,20 +40,6 @@ function Home({}) {
     const TextSize = ['18px', '18px', '20px', '22px', '24px'];
     const buttonTextSize = ['22px', '24px', '28px', '32px', '32px'];
     const verticalSpacing = ['60px', '80px', '80px', '140px', '180px'];
-    const stats = [
-        {
-            label: 'USD Market Cap ',
-            number: '$474 842 289',
-        },
-        {
-            label: 'Gold Bars ',
-            number: '700',
-        },
-        {
-            label: 'Gold Kilograms',
-            number: '7643.71',
-        },
-    ];
 
     const prodMeta = {
         title: 'GLDT | Coming Soon',
@@ -64,28 +51,9 @@ function Home({}) {
         description: 'GLDT Swap Description',
     };
 
-    const Stats = ({ label, number }) => {
-        return (
-            <Stat display={'flex'}>
-                <StatLabel
-                    fontSize={TextSize}
-                    fontWeight={'bold'}
-                    pb={['5px', '5px', '20px', '20px', '25px']}
-                    m={0}
-                >
-                    {label}
-                </StatLabel>
-                <StatNumber
-                    fontSize={mediumFontSize}
-                    fontWeight={400}
-                    m={0}
-                    pb={['15px', '15px', '25px', '0', '0']}
-                >
-                    {number}
-                </StatNumber>
-            </Stat>
-        );
-    };
+    const Supply = dynamic(() => import('./../src/components/Supply'), {
+        ssr: false,
+    });
 
     const partners = [
         {
@@ -241,9 +209,7 @@ function Home({}) {
                                         display={['flex']}
                                         flexDirection={['column', 'column', 'row', 'row', 'row']}
                                     >
-                                        {stats.map((e, i) => (
-                                            <Stats key={i} label={e.label} number={e.number} />
-                                        ))}
+                                        <Supply />
                                     </StatGroup>
                                     <Box display={['block', 'block', 'none', 'none', 'none']}>
                                         <Image width={312} src={Logo} />
