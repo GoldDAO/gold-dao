@@ -504,6 +504,11 @@ gldt core staging:
     - *import_dfx_id
   script:
     - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
+    paths:
+      - canister_ids.json
+    expire_in: 1 hour
   environment:
     name: gldt_core
     deployment_tier: production
@@ -522,6 +527,11 @@ gldt core:
     - *import_dfx_id
   script:
     - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
+    paths:
+      - canister_ids.json
+    expire_in: 6 months
   environment:
     name: gldt_core
     deployment_tier: production
@@ -535,7 +545,7 @@ gldt core:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
-  needs: ["gldt_fee_compensation canister build"]
+  needs: ["gldt_fee_compensation canister build", "gldt core staging"]
   before_script:
     - *import_dfx_id
   script:
