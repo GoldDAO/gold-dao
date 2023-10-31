@@ -46,18 +46,18 @@ import {
     removeAllItemsInCartAtom,
     removeCartItemByIdAtom,
 } from '@/atoms/cart';
-import { useAllCanisters } from './../../../../../utils/hooks/useAllCanisters';
-import { useNft } from './../../../../../utils/hooks/useNFTs';
+import { useAllCanisters } from '@utils/hooks/useAllCanisters';
+import { useNft } from '@utils/hooks/useNFTs';
 import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
-import { sendBatchOffer } from './../../../../../utils/queries/sendBatchOffer';
+import { sendBatchOffer } from '@utils/queries/sendBatchOffer';
 import Link from 'next/link';
 import TokenSign from '../gldt/TokenSign';
 import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg';
 import { gldNftCanisters } from '@/services/agents';
-import { cardPadding } from './../../../../../ui/theme';
+import { cardPadding } from '@ui/theme';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();

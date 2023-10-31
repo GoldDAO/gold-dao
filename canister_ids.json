@@ -26,5 +26,9 @@
   "gldt_fee_compensation": {
     "staging": "ccjse-eaaaa-aaaao-a2ixq-cai",
     "ic": ""
+  },
+  "ledger_indexer": {
+    "staging": "wusb2-uiaaa-aaaao-a2lca-cai",
+    "ic": ""
   }
 }
