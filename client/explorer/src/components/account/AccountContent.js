@@ -42,7 +42,7 @@ const AccountContent = ({ id, subAccount }) => {
     const [last, setlast] = useState([]);
     const [action, setAction] = useState();
     const [i, seti] = useState([[]]);
-    const { history } = useHistory(id, currentPage, action, index, last, currentSub, i);
+    const { history } = useHistory(id, currentPage, currentSub, i);
     const { subaccounts } = useSubaccounts(id);
     const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
     const router = useRouter();
@@ -62,10 +62,6 @@ const AccountContent = ({ id, subAccount }) => {
             });
         }
     }, [history]);
-
-    // useEffect(() => {
-    //     last.push(history?.Ok?.transactions[history.Ok.transactions.length - 1].id);
-    // }, [history]);
 
     const toggleChange = (e) => {
         setCurrentSub(e.target.value);
@@ -114,16 +110,6 @@ const AccountContent = ({ id, subAccount }) => {
                             <Text>{formatAmount(balance)}</Text> <TokenSign />
                         </HStack>
                     </Card>
-                    <Card
-                        p="15px 20px"
-                        shadow={'none'}
-                        border={'1px'}
-                        borderColor={'border'}
-                        w={'50%'}
-                    >
-                        <Text>Total Transactions</Text>
-                        {/* <Text>{parseInt(max) || 0}</Text> */}
-                    </Card>
                 </HStack>
             </Card>
 
@@ -171,14 +157,30 @@ const AccountContent = ({ id, subAccount }) => {
                                         </HStack>
                                     </Td>
                                     <Td>
-                                        {Principal.fromUint8Array(
-                                            e.transaction.transfer[0].from.owner._arr,
-                                        ).toString()}
+                                        <Link
+                                            href={`/account/${Principal.fromUint8Array(
+                                                e.transaction.transfer[0].from.owner._arr,
+                                            ).toString()}`}
+                                        >
+                                            <PrincipalFormat
+                                                principal={Principal.fromUint8Array(
+                                                    e.transaction.transfer[0].from.owner._arr,
+                                                ).toString()}
+                                            />
+                                        </Link>
                                     </Td>
                                     <Td>
-                                        {Principal.fromUint8Array(
-                                            e.transaction.transfer[0].to.owner._arr,
-                                        ).toString()}
+                                        <Link
+                                            href={`/account/${Principal.fromUint8Array(
+                                                e.transaction.transfer[0].to.owner._arr,
+                                            ).toString()}`}
+                                        >
+                                            <PrincipalFormat
+                                                principal={Principal.fromUint8Array(
+                                                    e.transaction.transfer[0].to.owner._arr,
+                                                ).toString()}
+                                            />
+                                        </Link>
                                     </Td>
                                 </Tr>
                             );
@@ -186,7 +188,6 @@ const AccountContent = ({ id, subAccount }) => {
                     </Tbody>
                 </Table>
                 <Pagination
-                    total={100}
                     currentHistoryPage={currentPage}
                     setCurrentHistoryPage={setCurrentPage}
                     setAction={setAction}
@@ -203,7 +204,7 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setActio
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Text>Page {currentHistoryPage + 1}</Text>
-                <Text>{total} entries</Text>
+                {/* <Text>{total} entries</Text> */}
             </Flex>
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Button
@@ -224,7 +225,7 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setActio
                     _hover={{
                         bg: 'border',
                     }}
-                    isDisabled={total / (currentHistoryPage + 1) < 10}
+                    // isDisabled={total / (currentHistoryPage + 1) < 10}
                     onClick={() => {
                         setCurrentHistoryPage((prev) => prev + 1);
                         setAction(+1);

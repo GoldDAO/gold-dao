@@ -1,16 +1,19 @@
 import React from 'react';
 import Layout from '@/components/Layout';
 import { Box, Heading } from '@chakra-ui/react';
+import dynamic from 'next/dynamic';
 
 const Transparency = () => {
+    const TransparencyContent = dynamic(
+        () => import('@/components/transparency/TransparencyContent'),
+        {
+            ssr: false,
+        },
+    );
+
     return (
         <Layout>
-            <Box my="100px">
-                <Heading as="h1" fontWeight={300}>
-                    {' '}
-                    Transparency
-                </Heading>
-            </Box>
+            <TransparencyContent />
         </Layout>
     );
 };

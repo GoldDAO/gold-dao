@@ -23,14 +23,14 @@ const queryNfts = async (principal, actors) => {
 	return { nftsArr, nftsByWeight };
 };
 
-export const useNft = (actors) => {
-	const { principal } = useConnect();
+export const useNft = (actors, principal) => {
+	const currentPrincipal = principal ? principal : useConnect().principal;
 	const [nfts, setNfts] = useState([]);
 	const [nftsByW, setNftsByW] = useState([]);
 	const [isLoading, setLoading] = useState(false);
 	useEffect(() => {
 		setLoading(true);
-		queryNfts(principal, actors)
+		queryNfts(currentPrincipal, actors)
 			.then((result) => {
 				getNftWithStatus(result.nftsArr, actors).then((r) => {
 					setNfts(r);
