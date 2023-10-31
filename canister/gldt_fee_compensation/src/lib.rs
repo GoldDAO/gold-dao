@@ -348,7 +348,14 @@ async fn run_compensation_job() {
     for canister in gld_nft_canister_conf.into_iter() {
         let GldNftConf { gld_nft_canister_id, weight, last_query_index } = canister.clone();
         // expected sale price is the weight of the NFT * 100
-        let expected_sale_price = GldtNumTokens::new_from_weight(weight).unwrap_or_default().get();
+        let expected_sale_price: Nat;
+
+        if let Ok(val) = GldtNumTokens::new_from_weight(weight) {
+            expected_sale_price = val.get();
+        } else {
+            return;
+        }
+
         // expected royalty fee is 0.5% of the sale price, plus deducting the TX fee
         let expected_royalty_fee = (expected_sale_price.clone() - GLDT_TX_FEE) / 200;
         // calculate the compensated amount based on the sale price
