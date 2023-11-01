@@ -1,15 +1,14 @@
 import { createClient } from '@connect2ic/core';
 import { Connect2ICProvider } from '@connect2ic/react';
-import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/providers';
-import { SafeHydrate } from '@/utils/SafeHydrate';
+import { SafeHydrate } from '@utils/SafeHydrate';
 import '@connect2ic/core/style.css';
-import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import {
     gldNftCanisters,
     gldtLedgerCanister,
     gldtCoreCanister,
     ledgerIndexerCanister,
-} from '@/services/agents/';
+} from '@utils/agents';
 import { customTheme } from '@ui/theme';
 
 const Providers = ({ children }) => {
@@ -22,6 +21,8 @@ const Providers = ({ children }) => {
         ledgerIndexerCanister,
         gldtCoreCanister,
     };
+
+    console.log('canisters', canisters);
 
     let client = createClient({
         canisters,

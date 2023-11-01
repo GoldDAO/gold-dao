@@ -52,11 +52,11 @@ import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
 import { sendBatchOffer } from '@utils/queries/sendBatchOffer';
 import Link from 'next/link';
-import TokenSign from '../gldt/TokenSign';
+import TokenSign from '@ui/gldt/TokenSign';
 import { CheckCircleIcon, ChevronDownIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg';
-import { gldNftCanisters } from '@/services/agents';
+import { gldNftCanisters } from '@utils/agents';
 import { cardPadding } from '@ui/theme';
 
 const SwapInterface = () => {

@@ -31,13 +31,13 @@ import { cancelSale } from '@utils/queries/cancelSale';
 import useSwapHistory, { useMaxEntry } from '@utils/hooks/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
 import useOngoingSwaps from '@utils/hooks/useOngoingSwap';
-import TokenSign from '../gldt/TokenSign';
+import TokenSign from '@ui/gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import NFTIcon from '/public/images/sell.svg';
 import weightIcon from '/public/images/scale.svg';
 import swappedIcon from '/public/images/send_money.svg';
 import Image from 'next/image';
-import Timestamp from '../tooltip/timeStamp';
+import Timestamp from '@ui/tooltip/timeStamp';
 import { cardPadding } from '@ui/theme';
 
 const Summary = () => {
@@ -431,7 +431,7 @@ const MyTransactions = () => {
                                                 </Tr>
                                             </Thead>
                                             <Tbody>
-                                                {ongoing.ongoing?.Ok.data[0].length < 1 && (
+                                                {ongoing?.ongoing?.Ok.data[0].length < 1 && (
                                                     <Tr>
                                                         <Td>You have no ongoing swaps</Td>
                                                         <Td></Td>
@@ -518,12 +518,12 @@ const MyTransactions = () => {
                                                 </Tr>
                                             </Thead>
                                             <Tbody>
-                                                {history.history?.Ok.data[0].length === 0 && (
+                                                {history?.history?.Ok.data[0]?.length === 0 && (
                                                     <Tr>
                                                         <Td>You have no ongoing swaps</Td>
                                                     </Tr>
                                                 )}
-                                                {history.history?.Ok.data[0].map((e, i) => {
+                                                {history?.history?.Ok.data[0]?.map((e, i) => {
                                                     return (
                                                         <Tr key={i}>
                                                             <Td>{Object.keys(e.record_type)}</Td>

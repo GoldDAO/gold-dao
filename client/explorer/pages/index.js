@@ -1,6 +1,4 @@
-import { Heading } from '@chakra-ui/react';
-import Layout from './../src/components/Layout';
-import { useConnect } from '@connect2ic/react';
+import Layout from './../src/components/layout/Layout';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 

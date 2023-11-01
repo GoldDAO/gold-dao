@@ -1,5 +1,4 @@
-import Layout from '@/components/layout/Layout';
-import { useConnect } from '@connect2ic/react';
+import { Layout } from '@/components/layout/Layout';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 

@@ -1,14 +1,13 @@
 import React from 'react';
-import Grid from './Grid';
+import Grid from '@ui/layout/Grid';
 import Footer from './Footer';
-import { Box, Container } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 
-const Layout = ({ children }) => {
-    const Header = dynamic(() => import('@/components/ui/header/Header'), {
+export const Layout = ({ children }) => {
+    const Header = dynamic(() => import('@/components/layout/Header'), {
         ssr: false,
     });
-
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Header />
@@ -17,5 +16,3 @@ const Layout = ({ children }) => {
         </Box>
     );
 };
-
-export default Layout;

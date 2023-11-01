@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const Providers = dynamic(() => import('@/components/c2ic/Providers'), {
+const Providers = dynamic(() => import('@/components/Providers'), {
     ssr: false,
 });
 

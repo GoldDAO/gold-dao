@@ -3,8 +3,8 @@ import { idlFactory } from './LEDGER_INDEXER.did.js';
 export { idlFactory };
 
 export const createActor = (canisterId, agent) => {
-    return Actor.createActor(idlFactory, {
-        agent,
-        canisterId,
-    });
+	return Actor.createActor(idlFactory, {
+		agent,
+		canisterId,
+	});
 };

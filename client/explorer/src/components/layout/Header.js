@@ -1,11 +1,10 @@
 import React from 'react';
-import Logo from './logo.svg';
+import Logo from '@ui/assets/logo.svg';
 import Image from 'next/image';
-import { Box, HStack, Input, InputGroup, InputRightElement, Text } from '@chakra-ui/react';
+import { HStack, Text } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Search2Icon } from '@chakra-ui/icons';
-import SearchBar from './SearchBar';
-import Grid from '../Grid';
+import Grid from '@ui/layout/Grid';
+
 const Header = () => {
     return (
         <HStack as="header" justify={'space-between'} alignItems={'center'}>
@@ -16,9 +15,6 @@ const Header = () => {
                 <Link href="/transparency" style={{ gridColumn: '10/13' }}>
                     <Text>Transparency</Text>
                 </Link>
-                {/* <Box sx={{ gridColumn: 'span 6' }}>
-                    <SearchBar />
-                </Box> */}
             </Grid>
         </HStack>
     );
