@@ -272,7 +272,7 @@ const Mynfts = ({ connected }) => {
                                                                     nfts.map((e, j) => {
                                                                         if (nftCounter[i] === 0) {
                                                                             return (
-                                                                                <Tr>
+                                                                                <Tr key={j}>
                                                                                     <Td>No Nfts</Td>
                                                                                 </Tr>
                                                                             );

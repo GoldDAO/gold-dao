@@ -23,7 +23,6 @@ const useSwapHistory = (page, limit, id) => {
 		const fetchHistory = async () => {
 			await queryHistory(gldtCoreActor, principal, page, limit)
 				.then((result) => {
-					console.log('result', result);
 					setHistory(result);
 					setIsloading(false);
 				})
