@@ -58,29 +58,55 @@ import Image from 'next/image';
 import Arrow from '/public/images/arrow.svg';
 import { gldNftCanisters } from '@utils/agents';
 import { cardPadding } from '@ui/theme';
+import { useDialog } from '@connect2ic/react';
 
 const SwapInterface = () => {
     const { isConnected } = useConnect();
+    const { open, isOpen } = useDialog();
+
+    const Overlay = () => {
+        return (
+            <Box
+                cursor={'pointer'}
+                onClick={open}
+                sx={{
+                    width: '100vw',
+                    height: '100vh',
+                    position: 'absolute',
+                    top: 0,
+                    color: 'transparent',
+                    left: 0,
+                    display: isConnected ? 'none' : 'block',
+                    zIndex: isOpen ? -1 : 100,
+                }}
+            ></Box>
+        );
+    };
+
     return (
-        <Card
-            mt="20px"
-            gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-            p={cardPadding.xl}
-            position={'relative'}
-            shadow={['md', 'lg']}
-            bg="bg"
-            mx={['10px', '20px', 0, 0, 0]}
-            display="grid"
-            justifyContent={'center'}
-            gridTemplateRows={'repeat(1, 1fr)'}
-            gridTemplateColumns={'repeat(1, 1fr)'}
-            gap="3"
-            borderRadius={'2xl'}
-        >
-            <Input isConnected={isConnected} />
-            <Output isConnected={isConnected} />
-            <SwapButton isConnected={isConnected} />
-        </Card>
+        <>
+            <Overlay />
+            <Card
+                mt="20px"
+                gridColumn={['1/13', '1/13', '2/12', '3/11', '4/10']}
+                p={cardPadding.xl}
+                position={'relative'}
+                shadow={['md', 'lg']}
+                bg="bg"
+                mx={['10px', '20px', 0, 0, 0]}
+                display="grid"
+                justifyContent={'center'}
+                x
+                gridTemplateRows={'repeat(1, 1fr)'}
+                gridTemplateColumns={'repeat(1, 1fr)'}
+                gap="3"
+                borderRadius={'2xl'}
+            >
+                <Input isConnected={isConnected} />
+                <Output isConnected={isConnected} />
+                <SwapButton isConnected={isConnected} />
+            </Card>
+        </>
     );
 };
 
@@ -142,7 +168,7 @@ const Input = ({ isConnected }) => {
             w={'100%'}
             p={cardPadding.xl}
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
-            gap={[3]}
+            gap={[2]}
         >
             <MyNfts isConnected={isConnected} />
             <SelectedNfts isConnected={isConnected} />
@@ -161,7 +187,7 @@ const Output = ({ isConnected }) => {
             shadow={'none'}
             p={cardPadding.xl}
             sx={{ gridTemplateRows: 'repeat(1, 1fr)' }}
-            gap={[3]}
+            gap={[2]}
         >
             <OutputOverview isConnected={isConnected} />
             <OutputDetails isConnected={isConnected} />
@@ -199,7 +225,13 @@ const OutputOverview = ({ isConnected }) => {
     const [weight] = useAtom(getTotalCartWeightAtom);
     const minted = weight * 100;
     return (
-        <Card shadow="none" border="1px" borderColor="border">
+        <Card
+            shadow="none"
+            border="1px"
+            borderColor="border"
+            borderEndStartRadius={0}
+            borderEndEndRadius={0}
+        >
             <CardBody>
                 <HStack justifyContent="space-between">
                     <Box color={isConnected ? 'black' : 'secondaryText'}>You will receive</Box>
@@ -222,22 +254,16 @@ const OutputDetails = ({ isConnected }) => {
                     bg="bg"
                     border="1px"
                     borderColor="border"
-                    borderStartEndRadius={'md'}
-                    borderStartStartRadius={'md'}
+                    borderRadius={'md'}
+                    borderStartStartRadius={0}
+                    borderStartEndRadius={0}
                     disabled="flex"
                     justifyContent={'space-between'}
                 >
                     <Text>Transaction Details</Text>
                     <AccordionIcon />
                 </AccordionButton>
-                <AccordionPanel
-                    bg="bg"
-                    borderEndEndRadius={'md'}
-                    borderEndStartRadius={'md'}
-                    border={'1px'}
-                    borderColor={'border'}
-                    borderTop={0}
-                >
+                <AccordionPanel bg="bg" border={'1px'} borderColor={'border'} borderTop={0}>
                     <TransactionDetailsTable />
                 </AccordionPanel>
             </AccordionItem>
@@ -401,7 +427,7 @@ const MyNftsPanel = ({ setIsloading }) => {
             border={'1px'}
             borderColor={'border'}
             borderTop={0}
-            p={{ base: '10px', md: '20px' }}
+            p={{ base: '10px', md: '10px' }}
             gap="2"
             display="grid"
             gridTemplateColumns={'repeat(2,1fr)'}
@@ -417,8 +443,7 @@ const MyNftsPanel = ({ setIsloading }) => {
                                 <CardHeader
                                     display={'flex'}
                                     justifyContent={'space-between'}
-                                    p={{ base: '10px', md: '20px' }}
-                                    pb="0px"
+                                    p={'10px'}
                                     color={'secondaryText'}
                                 >
                                     <Stack
@@ -426,7 +451,9 @@ const MyNftsPanel = ({ setIsloading }) => {
                                         justifyContent={{ base: 'flex-start', md: 'space-between' }}
                                         direction={{ base: 'column', md: 'row' }}
                                     >
-                                        <Text>GLD NFTs {Object.keys(gldNftCanisters)[i]}</Text>
+                                        <Text fontWeight={500} fontSize={'sm'} color="black">
+                                            GLD NFTs {Object.keys(gldNftCanisters)[i]}
+                                        </Text>
                                         <Button
                                             onClick={() =>
                                                 isAllSelected[i]
@@ -445,7 +472,7 @@ const MyNftsPanel = ({ setIsloading }) => {
                                         </Button>
                                     </Stack>
                                 </CardHeader>
-                                <CardBody p={{ base: '10px', md: '20px' }}>
+                                <CardBody p={'10px'} pt="0">
                                     {isLoading ? (
                                         <SkeletonToken />
                                     ) : (
@@ -475,7 +502,13 @@ const SelectedNfts = ({ isConnected }) => {
     const [cart] = useAtom(getCartAtom);
     const [weight] = useAtom(getTotalCartWeightAtom);
     return (
-        <Card shadow="none" border="1px" borderColor="border">
+        <Card
+            shadow="none"
+            border="1px"
+            borderColor="border"
+            borderTopStartRadius={0}
+            borderStartEndRadius={0}
+        >
             <HStack justifyContent={'space-between'}>
                 <CardHeader color={isConnected ? 'black' : 'secondaryText'}>Selected</CardHeader>
                 <CardBody textAlign="right" color={'secondaryText'}>

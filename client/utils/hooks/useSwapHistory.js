@@ -6,7 +6,7 @@ const queryHistory = async (actor, principal, page, limit) => {
 	const history = await Promise.resolve(
 		actor[0].get_historical_swaps_by_user({
 			page: [page],
-			limit: [limit],
+			limit:  limit ? [limit] : [],
 			account: [{ owner: Principal.fromText(principal), subaccount: [] }],
 		}),
 	);
