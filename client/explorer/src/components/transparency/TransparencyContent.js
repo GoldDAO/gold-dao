@@ -10,7 +10,8 @@ const TransparencyContent = () => {
     const actors = useAllCanisters();
     const { nfts, isLoading } = useNft(actors, 'm45be-jaaaa-aaaak-qcgnq-cai');
     const totalSupply = useTotalSupply();
-    const totalWeightSwapped = (totalSupply / 100).toFixed(2);
+
+    const totalWeightSwapped = (totalSupply.gldt / 100).toFixed(2);
 
     const getTotalWeight = (nfts, w) =>
         nfts.reduce((ac, e) => {
@@ -51,7 +52,7 @@ const TransparencyContent = () => {
                 <HStack>
                     <Card w={'50%'}>
                         <HStack>
-                            <Text>{totalSupply}</Text>
+                            <Text>{totalSupply.gldt}</Text>
                             <TokenSign />
                         </HStack>
                     </Card>

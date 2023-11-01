@@ -1,10 +1,10 @@
-import { buf2hex } from '@/utils/buf2hex';
+import { buf2hex } from '@utils/misc/buf2hex';
 import { Card, Table, Tbody, Td, Thead, Tr } from '@chakra-ui/react';
 import Timestamp from '@ui/tooltip/timeStamp';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import PrincipalFormat from '../Principal';
+import PrincipalFormat from '@ui/principal/Principal';
 import { Principal } from '@dfinity/principal';
 
 const TransactionContent = ({ id }) => {

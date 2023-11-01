@@ -1,4 +1,4 @@
-import { gldNftCanisters } from '@/services/agents';
+import { gldNftCanisters } from '@utils/agents';
 import { Principal } from '@dfinity/principal';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';

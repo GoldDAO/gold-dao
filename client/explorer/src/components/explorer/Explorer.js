@@ -1,14 +1,7 @@
 import {
-    Box,
     Button,
-    Card,
     Flex,
-    FormLabel,
-    HStack,
     Heading,
-    Input,
-    InputGroup,
-    InputRightElement,
     Table,
     TableContainer,
     Tbody,
@@ -18,16 +11,13 @@ import {
     Tr,
     VStack,
 } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import { useGldtLedgerTransactions } from '@utils/hooks/useGLDT';
+import React, { useState } from 'react';
 import Timestamp from '@ui/tooltip/timeStamp';
 import { Principal } from '@dfinity/principal';
 import { ArrowBackIcon, ArrowForwardIcon, Search2Icon } from '@chakra-ui/icons';
 import Link from 'next/link';
-import PrincipalFormat from '../Principal';
+import PrincipalFormat from '@ui/principal/Principal';
 import TokenSign from '@ui/gldt/TokenSign';
-import Grid from '../Grid';
-import { useCanister } from '@connect2ic/react';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import { formatAmount } from '@utils/misc/format';
 

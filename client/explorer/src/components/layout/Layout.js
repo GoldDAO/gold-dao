@@ -1,7 +1,7 @@
 import React from 'react';
-import Grid from './Grid';
-import { Box, Container } from '@chakra-ui/react';
-import Header from './header/Header';
+import Grid from '@ui/layout/Grid';
+import { Box } from '@chakra-ui/react';
+import Header from './Header';
 
 const Layout = ({ children }) => {
     return (
