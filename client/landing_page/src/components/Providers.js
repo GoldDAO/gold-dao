@@ -2,16 +2,15 @@ import { createClient } from '@connect2ic/core';
 import { Connect2ICProvider } from '@connect2ic/react';
 import { SafeHydrate } from '@utils/SafeHydrate';
 import '@connect2ic/core/style.css';
-import { ChakraProvider } from '@chakra-ui/react';
-import { gldNftCanisters, gldtLedgerCanister } from './../../../utils/agents';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { gldtLedgerCanister } from './../../../utils/agents';
+import { customTheme } from '@ui/theme';
 
 const Providers = ({ children }) => {
     const whitelist = [gldtLedgerCanister.canisterId];
     const canisters = {
         gldtLedgerCanister,
     };
-
-    console.log('canisters', canisters);
 
     let client = createClient({
         canisters,
@@ -22,9 +21,12 @@ const Providers = ({ children }) => {
             whitelist,
         },
     });
+    const theme = extendTheme({
+        ...customTheme,
+    });
 
     return (
-        <ChakraProvider>
+        <ChakraProvider theme={theme}>
             <Connect2ICProvider client={client}>
                 <SafeHydrate>{children}</SafeHydrate>
             </Connect2ICProvider>
