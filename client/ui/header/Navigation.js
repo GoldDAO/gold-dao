@@ -21,13 +21,13 @@ import Image from 'next/image';
 import { useConnect } from '@connect2ic/react';
 import React from 'react';
 
-export default function WithSubnavigation({nav, children}) {
+export default function WithSubnavigation({nav, children, noConnection}) {
 	const { isOpen, onToggle } = useDisclosure();
 	const { isConnected, principal } = useConnect();
 
 	return (
 		<Box mt="15px">
-			<Flex minH={'60px'} py={{ base: 2 }} px={{ base: 4 }} align={'center'}>
+			<Flex align={'center'}>
 				<Flex
 					flex={{ base: 1, md: 'auto' }}
 					ml={{ base: -2 }}

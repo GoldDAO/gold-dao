@@ -53,8 +53,8 @@ function Home() {
                     textSpan={[12, 12, 4, 5]}
                     titleSpan={[12, 12, 3, 2]}
                     titleOrder={2}
-                    colStart={[1, 1, 4, 4]}
-                    colEnd={[12, 12, 11, 11]}
+                    colStart={[1, 1, 5, 5]}
+                    colEnd={[12, 12, 12, 12]}
                     textOrder={[2, 2, 2, 2]}
                     titleAlign="right"
                 />

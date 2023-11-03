@@ -1,4 +1,4 @@
-import { Box, Divider, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
+import { Box, Button, Divider, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
 import React from 'react';
 import GridSystem from '../layout/Grid';
 
@@ -20,17 +20,26 @@ const Banner = () => {
                     <GridItem colSpan={2} alignSelf={'center'} colStart={[2]}>
                         <Divider orientation="horizontal" borderColor={'black'} />
                     </GridItem>
-                    <GridItem colSpan={2} alignSelf={'center'}>
-                        <Text w={'100%'} fontSize={'24px'}>
-                            Learn how
-                            <Box as="span" color="gold">
-                                <strong style={{ color: 'inherit' }}>&nbsp;GLDT&nbsp;</strong>
-                            </Box>
-                            works
-                        </Text>
+                    <GridItem colSpan={3} alignSelf={'center'}>
+                        <HStack fontSize={'20px'}>
+                            <Text width={'fit-content'} fontSize={'20px'}>
+                                Learn&nbsp;how
+                            </Text>
+                            <Text fontSize={'20px'} as="span" color="gold" w={'fit-content'}>
+                                <strong style={{ color: 'inherit' }}>GLDT</strong>
+                            </Text>
+                            <Text fontSize={'20px'}>works</Text>
+                            <Divider
+                                orientation="horizontal"
+                                borderColor={'black'}
+                                width={'150px'}
+                            />
+                        </HStack>
                     </GridItem>
-                    <GridItem colSpan={1} alignSelf={'center'}>
-                        <Divider orientation="horizontal" borderColor={'black'} />
+                    <GridItem colSpan={2}>
+                        <Button variant="yumi" w={'100%'}>
+                            Play Video
+                        </Button>
                     </GridItem>
                 </GridSystem>
             </GridItem>

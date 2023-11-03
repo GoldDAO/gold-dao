@@ -13,6 +13,7 @@ import {
     useDisclosure,
     HStack,
     Button,
+    GridItem,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
@@ -102,7 +103,9 @@ const DesktopNav = ({ nav, children }) => {
                 </Box>
             ))}
             {children}
-            <Button> Swap</Button>
+            <Button width={'150px'} variant={'yumiInverted'}>
+                Swap
+            </Button>
         </Stack>
     );
 };

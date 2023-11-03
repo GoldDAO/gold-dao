@@ -25,6 +25,31 @@ export const customTheme = {
 				padding: '10px 15px',
 			},
 		},
+		Heading: {
+			variants: {
+				h4: {
+					fontSize: '20px',
+					lineHeight: '26px',
+					fontWeight: 500,
+				},
+				h1: {
+					fontSize: '56px',
+					fontWeight: 500,
+					color: 'gold',
+				},
+				h2: {
+					fontSize: '56px',
+					fontWeight: 400,
+				}
+			}
+		},
+		Text: {
+			baseStyle: {
+				fontSize: '20px',
+				lineheight: '26px',
+				fontWeight: 400,
+			}
+		},
 		Alert: {
 			baseStyle: {
 				container: {
@@ -45,6 +70,26 @@ export const customTheme = {
 				},
 			},
 		},
+		Button: {
+			variants: {
+				yumi: {
+					bg: 'black',
+					color: 'white',
+					borderRadius: '50px',
+					fontSize: '18px',
+					fontWeight: 400,
+				},
+				yumiInverted: {
+					bg: 'white',
+					borderColor: 'black',
+					border: '1px',
+					color: 'black',
+					borderRadius: '50px',
+					fontSize: '18px',
+					fontWeight: 400,
+				}
+			}
+		}
 	},
 };
 

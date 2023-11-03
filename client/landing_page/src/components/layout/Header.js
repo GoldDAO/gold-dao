@@ -23,7 +23,7 @@ const Header = () => {
                         <Image src={Logo} width={50} height={50} alt="gldt-token-logo" />
                     </Link>
                 </GridItem>
-                <GridItem colSpan={8} display={'grid'} alignContent={'center'}>
+                <GridItem colSpan={9} display={'grid'} alignContent={'center'}>
                     <WithSubnavigation nav={nav} />
                 </GridItem>
             </GridSystem>

@@ -20,6 +20,9 @@ const Layout = ({ children, meta }) => {
                 <meta name="theme-color" content="#ffffff" />
             </Head>
             <VStack
+                maxW={'1540px'}
+                px={['20px', '40px']}
+                margin={'0 auto'}
                 w={'100%'}
                 alignItems={'flex-start'}
                 spacing={['40px', '60px', '100px', '100px']}
