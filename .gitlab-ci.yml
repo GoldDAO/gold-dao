@@ -182,7 +182,7 @@ landing_page test build:
   needs: ["generate test declarations"]
   <<: *node_template
   script:
-    - npm run build:landing_page
+    - npm run build:landing
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
     paths:
@@ -353,7 +353,7 @@ landing_page production build:
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   script:
-    - npm run build:landing_page
+    - npm run build:landing
     - PRODUCTION_URL=https://$(jq -r '."gldt_landing_page".ic' canister_ids.json).icp0.io
     - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
   artifacts:
