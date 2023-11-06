@@ -1,6 +1,5 @@
 import { Box, Grid, GridItem, Text, VStack } from '@chakra-ui/react';
 import React from 'react';
-import Nav from '../navigation/Nav';
 import Head from 'next/head';
 import Link from 'next/link';
 import Header from './Header';
@@ -20,8 +19,8 @@ const Layout = ({ children, meta }) => {
                 <meta name="theme-color" content="#ffffff" />
             </Head>
             <VStack
-                maxW={'1540px'}
-                px={['20px', '40px']}
+                // maxW={'1540px'}
+                px={['20px', '20px', '40px']}
                 margin={'0 auto'}
                 w={'100%'}
                 alignItems={'flex-start'}
@@ -31,10 +30,8 @@ const Layout = ({ children, meta }) => {
                 {children}
                 <Box as="footer" fontSize={'16px'} w={'100%'} pb="40px">
                     <GridSystem>
-                        <GridItem colStart={2} colSpan={2}>
-                            <Text fontStyle="italic" fontSize={'̈́18px'}>
-                                © 2023 GOLD DAO
-                            </Text>
+                        <GridItem colStart={0} colSpan={10}>
+                            <Text fontSize={'12px'}>© 2023 GOLD DAO</Text>
                         </GridItem>
                     </GridSystem>
                 </Box>

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { customTheme } from '@ui/theme';
 
-const inter = Inter({ subsets: ['latin'], weight: 'variable' });
+export const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500'] });
 
 export default function MyApp({ Component, pageProps }) {
     const Providers = dynamic(() => import('@/components/Providers'), {

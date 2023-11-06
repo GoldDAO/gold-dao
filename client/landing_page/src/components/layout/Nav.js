@@ -4,6 +4,7 @@ import {
     Text,
     IconButton,
     Stack,
+    VStack,
     Collapse,
     Icon,
     Popover,
@@ -29,8 +30,8 @@ export default function WithSubnavigation({ nav, children }) {
             <Flex align={'center'}>
                 <Flex
                     flex={{ base: 1, md: 'auto' }}
-                    ml={{ base: -2 }}
                     display={{ base: 'flex', md: 'none' }}
+                    justify={'flex-start'}
                 >
                     <IconButton
                         onClick={onToggle}
@@ -42,7 +43,11 @@ export default function WithSubnavigation({ nav, children }) {
                         }}
                     />
                 </Flex>
-                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
+                <Flex
+                    display={{ base: 'none', md: 'flex' }}
+                    flex={{ base: 1 }}
+                    justify={{ base: 'center', md: 'start' }}
+                >
                     <Flex
                         display={{ base: 'none', md: 'flex' }}
                         justifyContent={'space-between'}
@@ -52,7 +57,6 @@ export default function WithSubnavigation({ nav, children }) {
                     </Flex>
                 </Flex>
             </Flex>
-
             <Collapse in={isOpen} animateOpacity>
                 <MobileNav nav={nav}>{children}</MobileNav>
             </Collapse>
@@ -66,7 +70,13 @@ const DesktopNav = ({ nav, children }) => {
     const popoverContentBgColor = useColorModeValue('white', 'gray.800');
 
     return (
-        <Stack direction={'row'} alignItems={'center'} w={'100%'} justifyContent={'space-between'}>
+        <Stack
+            direction={'row'}
+            alignItems={'center'}
+            w={'100%'}
+            justifyContent={'space-between'}
+            className="asf"
+        >
             {nav.map((navItem) => (
                 <Box key={navItem.label}>
                     <Popover trigger={'hover'} placement={'bottom-start'}>
@@ -103,7 +113,7 @@ const DesktopNav = ({ nav, children }) => {
                 </Box>
             ))}
             {children}
-            <Button width={'150px'} variant={'yumiInverted'}>
+            <Button width={'150px'} variant={'yumiGold'}>
                 Swap
             </Button>
         </Stack>
@@ -151,15 +161,18 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 
 const MobileNav = ({ nav, children }) => {
     return (
-        <HStack p={4} display={{ base: 'flex', md: 'none' }} justifyContent={'space-between'}>
-            <Box>
+        <VStack p={4} display={{ base: 'flex', md: 'none' }} justifyContent={'flex-start'}>
+            <Box width={'100%'}>
                 {nav.map((navItem) => (
                     <MobileNavItem key={navItem.label} {...navItem} />
                 ))}
             </Box>
             {children}
-            <Button> Swap</Button>
-        </HStack>
+            <Button variant={'yumiGold'} width={'100%'}>
+                {' '}
+                Swap
+            </Button>
+        </VStack>
     );
 };
 
