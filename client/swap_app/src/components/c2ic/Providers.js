@@ -2,10 +2,10 @@ import { createClient } from '@connect2ic/core';
 import { Connect2ICProvider } from '@connect2ic/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
 import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/providers';
-import { SafeHydrate } from '@/utils/SafeHydrate';
+import { SafeHydrate } from '@utils/SafeHydrate';
 import '@connect2ic/core/style.css';
-import { ChakraProvider, extendBaseTheme, extendTheme } from '@chakra-ui/react';
-import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@/services/agents/';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { gldNftCanisters, gldtLedgerCanister, gldtCoreCanister } from '@utils/agents/';
 import { customTheme } from './../../../../ui/theme';
 
 const myStore = createStore();
