@@ -82,6 +82,7 @@ thread_local! {
     static MANAGERS: RefCell<Vec<Principal>> = RefCell::default();
     static FALLBACK_TIMER_ID: RefCell<TimerId> = RefCell::default();
     static LAST_NOTIFY_CALL_TIMESTAMP: RefCell<u64> = RefCell::default();
+    static COMPENSATION_FACTOR: RefCell<u64> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -154,6 +155,10 @@ fn init(conf: Option<Conf>) {
     MANAGERS.with(|cell| {
         *cell.borrow_mut() = vec![api::caller()];
     });
+
+    COMPENSATION_FACTOR.with(|cell| {
+        *cell.borrow_mut() = 1;
+    });
 }
 
 #[query]
@@ -167,6 +172,29 @@ fn set_gld_nft_conf(gld_nft_conf: Vec<GldNftConf>) -> Result<(), CustomError> {
     CONF.with(|cell| {
         let mut conf = cell.borrow_mut();
         conf.gld_nft_canister_conf = gld_nft_conf;
+    });
+    Ok(())
+}
+
+#[query]
+fn get_compensation_factor() -> u64 {
+    COMPENSATION_FACTOR.with(|cell| cell.borrow().clone())
+}
+
+#[update]
+fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomError> {
+    validate_caller()?;
+    if new_compensation_factor > 100 {
+        return Err(
+            CustomError::new_with_message(
+                ErrorType::Other,
+                "Compensation factor value has to be between 0 and 100".to_string()
+            )
+        );
+    }
+
+    COMPENSATION_FACTOR.with(|cell| {
+        *cell.borrow_mut() = new_compensation_factor;
     });
     Ok(())
 }
@@ -292,11 +320,13 @@ fn cronjob_master() -> Result<(), CustomError> {
 }
 
 fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
+    let compensation_factor = COMPENSATION_FACTOR.with(|cell| cell.borrow().clone());
+
     // The user should in the end have the sale_price + GLDT_TX_FEE on his balance.
     // There are three royalties and one intermediate transaction that need to be considered.
     // The fees are in total 1% which are fully compensated.
     // Therefore, the equation is: (sale_price - GLDT_TX_FEE) / 100 + 3 * GLDT_TX_FEE
-    (sale_price - GLDT_TX_FEE) / 100 + 3 * GLDT_TX_FEE
+    ((sale_price - GLDT_TX_FEE) * compensation_factor) / 100 + 3 * GLDT_TX_FEE
 }
 
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
