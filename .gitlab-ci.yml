@@ -563,7 +563,7 @@ gldt core:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: $PEM_FILE_PRODUCTION
-  needs: ["gldt_fee_compensation canister build"]
+  needs: ["gldt_fee_compensation canister build", "gldt core"]
   before_script:
     - *import_dfx_id
   script:
