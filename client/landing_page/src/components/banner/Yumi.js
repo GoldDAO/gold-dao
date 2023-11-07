@@ -45,7 +45,7 @@ const Yumi = () => {
                             right={['-20px', '-20px', '-20px', 0, 0]}
                             mixBlendMode="multiply"
                         >
-                            <Image src={Logo} />
+                            <Image src={Logo} alt="Gold 3D Yumi Logo" />
                         </Box>
                     </GridItem>
                     <GridItem

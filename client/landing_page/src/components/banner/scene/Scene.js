@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Canvas } from 'react-three-fiber';
+import { Canvas } from '@react-three/fiber';
 import Model from './Model';
 import { Box } from '@chakra-ui/react';
 import {

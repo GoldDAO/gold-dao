@@ -10,14 +10,14 @@ import dynamic from 'next/dynamic';
 import Yumi from '@/components/banner/Yumi';
 
 function Home() {
+    const { intro, partners, tech, price } = content;
     const meta = {
-        title: 'GLDT Swap landing page',
-        description: 'GLDT Swap landing page Description',
+        title: 'GLDT - Home',
+        description: intro,
     };
     const Stats = dynamic(() => import('@/components/stats/Stats'), {
         ssr: false,
     });
-    const { intro, partners, tech, price } = content;
     return (
         <Layout meta={meta}>
             <VStack

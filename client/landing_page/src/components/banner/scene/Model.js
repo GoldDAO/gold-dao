@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useTexture, useGLTF, SpotLight } from '@react-three/drei';
-import { useFrame, useThree } from 'react-three-fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { FlakesTexture } from 'three-stdlib';
 
 const Model = () => {

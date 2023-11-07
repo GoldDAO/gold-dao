@@ -9,29 +9,13 @@ import FaqSection from '@/components/FAQ/FaqSection';
 
 const FAQ = () => {
     const meta = {
-        title: 'GLDT Swap FAQ',
-        description: 'GLDT Swap FAQ Description',
+        title: 'GLDT - FAQ',
+        description: 'Frequently Asked Question about GLDT',
     };
 
     return (
         <Layout meta={meta}>
             <FaqSection full={true} />
-            {/* <GridSystem>
-                <GridItem colStart={[1, 1, 1, 2]} colEnd={[12, 12, 12, 7]}>
-                    <Box>
-                        <Heading as="h1" variant="h2">
-                            Frequently Asked Question
-                        </Heading>
-                    </Box>
-                </GridItem>
-                <GridItem colStart={[1, 1, 1, 4]} colEnd={[12, 12, 12, 12]}>
-                    <Accordion allowToggle>
-                        {Q.map((e, i) => (
-                            <Question key={i} q={e.q} r={e.r} />
-                        ))}
-                    </Accordion>
-                </GridItem>
-            </GridSystem> */}
         </Layout>
     );
 };
