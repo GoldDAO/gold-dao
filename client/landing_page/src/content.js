@@ -13,10 +13,10 @@ export const content = {
     },
     partners: [
         {
-            name: 'dfinity',
-            url: 'https://dfinity.org/',
-            img: dfinity,
-            w: '60px',
+            name: 'METALOR',
+            url: 'https://metalor.com/',
+            img: metalor,
+            w: '90px',
         },
         {
             name: 'origyn',
@@ -25,23 +25,25 @@ export const content = {
             w: '100px',
         },
         {
-            name: 'METALOR',
-            url: 'https://metalor.com/',
-            img: metalor,
-            w: '90px',
-        },
-        {
             name: 'KPMG',
             url: 'https://kpmg.com/',
             img: KPMG,
             w: '80px',
         },
+
         {
             name: 'loomis',
             url: 'https://www.loomis.ch',
             img: loomis,
             w: '65px',
         },
+        {
+            name: 'dfinity',
+            url: 'https://dfinity.org/',
+            img: dfinity,
+            w: '60px',
+        },
+
         {
             name: 'BAS',
             url: '#',
