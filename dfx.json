@@ -33,6 +33,21 @@
       },
       "build": ["npm run build:back"]
     },
+    "gldt_fee_compensation": {
+      "package": "gldt_fee_compensation",
+      "type": "custom",
+      "candid": "canister/gldt_fee_compensation/src/gldt_fee_compensation.did",
+      "wasm": "canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_fee_compensation/declarations"
+      },
+      "build": [
+        "./scripts/build-canister.sh gldt_fee_compensation",
+        "./scripts/generate-did.sh gldt_fee_compensation"
+      ]
+    },
     "gldt_swap_app": {
       "type": "assets",
       "source": ["swap_app/out"],

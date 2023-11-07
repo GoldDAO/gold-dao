@@ -1,0 +1,20 @@
+[package]
+name = "gldt_libs"
+version = "0.1.0"
+description = "Common libs for the GLDT project that are shared between canisters."
+authors = ["Dustin Becker <dustin@bochslerfinance.com>"]
+edition = "2021"
+
+[dependencies]
+candid = { version = "0.9.9"}
+ic-cdk = "0.11.0"
+ic-cdk-macros = "0.8.1"
+icrc-ledger-types = "0.1.2"
+serde = "1.0.188"
+serde_derive = "1.0.188"
+serde_bytes = "0.11.12"
+canistergeek_ic_rust = "0.4.2"
+
+[dev-dependencies]
+clippy="0.0.302"
+tokio = { version = "1.33.0", features = ["full"] }
