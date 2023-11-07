@@ -157,7 +157,7 @@ fn init(conf: Option<Conf>) {
     });
 
     COMPENSATION_FACTOR.with(|cell| {
-        *cell.borrow_mut() = 1;
+        *cell.borrow_mut() = 10;
     });
 }
 
@@ -184,7 +184,7 @@ fn get_compensation_factor() -> u64 {
 #[update]
 fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomError> {
     validate_caller()?;
-    if new_compensation_factor > 100 {
+    if new_compensation_factor > 1000 {
         return Err(
             CustomError::new_with_message(
                 ErrorType::Other,
@@ -326,7 +326,7 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
     // There are three royalties and one intermediate transaction that need to be considered.
     // The fees are in total 1% which are fully compensated.
     // Therefore, the equation is: (sale_price - GLDT_TX_FEE) / 100 + 3 * GLDT_TX_FEE
-    ((sale_price - GLDT_TX_FEE) * compensation_factor) / 100 + 3 * GLDT_TX_FEE
+    ((sale_price - GLDT_TX_FEE) * compensation_factor) / 1000 + 3 * GLDT_TX_FEE
 }
 
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
