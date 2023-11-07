@@ -18,7 +18,7 @@ const Yumi = () => {
             maxWidth="1540px"
         >
             <Fade>
-                <GridSystem>
+                <GridSystem gap={[4, 4, 6, 6, 8]}>
                     <GridItem
                         colStart={[2, 4, 4, 2, 2]}
                         colSpan={[10, 6, 6, 2, 2]}

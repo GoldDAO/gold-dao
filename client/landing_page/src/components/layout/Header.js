@@ -18,8 +18,6 @@ const Header = () => {
     ];
     const [scrollPosition, setScrollPosition] = useState(0);
 
-    console.log('scrollPosition', scrollPosition);
-
     const handleScroll = () => {
         setScrollPosition(window.scrollY);
     };
@@ -44,7 +42,11 @@ const Header = () => {
                 top="0"
                 borderBottom={'1px'}
                 pb="20px"
-                borderColor={scrollPosition > 100 ? 'gold' : 'transparent'}
+                borderColor={[
+                    'lightGold',
+                    'lightGold',
+                    scrollPosition > 100 ? 'lightGold' : 'transparent',
+                ]}
                 transition={'all .4s'}
             >
                 <GridSystem>

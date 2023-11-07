@@ -8,7 +8,9 @@ const Stats = () => {
     const stats = [
         {
             label: 'USD Market Cap ',
-            value: `${(new Number(totalSupply.gldt) * 100).toLocaleString('en-US')} $`,
+            value: totalSupply.gldt
+                ? `${(new Number(totalSupply.gldt) * 100).toLocaleString('en-US')} $`
+                : '-',
         },
         {
             label: 'Gold Bars',
@@ -16,7 +18,7 @@ const Stats = () => {
         },
         {
             label: 'Gold Kilograms',
-            value: `${(totalSupply.g / 100).toLocaleString('en-US')} g`,
+            value: totalSupply.g ? `${(totalSupply.g / 100).toLocaleString('en-US')} g` : '-',
         },
     ];
     return (

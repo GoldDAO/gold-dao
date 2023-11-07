@@ -29,7 +29,6 @@ const Partners = () => {
                             href={e.url}
                             key={i}
                             colSpan={[6, 6, 4, 2]}
-                            grid
                             alignSelf={'center'}
                             target={'_blank'}
                             border="1px"
