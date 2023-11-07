@@ -1,4 +1,9 @@
+import { inter } from 'pages/_app';
+
 export const customTheme = {
+	fonts: {
+		inter: inter.style.fontFamily
+	},
 	colors: {
 		transparent: 'transparent',
 		black: '#000',
@@ -31,15 +36,18 @@ export const customTheme = {
 					fontSize: '20px',
 					lineHeight: '26px',
 					fontWeight: 500,
+					fontFamily: inter.style.fontFamily ,
 				},
 				h1: {
-					fontSize: '56px',
+					fontSize: ['42px' ,'56px', '56px'],
 					fontWeight: 500,
 					color: 'gold',
+					fontFamily: inter.style.fontFamily ,
 				},
 				h2: {
-					fontSize: '56px',
-					fontWeight: 400,
+					fontSize: ['42px' ,'56px', '56px'],
+					fontWeight: 500,
+					fontFamily: inter.style.fontFamily ,
 				}
 			}
 		},
@@ -78,15 +86,21 @@ export const customTheme = {
 					borderRadius: '50px',
 					fontSize: '18px',
 					fontWeight: 400,
+					_hover: {
+						transform: 'scale(1.1)'
+					}
 				},
-				yumiInverted: {
-					bg: 'white',
-					borderColor: 'black',
-					border: '1px',
-					color: 'black',
+				yumiGold: {
+					bg: 'gold',
+					border: 'none',
+					outline: 'none',
+					color: 'white',
 					borderRadius: '50px',
 					fontSize: '18px',
-					fontWeight: 400,
+					fontWeight: 500,
+					_hover: {
+						transform: 'scale(1.1)'
+					}
 				}
 			}
 		}
