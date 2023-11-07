@@ -1,4 +1,9 @@
+import { inter } from 'pages/_app';
+
 export const customTheme = {
+	fonts: {
+		inter: inter.style.fontFamily
+	},
 	colors: {
 		transparent: 'transparent',
 		black: '#000',
@@ -25,6 +30,34 @@ export const customTheme = {
 				padding: '10px 15px',
 			},
 		},
+		Heading: {
+			variants: {
+				h4: {
+					fontSize: '20px',
+					lineHeight: '26px',
+					fontWeight: 500,
+					fontFamily: inter.style.fontFamily ,
+				},
+				h1: {
+					fontSize: ['42px' ,'56px', '56px'],
+					fontWeight: 500,
+					color: 'gold',
+					fontFamily: inter.style.fontFamily ,
+				},
+				h2: {
+					fontSize: ['42px' ,'56px', '56px'],
+					fontWeight: 500,
+					fontFamily: inter.style.fontFamily ,
+				}
+			}
+		},
+		Text: {
+			baseStyle: {
+				fontSize: '20px',
+				lineheight: '26px',
+				fontWeight: 400,
+			}
+		},
 		Alert: {
 			baseStyle: {
 				container: {
@@ -45,6 +78,32 @@ export const customTheme = {
 				},
 			},
 		},
+		Button: {
+			variants: {
+				yumi: {
+					bg: 'black',
+					color: 'white',
+					borderRadius: '50px',
+					fontSize: '18px',
+					fontWeight: 400,
+					_hover: {
+						transform: 'scale(1.1)'
+					}
+				},
+				yumiGold: {
+					bg: 'gold',
+					border: 'none',
+					outline: 'none',
+					color: 'white',
+					borderRadius: '50px',
+					fontSize: '18px',
+					fontWeight: 500,
+					_hover: {
+						transform: 'scale(1.1)'
+					}
+				}
+			}
+		}
 	},
 };
 
