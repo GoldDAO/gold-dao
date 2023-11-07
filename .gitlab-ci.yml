@@ -428,6 +428,25 @@ local deploy and tests:
     url: $SWAP_APP_URL
     action: start
 
+check canister ids:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      variables:
+        TARGET_NETWORK: staging
+    - if: $CI_COMMIT_TAG =~ '/^(core)|(fee_compensation)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
+      variables:
+        TARGET_NETWORK: ic
+  before_script:
+    - *import_dfx_id
+  script:
+    - scripts/pre-deploy.sh $TARGET_NETWORK
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
+    paths:
+      - canister_ids.json
+    expire_in: 1 hour
+
 swap app staging:
   variables:
     CANISTER_NAME: "swap_app"
@@ -499,16 +518,11 @@ gldt core staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
-  needs: ["gldt_core canister build"]
+  needs: ["gldt_core canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
   script:
     - scripts/deploy-gldt-core.sh $TARGET_NETWORK
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
-    paths:
-      - canister_ids.json
-    expire_in: 1 hour
   environment:
     name: gldt_core
     deployment_tier: production
@@ -522,7 +536,7 @@ gldt core:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: $PEM_FILE_PRODUCTION
-  needs: ["gldt_core canister build"]
+  needs: ["gldt_core canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -545,7 +559,7 @@ gldt core:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
-  needs: ["gldt_fee_compensation canister build", "gldt core staging"]
+  needs: ["gldt_fee_compensation canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -563,7 +577,7 @@ gldt core:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: $PEM_FILE_PRODUCTION
-  needs: ["gldt_fee_compensation canister build", "gldt core"]
+  needs: ["gldt_fee_compensation canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -581,6 +595,7 @@ gldt ledger staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
+  needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -599,6 +614,7 @@ gldt ledger:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: $PEM_FILE_PRODUCTION
+  needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -616,6 +632,7 @@ gldt ledger indexer staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
+  needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
   script:
@@ -634,6 +651,7 @@ gldt ledger indexer:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: $PEM_FILE_STAGING
+  needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
   script:
