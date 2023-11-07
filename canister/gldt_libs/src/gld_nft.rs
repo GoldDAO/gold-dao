@@ -1,3 +1,8 @@
+#![allow(unused_imports)]
+#![allow(non_upper_case_globals)]
+#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
+
 // This is an experimental feature to generate Rust binding from Candid.
 // You may want to manually adjust some of the types.
 use candid::{ self, CandidType, Deserialize, Principal };
@@ -506,7 +511,7 @@ pub struct EscrowReceipt {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct TransactionRecord {
     token_id: String,
-    txn_type: TransactionRecord_txn_type,
+    pub txn_type: TransactionRecord_txn_type,
     timestamp: candid::Int,
     index: candid::Nat,
 }
@@ -931,8 +936,22 @@ pub enum BidResponse_txn_type {
         amount: candid::Nat,
     },
 }
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub enum HistoryResult {
+    ok(Vec<TransactionRecord>),
+    err(OrigynError),
+}
 pub struct Service(pub Principal);
 impl Service {
+    pub async fn history_nft_origyn(
+        &self,
+        arg0: String,
+        arg1: Option<candid::Nat>,
+        arg2: Option<candid::Nat>
+    ) -> Result<(HistoryResult,)> {
+        ic_cdk::call(self.0, "history_nft_origyn", (arg0, arg1, arg2)).await
+    }
     pub async fn sale_nft_origyn(&self, arg0: ManageSaleRequest) -> Result<(ManageSaleResult,)> {
         ic_cdk::call(self.0, "sale_nft_origyn", (arg0,)).await
     }

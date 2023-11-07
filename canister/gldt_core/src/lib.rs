@@ -71,7 +71,7 @@
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
-use ic_cdk::{ api, storage };
+use ic_cdk::{ api::{ self, call::notify }, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
 use icrc_ledger_types::icrc1::{
     account::{ Account, Subaccount },
@@ -81,14 +81,18 @@ use serde::Serialize;
 use std::cell::RefCell;
 use std::hash::Hash;
 
-mod declarations;
-mod misc;
 mod records;
 mod registry;
-mod types;
-mod constants;
 
-use declarations::gld_nft::{
+use gldt_libs::types::{
+    NftId,
+    NftWeight,
+    GldtNumTokens,
+    GldtTokenSpec,
+    calculate_tokens_from_weight,
+};
+
+use gldt_libs::gld_nft::{
     self,
     Account as OrigynAccount,
     AskFeature,
@@ -96,8 +100,6 @@ use declarations::gld_nft::{
     BidResponse_txn_type,
     DepositWithdrawDescription,
     EscrowReceipt,
-    ICTokenSpec,
-    ICTokenSpec_standard,
     ManageSaleRequest,
     ManageSaleResponse,
     ManageSaleResult,
@@ -105,12 +107,9 @@ use declarations::gld_nft::{
     SaleStatusShared,
     SaleStatusShared_sale_type,
     SubAccountInfo,
-    TokenSpec,
 };
-use declarations::icrc1;
+use gldt_libs::gldt_ledger;
 
-use types::{ NftId, NftWeight, GldtNumTokens };
-use constants::*;
 use registry::{
     Registry,
     GldtLedgerInfo,
@@ -133,16 +132,20 @@ pub struct Conf {
     gldt_ledger_canister_id: Principal,
     /// Canister IDs of the Origyn NFT canisters that manages gold NFTs.
     gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
+    /// Canister ID of the fee compensation canister to cover the conversion fees.
+    gldt_fee_compensation_canister_id: Principal,
 }
 
 impl Conf {
     pub fn new(
         gldt_ledger_canister_id: Principal,
-        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>
+        gld_nft_canister_ids: Vec<(Principal, NftCanisterConf)>,
+        gldt_fee_compensation_canister_id: Principal
     ) -> Self {
         Self {
             gldt_ledger_canister_id,
             gld_nft_canister_ids,
+            gldt_fee_compensation_canister_id,
         }
     }
 }
@@ -168,6 +171,7 @@ impl Default for Conf {
         Conf {
             gldt_ledger_canister_id: Principal::anonymous(),
             gld_nft_canister_ids: Vec::new(),
+            gldt_fee_compensation_canister_id: Principal::anonymous(),
         }
     }
 }
@@ -178,38 +182,6 @@ impl Conf {
             .iter()
             .find(|(x, _)| *x == *collection_id)
             .map(|(_, conf)| conf.grams)
-    }
-}
-
-pub struct GldtTokenSpec {
-    id: Option<Nat>,
-    fee: Option<Nat>,
-    decimals: Nat,
-    canister: Principal,
-    standard: ICTokenSpec_standard,
-    symbol: String,
-}
-
-impl GldtTokenSpec {
-    pub fn new(canister_id_ledger: Principal) -> Self {
-        GldtTokenSpec {
-            id: None,
-            fee: Some(Nat::from(GLDT_TX_FEE)),
-            decimals: Nat::from(GLDT_DECIMALS),
-            canister: canister_id_ledger,
-            standard: ICTokenSpec_standard::ICRC1,
-            symbol: String::from("GLDT"),
-        }
-    }
-    pub fn get(&self) -> TokenSpec {
-        TokenSpec::ic(ICTokenSpec {
-            id: self.id.clone(),
-            fee: self.fee.clone(),
-            decimals: self.decimals.clone(),
-            canister: self.canister,
-            standard: self.standard.clone(),
-            symbol: self.symbol.clone(),
-        })
     }
 }
 
@@ -364,10 +336,6 @@ fn nft_info(args: InfoRequest) -> NftInfo {
     })
 }
 
-fn calculate_tokens_from_weight(grams: NftWeight) -> Result<GldtNumTokens, String> {
-    GldtNumTokens::new(Nat::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY))
-}
-
 async fn accept_offer(
     nft_id: NftId,
     gld_nft_canister_id: Principal,
@@ -496,10 +464,10 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
 
     // 100 tokens per gram.
     let tokens_minted = calculate_tokens_from_weight(gld_nft_conf.grams)?;
+
     // validate amount information
     match config {
         PricingConfigShared::ask(Some(features)) => {
-            let mut amount: Nat = Nat::from(0);
             for feature in features {
                 match feature {
                     AskFeature::buy_now(val) => {
@@ -525,10 +493,11 @@ fn validate_inputs(args: SubscriberNotification) -> Result<(NftId, Principal, Sw
                             );
                         }
                     }
+                    AskFeature::kyc(_) => {}
                     ask_feature => {
                         return Err(
                             format!(
-                                "Unexpected feature in asked, only token, notify and buy_now accepted and received AskFeature::{:?}",
+                                "Unexpected feature in asked, only token, notify, kyc and buy_now accepted and received AskFeature::{:?}",
                                 ask_feature
                             )
                         );
@@ -580,7 +549,7 @@ async fn mint_tokens(
         c.borrow().gldt_ledger_canister_id
     });
 
-    let service = icrc1::Service(gldt_ledger_canister_id);
+    let service = gldt_ledger::Service(gldt_ledger_canister_id);
 
     let result: TransferResult = (match service.icrc1_transfer(transfer_args.clone()).await {
         Ok((v,)) => Ok(v),
@@ -619,7 +588,7 @@ async fn withdraw_and_burn_escrow(
     let gldt_ledger_canister_id = CONF.with(|c| -> Principal {
         c.borrow().gldt_ledger_canister_id
     });
-    let service_ledger = icrc1::Service(gldt_ledger_canister_id);
+    let service_ledger = gldt_ledger::Service(gldt_ledger_canister_id);
     let minting_account = (match service_ledger.icrc1_minting_account().await {
         Ok((v,)) => Ok(v),
         Err((code, message)) => {
@@ -901,6 +870,15 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
     })
 }
 
+fn notify_fee_compensation_canister() {
+    log_message("INFO :: notify_fee_compensation_canister :: called".to_string());
+    let canister_id = CONF.with(|c| c.borrow().gldt_fee_compensation_canister_id);
+
+    if let Err(err) = notify(canister_id, "notify_compensation_job", ()) {
+        log_message(format!("ERROR :: notify_fee_compensation_canister :: {:?}", err));
+    }
+}
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct SubscriberNotification {
     escrow_info: SubAccountInfo,
@@ -975,6 +953,8 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         log_message(format!("ERROR :: {}", err));
                         err
                     });
+                    // notify the compensation canister
+                    notify_fee_compensation_canister();
                     let msg = format!("INFO :: accept_offer :: {}", "success");
                     log_message(msg.clone());
                     Ok(msg)

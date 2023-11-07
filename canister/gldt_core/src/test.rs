@@ -1,24 +1,25 @@
-use crate::declarations::gld_nft::{ SubAccountInfo_account, CandyShared };
-
 use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
-use declarations::gld_nft::{
+use gldt_libs::gld_nft::{
     Account as OrigynAccount,
     AskFeature,
     AuctionStateShared,
     PricingConfigShared,
     AuctionStateShared_status,
+    CandyShared,
     ICTokenSpec,
     ICTokenSpec_standard,
     SaleStatusShared,
     SaleStatusShared_sale_type,
     SubAccountInfo,
+    SubAccountInfo_account,
     TokenSpec,
 };
 use serde_bytes::ByteBuf;
-use records::{ GldtRecord };
+use records::GldtRecord;
+use gldt_libs::constants::*;
 
 // --------------------------------- constants ----------------------------------
 
@@ -49,7 +50,10 @@ fn init_service() {
                         ),
                         NftCanisterConf::new(10),
                     )
-                ]
+                ],
+                Principal::from_text("ccjse-eaaaa-aaaao-a2ixq-cai").expect(
+                    "Could not decode the principal."
+                )
             )
         )
     );

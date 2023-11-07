@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::collections::{ BTreeMap, HashMap };
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::BlockIndex };
 
-use crate::types::{ NftId, GldtNumTokens, NftWeight };
+use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Records {

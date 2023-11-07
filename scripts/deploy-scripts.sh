@@ -15,9 +15,10 @@ dfx canister create gldt_core
 dfx deploy gldt_core --network staging --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
   gld_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}};
-    record { principal "'"$(dfx identity get-principal)"'"; record { grams=100}};
-    }})'
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}}
+    };
+  gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network staging gldt_fee_compensation)"'"
+    })'
 dfx deploy gldt_core --argument '(opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network staging gldt_ledger)"'";
   gld_nft_canister_ids=vec{
     record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}}
@@ -80,9 +81,25 @@ dfx canister call gldt_core --network staging notify_sale_nft_origyn '(record {s
 
 
 dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx canister id --network staging gldt_core)"'";})'
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx identity get-principal)"'";})'
 dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "'"$(dfx identity get-principal)"'"; subaccount = opt blob "abcdefghijklmnopqrstuvxyz1234567"})'
 
-
+dfx canister call --network staging gldt_ledger icrc1_balance_of '(record {owner = principal "ccjse-eaaaa-aaaao-a2ixq-cai";})'
+dfx canister call --network staging gldt_ledger icrc1_transfer '(record {
+  to = record {owner = principal "ccjse-eaaaa-aaaao-a2ixq-cai";};
+  amount = 100_000_000_000;
+  })'
+# ccjse-eaaaa-aaaao-a2ixq-cai
+    #[serde(default)]
+    pub from_subaccount: Option<Subaccount>,
+    pub to: Account,
+    #[serde(default)]
+    pub fee: Option<NumTokens>,
+    #[serde(default)]
+    pub created_at_time: Option<u64>,
+    #[serde(default)]
+    pub memo: Option<Memo>,
+    pub amount: NumTokens,
 
 dfx canister call --network staging gldt_ledger get_blocks '(record {start= record { blocks= vec {0}} ;length=2})'
 dfx canister call --network staging gldt_ledger get_data_certificate
