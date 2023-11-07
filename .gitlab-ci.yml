@@ -434,9 +434,11 @@ check canister ids:
     - if: $CI_COMMIT_REF_NAME == "develop"
       variables:
         TARGET_NETWORK: staging
+        PEM_FILE: $PEM_FILE_STAGING
     - if: $CI_COMMIT_TAG =~ '/^(core)|(fee_compensation)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
+        PEM_FILE: $PEM_FILE_PRODUCTION
   before_script:
     - *import_dfx_id
   script:
