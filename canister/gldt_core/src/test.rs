@@ -2,24 +2,24 @@ use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
+use gldt_libs::constants::*;
 use gldt_libs::gld_nft::{
     Account as OrigynAccount,
     AskFeature,
     AuctionStateShared,
-    PricingConfigShared,
     AuctionStateShared_status,
     CandyShared,
     ICTokenSpec,
     ICTokenSpec_standard,
+    PricingConfigShared,
     SaleStatusShared,
     SaleStatusShared_sale_type,
     SubAccountInfo,
     SubAccountInfo_account,
     TokenSpec,
 };
-use serde_bytes::ByteBuf;
 use records::GldtRecord;
-use gldt_libs::constants::*;
+use serde_bytes::ByteBuf;
 
 // --------------------------------- constants ----------------------------------
 
@@ -65,7 +65,7 @@ fn init_records() {
         Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
             "Could not decode the principal."
         ),
-        SwapInfo::new(
+        &SwapInfo::new(
             "randomSellId1".to_string(),
             [0u8; 32],
             Account {
@@ -86,7 +86,7 @@ fn init_records() {
         Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
             "Could not decode the principal."
         ),
-        SwapInfo::new(
+        &SwapInfo::new(
             "randomSellId2".to_string(),
             [0u8; 32],
             Account {
@@ -221,7 +221,7 @@ fn test_get_historical_swaps_by_user_a2() {
 
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
-        page: Some(u32::MAX),
+        page: Some(usize::MAX),
         limit: Some(50),
     };
 
@@ -240,7 +240,7 @@ fn test_get_historical_swaps_by_user_a3() {
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
         page: Some(50),
-        limit: Some(u32::MAX),
+        limit: Some(usize::MAX),
     };
 
     let res = get_historical_swaps_by_user(get_swap_request);
@@ -264,7 +264,7 @@ fn test_get_historical_swaps_by_user_a4() {
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
         page: Some(1),
-        limit: Some(u32::MAX),
+        limit: Some(usize::MAX),
     };
 
     let res = get_historical_swaps_by_user(get_swap_request);
@@ -280,6 +280,7 @@ fn test_get_historical_swaps_by_user_a4() {
 
 #[test]
 fn test_get_historical_swaps_by_user_a5() {
+    init_records();
     let account = Account {
         owner: Principal::anonymous(),
         subaccount: None,
@@ -287,13 +288,19 @@ fn test_get_historical_swaps_by_user_a5() {
 
     let get_swap_request: GetSwapsRequest = GetSwapsRequest {
         account: Some(account),
-        page: Some(u32::MAX),
+        page: Some(usize::MAX),
         limit: Some(1),
     };
 
     let res = get_historical_swaps_by_user(get_swap_request);
 
-    assert_eq!(res, Err("Overflow when calculating end".to_string()));
+    assert_eq!(
+        res,
+        Ok(GetRecordsResponse {
+            total: 2,
+            data: None,
+        })
+    );
 }
 
 #[test]
@@ -484,7 +491,10 @@ fn test_get_historical_swaps_by_user_b1() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     ),
                     GldtRecord::new(
                         RecordType::Mint,
@@ -508,7 +518,10 @@ fn test_get_historical_swaps_by_user_b1() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -585,7 +598,10 @@ fn test_get_historical_swaps_by_user_b3() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -637,7 +653,10 @@ fn test_get_historical_swaps_by_user_b4() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -735,12 +754,12 @@ fn test_get_status_of_swap_b1() {
         let registry = &mut r.borrow_mut();
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             SwapInfo::new(
                 "randomSellId1".to_string(),
                 [0u8; 32],
@@ -791,12 +810,12 @@ fn test_get_status_of_swap_b2() {
         );
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
 
@@ -807,12 +826,12 @@ fn test_get_status_of_swap_b2() {
         );
 
         let _ = registry.update_minted(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
     });
@@ -854,12 +873,12 @@ fn test_get_status_of_swap_b3() {
         );
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
 
@@ -870,24 +889,24 @@ fn test_get_status_of_swap_b3() {
         );
 
         let _ = registry.update_minted(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
 
         swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0)));
 
         let _ = registry.update_swapped(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
     });
@@ -1057,12 +1076,12 @@ fn test_get_status_of_swap_b6() {
         );
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
     });
@@ -1099,12 +1118,12 @@ fn test_get_status_of_swap_b7() {
         );
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
     });
@@ -1144,7 +1163,7 @@ fn test_get_records_a1() {
 #[test]
 fn test_get_records_a2() {
     let records_request = GetRecordsRequest {
-        page: Some(u32::MAX),
+        page: Some(usize::MAX),
         limit: Some(50),
     };
 
@@ -1157,7 +1176,7 @@ fn test_get_records_a2() {
 fn test_get_records_a3() {
     let records_request = GetRecordsRequest {
         page: Some(50),
-        limit: Some(u32::MAX),
+        limit: Some(usize::MAX),
     };
 
     let res = get_records(records_request);
@@ -1174,7 +1193,7 @@ fn test_get_records_a3() {
 #[test]
 fn test_get_records_a4() {
     let records_request = GetRecordsRequest {
-        page: Some(u32::MAX),
+        page: Some(usize::MAX),
         limit: Some(1),
     };
 
@@ -1193,7 +1212,7 @@ fn test_get_records_a4() {
 fn test_get_records_a5() {
     let records_request = GetRecordsRequest {
         page: Some(1),
-        limit: Some(u32::MAX),
+        limit: Some(usize::MAX),
     };
 
     let res = get_records(records_request);
@@ -1374,7 +1393,10 @@ fn test_get_records_b2() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     ),
                     GldtRecord::new(
                         RecordType::Mint,
@@ -1398,7 +1420,10 @@ fn test_get_records_b2() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -1445,7 +1470,10 @@ fn test_get_records_b3() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -1492,7 +1520,10 @@ fn test_get_records_b4() {
                         0,
                         GldtNumTokens::new(Nat::from(0)).unwrap(),
                         Nat::from(0),
-                        RecordStatusInfo { status: RecordStatus::Ongoing, message: None }
+                        RecordStatusInfo {
+                            status: RecordStatus::Ongoing,
+                            message: None,
+                        }
                     )
                 ]
             ),
@@ -1716,7 +1747,7 @@ async fn test_notify_sale_nft_origyn_a8() {
     assert_eq!(
         res,
         Err(
-            "ERROR :: Unexpected feature in asked, only token, notify and buy_now accepted and received AskFeature::reserve(Nat(10000000000))".to_string()
+            "ERROR :: Unexpected feature in asked, only token, notify, kyc and buy_now accepted and received AskFeature::reserve(Nat(10000000000))".to_string()
         )
     );
 }
@@ -1779,12 +1810,12 @@ fn test_nft_info_a2() {
         let registry = &mut r.borrow_mut();
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             swap_info.clone()
         );
     });
@@ -1811,12 +1842,12 @@ fn test_nft_info_a3() {
         let registry = &mut r.borrow_mut();
 
         let _ = registry.init(
-            (
+            &(
                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
                     "Could not decode the principal."
                 ),
                 "random_nft_id_1".to_string(),
-            ).clone(),
+            ),
             SwapInfo::new(
                 "randomSellId1".to_string(),
                 [0u8; 32],

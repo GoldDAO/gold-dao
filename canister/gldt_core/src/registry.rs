@@ -71,7 +71,7 @@ impl GldtRegistryEntry {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
-pub enum RegistryUpdateType {
+pub enum UpdateType {
     Init,
     Mint,
     Swap,
@@ -243,10 +243,10 @@ pub enum SwappingStates {
 }
 
 impl Registry {
-    pub fn get_entry(&self, key: (Principal, NftId)) -> Option<&GldtRegistryEntry> {
+    pub fn get_entry(&self, key: &(Principal, NftId)) -> Option<&GldtRegistryEntry> {
         self.registry.get(&key)
     }
-    pub fn init(&mut self, key: (Principal, NftId), entry: SwapInfo) -> Result<(), String> {
+    pub fn init(&mut self, key: &(Principal, NftId), entry: SwapInfo) -> Result<(), String> {
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(v) => {
                 v.insert(GldtRegistryEntry::new(entry));
@@ -284,10 +284,10 @@ impl Registry {
 
     pub fn update_minted(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, key.clone(), entry.clone())?;
+        Self::sanity_check_inputs(self, &key, &entry)?;
         let _ = match entry.ledger_entry.clone() {
             None => {
                 return Err(
@@ -300,12 +300,11 @@ impl Registry {
             Some(ledger_entry) =>
                 match ledger_entry {
                     GldtLedgerEntry::Minted(ledger_info) => ledger_info,
-                    _ => {
+                    GldtLedgerEntry::Burned(_) => {
                         return Err(
                             format!(
-                                "There is no valid ledger entry for NFT: {}. Cannot update minting of tokens. Found {:?} ",
-                                key.1,
-                                ledger_entry
+                                "Burning not implemented yet. There is no valid ledger entry for NFT: {}. Cannot update minting of tokens.",
+                                key.1
                             )
                         );
                     }
@@ -342,10 +341,10 @@ impl Registry {
 
     pub fn update_swapped(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, key.clone(), entry.clone())?;
+        Self::sanity_check_inputs(self, &key, &entry)?;
         let _ = match entry.swapped.clone() {
             None => {
                 return Err(
@@ -388,7 +387,7 @@ impl Registry {
 
     pub fn update_failed(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
         match self.registry.get_mut(&key) {
@@ -407,7 +406,11 @@ impl Registry {
         Ok(())
     }
 
-    fn sanity_check_inputs(&self, key: (Principal, NftId), entry: SwapInfo) -> Result<(), String> {
+    fn sanity_check_inputs(
+        &self,
+        key: &(Principal, NftId),
+        entry: &SwapInfo
+    ) -> Result<(), String> {
         match self.registry.get(&key) {
             None => {
                 Err(

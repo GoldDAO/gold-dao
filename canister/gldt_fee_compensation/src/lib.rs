@@ -9,8 +9,8 @@ use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
 use gldt_libs::constants::GLDT_TX_FEE;
 use gldt_libs::misc::{
-    get_principal_from_gldnft_account,
     convert_gld_nft_account_to_icrc1_account,
+    get_principal_from_gldnft_account,
 };
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
@@ -22,15 +22,15 @@ use serde::Serialize;
 use std::cell::RefCell;
 use std::time::Duration;
 
-use gldt_libs::gld_nft::{ Service as GldNft_service, HistoryResult, TransactionRecord_txn_type };
+use gldt_libs::gld_nft::{ HistoryResult, Service as GldNft_service, TransactionRecord_txn_type };
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
-use gldt_libs::types::{ NftWeight, GldtTokenSpec, GldtNumTokens };
+use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
 
-mod registry;
 mod error;
+mod registry;
 
-use registry::{ Registry, FeeRegistryEntry, RegistryStatus };
 use error::{ CustomError, ErrorType };
+use registry::{ FeeRegistryEntry, Registry, RegistryStatus };
 
 pub type Index = Nat;
 
@@ -202,7 +202,7 @@ fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomErr
 
 /// Returns the GLDT balance of the fee compensation canister.
 #[update]
-pub async fn get_balance() -> Result<Nat, ()> {
+async fn get_balance() -> Result<Nat, ()> {
     let gldt_ledger_canister_id = CONF.with(|cell| cell.borrow().gldt_ledger_canister_id);
     let service_ledger = ICRC1_service(gldt_ledger_canister_id);
     if
@@ -309,14 +309,13 @@ fn cronjob_master() -> Result<(), CustomError> {
             });
             Ok(())
         }
-        None => {
+        None =>
             Err(
                 CustomError::new_with_message(
                     ErrorType::Other,
                     "Fatal error: interval + current_time > u64 MAX.".to_string()
                 )
-            )
-        }
+            ),
     }
 }
 
@@ -332,7 +331,7 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
 
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
 #[update]
-pub async fn notify_compensation_job() -> Result<(), CustomError> {
+fn notify_compensation_job() -> Result<(), CustomError> {
     log_message(format!("notify_compensation_job() called by {}", api::caller().to_text()));
     // only the GLDT core canister is allowed to call this method
     if api::caller() != CONF.with(|cell| cell.borrow().gldt_canister_id) {
@@ -493,7 +492,7 @@ async fn run_compensation_job() {
             counter += num_new_entries;
         };
     }
-    log_message(format!("Scanned {} new entries for compensation.", counter));
+    log_message(format!("Scanned {counter} new entries for compensation."));
 }
 
 async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) {
@@ -506,7 +505,9 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
     );
     if let Err(msg) = entry_added {
         log_message(
-            format!("WARNING :: compensation_job :: failed to add entry to registry. Message: {}", msg)
+            format!(
+                "WARNING :: compensation_job :: failed to add entry to registry. Message: {msg}"
+            )
         );
         return;
     }
@@ -525,7 +526,7 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
     match gldt_ledger_service.icrc1_transfer(transfer_args).await {
         Ok((Ok(v),)) => {
             // This is the happy path. All went well when we end up here.
-            log_message(format!("Successfully transferred GLDT. Message: {:?}", v));
+            log_message(format!("Successfully transferred GLDT. Message: {v:?}"));
             // update the entry in the registry
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
@@ -540,7 +541,7 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
                     key,
                     CustomError::new_with_message(
                         ErrorType::TransferError,
-                        format!("Failed to transfer GLDT. Message: {:?}", err)
+                        format!("Failed to transfer GLDT. Message: {err:?}")
                     )
                 )
             });
@@ -553,7 +554,7 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
                     key,
                     CustomError::new_with_message(
                         ErrorType::TransferError,
-                        format!("Failed to transfer GLDT. Message: {:?}", msg)
+                        format!("Failed to transfer GLDT. Message: {msg:?}")
                     )
                 )
             });
@@ -574,14 +575,14 @@ fn validate_caller() -> Result<(), CustomError> {
 
 // for monitoring during development
 #[query(name = "getCanistergeekInformation")]
-async fn get_canistergeek_information(
+fn get_canistergeek_information(
     request: canistergeek_ic_rust::api_type::GetInformationRequest
 ) -> canistergeek_ic_rust::api_type::GetInformationResponse<'static> {
     canistergeek_ic_rust::get_information(request)
 }
 
 #[update(name = "updateCanistergeekInformation")]
-pub async fn update_canistergeek_information(
+fn update_canistergeek_information(
     request: canistergeek_ic_rust::api_type::UpdateInformationRequest
 ) {
     canistergeek_ic_rust::update_information(request);
