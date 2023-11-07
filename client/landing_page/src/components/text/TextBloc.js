@@ -2,6 +2,7 @@ import { Box, Grid, GridItem, Heading, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import React from 'react';
 import GridSystem from '../layout/Grid';
+import { Fade } from 'react-awesome-reveal';
 
 const TextBloc = ({
     title,
@@ -21,39 +22,45 @@ const TextBloc = ({
     circle,
 }) => {
     return (
-        <GridSystem gap={[4, 4, 8, 8, 8]}>
-            <GridItem colSpan={titleSpan} order={titleOrder} colStart={variant ? '' : colStart}>
-                <Box
-                    display={'flex'}
-                    flexDirection={'column'}
-                    justifyContent={'center'}
-                    alignItems={'center'}
-                    position={'relative'}
-                >
-                    <Heading
-                        variant="h4"
-                        as="h4"
-                        textAlign={['left', 'left', 'left', titleAlign]}
-                        w={'100%'}
+        <Fade
+            as="div"
+            style={{
+                width: '100%',
+            }}
+        >
+            <GridSystem gap={[4, 4, 8, 8, 8]}>
+                <GridItem colSpan={titleSpan} order={titleOrder} colStart={variant ? '' : colStart}>
+                    <Box
+                        display={'flex'}
+                        flexDirection={'column'}
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                        position={'relative'}
                     >
-                        {title}
-                    </Heading>
-                    {subtitle && (
-                        <Text
+                        <Heading
+                            variant="h4"
                             as="h4"
                             textAlign={['left', 'left', 'left', titleAlign]}
-                            pt={[0, 0, '20px']}
                             w={'100%'}
                         >
-                            {subtitle}
-                        </Text>
-                    )}
-                    {link && (
-                        <Box pt={[0, 0, '20px']} textDecoration={'underline'} w={'100%'}>
-                            <Link href={link.href}>{link.label}</Link>
-                        </Box>
-                    )}
-                    {/* {circle && (
+                            {title}
+                        </Heading>
+                        {subtitle && (
+                            <Text
+                                as="h4"
+                                textAlign={['left', 'left', 'left', titleAlign]}
+                                pt={[0, 0, '20px']}
+                                w={'100%'}
+                            >
+                                {subtitle}
+                            </Text>
+                        )}
+                        {link && (
+                            <Box pt={[0, 0, '20px']} textDecoration={'underline'} w={'100%'}>
+                                <Link href={link.href}>{link.label}</Link>
+                            </Box>
+                        )}
+                        {/* {circle && (
                         <Box
                             position={'absolute'}
                             height={'150px'}
@@ -64,29 +71,30 @@ const TextBloc = ({
                             borderRadius={'50%'}
                         />
                     )} */}
-                </Box>
-            </GridItem>
-            <GridItem
-                colSpan={textSpan}
-                order={textOrder}
-                colEnd={children ? '' : variant ? '' : colEnd}
-                colStart={variant ? colStart : ''}
-            >
-                <Text fontSize={['18px', '18px', '20px']} lineHeight={'26px'}>
-                    {content}
-                </Text>
-            </GridItem>
-            {children && (
-                <GridItem
-                    colSpan={childrenSpan}
-                    order={2}
-                    colEnd={variant ? '' : colEnd}
-                    colStart={variant ? colStart : [1, 1, 4, 10, 10]}
-                >
-                    {children}
+                    </Box>
                 </GridItem>
-            )}
-        </GridSystem>
+                <GridItem
+                    colSpan={textSpan}
+                    order={textOrder}
+                    colEnd={children ? '' : variant ? '' : colEnd}
+                    colStart={variant ? colStart : ''}
+                >
+                    <Text fontSize={['18px', '18px', '20px']} lineHeight={'26px'}>
+                        {content}
+                    </Text>
+                </GridItem>
+                {children && (
+                    <GridItem
+                        colSpan={childrenSpan}
+                        order={2}
+                        colEnd={variant ? '' : colEnd}
+                        colStart={variant ? colStart : [1, 1, 4, 10, 10]}
+                    >
+                        {children}
+                    </GridItem>
+                )}
+            </GridSystem>
+        </Fade>
     );
 };
 

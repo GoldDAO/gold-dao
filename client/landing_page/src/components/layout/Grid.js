@@ -9,7 +9,7 @@ const GridSystem = ({ children, gap, auto }) => {
             templateColumns={auto ? `repeat(auto-fill, 1fr)` : `repeat(12, 1fr)`}
             w={'100%'}
             columnGap={gap ? gap : 8}
-            rowGap={[6, 4]}
+            rowGap={gap ? gap : [6, 4]}
             wrap="wrap"
         >
             {children}

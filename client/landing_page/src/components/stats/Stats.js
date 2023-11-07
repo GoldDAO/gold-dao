@@ -1,8 +1,24 @@
 import { LinkBox, Stack, Stat, StatGroup, StatLabel, StatNumber } from '@chakra-ui/react';
+import useTotalSupply from '@utils/hooks/useTotalSupply';
 import Link from 'next/link';
 import React from 'react';
 
-const Stats = ({ stats }) => {
+const Stats = () => {
+    const totalSupply = useTotalSupply();
+    const stats = [
+        {
+            label: 'USD Market Cap ',
+            value: `${(new Number(totalSupply.gldt) * 100).toLocaleString('en-US')} $`,
+        },
+        {
+            label: 'Gold Bars',
+            value: '700',
+        },
+        {
+            label: 'Gold Kilograms',
+            value: `${(totalSupply.g / 100).toLocaleString('en-US')} g`,
+        },
+    ];
     return (
         <StatGroup
             w={'100%'}

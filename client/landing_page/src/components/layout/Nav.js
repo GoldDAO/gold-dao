@@ -113,7 +113,13 @@ const DesktopNav = ({ nav, children }) => {
                 </Box>
             ))}
             {children}
-            <Button width={'150px'} variant={'yumiGold'}>
+            <Button
+                width={'150px'}
+                as={Link}
+                target="_blank"
+                href="https://staging.app.gldt.org"
+                variant={'yumiGold'}
+            >
                 Swap
             </Button>
         </Stack>
@@ -161,17 +167,24 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 
 const MobileNav = ({ nav, children }) => {
     return (
-        <VStack p={4} display={{ base: 'flex', md: 'none' }} justifyContent={'flex-start'}>
-            <Box width={'100%'}>
-                {nav.map((navItem) => (
-                    <MobileNavItem key={navItem.label} {...navItem} />
-                ))}
-            </Box>
-            {children}
-            <Button variant={'yumiGold'} width={'100%'}>
-                {' '}
-                Swap
-            </Button>
+        <VStack
+            p={4}
+            display={{ base: 'flex', md: 'none' }}
+            justifyContent={'center'}
+            bg="white"
+            w={'100%'}
+        >
+            <VStack bg="white" justifyContent={'center'} w={'100%'}>
+                <Box width={'100%'}>
+                    {nav.map((navItem) => (
+                        <MobileNavItem key={navItem.label} {...navItem} />
+                    ))}
+                </Box>
+                {children}
+                <Button variant={'yumiGold'} width={'100%'}>
+                    Swap
+                </Button>
+            </VStack>
         </VStack>
     );
 };
@@ -180,7 +193,7 @@ const MobileNavItem = ({ label, children, href }) => {
     const { isOpen, onToggle } = useDisclosure();
 
     return (
-        <Stack spacing={4} onClick={children && onToggle}>
+        <Stack spacing={4} onClick={children && onToggle} w={'100%'}>
             <Link href={href}>
                 <Text
                     transition=".2s all"
@@ -202,6 +215,7 @@ const MobileNavItem = ({ label, children, href }) => {
                     borderStyle={'solid'}
                     borderColor={useColorModeValue('gray.200', 'gray.700')}
                     align={'start'}
+                    w={'100%'}
                 >
                     {children &&
                         children.map((child) => (

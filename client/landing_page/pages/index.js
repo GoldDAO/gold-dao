@@ -2,17 +2,22 @@ import Layout from '@/components/layout/Layout';
 import Banner from '@/components/banner/Banner';
 import { content } from './../src/content';
 import TextBloc from '@/components/text/TextBloc';
-import Stats from '@/components/stats/Stats';
 import Partners from '@/components/partners/Partners';
 import { Divider, HStack, VStack } from '@chakra-ui/react';
 import FaqSection from '@/components/FAQ/FaqSection';
 import Scene from '@/components/banner/scene/Scene';
+import dynamic from 'next/dynamic';
+import Yumi from '@/components/banner/Yumi';
+
 function Home() {
     const meta = {
         title: 'GLDT Swap landing page',
         description: 'GLDT Swap landing page Description',
     };
-    const { intro, stats, partners, tech, price } = content;
+    const Stats = dynamic(() => import('@/components/stats/Stats'), {
+        ssr: false,
+    });
+    const { intro, partners, tech, price } = content;
     return (
         <Layout meta={meta}>
             <VStack
@@ -32,7 +37,7 @@ function Home() {
                     textOrder={[2, 2, 2, 2]}
                     childrenSpan={[12, 12, 12, 4, 4]}
                 >
-                    <Stats stats={stats} />
+                    <Stats />
                 </TextBloc>
                 <Partners />
                 <TextBloc
@@ -62,6 +67,7 @@ function Home() {
                     pastille={true}
                     circle={true}
                 />
+                <Yumi />
                 <FaqSection full={false} />
             </VStack>
         </Layout>

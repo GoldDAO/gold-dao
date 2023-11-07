@@ -22,7 +22,7 @@ const Partners = () => {
                 Powered By
             </Text>
             <Box py="20px">
-                <GridSystem>
+                <GridSystem gap={[3, 4, 4, 4, 8]}>
                     {partners.map((e, i) => (
                         <GridItem
                             as={Link}
@@ -31,8 +31,8 @@ const Partners = () => {
                             colSpan={[6, 6, 4, 2]}
                             grid
                             alignSelf={'center'}
+                            target={'_blank'}
                             border="1px"
-                            height={'80px'}
                             borderColor={'lightgray'}
                             _hover={{ transform: `scale(1.1)` }}
                             transition={'.2s'}
@@ -40,6 +40,7 @@ const Partners = () => {
                             display={'flex'}
                             alignItems={'center'}
                             justifyContent={'center'}
+                            height={'120px'}
                         >
                             <Box>
                                 <Image

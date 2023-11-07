@@ -11,20 +11,6 @@ export const content = {
         content:
             'The GLDT is a token backed by real gold from Metalor. Through the Yumi marketplace, owners can exchange their gold certificates (known as GLD NFTs) for GLDT tokens. For instance, if you have a certificate for 1 gram of gold, you can trade it for 100 GLDT. So, in essence, each GLDT token represents a portion of real gold.',
     },
-    stats: [
-        {
-            label: 'USD Market Cap ',
-            value: '$474 842 289',
-        },
-        {
-            label: 'Gold Bars',
-            value: '700',
-        },
-        {
-            label: 'Gold Kilograms',
-            value: '7643.71',
-        },
-    ],
     partners: [
         {
             name: 'dfinity',
