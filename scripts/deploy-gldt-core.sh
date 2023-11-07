@@ -13,7 +13,7 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-ledger [options] <NETWORK>
+  scripts/deploy-gldt-core.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit

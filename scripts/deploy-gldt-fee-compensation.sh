@@ -13,7 +13,7 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-ledger-indexer.sh [options] <NETWORK>
+  scripts/deploy-gldt-fee-compensation.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
@@ -42,4 +42,19 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
-dfx deploy --network $1 gldt_ledger_indexer --argument '( opt variant{Init = record {ledger_id =principal "'"$(dfx canister id --network $1 gldt_ledger)"'" }})'
+dfx deploy gldt_fee_compensation --network $1 --argument '(opt record {
+  fallback_timer_interval_secs=3600;
+  execution_delay_secs=20;
+  gldt_canister_id=principal "'"$(dfx canister id --network $1 gldt_core)"'";
+  gld_nft_canister_conf=vec{
+    record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_1g)"'";  weight=1;  last_query_index=1820};
+    record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_10g)"'";  weight=10;  last_query_index=286};
+    };
+  enabled= true;
+  gldt_ledger_canister_id=principal "'"$(dfx canister id --network $1 gldt_ledger)"'"
+    })'
+
+dfx canister call --network $1 gldt_fee_compensation set_gld_nft_conf '( vec{
+    record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_1g)"'";  weight=1;  last_query_index=1820};
+    record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_10g)"'";  weight=10;  last_query_index=286}
+    })'

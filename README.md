@@ -2,8 +2,10 @@
 
 ## Project Structure:
 
-- [`swap_app`](swap_app/): Contains the NextJS frontend
-- [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core` and `gldt_ledger`, as well as other dependencies wasm files)
+- [`client/swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
+- [`client/landing_page`](client/landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
+- [`client/explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
+- [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core`, `gldt_fee_compensation`, and `gldt_ledger`, as well as other dependencies wasm files)
 
 ## How to install and execute the dapp locally
 
@@ -21,20 +23,21 @@ npm install
 ```sh
 npm start
 ```
-The dapp will be available at `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/`
+The main dapp will be available at `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/`
 > **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:4943/?canisterId=bkyz2-fmaaa-aaaaa-qaaaq-cai`**
 
-To redeploy your latest changes on `gldt_core` or on the frontend:
+To redeploy your latest changes on `gldt_core`, `gldt_fee_compensation`, or on the frontend:
 ```sh
 npm run deploy
 ```
 
-If you need to test a redeploy operation for a canister (`gldt_core` or `gldt_ledger`), you can use one of those scripts:
+If you need to test a redeploy operation for a canister (`gldt_core`, `gldt_fee_compensation` or `gldt_ledger`), you can use one of those scripts:
 ```sh
 scripts/deploy-gldt-core.sh --help
+scripts/deploy-gldt-fee-compensation.sh --help
 scripts/deploy-ledger.sh --help
 ```
-Both contains safeguards against accidental deployments on staging or mainnet.
+Each one contains safeguards against accidental deployments on staging or mainnet.
 
 And to restart a fresh environment and redeploy all canisters, simply redo a `npm start`. It will stop the currently running replica if any, and restart a clean one, then redeploy everything.
 
@@ -44,11 +47,13 @@ And to restart a fresh environment and redeploy all canisters, simply redo a `np
 Launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/)
 
 ```sh
-npm run dev:swap_app
+npm run dev:swap_app # For the swap application frontend
+npm run dev:landing_page # For the main landing page
+npm run dev:explorer # For the GLDT explorer frontend
 ```
-The frontend will be available at `http://localhost:3000`
+The frontend development server will be available at `http://localhost:3000`.
 
-### Build all canisters, including frontend, and generate candid files and declarations:
+### Build all canisters, frontends, and generate candid files and declarations:
 ```sh
 npm run build
 ```
