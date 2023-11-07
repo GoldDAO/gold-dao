@@ -184,13 +184,12 @@ fn get_compensation_factor() -> u64 {
 #[update]
 fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomError> {
     validate_caller()?;
-    let previous_value = COMPENSATION_FACTOR.with(|cell| cell.borrow().clone());
 
-    if new_compensation_factor > previous_value {
+    if new_compensation_factor > 10 {
         return Err(
             CustomError::new_with_message(
                 ErrorType::Other,
-                format!("The compensation factor can only be reduced. Previous value is {}", previous_value)
+                "Compensation factor value has to be between 0 and 10 (mean 0.1% and 1%).".to_string()
             )
         );
     }
