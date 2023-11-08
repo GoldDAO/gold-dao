@@ -83,7 +83,7 @@ landing_page linter:
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *node_template
   script:
-    - npm run lint:landing_page
+    - npm run lint:landing
 
 explorer linter:
   stage: lint
