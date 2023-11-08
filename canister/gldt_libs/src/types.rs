@@ -5,7 +5,7 @@ use icrc_ledger_types::icrc1::transfer::NumTokens;
 use serde::Serialize;
 use std::hash::Hash;
 
-use crate::constants::*;
+use crate::constants::{ GLDT_SUBDIVIDABLE_BY, GLDT_DECIMALS, GLDT_PRICE_RATIO, GLDT_TX_FEE };
 
 /// An NFT is identified by a string.
 pub type NftId = String;
@@ -17,7 +17,7 @@ pub type NftWeight = u16;
 pub type NftSaleId = String;
 
 /// The number of tokens that are minted. Always needs to be a multiple of
-/// GLDT_PRICE_RATIO (100) * GLDT_SUBDIVIDABLE_BY (10**8)
+/// `GLDT_PRICE_RATIO` (100) * `GLDT_SUBDIVIDABLE_BY` (10**8)
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Default)]
 pub struct GldtNumTokens {
     value: NumTokens,
@@ -26,7 +26,7 @@ pub struct GldtNumTokens {
 impl GldtNumTokens {
     pub fn new(initial_value: NumTokens) -> Result<Self, String> {
         if !Self::is_valid(initial_value.clone()) {
-            return Err(format!("Invalid initial value for GldtNumTokens: {}", initial_value));
+            return Err(format!("Invalid initial value for GldtNumTokens: {initial_value}"));
         }
         Ok(GldtNumTokens {
             value: initial_value,
@@ -34,7 +34,7 @@ impl GldtNumTokens {
     }
 
     pub fn new_from_weight(weight: NftWeight) -> Result<Self, String> {
-        let value = Nat::from(weight) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY;
+        let value = Nat::from(weight) * Nat::from(GLDT_PRICE_RATIO) * GLDT_SUBDIVIDABLE_BY;
         Self::new(value)
     }
 
@@ -43,7 +43,7 @@ impl GldtNumTokens {
     }
 
     fn is_valid(val: NumTokens) -> bool {
-        val % (GLDT_SUBDIVIDABLE_BY * (GLDT_PRICE_RATIO as u64)) == 0
+        val % (GLDT_SUBDIVIDABLE_BY * Nat::from(GLDT_PRICE_RATIO)) == 0
     }
 }
 
@@ -82,5 +82,5 @@ impl GldtTokenSpec {
 }
 
 pub fn calculate_tokens_from_weight(grams: NftWeight) -> Result<GldtNumTokens, String> {
-    GldtNumTokens::new(Nat::from((grams as u64) * (GLDT_PRICE_RATIO as u64) * GLDT_SUBDIVIDABLE_BY))
+    GldtNumTokens::new(Nat::from(grams) * Nat::from(GLDT_PRICE_RATIO) * GLDT_SUBDIVIDABLE_BY)
 }

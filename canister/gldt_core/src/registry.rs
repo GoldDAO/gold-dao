@@ -244,7 +244,7 @@ pub enum SwappingStates {
 
 impl Registry {
     pub fn get_entry(&self, key: &(Principal, NftId)) -> Option<&GldtRegistryEntry> {
-        self.registry.get(&key)
+        self.registry.get(key)
     }
     pub fn init(&mut self, key: &(Principal, NftId), entry: SwapInfo) -> Result<(), String> {
         match self.registry.entry(key.clone()) {
@@ -287,7 +287,7 @@ impl Registry {
         key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, &key, &entry)?;
+        Self::sanity_check_inputs(self, key, &entry)?;
         let _ = match entry.ledger_entry.clone() {
             None => {
                 return Err(
@@ -344,7 +344,7 @@ impl Registry {
         key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, &key, &entry)?;
+        Self::sanity_check_inputs(self, key, &entry)?;
         let _ = match entry.swapped.clone() {
             None => {
                 return Err(
@@ -390,7 +390,7 @@ impl Registry {
         key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        match self.registry.get_mut(&key) {
+        match self.registry.get_mut(key) {
             Some(r) => {
                 r.gldt_issue.set_failed(entry.failed.unwrap_or_default());
             }
@@ -411,7 +411,7 @@ impl Registry {
         key: &(Principal, NftId),
         entry: &SwapInfo
     ) -> Result<(), String> {
-        match self.registry.get(&key) {
+        match self.registry.get(key) {
             None => {
                 Err(
                     format!(
@@ -497,7 +497,7 @@ impl Registry {
 
     pub fn get_ongoing_swaps_by_user(&self, account: Account) -> Vec<GldtRecord> {
         let mut result = Vec::new();
-        for ((gld_nft_canister_id, nft_id), entry) in self.registry.iter() {
+        for ((gld_nft_canister_id, nft_id), entry) in &self.registry {
             if entry.gldt_issue.receiving_account == account {
                 if entry.is_swapped() || entry.gldt_issue.did_fail() {
                     continue;
