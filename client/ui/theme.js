@@ -1,4 +1,10 @@
-import { inter } from 'pages/_app';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({
+	subsets: ['latin'],
+	weight: ['300', '400', '500'],
+	fallback: ['system-ui', 'arial', 'sans-serif'],
+});
 
 export const customTheme = {
 	fonts: {
@@ -56,7 +62,8 @@ export const customTheme = {
 				fontSize: '20px',
 				lineheight: '26px',
 				fontWeight: 400,
-			}
+			},
+
 		},
 		Alert: {
 			baseStyle: {
@@ -103,7 +110,7 @@ export const customTheme = {
 					}
 				}
 			}
-		}
+		},
 	},
 };
 

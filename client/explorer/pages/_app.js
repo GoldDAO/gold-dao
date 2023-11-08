@@ -3,7 +3,11 @@ import '@/css/global.css';
 import '@connect2ic/core/style.css';
 import dynamic from 'next/dynamic';
 
-const inter = Inter({ subsets: ['latin'] });
+export const inter = Inter({
+    subsets: ['latin'],
+    weight: ['300', '400', '500'],
+    fallback: ['system-ui', 'arial', 'sans-serif'],
+});
 
 const Providers = dynamic(() => import('@/components/Providers'), {
     ssr: false,
