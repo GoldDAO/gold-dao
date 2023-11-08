@@ -355,19 +355,23 @@ async fn accept_offer(
             match res {
                 ManageSaleResult::ok(val) => {
                     log_message(format!("Successful response: {val:?}"));
-                    let (sale_id, index) = match *val {
-                        ManageSaleResponse::bid(bid) => {
-                            let sale_id = match bid.txn_type {
-                                BidResponse_txn_type::sale_ended { sale_id, .. } => {
-                                    sale_id.unwrap_or_default()
-                                }
-                                _ => String::new(),
-                            };
-                            (sale_id, bid.index)
-                        }
-                        _ => ("invalid_ManageSaleResponse".to_string(), Nat::from(0)),
-                    };
-                    Ok(GldtSwapped::new(sale_id, index))
+                    if let ManageSaleResponse::bid(bid) = *val {
+                        // We expect a bid response and if another is returned, something went wrong.
+                        // An error is thrown in that case.
+                        let sale_id = match bid.txn_type {
+                            BidResponse_txn_type::sale_ended { sale_id, .. } => {
+                                sale_id.unwrap_or_default()
+                            }
+                            _ => String::new(),
+                        };
+                        Ok(GldtSwapped::new(sale_id, bid.index))
+                    } else {
+                        Err(
+                            format!(
+                                "Received invalid ManageSaleResponse from sale_nft_origyn. Expected bid, received {val:?}"
+                            )
+                        )
+                    }
                 }
                 ManageSaleResult::err(err) => {
                     log_message(format!("Error response: ManageSaleResult : {}", err.text));
