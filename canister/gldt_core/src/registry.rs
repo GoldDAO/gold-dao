@@ -288,7 +288,9 @@ impl Registry {
         entry: SwapInfo
     ) -> Result<(), String> {
         Self::sanity_check_inputs(self, key, &entry)?;
-        let _ = match entry.ledger_entry.clone() {
+        // check that the input to the function is as expected
+        // we are expecting the the ledger_entry is of type Minted
+        match entry.ledger_entry.clone() {
             None => {
                 return Err(
                     format!(
@@ -299,7 +301,7 @@ impl Registry {
             }
             Some(ledger_entry) =>
                 match ledger_entry {
-                    GldtLedgerEntry::Minted(ledger_info) => ledger_info,
+                    GldtLedgerEntry::Minted(_) => (), // this is the happy path
                     GldtLedgerEntry::Burned(_) => {
                         return Err(
                             format!(
@@ -309,7 +311,7 @@ impl Registry {
                         );
                     }
                 }
-        };
+        }
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(_) => {
                 Err(
@@ -345,7 +347,9 @@ impl Registry {
         entry: SwapInfo
     ) -> Result<(), String> {
         Self::sanity_check_inputs(self, key, &entry)?;
-        let _ = match entry.swapped.clone() {
+        // check that the input to the function is as expected
+        // we are expecting the key `swapped` to be Some
+        match entry.swapped.clone() {
             None => {
                 return Err(
                     format!(
@@ -354,8 +358,8 @@ impl Registry {
                     )
                 );
             }
-            Some(swapped) => swapped,
-        };
+            Some(_) => (),
+        }
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(_) => {
                 Err(

@@ -1,3 +1,5 @@
+#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
+
 //! As the GLD NFTs are using the ORIGYN NFT standard, the
 //! royalty fees for transactions are protected for any transfer.
 //! This includes also the swapping of NFTs for GLDT.
@@ -29,8 +31,8 @@ use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
 mod error;
 mod registry;
 
-use error::{ CustomError, ErrorType };
-use registry::{ FeeRegistryEntry, Registry, RegistryStatus };
+use error::{ Custom as CustomError, Type as ErrorType };
+use registry::{ FeeRegistryEntry, Registry, Status as RegistryStatus };
 
 pub type Index = Nat;
 

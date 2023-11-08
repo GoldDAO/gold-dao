@@ -1,3 +1,5 @@
+#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
+
 //! GLDT is a digital token 100% backed by physical gold in the form
 //! of NFTs in a ratio of 1 gram of gold NFTs equals 100 GLDT. The
 //! NFTs have their ownership registered to this canister, which is
@@ -267,7 +269,7 @@ fn init(conf: Option<Conf>) {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Copy)]
 pub struct GetRecordsRequest {
     page: Option<usize>,
     limit: Option<usize>,
@@ -320,9 +322,8 @@ pub struct NftInfo {
 
 type TransferResult = Result<BlockIndex, TransferError>;
 
-#[update]
+#[query]
 fn nft_info(args: InfoRequest) -> NftInfo {
-    log_message(format!("INFO :: nft_info. Arguments: {args:?}"));
     REGISTRY.with(|r| NftInfo {
         info: r.borrow().get_entry(&(args.source_canister, args.nft_id)).cloned(),
     })
@@ -693,7 +694,7 @@ pub struct GetStatusResponse {
     status: Option<SwappingStates>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Copy)]
 struct GetSwapsRequest {
     account: Option<Account>,
     page: Option<usize>,
@@ -769,14 +770,14 @@ fn get_ongoing_swaps_by_user(req: GetSwapsRequest) -> Result<GetSwapsResponse, S
     let Some(start) = page.checked_mul(limit) else {
         return Err("Overflow when calculating start".to_string());
     };
-    let res = REGISTRY.with(|r| {
+    let response = REGISTRY.with(|r| {
         let swaps = r.borrow().get_ongoing_swaps_by_user(account);
         GetSwapsResponse {
             total: swaps.len(),
             data: Some(swaps.iter().skip(start).take(limit).cloned().collect::<Vec<_>>()),
         }
     });
-    Ok(res)
+    Ok(response)
 }
 
 #[query]
@@ -802,7 +803,7 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
         }
     )?;
     REGISTRY.with(|r| {
-        let res = match r.borrow().get_entry(&(req.gld_nft_canister_id, req.nft_id)) {
+        let response = match r.borrow().get_entry(&(req.gld_nft_canister_id, req.nft_id)) {
             None => GetStatusResponse { status: None },
             Some(entry) => {
                 let swap_info = entry.get_issue_info();
@@ -815,7 +816,7 @@ fn get_status_of_swap(req: GetStatusRequest) -> Result<GetStatusResponse, String
                 }
             }
         };
-        Ok(res)
+        Ok(response)
     })
 }
 
@@ -886,15 +887,16 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) {
                 Ok(gldt_swapped) => {
                     // All went well and registry is updated and record is added.
                     swap_info.set_swapped(gldt_swapped);
-                    let _ = update_registry(
-                        &UpdateType::Swap,
-                        nft_id.clone(),
-                        gld_nft_canister_id,
-                        swap_info.clone()
-                    ).map_err(|err| {
+                    if
+                        let Err(err) = update_registry(
+                            &UpdateType::Swap,
+                            nft_id.clone(),
+                            gld_nft_canister_id,
+                            swap_info.clone()
+                        )
+                    {
                         log_message(format!("ERROR :: {err}"));
-                        err
-                    });
+                    }
                     add_record(nft_id.clone(), gld_nft_canister_id, &swap_info, RecordStatusInfo {
                         status: RecordStatus::Success,
                         message: None,
