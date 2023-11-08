@@ -260,7 +260,7 @@ const OutputDetails = ({ isConnected }) => {
                     disabled="flex"
                     justifyContent={'space-between'}
                 >
-                    <Text>Transaction Details</Text>
+                    <Text fontSize={'16px'}>Transaction Details</Text>
                     <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel bg="bg" border={'1px'} borderColor={'border'} borderTop={0}>
@@ -310,7 +310,7 @@ const TransactionDetailsTable = () => {
                         <Cell>Swapped Amount</Cell>
                         <Cell r>
                             <HStack>
-                                <Text>{minted} </Text>
+                                <Text fontSize={'14px'}>{minted} </Text>
                                 <TokenSign />
                             </HStack>
                         </Cell>
@@ -318,7 +318,7 @@ const TransactionDetailsTable = () => {
                     <Row>
                         <Cell>
                             <HStack>
-                                <Text>Conversion fee (1%)</Text>
+                                <Text fontSize={'14px'}>Conversion fee (1%)</Text>
                                 <Tooltip
                                     label="A conversion fee is deducted because the NFTs are running on the Origyn NFT standard. The Origyn NFT standard inherently protects creator royalties which are 1% for the GLD NFTs. Therefore, the fees are also present for the swapping of the GLDT."
                                     fontSize="sm"
@@ -329,14 +329,14 @@ const TransactionDetailsTable = () => {
                         </Cell>
                         <Cell r>
                             <HStack>
-                                <Text>- {fees}</Text> <TokenSign />
+                                <Text fontSize={'14px'}>- {fees}</Text> <TokenSign />
                             </HStack>
                         </Cell>
                     </Row>
                     <Row>
                         <Cell>
                             <HStack>
-                                <Text>Fee compensation</Text>
+                                <Text fontSize={'14px'}>Fee compensation</Text>
                                 <Tooltip
                                     label="The conversion fee of the first 100 Million GLDT swapped are refunded."
                                     fontSize="sm"
@@ -347,7 +347,7 @@ const TransactionDetailsTable = () => {
                         </Cell>
                         <Cell r>
                             <HStack>
-                                <Text>+ {fees} </Text>
+                                <Text fontSize={'14px'}>+ {fees} </Text>
                                 <TokenSign />
                             </HStack>
                         </Cell>
@@ -359,7 +359,7 @@ const TransactionDetailsTable = () => {
                         <Cell>Total received</Cell>
                         <Cell r>
                             <HStack>
-                                <Text>{minted}</Text>
+                                <Text fontSize={'16px'}>{minted}</Text>
                                 <Tooltip>
                                     <TokenSign />
                                 </Tooltip>

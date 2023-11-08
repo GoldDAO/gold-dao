@@ -3,7 +3,6 @@ import Logo from '@ui/assets/logo.svg';
 import Image from 'next/image';
 import { GridItem, HStack, Text } from '@chakra-ui/react';
 import Link from 'next/link';
-import Grid from '@ui/layout/Grid';
 import GridSystem from '@ui/layout/GridSystem';
 
 const Header = () => {

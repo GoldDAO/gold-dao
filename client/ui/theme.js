@@ -59,8 +59,8 @@ export const customTheme = {
 		},
 		Text: {
 			baseStyle: {
-				fontSize: '20px',
-				lineheight: '26px',
+				fontSize: ['18px', '18px','20px'],
+				lineheight: ['22px', '22px','26px'],
 				fontWeight: 400,
 			},
 

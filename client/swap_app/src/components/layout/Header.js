@@ -19,6 +19,7 @@ const Header = () => {
             style={{
                 gridColumn: 'span 12',
             }}
+            px={['20px', '20px', '40px']}
         >
             <WithSubnavigation nav={NAV_ITEMS}>
                 <Wallet />

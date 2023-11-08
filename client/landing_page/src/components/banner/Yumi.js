@@ -24,7 +24,7 @@ const Yumi = () => {
                         colSpan={[10, 6, 6, 2, 2]}
                         order={[2, 2, 2, 1, 1]}
                     >
-                        <Heading variant={'h4'} as="h4">
+                        <Heading variant={'h4'} as="h4" textAlign={['center', 'center', 'left']}>
                             Don’t own any{' '}
                             <Box color="gold" as="span" fontWeight={600}>
                                 GLD NFTs
@@ -53,11 +53,16 @@ const Yumi = () => {
                         order={[3, 3, 3, 3, 3]}
                         colStart={[2, 4, 4, 7, 7]}
                     >
-                        <Text>
+                        <Text textAlign={['center', 'center', 'left']}>
                             join the global movement towards a more transparent and accessible
                             buying and selling of gold.
                         </Text>
-                        <Button px="50px" mt="20px" variant={'yumi'}>
+                        <Button
+                            px="50px"
+                            mt="20px"
+                            variant={'yumi'}
+                            width={['100%', '100%', 'fit-content']}
+                        >
                             Buy GLD NFTs
                         </Button>
                     </GridItem>

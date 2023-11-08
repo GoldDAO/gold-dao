@@ -117,7 +117,7 @@ const Overview = () => {
                                     ) : (
                                         <Spinner size={'sm'} color="secondaryText" />
                                     )}
-                                    <Text>Total number of NFTs</Text>
+                                    <Text fontSize={'16px'}>Total number of NFTs</Text>
                                 </Box>
                             </Stack>
                         </HStack>
@@ -141,7 +141,7 @@ const Overview = () => {
                                 ) : (
                                     <Spinner size={'sm'} color="secondaryText" />
                                 )}
-                                <Text>Total NFTs weight</Text>
+                                <Text fontSize={'16px'}>Total NFTs weight</Text>
                             </Box>
                         </HStack>
                     </CardBody>
@@ -167,7 +167,7 @@ const Overview = () => {
                                 ) : (
                                     <Spinner size={'sm'} color="secondaryText" />
                                 )}
-                                <Text>Total GLDT swapped</Text>
+                                <Text fontSize={'16px'}>Total GLDT swapped</Text>
                             </Box>
                         </HStack>
                     </CardBody>
@@ -211,7 +211,7 @@ const Mynfts = ({ connected }) => {
             gap={[3]}
         >
             <CardHeader pl={0} py={{ base: '2px', md: '10px' }}>
-                <Text>My Nfts</Text>
+                <Text fontSize={'16px'}>My Nfts</Text>
             </CardHeader>
             <Accordion allowToggle>
                 <HStack
@@ -233,6 +233,7 @@ const Mynfts = ({ connected }) => {
                                         shadow={'none'}
                                         h="60px"
                                         bg="bg"
+                                        fontSize={'18px'}
                                         border="1px"
                                         borderColor="border"
                                         borderRadius={'md'}
@@ -243,7 +244,7 @@ const Mynfts = ({ connected }) => {
                                             justifyContent={'space-between'}
                                             borderStartStartRadius={'md'}
                                         >
-                                            <Text>GLD NFT {weight}g</Text>
+                                            <Text fontSize={'16px'}>GLD NFT {weight}g</Text>
 
                                             {isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                                         </HStack>
@@ -360,6 +361,7 @@ const SaleStatus = ({ status, e }) => {
             color={'secondaryText'}
             borderRadius={'200px'}
             p={'3px 12px'}
+            fontSize={'14px'}
             w={'fit-content'}
         >
             Not on Sale
@@ -372,8 +374,8 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
-                <Text>Page {currentHistoryPage + 1}</Text>
-                <Text>{total} entries</Text>
+                <Text fontSize={'16px'}>Page {currentHistoryPage + 1}</Text>
+                <Text fontSize={'16px'}>{total} entries</Text>
             </Flex>
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Button
@@ -419,7 +421,7 @@ const MyTransactions = () => {
             gap={[3]}
         >
             <CardHeader pl={0} py={{ base: '2px', md: '10px' }}>
-                <Text>My Transactions</Text>
+                <Text fontSize={'16px'}>My Transactions</Text>
             </CardHeader>
             <Accordion allowToggle>
                 <HStack wrap={'wrap'}>
