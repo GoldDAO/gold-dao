@@ -262,7 +262,7 @@ swap_app staging build:
     NETWORK: "staging"
   script:
     - npm run build:swap_app
-    - STAGING_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "SWAP_APP_URL=$STAGING_URL" > swap_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-swap_app_STAGING_BUILD"
@@ -287,7 +287,7 @@ landing_page staging build:
     NETWORK: "staging"
   script:
     - npm run build:landing
-    - STAGING_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "LANDING_URL=$STAGING_URL" > landing_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
@@ -312,7 +312,7 @@ explorer staging build:
     NETWORK: "staging"
   script:
     - npm run build:explorer
-    - STAGING_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "EXPLORER_URL=$STAGING_URL" > explorer_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
@@ -340,7 +340,7 @@ swap_app production build:
     NETWORK: "ic"
   script:
     - npm run build:swap_app
-    - PRODUCTION_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "SWAP_APP_URL=$PRODUCTION_URL" > swap_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
@@ -368,7 +368,7 @@ landing_page production build:
     NETWORK: "ic"
   script:
     - npm run build:landing
-    - PRODUCTION_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page"
@@ -396,7 +396,7 @@ explorer production build:
     NETWORK: "ic"
   script:
     - npm run build:explorer
-    - PRODUCTION_URL=$(node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids["$CANISTER_NAME"].$NETWORK}.icp0.io`);')
+    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "EXPLORER_URL=$PRODUCTION_URL" > explorer_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
