@@ -61,7 +61,11 @@ const TextBloc = ({
                                 </Text>
                             )}
                             {link && (
-                                <Box pt={[0, 0, '20px']} textDecoration={'underline'} w={'100%'}>
+                                <Box
+                                    pt={['10px', '10px', '20px']}
+                                    textDecoration={'underline'}
+                                    w={'100%'}
+                                >
                                     <Link href={link.href}>{link.label}</Link>
                                 </Box>
                             )}

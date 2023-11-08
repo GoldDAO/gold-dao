@@ -23,16 +23,10 @@ const Question = ({ q, r }) => {
                 textAlign={'left'}
                 py="1em"
             >
-                <Text fontSize={'20px'} m={0}>
-                    {q}
-                </Text>
+                <Text m={0}>{q}</Text>
                 <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel
-                py="1em"
-                fontSize={'18px'}
-                width={['100%', '100%', '100%', '100%', '75%']}
-            >
+            <AccordionPanel py="1em" width={['100%', '100%', '100%', '100%', '75%']}>
                 {r}
             </AccordionPanel>
         </AccordionItem>

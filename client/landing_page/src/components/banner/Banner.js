@@ -92,7 +92,7 @@ const Banner = () => {
                             </HStack>
                         </GridItem>
 
-                        <GridItem colSpan={[12, 12, 3, 3, 2]}>
+                        <GridItem colSpan={[11, 11, 3, 3, 2]}>
                             <Button variant="yumi" w={'100%'}>
                                 Play Video
                             </Button>

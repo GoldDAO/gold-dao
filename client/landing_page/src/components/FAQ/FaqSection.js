@@ -14,7 +14,7 @@ const FaqSection = ({ full }) => {
                 <GridSystem>
                     <GridItem
                         colStart={[1, 1, 1, 2]}
-                        colSpan={[12, 12, 3, 2]}
+                        colSpan={[11, 11, 3, 2]}
                         borderTop={'1px'}
                         borderTopColor={'lightGold'}
                     >
@@ -24,12 +24,14 @@ const FaqSection = ({ full }) => {
                             </Heading>
                             {!full && (
                                 <Box mt={[0, 0, '20px']} textDecoration={'underline'}>
-                                    <Link href={'FAQ'}>View more FAQs</Link>
+                                    <Link pt="7px" href={'FAQ'}>
+                                        View more FAQs
+                                    </Link>
                                 </Box>
                             )}
                         </Box>
                     </GridItem>
-                    <GridItem colSpan={[12, 12, 8]}>
+                    <GridItem colSpan={[11, 11, 8]}>
                         <Accordion allowToggle>
                             {Q.map((e, i) => {
                                 if (!full && i < 3) {
