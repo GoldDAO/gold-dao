@@ -1,7 +1,7 @@
 import BAS from '/public/images/partners/BAS.svg';
 import dfinity from '/public/images/partners/dfinity.svg';
 import KPMG from '/public/images/partners/KPMG.svg';
-import loomis from '/public/images/partners/loomis.jpg';
+import loomis from '/public/images/partners/loomis.png';
 import metalor from '/public/images/partners/metalor.svg';
 import origyn from '/public/images/partners/origyn.svg';
 
