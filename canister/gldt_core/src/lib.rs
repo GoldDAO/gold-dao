@@ -837,32 +837,32 @@ pub struct SubscriberNotification {
 }
 
 #[update]
-async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, String> {
+async fn notify_sale_nft_origyn(args: SubscriberNotification) {
     log_message(format!("Sale notifcation: {args:?}"));
     canistergeek_ic_rust::monitor::collect_metrics();
 
     // STEP 1 : validate inputs
-    let (nft_id, gld_nft_canister_id, mut swap_info) = (match validate_inputs(args.clone()) {
-        Ok(res) => Ok(res),
+    let (nft_id, gld_nft_canister_id, mut swap_info) = match validate_inputs(args.clone()) {
+        Ok(res) => res,
         Err(err) => {
-            let msg = format!("ERROR :: {err}");
-            log_message(msg.clone());
-            Err(msg)
+            log_message(format!("ERROR :: {err}"));
+            return;
         }
-    })?;
+    };
 
     // STEP 2 : add entry in registry to keep track of running listings
     //          and block any attempts of double minting
-    update_registry(
-        &UpdateType::Init,
-        nft_id.clone(),
-        gld_nft_canister_id,
-        swap_info.clone()
-    ).map_err(|err| {
-        let msg = format!("ERROR :: {err}");
-        log_message(msg.clone());
-        msg
-    })?;
+    if
+        let Err(err) = update_registry(
+            &UpdateType::Init,
+            nft_id.clone(),
+            gld_nft_canister_id,
+            swap_info.clone()
+        )
+    {
+        log_message(format!("ERROR :: {err}"));
+        return;
+    }
 
     // STEP 3 : mint GLDT to escrow address and then swap GLDTs and NFTs
     //          Careful after this point as tokens are being minted and transfers take place.
@@ -870,15 +870,17 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
     match mint_tokens(gld_nft_canister_id, swap_info.clone()).await {
         Ok(gldt_minted) => {
             swap_info.set_ledger_entry(GldtLedgerEntry::Minted(gldt_minted.clone()));
-            update_registry(
-                &UpdateType::Mint,
-                nft_id.clone(),
-                gld_nft_canister_id,
-                swap_info.clone()
-            ).map_err(|err| {
+            if
+                let Err(err) = update_registry(
+                    &UpdateType::Mint,
+                    nft_id.clone(),
+                    gld_nft_canister_id,
+                    swap_info.clone()
+                )
+            {
                 log_message(format!("ERROR :: {err}"));
-                err
-            })?;
+                return;
+            }
             // Second step: accept the offer of the listed NFT
             match accept_offer(nft_id.clone(), gld_nft_canister_id, swap_info.clone()).await {
                 Ok(gldt_swapped) => {
@@ -899,9 +901,7 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                     });
                     // notify the compensation canister
                     notify_fee_compensation_canister();
-                    let msg = "INFO :: accept_offer :: sucess".to_string();
-                    log_message(msg.clone());
-                    Ok(msg)
+                    log_message("INFO :: accept_offer :: success".to_string());
                 }
                 Err(msg) => {
                     // In case of a failure of the swapping after minting, the escrow is withdrawn
@@ -924,34 +924,42 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) -> Result<String, 
                         }
                     }
                     swap_info.set_failed(GldtError::SwappingError(None));
-                    update_registry(
-                        &UpdateType::Failed,
-                        nft_id.clone(),
-                        gld_nft_canister_id,
-                        swap_info.clone()
-                    )?;
+
+                    // Update the registry and add record
+                    if
+                        let Err(err) = update_registry(
+                            &UpdateType::Failed,
+                            nft_id.clone(),
+                            gld_nft_canister_id,
+                            swap_info.clone()
+                        )
+                    {
+                        log_message(format!("ERROR :: {err}"));
+                    }
                     add_record(nft_id.clone(), gld_nft_canister_id, &swap_info, RecordStatusInfo {
                         status: RecordStatus::Failed,
                         message: Some("Error while swapping GLD NFT for GLDT.".to_string()),
                     });
-                    Err("Error while swapping GLD NFT for GLDT.".to_string())
                 }
             }
         }
         Err(msg) => {
             log_message(format!("ERROR :: mint_tokens :: {msg}"));
             swap_info.set_failed(GldtError::MintingError(None));
-            update_registry(
-                &UpdateType::Failed,
-                nft_id.clone(),
-                gld_nft_canister_id,
-                swap_info.clone()
-            )?;
+            if
+                let Err(err) = update_registry(
+                    &UpdateType::Failed,
+                    nft_id.clone(),
+                    gld_nft_canister_id,
+                    swap_info.clone()
+                )
+            {
+                log_message(format!("ERROR :: {err}"));
+            }
             add_record(nft_id.clone(), gld_nft_canister_id, &swap_info, RecordStatusInfo {
                 status: RecordStatus::Failed,
                 message: Some("Error while minting GLDT.".to_string()),
             });
-            Err(msg)
         }
     }
 }
