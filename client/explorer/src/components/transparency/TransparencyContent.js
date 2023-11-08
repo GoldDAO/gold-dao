@@ -1,10 +1,12 @@
-import { Box, Card, HStack, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, Card, GridItem, HStack, Heading, Stack, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useNft } from '@utils/hooks/useNFTs';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
 import { useTotalSupply } from '@utils/hooks/useTotalSupply';
 import TokenSign from '@ui/gldt/TokenSign';
 import { cardPadding } from '@ui/theme';
+import Layout from '../layout/Layout';
+import GridSystem from '@ui/layout/GridSystem';
 
 const TransparencyContent = () => {
     const actors = useAllCanisters();
@@ -30,64 +32,35 @@ const TransparencyContent = () => {
 
     const w = [1, 10, 100, 1000];
     return (
-        <Box gridColumn={['1/13', '1/13', '3/11', '3/11']}>
-            <Heading as="h1" fontWeight={300}>
-                Transparency
-            </Heading>
-            <Card
-                mt="20px"
-                gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-                p={cardPadding.xl}
-                position={'relative'}
-                bg="bg"
-                mx={['10px', '20px', 0, 0, 0]}
-                display="grid"
-                justifyContent={'center'}
-                gridTemplateRows={'repeat(1, 1fr)'}
-                gridTemplateColumns={'repeat(1, 1fr)'}
-                gap="3"
-                borderRadius={'2xl'}
-            >
-                <Text>GLDT</Text>
-                <HStack>
-                    <Card w={'50%'}>
-                        <HStack>
-                            <Text>{totalSupply.gldt}</Text>
-                            <TokenSign />
-                        </HStack>
-                    </Card>
-                    <Card w={'50%'}>
-                        <HStack>
-                            <Text>{totalWeightSwapped} g</Text>
-                            <TokenSign />
-                        </HStack>
-                    </Card>
+        <GridSystem>
+            <GridItem gridColumn={['1/12', '1/12', '2/12']} py="40px">
+                <Heading as="h1" variant={'h1'}>
+                    GLDT
+                </Heading>
+                <Heading as="h2" variant={'h2'}>
+                    Transparency
+                </Heading>
+            </GridItem>
+            <GridItem colSpan={'8'} colStart={[1, 1, 2]}>
+                <Text fontSize={'16px'}>Total Supply</Text>
+                <HStack fontSize={'34px'}>
+                    <Text fontSize={'inherit'}>{totalSupply.gldt}</Text>
+                    <TokenSign />
                 </HStack>
-            </Card>
-            <Card
-                mt="20px"
-                gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-                p={cardPadding.xl}
-                position={'relative'}
-                bg="bg"
-                mx={['10px', '20px', 0, 0, 0]}
-                display="grid"
-                justifyContent={'center'}
-                gridTemplateRows={'repeat(1, 1fr)'}
-                gridTemplateColumns={'repeat(1, 1fr)'}
-                gap="3"
-                borderRadius={'2xl'}
-            >
-                <Stack wrap={'wrap'}>
-                    {arr.map((e, i) => (
-                        <Card key={i}>
-                            <Text>{w[i]}g GLD Nfts</Text>
-                            <Text>{e}g</Text>
-                        </Card>
-                    ))}
-                </Stack>
-            </Card>
-        </Box>
+            </GridItem>
+            <GridItem colSpan={'8'} colStart={[1, 1, 2]}>
+                <Text fontSize={'16px'}>Total Swapped</Text>
+                <HStack fontSize={'34px'}>
+                    <Text fontSize={'inherit'}>{totalWeightSwapped} g</Text>
+                </HStack>
+            </GridItem>
+            {arr.map((e, i) => (
+                <GridItem colSpan={'8'} colStart={[1, 1, 2]} key={i} fontSize={'34px'}>
+                    <Text fontSize={'16px'}>{w[i]}g GLD Nfts</Text>
+                    <Text fontSize={'inherit'}>{e}g</Text>
+                </GridItem>
+            ))}
+        </GridSystem>
     );
 };
 

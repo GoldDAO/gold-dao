@@ -11,7 +11,7 @@ const PrincipalFormat = ({ principal }) => {
 		principal && (
 			<HStack justifySelf={'flex-end'}>
 				<Tooltip label={principal}>
-					<Text>
+					<Text fontSize={'inherit'}>
 						{firstChars}...{lastChars}
 					</Text>
 				</Tooltip>
