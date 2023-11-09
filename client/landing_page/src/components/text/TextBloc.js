@@ -55,6 +55,8 @@ const TextBloc = ({
                                     as="h4"
                                     textAlign={['left', 'left', 'left', titleAlign]}
                                     pt={[0, 0, '20px']}
+                                    fontWeight={500}
+                                    color="gold"
                                     w={'100%'}
                                 >
                                     {subtitle}
