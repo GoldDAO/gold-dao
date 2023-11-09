@@ -261,9 +261,7 @@ impl Registry {
             btree_map::Entry::Vacant(v) => {
                 if num_entries >= (MAX_NUMBER_OF_ENTRIES as usize) {
                     return Err(
-                        format!(
-                            "Swap NFT limit reached, limit is actually set to {MAX_NUMBER_OF_ENTRIES}."
-                        )
+                        format!("Swap NFT limit reached, limit is set to {MAX_NUMBER_OF_ENTRIES}.")
                     );
                 }
 
@@ -279,7 +277,7 @@ impl Registry {
                     if o.get().count_older_record() >= (MAX_HISTORY_REGISTRY as usize) {
                         return Err(
                             format!(
-                                "Swap limit reached for this NFT, limit is actually set to {MAX_HISTORY_REGISTRY}."
+                                "Swap limit reached for this NFT, limit is set to {MAX_HISTORY_REGISTRY}."
                             )
                         );
                     }
