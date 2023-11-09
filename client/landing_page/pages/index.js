@@ -57,7 +57,7 @@ function Home() {
                     title={price.title}
                     content={price.content}
                     link={price.link}
-                    subtitle={<GldtValue />}
+                    subtitle={'1g gold = 100 GLDT'}
                     textSpan={[12, 12, 8, 5, 5]}
                     titleSpan={[12, 12, 3, 3, 2]}
                     titleOrder={(-2, -2, 0)}

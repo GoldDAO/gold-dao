@@ -57,8 +57,8 @@ const Header = () => {
                     </GridItem>
                     <GridItem
                         order={[-1, -1, 3]}
-                        colStart={[1, 1, 4]}
-                        colSpan={[9, 10, 9]}
+                        colStart={[1, 1, 10]}
+                        colSpan={[9, 10, 3]}
                         display={'grid'}
                         alignContent={'center'}
                     >
