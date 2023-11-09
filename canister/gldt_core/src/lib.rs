@@ -663,6 +663,14 @@ fn add_record(
     swap_info: &SwapInfo,
     status: RecordStatusInfo
 ) {
+    {
+        let records: Records = RECORDS.with(|cell| cell.borrow().clone());
+
+        if records.len() >= (records::MAX_NUMBER_OF_RECORDS as usize) {
+            return;
+        }
+    }
+
     // To avoid any erros at this stage, all faulty values are set to default.
     let weight = CONF.with(|c|
         c.borrow().get_weight_by_collection_id(&gld_nft_canister_id)
