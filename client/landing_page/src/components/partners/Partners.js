@@ -32,8 +32,9 @@ const Partners = () => {
                             alignSelf={'center'}
                             target={'_blank'}
                             border="1px"
+                            filter="grayscale(100%)"
                             borderColor={'lightgray'}
-                            _hover={{ transform: `scale(1.1)` }}
+                            _hover={{ transform: `scale(1.1)`, filter: 'grayscale(00%)' }}
                             transition={'.2s'}
                             borderRadius={'10px'}
                             display={'flex'}
@@ -46,7 +47,6 @@ const Partners = () => {
                                     src={e.img}
                                     alt={`logo ${e.name}`}
                                     style={{
-                                        filter: 'grayscale(100%)',
                                         opacity: 1,
                                         width: e.w,
                                     }}

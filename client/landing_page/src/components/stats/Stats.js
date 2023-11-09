@@ -18,7 +18,9 @@ const Stats = () => {
         },
         {
             label: 'Gold Kilograms',
-            value: totalSupply.g ? `${(totalSupply.g / 100).toLocaleString('en-US')} g` : '-',
+            value: totalSupply.g
+                ? `${Math.round(totalSupply.g / 100).toLocaleString('en-US')} g`
+                : '-',
         },
     ];
     return (

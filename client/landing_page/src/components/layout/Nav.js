@@ -22,6 +22,9 @@ import Logo from '/public/images/logo.svg';
 import Image from 'next/image';
 import React from 'react';
 
+const appUrl =
+    process.env.DFX_network !== 'ic' ? 'https://staging.app.gldt.org' : 'https://app.gldt.org';
+
 export default function WithSubnavigation({ nav, children }) {
     const { isOpen, onToggle } = useDisclosure();
 
@@ -113,15 +116,41 @@ const DesktopNav = ({ nav, children }) => {
                 </Box>
             ))}
             {children}
-            <Button
-                width={'150px'}
-                as={Link}
-                target="_blank"
-                href="https://staging.app.gldt.org"
-                variant={'yumiGold'}
-            >
-                Swap
-            </Button>
+            <HStack position="relative">
+                <Button
+                    width={'150px'}
+                    // as={Link}
+                    // target="_blank"
+                    cursor={'not-allowed'}
+                    // href={appUrl}
+                    variant={'disableYumiGold'}
+                >
+                    Swap App
+                </Button>
+                <Box
+                    position={'absolute'}
+                    borderRadius={'50%'}
+                    display={'flex'}
+                    transform={'rotate(10deg)'}
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                    width={'65px'}
+                    bg="gold"
+                    top="3px"
+                    left="110px"
+                    height={'65px'}
+                >
+                    <Text
+                        fontSize={'12px'}
+                        textAlign={'center'}
+                        color="white"
+                        lineHeight={'15px'}
+                        pt="2px"
+                    >
+                        Coming Soon
+                    </Text>
+                </Box>
+            </HStack>
         </Stack>
     );
 };
@@ -181,8 +210,16 @@ const MobileNav = ({ nav, children }) => {
                     ))}
                 </Box>
                 {children}
-                <Button variant={'yumiGold'} width={'100%'}>
-                    Swap
+                <Button
+                    width={'100%'}
+                    // as={Link}
+                    // target="_blank"
+                    // href={appUrl}
+                    variant={'yumiGold'}
+                    _disabled={true}
+                >
+                    Swap App
+                    <Box>Comming Soon</Box>
                 </Button>
             </VStack>
         </VStack>

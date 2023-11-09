@@ -4,6 +4,7 @@ import Logo from '/public/images/yumi.png';
 import GridSystem from '../layout/Grid';
 import Image from 'next/image';
 import { Fade } from 'react-awesome-reveal';
+import Link from 'next/link';
 const Yumi = () => {
     return (
         <Box
@@ -21,13 +22,18 @@ const Yumi = () => {
                 <GridSystem gap={[4, 4, 6, 6, 8]}>
                     <GridItem
                         colStart={[2, 4, 4, 2, 2]}
-                        colSpan={[10, 6, 6, 2, 2]}
+                        colSpan={[10, 8, 6, 2, 2]}
                         order={[2, 2, 2, 1, 1]}
                     >
-                        <Heading variant={'h4'} as="h4" textAlign={['center', 'center', 'left']}>
+                        <Heading
+                            variant={'h4'}
+                            as="h4"
+                            textAlign={['center', 'center', 'left']}
+                            w={'100%'}
+                        >
                             Don’t own any{' '}
                             <Box color="gold" as="span" fontWeight={600}>
-                                GLD NFTs
+                                GLD&nbsp;NFTs
                             </Box>
                             &nbsp;?
                         </Heading>
@@ -54,12 +60,15 @@ const Yumi = () => {
                         colStart={[2, 4, 4, 7, 7]}
                     >
                         <Text textAlign={['center', 'center', 'left']}>
-                            join the global movement towards a more transparent and accessible
-                            buying and selling of gold.
+                            Buy your first tokenised gold and join the movement to a more
+                            transparent and accessible future of owning gold.
                         </Text>
                         <Button
                             px="50px"
                             mt="20px"
+                            target="_blank"
+                            href="https://yumi.io/gold"
+                            as={Link}
                             variant={'yumi'}
                             width={['100%', '100%', 'fit-content']}
                         >
