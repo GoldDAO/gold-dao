@@ -267,7 +267,7 @@ swap_app staging build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-swap_app_STAGING_BUILD"
     paths:
-      - swap_app/out
+      - client/swap_app/out
     reports:
       dotenv: swap_deploy.env
     expire_in: 1 day
@@ -292,7 +292,7 @@ landing_page staging build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
     paths:
-      - landing/out
+      - client/landing_page/out
     reports:
       dotenv: landing_deploy.env
     expire_in: 1 day
@@ -317,7 +317,7 @@ explorer staging build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
     paths:
-      - explorer/out
+      - client/explorer/out
     reports:
       dotenv: explorer_deploy.env
     expire_in: 1 day
@@ -345,7 +345,7 @@ swap_app production build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
     paths:
-      - swap_app/out
+      - client/swap_app/out
     reports:
       dotenv: swap_deploy.env
     expire_in: 6 months
@@ -373,7 +373,7 @@ landing_page production build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page"
     paths:
-      - landing_page/out
+      - client/landing_page/out
     reports:
       dotenv: landing_deploy.env
     expire_in: 6 months
@@ -401,7 +401,7 @@ explorer production build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
     paths:
-      - explorer/out
+      - client/explorer/out
     reports:
       dotenv: explorer_deploy.env
     expire_in: 6 months
