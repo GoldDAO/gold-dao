@@ -9,7 +9,7 @@ export const content = {
     intro: {
         title: 'A token backed 100% by physical gold',
         content:
-            'The GLDT is a token backed by real gold from Metalor. Through the Yumi marketplace, owners can exchange their gold certificates (known as GLD NFTs) for GLDT tokens. For instance, if you have a certificate for 1 gram of gold, you can trade it for 100 GLDT. So, in essence, each GLDT token represents a portion of real gold.',
+            'GLDT is a fungible token backed by physical gold stored in vaults in Switzerland. Through the Yumi marketplace, user can purchase gold certificates (known as GLD NFTs) and then swap them for GLDT tokens in the swap app. For instance, if you have a certificate for 1 gram of gold, you can swap it for 100 GLDT. So, in essence, each GLDT token represents a portion of real phyiscal gold.',
     },
     partners: [
         {
@@ -38,15 +38,15 @@ export const content = {
             w: '65px',
         },
         {
-            name: 'dfinity',
-            url: 'https://dfinity.org/',
+            name: 'icp',
+            url: 'https://internetcomputer.org/',
             img: dfinity,
             w: '60px',
         },
 
         {
             name: 'BAS',
-            url: '#',
+            url: 'https://nbdc5-raaaa-aaaan-qdxfa-cai.icp0.io/',
             img: BAS,
             w: '110px',
         },
@@ -54,10 +54,10 @@ export const content = {
     tech: {
         title: 'Learn More About the Technology',
         content:
-            "The GLDT primarily uses the ICP blockchain for token minting. It's worth noting that the token is cross-platform and multi-chain. To learn more about how minting and the token work, consult the whitepaper.",
+            "The GLDT primarily uses the ICP blockchain for token minting. It's worth noting that the token will be cross-platform and multi-chain. To learn more about how minting and the token work, consult the whitepaper.",
         link: {
-            label: 'Read the whitepaper',
-            href: '/whitepaper',
+            label: 'Read the FAQ',
+            href: '/FAQ',
         },
     },
     price: {

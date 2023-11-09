@@ -45,13 +45,15 @@ export const customTheme = {
 					fontFamily: inter.style.fontFamily ,
 				},
 				h1: {
-					fontSize: ['42px' ,'56px', '56px'],
+					fontSize: ['42px' ,'56px', '60px'],
+					lineHeight:[ '48px', '68px', '68px'],
 					fontWeight: 500,
 					color: 'gold',
 					fontFamily: inter.style.fontFamily ,
 				},
 				h2: {
-					fontSize: ['42px' ,'56px', '56px'],
+					fontSize: ['42px' ,'56px', '60px'],
+					lineHeight:[ '48px', '68px', '68px'],
 					fontWeight: 500,
 					fontFamily: inter.style.fontFamily ,
 				}
@@ -107,7 +109,16 @@ export const customTheme = {
 					fontWeight: 500,
 					_hover: {
 						transform: 'scale(1.1)'
-					}
+					},
+				},
+				disableYumiGold: {
+					bg: 'bg',
+					border: 'none',
+					outline: 'none',
+					color: 'secondaryText',
+					borderRadius: '50px',
+					fontSize: '18px',
+					fontWeight: 500,
 				}
 			}
 		},

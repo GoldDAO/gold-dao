@@ -26,7 +26,7 @@ const Question = ({ q, r }) => {
                 <Text m={0}>{q}</Text>
                 <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel py="1em" width={['100%', '100%', '100%', '100%', '75%']}>
+            <AccordionPanel pb="1em" pl={0} width={['90%', '90%', '90%', '75%', '75%']}>
                 {r}
             </AccordionPanel>
         </AccordionItem>

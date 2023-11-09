@@ -8,6 +8,7 @@ import FaqSection from '@/components/FAQ/FaqSection';
 import Scene from '@/components/banner/scene/Scene';
 import dynamic from 'next/dynamic';
 import Yumi from '@/components/banner/Yumi';
+import GldtValue from '@/components/stats/GldtValue';
 
 function Home() {
     const { intro, partners, tech, price } = content;
@@ -56,14 +57,14 @@ function Home() {
                     title={price.title}
                     content={price.content}
                     link={price.link}
-                    subtitle={price.subTitle}
+                    subtitle={<GldtValue />}
                     textSpan={[12, 12, 8, 5, 5]}
                     titleSpan={[12, 12, 3, 3, 2]}
                     titleOrder={(-2, -2, 0)}
                     colStart={[0, 0, 1, 4, 5]}
                     colEnd={[12, 12, 12, 12]}
                     textOrder={[5, 5, 2, 2, 2]}
-                    titleAlign="center"
+                    titleAlign="right"
                     pastille={true}
                     circle={true}
                 />
