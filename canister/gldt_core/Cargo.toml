@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Core logic canister for swapping GLD NFT to GLDT."
 authors = ["Johan Georg", "Dustin Becker <dustin@bochslerfinance.com>", "Gautier Woja <gautier@bochslerfinance.com>"]
 edition = "2021"
+license= "AGPL-3.0-only"
+license-file = "../../LICENSE"
 
 ## See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]

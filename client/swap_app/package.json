@@ -8,7 +8,7 @@
         "url": "git@gitlab.bochslerfinance.com:gldt/gldt-swap-frontend.git"
     },
     "author": "Victor Audetat",
-    "license": "SEE LICENSE IN LICENSE.md",
+    "license": "AGPL-3.0-only",
     "private": true,
     "scripts": {
         "develop": "next dev",

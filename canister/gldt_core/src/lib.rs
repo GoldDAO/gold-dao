@@ -1,5 +1,28 @@
 #![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
+/*!
+# GLDT and GLDT Swapp dApp canisters
+
+## Copyright
+© 2023  [Bochsler Assets & Securities (BAS) SA], [Switzerland]
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[Bochsler Assets & Securities (BAS) SA]: https://bas.tech
+[Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
+*/
+
 //! GLDT is a digital token 100% backed by physical gold in the form
 //! of NFTs in a ratio of 1 gram of gold NFTs equals 100 GLDT. The
 //! NFTs have their ownership registered to this canister, which is
