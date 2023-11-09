@@ -35,13 +35,13 @@ const FaqSection = ({ full }) => {
                         {faq.map((e, i) => {
                             if (!full && i < 3) {
                                 return (
-                                    <Fade>
+                                    <Fade key={i}>
                                         <Question key={i} q={e.q} r={e.r} />
                                     </Fade>
                                 );
                             } else if (full) {
                                 return (
-                                    <Fade>
+                                    <Fade key={i}>
                                         <Question key={i} q={e.q} r={e.r} />
                                     </Fade>
                                 );
