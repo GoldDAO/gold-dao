@@ -529,6 +529,38 @@ landing page production:
     url: $LANDING_URL
     action: start
 
+explorer staging:
+  variables:
+    CANISTER_NAME: "gldt_explorer"
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      needs: ["explorer staging build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: $PEM_FILE_STAGING
+  <<: *asset_canister_deploy
+  environment:
+    name: explorer
+    deployment_tier: staging
+    url: $EXPLORER_URL
+    action: start
+
+explorer production:
+  variables:
+    CANISTER_NAME: "gldt_explorer"
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
+      needs: ["explorer production build"]
+      variables:
+        TARGET_NETWORK: ic
+        PEM_FILE: $PEM_FILE_PRODUCTION
+  <<: *asset_canister_deploy
+  environment:
+    name: explorer
+    deployment_tier: production
+    url: $EXPLORER_URL
+    action: start
+
 gldt core staging:
   stage: deploy
   rules:
