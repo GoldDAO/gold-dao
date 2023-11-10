@@ -28,7 +28,7 @@ if [[ $# -gt 0 ]]; then
         show_help
         exit
         ;;
-      -r || --reinstall )
+      -r | --reinstall )
         REINSTALL="--mode reinstall"
         ;;
     esac;
