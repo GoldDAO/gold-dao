@@ -424,7 +424,7 @@ local deploy and tests:
     - dfx --version
     - dfx start --clean --background
   script:
-    - scripts/local-deploy.sh
+    - NETWORK='local' scripts/local-deploy.sh
   after_script:
     - cat canister_ids.json
     - dfx stop
