@@ -9,7 +9,7 @@ import { faq } from './faq';
 const FaqSection = ({ full }) => {
     console.log('full', full);
     return (
-        <Box width={'100%'}>
+        <Box width={'100%'} position={'relative'} zIndex={20}>
             <GridSystem>
                 <GridItem
                     colStart={[1, 1, 1, 2]}

@@ -13,7 +13,7 @@ const Question = ({ q, r }) => {
         <AccordionItem
             w={'100%'}
             borderTopColor={'lightGold'}
-            borderBottomColor={'lightGold'}
+            borderBottomColor={'transparent'}
             textAlign={'left'}
         >
             <AccordionButton
@@ -23,11 +23,13 @@ const Question = ({ q, r }) => {
                 textAlign={'left'}
                 py="1em"
             >
-                <Text m={0}>{q}</Text>
+                <Text w={'90%'} m={0} fontWeight={500}>
+                    {q}
+                </Text>
                 <AccordionIcon />
             </AccordionButton>
             <AccordionPanel pb="1em" pl={0} width={['90%', '90%', '90%', '75%', '75%']}>
-                {r}
+                <Text>{r}</Text>
             </AccordionPanel>
         </AccordionItem>
     );

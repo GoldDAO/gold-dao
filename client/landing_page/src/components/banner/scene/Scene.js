@@ -1,16 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Model from './Model';
-import { Box, Text } from '@chakra-ui/react';
-import {
-    EffectComposer,
-    DepthOfField,
-    Noise,
-    SSAO,
-    LensFlare,
-    BrightnessContrast,
-} from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
+import { EffectComposer, Noise } from '@react-three/postprocessing';
 import {
     AccumulativeShadows,
     CameraShake,
@@ -20,32 +11,34 @@ import {
     RandomizedLight,
     Stats,
 } from '@react-three/drei';
-import * as THREE from 'three';
-import { useFrame, useThree } from '@react-three/fiber';
 
 const Scene = () => {
-    const [mouse, setMouse] = useState();
-    const GetPos = ({ setMouse }) => {
-        const { pointer, clock } = useThree();
-        useEffect(() => {
-            setMouse(pointer);
-        }, [pointer]);
-    };
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const updateMousePosition = (e) => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = -((e.clientY / window.innerHeight) * 2 - 1);
+            setMousePosition({ x, y });
+        };
+        window.addEventListener('mousemove', updateMousePosition);
+
+        return () => {
+            window.removeEventListener('mousemove', updateMousePosition);
+        };
+    }, []);
+
     return (
         <>
             <Canvas
                 style={{
                     opacity: 0.9,
-                    // width: '100vw',
-                    // height: '100vh',
-                    // top: 0,
                     position: 'absolute',
-                    // left: 0,
                     zIndex: -1,
                 }}
             >
                 <Suspense fallback={null}>
-                    <Model mouse={mouse} />
+                    <Model mouse={mousePosition} />
                 </Suspense>
                 <pointLight intensity={10} />
                 <Environment preset="city" />
@@ -78,18 +71,6 @@ const Scene = () => {
                 <EffectComposer>
                     <Noise opacity={0.1} />
                 </EffectComposer>
-            </Canvas>
-            <Canvas
-                style={{
-                    width: '100vw',
-                    height: '100vh',
-                    top: 0,
-                    position: 'fixed',
-                    left: 0,
-                    zIndex: 100,
-                }}
-            >
-                <GetPos setMouse={setMouse} />
             </Canvas>
         </>
     );
