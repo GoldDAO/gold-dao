@@ -58,5 +58,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     gld_nft_canister_ids=vec{
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
-      }})' --no-wallet -y
+    };
+    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
+      })' --no-wallet -y
 fi
