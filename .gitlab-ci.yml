@@ -458,7 +458,7 @@ check canister ids:
   before_script:
     - *import_dfx_id
   script:
-    - scripts/pre-deploy.sh $TARGET_NETWORK
+    - scripts/pre-deploy.sh --network $TARGET_NETWORK
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
     paths:

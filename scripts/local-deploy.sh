@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. scripts/pre-deploy.sh local && \
+. scripts/pre-deploy.sh --network ${NETWORK} && \
 echo "Deploying gldt_ledger on ${NETWORK}" && \
 . scripts/deploy-ledger.sh $NETWORK && \
 echo "Deploying gldt_ledger_indexer on ${NETWORK}" && \

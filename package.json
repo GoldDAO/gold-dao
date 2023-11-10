@@ -27,7 +27,7 @@
     "lint:swap_app": "npm run --workspace swap_app lint",
     "lint:landing": "npm run --workspace landing_page lint",
     "lint:explorer": "npm run --workspace explorer lint",
-    "deploy": "scripts/local-deploy.sh",
+    "deploy": "NETWORK='local' scripts/local-deploy.sh",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "test": "echo \"No tests yet! Please write some unit tests!\"",
