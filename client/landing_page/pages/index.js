@@ -20,35 +20,6 @@ GLDT and GLDT Swapp dApp frontend
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-import {
-    Box,
-    Button,
-    Container,
-    Grid,
-    GridItem,
-    HStack,
-    Stack,
-    Heading,
-    Stat,
-    StatGroup,
-    StatLabel,
-    StatNumber,
-    Text,
-    VStack,
-    Accordion,
-} from '@chakra-ui/react';
-import Head from 'next/head';
-import Logo from '/public/images/logo.svg';
-import Yumi from '/public/images/yumi.svg';
-import Image from 'next/image';
-import BAS from '/public/images/partners/BAS.svg';
-import dfinity from '/public/images/partners/dfinity.svg';
-import KPMG from '/public/images/partners/KPMG.svg';
-import loomis from '/public/images/partners/loomis.jpg';
-import metalor from '/public/images/partners/metalor.svg';
-import origyn from '/public/images/partners/origyn.svg';
-import Link from 'next/link';
-import Play from '/public/images/play.svg';
 import Layout from '@/components/layout/Layout';
 import Banner from '@/components/banner/Banner';
 import { content } from './../src/content';
