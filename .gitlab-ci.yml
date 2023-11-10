@@ -152,7 +152,7 @@ generate test declarations:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       # TODO: Add "gldt_fee_compensation test build"
-      needs: ["gldt_core test build"]
+      needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
