@@ -43,10 +43,7 @@
         "env_override": null,
         "output": "canister/gldt_fee_compensation/declarations"
       },
-      "build": [
-        "./scripts/build-canister.sh gldt_fee_compensation",
-        "./scripts/generate-did.sh gldt_fee_compensation"
-      ]
+      "build": ["npm run build:back"]
     },
     "gldt_swap_app": {
       "type": "assets",
