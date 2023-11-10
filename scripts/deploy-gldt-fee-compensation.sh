@@ -28,6 +28,9 @@ if [[ $# -gt 0 ]]; then
         show_help
         exit
         ;;
+      -r || --reinstall )
+        REINSTALL="--mode reinstall"
+        ;;
     esac;
     shift;
   done
@@ -42,7 +45,7 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
-dfx deploy gldt_fee_compensation --network $1 --argument '(opt record {
+dfx deploy gldt_fee_compensation --network $1 ${REINSTALL} --argument '(opt record {
   fallback_timer_interval_secs=3600;
   execution_delay_secs=20;
   gldt_canister_id=principal "'"$(dfx canister id --network $1 gldt_core)"'";

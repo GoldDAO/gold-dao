@@ -28,6 +28,9 @@ if [[ $# -gt 0 ]]; then
         show_help
         exit
         ;;
+      -r || --reinstall )
+        REINSTALL="--mode reinstall"
+        ;;
     esac;
     shift;
   done
@@ -60,5 +63,5 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
     };
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-      })' --no-wallet -y
+      })' --no-wallet ${REINSTALL} -y
 fi

@@ -575,7 +575,7 @@ gldt core staging:
   before_script:
     - *import_dfx_id
   script:
-    - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+    - scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
   environment:
     name: gldt_core
     deployment_tier: production
@@ -616,7 +616,7 @@ gldt fee compensation staging:
   before_script:
     - *import_dfx_id
   script:
-    - scripts/deploy-gldt-fee-compensation.sh $TARGET_NETWORK
+    - scripts/deploy-gldt-fee-compensation.sh --reinstall $TARGET_NETWORK
   environment:
     name: gldt_fee_compensation
     deployment_tier: staging
