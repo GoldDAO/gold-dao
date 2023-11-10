@@ -578,7 +578,7 @@ gldt core staging:
     - scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
   environment:
     name: gldt_core
-    deployment_tier: production
+    deployment_tier: staging
     url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
     action: start
 
