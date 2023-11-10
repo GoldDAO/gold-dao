@@ -419,7 +419,7 @@ local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core canister build", "swap_app test build", "landing_page test build", "explorer test build"]
+      needs: ["gldt_core test build", "gldt_fee_compensation test build", "swap_app test build", "landing_page test build", "explorer test build"]
   before_script:
     - dfx --version
     - dfx start --clean --background
