@@ -239,8 +239,7 @@ generate declarations:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
-      # TODO: Add "gldt_fee_compensation canister build"
-      needs: ["gldt_core canister build"]
+      needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
