@@ -13,7 +13,7 @@ export const faq = [
         q: 'Who can participate in the swap?',
         r: (
             <p>
-                Everybody who owns GLD NFT. See{' '}
+                Everybody who owns GLD NFT. See&nbsp;
                 {
                     <Link
                         style={{
@@ -21,11 +21,10 @@ export const faq = [
                         }}
                         href="https://yumi.io/gold/about"
                     >
-                        {' '}
-                        here{' '}
+                        here
                     </Link>
-                }{' '}
-                for details of purchasing GLD NFTs.
+                }
+                &nbsp;for details of purchasing GLD NFTs.
             </p>
         ),
     },
