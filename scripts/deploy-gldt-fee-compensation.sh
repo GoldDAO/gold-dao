@@ -58,3 +58,5 @@ dfx canister call --network $1 gldt_fee_compensation set_gld_nft_conf '( vec{
     record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_1g)"'";  weight=1;  last_query_index=1820};
     record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_10g)"'";  weight=10;  last_query_index=286}
     })'
+
+# TODO: add all NFTs types for production environment !
