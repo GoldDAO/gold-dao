@@ -15,10 +15,10 @@ const Banner = () => {
                 <GridSystem>
                     <GridItem colStart={[1, 1, 1, 2]} colEnd={[12, 12, 12, 7]}>
                         <Box maxW={'500px'}>
-                            <Heading as="h1" variant="h1" position="relative" zIndex={10}>
+                            <Heading as="h1" variant="h1">
                                 GLDT
                             </Heading>
-                            <Heading as="h2" variant="h2" position="relative" zIndex={10}>
+                            <Heading as="h2" variant="h2">
                                 The Future of Tokenized Gold
                             </Heading>
                         </Box>
