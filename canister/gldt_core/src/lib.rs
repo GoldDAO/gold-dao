@@ -1,7 +1,76 @@
-#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
-
 /*!
 # GLDT and GLDT Swapp dApp canisters
+
+GLDT is a digital token 100% backed by physical gold in the form
+of NFTs in a ratio of 1 gram of gold NFTs equals 100 GLDT. The
+NFTs have their ownership registered to this canister, which is
+used to convert NFTs to GLDT and back.  The GLDT canister
+purchases NFTs by minting tokens and sells NFTs against the
+burning of tokens.
+
+The code of this canister is generic in the sense that it is not
+tied to any particular type of NFT, except for the notion of
+'grams' which is tied to tokens in a ratio of one gram equals 100
+tokens. Thus, in principle, the same code can be used for NFT of
+any physical commodity measured in grams. The canister could be
+generalized further by replacing grams by some generic quantity,
+but doing so right now (2023) seems to have little benefit and only
+hamper the readability of the code.
+
+The GLDT canister collaborates with the canisters holding gold
+NFTs as well as the GLDT ledger, which follows the ICRC1 standard
+of the IC.
+
+```text
+User                   NFT                  GLDT            GLDT Ledger
+ |     list NFT (1)     |                    |                   |
+ +--------------------->|                    |                   |
+ |                      |    notify (2)      |                   |
+ |                      +------------------->|                   |
+ |                      |                    | mint request (3)  |
+ |                      |                    +------------------>|
+ |                      |<---------------------------------------+
+ |                      |                    |                   |
+ |                      |<-------------------+                   |
+ |                      |      accept (4)    |                   |
+ |                      |                    |                   |
+ |                      +---+                |                   |
+ |                      |   | accept (4a)    |                   |
+ |                      |<--+                |                   |
+ |                      |                    |                   |
+```
+
+The lifecycle of one NFT is as follows.
+
+* Swapping procedure from NFT => GLDT
+
+    1. A user lists an NFT for sale (1) through the NFT canister.
+
+    2. Upon successful listing, the NFT canister notifies the GLDT canister
+about the listing (2) with the public method `notify_sale_nft_origyn`
+which triggers the swapping sequence.
+
+    3. The GLDT canister mints (3) GLDT to an escrow account on the NFT canister.
+This is required for the sale to go through.
+
+    4. The GLDT canister accepts the offer of the listed NFT (4).
+
+    5. The offer is accepted (4a) on the NFT canister: the NFT now belongs
+to GLDT canister and the minted tokens on the escrow account are
+distributed to the `seller` (user).
+
+* The view of the ownership of NFT from the NFT canister and from
+the GLDT canister is periodically audited (to be implemented).
+
+* The GLDT canister releases an NFT against proof that the
+corresponding number of tokens have been burned (to be
+implemented).
+
+The GLDT ledger uses the account ID of the gldt cansiter (an
+instance of this code) as its 'minting account'.  Computed as
+`$(dfx ledger account-id --of-canister gldt_core)`. The GLDT canister
+also needs to point to the ledger canister as given by `$(dfx
+canister id gldt_ledger)`.
 
 ## Copyright
 © 2023  [Bochsler Assets & Securities (BAS) SA], [Switzerland]
@@ -23,76 +92,7 @@
 [Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
 */
 
-//! GLDT is a digital token 100% backed by physical gold in the form
-//! of NFTs in a ratio of 1 gram of gold NFTs equals 100 GLDT. The
-//! NFTs have their ownership registered to this canister, which is
-//! used to convert NFTs to GLDT and back.  The GLDT canister
-//! purchases NFTs by minting tokens and sells NFTs against the
-//! burning of tokens.
-//!
-//! The code of this canister is generic in the sense that it is not
-//! tied to any particular type of NFT, except for the notion of
-//! 'grams' which is tied to tokens in a ratio of one gram equals 100
-//! tokens. Thus, in principle, the same code can be used for NFT of
-//! any physical commodity measured in grams. The canister could be
-//! generalized further by replacing grams by some generic quantity,
-//! but doing so right now (2023) seems to have little benefit and only
-//! hamper the readability of the code.
-//!
-//! The GLDT canister collaborates with the canisters holding gold
-//! NFTs as well as the GLDT ledger, which follows the ICRC1 standard
-//! of the IC.
-//!
-//! ```text
-//! User                   NFT                  GLDT            GLDT Ledger
-//!  |     list NFT (1)     |                    |                   |
-//!  +--------------------->|                    |                   |
-//!  |                      |    notify (2)      |                   |
-//!  |                      +------------------->|                   |
-//!  |                      |                    | mint request (3)  |
-//!  |                      |                    +------------------>|
-//!  |                      |<---------------------------------------+
-//!  |                      |                    |                   |
-//!  |                      |<-------------------+                   |
-//!  |                      |      accept (4)    |                   |
-//!  |                      |                    |                   |
-//!  |                      +---+                |                   |
-//!  |                      |   | accept (4a)    |                   |
-//!  |                      |<--+                |                   |
-//!  |                      |                    |                   |
-//! ```
-//!
-//! The lifecycle of one NFT is as follows.
-//!
-//! * Swapping procedure from NFT => GLDT
-//!
-//!     1. A user lists an NFT for sale (1) through the NFT canister.
-//!
-//!     2. Upon successful listing, the NFT canister notifies the GLDT canister
-//! about the listing (2) with the public method `notify_sale_nft_origyn`
-//! which triggers the swapping sequence.
-//!
-//!     3. The GLDT canister mints (3) GLDT to an escrow account on the NFT canister.
-//! This is required for the sale to go through.
-//!
-//!     4. The GLDT canister accepts the offer of the listed NFT (4).
-//!
-//!     5. The offer is accepted (4a) on the NFT canister: the NFT now belongs
-//! to GLDT canister and the minted tokens on the escrow account are
-//! distributed to the `seller` (user).
-//!
-//! * The view of the ownership of NFT from the NFT canister and from
-//! the GLDT canister is periodically audited (to be implemented).
-//!
-//! * The GLDT canister releases an NFT against proof that the
-//! corresponding number of tokens have been burned (to be
-//! implemented).
-//!
-//! The GLDT ledger uses the account ID of the gldt cansiter (an
-//! instance of this code) as its 'minting account'.  Computed as
-//! `$(dfx ledger account-id --of-canister gldt_core)`. The GLDT canister
-//! also needs to point to the ledger canister as given by `$(dfx
-//! canister id gldt_ledger)`.
+#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;

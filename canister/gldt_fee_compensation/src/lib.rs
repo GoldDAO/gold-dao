@@ -1,7 +1,12 @@
-#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
-
 /*!
 # GLDT and GLDT Swapp dApp canisters
+
+As the GLD NFTs are using the ORIGYN NFT standard, the
+royalty fees for transactions are protected for any transfer.
+This includes also the swapping of NFTs for GLDT.
+To incentivice users to swap their NFTs for GLDT, the
+foundation is compensating the fees for the first 100 million
+GLDT. This canister takes care of the fee compensation.
 
 ## Copyright
 © 2023  [Bochsler Assets & Securities (BAS) SA], [Switzerland]
@@ -23,12 +28,7 @@
 [Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
 */
 
-//! As the GLD NFTs are using the ORIGYN NFT standard, the
-//! royalty fees for transactions are protected for any transfer.
-//! This includes also the swapping of NFTs for GLDT.
-//! To incentivice users to swap their NFTs for GLDT, the
-//! foundation is compensating the fees for the first 100 million
-//! GLDT. This canister takes care of the fee compensation.
+#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
