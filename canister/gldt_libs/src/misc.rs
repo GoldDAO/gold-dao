@@ -19,9 +19,9 @@ pub async fn dummy_await() {
     );
 }
 
-pub fn get_principal_from_gldnft_account(account: GldNftAccount) -> Option<Principal> {
+pub fn get_principal_from_gldnft_account(account: &GldNftAccount) -> Option<Principal> {
     match account {
-        GldNftAccount::principal(p) => Some(p),
+        GldNftAccount::principal(p) => Some(*p),
         _ => None,
     }
 }
@@ -36,15 +36,13 @@ pub fn convert_gld_nft_account_to_icrc1_account(account: GldNftAccount) -> Optio
 }
 
 fn convert_bytebuf_to_array(option_bytebuf: Option<serde_bytes::ByteBuf>) -> Option<[u8; 32]> {
-    option_bytebuf
-        .map(|buf| {
-            let mut array = [0; 32];
-            if buf.len() == 32 {
-                array.copy_from_slice(&buf);
-                Some(array)
-            } else {
-                None
-            }
-        })
-        .flatten()
+    option_bytebuf.and_then(|buf| {
+        let mut array = [0; 32];
+        if buf.len() == 32 {
+            array.copy_from_slice(&buf);
+            Some(array)
+        } else {
+            None
+        }
+    })
 }

@@ -6,7 +6,7 @@ use std::collections::{ BTreeMap, btree_map };
 
 use gldt_libs::types::NftSaleId;
 
-use crate::error::CustomError;
+use crate::error::Custom as CustomError;
 use crate::Index;
 
 /// The registry that keeps track of which royalties have been compensated.
@@ -18,12 +18,12 @@ pub struct Registry {
 impl Registry {
     pub fn init_entry(
         &mut self,
-        key: (Account, NftSaleId),
-        entry: FeeRegistryEntry
+        key: &(Account, NftSaleId),
+        entry: &FeeRegistryEntry
     ) -> Result<(), String> {
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(v) => {
-                v.insert(entry);
+                v.insert(entry.clone());
                 Ok(())
             }
             btree_map::Entry::Occupied(mut o) => {
@@ -32,7 +32,7 @@ impl Registry {
                 if o.get().did_fail() {
                     o.insert(FeeRegistryEntry {
                         previous_entry: Some(Box::new(o.get().clone())),
-                        ..entry
+                        ..entry.clone()
                     });
                     Ok(())
                 } else {
@@ -47,14 +47,14 @@ impl Registry {
             }
         }
     }
-    pub fn update_failed(&mut self, key: (Account, NftSaleId), message: CustomError) {
-        if let Some(entry) = self.registry.get_mut(&key) {
-            entry.status = RegistryStatus::Failed(message);
+    pub fn update_failed(&mut self, key: &(Account, NftSaleId), message: CustomError) {
+        if let Some(entry) = self.registry.get_mut(key) {
+            entry.status = Status::Failed(message);
         }
     }
-    pub fn update_completed(&mut self, key: (Account, NftSaleId), block_height: BlockIndex) {
-        if let Some(entry) = self.registry.get_mut(&key) {
-            entry.status = RegistryStatus::Success;
+    pub fn update_completed(&mut self, key: &(Account, NftSaleId), block_height: BlockIndex) {
+        if let Some(entry) = self.registry.get_mut(key) {
+            entry.status = Status::Success;
             entry.block_height = Some(block_height);
         }
     }
@@ -62,7 +62,7 @@ impl Registry {
 
 /// The status of the registry entry to avoid double compensation.
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
-pub enum RegistryStatus {
+pub enum Status {
     Success,
     Failed(CustomError),
     Ongoing,
@@ -80,7 +80,7 @@ pub struct FeeRegistryEntry {
     /// The index in the history_nft_origyn list where the payment was extracted from.
     pub history_index: Index,
     /// The status of the compensation
-    pub status: RegistryStatus,
+    pub status: Status,
     /// The timestamp of this entry
     pub timestamp: u64,
     /// Keeping track in case of previous entries that failed
@@ -89,6 +89,6 @@ pub struct FeeRegistryEntry {
 
 impl FeeRegistryEntry {
     pub fn did_fail(&self) -> bool {
-        matches!(self.status, RegistryStatus::Failed(_))
+        matches!(self.status, Status::Failed(_))
     }
 }

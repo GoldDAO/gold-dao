@@ -1,16 +1,41 @@
-//! As the GLD NFTs are using the ORIGYN NFT standard, the
-//! royalty fees for transactions are protected for any transfer.
-//! This includes also the swapping of NFTs for GLDT.
-//! To incentivice users to swap their NFTs for GLDT, the
-//! foundation is compensating the fees for the first 100 million
-//! GLDT. This canister takes care of the fee compensation.
+/*!
+# GLDT and GLDT Swapp dApp canisters
+
+As the GLD NFTs are using the ORIGYN NFT standard, the
+royalty fees for transactions are protected for any transfer.
+This includes also the swapping of NFTs for GLDT.
+To incentivice users to swap their NFTs for GLDT, the
+foundation is compensating the fees for the first 100 million
+GLDT. This canister takes care of the fee compensation.
+
+## Copyright
+© 2023  [Bochsler Assets & Securities (BAS) SA], [Switzerland]
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[Bochsler Assets & Securities (BAS) SA]: https://bas.tech
+[Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
+*/
+
+#![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canistergeek_ic_rust::logger::log_message;
 use gldt_libs::constants::GLDT_TX_FEE;
 use gldt_libs::misc::{
-    get_principal_from_gldnft_account,
     convert_gld_nft_account_to_icrc1_account,
+    get_principal_from_gldnft_account,
 };
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
@@ -22,15 +47,15 @@ use serde::Serialize;
 use std::cell::RefCell;
 use std::time::Duration;
 
-use gldt_libs::gld_nft::{ Service as GldNft_service, HistoryResult, TransactionRecord_txn_type };
+use gldt_libs::gld_nft::{ HistoryResult, Service as GldNft_service, TransactionRecord_txn_type };
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
-use gldt_libs::types::{ NftWeight, GldtTokenSpec, GldtNumTokens };
+use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
 
-mod registry;
 mod error;
+mod registry;
 
-use registry::{ Registry, FeeRegistryEntry, RegistryStatus };
-use error::{ CustomError, ErrorType };
+use error::{ Custom as CustomError, Type as ErrorType };
+use registry::{ FeeRegistryEntry, Registry, Status as RegistryStatus };
 
 pub type Index = Nat;
 
@@ -98,10 +123,10 @@ fn pre_upgrade() {
     let managers = MANAGERS.with(|cell| cell.borrow().clone());
 
     match storage::stable_save((registry, conf, managers, monitor_stable_data, logger_stable_data)) {
-        Ok(_) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
+        Ok(()) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
-                &format!("ERROR :: pre_upgrade :: failed to save stable memory. Message: {}", msg)
+                &format!("ERROR :: pre_upgrade :: failed to save stable memory. Message: {msg}")
             ),
     }
 }
@@ -136,7 +161,7 @@ fn post_upgrade() {
             // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
             // and the state to be restored.
             api::trap(
-                &format!("Failed to restore from stable memory. Reverting upgrade. Message: {}", msg)
+                &format!("Failed to restore from stable memory. Reverting upgrade. Message: {msg}")
             );
         }
     }
@@ -178,7 +203,7 @@ fn set_gld_nft_conf(gld_nft_conf: Vec<GldNftConf>) -> Result<(), CustomError> {
 
 #[query]
 fn get_compensation_factor() -> u64 {
-    COMPENSATION_FACTOR.with(|cell| cell.borrow().clone())
+    COMPENSATION_FACTOR.with(|cell| *cell.borrow())
 }
 
 #[update]
@@ -202,7 +227,7 @@ fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomErr
 
 /// Returns the GLDT balance of the fee compensation canister.
 #[update]
-pub async fn get_balance() -> Result<Nat, ()> {
+async fn get_balance() -> Result<Nat, ()> {
     let gldt_ledger_canister_id = CONF.with(|cell| cell.borrow().gldt_ledger_canister_id);
     let service_ledger = ICRC1_service(gldt_ledger_canister_id);
     if
@@ -212,16 +237,15 @@ pub async fn get_balance() -> Result<Nat, ()> {
         }).await
     {
         return Ok(balance);
-    } else {
-        return Err(());
     }
+    Err(())
 }
 
 /// Turns the compensation on or off.
 #[update]
 pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
     validate_caller()?;
-    log_message(format!("Setting compensation enabled to {}", enabled));
+    log_message(format!("Setting compensation enabled to {enabled}"));
     CONF.with(|cell| {
         let mut conf = cell.borrow_mut();
         conf.enabled = enabled;
@@ -229,11 +253,11 @@ pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
 
     if enabled {
         // starts the job
-        return cronjob_master();
+        cronjob_master()
     } else {
         // deletes an existing job if running
-        let timer_id = FALLBACK_TIMER_ID.with(|cell| cell.borrow().clone());
-        log_message(format!("Stopping timer with id {:?}", timer_id));
+        let timer_id = FALLBACK_TIMER_ID.with(|cell| *cell.borrow());
+        log_message(format!("Stopping timer with id {timer_id:?}"));
         ic_cdk_timers::clear_timer(timer_id);
         Ok(())
     }
@@ -241,8 +265,8 @@ pub fn set_compensation_enabled(enabled: bool) -> Result<(), CustomError> {
 
 /// Gets the status of whether or not the compensation is active.
 #[query]
-fn get_compensation_enabled() -> Result<bool, ()> {
-    Ok(CONF.with(|cell| cell.borrow().enabled))
+fn get_compensation_enabled() -> bool {
+    CONF.with(|cell| cell.borrow().enabled)
 }
 
 /// Sets the fallback timer interval of the automatic royalty payout check.
@@ -258,8 +282,8 @@ fn set_fallback_timer_interval_secs(fallback_timer_interval_secs: u64) -> Result
 
 /// Gets the fallback timer interval of the automatic royalty payout check.
 #[query]
-fn get_fallback_timer_interval_secs() -> Result<u64, ()> {
-    Ok(CONF.with(|cell| cell.borrow().fallback_timer_interval_secs))
+fn get_fallback_timer_interval_secs() -> u64 {
+    CONF.with(|cell| cell.borrow().fallback_timer_interval_secs)
 }
 
 /// Sets the execution delay for the notify execution of the automatic royalty payout check.
@@ -275,8 +299,8 @@ fn set_execution_delay_secs(execution_delay_secs: u64) -> Result<(), CustomError
 
 /// Gets the execution delay for the notify execution of the automatic royalty payout check.
 #[query]
-fn get_execution_delay_secs() -> Result<u64, ()> {
-    Ok(CONF.with(|cell| cell.borrow().execution_delay_secs))
+fn get_execution_delay_secs() -> u64 {
+    CONF.with(|cell| cell.borrow().execution_delay_secs)
 }
 
 /// The master job that triggers the compensation execution.
@@ -309,19 +333,18 @@ fn cronjob_master() -> Result<(), CustomError> {
             });
             Ok(())
         }
-        None => {
+        None =>
             Err(
                 CustomError::new_with_message(
                     ErrorType::Other,
                     "Fatal error: interval + current_time > u64 MAX.".to_string()
                 )
-            )
-        }
+            ),
     }
 }
 
 fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
-    let compensation_factor = COMPENSATION_FACTOR.with(|cell| cell.borrow().clone());
+    let compensation_factor = COMPENSATION_FACTOR.with(|cell| *cell.borrow());
 
     // The user should in the end have the sale_price + GLDT_TX_FEE on his balance.
     // There are three royalties and one intermediate transaction that need to be considered.
@@ -332,7 +355,7 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
 
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
 #[update]
-pub async fn notify_compensation_job() -> Result<(), CustomError> {
+fn notify_compensation_job() -> Result<(), CustomError> {
     log_message(format!("notify_compensation_job() called by {}", api::caller().to_text()));
     // only the GLDT core canister is allowed to call this method
     if api::caller() != CONF.with(|cell| cell.borrow().gldt_canister_id) {
@@ -345,7 +368,7 @@ pub async fn notify_compensation_job() -> Result<(), CustomError> {
         return Err(CustomError::new(ErrorType::CompensationDisabled));
     }
     // check if the last call was more than the specified delay ago
-    let last_call_timestamp = LAST_NOTIFY_CALL_TIMESTAMP.with(|cell| cell.borrow().clone()); // in nano seconds
+    let last_call_timestamp = LAST_NOTIFY_CALL_TIMESTAMP.with(|cell| *cell.borrow()); // in nano seconds
     let now = api::time(); // in nano seconds
     let threshold = CONF.with(|cell| cell.borrow().execution_delay_secs) * 1_000_000_000;
     if last_call_timestamp + threshold > now {
@@ -376,7 +399,7 @@ async fn run_compensation_job() {
 
     // define the constants for the check
     let token_spec = GldtTokenSpec::new(gldt_ledger_canister_id).get();
-    for canister in gld_nft_canister_conf.into_iter() {
+    for canister in gld_nft_canister_conf {
         let GldNftConf { gld_nft_canister_id, weight, last_query_index } = canister.clone();
         // expected sale price is the weight of the NFT * 100
         let expected_sale_price: Nat;
@@ -394,7 +417,7 @@ async fn run_compensation_job() {
         let gld_nft_service = GldNft_service(gld_nft_canister_id);
         if
             let Ok((HistoryResult::ok(res),)) = gld_nft_service.history_nft_origyn(
-                "".to_string(),
+                String::new(),
                 Some(last_query_index.clone()),
                 None
             ).await
@@ -424,11 +447,7 @@ async fn run_compensation_job() {
                                 return None;
                             }
                             // select only the ones where the buyer is the GLDT canister
-                            if
-                                let Some(principal) = get_principal_from_gldnft_account(
-                                    buyer.clone()
-                                )
-                            {
+                            if let Some(principal) = get_principal_from_gldnft_account(buyer) {
                                 if principal.to_text() != gldt_canister_id.to_text() {
                                     return None;
                                 }
@@ -493,7 +512,7 @@ async fn run_compensation_job() {
             counter += num_new_entries;
         };
     }
-    log_message(format!("Scanned {} new entries for compensation.", counter));
+    log_message(format!("Scanned {counter} new entries for compensation."));
 }
 
 async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) {
@@ -501,12 +520,14 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
     let entry_added = REGISTRY.with(
         |cell| -> Result<(), String> {
             let mut registry = cell.borrow_mut();
-            registry.init_entry(key.clone(), entry.clone())
+            registry.init_entry(&key, &entry)
         }
     );
     if let Err(msg) = entry_added {
         log_message(
-            format!("WARNING :: compensation_job :: failed to add entry to registry. Message: {}", msg)
+            format!(
+                "WARNING :: compensation_job :: failed to add entry to registry. Message: {msg}"
+            )
         );
         return;
     }
@@ -525,11 +546,11 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
     match gldt_ledger_service.icrc1_transfer(transfer_args).await {
         Ok((Ok(v),)) => {
             // This is the happy path. All went well when we end up here.
-            log_message(format!("Successfully transferred GLDT. Message: {:?}", v));
+            log_message(format!("Successfully transferred GLDT. Message: {v:?}"));
             // update the entry in the registry
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
-                registry.update_completed(key, v)
+                registry.update_completed(&key, v);
             });
         }
         Ok((Err(err),)) => {
@@ -537,12 +558,12 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
                 registry.update_failed(
-                    key,
+                    &key,
                     CustomError::new_with_message(
                         ErrorType::TransferError,
-                        format!("Failed to transfer GLDT. Message: {:?}", err)
+                        format!("Failed to transfer GLDT. Message: {err:?}")
                     )
-                )
+                );
             });
         }
         Err(msg) => {
@@ -550,12 +571,12 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
                 registry.update_failed(
-                    key,
+                    &key,
                     CustomError::new_with_message(
                         ErrorType::TransferError,
-                        format!("Failed to transfer GLDT. Message: {:?}", msg)
+                        format!("Failed to transfer GLDT. Message: {msg:?}")
                     )
-                )
+                );
             });
         }
     }
@@ -574,14 +595,14 @@ fn validate_caller() -> Result<(), CustomError> {
 
 // for monitoring during development
 #[query(name = "getCanistergeekInformation")]
-async fn get_canistergeek_information(
+fn get_canistergeek_information(
     request: canistergeek_ic_rust::api_type::GetInformationRequest
 ) -> canistergeek_ic_rust::api_type::GetInformationResponse<'static> {
     canistergeek_ic_rust::get_information(request)
 }
 
 #[update(name = "updateCanistergeekInformation")]
-pub async fn update_canistergeek_information(
+fn update_canistergeek_information(
     request: canistergeek_ic_rust::api_type::UpdateInformationRequest
 ) {
     canistergeek_ic_rust::update_information(request);

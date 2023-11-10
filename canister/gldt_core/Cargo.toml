@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Core logic canister for swapping GLD NFT to GLDT."
 authors = ["Johan Georg", "Dustin Becker <dustin@bochslerfinance.com>", "Gautier Woja <gautier@bochslerfinance.com>"]
 edition = "2021"
+license= "AGPL-3.0-only"
 
 ## See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -14,16 +15,16 @@ crate-type = ["cdylib"]
 # ic-cdk-bindgen = "0.1.0"
 
 [dependencies]
-candid = { version = "0.9.6"}
-ic-cdk = "0.11.0"
-ic-cdk-macros = "0.8.0"
-icrc-ledger-types = "0.1.0"
-serde = "1.0.126"
-serde_derive = "1.0.126"
+candid = { version = "0.9.11"}
+ic-cdk = "0.11.3"
+ic-cdk-macros = "0.8.1"
+icrc-ledger-types = "0.1.3"
+serde = "1.0.192"
+serde_derive = "1.0.192"
 serde_bytes = "0.11.12"
 canistergeek_ic_rust = "0.4.2"
 gldt_libs = {path="../gldt_libs"}
 
 [dev-dependencies]
 clippy="0.0.302"
-tokio = { version = "1.32.0", features = ["full"] }
+tokio = { version = "1.33.0", features = ["full"] }

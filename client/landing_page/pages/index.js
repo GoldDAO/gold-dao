@@ -1,3 +1,54 @@
+/** ****************************************************************************
+@file
+GLDT and GLDT Swapp dApp frontend
+
+@copyright Copyright © 2023  Bochsler Assets & Securities (BAS) SA, Switzerland
+@see {@link https://bas.tech}
+
+@license
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+import {
+    Box,
+    Button,
+    Container,
+    Grid,
+    GridItem,
+    HStack,
+    Stack,
+    Heading,
+    Stat,
+    StatGroup,
+    StatLabel,
+    StatNumber,
+    Text,
+    VStack,
+    Accordion,
+} from '@chakra-ui/react';
+import Head from 'next/head';
+import Logo from '/public/images/logo.svg';
+import Yumi from '/public/images/yumi.svg';
+import Image from 'next/image';
+import BAS from '/public/images/partners/BAS.svg';
+import dfinity from '/public/images/partners/dfinity.svg';
+import KPMG from '/public/images/partners/KPMG.svg';
+import loomis from '/public/images/partners/loomis.jpg';
+import metalor from '/public/images/partners/metalor.svg';
+import origyn from '/public/images/partners/origyn.svg';
+import Link from 'next/link';
+import Play from '/public/images/play.svg';
 import Layout from '@/components/layout/Layout';
 import Banner from '@/components/banner/Banner';
 import { content } from './../src/content';
