@@ -138,7 +138,7 @@ gldt_fee_compensation test build:
   <<: *rust_template
   script:
     - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
+    - ic-wasm canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
     - scripts/generate-did.sh gldt_fee_compensation
   artifacts:
     name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
@@ -152,7 +152,7 @@ generate test declarations:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       # TODO: Add "gldt_fee_compensation test build"
-      needs: ["gldt_core test build"]
+      needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
     - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
@@ -174,7 +174,7 @@ swap_app test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app-TEST"
     paths:
-      - swap_app/out
+      - client/swap_app/out
     expire_in: 1 day
 
 landing_page test build:
@@ -188,7 +188,7 @@ landing_page test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
     paths:
-      - landing_page/out
+      - client/landing_page/out
     expire_in: 1 day
 
 explorer test build:
@@ -202,7 +202,7 @@ explorer test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer-TEST"
     paths:
-      - explorer/out
+      - client/explorer/out
     expire_in: 1 day
 
 ################################################################################
@@ -419,12 +419,12 @@ local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core canister build", "swap_app test build", "landing_page test build", "explorer test build"]
+      needs: ["gldt_core test build", "gldt_fee_compensation test build", "swap_app test build", "landing_page test build", "explorer test build"]
   before_script:
     - dfx --version
     - dfx start --clean --background
   script:
-    - scripts/local-deploy.sh
+    - NETWORK='local' scripts/local-deploy.sh
   after_script:
     - cat canister_ids.json
     - dfx stop

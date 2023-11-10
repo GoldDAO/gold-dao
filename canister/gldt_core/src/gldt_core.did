@@ -203,8 +203,8 @@ type GetMetricsParameters = record {
   granularity : MetricsGranularity;
   dateFromMillis : nat;
 };
-type GetRecordsRequest = record { page : opt nat32; limit : opt nat32 };
-type GetRecordsResponse = record { total : nat32; data : opt vec GldtRecord };
+type GetRecordsRequest = record { page : opt nat64; limit : opt nat64 };
+type GetRecordsResponse = record { total : nat64; data : opt vec GldtRecord };
 type GetStatusRequest = record {
   nft_id : text;
   gld_nft_canister_id : principal;
@@ -212,8 +212,8 @@ type GetStatusRequest = record {
 };
 type GetStatusResponse = record { status : opt SwappingStates };
 type GetSwapsRequest = record {
-  page : opt nat32;
-  limit : opt nat32;
+  page : opt nat64;
+  limit : opt nat64;
   account : opt Account;
 };
 type GldtError = variant {
@@ -294,7 +294,6 @@ type RecordStatusInfo = record { status : RecordStatus; message : opt text };
 type RecordType = variant { Burn; Mint };
 type Result = variant { Ok : GetRecordsResponse; Err : text };
 type Result_1 = variant { Ok : GetStatusResponse; Err : text };
-type Result_2 = variant { Ok : text; Err : text };
 type SaleStatusShared = record {
   token_id : text;
   sale_type : SaleStatusShared_sale_type;
@@ -355,7 +354,7 @@ service : (opt Conf) -> {
   get_ongoing_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_records : (GetRecordsRequest) -> (Result) query;
   get_status_of_swap : (GetStatusRequest) -> (Result_1) query;
-  nft_info : (InfoRequest) -> (NftInfo);
-  notify_sale_nft_origyn : (SubscriberNotification) -> (Result_2);
+  nft_info : (InfoRequest) -> (NftInfo) query;
+  notify_sale_nft_origyn : (SubscriberNotification) -> ();
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();
 }

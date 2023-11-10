@@ -17,6 +17,7 @@ Usage:
 
 Options:
   -h, --help        Show this message and exit
+  -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
 EOF
 }
 
