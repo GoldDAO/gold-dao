@@ -2,14 +2,41 @@ use candid::{ CandidType, Deserialize, Nat, Principal };
 
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ BlockIndex, Memo } };
 use serde::Serialize;
-use std::collections::{ BTreeMap, btree_map };
+use std::collections::{ BTreeMap, btree_map, HashSet };
 
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
 
+type GldNftCollectionId = Principal;
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
 pub struct Registry {
-    registry: BTreeMap<(Principal, NftId), GldtRegistryEntry>,
+    registry: BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry>,
+}
+
+impl Registry {
+    fn unique_principals(&self) -> HashSet<GldNftCollectionId> {
+        let mut principals = HashSet::new();
+        for ((principal, _), _) in self.registry.iter() {
+            principals.insert(*principal);
+        }
+        principals
+    }
+    pub fn count_number_of_nfts_swapped_per_collection(&self) -> Vec<(GldNftCollectionId, usize)> {
+        let principals = self.unique_principals();
+        let mut result = Vec::new();
+        for principal in principals {
+            let count = self.registry
+                .iter()
+                .filter(
+                    |((p, _), entry)|
+                        p == &principal && entry.get_status_of_swap() == SwappingStates::Swapped
+                )
+                .count();
+            result.push((principal, count));
+        }
+        result
+    }
 }
 #[cfg(not(test))]
 const MAX_HISTORY_REGISTRY: usize = 64;
@@ -456,7 +483,7 @@ impl Registry {
             None => {
                 if let UpdateType::Init = update_type {
                     // Only init is allowed when there is no entry yet.
-                    return Ok(());
+                    Ok(())
                 } else {
                     Err(
                         format!(
