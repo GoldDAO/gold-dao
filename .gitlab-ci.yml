@@ -531,7 +531,7 @@ landing page production:
 
 explorer staging:
   variables:
-    CANISTER_NAME: "gldt_explorer"
+    CANISTER_NAME: "explorer"
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       needs: ["explorer staging build"]
@@ -547,7 +547,7 @@ explorer staging:
 
 explorer production:
   variables:
-    CANISTER_NAME: "gldt_explorer"
+    CANISTER_NAME: "explorer"
   rules:
     - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
       needs: ["explorer production build"]
