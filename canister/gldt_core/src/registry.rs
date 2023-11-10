@@ -15,6 +15,11 @@ pub struct Registry {
 }
 
 impl Registry {
+    #[cfg(test)]
+    pub fn get(&self) -> &BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry> {
+        &self.registry
+    }
+
     fn unique_principals(&self) -> HashSet<GldNftCollectionId> {
         let mut principals = HashSet::new();
         for ((principal, _), _) in self.registry.iter() {
