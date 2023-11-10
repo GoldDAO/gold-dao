@@ -703,7 +703,7 @@ gldt ledger indexer:
       when: manual
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: $PEM_FILE_STAGING
+    PEM_FILE: $PEM_FILE_PRODUCTION
   needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
