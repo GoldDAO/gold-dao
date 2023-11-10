@@ -174,7 +174,7 @@ swap_app test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app-TEST"
     paths:
-      - swap_app/out
+      - client/swap_app/out
     expire_in: 1 day
 
 landing_page test build:
@@ -188,7 +188,7 @@ landing_page test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
     paths:
-      - landing_page/out
+      - client/landing_page/out
     expire_in: 1 day
 
 explorer test build:
@@ -202,7 +202,7 @@ explorer test build:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer-TEST"
     paths:
-      - explorer/out
+      - client/explorer/out
     expire_in: 1 day
 
 ################################################################################
