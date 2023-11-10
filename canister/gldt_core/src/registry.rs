@@ -11,9 +11,14 @@ use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
 pub struct Registry {
     registry: BTreeMap<(Principal, NftId), GldtRegistryEntry>,
 }
-
+#[cfg(not(test))]
 const MAX_HISTORY_REGISTRY: u32 = 64;
+#[cfg(not(test))]
 const MAX_NUMBER_OF_ENTRIES: u32 = 16000;
+#[cfg(test)]
+pub const MAX_HISTORY_REGISTRY: u32 = 8;
+#[cfg(test)]
+pub const MAX_NUMBER_OF_ENTRIES: u32 = 16;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
