@@ -128,11 +128,13 @@ service : (opt Conf) -> {
     ) query;
   get_balance : () -> (Result);
   get_compensation_enabled : () -> (Result_1) query;
+  get_compensation_factor : () -> (nat64) query;
   get_execution_delay_secs : () -> (Result_2) query;
   get_fallback_timer_interval_secs : () -> (Result_2) query;
   get_gld_nft_conf : () -> (vec GldNftConf) query;
   notify_compensation_job : () -> (Result_3);
   set_compensation_enabled : (bool) -> (Result_3);
+  set_compensation_factor : (nat64) -> (Result_3);
   set_execution_delay_secs : (nat64) -> (Result_3);
   set_fallback_timer_interval_secs : (nat64) -> (Result_3);
   set_gld_nft_conf : (vec GldNftConf) -> (Result_3);
