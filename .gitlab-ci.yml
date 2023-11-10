@@ -42,6 +42,9 @@ stages:
     - npm ci --cache .npm --prefer-offline
 
 .rust template: &rust_template
+  tags:
+    - docker
+    - big
   image: rust:slim-bookworm
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
