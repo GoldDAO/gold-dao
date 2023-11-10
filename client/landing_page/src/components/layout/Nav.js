@@ -136,8 +136,8 @@ const DesktopNav = ({ nav, children }) => {
                     justifyContent={'center'}
                     width={'65px'}
                     bg="gold"
-                    top="3px"
-                    left="110px"
+                    top="-2px"
+                    left="80px"
                     height={'65px'}
                 >
                     <Text
@@ -211,7 +211,7 @@ const MobileNav = ({ nav, children }) => {
                 </Box>
                 {children}
 
-                <HStack position="relative" w={'100%'} overflow={'visible'}>
+                <HStack position="relative" zIndex={20} w={'100%'} overflow={'visible'}>
                     <Button
                         width={'100%'}
                         // as={Link}
@@ -232,7 +232,7 @@ const MobileNav = ({ nav, children }) => {
                         width={'65px'}
                         bg="gold"
                         top="-15px"
-                        left={['200px', '330px']}
+                        left={[0, 0, '200px', '330px']}
                         height={'65px'}
                     >
                         <Text
