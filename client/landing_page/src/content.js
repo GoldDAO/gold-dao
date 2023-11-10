@@ -52,17 +52,17 @@ export const content = {
         },
     ],
     tech: {
-        title: 'Learn More About the Technology',
+        title: 'Learn more about the technology',
         content:
-            "The GLDT primarily uses the ICP blockchain for token minting. It's worth noting that the token will be cross-platform and multi-chain. To learn more about how minting and the token work, consult the whitepaper.",
+            'GLDT and its underlying smart contracts run entirely on the ICP blockchain. In the future, the token will also be cross-platform and multi-chain. To learn more about how GLDT and swapping GLD NFT works, read the FAQ or consult the whitepaper.',
         link: {
             label: 'Read the FAQ',
             href: '/FAQ',
         },
     },
     price: {
-        title: 'Determining the Price of GLDT',
-        subTitle: '1g of gold = 100 gldt',
+        title: 'Determining the price of GLDT',
+        subTitle: '1g of Gold = 100 gldt',
         content:
             "The price of GLDT is directly linked to the spot price of physical gold. The market determines the price of gold, which is then used to calculate the value of GLDT. It's important to note that 100 GLDT is equivalent to 1 gram of gold.",
     },
