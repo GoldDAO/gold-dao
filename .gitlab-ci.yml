@@ -138,7 +138,7 @@ gldt_fee_compensation test build:
   <<: *rust_template
   script:
     - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
+    - ic-wasm canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
     - scripts/generate-did.sh gldt_fee_compensation
   artifacts:
     name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
