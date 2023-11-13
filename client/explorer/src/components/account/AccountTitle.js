@@ -8,13 +8,7 @@ const AccountTitle = ({ data }) => {
     const lastChars = data.id?.substring(data.id.length - charsCount);
 
     return (
-        <VStack
-            alignItems={'flex-start'}
-            spacing={'0'}
-            borderBottom={'1px'}
-            borderColor={'border'}
-            w={'100%'}
-        >
+        <VStack alignItems={'flex-start'} spacing={'0'} w={'100%'}>
             <Text color={'blackAlpha.600'} fontSize={'14px'}>
                 {data.label}
             </Text>

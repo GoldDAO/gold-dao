@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 
 export const inter = Inter({
     subsets: ['latin'],
-    weight: ['300', '400', '500'],
+    weight: ['200', '300', '400', '500'],
     fallback: ['system-ui', 'arial', 'sans-serif'],
 });
 

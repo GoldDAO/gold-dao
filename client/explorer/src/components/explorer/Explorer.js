@@ -22,6 +22,8 @@ import TokenSign from '@ui/gldt/TokenSign';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import { formatAmount } from '@utils/misc/format';
 import GridSystem from '@ui/layout/GridSystem';
+import Title from '../layout/Title';
+import TableTitle from '../layout/TableTitle';
 
 const Explorer = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -29,30 +31,10 @@ const Explorer = () => {
     const [startingIndex, setStartingIndex] = useState(0);
     const { blocks } = useBlock(startingIndex, rowsPerPage);
 
-    console.log('blocks', blocks);
     return (
-        <GridSystem>
-            <GridItem gridColumn={['1/12', '1/12', '2/6']} py="40px">
-                <Heading as="h1" variant={'h1'}>
-                    GLDT
-                </Heading>
-                <Heading as="h2" variant={'h2'}>
-                    EXPLORER
-                </Heading>
-            </GridItem>
-            <GridItem gridColumn={['1/12', '1/12', '1/2']}>
-                <Heading
-                    fontWeight={300}
-                    as="h3"
-                    textAlign={['left', 'left', 'right']}
-                    fontSize={'16px'}
-                    w={'100%'}
-                    borderBottom="1px"
-                    borderBottomColor={'secondaryText'}
-                >
-                    Past Transactions
-                </Heading>
-            </GridItem>
+        <GridSystem gap={'60px'}>
+            <Title title={'GLDT'} subTitle={'Explorer'} />
+            <TableTitle title={'Past Transactions'} />
             <GridItem gridColumn={['1/12', '1/12', '2/12']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
                     <Table bg="white" borderRadius={'sm'}>

@@ -14,9 +14,9 @@ const Header = () => {
                         <Image src={Logo} width={50} alt="logo" />
                     </Link>
                 </GridItem>
-                <GridItem alignSelf={'center'} colStart={10}>
-                    <Link href="/transparency" style={{ gridColumn: '10/13' }}>
-                        <Text fontSize={'18px'}>Transparency</Text>
+                <GridItem alignSelf={'center'} colStart={[6, 8, 10]}>
+                    <Link href="/transparency" style={{ gridColumn: '10/13' }} st>
+                        <Text fontSize="16px">Transparency</Text>
                     </Link>
                 </GridItem>
             </GridSystem>

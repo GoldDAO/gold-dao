@@ -31,6 +31,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Principal } from '@dfinity/principal';
 import GridSystem from '@ui/layout/GridSystem';
+import Title from '../layout/Title';
+import TableTitle from '../layout/TableTitle';
 
 const AccountContent = ({ id, subAccount }) => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -54,7 +56,6 @@ const AccountContent = ({ id, subAccount }) => {
     }, [history]);
 
     useEffect(() => {
-        console.log('history', history);
         if (history?.Ok?.transactions.length > 0) {
             setIndex({
                 last: history?.Ok?.transactions[history.Ok.transactions.length - 1].id,
@@ -75,19 +76,12 @@ const AccountContent = ({ id, subAccount }) => {
 
     return (
         <GridSystem>
-            <GridItem gridColumn={['1/12', '1/12', '2/12, 2/6']} py={['0px', '0px', '40px']}>
-                <Heading as="h1" variant={'h1'}>
-                    Account
-                </Heading>
-                <Heading as="h2" variant={'h2'}>
-                    <PrincipalFormat principal={id} />
-                </Heading>
-            </GridItem>
+            <Title title={'Account'} subTitle={<PrincipalFormat principal={id} />} />
             <GridItem
                 colSpan={[12, 12, 3, 2]}
                 colStart={[1, 1, 3]}
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
+                py={['0px', '0px', '20px']}
             >
                 <AccountTitle
                     data={{
@@ -99,43 +93,43 @@ const AccountContent = ({ id, subAccount }) => {
             <GridItem
                 colSpan={[12, 12, 3, 2]}
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
+                py={['0px', '0px', '20px']}
             >
-                <Select
-                    size="md"
-                    onChange={toggleChange}
-                    placeholder={subAccount}
-                    value={currentSub}
-                >
-                    {subaccounts.map((e, i) => (
-                        <option key={i} value={buf2hex(e)}>
-                            {buf2hex(e)}
-                        </option>
-                    ))}
-                </Select>
+                <VStack alignItems={'flex-start'}>
+                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                        Subaccounts
+                    </Text>
+                    <Select
+                        size="md"
+                        width={['50%', '50%', '100%']}
+                        onChange={toggleChange}
+                        placeholder={subAccount}
+                        value={currentSub}
+                    >
+                        {subaccounts.map((e, i) => (
+                            <option key={i} value={buf2hex(e)}>
+                                {buf2hex(e)}
+                            </option>
+                        ))}
+                    </Select>
+                </VStack>
             </GridItem>
             <GridItem
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
-                colSpan={[12, 12, 3, 2]}
+                py={['0px', '0px', '20px']}
+                colStart={[1, 1, 6]}
+                colEnd={[12, 12, 8]}
             >
-                <HStack>
-                    <Text>{formatAmount(balance)}</Text> <TokenSign />
-                </HStack>
+                <VStack alignItems={'flex-start'}>
+                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                        Balance
+                    </Text>
+                    <HStack>
+                        <Text>{formatAmount(balance)}</Text> <TokenSign />
+                    </HStack>
+                </VStack>
             </GridItem>
-            <GridItem gridColumn={['1/13', '1/13', '1/2', '1/2', '1/2']}>
-                <Heading
-                    fontWeight={300}
-                    as="h3"
-                    fontSize={'16px'}
-                    textAlign={'right'}
-                    w={'100%'}
-                    borderBottom="1px"
-                    borderBottomColor={'secondaryText'}
-                >
-                    History
-                </Heading>
-            </GridItem>
+            <TableTitle title={'History'} />
             <GridItem gridColumn={['1/12', '1/12', '2/12']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
                     <Table bg="white" borderRadius={'sm'}>
