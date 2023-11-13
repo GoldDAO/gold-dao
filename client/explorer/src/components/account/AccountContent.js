@@ -75,7 +75,7 @@ const AccountContent = ({ id, subAccount }) => {
     }, [currentSub, id, router]);
 
     return (
-        <GridSystem>
+        <GridSystem gap={['0px', '0px', '60px']}>
             <Title title={'Account'} subTitle={<PrincipalFormat principal={id} />} />
             <GridItem
                 colSpan={[12, 12, 3, 2]}
@@ -130,9 +130,15 @@ const AccountContent = ({ id, subAccount }) => {
                 </VStack>
             </GridItem>
             <TableTitle title={'History'} />
-            <GridItem gridColumn={['1/12', '1/12', '2/12']}>
+            <GridItem gridColumn={['1/13', '1/13', '2/12']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
-                    <Table bg="white" borderRadius={'sm'}>
+                    <Table
+                        bg="white"
+                        borderRadius={'sm'}
+                        w={'100%'}
+                        display={'block'}
+                        overflow={'scroll'}
+                    >
                         <Thead>
                             <Tr
                                 fontWeight={600}

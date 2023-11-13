@@ -32,12 +32,18 @@ const Explorer = () => {
     const { blocks } = useBlock(startingIndex, rowsPerPage);
 
     return (
-        <GridSystem gap={'60px'}>
+        <GridSystem gap={['0px', '0px', '60px']}>
             <Title title={'GLDT'} subTitle={'Explorer'} />
             <TableTitle title={'Past Transactions'} />
-            <GridItem gridColumn={['1/12', '1/12', '2/12']}>
+            <GridItem gridColumn={['1/13', '1/13', '2/12']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
-                    <Table bg="white" borderRadius={'sm'}>
+                    <Table
+                        bg="white"
+                        borderRadius={'sm'}
+                        w={'100%'}
+                        display={'block'}
+                        overflow={'scroll'}
+                    >
                         <Thead>
                             <Tr
                                 fontWeight={600}
@@ -154,7 +160,7 @@ export default Explorer;
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setStartingIndex }) => {
     total = total ? total : 0;
     return (
-        <VStack pt="20px">
+        <VStack pt="20px" w={'100%'}>
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Text fontSize={'14px'}>Page {currentHistoryPage + 1}</Text>
                 <Text fontSize={'14px'}>{total} entries</Text>

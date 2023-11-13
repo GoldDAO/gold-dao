@@ -33,7 +33,7 @@ const TransparencyContent = () => {
 
     const w = [1, 10, 100, 1000];
     return (
-        <GridSystem>
+        <GridSystem gap={['0px', '0px', '60px']}>
             <Title title={'GLDT'} subTitle={'Transparency'} />
             <GridItem colSpan={['12', '12', '12']}>
                 <Text fontSize={'16px'} width={['100%', '100%', '50%']}>
