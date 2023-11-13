@@ -38,8 +38,8 @@ const TransparencyContent = () => {
             <GridItem colSpan={['12', '12', '12']}>
                 <Text fontSize={'16px'} width={['100%', '100%', '50%']}>
                     GLDT are minted at a ratio of 100 GLDT per gram of GLD NFT. GLDT is about
-                    transparency and let's everyone verify themselves that the ratio of GLDT to GLD
-                    NFT in the swap contract is valid.
+                    transparency and let&apos;s everyone verify themselves that the ratio of GLDT to
+                    GLD NFT in the swap contract is valid.
                 </Text>
             </GridItem>
             <GridItem colSpan={['12', '12', '6', '3']} py={['10px', '10px', '20px']}>
