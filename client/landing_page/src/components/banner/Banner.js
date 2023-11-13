@@ -12,8 +12,8 @@ const Banner = () => {
             }}
         >
             <Box mt={['-40px', '-40px', '-0px']}>
-                <GridSystem>
-                    <GridItem colStart={[1, 1, 1, 2]} colEnd={[12, 12, 12, 7]}>
+                <GridSystem gap={[0, 0, 8]}>
+                    <GridItem colStart={[1, 1, 1, 2]} colEnd={[13, 13, 12, 7]}>
                         <Box maxW={'500px'}>
                             <Heading as="h1" variant="h1">
                                 GLDT
@@ -29,6 +29,8 @@ const Banner = () => {
                         position={'relative'}
                         margin={['0 auto', '0 auto', 0]}
                         top={['0', '0', '-230px', '-50px', '-50px']}
+                        mt={['30px', '30px', 0]}
+                        mb={['20px', '20px', 0]}
                         right={['0', '0', '-450px', '-50px', '-150px']}
                     >
                         <Box
@@ -43,7 +45,7 @@ const Banner = () => {
                         </Box>
                     </GridItem>
                     <GridItem colSpan={12}>
-                        <GridSystem gap={0}>
+                        <GridSystem gap={['0px', '0px', 8]}>
                             <GridItem
                                 colSpan={[0, 0, 3, 2]}
                                 alignSelf={'center'}
@@ -59,6 +61,7 @@ const Banner = () => {
                                 colSpan={[12, 12, 6, 3]}
                                 colStart={[1, 1, 4]}
                                 alignSelf={'center'}
+                                py={['20px', '20px', 0]}
                             >
                                 <HStack
                                     fontSize={'20px'}
@@ -99,8 +102,8 @@ const Banner = () => {
                                 </HStack>
                             </GridItem>
 
-                            <GridItem colSpan={[11, 11, 3, 3, 2]}>
-                                <Button variant="yumi" w={'100%'}>
+                            <GridItem colSpan={[12, 12, 3, 3, 2]} colStart={[]}>
+                                <Button variant="yumi" w={'100%'} maxWidth={'auto'}>
                                     Play Video
                                 </Button>
                             </GridItem>

@@ -1,14 +1,13 @@
 import React, { useLayoutEffect, useRef, useMemo, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useTexture, useGLTF, SpotLight } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { FlakesTexture } from 'three-stdlib';
 
 const Model = ({ mouse }) => {
     const { scene, nodes, materials } = useGLTF('/token_plus.glb');
     const ref = useRef();
     const [rEuler, rQuaternion] = useMemo(() => [new THREE.Euler(), new THREE.Quaternion()], []);
-    const { pointer, clock } = useThree();
 
     useFrame(() => {
         if (ref.current && mouse) {
@@ -19,8 +18,9 @@ const Model = ({ mouse }) => {
 
     useLayoutEffect(() => {
         scene.traverse((obj) => obj.isMesh && (obj.receiveShadow = obj.castShadow = true));
-        materials['Material.001'].color.set('orange');
-        materials['Material.001'].roughness = 0;
+        materials['Material.001'].color.set(0xc99210);
+        materials['Material.001'].roughness = 0.08;
+        materials['Material.001'].metalness = 1;
         materials['Material.001'].normalMap = new THREE.CanvasTexture(
             new FlakesTexture(),
             THREE.UVMapping,
