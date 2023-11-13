@@ -49,8 +49,13 @@ const Header = () => {
                 ]}
                 transition={'all .4s'}
             >
-                <GridSystem>
-                    <GridItem colStart={0} colSpan={[2, 2, 2, 1]} order={[3, 3, -1]}>
+                <GridSystem gap={[0, 0, 8]}>
+                    <GridItem
+                        colStart={0}
+                        colSpan={[1, 1, 1, 1]}
+                        order={[3, 3, -1]}
+                        pt={['7px', '7px', 0]}
+                    >
                         <Link href="/">
                             <Image src={Logo} width={50} height={50} alt="gldt-token-logo" />
                         </Link>
@@ -58,7 +63,7 @@ const Header = () => {
                     <GridItem
                         order={[-1, -1, 3]}
                         colStart={[1, 1, 10, 10]}
-                        colSpan={[10, 10, 6, 4]}
+                        colSpan={[11, 11, 6, 4]}
                         display={'grid'}
                         alignContent={'center'}
                     >

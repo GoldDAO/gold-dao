@@ -7,9 +7,8 @@ import { Fade } from 'react-awesome-reveal';
 import { faq } from './faq';
 
 const FaqSection = ({ full }) => {
-    console.log('full', full);
     return (
-        <Box width={'100%'} position={'relative'} zIndex={20}>
+        <Box width={'100%'}>
             <GridSystem>
                 <GridItem
                     colStart={[1, 1, 1, 2]}

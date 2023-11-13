@@ -41,7 +41,7 @@ const Scene = () => {
                     <Model mouse={mousePosition} />
                 </Suspense>
                 <pointLight intensity={10} />
-                <Environment preset="city" />
+                <Environment preset="dawn" />
                 <AccumulativeShadows
                     temporal
                     frames={100}
