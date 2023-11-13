@@ -671,6 +671,10 @@ fn add_record(
                 format!("INFO :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
             );
             return;
+        } else if records.len() >= (records::MAX_NUMBER_OF_RECORDS * 8) / 10 {
+            log_message(
+                format!("INFO :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
+            );
         }
     }
 
