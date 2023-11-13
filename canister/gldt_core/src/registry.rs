@@ -12,13 +12,13 @@ pub struct Registry {
     registry: BTreeMap<(Principal, NftId), GldtRegistryEntry>,
 }
 #[cfg(not(test))]
-const MAX_HISTORY_REGISTRY: u32 = 64;
+const MAX_HISTORY_REGISTRY: usize = 64;
 #[cfg(not(test))]
-const MAX_NUMBER_OF_ENTRIES: u32 = 16000;
+const MAX_NUMBER_OF_ENTRIES: usize = 16000;
 #[cfg(test)]
-pub const MAX_HISTORY_REGISTRY: u32 = 8;
+pub const MAX_HISTORY_REGISTRY: usize = 8;
 #[cfg(test)]
-pub const MAX_NUMBER_OF_ENTRIES: u32 = 16;
+pub const MAX_NUMBER_OF_ENTRIES: usize = 16;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
@@ -264,7 +264,7 @@ impl Registry {
 
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(v) => {
-                if num_entries >= (MAX_NUMBER_OF_ENTRIES as usize) {
+                if num_entries >= MAX_NUMBER_OF_ENTRIES {
                     return Err(
                         format!("Swap NFT limit reached, limit is set to {MAX_NUMBER_OF_ENTRIES}.")
                     );
@@ -279,7 +279,7 @@ impl Registry {
                 // If not, then there may be an attempt to double mint and the
                 // procedure is cancelled.
                 if o.get().is_burned() || o.get().gldt_issue.is_failed() {
-                    if o.get().count_older_record() >= (MAX_HISTORY_REGISTRY as usize) {
+                    if o.get().count_older_record() >= MAX_HISTORY_REGISTRY {
                         return Err(
                             format!(
                                 "Swap limit reached for this NFT, limit is set to {MAX_HISTORY_REGISTRY}."

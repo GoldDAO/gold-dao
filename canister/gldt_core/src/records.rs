@@ -6,9 +6,9 @@ use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::Bloc
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 
 #[cfg(not(test))]
-pub const MAX_NUMBER_OF_RECORDS: u32 = 64000;
+pub const MAX_NUMBER_OF_RECORDS: usize = 64000;
 #[cfg(test)]
-pub const MAX_NUMBER_OF_RECORDS: u32 = 64;
+pub const MAX_NUMBER_OF_RECORDS: usize = 64;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Records {

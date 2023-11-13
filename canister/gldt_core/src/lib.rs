@@ -666,7 +666,7 @@ fn add_record(
     {
         let records: Records = RECORDS.with(|cell| cell.borrow().clone());
 
-        if records.len() >= (records::MAX_NUMBER_OF_RECORDS as usize) {
+        if records.len() >= records::MAX_NUMBER_OF_RECORDS {
             return;
         }
     }
