@@ -668,12 +668,17 @@ fn add_record(
 
         if records.len() >= records::MAX_NUMBER_OF_RECORDS {
             log_message(
-                format!("INFO :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
+                format!("Error :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
             );
             return;
         } else if records.len() >= (records::MAX_NUMBER_OF_RECORDS * 8) / 10 {
+            let fill_percentage: usize = (records.len() * 100) / records::MAX_NUMBER_OF_RECORDS;
+
             log_message(
-                format!("INFO :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
+                format!(
+                    "Warn :: Records will be full soon (fill percentage : {fill_percentage}, size : {})",
+                    records::MAX_NUMBER_OF_RECORDS
+                )
             );
         }
     }
