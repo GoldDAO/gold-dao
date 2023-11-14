@@ -2,13 +2,11 @@ use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
-use gldt_libs::constants::*;
 use gldt_libs::gld_nft::{
     Account as OrigynAccount,
     AskFeature,
     AuctionStateShared,
     AuctionStateShared_status,
-    CandyShared,
     ICTokenSpec,
     ICTokenSpec_standard,
     PricingConfigShared,
@@ -18,8 +16,9 @@ use gldt_libs::gld_nft::{
     SubAccountInfo_account,
     TokenSpec,
 };
-use records::GldtRecord;
 use serde_bytes::ByteBuf;
+use records::{ GldtRecord, MAX_NUMBER_OF_RECORDS };
+use registry::{ MAX_NUMBER_OF_ENTRIES, MAX_HISTORY_REGISTRY };
 
 // --------------------------------- constants ----------------------------------
 
@@ -30,6 +29,7 @@ const CANISTER_ID_YUMI_KYC: &str = "2qft3-raaaa-aaaag-qci4a-cai";
 const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
 
 // --------------------------------- helpers ----------------------------------
+
 fn init_service() {
     init(
         Some(
@@ -1872,3 +1872,185 @@ fn test_nft_info_a3() {
 
     assert_eq!(res, NftInfo { info: None });
 }
+
+// ------------------------- add_records tests -----------------------------
+
+// #[test]
+// fn test_add_record_limit_1() {
+//     for _ in 0..MAX_NUMBER_OF_RECORDS {
+//         let result = add_record(
+//             "random_nft_id_1".to_string(),
+//             Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+//                 "Could not decode the principal."
+//             ),
+//             &SwapInfo::new(
+//                 "randomSellId1".to_string(),
+//                 [0u8; 32],
+//                 Account {
+//                     owner: Principal::anonymous(),
+//                     subaccount: Some([0u8; 32]),
+//                 },
+//                 0,
+//                 GldtNumTokens::new(Nat::from(0)).unwrap()
+//             ),
+//             RecordStatusInfo {
+//                 status: RecordStatus::Ongoing,
+//                 message: None,
+//             }
+//         );
+//         assert!(result.is_ok());
+//     }
+//     let result = add_record(
+//         "random_nft_id_1".to_string(),
+//         Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+//             "Could not decode the principal."
+//         ),
+//         &SwapInfo::new(
+//             "randomSellId1".to_string(),
+//             [0u8; 32],
+//             Account {
+//                 owner: Principal::anonymous(),
+//                 subaccount: Some([0u8; 32]),
+//             },
+//             0,
+//             GldtNumTokens::new(Nat::from(0)).unwrap()
+//         ),
+//         RecordStatusInfo {
+//             status: RecordStatus::Ongoing,
+//             message: None,
+//         }
+//     );
+
+//     assert!(result.is_err());
+// }
+
+// ------------------------- limit registry tests -----------------------------
+
+#[test]
+fn test_limit_registry_history() {
+    init_service();
+
+    REGISTRY.with(|r| {
+        let registry = &mut r.borrow_mut();
+
+        let swap_info = SwapInfo::new(
+            "randomSellId1".to_string(),
+            [0u8; 32],
+            Account {
+                owner: Principal::anonymous(),
+                subaccount: Some([0u8; 32]),
+            },
+            0,
+            GldtNumTokens::new(Nat::from(0)).unwrap()
+        );
+
+        let result: Result<(), String> = registry.init(
+            &(
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ),
+            swap_info.clone()
+        );
+
+        let _ = registry.update_failed(
+            &(
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ),
+            swap_info.clone()
+        );
+
+        for _ in 0..MAX_HISTORY_REGISTRY {
+            let result: Result<(), String> = registry.init(
+                &(
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_1".to_string(),
+                ),
+                swap_info.clone()
+            );
+
+            let _ = registry.update_failed(
+                &(
+                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        "Could not decode the principal."
+                    ),
+                    "random_nft_id_1".to_string(),
+                ),
+                swap_info.clone()
+            );
+
+            assert!(result.is_ok());
+        }
+        let result: Result<(), String> = registry.init(
+            &(
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ),
+            swap_info.clone()
+        );
+
+        let _ = registry.update_failed(
+            &(
+                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                    "Could not decode the principal."
+                ),
+                "random_nft_id_1".to_string(),
+            ),
+            swap_info.clone()
+        );
+
+        assert!(result.is_err());
+    })
+}
+
+// TODO : no solution found to generate random Principal Id......
+// #[test]
+// fn test_limit_registry() {
+//     init_service();
+
+//     REGISTRY.with(|r| {
+//         let registry = &mut r.borrow_mut();
+
+//         let swap_info = SwapInfo::new(
+//             "randomSellId1".to_string(),
+//             [0u8; 32],
+//             Account {
+//                 owner: Principal::anonymous(),
+//                 subaccount: Some([0u8; 32]),
+//             },
+//             0,
+//             GldtNumTokens::new(Nat::from(0)).unwrap()
+//         );
+
+//         for _ in 0..MAX_NUMBER_OF_ENTRIES {
+//             let rd_principal = Principal::anonymous();
+//             println!("rd principal = {}", rd_principal);
+//             let result: Result<(), String> = registry.init(
+//                 (rd_principal, "random_nft_id_1".to_string()).clone(),
+//                 swap_info.clone()
+//             );
+
+//             assert_eq!(result, Ok(()));
+//             // assert!(result.is_ok());
+//         }
+//         let result: Result<(), String> = registry.init(
+//             (
+//                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+//                     "Could not decode the principal."
+//                 ),
+//                 "random_nft_id_1".to_string(),
+//             ).clone(),
+//             swap_info.clone()
+//         );
+
+//         assert!(result.is_err());
+//     })
+// }

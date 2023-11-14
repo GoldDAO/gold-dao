@@ -11,6 +11,14 @@ use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
 pub struct Registry {
     registry: BTreeMap<(Principal, NftId), GldtRegistryEntry>,
 }
+#[cfg(not(test))]
+const MAX_HISTORY_REGISTRY: usize = 64;
+#[cfg(not(test))]
+const MAX_NUMBER_OF_ENTRIES: usize = 16000;
+#[cfg(test)]
+pub const MAX_HISTORY_REGISTRY: usize = 8;
+#[cfg(test)]
+pub const MAX_NUMBER_OF_ENTRIES: usize = 16;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
@@ -67,6 +75,10 @@ impl GldtRegistryEntry {
 
     pub fn get_issue_info(&self) -> &SwapInfo {
         &self.gldt_issue
+    }
+
+    fn count_older_record(&self) -> usize {
+        self.older_record.as_ref().map_or(0, |boxed_entry| 1 + boxed_entry.count_older_record())
     }
 }
 
@@ -248,8 +260,16 @@ impl Registry {
     }
     pub fn init(&mut self, key: &(Principal, NftId), entry: SwapInfo) -> Result<(), String> {
         Self::explicit_sequence_check(&self, key, UpdateType::Init)?;
+        let num_entries = self.registry.len();
+
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(v) => {
+                if num_entries >= MAX_NUMBER_OF_ENTRIES {
+                    return Err(
+                        format!("Swap NFT limit reached, limit is set to {MAX_NUMBER_OF_ENTRIES}.")
+                    );
+                }
+
                 v.insert(GldtRegistryEntry::new(entry));
                 Ok(())
             }
@@ -259,6 +279,14 @@ impl Registry {
                 // If not, then there may be an attempt to double mint and the
                 // procedure is cancelled.
                 if o.get().is_burned() || o.get().gldt_issue.is_failed() {
+                    if o.get().count_older_record() >= MAX_HISTORY_REGISTRY {
+                        return Err(
+                            format!(
+                                "Swap limit reached for this NFT, limit is set to {MAX_HISTORY_REGISTRY}."
+                            )
+                        );
+                    }
+
                     o.insert(GldtRegistryEntry {
                         gldt_issue: SwapInfo::new(
                             entry.nft_sale_id,

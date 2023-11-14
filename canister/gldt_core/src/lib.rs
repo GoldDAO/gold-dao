@@ -663,6 +663,26 @@ fn add_record(
     swap_info: &SwapInfo,
     status: RecordStatusInfo
 ) {
+    {
+        let records: Records = RECORDS.with(|cell| cell.borrow().clone());
+
+        if records.len() >= records::MAX_NUMBER_OF_RECORDS {
+            log_message(
+                format!("Error :: Records is full (size : {})", records::MAX_NUMBER_OF_RECORDS)
+            );
+            return;
+        } else if records.len() >= (records::MAX_NUMBER_OF_RECORDS * 8) / 10 {
+            let fill_percentage: usize = (records.len() * 100) / records::MAX_NUMBER_OF_RECORDS;
+
+            log_message(
+                format!(
+                    "Warn :: Records will be full soon (fill percentage : {fill_percentage}, size : {})",
+                    records::MAX_NUMBER_OF_RECORDS
+                )
+            );
+        }
+    }
+
     // To avoid any erros at this stage, all faulty values are set to default.
     let weight = CONF.with(|c|
         c.borrow().get_weight_by_collection_id(&gld_nft_canister_id)

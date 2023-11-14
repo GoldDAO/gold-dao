@@ -5,6 +5,11 @@ use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::Bloc
 
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 
+#[cfg(not(test))]
+pub const MAX_NUMBER_OF_RECORDS: usize = 64000;
+#[cfg(test)]
+pub const MAX_NUMBER_OF_RECORDS: usize = 64;
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Records {
     pub entries: BTreeMap<BlockIndex, GldtRecord>,
@@ -83,5 +88,11 @@ impl GldtRecord {
             block_height,
             status,
         }
+    }
+}
+
+impl Records {
+    pub fn len(&self) -> usize {
+        self.entries.len()
     }
 }
