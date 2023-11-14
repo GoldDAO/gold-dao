@@ -1013,8 +1013,8 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) {
     }
 }
 
-#[derive(CandidType)]
-struct LockedInfoResponse {
+#[derive(CandidType, Debug, PartialEq)]
+pub struct LockedInfoResponse {
     total_number_of_bars_locked: usize,
     total_weight_locked: usize,
 }

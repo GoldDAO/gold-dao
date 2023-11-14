@@ -2,19 +2,22 @@ use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
-use gldt_libs::gld_nft::{
-    Account as OrigynAccount,
-    AskFeature,
-    AuctionStateShared,
-    AuctionStateShared_status,
-    ICTokenSpec,
-    ICTokenSpec_standard,
-    PricingConfigShared,
-    SaleStatusShared,
-    SaleStatusShared_sale_type,
-    SubAccountInfo,
-    SubAccountInfo_account,
-    TokenSpec,
+use gldt_libs::{
+    gld_nft::{
+        Account as OrigynAccount,
+        AskFeature,
+        AuctionStateShared,
+        AuctionStateShared_status,
+        ICTokenSpec,
+        ICTokenSpec_standard,
+        PricingConfigShared,
+        SaleStatusShared,
+        SaleStatusShared_sale_type,
+        SubAccountInfo,
+        SubAccountInfo_account,
+        TokenSpec,
+    },
+    constants::GLDT_SUBDIVIDABLE_BY,
 };
 use serde_bytes::ByteBuf;
 use records::{ GldtRecord, MAX_NUMBER_OF_RECORDS };
@@ -61,7 +64,7 @@ fn init_service() {
     );
 }
 
-fn init_entry() -> SwapInfo {
+fn init_entry(weight: NftWeight) -> SwapInfo {
     SwapInfo::new(
         "test_sale_id".to_string(),
         [0u8; 32],
@@ -70,39 +73,47 @@ fn init_entry() -> SwapInfo {
             subaccount: None,
         },
         0,
-        GldtNumTokens::new(Nat::from(100)).unwrap()
+        calculate_tokens_from_weight(weight).unwrap()
     )
 }
-fn init_registry(num_entries: usize) {
-    assert!(num_entries < 1000);
-    let gld_nft_canister_id = Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect(
-        "Could not decode the principal."
-    );
-    let entry = init_entry();
-    for id in 0..num_entries {
-        let nft_id = format!("gold-{id}");
-        update_registry(&UpdateType::Init, nft_id, gld_nft_canister_id, entry);
+fn init_registry(num_entries_per_weight: usize) {
+    assert!(num_entries_per_weight < 1000);
+    let gld_nft_canister_id = [
+        Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect("Could not decode the principal."),
+        Principal::from_text(CANISTER_ID_GLD_NFT_10G).expect("Could not decode the principal."),
+    ];
+    let weights: [NftWeight; 2] = [1, 10];
+    for (i, g) in weights.iter().enumerate() {
+        let entry = init_entry(*g);
+        for id in 0..num_entries_per_weight {
+            let nft_id = format!("gold-{id}-{g}g");
+            let _ = update_registry(
+                &UpdateType::Init,
+                nft_id,
+                gld_nft_canister_id[i],
+                entry.clone()
+            );
+        }
     }
 }
 
 fn update_registry_to_swapped() {
-    let gld_nft_canister_id = Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect(
-        "Could not decode the principal."
-    );
-
-    for (key, val) in REGISTRY.with(|r| r.borrow().get()) {
-        let mut entry = val.clone();
-        let swap_info = entry.get_issue_info();
+    for (key, val) in REGISTRY.with(|r| r.borrow().get().clone()) {
+        let entry = val.clone();
+        let mut swap_info = entry.get_issue_info().clone();
         // 1. update to minted
         swap_info.set_ledger_entry(
             GldtLedgerEntry::Minted(
-                GldtLedgerInfo::new(Nat::from(0), GldtNumTokens::new(Nat::from(100)).unwrap())
+                GldtLedgerInfo::new(
+                    Nat::from(0),
+                    GldtNumTokens::new(Nat::from(100 * GLDT_SUBDIVIDABLE_BY)).unwrap()
+                )
             )
         );
-        update_registry(&UpdateType::Mint, key.1, key.0, *swap_info);
+        let _ = update_registry(&UpdateType::Mint, key.1.clone(), key.0, swap_info.clone());
         // 2. update to swapped
         swap_info.set_swapped(GldtSwapped::new("test_sale_id".to_string(), Nat::from(100)));
-        update_registry(&UpdateType::Mint, key.1, key.0, *swap_info);
+        let _ = update_registry(&UpdateType::Swap, key.1, key.0, swap_info);
     }
 }
 
@@ -1820,8 +1831,7 @@ fn test_get_records_b4() {
 //         )
 //     );
 // }
-
-// // ---------------------------------- nft_info --------------------------------
+// ---------------------------------- nft_info --------------------------------
 #[test]
 fn test_nft_info_a1() {
     let info_request = InfoRequest {
@@ -1922,18 +1932,32 @@ fn test_nft_info_a3() {
 
 #[test]
 fn test_get_locked_info_a1() {
-    let num_entries = 10;
+    let num_entries_per_weight = 0;
 
     init_service();
-    init_registry(num_entries);
+    init_registry(num_entries_per_weight);
     update_registry_to_swapped();
 
     let res = get_locked_info();
 
-    assert_eq!(
-        res,
-        Ok(GetLockedInfoResponse {
-            locked_info: None,
-        })
-    );
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: 0,
+        total_weight_locked: 0,
+    });
+}
+
+#[test]
+fn test_get_locked_info_a2() {
+    let num_entries_per_weight = 10;
+
+    init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped();
+
+    let res = get_locked_info();
+
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: num_entries_per_weight * 2,
+        total_weight_locked: num_entries_per_weight * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
+    });
 }
