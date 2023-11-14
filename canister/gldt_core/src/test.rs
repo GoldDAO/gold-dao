@@ -1,20 +1,25 @@
+use std::collections::HashMap;
+
 use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
-use gldt_libs::gld_nft::{
-    Account as OrigynAccount,
-    AskFeature,
-    AuctionStateShared,
-    AuctionStateShared_status,
-    ICTokenSpec,
-    ICTokenSpec_standard,
-    PricingConfigShared,
-    SaleStatusShared,
-    SaleStatusShared_sale_type,
-    SubAccountInfo,
-    SubAccountInfo_account,
-    TokenSpec,
+use gldt_libs::{
+    gld_nft::{
+        Account as OrigynAccount,
+        AskFeature,
+        AuctionStateShared,
+        AuctionStateShared_status,
+        ICTokenSpec,
+        ICTokenSpec_standard,
+        PricingConfigShared,
+        SaleStatusShared,
+        SaleStatusShared_sale_type,
+        SubAccountInfo,
+        SubAccountInfo_account,
+        TokenSpec,
+    },
+    constants::GLDT_SUBDIVIDABLE_BY,
 };
 use serde_bytes::ByteBuf;
 use records::{ GldtRecord, MAX_NUMBER_OF_RECORDS };
@@ -23,8 +28,10 @@ use registry::{ MAX_NUMBER_OF_ENTRIES, MAX_HISTORY_REGISTRY };
 // --------------------------------- constants ----------------------------------
 
 const CANISTER_ID_GLDT_CORE: &str = "m45be-jaaaa-aaaak-qcgnq-cai";
+const CANISTER_ID_GLDT_FEE_COMPENSATION: &str = "ccjse-eaaaa-aaaao-a2ixq-cai";
 const CANISTER_ID_GLDT_LEDGER: &str = "6uad6-fqaaa-aaaam-abovq-cai";
 const CANISTER_ID_GLD_NFT_1G: &str = "obapm-2iaaa-aaaak-qcgca-cai";
+const CANISTER_ID_GLD_NFT_10G: &str = "xyo2o-gyaaa-aaaal-qb55a-cai";
 const CANISTER_ID_YUMI_KYC: &str = "2qft3-raaaa-aaaag-qci4a-cai";
 const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
 
@@ -34,24 +41,24 @@ fn init_service() {
     init(
         Some(
             Conf::new(
-                Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai").expect(
+                Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
                     "Could not decode the principal."
                 ),
                 vec![
                     (
-                        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+                        Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect(
                             "Could not decode the principal."
                         ),
                         NftCanisterConf::new(1),
                     ),
                     (
-                        Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
+                        Principal::from_text(CANISTER_ID_GLD_NFT_10G).expect(
                             "Could not decode the principal."
                         ),
                         NftCanisterConf::new(10),
                     )
                 ],
-                Principal::from_text("ccjse-eaaaa-aaaao-a2ixq-cai").expect(
+                Principal::from_text(CANISTER_ID_GLDT_FEE_COMPENSATION).expect(
                     "Could not decode the principal."
                 )
             )
@@ -59,12 +66,70 @@ fn init_service() {
     );
 }
 
+fn init_entry(weight: NftWeight) -> SwapInfo {
+    SwapInfo::new(
+        "test_sale_id".to_string(),
+        [0u8; 32],
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        },
+        0,
+        calculate_tokens_from_weight(weight).unwrap()
+    )
+}
+fn init_registry(num_entries_per_weight: usize) {
+    assert!(num_entries_per_weight < 1000);
+    let gld_nft_canister_id = [
+        Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect("Could not decode the principal."),
+        Principal::from_text(CANISTER_ID_GLD_NFT_10G).expect("Could not decode the principal."),
+    ];
+    let weights: [NftWeight; 2] = [1, 10];
+    for (i, g) in weights.iter().enumerate() {
+        let entry = init_entry(*g);
+        for id in 0..num_entries_per_weight {
+            let nft_id = format!("gold-{id}-{g}g");
+            let _ = update_registry(
+                &UpdateType::Init,
+                nft_id,
+                gld_nft_canister_id[i],
+                entry.clone()
+            );
+        }
+    }
+}
+
+fn update_registry_to_swapped(num_of_entries_to_update_per_weight: Option<usize>) {
+    let mut count_map: HashMap<Principal, usize> = HashMap::new();
+    for (key, val) in REGISTRY.with(|r| r.borrow().get().clone()) {
+        if let Some(num) = num_of_entries_to_update_per_weight {
+            if count_map.entry(key.0.clone()).or_insert(0) >= &mut num.clone() {
+                continue;
+            }
+            *count_map.entry(key.0.clone()).or_insert(0) += 1;
+        }
+        let entry = val.clone();
+        let mut swap_info = entry.get_issue_info().clone();
+        // 1. update to minted
+        swap_info.set_ledger_entry(
+            GldtLedgerEntry::Minted(
+                GldtLedgerInfo::new(
+                    Nat::from(0),
+                    GldtNumTokens::new(Nat::from(100 * GLDT_SUBDIVIDABLE_BY)).unwrap()
+                )
+            )
+        );
+        let _ = update_registry(&UpdateType::Mint, key.1.clone(), key.0, swap_info.clone());
+        // 2. update to swapped
+        swap_info.set_swapped(GldtSwapped::new("test_sale_id".to_string(), Nat::from(100)));
+        let _ = update_registry(&UpdateType::Swap, key.1, key.0, swap_info);
+    }
+}
+
 fn init_records() {
     let _ = add_record(
         "random_nft_id_1".to_string(),
-        Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-            "Could not decode the principal."
-        ),
+        Principal::from_text(CANISTER_ID_GLD_NFT_1G).expect("Could not decode the principal."),
         &SwapInfo::new(
             "randomSellId1".to_string(),
             [0u8; 32],
@@ -1531,252 +1596,7 @@ fn test_get_records_b4() {
     );
 }
 
-// // ------------------------- notify_sale_nft_origyn tests -----------------------------
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a1() {
-//     init_service();
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     sale_nft_request.collection = Principal::anonymous();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: invalid caller: was 2vxsx-fae, expected one of [Principal { len: 10, bytes: [0, 0, 0, 0, 1, 80, 17, 132, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, Principal { len: 10, bytes: [0, 0, 0, 0, 1, 112, 15, 122, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }]".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a2() {
-//     init_service();
-
-//     let mut sale_nft_request = dummy_sale_nft_request();
-
-//     sale_nft_request.sale.token_id = "".to_string();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-//     assert_eq!(res, Err("ERROR :: NFT ID cannot be empty".to_string()));
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a3() {
-//     init_service();
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     sale_nft_request.escrow_info.account.sub_account = ByteBuf::from([
-//         199, 215, 43, 85, 161, 120, 243, 11, 166, 239, 227, 201, 223, 184, 203, 131, 205, 117, 219, 100,
-//         109, 105, 126, 235, 115, 10, 77, 39, 179, 197, 134,
-//     ]);
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-//     assert_eq!(
-//         res,
-//         Err("ERROR :: ERROR: expected a subaccount of length 32 but it was 31".to_string())
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a4() {
-//     init_service();
-
-//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-//         id: None,
-//         fee: Some(Nat::from(0)),
-//         decimals: Nat::from(8),
-//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-//             "Could not decode the principal."
-//         ),
-//         standard: ICTokenSpec_standard::ICRC1,
-//         symbol: "GLDT".to_string(),
-//     });
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.token = token.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Token specification are not correct. Expected ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" }), received: ic(ICTokenSpec { id: None, fee: Some(Nat(0)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" })".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a5() {
-//     init_service();
-
-//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-//         id: None,
-//         fee: Some(Nat::from(GLDT_TX_FEE)),
-//         decimals: Nat::from(1),
-//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-//             "Could not decode the principal."
-//         ),
-//         standard: ICTokenSpec_standard::ICRC1,
-//         symbol: "GLDT".to_string(),
-//     });
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.token = token.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Token specification are not correct. Expected ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" }), received: ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(1), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" })".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a6() {
-//     init_service();
-
-//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-//         id: None,
-//         fee: Some(Nat::from(GLDT_TX_FEE)),
-//         decimals: Nat::from(8),
-//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-//             "Could not decode the principal."
-//         ),
-//         standard: ICTokenSpec_standard::EXTFungible,
-//         symbol: "GLDT".to_string(),
-//     });
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.token = token.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Token specification are not correct. Expected ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" }), received: ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: EXTFungible, symbol: \"GLDT\" })".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a7() {
-//     init_service();
-
-//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-//         id: None,
-//         fee: Some(Nat::from(GLDT_TX_FEE)),
-//         decimals: Nat::from(8),
-//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-//             "Could not decode the principal."
-//         ),
-//         standard: ICTokenSpec_standard::EXTFungible,
-//         symbol: "GLDT2".to_string(),
-//     });
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.token = token.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Token specification are not correct. Expected ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: ICRC1, symbol: \"GLDT\" }), received: ic(ICTokenSpec { id: None, fee: Some(Nat(10000)), decimals: Nat(8), canister: Principal { len: 10, bytes: [0, 0, 0, 0, 1, 128, 11, 171, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, standard: EXTFungible, symbol: \"GLDT2\" })".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a8() {
-//     init_service();
-
-//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-//         id: None,
-//         fee: Some(Nat::from(GLDT_TX_FEE)),
-//         decimals: Nat::from(8),
-//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-//             "Could not decode the principal."
-//         ),
-//         standard: ICTokenSpec_standard::EXTFungible,
-//         symbol: "GLDT".to_string(),
-//     });
-
-//     let config = PricingConfigShared::ask(
-//         Some(
-//             Vec::from([
-//                 AskFeature::reserve(Nat::from(10000000000 as u64)),
-//                 AskFeature::buy_now(Nat::from(10000000000 as u64)),
-//                 AskFeature::notify(
-//                     Vec::from([
-//                         Principal::from_text(CANISTER_ID_GLDT_CORE).expect(
-//                             "Could not decode the principal."
-//                         ),
-//                     ])
-//                 ),
-//                 AskFeature::token(token),
-//             ])
-//         )
-//     );
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.config = config.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Unexpected feature in asked, only token, notify, kyc and buy_now accepted and received AskFeature::reserve(Nat(10000000000))".to_string()
-//         )
-//     );
-// }
-
-// #[tokio::test]
-// async fn test_notify_sale_nft_origyn_a9() {
-//     init_service();
-
-//     let config: PricingConfigShared = PricingConfigShared::extensible(
-//         Box::new(CandyShared::Nat64(1 as u64))
-//     );
-
-//     let mut sale_nft_request: SubscriberNotification = dummy_sale_nft_request();
-
-//     let SaleStatusShared_sale_type::auction(ref mut t) = sale_nft_request.sale.sale_type;
-
-//     t.config = config.clone();
-
-//     let res = notify_sale_nft_origyn(sale_nft_request).await;
-
-//     assert_eq!(
-//         res,
-//         Err(
-//             "ERROR :: Unexpected pricing_config_shared value, only ask value is accepted and received PricingConfigShared::extensible(Nat64(1))".to_string()
-//         )
-//     );
-// }
-
-// // ---------------------------------- nft_info --------------------------------
+// ---------------------------------- nft_info --------------------------------
 #[test]
 fn test_nft_info_a1() {
     let info_request = InfoRequest {
@@ -1873,184 +1693,53 @@ fn test_nft_info_a3() {
     assert_eq!(res, NftInfo { info: None });
 }
 
-// ------------------------- add_records tests -----------------------------
-
-// #[test]
-// fn test_add_record_limit_1() {
-//     for _ in 0..MAX_NUMBER_OF_RECORDS {
-//         let result = add_record(
-//             "random_nft_id_1".to_string(),
-//             Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-//                 "Could not decode the principal."
-//             ),
-//             &SwapInfo::new(
-//                 "randomSellId1".to_string(),
-//                 [0u8; 32],
-//                 Account {
-//                     owner: Principal::anonymous(),
-//                     subaccount: Some([0u8; 32]),
-//                 },
-//                 0,
-//                 GldtNumTokens::new(Nat::from(0)).unwrap()
-//             ),
-//             RecordStatusInfo {
-//                 status: RecordStatus::Ongoing,
-//                 message: None,
-//             }
-//         );
-//         assert!(result.is_ok());
-//     }
-//     let result = add_record(
-//         "random_nft_id_1".to_string(),
-//         Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-//             "Could not decode the principal."
-//         ),
-//         &SwapInfo::new(
-//             "randomSellId1".to_string(),
-//             [0u8; 32],
-//             Account {
-//                 owner: Principal::anonymous(),
-//                 subaccount: Some([0u8; 32]),
-//             },
-//             0,
-//             GldtNumTokens::new(Nat::from(0)).unwrap()
-//         ),
-//         RecordStatusInfo {
-//             status: RecordStatus::Ongoing,
-//             message: None,
-//         }
-//     );
-
-//     assert!(result.is_err());
-// }
-
-// ------------------------- limit registry tests -----------------------------
+// ------------------------- get_locked_info tests -------------------------
 
 #[test]
-fn test_limit_registry_history() {
+fn test_get_locked_info_a1() {
+    let num_entries_per_weight = 0;
+
     init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped(None);
 
-    REGISTRY.with(|r| {
-        let registry = &mut r.borrow_mut();
+    let res = get_locked_info();
 
-        let swap_info = SwapInfo::new(
-            "randomSellId1".to_string(),
-            [0u8; 32],
-            Account {
-                owner: Principal::anonymous(),
-                subaccount: Some([0u8; 32]),
-            },
-            0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
-        );
-
-        let result: Result<(), String> = registry.init(
-            &(
-                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                    "Could not decode the principal."
-                ),
-                "random_nft_id_1".to_string(),
-            ),
-            swap_info.clone()
-        );
-
-        let _ = registry.update_failed(
-            &(
-                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                    "Could not decode the principal."
-                ),
-                "random_nft_id_1".to_string(),
-            ),
-            swap_info.clone()
-        );
-
-        for _ in 0..MAX_HISTORY_REGISTRY {
-            let result: Result<(), String> = registry.init(
-                &(
-                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                        "Could not decode the principal."
-                    ),
-                    "random_nft_id_1".to_string(),
-                ),
-                swap_info.clone()
-            );
-
-            let _ = registry.update_failed(
-                &(
-                    Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                        "Could not decode the principal."
-                    ),
-                    "random_nft_id_1".to_string(),
-                ),
-                swap_info.clone()
-            );
-
-            assert!(result.is_ok());
-        }
-        let result: Result<(), String> = registry.init(
-            &(
-                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                    "Could not decode the principal."
-                ),
-                "random_nft_id_1".to_string(),
-            ),
-            swap_info.clone()
-        );
-
-        let _ = registry.update_failed(
-            &(
-                Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-                    "Could not decode the principal."
-                ),
-                "random_nft_id_1".to_string(),
-            ),
-            swap_info.clone()
-        );
-
-        assert!(result.is_err());
-    })
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: 0,
+        total_weight_locked: 0,
+    });
 }
 
-// TODO : no solution found to generate random Principal Id......
-// #[test]
-// fn test_limit_registry() {
-//     init_service();
+#[test]
+fn test_get_locked_info_a2() {
+    let num_entries_per_weight = 10;
 
-//     REGISTRY.with(|r| {
-//         let registry = &mut r.borrow_mut();
+    init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped(None);
 
-//         let swap_info = SwapInfo::new(
-//             "randomSellId1".to_string(),
-//             [0u8; 32],
-//             Account {
-//                 owner: Principal::anonymous(),
-//                 subaccount: Some([0u8; 32]),
-//             },
-//             0,
-//             GldtNumTokens::new(Nat::from(0)).unwrap()
-//         );
+    let res = get_locked_info();
 
-//         for _ in 0..MAX_NUMBER_OF_ENTRIES {
-//             let rd_principal = Principal::anonymous();
-//             println!("rd principal = {}", rd_principal);
-//             let result: Result<(), String> = registry.init(
-//                 (rd_principal, "random_nft_id_1".to_string()).clone(),
-//                 swap_info.clone()
-//             );
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: num_entries_per_weight * 2,
+        total_weight_locked: num_entries_per_weight * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
+    });
+}
 
-//             assert_eq!(result, Ok(()));
-//             // assert!(result.is_ok());
-//         }
-//         let result: Result<(), String> = registry.init(
-//             (
-//                 Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").expect(
-//                     "Could not decode the principal."
-//                 ),
-//                 "random_nft_id_1".to_string(),
-//             ).clone(),
-//             swap_info.clone()
-//         );
+#[test]
+fn test_get_locked_info_a3() {
+    let num_entries_per_weight = 10;
+    let num_entries_swapped = 7;
 
-//         assert!(result.is_err());
-//     })
-// }
+    init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped(Some(num_entries_swapped));
+
+    let res = get_locked_info();
+
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: num_entries_swapped * 2,
+        total_weight_locked: num_entries_swapped * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
+    });
+}

@@ -1013,6 +1013,31 @@ async fn notify_sale_nft_origyn(args: SubscriberNotification) {
     }
 }
 
+#[derive(CandidType, Debug, PartialEq)]
+pub struct LockedInfoResponse {
+    total_number_of_bars_locked: usize,
+    total_weight_locked: usize,
+}
+
+#[query]
+fn get_locked_info() -> LockedInfoResponse {
+    let count = REGISTRY.with(|r| r.borrow().count_number_of_nfts_swapped_per_collection());
+
+    let mut total_number_of_bars_locked: usize = 0;
+    let mut total_weight_locked: usize = 0;
+    count.iter().for_each(|(collection_id, count)| {
+        let weight = CONF.with(|c| c.borrow().get_weight_by_collection_id(collection_id)).unwrap_or(
+            0
+        );
+        total_weight_locked += usize::from(weight) * count;
+        total_number_of_bars_locked += count;
+    });
+    LockedInfoResponse {
+        total_number_of_bars_locked,
+        total_weight_locked,
+    }
+}
+
 // for monitoring during development
 #[query(name = "getCanistergeekInformation")]
 fn get_canistergeek_information(
