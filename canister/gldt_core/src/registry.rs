@@ -2,7 +2,7 @@ use candid::{ CandidType, Deserialize, Nat, Principal };
 
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ BlockIndex, Memo } };
 use serde::Serialize;
-use std::collections::{ BTreeMap, btree_map, HashSet };
+use std::collections::{ BTreeMap, btree_map, HashMap };
 
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
@@ -19,28 +19,16 @@ impl Registry {
     pub fn get(&self) -> &BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry> {
         &self.registry
     }
-
-    fn unique_principals(&self) -> HashSet<GldNftCollectionId> {
-        let mut principals = HashSet::new();
-        for ((principal, _), _) in self.registry.iter() {
-            principals.insert(*principal);
-        }
-        principals
-    }
     pub fn count_number_of_nfts_swapped_per_collection(&self) -> Vec<(GldNftCollectionId, usize)> {
-        let principals = self.unique_principals();
-        let mut result = Vec::new();
-        for principal in principals {
-            let count = self.registry
-                .iter()
-                .filter(
-                    |((p, _), entry)|
-                        p == &principal && entry.get_status_of_swap() == SwappingStates::Swapped
-                )
-                .count();
-            result.push((principal, count));
+        let mut count_map = HashMap::new();
+
+        for ((collection_id, _), entry) in self.registry.iter() {
+            if entry.get_status_of_swap() == SwappingStates::Swapped {
+                *count_map.entry(*collection_id).or_insert(0) += 1;
+            }
         }
-        result
+
+        count_map.into_iter().collect()
     }
 }
 #[cfg(not(test))]
@@ -50,7 +38,7 @@ const MAX_NUMBER_OF_ENTRIES: usize = 16000;
 #[cfg(test)]
 pub const MAX_HISTORY_REGISTRY: usize = 8;
 #[cfg(test)]
-pub const MAX_NUMBER_OF_ENTRIES: usize = 16;
+pub const MAX_NUMBER_OF_ENTRIES: usize = 32;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::*;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
@@ -97,8 +99,15 @@ fn init_registry(num_entries_per_weight: usize) {
     }
 }
 
-fn update_registry_to_swapped() {
+fn update_registry_to_swapped(num_of_entries_to_update_per_weight: Option<usize>) {
+    let mut count_map: HashMap<Principal, usize> = HashMap::new();
     for (key, val) in REGISTRY.with(|r| r.borrow().get().clone()) {
+        if let Some(num) = num_of_entries_to_update_per_weight {
+            if count_map.entry(key.0.clone()).or_insert(0) >= &mut num.clone() {
+                continue;
+            }
+            *count_map.entry(key.0.clone()).or_insert(0) += 1;
+        }
         let entry = val.clone();
         let mut swap_info = entry.get_issue_info().clone();
         // 1. update to minted
@@ -1692,7 +1701,7 @@ fn test_get_locked_info_a1() {
 
     init_service();
     init_registry(num_entries_per_weight);
-    update_registry_to_swapped();
+    update_registry_to_swapped(None);
 
     let res = get_locked_info();
 
@@ -1708,12 +1717,29 @@ fn test_get_locked_info_a2() {
 
     init_service();
     init_registry(num_entries_per_weight);
-    update_registry_to_swapped();
+    update_registry_to_swapped(None);
 
     let res = get_locked_info();
 
     assert_eq!(res, LockedInfoResponse {
         total_number_of_bars_locked: num_entries_per_weight * 2,
         total_weight_locked: num_entries_per_weight * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
+    });
+}
+
+#[test]
+fn test_get_locked_info_a3() {
+    let num_entries_per_weight = 10;
+    let num_entries_swapped = 7;
+
+    init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped(Some(num_entries_swapped));
+
+    let res = get_locked_info();
+
+    assert_eq!(res, LockedInfoResponse {
+        total_number_of_bars_locked: num_entries_swapped * 2,
+        total_weight_locked: num_entries_swapped * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
     });
 }
