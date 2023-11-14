@@ -269,6 +269,10 @@ type ICTokenSpec_standard = variant {
   Ledger;
 };
 type InfoRequest = record { nft_id : text; source_canister : principal };
+type LockedInfoResponse = record {
+  total_weight_locked : nat64;
+  total_number_of_bars_locked : nat64;
+};
 type LogMessageData = record { timeNanos : nat64; message : text };
 type MetricsGranularity = variant { hourly; daily };
 type MetricsRequest = record { parameters : GetMetricsParameters };
@@ -351,6 +355,7 @@ service : (opt Conf) -> {
     ) query;
   get_conf : () -> (Conf) query;
   get_historical_swaps_by_user : (GetSwapsRequest) -> (Result) query;
+  get_locked_info : () -> (LockedInfoResponse) query;
   get_ongoing_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_records : (GetRecordsRequest) -> (Result) query;
   get_status_of_swap : (GetStatusRequest) -> (Result_1) query;
