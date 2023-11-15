@@ -33,12 +33,20 @@ if [[ $# -gt 0 ]]; then
   if [[ "$1" == '--' ]]; then shift; fi
 fi
 
+# Arguments:
+# $1: Canister name
+# $2: Network name (optional)
+# $3: Memory amount to allocate (optional)
 create_canister () {
+	if [[ -n "${3}" ]]; then
+		export MEMALLOC="--memory-allocation ${3}"
+		echo -e "Memory allocation for ${2}:\t${3} B"
+	fi
 	if [[ $2 == "local" ]]; then
-		dfx canister create $1
+		dfx canister create $MEMALLOC $1
 		CANISTER_ID=$(dfx canister id $1)
 	elif [[ ($2 == "staging" || $2 == "ic") && $CI ]]; then
-		dfx canister create $1 --network $2
+		dfx canister create $MEMALLOC $1 --network $2
 		CANISTER_ID=$(dfx canister id $1 --network $2)
 	else
 		echo "Error during canister creation: unknown network ${2}"
@@ -47,14 +55,21 @@ create_canister () {
 	echo $CANISTER_ID
 }
 
+# Arguments:
+# $1: Canister name
+# $2: Network name (optional)
+# $3: Memory amount to allocate (optional)
 check_and_create_canister () {
 	if [[ $2 == "local" ]]; then
-		echo $(dfx canister id $1 2>/dev/null || echo $(create_canister $1 $2))
+		echo $(dfx canister id $1 2>/dev/null || echo $(create_canister $1 $2 $3))
 	elif [[ ($2 == "staging" && $CI) || ($2 == "ic" && $CI_COMMIT_TAG =~ ^(ledger|core|swap_app)-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$) ]]; then
 		if [[ $(cat canister_ids.json | jq -r .$1.$2) == "" ]]; then
-			echo $(create_canister $1 $2)
+			echo $(create_canister $1 $2 $3)
 		else
 			echo $(cat canister_ids.json | jq -r .$1.$2)
+			if [[ -n "${3}" ]]; then
+				dfx canister update-settings --memory-allocation $3 --network $2 $1
+			fi
 		fi
 	else
 		echo "Error: unknown network ${2}"
@@ -64,12 +79,19 @@ check_and_create_canister () {
 
 echo -e "\nCanisters IDs on $NETWORK:\n"
 IMPORTANT_MSG=""
-export GLDT_CORE_ID=$(check_and_create_canister gldt_core $NETWORK)
+export GLDT_CORE_ID=$(check_and_create_canister gldt_core $NETWORK 2147483648)
 echo -e "gldt_core      \033[1m${GLDT_CORE_ID}\033[0m${IMPORTANT_MSG}"
-export GLDT_LEDGER_ID=$(check_and_create_canister gldt_ledger $NETWORK)
+export GLDT_LEDGER_ID=$(check_and_create_canister gldt_ledger $NETWORK 1073741824)
 echo -e "gldt_ledger    \033[1m${GLDT_LEDGER_ID}\033[0m${IMPORTANT_MSG}"
+export GLDT_LEDGER_INDEXER_ID=$(check_and_create_canister gldt_ledger_indexer $NETWORK 1073741824)
 export GLDT_FRONT_ID=$(check_and_create_canister gldt_swap_app $NETWORK)
 echo -e "gldt_swap_app  \033[1m${GLDT_FRONT_ID}\033[0m${IMPORTANT_MSG}\n"
+export GLDT_LANDING_ID=$(check_and_create_canister gldt_landing_page $NETWORK)
+echo -e "gldt_landing_page  \033[1m${GLDT_LANDING_ID}\033[0m${IMPORTANT_MSG}\n"
+export GLDT_EXPLORER_ID=$(check_and_create_canister gldt_explorer $NETWORK)
+echo -e "gldt_explorer  \033[1m${GLDT_EXPLORER_ID}\033[0m${IMPORTANT_MSG}\n"
+export GLDT_COMPENSATION_ID=$(check_and_create_canister gldt_fee_compensation $NETWORK 1073741824)
+echo -e "gldt_fee_compensation  \033[1m${GLDT_COMPENSATION_ID}\033[0m${IMPORTANT_MSG}\n"
 
 if [[ ($NETWORK == "staging" || $NETWORK == "ic") && $CI ]]; then
 	echo -e "\n  \033[1;5;31mIMPORTANT\033[0m  If a canister id has just been created on \033[7m${NETWORK}\033[0m. Please update and version \033[4m'canister_ids.json'\033[0m on both the \033[7m'master'\033[0m and \033[7m'develop'\033[0m branches ASAP.\n"

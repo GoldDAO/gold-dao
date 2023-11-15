@@ -2,15 +2,43 @@ use candid::{ CandidType, Deserialize, Nat, Principal };
 
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ BlockIndex, Memo } };
 use serde::Serialize;
-use std::collections::{ BTreeMap, btree_map };
+use std::collections::{ BTreeMap, btree_map, HashMap };
 
-use crate::types::{ NftId, GldtNumTokens, NftWeight };
+use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
+
+type GldNftCollectionId = Principal;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
 pub struct Registry {
-    registry: BTreeMap<(Principal, NftId), GldtRegistryEntry>,
+    registry: BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry>,
 }
+
+impl Registry {
+    #[cfg(test)]
+    pub fn get(&self) -> &BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry> {
+        &self.registry
+    }
+    pub fn count_number_of_nfts_swapped_per_collection(&self) -> Vec<(GldNftCollectionId, usize)> {
+        let mut count_map = HashMap::new();
+
+        for ((collection_id, _), entry) in self.registry.iter() {
+            if entry.get_status_of_swap() == SwappingStates::Swapped {
+                *count_map.entry(*collection_id).or_insert(0) += 1;
+            }
+        }
+
+        count_map.into_iter().collect()
+    }
+}
+#[cfg(not(test))]
+const MAX_HISTORY_REGISTRY: usize = 64;
+#[cfg(not(test))]
+const MAX_NUMBER_OF_ENTRIES: usize = 16000;
+#[cfg(test)]
+pub const MAX_HISTORY_REGISTRY: usize = 8;
+#[cfg(test)]
+pub const MAX_NUMBER_OF_ENTRIES: usize = 32;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
@@ -68,10 +96,14 @@ impl GldtRegistryEntry {
     pub fn get_issue_info(&self) -> &SwapInfo {
         &self.gldt_issue
     }
+
+    fn count_older_record(&self) -> usize {
+        self.older_record.as_ref().map_or(0, |boxed_entry| 1 + boxed_entry.count_older_record())
+    }
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
-pub enum RegistryUpdateType {
+pub enum UpdateType {
     Init,
     Mint,
     Swap,
@@ -123,7 +155,7 @@ impl SwapInfo {
             failed: None,
         }
     }
-    pub fn did_fail(&self) -> bool {
+    pub fn is_failed(&self) -> bool {
         self.failed.is_some()
     }
 
@@ -243,12 +275,21 @@ pub enum SwappingStates {
 }
 
 impl Registry {
-    pub fn get_entry(&self, key: (Principal, NftId)) -> Option<&GldtRegistryEntry> {
-        self.registry.get(&key)
+    pub fn get_entry(&self, key: &(Principal, NftId)) -> Option<&GldtRegistryEntry> {
+        self.registry.get(key)
     }
-    pub fn init(&mut self, key: (Principal, NftId), entry: SwapInfo) -> Result<(), String> {
+    pub fn init(&mut self, key: &(Principal, NftId), entry: SwapInfo) -> Result<(), String> {
+        Self::explicit_sequence_check(&self, key, UpdateType::Init)?;
+        let num_entries = self.registry.len();
+
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(v) => {
+                if num_entries >= MAX_NUMBER_OF_ENTRIES {
+                    return Err(
+                        format!("Swap NFT limit reached, limit is set to {MAX_NUMBER_OF_ENTRIES}.")
+                    );
+                }
+
                 v.insert(GldtRegistryEntry::new(entry));
                 Ok(())
             }
@@ -257,7 +298,15 @@ impl Registry {
                 // a failed previous swap or because the tokens have been burned.
                 // If not, then there may be an attempt to double mint and the
                 // procedure is cancelled.
-                if o.get().is_burned() || o.get().gldt_issue.did_fail() {
+                if o.get().is_burned() || o.get().gldt_issue.is_failed() {
+                    if o.get().count_older_record() >= MAX_HISTORY_REGISTRY {
+                        return Err(
+                            format!(
+                                "Swap limit reached for this NFT, limit is set to {MAX_HISTORY_REGISTRY}."
+                            )
+                        );
+                    }
+
                     o.insert(GldtRegistryEntry {
                         gldt_issue: SwapInfo::new(
                             entry.nft_sale_id,
@@ -284,11 +333,14 @@ impl Registry {
 
     pub fn update_minted(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, key.clone(), entry.clone())?;
-        let _ = match entry.ledger_entry.clone() {
+        Self::sanity_check_inputs(self, key, &entry)?;
+        Self::explicit_sequence_check(&self, key, UpdateType::Mint)?;
+        // check that the input to the function is as expected
+        // we are expecting the the ledger_entry is of type Minted
+        match entry.ledger_entry.clone() {
             None => {
                 return Err(
                     format!(
@@ -299,18 +351,17 @@ impl Registry {
             }
             Some(ledger_entry) =>
                 match ledger_entry {
-                    GldtLedgerEntry::Minted(ledger_info) => ledger_info,
-                    _ => {
+                    GldtLedgerEntry::Minted(_) => (), // this is the happy path
+                    GldtLedgerEntry::Burned(_) => {
                         return Err(
                             format!(
-                                "There is no valid ledger entry for NFT: {}. Cannot update minting of tokens. Found {:?} ",
-                                key.1,
-                                ledger_entry
+                                "Burning not implemented yet. There is no valid ledger entry for NFT: {}. Cannot update minting of tokens.",
+                                key.1
                             )
                         );
                     }
                 }
-        };
+        }
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(_) => {
                 Err(
@@ -342,11 +393,14 @@ impl Registry {
 
     pub fn update_swapped(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        Self::sanity_check_inputs(self, key.clone(), entry.clone())?;
-        let _ = match entry.swapped.clone() {
+        Self::sanity_check_inputs(self, key, &entry)?;
+        Self::explicit_sequence_check(&self, key, UpdateType::Swap)?;
+        // check that the input to the function is as expected
+        // we are expecting the key `swapped` to be Some
+        match entry.swapped.clone() {
             None => {
                 return Err(
                     format!(
@@ -355,8 +409,8 @@ impl Registry {
                     )
                 );
             }
-            Some(swapped) => swapped,
-        };
+            Some(_) => (),
+        }
         match self.registry.entry(key.clone()) {
             btree_map::Entry::Vacant(_) => {
                 Err(
@@ -388,10 +442,11 @@ impl Registry {
 
     pub fn update_failed(
         &mut self,
-        key: (Principal, NftId),
+        key: &(Principal, NftId),
         entry: SwapInfo
     ) -> Result<(), String> {
-        match self.registry.get_mut(&key) {
+        Self::explicit_sequence_check(&self, key, UpdateType::Failed)?;
+        match self.registry.get_mut(key) {
             Some(r) => {
                 r.gldt_issue.set_failed(entry.failed.unwrap_or_default());
             }
@@ -407,8 +462,73 @@ impl Registry {
         Ok(())
     }
 
-    fn sanity_check_inputs(&self, key: (Principal, NftId), entry: SwapInfo) -> Result<(), String> {
-        match self.registry.get(&key) {
+    fn explicit_sequence_check(
+        &self,
+        key: &(Principal, NftId),
+        update_type: UpdateType
+    ) -> Result<(), String> {
+        // Proper sequence of entries needs to be ensured.
+        // Possible sequences currently are
+        // 1. Init -> Mint -> Swap
+        // 2. Any -> Failed
+
+        match self.registry.get(key) {
+            None => {
+                if let UpdateType::Init = update_type {
+                    // Only init is allowed when there is no entry yet.
+                    Ok(())
+                } else {
+                    Err(
+                        format!(
+                            "There is no active entry for NFT: {}. Cannot perform sequence check.",
+                            key.1
+                        )
+                    )
+                }
+            }
+            Some(r) => {
+                let previous_status = r.get_status_of_swap();
+                match update_type {
+                    UpdateType::Init => {
+                        // Init is further validated in the init function
+                        return Ok(());
+                    }
+                    UpdateType::Mint => {
+                        // Mint can only come after Init
+                        if previous_status == SwappingStates::Initialised {
+                            return Ok(());
+                        }
+                    }
+                    UpdateType::Swap => {
+                        // Swap can only come after Mint
+                        if previous_status == SwappingStates::Minted {
+                            return Ok(());
+                        }
+                    }
+                    UpdateType::Failed => {
+                        // Failed needs no validation as it can come from any state
+                        return Ok(());
+                    }
+                    UpdateType::Burn => {
+                        return Err("Burning not implemented yet.".to_string());
+                    }
+                }
+                Err(
+                    format!(
+                        "Invalid sequence of updates for NFT: {}. Previous status was {previous_status:?}, new status was supposed to be {update_type:?}.",
+                        key.1
+                    )
+                )
+            }
+        }
+    }
+
+    fn sanity_check_inputs(
+        &self,
+        key: &(Principal, NftId),
+        entry: &SwapInfo
+    ) -> Result<(), String> {
+        match self.registry.get(key) {
             None => {
                 Err(
                     format!(
@@ -494,9 +614,9 @@ impl Registry {
 
     pub fn get_ongoing_swaps_by_user(&self, account: Account) -> Vec<GldtRecord> {
         let mut result = Vec::new();
-        for ((gld_nft_canister_id, nft_id), entry) in self.registry.iter() {
+        for ((gld_nft_canister_id, nft_id), entry) in &self.registry {
             if entry.gldt_issue.receiving_account == account {
-                if entry.is_swapped() || entry.gldt_issue.did_fail() {
+                if entry.is_swapped() || entry.gldt_issue.is_failed() {
                     continue;
                 }
                 result.push(

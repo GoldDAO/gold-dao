@@ -11,6 +11,16 @@
         "output": "canister/gldt_ledger/declarations"
       }
     },
+    "gldt_ledger_indexer": {
+      "type": "custom",
+      "candid": "canister/gldt_ledger_indexer/gldt_ledger_indexer.did",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_ledger_indexer/declarations"
+      }
+    },
     "gldt_core": {
       "package": "gldt_core",
       "type": "custom",
@@ -23,9 +33,21 @@
       },
       "build": ["npm run build:back"]
     },
+    "gldt_fee_compensation": {
+      "package": "gldt_fee_compensation",
+      "type": "custom",
+      "candid": "canister/gldt_fee_compensation/src/gldt_fee_compensation.did",
+      "wasm": "canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_fee_compensation/declarations"
+      },
+      "build": ["npm run build:back"]
+    },
     "gldt_swap_app": {
       "type": "assets",
-      "source": ["swap_app/out"],
+      "source": ["client/swap_app/out"],
       "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
       "declarations": {
         "bindings": [],
@@ -36,7 +58,7 @@
     },
     "gldt_landing_page": {
       "type": "assets",
-      "source": ["landing_page/out"],
+      "source": ["client/landing_page/out"],
       "build": ["npm run postinstall", "npm run build:landing"],
       "declarations": {
         "bindings": [],
@@ -44,6 +66,16 @@
         "output": null
       },
       "frontend": {}
+    },
+    "gldt_explorer": {
+      "type": "assets",
+      "source": ["client/explorer/out"],
+      "build": ["npm run postinstall", "npm run build:explorer"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      }
     },
     "yumi_kyc": {
       "type": "custom",

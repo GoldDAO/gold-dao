@@ -11,9 +11,6 @@ out/
 **/.next
 .env
 target
-canister/gldt_core/target
-canister/gldt_core/declarations
-canister/gldt_ledger/declarations
-canister/gld_nft/declarations
-canister/yumi_kyc/declarations
+canister/**/target
+canister/**/declarations
 .vscode

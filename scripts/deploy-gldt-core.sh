@@ -13,10 +13,11 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-ledger [options] <NETWORK>
+  scripts/deploy-gldt-core.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
+  -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
 EOF
 }
 
@@ -27,6 +28,9 @@ if [[ $# -gt 0 ]]; then
       -h | --help )
         show_help
         exit
+        ;;
+      -r | --reinstall )
+        REINSTALL="--mode reinstall"
         ;;
     esac;
     shift;
@@ -43,17 +47,22 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
 fi
 
 if [[ $1 == "local" ]]; then
+# Temporarily use canister ids from staging for NFTs. Use the correct local ids when local NFT deployment will be working.
   dfx deploy gldt_core --network $1 --argument '(
   opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
   gld_nft_canister_ids=vec{
-    record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
-    }})' --mode reinstall -y
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
+    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}}
+    };
+  gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
+    })' --mode reinstall -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   dfx deploy gldt_core --network $1 --argument '(
     opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
     gld_nft_canister_ids=vec{
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
-      }})' --no-wallet -y
+    };
+    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
+      })' --no-wallet ${REINSTALL} -y
 fi
