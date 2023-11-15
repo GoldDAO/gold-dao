@@ -84,6 +84,10 @@ struct Conf {
     /// Canister IDs of the Origyn NFT canisters that manages gold NFTs.
     /// Is a tuple of the canister ID, the weight of the NFT and the last index checked.
     gld_nft_canister_conf: Vec<GldNftConf>,
+    /// The compensation factor to calculate the amount of fees compensated.
+    /// Default is 10, which means that 1% are compensated.
+    /// Is allowed to range between including 1 and 10.
+    compensation_factor: u64,
 }
 
 impl Default for Conf {
@@ -95,6 +99,7 @@ impl Default for Conf {
             gldt_ledger_canister_id: Principal::anonymous(),
             gld_nft_canister_conf: Vec::new(),
             gldt_canister_id: Principal::anonymous(),
+            compensation_factor: 10,
         }
     }
 }
@@ -107,7 +112,6 @@ thread_local! {
     static MANAGERS: RefCell<Vec<Principal>> = RefCell::default();
     static FALLBACK_TIMER_ID: RefCell<TimerId> = RefCell::default();
     static LAST_NOTIFY_CALL_TIMESTAMP: RefCell<u64> = RefCell::default();
-    static COMPENSATION_FACTOR: RefCell<u64> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -177,12 +181,9 @@ fn init(conf: Option<Conf>) {
         });
     }
 
+    #[cfg(not(test))]
     MANAGERS.with(|cell| {
         *cell.borrow_mut() = vec![api::caller()];
-    });
-
-    COMPENSATION_FACTOR.with(|cell| {
-        *cell.borrow_mut() = 10;
     });
 }
 
@@ -203,24 +204,24 @@ fn set_gld_nft_conf(gld_nft_conf: Vec<GldNftConf>) -> Result<(), CustomError> {
 
 #[query]
 fn get_compensation_factor() -> u64 {
-    COMPENSATION_FACTOR.with(|cell| *cell.borrow())
+    CONF.with(|cell| cell.borrow().compensation_factor)
 }
 
 #[update]
 fn set_compensation_factor(new_compensation_factor: u64) -> Result<(), CustomError> {
     validate_caller()?;
 
-    if new_compensation_factor > 10 {
+    if new_compensation_factor > 10 || new_compensation_factor < 1 {
         return Err(
             CustomError::new_with_message(
                 ErrorType::Other,
-                "Compensation factor value has to be between 0 and 10 (mean 0.1% and 1%).".to_string()
+                "Compensation factor value has to be between (including) 1 and 10 (mean 0.1% and 1%).".to_string()
             )
         );
     }
 
-    COMPENSATION_FACTOR.with(|cell| {
-        *cell.borrow_mut() = new_compensation_factor;
+    CONF.with(|cell| {
+        cell.borrow_mut().compensation_factor = new_compensation_factor;
     });
     Ok(())
 }
@@ -344,7 +345,7 @@ fn cronjob_master() -> Result<(), CustomError> {
 }
 
 fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
-    let compensation_factor = COMPENSATION_FACTOR.with(|cell| *cell.borrow());
+    let compensation_factor = CONF.with(|cell| cell.borrow().compensation_factor);
 
     // The user should in the end have the sale_price + GLDT_TX_FEE on his balance.
     // There are three royalties and one intermediate transaction that need to be considered.
@@ -583,6 +584,10 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
 }
 
 fn validate_caller() -> Result<(), CustomError> {
+    #[cfg(test)]
+    return Ok(());
+
+    #[cfg(not(test))]
     MANAGERS.with(|m| {
         if !m.borrow().contains(&api::caller()) {
             return Err(
@@ -616,3 +621,6 @@ fn get_candid_interface_tmp_hack() -> String {
     include_str!("gldt_fee_compensation.did").to_string()
 }
 export_candid!();
+
+#[cfg(test)]
+mod test;
