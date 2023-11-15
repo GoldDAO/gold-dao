@@ -22,6 +22,7 @@ import { Principal } from '@dfinity/principal';
 import GridSystem from '@ui/layout/GridSystem';
 import TokenSign from '@ui/gldt/TokenSign';
 import Title from '../layout/Title';
+import { formatAmount } from '@utils/misc/format';
 
 const TransactionContent = ({ id }) => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -40,75 +41,68 @@ const TransactionContent = ({ id }) => {
         });
 
         return (
-            <GridSystem gap={'20px'}>
+            <GridSystem gap={'40px'}>
                 <Title title={'Transction'} subTitle={id} />
-                <GridItem height={'20px'} gridColumn={['1/12', '2/11', '4/9']}>
-                    <HStack justifyContent={'space-between'}>
-                        <Text fontSize={'14px'}>Amount: </Text>
+                <GridItem colSpan={[12, 12, 4]}>
+                    <VStack alignItems={'flex-start'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Amount:
+                        </Text>
                         <HStack>
-                            <Text as="h3" variant={'h2'} fontSize={'14px'}>
-                                {parseInt(blocks.blocks[0].Map[2][1].Map[0][1].Int)}
-                            </Text>
+                            <Text>{formatAmount(blocks.blocks[0].Map[2][1].Map[0][1].Int)}</Text>{' '}
                             <TokenSign />
                         </HStack>
-                    </HStack>
+                    </VStack>
                 </GridItem>
-                <GridItem height={'20px'} gridColumn={['1/12', '2/11', '4/9']}>
-                    <HStack justifyContent={'space-between'}>
-                        <Text fontSize={'14px'}>Fees: </Text>
+                <GridItem colSpan={[12, 12, 4]}>
+                    <VStack alignItems={'flex-start'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Date/Hour
+                        </Text>
                         <HStack>
-                            <Text fontSize={'14px'}>
-                                {parseInt(blocks.blocks[0].Map[2][1].Map[1][1].Int) || 0}
-                            </Text>
-                            <TokenSign />
+                            <Timestamp timestamp={parseInt(blocks.blocks[0].Map[1][1].Int)} />
                         </HStack>
-                    </HStack>
+                    </VStack>
                 </GridItem>
-                <GridItem height={'20px'} gridColumn={['1/12', '2/11', '4/9']}>
-                    <HStack
-                        alignItems={'flex-start'}
-                        fontSize={'14px'}
-                        justifyContent={'space-between'}
-                    >
-                        <Text fontSize={'14px'}>Date/Hour</Text>
-                        <Timestamp timestamp={parseInt(blocks.blocks[0].Map[1][1].Int)} />
-                    </HStack>
+                <GridItem colSpan={[12, 12, 4]}>
+                    <VStack alignItems={'flex-start'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            From
+                        </Text>
+                        <HStack>
+                            <Link
+                                href={
+                                    typeof from === 'string'
+                                        ? '#'
+                                        : `/account/${Principal.fromUint8Array(from).toString()}`
+                                }
+                            >
+                                {typeof from === 'string' ? (
+                                    from
+                                ) : (
+                                    <PrincipalFormat
+                                        full
+                                        principal={Principal.fromUint8Array(from).toString()}
+                                    />
+                                )}
+                            </Link>
+                        </HStack>
+                    </VStack>
                 </GridItem>
-                <GridItem height={'20px'} gridColumn={['1/12', '2/11', '4/9']}>
-                    <HStack
-                        alignItems={'flex-start'}
-                        fontSize={'14px'}
-                        justifyContent={'space-between'}
-                    >
-                        <Text fontSize={'14px'}>from</Text>
-                        <Link
-                            href={
-                                typeof from === 'string'
-                                    ? '#'
-                                    : `/account/${Principal.fromUint8Array(from).toString()}`
-                            }
-                        >
-                            {typeof from === 'string' ? (
-                                from
-                            ) : (
+                <GridItem colSpan={[12, 12, 4]}>
+                    <VStack alignItems={'flex-start'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            To
+                        </Text>
+                        <HStack>
+                            <Link href={`/account/${Principal.fromUint8Array(to).toString()}`}>
                                 <PrincipalFormat
-                                    principal={Principal.fromUint8Array(from).toString()}
+                                    full
+                                    principal={Principal.fromUint8Array(to).toString()}
                                 />
-                            )}
-                        </Link>
-                    </HStack>
-                </GridItem>
-                <GridItem height={'20px'} gridColumn={['1/12', '2/11', '4/9']}>
-                    <HStack
-                        alignItems={'flex-start'}
-                        fontSize={'14px'}
-                        justifyContent={'space-between'}
-                    >
-                        <Text fontSize={'14px'}>To</Text>
-                        <Link href={`/account/${Principal.fromUint8Array(to).toString()}`}>
-                            <PrincipalFormat principal={Principal.fromUint8Array(to).toString()} />
-                        </Link>
-                    </HStack>
+                            </Link>
+                        </HStack>
+                    </VStack>
                 </GridItem>
             </GridSystem>
         );

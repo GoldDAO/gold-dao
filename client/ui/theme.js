@@ -88,6 +88,7 @@ export const customTheme = {
 				},
 			},
 		},
+
 		Button: {
 			variants: {
 				yumi: {

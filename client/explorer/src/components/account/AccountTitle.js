@@ -13,8 +13,16 @@ const AccountTitle = ({ data }) => {
                 {data.label}
             </Text>
             <HStack>
-                <Text color={'black'} fontSize={'20px'}>
-                    {firstChars}...{lastChars}
+                <Text
+                    maxW={['200px', '200px', '600px', '800px']}
+                    color={'black'}
+                    fontSize={'20px'}
+                    textOverflow={'ellipsis'}
+                    overflow={'hidden'}
+                    whiteSpace={'nowrap'}
+                    width={'100%'}
+                >
+                    {data.id}
                 </Text>
                 <CopyPrincipal text={data.id} />
             </HStack>
