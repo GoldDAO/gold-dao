@@ -1,8 +1,10 @@
 import {
+    Box,
     Button,
     Flex,
     GridItem,
     Heading,
+    Skeleton,
     Table,
     TableContainer,
     Tbody,
@@ -22,146 +24,213 @@ import TokenSign from '@ui/gldt/TokenSign';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import { formatAmount } from '@utils/misc/format';
 import GridSystem from '@ui/layout/GridSystem';
+import Title from '../layout/Title';
+import TableTitle from '../layout/TableTitle';
 
 const Explorer = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [startingIndex, setStartingIndex] = useState(0);
-    const { blocks } = useBlock(startingIndex, rowsPerPage);
+    const { blocks, isLoading } = useBlock(startingIndex, rowsPerPage);
+    const thead = ['Index', 'Date/Hour', 'Type', 'Amount', 'From', 'To'];
 
-    console.log('blocks', blocks);
     return (
-        <GridSystem>
-            <GridItem gridColumn={['1/12', '1/12', '2/6']} py="40px">
-                <Heading as="h1" variant={'h1'}>
-                    GLDT
-                </Heading>
-                <Heading as="h2" variant={'h2'}>
-                    EXPLORER
-                </Heading>
-            </GridItem>
-            <GridItem gridColumn={['1/12', '1/12', '1/2']}>
-                <Heading
-                    fontWeight={300}
-                    as="h3"
-                    textAlign={['left', 'left', 'right']}
-                    fontSize={'16px'}
-                    w={'100%'}
-                    borderBottom="1px"
-                    borderBottomColor={'secondaryText'}
-                >
-                    Past Transactions
-                </Heading>
-            </GridItem>
-            <GridItem gridColumn={['1/12', '1/12', '2/12']}>
+        <GridSystem gap={['0px', '0px', '20px']}>
+            <Title title={'GLDT'} subTitle={'Explorer'} />
+            <TableTitle title={'Past Transactions'} />
+            <GridItem gridColumn={['1/13', '1/13', '1/13']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
-                    <Table bg="white" borderRadius={'sm'}>
-                        <Thead>
-                            <Tr
-                                fontWeight={600}
-                                color={'secondaryText'}
-                                textTransform={'uppercase'}
-                                fontSize={'12px'}
-                            >
-                                <Td>Index</Td>
-                                <Td>Date/Hour</Td>
-                                <Td>Amount</Td>
-                                <Td>Fees</Td>
-                                <Td>From</Td>
-                                <Td>To</Td>
-                            </Tr>
-                        </Thead>
-                        <Tbody fontSize={'14px'}>
-                            {blocks?.blocks?.map((e, i) => {
-                                const from = e.Map[2][1].Map[2][1].Text
-                                    ? 'Minting account'
-                                    : e.Map[2][1].Map[2][1].Array[0].Blob;
-                                let to;
-                                e.Map[2][1].Map.map((e, i) => {
-                                    if (e[0] === 'to') {
-                                        to = e[1].Array[0].Blob;
-                                    }
-                                });
-                                return (
-                                    <Tr key={i}>
-                                        <Td>
-                                            <Link
-                                                href={`/transaction/${
-                                                    parseInt(blocks.chain_length) -
-                                                    i +
-                                                    startingIndex -
-                                                    1
-                                                }`}
-                                            >
-                                                {parseInt(blocks.chain_length) -
-                                                    i +
-                                                    startingIndex -
-                                                    1}
-                                            </Link>
-                                        </Td>
-                                        <Td>
-                                            <Timestamp timestamp={parseInt(e.Map[1][1].Int)} />
-                                        </Td>
-                                        <Td>
-                                            <Text fontSize={'14px'}>
-                                                {formatAmount(parseInt(e.Map[2][1].Map[0][1].Int))}
-                                            </Text>
-                                            <TokenSign />
-                                        </Td>
-                                        <Td>
-                                            <Text fontSize={'14px'}>
-                                                {formatAmount(
-                                                    parseInt(e.Map[2][1].Map[1][1].Int || 0),
-                                                )}
-                                            </Text>
-                                            <TokenSign />
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={
-                                                    typeof from === 'string'
-                                                        ? '#'
-                                                        : `/account/${Principal.fromUint8Array(
-                                                              from,
-                                                          ).toString()}`
-                                                }
-                                            >
-                                                {typeof from === 'string' ? (
-                                                    from
-                                                ) : (
-                                                    <PrincipalFormat
-                                                        principal={Principal.fromUint8Array(
-                                                            from,
-                                                        ).toString()}
+                    <Box w={'100%'} overflow={'scroll'}>
+                        <Table
+                            bg="white"
+                            borderRadius={'sm'}
+                            overflow-x="auto"
+                            w={'100%'}
+                            white-space="nowrap"
+                        >
+                            <Thead display="table-header-group">
+                                <Tr
+                                    fontWeight={600}
+                                    color={'secondaryText'}
+                                    textTransform={'uppercase'}
+                                    fontSize={'12px'}
+                                >
+                                    {thead.map((e, i) => (
+                                        <Td key={i}>{e}</Td>
+                                    ))}
+                                </Tr>
+                            </Thead>
+                            <Tbody fontSize={'14px'}>
+                                {!isLoading ? (
+                                    blocks?.blocks?.map((e, i) => {
+                                        const from = e.Map[2][1].Map[2][1].Text
+                                            ? 'Minting account'
+                                            : {
+                                                  principal: e.Map[2][1].Map[2][1].Array[0].Blob,
+                                                  subaccount: e.Map[2][1].Map[2][1].Array[1]?.Blob,
+                                              };
+
+                                        let to = {};
+                                        e.Map[2][1].Map.map((el, i) => {
+                                            if (el[0] === 'to') {
+                                                to = {
+                                                    principal: el[1].Array[0].Blob,
+                                                    subaccount: el[1].Array[1]?.Blob,
+                                                };
+                                            }
+                                        });
+                                        let type;
+                                        const labelsType = {
+                                            xfer: 'Transfer',
+                                            mint: 'Mint',
+                                            burn: 'Burn',
+                                        };
+                                        for (let i = 0; i < e.Map[2][1].Map.length - 1; i++) {
+                                            if (e.Map[2][1].Map[i][0] === 'op') {
+                                                type = labelsType[e.Map[2][1].Map[i][1].Text];
+                                            }
+                                        }
+
+                                        return (
+                                            <Tr key={i}>
+                                                <Td>
+                                                    <Link
+                                                        href={`/transaction/${
+                                                            parseInt(blocks.chain_length) -
+                                                            i +
+                                                            startingIndex -
+                                                            1
+                                                        }`}
+                                                    >
+                                                        {parseInt(blocks.chain_length) -
+                                                            i +
+                                                            startingIndex -
+                                                            1}
+                                                    </Link>
+                                                </Td>
+                                                <Td>
+                                                    <Timestamp
+                                                        timestamp={parseInt(e.Map[1][1].Int)}
                                                     />
-                                                )}
-                                            </Link>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/account/${Principal.fromUint8Array(
-                                                    to,
-                                                ).toString()}`}
-                                            >
-                                                <PrincipalFormat
-                                                    principal={Principal.fromUint8Array(
-                                                        to,
-                                                    ).toString()}
-                                                />
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                );
-                            })}
-                        </Tbody>
-                    </Table>
-                    <Pagination
-                        total={parseInt(blocks.chain_length)}
-                        currentHistoryPage={currentPage}
-                        setCurrentHistoryPage={setCurrentPage}
-                        setStartingIndex={setStartingIndex}
-                    />
+                                                </Td>
+                                                <Td>{type}</Td>
+                                                <Td>
+                                                    <Text fontSize={'14px'}>
+                                                        {formatAmount(e.Map[2][1].Map[0][1].Int)}
+                                                    </Text>
+                                                    <TokenSign />
+                                                </Td>
+                                                {/* <Td>
+                                                    <Text fontSize={'14px'}>
+                                                        {formatAmount(
+                                                            e.Map[2][1].Map[1][1].Int || 0,
+                                                        )}
+                                                    </Text>
+                                                    <TokenSign />
+                                                </Td> */}
+                                                <Td>
+                                                    <Link
+                                                        href={
+                                                            typeof from === 'string'
+                                                                ? '#'
+                                                                : `/account/${Principal.fromUint8Array(
+                                                                      from.principal,
+                                                                  ).toString()}`
+                                                        }
+                                                    >
+                                                        {typeof from === 'string' ? (
+                                                            from
+                                                        ) : (
+                                                            <Box fontSize={'16px'}>
+                                                                <PrincipalFormat
+                                                                    principal={Principal.fromUint8Array(
+                                                                        from.principal,
+                                                                    ).toString()}
+                                                                />
+                                                                {from.subaccount && (
+                                                                    <Box
+                                                                        fontSize={'14px'}
+                                                                        mt="-10px"
+                                                                        color={'secondaryText'}
+                                                                    >
+                                                                        <PrincipalFormat
+                                                                            nobtn={true}
+                                                                            principal={Principal.fromUint8Array(
+                                                                                from.subaccount,
+                                                                            ).toString()}
+                                                                        />
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
+                                                        )}
+                                                    </Link>
+                                                </Td>
+                                                <Td>
+                                                    {to.principal && (
+                                                        <Link
+                                                            href={
+                                                                typeof to === 'string'
+                                                                    ? '#'
+                                                                    : `/account/${Principal.fromUint8Array(
+                                                                          to.principal,
+                                                                      ).toString()}`
+                                                            }
+                                                        >
+                                                            <Box fontSize={'16px'}>
+                                                                <PrincipalFormat
+                                                                    principal={Principal.fromUint8Array(
+                                                                        to.principal,
+                                                                    ).toString()}
+                                                                />
+                                                                {to.subaccount && (
+                                                                    <Box
+                                                                        fontSize={'14px'}
+                                                                        mt="-10px"
+                                                                        color={'secondaryText'}
+                                                                    >
+                                                                        <PrincipalFormat
+                                                                            nobtn={true}
+                                                                            principal={Principal.fromUint8Array(
+                                                                                to.subaccount,
+                                                                            ).toString()}
+                                                                        />
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
+                                                        </Link>
+                                                    )}
+                                                </Td>
+                                            </Tr>
+                                        );
+                                    })
+                                ) : (
+                                    <>
+                                        {Array.from({ length: rowsPerPage }).map((e, i) => (
+                                            <Tr width={'100%'} key={i} borderRadius={'20px'}>
+                                                {thead.map((e, i) => (
+                                                    <Td key={i} p="0">
+                                                        <Skeleton
+                                                            height={'73px'}
+                                                            w={'100%'}
+                                                            startColor="blackAlpha.100"
+                                                            endColor="blackAlpha.300"
+                                                        />
+                                                    </Td>
+                                                ))}
+                                            </Tr>
+                                        ))}
+                                    </>
+                                )}
+                            </Tbody>
+                        </Table>
+                    </Box>
                 </TableContainer>
+                <Pagination
+                    total={parseInt(blocks.chain_length)}
+                    currentHistoryPage={currentPage}
+                    setCurrentHistoryPage={setCurrentPage}
+                    setStartingIndex={setStartingIndex}
+                />
             </GridItem>
         </GridSystem>
     );
@@ -172,7 +241,7 @@ export default Explorer;
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setStartingIndex }) => {
     total = total ? total : 0;
     return (
-        <VStack pt="20px">
+        <VStack w={'100%'} bg="bg" px="20px" pb="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
                 <Text fontSize={'14px'}>Page {currentHistoryPage + 1}</Text>
                 <Text fontSize={'14px'}>{total} entries</Text>

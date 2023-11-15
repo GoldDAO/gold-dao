@@ -8,19 +8,21 @@ const AccountTitle = ({ data }) => {
     const lastChars = data.id?.substring(data.id.length - charsCount);
 
     return (
-        <VStack
-            alignItems={'flex-start'}
-            spacing={'0'}
-            borderBottom={'1px'}
-            borderColor={'border'}
-            w={'100%'}
-        >
+        <VStack alignItems={'flex-start'} spacing={'0'} w={'100%'}>
             <Text color={'blackAlpha.600'} fontSize={'14px'}>
                 {data.label}
             </Text>
             <HStack>
-                <Text color={'black'} fontSize={'20px'}>
-                    {firstChars}...{lastChars}
+                <Text
+                    maxW={['200px', '200px', '600px', '800px']}
+                    color={'black'}
+                    fontSize={'20px'}
+                    textOverflow={'ellipsis'}
+                    overflow={'hidden'}
+                    whiteSpace={'nowrap'}
+                    width={'100%'}
+                >
+                    {data.id}
                 </Text>
                 <CopyPrincipal text={data.id} />
             </HStack>

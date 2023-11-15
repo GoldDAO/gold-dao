@@ -49,6 +49,7 @@ export const useBlock = (start, length, id) => {
 			})
 			.catch((error) => {
 				setLoading(false);
+				console.log('error', error);
 			});
 	}, [start]);
 	return { blocks, isLoading };

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { HStack, Text, Tooltip } from '@chakra-ui/react';
 import CopyPrincipal from '@ui/gldt/CopyPrincipal';
 
-const PrincipalFormat = ({ principal }) => {
+const PrincipalFormat = ({ principal , nobtn, full}) => {
 	const charsCount = 3;
 	const firstChars = principal?.slice(0, charsCount);
 	const lastChars = principal?.substring(principal.length - charsCount);
@@ -11,11 +11,19 @@ const PrincipalFormat = ({ principal }) => {
 		principal && (
 			<HStack justifySelf={'flex-end'}>
 				<Tooltip label={principal}>
+					<>
+						{!full &&
 					<Text fontSize={'inherit'}>
 						{firstChars}...{lastChars}
-					</Text>
+					</Text>}
+						{full &&
+					<Text fontSize={'inherit'}>
+						{principal}
+					</Text>}
+					</>
+
 				</Tooltip>
-				<CopyPrincipal text={principal} />
+				{!nobtn && <CopyPrincipal text={principal} />}
 			</HStack>
 		)
 	);

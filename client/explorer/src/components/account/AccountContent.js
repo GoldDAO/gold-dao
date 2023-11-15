@@ -7,6 +7,7 @@ import {
     HStack,
     Heading,
     Select,
+    Skeleton,
     Table,
     TableContainer,
     Tbody,
@@ -31,6 +32,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Principal } from '@dfinity/principal';
 import GridSystem from '@ui/layout/GridSystem';
+import Title from '../layout/Title';
+import TableTitle from '../layout/TableTitle';
 
 const AccountContent = ({ id, subAccount }) => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -39,10 +42,9 @@ const AccountContent = ({ id, subAccount }) => {
         last: null,
         first: null,
     });
-    const [last, setlast] = useState([]);
     const [action, setAction] = useState();
     const [i, seti] = useState([[]]);
-    const { history } = useHistory(id, currentPage, currentSub, i);
+    const { history, isLoading } = useHistory(id, currentPage, currentSub, i);
     const { subaccounts } = useSubaccounts(id);
     const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
     const router = useRouter();
@@ -54,7 +56,6 @@ const AccountContent = ({ id, subAccount }) => {
     }, [history]);
 
     useEffect(() => {
-        console.log('history', history);
         if (history?.Ok?.transactions.length > 0) {
             setIndex({
                 last: history?.Ok?.transactions[history.Ok.transactions.length - 1].id,
@@ -72,22 +73,47 @@ const AccountContent = ({ id, subAccount }) => {
             router.push(`/account/${id}?subaccount=${currentSub}`);
         }
     }, [currentSub, id, router]);
+    const thead = ['tx', 'Type', 'Date', 'GLDT amount', 'From', 'To'];
 
     return (
-        <GridSystem>
-            <GridItem gridColumn={['1/12', '1/12', '2/12, 2/6']} py={['0px', '0px', '40px']}>
-                <Heading as="h1" variant={'h1'}>
-                    Account
-                </Heading>
-                <Heading as="h2" variant={'h2'}>
-                    <PrincipalFormat principal={id} />
-                </Heading>
+        <GridSystem gap={['0px', '0px', '20px']}>
+            <Title title="Principal-id" subTitle={id} cp />
+            <GridItem
+                gridColumn={['1/12', '1/12', '1/6']}
+                alignSelf={['flex-start', 'flex-start', 'flex-end']}
+            >
+                <VStack alignItems={'flex-start'}>
+                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                        Subaccounts
+                    </Text>
+                    <Select
+                        size="md"
+                        width={['100%', '100%']}
+                        onChange={toggleChange}
+                        placeholder={subAccount}
+                        value={currentSub}
+                    >
+                        {subaccounts.map((e, i) => (
+                            <option key={i} value={buf2hex(e)}>
+                                {parseInt(buf2hex(e)) === 0 ? 'Default (0)' : buf2hex(e)}
+                            </option>
+                        ))}
+                    </Select>
+                </VStack>
+            </GridItem>
+            <GridItem gridColumn={['1/12', '1/12', '1/6']}>
+                <VStack alignItems={'flex-start'}>
+                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                        Balance
+                    </Text>
+                    <HStack>
+                        <Text>{formatAmount(balance)}</Text> <TokenSign />
+                    </HStack>
+                </VStack>
             </GridItem>
             <GridItem
-                colSpan={[12, 12, 3, 2]}
-                colStart={[1, 1, 3]}
+                gridColumn={['1/12', '1/12', '1/6']}
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
             >
                 <AccountTitle
                     data={{
@@ -96,123 +122,138 @@ const AccountContent = ({ id, subAccount }) => {
                     }}
                 />
             </GridItem>
-            <GridItem
-                colSpan={[12, 12, 3, 2]}
-                alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
-            >
-                <Select
-                    size="md"
-                    onChange={toggleChange}
-                    placeholder={subAccount}
-                    value={currentSub}
-                >
-                    {subaccounts.map((e, i) => (
-                        <option key={i} value={buf2hex(e)}>
-                            {buf2hex(e)}
-                        </option>
-                    ))}
-                </Select>
-            </GridItem>
-            <GridItem
-                alignSelf={['flex-start', 'flex-start', 'flex-end']}
-                py={['0px', '0px', '40px']}
-                colSpan={[12, 12, 3, 2]}
-            >
-                <HStack>
-                    <Text>{formatAmount(balance)}</Text> <TokenSign />
-                </HStack>
-            </GridItem>
-            <GridItem gridColumn={['1/13', '1/13', '1/2', '1/2', '1/2']}>
-                <Heading
-                    fontWeight={300}
-                    as="h3"
-                    fontSize={'16px'}
-                    textAlign={'right'}
-                    w={'100%'}
-                    borderBottom="1px"
-                    borderBottomColor={'secondaryText'}
-                >
-                    History
-                </Heading>
-            </GridItem>
-            <GridItem gridColumn={['1/12', '1/12', '2/12']}>
+            <TableTitle title={'History'} />
+            <GridItem gridColumn={['1/13', '1/13', '1/13']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
-                    <Table bg="white" borderRadius={'sm'}>
-                        <Thead>
-                            <Tr
-                                fontWeight={600}
-                                color={'secondaryText'}
-                                textTransform={'uppercase'}
-                                fontSize={'12px'}
-                            >
-                                <Td>tx</Td>
-                                <Td>Type</Td>
-                                <Td>Date</Td>
-                                <Td>GLDT amount</Td>
-                                <Td>From</Td>
-                                <Td>To</Td>
-                            </Tr>
-                        </Thead>
-                        <Tbody fontSize={'14px'}>
-                            {history?.Ok?.transactions?.map((e, i) => {
-                                return (
-                                    <Tr key={i}>
-                                        <Td>
-                                            <Link href={`/transaction/${e.id}`}>
-                                                {parseInt(e.id)}
-                                            </Link>
-                                        </Td>
-                                        <Td>{e.transaction.kind}</Td>
-                                        <Td>
-                                            <Timestamp
-                                                timestamp={parseInt(e.transaction.timestamp)}
-                                            />
-                                        </Td>
-                                        <Td>
-                                            <HStack>
-                                                <Text fontSize={'14px'}>
-                                                    {formatAmount(e.transaction.transfer[0].amount)}
-                                                </Text>
-                                                <TokenSign />
-                                            </HStack>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/account/${Principal.fromUint8Array(
-                                                    e.transaction.transfer[0].from.owner._arr,
-                                                ).toString()}`}
-                                            >
-                                                <PrincipalFormat
-                                                    principal={Principal.fromUint8Array(
-                                                        e.transaction.transfer[0].from.owner._arr,
-                                                    ).toString()}
-                                                />
-                                            </Link>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/account/${Principal.fromUint8Array(
-                                                    e.transaction.transfer[0].to.owner._arr,
-                                                ).toString()}`}
-                                            >
-                                                <PrincipalFormat
-                                                    principal={Principal.fromUint8Array(
-                                                        e.transaction.transfer[0].to.owner._arr,
-                                                    ).toString()}
-                                                />
-                                            </Link>
-                                        </Td>
+                    <Box w={'100%'} overflow={'scroll'}>
+                        <Table
+                            bg="white"
+                            borderRadius={'sm'}
+                            overflow-x="auto"
+                            w={'100%'}
+                            white-space="nowrap"
+                        >
+                            <Thead display="table-header-group">
+                                <Tr
+                                    fontWeight={600}
+                                    color={'secondaryText'}
+                                    textTransform={'uppercase'}
+                                    fontSize={'12px'}
+                                >
+                                    {thead.map((e, i) => (
+                                        <Td key={i}>{e}</Td>
+                                    ))}
+                                </Tr>
+                            </Thead>
+                            <Tbody fontSize={'14px'}>
+                                {history?.Ok?.transactions.length < 1 && (
+                                    <Tr>
+                                        <Td>No Transaction</Td>
                                     </Tr>
-                                );
-                            })}
-                        </Tbody>
-                    </Table>
-                    <Pagination
-                        currentHistoryPage={currentPage}
-                        setCurrentHistoryPage={setCurrentPage}
-                        setAction={setAction}
-                    />
+                                )}
+                                {!isLoading ? (
+                                    history?.Ok?.transactions?.map((e, i) => {
+                                        return (
+                                            <Tr key={i}>
+                                                <Td>
+                                                    <Link href={`/transaction/${e.id}`}>
+                                                        {parseInt(e.id)}
+                                                    </Link>
+                                                </Td>
+                                                <Td>{e.transaction.kind}</Td>
+                                                <Td>
+                                                    <Timestamp
+                                                        timestamp={parseInt(
+                                                            e.transaction.timestamp,
+                                                        )}
+                                                    />
+                                                </Td>
+                                                <Td>
+                                                    <HStack>
+                                                        <Text fontSize={'14px'}>
+                                                            {formatAmount(
+                                                                e.transaction.transfer[0].amount,
+                                                            )}
+                                                        </Text>
+                                                        <TokenSign />
+                                                    </HStack>
+                                                </Td>
+                                                <Td>
+                                                    <Link
+                                                        href={`/account/${Principal.fromUint8Array(
+                                                            e.transaction.transfer[0].from.owner
+                                                                ._arr,
+                                                        ).toString()}`}
+                                                    >
+                                                        <PrincipalFormat
+                                                            principal={Principal.fromUint8Array(
+                                                                e.transaction.transfer[0].from.owner
+                                                                    ._arr,
+                                                            ).toString()}
+                                                        />
+                                                        {e.transaction.transfer[0].from.subaccount
+                                                            .length > 0 && (
+                                                            <Box
+                                                                fontSize={'14px'}
+                                                                mt="-10px"
+                                                                color={'secondaryText'}
+                                                            >
+                                                                <PrincipalFormat
+                                                                    nobtn={true}
+                                                                    principal={Principal.fromUint8Array(
+                                                                        e.transaction.transfer[0]
+                                                                            .from.subaccount,
+                                                                    ).toString()}
+                                                                />
+                                                            </Box>
+                                                        )}
+                                                    </Link>
+                                                </Td>
+                                                <Td>
+                                                    <Link
+                                                        href={`/account/${Principal.fromUint8Array(
+                                                            e.transaction.transfer[0].to.owner._arr,
+                                                        ).toString()}`}
+                                                    >
+                                                        <PrincipalFormat
+                                                            principal={Principal.fromUint8Array(
+                                                                e.transaction.transfer[0].to.owner
+                                                                    ._arr,
+                                                            ).toString()}
+                                                        />
+                                                    </Link>
+                                                </Td>
+                                            </Tr>
+                                        );
+                                    })
+                                ) : (
+                                    <>
+                                        {Array.from({ length: 10 }).map((e, i) => (
+                                            <Tr width={'100%'} key={i} borderRadius={'20px'}>
+                                                {thead.map((e, i) => (
+                                                    <Td key={i} p="0">
+                                                        <Skeleton
+                                                            height={'73px'}
+                                                            w={'100%'}
+                                                            startColor="blackAlpha.100"
+                                                            endColor="blackAlpha.300"
+                                                        />
+                                                    </Td>
+                                                ))}
+                                            </Tr>
+                                        ))}
+                                    </>
+                                )}
+                            </Tbody>
+                        </Table>
+                    </Box>
+                    {history?.Ok?.transactions.length > 0 && (
+                        <Pagination
+                            currentHistoryPage={currentPage}
+                            setCurrentHistoryPage={setCurrentPage}
+                            setAction={setAction}
+                        />
+                    )}
                 </TableContainer>
             </GridItem>
         </GridSystem>

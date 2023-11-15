@@ -11,6 +11,7 @@ const GridSystem = ({ children, gap, auto }) => {
 			columnGap={gap ? gap : 8}
 			rowGap={gap ? gap : [6, 4]}
 			wrap="wrap"
+			mt={['20px', '20px', 0]}
 		>
 			{children}
 		</Grid>

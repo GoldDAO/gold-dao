@@ -64,6 +64,7 @@ export const customTheme = {
 				fontSize: ['18px', '18px','20px'],
 				lineheight: ['22px', '22px','26px'],
 				fontWeight: 400,
+				fontFamily: inter.style.fontFamily
 			},
 
 		},
@@ -87,6 +88,7 @@ export const customTheme = {
 				},
 			},
 		},
+
 		Button: {
 			variants: {
 				yumi: {
