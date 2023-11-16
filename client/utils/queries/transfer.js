@@ -1,7 +1,7 @@
 import { Principal } from '@dfinity/principal';
 
 
-export const transfer = async (amount, to, actor, setFeedback) => {
+export const transfer = async (amount, to, actor) => {
 	try {
 		const res = await actor.icrc1_transfer({
 			to: {

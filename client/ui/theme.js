@@ -8,6 +8,8 @@ const inter = Inter({
 
 export const customTheme = {
 	fonts: {
+		heading: inter.style.fontFamily,
+		body: inter.style.fontFamily,
 		inter: inter.style.fontFamily
 	},
 	colors: {
@@ -24,6 +26,7 @@ export const customTheme = {
 		lightBlack: '#2E2E2E',
 		border: '#E4E4E4',
 		darkGold: '#937937',
+		veryDarkGold: '#7a6d49'
 	},
 	components: {
 		Tooltip: {
@@ -59,6 +62,16 @@ export const customTheme = {
 				}
 			}
 		},
+		Input: {
+			defaultProps: {
+				focusBorderColor: 'black',
+			}
+		},
+		NumberInput: {
+			defaultProps: {
+				focusBorderColor: 'black',
+			}
+		},
 		Text: {
 			baseStyle: {
 				fontSize: ['18px', '18px','20px'],
@@ -70,18 +83,22 @@ export const customTheme = {
 		},
 		Alert: {
 			baseStyle: {
+				fontFamily: inter.style.fontFamily,
 				container: {
 					bg: 'white',
 					color: 'black',
-					borderRadius: '40px',
+					borderRadius: '140px',
 					border: '1px',
 					borderColor: 'black',
 				},
 				title: {
 					color: 'black',
+					fontWeight: 500,
 				},
 				description: {
 					color: 'black',
+					fontWeight:300,
+
 				},
 				icon: {
 					color: 'black',
@@ -128,7 +145,7 @@ export const customTheme = {
 };
 
 export const cardPadding = {
-	xl: [2, 2, 2, 4, 4],
+	xl: [2, 3, 4, 4, 4],
 	lg: [2, 2, 2, 4, 4],
 	md: [2, 2, 2, 4, 4],
 	sm: [2, 2, 2, 4, 4],

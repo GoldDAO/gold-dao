@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { HStack, Text, Tooltip } from '@chakra-ui/react';
 import CopyPrincipal from '@ui/gldt/CopyPrincipal';
+import { useConnect } from '@connect2ic/react';
 
-const PrincipalFormat = ({ principal , nobtn, full}) => {
+const PrincipalFormat = ({ nobtn, full}) => {
+	const { principal } = useConnect();
 	const charsCount = 3;
 	const firstChars = principal?.slice(0, charsCount);
 	const lastChars = principal?.substring(principal.length - charsCount);

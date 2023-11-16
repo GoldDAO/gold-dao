@@ -38,6 +38,12 @@ function Home({}) {
     const Transfer = dynamic(() => import('@/components/ui/transfer/Transfer'), {
         ssr: false,
     });
+
+    const tabSelected = {
+        color: '#fff',
+        bg: 'black',
+    };
+
     return (
         <>
             <Head>
@@ -53,8 +59,9 @@ function Home({}) {
             <Layout>
                 <Tabs
                     mt="15px"
-                    variant={'enclosed'}
-                    gridColumn={['4/13', '1/13', '2/12', '3/11', '3/11']}
+                    variant="soft-rounded"
+                    colorScheme="black"
+                    gridColumn={['1/13', '1/13', '2/12', '3/11', '4/10']}
                     position={'static'}
                     display="grid"
                     justifyContent={'center'}
@@ -63,11 +70,34 @@ function Home({}) {
                 >
                     <TabList
                         display={'flex'}
+                        bg="bg"
+                        w={'fit-content'}
+                        alignSelf={'center'}
                         justifyContent={'center'}
+                        borderRadius="50px"
                         borderBottomColor={'transparent'}
+                        justifySelf={'center'}
+                        opacity={isConnected ? 1 : 0.4}
+                        py="3px"
                     >
-                        <Tab opacity={isConnected ? 1 : 0.4}>Swap</Tab>
-                        <Tab opacity={isConnected ? 1 : 0.4}>Transfer</Tab>
+                        <Tab
+                            color={'blackAlpha.600'}
+                            _selected={tabSelected}
+                            mx="2px"
+                            fontSize={'16px'}
+                            fontWeight={500}
+                        >
+                            Swap
+                        </Tab>
+                        <Tab
+                            color={'blackAlpha.600'}
+                            _selected={tabSelected}
+                            mx="2px"
+                            fontWeight={500}
+                            fontSize={'16px'}
+                        >
+                            Transfer
+                        </Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>

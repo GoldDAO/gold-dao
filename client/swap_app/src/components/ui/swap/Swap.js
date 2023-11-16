@@ -99,11 +99,10 @@ const SwapInterface = ({ setIsConnected }) => {
                 mx={['10px', '20px', 0, 0, 0]}
                 display="grid"
                 justifyContent={'center'}
-                x
                 gridTemplateRows={'repeat(1, 1fr)'}
                 gridTemplateColumns={'repeat(1, 1fr)'}
                 gap="3"
-                borderRadius={'2xl'}
+                borderRadius={['lg', 'lg', 'lg', 'xl']}
             >
                 <Input isConnected={isConnected} />
                 <Output isConnected={isConnected} />
@@ -137,23 +136,32 @@ const TokenTag = ({ nft, size, isToggle, index }) => {
             minW={'120px'}
             transition=".2s all"
             cursor={'pointer'}
-            bg={isSelected ? 'lightGold' : 'white'}
-            border="1px"
-            borderColor={'gold'}
+            opacity={isSelected ? '1' : '.6'}
+            bg={isSelected ? 'lightGold' : 'lightGold'}
+            border={isSelected ? '1px' : '0px'}
+            borderColor={'darkGold'}
+            justifyContent={'center'}
             size={size}
             onClick={() => setIsSelected(!isSelected)}
         >
-            <TagLabel transition="all 1s" m={isSelected ? '0' : '0 auto'} color={'black'}>
-                {nft.name}
-            </TagLabel>
-            {isSelected && (
-                <TagCloseButton
+            <HStack justify={'space-between'}>
+                <TagLabel
                     transition="all 1s"
-                    opacity={isSelected ? 0.7 : 0}
-                    height={isSelected ? '10px' : '0px'}
-                    w={isSelected ? '10px' : '0px'}
-                />
-            )}
+                    m={isSelected ? '0' : '0 auto'}
+                    color={'veryDarkGold'}
+                >
+                    {nft.name}
+                </TagLabel>
+                {isSelected && (
+                    <TagCloseButton
+                        color={'veryDarkGold'}
+                        transition="all 1s"
+                        opacity={isSelected ? 0.7 : 0}
+                        height={isSelected ? '10px' : '0px'}
+                        w={isSelected ? '10px' : '0px'}
+                    />
+                )}
+            </HStack>
         </Tag>
     );
 };
@@ -237,8 +245,8 @@ const OutputOverview = ({ isConnected }) => {
         >
             <CardBody>
                 <HStack justifyContent="space-between">
-                    <Box color={isConnected ? 'black' : 'secondaryText'}>You will receive</Box>
-                    <HStack color={isConnected ? 'black' : 'secondaryText'}>
+                    <Box color={'secondaryText'}>You will receive</Box>
+                    <HStack color={'secondaryText'}>
                         <Text>{minted.toString()}</Text>&nbsp;
                         <TokenSign />
                     </HStack>
@@ -395,7 +403,7 @@ const MyNfts = ({ isConnected }) => {
                     display={'flex'}
                     justifyContent={'space-between'}
                 >
-                    <Box>Select from my NFTs</Box>
+                    <Text fontSize={'16px'}>Select from my NFTs</Text>
                     {isLoading ? <Spinner size="sm" ml={'1em'} /> : <AccordionIcon />}
                 </AccordionButton>
                 {connected && <MyNftsPanel setIsloading={setIsloading} />}
@@ -430,7 +438,7 @@ const MyNftsPanel = ({ setIsloading }) => {
             border={'1px'}
             borderColor={'border'}
             borderTop={0}
-            p={{ base: '10px', md: '10px' }}
+            p={'3px'}
             gap="2"
             display="grid"
             gridTemplateColumns={'repeat(2,1fr)'}
@@ -442,40 +450,26 @@ const MyNftsPanel = ({ setIsloading }) => {
                 nftsByW.map(
                     (weight, i) =>
                         weight.length > 0 && (
-                            <Card key={i} shadow={'none'}>
+                            <Card key={i} shadow={'none'} borderRadius={0}>
                                 <CardHeader
                                     display={'flex'}
                                     justifyContent={'space-between'}
                                     p={'10px'}
                                     color={'secondaryText'}
+                                    borderBottom={'1px'}
+                                    borderBottomColor="bg"
                                 >
                                     <Stack
                                         w={'100%'}
+                                        direction="column"
                                         justifyContent={{ base: 'flex-start', md: 'space-between' }}
-                                        direction={{ base: 'column', md: 'row' }}
                                     >
-                                        <Text fontWeight={500} fontSize={'sm'} color="black">
+                                        <Text fontSize={'14px'} color="black">
                                             GLD NFTs {Object.keys(gldNftCanisters)[i]}
                                         </Text>
-                                        <Button
-                                            onClick={() =>
-                                                isAllSelected[i]
-                                                    ? unSelectSameWeight(i)
-                                                    : selectSameWeight(i)
-                                            }
-                                            bg="transparent"
-                                            border={'1px'}
-                                            w="fit-content"
-                                            borderColor={'black'}
-                                            _hover={{ backgroundColor: 'bg' }}
-                                            fontWeight={400}
-                                            size={'xs'}
-                                        >
-                                            {isAllSelected[i] ? 'Unselect All' : 'Select All'}
-                                        </Button>
                                     </Stack>
                                 </CardHeader>
-                                <CardBody p={'10px'} pt="0">
+                                <CardBody p={'10px'} pt="10px">
                                     {isLoading ? (
                                         <SkeletonToken />
                                     ) : (
@@ -494,6 +488,25 @@ const MyNftsPanel = ({ setIsloading }) => {
                                         </HStack>
                                     )}
                                 </CardBody>
+                                <CardFooter px="10px" pt="0" pb="10px">
+                                    <Button
+                                        onClick={() =>
+                                            isAllSelected[i]
+                                                ? unSelectSameWeight(i)
+                                                : selectSameWeight(i)
+                                        }
+                                        bg="transparent"
+                                        border={'1px'}
+                                        w="fit-content"
+                                        borderColor={'secondaryText'}
+                                        _hover={{ backgroundColor: 'bg' }}
+                                        fontWeight={400}
+                                        size={'xs'}
+                                        outline={'none'}
+                                    >
+                                        {isAllSelected[i] ? 'Unselect All' : 'Select All'}
+                                    </Button>
+                                </CardFooter>
                             </Card>
                         ),
                 )}
@@ -513,7 +526,7 @@ const SelectedNfts = ({ isConnected }) => {
             borderStartEndRadius={0}
         >
             <HStack justifyContent={'space-between'}>
-                <CardHeader color={isConnected ? 'black' : 'secondaryText'}>Selected</CardHeader>
+                <CardHeader color={'secondaryText'}>Selected</CardHeader>
                 <CardBody textAlign="right" color={'secondaryText'}>
                     {cart.length} NFTs selected, {weight} g
                 </CardBody>

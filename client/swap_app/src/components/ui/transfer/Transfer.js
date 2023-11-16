@@ -42,11 +42,14 @@ import {
     NumberInput,
     NumberInputField,
     useToast,
+    InputGroup,
+    InputRightAddon,
 } from '@chakra-ui/react';
 import { useCanister, useConnect } from '@connect2ic/react';
 import { cardPadding } from '@ui/theme';
 import { Input as TextInput } from '@chakra-ui/react';
 import { transfer } from '@utils/queries/transfer';
+import TokenSign from '@ui/gldt/TokenSign';
 
 const Transfer = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
@@ -70,7 +73,7 @@ const Transfer = ({ setIsConnected }) => {
             gridTemplateRows={'repeat(1, 1fr)'}
             gridTemplateColumns={'repeat(1, 1fr)'}
             gap="3"
-            borderRadius={'2xl'}
+            borderRadius={['lg', 'lg', 'lg', 'xl']}
         >
             <Output isConnected={isConnected} setAmount={setAmount} />
             <Input isConnected={isConnected} setTo={setTo} />
@@ -100,14 +103,16 @@ const Input = ({ isConnected, setTo }) => {
             gap={[3]}
         >
             <VStack alignSelf={'flex-start'} w={'100%'} justifyContent={'flex-start'}>
-                <FormLabel color={'secondaryText'} alignSelf={'flex-start'} fontWeight={400}>
-                    Principal ID or Account ID
+                <FormLabel alignSelf={'flex-start'} fontWeight={400} pl="5px" mb="0">
+                    To
                 </FormLabel>
                 <TextInput
                     w={'100%'}
                     size={'lg'}
                     isDisabled={!isConnected}
-                    placeholder="0x000-000-000-000"
+                    height={'50px'}
+                    maxH={'65px'}
+                    placeholder="Principal ID"
                     onChange={handleChange}
                 />
             </VStack>
@@ -131,24 +136,39 @@ const Output = ({ isConnected, setAmount }) => {
             gap={[3]}
         >
             <VStack alignSelf={'flex-start'} w={'100%'} justifyContent={'flex-start'}>
-                <FormLabel color={'secondaryText'} alignSelf={'flex-start'} fontWeight={400}>
-                    Amount
+                <FormLabel alignSelf={'flex-start'} fontWeight={400} pl="5px" mb="0">
+                    Input Amount
                 </FormLabel>
-                <NumberInput allowMouseWheel w={'100%'} isDisabled={!isConnected}>
-                    <NumberInputField
-                        size={'lg'}
-                        onChange={handleChange}
-                        placeholder="00"
-                    ></NumberInputField>
-                </NumberInput>
+                <InputGroup>
+                    <NumberInput allowMouseWheel w={'100%'} isDisabled={!isConnected}>
+                        <NumberInputField
+                            size={'lg'}
+                            onChange={handleChange}
+                            placeholder="100"
+                            height={'50px'}
+                            borderTopRightRadius={0}
+                            borderBottomRightRadius={0}
+                            defaultValue={100}
+                        />
+                    </NumberInput>
+                    <InputRightAddon bg="white" height={'50px'}>
+                        <TokenSign />
+                    </InputRightAddon>
+                </InputGroup>
             </VStack>
         </Card>
     );
 };
-
 const TransferButton = ({ isConnected, amount, to }) => {
     const gldtLedgerActor = useCanister('gldtLedgerCanister')[0];
     const [isLoading, setIsLoading] = useState(false);
+    const [isEnable, setIsEnable] = useState(true);
+
+    useEffect(() => {
+        if (amount && to && isConnected) {
+        }
+    }, []);
+
     const toast = useToast({
         position: 'bottom',
     });
@@ -156,7 +176,6 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const handleTransfer = async () => {
         setIsLoading(true);
         const res = await transfer(amount, to, gldtLedgerActor);
-        console.log('res', res);
         if (res?.Ok) {
             toast({
                 title: 'Success',
@@ -174,7 +193,7 @@ const TransferButton = ({ isConnected, amount, to }) => {
     return (
         <>
             <Button
-                isDisabled={isLoading ? true : isConnected ? false : true}
+                isDisabled={!isEnable}
                 onClick={handleTransfer}
                 color="white"
                 bg="black"
