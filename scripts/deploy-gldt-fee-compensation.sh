@@ -55,8 +55,8 @@ dfx deploy gldt_fee_compensation --network $1 ${REINSTALL} --argument '(opt reco
     record { gld_nft_canister_id = principal "'"$(dfx canister id --network $1 gldnft_backend_10g)"'";  weight=10;  last_query_index=286};
     };
   enabled= true;
-  gldt_ledger_canister_id=principal "'"$(dfx canister id --network $1 gldt_ledger)"'"
-  compensation_factor=10;
+  gldt_ledger_canister_id=principal "'"$(dfx canister id --network $1 gldt_ledger)"'";
+  compensation_factor=10
     })'
 
 dfx canister call --network $1 gldt_fee_compensation set_gld_nft_conf '( vec{
