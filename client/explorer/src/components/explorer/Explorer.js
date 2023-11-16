@@ -63,15 +63,33 @@ const Explorer = () => {
                             <Tbody fontSize={'14px'}>
                                 {!isLoading ? (
                                     blocks?.blocks?.map((e, i) => {
-                                        const from = e.Map[2][1].Map[2][1].Text
+                                        let from;
+                                        let to;
+                                        let type;
+                                        const labelsType = {
+                                            xfer: 'Transfer',
+                                            mint: 'Mint',
+                                            burn: 'Burn',
+                                        };
+
+                                        let fromI;
+                                        e?.Map[e.Map.length - 1][1]?.Map.map((e, i) => {
+                                            console.log('e[0]', e[0]);
+                                            if (e[0] === 'from') {
+                                                fromI = i;
+                                            }
+                                        });
+                                        from = !e?.Map[e.Map.length - 1][1]?.Map[fromI]
                                             ? 'Minting account'
                                             : {
-                                                  principal: e.Map[2][1].Map[2][1].Array[0].Blob,
-                                                  subaccount: e.Map[2][1].Map[2][1].Array[1]?.Blob,
+                                                  principal:
+                                                      e.Map[e.Map.length - 1][1].Map[fromI]?.[1]
+                                                          .Array[0].Blob,
+                                                  subaccount:
+                                                      e.Map[e.Map.length - 1][1].Map[fromI]?.[1]
+                                                          .Array[1]?.Blob,
                                               };
-
-                                        let to = {};
-                                        e.Map[2][1].Map.map((el, i) => {
+                                        e.Map[e.Map.length - 1][1].Map.map((el, i) => {
                                             if (el[0] === 'to') {
                                                 to = {
                                                     principal: el[1].Array[0].Blob,
@@ -79,18 +97,19 @@ const Explorer = () => {
                                                 };
                                             }
                                         });
-                                        let type;
-                                        const labelsType = {
-                                            xfer: 'Transfer',
-                                            mint: 'Mint',
-                                            burn: 'Burn',
-                                        };
-                                        for (let i = 0; i < e.Map[2][1].Map.length - 1; i++) {
-                                            if (e.Map[2][1].Map[i][0] === 'op') {
-                                                type = labelsType[e.Map[2][1].Map[i][1].Text];
+
+                                        for (
+                                            let i = 0;
+                                            i < e.Map[e.Map.length - 1][1].Map.length - 1;
+                                            i++
+                                        ) {
+                                            if (e.Map[e.Map.length - 1][1].Map[i][0] === 'op') {
+                                                type =
+                                                    labelsType[
+                                                        e.Map[e.Map.length - 1][1].Map[i][1].Text
+                                                    ];
                                             }
                                         }
-
                                         return (
                                             <Tr key={i}>
                                                 <Td>
@@ -110,24 +129,21 @@ const Explorer = () => {
                                                 </Td>
                                                 <Td>
                                                     <Timestamp
-                                                        timestamp={parseInt(e.Map[1][1].Int)}
+                                                        timestamp={parseInt(
+                                                            e.Map[e.Map.length - 2][1].Int,
+                                                        )}
                                                     />
                                                 </Td>
                                                 <Td>{type}</Td>
                                                 <Td>
                                                     <Text fontSize={'14px'}>
-                                                        {formatAmount(e.Map[2][1].Map[0][1].Int)}
-                                                    </Text>
-                                                    <TokenSign />
-                                                </Td>
-                                                {/* <Td>
-                                                    <Text fontSize={'14px'}>
                                                         {formatAmount(
-                                                            e.Map[2][1].Map[1][1].Int || 0,
+                                                            e.Map[e.Map.length - 1][1].Map[0][1]
+                                                                .Int,
                                                         )}
                                                     </Text>
                                                     <TokenSign />
-                                                </Td> */}
+                                                </Td>
                                                 <Td>
                                                     <Link
                                                         href={
