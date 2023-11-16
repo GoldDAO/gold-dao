@@ -60,9 +60,13 @@ import { gldNftCanisters } from '@utils/agents';
 import { cardPadding } from '@ui/theme';
 import { useDialog } from '@connect2ic/react';
 
-const SwapInterface = () => {
+const SwapInterface = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
     const { open, isOpen } = useDialog();
+
+    useEffect(() => {
+        setIsConnected(isConnected);
+    }, [isConnected]);
 
     const Overlay = () => {
         return (
@@ -87,7 +91,6 @@ const SwapInterface = () => {
         <>
             <Overlay />
             <Card
-                mt="20px"
                 gridColumn={['1/13', '1/13', '2/12', '3/11', '4/10']}
                 p={cardPadding.xl}
                 position={'relative'}
