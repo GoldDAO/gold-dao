@@ -29,6 +29,7 @@ type CanisterMetricsData = variant {
 type CollectMetricsRequestType = variant { force; normal };
 type Conf = record {
   gld_nft_canister_conf : vec GldNftConf;
+  compensation_factor : nat64;
   gldt_canister_id : principal;
   fallback_timer_interval_secs : nat64;
   enabled : bool;
