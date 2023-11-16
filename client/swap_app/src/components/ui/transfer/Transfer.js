@@ -41,6 +41,7 @@ import {
     AccordionIcon,
     NumberInput,
     NumberInputField,
+    useToast,
 } from '@chakra-ui/react';
 import { useCanister, useConnect } from '@connect2ic/react';
 import { cardPadding } from '@ui/theme';
@@ -147,12 +148,34 @@ const Output = ({ isConnected, setAmount }) => {
 
 const TransferButton = ({ isConnected, amount, to }) => {
     const gldtLedgerActor = useCanister('gldtLedgerCanister')[0];
-    const [res, setRes] = useState();
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useToast({
+        position: 'bottom',
+    });
+
+    const handleTransfer = async () => {
+        setIsLoading(true);
+        const res = await transfer(amount, to, gldtLedgerActor);
+        console.log('res', res);
+        if (res?.Ok) {
+            toast({
+                title: 'Success',
+                description: 'Transaction Sent',
+            });
+        } else {
+            toast({
+                title: 'Failed',
+                description: 'Something went wrong',
+            });
+        }
+        setIsLoading(false);
+    };
+
     return (
         <>
             <Button
-                isDisabled={isConnected ? false : true}
-                onClick={() => transfer(amount, to, gldtLedgerActor, setRes)}
+                isDisabled={isLoading ? true : isConnected ? false : true}
+                onClick={handleTransfer}
                 color="white"
                 bg="black"
                 borderRadius={'500px'}
@@ -163,13 +186,9 @@ const TransferButton = ({ isConnected, amount, to }) => {
                 }}
             >
                 {!isConnected && 'Connect your wallet to transfer'}
-                {isConnected && 'Transfer'}
+                {isConnected && !isLoading && 'Transfer'}
+                {isLoading && 'Sending transaction...'}
             </Button>
-            {res && (
-                <Text textAlign={'center'} color={'green'}>
-                    {res.Ok && 'Transaction Sent'}
-                </Text>
-            )}
         </>
     );
 };

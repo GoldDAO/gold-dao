@@ -1,5 +1,6 @@
 import { Principal } from '@dfinity/principal';
 
+
 export const transfer = async (amount, to, actor, setFeedback) => {
 	try {
 		const res = await actor.icrc1_transfer({
@@ -13,7 +14,6 @@ export const transfer = async (amount, to, actor, setFeedback) => {
 			created_at_time: [],
 			memo: [],
 		});
-		setFeedback(res);
 		return res;
 	} catch (e) {
 		console.log('e', e);

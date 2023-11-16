@@ -67,7 +67,7 @@ function Home({}) {
                         borderBottomColor={'transparent'}
                     >
                         <Tab opacity={isConnected ? 1 : 0.4}>Swap</Tab>
-                        <Tab opacity={isConnected ? 1 : 0.4}>Transfert</Tab>
+                        <Tab opacity={isConnected ? 1 : 0.4}>Transfer</Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>

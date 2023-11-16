@@ -30,16 +30,62 @@ const TransactionContent = ({ id }) => {
     const { blocks, isLoading } = useBlock(0, 0, id);
 
     if (blocks.blocks) {
-        const from = blocks.blocks[0].Map[2][1].Map[2][1].Text
-            ? 'Minting account'
-            : blocks.blocks[0].Map[2][1].Map[2][1].Array[0].Blob;
+        // const from = blocks.blocks[0].Map[2][1].Map[2][1].Text
+        //     ? 'Minting account'
+        //     : blocks.blocks[0].Map[2][1].Map[2][1].Array[0].Blob;
+        // blocks.blocks[0].Map[2][1].Map.map((e, i) => {
+        //     if (e[0] === 'to') {
+        //         to = e[1].Array[0].Blob;
+        //     }
+        // });
+        let from;
         let to;
-        blocks.blocks[0].Map[2][1].Map.map((e, i) => {
-            if (e[0] === 'to') {
-                to = e[1].Array[0].Blob;
+        let type;
+        const labelsType = {
+            xfer: 'Transfer',
+            mint: 'Mint',
+            burn: 'Burn',
+        };
+
+        let fromI;
+        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1]?.Map.map((e, i) => {
+            console.log('e[0]', e[0]);
+            if (e[0] === 'from') {
+                fromI = i;
+            }
+        });
+        from = !blocks.blocks[0]?.Map[blocks.blocks[0].Map.length - 1][1]?.Map[fromI]
+            ? 'Minting account'
+            : {
+                  principal:
+                      blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[fromI]?.[1]
+                          .Array[0].Blob,
+                  subaccount:
+                      blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[fromI]?.[1]
+                          .Array[1]?.Blob,
+              };
+        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map.map((el, i) => {
+            if (el[0] === 'to') {
+                to = {
+                    principal: el[1].Array[0].Blob,
+                    subaccount: el[1].Array[1]?.Blob,
+                };
             }
         });
 
+        for (
+            let i = 0;
+            i < blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map.length - 1;
+            i++
+        ) {
+            if (blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[i][0] === 'op') {
+                type =
+                    labelsType[
+                        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[i][1].Text
+                    ];
+            }
+        }
+        console.log('to', to);
         return (
             <GridSystem gap={'40px'}>
                 <Title title={'Transction'} subTitle={id} />
@@ -49,7 +95,12 @@ const TransactionContent = ({ id }) => {
                             Amount:
                         </Text>
                         <HStack>
-                            <Text>{formatAmount(blocks.blocks[0].Map[2][1].Map[0][1].Int)}</Text>{' '}
+                            <Text>
+                                {formatAmount(
+                                    blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1]
+                                        .Map[0][1].Int,
+                                )}
+                            </Text>
                             <TokenSign />
                         </HStack>
                     </VStack>
@@ -60,7 +111,11 @@ const TransactionContent = ({ id }) => {
                             Date/Hour
                         </Text>
                         <HStack>
-                            <Timestamp timestamp={parseInt(blocks.blocks[0].Map[1][1].Int)} />
+                            <Timestamp
+                                timestamp={parseInt(
+                                    blocks.blocks[0].Map[blocks.blocks[0].Map.length - 2][1].Int,
+                                )}
+                            />
                         </HStack>
                     </VStack>
                 </GridItem>
@@ -74,7 +129,9 @@ const TransactionContent = ({ id }) => {
                                 href={
                                     typeof from === 'string'
                                         ? '#'
-                                        : `/account/${Principal.fromUint8Array(from).toString()}`
+                                        : `/account/${Principal.fromUint8Array(
+                                              from.principal,
+                                          ).toString()}`
                                 }
                             >
                                 {typeof from === 'string' ? (
@@ -82,7 +139,9 @@ const TransactionContent = ({ id }) => {
                                 ) : (
                                     <PrincipalFormat
                                         full
-                                        principal={Principal.fromUint8Array(from).toString()}
+                                        principal={Principal.fromUint8Array(
+                                            from.principal,
+                                        ).toString()}
                                     />
                                 )}
                             </Link>
@@ -98,7 +157,7 @@ const TransactionContent = ({ id }) => {
                             <Link href={`/account/${Principal.fromUint8Array(to).toString()}`}>
                                 <PrincipalFormat
                                     full
-                                    principal={Principal.fromUint8Array(to).toString()}
+                                    principal={Principal.fromUint8Array(to.principal).toString()}
                                 />
                             </Link>
                         </HStack>
