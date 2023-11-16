@@ -45,7 +45,7 @@ import {
 import { useCanister, useConnect } from '@connect2ic/react';
 import { cardPadding } from '@ui/theme';
 import { Input as TextInput } from '@chakra-ui/react';
-import { Principal } from '@dfinity/principal';
+import { transfer } from '@utils/queries/transfer';
 
 const Transfer = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
@@ -148,30 +148,11 @@ const Output = ({ isConnected, setAmount }) => {
 const TransferButton = ({ isConnected, amount, to }) => {
     const gldtLedgerActor = useCanister('gldtLedgerCanister')[0];
     const [res, setRes] = useState();
-    const transfer = async (amount, to) => {
-        try {
-            const res = await gldtLedgerActor.icrc1_transfer({
-                to: {
-                    owner: Principal.fromText(to),
-                    subaccount: [],
-                },
-                amount: BigInt(amount),
-                fee: [],
-                from_subaccount: [],
-                created_at_time: [],
-                memo: [],
-            });
-            console.log('res', res);
-            setRes(res);
-        } catch (e) {
-            console.log('e', e);
-        }
-    };
     return (
         <>
             <Button
                 isDisabled={isConnected ? false : true}
-                onClick={() => transfer(amount, to)}
+                onClick={() => transfer(amount, to, gldtLedgerActor, setRes)}
                 color="white"
                 bg="black"
                 borderRadius={'500px'}
