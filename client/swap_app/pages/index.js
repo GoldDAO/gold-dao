@@ -1,6 +1,3 @@
-import { Layout } from '@/components/layout/Layout';
-import { cardPadding } from '@/theme/theme';
-import { Card, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 /** ****************************************************************************
 @file
 GLDT and GLDT Swapp dApp frontend
@@ -25,12 +22,16 @@ GLDT and GLDT Swapp dApp frontend
 
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-
+import { Layout } from '@/components/layout/Layout';
+import { Card, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 function Home({}) {
     const meta = {
         title: 'GLDT Swap App',
         description: 'GLDT Swap App Description',
     };
+    const [isConnected, setIsConnected] = useState();
+
     const SwapInterface = dynamic(() => import('@/components/ui/swap/Swap'), {
         ssr: false,
     });
@@ -50,43 +51,33 @@ function Home({}) {
                 <meta name="theme-color" content="#ffffff" />
             </Head>
             <Layout>
-                <Card
-                    gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-                    p={cardPadding.xl}
-                    position={'relative'}
-                    shadow={['md', 'lg']}
-                    bg="bg"
-                    mx={['10px', '20px', 0, 0, 0]}
+                <Tabs
+                    mt="15px"
+                    variant={'enclosed'}
+                    gridColumn={['4/13', '1/13', '2/12', '3/11', '3/11']}
+                    position={'static'}
+                    display="grid"
                     justifyContent={'center'}
                     gridTemplateRows={'repeat(1, 1fr)'}
                     gridTemplateColumns={'repeat(1, 1fr)'}
-                    gap="3"
-                    borderRadius={'2xl'}
                 >
-                    <Tabs
-                        mt="15px"
-                        variant={'enclosed'}
-                        gridColumn={['1/13', '1/13', '2/12', '3/11', '3/11']}
-                        position={'relative'}
-                        display="grid"
+                    <TabList
+                        display={'flex'}
                         justifyContent={'center'}
-                        gridTemplateRows={'repeat(1, 1fr)'}
-                        gridTemplateColumns={'repeat(1, 1fr)'}
+                        borderBottomColor={'transparent'}
                     >
-                        <TabList display={'flex'} justifyContent={'center'}>
-                            <Tab>Swap</Tab>
-                            <Tab>Transfert</Tab>
-                        </TabList>
-                        <TabPanels>
-                            <TabPanel>
-                                <SwapInterface />
-                            </TabPanel>
-                            <TabPanel>
-                                <Transfer />
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
-                </Card>
+                        <Tab opacity={isConnected ? 1 : 0.4}>Swap</Tab>
+                        <Tab opacity={isConnected ? 1 : 0.4}>Transfert</Tab>
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel>
+                            <SwapInterface setIsConnected={setIsConnected} />
+                        </TabPanel>
+                        <TabPanel>
+                            <Transfer setIsConnected={setIsConnected} />
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
             </Layout>
         </>
     );
