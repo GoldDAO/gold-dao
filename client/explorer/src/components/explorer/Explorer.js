@@ -63,54 +63,81 @@ const Explorer = () => {
                             <Tbody fontSize={'14px'}>
                                 {!isLoading ? (
                                     blocks?.blocks?.map((e, i) => {
-                                        let from;
-                                        let to;
+                                        console.log('e', e);
+                                        let from = {
+                                            principal: null,
+                                            subaccount: null,
+                                        };
+                                        let to = {
+                                            principal: null,
+                                            subaccount: null,
+                                        };
                                         let type;
+                                        let tx;
+                                        let memo;
+                                        let fee;
+                                        let amt;
+                                        let ts;
                                         const labelsType = {
                                             xfer: 'Transfer',
                                             mint: 'Mint',
                                             burn: 'Burn',
                                         };
-                                        let fromI;
-                                        e?.Map[e.Map.length - 1][1]?.Map.map((e, i) => {
-                                            console.log('e[0]', e[0]);
+                                        e.Map.map((e, i) => {
+                                            if (e[0] === 'tx') {
+                                                tx = e[1].Map;
+                                            }
+                                            if (e[0] === 'ts') {
+                                                ts = e[1].Int;
+                                            }
+                                            if (e[0] === 'fee') {
+                                                fee = e[1].Int;
+                                            }
+                                        });
+                                        tx.map((e) => {
+                                            if (e[0] === 'memo') {
+                                                console.log('e[1].Blob', e[1].Blob);
+                                                memo =
+                                                    e[1].Blob.length > 0
+                                                        ? Principal.fromUint8Array(e[1].Blob)
+                                                        : '-' || '-';
+                                            }
                                             if (e[0] === 'from') {
-                                                fromI = i;
+                                                from.principal =
+                                                    Principal.fromUint8Array(
+                                                        e[1].Array[0].Blob,
+                                                    ).toString() || '';
+                                                from.subaccount = e[1].Array[1]?.Blob
+                                                    ? Principal.fromUint8Array(
+                                                          e[1].Array[1]?.Blob,
+                                                      ).toString()
+                                                    : undefined;
+                                            }
+                                            if (e[0] === 'to') {
+                                                to.principal =
+                                                    Principal.fromUint8Array(
+                                                        e[1].Array[0].Blob,
+                                                    ).toString() || '';
+                                                to.subaccount = e[1].Array[1]?.Blob
+                                                    ? Principal.fromUint8Array(
+                                                          e[1].Array[1]?.Blob,
+                                                      ).toString()
+                                                    : undefined;
+                                            }
+                                            if (e[0] === 'op') {
+                                                type = labelsType[e[1].Text];
+                                            }
+                                            if (e[0] === 'amt') {
+                                                amt = e[1].Int;
                                             }
                                         });
-                                        from = !e?.Map[e.Map.length - 1][1]?.Map[fromI]
-                                            ? 'Minting account'
-                                            : {
-                                                  principal:
-                                                      e.Map[e.Map.length - 1][1].Map[fromI]?.[1]
-                                                          .Array[0].Blob,
-                                                  subaccount:
-                                                      e.Map[e.Map.length - 1][1].Map[fromI]?.[1]
-                                                          .Array[1]?.Blob,
-                                              };
-                                        e.Map[e.Map.length - 1][1].Map.map((el, i) => {
-                                            if (el[0] === 'to') {
-                                                to = {
-                                                    principal: el[1].Array[0].Blob,
-                                                    subaccount: el[1].Array[1]?.Blob,
-                                                };
-                                            }
-                                        });
-
-                                        for (
-                                            let i = 0;
-                                            i < e.Map[e.Map.length - 1][1].Map.length - 1;
-                                            i++
-                                        ) {
-                                            if (e.Map[e.Map.length - 1][1].Map[i][0] === 'op') {
-                                                type =
-                                                    labelsType[
-                                                        e.Map[e.Map.length - 1][1].Map[i][1].Text
-                                                    ];
-                                            }
+                                        if (type === 'Mint') {
+                                            from.principal = 'Minting Account';
+                                            fee = '0.0000';
                                         }
-                                        console.log('to', to);
-                                        console.log('from', from);
+                                        if (!memo) {
+                                            memo = '-';
+                                        }
                                         return (
                                             <Tr key={i}>
                                                 <Td>
@@ -129,62 +156,39 @@ const Explorer = () => {
                                                     </Link>
                                                 </Td>
                                                 <Td>
-                                                    <Timestamp
-                                                        timestamp={parseInt(
-                                                            e.Map[e.Map.length - 2][1].Int,
-                                                        )}
-                                                    />
+                                                    <Timestamp timestamp={parseInt(ts)} />
                                                 </Td>
                                                 <Td>{type}</Td>
                                                 <Td>
                                                     <Text fontSize={'14px'}>
-                                                        {formatAmount(
-                                                            e.Map[e.Map.length - 1][1].Map[0][1]
-                                                                .Int,
-                                                        )}
+                                                        {formatAmount(amt)}
                                                     </Text>
                                                     <TokenSign />
                                                 </Td>
                                                 <Td>
                                                     <Link
                                                         href={
-                                                            typeof to === 'string'
+                                                            typeof from === 'string'
                                                                 ? '#'
-                                                                : `/account/${Principal.fromUint8Array(
-                                                                      from.principal,
-                                                                  ).toString()}${
+                                                                : `/account/${from.principal}${
                                                                       from.subaccount
                                                                           ? '?subaccount=' +
-                                                                            Principal.fromUint8Array(
-                                                                                from.subaccount,
-                                                                            ).toString()
+                                                                            from.subaccount
                                                                           : ''
                                                                   }`
                                                         }
                                                     >
-                                                        {typeof from === 'string' ? (
-                                                            from
-                                                        ) : (
-                                                            <Box fontSize={'16px'}>
+                                                        <PrincipalFormat
+                                                            principal={from.principal}
+                                                        />
+                                                        {from.subaccount && (
+                                                            <Box
+                                                                fontSize={'12px'}
+                                                                color={'blackAlpha.700'}
+                                                            >
                                                                 <PrincipalFormat
-                                                                    principal={Principal.fromUint8Array(
-                                                                        from.principal,
-                                                                    ).toString()}
+                                                                    principal={from.subaccount}
                                                                 />
-                                                                {from.subaccount && (
-                                                                    <Box
-                                                                        fontSize={'14px'}
-                                                                        mt="-10px"
-                                                                        color={'secondaryText'}
-                                                                    >
-                                                                        <PrincipalFormat
-                                                                            nobtn={true}
-                                                                            principal={Principal.fromUint8Array(
-                                                                                from.subaccount,
-                                                                            ).toString()}
-                                                                        />
-                                                                    </Box>
-                                                                )}
                                                             </Box>
                                                         )}
                                                     </Link>
@@ -195,39 +199,27 @@ const Explorer = () => {
                                                             href={
                                                                 typeof to === 'string'
                                                                     ? '#'
-                                                                    : `/account/${Principal.fromUint8Array(
-                                                                          to.principal,
-                                                                      ).toString()}${
+                                                                    : `/account/${to.principal}${
                                                                           to.subaccount
                                                                               ? '?subaccount=' +
-                                                                                Principal.fromUint8Array(
-                                                                                    to.subaccount,
-                                                                                ).toString()
+                                                                                to.subaccount
                                                                               : ''
                                                                       }`
                                                             }
                                                         >
-                                                            <Box fontSize={'16px'}>
-                                                                <PrincipalFormat
-                                                                    principal={Principal.fromUint8Array(
-                                                                        to.principal,
-                                                                    ).toString()}
-                                                                />
-                                                                {to.subaccount && (
-                                                                    <Box
-                                                                        fontSize={'14px'}
-                                                                        mt="-10px"
-                                                                        color={'secondaryText'}
-                                                                    >
-                                                                        <PrincipalFormat
-                                                                            nobtn={true}
-                                                                            principal={Principal.fromUint8Array(
-                                                                                to.subaccount,
-                                                                            ).toString()}
-                                                                        />
-                                                                    </Box>
-                                                                )}
-                                                            </Box>
+                                                            <PrincipalFormat
+                                                                principal={to.principal}
+                                                            />
+                                                            {to.subaccount && (
+                                                                <Box
+                                                                    fontSize={'12px'}
+                                                                    color={'blackAlpha.700'}
+                                                                >
+                                                                    <PrincipalFormat
+                                                                        principal={to.subaccount}
+                                                                    />
+                                                                </Box>
+                                                            )}
                                                         </Link>
                                                     )}
                                                 </Td>

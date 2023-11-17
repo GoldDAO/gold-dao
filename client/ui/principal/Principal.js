@@ -11,9 +11,9 @@ const PrincipalFormat = ({ nobtn, full, principal}) => {
 		}
 	},[]);
 
-	const charsCount = 3;
-	const firstChars = principal?.slice(0, charsCount);
-	const lastChars = principal?.substring(principal.length - charsCount);
+	const charsCount = 4;
+	const firstChars = principal?.slice(0, charsCount) || '';
+	const lastChars = principal?.substring(principal.length - charsCount) || '';
 	console.log('principal', principal);
 	return (
 		principal && (

@@ -120,7 +120,8 @@ const AccountContent = ({ id, subAccount }) => {
                         Balance
                     </Text>
                     <HStack>
-                        <Text>{formatAmount(balance)}</Text> <TokenSign />
+                        <Text>{Number(formatAmount(balance)).toLocaleString('en-US')}</Text>{' '}
+                        <TokenSign />
                     </HStack>
                 </VStack>
             </GridItem>
