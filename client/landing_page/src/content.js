@@ -1,4 +1,4 @@
-import BAS from '/public/images/partners/BAS.svg';
+import Yumi from '/public/images/partners/yumi.svg';
 import dfinity from '/public/images/partners/dfinity.svg';
 import KPMG from '/public/images/partners/KPMG.svg';
 import loomis from '/public/images/partners/loomis.png';
@@ -9,7 +9,7 @@ export const content = {
     intro: {
         title: 'A token backed 100% by physical gold',
         content:
-            'GLDT is a fungible token backed by physical gold stored in vaults in Switzerland. Through the Yumi marketplace, user can purchase gold certificates (known as GLD NFTs) and then swap them for GLDT tokens in the swap app. For instance, if you have a certificate for 1 gram of gold, you can swap it for 100 GLDT. So, in essence, each GLDT token represents a portion of real phyiscal gold.',
+            'GLDT is a fractionable token backed by insured physical gold securely stored in Swiss vaults and thoroughly audited. Users can buy gold certificates (referred to as GLD NFTs) via the Yumi marketplace. These certificates can then be exchanged for GLDT tokens using the swap app. For example, a certificate representing 1 gram of gold can be swapped for 100 GLDT tokens. Essentially, each GLDT represents a fractional share of actual physical gold, making it more liquid.This enables trading gold outside the traditional banking system.',
     },
     partners: [
         {
@@ -45,16 +45,16 @@ export const content = {
         },
 
         {
-            name: 'BAS',
-            url: 'https://nbdc5-raaaa-aaaan-qdxfa-cai.icp0.io/',
-            img: BAS,
-            w: '110px',
+            name: 'Yumi',
+            url: 'https://tppkg-ziaaa-aaaal-qatrq-cai.raw.ic0.app/',
+            img: Yumi,
+            w: '105px',
         },
     ],
     tech: {
         title: 'Learn more about the technology',
         content:
-            'GLDT and its underlying smart contracts run entirely on the ICP blockchain. In the future, the token will also be cross-platform and multi-chain. To learn more about how GLDT and swapping GLD NFT works, read the FAQ or consult the whitepaper.',
+            'GLDT and its underlying smart contracts run entirely on the ICP blockchain. In the future, the token will become cross-platform and multi-chain. This development introduces a new era in which physical gold can be transferred using blockchain technology. To learn more about how GLDT and swapping GLD NFT works, please refer to the FAQ or review the whitepaper.',
         link: {
             label: 'Read the FAQ',
             href: '/FAQ',
@@ -64,6 +64,6 @@ export const content = {
         title: 'Determining the price of GLDT',
         subTitle: '1g of Gold = 100 gldt',
         content:
-            "The price of GLDT is directly linked to the spot price of physical gold. The market determines the price of gold, which is then used to calculate the value of GLDT. It's important to note that 100 GLDT is equivalent to 1 gram of gold.",
+            "The price of GLDT is directly correlated with the spot price of physical gold. The market determines the price of gold, which is then used to calculate the value of GLDT. It's important to note that every 100 GLDT equals 1 gram of gold. This system operates 24/7, accessible all around the world with lowest fees.",
     },
 };
