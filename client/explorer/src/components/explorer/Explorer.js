@@ -71,7 +71,6 @@ const Explorer = () => {
                                             mint: 'Mint',
                                             burn: 'Burn',
                                         };
-
                                         let fromI;
                                         e?.Map[e.Map.length - 1][1]?.Map.map((e, i) => {
                                             console.log('e[0]', e[0]);
@@ -110,6 +109,8 @@ const Explorer = () => {
                                                     ];
                                             }
                                         }
+                                        console.log('to', to);
+                                        console.log('from', from);
                                         return (
                                             <Tr key={i}>
                                                 <Td>
@@ -147,11 +148,18 @@ const Explorer = () => {
                                                 <Td>
                                                     <Link
                                                         href={
-                                                            typeof from === 'string'
+                                                            typeof to === 'string'
                                                                 ? '#'
                                                                 : `/account/${Principal.fromUint8Array(
                                                                       from.principal,
-                                                                  ).toString()}`
+                                                                  ).toString()}${
+                                                                      from.subaccount
+                                                                          ? '?subaccount=' +
+                                                                            Principal.fromUint8Array(
+                                                                                from.subaccount,
+                                                                            ).toString()
+                                                                          : ''
+                                                                  }`
                                                         }
                                                     >
                                                         {typeof from === 'string' ? (
@@ -189,7 +197,14 @@ const Explorer = () => {
                                                                     ? '#'
                                                                     : `/account/${Principal.fromUint8Array(
                                                                           to.principal,
-                                                                      ).toString()}`
+                                                                      ).toString()}${
+                                                                          to.subaccount
+                                                                              ? '?subaccount=' +
+                                                                                Principal.fromUint8Array(
+                                                                                    to.subaccount,
+                                                                                ).toString()
+                                                                              : ''
+                                                                      }`
                                                             }
                                                         >
                                                             <Box fontSize={'16px'}>

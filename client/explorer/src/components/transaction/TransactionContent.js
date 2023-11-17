@@ -10,7 +10,6 @@ import {
     Text,
     Heading,
     HStack,
-    VStack,
     Box,
 } from '@chakra-ui/react';
 import Timestamp from '@ui/tooltip/timeStamp';
@@ -30,14 +29,6 @@ const TransactionContent = ({ id }) => {
     const { blocks, isLoading } = useBlock(0, 0, id);
 
     if (blocks.blocks) {
-        // const from = blocks.blocks[0].Map[2][1].Map[2][1].Text
-        //     ? 'Minting account'
-        //     : blocks.blocks[0].Map[2][1].Map[2][1].Array[0].Blob;
-        // blocks.blocks[0].Map[2][1].Map.map((e, i) => {
-        //     if (e[0] === 'to') {
-        //         to = e[1].Array[0].Blob;
-        //     }
-        // });
         let from;
         let to;
         let type;
@@ -85,12 +76,34 @@ const TransactionContent = ({ id }) => {
                     ];
             }
         }
-        console.log('to', to);
+        let fee;
+        let memo;
+        if (type === 'Transfer') {
+            fee = blocks.blocks[0].Map[0][1].Int;
+        }
+        if (type === 'Mint') {
+            fee = 0.0;
+            memo = blocks.blocks[0].Map[2][1].Map[1][1].Blob;
+            console.log(
+                'blocks.blocks[0].Map[2][1].Map[1][1]',
+                blocks.blocks[0].Map[2][1].Map[1][1],
+            );
+        }
         return (
             <GridSystem gap={'40px'}>
-                <Title title={'Transction'} subTitle={id} />
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <Title title={'GLDT '} subTitle={'Transaction'} />
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Block Index:
+                        </Text>
+                        <HStack>
+                            <Text>{id}</Text>
+                        </HStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             Amount:
                         </Text>
@@ -103,10 +116,21 @@ const TransactionContent = ({ id }) => {
                             </Text>
                             <TokenSign />
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            fee:
+                        </Text>
+                        <HStack>
+                            <Text>{formatAmount(fee)}</Text>
+                            <TokenSign />
+                        </HStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-start'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             Date/Hour
                         </Text>
@@ -117,10 +141,10 @@ const TransactionContent = ({ id }) => {
                                 )}
                             />
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             From
                         </Text>
@@ -146,23 +170,48 @@ const TransactionContent = ({ id }) => {
                                 )}
                             </Link>
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'center'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             To
                         </Text>
                         <HStack>
-                            <Link href={`/account/${Principal.fromUint8Array(to).toString()}`}>
+                            <Link
+                                href={`/account/${Principal.fromUint8Array(
+                                    to.principal,
+                                ).toString()}`}
+                            >
                                 <PrincipalFormat
                                     full
                                     principal={Principal.fromUint8Array(to.principal).toString()}
                                 />
                             </Link>
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
+                {memo && (
+                    <GridItem colSpan={[12, 12, 12]}>
+                        <HStack alignItems={'flex-start'}>
+                            <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                                Memo
+                            </Text>
+                            <HStack>
+                                <Link
+                                    href={`/account/${Principal.fromUint8Array(
+                                        to.principal,
+                                    ).toString()}`}
+                                >
+                                    <PrincipalFormat
+                                        full
+                                        principal={Principal.fromUint8Array(memo).toString()}
+                                    />
+                                </Link>
+                            </HStack>
+                        </HStack>
+                    </GridItem>
+                )}
             </GridSystem>
         );
     }

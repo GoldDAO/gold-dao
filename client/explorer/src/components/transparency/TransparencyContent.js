@@ -37,7 +37,7 @@ const TransparencyContent = () => {
         <GridSystem gap={['0px', '0px', '40px']}>
             <Title title={'GLDT'} subTitle={'Transparency'} />
             <GridItem colSpan={['12', '12', '12']} pt={['20px', '20px', 0]}>
-                <Text fontSize={'16px'} width={['100%', '100%', '50%']}>
+                <Text fontSize={'20px'} width={['100%', '100%', '50%']}>
                     GLDT are minted at a ratio of 100 GLDT per gram of GLD NFT. GLDT is about
                     transparency and let&apos;s everyone verify themselves that the ratio of GLDT to
                     GLD NFT in the swap contract is valid.
@@ -59,6 +59,13 @@ const TransparencyContent = () => {
                 >
                     Overview
                 </Heading>
+                <Text fontSize={'16px'} pt="20px" width={['100%', '100%', '100%', '50%']}>
+                    The "Total Supply of GLDT" should always be smaller than or equal to the "Total
+                    GLD NFTs Swapped" times 100. The total supply may be smaller due to the minor
+                    transaction fee of 0.0001 GLDT or because GLDT were burned without actually
+                    swapping GLD NFTs. In the end, there is always at least the same amount of GLD
+                    NFTs swapped as the equivalent amount of GLDT minted.
+                </Text>
             </GridItem>
             <GridItem colSpan={['12', '12', '6', '3']} py={['10px', '10px', '20px']}>
                 <Text fontSize={'14px'} fontWeight={500}>
@@ -102,6 +109,10 @@ const TransparencyContent = () => {
                 >
                     NFTs supply Breakdown
                 </Heading>
+                <Text fontSize={'16px'} pt="20px" width={['100%', '100%', '100%', '50%']}>
+                    Below is the individual breakdown of the sizes of GLD NFTs swapped. These will
+                    add up to the value of "Total GLD NFTs Swapped".
+                </Text>
             </GridItem>
             {arr.map((e, i) => (
                 <GridItem

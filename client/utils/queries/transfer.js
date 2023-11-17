@@ -14,6 +14,7 @@ export const transfer = async (amount, to, actor) => {
 			created_at_time: [],
 			memo: [],
 		});
+		console.log('res', res);
 		return res;
 	} catch (e) {
 		console.log('e', e);

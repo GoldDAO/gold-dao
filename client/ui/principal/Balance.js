@@ -6,14 +6,13 @@ import { HStack, Text, Button } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons';
 const Balance = () => {
 	const { principal } = useConnect();
-	const balance = useGLDTbalance(principal);
-	const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
-
+	const {balance, isLoading} = useGLDTbalance(principal);
+	const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
 
 	return (
-		<HStack height={0}>
-			<RefreshButton forceUpdate={forceUpdate} /><Text fontSize={'16px'}>{Number(balance).toLocaleString('en-US')}</Text> <TokenSign /> 
+		<HStack >
+			<Text fontSize={'16px'}>{Number(balance).toLocaleString('en-US')}</Text> <TokenSign /> <RefreshButton forceUpdate={forceUpdate} />
 		</HStack>
 	);
 };
@@ -23,7 +22,7 @@ export default Balance;
 const RefreshButton = ({forceUpdate}) => {
 	return(
 		<Button
-			onClick={() => forceUpdate()}
+			onClick={forceUpdate}
 			borderRadius={'200px'}
 			_hover={{
 				bg: 'bg',

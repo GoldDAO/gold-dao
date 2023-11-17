@@ -77,7 +77,20 @@ const AccountContent = ({ id, subAccount }) => {
 
     return (
         <GridSystem gap={['0px', '0px', '20px']}>
-            <Title title="Principal-id" subTitle={id} cp />
+            <Title title="GLDT" subTitle={'Account'} />
+            <GridItem
+                gridColumn={['1/12', '1/12', '1/12']}
+                alignSelf={['flex-start', 'flex-start', 'flex-end']}
+            >
+                <VStack alignItems={'flex-start'}>
+                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                        Principal-ID
+                    </Text>
+                    <HStack>
+                        <PrincipalFormat principal={id} full />
+                    </HStack>
+                </VStack>
+            </GridItem>
             <GridItem
                 gridColumn={['1/12', '1/12', '1/6']}
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
@@ -111,17 +124,7 @@ const AccountContent = ({ id, subAccount }) => {
                     </HStack>
                 </VStack>
             </GridItem>
-            <GridItem
-                gridColumn={['1/12', '1/12', '1/6']}
-                alignSelf={['flex-start', 'flex-start', 'flex-end']}
-            >
-                <AccountTitle
-                    data={{
-                        label: 'AccountID',
-                        id: '20e43f0bd4f09346ed0bfd7006ed3a0df564c1a1e6eb483f8315d592f872e98f',
-                    }}
-                />
-            </GridItem>
+
             <TableTitle title={'History'} />
             <GridItem gridColumn={['1/13', '1/13', '1/13']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>

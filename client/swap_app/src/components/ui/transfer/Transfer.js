@@ -50,6 +50,7 @@ import { cardPadding } from '@ui/theme';
 import { Input as TextInput } from '@chakra-ui/react';
 import { transfer } from '@utils/queries/transfer';
 import TokenSign from '@ui/gldt/TokenSign';
+import Link from 'next/link';
 
 const Transfer = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
@@ -164,10 +165,18 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isEnable, setIsEnable] = useState(true);
 
+    const isPrincipal = (str) => {
+        const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
+        return regex.test(str);
+    };
+
     useEffect(() => {
-        if (amount && to && isConnected) {
+        if (amount > 0 && isPrincipal(to) && isConnected) {
+            setIsEnable(true);
+        } else {
+            setIsEnable(false);
         }
-    }, []);
+    }, [amount, to, isConnected]);
 
     const toast = useToast({
         position: 'bottom',
@@ -176,10 +185,22 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const handleTransfer = async () => {
         setIsLoading(true);
         const res = await transfer(amount, to, gldtLedgerActor);
+        const env = process.env.DFX_NETWORK;
+        const prefix = env === 'ic' ? '' : 'staging';
         if (res?.Ok) {
             toast({
                 title: 'Success',
-                description: 'Transaction Sent',
+                description: (
+                    <Link
+                        href={`https://${prefix}.explorer.gldt.org/transaction/${res.Ok}`}
+                        target="_blank"
+                        style={{
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        Transaction {parseInt(res.Ok)} Sent
+                    </Link>
+                ),
             });
         } else {
             toast({
