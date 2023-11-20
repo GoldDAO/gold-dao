@@ -15,7 +15,7 @@ const Banner = () => {
                 width: '100%',
             }}
         >
-            <Box minH={'70vh'} mt={['0px', '10px', '20px', '40px']} overflowX={'hidden'}>
+            <Box minH={'70vh'} overflowX={'hidden'}>
                 <GridSystem gap={[0, 0, 8]}>
                     <GridItem colStart={[1, 1, 1, 1, 2]} colEnd={[13, 13, 8, 8, 8]}>
                         <Heading as="h1" variant="h1" textAlign={['center', 'center', 'left']}>
