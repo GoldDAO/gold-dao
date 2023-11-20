@@ -64,18 +64,13 @@ export default Summary;
 
 const Overview = () => {
     const actors = useAllCanisters();
-    const { max } = useMaxEntry();
     const { nfts, isLoading } = useNft(actors);
-    const history = useSwapHistory(0, max);
+    const history = useSwapHistory(0, 10);
 
     const totalweight = nfts.reduce((ac, e) => {
         return ac + e.weight;
     }, 0);
     const nftsN = nfts.length;
-
-    useEffect(() => {
-        console.log('history', history);
-    }, [history]);
 
     const totalSwap = history?.history?.Ok?.data[0]?.reduce((ac, e) => {
         return ac + parseInt(e.num_tokens.value) / 100000000;
