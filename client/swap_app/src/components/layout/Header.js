@@ -2,7 +2,6 @@ import WithSubnavigation from '@ui/header/Navigation';
 import { Box, Grid, GridItem } from '@chakra-ui/react';
 import Principal from '@ui/principal/Principal';
 import Balance from '@ui/principal/Balance';
-import { useConnect } from '@connect2ic/react';
 
 const NAV_ITEMS = [
     {
@@ -12,7 +11,6 @@ const NAV_ITEMS = [
 ];
 
 const Header = () => {
-    const { isConnected, principal } = useConnect();
     return (
         <Box
             as="header"
@@ -30,12 +28,12 @@ const Header = () => {
 
 const Wallet = () => {
     return (
-        <Grid>
-            <GridItem gridColumn={'span 3'}>
-                <Principal />
-            </GridItem>
+        <Grid gridTemplateColumns={'repeat(6, 1fr)'} alignItems={'center'} gap={'40px'}>
             <GridItem gridColumn={'span 3'}>
                 <Balance />
+            </GridItem>
+            <GridItem gridColumn={'span 3'}>
+                <Principal />
             </GridItem>
         </Grid>
     );

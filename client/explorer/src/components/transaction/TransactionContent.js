@@ -10,7 +10,6 @@ import {
     Text,
     Heading,
     HStack,
-    VStack,
     Box,
 } from '@chakra-ui/react';
 import Timestamp from '@ui/tooltip/timeStamp';
@@ -28,69 +27,89 @@ const TransactionContent = ({ id }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const { blocks, isLoading } = useBlock(0, 0, id);
-
     if (blocks.blocks) {
-        // const from = blocks.blocks[0].Map[2][1].Map[2][1].Text
-        //     ? 'Minting account'
-        //     : blocks.blocks[0].Map[2][1].Map[2][1].Array[0].Blob;
-        // blocks.blocks[0].Map[2][1].Map.map((e, i) => {
-        //     if (e[0] === 'to') {
-        //         to = e[1].Array[0].Blob;
-        //     }
-        // });
-        let from;
-        let to;
+        let from = {
+            principal: null,
+            subaccount: null,
+        };
+        let to = {
+            principal: null,
+            subaccount: null,
+        };
         let type;
+        let tx;
+        let memo;
+        let fee;
+        let amt;
+        let ts;
         const labelsType = {
             xfer: 'Transfer',
             mint: 'Mint',
             burn: 'Burn',
         };
-
-        let fromI;
-        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1]?.Map.map((e, i) => {
-            console.log('e[0]', e[0]);
+        blocks.blocks[0].Map.map((e, i) => {
+            if (e[0] === 'tx') {
+                tx = e[1].Map;
+            }
+            if (e[0] === 'ts') {
+                ts = e[1].Int;
+            }
+            if (e[0] === 'fee') {
+                fee = e[1].Int;
+            }
+        });
+        tx.map((e) => {
+            if (e[0] === 'memo') {
+                console.log('e[1].Blob', e[1].Blob);
+                memo = e[1].Blob.length > 0 ? Principal.fromUint8Array(e[1].Blob) : '-' || '-';
+            }
             if (e[0] === 'from') {
-                fromI = i;
+                from.principal = Principal.fromUint8Array(e[1].Array[0].Blob).toString() || '';
+                from.subaccount = Principal.fromUint8Array(e[1].Array[1]?.Blob) || '';
+            }
+            if (e[0] === 'to') {
+                to.principal = Principal.fromUint8Array(e[1].Array[0].Blob).toString() || '';
+                to.subaccount = Principal.fromUint8Array(e[1].Array[1]?.Blob) || '';
+            }
+            if (e[0] === 'op') {
+                type = labelsType[e[1].Text];
+            }
+            if (e[0] === 'amt') {
+                amt = e[1].Int;
             }
         });
-        from = !blocks.blocks[0]?.Map[blocks.blocks[0].Map.length - 1][1]?.Map[fromI]
-            ? 'Minting account'
-            : {
-                  principal:
-                      blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[fromI]?.[1]
-                          .Array[0].Blob,
-                  subaccount:
-                      blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[fromI]?.[1]
-                          .Array[1]?.Blob,
-              };
-        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map.map((el, i) => {
-            if (el[0] === 'to') {
-                to = {
-                    principal: el[1].Array[0].Blob,
-                    subaccount: el[1].Array[1]?.Blob,
-                };
-            }
-        });
-
-        for (
-            let i = 0;
-            i < blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map.length - 1;
-            i++
-        ) {
-            if (blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[i][0] === 'op') {
-                type =
-                    labelsType[
-                        blocks.blocks[0].Map[blocks.blocks[0].Map.length - 1][1].Map[i][1].Text
-                    ];
-            }
+        if (type === 'Mint') {
+            from.principal = 'Minting Account';
+            fee = '0.0000';
         }
-        console.log('to', to);
+        if (!memo) {
+            memo = '-';
+        }
         return (
             <GridSystem gap={'40px'}>
-                <Title title={'Transction'} subTitle={id} />
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <Title title={'GLDT '} subTitle={'Transaction'} />
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Block Index:
+                        </Text>
+                        <HStack>
+                            <Text>{id}</Text>
+                        </HStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Type:
+                        </Text>
+                        <HStack>
+                            <Text>{type}</Text>
+                        </HStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             Amount:
                         </Text>
@@ -103,65 +122,68 @@ const TransactionContent = ({ id }) => {
                             </Text>
                             <TokenSign />
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            fee:
+                        </Text>
+                        <HStack>
+                            <Text>{formatAmount(fee, 4)}</Text>
+                            <TokenSign />
+                        </HStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-start'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             Date/Hour
                         </Text>
                         <HStack>
-                            <Timestamp
-                                timestamp={parseInt(
-                                    blocks.blocks[0].Map[blocks.blocks[0].Map.length - 2][1].Int,
-                                )}
-                            />
+                            <Timestamp timestamp={parseInt(ts)} />
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             From
                         </Text>
                         <HStack>
                             <Link
-                                href={
-                                    typeof from === 'string'
-                                        ? '#'
-                                        : `/account/${Principal.fromUint8Array(
-                                              from.principal,
-                                          ).toString()}`
-                                }
+                                href={typeof from === 'string' ? '#' : `/account/${from.principal}`}
                             >
-                                {typeof from === 'string' ? (
-                                    from
-                                ) : (
-                                    <PrincipalFormat
-                                        full
-                                        principal={Principal.fromUint8Array(
-                                            from.principal,
-                                        ).toString()}
-                                    />
-                                )}
+                                <PrincipalFormat full principal={from.principal} />
                             </Link>
                         </HStack>
-                    </VStack>
+                    </HStack>
                 </GridItem>
-                <GridItem colSpan={[12, 12, 4]}>
-                    <VStack alignItems={'flex-start'}>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-end'}>
                         <Text color={'blackAlpha.600'} fontSize={'14px'}>
                             To
                         </Text>
                         <HStack>
-                            <Link href={`/account/${Principal.fromUint8Array(to).toString()}`}>
-                                <PrincipalFormat
-                                    full
-                                    principal={Principal.fromUint8Array(to.principal).toString()}
-                                />
+                            <Link href={typeof to === 'string' ? '#' : `/account/${to.principal}`}>
+                                <PrincipalFormat full principal={to.principal} />
                             </Link>
                         </HStack>
-                    </VStack>
+                    </HStack>
+                </GridItem>
+                <GridItem colSpan={[12, 12, 12]}>
+                    <HStack alignItems={'flex-start'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Memo
+                        </Text>
+                        <HStack>
+                            {memo && memo.length > 5 ? (
+                                <PrincipalFormat full principal={memo} />
+                            ) : (
+                                <Text>{memo}</Text>
+                            )}
+                        </HStack>
+                    </HStack>
                 </GridItem>
             </GridSystem>
         );

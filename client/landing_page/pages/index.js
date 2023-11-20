@@ -27,10 +27,8 @@ import TextBloc from '@/components/text/TextBloc';
 import Partners from '@/components/partners/Partners';
 import { Divider, HStack, VStack } from '@chakra-ui/react';
 import FaqSection from '@/components/FAQ/FaqSection';
-import Scene from '@/components/banner/scene/Scene';
 import dynamic from 'next/dynamic';
 import Yumi from '@/components/banner/Yumi';
-import GldtValue from '@/components/stats/GldtValue';
 
 function Home() {
     const { intro, partners, tech, price } = content;
@@ -38,9 +36,7 @@ function Home() {
         title: 'GLDT - Home',
         description: intro,
     };
-    const Stats = dynamic(() => import('@/components/stats/Stats'), {
-        ssr: false,
-    });
+
     return (
         <Layout meta={meta}>
             <VStack
@@ -52,16 +48,14 @@ function Home() {
                 <TextBloc
                     title={intro.title}
                     content={intro.content}
-                    textSpan={[12, 12, 8, 5, 5]}
+                    textSpan={[12, 12, 8, 7, 7]}
                     titleSpan={[12, 12, 3, 2, 2]}
                     titleOrder={[2, 2, 2, 2]}
                     colStart={[0, 0, 0, 2, 2]}
                     colEnd={[12, 12, 12]}
                     textOrder={[2, 2, 2, 2]}
                     childrenSpan={[12, 12, 12, 4, 4]}
-                >
-                    <Stats />
-                </TextBloc>
+                ></TextBloc>
                 <Partners />
                 <TextBloc
                     title={tech.title}

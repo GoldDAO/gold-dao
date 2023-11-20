@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Accordion,
     AccordionButton,
@@ -42,11 +42,22 @@ import {
     NumberInput,
     NumberInputField,
     useToast,
+    InputGroup,
+    InputRightAddon,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+    AlertDialogCloseButton,
 } from '@chakra-ui/react';
 import { useCanister, useConnect } from '@connect2ic/react';
 import { cardPadding } from '@ui/theme';
 import { Input as TextInput } from '@chakra-ui/react';
 import { transfer } from '@utils/queries/transfer';
+import TokenSign from '@ui/gldt/TokenSign';
+import Link from 'next/link';
 
 const Transfer = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
@@ -70,7 +81,7 @@ const Transfer = ({ setIsConnected }) => {
             gridTemplateRows={'repeat(1, 1fr)'}
             gridTemplateColumns={'repeat(1, 1fr)'}
             gap="3"
-            borderRadius={'2xl'}
+            borderRadius={['lg', 'lg', 'lg', 'xl']}
         >
             <Output isConnected={isConnected} setAmount={setAmount} />
             <Input isConnected={isConnected} setTo={setTo} />
@@ -100,14 +111,16 @@ const Input = ({ isConnected, setTo }) => {
             gap={[3]}
         >
             <VStack alignSelf={'flex-start'} w={'100%'} justifyContent={'flex-start'}>
-                <FormLabel color={'secondaryText'} alignSelf={'flex-start'} fontWeight={400}>
-                    Principal ID or Account ID
+                <FormLabel alignSelf={'flex-start'} fontWeight={400} pl="5px" mb="0">
+                    To
                 </FormLabel>
                 <TextInput
                     w={'100%'}
                     size={'lg'}
                     isDisabled={!isConnected}
-                    placeholder="0x000-000-000-000"
+                    height={'50px'}
+                    maxH={'65px'}
+                    placeholder="Enter Principal ID"
                     onChange={handleChange}
                 />
             </VStack>
@@ -131,24 +144,48 @@ const Output = ({ isConnected, setAmount }) => {
             gap={[3]}
         >
             <VStack alignSelf={'flex-start'} w={'100%'} justifyContent={'flex-start'}>
-                <FormLabel color={'secondaryText'} alignSelf={'flex-start'} fontWeight={400}>
-                    Amount
+                <FormLabel alignSelf={'flex-start'} fontWeight={400} pl="5px" mb="0">
+                    Input Amount
                 </FormLabel>
-                <NumberInput allowMouseWheel w={'100%'} isDisabled={!isConnected}>
-                    <NumberInputField
-                        size={'lg'}
-                        onChange={handleChange}
-                        placeholder="00"
-                    ></NumberInputField>
-                </NumberInput>
+                <InputGroup>
+                    <NumberInput allowMouseWheel w={'100%'} isDisabled={!isConnected}>
+                        <NumberInputField
+                            size={'lg'}
+                            onChange={handleChange}
+                            placeholder="100"
+                            height={'50px'}
+                            borderTopRightRadius={0}
+                            borderBottomRightRadius={0}
+                            defaultValue={100}
+                        />
+                    </NumberInput>
+                    <InputRightAddon bg="white" height={'50px'}>
+                        <TokenSign />
+                    </InputRightAddon>
+                </InputGroup>
             </VStack>
         </Card>
     );
 };
-
 const TransferButton = ({ isConnected, amount, to }) => {
     const gldtLedgerActor = useCanister('gldtLedgerCanister')[0];
     const [isLoading, setIsLoading] = useState(false);
+    const [isEnable, setIsEnable] = useState(true);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const isPrincipal = (str) => {
+        const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
+        return regex.test(str);
+    };
+
+    useEffect(() => {
+        if (amount > 0 && isPrincipal(to) && isConnected && !isLoading) {
+            setIsEnable(true);
+        } else {
+            setIsEnable(false);
+        }
+    }, [amount, to, isConnected, isLoading]);
+
     const toast = useToast({
         position: 'bottom',
     });
@@ -156,11 +193,22 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const handleTransfer = async () => {
         setIsLoading(true);
         const res = await transfer(amount, to, gldtLedgerActor);
-        console.log('res', res);
+        const env = process.env.DFX_NETWORK;
+        const prefix = env === 'ic' ? '' : 'staging';
         if (res?.Ok) {
             toast({
                 title: 'Success',
-                description: 'Transaction Sent',
+                description: (
+                    <Link
+                        href={`https://${prefix}.explorer.gldt.org/transaction/${res.Ok}`}
+                        target="_blank"
+                        style={{
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        Transaction {parseInt(res.Ok)} Sent
+                    </Link>
+                ),
             });
         } else {
             toast({
@@ -174,8 +222,8 @@ const TransferButton = ({ isConnected, amount, to }) => {
     return (
         <>
             <Button
-                isDisabled={isLoading ? true : isConnected ? false : true}
-                onClick={handleTransfer}
+                isDisabled={!isEnable}
+                onClick={onOpen}
                 color="white"
                 bg="black"
                 borderRadius={'500px'}
@@ -189,6 +237,67 @@ const TransferButton = ({ isConnected, amount, to }) => {
                 {isConnected && !isLoading && 'Transfer'}
                 {isLoading && 'Sending transaction...'}
             </Button>
+            <Confirm
+                open={isOpen}
+                onClose={onClose}
+                onOpen={onOpen}
+                amt={amount}
+                to={to}
+                transfer={handleTransfer}
+            />
+        </>
+    );
+};
+
+const Confirm = ({ open, onClose, amt, to, transfer }) => {
+    const cancelRef = useRef();
+    return (
+        <>
+            <AlertDialog
+                motionPreset="slideInBottom"
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isOpen={open}
+                isCentered
+            >
+                <AlertDialogOverlay />
+                <AlertDialogContent borderRadius={'2xl'}>
+                    <AlertDialogHeader borderBottom={'1px'} borderColor={'border'}>
+                        Confirm Transfer
+                    </AlertDialogHeader>
+                    <AlertDialogCloseButton />
+                    <AlertDialogBody pt="20px">
+                        {`You are about to send ${amt} GLDT (0.0001 GLDT TX fee) to ${to}`}
+                    </AlertDialogBody>
+                    <AlertDialogFooter>
+                        <Button
+                            ref={cancelRef}
+                            onClick={onClose}
+                            variant={'outline'}
+                            border={'1px'}
+                            borderColor={'black'}
+                            borderRadius={'30px'}
+                            px="30px"
+                            _hover={{
+                                transform: 'scale(1.1)',
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="yumi"
+                            px="30px"
+                            ml={3}
+                            onClick={() => {
+                                transfer();
+                                onClose();
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 };
