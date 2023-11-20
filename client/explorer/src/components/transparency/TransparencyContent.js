@@ -60,11 +60,11 @@ const TransparencyContent = () => {
                     Overview
                 </Heading>
                 <Text fontSize={'16px'} pt="20px" width={['100%', '100%', '100%', '50%']}>
-                    The "Total Supply of GLDT" should always be smaller than or equal to the "Total
+                    {`The "Total Supply of GLDT" should always be smaller than or equal to the "Total
                     GLD NFTs Swapped" times 100. The total supply may be smaller due to the minor
                     transaction fee of 0.0001 GLDT or because GLDT were burned without actually
                     swapping GLD NFTs. In the end, there is always at least the same amount of GLD
-                    NFTs swapped as the equivalent amount of GLDT minted.
+                    NFTs swapped as the equivalent amount of GLDT minted.`}
                 </Text>
             </GridItem>
             <GridItem colSpan={['12', '12', '6', '3']} py={['10px', '10px', '20px']}>
@@ -110,8 +110,8 @@ const TransparencyContent = () => {
                     NFTs supply Breakdown
                 </Heading>
                 <Text fontSize={'16px'} pt="20px" width={['100%', '100%', '100%', '50%']}>
-                    Below is the individual breakdown of the sizes of GLD NFTs swapped. These will
-                    add up to the value of "Total GLD NFTs Swapped".
+                    {`Below is the individual breakdown of the sizes of GLD NFTs swapped. These will
+                    add up to the value of "Total GLD NFTs Swapped".`}
                 </Text>
             </GridItem>
             {arr.map((e, i) => (
