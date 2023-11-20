@@ -34,6 +34,7 @@ const useSwapHistory = (page, limit, id) => {
 		};
 		fetchHistory();
 	}, [page, limit]);
+	console.log('history-useSwapHistory', history);
 	return { history, isLoading };
 };
 
