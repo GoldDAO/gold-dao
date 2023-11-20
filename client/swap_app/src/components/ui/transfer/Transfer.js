@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Accordion,
     AccordionButton,
@@ -44,6 +44,13 @@ import {
     useToast,
     InputGroup,
     InputRightAddon,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+    AlertDialogCloseButton,
 } from '@chakra-ui/react';
 import { useCanister, useConnect } from '@connect2ic/react';
 import { cardPadding } from '@ui/theme';
@@ -113,7 +120,7 @@ const Input = ({ isConnected, setTo }) => {
                     isDisabled={!isConnected}
                     height={'50px'}
                     maxH={'65px'}
-                    placeholder="Principal ID"
+                    placeholder="Enter Principal ID"
                     onChange={handleChange}
                 />
             </VStack>
@@ -164,6 +171,7 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const gldtLedgerActor = useCanister('gldtLedgerCanister')[0];
     const [isLoading, setIsLoading] = useState(false);
     const [isEnable, setIsEnable] = useState(true);
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const isPrincipal = (str) => {
         const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
@@ -171,12 +179,12 @@ const TransferButton = ({ isConnected, amount, to }) => {
     };
 
     useEffect(() => {
-        if (amount > 0 && isPrincipal(to) && isConnected) {
+        if (amount > 0 && isPrincipal(to) && isConnected && !isLoading) {
             setIsEnable(true);
         } else {
             setIsEnable(false);
         }
-    }, [amount, to, isConnected]);
+    }, [amount, to, isConnected, isLoading]);
 
     const toast = useToast({
         position: 'bottom',
@@ -215,7 +223,7 @@ const TransferButton = ({ isConnected, amount, to }) => {
         <>
             <Button
                 isDisabled={!isEnable}
-                onClick={handleTransfer}
+                onClick={onOpen}
                 color="white"
                 bg="black"
                 borderRadius={'500px'}
@@ -229,6 +237,67 @@ const TransferButton = ({ isConnected, amount, to }) => {
                 {isConnected && !isLoading && 'Transfer'}
                 {isLoading && 'Sending transaction...'}
             </Button>
+            <Confirm
+                open={isOpen}
+                onClose={onClose}
+                onOpen={onOpen}
+                amt={amount}
+                to={to}
+                transfer={handleTransfer}
+            />
+        </>
+    );
+};
+
+const Confirm = ({ open, onClose, amt, to, transfer }) => {
+    const cancelRef = useRef();
+    return (
+        <>
+            <AlertDialog
+                motionPreset="slideInBottom"
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isOpen={open}
+                isCentered
+            >
+                <AlertDialogOverlay />
+                <AlertDialogContent borderRadius={'2xl'}>
+                    <AlertDialogHeader borderBottom={'1px'} borderColor={'border'}>
+                        Confirm Transfer
+                    </AlertDialogHeader>
+                    <AlertDialogCloseButton />
+                    <AlertDialogBody pt="20px">
+                        {`You are about to send ${amt} GLDT (0.0001 GLDT TX fee) to ${to}`}
+                    </AlertDialogBody>
+                    <AlertDialogFooter>
+                        <Button
+                            ref={cancelRef}
+                            onClick={onClose}
+                            variant={'outline'}
+                            border={'1px'}
+                            borderColor={'black'}
+                            borderRadius={'30px'}
+                            px="30px"
+                            _hover={{
+                                transform: 'scale(1.1)',
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="yumi"
+                            px="30px"
+                            ml={3}
+                            onClick={() => {
+                                transfer();
+                                onClose();
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 };

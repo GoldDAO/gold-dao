@@ -26,8 +26,8 @@ export default function WithSubnavigation({nav, children, noConnection}) {
 	const { isConnected, principal } = useConnect();
 
 	return (
-		<Box mt="15px">
-			<Flex align={'center'}>
+		<Box mt="15px" >
+			<Flex align={'center'} >
 				<Flex
 					flex={{ base: 1, md: 'auto' }}
 					ml={{ base: -2 }}
@@ -55,7 +55,9 @@ export default function WithSubnavigation({nav, children, noConnection}) {
 					<Flex
 						display={{ base: 'none', md: 'flex' }}
 						ml={10}
+						w={'100%'}
 						justifyContent={'space-between'}
+						
 					>
 						{isConnected && <DesktopNav nav={nav}> {children}</DesktopNav>}
 					</Flex>
@@ -83,10 +85,12 @@ const DesktopNav = ({nav, children}) => {
 			spacing={20}
 			alignItems={'center'}
 			justifyContent={'space-between'}
+			w={'100%'}
 			pr={['20px', '20px', '20px', '40px']}
 		>
+			{children}
 			{nav.map((navItem) => (
-				<Box key={navItem.label}>
+				<Box key={navItem.label}  >
 					<Popover trigger={'hover'} placement={'bottom-start'}>
 						<PopoverTrigger>
 							<Link href={navItem.href}>
@@ -122,7 +126,7 @@ const DesktopNav = ({nav, children}) => {
 					</Popover>
 				</Box>
 			))}
-			{children}
+			
 		</Stack>
 	);
 };

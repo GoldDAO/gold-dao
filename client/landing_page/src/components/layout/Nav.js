@@ -127,29 +127,6 @@ const DesktopNav = ({ nav, children }) => {
                 >
                     Swap App
                 </Button>
-                <Box
-                    position={'absolute'}
-                    borderRadius={'50%'}
-                    display={'flex'}
-                    transform={'rotate(10deg)'}
-                    alignItems={'center'}
-                    justifyContent={'center'}
-                    width={'65px'}
-                    bg="gold"
-                    top="-2px"
-                    left="80px"
-                    height={'65px'}
-                >
-                    <Text
-                        fontSize={'12px'}
-                        textAlign={'center'}
-                        color="white"
-                        lineHeight={'15px'}
-                        pt="2px"
-                    >
-                        Coming Soon
-                    </Text>
-                </Box>
             </HStack>
         </Stack>
     );

@@ -31,11 +31,10 @@ const Yumi = () => {
                             textAlign={['center', 'center', 'left']}
                             w={'100%'}
                         >
-                            Don’t own any{' '}
-                            <Box color="gold" as="span" fontWeight={600}>
-                                GLD&nbsp;NFTs
+                            Get started with
+                            <Box color="gold" as="span" fontWeight={500}>
+                                &nbsp;GLD&nbsp;NFTs&nbsp;!
                             </Box>
-                            &nbsp;?
                         </Heading>
                     </GridItem>
                     <GridItem

@@ -1,28 +1,35 @@
 import useGLDTbalance from '@utils/hooks/useGLDTbalance';
 import { useConnect } from '@connect2ic/react';
-import React, {useReducer} from 'react';
+import React, {useReducer, useEffect, useRef, useState} from 'react';
 import TokenSign from '../gldt/TokenSign';
 import { HStack, Text, Button } from '@chakra-ui/react';
-import { RepeatIcon } from '@chakra-ui/icons';
+import { RepeatIcon, SpinnerIcon } from '@chakra-ui/icons';
 const Balance = () => {
 	const { principal } = useConnect();
-	const {balance, isLoading} = useGLDTbalance(principal);
-	const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+	const [shouldUpdate, forceUpdate] = useState(0);
+	const {balance, isLoading} = useGLDTbalance(principal, shouldUpdate);
 
+	const handleRefresh = () => {
+		forceUpdate(prevKey => prevKey + 1);
+	};
 
 	return (
-		<HStack >
-			<Text fontSize={'16px'}>{Number(balance).toLocaleString('en-US')}</Text> <TokenSign /> <RefreshButton forceUpdate={forceUpdate} />
+		<HStack>
+			<Text fontSize={'16px'}>{Number(balance).toLocaleString('en-US')}</Text> 
+			<TokenSign /> 
+			<RefreshButton 
+				handleRefresh={handleRefresh} 
+				isLoading={isLoading}/>
 		</HStack>
 	);
 };
 
 export default Balance;
 
-const RefreshButton = ({forceUpdate}) => {
+const RefreshButton = ({handleRefresh,isLoading}) => {
 	return(
 		<Button
-			onClick={forceUpdate}
+			onClick={handleRefresh}
 			borderRadius={'200px'}
 			_hover={{
 				bg: 'bg',
@@ -33,8 +40,7 @@ const RefreshButton = ({forceUpdate}) => {
 			bg="transparent"
 			color="black"
 			aria-label="Refresh Balance"
-		>
-			<RepeatIcon />
+		>{isLoading ? <SpinnerIcon /> : <RepeatIcon />}
 		</Button>
 	);
 	

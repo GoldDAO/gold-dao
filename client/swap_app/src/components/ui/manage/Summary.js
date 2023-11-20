@@ -44,15 +44,14 @@ const Summary = () => {
     return (
         <Card
             mt="20px"
-            gridColumn={['1/13', '1/13', '2/12', '3/11', '4/10']}
+            gridColumn={['1/12', '1/12', '2/12']}
             p={cardPadding.xl}
-            shadow={['md', 'lg']}
             mx={['10px', '20px', 0, 0, 0]}
-            bg="bg"
             display="grid"
             gridTemplateRows={'repeat(1, 1fr)'}
             gap="3"
             borderRadius={'2xl'}
+            shadow={'none'}
         >
             {isConnected ? <Overview connected={isConnected} /> : <Skeleton h={'100px'} />}
             {isConnected ? <Mynfts connected={isConnected} /> : <Skeleton h={'200px'} />}
@@ -90,7 +89,7 @@ const Overview = () => {
         );
     };
     return (
-        <Card shadow={'none'} border={'1px'} borderColor={'border'} borderRadius={'lg'}>
+        <Card shadow={'none'} borderRadius={'lg'}>
             <Stack
                 spacing={{ base: 0, md: '15px' }}
                 direction={['column', 'column', 'row']}
@@ -117,7 +116,7 @@ const Overview = () => {
                                     ) : (
                                         <Spinner size={'sm'} color="secondaryText" />
                                     )}
-                                    <Text fontSize={'16px'}>Total number of NFTs</Text>
+                                    <Text fontSize={'14px'}>Total number of NFTs</Text>
                                 </Box>
                             </Stack>
                         </HStack>
@@ -141,7 +140,7 @@ const Overview = () => {
                                 ) : (
                                     <Spinner size={'sm'} color="secondaryText" />
                                 )}
-                                <Text fontSize={'16px'}>Total NFTs weight</Text>
+                                <Text fontSize={'14px'}>Total NFTs weight</Text>
                             </Box>
                         </HStack>
                     </CardBody>
@@ -167,7 +166,7 @@ const Overview = () => {
                                 ) : (
                                     <Spinner size={'sm'} color="secondaryText" />
                                 )}
-                                <Text fontSize={'16px'}>Total GLDT swapped</Text>
+                                <Text fontSize={'14px'}>Total GLDT swapped</Text>
                             </Box>
                         </HStack>
                     </CardBody>
@@ -199,11 +198,25 @@ const Mynfts = ({ connected }) => {
         }
     }, [nfts]);
 
+    const sortNfts = (nfts) => {
+        const nftsByW = {
+            1: [],
+            10: [],
+            100: [],
+            1000: [],
+        };
+
+        nfts.map((e) => {
+            nftsByW[e.weight].push(e);
+        });
+        return nftsByW;
+    };
+
     return (
         <Card
             bg="white"
-            borderRadius={'lg'}
-            border="1px"
+            borderRadius={0}
+            borderTop="1px"
             borderColor="border"
             shadow={'none'}
             p={[2, 2, 3, 4, 6]}
@@ -225,10 +238,17 @@ const Mynfts = ({ connected }) => {
                     borderEndStartRadius={'md'}
                     direction={['column', 'column', 'column', 'column', 'column']}
                 >
-                    {weights.map((weight, i) => {
+                    {Object.keys(sortNfts(nfts)).map((weight, i) => {
                         return (
                             <Card key={i} shadow={'none'} alignSelf={'flex-start'}>
-                                <AccordionItem border={0} isDisabled={isLoading}>
+                                <AccordionItem
+                                    border={0}
+                                    isDisabled={
+                                        isLoading || sortNfts(nfts)[weight].length > 0
+                                            ? false
+                                            : true
+                                    }
+                                >
                                     <AccordionButton
                                         shadow={'none'}
                                         h="60px"
@@ -244,7 +264,11 @@ const Mynfts = ({ connected }) => {
                                             justifyContent={'space-between'}
                                             borderStartStartRadius={'md'}
                                         >
-                                            <Text fontSize={'16px'}>GLD NFT {weight}g</Text>
+                                            <Text fontSize={'16px'}>
+                                                {sortNfts(nfts)[weight].length > 0
+                                                    ? `GLD NFT ${weight}g`
+                                                    : `NO ${weight}g GLD NFT`}
+                                            </Text>
 
                                             {isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                                         </HStack>
@@ -270,16 +294,8 @@ const Mynfts = ({ connected }) => {
                                                             </Thead>
                                                             <Tbody p={0}>
                                                                 {!isLoading &&
-                                                                    nfts.map((e, j) => {
-                                                                        if (nftCounter[i] === 0) {
-                                                                            return (
-                                                                                <Tr key={j}>
-                                                                                    <Td>No Nfts</Td>
-                                                                                </Tr>
-                                                                            );
-                                                                        } else if (
-                                                                            e.weight === weight
-                                                                        ) {
+                                                                    sortNfts(nfts)[weight].map(
+                                                                        (e, j) => {
                                                                             return (
                                                                                 <Tr key={j}>
                                                                                     <Td>
@@ -295,8 +311,8 @@ const Mynfts = ({ connected }) => {
                                                                                     </Td>
                                                                                 </Tr>
                                                                             );
-                                                                        }
-                                                                    })}
+                                                                        },
+                                                                    )}
                                                             </Tbody>
                                                         </Table>
                                                     </TableContainer>
@@ -412,8 +428,8 @@ const MyTransactions = () => {
     return (
         <Card
             bg="white"
-            borderRadius={'lg'}
-            border="1px"
+            borderRadius={0}
+            borderTop="1px"
             borderColor="border"
             shadow={'none'}
             p={[2, 2, 3, 4, 6]}

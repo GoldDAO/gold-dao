@@ -1,24 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect , useState } from 'react';
 import { HStack, Text, Tooltip , Box} from '@chakra-ui/react';
 import CopyPrincipal from '@ui/gldt/CopyPrincipal';
 import { useConnect } from '@connect2ic/react';
 
 const PrincipalFormat = ({ nobtn, full, principal}) => {
 	const myPrincipal = useConnect().principal;
+	const [currentPrincipal, setCurrentPrincipal] = useState();
+
 	useEffect(() => {
 		if(!principal){
-			principal = myPrincipal;
+			setCurrentPrincipal(myPrincipal);
+		} else {
+			setCurrentPrincipal(principal);
 		}
-	},[]);
+	},[myPrincipal]);
 
 	const charsCount = 4;
-	const firstChars = principal?.slice(0, charsCount) || '';
-	const lastChars = principal?.substring(principal.length - charsCount) || '';
-	console.log('principal', principal);
+	const firstChars = currentPrincipal?.slice(0, charsCount) || '';
+	const lastChars = currentPrincipal?.substring(currentPrincipal.length - charsCount) || '';
 	return (
-		principal && (
+		currentPrincipal && (
 			<HStack justifySelf={'flex-end'}>
-				<Tooltip label={principal.toString()}>
+				<Tooltip label={currentPrincipal.toString()}>
 					<Box>
 						{!full &&
 					<Text fontSize={'inherit'}>
@@ -26,12 +29,11 @@ const PrincipalFormat = ({ nobtn, full, principal}) => {
 					</Text>}
 						{full &&
 					<Text fontSize={'inherit'}>
-						{principal}
+						{currentPrincipal}
 					</Text>}
 					</Box>
-
 				</Tooltip>
-				{!nobtn && <CopyPrincipal text={principal} />}
+				{!nobtn && <CopyPrincipal text={currentPrincipal} />}
 			</HStack>
 		)
 	);

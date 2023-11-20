@@ -1,4 +1,13 @@
-import { LinkBox, Stack, Stat, StatGroup, StatLabel, StatNumber } from '@chakra-ui/react';
+import {
+    Grid,
+    GridItem,
+    LinkBox,
+    Stack,
+    Stat,
+    StatGroup,
+    StatLabel,
+    StatNumber,
+} from '@chakra-ui/react';
 import useTotalSupply from '@utils/hooks/useTotalSupply';
 import Link from 'next/link';
 import React from 'react';
@@ -25,34 +34,34 @@ const Stats = () => {
     ];
     return (
         <StatGroup
+            display={'block'}
             w={'100%'}
-            justifyContent={['space-between', 'flex-start', 'flex-start', 'flex-start', 'flex-end']}
             pt={['20px', '20px', '20px', 0]}
+            mt={['30px', '40px', '40px', '80px']}
+            justifyContent={'flex-start'}
         >
-            <Stack
-                direction={['row', 'row', 'row', 'column']}
-                flexWrap={'wrap'}
-                justifyContent={[
-                    'space-between',
-                    'flex-start',
-                    'flex-start',
-                    'flex-start',
-                    'flex-end',
-                ]}
-                spacing={['20px']}
-                w="100%"
-            >
-                {stats.map((e, i) => (
-                    <Stat key={i} display={'flex'} w="33%" minW={'160px'}>
-                        <StatLabel fontWeight={'bold'} m={0}>
-                            {e.label}
-                        </StatLabel>
-                        <StatNumber fontWeight={300} m={0}>
-                            {e.value}
-                        </StatNumber>
-                    </Stat>
-                ))}
-            </Stack>
+            {stats.map((e, i) => (
+                <Stat
+                    key={i}
+                    w={['100%', '100%', 'fit-content']}
+                    display={['block', 'block', 'inline-block']}
+                    mt={['20px', '20px', 0]}
+                    mr={[0, 0, '40px', '80px']}
+                    mx={['auto', 'auto']}
+                >
+                    <StatLabel fontWeight={'bold'} m={0} textAlign={['center', 'center', 'left']}>
+                        {e.label}
+                    </StatLabel>
+                    <StatNumber
+                        textAlign={['center', 'center', 'left']}
+                        fontWeight={300}
+                        m={0}
+                        fontSize={['24px', '24px', '28px', '36px']}
+                    >
+                        {e.value}
+                    </StatNumber>
+                </Stat>
+            ))}
         </StatGroup>
     );
 };

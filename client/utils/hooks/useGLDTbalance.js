@@ -7,24 +7,26 @@ const queryGLDTbalance = async (actor, principal) => {
 	return req;
 };
 
-const useGLDTbalance = (principal) => {
+const useGLDTbalance = (principal, shouldUpdate) => {
 	const [balance, setBalance] = useState([]);
 	const [isLoading, setIsloading] = useState(false);
 	const gldtLedgerActor = useCanister('gldtLedgerCanister');
 	useEffect(() => {
-		setIsloading(true);
 		if (principal) {
 			const fetchBalance = async () => {
+				setIsloading(true);
 				const fetchedBalance = await queryGLDTbalance(
 					gldtLedgerActor,
 					Principal.fromText(principal),
 				);
 				setBalance((Number(fetchedBalance) / 100000000).toFixed(2));
+				setIsloading(false);
+
 			};
 			fetchBalance();
 		}
-		setIsloading(false);
-	}, [principal]);
+		
+	}, [principal, shouldUpdate]);
 	return {balance, isLoading};
 };
 

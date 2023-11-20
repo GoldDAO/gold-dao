@@ -17,7 +17,7 @@ import {
 import React, { useState } from 'react';
 import Timestamp from '@ui/tooltip/timeStamp';
 import { Principal } from '@dfinity/principal';
-import { ArrowBackIcon, ArrowForwardIcon, Search2Icon } from '@chakra-ui/icons';
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import PrincipalFormat from '@ui/principal/Principal';
 import TokenSign from '@ui/gldt/TokenSign';
@@ -75,8 +75,8 @@ const Explorer = () => {
                                         let type;
                                         let tx;
                                         let memo;
-                                        let fee;
                                         let amt;
+                                        let fee;
                                         let ts;
                                         const labelsType = {
                                             xfer: 'Transfer',
@@ -187,6 +187,7 @@ const Explorer = () => {
                                                                 color={'blackAlpha.700'}
                                                             >
                                                                 <PrincipalFormat
+                                                                    nobtn
                                                                     principal={from.subaccount}
                                                                 />
                                                             </Box>
@@ -216,6 +217,7 @@ const Explorer = () => {
                                                                     color={'blackAlpha.700'}
                                                                 >
                                                                     <PrincipalFormat
+                                                                        nobtn
                                                                         principal={to.subaccount}
                                                                     />
                                                                 </Box>
