@@ -386,7 +386,7 @@ const SaleStatus = ({ status, e }) => {
 };
 
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total }) => {
-    total = total ? total : 0;
+    total = total ? Number(total) : 0;
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>

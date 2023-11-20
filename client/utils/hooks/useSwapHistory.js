@@ -10,6 +10,7 @@ const queryHistory = async (actor, principal, page, limit) => {
 			account: [{ owner: Principal.fromText(principal), subaccount: [] }],
 		}),
 	);
+	console.log('history', history);
 	return history;
 };
 
