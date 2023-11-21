@@ -1,15 +1,17 @@
 import { Principal } from '@dfinity/principal';
 import { useEffect, useState } from 'react';
 import { useCanister } from '@connect2ic/react';
+import {  stringToUint8Array } from '@utils/misc/buf2hex';
 
 const queryHistory = async (principal, actors, currentPage, currentSub, i) => {
+	console.log('currentSub', currentSub);
 	const history = await Promise.resolve(actors[0]
 		.get_account_transactions({
 			max_results: 10,
 			start: currentPage > 0 ? [i[currentPage]] : i[0],  
 			account: {
 				owner: Principal.fromText(principal), 
-				subaccount: currentSub ? [Principal.fromText(currentSub)] : []
+				subaccount: currentSub ? [stringToUint8Array(currentSub)] : []
 			}
 		}));
 	return {history} ;
@@ -18,20 +20,25 @@ const queryHistory = async (principal, actors, currentPage, currentSub, i) => {
  
 export const useHistory = (principal, currentPage,  currentSub, i ) => {
 	const actor = useCanister('ledgerIndexerCanister');
-	const [history, setHistory] = useState([]);
+	const [history, setHistory] = useState();
 	const [isLoading, setLoading] = useState(false);
+
 	useEffect(() => {
+		setHistory();
 		setLoading(true);
-		queryHistory(principal, actor, currentPage,  currentSub, i)
-			.then((result) => {
-				console.log('result', result);
-				setHistory(result.history);
-				setLoading(false);
-			})
-			.catch((error) => {
-				console.log('error', error);
-				setLoading(false);
-			});
-	}, [currentPage]);
-	return { history, isLoading };
+		const fetch = async () => {
+			await queryHistory(principal, actor, currentPage,  currentSub, i)
+				.then((result) => {
+					console.log('result-history', result);
+					setHistory(result);
+					setLoading(false);
+				})
+				.catch((error) => {
+					console.log('error', error);
+					setLoading(false);
+				});
+		};
+		fetch();
+	}, [currentPage,  currentSub]);
+	return {isLoading, history};
 };

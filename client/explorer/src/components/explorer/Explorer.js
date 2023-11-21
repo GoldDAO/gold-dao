@@ -26,6 +26,7 @@ import { formatAmount } from '@utils/misc/format';
 import GridSystem from '@ui/layout/GridSystem';
 import Title from '../layout/Title';
 import TableTitle from '../layout/TableTitle';
+import { buf2hex } from '@utils/misc/buf2hex';
 
 const Explorer = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -108,9 +109,7 @@ const Explorer = () => {
                                                         e[1].Array[0].Blob,
                                                     ).toString() || '';
                                                 from.subaccount = e[1].Array[1]?.Blob
-                                                    ? Principal.fromUint8Array(
-                                                          e[1].Array[1]?.Blob,
-                                                      ).toString()
+                                                    ? buf2hex(e[1].Array[1]?.Blob).toString()
                                                     : undefined;
                                             }
                                             if (e[0] === 'to') {
@@ -119,9 +118,7 @@ const Explorer = () => {
                                                         e[1].Array[0].Blob,
                                                     ).toString() || '';
                                                 to.subaccount = e[1].Array[1]?.Blob
-                                                    ? Principal.fromUint8Array(
-                                                          e[1].Array[1]?.Blob,
-                                                      ).toString()
+                                                    ? buf2hex(e[1].Array[1]?.Blob).toString()
                                                     : undefined;
                                             }
                                             if (e[0] === 'op') {

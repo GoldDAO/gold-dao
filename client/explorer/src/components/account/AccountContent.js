@@ -37,6 +37,8 @@ import TableTitle from '../layout/TableTitle';
 
 const AccountContent = ({ id, subAccount }) => {
     const [currentPage, setCurrentPage] = useState(0);
+    const router = useRouter();
+    const subaccountParam = router.query.subaccount;
     const [currentSub, setCurrentSub] = useState();
     const [index, setIndex] = useState({
         last: null,
@@ -44,18 +46,17 @@ const AccountContent = ({ id, subAccount }) => {
     });
     const [action, setAction] = useState();
     const [i, seti] = useState([[]]);
-    const { history, isLoading } = useHistory(id, currentPage, currentSub, i);
+    const { history, isLoading } = useHistory(id, currentPage, router.query.subaccount, i);
     const { subaccounts } = useSubaccounts(id);
-    const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
-    const router = useRouter();
+    const [balance, setBalance] = useState(0);
+
+    const thead = ['tx', 'Type', 'Date', 'GLDT amount', 'From', 'To'];
+    const oldest = history?.history?.Ok?.oldest_tx_id[0];
 
     useEffect(() => {
         if (history?.Ok?.transactions[history?.Ok?.transactions?.length - 1]?.id) {
             i.push(parseInt(history?.Ok?.transactions[history.Ok.transactions.length - 1].id));
         }
-    }, [history]);
-
-    useEffect(() => {
         if (history?.Ok?.transactions.length > 0) {
             setIndex({
                 last: history?.Ok?.transactions[history.Ok.transactions.length - 1].id,
@@ -67,14 +68,17 @@ const AccountContent = ({ id, subAccount }) => {
     const toggleChange = (e) => {
         setCurrentSub(e.target.value);
     };
-
     useEffect(() => {
         if (currentSub) {
             router.push(`/account/${id}?subaccount=${currentSub}`);
         }
-    }, [currentSub, id, router]);
-    const thead = ['tx', 'Type', 'Date', 'GLDT amount', 'From', 'To'];
+    }, [currentSub, id]);
 
+    useEffect(() => {
+        if (history) {
+            setBalance(history.history.Ok.balance);
+        }
+    }, [history]);
     return (
         <GridSystem gap={['0px', '0px', '20px']}>
             <Title title="GLDT" subTitle={'Account'} />
@@ -150,13 +154,15 @@ const AccountContent = ({ id, subAccount }) => {
                                 </Tr>
                             </Thead>
                             <Tbody fontSize={'14px'}>
-                                {history?.Ok?.transactions.length < 1 && (
+                                {history?.history?.Ok?.transactions.length < 1 && (
                                     <Tr>
                                         <Td>No Transaction</Td>
                                     </Tr>
                                 )}
                                 {!isLoading ? (
-                                    history?.Ok?.transactions?.map((e, i) => {
+                                    history?.history?.Ok?.transactions?.map((e, i) => {
+                                        let from;
+                                        let to;
                                         return (
                                             <Tr key={i}>
                                                 <Td>
@@ -176,22 +182,24 @@ const AccountContent = ({ id, subAccount }) => {
                                                     <HStack>
                                                         <Text fontSize={'14px'}>
                                                             {formatAmount(
-                                                                e.transaction.transfer[0].amount,
+                                                                e.transaction[e.transaction.kind][0]
+                                                                    .amount,
                                                             )}
                                                         </Text>
                                                         <TokenSign />
                                                     </HStack>
                                                 </Td>
-                                                <Td>
+
+                                                {/* <Td>
                                                     <Link
                                                         href={`/account/${Principal.fromUint8Array(
-                                                            e.transaction.transfer[0].from.owner
-                                                                ._arr,
+                                                            e.transaction[e.transaction.kind][0]
+                                                                .from.owner._arr,
                                                         ).toString()}`}
                                                     >
                                                         <PrincipalFormat
                                                             principal={Principal.fromUint8Array(
-                                                                e.transaction.transfer[0].from.owner
+                                                                e.transaction[e.transaction.kind][0].from.owner
                                                                     ._arr,
                                                             ).toString()}
                                                         />
@@ -212,8 +220,8 @@ const AccountContent = ({ id, subAccount }) => {
                                                             </Box>
                                                         )}
                                                     </Link>
-                                                </Td>
-                                                <Td>
+                                                </Td>*/}
+                                                {/* <Td>
                                                     <Link
                                                         href={`/account/${Principal.fromUint8Array(
                                                             e.transaction.transfer[0].to.owner._arr,
@@ -226,7 +234,7 @@ const AccountContent = ({ id, subAccount }) => {
                                                             ).toString()}
                                                         />
                                                     </Link>
-                                                </Td>
+                                                </Td> */}
                                             </Tr>
                                         );
                                     })
@@ -251,11 +259,17 @@ const AccountContent = ({ id, subAccount }) => {
                             </Tbody>
                         </Table>
                     </Box>
-                    {history?.Ok?.transactions.length > 0 && (
+                    {history?.history?.Ok?.transactions.length > 0 && (
                         <Pagination
                             currentHistoryPage={currentPage}
                             setCurrentHistoryPage={setCurrentPage}
                             setAction={setAction}
+                            oldest={oldest}
+                            last={
+                                history?.history?.Ok?.transactions[
+                                    history?.history?.Ok?.transactions.length - 1
+                                ]
+                            }
                         />
                     )}
                 </TableContainer>
@@ -266,7 +280,7 @@ const AccountContent = ({ id, subAccount }) => {
 
 export default AccountContent;
 
-const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setAction }) => {
+const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, oldest, setAction, last }) => {
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
@@ -292,7 +306,7 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setActio
                     _hover={{
                         bg: 'border',
                     }}
-                    // isDisabled={total / (currentHistoryPage + 1) < 10}
+                    isDisabled={last.id === oldest}
                     onClick={() => {
                         setCurrentHistoryPage((prev) => prev + 1);
                         setAction(+1);

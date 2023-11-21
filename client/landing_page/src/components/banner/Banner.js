@@ -25,7 +25,7 @@ const Banner = () => {
                             The future of owning physical gold,
                         </Heading>
                     </GridItem>
-                    <GridItem
+                    {/* <GridItem
                         colStart={[1, 1, 9, 9, 9]}
                         colEnd={12}
                         height={['150px', '150px', '0', '0', '0']}
@@ -44,9 +44,9 @@ const Banner = () => {
                         >
                             <Scene />
                         </Box>
-                    </GridItem>
+                    </GridItem> */}
                     <GridItem colSpan={12}>
-                        <GridSystem gap={['0px', '0px', 8]}>
+                        {/* <GridSystem gap={['0px', '0px', 8]}>
                             <GridItem
                                 colSpan={[0, 0, 3, 2]}
                                 alignSelf={'center'}
@@ -108,7 +108,7 @@ const Banner = () => {
                                     Play Video
                                 </Button>
                             </GridItem>
-                        </GridSystem>
+                        </GridSystem> */}
                     </GridItem>
                     <GridItem colStart={[1, 1, 1, 1, 4]} colEnd={[12]}>
                         <Stats />
