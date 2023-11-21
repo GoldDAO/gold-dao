@@ -1,4 +1,7 @@
 # GLDT SWAP MONOREPO
+This repository contains the source code for the GLDNFT to GLDT swapping mechanisms, as well as configuration and deployment files for GLDT ledger and indexer canisters.
+
+See the [official website](https://gldt.org/) for more informations about the project.
 
 ## Project Structure:
 
@@ -7,8 +10,7 @@
 - [`client/explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
 - [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core`, `gldt_fee_compensation`, and `gldt_ledger`, as well as other dependencies wasm files)
 
-## How to install and execute the dapp locally
-
+## Local development instructions
 1. Clone this repository:
 ```sh
 git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
@@ -16,6 +18,7 @@ git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
 
 2. Install the dependencies.
 ```sh
+cd gldt-swap
 npm install
 ```
 
@@ -23,8 +26,7 @@ npm install
 ```sh
 npm start
 ```
-The main dapp will be available at `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/`
-> **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:4943/?canisterId=bkyz2-fmaaa-aaaaa-qaaaq-cai`**
+> **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:<REPLICA_PORT>/?canisterId=<FRONTEND_CANISTER_ID>`**. Instead, use the following url to access the locally deployed dapp: `http://<FRONTEND_CANISTER_ID>.localhost:<REPLICA_PORT>/`.
 
 To redeploy your latest changes on `gldt_core`, `gldt_fee_compensation`, or on the frontend:
 ```sh
