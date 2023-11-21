@@ -3,6 +3,9 @@ This repository contains the source code for the GLDNFT to GLDT swapping mechani
 
 See the [official website](https://gldt.org/) for more informations about the project.
 
+> :warning: You are on the `master` branch, that currently doesn't contain any code for canisters. For now, checkout the `develop` branch to see the current source code being actively developed.  
+> The `master` branch will become the default once the project will be launched in production.
+
 ## Project Structure:
 
 - [`client/swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
