@@ -19,10 +19,10 @@ const Banner = () => {
                 <GridSystem gap={[0, 0, 8]}>
                     <GridItem colStart={[1, 1, 1, 1, 2]} colEnd={[13, 13, 8, 8, 8]}>
                         <Heading as="h1" variant="h1" textAlign={['center', 'center', 'left']}>
-                            GLDT,
+                            GLDT
                         </Heading>
                         <Heading as="h2" variant="h2" textAlign={['center', 'center', 'left']}>
-                            The future of owning physical gold,
+                            The future of owning physical gold
                         </Heading>
                     </GridItem>
                     <GridItem

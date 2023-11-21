@@ -59,8 +59,8 @@ const Yumi = () => {
                         colStart={[2, 4, 4, 7, 7]}
                     >
                         <Text textAlign={['center', 'center', 'left']}>
-                            Buy your first tokenised gold and join the movement to a more
-                            transparent and accessible future of owning gold.
+                            Explore the future of ownership of physical gold and acquire your GLD
+                            NFTs today on YUMI NFT marketplace.
                         </Text>
                         <Button
                             px="50px"
