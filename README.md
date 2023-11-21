@@ -1,15 +1,24 @@
-# GLDT swap
-This repository contains the source code for the GLDT page frontend, including swap interface, and the swap canister.  
-As the front-end will be hosted on the Internet Computer, this projects uses [NextJS](https://nextjs.org/docs) and bundles a full static website with [client-side fetching](https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side).
+# GLDT SWAP MONOREPO
+This repository contains the source code for the GLDNFT to GLDT swapping mechanisms, as well as configuration and deployment files for GLDT ledger and indexer canisters.
 
-> :bulb: This project uses the [`pages` routing](https://nextjs.org/docs/getting-started/project-structure#pages-routing-conventions), and not the [`app` routing that just went out of beta](https://nextjs.org/blog/next-13-4#nextjs-app-router).
+See the [official website](https://gldt.org/) for more informations about the project.
 
-## Development
-### Dfinity SDK
-To be able to work on canisters development, or to test in a local canister execution environment, you may need to install the [Dfinity SDK](https://github.com/dfinity/sdk), and especially the [`dfx`](https://internetcomputer.org/docs/current/references/cli-reference/) CLI.
+## Project Structure:
 
-First install the dependencies with
+- [`client/swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
+- [`client/landing_page`](client/landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
+- [`client/explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
+- [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core`, `gldt_fee_compensation`, and `gldt_ledger`, as well as other dependencies wasm files)
+
+## Local development instructions
+1. Clone this repository:
 ```sh
+git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
+```
+
+2. Install the dependencies.
+```sh
+cd gldt-swap
 npm install
 ```
 Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
@@ -20,7 +29,9 @@ or you can deploy the canister(s) and frontend to test in a [local replica](http
 ```sh
 npm start
 ```
-And if you want to see some changes in the code, run
+> **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:<REPLICA_PORT>/?canisterId=<FRONTEND_CANISTER_ID>`**. Instead, use the following url to access the locally deployed dapp: `http://<FRONTEND_CANISTER_ID>.localhost:<REPLICA_PORT>/`.
+
+To redeploy your latest changes on `gldt_core`, `gldt_fee_compensation`, or on the frontend:
 ```sh
 npm run restart
 ```
