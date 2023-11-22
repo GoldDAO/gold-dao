@@ -441,23 +441,35 @@ async fn run_compensation_job() {
                         } => {
                             // select only the one that has a tag of "com.origyn.royalty.network"
                             if tag != &"com.origyn.royalty.network".to_string() {
+                                log_message(format!("Tag is not correct : {tag} received."));
                                 return None;
                             }
                             // select only the ones where the token is GLDT
                             if token.clone() != token_spec {
+                                log_message(
+                                    format!("Token is not correct : {:?} received.", token.clone())
+                                );
                                 return None;
                             }
                             // select only the ones where the buyer is the GLDT canister
                             if let Some(principal) = get_principal_from_gldnft_account(buyer) {
                                 if principal.to_text() != gldt_canister_id.to_text() {
+                                    log_message(
+                                        format!(
+                                            "Principal id is not correct : received {}.",
+                                            principal.to_text()
+                                        )
+                                    );
                                     return None;
                                 }
                             } else {
+                                log_message(format!("Couldnt get principal from gldtnft account."));
                                 return None;
                             }
                             // select only the ones where the expected royalty fee
                             // matches the amount of the royalty fee in the entry
                             if expected_royalty_fee != *amount {
+                                log_message(format!("Expected royalty fee has bad value."));
                                 return None;
                             }
                             // select only the ones where the sale_id is defined
