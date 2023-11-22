@@ -1,4 +1,4 @@
-import { Box, Button, Divider, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
+import { Box, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
 import React from 'react';
 import GridSystem from '../layout/Grid';
 import Scene from './scene/Scene';

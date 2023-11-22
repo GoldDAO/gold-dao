@@ -24,12 +24,12 @@ import {
     VStack,
     Flex,
 } from '@chakra-ui/react';
-import { useNft } from '@utils/hooks/useNFTs';
+import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
 import { cancelSale } from '@utils/queries/cancelSale';
-import useSwapHistory, { useMaxEntry } from '@utils/hooks/useSwapHistory';
+import useSwapHistory, { useMaxEntry } from '@utils/hooks/gldtCore/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
-import useOngoingSwaps from '@utils/hooks/useOngoingSwap';
+import useOngoingSwaps from '@utils/hooks/gldtCore/useOngoingSwap';
 import TokenSign from '@ui/gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import NFTIcon from '/public/images/sell.svg';

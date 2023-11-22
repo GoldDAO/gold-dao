@@ -47,7 +47,7 @@ import {
     removeCartItemByIdAtom,
 } from '@/atoms/cart';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
-import { useNft } from '@utils/hooks/useNFTs';
+import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
 import { sendBatchOffer } from '@utils/queries/sendBatchOffer';
