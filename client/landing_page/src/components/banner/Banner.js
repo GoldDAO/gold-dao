@@ -15,9 +15,9 @@ const Banner = () => {
                 width: '100%',
             }}
         >
-            <Box minH={'70vh'} overflowX={'hidden'}>
+            <Box minH={'70vh'} overflowX={'hidden'} maxH={'600px'}>
                 <GridSystem gap={[0, 0, 8]}>
-                    <GridItem colStart={[1, 1, 1, 1, 2]} colEnd={[13, 13, 8, 8, 8]}>
+                    <GridItem colStart={[1, 1, 1, 1, 2]} colEnd={[13, 13, 10, 10, 10]}>
                         <Heading as="h1" variant="h1" textAlign={['center', 'center', 'left']}>
                             GLDT,
                         </Heading>
