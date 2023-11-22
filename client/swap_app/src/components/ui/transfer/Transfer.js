@@ -58,6 +58,12 @@ import { Input as TextInput } from '@chakra-ui/react';
 import { transfer } from '@utils/queries/transfer';
 import TokenSign from '@ui/gldt/TokenSign';
 import Link from 'next/link';
+import { WarningIcon } from '@chakra-ui/icons';
+
+const isPrincipal = (str) => {
+    const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
+    return regex.test(str);
+};
 
 const Transfer = ({ setIsConnected }) => {
     const { isConnected } = useConnect();
@@ -93,8 +99,15 @@ const Transfer = ({ setIsConnected }) => {
 export default Transfer;
 
 const Input = ({ isConnected, setTo }) => {
+    const [warn, setWarn] = useState();
+
     const handleChange = (e) => {
         setTo(e.target.value);
+        if (!isPrincipal(e.target.value)) {
+            setWarn('Please enter a valid principal id.');
+        } else if (isPrincipal(e.target.value)) {
+            setWarn(null);
+        }
     };
     return (
         <Card
@@ -123,14 +136,31 @@ const Input = ({ isConnected, setTo }) => {
                     placeholder="Enter Principal ID"
                     onChange={handleChange}
                 />
+                <Text
+                    fontSize={'12px'}
+                    color={'blackAlpha.600'}
+                    bg="bg"
+                    p="5px 10px"
+                    borderRadius={'10px'}
+                    alignSelf={'flex-start'}
+                >
+                    {warn}
+                </Text>
             </VStack>
         </Card>
     );
 };
 
 const Output = ({ isConnected, setAmount }) => {
+    const [warn, setWarn] = useState();
+
     const handleChange = (e) => {
         setAmount(e.target.value);
+        if (e.target.value < 0) {
+            setWarn('Please a valid amount of GLDT to sent.');
+        } else if (e.target.value > 0) {
+            setWarn(null);
+        }
     };
     return (
         <Card
@@ -163,6 +193,16 @@ const Output = ({ isConnected, setAmount }) => {
                         <TokenSign />
                     </InputRightAddon>
                 </InputGroup>
+                <Text
+                    fontSize={'12px'}
+                    color={'blackAlpha.600'}
+                    bg="bg"
+                    p="5px 10px"
+                    borderRadius={'10px'}
+                    alignSelf={'flex-start'}
+                >
+                    {warn}
+                </Text>
             </VStack>
         </Card>
     );
@@ -172,11 +212,6 @@ const TransferButton = ({ isConnected, amount, to }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isEnable, setIsEnable] = useState(true);
     const { isOpen, onOpen, onClose } = useDisclosure();
-
-    const isPrincipal = (str) => {
-        const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
-        return regex.test(str);
-    };
 
     useEffect(() => {
         if (amount > 0 && isPrincipal(to) && isConnected && !isLoading) {

@@ -635,36 +635,86 @@ const BatchOfferResponse = ({ res, loading }) => {
     const [err, setErr] = useState(0);
     const [succ, setSucc] = useState(0);
 
+    useEffect(() => {
+        setSucc(0);
+        setErr(0);
+        res?.map((el) => {
+            return el?.map((e, i) => {
+                e.err && setErr((prev) => prev + 1);
+                e.ok && setSucc((prev) => prev + 1);
+            });
+        });
+    }, [res]);
+
+    const errorTexts = {
+        'token is non-transferable': 'Token is non-transferable',
+        'kyc fail': `Your account hasn't been KYC'd and is not eligible to swap GLD NFT for GLDT. Please go to yumi.io to get verified.`,
+    };
+
     return !loading ? (
         <>
             {res?.map((el) => {
                 return el?.map((e, i) => (
-                    <Box pb={'20px'} key={i}>
+                    <Box key={i}>
                         {e.ok && (
                             <HStack>
-                                <CheckCircleIcon color="green.300" />
+                                <CheckCircleIcon color="green.400" />
                                 <Text>{e.ok?.token_id}</Text>
                             </HStack>
                         )}
                         {e.err && (
                             <HStack>
-                                <WarningIcon color="red.300" />
-                                <Text>{e.err?.text}</Text>
+                                <WarningIcon color="red.400" />
+                                <Text>{errorTexts[e.err?.text] || e.err?.text}</Text>
                             </HStack>
                         )}
                     </Box>
                 ));
             })}
-            <Text>
-                Swap request successfully sent. You can follow the progress on your&nbsp;
-                <Link
-                    href={'/my-account'}
-                    style={{
-                        textDecoration: 'underline',
-                    }}
-                >
-                    Account Page
-                </Link>
+            <Text pt="20px">
+                <HStack>
+                    <Box
+                        height={'20px'}
+                        width={'20px'}
+                        bg="red.400"
+                        borderRadius={'20px'}
+                        display={'flex'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        color="white"
+                        fontSize={'12px'}
+                    >
+                        {err}
+                    </Box>
+                    <Text>Errors</Text>
+                </HStack>
+                <HStack>
+                    <Box
+                        height={'20px'}
+                        width={'20px'}
+                        bg="green.400"
+                        borderRadius={'20px'}
+                        display={'flex'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        color="white"
+                        fontSize={'12px'}
+                    >
+                        {succ}
+                    </Box>
+                    <Text>Success</Text>
+                </HStack>
+                <Box pt="20px">
+                    <Link
+                        href={'/my-account'}
+                        style={{
+                            textDecoration: 'underline',
+                            marginTop: '20px',
+                        }}
+                    >
+                        Account Page
+                    </Link>
+                </Box>
             </Text>
         </>
     ) : (
