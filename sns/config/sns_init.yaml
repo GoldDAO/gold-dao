@@ -352,47 +352,47 @@ Distribution:
     # For testing, propose_sns.sh will fill this in automatically.
     # TODO - define all developer neurons
     # TODO - current principals are arbitratry - replace them!!!!
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 0 years
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 3 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 6 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 9 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 12 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 15 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 18 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 21 months
-    - principal: uts47-wa2j2-xuhf2-er2vb-mbrfc-6xslp-fbhfx-lbcfp-rmqqz-xce7m-sqe
+    - principal: add-a-principal
       stake: 20_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
@@ -440,12 +440,12 @@ Swap:
   # direct participants (`minimum_participants`) is reached (otherwise, it
   # would be aborted).
   # Must be at least `min_participants * minimum_direct_participation_icp`.
-  maximum_direct_participation_icp: 730_000 tokens
+  maximum_direct_participation_icp: 740_000 tokens
 
   # The minimum amount of ICP that each participant must contribute
   # to participate. This field is specified as a token. For instance,
   # "1 token".
-  minimum_participant_icp: 100 tokens
+  minimum_participant_icp: 8 tokens
 
   # The maximum amount of ICP that each participant may contribute
   # to participate. This field is specified as a token. For instance,
