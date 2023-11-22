@@ -25,6 +25,8 @@ import Head from 'next/head';
 import { Layout } from '@/components/layout/Layout';
 import { Card, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import Metas from '@ui/layout/Metas';
+
 function Home({}) {
     const meta = {
         title: 'GLDT Swap App',
@@ -46,16 +48,7 @@ function Home({}) {
 
     return (
         <>
-            <Head>
-                <title>{meta.title}</title>
-                <meta property={`og:title`} content={meta.title} key="title" />
-                <meta property={`og:description`} content={meta.description} key="title" />
-                <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-                <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
-                <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
-                <meta name="msapplication-TileColor" content="#da532c" />
-                <meta name="theme-color" content="#ffffff" />
-            </Head>
+            <Metas meta={meta} />
             <Layout>
                 <Tabs
                     mt="15px"
