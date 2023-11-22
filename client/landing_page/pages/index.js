@@ -39,11 +39,7 @@ function Home() {
 
     return (
         <Layout meta={meta}>
-            <VStack
-                w={'100%'}
-                alignItems={'flex-start'}
-                spacing={['40px', '60px', '100px', '100px']}
-            >
+            <VStack w={'100%'} alignItems={'flex-start'} spacing={['40px', '60px', '80px', '80px']}>
                 <Banner />
                 <TextBloc
                     title={intro.title}

@@ -632,6 +632,9 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
 };
 
 const BatchOfferResponse = ({ res, loading }) => {
+    const [err, setErr] = useState(0);
+    const [succ, setSucc] = useState(0);
+
     return !loading ? (
         <>
             {res?.map((el) => {
