@@ -634,12 +634,15 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
 const BatchOfferResponse = ({ res, loading }) => {
     const [err, setErr] = useState(0);
     const [succ, setSucc] = useState(0);
+    const [kycWarn, setKycWarn] = useState(false);
 
     useEffect(() => {
         setSucc(0);
         setErr(0);
+        setKycWarn(false);
         res?.map((el) => {
             return el?.map((e, i) => {
+                e.err?.text && e.err?.text === 'kyc fail' && setKycWarn(true);
                 e.err && setErr((prev) => prev + 1);
                 e.ok && setSucc((prev) => prev + 1);
             });
@@ -648,8 +651,10 @@ const BatchOfferResponse = ({ res, loading }) => {
 
     const errorTexts = {
         'token is non-transferable': 'Token is non-transferable',
-        'kyc fail': `Your account hasn't been KYC'd and is not eligible to swap GLD NFT for GLDT. Please go to yumi.io to get verified.`,
+        'kyc fail': `Your account hasn't been KYC'd`,
     };
+
+    const KYCWarnText = `Your account hasn't been KYC'd and is not eligible to swap GLD NFT for GLDT. Please go to yumi.io to get verified.`;
 
     return !loading ? (
         <>
@@ -672,38 +677,43 @@ const BatchOfferResponse = ({ res, loading }) => {
                 ));
             })}
             <Text pt="20px">
-                <HStack>
-                    <Box
-                        height={'20px'}
-                        width={'20px'}
-                        bg="red.400"
-                        borderRadius={'20px'}
-                        display={'flex'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        color="white"
-                        fontSize={'12px'}
-                    >
-                        {err}
-                    </Box>
-                    <Text>Errors</Text>
-                </HStack>
-                <HStack>
-                    <Box
-                        height={'20px'}
-                        width={'20px'}
-                        bg="green.400"
-                        borderRadius={'20px'}
-                        display={'flex'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        color="white"
-                        fontSize={'12px'}
-                    >
-                        {succ}
-                    </Box>
-                    <Text>Success</Text>
-                </HStack>
+                {err > 0 && (
+                    <HStack>
+                        <Box
+                            height={'20px'}
+                            width={'20px'}
+                            bg="red.400"
+                            borderRadius={'20px'}
+                            display={'flex'}
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            color="white"
+                            fontSize={'12px'}
+                        >
+                            {err}
+                        </Box>
+                        <Text>Errors</Text>
+                    </HStack>
+                )}
+                {succ > 0 && (
+                    <HStack>
+                        <Box
+                            height={'20px'}
+                            width={'20px'}
+                            bg="green.400"
+                            borderRadius={'20px'}
+                            display={'flex'}
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            color="white"
+                            fontSize={'12px'}
+                        >
+                            {succ}
+                        </Box>
+                        <Text>NFTs successfully swap</Text>
+                    </HStack>
+                )}
+                {kycWarn && <Box pt="20px">{KYCWarnText}</Box>}
                 <Box pt="20px">
                     <Link
                         href={'/my-account'}
