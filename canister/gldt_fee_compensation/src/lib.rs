@@ -544,10 +544,12 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
     };
     let gldt_ledger_canister_id = CONF.with(|cell| cell.borrow().gldt_ledger_canister_id);
     let gldt_ledger_service = ICRC1_service(gldt_ledger_canister_id);
-    match gldt_ledger_service.icrc1_transfer(transfer_args).await {
+    match gldt_ledger_service.icrc1_transfer(transfer_args.clone()).await {
         Ok((Ok(v),)) => {
             // This is the happy path. All went well when we end up here.
-            log_message(format!("Successfully transferred GLDT. Message: {v:?}"));
+            log_message(
+                format!("Successfully transferred GLDT ({}). Message: {v:?}", transfer_args.amount)
+            );
             // update the entry in the registry
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
@@ -556,6 +558,12 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
         }
         Ok((Err(err),)) => {
             // update the entry in the registry with failed
+            log_message(
+                format!(
+                    "Failed to transfer GLDT ({}). Transfer Error : {err:?}",
+                    transfer_args.amount
+                )
+            );
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
                 registry.update_failed(
@@ -568,6 +576,12 @@ async fn transfer_compensation(key: (Account, String), entry: FeeRegistryEntry) 
             });
         }
         Err(msg) => {
+            log_message(
+                format!(
+                    "Failed to transfer GLDT ({}). Rejection code : {msg:?}",
+                    transfer_args.amount
+                )
+            );
             // update the entry in the registry with failed
             REGISTRY.with(|cell| {
                 let mut registry = cell.borrow_mut();
