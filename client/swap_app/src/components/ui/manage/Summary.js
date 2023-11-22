@@ -259,12 +259,24 @@ const Mynfts = ({ connected }) => {
                                             justifyContent={'space-between'}
                                             borderStartStartRadius={'md'}
                                         >
-                                            <Text fontSize={'16px'}>
-                                                {sortNfts(nfts)[weight].length > 0
-                                                    ? `GLD NFT ${weight}g`
-                                                    : `NO ${weight}g GLD NFT`}
-                                            </Text>
-
+                                            <HStack>
+                                                <Box
+                                                    as="span"
+                                                    display={'flex'}
+                                                    alignItems={'center'}
+                                                    justifyContent={'center'}
+                                                    height={'20px'}
+                                                    w={'20px'}
+                                                    bg={'secondaryText'}
+                                                    borderRadius={'20px'}
+                                                    color={'white'}
+                                                >
+                                                    <Text fontSize={'12px'}>
+                                                        {sortNfts(nfts)[weight].length}
+                                                    </Text>
+                                                </Box>
+                                                <Text fontSize={'16px'}>GLD NFT {weight}g</Text>
+                                            </HStack>
                                             {isLoading ? <Spinner size="md" /> : <AccordionIcon />}
                                         </HStack>
                                     </AccordionButton>
