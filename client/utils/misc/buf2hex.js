@@ -4,7 +4,7 @@ export const buf2hex = (buffer) => {
 
 export const  stringToUint8Array = (inputString) => {
 	if (inputString.length !== 64) {
-		throw new Error('Hex string must represent 32 bytes of data');
+		console.log('Hex string must represent 32 bytes of data');
 	}
 
 	const byteArray = new Uint8Array(32);
