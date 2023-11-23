@@ -11,7 +11,7 @@ const Banner = () => {
         } catch (e) {
             console.log('e', e);
         }
-    });
+    }, []);
     return (
         <Fade
             as="div"
@@ -34,6 +34,8 @@ const Banner = () => {
                             muted={true}
                             loop={true}
                             ref={videoRef}
+                            poster="/images/poster.png"
+                            onClick={() => videoRef.current.play()}
                         >
                             <source src="/gldt.mp4" type="video/mp4" />
                             Your browser does not support the video tag.
