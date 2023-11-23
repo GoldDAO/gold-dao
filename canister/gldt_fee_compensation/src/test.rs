@@ -105,7 +105,7 @@ fn test_export_2() {
     let right =
         json!({
         "registry": {
-            "2vxsx-fae-tmp": fee
+            "2vxsx-fae|tmp": fee
         },
         "configuration": {
             "compensation_factor": 10,
@@ -121,5 +121,61 @@ fn test_export_2() {
 
     let export = export_data();
 
+    assert_eq!(export, right);
+}
+
+// ------------------- Import -------------------
+
+#[test]
+fn test_import() {
+    let fee = FeeRegistryEntry {
+        amount: Nat::from(0),
+        block_height: None,
+        gld_nft_canister_id: Principal::anonymous(),
+        history_index: Nat::from(0),
+        status: registry::Status::Success,
+        timestamp: 0,
+        previous_entry: None,
+    };
+
+    let import =
+        json!({
+        "registry": {
+            "2vxsx-fae|tmp": fee
+        },
+        "configuration": {
+            "compensation_factor": 10,
+            "enabled":false,
+            "execution_delay_secs": 20,
+            "fallback_timer_interval_secs": 3600,
+            "gld_nft_canister_conf":[],
+            "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+            "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
+        },
+        "managers": [],
+    }).to_string();
+
+    let import = import_data(import);
+
+    let right =
+        json!({
+        "registry": {
+            "2vxsx-fae|tmp": fee
+        },
+        "configuration": {
+            "compensation_factor": 10,
+            "enabled":false,
+            "execution_delay_secs": 20,
+            "fallback_timer_interval_secs": 3600,
+            "gld_nft_canister_conf":[],
+            "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+            "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
+        },
+        "managers": [],
+    }).to_string();
+
+    let export = export_data();
+
+    assert_eq!(import, Ok(()));
     assert_eq!(export, right);
 }

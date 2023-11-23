@@ -1,9 +1,14 @@
-use candid::{ CandidType, Deserialize, Principal };
+use candid::{ CandidType, Principal };
 
+use ic_cdk::print;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::{ NumTokens, BlockIndex } };
 use std::collections::{ BTreeMap, btree_map };
 use serde::ser::{ Serialize, Serializer, SerializeMap };
+use serde::de::{ self, Deserialize, Deserializer, MapAccess, Visitor };
 use serde::Serialize as Serialize_default;
+use serde::Deserialize as Deserialize_default;
+use std::fmt;
+use std::marker::PhantomData;
 
 use gldt_libs::types::NftSaleId;
 
@@ -11,7 +16,7 @@ use crate::error::Custom as CustomError;
 use crate::Index;
 
 /// The registry that keeps track of which royalties have been compensated.
-#[derive(CandidType, Deserialize, Clone, Debug, Hash, Default)]
+#[derive(CandidType, Clone, Debug, Hash, Default)]
 pub struct Registry {
     pub registry: BTreeMap<(Account, NftSaleId), FeeRegistryEntry>,
 }
@@ -20,9 +25,52 @@ impl Serialize for Registry {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         let mut map = serializer.serialize_map(Some(self.registry.len()))?;
         for (k, v) in self.registry.clone() {
-            map.serialize_entry(&format!("{}-{}", k.0, k.1).clone(), &v)?;
+            map.serialize_entry(&format!("{}|{}", k.0, k.1).clone(), &v)?;
         }
         map.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for Registry {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        struct RegistryVisitor {
+            marker: PhantomData<fn() -> Registry>,
+        }
+
+        impl<'de> Visitor<'de> for RegistryVisitor {
+            type Value = Registry;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str(
+                    "Expecting example : \"registry\":{\"2vxsx-fae|tmp\":{\"amount\":[],\"block_height\":null,\"gld_nft_canister_id\":\"2vxsx-fae\",\"history_index\":[],\"previous_entry\":null,\"status\":\"Success\",\"timestamp\":0}}"
+                )
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Registry, V::Error> where V: MapAccess<'de> {
+                let mut my_map = BTreeMap::new();
+                while let Some((key, value)) = map.next_entry::<String, FeeRegistryEntry>()? {
+                    let parts: Vec<&str> = key.splitn(2, '|').collect();
+
+                    if parts.len() != 2 {
+                        return Err(
+                            de::Error::invalid_value(
+                                de::Unexpected::Str(&key),
+                                &"a key with format 'account-nftSaleId'"
+                            )
+                        );
+                    }
+
+                    let account = parts[0].parse::<Account>().map_err(de::Error::custom)?;
+                    let nft_sale_id = parts[1].to_owned();
+
+                    let tuple = (account, nft_sale_id);
+                    my_map.insert(tuple, value);
+                }
+                Ok(Registry { registry: my_map })
+            }
+        }
+
+        deserializer.deserialize_map(RegistryVisitor { marker: PhantomData })
     }
 }
 
@@ -72,7 +120,7 @@ impl Registry {
 }
 
 /// The status of the registry entry to avoid double compensation.
-#[derive(CandidType, Serialize_default, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum Status {
     Success,
     Failed(CustomError),
@@ -80,7 +128,7 @@ pub enum Status {
 }
 
 /// Entry into the registry allows to keep a record of which fees have been compensated.
-#[derive(CandidType, Serialize_default, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct FeeRegistryEntry {
     /// The amount of GLDT compensated
     pub amount: NumTokens,
