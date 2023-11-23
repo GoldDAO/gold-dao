@@ -8,7 +8,7 @@ import {
     StatLabel,
     StatNumber,
 } from '@chakra-ui/react';
-import useTotalSupply from '@utils/hooks/useTotalSupply';
+import useTotalSupply from '@utils/hooks/gldtLedger/useTotalSupply';
 import Link from 'next/link';
 import React from 'react';
 

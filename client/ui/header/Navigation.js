@@ -16,7 +16,7 @@ import {
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import C2icButton from '@/components/c2ic/C2icButton';
 import Link from 'next/link';
-import Logo from '/public/images/logo.svg';
+import Logo from '@ui/assets/logo.svg';
 import Image from 'next/image';
 import { useConnect } from '@connect2ic/react';
 import React from 'react';

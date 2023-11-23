@@ -27,16 +27,19 @@ import Timestamp from '@ui/tooltip/timeStamp';
 import TokenSign from '@ui/gldt/TokenSign';
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import AccountTitle from './AccountTitle';
-import { buf2hex } from '@utils/misc/buf2hex';
+import { buf2hex, stringToUint8Array } from '@utils/misc/buf2hex';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Principal } from '@dfinity/principal';
 import GridSystem from '@ui/layout/GridSystem';
 import Title from '../layout/Title';
 import TableTitle from '../layout/TableTitle';
+import CopyPrincipal from '@ui/gldt/CopyPrincipal';
 
 const AccountContent = ({ id, subAccount }) => {
     const [currentPage, setCurrentPage] = useState(0);
+    const router = useRouter();
+    const subaccountParam = router.query.subaccount;
     const [currentSub, setCurrentSub] = useState();
     const [index, setIndex] = useState({
         last: null,
@@ -44,18 +47,16 @@ const AccountContent = ({ id, subAccount }) => {
     });
     const [action, setAction] = useState();
     const [i, seti] = useState([[]]);
-    const { history, isLoading } = useHistory(id, currentPage, currentSub, i);
+    const { history, isLoading } = useHistory(id, currentPage, router.query.subaccount, i);
     const { subaccounts } = useSubaccounts(id);
-    const { balance } = useBalance(id, currentSub ? currentSub : subAccount);
-    const router = useRouter();
+    const [balance, setBalance] = useState(0);
+    const thead = ['tx', 'Type', 'Date', 'GLDT amount', 'From', 'To'];
+    const oldest = history?.history?.Ok?.oldest_tx_id[0];
 
     useEffect(() => {
         if (history?.Ok?.transactions[history?.Ok?.transactions?.length - 1]?.id) {
             i.push(parseInt(history?.Ok?.transactions[history.Ok.transactions.length - 1].id));
         }
-    }, [history]);
-
-    useEffect(() => {
         if (history?.Ok?.transactions.length > 0) {
             setIndex({
                 last: history?.Ok?.transactions[history.Ok.transactions.length - 1].id,
@@ -67,14 +68,17 @@ const AccountContent = ({ id, subAccount }) => {
     const toggleChange = (e) => {
         setCurrentSub(e.target.value);
     };
-
     useEffect(() => {
         if (currentSub) {
             router.push(`/account/${id}?subaccount=${currentSub}`);
         }
-    }, [currentSub, id, router]);
-    const thead = ['tx', 'Type', 'Date', 'GLDT amount', 'From', 'To'];
+    }, [currentSub, id]);
 
+    useEffect(() => {
+        if (history) {
+            setBalance(history.history.Ok.balance);
+        }
+    }, [history]);
     return (
         <GridSystem gap={['0px', '0px', '20px']}>
             <Title title="GLDT" subTitle={'Account'} />
@@ -95,24 +99,27 @@ const AccountContent = ({ id, subAccount }) => {
                 gridColumn={['1/12', '1/12', '1/6']}
                 alignSelf={['flex-start', 'flex-start', 'flex-end']}
             >
-                <VStack alignItems={'flex-start'}>
-                    <Text color={'blackAlpha.600'} fontSize={'14px'}>
-                        Subaccounts
-                    </Text>
-                    <Select
-                        size="md"
-                        width={['100%', '100%']}
-                        onChange={toggleChange}
-                        placeholder={subAccount}
-                        value={currentSub}
-                    >
-                        {subaccounts.map((e, i) => (
-                            <option key={i} value={buf2hex(e)}>
-                                {parseInt(buf2hex(e)) === 0 ? 'Default (0)' : buf2hex(e)}
-                            </option>
-                        ))}
-                    </Select>
-                </VStack>
+                <HStack alignItems={'center'} justifyContent={'flex-start'}>
+                    <VStack w={'100%'} alignItems={'flex-start'} justifyContent={'center'}>
+                        <Text color={'blackAlpha.600'} fontSize={'14px'}>
+                            Subaccounts
+                        </Text>
+                        <Select
+                            size="md"
+                            width={['100%', '100%']}
+                            onChange={toggleChange}
+                            placeholder={subAccount}
+                            value={currentSub}
+                        >
+                            {subaccounts.map((e, i) => (
+                                <option key={i} value={buf2hex(e)}>
+                                    {parseInt(buf2hex(e)) === 0 ? 'Default (0)' : buf2hex(e)}
+                                </option>
+                            ))}
+                        </Select>
+                    </VStack>
+                    <CopyPrincipal text={currentSub || router.query.subaccount || ''} />
+                </HStack>
             </GridItem>
             <GridItem gridColumn={['1/12', '1/12', '1/6']}>
                 <VStack alignItems={'flex-start'}>
@@ -125,7 +132,6 @@ const AccountContent = ({ id, subAccount }) => {
                     </HStack>
                 </VStack>
             </GridItem>
-
             <TableTitle title={'History'} />
             <GridItem gridColumn={['1/13', '1/13', '1/13']}>
                 <TableContainer width={'100%'} m="0 auto" p="20px" bg="bg" borderRadius={'md'}>
@@ -150,82 +156,110 @@ const AccountContent = ({ id, subAccount }) => {
                                 </Tr>
                             </Thead>
                             <Tbody fontSize={'14px'}>
-                                {history?.Ok?.transactions.length < 1 && (
+                                {history?.history?.Ok?.transactions.length < 1 && (
                                     <Tr>
                                         <Td>No Transaction</Td>
                                     </Tr>
                                 )}
                                 {!isLoading ? (
-                                    history?.Ok?.transactions?.map((e, i) => {
+                                    history?.history?.Ok?.transactions?.map((e, i) => {
+                                        const from =
+                                            e.transaction[e.transaction.kind][0].from || '';
+                                        const to = e.transaction[e.transaction.kind][0].to || '';
+                                        const id = parseInt(e.id) || '';
+                                        const kind = e.transaction.kind || '';
+                                        const timestamp = e.transaction.timestamp || '';
+                                        const amt =
+                                            e.transaction[e.transaction.kind][0].amount || '';
+                                        console.log('from', from);
+                                        console.log('to', to);
                                         return (
                                             <Tr key={i}>
                                                 <Td>
-                                                    <Link href={`/transaction/${e.id}`}>
-                                                        {parseInt(e.id)}
-                                                    </Link>
+                                                    <Link href={`/transaction/${id}`}>{id}</Link>
                                                 </Td>
-                                                <Td>{e.transaction.kind}</Td>
+                                                <Td>{kind}</Td>
                                                 <Td>
-                                                    <Timestamp
-                                                        timestamp={parseInt(
-                                                            e.transaction.timestamp,
-                                                        )}
-                                                    />
+                                                    <Timestamp timestamp={parseInt(timestamp)} />
                                                 </Td>
                                                 <Td>
                                                     <HStack>
                                                         <Text fontSize={'14px'}>
-                                                            {formatAmount(
-                                                                e.transaction.transfer[0].amount,
-                                                            )}
+                                                            {formatAmount(amt)}
                                                         </Text>
                                                         <TokenSign />
                                                     </HStack>
                                                 </Td>
+
                                                 <Td>
-                                                    <Link
-                                                        href={`/account/${Principal.fromUint8Array(
-                                                            e.transaction.transfer[0].from.owner
-                                                                ._arr,
-                                                        ).toString()}`}
-                                                    >
-                                                        <PrincipalFormat
-                                                            principal={Principal.fromUint8Array(
-                                                                e.transaction.transfer[0].from.owner
-                                                                    ._arr,
-                                                            ).toString()}
-                                                        />
-                                                        {e.transaction.transfer[0].from.subaccount
-                                                            .length > 0 && (
-                                                            <Box
-                                                                fontSize={'14px'}
-                                                                mt="-10px"
-                                                                color={'secondaryText'}
-                                                            >
-                                                                <PrincipalFormat
-                                                                    nobtn={true}
-                                                                    principal={Principal.fromUint8Array(
-                                                                        e.transaction.transfer[0]
-                                                                            .from.subaccount,
-                                                                    ).toString()}
-                                                                />
-                                                            </Box>
-                                                        )}
-                                                    </Link>
+                                                    {from?.owner?._arr && (
+                                                        <Link
+                                                            href={`/account/${Principal.fromUint8Array(
+                                                                from.owner._arr,
+                                                            ).toString()}${
+                                                                from.subaccount.length > 0
+                                                                    ? `?subaccount=${buf2hex(
+                                                                          from.subaccount[0],
+                                                                      )}`
+                                                                    : ''
+                                                            }`}
+                                                        >
+                                                            <PrincipalFormat
+                                                                principal={Principal.fromUint8Array(
+                                                                    from.owner._arr,
+                                                                ).toString()}
+                                                            />
+                                                            {from.subaccount.length > 0 && (
+                                                                <Box
+                                                                    fontSize={'14px'}
+                                                                    mt="-10px"
+                                                                    color={'secondaryText'}
+                                                                >
+                                                                    <PrincipalFormat
+                                                                        nobtn={true}
+                                                                        principal={buf2hex(
+                                                                            from.subaccount[0],
+                                                                        )}
+                                                                    />
+                                                                </Box>
+                                                            )}
+                                                        </Link>
+                                                    )}
                                                 </Td>
                                                 <Td>
-                                                    <Link
-                                                        href={`/account/${Principal.fromUint8Array(
-                                                            e.transaction.transfer[0].to.owner._arr,
-                                                        ).toString()}`}
-                                                    >
-                                                        <PrincipalFormat
-                                                            principal={Principal.fromUint8Array(
-                                                                e.transaction.transfer[0].to.owner
-                                                                    ._arr,
-                                                            ).toString()}
-                                                        />
-                                                    </Link>
+                                                    {to?.owner?._arr && (
+                                                        <Link
+                                                            href={`/account/${Principal.fromUint8Array(
+                                                                to.owner._arr,
+                                                            ).toString()}${
+                                                                to.subaccount.length > 0
+                                                                    ? `?subaccount=${buf2hex(
+                                                                          to.subaccount[0],
+                                                                      )}`
+                                                                    : ''
+                                                            }`}
+                                                        >
+                                                            <PrincipalFormat
+                                                                principal={Principal.fromUint8Array(
+                                                                    to.owner._arr,
+                                                                ).toString()}
+                                                            />
+                                                            {to.subaccount.length > 0 && (
+                                                                <Box
+                                                                    fontSize={'14px'}
+                                                                    mt="-10px"
+                                                                    color={'secondaryText'}
+                                                                >
+                                                                    <PrincipalFormat
+                                                                        nobtn={true}
+                                                                        principal={buf2hex(
+                                                                            to.subaccount[0],
+                                                                        )}
+                                                                    />
+                                                                </Box>
+                                                            )}
+                                                        </Link>
+                                                    )}
                                                 </Td>
                                             </Tr>
                                         );
@@ -251,11 +285,17 @@ const AccountContent = ({ id, subAccount }) => {
                             </Tbody>
                         </Table>
                     </Box>
-                    {history?.Ok?.transactions.length > 0 && (
+                    {history?.history?.Ok?.transactions.length > 0 && (
                         <Pagination
                             currentHistoryPage={currentPage}
                             setCurrentHistoryPage={setCurrentPage}
                             setAction={setAction}
+                            oldest={oldest}
+                            last={
+                                history?.history?.Ok?.transactions[
+                                    history?.history?.Ok?.transactions.length - 1
+                                ]
+                            }
                         />
                     )}
                 </TableContainer>
@@ -266,7 +306,8 @@ const AccountContent = ({ id, subAccount }) => {
 
 export default AccountContent;
 
-const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setAction }) => {
+const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, oldest, setAction, last }) => {
+    console.log('oldest', oldest);
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>
@@ -292,7 +333,7 @@ const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, total, setActio
                     _hover={{
                         bg: 'border',
                     }}
-                    // isDisabled={total / (currentHistoryPage + 1) < 10}
+                    isDisabled={last.id === oldest}
                     onClick={() => {
                         setCurrentHistoryPage((prev) => prev + 1);
                         setAction(+1);

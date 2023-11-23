@@ -1,12 +1,16 @@
-import { Box, Button, Divider, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
-import React from 'react';
+import { Box, Button, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
+import React, { useEffect, useRef } from 'react';
 import GridSystem from '../layout/Grid';
-import Scene from './scene/Scene';
 import { Fade } from 'react-awesome-reveal';
-import dynamic from 'next/dynamic';
+import Link from 'next/link';
 const Banner = () => {
-    const Stats = dynamic(() => import('@/components/stats/Stats'), {
-        ssr: false,
+    const videoRef = useRef();
+    useEffect(() => {
+        try {
+            videoRef.current.play();
+        } catch (e) {
+            console.log('e', e);
+        }
     });
     return (
         <Fade
@@ -15,103 +19,61 @@ const Banner = () => {
                 width: '100%',
             }}
         >
-            <Box minH={'70vh'} overflowX={'hidden'}>
+            <Box overflowX={'hidden'} height={'fit-content'}>
                 <GridSystem gap={[0, 0, 8]}>
-                    <GridItem colStart={[1, 1, 1, 1, 2]} colEnd={[13, 13, 8, 8, 8]}>
-                        <Heading as="h1" variant="h1" textAlign={['center', 'center', 'left']}>
-                            GLDT
-                        </Heading>
-                        <Heading as="h2" variant="h2" textAlign={['center', 'center', 'left']}>
-                            The future of owning physical gold
-                        </Heading>
+                    <GridItem
+                        colSpan={[12, 12, 12, 5, 6]}
+                        alignSelf={['center', 'center', 'center', 'flex-start']}
+                        justifySelf={['center', 'center', 'center', 'flex-start']}
+                        order={[2, 2, 2, -1]}
+                    >
+                        <video
+                            playsinline={true}
+                            autoplay={true}
+                            autoPlay={true}
+                            muted={true}
+                            loop={true}
+                            ref={videoRef}
+                        >
+                            <source src="/gldt.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
                     </GridItem>
                     <GridItem
-                        colStart={[1, 1, 9, 9, 9]}
-                        colEnd={12}
-                        height={['150px', '150px', '0', '0', '0']}
-                        position={'relative'}
-                        margin={['0 auto', '0 auto', 0]}
-                        mt={['30px', '30px', 0]}
-                        mb={['20px', '20px', 0]}
-                        right={['-20px', '-20px', '0', '50px', '50px']}
+                        colStart={[1, 1, 1, 6, 7]}
+                        colEnd={[13, 13]}
+                        alignSelf={'center'}
+                        justifyContent={['center']}
                     >
-                        <Box
-                            height={['250px', '250px', '300px', '400px', '400px']}
-                            w={['250px', '250px', '300px', '400px', '400px']}
-                            top={['-50px']}
-                            position="relative"
-                            zIndex={-1}
+                        <Heading
+                            as="h1"
+                            variant="h1"
+                            textAlign={['center', 'center', 'center', 'left']}
                         >
-                            <Scene />
+                            GLDT,
+                        </Heading>
+                        <Heading
+                            as="h2"
+                            variant="h2"
+                            textAlign={['center', 'center', 'center', 'left']}
+                        >
+                            The future of owning physical gold,
+                        </Heading>
+                        <Box
+                            width={'100%'}
+                            display={'flex'}
+                            justifyContent={['center', 'center', 'center', 'flex-start']}
+                        >
+                            <Button
+                                as={Link}
+                                href="/FAQ"
+                                variant="yumi"
+                                mt="30px"
+                                px={['20px', '20px', '40px']}
+                            >
+                                Read our F.A.Q .
+                            </Button>
                         </Box>
-                    </GridItem>
-                    <GridItem colSpan={12}>
-                        <GridSystem gap={['0px', '0px', 8]}>
-                            <GridItem
-                                colSpan={[0, 0, 3, 2]}
-                                alignSelf={'center'}
-                                colStart={[0, 0, 1, 1, 2]}
-                            >
-                                <Divider
-                                    orientation="horizontal"
-                                    borderColor={'black'}
-                                    display={['none', 'none', 'block']}
-                                />
-                            </GridItem>
-                            <GridItem
-                                colSpan={[12, 12, 6, 4, 3]}
-                                colStart={[1, 1, 4]}
-                                alignSelf={'center'}
-                                py={['20px', '20px', 0]}
-                            >
-                                <HStack
-                                    fontSize={'20px'}
-                                    justifyContent={['center', 'center', 'flex-start']}
-                                >
-                                    <Text width={'fit-content'} fontSize={'20px'}>
-                                        Learn&nbsp;how
-                                    </Text>
-                                    <Text
-                                        fontSize={'20px'}
-                                        as="span"
-                                        color="gold"
-                                        w={'fit-content'}
-                                    >
-                                        <strong style={{ color: 'inherit' }}>GLDT</strong>
-                                    </Text>
-                                    <Text paddingRight="10px" fontSize={'20px'}>
-                                        works
-                                    </Text>
-                                    <Divider
-                                        orientation="horizontal"
-                                        borderColor={'black'}
-                                        width={'150px'}
-                                        alignItems={'center'}
-                                        justifyContent={'flex-end'}
-                                        display={['none', 'none', 'flex']}
-                                        sx={{
-                                            _before: {
-                                                borderTop: '4px solid transparent',
-                                                borderBottom: '4px solid transparent',
-                                                borderLeft: '8px solid #000',
-                                                marginTop: '1px',
-                                                opacity: 1,
-                                                content: "''",
-                                            },
-                                        }}
-                                    />
-                                </HStack>
-                            </GridItem>
-
-                            <GridItem colSpan={[12, 12, 3, 3, 2]} colStart={[]}>
-                                <Button variant="yumi" w={'100%'} maxWidth={'auto'}>
-                                    Play Video
-                                </Button>
-                            </GridItem>
-                        </GridSystem>
-                    </GridItem>
-                    <GridItem colStart={[1, 1, 1, 1, 4]} colEnd={[12]}>
-                        <Stats />
                     </GridItem>
                 </GridSystem>
             </Box>

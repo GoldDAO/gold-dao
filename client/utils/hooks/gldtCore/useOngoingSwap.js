@@ -58,7 +58,7 @@ const useOngoingSwaps = (repeat, page) => {
 		if (interval) {
 			return () => clearInterval(interval);
 		}
-	}, [loop]);
+	}, [loop, principal]);
 	return { ongoing, isLoading };
 };
 

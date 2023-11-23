@@ -48,15 +48,15 @@ export const customTheme = {
 					fontFamily: inter.style.fontFamily ,
 				},
 				h1: {
-					fontSize: ['46px' ,'56px', '60px', '76px', '78px'],
-					lineHeight:[ '48px', '68px', '68px', '74px',  '90px'],
+					fontSize: ['46px' ,'56px', '60px', '60px', '74px', ],
+					lineHeight:[ '48px', '60px', '68px', '68px','80px', ],
 					fontWeight: 500,
 					color: 'gold',
 					fontFamily: inter.style.fontFamily ,
 				},
 				h2: {
-					fontSize: ['46px' ,'56px', '60px', '76px', '78px'],
-					lineHeight:[ '48px', '68px', '68px', '74px', '90px'],
+					fontSize: ['46px' ,'56px', '60px', '60px','74px', ],
+					lineHeight:[ '48px', '60px', '68px', '68px','80px',],
 					fontWeight: 500,
 					fontFamily: inter.style.fontFamily ,
 				}

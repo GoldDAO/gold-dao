@@ -1,8 +1,8 @@
 import { Box, Card, GridItem, HStack, Heading, Stack, Text } from '@chakra-ui/react';
 import React from 'react';
-import { useNft } from '@utils/hooks/useNFTs';
+import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
-import { useTotalSupply } from '@utils/hooks/useTotalSupply';
+import { useTotalSupply } from '@utils/hooks/gldtLedger/useTotalSupply';
 import TokenSign from '@ui/gldt/TokenSign';
 import { cardPadding } from '@ui/theme';
 import Layout from '../layout/Layout';

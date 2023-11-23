@@ -47,7 +47,7 @@ import {
     removeCartItemByIdAtom,
 } from '@/atoms/cart';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
-import { useNft } from '@utils/hooks/useNFTs';
+import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAtom } from 'jotai';
 import { useConnect } from '@connect2ic/react';
 import { sendBatchOffer } from '@utils/queries/sendBatchOffer';
@@ -242,9 +242,10 @@ const OutputOverview = ({ isConnected }) => {
             borderColor="border"
             borderEndStartRadius={0}
             borderEndEndRadius={0}
+            h="60px"
         >
-            <CardBody>
-                <HStack justifyContent="space-between">
+            <CardBody py="0">
+                <HStack justifyContent="space-between" alignItems={'center'} height={'100%'}>
                     <Box color={'secondaryText'}>You will receive</Box>
                     <HStack color={'secondaryText'}>
                         <Text>{minted.toString()}</Text>&nbsp;
@@ -520,6 +521,7 @@ const SelectedNfts = ({ isConnected }) => {
     return (
         <Card
             shadow="none"
+            h="60px"
             border="1px"
             borderColor="border"
             borderTopStartRadius={0}
@@ -632,36 +634,99 @@ const ConfirmationDialog = ({ isOpen, onClose }) => {
 };
 
 const BatchOfferResponse = ({ res, loading }) => {
+    const [err, setErr] = useState(0);
+    const [succ, setSucc] = useState(0);
+    const [kycWarn, setKycWarn] = useState(false);
+
+    useEffect(() => {
+        setSucc(0);
+        setErr(0);
+        setKycWarn(false);
+        res?.map((el) => {
+            return el?.map((e, i) => {
+                e.err?.text && e.err?.text === 'kyc fail' && setKycWarn(true);
+                e.err && setErr((prev) => prev + 1);
+                e.ok && setSucc((prev) => prev + 1);
+            });
+        });
+    }, [res]);
+
+    const errorTexts = {
+        'token is non-transferable': 'Token is non-transferable',
+        'kyc fail': `Your account hasn't been KYC'd`,
+    };
+
+    const KYCWarnText = `Your account hasn't been KYC'd and is not eligible to swap GLD NFT for GLDT. Please go to yumi.io to get verified.`;
+
     return !loading ? (
         <>
             {res?.map((el) => {
                 return el?.map((e, i) => (
-                    <Box pb={'20px'} key={i}>
+                    <Box key={i}>
                         {e.ok && (
                             <HStack>
-                                <CheckCircleIcon color="green.300" />
+                                <CheckCircleIcon color="green.400" />
                                 <Text>{e.ok?.token_id}</Text>
                             </HStack>
                         )}
                         {e.err && (
                             <HStack>
-                                <WarningIcon color="red.300" />
-                                <Text>{e.err?.text}</Text>
+                                <WarningIcon color="red.400" />
+                                <Text>{errorTexts[e.err?.text] || e.err?.text}</Text>
                             </HStack>
                         )}
                     </Box>
                 ));
             })}
-            <Text>
-                Swap request successfully sent. You can follow the progress on your&nbsp;
-                <Link
-                    href={'/my-account'}
-                    style={{
-                        textDecoration: 'underline',
-                    }}
-                >
-                    Account Page
-                </Link>
+            <Text pt="20px">
+                {err > 0 && (
+                    <HStack>
+                        <Box
+                            height={'20px'}
+                            width={'20px'}
+                            bg="red.400"
+                            borderRadius={'20px'}
+                            display={'flex'}
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            color="white"
+                            fontSize={'12px'}
+                        >
+                            {err}
+                        </Box>
+                        <Text>Errors</Text>
+                    </HStack>
+                )}
+                {succ > 0 && (
+                    <HStack>
+                        <Box
+                            height={'20px'}
+                            width={'20px'}
+                            bg="green.400"
+                            borderRadius={'20px'}
+                            display={'flex'}
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            color="white"
+                            fontSize={'12px'}
+                        >
+                            {succ}
+                        </Box>
+                        <Text>NFTs successfully swap</Text>
+                    </HStack>
+                )}
+                {kycWarn && <Box pt="20px">{KYCWarnText}</Box>}
+                <Box pt="20px">
+                    <Link
+                        href={'/my-account'}
+                        style={{
+                            textDecoration: 'underline',
+                            marginTop: '20px',
+                        }}
+                    >
+                        Account Page
+                    </Link>
+                </Box>
             </Text>
         </>
     ) : (
