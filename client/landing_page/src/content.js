@@ -9,7 +9,7 @@ export const content = {
     intro: {
         title: 'A token backed 100% by physical gold',
         content:
-            'GLDT is a fractionable token backed by insured physical gold securely stored in Swiss vaults and thoroughly audited. Users can buy gold certificates (referred to as GLD NFTs) via the Yumi marketplace. These certificates can then be exchanged for GLDT tokens using the swap app. For example, a certificate representing 1 gram of gold can be swapped for 100 GLDT tokens. Essentially, each GLDT represents a fractional share of actual physical gold, making it more liquid.This enables trading gold outside the traditional banking system.',
+            'GLDT is a fractionable token backed by insured physical gold securely stored in Swiss vaults and thoroughly audited. Users can buy gold certificates (referred to as GLD NFTs) via the Yumi marketplace. These certificates can then be exchanged for GLDT tokens using the swap app. For example, a certificate representing 1 gram of gold can be swapped for 100 GLDT tokens. Essentially, each GLDT represents a fractional share of actual physical gold, making it more liquid. This enables trading gold outside the traditional banking system.',
     },
     partners: [
         {

@@ -163,6 +163,7 @@ const AccountContent = ({ id, subAccount }) => {
                                 )}
                                 {!isLoading ? (
                                     history?.history?.Ok?.transactions?.map((e, i) => {
+                                        console.log('e', e);
                                         const from =
                                             e.transaction[e.transaction.kind][0].from || '';
                                         const to = e.transaction[e.transaction.kind][0].to || '';
@@ -171,8 +172,7 @@ const AccountContent = ({ id, subAccount }) => {
                                         const timestamp = e.transaction.timestamp || '';
                                         const amt =
                                             e.transaction[e.transaction.kind][0].amount || '';
-                                        console.log('from', from);
-                                        console.log('to', to);
+
                                         return (
                                             <Tr key={i}>
                                                 <Td>
@@ -192,74 +192,92 @@ const AccountContent = ({ id, subAccount }) => {
                                                 </Td>
 
                                                 <Td>
-                                                    {from?.owner?._arr && (
-                                                        <Link
-                                                            href={`/account/${Principal.fromUint8Array(
-                                                                from.owner._arr,
-                                                            ).toString()}${
-                                                                from.subaccount.length > 0
-                                                                    ? `?subaccount=${buf2hex(
-                                                                          from.subaccount[0],
-                                                                      )}`
-                                                                    : ''
-                                                            }`}
-                                                        >
-                                                            <PrincipalFormat
-                                                                principal={Principal.fromUint8Array(
+                                                    <HStack>
+                                                        {from?.owner?._arr && from !== '' && (
+                                                            <Link
+                                                                href={`/account/${Principal.fromUint8Array(
                                                                     from.owner._arr,
-                                                                ).toString()}
+                                                                ).toString()}${
+                                                                    from.subaccount.length > 0
+                                                                        ? `?subaccount=${buf2hex(
+                                                                              from.subaccount[0],
+                                                                          )}`
+                                                                        : ''
+                                                                }`}
+                                                            >
+                                                                <PrincipalFormat
+                                                                    nobtn
+                                                                    principal={Principal.fromUint8Array(
+                                                                        from.owner._arr,
+                                                                    ).toString()}
+                                                                />
+                                                                {from.subaccount.length > 0 && (
+                                                                    <Box
+                                                                        fontSize={'14px'}
+                                                                        color={'secondaryText'}
+                                                                    >
+                                                                        <PrincipalFormat
+                                                                            nobtn={true}
+                                                                            principal={buf2hex(
+                                                                                from.subaccount[0],
+                                                                            )}
+                                                                        />
+                                                                    </Box>
+                                                                )}
+                                                            </Link>
+                                                        )}
+                                                        {from !== '' && (
+                                                            <CopyPrincipal
+                                                                text={Principal.fromUint8Array(
+                                                                    from.owner._arr,
+                                                                )}
                                                             />
-                                                            {from.subaccount.length > 0 && (
-                                                                <Box
-                                                                    fontSize={'14px'}
-                                                                    mt="-10px"
-                                                                    color={'secondaryText'}
-                                                                >
-                                                                    <PrincipalFormat
-                                                                        nobtn={true}
-                                                                        principal={buf2hex(
-                                                                            from.subaccount[0],
-                                                                        )}
-                                                                    />
-                                                                </Box>
-                                                            )}
-                                                        </Link>
-                                                    )}
+                                                        )}
+                                                    </HStack>
                                                 </Td>
                                                 <Td>
-                                                    {to?.owner?._arr && (
-                                                        <Link
-                                                            href={`/account/${Principal.fromUint8Array(
-                                                                to.owner._arr,
-                                                            ).toString()}${
-                                                                to.subaccount.length > 0
-                                                                    ? `?subaccount=${buf2hex(
-                                                                          to.subaccount[0],
-                                                                      )}`
-                                                                    : ''
-                                                            }`}
-                                                        >
-                                                            <PrincipalFormat
-                                                                principal={Principal.fromUint8Array(
+                                                    <HStack>
+                                                        {to?.owner?._arr && to !== '' && (
+                                                            <Link
+                                                                href={`/account/${Principal.fromUint8Array(
                                                                     to.owner._arr,
-                                                                ).toString()}
+                                                                ).toString()}${
+                                                                    to.subaccount.length > 0
+                                                                        ? `?subaccount=${buf2hex(
+                                                                              to.subaccount[0],
+                                                                          )}`
+                                                                        : ''
+                                                                }`}
+                                                            >
+                                                                <PrincipalFormat
+                                                                    nobtn
+                                                                    principal={Principal.fromUint8Array(
+                                                                        to.owner._arr,
+                                                                    ).toString()}
+                                                                />
+                                                                {to.subaccount.length > 0 && (
+                                                                    <Box
+                                                                        fontSize={'14px'}
+                                                                        color={'secondaryText'}
+                                                                    >
+                                                                        <PrincipalFormat
+                                                                            nobtn={true}
+                                                                            principal={buf2hex(
+                                                                                to.subaccount[0],
+                                                                            )}
+                                                                        />
+                                                                    </Box>
+                                                                )}
+                                                            </Link>
+                                                        )}
+                                                        {to !== '' && (
+                                                            <CopyPrincipal
+                                                                text={Principal.fromUint8Array(
+                                                                    to.owner._arr,
+                                                                )}
                                                             />
-                                                            {to.subaccount.length > 0 && (
-                                                                <Box
-                                                                    fontSize={'14px'}
-                                                                    mt="-10px"
-                                                                    color={'secondaryText'}
-                                                                >
-                                                                    <PrincipalFormat
-                                                                        nobtn={true}
-                                                                        principal={buf2hex(
-                                                                            to.subaccount[0],
-                                                                        )}
-                                                                    />
-                                                                </Box>
-                                                            )}
-                                                        </Link>
-                                                    )}
+                                                        )}
+                                                    </HStack>
                                                 </Td>
                                             </Tr>
                                         );
