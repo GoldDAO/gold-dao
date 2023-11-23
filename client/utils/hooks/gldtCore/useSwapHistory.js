@@ -33,7 +33,7 @@ const useSwapHistory = (page, limit, id) => {
 				});
 		};
 		fetchHistory();
-	}, [page, limit]);
+	}, [page, limit, principal]);
 	console.log('history-useSwapHistory', history);
 	return { history, isLoading };
 };

@@ -242,9 +242,10 @@ const OutputOverview = ({ isConnected }) => {
             borderColor="border"
             borderEndStartRadius={0}
             borderEndEndRadius={0}
+            h="60px"
         >
-            <CardBody>
-                <HStack justifyContent="space-between">
+            <CardBody py="0">
+                <HStack justifyContent="space-between" alignItems={'center'} height={'100%'}>
                     <Box color={'secondaryText'}>You will receive</Box>
                     <HStack color={'secondaryText'}>
                         <Text>{minted.toString()}</Text>&nbsp;
@@ -520,6 +521,7 @@ const SelectedNfts = ({ isConnected }) => {
     return (
         <Card
             shadow="none"
+            h="60px"
             border="1px"
             borderColor="border"
             borderTopStartRadius={0}
