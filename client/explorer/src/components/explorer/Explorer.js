@@ -158,7 +158,7 @@ const Explorer = () => {
                                                 <Td>{type}</Td>
                                                 <Td>
                                                     <Text fontSize={'14px'}>
-                                                        {formatAmount(amt)}
+                                                        {formatAmount(amt, 4)}
                                                     </Text>
                                                     <TokenSign />
                                                 </Td>
