@@ -1,8 +1,9 @@
 use candid::{ CandidType, Deserialize, Principal };
 
 use icrc_ledger_types::icrc1::{ account::Account, transfer::{ NumTokens, BlockIndex } };
-use serde::Serialize;
 use std::collections::{ BTreeMap, btree_map };
+use serde::ser::{ Serialize, Serializer, SerializeMap };
+use serde::Serialize as Serialize_default;
 
 use gldt_libs::types::NftSaleId;
 
@@ -10,9 +11,19 @@ use crate::error::Custom as CustomError;
 use crate::Index;
 
 /// The registry that keeps track of which royalties have been compensated.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
+#[derive(CandidType, Deserialize, Clone, Debug, Hash, Default)]
 pub struct Registry {
-    registry: BTreeMap<(Account, NftSaleId), FeeRegistryEntry>,
+    pub registry: BTreeMap<(Account, NftSaleId), FeeRegistryEntry>,
+}
+
+impl Serialize for Registry {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        let mut map = serializer.serialize_map(Some(self.registry.len()))?;
+        for (k, v) in self.registry.clone() {
+            map.serialize_entry(&format!("{}-{}", k.0, k.1).clone(), &v)?;
+        }
+        map.end()
+    }
 }
 
 impl Registry {
@@ -61,7 +72,7 @@ impl Registry {
 }
 
 /// The status of the registry entry to avoid double compensation.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub enum Status {
     Success,
     Failed(CustomError),
@@ -69,7 +80,7 @@ pub enum Status {
 }
 
 /// Entry into the registry allows to keep a record of which fees have been compensated.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize, Clone, Debug, Hash, PartialEq)]
 pub struct FeeRegistryEntry {
     /// The amount of GLDT compensated
     pub amount: NumTokens,
