@@ -72,7 +72,7 @@ fn test_export() {
         "managers": [],
     }).to_string();
 
-    let export = export_data();
+    let export = fetch_metadata();
 
     assert_eq!(export, right);
 }
@@ -119,7 +119,7 @@ fn test_export_2() {
         "managers": [],
     }).to_string();
 
-    let export = export_data();
+    let export = fetch_metadata();
 
     assert_eq!(export, right);
 }
@@ -174,8 +174,25 @@ fn test_import() {
         "managers": [],
     }).to_string();
 
-    let export = export_data();
+    let export = fetch_metadata();
 
-    assert_eq!(import, Ok(()));
+    assert_eq!(
+        import,
+        Ok(
+            json!({
+        "registry": {},
+        "configuration": {
+            "compensation_factor": 10,
+            "enabled":false,
+            "execution_delay_secs": 20,
+            "fallback_timer_interval_secs": 3600,
+            "gld_nft_canister_conf":[],
+            "gldt_canister_id":"2vxsx-fae",
+            "gldt_ledger_canister_id":"2vxsx-fae"
+        },
+        "managers": [],
+    }).to_string()
+        )
+    );
     assert_eq!(export, right);
 }

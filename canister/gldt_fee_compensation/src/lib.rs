@@ -306,8 +306,8 @@ fn get_execution_delay_secs() -> u64 {
     CONF.with(|cell| cell.borrow().execution_delay_secs)
 }
 
-#[query(name = "exportData")]
-fn export_data() -> String {
+#[query(name = "fetchMetadata")]
+fn fetch_metadata() -> String {
     let registry_data = REGISTRY.with(|cell| cell.borrow().clone());
     let conf_data = CONF.with(|cell| cell.borrow().clone());
     let managers_data = MANAGERS.with(|cell| cell.borrow().clone());
@@ -320,43 +320,67 @@ fn export_data() -> String {
 }
 
 #[update(name = "importData")]
-fn import_data(json_data: String) -> Result<(), String> {
+fn import_data(json_data: String) -> Result<String, CustomError> {
+    validate_caller()?;
+
+    let previous_metadata = fetch_metadata();
+
     let data: Value = serde_json
         ::from_str(&json_data)
-        .map_err(|e| format!("Error parsing JSON: {:?}", e))?;
+        .map_err(|e|
+            CustomError::new_with_message(
+                ErrorType::Other,
+                format!("Error parsing JSON: {:?}", e).to_string()
+            )
+        )?;
 
     let registry_data = data["registry"].clone();
     let conf_data = data["configuration"].clone();
     let managers_data = data["managers"].clone();
 
     REGISTRY.with(
-        |cell| -> Result<(), String> {
+        |cell| -> Result<(), CustomError> {
             *cell.borrow_mut() = serde_json
                 ::from_value(registry_data)
-                .map_err(|e| format!("Error parsing registry data: {:?}", e))?;
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing registry data: {:?}", e).to_string()
+                    )
+                )?;
             Ok(())
         }
     )?;
 
     CONF.with(
-        |cell| -> Result<(), String> {
+        |cell| -> Result<(), CustomError> {
             *cell.borrow_mut() = serde_json
                 ::from_value(conf_data)
-                .map_err(|e| format!("Error parsing configuration data: {:?}", e))?;
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing configuration data: {:?}", e).to_string()
+                    )
+                )?;
             Ok(())
         }
     )?;
 
     MANAGERS.with(
-        |cell| -> Result<(), String> {
+        |cell| -> Result<(), CustomError> {
             *cell.borrow_mut() = serde_json
                 ::from_value(managers_data)
-                .map_err(|e| format!("Error parsing managers data: {:?}", e))?;
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing managers data: {:?}", e).to_string()
+                    )
+                )?;
             Ok(())
         }
     )?;
 
-    Ok(())
+    Ok(previous_metadata)
 }
 
 /// The master job that triggers the compensation execution.
