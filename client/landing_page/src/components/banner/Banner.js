@@ -52,14 +52,14 @@ const Banner = () => {
                             variant="h1"
                             textAlign={['center', 'center', 'center', 'left']}
                         >
-                            GLDT,
+                            GLDT
                         </Heading>
                         <Heading
                             as="h2"
                             variant="h2"
                             textAlign={['center', 'center', 'center', 'left']}
                         >
-                            The future of owning physical gold,
+                            The future of owning physical gold
                         </Heading>
                         <Box
                             width={'100%'}
@@ -68,12 +68,12 @@ const Banner = () => {
                         >
                             <Button
                                 as={Link}
-                                href="/FAQ"
                                 variant="yumi"
+                                href="/Gold_DAO.pdf"
                                 mt="30px"
                                 px={['20px', '20px', '40px']}
                             >
-                                Read our F.A.Q .
+                                Read our whitepaper
                             </Button>
                         </Box>
                     </GridItem>

@@ -58,11 +58,13 @@ import { Input as TextInput } from '@chakra-ui/react';
 import { transfer } from '@utils/queries/transfer';
 import TokenSign from '@ui/gldt/TokenSign';
 import Link from 'next/link';
-import { WarningIcon } from '@chakra-ui/icons';
 
 const isPrincipal = (str) => {
-    const regex = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
-    return regex.test(str);
+    const principal = /^([a-zA-Z0-9]{5}-){10}[a-zA-Z0-9]{3}$/;
+    const canister = /^([a-zA-Z0-9]+-){4}[a-zA-Z0-9]+$/;
+    if (!principal.test(str) && !canister.test(str)) {
+        return false;
+    } else return true;
 };
 
 const Transfer = ({ setIsConnected }) => {
@@ -136,16 +138,18 @@ const Input = ({ isConnected, setTo }) => {
                     placeholder="Enter Principal ID"
                     onChange={handleChange}
                 />
-                <Text
-                    fontSize={'12px'}
-                    color={'blackAlpha.600'}
-                    bg="bg"
-                    p="5px 10px"
-                    borderRadius={'10px'}
-                    alignSelf={'flex-start'}
-                >
-                    {warn}
-                </Text>
+                {warn && (
+                    <Text
+                        fontSize={'12px'}
+                        color={'blackAlpha.600'}
+                        bg="bg"
+                        p="5px 10px"
+                        borderRadius={'10px'}
+                        alignSelf={'flex-start'}
+                    >
+                        {warn}
+                    </Text>
+                )}
             </VStack>
         </Card>
     );
@@ -193,16 +197,18 @@ const Output = ({ isConnected, setAmount }) => {
                         <TokenSign />
                     </InputRightAddon>
                 </InputGroup>
-                <Text
-                    fontSize={'12px'}
-                    color={'blackAlpha.600'}
-                    bg="bg"
-                    p="5px 10px"
-                    borderRadius={'10px'}
-                    alignSelf={'flex-start'}
-                >
-                    {warn}
-                </Text>
+                {warn && (
+                    <Text
+                        fontSize={'12px'}
+                        color={'blackAlpha.600'}
+                        bg="bg"
+                        p="5px 10px"
+                        borderRadius={'10px'}
+                        alignSelf={'flex-start'}
+                    >
+                        {warn}
+                    </Text>
+                )}
             </VStack>
         </Card>
     );

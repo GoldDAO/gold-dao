@@ -1,5 +1,5 @@
 import { buf2hex } from '@utils/misc/buf2hex';
-import { GridItem, Table, Tr, Td, TableContainer, HStack, Text } from '@chakra-ui/react';
+import { GridItem, Table, Tr, Td, TableContainer, HStack, Text, Tbody } from '@chakra-ui/react';
 import Timestamp from '@ui/tooltip/timeStamp';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import GridSystem from '@ui/layout/GridSystem';
 import TokenSign from '@ui/gldt/TokenSign';
 import Title from '../layout/Title';
 import { formatAmount } from '@utils/misc/format';
+import { formatNumber } from '@/utils/misc';
 
 const TransactionContent = ({ id }) => {
     const { blocks, isLoading } = useBlock(0, 0, id);
@@ -35,7 +36,6 @@ const TransactionContent = ({ id }) => {
             burn: 'Burn',
         };
         blocks.blocks[0].Map.map((e, i) => {
-            console.log('e', e);
             if (e[0] === 'ts') {
                 ts = e[1].Int;
             }
@@ -49,9 +49,10 @@ const TransactionContent = ({ id }) => {
             }
         });
         tx.map((e) => {
+            console.log('e', e);
             switch (e[0]) {
                 case 'memo':
-                    memo = e[1].Blob.length > 0 ? Principal.fromUint8Array(e[1].Blob) : '0' || '0';
+                    memo = e[1].Blob.length > 0 ? buf2hex(e[1].Blob) : '0' || '0';
                     break;
                 case 'from':
                     from.principal = Principal.fromUint8Array(e[1].Array[0].Blob).toString() || '';
@@ -69,7 +70,7 @@ const TransactionContent = ({ id }) => {
                     amt = e[1].Int ? e[1].Int : '';
                     break;
                 case 'fee':
-                    fee = e[1].Int ? e[1].Int : '';
+                    fee = e[1].Int ? e[1].Int : 0;
                     break;
             }
         });
@@ -80,6 +81,10 @@ const TransactionContent = ({ id }) => {
         if (!memo) {
             memo = '0';
         }
+        if (!fee) {
+            fee = 0;
+        }
+        console.log('fee', fee);
         const data = [
             { label: 'Block Index', value: id },
             { label: 'Type', value: type },
@@ -87,7 +92,7 @@ const TransactionContent = ({ id }) => {
                 label: 'Amount',
                 value: (
                     <HStack>
-                        <Text>{formatAmount(amt, 4)}</Text>
+                        <Text>{formatNumber(formatAmount(amt, 4))}</Text>
                         <TokenSign />
                     </HStack>
                 ),
@@ -96,7 +101,7 @@ const TransactionContent = ({ id }) => {
                 label: 'Fee',
                 value: (
                     <HStack>
-                        <Text>{formatAmount(fee, 4)}</Text>
+                        <Text>{formatNumber(formatAmount(fee, 4))}</Text>
                         <TokenSign />
                     </HStack>
                 ),
@@ -127,12 +132,16 @@ const TransactionContent = ({ id }) => {
                 <GridItem colSpan={[12, 12, 12]}>
                     <TableContainer>
                         <Table>
-                            {data.map((e, i) => (
-                                <Tr key={i}>
-                                    <Td> {e.label}:</Td>
-                                    <Td>{e.value}</Td>
-                                </Tr>
-                            ))}
+                            <Tbody>
+                                {data.map((e, i) => {
+                                    return (
+                                        <Tr key={i}>
+                                            <Td> {e.label}:</Td>
+                                            <Td>{e.value}</Td>
+                                        </Tr>
+                                    );
+                                })}
+                            </Tbody>
                         </Table>
                     </TableContainer>
                 </GridItem>

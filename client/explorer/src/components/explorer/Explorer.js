@@ -3,6 +3,7 @@ import {
     Button,
     Flex,
     GridItem,
+    HStack,
     Heading,
     Skeleton,
     Table,
@@ -27,6 +28,7 @@ import GridSystem from '@ui/layout/GridSystem';
 import Title from '../layout/Title';
 import TableTitle from '../layout/TableTitle';
 import { buf2hex } from '@utils/misc/buf2hex';
+import CopyPrincipal from '@ui/gldt/CopyPrincipal';
 
 const Explorer = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -158,69 +160,81 @@ const Explorer = () => {
                                                 <Td>{type}</Td>
                                                 <Td>
                                                     <Text fontSize={'14px'}>
-                                                        {formatAmount(amt, 4)}
+                                                        {formatAmount(amt, 2)}
                                                     </Text>
                                                     <TokenSign />
                                                 </Td>
                                                 <Td>
-                                                    <Link
-                                                        href={
-                                                            typeof from === 'string'
-                                                                ? '#'
-                                                                : `/account/${from.principal}${
-                                                                      from.subaccount
-                                                                          ? '?subaccount=' +
-                                                                            from.subaccount
-                                                                          : ''
-                                                                  }`
-                                                        }
-                                                    >
-                                                        <PrincipalFormat
-                                                            principal={from.principal}
-                                                        />
-                                                        {from.subaccount && (
-                                                            <Box
-                                                                fontSize={'12px'}
-                                                                color={'blackAlpha.700'}
-                                                            >
-                                                                <PrincipalFormat
-                                                                    nobtn
-                                                                    principal={from.subaccount}
-                                                                />
-                                                            </Box>
-                                                        )}
-                                                    </Link>
-                                                </Td>
-                                                <Td>
-                                                    {to.principal && (
+                                                    <HStack>
                                                         <Link
                                                             href={
-                                                                typeof to === 'string'
+                                                                typeof from === 'string'
                                                                     ? '#'
-                                                                    : `/account/${to.principal}${
-                                                                          to.subaccount
+                                                                    : `/account/${from.principal}${
+                                                                          from.subaccount
                                                                               ? '?subaccount=' +
-                                                                                to.subaccount
+                                                                                from.subaccount
                                                                               : ''
                                                                       }`
                                                             }
                                                         >
                                                             <PrincipalFormat
-                                                                principal={to.principal}
+                                                                principal={from.principal}
+                                                                nobtn
                                                             />
-                                                            {to.subaccount && (
+                                                            {from.subaccount && (
                                                                 <Box
                                                                     fontSize={'12px'}
                                                                     color={'blackAlpha.700'}
                                                                 >
                                                                     <PrincipalFormat
                                                                         nobtn
-                                                                        principal={to.subaccount}
+                                                                        principal={from.subaccount}
                                                                     />
                                                                 </Box>
                                                             )}
                                                         </Link>
-                                                    )}
+                                                        <CopyPrincipal text={from.principal} />
+                                                    </HStack>
+                                                </Td>
+                                                <Td>
+                                                    <HStack>
+                                                        {to.principal && (
+                                                            <Link
+                                                                href={
+                                                                    typeof to === 'string'
+                                                                        ? '#'
+                                                                        : `/account/${
+                                                                              to.principal
+                                                                          }${
+                                                                              to.subaccount
+                                                                                  ? '?subaccount=' +
+                                                                                    to.subaccount
+                                                                                  : ''
+                                                                          }`
+                                                                }
+                                                            >
+                                                                <PrincipalFormat
+                                                                    nobtn
+                                                                    principal={to.principal}
+                                                                />
+                                                                {to.subaccount && (
+                                                                    <Box
+                                                                        fontSize={'12px'}
+                                                                        color={'blackAlpha.700'}
+                                                                    >
+                                                                        <PrincipalFormat
+                                                                            nobtn
+                                                                            principal={
+                                                                                to.subaccount
+                                                                            }
+                                                                        />
+                                                                    </Box>
+                                                                )}
+                                                            </Link>
+                                                        )}
+                                                        <CopyPrincipal text={from.principal} />
+                                                    </HStack>
                                                 </Td>
                                             </Tr>
                                         );
