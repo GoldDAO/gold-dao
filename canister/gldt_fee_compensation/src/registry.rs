@@ -41,7 +41,17 @@ impl<'de> Deserialize<'de> for Registry {
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str(
-                    "Expecting example : \"registry\":{\"2vxsx-fae|tmp\":{\"amount\":[],\"block_height\":null,\"gld_nft_canister_id\":\"2vxsx-fae\",\"history_index\":[],\"previous_entry\":null,\"status\":\"Success\",\"timestamp\":0}}"
+                    "Expecting example : \"registry\":{ \
+                        \"2vxsx-fae|tmp\":{ \
+                            \"amount\":[], \
+                            \"block_height\":null, \
+                            \"gld_nft_canister_id\":\"2vxsx-fae\", \
+                            \"history_index\":[], \
+                            \"previous_entry\":null, \
+                            \"status\":\"Success\", \
+                            \"timestamp\":0 \
+                        } \
+                    }"
                 )
             }
 

@@ -40,7 +40,21 @@ impl<'de> Deserialize<'de> for Registry {
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str(
-                    "Expecting example : \"registry\":{\"2vxsx-fae|tmp\":{\"amount\":[],\"block_height\":null,\"gld_nft_canister_id\":\"2vxsx-fae\",\"history_index\":[],\"previous_entry\":null,\"status\":\"Success\",\"timestamp\":0}}"
+                    "Expecting example : \"obapm-2iaaa-aaaak-qcgca-cai|gold-0-1g\":{ \
+                    \"gldt_issue\":{ \
+                        \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                        \"failed\":null, \
+                        \"ledger_entry\":{\"Minted\":{\"block_height\":[],\"num_tokens\":{\"value\":[1410065408,2]}}}, \
+                        \"nft_sale_id\":\"test_sale_id\", \
+                        \"num_tokens\":{\"value\":[1410065408,2]}, \
+                        \"receiving_account\":{\"owner\":\"2vxsx-fae\",\"subaccount\":null}, \
+                        \"requested_memo\":[], \
+                        \"swap_request_timestamp\":0, \
+                        \"swapped\":{\"index\":[100],\"sale_id\":\"test_sale_id\"} \
+                    }, \
+                    \"gldt_redeem\":null, \
+                    \"older_record\":null \
+                } "
                 )
             }
 
