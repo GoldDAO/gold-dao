@@ -1060,7 +1060,7 @@ fn get_locked_info() -> LockedInfoResponse {
     }
 }
 
-#[query(name = "fetchMetadata")]
+#[query]
 fn fetch_metadata() -> String {
     let registry_data = REGISTRY.with(|cell| cell.borrow().clone());
     let conf_data = CONF.with(|cell| cell.borrow().clone());
@@ -1075,7 +1075,7 @@ fn fetch_metadata() -> String {
     }).to_string()
 }
 
-#[update(name = "importData")]
+#[update]
 fn import_data(json_data: String) -> Result<String, CustomError> {
     validate_caller()?;
 
