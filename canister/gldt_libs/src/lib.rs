@@ -10,3 +10,4 @@ pub mod types;
 pub mod gldt_ledger;
 pub mod gld_nft;
 pub mod misc;
+pub mod error;

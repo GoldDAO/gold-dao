@@ -11,8 +11,8 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use gldt_libs::types::NftSaleId;
+use gldt_libs::error::Custom as CustomError;
 
-use crate::error::Custom as CustomError;
 use crate::Index;
 
 /// The registry that keeps track of which royalties have been compensated.
@@ -55,7 +55,7 @@ impl<'de> Deserialize<'de> for Registry {
                         return Err(
                             de::Error::invalid_value(
                                 de::Unexpected::Str(&key),
-                                &"a key with format 'account-nftSaleId'"
+                                &"a key with format 'account|nftSaleId'"
                             )
                         );
                     }

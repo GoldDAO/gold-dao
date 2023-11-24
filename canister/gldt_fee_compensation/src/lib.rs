@@ -52,11 +52,10 @@ use std::time::Duration;
 use gldt_libs::gld_nft::{ HistoryResult, Service as GldNft_service, TransactionRecord_txn_type };
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
 use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
+use gldt_libs::error::{ Custom as CustomError, Type as ErrorType };
 
-mod error;
 mod registry;
 
-use error::{ Custom as CustomError, Type as ErrorType };
 use registry::{ FeeRegistryEntry, Registry, Status as RegistryStatus };
 
 pub type Index = Nat;

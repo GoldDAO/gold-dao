@@ -105,6 +105,7 @@ use icrc_ledger_types::icrc1::{
 use serde::Serialize;
 use std::cell::RefCell;
 use std::hash::Hash;
+use serde_json::{ json, Value };
 
 mod records;
 mod registry;
@@ -134,6 +135,7 @@ use gldt_libs::gld_nft::{
     SubAccountInfo,
 };
 use gldt_libs::gldt_ledger;
+use gldt_libs::error::{ Custom as CustomError, Type as ErrorType };
 
 use records::{ GldtRecord, RecordStatus, RecordStatusInfo, RecordType, Records };
 use registry::{
@@ -215,6 +217,7 @@ thread_local! {
     static CONF: RefCell<Conf> = RefCell::default();
     static REGISTRY: RefCell<Registry> = RefCell::default();
     static RECORDS: RefCell<Records> = RefCell::default();
+    static MANAGERS: RefCell<Vec<Principal>> = RefCell::default();
 }
 
 #[ic_cdk_macros::pre_upgrade]
@@ -228,8 +231,18 @@ fn pre_upgrade() {
     let conf = CONF.with(|cell| cell.borrow().clone());
     let registry = REGISTRY.with(|cell| cell.borrow().clone());
     let records = RECORDS.with(|cell| cell.borrow().clone());
+    let managers = MANAGERS.with(|cell| cell.borrow().clone());
 
-    match storage::stable_save((conf, registry, records, monitor_stable_data, logger_stable_data)) {
+    match
+        storage::stable_save((
+            conf,
+            registry,
+            records,
+            managers,
+            monitor_stable_data,
+            logger_stable_data,
+        ))
+    {
         Ok(()) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -245,13 +258,14 @@ fn post_upgrade() {
             Conf,
             Registry,
             Records,
+            Vec<Principal>,
             canistergeek_ic_rust::monitor::PostUpgradeStableData,
             canistergeek_ic_rust::logger::PostUpgradeStableData,
         ),
         String
     > = storage::stable_restore();
     match stable_data {
-        Ok((conf, registry, records, monitor_stable_data, logger_stable_data)) => {
+        Ok((conf, registry, records, managers, monitor_stable_data, logger_stable_data)) => {
             CONF.with(|cell| {
                 *cell.borrow_mut() = conf;
             });
@@ -260,6 +274,9 @@ fn post_upgrade() {
             });
             RECORDS.with(|cell| {
                 *cell.borrow_mut() = records;
+            });
+            MANAGERS.with(|cell| {
+                *cell.borrow_mut() = managers;
             });
             canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
@@ -290,6 +307,11 @@ fn init(conf: Option<Conf>) {
             *c.borrow_mut() = conf;
         });
     }
+
+    #[cfg(not(test))]
+    MANAGERS.with(|cell| {
+        *cell.borrow_mut() = vec![api::caller()];
+    });
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Copy)]
@@ -1036,6 +1058,115 @@ fn get_locked_info() -> LockedInfoResponse {
         total_number_of_bars_locked,
         total_weight_locked,
     }
+}
+
+#[query(name = "fetchMetadata")]
+fn fetch_metadata() -> String {
+    let registry_data = REGISTRY.with(|cell| cell.borrow().clone());
+    let conf_data = CONF.with(|cell| cell.borrow().clone());
+    let records_data = RECORDS.with(|cell| cell.borrow().clone());
+    let managers_data = MANAGERS.with(|cell| cell.borrow().clone());
+
+    json!({
+        "registry": registry_data,
+        "configuration": conf_data,
+        "records": records_data,
+        "managers": managers_data
+    }).to_string()
+}
+
+#[update(name = "importData")]
+fn import_data(json_data: String) -> Result<String, CustomError> {
+    validate_caller()?;
+
+    let previous_metadata = fetch_metadata();
+
+    let data: Value = serde_json
+        ::from_str(&json_data)
+        .map_err(|e|
+            CustomError::new_with_message(
+                ErrorType::Other,
+                format!("Error parsing JSON: {:?}", e).to_string()
+            )
+        )?;
+
+    let registry_data = data["registry"].clone();
+    let records_data = data["records"].clone();
+    let conf_data = data["configuration"].clone();
+    let managers_data = data["managers"].clone();
+
+    REGISTRY.with(
+        |cell| -> Result<(), CustomError> {
+            *cell.borrow_mut() = serde_json
+                ::from_value(registry_data)
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing registry data: {:?}", e).to_string()
+                    )
+                )?;
+            Ok(())
+        }
+    )?;
+
+    RECORDS.with(
+        |cell| -> Result<(), CustomError> {
+            *cell.borrow_mut() = serde_json
+                ::from_value(records_data)
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing registry data: {:?}", e).to_string()
+                    )
+                )?;
+            Ok(())
+        }
+    )?;
+
+    CONF.with(
+        |cell| -> Result<(), CustomError> {
+            *cell.borrow_mut() = serde_json
+                ::from_value(conf_data)
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing configuration data: {:?}", e).to_string()
+                    )
+                )?;
+            Ok(())
+        }
+    )?;
+
+    MANAGERS.with(
+        |cell| -> Result<(), CustomError> {
+            *cell.borrow_mut() = serde_json
+                ::from_value(managers_data)
+                .map_err(|e|
+                    CustomError::new_with_message(
+                        ErrorType::Other,
+                        format!("Error parsing managers data: {:?}", e).to_string()
+                    )
+                )?;
+            Ok(())
+        }
+    )?;
+
+    Ok(previous_metadata)
+}
+
+fn validate_caller() -> Result<(), CustomError> {
+    #[cfg(test)]
+    return Ok(());
+
+    #[cfg(not(test))]
+    MANAGERS.with(|m| {
+        if !m.borrow().contains(&api::caller()) {
+            return Err(
+                CustomError::new_with_message(ErrorType::Unauthorized, "Invalid caller".to_string())
+            );
+        }
+        Ok(())
+    })
 }
 
 // for monitoring during development
