@@ -39,7 +39,6 @@ use gldt_libs::misc::{
 };
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
-use std::collections::{ BTreeMap, btree_map };
 
 use ic_cdk_timers::TimerId;
 use icrc_ledger_types::icrc1::account::Account;

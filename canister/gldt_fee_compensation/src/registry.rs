@@ -1,6 +1,5 @@
 use candid::{ CandidType, Principal };
 
-use ic_cdk::print;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::{ NumTokens, BlockIndex } };
 use std::collections::{ BTreeMap, btree_map };
 use serde::ser::{ Serialize, Serializer, SerializeMap };

@@ -5,34 +5,34 @@ use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 
 use gldt_libs::{
-    gld_nft::{
-        Account as OrigynAccount,
-        AskFeature,
-        AuctionStateShared,
-        AuctionStateShared_status,
-        ICTokenSpec,
-        ICTokenSpec_standard,
-        PricingConfigShared,
-        SaleStatusShared,
-        SaleStatusShared_sale_type,
-        SubAccountInfo,
-        SubAccountInfo_account,
-        TokenSpec,
-    },
+    // gld_nft::{
+    //     Account as OrigynAccount,
+    //     AskFeature,
+    //     AuctionStateShared,
+    //     AuctionStateShared_status,
+    //     ICTokenSpec,
+    //     ICTokenSpec_standard,
+    //     PricingConfigShared,
+    //     SaleStatusShared,
+    //     SaleStatusShared_sale_type,
+    //     SubAccountInfo,
+    //     SubAccountInfo_account,
+    //     TokenSpec,
+    // },
     constants::GLDT_SUBDIVIDABLE_BY,
 };
-use serde_bytes::ByteBuf;
-use records::{ GldtRecord, MAX_NUMBER_OF_RECORDS };
-use registry::{ MAX_NUMBER_OF_ENTRIES, MAX_HISTORY_REGISTRY };
+// use serde_bytes::ByteBuf;
+use records::GldtRecord;
 
 // --------------------------------- constants ----------------------------------
 
-const CANISTER_ID_GLDT_CORE: &str = "m45be-jaaaa-aaaak-qcgnq-cai";
+// const CANISTER_ID_GLDT_CORE: &str = "m45be-jaaaa-aaaak-qcgnq-cai";
 const CANISTER_ID_GLDT_FEE_COMPENSATION: &str = "ccjse-eaaaa-aaaao-a2ixq-cai";
 const CANISTER_ID_GLDT_LEDGER: &str = "6uad6-fqaaa-aaaam-abovq-cai";
 const CANISTER_ID_GLD_NFT_1G: &str = "obapm-2iaaa-aaaak-qcgca-cai";
 const CANISTER_ID_GLD_NFT_10G: &str = "xyo2o-gyaaa-aaaal-qb55a-cai";
-const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
+// const CANISTER_ID_YUMI_KYC: &str = "2qft3-raaaa-aaaag-qci4a-cai";
+// const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
 
 // --------------------------------- helpers ----------------------------------
 
@@ -167,89 +167,89 @@ fn init_records() {
     );
 }
 
-fn dummy_sale_nft_request() -> SubscriberNotification {
-    let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
-        id: None,
-        fee: Some(Nat::from(10000)),
-        decimals: Nat::from(8),
-        canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
-            "Could not decode the principal."
-        ),
-        standard: ICTokenSpec_standard::ICRC1,
-        symbol: "GLDT".to_string(),
-    });
-    SubscriberNotification {
-        escrow_info: SubAccountInfo {
-            account_id: ByteBuf::from([
-                105, 135, 242, 243, 165, 181, 162, 160, 1, 21, 162, 41, 181, 82, 9, 143, 106, 45,
-                220, 234, 128, 124, 41, 191, 175, 77, 115, 154, 207, 39, 8, 14,
-            ]),
-            principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
-                "Could not decode the principal."
-            ),
-            account_id_text: "6987f2f3a5b5a2a00115a229b552098f6a2ddcea807c29bfaf4d739acf27080e".to_string(),
-            account: SubAccountInfo_account {
-                principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
-                    "Could not decode the principal."
-                ),
-                sub_account: ByteBuf::from([
-                    199, 215, 43, 85, 161, 120, 243, 11, 166, 239, 227, 201, 223, 184, 203, 131,
-                    205, 117, 219, 100, 109, 105, 126, 235, 115, 10, 77, 39, 179, 197, 134, 24,
-                ]),
-            },
-        },
-        sale: SaleStatusShared {
-            token_id: "Gold-00001".to_string(),
-            sale_type: SaleStatusShared_sale_type::auction(AuctionStateShared {
-                status: AuctionStateShared_status::open,
-                participants: Vec::from([
-                    (
-                        Principal::from_text(TEST_PRINCIPAL_ID).expect(
-                            "Could not decode the principal."
-                        ),
-                        candid::Int::default(),
-                    ),
-                ]),
-                token: token.clone(),
-                current_bid_amount: Nat::from(0),
-                winner: None,
-                end_date: candid::Int::default(),
-                start_date: candid::Int::default(),
-                wait_for_quiet_count: Some(Nat::from(0)),
-                current_escrow: None,
-                allow_list: None,
-                current_broker_id: None,
-                min_next_bid: Nat::from(10000000000 as u64),
-                config: PricingConfigShared::ask(
-                    Some(
-                        Vec::from([
-                            AskFeature::buy_now(Nat::from(10000000000 as u64)),
-                            AskFeature::notify(
-                                Vec::from([
-                                    Principal::from_text(CANISTER_ID_GLDT_CORE).expect(
-                                        "Could not decode the principal."
-                                    ),
-                                ])
-                            ),
-                            AskFeature::token(token),
-                        ])
-                    )
-                ),
-            }),
-            broker_id: None,
-            original_broker_id: None,
-            sale_id: "9f6c0fdc44d7cca4af7f1c25fbf1e92d86c317addf53577f08d73fadfa78e93f".to_string(),
-        },
-        seller: OrigynAccount::principal(
-            Principal::from_text(
-                "mqov6-tdewf-wfzea-raa7y-kxcpv-res3j-g3dc2-wklml-eamt2-5wt7h-fae"
-            ).expect("Could not decode the principal.")
-        ),
-        collection: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
-            "Could not decode the principal."
-        ),
-    }
-}
+// fn dummy_sale_nft_request() -> SubscriberNotification {
+//     let token: TokenSpec = TokenSpec::ic(ICTokenSpec {
+//         id: None,
+//         fee: Some(Nat::from(10000)),
+//         decimals: Nat::from(8),
+//         canister: Principal::from_text(CANISTER_ID_GLDT_LEDGER).expect(
+//             "Could not decode the principal."
+//         ),
+//         standard: ICTokenSpec_standard::ICRC1,
+//         symbol: "GLDT".to_string(),
+//     });
+//     SubscriberNotification {
+//         escrow_info: SubAccountInfo {
+//             account_id: ByteBuf::from([
+//                 105, 135, 242, 243, 165, 181, 162, 160, 1, 21, 162, 41, 181, 82, 9, 143, 106, 45,
+//                 220, 234, 128, 124, 41, 191, 175, 77, 115, 154, 207, 39, 8, 14,
+//             ]),
+//             principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
+//                 "Could not decode the principal."
+//             ),
+//             account_id_text: "6987f2f3a5b5a2a00115a229b552098f6a2ddcea807c29bfaf4d739acf27080e".to_string(),
+//             account: SubAccountInfo_account {
+//                 principal: Principal::from_text(TEST_PRINCIPAL_ID).expect(
+//                     "Could not decode the principal."
+//                 ),
+//                 sub_account: ByteBuf::from([
+//                     199, 215, 43, 85, 161, 120, 243, 11, 166, 239, 227, 201, 223, 184, 203, 131,
+//                     205, 117, 219, 100, 109, 105, 126, 235, 115, 10, 77, 39, 179, 197, 134, 24,
+//                 ]),
+//             },
+//         },
+//         sale: SaleStatusShared {
+//             token_id: "Gold-00001".to_string(),
+//             sale_type: SaleStatusShared_sale_type::auction(AuctionStateShared {
+//                 status: AuctionStateShared_status::open,
+//                 participants: Vec::from([
+//                     (
+//                         Principal::from_text(TEST_PRINCIPAL_ID).expect(
+//                             "Could not decode the principal."
+//                         ),
+//                         candid::Int::default(),
+//                     ),
+//                 ]),
+//                 token: token.clone(),
+//                 current_bid_amount: Nat::from(0),
+//                 winner: None,
+//                 end_date: candid::Int::default(),
+//                 start_date: candid::Int::default(),
+//                 wait_for_quiet_count: Some(Nat::from(0)),
+//                 current_escrow: None,
+//                 allow_list: None,
+//                 current_broker_id: None,
+//                 min_next_bid: Nat::from(10000000000 as u64),
+//                 config: PricingConfigShared::ask(
+//                     Some(
+//                         Vec::from([
+//                             AskFeature::buy_now(Nat::from(10000000000 as u64)),
+//                             AskFeature::notify(
+//                                 Vec::from([
+//                                     Principal::from_text(CANISTER_ID_GLDT_CORE).expect(
+//                                         "Could not decode the principal."
+//                                     ),
+//                                 ])
+//                             ),
+//                             AskFeature::token(token),
+//                         ])
+//                     )
+//                 ),
+//             }),
+//             broker_id: None,
+//             original_broker_id: None,
+//             sale_id: "9f6c0fdc44d7cca4af7f1c25fbf1e92d86c317addf53577f08d73fadfa78e93f".to_string(),
+//         },
+//         seller: OrigynAccount::principal(
+//             Principal::from_text(
+//                 "mqov6-tdewf-wfzea-raa7y-kxcpv-res3j-g3dc2-wklml-eamt2-5wt7h-fae"
+//             ).expect("Could not decode the principal.")
+//         ),
+//         collection: Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").expect(
+//             "Could not decode the principal."
+//         ),
+//     }
+// }
 
 // ------------------------- get_historical_swaps_by_user tests --------------------------
 #[test]
@@ -1865,75 +1865,424 @@ fn test_export_2() {
     assert_eq!(export, right);
 }
 
+#[test]
+fn test_export_3() {
+    init_service();
+    init_records();
+
+    let right =
+        json!({
+            "configuration": {
+                "gld_nft_canister_ids": [
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id":"6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{
+                    "0":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+                        "grams":1,
+                        "nft_id":"random_nft_id_1",
+                        "nft_sale_id":"randomSellId1",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    },
+                    "1":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"xyo2o-gyaaa-aaaal-qb55a-cai",
+                        "grams":10,
+                        "nft_id":"random_nft_id_2",
+                        "nft_sale_id":"randomSellId2",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    }
+                },
+                "entries_by_user":{
+                    "2vxsx-fae":[
+                        [],
+                        [1]
+                    ]
+                }
+            },
+            "registry":{}
+        }).to_string();
+
+    let export = fetch_metadata();
+
+    assert_eq!(export, right);
+}
+
 // // ------------------- Import -------------------
 
-// #[test]
-// fn test_import() {
-//     let fee = FeeRegistryEntry {
-//         amount: Nat::from(0),
-//         block_height: None,
-//         gld_nft_canister_id: Principal::anonymous(),
-//         history_index: Nat::from(0),
-//         status: registry::Status::Success,
-//         timestamp: 0,
-//         previous_entry: None,
-//     };
+#[test]
+fn test_import() {
+    let import =
+        json!({
+            "configuration": {
+                "gld_nft_canister_ids": [
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id":"6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{
+                    "0":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+                        "grams":1,
+                        "nft_id":"random_nft_id_1",
+                        "nft_sale_id":"randomSellId1",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    },
+                    "1":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"xyo2o-gyaaa-aaaal-qb55a-cai",
+                        "grams":10,
+                        "nft_id":"random_nft_id_2",
+                        "nft_sale_id":"randomSellId2",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    }
+                },
+                "entries_by_user":{
+                    "2vxsx-fae":[
+                        [],
+                        [1]
+                    ]
+                }
+            },
+            "registry":{}
+        }).to_string();
 
-//     let import =
-//         json!({
-//         "registry": {
-//             "2vxsx-fae|tmp": fee
-//         },
-//         "configuration": {
-//             "compensation_factor": 10,
-//             "enabled":false,
-//             "execution_delay_secs": 20,
-//             "fallback_timer_interval_secs": 3600,
-//             "gld_nft_canister_conf":[],
-//             "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
-//             "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
-//         },
-//         "managers": [],
-//     }).to_string();
+    let import = import_data(import);
 
-//     let import = import_data(import);
+    let right =
+        json!({
+            "configuration": {
+                "gld_nft_canister_ids": [
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id":"6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{
+                    "0":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+                        "grams":1,
+                        "nft_id":"random_nft_id_1",
+                        "nft_sale_id":"randomSellId1",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    },
+                    "1":{
+                        "block_height":[],
+                        "counterparty":{
+                            "owner":"2vxsx-fae",
+                            "subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        },
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "gld_nft_canister_id":"xyo2o-gyaaa-aaaal-qb55a-cai",
+                        "grams":10,
+                        "nft_id":"random_nft_id_2",
+                        "nft_sale_id":"randomSellId2",
+                        "num_tokens":{"value":[]},
+                        "record_type":"Mint",
+                        "status":{"message":null,"status":"Ongoing"},
+                        "timestamp":0
+                    }
+                },
+                "entries_by_user":{
+                    "2vxsx-fae":[
+                        [],
+                        [1]
+                    ]
+                }
+            },
+            "registry":{}
+        }).to_string();
 
-//     let right =
-//         json!({
-//         "registry": {
-//             "2vxsx-fae|tmp": fee
-//         },
-//         "configuration": {
-//             "compensation_factor": 10,
-//             "enabled":false,
-//             "execution_delay_secs": 20,
-//             "fallback_timer_interval_secs": 3600,
-//             "gld_nft_canister_conf":[],
-//             "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
-//             "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
-//         },
-//         "managers": [],
-//     }).to_string();
+    let export = fetch_metadata();
 
-//     let export = fetch_metadata();
+    assert_eq!(
+        import,
+        Ok(
+            json!({
+                "registry": {},
+                "records": {
+                    "entries":{},
+                    "entries_by_user":{}
+                },
+                "configuration": {
+                    "gld_nft_canister_ids": [],
+                    "gldt_fee_compensation_canister_id": "2vxsx-fae",
+                    "gldt_ledger_canister_id": "2vxsx-fae",
+                },
+                "managers": [],
+            }).to_string()
+        )
+    );
+    assert_eq!(export, right);
+}
 
-//     assert_eq!(
-//         import,
-//         Ok(
-//             json!({
-//         "registry": {},
-//         "configuration": {
-//             "compensation_factor": 10,
-//             "enabled":false,
-//             "execution_delay_secs": 20,
-//             "fallback_timer_interval_secs": 3600,
-//             "gld_nft_canister_conf":[],
-//             "gldt_canister_id":"2vxsx-fae",
-//             "gldt_ledger_canister_id":"2vxsx-fae"
-//         },
-//         "managers": [],
-//     }).to_string()
-//         )
-//     );
-//     assert_eq!(export, right);
-// }
+#[test]
+fn test_import_2() {
+    let import =
+        json!({
+            "configuration":{
+                "gld_nft_canister_ids":[
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id": "6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{},
+                "entries_by_user":{}
+            },
+            "registry":{
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-0-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-1-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-0-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-1-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                }
+            }
+        }).to_string();
+
+    let import = import_data(import);
+
+    let right =
+        json!({
+            "configuration":{
+                "gld_nft_canister_ids":[
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id": "6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{},
+                "entries_by_user":{}
+            },
+            "registry":{
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-0-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-1-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-0-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-1-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                }
+            }
+        }).to_string();
+
+    let export = fetch_metadata();
+
+    assert_eq!(
+        import,
+        Ok(
+            json!({
+                "registry": {},
+                "records": {
+                    "entries":{},
+                    "entries_by_user":{}
+                },
+                "configuration": {
+                    "gld_nft_canister_ids": [],
+                    "gldt_fee_compensation_canister_id": "2vxsx-fae",
+                    "gldt_ledger_canister_id": "2vxsx-fae",
+                },
+                "managers": [],
+            }).to_string()
+        )
+    );
+    assert_eq!(export, right);
+}
