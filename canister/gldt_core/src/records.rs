@@ -26,14 +26,12 @@ impl Serialize for Records {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         let mut state = serializer.serialize_struct("Records", 2)?;
 
-        // Convertir les clés de `entries` en chaînes
         let entries_as_strings: HashMap<String, &GldtRecord> = self.entries
             .iter()
             .map(|(k, v)| (k.to_string(), v))
             .collect();
         state.serialize_field("entries", &entries_as_strings)?;
 
-        // Convertir les clés de `entries_by_user` en chaînes
         let entries_by_user_as_strings: HashMap<String, &Vec<BlockIndex>> = self.entries_by_user
             .iter()
             .map(|(k, v)| (k.to_string(), v))
