@@ -1,7 +1,14 @@
 import { createClient } from '@connect2ic/core';
 import { Connect2ICProvider } from '@connect2ic/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
-import { InfinityWallet, NFID, defaultProviders } from '@connect2ic/core/providers';
+import {
+    AstroX,
+    InfinityWallet,
+    InternetIdentity,
+    NFID,
+    StoicWallet,
+    defaultProviders,
+} from '@connect2ic/core/providers';
 import { SafeHydrate } from '@utils/SafeHydrate';
 import '@connect2ic/core/style.css';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
@@ -20,9 +27,17 @@ const Providers = ({ children }) => {
         gldtCoreCanister,
     };
 
+    const providers = [
+        new InfinityWallet(),
+        new NFID(),
+        new AstroX(),
+        new InternetIdentity(),
+        new StoicWallet(),
+    ];
+
     let client = createClient({
         canisters,
-        providers: [new InfinityWallet()],
+        providers: providers,
         globalProviderConfig: {
             host: 'https://icp0.io',
             dev: false,
