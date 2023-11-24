@@ -1728,7 +1728,7 @@ fn test_get_locked_info_a2() {
 
 #[test]
 fn test_get_locked_info_a3() {
-    let num_entries_per_weight = 10;
+    let num_entries_per_weight: usize = 10;
     let num_entries_swapped = 7;
 
     init_service();
@@ -1742,3 +1742,198 @@ fn test_get_locked_info_a3() {
         total_weight_locked: num_entries_swapped * 11, // x 11 because only 1g and 10g are in the registry and an equal number is present
     });
 }
+
+// ------------------- EXPORT -------------------
+#[test]
+fn test_export() {
+    let right =
+        json!({
+        "registry": {},
+        "records": {
+            "entries":{},
+            "entries_by_user":{}
+        },
+        "configuration": {
+            "gld_nft_canister_ids": [],
+            "gldt_fee_compensation_canister_id": "2vxsx-fae",
+            "gldt_ledger_canister_id": "2vxsx-fae",
+        },
+        "managers": [],
+    }).to_string();
+
+    let export = fetch_metadata();
+
+    assert_eq!(export, right);
+}
+
+#[test]
+fn test_export_2() {
+    let num_entries_per_weight: usize = 2;
+    let num_entries_swapped = 2;
+
+    init_service();
+    init_registry(num_entries_per_weight);
+    update_registry_to_swapped(Some(num_entries_swapped));
+
+    let right =
+        json!({
+            "configuration":{
+                "gld_nft_canister_ids":[
+                    [
+                        "obapm-2iaaa-aaaak-qcgca-cai",
+                        {"grams":1}
+                    ],
+                    [
+                        "xyo2o-gyaaa-aaaal-qb55a-cai",
+                        {"grams":10}
+                    ]
+                ],
+                "gldt_fee_compensation_canister_id":"ccjse-eaaaa-aaaao-a2ixq-cai",
+                "gldt_ledger_canister_id": "6uad6-fqaaa-aaaam-abovq-cai"
+            },
+            "managers":[],
+            "records":{
+                "entries":{},
+                "entries_by_user":{}
+            },
+            "registry":{
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-0-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "obapm-2iaaa-aaaak-qcgca-cai|gold-1-1g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1410065408,2]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-0-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                },
+                "xyo2o-gyaaa-aaaal-qb55a-cai|gold-1-10g":{
+                    "gldt_issue":{
+                        "escrow_subaccount":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        "failed":null,
+                        "ledger_entry":{"Minted":{"block_height":[],"num_tokens":{"value":[1410065408,2]}}},
+                        "nft_sale_id":"test_sale_id",
+                        "num_tokens":{"value":[1215752192,23]},
+                        "receiving_account":{"owner":"2vxsx-fae","subaccount":null},
+                        "requested_memo":[],
+                        "swap_request_timestamp":0,
+                        "swapped":{"index":[100],"sale_id":"test_sale_id"}
+                    },
+                    "gldt_redeem":null,
+                    "older_record":null
+                }
+            }
+        }).to_string();
+
+    let export = fetch_metadata();
+
+    assert_eq!(export, right);
+}
+
+// // ------------------- Import -------------------
+
+// #[test]
+// fn test_import() {
+//     let fee = FeeRegistryEntry {
+//         amount: Nat::from(0),
+//         block_height: None,
+//         gld_nft_canister_id: Principal::anonymous(),
+//         history_index: Nat::from(0),
+//         status: registry::Status::Success,
+//         timestamp: 0,
+//         previous_entry: None,
+//     };
+
+//     let import =
+//         json!({
+//         "registry": {
+//             "2vxsx-fae|tmp": fee
+//         },
+//         "configuration": {
+//             "compensation_factor": 10,
+//             "enabled":false,
+//             "execution_delay_secs": 20,
+//             "fallback_timer_interval_secs": 3600,
+//             "gld_nft_canister_conf":[],
+//             "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+//             "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
+//         },
+//         "managers": [],
+//     }).to_string();
+
+//     let import = import_data(import);
+
+//     let right =
+//         json!({
+//         "registry": {
+//             "2vxsx-fae|tmp": fee
+//         },
+//         "configuration": {
+//             "compensation_factor": 10,
+//             "enabled":false,
+//             "execution_delay_secs": 20,
+//             "fallback_timer_interval_secs": 3600,
+//             "gld_nft_canister_conf":[],
+//             "gldt_canister_id":"obapm-2iaaa-aaaak-qcgca-cai",
+//             "gldt_ledger_canister_id":"obapm-2iaaa-aaaak-qcgca-cai"
+//         },
+//         "managers": [],
+//     }).to_string();
+
+//     let export = fetch_metadata();
+
+//     assert_eq!(
+//         import,
+//         Ok(
+//             json!({
+//         "registry": {},
+//         "configuration": {
+//             "compensation_factor": 10,
+//             "enabled":false,
+//             "execution_delay_secs": 20,
+//             "fallback_timer_interval_secs": 3600,
+//             "gld_nft_canister_conf":[],
+//             "gldt_canister_id":"2vxsx-fae",
+//             "gldt_ledger_canister_id":"2vxsx-fae"
+//         },
+//         "managers": [],
+//     }).to_string()
+//         )
+//     );
+//     assert_eq!(export, right);
+// }
