@@ -351,52 +351,237 @@ Distribution:
     #
     # For testing, propose_sns.sh will fill this in automatically.
     # TODO - define all developer neurons
-    # TODO - current principals are arbitratry - replace them!!!!
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    # team member 1
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 0 years
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 3 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 6 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 9 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 12 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 15 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 18 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 21 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 24 months
+    # team member 2
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 3
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: principal-of-team-member-3
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 4
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: principal-of-team-member-4
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 5
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: principal-of-team-member-5
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+
   # The initial SNS token balances of the various canisters of the SNS.
   InitialBalances:
     # The initial SNS token balance of the SNS Governance canister is known
