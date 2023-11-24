@@ -52,7 +52,50 @@ impl<'de> Deserialize<'de> for Records {
             type Value = Records;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("A map representing entries and entries_by_user")
+                formatter.write_str(
+                    "Expecting example : { \
+                        \"entries\":{ \
+                            \"0\":{ \
+                                \"block_height\":[], \
+                                \"counterparty\":{ \
+                                    \"owner\":\"2vxsx-fae\", \
+                                    \"subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] \
+                                }, \
+                                \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                                \"gld_nft_canister_id\":\"obapm-2iaaa-aaaak-qcgca-cai\", \
+                                \"grams\":1, \
+                                \"nft_id\":\"random_nft_id_1\", \
+                                \"nft_sale_id\":\"randomSellId1\", \
+                                \"num_tokens\":{\"value\":[]}, \
+                                \"record_type\":\"Mint\", \
+                                \"status\":{\"message\":null,\"status\":\"Ongoing\"}, \
+                                \"timestamp\":0 \
+                            },
+                            \"1\":{
+                                \"block_height\":[], \
+                                \"counterparty\":{ \
+                                    \"owner\":\"2vxsx-fae\", \
+                                    \"subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] \
+                                }, \
+                                \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                                \"gld_nft_canister_id\":\"xyo2o-gyaaa-aaaal-qb55a-cai\", \
+                                \"grams\":10, \
+                                \"nft_id\":\"random_nft_id_2\", \
+                                \"nft_sale_id\":\"randomSellId2\", \
+                                \"num_tokens\":{\"value\":[]}, \
+                                \"record_type\":\"Mint\", \
+                                \"status\":{\"message\":null,\"status\":\"Ongoing\"}, \
+                                \"timestamp\":0 \
+                            } \
+                        }, \
+                        \"entries_by_user\":{ \
+                            \"2vxsx-fae\":[ \
+                                [], \
+                                [1] \
+                            ] \
+                        } \
+                    }"
+                )
             }
 
             fn visit_map<V>(self, mut map: V) -> Result<Records, V::Error> where V: MapAccess<'de> {
