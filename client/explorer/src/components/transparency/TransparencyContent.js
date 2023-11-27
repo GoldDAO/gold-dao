@@ -1,14 +1,11 @@
-import { Box, Card, GridItem, HStack, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
 import { useTotalSupply } from '@utils/hooks/gldtLedger/useTotalSupply';
 import TokenSign from '@ui/gldt/TokenSign';
-import { cardPadding } from '@ui/theme';
-import Layout from '../layout/Layout';
 import GridSystem from '@ui/layout/GridSystem';
 import Title from '../layout/Title';
-import TableTitle from '../layout/TableTitle';
 
 const TransparencyContent = () => {
     const actors = useAllCanisters();

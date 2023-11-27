@@ -163,7 +163,6 @@ const AccountContent = ({ id, subAccount }) => {
                                 )}
                                 {!isLoading ? (
                                     history?.history?.Ok?.transactions?.map((e, i) => {
-                                        console.log('e', e);
                                         const from =
                                             e.transaction[e.transaction.kind][0].from || '';
                                         const to = e.transaction[e.transaction.kind][0].to || '';
@@ -325,7 +324,6 @@ const AccountContent = ({ id, subAccount }) => {
 export default AccountContent;
 
 const Pagination = ({ currentHistoryPage, setCurrentHistoryPage, oldest, setAction, last }) => {
-    console.log('oldest', oldest);
     return (
         <VStack p="20px">
             <Flex justifyContent={'space-between'} width={'100%'}>

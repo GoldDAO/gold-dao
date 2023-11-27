@@ -1,6 +1,6 @@
-import { ConnectButton, ConnectDialog, useConnect, useDialog, useWallet } from '@connect2ic/react';
+import { ConnectButton, ConnectDialog, useConnect } from '@connect2ic/react';
 import { useAtom } from 'jotai';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { emptyAllNftsAtom } from '@/atoms/nfts';
 import { removeAllItemsInCartAtom } from '@/atoms/cart';
 import { useRouter } from 'next/router';

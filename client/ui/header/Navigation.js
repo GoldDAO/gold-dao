@@ -13,7 +13,7 @@ import {
 	useDisclosure,
 	HStack,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon,  ChevronRightIcon } from '@chakra-ui/icons';
 import C2icButton from '@/components/c2ic/C2icButton';
 import Link from 'next/link';
 import Logo from '@ui/assets/logo.svg';

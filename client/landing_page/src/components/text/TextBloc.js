@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, Heading, Text } from '@chakra-ui/react';
+import { Box, GridItem, Heading, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import React from 'react';
 import GridSystem from '../layout/Grid';
@@ -19,7 +19,6 @@ const TextBloc = ({
     childrenSpan,
     variant,
     titleAlign,
-    circle,
 }) => {
     return (
         <Fade
@@ -71,17 +70,6 @@ const TextBloc = ({
                                     <Link href={link.href}>{link.label}</Link>
                                 </Box>
                             )}
-                            {/* {circle && (
-                        <Box
-                            position={'absolute'}
-                            height={'150px'}
-                            width={'150px'}
-                            border={'1px'}
-                            borderColor={'gold'}
-                            zIndex={-1}
-                            borderRadius={'50%'}
-                        />
-                    )} */}
                         </Box>
                     </GridItem>
                     <GridItem

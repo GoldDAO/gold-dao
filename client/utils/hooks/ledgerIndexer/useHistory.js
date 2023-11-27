@@ -4,7 +4,6 @@ import { useCanister } from '@connect2ic/react';
 import {  stringToUint8Array } from '@utils/misc/buf2hex';
 
 const queryHistory = async (principal, actors, currentPage, currentSub, i) => {
-	console.log('currentSub', currentSub);
 	const history = await Promise.resolve(actors[0]
 		.get_account_transactions({
 			max_results: 10,
@@ -29,7 +28,6 @@ export const useHistory = (principal, currentPage,  currentSub, i ) => {
 		const fetch = async () => {
 			await queryHistory(principal, actor, currentPage,  currentSub, i)
 				.then((result) => {
-					console.log('result-history', result);
 					setHistory(result);
 					setLoading(false);
 				})

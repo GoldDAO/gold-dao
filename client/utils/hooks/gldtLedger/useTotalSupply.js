@@ -1,5 +1,4 @@
 import { useCanister } from '@connect2ic/react';
-import React from 'react';
 import { useEffect,useState } from 'react';
 
 const queryGLDTbalance = async (actor) => {

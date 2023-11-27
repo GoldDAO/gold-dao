@@ -3,7 +3,7 @@ import { GridItem, Table, Tr, Td, TableContainer, HStack, Text, Tbody } from '@c
 import Timestamp from '@ui/tooltip/timeStamp';
 import { useBlock } from '@utils/hooks/ledgerIndexer/useBlock';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 import PrincipalFormat from '@ui/principal/Principal';
 import { Principal } from '@dfinity/principal';
 import GridSystem from '@ui/layout/GridSystem';
@@ -49,7 +49,6 @@ const TransactionContent = ({ id }) => {
             }
         });
         tx.map((e) => {
-            console.log('e', e);
             switch (e[0]) {
                 case 'memo':
                     memo = e[1].Blob.length > 0 ? buf2hex(e[1].Blob) : '0' || '0';
@@ -64,7 +63,6 @@ const TransactionContent = ({ id }) => {
                     break;
                 case 'op':
                     type = labelsType[e[1].Text] ? labelsType[e[1].Text] : '';
-                    console.log('labelsType[e[1].Text]', labelsType[e[1].Text]);
                     break;
                 case 'amt':
                     amt = e[1].Int ? e[1].Int : '';
@@ -84,7 +82,6 @@ const TransactionContent = ({ id }) => {
         if (!fee) {
             fee = 0;
         }
-        console.log('fee', fee);
         const data = [
             { label: 'Block Index', value: id },
             { label: 'Type', value: type },

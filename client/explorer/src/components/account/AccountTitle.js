@@ -1,4 +1,4 @@
-import { Box, HStack, Text, VStack } from '@chakra-ui/react';
+import { HStack, Text, VStack } from '@chakra-ui/react';
 import CopyPrincipal from '@ui/gldt/CopyPrincipal';
 import React from 'react';
 

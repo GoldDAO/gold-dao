@@ -1,5 +1,4 @@
 import Layout from '@/components/layout/Layout';
-import { Accordion, Box, GridItem, Heading } from '@chakra-ui/react';
 import React from 'react';
 import FaqSection from '@/components/FAQ/FaqSection';
 

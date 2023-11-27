@@ -1,6 +1,5 @@
 import { GridItem, Heading } from '@chakra-ui/react';
 import CopyPrincipal from '@ui/gldt/CopyPrincipal';
-import PrincipalFormat from '@ui/principal/Principal';
 import React from 'react';
 
 const Title = ({ title, subTitle, cp }) => {

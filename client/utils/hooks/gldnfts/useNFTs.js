@@ -1,8 +1,7 @@
 import { gldNftCanisters } from '@utils/agents';
 import { Principal } from '@dfinity/principal';
-import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { useConnect, useWallet } from '@connect2ic/react';
+import { useConnect } from '@connect2ic/react';
 
 const queryNfts = async (principal, actors) => {
 	const weights = Object.keys(gldNftCanisters);

@@ -22,8 +22,6 @@ const Providers = ({ children }) => {
         gldtCoreCanister,
     };
 
-    console.log('canisters', canisters);
-
     let client = createClient({
         canisters,
         providers: [],

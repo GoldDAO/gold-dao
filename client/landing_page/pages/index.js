@@ -25,9 +25,8 @@ import Banner from '@/components/banner/Banner';
 import { content } from './../src/content';
 import TextBloc from '@/components/text/TextBloc';
 import Partners from '@/components/partners/Partners';
-import { Divider, HStack, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import FaqSection from '@/components/FAQ/FaqSection';
-import dynamic from 'next/dynamic';
 import Yumi from '@/components/banner/Yumi';
 
 function Home() {
