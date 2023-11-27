@@ -32,7 +32,6 @@ const CANISTER_ID_GLDT_FEE_COMPENSATION: &str = "ccjse-eaaaa-aaaao-a2ixq-cai";
 const CANISTER_ID_GLDT_LEDGER: &str = "6uad6-fqaaa-aaaam-abovq-cai";
 const CANISTER_ID_GLD_NFT_1G: &str = "obapm-2iaaa-aaaak-qcgca-cai";
 const CANISTER_ID_GLD_NFT_10G: &str = "xyo2o-gyaaa-aaaal-qb55a-cai";
-const CANISTER_ID_YUMI_KYC: &str = "2qft3-raaaa-aaaag-qci4a-cai";
 const TEST_PRINCIPAL_ID: &str = "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe";
 
 // --------------------------------- helpers ----------------------------------
