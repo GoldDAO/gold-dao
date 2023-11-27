@@ -1,8 +1,7 @@
-import { Box, Button, Grid, GridItem } from '@chakra-ui/react';
+import { Box, GridItem } from '@chakra-ui/react';
 import React from 'react';
 import Logo from '@ui/assets/logo.svg';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import WithSubnavigation from './Nav';
 import Link from 'next/link';
 import GridSystem from './Grid';

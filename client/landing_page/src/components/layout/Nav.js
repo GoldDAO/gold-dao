@@ -14,12 +14,9 @@ import {
     useDisclosure,
     HStack,
     Button,
-    GridItem,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
-import Logo from '/public/images/logo.svg';
-import Image from 'next/image';
 import React from 'react';
 
 const appUrl =
@@ -95,7 +92,6 @@ const DesktopNav = ({ nav, children }) => {
                                 </Text>
                             </Link>
                         </PopoverTrigger>
-
                         {navItem.children && (
                             <PopoverContent
                                 border={0}
@@ -199,29 +195,6 @@ const MobileNav = ({ nav, children }) => {
                     >
                         Swap App
                     </Button>
-                    <Box
-                        position={'absolute'}
-                        borderRadius={'50%'}
-                        display={'flex'}
-                        transform={'rotate(10deg)'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        width={'65px'}
-                        bg="gold"
-                        top="-15px"
-                        left={[0, 0, '200px', '330px']}
-                        height={'65px'}
-                    >
-                        <Text
-                            fontSize={'12px'}
-                            textAlign={'center'}
-                            color="white"
-                            lineHeight={'15px'}
-                            pt="2px"
-                        >
-                            Coming Soon
-                        </Text>
-                    </Box>
                 </HStack>
             </VStack>
         </VStack>
@@ -245,7 +218,6 @@ const MobileNavItem = ({ label, children, href }) => {
                     {label}
                 </Text>
             </Link>
-
             <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
                 <Stack
                     mt={2}

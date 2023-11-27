@@ -1,6 +1,6 @@
 import { CopyIcon } from '@chakra-ui/icons';
 import { Button, useToast } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React from 'react';
 
 const CopyPrincipal = ({ text }) => {
 	const toast = useToast({

@@ -1,13 +1,4 @@
-import {
-    Grid,
-    GridItem,
-    LinkBox,
-    Stack,
-    Stat,
-    StatGroup,
-    StatLabel,
-    StatNumber,
-} from '@chakra-ui/react';
+import { Stat, StatGroup, StatLabel, StatNumber } from '@chakra-ui/react';
 import useTotalSupply from '@utils/hooks/gldtLedger/useTotalSupply';
 import Link from 'next/link';
 import React from 'react';

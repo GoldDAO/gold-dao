@@ -10,7 +10,6 @@ const queryHistory = async (actor, principal, page, limit) => {
 			account: [{ owner: Principal.fromText(principal), subaccount: [] }],
 		}),
 	);
-	console.log('history', history);
 	return history;
 };
 
@@ -34,7 +33,6 @@ const useSwapHistory = (page, limit, id) => {
 		};
 		fetchHistory();
 	}, [page, limit, principal]);
-	console.log('history-useSwapHistory', history);
 	return { history, isLoading };
 };
 

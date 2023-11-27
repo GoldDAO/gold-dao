@@ -1,6 +1,6 @@
 import useGLDTbalance from '@utils/hooks/ledgerIndexer/useGLDTbalance';
 import { useConnect } from '@connect2ic/react';
-import React, {useReducer, useEffect, useRef, useState} from 'react';
+import React, { useState} from 'react';
 import TokenSign from '../gldt/TokenSign';
 import { HStack, Text, Button } from '@chakra-ui/react';
 import { RepeatIcon, SpinnerIcon } from '@chakra-ui/icons';

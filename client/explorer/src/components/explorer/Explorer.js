@@ -4,7 +4,6 @@ import {
     Flex,
     GridItem,
     HStack,
-    Heading,
     Skeleton,
     Table,
     TableContainer,
@@ -66,7 +65,6 @@ const Explorer = () => {
                             <Tbody fontSize={'14px'}>
                                 {!isLoading ? (
                                     blocks?.blocks?.map((e, i) => {
-                                        console.log('e', e);
                                         let from = {
                                             principal: null,
                                             subaccount: null,
@@ -99,7 +97,6 @@ const Explorer = () => {
                                         });
                                         tx.map((e) => {
                                             if (e[0] === 'memo') {
-                                                console.log('e[1].Blob', e[1].Blob);
                                                 memo =
                                                     e[1].Blob.length > 0
                                                         ? Principal.fromUint8Array(e[1].Blob)

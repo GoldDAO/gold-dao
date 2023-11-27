@@ -1,5 +1,5 @@
 import { useCanister, useConnect } from '@connect2ic/react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Principal } from '@dfinity/principal';
 
 const queryOngoingSwaps = async (actor, principal, page) => {
@@ -46,7 +46,6 @@ const useOngoingSwaps = (repeat, page) => {
 					.then((result) => {
 						setOngoing(result);
 						setIsloading(false);
-						console.log('no repeat');
 					})
 					.catch((error) => {
 						setIsloading(false);

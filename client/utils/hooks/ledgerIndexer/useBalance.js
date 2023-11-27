@@ -20,7 +20,6 @@ export const useBalance = (principal) => {
 		setLoading(true);
 		queryBalance(principal, actor)
 			.then((result) => {
-				console.log('result-balance', result);
 				setBalance(result);
 				setLoading(false);
 			})

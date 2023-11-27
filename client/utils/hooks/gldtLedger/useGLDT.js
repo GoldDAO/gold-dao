@@ -1,5 +1,5 @@
 import { useCanister } from '@connect2ic/react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const queryTransaction = async (actor, rowsPerPage, currentPage) => {
 	const max = await actor[0].get_transactions({ start: 1, length: 2 });

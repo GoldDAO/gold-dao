@@ -1,7 +1,5 @@
-import { Box, Grid, GridItem, Text, VStack } from '@chakra-ui/react';
+import { Box, GridItem, Text, VStack } from '@chakra-ui/react';
 import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
 import Header from './Header';
 import GridSystem from './Grid';
 import Metas from '@ui/layout/Metas';

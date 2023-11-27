@@ -27,11 +27,11 @@ import {
 import { useNft } from '@utils/hooks/gldnfts/useNFTs';
 import { useAllCanisters } from '@utils/hooks/useAllCanisters';
 import { cancelSale } from '@utils/queries/cancelSale';
-import useSwapHistory, { useMaxEntry } from '@utils/hooks/gldtCore/useSwapHistory';
+import useSwapHistory from '@utils/hooks/gldtCore/useSwapHistory';
 import { useConnect } from '@connect2ic/react';
 import useOngoingSwaps from '@utils/hooks/gldtCore/useOngoingSwap';
 import TokenSign from '@ui/gldt/TokenSign';
-import { ArrowBackIcon, ArrowForwardIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, ArrowForwardIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import NFTIcon from '/public/images/sell.svg';
 import weightIcon from '/public/images/scale.svg';
 import swappedIcon from '/public/images/send_money.svg';

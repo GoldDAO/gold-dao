@@ -1,4 +1,3 @@
-import { Principal } from '@dfinity/principal';
 import { useEffect, useState } from 'react';
 import { useCanister } from '@connect2ic/react';
 

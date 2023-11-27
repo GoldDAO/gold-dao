@@ -1,5 +1,5 @@
-import { useCanister, useWallet } from '@connect2ic/react';
-import React, { useState, useEffect } from 'react';
+import { useCanister} from '@connect2ic/react';
+import { useState, useEffect } from 'react';
 import { Principal } from '@dfinity/principal';
 
 const queryGLDTbalance = async (actor, principal) => {

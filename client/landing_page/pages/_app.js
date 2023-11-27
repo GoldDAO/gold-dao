@@ -1,9 +1,6 @@
 import { Inter } from 'next/font/google';
-import { useEffect } from 'react';
 import '../src/css/global.css';
 import dynamic from 'next/dynamic';
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import { customTheme } from '@ui/theme';
 
 export const inter = Inter({
     subsets: ['latin'],

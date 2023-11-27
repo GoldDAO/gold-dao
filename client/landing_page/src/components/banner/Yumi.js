@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Divider, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
+import { Box, Button, GridItem, Heading, Text } from '@chakra-ui/react';
 import Logo from '/public/images/yumi.png';
 import GridSystem from '../layout/Grid';
 import Image from 'next/image';
@@ -14,8 +14,6 @@ const Yumi = () => {
             borderBottom={'1px'}
             borderColor={'lightGold'}
             margin="0 auto"
-            // borderRadius={'10px'}
-            // bg="bg"
             maxWidth="1540px"
         >
             <Fade>
