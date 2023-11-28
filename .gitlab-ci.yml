@@ -256,7 +256,7 @@ generate declarations:
 swap_app staging build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   variables:
@@ -281,7 +281,7 @@ swap_app staging build:
 landing_page staging build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["generate declarations"]
   <<: *node_template
   variables:
@@ -306,7 +306,7 @@ landing_page staging build:
 explorer staging build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["generate declarations"]
   <<: *node_template
   variables:
@@ -450,7 +450,7 @@ local deploy and tests:
 check canister ids:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: $PEM_FILE_STAGING
@@ -472,7 +472,7 @@ swap app staging:
   variables:
     CANISTER_NAME: "swap_app"
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       needs: ["swap_app staging build"]
       variables:
         TARGET_NETWORK: staging
@@ -504,7 +504,7 @@ landing page staging:
   variables:
     CANISTER_NAME: "landing_page"
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       needs: ["landing_page staging build"]
       variables:
         TARGET_NETWORK: staging
@@ -529,14 +529,14 @@ landing page production:
   environment:
     name: landing page
     deployment_tier: production
-    url: $LANDING_URL
+    url: https://gldt.org/
     action: start
 
 explorer staging:
   variables:
     CANISTER_NAME: "explorer"
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       needs: ["explorer staging build"]
       variables:
         TARGET_NETWORK: staging
@@ -567,7 +567,7 @@ explorer production:
 gldt core staging:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
@@ -608,7 +608,7 @@ gldt core:
 gldt fee compensation staging:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
@@ -644,7 +644,7 @@ gldt fee compensation:
 gldt ledger staging:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
@@ -681,7 +681,7 @@ gldt ledger:
 gldt ledger indexer staging:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: $PEM_FILE_STAGING
