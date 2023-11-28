@@ -1,0 +1,30 @@
+{
+  "gldt_core": {
+    "ic": "m5bu4-7qaaa-aaaap-abrxq-cai",
+    "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
+  },
+  "gldt_explorer": {
+    "ic": "o4yaf-3yaaa-aaaap-abr2a-cai",
+    "staging": "o6ihl-oyaaa-aaaal-ac5oa-cai"
+  },
+  "gldt_fee_compensation": {
+    "ic": "oa42u-myaaa-aaaap-abrya-cai",
+    "staging": "ccjse-eaaaa-aaaao-a2ixq-cai"
+  },
+  "gldt_landing_page": {
+    "ic": "bojx2-iaaaa-aaaag-ab3jq-cai",
+    "staging": "maz3v-6aaaa-aaaak-qcgpq-cai"
+  },
+  "gldt_ledger": {
+    "ic": "oh54a-baaaa-aaaap-abryq-cai",
+    "staging": "6uad6-fqaaa-aaaam-abovq-cai"
+  },
+  "gldt_ledger_indexer": {
+    "ic": "oo6x4-xiaaa-aaaap-abrza-cai",
+    "staging": "wusb2-uiaaa-aaaao-a2lca-cai"
+  },
+  "gldt_swap_app": {
+    "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
+    "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
+  }
+}

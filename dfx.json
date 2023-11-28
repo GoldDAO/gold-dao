@@ -1,24 +1,167 @@
 {
-	"__0": "GLDT.org static website with swap canister",
-	"canisters": {
-		"internet_identity": {
-			"__0": "The development build of Internet Identity. For more information, see https://github.com/dfinity/internet-identity#build-features-and-flavors",
-			"type": "custom",
-			"candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-			"wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
-			"__1": "Internet Identity canister to use in production (on the IC):",
-			"remote": {
-				"id": {
-					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-				}
-			}
-		},
-		"www": {
-			"type": "assets",
-			"source": [
-				"out"
-			],
-			"frontend": {}
-		}
-	}
+  "__0": "GLDT.org static website with swap canister",
+  "canisters": {
+    "gldt_ledger": {
+      "type": "custom",
+      "candid": "canister/gldt_ledger/gldt_ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_ledger/declarations"
+      }
+    },
+    "gldt_ledger_indexer": {
+      "type": "custom",
+      "candid": "canister/gldt_ledger_indexer/gldt_ledger_indexer.did",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_ledger_indexer/declarations"
+      }
+    },
+    "gldt_core": {
+      "package": "gldt_core",
+      "type": "custom",
+      "candid": "canister/gldt_core/src/gldt_core.did",
+      "wasm": "canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_core/declarations"
+      },
+      "build": ["npm run build:back"]
+    },
+    "gldt_fee_compensation": {
+      "package": "gldt_fee_compensation",
+      "type": "custom",
+      "candid": "canister/gldt_fee_compensation/src/gldt_fee_compensation.did",
+      "wasm": "canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gldt_fee_compensation/declarations"
+      },
+      "build": ["npm run build:back"]
+    },
+    "gldt_swap_app": {
+      "type": "assets",
+      "source": ["client/swap_app/out"],
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {}
+    },
+    "gldt_landing_page": {
+      "type": "assets",
+      "source": ["client/landing_page/out"],
+      "build": ["npm run postinstall", "npm run build:landing"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {}
+    },
+    "gldt_explorer": {
+      "type": "assets",
+      "source": ["client/explorer/out"],
+      "build": ["npm run postinstall", "npm run build:explorer"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      }
+    },
+    "yumi_kyc": {
+      "type": "custom",
+      "candid": "canister/yumi_kyc/kyc.did",
+      "wasm": "canister/yumi_kyc/kyc.wasm",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/yumi_kyc/declarations"
+      },
+      "remote": {
+        "id": {
+          "staging": "uftys-3qaaa-aaaah-abwpq-cai",
+          "ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
+        }
+      }
+    },
+    "gldnft_backend_1g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "canister/gld_nft/declarations"
+      },
+      "remote": {
+        "id": {
+          "staging": "obapm-2iaaa-aaaak-qcgca-cai",
+          "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+        }
+      }
+    },
+    "gldnft_backend_10g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "remote": {
+        "id": {
+          "staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
+          "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
+        }
+      }
+    },
+    "gldnft_backend_100g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "remote": {
+        "id": {
+          "staging": "zhfjc-liaaa-aaaal-acgja-cai",
+          "ic": "zhfjc-liaaa-aaaal-acgja-cai"
+        }
+      }
+    },
+    "gldnft_backend_1000g": {
+      "type": "custom",
+      "candid": "canister/gld_nft/origyn_nft_reference.did",
+      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "remote": {
+        "id": {
+          "staging": "7i7jl-6qaaa-aaaam-abjma-cai",
+          "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+        }
+      }
+    }
+  },
+  "networks": {
+    "staging": {
+      "providers": ["https://icp0.io"],
+      "type": "persistent"
+    }
+  }
 }

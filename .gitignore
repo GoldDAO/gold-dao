@@ -3,3 +3,14 @@ out/
 .npm/
 .dfx/
 .next/
+.DS_Store
+**/node_modules
+**/.dfx
+**/.npm
+**/out
+**/.next
+.env
+target
+canister/**/target
+canister/**/declarations
+.vscode

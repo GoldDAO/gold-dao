@@ -3,9 +3,6 @@ This repository contains the source code for the GLDNFT to GLDT swapping mechani
 
 See the [official website](https://gldt.org/) for more informations about the project.
 
-> :warning: You are on the `master` branch, that currently doesn't contain any code for canisters. For now, checkout the `develop` branch to see the current source code being actively developed.  
-> The `master` branch will become the default once the project will be launched in production.
-
 ## Project Structure:
 
 - [`client/swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
@@ -24,11 +21,8 @@ git clone https://gitlab.bochslerfinance.com/gldt/gldt-swap
 cd gldt-swap
 npm install
 ```
-Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
-```sh
-npm run frontdev
-```
-or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
+
+3. To deploy and run the project in a local replica, simply run:
 ```sh
 npm start
 ```
@@ -36,21 +30,39 @@ npm start
 
 To redeploy your latest changes on `gldt_core`, `gldt_fee_compensation`, or on the frontend:
 ```sh
-npm run restart
+npm run deploy
 ```
-Once you finished your work, simply type `npm run stop` to stop the local canister execution.
 
-## Deployment
-TBD
+If you need to test a redeploy operation for a canister (`gldt_core`, `gldt_fee_compensation` or `gldt_ledger`), you can use one of those scripts:
+```sh
+scripts/deploy-gldt-core.sh --help
+scripts/deploy-gldt-fee-compensation.sh --help
+scripts/deploy-ledger.sh --help
+```
+Each one contains safeguards against accidental deployments on staging or mainnet.
 
-### Keys management
-TBD
+And to restart a fresh environment and redeploy all canisters, simply redo a `npm start`. It will stop the currently running replica if any, and restart a clean one, then redeploy everything.
 
-...
+## Other scripts:
 
-## TODO
-- [x] Scaffold project for selected development frameworks
-- [ ] Initialize basic CI/CD (lint, test build, etc)
-- [ ] Write CONTRIBUTING guide
-- [ ] Setup keys management
-- [ ] Update this README
+### Start a NextJS development server:
+Launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/)
+
+```sh
+npm run dev:swap_app # For the swap application frontend
+npm run dev:landing_page # For the main landing page
+npm run dev:explorer # For the GLDT explorer frontend
+```
+The frontend development server will be available at `http://localhost:3000`.
+
+### Build all canisters, frontends, and generate candid files and declarations:
+```sh
+npm run build
+```
+
+## Technical documentation
+- Developers documentation still :construction: WIP (See code comments for now. Documentation will be automatically generated and published at a later time)
+- Integrators documentation is :construction: [WIP in the wiki](https://gitlab.bochslerfinance.com/gldt/gldt-swap/-/wikis/home), and will be published in the frontend at a later time.
+
+## DevOps documentation
+- :construction: WIP on [this wiki page](https://gitlab.bochslerfinance.com/gldt/gldt-swap/-/wikis/Releases-and-Deployments-process).
