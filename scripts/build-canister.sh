@@ -2,16 +2,11 @@
 
 show_help() {
   cat << EOF
-gldt_core canister deployment script.
-Must be run from the repository's root folder, and with a running replica if for local deployment.
-'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
-The NETWORK argument should preferably be passed from the env variable that was previously defined
-by the pre-deploy script (using the dot notation, or inside a macro deploy script).
-
-The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
+Canister build and did generation script.
+Must be run from the repository's root folder.
 
 Usage:
-  scripts/deploy-gldt-fee-compensation.sh [options] <NETWORK>
+  scripts/build-canister.sh [options] <CANISTER>
 
 Options:
   -h, --help        Show this message and exit
@@ -34,7 +29,7 @@ if [[ $# -gt 0 ]]; then
   done
   if [[ "$1" == '--' ]]; then shift; fi
 else
-  echo "Error: missing <NETWORK> argument"
+  echo "Error: missing <CANISTER> argument"
   exit 1
 fi
 
