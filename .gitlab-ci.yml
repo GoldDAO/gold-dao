@@ -221,7 +221,7 @@ gldt_core canister build:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-    - if: ($CI_COMMIT_REF_NAME == "develop" && ) || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
     - scripts/build-canister.sh gldt_core
