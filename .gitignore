@@ -13,4 +13,5 @@ out/
 target
 canister/**/target
 canister/**/declarations
+canister /**/*.did
 .vscode
