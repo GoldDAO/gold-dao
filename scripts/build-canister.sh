@@ -33,9 +33,14 @@ else
   exit 1
 fi
 
+if [[ $WASMONLY == 1 ]]; then
+  echo "" > canister/$1/src/${1}.did
+fi
+
 cargo build --target wasm32-unknown-unknown --target-dir canister/$1/target --release --locked -p $1
 
 if [[ $WASMONLY == 1 ]]; then
+  rm canister/$1/src/${1}.did
 	echo "$1 wasm file created and read for did generation"
 else
 	ic-wasm canister/$1/target/wasm32-unknown-unknown/release/$1.wasm -o canister/$1/target/wasm32-unknown-unknown/release/${1}.wasm shrink
