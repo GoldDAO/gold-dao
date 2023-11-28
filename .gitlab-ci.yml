@@ -70,7 +70,7 @@ swap_app linter:
       changes:
         - "client/swap_app/*.{js,json}"
         - "client/swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   <<: *node_template
   script:
     - npm run lint:swap_app
@@ -82,7 +82,7 @@ landing_page linter:
       changes:
         - "client/landing_page/*.{js,json}"
         - "client/landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   <<: *node_template
   script:
     - npm run lint:landing
@@ -94,7 +94,7 @@ explorer linter:
       changes:
         - "client/explorer/*.{js,json}"
         - "client/explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   <<: *node_template
   script:
     - npm run lint:explorer
@@ -107,7 +107,7 @@ rust lint:
         - "Cargo.{lock,toml}"
         - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
         - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
-    - if: $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   <<: *rust_template
   script:
     - cargo clippy
