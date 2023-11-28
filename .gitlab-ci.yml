@@ -453,7 +453,7 @@ local deploy and tests:
   - dfx identity whoami
 
 .asset canister deploy: &asset_canister_deploy
-  - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_${CANISTER_NAME}
+  - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y gldt_${CANISTER_NAME}
 
 check canister ids:
   stage: deploy
