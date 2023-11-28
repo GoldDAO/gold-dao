@@ -211,7 +211,7 @@ explorer test build:
 gldt_core canister build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
     - scripts/build-canister.sh gldt_core
@@ -226,7 +226,7 @@ gldt_core canister build:
 gldt_fee_compensation canister build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
     - scripts/build-canister.sh gldt_fee_compensation
@@ -241,7 +241,7 @@ gldt_fee_compensation canister build:
 generate declarations:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
       needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
   script:
     - dfx generate
@@ -331,10 +331,10 @@ explorer staging build:
 swap_app production build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "swap_app/*.{js,json}"
-        - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
+      # changes:
+      #  - "swap_app/*.{js,json}"
+      #  - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   variables:
@@ -359,10 +359,10 @@ swap_app production build:
 landing_page production build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "landing_page/*.{js,json}"
-        - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
+      # changes:
+      #   - "landing_page/*.{js,json}"
+      #   - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   variables:
@@ -373,7 +373,7 @@ landing_page production build:
     - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
     paths:
       - client/landing_page/out
     reports:
