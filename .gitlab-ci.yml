@@ -345,10 +345,11 @@ explorer staging build:
 swap_app production build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
-      # changes:
-      #  - "swap_app/*.{js,json}"
-      #  - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "swap_app/*.{js,json}"
+        - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   variables:
@@ -373,10 +374,11 @@ swap_app production build:
 landing_page production build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
-      # changes:
-      #   - "landing_page/*.{js,json}"
-      #   - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "landing_page/*.{js,json}"
+        - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
   <<: *node_template
   variables:
@@ -401,6 +403,7 @@ landing_page production build:
 explorer production build:
   stage: build
   rules:
+    - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
     - if: $CI_COMMIT_REF_NAME == "master"
       changes:
         - "explorer/*.{js,json}"
