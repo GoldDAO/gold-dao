@@ -453,16 +453,7 @@ local deploy and tests:
   - dfx identity whoami
 
 .asset canister deploy: &asset_canister_deploy
-  stage: deploy
-  before_script:
-    - *import_dfx_id
-  script:
-    - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_${CANISTER_NAME}
-  environment:
-    name: swap app
-    deployment_tier: $ENVIRONMENT_TIER
-    url: $SWAP_APP_URL
-    action: start
+  - dfx deploy --network $TARGET_NETWORK --no-wallet -y gldt_${CANISTER_NAME}
 
 check canister ids:
   stage: deploy
@@ -486,6 +477,7 @@ check canister ids:
     expire_in: 1 hour
 
 swap app staging:
+  stage: deploy
   variables:
     CANISTER_NAME: "swap_app"
   rules:
@@ -494,7 +486,10 @@ swap app staging:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: $PEM_FILE_STAGING
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: swap app
     deployment_tier: staging
@@ -502,6 +497,7 @@ swap app staging:
     action: start
 
 swap app production:
+  stage: deploy
   variables:
     CANISTER_NAME: "swap_app"
   rules:
@@ -510,7 +506,10 @@ swap app production:
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: $PEM_FILE_PRODUCTION
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: swap app
     deployment_tier: production
@@ -518,6 +517,7 @@ swap app production:
     action: start
 
 landing page staging:
+  stage: deploy
   variables:
     CANISTER_NAME: "landing_page"
   rules:
@@ -526,7 +526,10 @@ landing page staging:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: $PEM_FILE_STAGING
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: landing page
     deployment_tier: staging
@@ -534,6 +537,7 @@ landing page staging:
     action: start
 
 landing page production:
+  stage: deploy
   variables:
     CANISTER_NAME: "landing_page"
   rules:
@@ -542,7 +546,10 @@ landing page production:
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: $PEM_FILE_PRODUCTION
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: landing page
     deployment_tier: production
@@ -550,6 +557,7 @@ landing page production:
     action: start
 
 explorer staging:
+  stage: deploy
   variables:
     CANISTER_NAME: "explorer"
   rules:
@@ -558,7 +566,10 @@ explorer staging:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: $PEM_FILE_STAGING
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: explorer
     deployment_tier: staging
@@ -566,6 +577,7 @@ explorer staging:
     action: start
 
 explorer production:
+  stage: deploy
   variables:
     CANISTER_NAME: "explorer"
   rules:
@@ -574,7 +586,10 @@ explorer production:
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: $PEM_FILE_PRODUCTION
-  <<: *asset_canister_deploy
+  before_script:
+    - *import_dfx_id
+  script:
+    - *asset_canister_deploy
   environment:
     name: explorer
     deployment_tier: production
