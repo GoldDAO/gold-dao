@@ -451,6 +451,7 @@ local deploy and tests:
   - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
   - dfx identity use gitlab-ci-gldt
   - dfx identity whoami
+  - dfx identity get-principal
 
 .asset canister deploy: &asset_canister_deploy
   - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y gldt_${CANISTER_NAME}
@@ -461,11 +462,11 @@ check canister ids:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: $PEM_FILE_STAGING
+        PEM_FILE: "${PEM_FILE_STAGING}"
     - if: $CI_COMMIT_TAG =~ '/^(core)|(fee_compensation)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
-        PEM_FILE: $PEM_FILE_PRODUCTION
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
     - *import_dfx_id
   script:
@@ -485,7 +486,7 @@ swap app staging:
       needs: ["swap_app staging build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: $PEM_FILE_STAGING
+        PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
     - *import_dfx_id
   script:
@@ -505,7 +506,7 @@ swap app production:
       needs: ["swap_app production build"]
       variables:
         TARGET_NETWORK: ic
-        PEM_FILE: $PEM_FILE_PRODUCTION
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
     - *import_dfx_id
   script:
@@ -525,7 +526,7 @@ landing page staging:
       needs: ["landing_page staging build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: $PEM_FILE_STAGING
+        PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
     - *import_dfx_id
   script:
@@ -545,7 +546,7 @@ landing page production:
       needs: ["landing_page production build"]
       variables:
         TARGET_NETWORK: ic
-        PEM_FILE: $PEM_FILE_PRODUCTION
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
     - *import_dfx_id
   script:
@@ -565,7 +566,7 @@ explorer staging:
       needs: ["explorer staging build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: $PEM_FILE_STAGING
+        PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
     - *import_dfx_id
   script:
@@ -585,7 +586,7 @@ explorer production:
       needs: ["explorer production build"]
       variables:
         TARGET_NETWORK: ic
-        PEM_FILE: $PEM_FILE_PRODUCTION
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
     - *import_dfx_id
   script:
@@ -602,7 +603,7 @@ gldt core staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: $PEM_FILE_STAGING
+    PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["gldt_core canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
@@ -620,7 +621,7 @@ gldt core:
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: $PEM_FILE_PRODUCTION
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["gldt_core canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
@@ -643,7 +644,7 @@ gldt fee compensation staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: $PEM_FILE_STAGING
+    PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["gldt_fee_compensation canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
@@ -661,7 +662,7 @@ gldt fee compensation:
     - if: $CI_COMMIT_TAG =~ '/^fee_compensation-v\d+\.\d+\.\d+$/'
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: $PEM_FILE_PRODUCTION
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["gldt_fee_compensation canister build", "check canister ids"]
   before_script:
     - *import_dfx_id
@@ -679,7 +680,7 @@ gldt ledger staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: $PEM_FILE_STAGING
+    PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
@@ -698,7 +699,7 @@ gldt ledger:
       when: manual
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: $PEM_FILE_PRODUCTION
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
@@ -716,7 +717,7 @@ gldt ledger indexer staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: $PEM_FILE_STAGING
+    PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
@@ -735,7 +736,7 @@ gldt ledger indexer:
       when: manual
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: $PEM_FILE_PRODUCTION
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["check canister ids"]
   before_script:
     - *import_dfx_id
