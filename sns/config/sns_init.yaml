@@ -72,13 +72,6 @@ description: >
   traditional gold investment, such as lack of transferability and liquidity, while leveraging blockchain's
   transparency and efficiency.
 
-  Central to this initiative is the use of the Internet Computer Protocol (ICP) and ORIGYN protocol, ensuring
-  decentralized governance and secure, transparent transactions. The Gold DAO, governed by the GLDGov token,
-  allows stakeholders to participate actively in decision-making processes, reflecting a true decentralized
-  autonomous organization. This revolutionary approach not only bridges the gap between physical gold and digital
-  assets but also addresses skepticism in traditional finance and banking sectors, showcasing the potential of
-  integrating tangible assets with digital innovations.
-
 # This is currently a placeholder field and must be left empty for now.
 Principals: []
 
@@ -99,14 +92,38 @@ NnsProposal:
 
   # The HTTPS address of additional content required to evaluate the NNS
   # proposal.
-  url: "https://forum.dfinity.org/t/sns-the-gold-dao-by-dao-link/"
+  url: "https://forum.dfinity.org/t/comprehensive-overview-of-gold-dao/"
 
   # The description of the proposal. Must be a string of 10 to 2,000 bytes.
-  # TODO
   summary: >
+    # Gold DAO Proposal for SNS
     Proposal to create an SNS for the project Gold DAO.
-    The SNS will be initialized with the following neurons:
-    ...
+    ## Token distribution
+    The total supply at time of the SNS sale is 1_000_000_000 Tokens.
+    * 20% allocated to the decentralisation smaller (200_000_000 Tokens)
+    * 18% allocated to the team (180_000_000 Tokens)
+    * 62% allocated to the treasury (620_000_000 Tokens)
+    ## Governance
+    The governance model includes staking, voting, and other relevant details.
+    The minimum amount of SNS tokens to stake a neuron is 100.
+    The minimum dissolve delay for a neuron to cast votes on proposals is 3 months and the maxmimum dissolve delay is 2 years.
+    ## Decentralisation Sale
+    * Minimum number of participants: 100
+    * Minimum raised through direct participation: 200_000 ICP
+    * Maximum raised through direct participation: 750_000 ICP
+    * Minimum contribution through direct participation: 8 ICP
+    * Maximum contribution through direct participation: 200_000 ICP
+    * Neuron fund participation: Yes
+    ## The dapp
+    The Gold DAO is developed in different phases and the SNS will control the following canisters at time of the SNS sale
+    * oh54a-baaaa-aaaap-abryq-cai (GLDT ledger)
+    * oo6x4-xiaaa-aaaap-abrza-cai (GLDT ledger indexer)
+    * o4yaf-3yaaa-aaaap-abr2a-cai (GLDT explorer frontend)
+    * bojx2-iaaaa-aaaag-ab3jq-cai (GLDT landing page frontend)
+    * oj7ri-2qaaa-aaaap-abrzq-cai (GLDT swap app frontend)
+    ## Verification
+    All information about the project can be verified in the [whitepaper](https://gold-dao.gitbook.io/gold-dao-whitepaper/) and on [Github](https://github.com/GoldDAO/gldt-swap).
+
 
 # If the SNS launch attempt fails, control over the dapp canister(s) is given to
 # these principals. In most use cases, this is chosen to be the original set of
@@ -350,53 +367,237 @@ Distribution:
     # principals of your intended genesis neurons.
     #
     # For testing, propose_sns.sh will fill this in automatically.
-    # TODO - define all developer neurons
-    # TODO - current principals are arbitratry - replace them!!!!
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    # team member 1
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 0 years
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 3 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 6 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 9 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 12 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 15 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 18 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 21 months
-    - principal: add-a-principal
-      stake: 20_000_000 tokens
+    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+      stake: 4_000_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 24 months
+    # team member 2
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: 3432o-lw3ke-mhdyc-yejn7-uh2f4-jhxji-qyovs-47lfe-kd7eh-aenvp-uqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 3
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: rtjwo-i6s27-zqv3b-doug2-pauqi-syi2m-nmth7-f5tf2-anwab-fvrxl-qqe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 4
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: begps-kh2jh-dsfub-x6n7y-qgbwg-qkkye-gfzwr-y3in3-lqoge-vbvis-lae
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+    # team member 5
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 0 years
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 3 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 6 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 9 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 12 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 15 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 18 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 21 months
+    - principal: k67e7-7sq2s-4zxso-s5d2u-s3cwy-an5xo-44w2d-6xl2w-k7qcy-i37af-6qe
+      stake: 4_000_000 tokens
+      memo: 0
+      dissolve_delay: 3 month
+      vesting_period: 24 months
+
   # The initial SNS token balances of the various canisters of the SNS.
   InitialBalances:
     # The initial SNS token balance of the SNS Governance canister is known
@@ -432,7 +633,7 @@ Swap:
   # the swap to succeed. If this amount is not achieved, the swap will be
   # aborted (instead of committed) when the due date/time occurs.
   # Must be smaller than or equal than `maximum_direct_participation_icp`.
-  minimum_direct_participation_icp: 100_000 tokens
+  minimum_direct_participation_icp: 200_000 tokens
 
   # Maximum amount of ICP from direct participants. If this amount is achieved,
   # the swap will finalize immediately, without waiting for the due date/time;
@@ -440,7 +641,7 @@ Swap:
   # direct participants (`minimum_participants`) is reached (otherwise, it
   # would be aborted).
   # Must be at least `min_participants * minimum_direct_participation_icp`.
-  maximum_direct_participation_icp: 740_000 tokens
+  maximum_direct_participation_icp: 750_000 tokens
 
   # The minimum amount of ICP that each participant must contribute
   # to participate. This field is specified as a token. For instance,
@@ -457,9 +658,10 @@ Swap:
   #
   # This field is optional. If set, must be within 1 to 1,000 characters and
   # at most 8,000 bytes.
-  # confirmation_text: >
-  #     I confirm my understanding of the responsibilities and risks
-  #     associated with participating in this token swap.
+  confirmation_text: >
+      I confirm my understanding of the responsibilities and risks
+      associated with participating in this token swap and that I'm
+      not resident of one of the sanctioned countries listed below.
 
   # A list of countries from which swap participation should not be allowed.
   #
@@ -468,7 +670,30 @@ Swap:
   #
   # Each list element must be an ISO 3166-1 alpha-2 country code.
   restricted_countries:
-    - AQ # Antarctica
+    - AF # AFGHANISTAN
+    - BY # BELARUS
+    - BA # BOSNIA AND HERZEGOVINA
+    - BI # BURUNDI
+    - CF # CENTRAL AFRICAN REPUBLIC
+    - KP # NORTH KOREA
+    - CD # DEMOCRATIC REPUBLIC OF THE CONGO
+    - IR # IRAN
+    - IQ # IRAQ
+    - LB # LEBANON
+    - LY # LIBYA
+    - ML # MALI
+    - ME # MONTENEGRO
+    - MM # MYANMAR
+    - NI # NICARAGUA
+    - RU # RUSSIA
+    - RS # SERBIA
+    - SO # SOMALIA
+    - SD # SUDAN
+    - SY # SYRIA
+    - UA # UKRAINE
+    - VE # VENEZUELA
+    - YE # YEMEN
+    - ZW # ZIMBABWE
 
   # Configuration of the vesting schedule of the neuron basket, i.e., the SNS
   # neurons that a participants will receive from a successful
