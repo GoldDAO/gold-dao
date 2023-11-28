@@ -658,9 +658,10 @@ Swap:
   #
   # This field is optional. If set, must be within 1 to 1,000 characters and
   # at most 8,000 bytes.
-  # confirmation_text: >
-  #     I confirm my understanding of the responsibilities and risks
-  #     associated with participating in this token swap.
+  confirmation_text: >
+      I confirm my understanding of the responsibilities and risks
+      associated with participating in this token swap and that I'm
+      not resident of one of the sanctioned countries listed below.
 
   # A list of countries from which swap participation should not be allowed.
   #
@@ -669,7 +670,30 @@ Swap:
   #
   # Each list element must be an ISO 3166-1 alpha-2 country code.
   restricted_countries:
-    - AQ # Antarctica
+    - AF # AFGHANISTAN
+    - BY # BELARUS
+    - BA # BOSNIA AND HERZEGOVINA
+    - BI # BURUNDI
+    - CF # CENTRAL AFRICAN REPUBLIC
+    - KP # NORTH KOREA
+    - CD # DEMOCRATIC REPUBLIC OF THE CONGO
+    - IR # IRAN
+    - IQ # IRAQ
+    - LB # LEBANON
+    - LY # LIBYA
+    - ML # MALI
+    - ME # MONTENEGRO
+    - MM # MYANMAR
+    - NI # NICARAGUA
+    - RU # RUSSIA
+    - RS # SERBIA
+    - SO # SOMALIA
+    - SD # SUDAN
+    - SY # SYRIA
+    - UA # UKRAINE
+    - VE # VENEZUELA
+    - YE # YEMEN
+    - ZW # ZIMBABWE
 
   # Configuration of the vesting schedule of the neuron basket, i.e., the SNS
   # neurons that a participants will receive from a successful
