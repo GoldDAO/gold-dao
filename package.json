@@ -1,7 +1,7 @@
 {
   "name": "gldt-monorepo",
   "description": "GLDT frontend app and GLDT canister",
-  "author": "Bochsler Consulting",
+  "author": "GoldDAO",
   "workspaces": [
     "client/swap_app",
     "client/landing_page",

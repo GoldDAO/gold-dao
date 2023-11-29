@@ -3,10 +3,6 @@
     "version": "0.1.0",
     "description": "GLDT landing page",
     "main": "index.js",
-    "repository": {
-        "type": "git+ssh",
-        "url": "git@gitlab.bochslerfinance.com:gldt/gldt-swap-frontend.git"
-    },
     "author": "Victor Audetat",
     "license": "AGPL-3.0-only",
     "private": true,
