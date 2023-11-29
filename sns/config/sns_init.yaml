@@ -1,15 +1,3 @@
-# You should make a copy of this file, name it sns_init.yaml, and edit it to
-# suit your needs.
-#
-# All principal IDs should almost certainly be changed.
-#
-# In this file, 1 year is nominally defined to be 365.25 days.
-#
-# This gets passed to `sns propose`. See propose_sns.sh.
-#
-# This follows the second configuration file format developed for the `sns`
-# CLI. The first format will be supported for a time, but this format will
-# eventually become the standard format.
 # ------------------------------------------------------------------------------
 # UNITS
 #
