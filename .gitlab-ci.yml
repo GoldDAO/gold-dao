@@ -157,8 +157,7 @@ generate test declarations:
       needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
-    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
-    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
+    - scripts/refactor_nft_declarations.sh
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
