@@ -448,7 +448,6 @@ local deploy and tests:
 
 .import dfx identity: &import_dfx_id
   - dfx --version
-  - echo "Checking PEM file path inside import template script (${PEM_FILE})"
   - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
   - dfx identity use gitlab-ci-gldt
   - dfx identity whoami
@@ -529,7 +528,6 @@ landing page staging:
         TARGET_NETWORK: staging
         PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
-    - echo "Checking PEM file path before import template script (${PEM_FILE})"
     - *import_dfx_id
   script:
     - *asset_canister_deploy
@@ -550,7 +548,6 @@ landing page production:
         TARGET_NETWORK: ic
         PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
-    - echo "Checking PEM file path before import template script (${PEM_FILE})"
     - *import_dfx_id
   script:
     - *asset_canister_deploy
