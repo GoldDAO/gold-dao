@@ -88,14 +88,14 @@ NnsProposal:
     Proposal to create an SNS for the project Gold DAO.
     ## Token distribution
     The total supply at time of the SNS sale is 1_000_000_000 Tokens.
-    * 20% allocated to the decentralisation smaller (200_000_000 Tokens)
+    * 20% allocated to the decentralization sale (200_000_000 Tokens)
     * 18% allocated to the team (180_000_000 Tokens)
     * 62% allocated to the treasury (620_000_000 Tokens)
     ## Governance
     The governance model includes staking, voting, and other relevant details.
     The minimum amount of SNS tokens to stake a neuron is 100.
     The minimum dissolve delay for a neuron to cast votes on proposals is 3 months and the maxmimum dissolve delay is 2 years.
-    ## Decentralisation Sale
+    ## Decentralization Sale
     * Minimum number of participants: 100
     * Minimum raised through direct participation: 200_000 ICP
     * Maximum raised through direct participation: 750_000 ICP
@@ -730,7 +730,7 @@ Swap:
   #   the CreateServiceNervousSystem proposal is executed. This facilitates
   #   testing in an accelerated manner.
   #
-  # start_time: 23:30 UTC  # Intentionally commented out for testing.
+  # start_time: 12:00 UTC  # Intentionally commented out for testing.
 
   # The duration of the decentralization swap. When `start_time` is calculated
   # during CreateServiceNervousSystem proposal execution, this `duration` will
