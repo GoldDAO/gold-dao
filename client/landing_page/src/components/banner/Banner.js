@@ -73,7 +73,7 @@ const Banner = () => {
                                 mt="30px"
                                 px={['20px', '20px', '40px']}
                             >
-                                Read our whitepaper
+                                Read the whitepaper
                             </Button>
                         </Box>
                     </GridItem>
