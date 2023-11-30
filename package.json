@@ -33,8 +33,8 @@
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "test": "npm run test:sns",
-    "test:sns": "scripts/sns-tests.sh",
-    "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
+    "test:sns": "npm run build && scripts/sns-tests.sh",
+    "postinstall": "dfx toolchain default 0.14.3 & rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
     "eslint": "8.40.0"
