@@ -118,6 +118,8 @@ rust lint:
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
+    - touch canister/gldt_core/src/gldt_core.did
+    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
     - cargo clippy
 
 ################################################################################
