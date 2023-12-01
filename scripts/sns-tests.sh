@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SNS_TESTING_INSTANCE=$(
-	docker run -p 8000:8000 -p 8080:8080 -v "`pwd`":/dapp -d ghcr.io/dfinity/sns-testing:main dfx start --clean
+	docker run -p 8000:8000 -p 8080:8080 -v "`pwd`":/dapp -d ghcr.io/dfinity/sns-testing:main dfx start --clean --artificial-delay 100
 )
 while ! docker logs $SNS_TESTING_INSTANCE 2>&1 | grep -m 1 'Dashboard:'
 do
