@@ -451,6 +451,7 @@ local deploy and tests:
   - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
   - dfx identity use gitlab-ci-gldt
   - dfx identity whoami
+  - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi
   - dfx identity get-principal
 
 .asset canister deploy: &asset_canister_deploy
