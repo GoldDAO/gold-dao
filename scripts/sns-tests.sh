@@ -24,4 +24,8 @@ NETWORK="snstesting" scripts/local-deploy.sh
 
 docker exec -it $SNS_TESTING_INSTANCE bash
 
+# At this point, you can work on the hosted replica with both dfx and quill commands,
+# or from the canisters frontends served on port 8080.
+# Then when finished testing, simply type 'exit' in the terminal.
+
 docker kill $SNS_TESTING_INSTANCE
