@@ -13,8 +13,10 @@ docker exec -it $SNS_TESTING_INSTANCE bash setup_locally.sh
 
 case "$(uname -s)" in
 	Linux*)
+		xdg-open http://localhost:8000/_/dashboard
 		xdg-open http://qsgjb-riaaa-aaaaa-aaaga-cai.localhost:8080/;;
 	Darwin*)
+		open http://localhost:8000/_/dashboard
 		open http://qsgjb-riaaa-aaaaa-aaaga-cai.localhost:8080/;;
 	*)
 		echo "Unrecognized system. Visit the local NNS frontend in your browser: http://qsgjb-riaaa-aaaaa-aaaga-cai.localhost:8080/"
