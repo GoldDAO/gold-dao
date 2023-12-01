@@ -41,7 +41,7 @@ else
   exit 1
 fi
 
-if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
+if [[ ! $1 =~ ^(local|staging|ic|snstesting)$ ]]; then
   echo "Error: unknown network for deployment"
   exit 2
 fi
