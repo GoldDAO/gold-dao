@@ -129,9 +129,10 @@ gldt_core test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
+    - scripts/build-canister.sh --wasmonly gldt_core
+    - scripts/generate-did.sh gldt_core
     - scripts/build-canister.sh gldt_core
     - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
-    - scripts/generate-did.sh gldt_core
   artifacts:
     name: "gldt_core-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
@@ -145,9 +146,10 @@ gldt_fee_compensation test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   <<: *rust_template
   script:
+    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
+    - scripts/generate-did.sh gldt_fee_compensation
     - scripts/build-canister.sh gldt_fee_compensation
     - ic-wasm canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
-    - scripts/generate-did.sh gldt_fee_compensation
   artifacts:
     name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
@@ -163,8 +165,7 @@ generate test declarations:
       needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
-    - mv canister/gld_nft/declarations/gldnft_backend_1g.did.js canister/gld_nft/declarations/gld_nft.did.js
-    - mv canister/gld_nft/declarations/gldnft_backend_1g.did canister/gld_nft/declarations/gld_nft.did
+    - scripts/refactor_nft_declarations.sh
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
@@ -224,8 +225,9 @@ gldt_core canister build:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
-    - scripts/build-canister.sh gldt_core
+    - scripts/build-canister.sh --wasmonly gldt_core
     - scripts/generate-did.sh gldt_core
+    - scripts/build-canister.sh gldt_core
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_core-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
@@ -241,8 +243,9 @@ gldt_fee_compensation canister build:
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
-    - scripts/build-canister.sh gldt_fee_compensation
+    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
     - scripts/generate-did.sh gldt_fee_compensation
+    - scripts/build-canister.sh gldt_fee_compensation
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_fee_compensation-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
