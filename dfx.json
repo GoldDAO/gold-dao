@@ -162,6 +162,10 @@
     "staging": {
       "providers": ["https://icp0.io"],
       "type": "persistent"
+    },
+    "snstesting": {
+      "providers": ["http://127.0.0.1:8000", "http://localhost:8000"],
+      "type": "ephemeral"
     }
   }
 }

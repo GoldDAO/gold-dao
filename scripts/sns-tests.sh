@@ -20,8 +20,7 @@ case "$(uname -s)" in
 		echo "Unrecognized system. Visit the local NNS frontend in your browser: http://qsgjb-riaaa-aaaaa-aaaga-cai.localhost:8080/"
 esac
 
-
-docker exec -it $SNS_TESTING_INSTANCE bash "cd /dapp && NETWORK='local' scripts/local-deploy.sh"
+NETWORK="snstesting" scripts/local-deploy.sh
 
 docker exec -it $SNS_TESTING_INSTANCE bash
 
