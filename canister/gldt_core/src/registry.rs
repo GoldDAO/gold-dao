@@ -1,17 +1,91 @@
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{ CandidType, Nat, Principal };
 
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ BlockIndex, Memo } };
-use serde::Serialize;
+use serde::Serialize as Serialize_default;
+use serde::Deserialize as Deserialize_default;
 use std::collections::{ BTreeMap, btree_map, HashMap };
+use serde::ser::{ Serialize, Serializer, SerializeMap };
+use serde::de::{ self, Deserialize, Deserializer, MapAccess, Visitor };
 
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 use crate::records::{ GldtRecord, RecordType, RecordStatusInfo, RecordStatus };
+use std::fmt;
+use std::marker::PhantomData;
 
 type GldNftCollectionId = Principal;
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, Default)]
+#[derive(CandidType, Clone, Debug, Hash, Default)]
 pub struct Registry {
     registry: BTreeMap<(GldNftCollectionId, NftId), GldtRegistryEntry>,
+}
+
+impl Serialize for Registry {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        let mut map = serializer.serialize_map(Some(self.registry.len()))?;
+        for (k, v) in self.registry.clone() {
+            map.serialize_entry(&format!("{}|{}", k.0.to_string(), k.1).clone(), &v)?;
+        }
+        map.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for Registry {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        struct RegistryVisitor {
+            marker: PhantomData<fn() -> Registry>,
+        }
+
+        impl<'de> Visitor<'de> for RegistryVisitor {
+            type Value = Registry;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str(
+                    "Expecting example : \"obapm-2iaaa-aaaak-qcgca-cai|gold-0-1g\":{ \
+                    \"gldt_issue\":{ \
+                        \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                        \"failed\":null, \
+                        \"ledger_entry\":{\"Minted\":{\"block_height\":[],\"num_tokens\":{\"value\":[1410065408,2]}}}, \
+                        \"nft_sale_id\":\"test_sale_id\", \
+                        \"num_tokens\":{\"value\":[1410065408,2]}, \
+                        \"receiving_account\":{\"owner\":\"2vxsx-fae\",\"subaccount\":null}, \
+                        \"requested_memo\":[], \
+                        \"swap_request_timestamp\":0, \
+                        \"swapped\":{\"index\":[100],\"sale_id\":\"test_sale_id\"} \
+                    }, \
+                    \"gldt_redeem\":null, \
+                    \"older_record\":null \
+                } "
+                )
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Registry, V::Error> where V: MapAccess<'de> {
+                let mut my_map = BTreeMap::new();
+                while let Some((key, value)) = map.next_entry::<String, GldtRegistryEntry>()? {
+                    let parts: Vec<&str> = key.splitn(2, '|').collect();
+
+                    if parts.len() != 2 {
+                        return Err(
+                            de::Error::invalid_value(
+                                de::Unexpected::Str(&key),
+                                &"a key with format 'GldNftCollectionId|NftId'"
+                            )
+                        );
+                    }
+
+                    let account: GldNftCollectionId = parts[0]
+                        .parse::<GldNftCollectionId>()
+                        .map_err(de::Error::custom)?;
+                    let nft_sale_id: String = parts[1].to_owned();
+
+                    let tuple = (account, nft_sale_id);
+                    my_map.insert(tuple, value);
+                }
+                Ok(Registry { registry: my_map })
+            }
+        }
+
+        deserializer.deserialize_map(RegistryVisitor { marker: PhantomData })
+    }
 }
 
 impl Registry {
@@ -42,7 +116,7 @@ pub const MAX_NUMBER_OF_ENTRIES: usize = 32;
 
 /// Entry into the GLDT registry that keeps track of the NFTs that
 /// have been swapped for GLDT.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRegistryEntry {
     /// The lifecycle of an NFT starts with the issuance of GLDT
     gldt_issue: SwapInfo,
@@ -102,7 +176,7 @@ impl GldtRegistryEntry {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum UpdateType {
     Init,
     Mint,
@@ -112,7 +186,7 @@ pub enum UpdateType {
 }
 
 ///
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct SwapInfo {
     /// The sale id of the NFT listing in the GLD NFT canister
     nft_sale_id: String,
@@ -193,19 +267,19 @@ impl SwapInfo {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum GldtLedgerEntry {
     Minted(GldtLedgerInfo),
     Burned(GldtLedgerInfo),
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct Error {
     error_code: Nat,
     error_message: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum GldtError {
     /// The minting of GLDT failed.
     MintingError(Option<Error>),
@@ -224,7 +298,16 @@ impl Default for GldtError {
 }
 
 /// Record of information about an NFT for which GLDT has been minted.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Default)]
+#[derive(
+    CandidType,
+    Serialize_default,
+    Deserialize_default,
+    Clone,
+    Debug,
+    Hash,
+    PartialEq,
+    Default
+)]
 pub struct GldtLedgerInfo {
     /// Block height when this entry was made. Must be non-zero and
     /// point to a block with a minting or burning transaction with the right
@@ -249,7 +332,7 @@ impl GldtLedgerInfo {
 }
 
 /// Record of information about an NFT that has been successfully swapped for GLDT.
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct GldtSwapped {
     /// Sale ID of the successful sale
     sale_id: String,
@@ -266,7 +349,7 @@ impl GldtSwapped {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum SwappingStates {
     Initialised,
     Minted,

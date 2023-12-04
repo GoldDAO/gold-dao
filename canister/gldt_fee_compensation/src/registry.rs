@@ -1,6 +1,5 @@
 use candid::{ CandidType, Principal };
 
-use ic_cdk::print;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::{ NumTokens, BlockIndex } };
 use std::collections::{ BTreeMap, btree_map };
 use serde::ser::{ Serialize, Serializer, SerializeMap };
@@ -11,8 +10,8 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use gldt_libs::types::NftSaleId;
+use gldt_libs::error::Custom as CustomError;
 
-use crate::error::Custom as CustomError;
 use crate::Index;
 
 /// The registry that keeps track of which royalties have been compensated.
@@ -42,7 +41,17 @@ impl<'de> Deserialize<'de> for Registry {
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str(
-                    "Expecting example : \"registry\":{\"2vxsx-fae|tmp\":{\"amount\":[],\"block_height\":null,\"gld_nft_canister_id\":\"2vxsx-fae\",\"history_index\":[],\"previous_entry\":null,\"status\":\"Success\",\"timestamp\":0}}"
+                    "Expecting example : \"registry\":{ \
+                        \"2vxsx-fae|tmp\":{ \
+                            \"amount\":[], \
+                            \"block_height\":null, \
+                            \"gld_nft_canister_id\":\"2vxsx-fae\", \
+                            \"history_index\":[], \
+                            \"previous_entry\":null, \
+                            \"status\":\"Success\", \
+                            \"timestamp\":0 \
+                        } \
+                    }"
                 )
             }
 
@@ -55,7 +64,7 @@ impl<'de> Deserialize<'de> for Registry {
                         return Err(
                             de::Error::invalid_value(
                                 de::Unexpected::Str(&key),
-                                &"a key with format 'account-nftSaleId'"
+                                &"a key with format 'account|nftSaleId'"
                             )
                         );
                     }

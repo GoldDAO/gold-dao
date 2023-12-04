@@ -39,7 +39,6 @@ use gldt_libs::misc::{
 };
 use ic_cdk::{ api, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
-use std::collections::{ BTreeMap, btree_map };
 
 use ic_cdk_timers::TimerId;
 use icrc_ledger_types::icrc1::account::Account;
@@ -52,11 +51,10 @@ use std::time::Duration;
 use gldt_libs::gld_nft::{ HistoryResult, Service as GldNft_service, TransactionRecord_txn_type };
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
 use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
+use gldt_libs::error::{ Custom as CustomError, Type as ErrorType };
 
-mod error;
 mod registry;
 
-use error::{ Custom as CustomError, Type as ErrorType };
 use registry::{ FeeRegistryEntry, Registry, Status as RegistryStatus };
 
 pub type Index = Nat;
@@ -306,7 +304,7 @@ fn get_execution_delay_secs() -> u64 {
     CONF.with(|cell| cell.borrow().execution_delay_secs)
 }
 
-#[query(name = "fetchMetadata")]
+#[query]
 fn fetch_metadata() -> String {
     let registry_data = REGISTRY.with(|cell| cell.borrow().clone());
     let conf_data = CONF.with(|cell| cell.borrow().clone());
@@ -319,7 +317,7 @@ fn fetch_metadata() -> String {
     }).to_string()
 }
 
-#[update(name = "importData")]
+#[update]
 fn import_data(json_data: String) -> Result<String, CustomError> {
     validate_caller()?;
 

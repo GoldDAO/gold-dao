@@ -1,7 +1,13 @@
-use candid::{ CandidType, Deserialize, Principal };
-use serde::Serialize;
+use candid::{ CandidType, Principal };
 use std::collections::{ BTreeMap, HashMap };
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::BlockIndex };
+use serde::ser::{ Serialize, Serializer, SerializeStruct };
+use serde::de::{ self, Deserialize, Deserializer, MapAccess, Visitor };
+use serde::Serialize as Serialize_default;
+use serde::Deserialize as Deserialize_default;
+
+use std::fmt;
+use std::marker::PhantomData;
 
 use gldt_libs::types::{ NftId, GldtNumTokens, NftWeight };
 
@@ -10,32 +16,145 @@ pub const MAX_NUMBER_OF_RECORDS: usize = 64000;
 #[cfg(test)]
 pub const MAX_NUMBER_OF_RECORDS: usize = 64;
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(CandidType, Clone, Debug, Default)]
 pub struct Records {
     pub entries: BTreeMap<BlockIndex, GldtRecord>,
     pub entries_by_user: HashMap<Principal, Vec<BlockIndex>>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+impl Serialize for Records {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        let mut state = serializer.serialize_struct("Records", 2)?;
+
+        let entries_as_strings: HashMap<String, &GldtRecord> = self.entries
+            .iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect();
+        state.serialize_field("entries", &entries_as_strings)?;
+
+        let entries_by_user_as_strings: HashMap<String, &Vec<BlockIndex>> = self.entries_by_user
+            .iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect();
+        state.serialize_field("entries_by_user", &entries_by_user_as_strings)?;
+
+        state.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for Records {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        struct RecordsVisitor {
+            marker: PhantomData<fn() -> Records>,
+        }
+
+        impl<'de> Visitor<'de> for RecordsVisitor {
+            type Value = Records;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str(
+                    "Expecting example : { \
+                        \"entries\":{ \
+                            \"0\":{ \
+                                \"block_height\":[], \
+                                \"counterparty\":{ \
+                                    \"owner\":\"2vxsx-fae\", \
+                                    \"subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] \
+                                }, \
+                                \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                                \"gld_nft_canister_id\":\"obapm-2iaaa-aaaak-qcgca-cai\", \
+                                \"grams\":1, \
+                                \"nft_id\":\"random_nft_id_1\", \
+                                \"nft_sale_id\":\"randomSellId1\", \
+                                \"num_tokens\":{\"value\":[]}, \
+                                \"record_type\":\"Mint\", \
+                                \"status\":{\"message\":null,\"status\":\"Ongoing\"}, \
+                                \"timestamp\":0 \
+                            },
+                            \"1\":{
+                                \"block_height\":[], \
+                                \"counterparty\":{ \
+                                    \"owner\":\"2vxsx-fae\", \
+                                    \"subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] \
+                                }, \
+                                \"escrow_subaccount\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], \
+                                \"gld_nft_canister_id\":\"xyo2o-gyaaa-aaaal-qb55a-cai\", \
+                                \"grams\":10, \
+                                \"nft_id\":\"random_nft_id_2\", \
+                                \"nft_sale_id\":\"randomSellId2\", \
+                                \"num_tokens\":{\"value\":[]}, \
+                                \"record_type\":\"Mint\", \
+                                \"status\":{\"message\":null,\"status\":\"Ongoing\"}, \
+                                \"timestamp\":0 \
+                            } \
+                        }, \
+                        \"entries_by_user\":{ \
+                            \"2vxsx-fae\":[ \
+                                [], \
+                                [1] \
+                            ] \
+                        } \
+                    }"
+                )
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Records, V::Error> where V: MapAccess<'de> {
+                let mut entries = None;
+                let mut entries_by_user = None;
+
+                while let Some(key) = map.next_key::<String>()? {
+                    match key.as_str() {
+                        "entries" => {
+                            entries = Some(map.next_value::<BTreeMap<BlockIndex, GldtRecord>>()?);
+                        }
+                        "entries_by_user" => {
+                            entries_by_user = Some(
+                                map.next_value::<HashMap<Principal, Vec<BlockIndex>>>()?
+                            );
+                        }
+                        _ => {
+                            return Err(de::Error::unknown_field(&key, FIELDS));
+                        }
+                    }
+                }
+
+                let entries = entries.ok_or_else(|| de::Error::missing_field("entries"))?;
+                let entries_by_user = entries_by_user.ok_or_else(||
+                    de::Error::missing_field("entries_by_user")
+                )?;
+
+                Ok(Records {
+                    entries,
+                    entries_by_user,
+                })
+            }
+        }
+
+        const FIELDS: &'static [&'static str] = &["entries", "entries_by_user"];
+        deserializer.deserialize_map(RecordsVisitor { marker: PhantomData })
+    }
+}
+
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum RecordType {
     Mint,
     Burn,
 }
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub enum RecordStatus {
     Success,
     Failed,
     Ongoing,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct RecordStatusInfo {
     pub status: RecordStatus,
     pub message: Option<String>,
 }
 
 /// Record of successful minting or burning of GLDT for GLD NFTs
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq)]
+#[derive(CandidType, Serialize_default, Deserialize_default, Clone, Debug, Hash, PartialEq)]
 pub struct GldtRecord {
     /// The type of transaction
     record_type: RecordType,

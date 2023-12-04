@@ -1,5 +1,5 @@
 use super::*;
-use serde_json::{ json, Value };
+use serde_json::json;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use registry;
@@ -99,7 +99,7 @@ fn test_export_2() {
 
     REGISTRY.with(|cell| {
         let mut registry = cell.borrow_mut();
-        registry.init_entry(&key, &fee);
+        let _ = registry.init_entry(&key, &fee);
     });
 
     let right =
