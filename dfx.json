@@ -31,7 +31,7 @@
         "env_override": null,
         "output": "canister/gldt_core/declarations"
       },
-      "build": ["npm run build:back"]
+      "build": ["scripts/build-canister.sh --wasmonly gldt_core && scripts/generate-did.sh gldt_core && dfx generate && scripts/refactor_nft_declarations.sh && scripts/build-canister.sh gldt_core"]
     },
     "gldt_fee_compensation": {
       "package": "gldt_fee_compensation",
@@ -43,7 +43,7 @@
         "env_override": null,
         "output": "canister/gldt_fee_compensation/declarations"
       },
-      "build": ["npm run build:back"]
+      "build": ["scripts/build-canister.sh --wasmonly gldt_fee_compensation && scripts/generate-did.sh gldt_fee_compensation && scripts/build-canister.sh gldt_fee_compensation"]
     },
     "gldt_swap_app": {
       "type": "assets",
