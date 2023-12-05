@@ -4,8 +4,3 @@ members = ["canister/gldt_core", "canister/gldt_fee_compensation"]
 [profile.release]
 lto = "thin"
 panic = "abort"
-
-[dev-dependencies]
-clippy = "0.0.302"
-ic-wasm = "0.7.0"
-candid-extractor = "0.1.2"
