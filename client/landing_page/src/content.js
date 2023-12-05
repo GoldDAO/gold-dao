@@ -7,9 +7,9 @@ import origyn from '/public/images/partners/origyn.svg';
 
 export const content = {
     intro: {
-        title: 'A token backed 100% by physical gold',
+        title: 'A token backed 100% in perpetuity by physical gold',
         content:
-            'GLDT is a fractionable token backed by insured physical gold securely stored in Swiss vaults and thoroughly audited. Users can buy gold certificates (referred to as GLD NFTs) via the Yumi marketplace. These certificates can then be exchanged for GLDT tokens using the swap app. For example, a certificate representing 1 gram of gold can be swapped for 100 GLDT tokens. Essentially, each GLDT represents a fractional share of actual physical gold, making it more liquid. This enables trading gold outside the traditional banking system.',
+            'GLDT is a fractionable token backed by physical gold stored securely in Swiss vaults, also being audited quarterly and insured. Users can buy gold certificates (referred to as GLD NFTs) via the Yumi marketplace. These certificates can then be exchanged for GLDT tokens using the swap app. For example, a GLD NFT representing 1 gram of gold can be swapped for 100 GLDT tokens. Essentially, each GLDT represents a fractional share of actual physical gold, making it far more liquid. This enables the trading of gold outside the traditional banking system.',
     },
     partners: [
         {
@@ -54,7 +54,7 @@ export const content = {
     tech: {
         title: 'Learn more about the technology',
         content:
-            'GLDT and its underlying smart contracts run entirely on the ICP blockchain. In the future, the token will become cross-platform and multi-chain. This development introduces a new era in which physical gold can be transferred using blockchain technology. To learn more about how GLDT and swapping GLD NFT works, please refer to the FAQ or review the whitepaper.',
+            'GLDTs and their underlying smart contracts run entirely on the ICP blockchain. In the future, GLDTs will become cross-platform and multi-chain. This heralds a new era in which physical gold can be transferred using blockchain technology. To learn more about how GLDT and swapping GLD NFTs works, please refer to the FAQ or review the whitepaper.',
         link: {
             label: 'Read the FAQ',
             href: '/FAQ',

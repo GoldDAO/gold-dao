@@ -2,7 +2,7 @@ import Link from 'next/link';
 export const faq = [
     {
         q: 'What is a GLDT?',
-        r: 'GLDT stands for “Gold token” and is a fungible token which is backed by GLD NFT. GLD NFTs are NFTs that represent ownership of physical gold bars. 1 GLDT is exactly 0.01g of gold and GLD NFTs can be swapped at a ratio of 1g for 100 GLDT.',
+        r: 'GLDT stands for “Gold Token”, being a fungible token backed by GLD NFTs. GLD NFTs are NFTs that represent irrefutable ownership of physical gold bars. 1 GLDT represents exactly 0.01g of gold, and GLD NFTs can be swapped at a ratio of 1g for 100 GLDTs.',
     },
     {
         q: 'How are GLDT minted?',
@@ -49,10 +49,10 @@ export const faq = [
     },
     {
         q: 'How and when can I swap back my GLDT? Can I sell my GLDT on another platform?',
-        r: 'You can swap your GLDT back to GLD NFT on our platform soon. This is currently under development. You can go on any exchange that supports GLDT and trade it for other cryptocurrencies.',
+        r: 'You can swap your GLDT back to GLD NFT on the platform soon. This is currently under development. You may also visit any exchange that supports GLDT and trade it for other cryptocurrencies.',
     },
     {
         q: 'Where can I find more information about GLD NFTs?',
-        r: 'Go to yumi.io/gold to learn more about GLD NFTs which are the backing of GLDT.',
+        r: 'Go to yumi.io/gold to learn more about GLD NFTs, which back GLDTs.',
     },
 ];
