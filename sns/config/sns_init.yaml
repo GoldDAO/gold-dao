@@ -356,47 +356,47 @@ Distribution:
     #
     # For testing, propose_sns.sh will fill this in automatically.
     # team member 1
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 0 years
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 3 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 6 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 9 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 12 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 15 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 18 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
       vesting_period: 21 months
-    - principal: p7m6l-xwkr6-y46va-zm7ap-dv36u-de6cr-afpgn-fjouf-x7fkk-kftcc-4qe
+    - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 month
