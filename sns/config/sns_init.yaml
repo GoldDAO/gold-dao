@@ -632,47 +632,47 @@ Distribution:
       dissolve_delay: 3 months
       vesting_period: 24 months
     # team member 7
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 0 years
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 3 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 6 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 9 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 12 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 15 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 18 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 21 months
-    - principal: team-member-7
+    - principal: qmsy7-egd3c-y62sd-th6o4-ihz3d-a5e74-txh6v-frddm-mib7w-6sojj-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
