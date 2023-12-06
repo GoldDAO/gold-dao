@@ -9,6 +9,8 @@ do
 	sleep 3
 done
 
+docker exec -it $SNS_TESTING_INSTANCE bash setup_locally.sh
+
 curl --progress-bar -o scripts/nvm_install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh
 docker exec -it $SNS_TESTING_INSTANCE bash /dapp/scripts/nvm_install.sh
 rm scripts/nvm_install.sh
