@@ -32,9 +32,8 @@
     "deploy": "NETWORK='local' scripts/local-deploy.sh",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
-    "test": "npm run test:sns",
-    "test:sns": "scripts/sns-tests.sh",
-    "postinstall": "dfx toolchain default 0.14.3 & rustup update; rustup target add wasm32-unknown-unknown; rustup component add clippy; cargo install ic-wasm candid-extractor; echo 'If installing locally, you should also ensure that wasmtime (see https://wasmtime.dev ) is installed.'"
+    "test": "echo \"No tests yet! Please write some unit tests!\"",
+    "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
     "eslint": "8.40.0"

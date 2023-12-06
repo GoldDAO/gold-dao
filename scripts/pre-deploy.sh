@@ -42,8 +42,8 @@ create_canister () {
 		export MEMALLOC="--memory-allocation ${3}"
 		echo -e "Memory allocation for ${2}:\t${3} B"
 	fi
-	if [[ $2 == "local" || $2 == "snstesting" ]]; then
-		dfx canister create --no-wallet $MEMALLOC $1 --network $2
+	if [[ $2 == "local" ]]; then
+		dfx canister create $MEMALLOC $1
 		CANISTER_ID=$(dfx canister id $1)
 	elif [[ ($2 == "staging" || $2 == "ic") && $CI ]]; then
 		dfx canister create $MEMALLOC $1 --network $2
@@ -60,8 +60,8 @@ create_canister () {
 # $2: Network name (optional)
 # $3: Memory amount to allocate (optional)
 check_and_create_canister () {
-	if [[ $2 == "local" || $2 == "snstesting" ]]; then
-		echo $(dfx canister id --network $2 $1 2>/dev/null || echo $(create_canister $1 $2 $3))
+	if [[ $2 == "local" ]]; then
+		echo $(dfx canister id $1 2>/dev/null || echo $(create_canister $1 $2 $3))
 	elif [[ ($2 == "staging" && $CI) || ($2 == "ic" && $CI_COMMIT_TAG =~ ^(ledger|core|swap_app)-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$) ]]; then
 		if [[ $(cat canister_ids.json | jq -r .$1.$2) == "" ]]; then
 			echo $(create_canister $1 $2 $3)
