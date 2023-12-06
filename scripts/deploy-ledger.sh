@@ -37,7 +37,7 @@ else
   exit 1
 fi
 
-if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
+if [[ ! $1 =~ ^(local|staging|ic|snstesting)$ ]]; then
   echo "Error: unknown network for deployment"
   exit 2
 fi
@@ -61,7 +61,7 @@ export TOKEN_SYMBOL="GLDT"
 # The defx deploy commands below could have been regrouped into a single conditional group with variables as arguments
 # But for security and clarity reasons, they have been kept distinct, to avoid any potential unwanted execution.
 
-if [[ $1 == "local" ]]; then
+if [[ $1 == "local" || $1 == "snstesting" ]]; then
   dfx canister call --network $1 gldt_ledger get_data_certificate 2>/dev/null > /dev/null
   if [[  $? -ne 0 || upgrade_me -eq 1 ]]; then
     dfx deploy --network $1 gldt_ledger --argument "(variant {Init = record {

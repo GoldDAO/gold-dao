@@ -41,12 +41,12 @@ else
   exit 1
 fi
 
-if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
+if [[ ! $1 =~ ^(local|staging|ic|snstesting)$ ]]; then
   echo "Error: unknown network for deployment"
   exit 2
 fi
 
-if [[ $1 == "local" ]]; then
+if [[ $1 == "local" || $1 == "snstesting" ]]; then
 # Temporarily use canister ids from staging for NFTs. Use the correct local ids when local NFT deployment will be working.
   dfx deploy gldt_core --network $1 --argument '(
   opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
