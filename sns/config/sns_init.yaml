@@ -210,7 +210,7 @@ Voting:
   #
   # Users cannot access the SNS tokens used to stake neurons (until the neuron
   # is dissolved). This field is specified as a duration. For example: "6 months".
-  minimum_dissolve_delay: 3 month
+  minimum_dissolve_delay: 3 months
 
   # Configuration of voting power bonuses that are applied to neurons to
   # incentivize alignment with the best interest of the DAO. Note, these
