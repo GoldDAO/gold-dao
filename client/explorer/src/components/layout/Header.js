@@ -6,6 +6,17 @@ import Link from 'next/link';
 import GridSystem from '@ui/layout/GridSystem';
 
 const Header = () => {
+    const displayTransparency = false;
+    const transpLink = displayTransparency ? 
+        (
+            <Link href="/transparency">
+                <Text fontSize="16px">Transparency</Text>
+            </Link>
+        ) :
+        (
+            <div></div>
+        );
+
     return (
         <HStack
             as="header"
@@ -20,9 +31,7 @@ const Header = () => {
                     </Link>
                 </GridItem>
                 <GridItem alignSelf={'center'} colStart={[12, 12, 12]}>
-                    <Link href="/transparency">
-                        <Text fontSize="16px">Transparency</Text>
-                    </Link>
+                    {transpLink}
                 </GridItem>
             </GridSystem>
         </HStack>

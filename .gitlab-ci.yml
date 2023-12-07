@@ -579,7 +579,7 @@ explorer staging:
   environment:
     name: explorer
     deployment_tier: staging
-    url: $EXPLORER_URL
+    url: https://staging.explorer.gldt.org/
     action: start
 
 explorer production:
@@ -599,7 +599,7 @@ explorer production:
   environment:
     name: explorer
     deployment_tier: production
-    url: $EXPLORER_URL
+    url: https://explorer.gldt.org/
     action: start
 
 gldt core staging:
@@ -617,7 +617,7 @@ gldt core staging:
   environment:
     name: gldt_core
     deployment_tier: staging
-    url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://m45be-jaaaa-aaaak-qcgnq-cai.icp0.io
     action: start
 
 gldt core:
@@ -640,7 +640,7 @@ gldt core:
   environment:
     name: gldt_core
     deployment_tier: production
-    url: https://$(jq -r '."gldt_core".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://m5bu4-7qaaa-aaaap-abrxq-cai.icp0.io
     action: start
 
 gldt fee compensation staging:
@@ -658,7 +658,7 @@ gldt fee compensation staging:
   environment:
     name: gldt_fee_compensation
     deployment_tier: staging
-    url: https://$(jq -r '."gldt_fee_compensation".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://ccjse-eaaaa-aaaao-a2ixq-cai.icp0.io
     action: start
 
 gldt fee compensation:
@@ -676,7 +676,7 @@ gldt fee compensation:
   environment:
     name: gldt_fee_compensation
     deployment_tier: production
-    url: https://$(jq -r '."gldt_fee_compensation".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://oa42u-myaaa-aaaap-abrya-cai.icp0.io
     action: start
 
 gldt ledger staging:
@@ -694,7 +694,7 @@ gldt ledger staging:
   environment:
     name: gldt_ledger
     deployment_tier: staging
-    url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://6uad6-fqaaa-aaaam-abovq-cai.icp0.io
     action: start
 
 gldt ledger:
@@ -713,7 +713,7 @@ gldt ledger:
   environment:
     name: gldt_ledger
     deployment_tier: production
-    url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://oh54a-baaaa-aaaap-abryq-cai.icp0.io
     action: start
 
 gldt ledger indexer staging:
@@ -731,7 +731,7 @@ gldt ledger indexer staging:
   environment:
     name: gldt_ledger_indexer
     deployment_tier: staging
-    url: https://$(jq -r '."gldt_ledger_indexer".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://wusb2-uiaaa-aaaao-a2lca-cai.icp0.io
     action: start
 
 gldt ledger indexer:
@@ -750,5 +750,5 @@ gldt ledger indexer:
   environment:
     name: gldt_ledger_indexer
     deployment_tier: production
-    url: https://$(jq -r '."gldt_ledger_indexer".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://oo6x4-xiaaa-aaaap-abrza-cai.icp0.io
     action: start

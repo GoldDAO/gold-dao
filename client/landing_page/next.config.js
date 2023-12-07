@@ -3,30 +3,49 @@ const env = require('dotenv').config({
     path: path.resolve(__dirname, './../../.env'),
 });
 const InternalCanisterIds = require('./../../canister_ids.json');
-// const GeneratedLocalCanisterIds = require('./../../.dfx/local/canister_ids.json');
+const GeneratedLocalCanisterIds = process.env.CI ? {
+    // Obviously, find another way to do this....
+    gldt_core: {
+        local: "bkyz2-fmaaa-aaaaa-qaaaq-cai"
+    },
+    gldt_ledger: {
+        local: "bd3sg-teaaa-aaaaa-qaaba-cai"
+    }
+} : require('./../../.dfx/local/canister_ids.json');
 const ExternalCanisterIds = require('./../../dfx.json');
 
-// const toml = require('./../../canister/gldt_core/Cargo.toml');
-// const LOCAL_TESTING = false;
+// The $NETWORK env variable is defined by the CI/CD job
 
-const canisterKey = process.env.DFX_NETWORK || 'staging'; // takes "staging" for develop and staging environment and "ic" for production environment
-const GLDNFT_CANISTER_IDS = {
+const canisterKey = process.env.NETWORK || "local";
+console.debug(`This frontend will be built using canister ids coming from the ${canisterKey} network`);
+
+const GLDNFT_CANISTER_IDS = process.env.NETWORK ?
+{
     '1g': ExternalCanisterIds.canisters.gldnft_backend_1g.remote.id[canisterKey],
     '10g': ExternalCanisterIds.canisters.gldnft_backend_10g.remote.id[canisterKey],
     '100g': ExternalCanisterIds.canisters.gldnft_backend_100g.remote.id[canisterKey],
     '1000g': ExternalCanisterIds.canisters.gldnft_backend_1000g.remote.id[canisterKey],
-};
+} :
+{/* Uncomment when you'll have locally deployed NFT's !
+    '1g': GeneratedLocalCanisterIds.gldnft_backend_1g[canisterKey],
+    '10g': GeneratedLocalCanisterIds.gldnft_backend_10g[canisterKey],
+    '100g': GeneratedLocalCanisterIds.gldnft_backend_100g[canisterKey],
+    '1000g': GeneratedLocalCanisterIds.gldnft_backend_1000g[canisterKey],
+*/};
+
 const FRONTEND_VERSION = process.env.GIT_COMMIT_REF_NAME || 'local build';
 
-let GLDT_CANISTER_ID = InternalCanisterIds.gldt_core[canisterKey];
-let GLDT_LEDGER_CANISTER_ID = InternalCanisterIds.gldt_ledger[canisterKey];
-// let YUMI_KYC_CANISTER_ID = InternalCanisterIds.yumi_kyc[canisterKey];
-let YUMI_KYC_CANISTER_ID = ExternalCanisterIds.canisters.yumi_kyc.remote.id[canisterKey];
-// if (LOCAL_TESTING) {
-//   GLDT_CANISTER_ID = GeneratedLocalCanisterIds.gldt_core['local'];
-//   GLDT_LEDGER_CANISTER_ID = GeneratedLocalCanisterIds.gldt_ledger['local'];
-//   YUMI_KYC_CANISTER_ID = GeneratedLocalCanisterIds.yumi_kyc['local'];
-// }
+const GLDT_CANISTER_ID = process.env.NETWORK ?
+    InternalCanisterIds.gldt_core[canisterKey] :
+    GeneratedLocalCanisterIds.gldt_core[canisterKey];
+
+const GLDT_LEDGER_CANISTER_ID = process.env.NETWORK ?
+    InternalCanisterIds.gldt_ledger[canisterKey]:
+    GeneratedLocalCanisterIds.gldt_ledger[canisterKey];
+
+const YUMI_KYC_CANISTER_ID = process.env.NETWORK ?
+    ExternalCanisterIds.canisters.yumi_kyc.remote.id[canisterKey] :
+    ""; //GeneratedLocalCanisterIds.yumi_kyc[canisterKey];
 
 const nextConfig = {
     output: 'export',
@@ -41,7 +60,7 @@ const nextConfig = {
         GLDT_LEDGER_CANISTER_ID,
         GLDNFT_CANISTER_IDS,
         YUMI_KYC_CANISTER_ID,
-        DFX_NETWORK: process.env.DFX_NETWORK,
+        DFX_NETWORK: canisterKey,
     },
     images: { unoptimized: true },
 };
