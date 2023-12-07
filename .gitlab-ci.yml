@@ -713,7 +713,7 @@ gldt ledger:
   environment:
     name: gldt_ledger
     deployment_tier: production
-    url: https://$(jq -r '."gldt_ledger".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://oh54a-baaaa-aaaap-abryq-cai.icp0.io
     action: start
 
 gldt ledger indexer staging:
@@ -750,5 +750,5 @@ gldt ledger indexer:
   environment:
     name: gldt_ledger_indexer
     deployment_tier: production
-    url: https://$(jq -r '."gldt_ledger_indexer".${TARGET_NETWORK}' canister_ids.json).icp0.io
+    url: https://oo6x4-xiaaa-aaaap-abrza-cai.icp0.io
     action: start
