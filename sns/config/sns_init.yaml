@@ -342,17 +342,13 @@ Distribution:
   # right after the SNS creation and thus includes the pre-initialization mode
   # period.
   #
-  # For example:
-  #  - principal: hpikg-6exdt-jn33w-ndty3-fc7jc-tl2lr-buih3-cs3y7-tftkp-sfp62-gqe
-  #    stake: 1_000 tokens
-  #    memo: 0
-  #    dissolve_delay: 2 years
-  #    vesting_period: 4 years
   Neurons:
     # For the actual SNS launch, you should replace this with one or more
     # principals of your intended genesis neurons.
+    # Team neurons are split among 8 team members, each receiving 2.5M tokens with a 3 month dissolve delay.
+    # So in total each team member receives 22.5M tokens split in 9 neurons, summing up in total to 180M tokens for the team.
+    # (2.5M * 9) * 8 = 180M tokens (= 18% of total supply)
     #
-    # For testing, propose_sns.sh will fill this in automatically.
     # team member 1
     - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
