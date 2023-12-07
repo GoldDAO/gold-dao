@@ -3,7 +3,18 @@ const env = require('dotenv').config({
     path: path.resolve(__dirname, './../../.env'),
 });
 const InternalCanisterIds = require('./../../canister_ids.json');
-const GeneratedLocalCanisterIds = require('./../../.dfx/local/canister_ids.json');
+const GeneratedLocalCanisterIds = process.env.CI ? {
+    // Obviously, find another way to do this....
+    gldt_core: {
+        local: "bkyz2-fmaaa-aaaaa-qaaaq-cai"
+    },
+    gldt_ledger: {
+        local: "bd3sg-teaaa-aaaaa-qaaba-cai"
+    },
+    gldt_ledger_indexer: {
+        local: "be2us-64aaa-aaaaa-qaabq-cai"
+    }
+} : require('./../../.dfx/local/canister_ids.json');
 const ExternalCanisterIds = require('./../../dfx.json');
 
 // The $NETWORK env variable is defined by the CI/CD job
