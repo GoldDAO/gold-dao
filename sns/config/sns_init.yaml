@@ -52,13 +52,7 @@ name: Gold DAO
 # Description of the SNS project.
 # Must be a string of max length = 2,000.
 description: >
-  The Gold DAO project represents a groundbreaking fusion of traditional gold investment and modern blockchain
-  technology, creating a stable and decentralized financial platform. At its core, the project introduces three
-  primary products: the Gold NFT (GLD NFT), representing direct ownership of physical gold; the Gold Token (GLDT),
-  a fungible token allowing fractional gold ownership; and a USD-pegged stablecoin (USDG), backed by gold, offering
-  a reliable alternative to fiat-backed stablecoins. These components work together to address the limitations of
-  traditional gold investment, such as lack of transferability and liquidity, while leveraging blockchain's
-  transparency and efficiency.
+  The Gold DAO project represents a groundbreaking fusion of traditional gold and modern blockchain technology, enabling physical gold to be accessible to everyone in the world instantaneously without using the banking system. At its core, the project introduces two primary products: the Gold Token (GLDT), a fungible token allowing fractional gold ownership; and a USD-pegged stablecoin (USDG), backed by gold (GLDT), offering a reliable alternative to fiat-backed stablecoins. These components work together to address the limitations of traditional gold transaction, inducing transferability and liquidity, while leveraging blockchain's transparency and efficiency.
 
 # This is currently a placeholder field and must be left empty for now.
 Principals: []
@@ -70,7 +64,7 @@ logo: logo.png
 
 # URL to the dapp controlled by the SNS project.
 # Must be a string from 10 to 512 bytes.
-url: https://gldt.org
+url: https://www.gold-dao.org
 
 # Metadata for the NNS proposal required to create the SNS. This data will be
 # shown only in the NNS proposal.
@@ -108,8 +102,7 @@ NnsProposal:
     * oo6x4-xiaaa-aaaap-abrza-cai (GLDT ledger indexer)
     * o4yaf-3yaaa-aaaap-abr2a-cai (GLDT explorer frontend)
     * bojx2-iaaaa-aaaag-ab3jq-cai (GLDT landing page frontend)
-    * oj7ri-2qaaa-aaaap-abrzq-cai (GLDT swap app frontend)
-    ## Verification
+    ## Verification
     All information about the project can be verified in the [whitepaper](https://gold-dao.gitbook.io/gold-dao-whitepaper/) and on [Github](https://github.com/GoldDAO/gldt-swap).
 
 
@@ -139,7 +132,6 @@ dapp_canisters:
   - oo6x4-xiaaa-aaaap-abrza-cai # GLDT ledger indexer
   - o4yaf-3yaaa-aaaap-abr2a-cai # GLDT explorer frontend
   - bojx2-iaaaa-aaaag-ab3jq-cai # GLDT landing page frontend
-  - oj7ri-2qaaa-aaaap-abrzq-cai # GLDT swap app frontend
 
 # Configuration of SNS tokens in the SNS Ledger canister deployed as part
 # of the SNS.
@@ -212,7 +204,7 @@ Voting:
   #
   # Users cannot access the SNS tokens used to stake neurons (until the neuron
   # is dissolved). This field is specified as a duration. For example: "6 months".
-  minimum_dissolve_delay: 3 month
+  minimum_dissolve_delay: 3 months
 
   # Configuration of voting power bonuses that are applied to neurons to
   # incentivize alignment with the best interest of the DAO. Note, these
@@ -344,17 +336,13 @@ Distribution:
   # right after the SNS creation and thus includes the pre-initialization mode
   # period.
   #
-  # For example:
-  #  - principal: hpikg-6exdt-jn33w-ndty3-fc7jc-tl2lr-buih3-cs3y7-tftkp-sfp62-gqe
-  #    stake: 1_000 tokens
-  #    memo: 0
-  #    dissolve_delay: 2 years
-  #    vesting_period: 4 years
   Neurons:
     # For the actual SNS launch, you should replace this with one or more
     # principals of your intended genesis neurons.
+    # Team neurons are split among 8 team members, each receiving 2.5M tokens with a 3 month dissolve delay.
+    # So in total each team member receives 22.5M tokens split in 9 neurons, summing up in total to 180M tokens for the team.
+    # (2.5M * 9) * 8 = 180M tokens (= 18% of total supply)
     #
-    # For testing, propose_sns.sh will fill this in automatically.
     # team member 1
     - principal: fv4gl-4digp-v54d7-yclkh-mokfc-3ugji-uim47-pb357-6cjtl-bz5sf-gqe
       stake: 2_500_000 tokens
@@ -586,47 +574,47 @@ Distribution:
       dissolve_delay: 3 months
       vesting_period: 24 months
     # team member 6
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 0 years
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 3 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 6 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 9 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 12 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 15 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 18 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 21 months
-    - principal: mlnie-bxsfa-gv7tu-ehhvv-7i24g-b2cnn-qbxnk-q4css-g24an-yinaf-lae
+    - principal: 5u5em-tfqms-fnxvj-u4p5w-y5p6z-viwwl-brxk3-asjj2-rv5eo-y4eu7-vqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
@@ -678,47 +666,47 @@ Distribution:
       dissolve_delay: 3 months
       vesting_period: 24 months
     # team member 8
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 0 years
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 3 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 6 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 9 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 12 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 15 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 18 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 21 months
-    - principal: team-member-8
+    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
@@ -817,7 +805,6 @@ Swap:
     - SD # SUDAN
     - SY # SYRIA
     - UA # UKRAINE
-    - US # UNITED STATES OF AMERICA
     - VE # VENEZUELA
     - YE # YEMEN
     - ZW # ZIMBABWE
