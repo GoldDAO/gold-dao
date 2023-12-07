@@ -617,7 +617,7 @@ gldt core staging:
   environment:
     name: gldt_core
     deployment_tier: staging
-    url: https://m45be-jaaaa-aaaak-qcgnq-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
     action: start
 
 gldt core:
@@ -640,7 +640,7 @@ gldt core:
   environment:
     name: gldt_core
     deployment_tier: production
-    url: https://m5bu4-7qaaa-aaaap-abrxq-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m5bu4-7qaaa-aaaap-abrxq-cai
     action: start
 
 gldt fee compensation staging:
@@ -658,7 +658,7 @@ gldt fee compensation staging:
   environment:
     name: gldt_fee_compensation
     deployment_tier: staging
-    url: https://ccjse-eaaaa-aaaao-a2ixq-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ccjse-eaaaa-aaaao-a2ixq-cai
     action: start
 
 gldt fee compensation:
@@ -676,7 +676,7 @@ gldt fee compensation:
   environment:
     name: gldt_fee_compensation
     deployment_tier: production
-    url: https://oa42u-myaaa-aaaap-abrya-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oa42u-myaaa-aaaap-abrya-cai
     action: start
 
 gldt ledger staging:
@@ -694,7 +694,7 @@ gldt ledger staging:
   environment:
     name: gldt_ledger
     deployment_tier: staging
-    url: https://6uad6-fqaaa-aaaam-abovq-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6uad6-fqaaa-aaaam-abovq-cai
     action: start
 
 gldt ledger:
@@ -713,7 +713,7 @@ gldt ledger:
   environment:
     name: gldt_ledger
     deployment_tier: production
-    url: https://oh54a-baaaa-aaaap-abryq-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oh54a-baaaa-aaaap-abryq-cai
     action: start
 
 gldt ledger indexer staging:
@@ -731,7 +731,7 @@ gldt ledger indexer staging:
   environment:
     name: gldt_ledger_indexer
     deployment_tier: staging
-    url: https://wusb2-uiaaa-aaaao-a2lca-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=wusb2-uiaaa-aaaao-a2lca-cai
     action: start
 
 gldt ledger indexer:
@@ -750,5 +750,5 @@ gldt ledger indexer:
   environment:
     name: gldt_ledger_indexer
     deployment_tier: production
-    url: https://oo6x4-xiaaa-aaaap-abrza-cai.icp0.io
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oo6x4-xiaaa-aaaap-abrza-cai
     action: start
