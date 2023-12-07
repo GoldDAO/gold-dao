@@ -70,7 +70,7 @@ logo: logo.png
 
 # URL to the dapp controlled by the SNS project.
 # Must be a string from 10 to 512 bytes.
-url: https://gldt.org
+url: https://www.gold-dao.org
 
 # Metadata for the NNS proposal required to create the SNS. This data will be
 # shown only in the NNS proposal.
