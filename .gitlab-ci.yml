@@ -224,7 +224,7 @@ gldt_core canister build:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
     - scripts/build-canister.sh --wasmonly gldt_core
@@ -242,7 +242,7 @@ gldt_fee_compensation canister build:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
   <<: *rust_template
   script:
     - scripts/build-canister.sh --wasmonly gldt_fee_compensation
@@ -260,7 +260,7 @@ generate declarations:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^.+-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
       needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
   script:
     - dfx generate
