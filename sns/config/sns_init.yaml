@@ -52,7 +52,7 @@ name: Gold DAO
 # Description of the SNS project.
 # Must be a string of max length = 2,000.
 description: >
-  The Gold DAO project represents a groundbreaking fusion of traditional gold and modern blockchain technology, enabling physical gold to be accessible to everyone in the world instantaneously without using the banking system. At its core, the project introduces two primary products: the Gold Token (GLDT), a fungible token allowing fractional gold ownership; and a USD-pegged stablecoin (USDG), backed by gold (GLDT), offering a reliable alternative to fiat-backed stablecoins. These components work together to address the limitations of traditional gold transaction, inducing transferability and liquidity, while leveraging blockchain's transparency and efficiency.
+  The Gold DAO project represents a groundbreaking fusion of traditional gold and modern blockchain technology, allowing anyone in the world to access  physical gold instantaneously, with no dependence upon the banking system. At its core, the project introduces two primary products: the Gold Token (GLDT) - a fungible token allowing fractional gold ownership; and a USD-pegged stablecoin (USDG) - backed by gold (GLDT). These components combine to unlock a reliable alternative to fiat-backed stablecoins and their inflationary underpinnings, eradicating the limitations of traditional gold transacting by enabling instant transferability and liquidity, leveraging blockchain's transparency and efficiency.
 
 # This is currently a placeholder field and must be left empty for now.
 Principals: []
@@ -666,47 +666,47 @@ Distribution:
       dissolve_delay: 3 months
       vesting_period: 24 months
     # team member 8
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 0 years
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 3 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 6 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 9 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 12 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 15 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 18 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
       vesting_period: 21 months
-    - principal: aqzai-meyuz-xpeyo-zcxc2-ydfyk-ssqmt-x7tuj-4f7tj-3xkka-zsjaq-oae
+    - principal: mxscg-mfcsc-xkqze-a2wub-e6sct-fhfna-4a5sr-i63yc-pg7te-caopp-kqe
       stake: 2_500_000 tokens
       memo: 0
       dissolve_delay: 3 months
