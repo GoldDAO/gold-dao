@@ -108,7 +108,6 @@ NnsProposal:
     * oo6x4-xiaaa-aaaap-abrza-cai (GLDT ledger indexer)
     * o4yaf-3yaaa-aaaap-abr2a-cai (GLDT explorer frontend)
     * bojx2-iaaaa-aaaag-ab3jq-cai (GLDT landing page frontend)
-    * oj7ri-2qaaa-aaaap-abrzq-cai (GLDT swap app frontend)
     ## Verification
     All information about the project can be verified in the [whitepaper](https://gold-dao.gitbook.io/gold-dao-whitepaper/) and on [Github](https://github.com/GoldDAO/gldt-swap).
 
@@ -139,7 +138,6 @@ dapp_canisters:
   - oo6x4-xiaaa-aaaap-abrza-cai # GLDT ledger indexer
   - o4yaf-3yaaa-aaaap-abr2a-cai # GLDT explorer frontend
   - bojx2-iaaaa-aaaag-ab3jq-cai # GLDT landing page frontend
-  - oj7ri-2qaaa-aaaap-abrzq-cai # GLDT swap app frontend
 
 # Configuration of SNS tokens in the SNS Ledger canister deployed as part
 # of the SNS.
