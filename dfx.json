@@ -156,6 +156,11 @@
           "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
         }
       }
+    },
+    "sns_governance": {
+      "type": "custom",
+      "candid": "sns/scripts/candid/sns_governance.did",
+      "wasm": ""
     }
   },
   "networks": {
