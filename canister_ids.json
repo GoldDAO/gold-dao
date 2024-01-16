@@ -26,5 +26,25 @@
   "gldt_swap_app": {
     "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
     "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
+  },
+  "sns_governance": {
+    "ic": "tr3th-kiaaa-aaaaq-aab6q-cai",
+    "staging": ""
+  },
+  "sns_index": {
+    "ic": "efv5g-kqaaa-aaaaq-aacaa-cai",
+    "staging": ""
+  },
+  "sns_ledger": {
+    "ic": "tyyy3-4aaaa-aaaaq-aab7a-cai",
+    "staging": ""
+  },
+  "sns_root": {
+    "ic": "tw2vt-hqaaa-aaaaq-aab6a-cai",
+    "staging": ""
+  },
+  "sns_swap": {
+    "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
+    "staging": ""
   }
 }
