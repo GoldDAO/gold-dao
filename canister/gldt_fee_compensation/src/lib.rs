@@ -31,7 +31,6 @@ GLDT. This canister takes care of the fee compensation.
 #![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
-use canistergeek_ic_rust::logger::log_message;
 use gldt_libs::constants::GLDT_TX_FEE;
 use gldt_libs::misc::{
     convert_gld_nft_account_to_icrc1_account,
@@ -52,6 +51,7 @@ use gldt_libs::gld_nft::{ HistoryResult, Service as GldNft_service, TransactionR
 use gldt_libs::gldt_ledger::Service as ICRC1_service;
 use gldt_libs::types::{ GldtNumTokens, GldtTokenSpec, NftWeight };
 use gldt_libs::error::{ Custom as CustomError, Type as ErrorType };
+use gldt_libs::misc::log_message;
 
 mod registry;
 
@@ -118,15 +118,11 @@ thread_local! {
 fn pre_upgrade() {
     log_message("executing pre_upgrade".to_string());
 
-    // canister geek data
-    let monitor_stable_data = canistergeek_ic_rust::monitor::pre_upgrade_stable_data();
-    let logger_stable_data = canistergeek_ic_rust::logger::pre_upgrade_stable_data();
-
     let registry = REGISTRY.with(|cell| cell.borrow().clone());
     let conf = CONF.with(|cell| cell.borrow().clone());
     let managers = MANAGERS.with(|cell| cell.borrow().clone());
 
-    match storage::stable_save((registry, conf, managers, monitor_stable_data, logger_stable_data)) {
+    match storage::stable_save((registry, conf, managers)) {
         Ok(()) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -137,18 +133,9 @@ fn pre_upgrade() {
 
 #[ic_cdk_macros::post_upgrade]
 fn post_upgrade() {
-    let stable_data: Result<
-        (
-            Registry,
-            Conf,
-            Vec<Principal>,
-            canistergeek_ic_rust::monitor::PostUpgradeStableData,
-            canistergeek_ic_rust::logger::PostUpgradeStableData,
-        ),
-        String
-    > = storage::stable_restore();
+    let stable_data: Result<(Registry, Conf, Vec<Principal>), String> = storage::stable_restore();
     match stable_data {
-        Ok((registry, conf, managers, monitor_stable_data, logger_stable_data)) => {
+        Ok((registry, conf, managers)) => {
             REGISTRY.with(|cell| {
                 *cell.borrow_mut() = registry;
             });
@@ -158,8 +145,6 @@ fn post_upgrade() {
             MANAGERS.with(|cell| {
                 *cell.borrow_mut() = managers;
             });
-            canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
-            canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
         Err(msg) => {
             // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
@@ -701,29 +686,14 @@ fn validate_caller() -> Result<(), CustomError> {
     })
 }
 
-// for monitoring during development
-#[query(name = "getCanistergeekInformation")]
-fn get_canistergeek_information(
-    request: canistergeek_ic_rust::api_type::GetInformationRequest
-) -> canistergeek_ic_rust::api_type::GetInformationResponse<'static> {
-    canistergeek_ic_rust::get_information(request)
-}
-
-#[update(name = "updateCanistergeekInformation")]
-fn update_canistergeek_information(
-    request: canistergeek_ic_rust::api_type::UpdateInformationRequest
-) {
-    canistergeek_ic_rust::update_information(request);
-}
-
 /// This makes this Candid service self-describing, so that for example Candid UI, but also other
 /// tools, can seamlessly integrate with it. The concrete interface (method name etc.) is
 /// provisional, but works.
-#[query(name = "__get_candid_interface_tmp_hack")]
-fn get_candid_interface_tmp_hack() -> String {
-    include_str!("gldt_fee_compensation.did").to_string()
-}
-export_candid!();
+// #[query(name = "__get_candid_interface_tmp_hack")]
+// fn get_candid_interface_tmp_hack() -> String {
+//     include_str!("gldt_fee_compensation.did").to_string()
+// }
+// export_candid!();
 
 #[cfg(test)]
 mod test;

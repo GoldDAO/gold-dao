@@ -1,5 +1,4 @@
 use candid::Principal;
-use canistergeek_ic_rust::logger::log_message;
 use icrc_ledger_types::icrc1::account::Account;
 
 use crate::{ gldt_ledger, gld_nft::Account as GldNftAccount };
@@ -17,6 +16,11 @@ pub async fn dummy_await() {
     log_message(
         format!("Received dummy await - after time {}", ic_cdk::api::time() / 1_000_000_000)
     );
+}
+
+// dummy for now until package compatibility is fixed
+pub fn log_message(message: String) {
+    ic_cdk::print(format!("GLDT: {}", message));
 }
 
 pub fn get_principal_from_gldnft_account(account: &GldNftAccount) -> Option<Principal> {

@@ -95,7 +95,6 @@ canister id gldt_ledger)`.
 #![allow(clippy::must_use_candidate, clippy::too_many_lines, clippy::too_many_arguments)]
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
-use canistergeek_ic_rust::logger::log_message;
 use ic_cdk::{ api::{ self, call::notify }, storage };
 use ic_cdk_macros::{ export_candid, init, query, update };
 use icrc_ledger_types::icrc1::{
@@ -136,6 +135,7 @@ use gldt_libs::gld_nft::{
 };
 use gldt_libs::gldt_ledger;
 use gldt_libs::error::{ Custom as CustomError, Type as ErrorType };
+use gldt_libs::misc::log_message;
 
 use records::{ GldtRecord, RecordStatus, RecordStatusInfo, RecordType, Records };
 use registry::{
@@ -224,25 +224,12 @@ thread_local! {
 fn pre_upgrade() {
     log_message("executing pre_upgrade".to_string());
 
-    // canister geek data
-    let monitor_stable_data = canistergeek_ic_rust::monitor::pre_upgrade_stable_data();
-    let logger_stable_data = canistergeek_ic_rust::logger::pre_upgrade_stable_data();
-
     let conf = CONF.with(|cell| cell.borrow().clone());
     let registry = REGISTRY.with(|cell| cell.borrow().clone());
     let records = RECORDS.with(|cell| cell.borrow().clone());
     let managers = MANAGERS.with(|cell| cell.borrow().clone());
 
-    match
-        storage::stable_save((
-            conf,
-            registry,
-            records,
-            managers,
-            monitor_stable_data,
-            logger_stable_data,
-        ))
-    {
+    match storage::stable_save((conf, registry, records, managers)) {
         Ok(()) => log_message("INFO :: pre_upgrade :: stable memory saved".to_string()),
         Err(msg) =>
             api::trap(
@@ -254,18 +241,11 @@ fn pre_upgrade() {
 #[ic_cdk_macros::post_upgrade]
 fn post_upgrade() {
     let stable_data: Result<
-        (
-            Conf,
-            Registry,
-            Records,
-            Vec<Principal>,
-            canistergeek_ic_rust::monitor::PostUpgradeStableData,
-            canistergeek_ic_rust::logger::PostUpgradeStableData,
-        ),
+        (Conf, Registry, Records, Vec<Principal>),
         String
     > = storage::stable_restore();
     match stable_data {
-        Ok((conf, registry, records, managers, monitor_stable_data, logger_stable_data)) => {
+        Ok((conf, registry, records, managers)) => {
             CONF.with(|cell| {
                 *cell.borrow_mut() = conf;
             });
@@ -278,8 +258,6 @@ fn post_upgrade() {
             MANAGERS.with(|cell| {
                 *cell.borrow_mut() = managers;
             });
-            canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
-            canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
         Err(msg) => {
             // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
@@ -909,7 +887,6 @@ pub struct SubscriberNotification {
 #[update]
 async fn notify_sale_nft_origyn(args: SubscriberNotification) {
     log_message(format!("Sale notifcation: {args:?}"));
-    canistergeek_ic_rust::monitor::collect_metrics();
 
     // STEP 1 : validate inputs
     let (nft_id, gld_nft_canister_id, mut swap_info) = match validate_inputs(args.clone()) {
@@ -1169,30 +1146,14 @@ fn validate_caller() -> Result<(), CustomError> {
     })
 }
 
-// for monitoring during development
-#[query(name = "getCanistergeekInformation")]
-fn get_canistergeek_information(
-    request: canistergeek_ic_rust::api_type::GetInformationRequest
-) -> canistergeek_ic_rust::api_type::GetInformationResponse<'static> {
-    canistergeek_ic_rust::get_information(request)
-}
-
-#[update(name = "updateCanistergeekInformation")]
-fn update_canistergeek_information(
-    request: canistergeek_ic_rust::api_type::UpdateInformationRequest
-) {
-    canistergeek_ic_rust::update_information(request);
-}
-
 /// This makes this Candid service self-describing, so that for example Candid UI, but also other
 /// tools, can seamlessly integrate with it. The concrete interface (method name etc.) is
 /// provisional, but works.
-#[query]
-fn __get_candid_interface_tmp_hack() -> String {
-    include_str!("gldt_core.did").to_string()
-}
-
-export_candid!();
+// #[query]
+// fn __get_candid_interface_tmp_hack() -> String {
+//     include_str!("gldt_core.did").to_string()
+// }
+// export_candid!();
 
 #[cfg(test)]
 mod test;
