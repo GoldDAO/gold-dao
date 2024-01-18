@@ -413,7 +413,7 @@ fn calculate_compensation(sale_price: NumTokens) -> NumTokens {
     // There are three royalties and one intermediate transaction that need to be considered.
     // The fees are in total 1% which are fully compensated.
     // Therefore, the equation is: (sale_price - GLDT_TX_FEE) / 100 + 3 * GLDT_TX_FEE
-    ((sale_price - GLDT_TX_FEE) * compensation_factor) / 1000 + 3 * GLDT_TX_FEE
+    ((sale_price - GLDT_TX_FEE) * compensation_factor) / 1000u16 + 3 * GLDT_TX_FEE
 }
 
 /// The notify method which is called from the GLDT core canister to trigger the compensation.
@@ -474,7 +474,7 @@ async fn run_compensation_job() {
         }
 
         // expected royalty fee is 0.5% of the sale price, plus deducting the TX fee
-        let expected_royalty_fee = (expected_sale_price.clone() - GLDT_TX_FEE) / 200;
+        let expected_royalty_fee = (expected_sale_price.clone() - GLDT_TX_FEE) / 200u8;
         // calculate the compensated amount based on the sale price
         let fee_compensation = calculate_compensation(expected_sale_price.clone());
         let gld_nft_service = GldNft_service(gld_nft_canister_id);

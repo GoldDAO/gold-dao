@@ -88,10 +88,10 @@ fn test_export_2() {
     );
 
     let fee = FeeRegistryEntry {
-        amount: Nat::from(0),
+        amount: Nat::from(0u8),
         block_height: None,
         gld_nft_canister_id: Principal::anonymous(),
-        history_index: Nat::from(0),
+        history_index: Nat::from(0u8),
         status: registry::Status::Success,
         timestamp: 0,
         previous_entry: None,
@@ -129,10 +129,10 @@ fn test_export_2() {
 #[test]
 fn test_import() {
     let fee = FeeRegistryEntry {
-        amount: Nat::from(0),
+        amount: Nat::from(0u8),
         block_height: None,
         gld_nft_canister_id: Principal::anonymous(),
-        history_index: Nat::from(0),
+        history_index: Nat::from(0u8),
         status: registry::Status::Success,
         timestamp: 0,
         previous_entry: None,

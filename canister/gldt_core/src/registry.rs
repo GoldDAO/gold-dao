@@ -292,7 +292,7 @@ pub enum GldtError {
 impl Default for GldtError {
     fn default() -> Self {
         Self::Other(
-            Some(Error { error_code: Nat::from(0), error_message: "unknown error".to_string() })
+            Some(Error { error_code: Nat::from(0u8), error_message: "unknown error".to_string() })
         )
     }
 }
@@ -713,7 +713,7 @@ impl Registry {
                         entry.gldt_issue.get_nft_sale_id(),
                         0 as NftWeight,
                         entry.gldt_issue.get_num_tokens(),
-                        Nat::from(0),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,

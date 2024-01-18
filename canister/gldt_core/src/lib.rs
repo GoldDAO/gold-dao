@@ -690,7 +690,7 @@ fn add_record(
 
     let block_height = match swap_info.get_ledger_entry() {
         Some(GldtLedgerEntry::Minted(minted)) => minted.get_block_height(),
-        _ => Nat::from(0),
+        _ => Nat::from(0u8),
     };
     RECORDS.with(|r| {
         // let mut service = s.borrow_mut();
@@ -698,8 +698,8 @@ fn add_record(
 
         let entries = &mut records.entries;
         let new_index: BlockIndex = match entries.last_key_value() {
-            Some((last_index, _)) => (*last_index).clone() + Nat::from(1),
-            None => Nat::from(0),
+            Some((last_index, _)) => (*last_index).clone() + Nat::from(1u8),
+            None => Nat::from(0u8),
         };
 
         #[cfg(not(test))]

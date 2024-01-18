@@ -22,8 +22,8 @@ use gldt_libs::{
     constants::GLDT_SUBDIVIDABLE_BY,
 };
 // use serde_bytes::ByteBuf;
-use records::{GldtRecord, MAX_NUMBER_OF_RECORDS};
-use registry::{MAX_HISTORY_REGISTRY};
+use records::{ GldtRecord, MAX_NUMBER_OF_RECORDS };
+use registry::{ MAX_HISTORY_REGISTRY };
 
 // --------------------------------- constants ----------------------------------
 
@@ -114,14 +114,14 @@ fn update_registry_to_swapped(num_of_entries_to_update_per_weight: Option<usize>
         swap_info.set_ledger_entry(
             GldtLedgerEntry::Minted(
                 GldtLedgerInfo::new(
-                    Nat::from(0),
+                    Nat::from(0u8),
                     GldtNumTokens::new(Nat::from(100 * GLDT_SUBDIVIDABLE_BY)).unwrap()
                 )
             )
         );
         let _ = update_registry(&UpdateType::Mint, key.1.clone(), key.0, swap_info.clone());
         // 2. update to swapped
-        swap_info.set_swapped(GldtSwapped::new("test_sale_id".to_string(), Nat::from(100)));
+        swap_info.set_swapped(GldtSwapped::new("test_sale_id".to_string(), Nat::from(100u8)));
         let _ = update_registry(&UpdateType::Swap, key.1, key.0, swap_info);
     }
 }
@@ -138,7 +138,7 @@ fn init_records() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         ),
         RecordStatusInfo {
             status: RecordStatus::Ongoing,
@@ -159,7 +159,7 @@ fn init_records() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         ),
         RecordStatusInfo {
             status: RecordStatus::Ongoing,
@@ -212,11 +212,11 @@ fn init_records() {
 //                     ),
 //                 ]),
 //                 token: token.clone(),
-//                 current_bid_amount: Nat::from(0),
+//                 current_bid_amount: Nat::from(0u8),
 //                 winner: None,
 //                 end_date: candid::Int::default(),
 //                 start_date: candid::Int::default(),
-//                 wait_for_quiet_count: Some(Nat::from(0)),
+//                 wait_for_quiet_count: Some(Nat::from(0u8)),
 //                 current_escrow: None,
 //                 allow_list: None,
 //                 current_broker_id: None,
@@ -554,8 +554,8 @@ fn test_get_historical_swaps_by_user_b1() {
                         ],
                         "randomSellId2".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -581,8 +581,8 @@ fn test_get_historical_swaps_by_user_b1() {
                         ],
                         "randomSellId1".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -661,8 +661,8 @@ fn test_get_historical_swaps_by_user_b3() {
                         ],
                         "randomSellId1".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -716,8 +716,8 @@ fn test_get_historical_swaps_by_user_b4() {
                         ],
                         "randomSellId2".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -833,7 +833,7 @@ fn test_get_status_of_swap_b1() {
                     subaccount: Some([0u8; 32]),
                 },
                 0,
-                GldtNumTokens::new(Nat::from(0)).unwrap()
+                GldtNumTokens::new(Nat::from(0u8)).unwrap()
             )
         );
     });
@@ -871,7 +871,7 @@ fn test_get_status_of_swap_b2() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         );
 
         let _ = registry.init(
@@ -886,7 +886,7 @@ fn test_get_status_of_swap_b2() {
 
         swap_info.set_ledger_entry(
             GldtLedgerEntry::Minted(
-                GldtLedgerInfo::new(Nat::from(0), GldtNumTokens::new(Nat::from(0)).unwrap())
+                GldtLedgerInfo::new(Nat::from(0u8), GldtNumTokens::new(Nat::from(0u8)).unwrap())
             )
         );
 
@@ -934,7 +934,7 @@ fn test_get_status_of_swap_b3() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         );
 
         let _ = registry.init(
@@ -949,7 +949,7 @@ fn test_get_status_of_swap_b3() {
 
         swap_info.set_ledger_entry(
             GldtLedgerEntry::Minted(
-                GldtLedgerInfo::new(Nat::from(0), GldtNumTokens::new(Nat::from(0)).unwrap())
+                GldtLedgerInfo::new(Nat::from(0u8), GldtNumTokens::new(Nat::from(0u8)).unwrap())
             )
         );
 
@@ -963,7 +963,7 @@ fn test_get_status_of_swap_b3() {
             swap_info.clone()
         );
 
-        swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0)));
+        swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0u8)));
 
         let _ = registry.update_swapped(
             &(
@@ -1010,7 +1010,7 @@ fn test_get_status_of_swap_b3() {
 //                 subaccount: Some([0u8; 32]),
 //             },
 //             0,
-//             GldtNumTokens::new(Nat::from(0)).unwrap()
+//             GldtNumTokens::new(Nat::from(0u8)).unwrap()
 //         );
 
 //         let _ = registry.init(
@@ -1025,7 +1025,7 @@ fn test_get_status_of_swap_b3() {
 
 //         swap_info.set_ledger_entry(
 //             GldtLedgerEntry::Minted(
-//                 GldtLedgerInfo::new(Nat::from(0), GldtNumTokens::new(Nat::from(0)).unwrap())
+//                 GldtLedgerInfo::new(Nat::from(0u8), GldtNumTokens::new(Nat::from(0u8)).unwrap())
 //             )
 //         );
 
@@ -1039,7 +1039,7 @@ fn test_get_status_of_swap_b3() {
 //             swap_info.clone()
 //         );
 
-//         swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0)));
+//         swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0u8)));
 
 //         let _ = registry.update_swapped(
 //             (
@@ -1083,7 +1083,7 @@ fn test_get_status_of_swap_b3() {
 //                 subaccount: Some([0u8; 32]),
 //             },
 //             0,
-//             GldtNumTokens::new(Nat::from(0)).unwrap()
+//             GldtNumTokens::new(Nat::from(0u8)).unwrap()
 //         );
 
 //         let _ = registry.init(
@@ -1096,7 +1096,7 @@ fn test_get_status_of_swap_b3() {
 //             swap_info.clone()
 //         );
 
-//         swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0)));
+//         swap_info.set_swapped(GldtSwapped::new("randomSellId1".to_string(), Nat::from(0u8)));
 
 //         let _ = registry.update_swapped(
 //             (
@@ -1137,7 +1137,7 @@ fn test_get_status_of_swap_b6() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         );
 
         let _ = registry.init(
@@ -1179,7 +1179,7 @@ fn test_get_status_of_swap_b7() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         );
 
         let _ = registry.init(
@@ -1456,8 +1456,8 @@ fn test_get_records_b2() {
                         ],
                         "randomSellId1".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -1483,8 +1483,8 @@ fn test_get_records_b2() {
                         ],
                         "randomSellId2".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -1533,8 +1533,8 @@ fn test_get_records_b3() {
                         ],
                         "randomSellId1".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -1583,8 +1583,8 @@ fn test_get_records_b4() {
                         ],
                         "randomSellId2".to_string(),
                         0,
-                        GldtNumTokens::new(Nat::from(0)).unwrap(),
-                        Nat::from(0),
+                        GldtNumTokens::new(Nat::from(0u8)).unwrap(),
+                        Nat::from(0u8),
                         RecordStatusInfo {
                             status: RecordStatus::Ongoing,
                             message: None,
@@ -1623,7 +1623,7 @@ fn test_nft_info_a2() {
             subaccount: Some([0u8; 32]),
         },
         0,
-        GldtNumTokens::new(Nat::from(0)).unwrap()
+        GldtNumTokens::new(Nat::from(0u8)).unwrap()
     );
 
     REGISTRY.with(|r| {
@@ -1676,7 +1676,7 @@ fn test_nft_info_a3() {
                     subaccount: Some([0u8; 32]),
                 },
                 0,
-                GldtNumTokens::new(Nat::from(0)).unwrap()
+                GldtNumTokens::new(Nat::from(0u8)).unwrap()
             )
         );
     });
@@ -2324,7 +2324,7 @@ fn test_add_record_limit_1() {
                     subaccount: Some([0u8; 32]),
                 },
                 0,
-                GldtNumTokens::new(Nat::from(0)).unwrap()
+                GldtNumTokens::new(Nat::from(0u8)).unwrap()
             ),
             RecordStatusInfo {
                 status: RecordStatus::Ongoing,
@@ -2348,7 +2348,7 @@ fn test_add_record_limit_1() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         ),
         RecordStatusInfo {
             status: RecordStatus::Ongoing,
@@ -2358,7 +2358,6 @@ fn test_add_record_limit_1() {
 
     let export2 = fetch_metadata();
     assert_eq!(export1, export2);
-
 }
 
 // ------------------------- limit registry tests -----------------------------
@@ -2378,7 +2377,7 @@ fn test_limit_registry_history() {
                 subaccount: Some([0u8; 32]),
             },
             0,
-            GldtNumTokens::new(Nat::from(0)).unwrap()
+            GldtNumTokens::new(Nat::from(0u8)).unwrap()
         );
 
         let _ = registry.init(
@@ -2464,7 +2463,7 @@ fn test_limit_registry_history() {
 //                 subaccount: Some([0u8; 32]),
 //             },
 //             0,
-//             GldtNumTokens::new(Nat::from(0)).unwrap()
+//             GldtNumTokens::new(Nat::from(0u8)).unwrap()
 //         );
 
 //         for _ in 0..MAX_NUMBER_OF_ENTRIES {

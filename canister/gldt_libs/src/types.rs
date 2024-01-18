@@ -43,7 +43,7 @@ impl GldtNumTokens {
     }
 
     fn is_valid(val: NumTokens) -> bool {
-        val % (GLDT_SUBDIVIDABLE_BY * Nat::from(GLDT_PRICE_RATIO)) == 0
+        val % (GLDT_SUBDIVIDABLE_BY * Nat::from(GLDT_PRICE_RATIO)) == 0u8
     }
 }
 
