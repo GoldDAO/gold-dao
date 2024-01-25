@@ -1,0 +1,17 @@
+[package]
+name = "sns_rewards"
+version = "0.1.0"
+description = "Rewards canister to distribute custom token rewards for SNS participants."
+edition = "2021"
+license = "AGPL-3.0-only"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = { workspace = true }
+ic-cdk = { workspace = true }
+ic-stable-structures = { workspace = true }
+icrc-ledger-types = { workspace = true }
+serde = { workspace = true }

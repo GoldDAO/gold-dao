@@ -77,6 +77,17 @@
         "output": null
       }
     },
+    "sns_rewards": {
+      "type": "custom",
+      "candid": "backend/canisters/sns_rewards/api/can.did",
+      "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/sns_rewards/api"
+      },
+      "build": ["./scripts/build-canister.sh sns_rewards"]
+    },
     "yumi_kyc": {
       "type": "custom",
       "candid": "canister/yumi_kyc/kyc.did",
