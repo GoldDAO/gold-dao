@@ -1,1 +1,15 @@
-service : { test : () -> (text) query }
+type NeuronId = record { id : vec nat8 };
+type NeuronInfo = record {
+  accumulated_maturity : nat64;
+  last_maturity : nat64;
+};
+service : {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  get_all_principals_and_number_of_neurons : () -> (
+      vec record { principal; nat64 },
+    ) query;
+  get_neuron : (NeuronId) -> (opt NeuronInfo) query;
+  get_principal_neurons : (principal) -> (opt vec NeuronId) query;
+  sync_neurons : () -> (nat64);
+  test : () -> (text) query;
+}

@@ -11,13 +11,14 @@ use candid::{ CandidType, Principal, Deserialize, Encode, Decode };
 use std::cell::RefCell;
 use std::borrow::Cow;
 
+use sns_governance_canister::types::NeuronId;
+
+use jobs::process_neurons::*;
+
 mod lifecycle;
 mod jobs;
 mod queries;
 mod updates;
-
-type NeuronId = u64;
-type Maturity = u64;
 
 type VM = VirtualMemory<DefaultMemoryImpl>;
 
@@ -71,11 +72,11 @@ thread_local! {
     // });
 
     /// Mapping of each neuron to its accumulated maturity and last fetched maturity
-    static NEURON_MATURITY: RefCell<
-        StableBTreeMap<NeuronId, (Maturity, Maturity), VM>
-    > = MEMORY_MANAGER.with(|mm| {
-        RefCell::new(StableBTreeMap::init(mm.borrow().get(NEURON_MATURITY_MEM_ID)))
-    });
+    // static NEURON_MATURITY: RefCell<
+    //     StableBTreeMap<NeuronId, (Maturity, Maturity), VM>
+    // > = MEMORY_MANAGER.with(|mm| {
+    //     RefCell::new(StableBTreeMap::init(mm.borrow().get(NEURON_MATURITY_MEM_ID)))
+    // });
 
     // Mapping of each user to their info (principal, user_info)
     static PRINCIPAL_NEURONS: RefCell<

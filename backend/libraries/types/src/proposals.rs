@@ -1,4 +1,4 @@
-use crate::{ CanisterId, MessageId, NnsNeuronId, ProposalId, SnsNeuronId, TimestampMillis };
+use crate::{ CanisterId, NnsNeuronId, ProposalId, SnsNeuronId, TimestampMillis };
 use candid::CandidType;
 use serde::{ Deserialize, Serialize };
 
@@ -159,7 +159,7 @@ pub struct ProposalContent {
 
 #[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
 pub struct ProposalUpdate {
-    pub message_id: MessageId,
+    // pub message_id: MessageId,
     pub status: Option<ProposalDecisionStatus>,
     pub reward_status: Option<ProposalRewardStatus>,
     pub latest_tally: Option<Tally>,

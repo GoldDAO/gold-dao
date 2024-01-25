@@ -8,7 +8,16 @@ pub struct NeuronPermission {
 }
 /// The id of a specific neuron, which equals the neuron's subaccount on the ledger canister
 /// (the account that holds the neuron's staked tokens).
-#[derive(candid::CandidType, candid::Deserialize, Eq, std::hash::Hash, Clone, PartialEq)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Eq,
+    std::hash::Hash,
+    Clone,
+    PartialEq,
+    PartialOrd,
+    Ord
+)]
 pub struct NeuronId {
     pub id: Vec<u8>,
 }
@@ -267,7 +276,18 @@ pub struct TransferSnsTreasuryFunds {
 pub mod transfer_sns_treasury_funds {
     /// Whether to make the transfer from the NNS ledger (in ICP) or
     /// to make the transfer from the SNS ledger (in SNS tokens).
-    #[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+    #[derive(
+        candid::CandidType,
+        candid::Deserialize,
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord
+    )]
     #[repr(i32)]
     pub enum TransferFrom {
         Unspecified = 0,
@@ -428,7 +448,18 @@ pub struct GovernanceError {
 }
 /// Nested message and enum types in `GovernanceError`.
 pub mod governance_error {
-    #[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+    #[derive(
+        candid::CandidType,
+        candid::Deserialize,
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord
+    )]
     #[repr(i32)]
     pub enum ErrorType {
         Unspecified = 0,
@@ -1115,7 +1146,18 @@ pub mod governance {
         /// When current_basis_points was last updated (seconds since UNIX epoch).
         pub updated_at_timestamp_seconds: Option<u64>,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+    #[derive(
+        candid::CandidType,
+        candid::Deserialize,
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord
+    )]
     #[repr(i32)]
     pub enum Mode {
         /// This forces people to explicitly populate the mode field.
@@ -1764,7 +1806,18 @@ pub struct Account {
 }
 /// The different types of neuron permissions, i.e., privileges to modify a neuron,
 /// that principals can have.
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum NeuronPermissionType {
     /// Unused, here for PB lint purposes.
@@ -1807,7 +1860,8 @@ impl NeuronPermissionType {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             NeuronPermissionType::Unspecified => "NEURON_PERMISSION_TYPE_UNSPECIFIED",
-            NeuronPermissionType::ConfigureDissolveState => "NEURON_PERMISSION_TYPE_CONFIGURE_DISSOLVE_STATE",
+            NeuronPermissionType::ConfigureDissolveState =>
+                "NEURON_PERMISSION_TYPE_CONFIGURE_DISSOLVE_STATE",
             NeuronPermissionType::ManagePrincipals => "NEURON_PERMISSION_TYPE_MANAGE_PRINCIPALS",
             NeuronPermissionType::SubmitProposal => "NEURON_PERMISSION_TYPE_SUBMIT_PROPOSAL",
             NeuronPermissionType::Vote => "NEURON_PERMISSION_TYPE_VOTE",
@@ -1816,12 +1870,24 @@ impl NeuronPermissionType {
             NeuronPermissionType::MergeMaturity => "NEURON_PERMISSION_TYPE_MERGE_MATURITY",
             NeuronPermissionType::DisburseMaturity => "NEURON_PERMISSION_TYPE_DISBURSE_MATURITY",
             NeuronPermissionType::StakeMaturity => "NEURON_PERMISSION_TYPE_STAKE_MATURITY",
-            NeuronPermissionType::ManageVotingPermission => "NEURON_PERMISSION_TYPE_MANAGE_VOTING_PERMISSION",
+            NeuronPermissionType::ManageVotingPermission =>
+                "NEURON_PERMISSION_TYPE_MANAGE_VOTING_PERMISSION",
         }
     }
 }
 /// The types of votes a neuron can issue.
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum Vote {
     /// This exists because proto3 defaults to the 0 value on enums.
@@ -1846,7 +1912,18 @@ impl Vote {
         }
     }
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum ProposalDecisionStatus {
     Unspecified = 0,
@@ -1879,7 +1956,18 @@ impl ProposalDecisionStatus {
     }
 }
 /// A proposal's status, with respect to reward distribution.
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum ProposalRewardStatus {
     Unspecified = 0,
@@ -1914,7 +2002,18 @@ impl ProposalRewardStatus {
 /// `claim_swap_neurons` API may have. The status is reported back to callers of
 /// the API (mainly the SNS Sale canister) to indicate the success of the
 /// operation.
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum ClaimedSwapNeuronStatus {
     /// Unspecified represents the default value for unknown enum values when deserializing.
@@ -1949,13 +2048,25 @@ impl ClaimedSwapNeuronStatus {
             ClaimedSwapNeuronStatus::Success => "CLAIMED_SWAP_NEURON_STATUS_SUCCESS",
             ClaimedSwapNeuronStatus::Invalid => "CLAIMED_SWAP_NEURON_STATUS_INVALID",
             ClaimedSwapNeuronStatus::AlreadyExists => "CLAIMED_SWAP_NEURON_STATUS_ALREADY_EXISTS",
-            ClaimedSwapNeuronStatus::MemoryExhausted => "CLAIMED_SWAP_NEURON_STATUS_MEMORY_EXHAUSTED",
+            ClaimedSwapNeuronStatus::MemoryExhausted =>
+                "CLAIMED_SWAP_NEURON_STATUS_MEMORY_EXHAUSTED",
         }
     }
 }
 /// An enum representing the errors that the `claim_swap_neurons` API may
 /// return.
-#[derive(candid::CandidType, candid::Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    candid::CandidType,
+    candid::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord
+)]
 #[repr(i32)]
 pub enum ClaimSwapNeuronsError {
     /// Unspecified represents the default value for unknown enum values when deserializing.
@@ -2017,7 +2128,8 @@ impl ProposalData {
         const MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO: f64 = 0.03;
 
         if let Some(tally) = self.latest_tally.as_ref() {
-            (tally.yes as f64 >= tally.total as f64 * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO) && tally.yes > tally.no
+            (tally.yes as f64) >= (tally.total as f64) * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO &&
+                tally.yes > tally.no
         } else {
             false
         }
@@ -2031,8 +2143,7 @@ impl ProposalData {
     fn get_deadline_timestamp_seconds(&self) -> u64 {
         self.wait_for_quiet_state
             .as_ref()
-            .expect("Proposal must have a wait_for_quiet_state.")
-            .current_deadline_timestamp_seconds
+            .expect("Proposal must have a wait_for_quiet_state.").current_deadline_timestamp_seconds
     }
 }
 
