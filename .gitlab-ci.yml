@@ -141,7 +141,7 @@ gldt_core tests:
   script:
     - touch canister/gldt_core/src/gldt_core.did
     - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
-    - cargo test
+    - cargo test -j 1
 # TODO: Add code coverage calculation and export as cobertura artifact.
 
 ################################################################################
