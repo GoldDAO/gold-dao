@@ -32,7 +32,7 @@
     "deploy": "NETWORK='local' scripts/local-deploy.sh",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
-    "test": "echo \"No tests yet! Please write some unit tests!\"",
+    "test": "npm run build:backdid && cargo test",
     "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {
