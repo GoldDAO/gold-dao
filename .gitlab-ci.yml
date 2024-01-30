@@ -125,7 +125,7 @@ rust lint:
 ################################################################################
 # Unit tests
 ################################################################################
-gldt_core tests:
+gldt rust tests:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
