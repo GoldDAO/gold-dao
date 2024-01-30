@@ -5,6 +5,8 @@ As the front-end will be hosted on the Internet Computer, this projects uses [Ne
 
 > :bulb: This project uses the [`pages` routing](https://nextjs.org/docs/getting-started/project-structure#pages-routing-conventions), and not the [`app` routing that just went out of beta](https://nextjs.org/blog/next-13-4#nextjs-app-router).
 
+See [main README](../README.md) for more informations about the global GLDT project.
+
 ## Development
 ### Dependencies and local scripts
 
