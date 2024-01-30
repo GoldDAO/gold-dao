@@ -33,7 +33,6 @@ function Home({}) {
         description: 'GLDT Explorer Description',
     };
     if (router.asPath.includes("transaction/")) {
-        console.debug(`Routing to ${router.basePath}${router.asPath} !`);
         router.push(router.asPath);
     }
     const Explorer = dynamic(() => import('@/components/explorer/Explorer'), {
