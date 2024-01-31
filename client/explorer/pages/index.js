@@ -32,7 +32,7 @@ function Home({}) {
         title: 'GLDT Explorer',
         description: 'GLDT Explorer Description',
     };
-    if (router.asPath.includes("transaction/")) {
+    if (router.asPath.includes("transaction/") || router.asPath.includes("account/")) {
         router.push(router.asPath);
     }
     const Explorer = dynamic(() => import('@/components/explorer/Explorer'), {
