@@ -54,11 +54,11 @@ stages:
       - canister/gldt_core/target
       - canister/gldt_fee_compensation/target
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential > /dev/null
+    - apt update > /dev/null && apt install -y wget build-essential pkg-config > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor pkg-config cargo-tarpaulin
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
     - export PATH="$PWD/.cargo/bin:$PATH"
 
 ################################################################################
