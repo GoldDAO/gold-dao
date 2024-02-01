@@ -54,7 +54,7 @@ stages:
       - canister/gldt_core/target
       - canister/gldt_fee_compensation/target
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential pkg-config > /dev/null
+    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
