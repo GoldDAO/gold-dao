@@ -16,3 +16,6 @@ canister/**/declarations
 canister/gldt_core/src/gldt_core.did
 canister/gldt_fee_compensation/src/gldt_fee_compensation.did
 .vscode
+lcov.info
+cobertura.xml
+tarpaulin-report.html

@@ -155,23 +155,6 @@ gldt_core tests:
       changes:
         - "Cargo.{lock,toml}"
         - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - ".gitlab-ci.yml"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
-  script:
-    - touch canister/gldt_core/src/gldt_core.did
-    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
-    - cargo test -p gldt_core -j 2 --lib
-# TODO: Add code coverage calculation and export as cobertura artifact.
-
-gldt_fee_compensation tests:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "Cargo.{lock,toml}"
         - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
         - ".gitlab-ci.yml"
     - if: $CI_OPEN_MERGE_REQUESTS
@@ -181,8 +164,37 @@ gldt_fee_compensation tests:
   script:
     - touch canister/gldt_core/src/gldt_core.did
     - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
-    - cargo test -p gldt_fee_compensation -j 2 --lib
-# TODO: Add code coverage calculation and export as cobertura artifact.
+    - cargo tarpaulin -p gldt_core -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+
+gldt_fee_compensation tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - ".gitlab-ci.yml"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  script:
+    - touch canister/gldt_core/src/gldt_core.did
+    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
 
 ################################################################################
 # Test builds
