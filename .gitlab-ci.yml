@@ -20,6 +20,7 @@ cache:
       - .dfx
 
 stages:
+  - preparation
   - lint
   - test
   - build
@@ -59,6 +60,28 @@ stages:
     - mkdir -pv .cargo
     - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor tarpaulin
     - export PATH="$PWD/.cargo/bin:$PATH"
+
+################################################################################
+# Cache preparation
+################################################################################
+node cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *node_template
+  script:
+    - npm pkg get name description author license workspaces engines
+    - node --version
+    - npm --version
+
+cargo cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
+  script:
+    - cargo version
+    - cargo verify-project
 
 ################################################################################
 # Linters
