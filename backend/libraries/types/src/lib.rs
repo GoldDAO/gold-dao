@@ -1,10 +1,10 @@
 use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
-// mod message_id;
+mod http;
 mod proposals;
 
-// pub use message_id::*;
+pub use http::*;
 pub use proposals::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]

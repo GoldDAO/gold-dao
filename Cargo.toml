@@ -13,6 +13,7 @@ members = [
   "backend/libraries/canister_state_macros",
   "backend/libraries/canister_time",
   "backend/libraries/canister_tracing_macros",
+  "backend/libraries/http_request",
   "backend/libraries/types",
 ]
 resolver = "2"

@@ -499,6 +499,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "http_request"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_logger",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "types",
+]
+
+[[package]]
 name = "ic-cdk"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -996,6 +1008,7 @@ dependencies = [
  "candid",
  "canister_state_macros",
  "canister_time",
+ "http_request",
  "ic-cdk",
  "ic-cdk-macros",
  "ic-stable-structures",

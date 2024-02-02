@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use serde::Deserialize;
+use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
@@ -15,17 +15,40 @@ pub struct NeuronInfo {
 
 #[derive(CandidType, Deserialize)]
 pub struct RuntimeState {
+    /// SNS governance cansiter
+    pub sns_governance_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
     /// Stores the mapping of each principal to its neurons
     pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
 }
 
-impl Default for RuntimeState {
-    fn default() -> Self {
+impl RuntimeState {
+    pub fn new(sns_governance_canister: Principal) -> Self {
         Self {
+            sns_governance_canister,
+            ..Self::default()
+        }
+    }
+    pub fn default() -> Self {
+        Self {
+            sns_governance_canister: Principal::anonymous(),
             neuron_maturity: BTreeMap::new(),
             principal_neurons: BTreeMap::new(),
         }
     }
+    pub fn metrics(&self) -> Metrics {
+        Metrics {
+            sns_governance_canister: self.sns_governance_canister,
+            number_of_neurons: self.neuron_maturity.len(),
+            number_of_owners: self.principal_neurons.len(),
+        }
+    }
+}
+
+#[derive(CandidType, Serialize)]
+pub struct Metrics {
+    pub sns_governance_canister: Principal,
+    pub number_of_neurons: usize,
+    pub number_of_owners: usize,
 }

@@ -3,6 +3,8 @@ use candid::Principal;
 use sns_governance_canister::types::NeuronId;
 use state::NeuronInfo;
 use queries::GetNeuronResponse;
+use lifecycle::Args;
+use types::{ HttpRequest, HttpResponse };
 
 mod lifecycle;
 mod jobs;
