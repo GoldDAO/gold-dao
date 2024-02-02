@@ -994,8 +994,10 @@ name = "sns_rewards"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "canister_state_macros",
  "canister_time",
  "ic-cdk",
+ "ic-cdk-macros",
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",

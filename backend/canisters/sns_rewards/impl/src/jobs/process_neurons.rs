@@ -7,106 +7,116 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use candid::{ CandidType, Principal };
-use ic_cdk::query;
+use candid::Principal;
+
 use sns_governance_canister::types::{ NeuronId, Neuron };
 
-use std::cell::RefCell;
 use std::collections::{ btree_map, BTreeMap };
 
 use types::{ Maturity, TimestampSeconds };
-use canister_time::timestamp_seconds;
 
-#[derive(CandidType, Clone)]
-pub struct NeuronInfo {
-    last_maturity: u64,
-    accumulated_maturity: u64,
-}
+use crate::state::{ mutate_state, NeuronInfo };
 
 pub type MaturityHistory = Vec<(TimestampSeconds, Maturity)>;
 
-thread_local! {
-    static NEURON_REGISTRY: RefCell<BTreeMap<NeuronId, NeuronInfo>> = RefCell::default();
-    static PRINCIPAL_NEURONS: RefCell<BTreeMap<Principal, Vec<NeuronId>>> = RefCell::default();
-    static MATURITY_HISTORY: RefCell<BTreeMap<NeuronId, MaturityHistory>> = RefCell::default();
-}
-
-pub async fn fetch_neuron_data() -> Result<u64, String> {
-    // 1. fetch maturity of all neurons
-    //    a. call `list_neurons` from SNS governance canister
-    //    b. update the internal structure of maturity storage
-
+pub async fn update_neuron_data() -> Result<u64, String> {
     // let canister_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
     let canister_id = Principal::from_text("2jvtu-yqaaa-aaaaq-aaama-cai").unwrap();
-    let args = sns_governance_canister::list_neurons::Args {
-        limit: 100,
+
+    let mut number_of_scanned_neurons: u64 = 0;
+    let mut continue_scanning = true;
+    let limit = 100;
+
+    let mut args = sns_governance_canister::list_neurons::Args {
+        limit,
         start_page_at: None,
         of_principal: None,
     };
 
-    ic_cdk::println!("Fetching neuron data");
-    match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
-        Ok(response) => {
-            PRINCIPAL_NEURONS.with(|prin| {
-                MATURITY_HISTORY.with(|hist| {
-                    NEURON_REGISTRY.with(|reg| {
-                        let mut reg_borrow = reg.borrow_mut();
-                        let mut hist_borrow = hist.borrow_mut();
-                        let mut prin_borrow = prin.borrow_mut();
+    while continue_scanning {
+        continue_scanning = false;
 
-                        response.neurons.iter().for_each(|neuron| {
-                            update_registry(&mut reg_borrow, neuron);
-                            update_history(&mut hist_borrow, neuron);
-                            update_principal_mapping(&mut prin_borrow, neuron);
-                        });
+        ic_cdk::println!("Fetching neuron data");
+        match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
+            Ok(response) => {
+                mutate_state(|state| {
+                    let neuron_maturity = &mut state.neuron_maturity;
+                    let principal_neurons = &mut state.principal_neurons;
+                    response.neurons.iter().for_each(|neuron| {
+                        update_neuron_maturity(neuron_maturity, neuron);
+                        update_principal_neuron_mapping(principal_neurons, neuron)
                     });
-                })
-            });
-            Ok(response.neurons.len() as u64)
+                });
+                let number_of_received_neurons = response.neurons.len() as u64;
+                if (number_of_received_neurons as u32) == limit {
+                    continue_scanning = true;
+                    args.start_page_at = response.neurons.last().map_or_else(
+                        || {
+                            ic_cdk::api::trap(
+                                "Missing last neuron to continue iterating. This should not be possible as the limits are checked."
+                            )
+                        },
+                        |n| n.id.clone()
+                    );
+                }
+                number_of_scanned_neurons += number_of_received_neurons;
+            }
+            Err(err) => {
+                ic_cdk::println!("err: {:?}", err);
+                // add proper proper logging and tracing here
+            }
         }
-        Err(err) => {
-            ic_cdk::println!("err: {:?}", err);
-            Err(format!("Error: {:?}", err))
+        // for testing
+        if number_of_scanned_neurons >= 300 {
+            break;
         }
     }
+    Ok(number_of_scanned_neurons)
 }
-// Function to update registry
-fn update_registry(reg: &mut BTreeMap<NeuronId, NeuronInfo>, neuron: &Neuron) {
+
+// Function to update neuron maturity
+fn update_neuron_maturity(reg: &mut BTreeMap<NeuronId, NeuronInfo>, neuron: &Neuron) {
     if let Some(id) = &neuron.id {
-        let maturity = neuron.maturity_e8s_equivalent;
+        let maturity =
+            neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent.unwrap_or(0);
         match reg.entry(id.clone()) {
             btree_map::Entry::Vacant(entry) => {
                 entry.insert(NeuronInfo {
-                    last_maturity: maturity,
+                    last_synced_maturity: maturity,
                     accumulated_maturity: 0,
                 });
             }
             btree_map::Entry::Occupied(mut entry) => {
                 let info = entry.get_mut();
-                info.accumulated_maturity += maturity - info.last_maturity;
-                info.last_maturity = maturity;
+                let delta = maturity - info.last_synced_maturity;
+                if delta != 0 {
+                    // only add the difference if the maturity has increased
+                    info.accumulated_maturity += std::cmp::max(delta, 0);
+                    info.last_synced_maturity = maturity;
+                }
             }
         }
     }
 }
 
-// Function to update history
-fn update_history(hist: &mut BTreeMap<NeuronId, Vec<(u64, u64)>>, neuron: &Neuron) {
-    if let Some(id) = &neuron.id {
-        let maturity = neuron.maturity_e8s_equivalent;
-        match hist.entry(id.clone()) {
-            btree_map::Entry::Vacant(entry) => {
-                entry.insert(vec![(timestamp_seconds(), maturity)]);
-            }
-            btree_map::Entry::Occupied(mut entry) => {
-                entry.get_mut().push((timestamp_seconds(), maturity));
-            }
-        }
-    }
-}
+// // Function to update history
+// fn update_neuron_history(hist: &mut BTreeMap<NeuronId, MaturityHistory>, neuron: &Neuron) {
+//     if let Some(id) = &neuron.id {
+//         let maturity = neuron.maturity_e8s_equivalent;
+//         match hist.entry(id.clone()) {
+//             btree_map::Entry::Vacant(entry) => {
+//                 entry.insert(vec![(timestamp_seconds(), maturity)]);
+//             }
+//             btree_map::Entry::Occupied(mut entry) => {
+//                 entry.get_mut().push((timestamp_seconds(), maturity));
+//             }
+//         }
+//     }
+// }
 
 // Function to update principal-neuron mapping
-fn update_principal_mapping(prin: &mut BTreeMap<Principal, Vec<NeuronId>>, neuron: &Neuron) {
+fn update_principal_neuron_mapping(prin: &mut BTreeMap<Principal, Vec<NeuronId>>, neuron: &Neuron) {
+    // only look at the first permissioned principal, as this is in 99% cases the owner of the neuron
     if let Some(permissioned_principal) = neuron.permissions.first() {
         if let Some(pid) = permissioned_principal.principal {
             prin.entry(pid)
@@ -122,26 +132,4 @@ fn update_principal_mapping(prin: &mut BTreeMap<Principal, Vec<NeuronId>>, neuro
                 });
         }
     }
-}
-
-pub type GetNeuronResponse = NeuronInfo;
-
-#[query]
-fn get_neuron(id: NeuronId) -> Option<GetNeuronResponse> {
-    NEURON_REGISTRY.with(|reg| { reg.borrow().get(&id).cloned() })
-}
-
-#[query]
-fn get_principal_neurons(principal: Principal) -> Option<Vec<NeuronId>> {
-    PRINCIPAL_NEURONS.with(|prin| { prin.borrow().get(&principal).cloned() })
-}
-
-#[query]
-fn get_all_principals_and_number_of_neurons() -> Vec<(Principal, u64)> {
-    PRINCIPAL_NEURONS.with(|prin| {
-        prin.borrow()
-            .iter()
-            .map(|(p, n)| (p.clone(), n.len() as u64))
-            .collect()
-    })
 }
