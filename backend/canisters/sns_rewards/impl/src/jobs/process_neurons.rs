@@ -8,20 +8,16 @@ is eligible for.
 */
 
 use candid::Principal;
-
 use sns_governance_canister::types::{ NeuronId, Neuron };
-
 use std::collections::{ btree_map, BTreeMap };
-
 use types::{ Maturity, TimestampSeconds };
 
-use crate::state::{ mutate_state, NeuronInfo };
+use crate::state::{ mutate_state, read_state, NeuronInfo };
 
 pub type MaturityHistory = Vec<(TimestampSeconds, Maturity)>;
 
-pub async fn update_neuron_data() -> Result<u64, String> {
-    // let canister_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
-    let canister_id = Principal::from_text("2jvtu-yqaaa-aaaaq-aaama-cai").unwrap();
+pub async fn update_neuron_data() {
+    let canister_id = read_state(|state| state.sns_governance_canister);
 
     let mut number_of_scanned_neurons: u64 = 0;
     let mut continue_scanning = true;
@@ -66,12 +62,11 @@ pub async fn update_neuron_data() -> Result<u64, String> {
                 // add proper proper logging and tracing here
             }
         }
-        // for testing
-        if number_of_scanned_neurons >= 300 {
-            break;
-        }
+        // // for testing
+        // if number_of_scanned_neurons >= 300 {
+        //     break;
+        // }
     }
-    Ok(number_of_scanned_neurons)
 }
 
 // Function to update neuron maturity
