@@ -161,6 +161,8 @@ gldt_core tests:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
+  tags:
+    - dind
   services:
     - docker:dind
   variables:
@@ -190,6 +192,8 @@ gldt_fee_compensation tests:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
+  tags:
+    - dind
   services:
     - docker:dind
   variables:
