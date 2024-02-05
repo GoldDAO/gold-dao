@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 ic0 = { workspace = true }
+ic-cdk = { workspace = true }
+ic-cdk-timers = { workspace = true }
+types = { path = '../types' }
