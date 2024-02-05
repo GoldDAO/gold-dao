@@ -50,8 +50,8 @@ stages:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
       - .cargo
-      - canister/gldt_core/target
-      - canister/gldt_fee_compensation/target
+      - backend/canisters/gldt_core/target
+      - backend/canisters/gldt_fee_compensation/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential > /dev/null
     - rustup component add clippy
@@ -111,15 +111,15 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
-    - touch canister/gldt_core/src/gldt_core.did
-    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+    - touch backend/canisters/gldt_core/src/gldt_core.did
+    - touch backend/canisters/gldt_fee_compensation/src/gldt_fee_compensation.did
     - cargo clippy
 
 ################################################################################
@@ -134,12 +134,12 @@ gldt_core test build:
     - scripts/build-canister.sh --wasmonly gldt_core
     - scripts/generate-did.sh gldt_core
     - scripts/build-canister.sh gldt_core
-    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
+    - ic-wasm backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
   artifacts:
     name: "gldt_core-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
-      - canister/gldt_core/target/wasm32-unknown-unknown/release
-      - canister/gldt_core/src/gldt_core.did
+      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_core/src/gldt_core.did
     expire_in: 1 day
 
 gldt_fee_compensation test build:
@@ -151,12 +151,12 @@ gldt_fee_compensation test build:
     - scripts/build-canister.sh --wasmonly gldt_fee_compensation
     - scripts/generate-did.sh gldt_fee_compensation
     - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
+    - ic-wasm backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
   artifacts:
     name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
-      - canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_fee_compensation/src/gldt_fee_compensation.did
     expire_in: 1 day
 
 generate test declarations:
@@ -171,7 +171,7 @@ generate test declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
-      - canister/**/declarations
+      - backend/canisters/**/declarations
     expire_in: 1 day
 
 swap_app test build:
@@ -233,8 +233,8 @@ gldt_core canister build:
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_core-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/gldt_core/target/wasm32-unknown-unknown/release
-      - canister/gldt_core/src/gldt_core.did
+      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_core/src/gldt_core.did
     expire_in: 6 months
 
 gldt_fee_compensation canister build:
@@ -251,8 +251,8 @@ gldt_fee_compensation canister build:
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_fee_compensation-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_fee_compensation/src/gldt_fee_compensation.did
     expire_in: 6 months
 
 generate declarations:
@@ -268,7 +268,7 @@ generate declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
-      - canister/**/declarations
+      - backend/canisters/**/declarations
     expire_in: 6 months
 
 swap_app staging build:
