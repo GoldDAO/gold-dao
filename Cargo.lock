@@ -207,7 +207,10 @@ version = "0.1.0"
 name = "canister_time"
 version = "0.1.0"
 dependencies = [
+ "ic-cdk",
+ "ic-cdk-timers",
  "ic0",
+ "types",
 ]
 
 [[package]]

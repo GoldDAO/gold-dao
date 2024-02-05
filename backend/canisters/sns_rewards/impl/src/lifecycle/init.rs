@@ -2,7 +2,9 @@ use candid::{ CandidType, Principal };
 use ic_cdk_macros::init;
 use serde::Deserialize;
 
-use crate::state::{ init_state, RuntimeState };
+use crate::state::RuntimeState;
+
+use super::init_canister;
 
 #[derive(Deserialize, CandidType)]
 pub struct Args {
@@ -13,5 +15,5 @@ pub struct Args {
 fn init(args: Args) {
     let runtime_state = RuntimeState::new(args.sns_governance_canister);
 
-    init_state(runtime_state)
+    init_canister(runtime_state)
 }

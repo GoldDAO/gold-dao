@@ -1,8 +1,9 @@
 // use sns_governance_canister::types::ListNeuronsResponse;
-use crate::jobs::process_neurons::update_neuron_data;
+use crate::jobs::synchronise_neurons::run;
 use ic_cdk::update;
 
+// Only for development, remove after
 #[update]
-async fn sync_neurons() {
-    update_neuron_data().await
+async fn sync_neurons_manual_trigger() {
+    run()
 }

@@ -8,15 +8,26 @@ is eligible for.
 */
 
 use candid::Principal;
+use canister_time::{ run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
-use std::collections::{ btree_map, BTreeMap };
-use types::{ Maturity, TimestampSeconds };
+use std::{ collections::{ btree_map, BTreeMap }, time::Duration };
+use types::Milliseconds;
 
 use crate::state::{ mutate_state, read_state, NeuronInfo };
 
-pub type MaturityHistory = Vec<(TimestampSeconds, Maturity)>;
+const SYNC_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS;
 
-pub async fn update_neuron_data() {
+pub fn start_job() {
+    run_now_then_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run);
+}
+
+pub fn run() {
+    ic_cdk::spawn(synchronise_neuron_data())
+}
+
+// pub type MaturityHistory = Vec<(TimestampSeconds, Maturity)>;
+
+pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.sns_governance_canister);
 
     let mut number_of_scanned_neurons: u64 = 0;
@@ -62,6 +73,9 @@ pub async fn update_neuron_data() {
                 // add proper proper logging and tracing here
             }
         }
+        // TODO: add to logging
+        // log("Scanned {number_of_scanner_neurons} neurons.")
+
         // // for testing
         // if number_of_scanned_neurons >= 300 {
         //     break;
