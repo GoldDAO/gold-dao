@@ -251,7 +251,6 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      # TODO: Add "gldt_fee_compensation test build"
       needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
