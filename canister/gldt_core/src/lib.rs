@@ -110,8 +110,6 @@ use serde_json::{ json, Value };
 mod records;
 mod registry;
 
-// Test change to test code coverage display in Gitlab MR
-
 use gldt_libs::types::{
     calculate_tokens_from_weight,
     GldtNumTokens,
