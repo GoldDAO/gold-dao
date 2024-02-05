@@ -8,7 +8,7 @@ is eligible for.
 */
 
 use candid::Principal;
-use canister_time::{ run_now_then_interval, DAY_IN_MS };
+use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use std::{ collections::{ btree_map, BTreeMap }, time::Duration };
 use types::Milliseconds;
@@ -30,7 +30,11 @@ pub fn run() {
 pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.sns_governance_canister);
 
-    let mut number_of_scanned_neurons: u64 = 0;
+    mutate_state(|state| {
+        state.debug_data.last_synced_start = now_millis();
+    });
+
+    let mut number_of_scanned_neurons = 0;
     let mut continue_scanning = true;
     let limit = 100;
 
@@ -54,7 +58,7 @@ pub async fn synchronise_neuron_data() {
                         update_principal_neuron_mapping(principal_neurons, neuron)
                     });
                 });
-                let number_of_received_neurons = response.neurons.len() as u64;
+                let number_of_received_neurons = response.neurons.len();
                 if (number_of_received_neurons as u32) == limit {
                     continue_scanning = true;
                     args.start_page_at = response.neurons.last().map_or_else(
@@ -73,14 +77,18 @@ pub async fn synchronise_neuron_data() {
                 // add proper proper logging and tracing here
             }
         }
-        // TODO: add to logging
-        // log("Scanned {number_of_scanner_neurons} neurons.")
 
         // // for testing
         // if number_of_scanned_neurons >= 300 {
         //     break;
         // }
     }
+    // TODO: add to logging
+    // log("Scanned {number_of_scanner_neurons} neurons.")
+    mutate_state(|state| {
+        state.debug_data.last_synced_end = now_millis();
+        state.debug_data.last_synced_number_of_neurons = number_of_scanned_neurons;
+    });
 }
 
 // Function to update neuron maturity
