@@ -20,6 +20,7 @@ cache:
       - .dfx
 
 stages:
+  - preparation
   - lint
   - test
   - build
@@ -53,12 +54,34 @@ stages:
       - canister/gldt_core/target
       - canister/gldt_fee_compensation/target
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential > /dev/null
+    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
     - export PATH="$PWD/.cargo/bin:$PATH"
+
+################################################################################
+# Cache preparation
+################################################################################
+node cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *node_template
+  script:
+    - npm pkg get name description author license workspaces engines
+    - node --version
+    - npm --version
+
+cargo cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
+  script:
+    - cargo version
+    - cargo verify-project
 
 ################################################################################
 # Linters
@@ -123,6 +146,71 @@ rust lint:
     - cargo clippy
 
 ################################################################################
+# Unit tests
+################################################################################
+gldt_core tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - ".gitlab-ci.yml"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  tags:
+    - dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
+  script:
+    - touch canister/gldt_core/src/gldt_core.did
+    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+    - cargo tarpaulin -p gldt_core -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+
+gldt_fee_compensation tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - ".gitlab-ci.yml"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  tags:
+    - dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
+  script:
+    - touch canister/gldt_core/src/gldt_core.did
+    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+
+################################################################################
 # Test builds
 ################################################################################
 gldt_core test build:
@@ -163,7 +251,6 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      # TODO: Add "gldt_fee_compensation test build"
       needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
