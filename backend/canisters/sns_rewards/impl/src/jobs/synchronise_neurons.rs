@@ -31,7 +31,7 @@ pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.sns_governance_canister);
 
     mutate_state(|state| {
-        state.debug_data.last_synced_start = now_millis();
+        state.sync_info.last_synced_start = now_millis();
     });
 
     let mut number_of_scanned_neurons = 0;
@@ -86,8 +86,8 @@ pub async fn synchronise_neuron_data() {
     // TODO: add to logging
     // log("Scanned {number_of_scanner_neurons} neurons.")
     mutate_state(|state| {
-        state.debug_data.last_synced_end = now_millis();
-        state.debug_data.last_synced_number_of_neurons = number_of_scanned_neurons;
+        state.sync_info.last_synced_end = now_millis();
+        state.sync_info.last_synced_number_of_neurons = number_of_scanned_neurons;
     });
 }
 
