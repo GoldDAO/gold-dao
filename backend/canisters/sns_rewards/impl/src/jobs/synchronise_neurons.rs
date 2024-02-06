@@ -10,6 +10,7 @@ is eligible for.
 use candid::Principal;
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
+use tracing::{ debug, error, info };
 use std::{ collections::{ btree_map, BTreeMap }, time::Duration };
 use types::Milliseconds;
 
@@ -47,7 +48,7 @@ pub async fn synchronise_neuron_data() {
     while continue_scanning {
         continue_scanning = false;
 
-        ic_cdk::println!("Fetching neuron data");
+        debug!("Fetching neuron data");
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
                 mutate_state(|state| {
@@ -60,31 +61,29 @@ pub async fn synchronise_neuron_data() {
                 });
                 let number_of_received_neurons = response.neurons.len();
                 if (number_of_received_neurons as u32) == limit {
-                    continue_scanning = true;
                     args.start_page_at = response.neurons.last().map_or_else(
                         || {
-                            ic_cdk::api::trap(
-                                "Missing last neuron to continue iterating. This should not be possible as the limits are checked."
-                            )
+                            error!(
+                                "Missing last neuron to continue iterating.
+                                This should not be possible as the limits are checked. Stopping loop here."
+                            );
+                            None
                         },
-                        |n| n.id.clone()
+                        |n| {
+                            continue_scanning = true;
+                            n.id.clone()
+                        }
                     );
                 }
                 number_of_scanned_neurons += number_of_received_neurons;
             }
             Err(err) => {
-                ic_cdk::println!("err: {:?}", err);
-                // add proper proper logging and tracing here
+                let error_message = format!("{err:?}");
+                error!(?error_message, "Error fetching neuron data");
             }
         }
-
-        // // for testing
-        // if number_of_scanned_neurons >= 300 {
-        //     break;
-        // }
     }
-    // TODO: add to logging
-    // log("Scanned {number_of_scanner_neurons} neurons.")
+    info!("Successfully scanned {number_of_scanned_neurons} neurons.");
     mutate_state(|state| {
         state.sync_info.last_synced_end = now_millis();
         state.sync_info.last_synced_number_of_neurons = number_of_scanned_neurons;
