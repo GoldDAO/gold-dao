@@ -1,18 +1,19 @@
 use ic_cdk::storage;
 use ic_cdk_macros::pre_upgrade;
+use tracing::info;
 
 use crate::state::take_state;
 
 #[pre_upgrade]
 fn pre_upgrade() {
-    // TODO: add tracing and logging
+    info!("Pre upgrade.");
+
     let runtime_state = take_state();
 
-    let stable_state = (runtime_state,);
+    let logs = canister_logger::export_logs();
+    let traces = canister_logger::export_traces();
 
-    if let Err(err) = storage::stable_save(stable_state) {
-        ic_cdk::api::trap(
-            &format!("ERROR :: pre_upgrade :: failed to save stable memory. Error: {err}")
-        )
-    };
+    let stable_state = (runtime_state, logs, traces);
+
+    storage::stable_save(stable_state).unwrap();
 }

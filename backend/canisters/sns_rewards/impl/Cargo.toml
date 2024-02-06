@@ -10,8 +10,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 candid = { workspace = true }
+canister_logger = { path = '../../../libraries/canister_logger' }
 canister_state_macros = { path = '../../../libraries/canister_state_macros' }
 canister_time = { path = '../../../libraries/canister_time' }
+canister_tracing_macros = { path = '../../../libraries/canister_tracing_macros' }
 http_request = { path = '../../../libraries/http_request' }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
@@ -21,3 +23,4 @@ serde = { workspace = true }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 sns_governance_canister_c2c_client = { path = '../../../external_canisters/sns_governance/c2c_client' }
 types = { path = '../../../libraries/types' }
+tracing = { workspace = true }

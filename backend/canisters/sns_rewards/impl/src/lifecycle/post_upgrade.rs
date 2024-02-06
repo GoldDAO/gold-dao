@@ -1,18 +1,17 @@
+use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
-use ic_cdk::{ api, storage };
+use ic_cdk::storage;
+use tracing::info;
 
 use super::init_canister;
 
 #[post_upgrade]
+#[trace]
 fn post_upgrade() {
-    match storage::stable_restore() {
-        Ok((runtime_state,)) => { init_canister(runtime_state) }
-        Err(msg) => {
-            // Traps in pre_upgrade or post_upgrade will cause the upgrade to be reverted
-            // and the state to be restored.
-            api::trap(
-                &format!("Failed to restore from stable memory. Reverting upgrade. Message: {msg}")
-            );
-        }
-    }
+    let (runtime_state, logs, traces) = storage::stable_restore().unwrap();
+
+    canister_logger::init_with_logs(true, logs, traces);
+    init_canister(runtime_state);
+
+    info!("Post upgrade complete.")
 }
