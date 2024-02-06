@@ -1,9 +1,11 @@
+mod logs_handler;
 mod router;
 
 use serde::Serialize;
 use serde_bytes::ByteBuf;
 use types::{ HeaderField, HttpResponse };
 
+pub use logs_handler::*;
 pub use router::*;
 
 pub fn build_json_response<T: Serialize>(body: &T) -> HttpResponse {
