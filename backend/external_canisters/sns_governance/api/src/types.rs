@@ -1,3 +1,8 @@
+use candid::{ Decode, Encode, CandidType };
+use ic_stable_structures::{ storable::Bound, Storable };
+use serde::{ Serialize, Deserialize };
+use std::{ borrow::Cow, fmt::{ self, Display, Formatter } };
+
 /// A principal with a particular set of permissions over a neuron.
 #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
 pub struct NeuronPermission {
@@ -9,8 +14,9 @@ pub struct NeuronPermission {
 /// The id of a specific neuron, which equals the neuron's subaccount on the ledger canister
 /// (the account that holds the neuron's staked tokens).
 #[derive(
-    candid::CandidType,
-    candid::Deserialize,
+    CandidType,
+    Serialize,
+    Deserialize,
     Eq,
     std::hash::Hash,
     Clone,
@@ -19,8 +25,25 @@ pub struct NeuronPermission {
     Ord
 )]
 pub struct NeuronId {
-    pub id: Vec<u8>,
+    id: Vec<u8>,
 }
+
+impl Storable for NeuronId {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(self.id.clone())
+    }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Self { id: bytes.into_owned() }
+    }
+    const BOUND: Bound = Bound::Bounded { max_size: 32, is_fixed_size: true };
+}
+
+impl Display for NeuronId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", hex::encode(&self.id))
+    }
+}
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {

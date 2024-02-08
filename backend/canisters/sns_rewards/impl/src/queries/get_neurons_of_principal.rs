@@ -1,8 +1,9 @@
 use candid::{ CandidType, Principal };
 use ic_cdk_macros::query;
 use sns_governance_canister::types::NeuronId;
+use types::NeuronInfo;
 
-use crate::state::{ read_state, NeuronInfo };
+use crate::state::read_state;
 
 #[derive(CandidType)]
 pub struct GetNeuronResponse {

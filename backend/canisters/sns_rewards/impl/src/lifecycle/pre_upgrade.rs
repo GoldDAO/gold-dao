@@ -1,8 +1,8 @@
-use ic_cdk::storage;
 use ic_cdk_macros::pre_upgrade;
+use stable_memory::get_writer;
 use tracing::info;
 
-use crate::state::take_state;
+use crate::{ memory::get_upgrades_memory, state::take_state };
 
 #[pre_upgrade]
 fn pre_upgrade() {
@@ -15,5 +15,8 @@ fn pre_upgrade() {
 
     let stable_state = (runtime_state, logs, traces);
 
-    storage::stable_save(stable_state).unwrap();
+    let mut memory = get_upgrades_memory();
+    let writer = get_writer(&mut memory);
+
+    serializer::serialize(stable_state, writer).unwrap();
 }

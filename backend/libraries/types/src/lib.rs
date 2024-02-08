@@ -2,9 +2,11 @@ use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
 mod http;
+mod neuron_info;
 mod proposals;
 
 pub use http::*;
+pub use neuron_info::*;
 pub use proposals::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]

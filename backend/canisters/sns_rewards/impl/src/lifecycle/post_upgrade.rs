@@ -1,14 +1,19 @@
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
-use ic_cdk::storage;
+use stable_memory::get_reader;
 use tracing::info;
+
+use crate::memory::get_upgrades_memory;
 
 use super::init_canister;
 
 #[post_upgrade]
 #[trace]
 fn post_upgrade() {
-    let (runtime_state, logs, traces) = storage::stable_restore().unwrap();
+    let memory = get_upgrades_memory();
+    let reader = get_reader(&memory);
+
+    let (runtime_state, logs, traces) = serializer::deserialize(reader).unwrap();
 
     canister_logger::init_with_logs(true, logs, traces);
     init_canister(runtime_state);

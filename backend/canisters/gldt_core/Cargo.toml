@@ -2,9 +2,13 @@
 name = "gldt_core"
 version = "0.1.0"
 description = "Core logic canister for swapping GLD NFT to GLDT."
-authors = ["Johan Georg", "Dustin Becker <dustin@bochslerfinance.com>", "Gautier Woja <gautier@bochslerfinance.com>"]
+authors = [
+  "Johan Georg",
+  "Dustin Becker <dustin@bochslerfinance.com>",
+  "Gautier Woja <gautier@bochslerfinance.com>",
+]
 edition = "2021"
-license= "AGPL-3.0-only"
+license = "AGPL-3.0-only"
 
 ## See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -20,11 +24,11 @@ ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
-serde_derive = { workspace = true }
+# serde_derive = { workspace = true }
 serde_bytes = { workspace = true }
-gldt_libs = {path="../gldt_libs"}
+gldt_libs = { path = "../gldt_libs" }
 serde_json = { workspace = true }
 
 [dev-dependencies]
-clippy="0.0.302"
+clippy = "0.0.302"
 tokio = { version = "1.33.0", features = ["full"] }

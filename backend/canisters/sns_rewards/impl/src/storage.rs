@@ -1,1 +1,0 @@
-// contains direct stable memory
