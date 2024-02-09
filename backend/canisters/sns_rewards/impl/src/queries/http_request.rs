@@ -1,4 +1,3 @@
-// use crate::{ read_state, RuntimeState };
 use http_request::{ build_json_response, extract_route, Route, encode_logs };
 use ic_cdk_macros::query;
 use types::{ HttpRequest, HttpResponse, TimestampMillis };
@@ -19,15 +18,10 @@ fn http_request(request: HttpRequest) -> HttpResponse {
         build_json_response(&state.metrics())
     }
 
-    // fn get_neurons(state: &RuntimeState) -> HttpResponse {
-    //     build_json_response(&state.data.neurons)
-    // }
-
     match extract_route(&request.url) {
         Route::Logs(since) => get_logs_impl(since),
         Route::Traces(since) => get_traces_impl(since),
         Route::Metrics => read_state(get_metrics_impl),
-        // Route::Other(path, _) if path == "neurons" => read_state(get_neurons),
         _ => HttpResponse::not_found(),
     }
 }

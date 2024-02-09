@@ -48,10 +48,5 @@ service : (Args) -> {
   get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
   sync_neurons_manual_trigger : () -> ();
-  update_debug : () -> (text);
-  update_error : () -> (text);
   update_info : () -> (text);
-  update_trace : () -> (text);
-  update_trace_macro : () -> (text);
-  update_warning : () -> (text);
 }
