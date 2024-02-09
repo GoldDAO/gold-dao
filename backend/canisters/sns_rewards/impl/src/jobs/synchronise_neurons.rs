@@ -134,14 +134,16 @@ fn update_neuron_maturity(
                 let prev_neuron_info = entry.get_mut();
                 if let Some(delta) = maturity.checked_sub(prev_neuron_info.last_synced_maturity) {
                     // only add the difference if the maturity has increased
-                    neuron_info.accumulated_maturity = prev_neuron_info.accumulated_maturity
-                        .checked_add(delta)
-                        .unwrap_or(prev_neuron_info.accumulated_maturity);
-                    // then overwrite the previous entry
-                    prev_neuron_info.accumulated_maturity = neuron_info.accumulated_maturity;
-                    prev_neuron_info.last_synced_maturity = neuron_info.last_synced_maturity;
-                    // and return the updated neuron info
-                    res = Some((id.clone(), neuron_info));
+                    if delta > 0 {
+                        neuron_info.accumulated_maturity = prev_neuron_info.accumulated_maturity
+                            .checked_add(delta)
+                            .unwrap_or(prev_neuron_info.accumulated_maturity);
+                        // then overwrite the previous entry
+                        prev_neuron_info.accumulated_maturity = neuron_info.accumulated_maturity;
+                        prev_neuron_info.last_synced_maturity = neuron_info.last_synced_maturity;
+                        // and return the updated neuron info
+                        res = Some((id.clone(), neuron_info));
+                    }
                 }
             }
         }
