@@ -44,6 +44,12 @@ impl Display for NeuronId {
     }
 }
 
+impl Default for NeuronId {
+    fn default() -> Self {
+        Self { id: Vec::new() }
+    }
+}
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {

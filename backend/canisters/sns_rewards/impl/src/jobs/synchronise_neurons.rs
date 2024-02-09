@@ -10,7 +10,7 @@ is eligible for.
 use candid::Principal;
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS, HOUR_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
-use tracing::{ debug, error, info };
+use tracing::{ debug, error, info, warn };
 use std::{ collections::{ btree_map, BTreeMap }, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo, TimestampMillis };
 
@@ -132,11 +132,11 @@ fn update_neuron_maturity(
             }
             btree_map::Entry::Occupied(mut entry) => {
                 let prev_neuron_info = entry.get_mut();
-                let delta = maturity - prev_neuron_info.last_synced_maturity;
-                if delta != 0 {
+                if let Some(delta) = maturity.checked_sub(prev_neuron_info.last_synced_maturity) {
                     // only add the difference if the maturity has increased
-                    neuron_info.accumulated_maturity =
-                        prev_neuron_info.accumulated_maturity + std::cmp::max(delta, 0);
+                    neuron_info.accumulated_maturity = prev_neuron_info.accumulated_maturity
+                        .checked_add(delta)
+                        .unwrap_or(prev_neuron_info.accumulated_maturity);
                     // then overwrite the previous entry
                     prev_neuron_info.accumulated_maturity = neuron_info.accumulated_maturity;
                     prev_neuron_info.last_synced_maturity = neuron_info.last_synced_maturity;
@@ -180,5 +180,11 @@ fn update_principal_neuron_mapping(prin: &mut BTreeMap<Principal, Vec<NeuronId>>
 }
 
 fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
-    neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent.unwrap_or(0)
+    neuron.maturity_e8s_equivalent
+        .checked_add(neuron.staked_maturity_e8s_equivalent.unwrap_or(0))
+        .unwrap_or_else(|| {
+            let id = neuron.id.clone().unwrap_or_default();
+            warn!("Unexpected overflow when calculating total maturity of neuron {id}");
+            0
+        })
 }
