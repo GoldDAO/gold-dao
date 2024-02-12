@@ -42,7 +42,7 @@ fi
 cargo build --target wasm32-unknown-unknown --target-dir $BASE_CANISTER_PATH/$1/target --release --locked -p $1
 
 if [[ $WASMONLY == 1 ]]; then
-  rm $BASE_CANISTER_PATH/$1/api/can.did
+  rm -f $BASE_CANISTER_PATH/$1/api/can.did
 	echo "$1 wasm file created and read for did generation"
 else
 	ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm shrink
