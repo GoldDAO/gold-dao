@@ -1153,7 +1153,7 @@ fn validate_caller() -> Result<(), CustomError> {
 // fn __get_candid_interface_tmp_hack() -> String {
 //     include_str!("gldt_core.did").to_string()
 // }
-// export_candid!();
+export_candid!();
 
 #[cfg(test)]
 mod test;
