@@ -3,45 +3,45 @@
   "canisters": {
     "gldt_ledger": {
       "type": "custom",
-      "candid": "canister/gldt_ledger/gldt_ledger.did",
+      "candid": "backend/canisters/gldt_ledger/gldt_ledger.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/gldt_ledger/declarations"
+        "output": "backend/canisters/gldt_ledger/api"
       }
     },
     "gldt_ledger_indexer": {
       "type": "custom",
-      "candid": "canister/gldt_ledger_indexer/gldt_ledger_indexer.did",
+      "candid": "backend/canisters/gldt_ledger_indexer/gldt_ledger_indexer.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/gldt_ledger_indexer/declarations"
+        "output": "backend/canisters/gldt_ledger_indexer/api"
       }
     },
     "gldt_core": {
       "package": "gldt_core",
       "type": "custom",
-      "candid": "canister/gldt_core/src/gldt_core.did",
-      "wasm": "canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
+      "candid": "backend/canisters/gldt_core/src/gldt_core.did",
+      "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/gldt_core/declarations"
+        "output": "backend/canisters/gldt_core/api"
       },
       "build": ["npm run build:back"]
     },
     "gldt_fee_compensation": {
       "package": "gldt_fee_compensation",
       "type": "custom",
-      "candid": "canister/gldt_fee_compensation/src/gldt_fee_compensation.did",
-      "wasm": "canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
+      "candid": "backend/canisters/gldt_fee_compensation/src/gldt_fee_compensation.did",
+      "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/gldt_fee_compensation/declarations"
+        "output": "backend/canisters/gldt_fee_compensation/api"
       },
       "build": ["npm run build:back"]
     },
@@ -90,12 +90,12 @@
     },
     "yumi_kyc": {
       "type": "custom",
-      "candid": "canister/yumi_kyc/kyc.did",
-      "wasm": "canister/yumi_kyc/kyc.wasm",
+      "candid": "backend/external_canisters/yumi_kyc/kyc.did",
+      "wasm": "backend/external_canisters/yumi_kyc/kyc.wasm",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/yumi_kyc/declarations"
+        "output": "backend/external_canisters/yumi_kyc/api"
       },
       "remote": {
         "id": {
@@ -106,12 +106,12 @@
     },
     "gldnft_backend_1g": {
       "type": "custom",
-      "candid": "canister/gld_nft/origyn_nft_reference.did",
-      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "canister/gld_nft/declarations"
+        "output": "backend/external_canisters/gld_nft/api"
       },
       "remote": {
         "id": {
@@ -122,8 +122,8 @@
     },
     "gldnft_backend_10g": {
       "type": "custom",
-      "candid": "canister/gld_nft/origyn_nft_reference.did",
-      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
         "env_override": null,
@@ -138,8 +138,8 @@
     },
     "gldnft_backend_100g": {
       "type": "custom",
-      "candid": "canister/gld_nft/origyn_nft_reference.did",
-      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
         "env_override": null,
@@ -154,8 +154,8 @@
     },
     "gldnft_backend_1000g": {
       "type": "custom",
-      "candid": "canister/gld_nft/origyn_nft_reference.did",
-      "wasm": "canister/gld_nft/origyn_nft_reference.wasm.gz",
+      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
         "env_override": null,
