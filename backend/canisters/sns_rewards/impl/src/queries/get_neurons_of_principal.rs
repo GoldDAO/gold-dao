@@ -14,6 +14,10 @@ pub struct GetNeuronResponse {
 
 #[query]
 fn get_neurons_of_principal(principal: Principal) -> Vec<GetNeuronResponse> {
+    get_neurons_of_principal_int(principal)
+}
+
+pub fn get_neurons_of_principal_int(principal: Principal) -> Vec<GetNeuronResponse> {
     read_state(|state| {
         state.principal_neurons
             .get(&principal)

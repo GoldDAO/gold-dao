@@ -686,13 +686,6 @@ fn validate_caller() -> Result<(), CustomError> {
     })
 }
 
-/// This makes this Candid service self-describing, so that for example Candid UI, but also other
-/// tools, can seamlessly integrate with it. The concrete interface (method name etc.) is
-/// provisional, but works.
-// #[query(name = "__get_candid_interface_tmp_hack")]
-// fn get_candid_interface_tmp_hack() -> String {
-//     include_str!("gldt_fee_compensation.did").to_string()
-// }
 export_candid!();
 
 #[cfg(test)]

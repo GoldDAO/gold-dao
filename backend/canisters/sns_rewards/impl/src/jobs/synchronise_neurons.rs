@@ -7,18 +7,13 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use candid::Principal;
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS, HOUR_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use tracing::{ debug, error, info, warn };
-use std::{ collections::{ btree_map, BTreeMap }, time::Duration };
-use types::{ Maturity, Milliseconds, NeuronInfo, TimestampMillis };
+use std::{ collections::btree_map, time::Duration };
+use types::{ Maturity, Milliseconds, NeuronInfo };
 
-use crate::{
-    // model::maturity_history::{ insert_event, MaturityEvent },
-    model::maturity_history::MaturityHistory,
-    state::{ mutate_state, read_state },
-};
+use crate::state::{ mutate_state, read_state, RuntimeState };
 
 // set to HOURS for development but modify to DAYS for production
 const SYNC_NEURONS_INTERVAL: Milliseconds = HOUR_IN_MS;
@@ -56,27 +51,11 @@ pub async fn synchronise_neuron_data() {
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
                 mutate_state(|state| {
-                    let neuron_maturity = &mut state.neuron_maturity;
-                    let principal_neurons = &mut state.principal_neurons;
-                    let maturity_history = &mut state.maturity_history;
                     debug!("Updating neurons");
-                    let mut neuron_infos: Vec<(NeuronId, TimestampMillis, NeuronInfo)> = vec![];
                     response.neurons.iter().for_each(|neuron| {
-                        update_principal_neuron_mapping(principal_neurons, neuron);
-                        if
-                            let Some((neuron_id, neuron_info)) = update_neuron_maturity(
-                                neuron_maturity,
-                                neuron
-                            )
-                        {
-                            neuron_infos.push((
-                                neuron_id,
-                                state.sync_info.last_synced_start,
-                                neuron_info.into(),
-                            ));
-                        }
+                        update_principal_neuron_mapping(state, neuron);
+                        update_neuron_maturity(state, neuron);
                     });
-                    update_neuron_maturity_history(maturity_history, neuron_infos);
                 });
                 let number_of_received_neurons = response.neurons.len();
                 if (number_of_received_neurons as u32) == limit {
@@ -110,59 +89,51 @@ pub async fn synchronise_neuron_data() {
 }
 
 // Function to update neuron maturity
-fn update_neuron_maturity(
-    reg: &mut BTreeMap<NeuronId, NeuronInfo>,
-    neuron: &Neuron
-) -> Option<(NeuronId, NeuronInfo)> {
+fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
     // This function only returns Some() if the neuron is initialised or its maturity has changed
-    let mut res: Option<(NeuronId, NeuronInfo)> = None;
     if let Some(id) = &neuron.id {
+        let updated_neuron: Option<(NeuronId, NeuronInfo)>;
+
         let maturity = calculate_total_maturity(neuron);
 
-        let mut neuron_info = NeuronInfo {
+        let neuron_info = NeuronInfo {
             last_synced_maturity: maturity,
             accumulated_maturity: 0,
         };
 
         // TODO - check age of neuron to avoid someone gaming the system by spawning neurons (check if really relevant)
-        match reg.entry(id.clone()) {
+        match state.neuron_maturity.entry(id.clone()) {
             btree_map::Entry::Vacant(entry) => {
                 entry.insert(neuron_info);
-                res = Some((id.clone(), neuron_info));
+                updated_neuron = Some((id.clone(), neuron_info));
             }
             btree_map::Entry::Occupied(mut entry) => {
-                let prev_neuron_info = entry.get_mut();
-                if let Some(delta) = maturity.checked_sub(prev_neuron_info.last_synced_maturity) {
+                let neuron_info_entry = entry.get_mut();
+                if let Some(delta) = maturity.checked_sub(neuron_info_entry.last_synced_maturity) {
                     // only add the difference if the maturity has increased
-                    if delta > 0 {
-                        neuron_info.accumulated_maturity = prev_neuron_info.accumulated_maturity
-                            .checked_add(delta)
-                            .unwrap_or(prev_neuron_info.accumulated_maturity);
-                        // then overwrite the previous entry
-                        prev_neuron_info.accumulated_maturity = neuron_info.accumulated_maturity;
-                        prev_neuron_info.last_synced_maturity = neuron_info.last_synced_maturity;
-                        // and return the updated neuron info
-                        res = Some((id.clone(), neuron_info));
+                    if delta == 0 {
+                        return;
                     }
+                    // update accumulated maturity
+                    neuron_info_entry.accumulated_maturity = neuron_info_entry.accumulated_maturity
+                        .checked_add(delta)
+                        .unwrap_or(neuron_info_entry.accumulated_maturity);
                 }
+                // update the last_synced_maturity
+                neuron_info_entry.last_synced_maturity = maturity;
+                updated_neuron = Some((id.clone(), neuron_info_entry.clone()));
             }
         }
-        // for development purposes, we always log the maturity of the neuron to test the history log
-        res = Some((id.clone(), neuron_info));
+        // update history
+        if let Some((n_id, n_info)) = updated_neuron {
+            state.maturity_history.insert((n_id, state.sync_info.last_synced_start), n_info)
+        }
     }
-    return res;
-}
-
-// Function to insert entry to maturity history of neurons
-fn update_neuron_maturity_history(
-    maturity_history: &mut MaturityHistory,
-    data: Vec<(NeuronId, TimestampMillis, NeuronInfo)>
-) {
-    maturity_history.insert_multiple(data);
 }
 
 // Function to update principal-neuron mapping
-fn update_principal_neuron_mapping(prin: &mut BTreeMap<Principal, Vec<NeuronId>>, neuron: &Neuron) {
+fn update_principal_neuron_mapping(state: &mut RuntimeState, neuron: &Neuron) {
+    let prin = &mut state.principal_neurons;
     // only look at the first permissioned principal, as this is in 99% cases the owner of the neuron
     if let Some(permissioned_principal) = neuron.permissions.first() {
         if let Some(pid) = permissioned_principal.principal {
@@ -189,4 +160,125 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
             warn!("Unexpected overflow when calculating total maturity of neuron {id}");
             0
         })
+}
+
+// Tests
+// - check multiple permissioned principals
+// - check the bounds
+// - check neuron principal mapping
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use candid::Principal;
+    use sns_governance_canister::types::{ neuron, Neuron, NeuronId, NeuronPermission };
+    use types::NeuronInfo;
+
+    use crate::{
+        jobs::synchronise_neurons::update_principal_neuron_mapping,
+        state::{ init_state, mutate_state, read_state, RuntimeState },
+    };
+
+    use super::update_neuron_maturity;
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::new(Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap()));
+    }
+
+    fn init_neuron(id: NeuronId) -> Neuron {
+        Neuron {
+            id: Some(id),
+            permissions: vec![],
+            cached_neuron_stake_e8s: 0,
+            neuron_fees_e8s: 0,
+            created_timestamp_seconds: 0,
+            aging_since_timestamp_seconds: 0,
+            followees: BTreeMap::default(),
+            maturity_e8s_equivalent: 0,
+            voting_power_percentage_multiplier: 0,
+            source_nns_neuron_id: None,
+            staked_maturity_e8s_equivalent: None,
+            auto_stake_maturity: None,
+            vesting_period_seconds: None,
+            disburse_maturity_in_progress: vec![],
+            dissolve_state: None,
+        }
+    }
+
+    #[test]
+    fn test_insert_update_neuron() {
+        init_runtime_state();
+
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let limit = 5;
+
+        // let mut neuron = init_neuron(neuron_id.clone());
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        // 1. Insert new neuron
+        mutate_state(|state| {
+            update_neuron_maturity(state, &neuron);
+        });
+
+        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0 };
+        let mut result = read_state(|state| {
+            state.neuron_maturity.get(&neuron_id).cloned()
+        }).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        let mut expected_result_history = vec![(0, expected_result)];
+        let mut result_history = read_state(|state| {
+            state.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+
+        // 2. Increase neuron maturity
+        neuron.maturity_e8s_equivalent = 100;
+        neuron.staked_maturity_e8s_equivalent = Some(50);
+
+        mutate_state(|state| {
+            state.sync_info.last_synced_start += 100;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 150 };
+        result = read_state(|state| { state.neuron_maturity.get(&neuron_id).cloned() }).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        expected_result_history.push((100, expected_result));
+        result_history = read_state(|state| {
+            state.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+
+        // 3. Reduce neuron maturity
+        neuron.maturity_e8s_equivalent = 0;
+        neuron.staked_maturity_e8s_equivalent = Some(50);
+
+        mutate_state(|state| {
+            state.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        result = read_state(|state| { state.neuron_maturity.get(&neuron_id).cloned() }).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        expected_result_history.push((250, expected_result));
+        result_history = read_state(|state| {
+            state.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+    }
+
 }

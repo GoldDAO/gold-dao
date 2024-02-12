@@ -22,7 +22,8 @@ pub struct NeuronPermission {
     Clone,
     PartialEq,
     PartialOrd,
-    Ord
+    Ord,
+    Debug
 )]
 pub struct NeuronId {
     id: Vec<u8>,
@@ -50,6 +51,18 @@ impl Default for NeuronId {
     }
 }
 
+impl NeuronId {
+    pub fn new(id_as_hex: &str) -> Option<Self> {
+        if let Ok(id) = hex::decode(id_as_hex) {
+            Some(Self {
+                id,
+            })
+        } else {
+            None
+        }
+    }
+}
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {
@@ -62,7 +75,7 @@ pub struct DisburseMaturityInProgress {
     pub account_to_disburse_to: Option<Account>,
 }
 /// A neuron in the governance system.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Default)]
 pub struct Neuron {
     /// The unique id of this neuron.
     pub id: Option<NeuronId>,

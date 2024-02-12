@@ -30,7 +30,7 @@ impl MaturityHistory {
         self.history.insert(key, val);
     }
 
-    pub fn insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {
+    pub fn _insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {
         for (neuron_id, ts, event) in events {
             self.insert((neuron_id, ts), event);
         }

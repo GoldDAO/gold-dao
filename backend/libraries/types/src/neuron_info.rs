@@ -7,7 +7,7 @@ use serde::{ Deserialize, Serialize };
 const MAX_VALUE_SIZE: u32 = 100;
 
 /// The maturity information about a neuron
-#[derive(Serialize, Clone, Deserialize, CandidType, Copy)]
+#[derive(Serialize, Clone, Deserialize, CandidType, Copy, Debug, PartialEq, Eq)]
 pub struct NeuronInfo {
     pub last_synced_maturity: u64,
     pub accumulated_maturity: u64,

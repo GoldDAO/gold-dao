@@ -38,8 +38,14 @@ pub fn now_millis() -> TimestampMillis {
     now_nanos() / NANOS_PER_MILLISECOND
 }
 
+#[cfg(target_arch = "wasm32")]
 pub fn now_nanos() -> TimestampNanos {
     ic_cdk::api::time()
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn now_nanos() -> TimestampNanos {
+    0
 }
 
 pub fn run_now_then_interval(interval: Duration, func: fn()) {
