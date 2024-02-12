@@ -171,7 +171,7 @@ generate test declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
-      - backend/canisters/**/declarations
+      - backend/canisters/**/api
     expire_in: 1 day
 
 swap_app test build:
@@ -268,7 +268,7 @@ generate declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
-      - backend/canisters/**/declarations
+      - backend/canisters/**/api
     expire_in: 6 months
 
 swap_app staging build:
