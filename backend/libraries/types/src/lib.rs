@@ -2,10 +2,12 @@ use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
 mod http;
+mod memory;
 mod neuron_info;
 mod proposals;
 
 pub use http::*;
+pub use memory::*;
 pub use neuron_info::*;
 pub use proposals::*;
 

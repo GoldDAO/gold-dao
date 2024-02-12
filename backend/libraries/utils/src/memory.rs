@@ -1,4 +1,4 @@
-pub fn used() -> u64 {
+pub fn wasm_memory_size() -> u64 {
     #[cfg(target_arch = "wasm32")]
     {
         const UPPER_LIMIT_WASM_SIZE_BYTES: u64 = 3 * 1024 * 1024; // 3MB

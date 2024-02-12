@@ -1320,6 +1320,8 @@ dependencies = [
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
+ "stable_memory",
+ "utils",
 ]
 
 [[package]]

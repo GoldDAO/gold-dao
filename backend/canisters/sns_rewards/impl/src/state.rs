@@ -4,7 +4,7 @@ use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ NeuronInfo, TimestampMillis };
+use types::{ MemorySize, NeuronInfo, TimestampMillis };
 
 use crate::model::maturity_history::MaturityHistory;
 
@@ -68,7 +68,7 @@ pub struct Metrics {
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct CanisterInfo {
     pub now: TimestampMillis,
-    pub memory_used: u64,
+    pub memory_used: MemorySize,
     // pub wasm_version: BuildVersion,
 }
 
@@ -76,7 +76,7 @@ impl CanisterInfo {
     pub fn fetch_info() -> Self {
         Self {
             now: now_millis(),
-            memory_used: utils::memory::used(),
+            memory_used: MemorySize::used(),
             // wasm_version: BuildVersion::default(),
         }
     }
