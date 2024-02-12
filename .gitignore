@@ -12,6 +12,4 @@ out/
 .env
 target
 backend/canisters/**/target
-backend/canisters/gldt_core/api/can.did
-backend/canisters/gldt_fee_compensation/api/can.did
 .vscode

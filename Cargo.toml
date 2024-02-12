@@ -1,9 +1,9 @@
 [workspace]
 members = [
-  "backend/canisters/gldt_core",
-  "backend/canisters/gldt_fee_compensation",
-  "backend/canisters/sns_rewards/api",
+  "backend/canisters/gldt_core/impl",
+  "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",
+  "backend/canisters/gldt_libs",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
   "backend/libraries/candid_gen",

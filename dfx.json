@@ -24,7 +24,7 @@
     "gldt_core": {
       "package": "gldt_core",
       "type": "custom",
-      "candid": "backend/canisters/gldt_core/src/gldt_core.did",
+      "candid": "backend/canisters/gldt_core/api/can.did",
       "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
@@ -36,7 +36,7 @@
     "gldt_fee_compensation": {
       "package": "gldt_fee_compensation",
       "type": "custom",
-      "candid": "backend/canisters/gldt_fee_compensation/src/gldt_fee_compensation.did",
+      "candid": "backend/canisters/gldt_fee_compensation/api/can.did",
       "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
@@ -84,7 +84,7 @@
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/canisters/sns_rewards/api"
+        "output": "npm run build:back"
       },
       "build": ["./scripts/build-canister.sh sns_rewards"]
     },
