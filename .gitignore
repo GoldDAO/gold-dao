@@ -12,4 +12,5 @@ out/
 .env
 target
 backend/canisters/**/target
+backend/**/api/declarations
 .vscode

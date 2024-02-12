@@ -3,22 +3,22 @@
   "canisters": {
     "gldt_ledger": {
       "type": "custom",
-      "candid": "backend/canisters/gldt_ledger/gldt_ledger.did",
+      "candid": "backend/canisters/gldt_ledger/api/can.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/canisters/gldt_ledger/api"
+        "output": "backend/canisters/gldt_ledger/api/declarations"
       }
     },
     "gldt_ledger_indexer": {
       "type": "custom",
-      "candid": "backend/canisters/gldt_ledger_indexer/gldt_ledger_indexer.did",
+      "candid": "backend/canisters/gldt_ledger_indexer/api/can.did",
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/canisters/gldt_ledger_indexer/api"
+        "output": "backend/canisters/gldt_ledger_indexer/api/declarations"
       }
     },
     "gldt_core": {
@@ -29,7 +29,7 @@
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/canisters/gldt_core/api"
+        "output": "backend/canisters/gldt_core/api/declarations"
       },
       "build": ["npm run build:back"]
     },
@@ -41,7 +41,7 @@
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/canisters/gldt_fee_compensation/api"
+        "output": "backend/canisters/gldt_fee_compensation/api/declarations"
       },
       "build": ["npm run build:back"]
     },
@@ -84,18 +84,18 @@
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "npm run build:back"
+        "output": "backend/canisters/sns_rewards/api/declarations"
       },
       "build": ["./scripts/build-canister.sh sns_rewards"]
     },
     "yumi_kyc": {
       "type": "custom",
-      "candid": "backend/external_canisters/yumi_kyc/kyc.did",
+      "candid": "backend/external_canisters/yumi_kyc/api/can.did",
       "wasm": "backend/external_canisters/yumi_kyc/kyc.wasm",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/external_canisters/yumi_kyc/api"
+        "output": "backend/external_canisters/yumi_kyc/api/declarations"
       },
       "remote": {
         "id": {
@@ -106,12 +106,12 @@
     },
     "gldnft_backend_1g": {
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
-        "output": "backend/external_canisters/gld_nft/api"
+        "output": "backend/external_canisters/gld_nft/api/declarations"
       },
       "remote": {
         "id": {
@@ -122,7 +122,7 @@
     },
     "gldnft_backend_10g": {
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
@@ -138,7 +138,7 @@
     },
     "gldnft_backend_100g": {
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
@@ -154,7 +154,7 @@
     },
     "gldnft_backend_1000g": {
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/origyn_nft_reference.did",
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": [],
