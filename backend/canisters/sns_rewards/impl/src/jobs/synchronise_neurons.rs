@@ -7,7 +7,7 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS, HOUR_IN_MS };
+use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use tracing::{ debug, error, info, warn };
 use std::{ collections::btree_map, time::Duration };
@@ -15,8 +15,7 @@ use types::{ Maturity, Milliseconds, NeuronInfo };
 
 use crate::state::{ mutate_state, read_state, RuntimeState };
 
-// set to HOURS for development but modify to DAYS for production
-const SYNC_NEURONS_INTERVAL: Milliseconds = HOUR_IN_MS;
+const SYNC_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     run_now_then_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run);
@@ -163,16 +162,12 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
 }
 
 // Tests
-// - check multiple permissioned principals
 // - check the bounds
-// - check neuron principal mapping
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-
     use candid::Principal;
-    use sns_governance_canister::types::{ neuron, Neuron, NeuronId, NeuronPermission };
+    use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
     use types::NeuronInfo;
 
     use crate::{
@@ -184,26 +179,6 @@ mod tests {
 
     fn init_runtime_state() {
         init_state(RuntimeState::new(Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap()));
-    }
-
-    fn init_neuron(id: NeuronId) -> Neuron {
-        Neuron {
-            id: Some(id),
-            permissions: vec![],
-            cached_neuron_stake_e8s: 0,
-            neuron_fees_e8s: 0,
-            created_timestamp_seconds: 0,
-            aging_since_timestamp_seconds: 0,
-            followees: BTreeMap::default(),
-            maturity_e8s_equivalent: 0,
-            voting_power_percentage_multiplier: 0,
-            source_nns_neuron_id: None,
-            staked_maturity_e8s_equivalent: None,
-            auto_stake_maturity: None,
-            vesting_period_seconds: None,
-            disburse_maturity_in_progress: vec![],
-            dissolve_state: None,
-        }
     }
 
     #[test]
@@ -281,4 +256,93 @@ mod tests {
         assert_eq!(result_history, expected_result_history);
     }
 
+    #[test]
+    fn test_principal_neuron_mapping() {
+        init_runtime_state();
+
+        let owner = Principal::from_text(
+            "7rsnd-jlslx-mihvm-ijuij-qaijh-bcher-p5twl-fohca-56vqv-nhfqv-wqe"
+        ).unwrap();
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(owner.clone()),
+            permission_type: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        });
+
+        mutate_state(|state| {
+            update_principal_neuron_mapping(state, &neuron);
+        });
+
+        let expected_result = vec![neuron_id.clone()];
+        let result = read_state(|state| state.principal_neurons.get(&owner).cloned())
+            .unwrap()
+            .clone();
+
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_multiple_principal_neuron_mapping() {
+        init_runtime_state();
+
+        let owner = Principal::from_text(
+            "7rsnd-jlslx-mihvm-ijuij-qaijh-bcher-p5twl-fohca-56vqv-nhfqv-wqe"
+        ).unwrap();
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(owner.clone()),
+            permission_type: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        });
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(Principal::anonymous()),
+            permission_type: vec![0, 1, 2, 3, 4, 5, 6],
+        });
+
+        mutate_state(|state| {
+            update_principal_neuron_mapping(state, &neuron);
+        });
+
+        let expected_result = vec![neuron_id.clone()];
+        let result = read_state(|state| state.principal_neurons.get(&owner).cloned())
+            .unwrap()
+            .clone();
+
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_neuron_bounds() {
+        init_runtime_state();
+
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let limit = 5;
+
+        // let mut neuron = init_neuron(neuron_id.clone());
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        // 1. Insert new neuron
+        mutate_state(|state| {
+            update_neuron_maturity(state, &neuron);
+        });
+
+        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0 };
+        let mut result = read_state(|state| {
+            state.neuron_maturity.get(&neuron_id).cloned()
+        }).unwrap();
+
+        assert_eq!(result, expected_result);
+    }
 }
