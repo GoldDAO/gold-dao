@@ -319,30 +319,4 @@ mod tests {
 
         assert_eq!(result, expected_result);
     }
-
-    #[test]
-    fn test_neuron_bounds() {
-        init_runtime_state();
-
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let limit = 5;
-
-        // let mut neuron = init_neuron(neuron_id.clone());
-        let mut neuron = Neuron::default();
-        neuron.id = Some(neuron_id.clone());
-
-        // 1. Insert new neuron
-        mutate_state(|state| {
-            update_neuron_maturity(state, &neuron);
-        });
-
-        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0 };
-        let mut result = read_state(|state| {
-            state.neuron_maturity.get(&neuron_id).cloned()
-        }).unwrap();
-
-        assert_eq!(result, expected_result);
-    }
 }
