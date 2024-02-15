@@ -3,7 +3,7 @@ use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ NeuronInfo, TimestampMillis };
+use types::{ Cycles, NeuronInfo, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 use crate::model::maturity_history::MaturityHistory;
@@ -54,6 +54,7 @@ impl RuntimeState {
                 now: self.env.now(),
                 test_mode: self.env.test_mode(),
                 memory_used: MemorySize::used(),
+                cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
             },
             sns_governance_canister: self.sns_governance_canister,
             number_of_neurons: self.neuron_maturity.len(),
@@ -77,6 +78,7 @@ pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
     pub memory_used: MemorySize,
+    pub cycles_balance_in_tc: f64,
     // pub wasm_version: BuildVersion,
 }
 

@@ -13,7 +13,7 @@ pub use proposals::*;
 pub struct Empty {}
 
 pub type CanisterId = Principal;
-pub type Cycles = u128;
+pub type Cycles = u64;
 pub type Hash = [u8; 32];
 pub type Maturity = u64;
 pub type Milliseconds = u64;

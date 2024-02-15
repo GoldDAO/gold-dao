@@ -17,6 +17,9 @@ pub trait Environment {
     fn now(&self) -> TimestampMillis {
         self.now_nanos() / 1_000_000
     }
+    fn cycles_balance_in_tc(&self) -> f64 {
+        (self.cycles_balance() as f64) / 1_000_000_000_000.0
+    }
 }
 
 impl CanisterEnv {
