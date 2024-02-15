@@ -11,10 +11,8 @@ out/
 **/.next
 .env
 target
-canister/**/target
-canister/**/declarations
-canister/gldt_core/src/gldt_core.did
-canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+backend/canisters/**/target
+backend/**/api/declarations
 .vscode
 lcov.info
 cobertura.xml

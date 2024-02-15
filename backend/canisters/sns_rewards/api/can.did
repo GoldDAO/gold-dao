@@ -1,0 +1,52 @@
+type Args = record { sns_governance_canister : principal };
+type GetNeuronResponse = record {
+  id : NeuronId;
+  owner : principal;
+  info : NeuronInfo;
+};
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : vec nat8;
+  headers : vec record { text; text };
+};
+type HttpResponse = record {
+  body : vec nat8;
+  headers : vec record { text; text };
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
+};
+type NeuronId = record { id : vec nat8 };
+type NeuronInfo = record {
+  accumulated_maturity : nat64;
+  last_synced_maturity : nat64;
+};
+type StreamingStrategy = variant {
+  Callback : record {
+    token : Token;
+    callback : func (Token) -> (HttpResponse) query;
+  };
+};
+type Token = record {
+  key : text;
+  sha256 : opt vec nat8;
+  index : nat;
+  content_encoding : text;
+};
+service : (Args) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  convert_neuron_disp : (NeuronId) -> (text) query;
+  get_all_neuron_owners : () -> (vec principal) query;
+  get_all_neurons : () -> (nat64) query;
+  get_maturity_history_of_neuron : (NeuronId, opt nat64) -> (
+      vec record { nat64; NeuronInfo },
+    ) query;
+  get_n_history : (opt nat64) -> (
+      vec record { record { NeuronId; nat64 }; NeuronInfo },
+    ) query;
+  get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
+  get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  sync_neurons_manual_trigger : () -> ();
+  update_info : () -> (text);
+}
