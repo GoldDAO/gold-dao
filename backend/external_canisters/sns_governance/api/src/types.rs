@@ -1,4 +1,4 @@
-use candid::{ Decode, Encode, CandidType };
+use candid::CandidType;
 use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Serialize, Deserialize };
 use std::{ borrow::Cow, fmt::{ self, Display, Formatter } };

@@ -1316,8 +1316,6 @@ dependencies = [
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
- "stable_memory",
- "utils",
 ]
 
 [[package]]
@@ -1337,11 +1335,15 @@ name = "utils"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "canister_time",
  "ciborium",
+ "ic-cdk",
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
+ "stable_memory",
+ "types",
 ]
 
 [[package]]

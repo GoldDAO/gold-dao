@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
-use canister_time::now_millis;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ MemorySize, NeuronInfo, TimestampMillis };
+use types::{ NeuronInfo, TimestampMillis };
+use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 use crate::model::maturity_history::MaturityHistory;
 
@@ -14,6 +14,8 @@ canister_state!(RuntimeState);
 pub struct RuntimeState {
     // These are maintained via pre_ and post_upgrade hooks
 
+    /// Runtime environment
+    pub env: CanisterEnv,
     /// SNS governance cansiter
     pub sns_governance_canister: Principal,
     /// Stores the maturity information about each neuron
@@ -38,6 +40,7 @@ impl RuntimeState {
     }
     pub fn default() -> Self {
         Self {
+            env: CanisterEnv::default(),
             sns_governance_canister: Principal::anonymous(),
             neuron_maturity: BTreeMap::new(),
             principal_neurons: BTreeMap::new(),
@@ -47,7 +50,11 @@ impl RuntimeState {
     }
     pub fn metrics(&self) -> Metrics {
         Metrics {
-            canister_info: CanisterInfo::fetch_info(),
+            canister_info: CanisterInfo {
+                now: self.env.now(),
+                test_mode: self.env.test_mode(),
+                memory_used: MemorySize::used(),
+            },
             sns_governance_canister: self.sns_governance_canister,
             number_of_neurons: self.neuron_maturity.len(),
             number_of_owners: self.principal_neurons.len(),
@@ -68,18 +75,9 @@ pub struct Metrics {
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct CanisterInfo {
     pub now: TimestampMillis,
+    pub test_mode: bool,
     pub memory_used: MemorySize,
     // pub wasm_version: BuildVersion,
-}
-
-impl CanisterInfo {
-    pub fn fetch_info() -> Self {
-        Self {
-            now: now_millis(),
-            memory_used: MemorySize::used(),
-            // wasm_version: BuildVersion::default(),
-        }
-    }
 }
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Copy)]

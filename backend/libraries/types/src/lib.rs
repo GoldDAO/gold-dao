@@ -2,12 +2,10 @@ use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
 mod http;
-mod memory;
 mod neuron_info;
 mod proposals;
 
 pub use http::*;
-pub use memory::*;
 pub use neuron_info::*;
 pub use proposals::*;
 
@@ -15,6 +13,7 @@ pub use proposals::*;
 pub struct Empty {}
 
 pub type CanisterId = Principal;
+pub type Cycles = u128;
 pub type Hash = [u8; 32];
 pub type Maturity = u64;
 pub type Milliseconds = u64;

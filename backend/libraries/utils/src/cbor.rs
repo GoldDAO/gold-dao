@@ -1,4 +1,3 @@
-use candid::Encode;
 use ic_stable_structures::{ Storable, storable::Bound };
 use std::borrow::Cow;
 

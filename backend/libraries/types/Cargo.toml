@@ -11,5 +11,3 @@ ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }
-stable_memory = { path = "../stable_memory" }
-utils = { path = "../utils" }
