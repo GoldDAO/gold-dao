@@ -190,11 +190,13 @@ mod tests {
         ).unwrap();
         let limit = 5;
 
-        // let mut neuron = init_neuron(neuron_id.clone());
         let mut neuron = Neuron::default();
         neuron.id = Some(neuron_id.clone());
 
+        // ********************************
         // 1. Insert new neuron
+        // ********************************
+
         mutate_state(|state| {
             update_neuron_maturity(state, &neuron);
         });
@@ -213,7 +215,10 @@ mod tests {
 
         assert_eq!(result_history, expected_result_history);
 
+        // ********************************
         // 2. Increase neuron maturity
+        // ********************************
+
         neuron.maturity_e8s_equivalent = 100;
         neuron.staked_maturity_e8s_equivalent = Some(50);
 
@@ -234,7 +239,10 @@ mod tests {
 
         assert_eq!(result_history, expected_result_history);
 
+        // ********************************
         // 3. Reduce neuron maturity
+        // ********************************
+
         neuron.maturity_e8s_equivalent = 0;
         neuron.staked_maturity_e8s_equivalent = Some(50);
 
@@ -249,6 +257,30 @@ mod tests {
         assert_eq!(result, expected_result);
 
         expected_result_history.push((250, expected_result));
+        result_history = read_state(|state| {
+            state.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+
+        // ********************************
+        // 4. No change in neuron maturity
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 0;
+        neuron.staked_maturity_e8s_equivalent = Some(50);
+
+        mutate_state(|state| {
+            state.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        result = read_state(|state| { state.neuron_maturity.get(&neuron_id).cloned() }).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        // `expected_result_history` stays the same
         result_history = read_state(|state| {
             state.maturity_history.get_maturity_history(neuron_id.clone(), limit)
         });
