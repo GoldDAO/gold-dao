@@ -20,6 +20,8 @@ pub async fn dummy_await() {
 
 // dummy for now until package compatibility is fixed
 pub fn log_message(message: String) {
+    // will be updated with gldt_core rework and new logging implementation
+    #[cfg(target_arch = "wasm32")]
     ic_cdk::print(format!("GLDT: {}", message));
 }
 
