@@ -355,7 +355,7 @@ generate declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
-      - backend/canisters/**/api
+      - backend/**/api
     expire_in: 6 months
 
 swap_app staging build:
