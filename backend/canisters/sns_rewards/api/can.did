@@ -1,4 +1,4 @@
-type Args = record { sns_governance_canister : principal };
+type Args = record { test_mode : bool };
 type GetNeuronResponse = record {
   id : NeuronId;
   owner : principal;
