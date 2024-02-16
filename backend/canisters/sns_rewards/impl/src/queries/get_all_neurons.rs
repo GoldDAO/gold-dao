@@ -4,5 +4,5 @@ use crate::state::read_state;
 
 #[query]
 fn get_all_neurons() -> usize {
-    read_state(|state| state.neuron_maturity.len())
+    read_state(|state| state.data.neuron_maturity.len())
 }

@@ -12,12 +12,12 @@ fn get_maturity_history_of_neuron(
     size: Option<usize>
 ) -> MaturityHistoryResponse {
     read_state(|state| {
-        state.maturity_history.get_maturity_history(neuron_id, size.unwrap_or(100))
+        state.data.maturity_history.get_maturity_history(neuron_id, size.unwrap_or(100))
     })
 }
 
 // no real use for this, mainly for testing. Remove later
 #[query]
 fn get_n_history(size: Option<usize>) -> Vec<((NeuronId, TimestampMillis), NeuronInfo)> {
-    read_state(|state| { state.maturity_history.get(size.unwrap_or(100)) })
+    read_state(|state| { state.data.maturity_history.get(size.unwrap_or(100)) })
 }

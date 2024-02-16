@@ -5,5 +5,5 @@ use crate::state::read_state;
 
 #[query]
 fn get_neuron_by_id(id: NeuronId) -> Option<NeuronInfo> {
-    read_state(|state| { state.neuron_maturity.get(&id).cloned() })
+    read_state(|state| { state.data.neuron_maturity.get(&id).cloned() })
 }
