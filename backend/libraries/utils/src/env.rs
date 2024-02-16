@@ -1,9 +1,9 @@
 use candid::Principal;
+use serde::{ Deserialize, Serialize };
 use types::{ CanisterId, Cycles, TimestampMillis, TimestampNanos };
 use canister_time::now_nanos;
-use serde::{ Deserialize, Serialize };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct CanisterEnv {
     test_mode: bool,
 }
@@ -28,6 +28,7 @@ impl CanisterEnv {
             test_mode,
         }
     }
+
     pub fn test_mode(&self) -> bool {
         self.test_mode
     }
@@ -63,11 +64,5 @@ impl Environment for CanisterEnv {
     #[cfg(not(target_arch = "wasm32"))]
     fn cycles_balance(&self) -> Cycles {
         0
-    }
-}
-
-impl Default for CanisterEnv {
-    fn default() -> Self {
-        Self::new(true)
     }
 }
