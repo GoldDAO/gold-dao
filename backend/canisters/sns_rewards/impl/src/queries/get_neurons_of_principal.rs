@@ -19,13 +19,13 @@ fn get_neurons_of_principal(principal: Principal) -> Vec<GetNeuronResponse> {
 
 pub fn get_neurons_of_principal_int(principal: Principal) -> Vec<GetNeuronResponse> {
     read_state(|state| {
-        state.principal_neurons
+        state.data.principal_neurons
             .get(&principal)
             .map(|neuron_ids| {
                 neuron_ids
                     .iter()
                     .filter_map(|id| {
-                        state.neuron_maturity.get(id).map(|info| GetNeuronResponse {
+                        state.data.neuron_maturity.get(id).map(|info| GetNeuronResponse {
                             id: id.clone(),
                             owner: principal,
                             info: info.clone(),
