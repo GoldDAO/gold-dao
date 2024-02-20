@@ -13,6 +13,15 @@ pub const SNS_LEDGER_CANISTER_ID: CanisterId = Principal::from_slice(
 pub const SNS_LEDGER_INDEX_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 2, 0, 0, 128, 1, 1]
 );
+pub const NNS_GOVERNANCE_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+);
+pub const ICP_LEDGER_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 0, 0, 0, 2, 1, 1]
+);
+pub const CYCLES_MINTING_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 0, 0, 0, 4, 1, 1]
+);
 
 #[cfg(test)]
 mod tests {
@@ -47,6 +56,30 @@ mod tests {
         assert_eq!(
             SNS_LEDGER_INDEX_CANISTER_ID,
             Principal::from_text("efv5g-kqaaa-aaaaq-aacaa-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn icp_ledger_canister_id() {
+        assert_eq!(
+            ICP_LEDGER_CANISTER_ID,
+            Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn nns_governance_canister_id() {
+        assert_eq!(
+            NNS_GOVERNANCE_CANISTER_ID,
+            Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn cycles_minting_canister_id() {
+        assert_eq!(
+            CYCLES_MINTING_CANISTER_ID,
+            Principal::from_text("rkp4c-7iaaa-aaaaa-aaaca-cai").unwrap()
         );
     }
 }
