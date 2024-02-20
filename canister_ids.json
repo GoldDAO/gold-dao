@@ -46,5 +46,9 @@
   "sns_swap": {
     "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
     "staging": ""
+  },
+  "sns_rewards": {
+    "ic": "",
+    "staging": "2f5ll-gqaaa-aaaak-qcfuq-cai"
   }
 }

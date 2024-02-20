@@ -22,14 +22,19 @@ GLDT and GLDT Swapp dApp frontend
 
 import Layout from './../src/components/layout/Layout';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import Metas from '@ui/layout/Metas';
 
 function Home({}) {
+    const router = useRouter();
     const meta = {
         title: 'GLDT Explorer',
         description: 'GLDT Explorer Description',
     };
+    if (router.asPath.includes("transaction/") || router.asPath.includes("account/")) {
+        router.push(router.asPath);
+    }
     const Explorer = dynamic(() => import('@/components/explorer/Explorer'), {
         ssr: false,
     });

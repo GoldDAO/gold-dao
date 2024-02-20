@@ -14,5 +14,5 @@ echo "Deploying gldt_fee_compensation on ${NETWORK}"
 . scripts/deploy-gldt-fee-compensation.sh $NETWORK
 echo "Deploying frontends on ${NETWORK}"
 dfx deploy --network ${NETWORK} gldt_landing_page
-dfx deploy --network ${NETWORK} gldt_swapp_app
+dfx deploy --network ${NETWORK} gldt_swap_app
 dfx deploy --network ${NETWORK} gldt_explorer
