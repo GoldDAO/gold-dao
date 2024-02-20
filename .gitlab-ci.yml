@@ -545,8 +545,17 @@ local deploy and tests:
   - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi
   - dfx identity get-principal
 
-.asset canister deploy: &asset_canister_deploy
+.asset canister staging deploy: &asset_canister_staging_deploy
   - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y gldt_${CANISTER_NAME}
+
+.asset canister production deploy: &asset_canister_production_deploy
+  - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
+  - >
+    quill sns make-upgrade-canister-proposal $PROPOSER_NEURON_ID
+    --target-canister-id $(cat canister_ids.json | jq .gldt_${CANISTER_NAME}.ic)
+    --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+    --title "Upgrade `${CANISTER_NAME} to `${$CI_COMMIT_TAG}`
+    --url ${DETAILS_URL} | quill send --yes --
 
 check canister ids:
   stage: deploy
@@ -582,7 +591,7 @@ swap app staging:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_staging_deploy
   environment:
     name: swap app
     deployment_tier: staging
@@ -602,7 +611,7 @@ swap app production:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_production_deploy
   environment:
     name: swap app
     deployment_tier: production
@@ -622,7 +631,7 @@ landing page staging:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_staging_deploy
   environment:
     name: landing page
     deployment_tier: staging
@@ -642,7 +651,7 @@ landing page production:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_production_deploy
   environment:
     name: landing page
     deployment_tier: production
@@ -662,7 +671,7 @@ explorer staging:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_staging_deploy
   environment:
     name: explorer
     deployment_tier: staging
@@ -682,7 +691,7 @@ explorer production:
   before_script:
     - *import_dfx_id
   script:
-    - *asset_canister_deploy
+    - *asset_canister_production_deploy
   environment:
     name: explorer
     deployment_tier: production
