@@ -2,10 +2,6 @@
 
 show_help() {
   cat << EOF
-Submit a new SNS proposal for an asset canister upgrade.  
-PROPOSAL must be a string containing all the proposal details.
-See 
-
 Usage:
   scripts/send-pupgrade-proposal.sh [options] <PROPOSER_NEURON_ID> <CANISTER_ID> <WASM_PATH> <TITLE> <URL>
 
@@ -18,27 +14,12 @@ Arguments:
 
 Options:
   -h, --help        Show this message and exit
-  --network NETWORK The network where the commands will be executed (default is 'local')
 EOF
 }
-export NETWORK="local"
 
-if [[ $# -gt 4 ]]; then
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
-    case $1 in
-      -h | --help )
-        show_help
-        exit
-        ;;
-      --network )
-        shift; export NETWORK=$1
-        ;;
-    esac;
-    shift;
-  done
-  if [[ "$1" == '--' ]]; then shift; fi
-else
-  echo "Error: invalid argument number"
+if [[ $# -lt 4 ]]; then
+  echo "Error: invalid argument number\n"
+  show_help
   exit 1
 fi
 
