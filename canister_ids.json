@@ -27,6 +27,10 @@
     "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
     "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
   },
+  "icp_neuron": {
+    "ic": "",
+    "staging": "j2neh-vqaaa-aaaal-aduxq-cai"
+  },
   "sns_rewards": {
     "ic": "",
     "staging": "2f5ll-gqaaa-aaaak-qcfuq-cai"

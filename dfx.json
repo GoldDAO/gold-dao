@@ -77,6 +77,17 @@
         "output": null
       }
     },
+    "icp_neuron": {
+      "type": "custom",
+      "candid": "backend/canisters/icp_neuron/api/can.did",
+      "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/icp_neuron/api/declarations"
+      },
+      "build": ["./scripts/build-canister.sh icp_neuron"]
+    },
     "sns_rewards": {
       "type": "custom",
       "candid": "backend/canisters/sns_rewards/api/can.did",
