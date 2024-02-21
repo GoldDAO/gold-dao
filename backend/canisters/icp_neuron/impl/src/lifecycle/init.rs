@@ -5,7 +5,7 @@ use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use serde::Deserialize;
 use tracing::info;
-use utils::env::CanisterEnv;
+use utils::env::{ CanisterEnv, Environment };
 
 #[derive(Deserialize, CandidType, Debug)]
 pub struct InitArgs {
@@ -22,7 +22,11 @@ fn init(args: InitArgs) {
     // validate_rewards_recipients(&rewards_recipients);
 
     let env = CanisterEnv::new(args.test_mode);
-    let data = Data::new(rewards_recipients);
+    let mut data = Data::new(rewards_recipients);
+
+    if args.test_mode {
+        data.authorized_principals.push(env.caller());
+    }
 
     let runtime_state = RuntimeState::new(env, data);
 
