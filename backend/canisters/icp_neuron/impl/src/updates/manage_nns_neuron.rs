@@ -1,6 +1,6 @@
-use crate::ecdsa::make_canister_call_via_ecdsa;
+use crate::ecdsa::CanisterEcdsaRequest;
+use crate::{ ecdsa::make_canister_call_via_ecdsa, state::read_state };
 use crate::guards::caller_is_governance_principal;
-use crate::state::mutate_state;
 use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk::update;
@@ -31,19 +31,35 @@ pub(crate) async fn manage_nns_neuron_impl(
     command: Command
 ) -> ManageNnsNeuronResponse {
     let nonce: Vec<u8>;
-    if let Ok((rand_bytes,)) = ic_cdk::api::management_canister::main::raw_rand().await {
-        nonce = rand_bytes;
-    } else {
-        return ManageNnsNeuronResponse::InternalError("Unable to initialise nonce.".to_string());
+    match ic_cdk::api::management_canister::main::raw_rand().await {
+        Ok((rand_bytes,)) => {
+            nonce = rand_bytes;
+        }
+        Err(_) => {
+            return ManageNnsNeuronResponse::InternalError(
+                "Unable to initialise nonce.".to_string()
+            );
+        }
     }
-    let request = mutate_state(|state| {
-        state.prepare_canister_call_via_ecdsa(
-            state.data.nns_governance_canister_id,
-            "manage_neuron".to_string(),
-            ManageNeuron::new(neuron_id, command),
-            Some(nonce)
-        )
-    });
+
+    let request: CanisterEcdsaRequest;
+    match
+        read_state(|state| {
+            state.prepare_canister_call_via_ecdsa(
+                state.data.nns_governance_canister_id,
+                "manage_neuron".to_string(),
+                ManageNeuron::new(neuron_id, command),
+                Some(nonce)
+            )
+        })
+    {
+        Ok(val) => {
+            request = val;
+        }
+        Err(err) => {
+            return ManageNnsNeuronResponse::InternalError(err);
+        }
+    }
 
     match make_canister_call_via_ecdsa(request).await {
         Ok(response) => ManageNnsNeuronResponse::Success(response),

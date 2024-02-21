@@ -41,7 +41,7 @@ impl RuntimeState {
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
             },
             public_key: hex::encode(&self.data.public_key),
-            public_key_der: hex::encode(&self.data.get_public_key_der()),
+            public_key_der: hex::encode(&self.data.get_public_key_der().unwrap_or_default()),
             own_principal: self.data.get_principal(),
             authorized_principals: self.data.authorized_principals.clone(),
             neurons: self.data.get_neuron_list(),
@@ -57,12 +57,12 @@ impl RuntimeState {
     }
 
     pub fn prepare_canister_call_via_ecdsa<A: CandidType>(
-        &mut self,
+        &self,
         canister_id: CanisterId,
         method_name: String,
         args: A,
         nonce: Option<Vec<u8>>
-    ) -> CanisterEcdsaRequest {
+    ) -> Result<CanisterEcdsaRequest, String> {
         let envelope_content = EnvelopeContent::Call {
             nonce,
             ingress_expiry: self.env.now_nanos() + 5 * MINUTE_IN_MS * NANOS_PER_MILLISECOND,
@@ -72,13 +72,15 @@ impl RuntimeState {
             arg: candid::encode_one(&args).unwrap(),
         };
 
-        CanisterEcdsaRequest {
+        let public_key = self.data.get_public_key_der()?;
+
+        Ok(CanisterEcdsaRequest {
             envelope_content,
             request_url: format!("{IC_URL}/api/v2/canister/{canister_id}/call"),
-            public_key: self.data.get_public_key_der(),
+            public_key,
             key_id: get_key_id(false),
             this_canister_id: self.env.canister_id(),
-        }
+        })
     }
 }
 
@@ -91,7 +93,7 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub nns_governance_canister_id: Principal,
     pub icp_ledger_canister_id: Principal,
-    pub rewards_recipients: Vec<RewardsRecipients>,
+    pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
 }
 
@@ -110,11 +112,11 @@ pub struct Data {
     pub neurons: Neurons,
     pub nns_governance_canister_id: Principal,
     pub icp_ledger_canister_id: Principal,
-    pub rewards_recipients: Vec<RewardsRecipients>,
+    pub rewards_recipients: RewardsRecipientList,
 }
 
 impl Data {
-    pub fn new(rewards_recipients: Vec<RewardsRecipients>) -> Self {
+    pub fn new(rewards_recipients: RewardsRecipientList) -> Self {
         Self {
             rewards_recipients,
             public_key: Vec::new(),
@@ -141,12 +143,19 @@ impl Data {
 }
 
 impl Data {
-    pub fn get_public_key_der(&self) -> Vec<u8> {
-        PublicKey::from_sec1_bytes(&self.public_key).unwrap().to_public_key_der().unwrap().to_vec()
+    pub fn get_public_key_der(&self) -> Result<Vec<u8>, String> {
+        match PublicKey::from_sec1_bytes(&self.public_key) {
+            Ok(val) =>
+                match val.to_public_key_der() {
+                    Ok(pk) => Ok(pk.to_vec()),
+                    Err(_) => Err("Error converting public key.".to_string()),
+                }
+            Err(_) => Err("Error converting public key.".to_string()),
+        }
     }
 
     pub fn get_principal(&self) -> Principal {
-        Principal::self_authenticating(&self.get_public_key_der())
+        Principal::self_authenticating(&self.get_public_key_der().unwrap_or_default())
     }
 }
 
@@ -166,7 +175,7 @@ pub struct NeuronList {
 }
 
 #[derive(Serialize, Deserialize, CandidType, Debug, Clone)]
-pub struct RewardsRecipients {
+pub struct RewardsRecipient {
     /// The account to which the rewards will be disbursed
     pub account: Account,
     /// A tag to identify the recipient
@@ -175,4 +184,42 @@ pub struct RewardsRecipients {
     /// For consistency, the sum of all weights should add up to 10000. If you are defining % values, define them as
     /// multiples of 100. E.g. 33% would be 3300, 1.5% would be 150 and 75.23% would be 7523.
     pub reward_weight: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, CandidType)]
+pub struct RewardsRecipientList(Vec<RewardsRecipient>);
+
+impl RewardsRecipientList {
+    pub fn new(list: Vec<RewardsRecipient>) -> Result<Self, String> {
+        Self::validate(&list)?;
+        Ok(Self(list))
+    }
+
+    fn validate(list: &Vec<RewardsRecipient>) -> Result<(), String> {
+        if list.is_empty() {
+            return Err("Invalid rewards recipients: empty list.".to_string());
+        }
+        // expecting 4 recipients in the current design. Limit can be lifted if needed.
+        if list.len() > 5 {
+            return Err("Invalid rewards recipients: too many recipients.".to_string());
+        }
+        let mut sum = 0;
+        for recipient in list {
+            if recipient.account.owner == Principal::anonymous() {
+                return Err("Invalid rewards recipient: account owner is anonymous.".to_string());
+            }
+            if recipient.reward_weight == 0 || recipient.reward_weight > 10000 {
+                return Err(
+                    "Invalid rewards recipient: reward weight has to be between 1 and 10000.".to_string()
+                );
+            }
+            sum += recipient.reward_weight;
+        }
+        if sum != 10000 {
+            return Err(
+                "Invalid rewards recipient: the sum of all needs to add up to 10000.".to_string()
+            );
+        }
+        Ok(())
+    }
 }

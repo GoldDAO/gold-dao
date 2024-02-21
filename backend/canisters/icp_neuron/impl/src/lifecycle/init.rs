@@ -1,6 +1,6 @@
 use crate::lifecycle::init_canister;
-use crate::state::{ Data, RewardsRecipients, RuntimeState };
-use candid::{ CandidType, Principal };
+use crate::state::{ Data, RewardsRecipientList, RewardsRecipient, RuntimeState };
+use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use serde::Deserialize;
@@ -10,7 +10,7 @@ use utils::env::{ CanisterEnv, Environment };
 #[derive(Deserialize, CandidType, Debug)]
 pub struct InitArgs {
     test_mode: bool,
-    rewards_recipients: Vec<RewardsRecipients>,
+    rewards_recipients: Vec<RewardsRecipient>,
 }
 
 #[init]
@@ -18,8 +18,7 @@ pub struct InitArgs {
 fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
-    let rewards_recipients = args.rewards_recipients.clone();
-    // validate_rewards_recipients(&rewards_recipients);
+    let rewards_recipients = RewardsRecipientList::new(args.rewards_recipients.clone()).unwrap();
 
     let env = CanisterEnv::new(args.test_mode);
     let mut data = Data::new(rewards_recipients);
@@ -33,24 +32,4 @@ fn init(args: InitArgs) {
     init_canister(runtime_state);
 
     info!("Init complete.")
-}
-
-fn validate_rewards_recipients(rewards_recipients: &Vec<RewardsRecipients>) {
-    if rewards_recipients.is_empty() {
-        ic_cdk::api::trap("Invalid rewards recipients: empty list.");
-    }
-    // expecting 4 recipients in the current design. Limit can be lifted if needed.
-    if rewards_recipients.len() > 5 {
-        ic_cdk::api::trap("Invalid rewards recipients: too many recipients.");
-    }
-    for recipient in rewards_recipients {
-        if recipient.account.owner == Principal::anonymous() {
-            ic_cdk::api::trap("Invalid rewards recipient: account owner is anonymous.");
-        }
-        if recipient.reward_weight == 0 || recipient.reward_weight > 10000 {
-            ic_cdk::api::trap(
-                "Invalid rewards recipient: reward weight has to be between 1 and 10000."
-            );
-        }
-    }
 }

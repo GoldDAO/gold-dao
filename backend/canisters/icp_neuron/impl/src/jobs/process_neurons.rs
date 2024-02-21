@@ -113,12 +113,12 @@ async fn disburse_neurons(neuron_ids: Vec<u64>) {
     let rewards_recipient_principals_ids = read_state(|state|
         state.data.rewards_recipients.clone()
     );
+    let _recipient_canister = &rewards_recipient_principals_ids;
 
     for neuron_id in neuron_ids {
         info!(neuron_id, "Disbursing neuron");
 
         // TODO - split the rewards accordingly
-        let _recipient_canister = &rewards_recipient_principals_ids;
 
         // let account = nns_governance_canister::types::AccountIdentifier {
         //     hash: AccountIdentifier::new(&recipient_canister, &DEFAULT_SUBACCOUNT)

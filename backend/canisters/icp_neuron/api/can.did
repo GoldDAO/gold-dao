@@ -42,7 +42,7 @@ type IncreaseDissolveDelay = record {
 };
 type InitArgs = record {
   test_mode : bool;
-  rewards_recipients : vec RewardsRecipients;
+  rewards_recipients : vec RewardsRecipient;
 };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
@@ -63,7 +63,7 @@ type Operation = variant {
 };
 type RegisterVote = record { vote : int32; proposal : opt NeuronId };
 type RemoveHotKey = record { hot_key_to_remove : opt principal };
-type RewardsRecipients = record {
+type RewardsRecipient = record {
   tag : text;
   reward_weight : nat64;
   account : Account;
