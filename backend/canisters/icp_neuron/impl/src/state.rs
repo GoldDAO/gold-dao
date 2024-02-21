@@ -1,6 +1,5 @@
 use canister_time::{ MINUTE_IN_MS, NANOS_PER_MILLISECOND };
 
-use ic_stable_structures::Storable;
 use ic_transport_types::EnvelopeContent;
 use icrc_ledger_types::icrc1::account::Account;
 use k256::{ pkcs8::EncodePublicKey, PublicKey };
@@ -45,7 +44,7 @@ impl RuntimeState {
             public_key_der: hex::encode(&self.data.get_public_key_der()),
             own_principal: self.data.get_principal(),
             authorized_principals: self.data.authorized_principals.clone(),
-            // neurons: self.neurons,
+            neurons: self.data.get_neuron_list(),
             nns_governance_canister_id: self.data.nns_governance_canister_id,
             icp_ledger_canister_id: self.data.icp_ledger_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
@@ -93,6 +92,7 @@ pub struct Metrics {
     pub nns_governance_canister_id: Principal,
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: Vec<RewardsRecipients>,
+    pub neurons: NeuronList,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -124,6 +124,20 @@ impl Data {
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
         }
     }
+
+    pub fn get_neuron_list(&self) -> NeuronList {
+        NeuronList {
+            active: self.neurons.active_neurons
+                .iter()
+                .filter_map(|n| n.id.as_ref().map(|id| id.id))
+                .collect(),
+            spawning: self.neurons.spawning_neurons
+                .iter()
+                .filter_map(|n| n.id.as_ref().map(|id| id.id))
+                .collect(),
+            disbursed: self.neurons.disbursed_neurons.clone(),
+        }
+    }
 }
 
 impl Data {
@@ -144,25 +158,12 @@ pub struct Neurons {
     pub disbursed_neurons: Vec<u64>,
 }
 
-// pub enum NeuronState {
-//     Active,
-//     Spawning,
-//     Disbursed,
-// }
-
-// impl Neurons {
-//     pub fn list(&self, neuron_state: NeuronState) -> Vec<Neuron> {
-//         match neuron_state {
-//             NeuronState::Active => self.active_neurons.clone(),
-//             NeuronState::Spawning => self.spawning_neurons.clone(),
-//             NeuronState::Disbursed =>
-//                 self.disbursed_neurons
-//                     .iter()
-//                     .map(|id| Neuron { id: *id, ..Default::default() })
-//                     .collect(),
-//         }
-//     }
-// }
+#[derive(CandidType, Serialize)]
+pub struct NeuronList {
+    active: Vec<u64>,
+    spawning: Vec<u64>,
+    disbursed: Vec<u64>,
+}
 
 #[derive(Serialize, Deserialize, CandidType, Debug, Clone)]
 pub struct RewardsRecipients {
@@ -171,6 +172,7 @@ pub struct RewardsRecipients {
     /// A tag to identify the recipient
     pub tag: String,
     /// The weight of the rewards to be disbursed to this recipient. The weight is a number between 1 and 10000.
-    /// For consistency, the sum of all weights should be 10000.
+    /// For consistency, the sum of all weights should add up to 10000. If you are defining % values, define them as
+    /// multiples of 100. E.g. 33% would be 3300, 1.5% would be 150 and 75.23% would be 7523.
     pub reward_weight: u64,
 }

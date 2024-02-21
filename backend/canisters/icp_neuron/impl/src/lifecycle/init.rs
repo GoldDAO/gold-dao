@@ -39,7 +39,7 @@ fn validate_rewards_recipients(rewards_recipients: &Vec<RewardsRecipients>) {
     if rewards_recipients.is_empty() {
         ic_cdk::api::trap("Invalid rewards recipients: empty list.");
     }
-    // expecting 4 recipients in the current design
+    // expecting 4 recipients in the current design. Limit can be lifted if needed.
     if rewards_recipients.len() > 5 {
         ic_cdk::api::trap("Invalid rewards recipients: too many recipients.");
     }

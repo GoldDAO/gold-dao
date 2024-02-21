@@ -1,6 +1,6 @@
 use crate::updates::manage_nns_neuron::{
     manage_nns_neuron_impl,
-    ManageNnsNeuronResponse::InternalError,
+    ManageNnsNeuronResponse::{ InternalError, Success },
 };
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
