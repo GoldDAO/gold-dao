@@ -3,7 +3,7 @@ use canister_time::{ MINUTE_IN_MS, NANOS_PER_MILLISECOND };
 use ic_stable_structures::Storable;
 use ic_transport_types::EnvelopeContent;
 use icrc_ledger_types::icrc1::account::Account;
-// use k256::{ pkcs8::EncodePublicKey, PublicKey };
+use k256::{ pkcs8::EncodePublicKey, PublicKey };
 use nns_governance_canister::types::Neuron;
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
@@ -42,6 +42,7 @@ impl RuntimeState {
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
             },
             public_key: hex::encode(&self.data.public_key),
+            public_key_der: hex::encode(&self.data.get_public_key_der()),
             own_principal: self.data.get_principal(),
             authorized_principals: self.data.authorized_principals.clone(),
             // neurons: self.neurons,
@@ -86,6 +87,7 @@ impl RuntimeState {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub public_key: String,
+    pub public_key_der: String,
     pub own_principal: Principal,
     pub authorized_principals: Vec<Principal>,
     pub nns_governance_canister_id: Principal,
@@ -126,12 +128,11 @@ impl Data {
 
 impl Data {
     pub fn get_public_key_der(&self) -> Vec<u8> {
-        // PublicKey::from_sec1_bytes(&self.public_key).unwrap().to_public_key_der().unwrap().to_vec()
-        self.public_key.clone()
+        PublicKey::from_sec1_bytes(&self.public_key).unwrap().to_public_key_der().unwrap().to_vec()
     }
 
     pub fn get_principal(&self) -> Principal {
-        Principal::self_authenticating(&self.public_key)
+        Principal::self_authenticating(&self.get_public_key_der())
     }
 }
 
