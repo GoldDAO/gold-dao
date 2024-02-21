@@ -1,4 +1,7 @@
-use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
+use crate::updates::manage_nns_neuron::{
+    manage_nns_neuron_impl,
+    ManageNnsNeuronResponse::InternalError,
+};
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
 use ic_ledger_types::{ AccountIdentifier, DEFAULT_SUBACCOUNT };
@@ -6,7 +9,7 @@ use nns_governance_canister::types::manage_neuron::{ Command, Disburse, Spawn };
 use nns_governance_canister::types::ListNeurons;
 use utils::env::Environment;
 use std::time::Duration;
-use tracing::info;
+use tracing::{ info, warn };
 use types::Milliseconds;
 
 // We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left
@@ -99,7 +102,10 @@ async fn run_async() {
 async fn spawn_neurons(neuron_ids: Vec<u64>) {
     for neuron_id in neuron_ids {
         info!(neuron_id, "Spawning neuron from maturity");
-        manage_nns_neuron_impl(neuron_id, Command::Spawn(Spawn::default())).await;
+        match manage_nns_neuron_impl(neuron_id, Command::Spawn(Spawn::default())).await {
+            Success(_) => info!("Successfully spawned neuron {neuron_id}."),
+            InternalError(err) => warn!("Error spawning neuron {neuron_id}: {err}"),
+        }
     }
 }
 
