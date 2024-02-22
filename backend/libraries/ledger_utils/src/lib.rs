@@ -25,7 +25,6 @@ pub fn icrc_account_to_legacy_account_id(icrc_account: Account) -> AccountIdenti
 #[cfg(test)]
 mod tests {
     use candid::Principal;
-    use ic_ledger_types::AccountIdentifier;
     use icrc_ledger_types::icrc1::account::Account;
 
     use crate::icrc_account_to_legacy_account_id;

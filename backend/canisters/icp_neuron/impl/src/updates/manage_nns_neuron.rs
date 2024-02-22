@@ -3,7 +3,7 @@ use crate::{ ecdsa::make_canister_call_via_ecdsa, state::read_state };
 use crate::guards::caller_is_governance_principal;
 use candid::CandidType;
 use canister_tracing_macros::trace;
-use ic_cdk::update;
+use ic_cdk::{ query, update };
 use nns_governance_canister::types::manage_neuron::Command;
 use nns_governance_canister::types::ManageNeuron;
 use serde::{ Deserialize, Serialize };
@@ -18,6 +18,12 @@ pub struct ManageNnsNeuronRequest {
 pub enum ManageNnsNeuronResponse {
     Success(String),
     InternalError(String),
+}
+
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn manage_nns_neuron_validate(args: ManageNnsNeuronRequest) -> Result<String, String> {
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
 }
 
 #[update(guard = "caller_is_governance_principal")]
