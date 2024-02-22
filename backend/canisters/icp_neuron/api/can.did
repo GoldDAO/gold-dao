@@ -65,7 +65,7 @@ type RegisterVote = record { vote : int32; proposal : opt NeuronId };
 type RemoveHotKey = record { hot_key_to_remove : opt principal };
 type RewardsRecipient = record {
   tag : text;
-  reward_weight : nat64;
+  reward_weight : nat16;
   account : Account;
 };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
