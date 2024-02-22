@@ -1,10 +1,11 @@
 use crate::lifecycle::init_canister;
-use crate::state::{ Data, RewardsRecipientList, RewardsRecipient, RuntimeState };
+use crate::state::{ Data, RuntimeState };
 use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use serde::Deserialize;
 use tracing::info;
+use types::{ RewardsRecipient, RewardsRecipientList };
 use utils::env::{ CanisterEnv, Environment };
 
 #[derive(Deserialize, CandidType, Debug)]

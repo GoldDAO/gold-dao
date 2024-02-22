@@ -164,9 +164,6 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
         })
 }
 
-// Tests
-// - check the bounds
-
 #[cfg(test)]
 mod tests {
     use candid::Principal;

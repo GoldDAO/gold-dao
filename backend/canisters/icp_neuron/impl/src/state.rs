@@ -7,7 +7,7 @@ use nns_governance_canister::types::Neuron;
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ CanisterId, TimestampMillis };
+use types::{ CanisterId, TimestampMillis, RewardsRecipientList };
 use utils::{
     consts::{ ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID },
     env::{ CanisterEnv, Environment },
@@ -172,54 +172,4 @@ pub struct NeuronList {
     active: Vec<u64>,
     spawning: Vec<u64>,
     disbursed: Vec<u64>,
-}
-
-#[derive(Serialize, Deserialize, CandidType, Debug, Clone)]
-pub struct RewardsRecipient {
-    /// The account to which the rewards will be disbursed
-    pub account: Account,
-    /// A tag to identify the recipient
-    pub tag: String,
-    /// The weight of the rewards to be disbursed to this recipient. The weight is a number between 1 and 10000.
-    /// For consistency, the sum of all weights should add up to 10000. If you are defining % values, define them as
-    /// multiples of 100. E.g. 33% would be 3300, 1.5% would be 150 and 75.23% would be 7523.
-    pub reward_weight: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, CandidType)]
-pub struct RewardsRecipientList(Vec<RewardsRecipient>);
-
-impl RewardsRecipientList {
-    pub fn new(list: Vec<RewardsRecipient>) -> Result<Self, String> {
-        Self::validate(&list)?;
-        Ok(Self(list))
-    }
-
-    fn validate(list: &Vec<RewardsRecipient>) -> Result<(), String> {
-        if list.is_empty() {
-            return Err("Invalid rewards recipients: empty list.".to_string());
-        }
-        // expecting 4 recipients in the current design. Limit can be lifted if needed.
-        if list.len() > 5 {
-            return Err("Invalid rewards recipients: too many recipients.".to_string());
-        }
-        let mut sum = 0;
-        for recipient in list {
-            if recipient.account.owner == Principal::anonymous() {
-                return Err("Invalid rewards recipient: account owner is anonymous.".to_string());
-            }
-            if recipient.reward_weight == 0 || recipient.reward_weight > 10000 {
-                return Err(
-                    "Invalid rewards recipient: reward weight has to be between 1 and 10000.".to_string()
-                );
-            }
-            sum += recipient.reward_weight;
-        }
-        if sum != 10000 {
-            return Err(
-                "Invalid rewards recipient: the sum of all needs to add up to 10000.".to_string()
-            );
-        }
-        Ok(())
-    }
 }

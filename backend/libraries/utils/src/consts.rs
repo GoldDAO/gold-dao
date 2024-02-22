@@ -1,6 +1,8 @@
 use candid::Principal;
 use types::CanisterId;
 
+pub const E8S_PER_ICP: u64 = 100_000_000;
+
 pub const SNS_ROOT_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 2, 0, 0, 124, 1, 1]
 );

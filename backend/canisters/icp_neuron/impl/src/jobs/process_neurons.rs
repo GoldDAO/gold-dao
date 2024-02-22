@@ -4,10 +4,15 @@ use crate::updates::manage_nns_neuron::{
 };
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
-use ic_ledger_types::{ AccountIdentifier, DEFAULT_SUBACCOUNT };
-use nns_governance_canister::types::manage_neuron::{ Command, Disburse, Spawn };
+use ic_ledger_types::{ AccountIdentifier, Subaccount, DEFAULT_SUBACCOUNT };
+use icrc_ledger_types::icrc1::account::Account;
+use ledger_utils::icrc_account_to_legacy_account_id;
+use nns_governance_canister::types::{
+    manage_neuron::{ disburse::Amount, Command, Disburse, Spawn },
+    Neuron,
+};
 use nns_governance_canister::types::ListNeurons;
-use utils::env::Environment;
+use utils::{ consts::E8S_PER_ICP, env::Environment };
 use std::time::Duration;
 use tracing::{ info, warn };
 use types::Milliseconds;
@@ -15,7 +20,6 @@ use types::Milliseconds;
 // We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left
 // before the neuron can be spawned
 const REFRESH_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS + MINUTE_IN_MS;
-const E8S_PER_ICP: u64 = 100_000_000;
 
 const SPAWN_LIMIT_ICP: u64 = 1000;
 
@@ -51,10 +55,10 @@ async fn run_async() {
             .filter_map(|n| n.id.as_ref().map(|id| id.id))
             .collect();
 
-        let neurons_to_disburse: Vec<_> = response.full_neurons
+        let neurons_to_disburse: Vec<Neuron> = response.full_neurons
             .iter()
             .filter(|n| n.is_dissolved(now) && n.cached_neuron_stake_e8s > 0)
-            .filter_map(|n| n.id.as_ref().map(|id| id.id))
+            .cloned()
             .collect();
 
         mutate_state(|state| {
@@ -109,29 +113,45 @@ async fn spawn_neurons(neuron_ids: Vec<u64>) {
     }
 }
 
-async fn disburse_neurons(neuron_ids: Vec<u64>) {
-    let rewards_recipient_principals_ids = read_state(|state|
-        state.data.rewards_recipients.clone()
-    );
-    let _recipient_canister = &rewards_recipient_principals_ids;
+async fn disburse_neurons(neurons: Vec<Neuron>) {
+    let rewards_recipients = read_state(|state| state.data.rewards_recipients.clone());
 
-    for neuron_id in neuron_ids {
-        info!(neuron_id, "Disbursing neuron");
+    for neuron in neurons {
+        let neuron_id: u64;
+        if let Some(id) = neuron.id {
+            neuron_id = id.id;
+            info!(id.id, "Disbursing neuron.");
+        } else {
+            warn!("Empty neuron id. Cannot disburse and continuing to next one.");
+            continue;
+        }
 
-        // TODO - split the rewards accordingly
+        let total_amount = neuron.cached_neuron_stake_e8s;
 
-        // let account = nns_governance_canister::types::AccountIdentifier {
-        //     hash: AccountIdentifier::new(&recipient_canister, &DEFAULT_SUBACCOUNT)
-        //         .as_ref()
-        //         .to_vec(),
-        // };
+        let payments_list: Vec<(Account, u64)>;
+        match rewards_recipients.split_amount_to_each_recipient(total_amount) {
+            Ok(list) => {
+                payments_list = list;
+            }
+            Err(err) => {
+                warn!(
+                    "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
+                );
+                continue;
+            }
+        }
 
-        // manage_nns_neuron_impl(
-        //     neuron_id,
-        //     Command::Disburse(Disburse {
-        //         to_account: Some(account.clone()),
-        //         amount: None,
-        //     })
-        // ).await;
+        for (icrc_account, amount) in payments_list {
+            let icp_ledger_account = nns_governance_canister::types::AccountIdentifier {
+                hash: icrc_account_to_legacy_account_id(icrc_account).as_ref().to_vec(),
+            };
+            manage_nns_neuron_impl(
+                neuron_id,
+                Command::Disburse(Disburse {
+                    to_account: Some(icp_ledger_account),
+                    amount: Some(Amount { e8s: amount }),
+                })
+            ).await;
+        }
     }
 }
