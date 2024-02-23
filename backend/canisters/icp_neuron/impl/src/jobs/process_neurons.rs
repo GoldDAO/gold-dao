@@ -10,7 +10,7 @@ use nns_governance_canister::types::{
 use nns_governance_canister::types::ListNeurons;
 use utils::{ consts::E8S_PER_ICP, env::Environment };
 use std::time::Duration;
-use tracing::{ info, trace, warn };
+use tracing::{ error, info, trace, warn };
 use types::Milliseconds;
 
 // We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left
@@ -30,8 +30,8 @@ pub fn run() {
 async fn run_async() {
     let nns_governance_canister_id = read_state(|state| state.data.nns_governance_canister_id);
 
-    if
-        let Ok(response) = nns_governance_canister_c2c_client::list_neurons(
+    match
+        nns_governance_canister_c2c_client::list_neurons(
             nns_governance_canister_id,
             &(ListNeurons {
                 neuron_ids: Vec::new(),
@@ -39,64 +39,66 @@ async fn run_async() {
             })
         ).await
     {
-        trace!("{response:?}");
-        let now = read_state(|state| state.env.now());
+        Ok(response) => {
+            let now = read_state(|state| state.env.now());
 
-        let neurons_to_spawn: Vec<_> = response.full_neurons
-            .iter()
-            .filter(
-                |n|
-                    n.spawn_at_timestamp_seconds.is_none() &&
-                    n.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP
-            )
-            .filter_map(|n| n.id.as_ref().map(|id| id.id))
-            .collect();
+            let neurons_to_spawn: Vec<_> = response.full_neurons
+                .iter()
+                .filter(
+                    |n|
+                        n.spawn_at_timestamp_seconds.is_none() &&
+                        n.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP
+                )
+                .filter_map(|n| n.id.as_ref().map(|id| id.id))
+                .collect();
 
-        let neurons_to_disburse: Vec<Neuron> = response.full_neurons
-            .iter()
-            .filter(|n| n.is_dissolved(now) && n.cached_neuron_stake_e8s > 0)
-            .cloned()
-            .collect();
+            let neurons_to_disburse: Vec<Neuron> = response.full_neurons
+                .iter()
+                .filter(|n| n.is_dissolved(now) && n.cached_neuron_stake_e8s > 0)
+                .cloned()
+                .collect();
 
-        mutate_state(|state| {
-            let mut active_neurons = Vec::new();
-            let mut spawning_neurons = Vec::new();
-            let mut disbursed_neurons = Vec::new();
-            for neuron in response.full_neurons.into_iter() {
-                if neuron.maturity_e8s_equivalent == 0 && neuron.cached_neuron_stake_e8s == 0 {
-                    if let Some(neuron_id) = neuron.id {
-                        disbursed_neurons.push(neuron_id.id);
+            mutate_state(|state| {
+                let mut active_neurons = Vec::new();
+                let mut spawning_neurons = Vec::new();
+                let mut disbursed_neurons = Vec::new();
+                for neuron in response.full_neurons.into_iter() {
+                    if neuron.maturity_e8s_equivalent == 0 && neuron.cached_neuron_stake_e8s == 0 {
+                        if let Some(neuron_id) = neuron.id {
+                            disbursed_neurons.push(neuron_id.id);
+                        }
+                    } else if neuron.spawn_at_timestamp_seconds.is_some() {
+                        spawning_neurons.push(neuron);
+                    } else {
+                        active_neurons.push(neuron);
                     }
-                } else if neuron.spawn_at_timestamp_seconds.is_some() {
-                    spawning_neurons.push(neuron);
-                } else {
-                    active_neurons.push(neuron);
                 }
+
+                state.data.neurons = Neurons {
+                    timestamp: now,
+                    active_neurons,
+                    spawning_neurons,
+                    disbursed_neurons,
+                };
+            });
+
+            let mut neurons_updated = false;
+            if !neurons_to_spawn.is_empty() {
+                spawn_neurons(neurons_to_spawn).await;
+                neurons_updated = true;
             }
 
-            state.data.neurons = Neurons {
-                timestamp: now,
-                active_neurons,
-                spawning_neurons,
-                disbursed_neurons,
-            };
-        });
+            if !neurons_to_disburse.is_empty() {
+                disburse_neurons(neurons_to_disburse).await;
+                neurons_updated = true;
+            }
 
-        let mut neurons_updated = false;
-        if !neurons_to_spawn.is_empty() {
-            spawn_neurons(neurons_to_spawn).await;
-            neurons_updated = true;
+            if neurons_updated {
+                // Refresh the neurons again given that they've been updated
+                ic_cdk_timers::set_timer(Duration::ZERO, || ic_cdk::spawn(run_async()));
+            }
         }
-
-        if !neurons_to_disburse.is_empty() {
-            disburse_neurons(neurons_to_disburse).await;
-            neurons_updated = true;
-        }
-
-        if neurons_updated {
-            // Refresh the neurons again given that they've been updated
-            ic_cdk_timers::set_timer(Duration::ZERO, || ic_cdk::spawn(run_async()));
-        }
+        Err(err) => { error!("Error fetching neuron list: {err:?}") }
     }
 }
 
