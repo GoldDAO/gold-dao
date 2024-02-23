@@ -22,6 +22,13 @@ pub fn icrc_account_to_legacy_account_id(icrc_account: Account) -> AccountIdenti
     AccountIdentifier::new(&icrc_account.owner, &subaccount)
 }
 
+pub fn principal_to_legacy_account_id(
+    principal: Principal,
+    subaccount: Option<Subaccount>
+) -> AccountIdentifier {
+    AccountIdentifier::new(&principal, &subaccount.unwrap_or(DEFAULT_SUBACCOUNT))
+}
+
 #[cfg(test)]
 mod tests {
     use candid::Principal;

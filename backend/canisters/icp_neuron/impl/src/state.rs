@@ -1,8 +1,8 @@
 use canister_time::{ MINUTE_IN_MS, NANOS_PER_MILLISECOND };
 
 use ic_transport_types::EnvelopeContent;
-use icrc_ledger_types::icrc1::account::Account;
 use k256::{ pkcs8::EncodePublicKey, PublicKey };
+use ledger_utils::principal_to_legacy_account_id;
 use nns_governance_canister::types::Neuron;
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
@@ -43,6 +43,10 @@ impl RuntimeState {
             public_key: hex::encode(&self.data.public_key),
             public_key_der: hex::encode(&self.data.get_public_key_der().unwrap_or_default()),
             own_principal: self.data.get_principal(),
+            canister_default_account_id: principal_to_legacy_account_id(
+                self.env.canister_id(),
+                None
+            ).to_string(),
             authorized_principals: self.data.authorized_principals.clone(),
             neurons: self.data.get_neuron_list(),
             nns_governance_canister_id: self.data.nns_governance_canister_id,
@@ -90,6 +94,7 @@ pub struct Metrics {
     pub public_key: String,
     pub public_key_der: String,
     pub own_principal: Principal,
+    pub canister_default_account_id: String,
     pub authorized_principals: Vec<Principal>,
     pub nns_governance_canister_id: Principal,
     pub icp_ledger_canister_id: Principal,
