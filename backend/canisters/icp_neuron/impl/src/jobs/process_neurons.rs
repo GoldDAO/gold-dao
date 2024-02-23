@@ -1,10 +1,6 @@
-use crate::updates::manage_nns_neuron::{
-    manage_nns_neuron_impl,
-    ManageNnsNeuronResponse::{ InternalError, Success },
-};
+use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
-use ic_ledger_types::{ AccountIdentifier, Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::account::Account;
 use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{
@@ -14,7 +10,7 @@ use nns_governance_canister::types::{
 use nns_governance_canister::types::ListNeurons;
 use utils::{ consts::E8S_PER_ICP, env::Environment };
 use std::time::Duration;
-use tracing::{ info, warn };
+use tracing::{ info, trace, warn };
 use types::Milliseconds;
 
 // We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left
@@ -43,6 +39,7 @@ async fn run_async() {
             })
         ).await
     {
+        trace!("{response:?}");
         let now = read_state(|state| state.env.now());
 
         let neurons_to_spawn: Vec<_> = response.full_neurons
@@ -107,8 +104,8 @@ async fn spawn_neurons(neuron_ids: Vec<u64>) {
     for neuron_id in neuron_ids {
         info!(neuron_id, "Spawning neuron from maturity");
         match manage_nns_neuron_impl(neuron_id, Command::Spawn(Spawn::default())).await {
-            Success(_) => info!("Successfully spawned neuron {neuron_id}."),
-            InternalError(err) => warn!("Error spawning neuron {neuron_id}: {err}"),
+            Ok(_) => info!("Successfully spawned neuron {neuron_id}."),
+            Err(err) => warn!("Error spawning neuron {neuron_id}: {err}"),
         }
     }
 }
@@ -145,13 +142,18 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
             let icp_ledger_account = nns_governance_canister::types::AccountIdentifier {
                 hash: icrc_account_to_legacy_account_id(icrc_account).as_ref().to_vec(),
             };
-            manage_nns_neuron_impl(
-                neuron_id,
-                Command::Disburse(Disburse {
-                    to_account: Some(icp_ledger_account),
-                    amount: Some(Amount { e8s: amount }),
-                })
-            ).await;
+            match
+                manage_nns_neuron_impl(
+                    neuron_id,
+                    Command::Disburse(Disburse {
+                        to_account: Some(icp_ledger_account),
+                        amount: Some(Amount { e8s: amount }),
+                    })
+                ).await
+            {
+                Ok(_) => (),
+                Err(_) => (),
+            }
         }
     }
 }

@@ -1,4 +1,3 @@
-use crate::ecdsa::CanisterEcdsaRequest;
 use crate::{ ecdsa::make_canister_call_via_ecdsa, state::read_state };
 use crate::guards::caller_is_governance_principal;
 use candid::CandidType;
@@ -7,6 +6,7 @@ use ic_cdk::{ query, update };
 use nns_governance_canister::types::manage_neuron::Command;
 use nns_governance_canister::types::ManageNeuron;
 use serde::{ Deserialize, Serialize };
+use utils::rand::generate_rand_byte_array;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct ManageNnsNeuronRequest {
@@ -29,46 +29,26 @@ async fn manage_nns_neuron_validate(args: ManageNnsNeuronRequest) -> Result<Stri
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
 async fn manage_nns_neuron(args: ManageNnsNeuronRequest) -> ManageNnsNeuronResponse {
-    manage_nns_neuron_impl(args.neuron_id, args.command).await
+    match manage_nns_neuron_impl(args.neuron_id, args.command).await {
+        Ok(ok) => ManageNnsNeuronResponse::Success(ok),
+        Err(err) => ManageNnsNeuronResponse::InternalError(err),
+    }
 }
 
 pub(crate) async fn manage_nns_neuron_impl(
     neuron_id: u64,
     command: Command
-) -> ManageNnsNeuronResponse {
-    let nonce: Vec<u8>;
-    match ic_cdk::api::management_canister::main::raw_rand().await {
-        Ok((rand_bytes,)) => {
-            nonce = rand_bytes;
-        }
-        Err(_) => {
-            return ManageNnsNeuronResponse::InternalError(
-                "Unable to initialise nonce.".to_string()
-            );
-        }
-    }
+) -> Result<String, String> {
+    let nonce = generate_rand_byte_array().await?;
 
-    let request: CanisterEcdsaRequest;
-    match
-        read_state(|state| {
-            state.prepare_canister_call_via_ecdsa(
-                state.data.nns_governance_canister_id,
-                "manage_neuron".to_string(),
-                ManageNeuron::new(neuron_id, command),
-                Some(nonce)
-            )
-        })
-    {
-        Ok(val) => {
-            request = val;
-        }
-        Err(err) => {
-            return ManageNnsNeuronResponse::InternalError(err);
-        }
-    }
+    let request = read_state(|state| {
+        state.prepare_canister_call_via_ecdsa(
+            state.data.nns_governance_canister_id,
+            "manage_neuron".to_string(),
+            ManageNeuron::new(neuron_id, command),
+            Some(nonce)
+        )
+    })?;
 
-    match make_canister_call_via_ecdsa(request).await {
-        Ok(response) => ManageNnsNeuronResponse::Success(response),
-        Err(error) => ManageNnsNeuronResponse::InternalError(error),
-    }
+    make_canister_call_via_ecdsa(request).await
 }

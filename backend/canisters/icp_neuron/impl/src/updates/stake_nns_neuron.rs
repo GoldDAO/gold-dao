@@ -12,6 +12,7 @@ use nns_governance_canister::types::{ manage_neuron_response, ManageNeuron };
 use serde::{ Deserialize, Serialize };
 use tracing::{ error, info };
 use types::CanisterId;
+use utils::rand::generate_rand_nonce;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum StakeNnsNeuronResponse {
@@ -41,12 +42,7 @@ async fn stake_nns_neuron() -> StakeNnsNeuronResponse {
 }
 
 async fn stake_nns_neuron_impl() -> Result<u64, String> {
-    let nonce: u64;
-    if let Ok((random_bytes,)) = ic_cdk::api::management_canister::main::raw_rand().await {
-        nonce = u64::from_be_bytes(random_bytes.try_into().unwrap());
-    } else {
-        return Err("Error initialising nonce.".to_string());
-    }
+    let nonce = generate_rand_nonce().await?;
 
     let PrepareResult { nns_governance_canister_id, icp_ledger_canister_id, principal } =
         read_state(prepare);

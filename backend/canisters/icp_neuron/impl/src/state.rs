@@ -61,10 +61,10 @@ impl RuntimeState {
         canister_id: CanisterId,
         method_name: String,
         args: A,
-        nonce: Option<Vec<u8>>
+        nonce: Option<[u8; 8]>
     ) -> Result<CanisterEcdsaRequest, String> {
         let envelope_content = EnvelopeContent::Call {
-            nonce,
+            nonce: nonce.map(|n| n.to_vec()),
             ingress_expiry: self.env.now_nanos() + 5 * MINUTE_IN_MS * NANOS_PER_MILLISECOND,
             sender: self.data.get_principal(),
             canister_id,
