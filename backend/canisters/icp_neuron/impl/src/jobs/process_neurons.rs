@@ -27,7 +27,7 @@ pub fn start_job() {
     run_now_then_interval(Duration::from_millis(REFRESH_NEURONS_INTERVAL), run);
 }
 
-fn run() {
+pub fn run() {
     ic_cdk::spawn(run_async());
 }
 
