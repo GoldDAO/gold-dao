@@ -14,7 +14,7 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::ecdsa::{ get_key_id, CanisterEcdsaRequest };
+use crate::{ ecdsa::{ get_key_id, CanisterEcdsaRequest }, types::neuron_metrics::NeuronWithMetric };
 
 const IC_URL: &str = "https://icp-api.io";
 
@@ -136,7 +136,7 @@ impl Data {
         NeuronList {
             active: self.neurons.active_neurons
                 .iter()
-                .filter_map(|n| n.id.as_ref().map(|id| id.id))
+                .map(|n| NeuronWithMetric::from(n.clone()))
                 .collect(),
             spawning: self.neurons.spawning_neurons
                 .iter()
@@ -174,7 +174,7 @@ pub struct Neurons {
 
 #[derive(CandidType, Serialize)]
 pub struct NeuronList {
-    active: Vec<u64>,
+    active: Vec<NeuronWithMetric>,
     spawning: Vec<u64>,
     disbursed: Vec<u64>,
 }

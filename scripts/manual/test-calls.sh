@@ -8,3 +8,6 @@ dfx canister call --network staging icp_neuron stake_nns_neuron
 
 dfx canister call --network staging icp_neuron manage_nns_neuron '(record {neuron_id = 17481076647658761488;
 command = variant { Configure = record { operation = opt variant { AddHotKey = record { new_hot_key = opt principal "j2neh-vqaaa-aaaal-aduxq-cai" } }} }})'
+
+
+dfx canister call --network ic nns_governance manage_neuron '(record { id = opt record {id = 17481076647658761488 }; command = variant { ClaimOrRefresh = record { by = opt variant {NeuronIdOrSubaccount = record {}}} }})'

@@ -10,7 +10,7 @@ use nns_governance_canister::types::{
 use nns_governance_canister::types::ListNeurons;
 use utils::{ consts::E8S_PER_ICP, env::Environment };
 use std::time::Duration;
-use tracing::{ error, info, trace, warn };
+use tracing::{ error, info, warn };
 use types::Milliseconds;
 
 // We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left

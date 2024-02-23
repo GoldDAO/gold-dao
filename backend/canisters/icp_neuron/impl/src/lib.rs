@@ -11,5 +11,6 @@ mod memory;
 mod queries;
 mod updates;
 mod state;
+mod types;
 
 export_candid!();
