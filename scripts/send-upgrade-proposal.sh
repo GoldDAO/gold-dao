@@ -29,7 +29,7 @@ export WASM_PATH=$3
 export UPGRADE_TITLE=$4
 export DETAILS_URL=$5
 
-quill sns make-upgrade-canister-proposal $PROPOSER_NEURON_ID \
+quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER_NEURON_ID \
   --target-canister-id $CANISTER_ID --wasm-path $WASM_PATH \
   --title $UPGRADE_TITLE --url $DETAILS_URL > msg.json && \
 quill send --yes msg.json; rm msg.json
