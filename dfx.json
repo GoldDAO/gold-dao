@@ -194,19 +194,19 @@
     },
     "sns_governance": {
       "build": "",
-      "candid": "candid/sns_governance.did",
+      "candid": "backend/external_canisters/sns_governance/can.did",
       "type": "custom",
       "wasm": ""
     },
     "sns_index": {
       "build": "",
-      "candid": "candid/sns_index.did",
+      "candid": "backend/external_canisters/sns_index/can.did",
       "type": "custom",
       "wasm": ""
     },
     "sns_ledger": {
       "build": "",
-      "candid": "candid/sns_ledger.did",
+      "candid": "backend/external_canisters/sns_ledger/can.did",
       "type": "custom",
       "wasm": ""
     },
@@ -228,13 +228,13 @@
     },
     "sns_root": {
       "build": "",
-      "candid": "candid/sns_root.did",
+      "candid": "backend/external_canisters/sns_root/can.did",
       "type": "custom",
       "wasm": ""
     },
     "sns_swap": {
       "build": "",
-      "candid": "candid/sns_swap.did",
+      "candid": "backend/external_canisters/sns_swap/can.did",
       "type": "custom",
       "wasm": ""
     },
