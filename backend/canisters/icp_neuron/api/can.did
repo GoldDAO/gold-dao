@@ -44,12 +44,26 @@ type InitArgs = record {
   test_mode : bool;
   rewards_recipients : vec RewardsRecipient;
 };
+type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
 type MemoAndController = record { controller : opt principal; memo : nat64 };
 type Merge = record { source_neuron_id : opt NeuronId };
 type MergeMaturity = record { percentage_to_merge : nat32 };
 type NeuronId = record { id : nat64 };
+type NeuronList = record {
+  active : vec NeuronWithMetric;
+  disbursed : vec nat64;
+  spawning : vec nat64;
+};
+type NeuronWithMetric = record {
+  id : nat64;
+  dissolve_delay : nat64;
+  maturity : nat64;
+  staked_amount : nat64;
+  deposit_account : text;
+  dissolving : bool;
+};
 type Operation = variant {
   RemoveHotKey : RemoveHotKey;
   AddHotKey : AddHotKey;
@@ -78,7 +92,7 @@ type Split = record { amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
 type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
 service : (opt InitArgs) -> {
+  list_neurons : () -> (ListNeuronsResponse) query;
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
-  manage_recipients : () -> ();
   stake_nns_neuron : () -> (StakeNnsNeuronResponse);
 }
