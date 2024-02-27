@@ -26,8 +26,20 @@ stages:
   - build
   - deploy
 
-include: "scripts/ci-cd/.node_template.yml"
-include: "scripts/ci-cd/.rust_template.yml"
+include:
+  # Templates:
+  - local: scripts/ci-cd/.node_template.yml
+  - local: scripts/ci-cd/.rust_template.yml
+  # Frontend linters:
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: swap_app
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: landing_page
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: explorer
 
 ################################################################################
 # Cache preparation
@@ -36,7 +48,7 @@ node cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *node_template
+  extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
     - node --version
@@ -46,7 +58,7 @@ cargo cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
+  extends: .rust template
   script:
     - cargo version
     - cargo verify-project
@@ -54,47 +66,8 @@ cargo cache:
 ################################################################################
 # Linters
 ################################################################################
-swap_app linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/swap_app/*.{js,json}"
-        - "client/swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:swap_app
 
-landing_page linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/landing_page/*.{js,json}"
-        - "client/landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:landing
-
-explorer linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/explorer/*.{js,json}"
-        - "client/explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:explorer
+# See includes above for frontends
 
 rust lint:
   stage: lint
@@ -107,7 +80,7 @@ rust lint:
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
+  extends: .rust template
   script:
     - touch backend/canisters/gldt_core/api/can.did
     - touch backend/canisters/gldt_fee_compensation/api/can.did
@@ -128,7 +101,7 @@ gldt_core tests:
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
+  extends: .rust template
   tags:
     - dind
   services:
@@ -159,7 +132,7 @@ gldt_fee_compensation tests:
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
+  extends: .rust template
   tags:
     - dind
   services:
@@ -185,7 +158,7 @@ gldt_core test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
+  extends: .rust template
   script:
     - scripts/build-canister.sh --wasmonly gldt_core
     - scripts/generate-did.sh gldt_core
@@ -202,7 +175,7 @@ gldt_fee_compensation test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
+  extends: .rust template
   script:
     - scripts/build-canister.sh --wasmonly gldt_fee_compensation
     - scripts/generate-did.sh gldt_fee_compensation
@@ -234,7 +207,7 @@ swap_app test build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   needs: ["gldt_core test build","generate test declarations"]
-  <<: *node_template
+  extends: .node template
   script:
     - npm run build:swap_app
   artifacts:
@@ -248,7 +221,7 @@ landing_page test build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   needs: ["generate test declarations"]
-  <<: *node_template
+  extends: .node template
   script:
     - npm run build:landing
   artifacts:
@@ -262,7 +235,7 @@ explorer test build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   needs: ["generate test declarations"]
-  <<: *node_template
+  extends: .node template
   script:
     - npm run build:explorer
   artifacts:
@@ -280,7 +253,7 @@ gldt_core canister build:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  <<: *rust_template
+  extends: .rust template
   script:
     - scripts/build-canister.sh --wasmonly gldt_core
     - scripts/generate-did.sh gldt_core
@@ -298,7 +271,7 @@ gldt_fee_compensation canister build:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  <<: *rust_template
+  extends: .rust template
   script:
     - scripts/build-canister.sh --wasmonly gldt_fee_compensation
     - scripts/generate-did.sh gldt_fee_compensation
@@ -331,7 +304,7 @@ swap_app staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_swap_app"
     NETWORK: "staging"
@@ -356,7 +329,7 @@ landing_page staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_landing_page"
     NETWORK: "staging"
@@ -381,7 +354,7 @@ explorer staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_explorer"
     NETWORK: "staging"
@@ -410,7 +383,7 @@ swap_app production build:
         - "swap_app/*.{js,json}"
         - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_swap_app"
     NETWORK: "ic"
@@ -439,7 +412,7 @@ landing_page production build:
         - "landing_page/*.{js,json}"
         - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_landing_page"
     NETWORK: "ic"
@@ -468,7 +441,7 @@ explorer production build:
         - "explorer/*.{js,json}"
         - "explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
+  extends: .node template
   variables:
     CANISTER_NAME: "gldt_explorer"
     NETWORK: "ic"

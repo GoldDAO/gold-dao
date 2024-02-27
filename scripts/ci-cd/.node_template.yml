@@ -1,6 +1,6 @@
 # NodeJS & NextJS job template
 
-.node template: &node_template
+.node template:
   image: node:18
   cache:
   - key: "node-$CI_COMMIT_REF_SLUG"

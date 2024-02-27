@@ -1,0 +1,22 @@
+spec:
+  inputs:
+    src-folder:
+      description: "The NextJS project folder. Must be located in the /client/ folder"
+---
+# Front-end (NextJS) linter job template
+
+#include: .node_template.yml
+
+$[[ inputs.src-folder ]] linter:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  extends: .node template
+  script:
+    - npm run lint:$[[ inputs.src-folder ]]

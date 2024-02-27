@@ -1,6 +1,6 @@
 # Rust / Cargo (for wasm builds) template
 
-.rust template: &rust_template
+.rust template:
   tags:
     - docker
     - big
