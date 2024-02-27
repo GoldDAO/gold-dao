@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Check if exactly two arguments are provided
+# Check if exactly one argument is provided
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <staging|ic>"
     exit 1
@@ -18,9 +18,6 @@ if [ "$CHOICE" != "staging" ] && [ "$CHOICE" != "ic" ]; then
     exit 2
 fi
 
-# Define the output file path
-
-# Use jq to dynamically choose between staging and ic fields
 jq --arg choice "$CHOICE" '{
   governance_canister_id: .sns_governance[$choice],
   index_canister_id: .sns_index[$choice],

@@ -8,24 +8,27 @@ CID="j2neh-vqaaa-aaaal-aduxq-cai"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
+./scripts/sns_testing/prepare_scripts.sh staging
+
 [ -e message.json ] && rm message.json
 
-quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-proposal $DEVELOPER_NEURON_ID --proposal "(
+quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
+    make-proposal $DEVELOPER_NEURON_ID --proposal "(
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Adding the manage_nns_neuron method to the SNS to be able to manage the ICP NNS neurons via the Gold DAO SNS.\";
+        summary=\"Adding the stake_nns_neuron method to the SNS to be able to stake ICP NNS neurons via the Gold DAO SNS.\";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_001 : nat64);
-                name = \"Manage NNS neuron\";
-                description = \"Proposal to manage the ICP neuron under control of the Gold DAO.\";
+                id = (1_002 : nat64);
+                name = \"Stake NNS neuron\";
+                description = \"Proposal to stake an ICP neuron under control of the Gold DAO.\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
                         validator_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
                         target_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
-                        validator_method_name = \"manage_nns_neuron_validate\";
-                        target_method_name = \"manage_nns_neuron\"
+                        validator_method_name = \"stake_nns_neuron_validate\";
+                        target_method_name = \"stake_nns_neuron\"
                     }
                 }
             }
@@ -35,4 +38,4 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
 
 quill send message.json -y
 
-rm tmp.pem && rm message.json
+rm tmp.pem && rm message.json && rm sns_canister_ids.json

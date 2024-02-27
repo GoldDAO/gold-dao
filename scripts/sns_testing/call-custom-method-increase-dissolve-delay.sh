@@ -5,7 +5,9 @@ DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb
 CANISTER_IDS="sns_canister_ids.json"
 
 FID=1001
-ADDITIONAL_SECONDS=$((3600*24*365*1))
+
+ADDITIONAL_SECONDS=$((3600))
+NNS_NEURON_ID=12686565467252200941
 
 export BLOB="$(didc encode --format blob "(record {
     command = variant {
@@ -17,8 +19,10 @@ export BLOB="$(didc encode --format blob "(record {
             }
         }
     };
-    neuron_id = 17481076647658761488:nat64
+    neuron_id = ${NNS_NEURON_ID}:nat64
 })")"
+
+./scripts/sns_testing/prepare_scripts.sh staging
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
@@ -28,7 +32,7 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
     record {
         title=\"Update neuron's dissolve delay.\";
         url=\"https://example.com/\";
-        summary=\"Adjusting the dissolve delay of one neuron to 6 months.\";
+        summary=\"Adding ${ADDITIONAL_SECONDS} seconds to dissolve delay of neuron ${NEURON_ID}.\";
         action= opt variant {
             ExecuteGenericNervousSystemFunction = record {
                 function_id= ${FID}:nat64;
@@ -40,4 +44,4 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
 
 quill send message.json -y
 
-rm tmp.pem && rm message.json
+rm tmp.pem && rm message.json && rm sns_canister_ids.json

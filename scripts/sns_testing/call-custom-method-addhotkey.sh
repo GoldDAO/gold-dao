@@ -4,6 +4,9 @@ PEM_FILE="tmp.pem"
 DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
 CANISTER_IDS="sns_canister_ids.json"
 
+NNS_NEURON_ID=12686565467252200941
+HOTKEY_TO_ADD="j2neh-vqaaa-aaaal-aduxq-cai"
+
 FID=1001
 
 export BLOB="$(didc encode --format blob "(record {
@@ -11,13 +14,15 @@ export BLOB="$(didc encode --format blob "(record {
         Configure = record {
             operation = opt variant {
                 AddHotKey = record {
-                    new_hot_key = opt principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\"
+                    new_hot_key = opt principal \"${HOTKEY_TO_ADD}\"
                 }
             }
         }
     };
-    neuron_id = 17481076647658761488:nat64
+    neuron_id = ${NNS_NEURON_ID}:nat64
 })")"
+
+./scripts/sns_testing/prepare_scripts.sh staging
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
@@ -27,7 +32,7 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
     record {
         title=\"Add hotkey to neuron.\";
         url=\"https://example.com/\";
-        summary=\"Add hotkey to neuron.\";
+        summary=\"Add hotkey ${HOTKEY_TO_ADD} to neuron ${NNS_NEURON_ID}.\";
         action= opt variant {
             ExecuteGenericNervousSystemFunction = record {
                 function_id= ${FID}:nat64;
@@ -40,4 +45,4 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
 
 quill send message.json -y
 
-rm tmp.pem && rm message.json
+rm tmp.pem && rm message.json && rm sns_canister_ids.json
