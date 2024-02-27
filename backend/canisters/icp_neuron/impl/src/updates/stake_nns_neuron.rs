@@ -22,8 +22,8 @@ pub enum StakeNnsNeuronResponse {
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
-async fn stake_nns_neuron_validate(args: StakeNnsNeuronResponse) -> Result<String, String> {
-    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+async fn stake_nns_neuron_validate() -> Result<String, String> {
+    Ok("No arguments to validate".to_string())
 }
 
 #[update(guard = "caller_is_governance_principal")]
