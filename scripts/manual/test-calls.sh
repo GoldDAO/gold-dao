@@ -11,3 +11,7 @@ command = variant { Configure = record { operation = opt variant { AddHotKey = r
 
 
 dfx canister call --network ic nns_governance manage_neuron '(record { id = opt record {id = 17481076647658761488 }; command = variant { ClaimOrRefresh = record { by = opt variant {NeuronIdOrSubaccount = record {}}} }})'
+
+
+dfx canister call --network ic rrkah-fqaaa-aaaaa-aaaaq-cai list_neurons '(record {neuron_ids=vec {}; include_neurons_readable_by_caller= true})'
+# dfx canister call --network ic rrkah-fqaaa-aaaaa-aaaaq-cai get_full_neuron '(17481076647658761488)'
