@@ -112,7 +112,7 @@ gldt_core tests:
   script:
     - touch backend/canisters/gldt_core/api/can.did
     - touch backend/canisters/gldt_fee_compensation/api/can.did
-    - cargo tarpaulin -p gldt_core -j 2 --lib -o Xml
+    - cargo tarpaulin -p gldt_core -j 2 --lib --no-fail-fast --target wasm32-unknown-unknown -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
     reports:
@@ -143,7 +143,7 @@ gldt_fee_compensation tests:
   script:
     - touch backend/canisters/gldt_core/api/can.did
     - touch backend/canisters/gldt_fee_compensation/api/can.did
-    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib -o Xml
+    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib --no-fail-fast --target wasm32-unknown-unknown -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
     reports:
