@@ -26,40 +26,8 @@ stages:
   - build
   - deploy
 
-###############################################################################
-# Templates
-###############################################################################
-.node template: &node_template
-  image: node:18
-  cache:
-  - key: "node-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .npm/
-      - node_modules/
-      - client/**/.next/
-      - client/**/.npm/
-      - client/**/node_modules/
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-
-.rust template: &rust_template
-  tags:
-    - docker
-    - big
-  image: rust:slim-bookworm
-  cache:
-  - key: "rust-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .cargo
-      - backend/canisters/gldt_core/target
-      - backend/canisters/gldt_fee_compensation/target
-  before_script:
-    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
-    - rustup component add clippy
-    - rustup target add wasm32-unknown-unknown
-    - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
-    - export PATH="$PWD/.cargo/bin:$PATH"
+include: "scripts/ci-cd/.node_template.yml"
+include: "scripts/ci-cd/.rust_template.yml"
 
 ################################################################################
 # Cache preparation
