@@ -154,19 +154,34 @@
     },
     "sns_governance": {
       "build": "",
-      "candid": "backend/external_canisters/sns_governance/can.did",
+      "candid": "backend/external_canisters/sns_governance/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_governance/api/declarations"
+      },
       "type": "custom",
       "wasm": ""
     },
     "sns_index": {
       "build": "",
-      "candid": "backend/external_canisters/sns_index/can.did",
+      "candid": "backend/external_canisters/sns_index/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_index/api/declarations"
+      },
       "type": "custom",
       "wasm": ""
     },
     "sns_ledger": {
       "build": "",
-      "candid": "backend/external_canisters/sns_ledger/can.did",
+      "candid": "backend/external_canisters/sns_ledger/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_ledger/api/declarations"
+      },
       "type": "custom",
       "wasm": ""
     },
@@ -183,13 +198,23 @@
     },
     "sns_root": {
       "build": "",
-      "candid": "backend/external_canisters/sns_root/can.did",
+      "candid": "backend/external_canisters/sns_root/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_root/api/declarations"
+      },
       "type": "custom",
       "wasm": ""
     },
     "sns_swap": {
       "build": "",
-      "candid": "backend/external_canisters/sns_swap/can.did",
+      "candid": "backend/external_canisters/sns_swap/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_swap/api/declarations"
+      },
       "type": "custom",
       "wasm": ""
     },
