@@ -17,7 +17,8 @@ pub struct InitArgs {
 
 #[init]
 #[trace]
-fn init(args: InitArgs) {
+fn init(init_args: Option<InitArgs>) {
+    let args = init_args.ok_or("Must provide init arguments.".to_string()).unwrap();
     canister_logger::init(args.test_mode);
 
     let rewards_recipients = RewardsRecipientList::new(args.rewards_recipients.clone()).unwrap();

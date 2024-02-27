@@ -77,7 +77,7 @@ type Spawn = record {
 type Split = record { amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
 type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
-service : (InitArgs) -> {
+service : (opt InitArgs) -> {
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
   manage_recipients : () -> ();
   stake_nns_neuron : () -> (StakeNnsNeuronResponse);
