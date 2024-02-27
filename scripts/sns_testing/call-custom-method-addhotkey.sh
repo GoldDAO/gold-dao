@@ -1,0 +1,43 @@
+#!/bin/bash
+
+PEM_FILE="tmp.pem"
+DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
+CANISTER_IDS="sns_canister_ids.json"
+
+FID=1001
+
+export BLOB="$(didc encode --format blob "(record {
+    command = variant {
+        Configure = record {
+            operation = opt variant {
+                AddHotKey = record {
+                    new_hot_key = opt principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\"
+                }
+            }
+        }
+    };
+    neuron_id = 17481076647658761488:nat64
+})")"
+
+dfx identity export gitlab_ci_gldt_staging > tmp.pem
+
+[ -e message.json ] && rm message.json
+
+quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-proposal $DEVELOPER_NEURON_ID --proposal "(
+    record {
+        title=\"Add hotkey to neuron.\";
+        url=\"https://example.com/\";
+        summary=\"Add hotkey to neuron.\";
+        action= opt variant {
+            ExecuteGenericNervousSystemFunction = record {
+                function_id= ${FID}:nat64;
+                payload = ${BLOB}
+            }
+        }
+    }
+)" > message.json
+
+
+quill send message.json -y
+
+rm tmp.pem && rm message.json
