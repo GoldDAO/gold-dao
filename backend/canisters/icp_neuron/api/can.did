@@ -25,6 +25,10 @@ type Command = variant {
   Disburse : Disburse;
 };
 type Configure = record { operation : opt Operation };
+type DepositAccount = record {
+  legacy_account_id : text;
+  icrc_account : Account;
+};
 type Disburse = record {
   to_account : opt AccountIdentifier;
   amount : opt Amount;
@@ -61,7 +65,7 @@ type NeuronWithMetric = record {
   dissolve_delay : nat64;
   maturity : nat64;
   staked_amount : nat64;
-  deposit_account : text;
+  deposit_account : opt DepositAccount;
   dissolving : bool;
 };
 type Operation = variant {

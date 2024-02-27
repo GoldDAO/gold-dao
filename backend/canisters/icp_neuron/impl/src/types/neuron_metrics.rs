@@ -1,6 +1,6 @@
 use candid::CandidType;
-use ic_ledger_types::Subaccount;
-use ledger_utils::principal_to_legacy_account_id;
+use icrc_ledger_types::icrc1::account::Account;
+use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{ neuron::DissolveState, Neuron };
 use serde::Serialize;
 use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
@@ -8,7 +8,7 @@ use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
 #[derive(CandidType, Serialize, Debug, PartialEq, Eq)]
 pub struct NeuronWithMetric {
     pub id: u64,
-    pub deposit_account: String,
+    pub deposit_account: Option<DepositAccount>,
     pub staked_amount: u64,
     pub maturity: u64,
     pub dissolve_delay: u64,
@@ -34,12 +34,18 @@ impl From<Neuron> for NeuronWithMetric {
 
         let subaccount_bytes: Result<[u8; 32], _> = neuron.account.try_into();
         let deposit_account = match subaccount_bytes {
-            Ok(bytes) =>
-                principal_to_legacy_account_id(
-                    NNS_GOVERNANCE_CANISTER_ID,
-                    Some(Subaccount(bytes))
-                ).to_hex(),
-            Err(_) => "unknown".to_string(),
+            Ok(bytes) => {
+                let icrc_account = Account {
+                    owner: NNS_GOVERNANCE_CANISTER_ID,
+                    subaccount: Some(bytes),
+                };
+                let legacy_account_id = icrc_account_to_legacy_account_id(icrc_account).to_hex();
+                Some(DepositAccount {
+                    icrc_account,
+                    legacy_account_id,
+                })
+            }
+            Err(_) => None,
         };
         Self {
             id: neuron.id.map_or(0, |id| id.id),
@@ -52,11 +58,21 @@ impl From<Neuron> for NeuronWithMetric {
     }
 }
 
+#[derive(CandidType, Serialize, Debug, PartialEq, Eq)]
+pub struct DepositAccount {
+    icrc_account: Account,
+    legacy_account_id: String,
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
+    use icrc_ledger_types::icrc1::account::Account;
     use nns_governance_canister::types::{ Neuron, NeuronId };
+    use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
+
+    use crate::types::neuron_metrics::DepositAccount;
 
     use super::NeuronWithMetric;
 
@@ -121,7 +137,16 @@ mod tests {
 
         let expeted_result = NeuronWithMetric {
             id: 17_481_076_647_658_761_488,
-            deposit_account: "6601afb37d5807c9ed17c8343bb1c7180f98eca73a64727f56134c720cf0304a".to_string(),
+            deposit_account: Some(DepositAccount {
+                icrc_account: Account {
+                    owner: NNS_GOVERNANCE_CANISTER_ID,
+                    subaccount: Some([
+                        149, 128, 178, 23, 182, 54, 48, 115, 178, 174, 154, 119, 21, 182, 104, 106,
+                        141, 106, 190, 141, 3, 144, 216, 56, 228, 185, 230, 194, 1, 119, 126, 193,
+                    ]),
+                },
+                legacy_account_id: "6601afb37d5807c9ed17c8343bb1c7180f98eca73a64727f56134c720cf0304a".to_string(),
+            }),
             staked_amount: 0,
             maturity: 0,
             dissolve_delay: 0,
