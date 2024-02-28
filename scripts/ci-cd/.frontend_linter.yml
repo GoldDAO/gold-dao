@@ -5,8 +5,6 @@ spec:
 ---
 # Front-end (NextJS) linter job template
 
-#include: .node_template.yml
-
 $[[ inputs.src-folder ]] linter:
   stage: lint
   rules:
