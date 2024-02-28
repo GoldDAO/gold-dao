@@ -1,7 +1,7 @@
+use crate::types::outstanding_payments::{ OutstandingPayments, PaymentStatus };
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
-use icrc_ledger_types::icrc1::account::Account;
 use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{
     manage_neuron::{ disburse::Amount, Command, Disburse, Spawn },
@@ -130,35 +130,61 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
 
         let total_amount = neuron.cached_neuron_stake_e8s;
 
-        let payments_list: Vec<(Account, u64)>;
-        match rewards_recipients.split_amount_to_each_recipient(total_amount) {
-            Ok(list) => {
-                payments_list = list;
+        let mut payments_list = mutate_state(|s| {
+            match s.data.outstanding_payments.get_outstanding_payments(neuron_id) {
+                // if there are still outstanding payments for this neuron, use those
+                Some(x) => x,
+                // Else create a new list and store it in the oustanding payments list
+                None => {
+                    match rewards_recipients.split_amount_to_each_recipient(total_amount) {
+                        Ok(list) => { OutstandingPayments::new(list) }
+                        Err(err) => {
+                            error!(
+                                "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
+                            );
+                            OutstandingPayments::new(vec![])
+                        }
+                    }
+                }
             }
-            Err(err) => {
-                warn!(
-                    "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
-                );
-                continue;
-            }
+        });
+
+        if payments_list.has_none() {
+            continue;
         }
 
-        for (icrc_account, amount) in payments_list {
+        for payment in payments_list.0.iter_mut() {
+            if !payment.is_pending() {
+                continue;
+            }
             let icp_ledger_account = nns_governance_canister::types::AccountIdentifier {
-                hash: icrc_account_to_legacy_account_id(icrc_account).as_ref().to_vec(),
+                hash: icrc_account_to_legacy_account_id(payment.to).as_ref().to_vec(),
             };
             match
                 manage_nns_neuron_impl(
                     neuron_id,
                     Command::Disburse(Disburse {
                         to_account: Some(icp_ledger_account),
-                        amount: Some(Amount { e8s: amount }),
+                        amount: Some(Amount { e8s: payment.amount }),
                     })
                 ).await
             {
-                Ok(_) => (),
-                Err(_) => (),
+                Ok(_) => {
+                    payment.status = PaymentStatus::Complete;
+                }
+                Err(err) =>
+                    error!(
+                        "Error processing disburse payment for neuron {neuron_id}. Error: {err}"
+                    ),
             }
         }
+
+        mutate_state(|s| {
+            if payments_list.all_settled() {
+                s.data.outstanding_payments.settle(neuron_id);
+            } else {
+                s.data.outstanding_payments.update(neuron_id, payments_list)
+            }
+        });
     }
 }

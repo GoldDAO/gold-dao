@@ -14,7 +14,10 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::{ ecdsa::{ get_key_id, CanisterEcdsaRequest }, types::neuron_metrics::NeuronWithMetric };
+use crate::{
+    ecdsa::{ get_key_id, CanisterEcdsaRequest },
+    types::{ neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList },
+};
 
 const IC_URL: &str = "https://icp-api.io";
 
@@ -52,6 +55,7 @@ impl RuntimeState {
             nns_governance_canister_id: self.data.nns_governance_canister_id,
             icp_ledger_canister_id: self.data.icp_ledger_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
+            outstanding_payments: self.data.outstanding_payments.clone(),
         }
     }
 
@@ -100,6 +104,7 @@ pub struct Metrics {
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
+    pub outstanding_payments: OutstandingPaymentsList,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -118,6 +123,7 @@ pub struct Data {
     pub nns_governance_canister_id: Principal,
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: RewardsRecipientList,
+    pub outstanding_payments: OutstandingPaymentsList,
 }
 
 impl Data {
@@ -129,6 +135,7 @@ impl Data {
             neurons: Neurons::default(),
             nns_governance_canister_id: NNS_GOVERNANCE_CANISTER_ID,
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
+            outstanding_payments: OutstandingPaymentsList::default(),
         }
     }
 
