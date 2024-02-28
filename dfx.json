@@ -59,7 +59,7 @@
     "gldt_landing_page": {
       "type": "assets",
       "source": ["client/landing_page/out"],
-      "build": ["npm run postinstall", "npm run build:landing"],
+      "build": ["npm run postinstall", "npm run build:landing_page"],
       "declarations": {
         "bindings": [],
         "env_override": null,

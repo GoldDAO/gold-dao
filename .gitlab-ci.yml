@@ -54,6 +54,17 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_fee_compensation
+  # Frontend builds
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: swap_app
+      dependencies: ["gldt_core test build","generate test declarations"]
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: landing_page
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: explorer
 
 ################################################################################
 # Cache preparation
@@ -81,7 +92,7 @@ cargo cache:
 # Linters
 ################################################################################
 
-# See includes above for frontends
+# See includes above for frontends lint
 
 rust lint:
   stage: lint
@@ -107,10 +118,10 @@ rust lint:
 # See includes above
 
 ################################################################################
-# Test builds
+# Builds
 ################################################################################
 
-# See includes above for canister test builds
+# See includes above for canister builds
 
 generate test declarations:
   stage: test
@@ -125,54 +136,6 @@ generate test declarations:
     paths:
       - backend/**/declarations
     expire_in: 1 day
-
-swap_app test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build","generate test declarations"]
-  extends: .node template
-  script:
-    - npm run build:swap_app
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app-TEST"
-    paths:
-      - client/swap_app/out
-    expire_in: 1 day
-
-landing_page test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["generate test declarations"]
-  extends: .node template
-  script:
-    - npm run build:landing
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
-    paths:
-      - client/landing_page/out
-    expire_in: 1 day
-
-explorer test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["generate test declarations"]
-  extends: .node template
-  script:
-    - npm run build:explorer
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer-TEST"
-    paths:
-      - client/explorer/out
-    expire_in: 1 day
-
-################################################################################
-# Builds
-################################################################################
-
-# See includes above for canister builds
 
 generate declarations:
   stage: build
@@ -190,167 +153,7 @@ generate declarations:
       - backend/**/api
     expire_in: 6 months
 
-swap_app staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["gldt_core canister build", "generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_swap_app"
-    NETWORK: "staging"
-  script:
-    - npm run build:swap_app
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "SWAP_APP_URL=$STAGING_URL" > swap_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-swap_app_STAGING_BUILD"
-    paths:
-      - client/swap_app/out
-    reports:
-      dotenv: swap_deploy.env
-    expire_in: 1 day
-  environment:
-    name: swap app
-    deployment_tier: staging
-    action: prepare
-
-landing_page staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_landing_page"
-    NETWORK: "staging"
-  script:
-    - npm run build:landing
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "LANDING_URL=$STAGING_URL" > landing_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
-    paths:
-      - client/landing_page/out
-    reports:
-      dotenv: landing_deploy.env
-    expire_in: 1 day
-  environment:
-    name: landing page
-    deployment_tier: staging
-    action: prepare
-
-explorer staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_explorer"
-    NETWORK: "staging"
-  script:
-    - npm run build:explorer
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "EXPLORER_URL=$STAGING_URL" > explorer_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
-    paths:
-      - client/explorer/out
-    reports:
-      dotenv: explorer_deploy.env
-    expire_in: 1 day
-  environment:
-    name: explorer
-    deployment_tier: staging
-    action: prepare
-
-swap_app production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "swap_app/*.{js,json}"
-        - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_swap_app"
-    NETWORK: "ic"
-  script:
-    - npm run build:swap_app
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "SWAP_APP_URL=$PRODUCTION_URL" > swap_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
-    paths:
-      - client/swap_app/out
-    reports:
-      dotenv: swap_deploy.env
-    expire_in: 6 months
-  environment:
-    name: swap app
-    deployment_tier: production
-    action: prepare
-
-landing_page production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "landing_page/*.{js,json}"
-        - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_landing_page"
-    NETWORK: "ic"
-  script:
-    - npm run build:landing
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - client/landing_page/out
-    reports:
-      dotenv: landing_deploy.env
-    expire_in: 6 months
-  environment:
-    name: landing page
-    deployment_tier: production
-    action: prepare
-
-explorer production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "explorer/*.{js,json}"
-        - "explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  extends: .node template
-  variables:
-    CANISTER_NAME: "gldt_explorer"
-    NETWORK: "ic"
-  script:
-    - npm run build:explorer
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "EXPLORER_URL=$PRODUCTION_URL" > explorer_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
-    paths:
-      - client/explorer/out
-    reports:
-      dotenv: explorer_deploy.env
-    expire_in: 6 months
-  environment:
-    name: explorer
-    deployment_tier: production
-    action: prepare
+# See includes above for frontend builds
 
 ################################################################################
 # Deployments
