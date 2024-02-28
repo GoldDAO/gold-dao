@@ -47,13 +47,13 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_fee_compensation
+  # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_core
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_fee_compensation
-  
 
 ################################################################################
 # Cache preparation
