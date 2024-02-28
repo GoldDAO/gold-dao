@@ -6,8 +6,8 @@ CANISTER_IDS="sns_canister_ids.json"
 
 FID=1001
 
-ADDITIONAL_SECONDS=$((300))
-NNS_NEURON_ID=5366258317940288231
+ADDITIONAL_SECONDS=$((60))
+NNS_NEURON_ID=16320996336187008175
 
 export BLOB="$(didc encode --format blob "(record {
     command = variant {
