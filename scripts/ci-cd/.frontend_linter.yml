@@ -2,6 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder. Must be located in the /client/ folder
+      options: ["swap_app", "landing_page", "explorer"]
 ---
 # Front-end (NextJS) linter job template
 
