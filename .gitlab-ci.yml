@@ -58,7 +58,6 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: swap_app
-      dependencies: ["gldt_core test build","generate test declarations"]
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: landing_page
