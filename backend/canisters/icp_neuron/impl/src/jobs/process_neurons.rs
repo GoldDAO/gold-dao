@@ -95,7 +95,10 @@ async fn run_async() {
 
             if neurons_updated {
                 // Refresh the neurons again given that they've been updated
-                ic_cdk_timers::set_timer(Duration::ZERO, || ic_cdk::spawn(run_async()));
+                // Add a delay of 2 minutes to give enough time for transactions to pass
+                ic_cdk_timers::set_timer(Duration::from_millis(2 * MINUTE_IN_MS), ||
+                    ic_cdk::spawn(run_async())
+                );
             }
         }
         Err(err) => { error!("Error fetching neuron list: {err:?}") }
