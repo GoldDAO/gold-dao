@@ -36,7 +36,7 @@ impl RuntimeState {
         Metrics {
             canister_info: CanisterInfo {
                 now: self.env.now(),
-                test_mode: self.env.test_mode(),
+                test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
             },

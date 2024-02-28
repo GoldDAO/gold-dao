@@ -17,7 +17,7 @@ fn post_upgrade() {
         ::deserialize(reader)
         .unwrap();
 
-    canister_logger::init_with_logs(runtime_state.env.test_mode(), logs, traces);
+    canister_logger::init_with_logs(runtime_state.env.is_test_mode(), logs, traces);
     init_canister(runtime_state);
 
     info!("Post upgrade complete.")
