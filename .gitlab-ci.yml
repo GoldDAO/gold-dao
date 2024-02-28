@@ -47,6 +47,13 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_fee_compensation
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_core
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_fee_compensation
+  
 
 ################################################################################
 # Cache preparation
@@ -102,39 +109,8 @@ rust lint:
 ################################################################################
 # Test builds
 ################################################################################
-gldt_core test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  extends: .rust template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_core
-    - scripts/generate-did.sh gldt_core
-    - scripts/build-canister.sh gldt_core
-    - ic-wasm backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
-  artifacts:
-    name: "gldt_core-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
-    paths:
-      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_core/api/can.did
-    expire_in: 1 day
 
-gldt_fee_compensation test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  extends: .rust template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
-    - scripts/generate-did.sh gldt_fee_compensation
-    - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
-  artifacts:
-    name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
-    paths:
-      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_fee_compensation/api/can.did
-    expire_in: 1 day
+# See includes above for canister test builds
 
 generate test declarations:
   stage: test
@@ -195,41 +171,8 @@ explorer test build:
 ################################################################################
 # Builds
 ################################################################################
-gldt_core canister build:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  extends: .rust template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_core
-    - scripts/generate-did.sh gldt_core
-    - scripts/build-canister.sh gldt_core
-  artifacts:
-    name: "${CI_PROJECT_NAME}-gldt_core-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
-    paths:
-      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_core/api/can.did
-    expire_in: 6 months
 
-gldt_fee_compensation canister build:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  extends: .rust template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
-    - scripts/generate-did.sh gldt_fee_compensation
-    - scripts/build-canister.sh gldt_fee_compensation
-  artifacts:
-    name: "${CI_PROJECT_NAME}-gldt_fee_compensation-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
-    paths:
-      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_fee_compensation/api/can.did
-    expire_in: 6 months
+# See includes above for canister builds
 
 generate declarations:
   stage: build
