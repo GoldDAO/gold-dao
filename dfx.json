@@ -1,113 +1,56 @@
 {
   "__0": "GLDT.org static website with swap canister",
   "canisters": {
-    "gldt_ledger": {
-      "type": "custom",
-      "candid": "backend/canisters/gldt_ledger/api/can.did",
-      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_ledger/api/declarations"
-      }
-    },
-    "gldt_ledger_indexer": {
-      "type": "custom",
-      "candid": "backend/canisters/gldt_ledger_indexer/api/can.did",
-      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_ledger_indexer/api/declarations"
-      }
-    },
-    "gldt_core": {
-      "package": "gldt_core",
-      "type": "custom",
-      "candid": "backend/canisters/gldt_core/api/can.did",
-      "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_core/api/declarations"
-      },
-      "build": ["npm run build:back"]
-    },
-    "gldt_fee_compensation": {
-      "package": "gldt_fee_compensation",
-      "type": "custom",
-      "candid": "backend/canisters/gldt_fee_compensation/api/can.did",
-      "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_fee_compensation/api/declarations"
-      },
-      "build": ["npm run build:back"]
-    },
-    "gldt_swap_app": {
-      "type": "assets",
-      "source": ["client/swap_app/out"],
-      "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
+    "gldnft_backend_1000g": {
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
-      },
-      "frontend": {}
-    },
-    "gldt_landing_page": {
-      "type": "assets",
-      "source": ["client/landing_page/out"],
-      "build": ["npm run postinstall", "npm run build:landing_page"],
-      "declarations": {
-        "bindings": [],
-        "env_override": null,
-        "output": null
-      },
-      "frontend": {}
-    },
-    "gldt_explorer": {
-      "type": "assets",
-      "source": ["client/explorer/out"],
-      "build": ["npm run postinstall", "npm run build:explorer"],
-      "declarations": {
-        "bindings": [],
-        "env_override": null,
-        "output": null
-      }
-    },
-    "sns_rewards": {
-      "type": "custom",
-      "candid": "backend/canisters/sns_rewards/api/can.did",
-      "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/sns_rewards/api/declarations"
-      },
-      "build": ["./scripts/build-canister.sh sns_rewards"]
-    },
-    "yumi_kyc": {
-      "type": "custom",
-      "candid": "backend/external_canisters/yumi_kyc/api/can.did",
-      "wasm": "backend/external_canisters/yumi_kyc/kyc.wasm",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/external_canisters/yumi_kyc/api/declarations"
       },
       "remote": {
         "id": {
-          "staging": "uftys-3qaaa-aaaah-abwpq-cai",
-          "ic": "ucs6g-wiaaa-aaaah-abwpa-cai"
+          "ic": "7i7jl-6qaaa-aaaam-abjma-cai",
+          "staging": "7i7jl-6qaaa-aaaam-abjma-cai"
         }
-      }
+      },
+      "type": "custom",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
+    },
+    "gldnft_backend_100g": {
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "remote": {
+        "id": {
+          "ic": "zhfjc-liaaa-aaaal-acgja-cai",
+          "staging": "zhfjc-liaaa-aaaal-acgja-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
+    },
+    "gldnft_backend_10g": {
+      "candid": "backend/external_canisters/gld_nft/api/can.did",
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "remote": {
+        "id": {
+          "ic": "sy3ra-iqaaa-aaaao-aixda-cai",
+          "staging": "xyo2o-gyaaa-aaaal-qb55a-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
     },
     "gldnft_backend_1g": {
-      "type": "custom",
       "candid": "backend/external_canisters/gld_nft/api/can.did",
-      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
       "declarations": {
         "bindings": ["js", "did"],
         "env_override": null,
@@ -115,63 +58,181 @@
       },
       "remote": {
         "id": {
-          "staging": "obapm-2iaaa-aaaak-qcgca-cai",
-          "ic": "io7gn-vyaaa-aaaak-qcbiq-cai"
+          "ic": "io7gn-vyaaa-aaaak-qcbiq-cai",
+          "staging": "obapm-2iaaa-aaaak-qcgca-cai"
         }
-      }
-    },
-    "gldnft_backend_10g": {
+      },
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/api/can.did",
-      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
+      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
+    },
+    "gldt_core": {
+      "build": ["npm run build:back"],
+      "candid": "backend/canisters/gldt_core/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_core/api/declarations"
+      },
+      "package": "gldt_core",
+      "type": "custom",
+      "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz"
+    },
+    "gldt_explorer": {
+      "build": ["npm run postinstall", "npm run build:explorer"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "remote": {
-        "id": {
-          "staging": "xyo2o-gyaaa-aaaal-qb55a-cai",
-          "ic": "sy3ra-iqaaa-aaaao-aixda-cai"
-        }
-      }
+      "source": ["client/explorer/out"],
+      "type": "assets"
     },
-    "gldnft_backend_100g": {
+    "gldt_fee_compensation": {
+      "build": ["npm run build:back"],
+      "candid": "backend/canisters/gldt_fee_compensation/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_fee_compensation/api/declarations"
+      },
+      "package": "gldt_fee_compensation",
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/api/can.did",
-      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
+      "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz"
+    },
+    "gldt_landing_page": {
+      "build": ["npm run postinstall", "npm run build:landing"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "remote": {
-        "id": {
-          "staging": "zhfjc-liaaa-aaaal-acgja-cai",
-          "ic": "zhfjc-liaaa-aaaal-acgja-cai"
-        }
-      }
+      "frontend": {},
+      "source": ["client/landing_page/out"],
+      "type": "assets"
     },
-    "gldnft_backend_1000g": {
+    "gldt_ledger": {
+      "candid": "backend/canisters/gldt_ledger/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_ledger/api/declarations"
+      },
       "type": "custom",
-      "candid": "backend/external_canisters/gld_nft/api/can.did",
-      "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-ledger.wasm.gz"
+    },
+    "gldt_ledger_indexer": {
+      "candid": "backend/canisters/gldt_ledger_indexer/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_ledger_indexer/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz"
+    },
+    "gldt_swap_app": {
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "remote": {
-        "id": {
-          "staging": "7i7jl-6qaaa-aaaam-abjma-cai",
-          "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
-        }
-      }
+      "frontend": {},
+      "source": ["client/swap_app/out"],
+      "type": "assets"
+    },
+    "icp_neuron": {
+      "build": ["./scripts/build-canister.sh icp_neuron"],
+      "candid": "backend/canisters/icp_neuron/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/icp_neuron/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz"
     },
     "sns_governance": {
+      "build": "",
+      "candid": "backend/external_canisters/sns_governance/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_governance/api/declarations"
+      },
       "type": "custom",
-      "candid": "sns/scripts/candid/sns_governance.did",
       "wasm": ""
+    },
+    "sns_index": {
+      "build": "",
+      "candid": "backend/external_canisters/sns_index/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_index/api/declarations"
+      },
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_ledger": {
+      "build": "",
+      "candid": "backend/external_canisters/sns_ledger/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_ledger/api/declarations"
+      },
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_rewards": {
+      "build": ["./scripts/build-canister.sh sns_rewards"],
+      "candid": "backend/canisters/sns_rewards/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/sns_rewards/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
+    },
+    "sns_root": {
+      "build": "",
+      "candid": "backend/external_canisters/sns_root/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_root/api/declarations"
+      },
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_swap": {
+      "build": "",
+      "candid": "backend/external_canisters/sns_swap/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/sns_swap/api/declarations"
+      },
+      "type": "custom",
+      "wasm": ""
+    },
+    "yumi_kyc": {
+      "candid": "backend/external_canisters/yumi_kyc/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/external_canisters/yumi_kyc/api/declarations"
+      },
+      "remote": {
+        "id": {
+          "ic": "ucs6g-wiaaa-aaaah-abwpa-cai",
+          "staging": "uftys-3qaaa-aaaah-abwpq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "backend/external_canisters/yumi_kyc/kyc.wasm"
     }
   },
   "networks": {

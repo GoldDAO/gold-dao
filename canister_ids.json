@@ -27,28 +27,32 @@
     "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
     "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
   },
+  "icp_neuron": {
+    "ic": "j4jiq-sqaaa-aaaap-ab23a-cai",
+    "staging": "j2neh-vqaaa-aaaal-aduxq-cai"
+  },
   "sns_governance": {
     "ic": "tr3th-kiaaa-aaaaq-aab6q-cai",
-    "staging": ""
+    "staging": "j3ioe-7iaaa-aaaap-ab23q-cai"
   },
   "sns_index": {
     "ic": "efv5g-kqaaa-aaaaq-aacaa-cai",
-    "staging": ""
+    "staging": "iwgkk-qaaaa-aaaap-ab24a-cai"
   },
   "sns_ledger": {
     "ic": "tyyy3-4aaaa-aaaaq-aab7a-cai",
-    "staging": ""
+    "staging": "irhm6-5yaaa-aaaap-ab24q-cai"
+  },
+  "sns_rewards": {
+    "ic": "iyehc-lqaaa-aaaap-ab25a-cai",
+    "staging": "2f5ll-gqaaa-aaaak-qcfuq-cai"
   },
   "sns_root": {
     "ic": "tw2vt-hqaaa-aaaaq-aab6a-cai",
-    "staging": ""
+    "staging": "i7fbw-giaaa-aaaap-ab25q-cai"
   },
   "sns_swap": {
     "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
-    "staging": ""
-  },
-  "sns_rewards": {
-    "ic": "",
-    "staging": "2f5ll-gqaaa-aaaak-qcfuq-cai"
+    "staging": "ikcq3-haaaa-aaaap-ab26a-cai"
   }
 }

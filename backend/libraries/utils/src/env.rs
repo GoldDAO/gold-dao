@@ -29,7 +29,7 @@ impl CanisterEnv {
         }
     }
 
-    pub fn test_mode(&self) -> bool {
+    pub fn is_test_mode(&self) -> bool {
         self.test_mode
     }
 }
