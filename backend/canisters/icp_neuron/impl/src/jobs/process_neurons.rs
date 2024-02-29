@@ -83,15 +83,17 @@ async fn run_async() {
             });
 
             let mut neurons_updated = false;
-            if !neurons_to_spawn.is_empty() {
-                spawn_neurons(neurons_to_spawn).await;
-                neurons_updated = true;
-            }
+            // TODO - Deactivated neurons spawning and disbursing for now and will only activate
+            // TODO - once the sns rewards canister is fully ready
+            // if !neurons_to_spawn.is_empty() {
+            //     spawn_neurons(neurons_to_spawn).await;
+            //     neurons_updated = true;
+            // }
 
-            if !neurons_to_disburse.is_empty() {
-                disburse_neurons(neurons_to_disburse).await;
-                neurons_updated = true;
-            }
+            // if !neurons_to_disburse.is_empty() {
+            //     disburse_neurons(neurons_to_disburse).await;
+            //     neurons_updated = true;
+            // }
 
             if neurons_updated {
                 // Refresh the neurons again given that they've been updated
