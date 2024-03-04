@@ -4,10 +4,12 @@ use serde::{ Deserialize, Serialize };
 mod http;
 mod neuron_info;
 mod proposals;
+mod rewards_recipients;
 
 pub use http::*;
 pub use neuron_info::*;
 pub use proposals::*;
+pub use rewards_recipients::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Empty {}
