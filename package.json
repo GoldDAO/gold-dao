@@ -19,9 +19,9 @@
     "build:swap_app": "npm run --workspace swap_app build",
     "build:landing": "npm run --workspace landing_page build",
     "build:explorer": "npm run --workspace explorer build",
-    "build:back": "scripts/build-canister.sh gldt_core && scripts/build-canister.sh gldt_fee_compensation",
-    "build:backdid": "scripts/build-canister.sh --wasmonly gldt_core && scripts/build-canister.sh --wasmonly gldt_fee_compensation && npm run build:candid && npm run build:declarations && npm run build:back",
-    "build:candid": "scripts/generate-did.sh gldt_core & scripts/generate-did.sh gldt_fee_compensation",
+    "build:back": "scripts/build-canister.sh gldt_core && scripts/build-canister.sh gldt_fee_compensation && scripts/build-canister.sh sns_rewards",
+    "build:backdid": "scripts/build-canister.sh --wasmonly gldt_core && scripts/build-canister.sh --wasmonly gldt_fee_compensation && scripts/build-canister.sh --wasmonly sns_rewards && npm run build:candid && npm run build:declarations && npm run build:back",
+    "build:candid": "scripts/generate-did.sh gldt_core & scripts/generate-did.sh gldt_fee_compensation & scripts/generate-did.sh sns_rewards",
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
     "lint": "npm run lint:back && npm run lint:frontends",
     "lint:back": "cargo clippy",
@@ -32,7 +32,7 @@
     "deploy": "NETWORK='local' scripts/local-deploy.sh",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
-    "test": "echo \"No tests yet! Please write some unit tests!\"",
+    "test": "npm run build:backdid && cargo tarpaulin --count -o html",
     "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
   },
   "devDependencies": {

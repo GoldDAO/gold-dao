@@ -1,16 +1,19 @@
-import {createActor, idlFactory} from '../../../canister/gld_nft/declarations';
+import {
+  createActor,
+  idlFactory,
+} from '../../../backend/external_canisters/gld_nft/api/declarations';
 import {
   createActor as createGLDTLedgerActor,
   idlFactory as idlGLDTLedgerFactory,
-} from '../../../canister/gldt_ledger/declarations';
+} from '../../../backend/canisters/gldt_ledger/api/declarations';
 import {
   createActor as createGLDTCoreActor,
   idlFactory as idlGLDTCoreFactory,
-} from '../../../canister/gldt_core/declarations';
+} from '../../../backend/canisters/gldt_core/api/declarations';
 import {
   createActor as createLedgerIndexActors,
   idlFactory as idlLedgerIndexerFactory,
-} from '../../../canister/gldt_ledger_indexer/declarations';
+} from '../../../backend/canisters/gldt_ledger_indexer/api/declarations';
 
 const GLDNFT_CANISTER_IDS = process.env.GLDNFT_CANISTER_IDS || {};
 

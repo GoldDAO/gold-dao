@@ -20,6 +20,7 @@ cache:
       - .dfx
 
 stages:
+  - preparation
   - lint
   - test
   - build
@@ -50,15 +51,37 @@ stages:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
       - .cargo
-      - canister/gldt_core/target
-      - canister/gldt_fee_compensation/target
+      - backend/canisters/gldt_core/target
+      - backend/canisters/gldt_fee_compensation/target
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential > /dev/null
+    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
     - export PATH="$PWD/.cargo/bin:$PATH"
+
+################################################################################
+# Cache preparation
+################################################################################
+node cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *node_template
+  script:
+    - npm pkg get name description author license workspaces engines
+    - node --version
+    - npm --version
+
+cargo cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
+  script:
+    - cargo version
+    - cargo verify-project
 
 ################################################################################
 # Linters
@@ -111,16 +134,81 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "canister/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "canister/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
   <<: *rust_template
   script:
-    - touch canister/gldt_core/src/gldt_core.did
-    - touch canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+    - touch backend/canisters/gldt_core/api/can.did
+    - touch backend/canisters/gldt_fee_compensation/api/can.did
     - cargo clippy
+
+################################################################################
+# Unit tests
+################################################################################
+gldt_core tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - ".gitlab-ci.yml"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  tags:
+    - dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
+  script:
+    - touch backend/canisters/gldt_core/api/can.did
+    - touch backend/canisters/gldt_fee_compensation/api/can.did
+    - cargo tarpaulin -p gldt_core -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+
+gldt_fee_compensation tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
+        - ".gitlab-ci.yml"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+  <<: *rust_template
+  tags:
+    - dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
+  script:
+    - touch backend/canisters/gldt_core/api/can.did
+    - touch backend/canisters/gldt_fee_compensation/api/can.did
+    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib -o Xml
+  coverage: /^\d+.\d+% coverage/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
 
 ################################################################################
 # Test builds
@@ -134,12 +222,12 @@ gldt_core test build:
     - scripts/build-canister.sh --wasmonly gldt_core
     - scripts/generate-did.sh gldt_core
     - scripts/build-canister.sh gldt_core
-    - ic-wasm canister/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
+    - ic-wasm backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
   artifacts:
     name: "gldt_core-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
-      - canister/gldt_core/target/wasm32-unknown-unknown/release
-      - canister/gldt_core/src/gldt_core.did
+      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_core/api/can.did
     expire_in: 1 day
 
 gldt_fee_compensation test build:
@@ -151,19 +239,18 @@ gldt_fee_compensation test build:
     - scripts/build-canister.sh --wasmonly gldt_fee_compensation
     - scripts/generate-did.sh gldt_fee_compensation
     - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
+    - ic-wasm backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
   artifacts:
     name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
     paths:
-      - canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_fee_compensation/api/can.did
     expire_in: 1 day
 
 generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      # TODO: Add "gldt_fee_compensation test build"
       needs: ["gldt_core test build","gldt_fee_compensation test build"]
   script:
     - dfx generate
@@ -171,7 +258,7 @@ generate test declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
     paths:
-      - canister/**/declarations
+      - backend/**/declarations
     expire_in: 1 day
 
 swap_app test build:
@@ -233,8 +320,8 @@ gldt_core canister build:
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_core-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/gldt_core/target/wasm32-unknown-unknown/release
-      - canister/gldt_core/src/gldt_core.did
+      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_core/api/can.did
     expire_in: 6 months
 
 gldt_fee_compensation canister build:
@@ -251,8 +338,8 @@ gldt_fee_compensation canister build:
   artifacts:
     name: "${CI_PROJECT_NAME}-gldt_fee_compensation-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
-      - canister/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - canister/gldt_fee_compensation/src/gldt_fee_compensation.did
+      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
+      - backend/canisters/gldt_fee_compensation/api/can.did
     expire_in: 6 months
 
 generate declarations:
@@ -268,7 +355,7 @@ generate declarations:
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
     paths:
-      - canister/**/declarations
+      - backend/**/api
     expire_in: 6 months
 
 swap_app staging build:
