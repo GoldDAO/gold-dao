@@ -46,14 +46,14 @@ include:
       src-folder: gldt_core
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
-      src-folder: gldt_fee_compensation
+      src-folder: icp_neuron
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_core
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: gldt_fee_compensation
+      src-folder: icp_neuron
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -101,15 +101,15 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_core,gldt_core/impl,gldt_core/impl/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{icp_neuron,icp_neuron/impl,icp_neuron/impl/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
   extends: .rust template
   script:
     - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/gldt_fee_compensation/api/can.did
+    - touch backend/canisters/icp_neuron/api/can.did
     - cargo clippy
 
 ################################################################################
@@ -128,7 +128,7 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build","gldt_fee_compensation test build"]
+      needs: ["gldt_core test build","icp_neuron test build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -144,7 +144,7 @@ generate declarations:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-      needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
+      needs: ["gldt_core canister build", "icp_neuron canister build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -163,7 +163,7 @@ local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build", "gldt_fee_compensation test build", "swap_app test build", "landing_page test build", "explorer test build"]
+      needs: ["gldt_core test build", "icp_neuron test build", "swap_app test build", "landing_page test build", "explorer test build"]
   before_script:
     - dfx --version
     - dfx start --clean --background
@@ -181,7 +181,7 @@ check canister ids:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(fee_compensation)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: "${PEM_FILE_PRODUCTION}"
@@ -356,40 +356,40 @@ gldt core:
     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m5bu4-7qaaa-aaaap-abrxq-cai
     action: start
 
-gldt fee compensation staging:
+icp neuron staging:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["gldt_fee_compensation canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "check canister ids"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-fee-compensation.sh --reinstall $TARGET_NETWORK
+    - scripts/deploy-icp-neuron.sh --reinstall $TARGET_NETWORK
   environment:
-    name: gldt_fee_compensation
+    name: icp_neuron
     deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ccjse-eaaaa-aaaao-a2ixq-cai
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j2neh-vqaaa-aaaal-aduxq-cai
     action: start
 
-gldt fee compensation:
+icp neuron:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_TAG =~ '/^fee_compensation-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["gldt_fee_compensation canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "check canister ids"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-fee-compensation.sh $TARGET_NETWORK
+    - scripts/deploy-icp-neuron.sh $TARGET_NETWORK
   environment:
-    name: gldt_fee_compensation
+    name: icp_neuron
     deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oa42u-myaaa-aaaap-abrya-cai
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j4jiq-sqaaa-aaaap-ab23a-cai
     action: start
 
 gldt ledger staging:
