@@ -48,6 +48,8 @@ type InitArgs = record { test_mode : bool };
 type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
+type ManageRewardRecipientsRequest = record { list : vec RewardsRecipient };
+type ManageRewardRecipientsResponse = variant { Success; InternalError : text };
 type MemoAndController = record { controller : opt principal; memo : nat64 };
 type Merge = record { source_neuron_id : opt NeuronId };
 type MergeMaturity = record { percentage_to_merge : nat32 };
@@ -95,5 +97,8 @@ type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
 service : (opt InitArgs) -> {
   list_neurons : () -> (ListNeuronsResponse) query;
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
+  manage_reward_recipients : (ManageRewardRecipientsRequest) -> (
+      ManageRewardRecipientsResponse,
+    );
   stake_nns_neuron : () -> (StakeNnsNeuronResponse);
 }
