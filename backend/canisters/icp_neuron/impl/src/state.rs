@@ -127,9 +127,9 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(rewards_recipients: RewardsRecipientList) -> Self {
+    pub fn new() -> Self {
         Self {
-            rewards_recipients,
+            rewards_recipients: RewardsRecipientList::empty(),
             public_key: Vec::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             neurons: Neurons::default(),

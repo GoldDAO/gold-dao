@@ -44,10 +44,7 @@ type Follow = record { topic : int32; followees : vec NeuronId };
 type IncreaseDissolveDelay = record {
   additional_dissolve_delay_seconds : nat32;
 };
-type InitArgs = record {
-  test_mode : bool;
-  rewards_recipients : vec RewardsRecipient;
-};
+type InitArgs = record { test_mode : bool };
 type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };

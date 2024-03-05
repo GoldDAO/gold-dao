@@ -20,12 +20,17 @@ pub struct RewardsRecipientList(Vec<RewardsRecipient>);
 impl RewardsRecipientList {
     const TOTAL_REWARD_WEIGHT: u16 = 10000;
 
-    pub fn new(list: Vec<RewardsRecipient>) -> Result<Self, String> {
-        Self::validate(&list)?;
-        Ok(Self(list))
+    pub fn empty() -> Self {
+        Self(vec![])
     }
 
-    fn validate(list: &Vec<RewardsRecipient>) -> Result<(), String> {
+    pub fn set(&mut self, list: Vec<RewardsRecipient>) -> Result<(), String> {
+        Self::validate(&list)?;
+        *self = Self(list);
+        Ok(())
+    }
+
+    pub fn validate(list: &Vec<RewardsRecipient>) -> Result<(), String> {
         if list.is_empty() {
             return Err("Invalid rewards recipients: empty list.".to_string());
         }
@@ -67,6 +72,9 @@ impl RewardsRecipientList {
             return Err(
                 format!("Amount needs to be at least 100_000_000 (1 ICP). Passed amount: {}", amount).to_string()
             );
+        }
+        if self.0.is_empty() {
+            return Err("No reward recipients defined.".to_string());
         }
 
         let mut result = vec![];
@@ -124,17 +132,19 @@ mod tests {
 
     #[test]
     fn initialise_rewards_recipient_list_empty() {
-        let list = RewardsRecipientList::new(vec![]);
+        let mut list = RewardsRecipientList::empty();
+        let result = list.set(vec![]);
 
-        assert_eq!(list, Err("Invalid rewards recipients: empty list.".to_string()))
+        assert_eq!(result, Err("Invalid rewards recipients: empty list.".to_string()))
     }
 
     #[test]
     fn initialise_rewards_recipient_list_wrong_sum() {
-        let list = RewardsRecipientList::new(vec![dummy_recipient(1000), dummy_recipient(1000)]);
+        let mut list = RewardsRecipientList::empty();
+        let result = list.set(vec![dummy_recipient(1000), dummy_recipient(1000)]);
 
         assert_eq!(
-            list,
+            result,
             Err(
                 format!(
                     "Invalid rewards recipient: the sum of all needs to add up to {}.",
@@ -152,14 +162,26 @@ mod tests {
             dummy_recipient(3300),
             dummy_recipient(100)
         ];
-        let list = RewardsRecipientList::new(recipients.clone());
 
-        assert_eq!(list.unwrap().0, recipients)
+        let mut list = RewardsRecipientList::empty();
+        list.set(recipients.clone()).unwrap();
+
+        assert_eq!(list.0, recipients)
+    }
+
+    #[test]
+    fn split_amount_to_each_recipient_empty_list() {
+        let list = RewardsRecipientList::empty();
+        let result = list.split_amount_to_each_recipient(100_000_000);
+
+        let expected_result = Err("No reward recipients defined.".to_string());
+        assert_eq!(result, expected_result)
     }
 
     #[test]
     fn split_amount_to_each_recipient() {
-        let list = RewardsRecipientList::new(
+        let mut list = RewardsRecipientList::empty();
+        list.set(
             vec![
                 dummy_recipient(3300),
                 dummy_recipient(3300),
@@ -200,7 +222,8 @@ mod tests {
     }
     #[test]
     fn split_amount_to_each_recipient_invalid_amount() {
-        let list = RewardsRecipientList::new(
+        let mut list = RewardsRecipientList::empty();
+        list.set(
             vec![
                 dummy_recipient(3300),
                 dummy_recipient(3300),
