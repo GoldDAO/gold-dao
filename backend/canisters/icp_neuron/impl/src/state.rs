@@ -45,7 +45,10 @@ impl RuntimeState {
             },
             public_key: hex::encode(&self.data.public_key),
             public_key_der: hex::encode(&self.data.get_public_key_der().unwrap_or_default()),
-            own_principal: self.data.get_principal(),
+            own_principal: self.data
+                .get_principal()
+                .map(|p| p.to_text())
+                .unwrap_or("".to_string()),
             canister_default_account_id: principal_to_legacy_account_id(
                 self.env.canister_id(),
                 None
@@ -74,7 +77,7 @@ impl RuntimeState {
         let envelope_content = EnvelopeContent::Call {
             nonce: nonce.map(|n| n.to_vec()),
             ingress_expiry: self.env.now_nanos() + 5 * MINUTE_IN_MS * NANOS_PER_MILLISECOND,
-            sender: self.data.get_principal(),
+            sender: self.data.get_principal()?,
             canister_id,
             method_name,
             arg: candid::encode_one(&args).unwrap(),
@@ -97,7 +100,7 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub public_key: String,
     pub public_key_der: String,
-    pub own_principal: Principal,
+    pub own_principal: String,
     pub canister_default_account_id: String,
     pub authorized_principals: Vec<Principal>,
     pub nns_governance_canister_id: Principal,
@@ -166,8 +169,8 @@ impl Data {
         }
     }
 
-    pub fn get_principal(&self) -> Principal {
-        Principal::self_authenticating(&self.get_public_key_der().unwrap_or_default())
+    pub fn get_principal(&self) -> Result<Principal, String> {
+        self.get_public_key_der().and_then(|pk| Ok(Principal::self_authenticating(pk)))
     }
 }
 
