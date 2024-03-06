@@ -14,10 +14,10 @@ default:
       - runner_unsupported
       - unknown_failure
 
-# cache:
-#   - key: "dfx-$CI_COMMIT_REF_SLUG"
-#     paths:
-#       - .dfx
+cache:
+  - key: "dfx-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .dfx
 
 stages:
   - preparation
@@ -31,14 +31,14 @@ stages:
 ###############################################################################
 .node template: &node_template
   image: node:18
-  # cache:
-  # - key: "node-$CI_COMMIT_REF_SLUG"
-  #   paths:
-  #     - .npm/
-  #     - node_modules/
-  #     - client/**/.next/
-  #     - client/**/.npm/
-  #     - client/**/node_modules/
+  cache:
+  - key: "node-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .npm/
+      - node_modules/
+      - client/**/.next/
+      - client/**/.npm/
+      - client/**/node_modules/
   before_script:
     - npm ci --cache .npm --prefer-offline
 
@@ -47,12 +47,12 @@ stages:
     - docker
     - big
   image: rust:slim-bookworm
-  # cache:
-  # - key: "rust-$CI_COMMIT_REF_SLUG"
-  #   paths:
-  #     - .cargo
-  #     - backend/canisters/gldt_core/target
-  #     - backend/canisters/gldt_fee_compensation/target
+  cache:
+  - key: "rust-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .cargo
+      - backend/canisters/gldt_core/target
+      - backend/canisters/gldt_fee_compensation/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
@@ -64,24 +64,24 @@ stages:
 ################################################################################
 # Cache preparation
 ################################################################################
-# node cache:
-#   stage: preparation
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#   <<: *node_template
-#   script:
-#     - npm pkg get name description author license workspaces engines
-#     - node --version
-#     - npm --version
+node cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *node_template
+  script:
+    - npm pkg get name description author license workspaces engines
+    - node --version
+    - npm --version
 
-# cargo cache:
-#   stage: preparation
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#   <<: *rust_template
-#   script:
-#     - cargo version
-#     - cargo verify-project
+cargo cache:
+  stage: preparation
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  <<: *rust_template
+  script:
+    - cargo version
+    - cargo verify-project
 
 ################################################################################
 # Linters
