@@ -14,7 +14,7 @@ $[[ inputs.src-folder ]] test build:
   script:
     - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
     - scripts/generate-did.sh $[[ inputs.src-folder ]]
-    - scripts/build-canister.sh $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
     - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
   artifacts:
     name: "$[[ inputs.src-folder ]]-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
@@ -33,7 +33,7 @@ $[[ inputs.src-folder ]] canister build:
   script:
     - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
     - scripts/generate-did.sh $[[ inputs.src-folder ]]
-    - scripts/build-canister.sh $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
   artifacts:
     name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
     paths:
