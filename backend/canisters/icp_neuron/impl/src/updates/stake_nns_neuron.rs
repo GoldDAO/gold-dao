@@ -45,7 +45,7 @@ async fn stake_nns_neuron_impl() -> Result<u64, String> {
     let nonce = generate_rand_nonce().await?;
 
     let PrepareResult { nns_governance_canister_id, icp_ledger_canister_id, principal } =
-        read_state(prepare);
+        read_state(prepare)?;
 
     let subaccount = compute_neuron_staking_subaccount_bytes(principal, nonce);
 
@@ -113,10 +113,10 @@ struct PrepareResult {
     principal: Principal,
 }
 
-fn prepare(state: &RuntimeState) -> PrepareResult {
-    PrepareResult {
+fn prepare(state: &RuntimeState) -> Result<PrepareResult, String> {
+    Ok(PrepareResult {
         nns_governance_canister_id: state.data.nns_governance_canister_id,
         icp_ledger_canister_id: state.data.icp_ledger_canister_id,
-        principal: state.data.get_principal(),
-    }
+        principal: state.data.get_principal()?,
+    })
 }
