@@ -72,6 +72,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
       })' --no-wallet ${REINSTALL} --by-proposal -y
   quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+    --pem-file $PEM_FILE \
     --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
     --wasm-path .dfx/local/gldt_core/gldt_core.wasm.gz \
     --title "Upgrade `gldt_core` to `${CI_COMMIT_TAG}`" \

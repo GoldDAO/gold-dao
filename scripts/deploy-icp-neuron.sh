@@ -63,6 +63,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
   fi
   dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y
   quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+    --pem-file $PEM_FILE \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
     --wasm-path .dfx/local/icp_neuron/icp_neuron.wasm.gz \
     --title "Upgrade `icp_neuron` to `${CI_COMMIT_TAG}`" \
