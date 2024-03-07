@@ -1,5 +1,6 @@
 {
-  "__0": "GLDT.org static website with swap canister",
+  "dfx": "0.17.0",
+  "__0": "GLDT.org static website with swap canisters",
   "canisters": {
     "gldnft_backend_1000g": {
       "candid": "backend/external_canisters/gld_nft/api/can.did",
