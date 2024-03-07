@@ -27,7 +27,7 @@
     "lint:back": "cargo clippy",
     "lint:frontends": "npm run lint:swap_app && npm run lint:landing && npm run lint:explorer",
     "lint:swap_app": "npm run --workspace swap_app lint",
-    "lint:landing": "npm run --workspace landing_page lint",
+    "lint:landing_page": "npm run --workspace landing_page lint",
     "lint:explorer": "npm run --workspace explorer lint",
     "deploy": "NETWORK='local' scripts/local-deploy.sh",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
