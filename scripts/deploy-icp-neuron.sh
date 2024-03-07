@@ -55,13 +55,13 @@ fi
 if [[ $1 == "local" ]]; then
   dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^icp_neuron-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
-  . scripts/parse_proposal_details.sh
   if [[ $1 == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
-  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y
+  . scripts/parse_proposal_details.sh && \
+  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
   quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
@@ -69,3 +69,4 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
     --title "Upgrade icp_neuron to ${CI_COMMIT_TAG}" \
     --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
 fi
+return
