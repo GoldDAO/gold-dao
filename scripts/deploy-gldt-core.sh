@@ -75,6 +75,6 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     --pem-file $PEM_FILE \
     --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
     --wasm-path .dfx/local/gldt_core/gldt_core.wasm.gz \
-    --title "Upgrade `gldt_core` to `${CI_COMMIT_TAG}`" \
+    --title "Upgrade gldt_core to ${CI_COMMIT_TAG}" \
     --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
 fi

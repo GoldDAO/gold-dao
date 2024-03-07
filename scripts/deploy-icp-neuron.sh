@@ -66,6 +66,6 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
     --pem-file $PEM_FILE \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
     --wasm-path .dfx/local/icp_neuron/icp_neuron.wasm.gz \
-    --title "Upgrade `icp_neuron` to `${CI_COMMIT_TAG}`" \
+    --title "Upgrade icp_neuron to ${CI_COMMIT_TAG}" \
     --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
 fi
