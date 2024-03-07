@@ -326,7 +326,7 @@ gldt core staging:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
+    - . scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
   environment:
     name: gldt_core
     deployment_tier: staging
@@ -344,7 +344,7 @@ gldt core:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+    - . scripts/deploy-gldt-core.sh $TARGET_NETWORK
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
     paths:
@@ -367,7 +367,7 @@ icp neuron staging:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-icp-neuron.sh --reinstall $TARGET_NETWORK
+    - . scripts/deploy-icp-neuron.sh --reinstall $TARGET_NETWORK
   environment:
     name: icp_neuron
     deployment_tier: staging
@@ -385,7 +385,7 @@ icp neuron:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-icp-neuron.sh $TARGET_NETWORK
+    - . scripts/deploy-icp-neuron.sh $TARGET_NETWORK
   environment:
     name: icp_neuron
     deployment_tier: production
