@@ -20,6 +20,7 @@ ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
+ic-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serializer = { path = '../../../libraries/serializer' }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
@@ -28,3 +29,4 @@ stable_memory = { path = '../../../libraries/stable_memory' }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
+sha256 = { path = "../../../libraries/sha256" }

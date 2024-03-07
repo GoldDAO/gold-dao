@@ -3,7 +3,8 @@ use candid::Principal;
 use sns_governance_canister::types::NeuronId;
 use queries::{ GetNeuronResponse, get_maturity_history_of_neuron::MaturityHistoryResponse };
 use lifecycle::Args;
-use types::{ HttpRequest, HttpResponse, NeuronInfo, TimestampMillis };
+use types::{ HttpRequest, HttpResponse, NeuronInfo, TimestampMillis, TransferTokenArgs };
+use ic_ledger_types::BlockIndex;
 
 mod jobs;
 mod lifecycle;

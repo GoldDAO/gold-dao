@@ -1,16 +1,17 @@
 use std::collections::BTreeMap;
+use icrc_ledger_types::icrc1::account::Subaccount;
 use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::NeuronId;
+use sns_governance_canister::types::{NeuronId};
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::SNS_GOVERNANCE_CANISTER_ID,
+    consts::{OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
 
-use crate::model::maturity_history::MaturityHistory;
+use crate::model::{maturity_history::MaturityHistory, reward_pool::RewardPool};
 
 canister_state!(RuntimeState);
 
@@ -70,6 +71,7 @@ pub struct SyncInfo {
 pub struct Data {
     /// SNS governance cansiter
     pub sns_governance_canister: Principal,
+    pub ogy_ledger_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
     /// Stores the mapping of each principal to its neurons
@@ -78,16 +80,22 @@ pub struct Data {
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
+    /// SubAccounts to hold rewards for user's neurons 
+    // pub sub_accounts: BTreeMap<Principal, Vec<Subaccount>>,
+    /// Reward pool sub accounts to hold rewards that are due for distribution to sub_accounts
+    pub reward_pools: RewardPool,
 }
 
 impl Default for Data {
     fn default() -> Self {
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
+            ogy_ledger_canister: OGY_LEDGER_CANISTER_ID,
             neuron_maturity: BTreeMap::new(),
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
+            reward_pools : RewardPool::default(),
         }
     }
 }

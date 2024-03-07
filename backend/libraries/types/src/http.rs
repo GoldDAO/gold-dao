@@ -1,6 +1,6 @@
 #![allow(deprecated)]
-use candid::{define_function, CandidType, Nat};
-use serde::Deserialize;
+use candid::{define_function, CandidType, Nat, Principal};
+use serde::{Deserialize, Serialize};
 use serde_bytes::ByteBuf;
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -97,3 +97,4 @@ impl HttpResponse {
         }
     }
 }
+
