@@ -19,7 +19,8 @@
       --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.staging)
       --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_SHORT_SHA}"
-      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
+      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} > /tmp/msg.json && quill send --yes /tmp/msg.json;
+      rm -f /tmp/msg.json
 
 .asset canister production deploy:
   script:
@@ -31,4 +32,5 @@
       --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.ic)
       --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_TAG}"
-      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
+      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} > /tmp/msg.json && quill send --yes /tmp/msg.json;
+      rm -f /tmp/msg.json
