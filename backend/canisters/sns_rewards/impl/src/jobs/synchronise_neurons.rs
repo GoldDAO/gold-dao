@@ -54,6 +54,7 @@ pub async fn synchronise_neuron_data() {
                     response.neurons.iter().for_each(|neuron| {
                         update_principal_neuron_mapping(state, neuron);
                         update_neuron_maturity(state, neuron);
+                        create_reward_subaccount(state, neuron)
                     });
                 });
                 let number_of_received_neurons = response.neurons.len();
@@ -162,6 +163,18 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
             warn!("Unexpected overflow when calculating total maturity of neuron {id}");
             0
         })
+}
+
+// Creates a reward sub account for each neuron based on the neuron id
+fn create_reward_subaccount(state: &mut RuntimeState, neuron : &Neuron) {
+    // check if there is an account
+    // if we have an account, nothing to do
+    // if we dont have an account then create one
+    if let Some(id) = &neuron.id {
+        state.data.user_rewards.create_sub_account(id);
+    } else {
+        warn!("Neuron has no id to create sub account");
+    }
 }
 
 #[cfg(test)]

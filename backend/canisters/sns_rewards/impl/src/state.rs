@@ -1,17 +1,16 @@
 use std::collections::BTreeMap;
-use icrc_ledger_types::icrc1::account::Subaccount;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::{OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
+    consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
 
-use crate::model::maturity_history::MaturityHistory;
+use crate::model::{maturity_history::MaturityHistory, user_reward::UserReward};
 
 canister_state!(RuntimeState);
 
@@ -82,19 +81,21 @@ pub struct Data {
     pub maturity_history: MaturityHistory,
     /// SubAccounts to hold rewards for user's neurons 
     pub user_rewards: UserReward,
-    /// Reward pool sub accounts to hold rewards that are due for distribution to sub_accounts
 }
 
 impl Default for Data {
     fn default() -> Self {
+
+        let ogy_ledger_canister_id = Principal::from_text("jwcfb-hyaaa-aaaaj-aac4q-cai").expect("failed to parse OGY ledger canister id");
+
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
-            ogy_ledger_canister: OGY_LEDGER_CANISTER_ID,
+            ogy_ledger_canister: ogy_ledger_canister_id,
             neuron_maturity: BTreeMap::new(),
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            user_rewards : UserReward::new()
+            user_rewards : UserReward::default()
         }
     }
 }

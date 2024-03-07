@@ -51,12 +51,25 @@ impl Default for NeuronId {
     }
 }
 
+
+
 impl NeuronId {
     pub fn new(id_as_hex: &str) -> Option<Self> {
         if let Ok(id) = hex::decode(id_as_hex) {
             Some(Self {
                 id,
             })
+        } else {
+            None
+        }
+    }
+
+    pub fn into_array(self) -> Option<[u8; 32]> {
+        // Check if the Vec<u8> has exactly 32 elements
+        if self.id.len() == 32 {
+            let mut array = [0u8; 32];
+            array.copy_from_slice(&self.id);
+            Some(array)
         } else {
             None
         }

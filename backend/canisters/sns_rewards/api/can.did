@@ -34,18 +34,6 @@ type Token = record {
   content_encoding : text;
 };
 
-type TokenType = variant {
-    "ICP";
-    "OGY";
-};
-
-
-type TransferTokenArgs = record {
-    token_type: TokenType,
-    amount: u64,
-    from_canister: Principal,
-}
-
 service : (Args) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   convert_neuron_disp : (NeuronId) -> (text) query;
@@ -61,6 +49,5 @@ service : (Args) -> {
   get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
   sync_neurons_manual_trigger : () -> ();
-  transfer_funds_to_reward_pool : (TransferTokenArgs) -> (BlockIndex);
   update_info : () -> (text);
 }

@@ -28,8 +28,6 @@ pub const CYCLES_MINTING_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 0, 0, 0, 4, 1, 1]
 );
 
-pub const OGY_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(&[162, 201, 187, 166, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-
 #[cfg(test)]
 mod tests {
     use super::*;

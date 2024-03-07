@@ -1,11 +1,7 @@
-use std::{borrow::Cow, fmt::Display};
-
-use candid::{CandidType, Decode, Encode, Principal};
-use ic_ledger_types::AccountIdentifier;
-use ic_stable_structures::{storable::Bound, StableBTreeMap, Storable};
+use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::NeuronId;
-use tracing::warn;
+use sns_governance_canister::types::{NeuronId};
+use types::StoredSubaccount;
 
 use crate::memory::{get_user_reward_accounts, VM};
 
@@ -14,10 +10,10 @@ use crate::memory::{get_user_reward_accounts, VM};
 #[derive(Serialize, Deserialize)]
 pub struct UserReward {
     #[serde(skip, default = "init_map")]
-    reward_accounts: StableBTreeMap<NeuronId, AccountIdentifier, VM>,
+    reward_accounts: StableBTreeMap<NeuronId, StoredSubaccount, VM>,
 }
 
-fn init_map() -> StableBTreeMap<RewardPoolToken, AccountIdentifier, VM> {
+fn init_map() -> StableBTreeMap<NeuronId, StoredSubaccount, VM> {
     let memory = get_user_reward_accounts();
 
     StableBTreeMap::init(memory)
@@ -32,14 +28,26 @@ impl Default for UserReward {
 }
 
 impl UserReward {
-    pub fn create_sub_account(&mut self, neuron_id: NeuronId) -> u64 {
-        let sub_account = AccountIdentifier::new(&this_canister_id, neuron_id);
-        self.reward_accounts
-            .entry(neuron_id)
-            .or_insert(neuron_id, sub_account)
+    pub fn create_sub_account(&mut self, neuron_id: &NeuronId) -> u64 {
+        let neuron_id_as_bytes = neuron_id.clone()
+            .into_array()
+            .expect("Error conerting NeuronId into u8");
+
+        let sub_account_exists = self.reward_accounts.contains_key(&neuron_id);
+
+        if !sub_account_exists {
+            let sub_account = StoredSubaccount(neuron_id_as_bytes);
+            self.reward_accounts.insert(neuron_id.clone(), sub_account);
+            1
+        } else {
+            1
+        }
     }
 
-    pub fn get_account_by_neuron_id(&mut self, neuron_id: NeuronId) -> Option<AccountIdentifier> {
-        self.reward_accounts.get(neuron_id)
+    pub fn get_account_id_by_neuron_id(
+        &mut self,
+        neuron_id: NeuronId,
+    ) -> Option<StoredSubaccount> {
+        self.reward_accounts.get(&neuron_id)
     }
 }
