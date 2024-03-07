@@ -25,7 +25,7 @@
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
     "lint": "npm run lint:back && npm run lint:frontends",
     "lint:back": "cargo clippy",
-    "lint:frontends": "npm run lint:swap_app && npm run lint:landing && npm run lint:explorer",
+    "lint:frontends": "npm run lint:swap_app && npm run lint:landing_page && npm run lint:explorer",
     "lint:swap_app": "npm run --workspace swap_app lint",
     "lint:landing_page": "npm run --workspace landing_page lint",
     "lint:explorer": "npm run --workspace explorer lint",
