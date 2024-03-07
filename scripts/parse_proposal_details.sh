@@ -14,8 +14,6 @@ fi
 
 DETAILSURLFIELD=$(cat proposal_template.md | grep "details_url")
 export DETAILS_URL=${DETAILSURLFIELD:13}
-sed -i.bak "s/<<VERSIONTAG>>/${VERSION}/g" proposal_template.md && \
-sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal_template.md && \
-cp -f proposal_template.md proposal.md
-mv -f proposal_template.md.bak proposal_template.md
+sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_template.md > proposal.md && \
+sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal.md
 return
