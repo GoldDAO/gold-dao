@@ -81,9 +81,10 @@ pub struct Data {
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
     /// SubAccounts to hold rewards for user's neurons 
-    // pub sub_accounts: BTreeMap<Principal, Vec<Subaccount>>,
+    pub user_rewards: UserReward,
     /// Reward pool sub accounts to hold rewards that are due for distribution to sub_accounts
     pub reward_pools: RewardPool,
+
 }
 
 impl Default for Data {
@@ -96,6 +97,7 @@ impl Default for Data {
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
             reward_pools : RewardPool::default(),
+            user_rewards : UserReward::new()
         }
     }
 }
