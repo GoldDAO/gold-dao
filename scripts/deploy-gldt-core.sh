@@ -62,6 +62,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
+  . scripts/prepare_sns_canister_ids.sh $1 && \
   . scripts/parse_proposal_details.sh && \
 #  dfx deploy gldt_core --network $1 --argument '(
 #    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
@@ -71,7 +72,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
 #    };
 #    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
 #      })' --no-wallet ${REINSTALL} --by-proposal -y && \
-  quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+  quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
     --canister-upgrade-arg '(
     opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";

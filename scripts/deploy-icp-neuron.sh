@@ -60,9 +60,10 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
+  . scripts/prepare_sns_canister_ids.sh $1 && \
   . scripts/parse_proposal_details.sh && \
 #  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
-  quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+  quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
     --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
