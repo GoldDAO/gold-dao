@@ -57,6 +57,12 @@ if [[ $1 == "local" ]]; then
   gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
     })' --mode reinstall -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  . script/parse_proposal_details.sh
+  if [[ $1 == "ic" ]]; then
+    PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+  else
+    PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
+  fi
   dfx deploy gldt_core --network $1 --argument '(
     opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
     gld_nft_canister_ids=vec{
@@ -64,5 +70,10 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
     };
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-      })' --no-wallet ${REINSTALL} -y
+      })' --no-wallet ${REINSTALL} --by-proposal -y
+  quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+    --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
+    --wasm-path .dfx/local/gldt_core/gldt_core.wasm.gz \
+    --title "Upgrade `gldt_core` to `${CI_COMMIT_TAG}`" \
+    --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
 fi
