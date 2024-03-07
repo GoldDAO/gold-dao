@@ -4,7 +4,7 @@
 
 show_help() {
   cat << EOF
-gldt_core canister deployment script.
+icp_neuron canister deployment script.
 Must be run from the repository's root folder, and with a running replica if for local deployment.
 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
 The NETWORK argument should preferably be passed from the env variable that was previously defined
@@ -13,7 +13,7 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-gldt-core.sh [options] <NETWORK>
+  scripts/deploy-icp-neuron.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
@@ -46,35 +46,26 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
+if [[ $1 =~ ^(local|staging)$ ]]; then
+  TESTMODE="true"
+else
+  TESTMODE="false"
+fi
+
 if [[ $1 == "local" ]]; then
-# Temporarily use canister ids from staging for NFTs. Use the correct local ids when local NFT deployment will be working.
-  dfx deploy gldt_core --network $1 --argument '(
-  opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
-  gld_nft_canister_ids=vec{
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_1g)"'"; record { grams=1}};
-    record { principal "'"$(dfx canister id --network staging gldnft_backend_10g)"'"; record { grams=10}}
-    };
-  gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-    })' --mode reinstall -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^icp_neuron-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   . script/parse_proposal_details.sh
   if [[ $1 == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
-  dfx deploy gldt_core --network $1 --argument '(
-    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
-    gld_nft_canister_ids=vec{
-      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
-      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
-    };
-    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-      })' --no-wallet ${REINSTALL} --by-proposal -y
+  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y
   quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
-    --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
-    --wasm-path .dfx/local/gldt_core/gldt_core.wasm.gz \
-    --title "Upgrade `gldt_core` to `${CI_COMMIT_TAG}`" \
+    --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
+    --wasm-path .dfx/local/icp_neuron/icp_neuron.wasm.gz \
+    --title "Upgrade `icp_neuron` to `${CI_COMMIT_TAG}`" \
     --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
 fi

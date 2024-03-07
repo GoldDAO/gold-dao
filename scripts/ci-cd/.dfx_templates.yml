@@ -1,0 +1,34 @@
+# dfx and quill commands templates
+
+.import dfx identity:
+  before_script:
+    - dfx --version
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity use gitlab-ci-gldt
+    - dfx identity whoami
+    - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi
+    - dfx identity get-principal
+
+.asset canister staging deploy:
+  script:
+    - scripts/parse_proposal_details.sh
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
+    - >
+      quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_STAGING
+      --pem-file $PEM_FILE
+      --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.staging)
+      --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --title "Upgrade `${CANISTER_NAME}` to `${CI_COMMIT_SHORT_SHA}`"
+      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
+
+.asset canister production deploy:
+  script:
+    - scripts/parse_proposal_details.sh
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
+    - >
+      quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_PRODUCTION
+      --pem-file $PEM_FILE
+      --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.ic)
+      --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --title "Upgrade `${CANISTER_NAME}` to `${CI_COMMIT_TAG}`"
+      --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
