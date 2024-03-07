@@ -61,12 +61,13 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
   . scripts/parse_proposal_details.sh && \
-  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
-  quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+#  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
+  quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
+    --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
     --wasm-path .dfx/local/icp_neuron/icp_neuron.wasm.gz \
     --title "Upgrade icp_neuron to ${CI_COMMIT_TAG}" \
-    --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
+    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
 fi
 return

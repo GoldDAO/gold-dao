@@ -63,19 +63,26 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
   fi
   . scripts/parse_proposal_details.sh && \
-  dfx deploy gldt_core --network $1 --argument '(
+#  dfx deploy gldt_core --network $1 --argument '(
+#    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
+#    gld_nft_canister_ids=vec{
+#      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
+#      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
+#    };
+#    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
+#      })' --no-wallet ${REINSTALL} --by-proposal -y && \
+  quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+    --pem-file $PEM_FILE \
+    --canister-upgrade-arg '(
     opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
     gld_nft_canister_ids=vec{
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
     };
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-      })' --no-wallet ${REINSTALL} --by-proposal -y && \
-  quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $PROPOSER \
-    --pem-file $PEM_FILE \
-    --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
+      })' --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
     --wasm-path .dfx/local/gldt_core/gldt_core.wasm.gz \
     --title "Upgrade gldt_core to ${CI_COMMIT_TAG}" \
-    --url ${DETAILS_URL} --summary ${PROPOSAL_SUMMARY} | quill send --yes --
+    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
 fi
 return
