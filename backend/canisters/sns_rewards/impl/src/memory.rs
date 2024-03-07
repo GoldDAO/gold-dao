@@ -27,10 +27,6 @@ pub fn get_maturity_history_memory() -> VM {
     get_memory(MATURITY_HISTORY)
 }
 
-pub fn get_reward_pool_memory() -> VM {
-    get_memory(REWARD_POOL)
-}
-
 pub fn get_user_reward_accounts() -> VM {
     get_memory(USER_REWARD_SUB_ACCOUNT)
 }

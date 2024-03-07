@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use icrc_ledger_types::icrc1::account::Subaccount;
 use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::{NeuronId};
+use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
@@ -11,7 +11,7 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::model::{maturity_history::MaturityHistory, reward_pool::RewardPool};
+use crate::model::maturity_history::MaturityHistory;
 
 canister_state!(RuntimeState);
 
@@ -83,8 +83,6 @@ pub struct Data {
     /// SubAccounts to hold rewards for user's neurons 
     pub user_rewards: UserReward,
     /// Reward pool sub accounts to hold rewards that are due for distribution to sub_accounts
-    pub reward_pools: RewardPool,
-
 }
 
 impl Default for Data {
@@ -96,7 +94,6 @@ impl Default for Data {
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            reward_pools : RewardPool::default(),
             user_rewards : UserReward::new()
         }
     }
