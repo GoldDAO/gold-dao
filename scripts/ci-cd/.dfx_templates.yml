@@ -12,7 +12,7 @@
 .asset canister staging deploy:
   script:
     - scripts/parse_proposal_details.sh
-    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y gldt_${CANISTER_NAME}
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
     - >
       quill sns --canister-ids-file canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_STAGING
       --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.staging)
