@@ -206,6 +206,8 @@ asset canisters upgrade proposal tests:
         TARGET_NETWORK: staging
         PEM_FILE: testid.pem
         TEST_QUILL: "--dry-run"
+  cache:
+    policy: pull
   before_script:
     - dfx identity new --storage-mode plaintext testid
     - dfx identity use testid
@@ -352,6 +354,8 @@ backend canisters upgrade proposal tests:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: testid.pem
+  cache:
+    policy: pull
   before_script:
     - dfx identity new --storage-mode plaintext testid
     - dfx identity use testid
