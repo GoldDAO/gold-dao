@@ -64,6 +64,8 @@ pub struct SyncInfo {
     pub last_synced_start: TimestampMillis,
     pub last_synced_end: TimestampMillis,
     pub last_synced_number_of_neurons: usize,
+    pub last_distribution_start: TimestampMillis,
+    pub last_distribution_end: TimestampMillis
 }
 
 #[derive(Serialize, Deserialize)]

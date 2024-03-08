@@ -12,6 +12,7 @@ const MAX_VALUE_SIZE: u32 = 100;
 pub struct NeuronInfo {
     pub last_synced_maturity: u64,
     pub accumulated_maturity: u64,
+    pub rewarded_maturity: u64,
 }
 
 impl Storable for NeuronInfo {

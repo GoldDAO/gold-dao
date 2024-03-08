@@ -47,6 +47,10 @@ impl MaturityHistory {
     pub fn get(&self, size: usize) -> Vec<((NeuronId, TimestampMillis), NeuronInfo)> {
         self.history.iter().take(size).collect()
     }
+
+    pub fn get_keys(&self) -> Vec<NeuronId> {
+        self.history.iter().map(|(key, _)| key.0.clone()).collect()
+    }
 }
 
 fn history_range(

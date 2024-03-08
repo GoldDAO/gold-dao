@@ -98,7 +98,8 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
 
         let neuron_info = NeuronInfo {
             last_synced_maturity: maturity,
-            accumulated_maturity: 0,
+            accumulated_maturity: maturity,
+            rewarded_maturity : 0
         };
 
         // TODO - check age of neuron to avoid someone gaming the system by spawning neurons (check if really relevant)
@@ -214,7 +215,7 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0 };
+        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0, rewarded_maturity : 0 };
         let mut result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -240,7 +241,7 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 150 };
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 150, rewarded_maturity : 0 };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -266,7 +267,7 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50, rewarded_maturity : 0 };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -292,7 +293,7 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50, rewarded_maturity : 0 };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
