@@ -20,7 +20,7 @@ GLDT and GLDT Swapp dApp frontend
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *******************************************************************************/
 
-import Layout from './../src/components/layout/Layout';
+import Layout from '../src/components/layout/Layout';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
@@ -32,7 +32,7 @@ function Home({}) {
         title: 'GLDT Explorer',
         description: 'GLDT Explorer Description',
     };
-    if (router.asPath.includes("transaction/") || router.asPath.includes("account/")) {
+    if (router.asPath.includes('transaction/') || router.asPath.includes('account/')) {
         router.push(router.asPath);
     }
     const Explorer = dynamic(() => import('@/components/explorer/Explorer'), {

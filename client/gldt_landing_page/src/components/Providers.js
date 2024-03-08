@@ -3,7 +3,7 @@ import { Connect2ICProvider } from '@connect2ic/react';
 import { SafeHydrate } from '@utils/SafeHydrate';
 import '@connect2ic/core/style.css';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import { gldtLedgerCanister } from './../../../utils/agents';
+import { gldtLedgerCanister } from '../../../utils/agents';
 import { customTheme } from '@ui/theme';
 
 const Providers = ({ children }) => {

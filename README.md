@@ -5,9 +5,9 @@ See the [official website](https://gldt.org/) for more informations about the pr
 
 ## Project Structure
 
-- [`client/swap_app`](client/swap_app/): Contains the NextJS frontend for the [swap application](https://app.gldt.org).
-- [`client/landing_page`](client/landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
-- [`client/explorer`](client/explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
+- [`client/gldt_swap_app`](client/gldt_swap_app/): Contains the NextJS frontend for the [GLDT swap application](https://app.gldt.org).
+- [`client/gldt_landing_page`](client/gldt_landing_page/): Contains the NextJS frontend for the [gldt.org landing page](https://gldt.org).
+- [`client/gldt_explorer`](client/gldt_explorer): Contains the NextJS frontend for the [GLDT explorer](https://explorer.gldt.org).
 - [`canister`](canister/): Contains the source code for the GLDT canisters (`gldt_core`, `gldt_fee_compensation`, and `gldt_ledger`, as well as other dependencies wasm files)
 
 ## Local development instructions
@@ -50,9 +50,9 @@ All frontends are developed in React, using the NextJS compiler to generate the 
 To launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/):
 
 ```sh
-npm run dev:swap_app # For the swap application frontend
-npm run dev:landing_page # For the main landing page
-npm run dev:explorer # For the GLDT explorer frontend
+npm run dev:gldt_swap_app # For the GLDT swap application frontend
+npm run dev:gldt_landing_page # For the GLDT main landing page
+npm run dev:gldt_explorer # For the GLDT explorer frontend
 ```
 The frontend development server will be available at `http://localhost:3000`.
 
