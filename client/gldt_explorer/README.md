@@ -19,7 +19,7 @@ npm install
 Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
 
 ```sh
-npm run dev:explorer
+npm run dev:gldt_explorer
 ```
 
 or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with

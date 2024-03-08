@@ -22,7 +22,7 @@ npm install
 Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
 
 ```sh
-npm run dev:swap_app
+npm run dev:gldt_swap_app
 ```
 
 or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
