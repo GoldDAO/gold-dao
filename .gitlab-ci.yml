@@ -204,10 +204,13 @@ asset canisters upgrade proposal tests:
       needs: ["swap_app test build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
+        PEM_FILE: testid.pem
         TEST_QUILL: "--dry-run"
   before_script:
-    - !reference [.import dfx identity, before_script]
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx identity export testid > testid.pem
   script:
     - !reference [.asset canister staging deploy, script]
   environment:
@@ -342,10 +345,13 @@ backend canisters upgrade proposal tests:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
+    PEM_FILE: testid.pem
   needs: ["gldt_core test build"]
   before_script:
-    - !reference [.import dfx identity, before_script]
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx identity export testid > testid.pem
   script:
     - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
   environment:
