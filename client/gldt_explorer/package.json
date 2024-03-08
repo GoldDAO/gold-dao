@@ -1,5 +1,5 @@
 {
-    "name": "explorer",
+    "name": "gldt_explorer",
     "version": "1.0.1",
     "description": "GLDT explorer page",
     "main": "index.js",

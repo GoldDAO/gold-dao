@@ -1,5 +1,5 @@
 {
-    "name": "landing_page",
+    "name": "gldt_landing_page",
     "version": "0.1.0",
     "description": "GLDT landing page",
     "main": "index.js",

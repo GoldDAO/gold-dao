@@ -1,5 +1,5 @@
 {
-    "name": "swap_app",
+    "name": "gldt_swap_app",
     "version": "0.1.0",
     "description": "GLDT page and swap canister and frontend",
     "main": "index.js",
