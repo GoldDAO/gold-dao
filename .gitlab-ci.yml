@@ -213,8 +213,8 @@ asset canisters upgrade proposal tests:
     - dfx start --clean --background
     - dfx identity export testid > testid.pem
   script:
-    - dfx canister create gldt_swap_app
-    - export GLDT_CORE_ID=$(dfx canister id gldt_swap_app)
+    - dfx canister create --all
+    - export GLDT_FRONT_ID=$(dfx canister id gldt_swap_app)
     - !reference [.asset canister staging deploy, script]
   after_script:
     - dfx stop
@@ -359,7 +359,7 @@ backend canisters upgrade proposal tests:
     - dfx start --clean --background
     - dfx identity export testid > testid.pem
   script:
-    - dfx canister create gldt_core
+    - dfx canister create --all
     - export GLDT_CORE_ID=$(dfx canister id gldt_core)
     - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
   after_script:
