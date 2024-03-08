@@ -195,7 +195,7 @@ check canister ids:
       - canister_ids.json
     expire_in: 1 hour
 
-asset canisters upgrade proposal tests:
+.asset canisters upgrade proposal tests:
   stage: deploy
   variables:
     CANISTER_NAME: "swap_app"
@@ -346,7 +346,7 @@ explorer production:
     url: https://explorer.gldt.org/
     action: start
 
-backend canisters upgrade proposal tests:
+.backend canisters upgrade proposal tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
