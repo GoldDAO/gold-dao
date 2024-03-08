@@ -336,6 +336,24 @@ explorer production:
     url: https://explorer.gldt.org/
     action: start
 
+backend canisters upgrade proposal tests:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  variables:
+    TARGET_NETWORK: staging
+    PEM_FILE: "${PEM_FILE_STAGING}"
+  needs: []
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
+  environment:
+    name: gldt_core
+    deployment_tier: staging
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
+    action: verify
+
 gldt core staging:
   stage: deploy
   rules:
