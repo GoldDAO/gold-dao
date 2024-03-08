@@ -72,7 +72,6 @@ pub struct SyncInfo {
 pub struct Data {
     /// SNS governance cansiter
     pub sns_governance_canister: Principal,
-    pub ogy_ledger_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
     /// Stores the mapping of each principal to its neurons
@@ -83,6 +82,9 @@ pub struct Data {
     pub maturity_history: MaturityHistory,
     /// SubAccounts to hold rewards for user's neurons 
     pub user_rewards: UserReward,
+    /// OGY ledger id
+    pub ogy_ledger_canister: Principal,
+
 }
 
 impl Default for Data {

@@ -5,11 +5,17 @@ This job is responsible for distributing rewards to user's sub accounts.
 All the different reward tokens are to be held in the 0 sub account.
 */
 
-use canister_time::{now_millis, run_now_then_interval, WEEK_IN_MS};
+use candid::{CandidType, Nat, Principal};
+use canister_time::{now_millis, run_interval, WEEK_IN_MS};
+use ic_ledger_types::Subaccount;
+use icrc_ledger_types::icrc1::account::Account;
+use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use tracing::{debug, error, info, warn};
-use types::Milliseconds;
+use types::{Milliseconds, Token};
+use ic_cdk::api::call::{call, RejectionCode};
+use ic_cdk::{ api};
 use crate::{
     model::maturity_history::MaturityHistory,
     state::{mutate_state, read_state},
@@ -18,7 +24,7 @@ use crate::{
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
 
 pub fn start_job() {
-    run_now_then_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run);
+    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run);
 }
 
 pub fn run() {
@@ -32,7 +38,7 @@ pub async fn distribute_rewards() {
     // 3 ) Get total OGY, ICP, GLDGov in sub account 0
     // 4 ) Pay each sub account its perentage of OGY, ICP, GLDGov
 
-    // part 1 ) Cacluating total maturity
+    // 1 ) Cacluating neuron reward percentage
     let new_distribution_time = now_millis();
     mutate_state(|state| {
         state.data.sync_info.last_distribution_start = new_distribution_time;
@@ -51,6 +57,12 @@ pub async fn distribute_rewards() {
         let percentage = entry.1.checked_div(total_maturity_for_all_neurons).unwrap_or(0);
         (entry.0.clone(), percentage)
     }).collect();
+
+
+    // 2 ) Get balances of all reward pools
+    let ogy_reward_pool_id = read_state(|state| state.data.ogy_ledger_canister);
+    let ogy_reward_pool_balance = query_token_balance_icrc1(ogy_reward_pool_id).await;
+
 
 
 }
@@ -79,6 +91,27 @@ pub fn calculate_neuron_maturity_for_interval(
     }
 
     latest_maturity_per_neuron
+}
+
+#[derive(CandidType, Serialize, Deserialize)]
+struct BalanceQuery {
+    owner: Principal,
+    subaccount : Option<Subaccount>
+}
+
+#[derive(CandidType, Deserialize)]
+struct BalanceResponse(u64);
+
+
+
+async fn query_token_balance_icrc1(ledger_id : Principal) -> Result<u64, String> {
+    let a = BalanceQuery {
+        owner: ic_cdk::api::id(),
+        subaccount: None, // Adjust according to your data type
+    };
+
+    let (b_res,) = call(ledger_id, "icrc1_balance_of", (a,)).await.unwrap();
+    b_res
 }
 
 #[cfg(test)]

@@ -43,6 +43,6 @@ impl Storable for StoredSubaccount {
 
     const BOUND: Bound = Bound::Bounded {
         max_size: MAX_VALUE_SIZE_SUB_ACCOUNT,
-        is_fixed_size: true,
+        is_fixed_size: false,
     };
 }

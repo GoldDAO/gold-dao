@@ -8,8 +8,9 @@ is eligible for.
 */
 
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
+use ic_cdk::println;
 use sns_governance_canister::types::{ NeuronId, Neuron };
-use tracing::{ debug, error, info, warn };
+use tracing::{ debug, error, info, warn};
 use std::{ collections::btree_map, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo };
 
@@ -27,7 +28,7 @@ pub fn run() {
 
 pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
-
+    println!("something is up 1");
     mutate_state(|state| {
         state.data.sync_info.last_synced_start = now_millis();
     });
@@ -52,6 +53,7 @@ pub async fn synchronise_neuron_data() {
                 mutate_state(|state| {
                     debug!("Updating neurons");
                     response.neurons.iter().for_each(|neuron| {
+                        println!("neuron: {:?}", neuron.id);
                         update_principal_neuron_mapping(state, neuron);
                         update_neuron_maturity(state, neuron);
                         create_reward_subaccount(state, neuron)
@@ -61,6 +63,7 @@ pub async fn synchronise_neuron_data() {
                 if (number_of_received_neurons as u32) == limit {
                     args.start_page_at = response.neurons.last().map_or_else(
                         || {
+                            println!("err: {:?}", "some error 1");
                             error!(
                                 "Missing last neuron to continue iterating.
                                 This should not be possible as the limits are checked. Stopping loop here."
@@ -76,11 +79,16 @@ pub async fn synchronise_neuron_data() {
                 number_of_scanned_neurons += number_of_received_neurons;
             }
             Err(err) => {
+                println!("err: {:?}", err);
                 let error_message = format!("{err:?}");
                 error!(?error_message, "Error fetching neuron data");
             }
         }
     }
+    read_state(|state| {
+        let d = state.data.neuron_maturity.clone();
+        println!("Data: {:?}", d);
+    });
     info!("Successfully scanned {number_of_scanned_neurons} neurons.");
     mutate_state(|state| {
         state.data.sync_info.last_synced_end = now_millis();

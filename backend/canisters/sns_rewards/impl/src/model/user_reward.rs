@@ -1,6 +1,6 @@
 use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::{NeuronId};
+use sns_governance_canister::types::NeuronId;
 use types::StoredSubaccount;
 
 use crate::memory::{get_user_reward_accounts, VM};
