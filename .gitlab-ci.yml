@@ -343,11 +343,11 @@ explorer production:
 backend canisters upgrade proposal tests:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: testid.pem
-  needs: ["gldt_core test build"]
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["gldt_core test build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: testid.pem
   before_script:
     - dfx identity new --storage-mode plaintext testid
     - dfx identity use testid
