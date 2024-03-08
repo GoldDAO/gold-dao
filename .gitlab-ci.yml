@@ -195,6 +195,27 @@ check canister ids:
       - canister_ids.json
     expire_in: 1 hour
 
+asset canisters upgrade proposal tests:
+  stage: deploy
+  variables:
+    CANISTER_NAME: "swap_app"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["swap_app test build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: "${PEM_FILE_STAGING}"
+        TEST_QUILL: "--dry-run"
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - !reference [.asset canister staging deploy, script]
+  environment:
+    name: swap app
+    deployment_tier: staging
+    url: $SWAP_APP_URL
+    action: start
+
 swap app staging:
   stage: deploy
   variables:
