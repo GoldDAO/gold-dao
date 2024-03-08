@@ -217,7 +217,7 @@ asset canisters upgrade proposal tests:
     name: swap app
     deployment_tier: staging
     url: $SWAP_APP_URL
-    action: start
+    action: verify
 
 swap app staging:
   stage: deploy
