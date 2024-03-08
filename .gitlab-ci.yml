@@ -302,7 +302,7 @@ gldt explorer staging:
     url: https://staging.explorer.gldt.org/
     action: start
 
-explorer production:
+gldt explorer production:
   stage: deploy
   variables:
     CANISTER_NAME: "gldt_explorer"
