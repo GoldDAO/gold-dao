@@ -18,7 +18,7 @@
       quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_STAGING
       --pem-file $PEM_FILE
       --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.staging)
-      --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --wasm-path .dfx/local/canisters/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_SHORT_SHA}"
       --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
 
@@ -31,6 +31,6 @@
       quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_PRODUCTION
       --pem-file $PEM_FILE
       --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.ic)
-      --wasm-path .dfx/local/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --wasm-path .dfx/local/canisters/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_TAG}"
       --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
