@@ -212,6 +212,7 @@ asset canisters upgrade proposal tests:
     - dfx identity get-principal
     - dfx identity export testid > testid.pem
   script:
+    - . scripts/pre-deploy.sh --network ${TARGET_NETWORK}
     - !reference [.asset canister staging deploy, script]
   environment:
     name: swap app
@@ -353,6 +354,7 @@ backend canisters upgrade proposal tests:
     - dfx identity get-principal
     - dfx identity export testid > testid.pem
   script:
+    - . scripts/pre-deploy.sh --network ${TARGET_NETWORK}
     - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
   environment:
     name: gldt_core
