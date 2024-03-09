@@ -166,7 +166,7 @@ local deploy and tests:
       needs: ["gldt_core test build", "icp_neuron test build", "swap_app test build", "landing_page test build", "explorer test build"]
   before_script:
     - dfx --version
-    - dfx start --clean --background
+    - dfx start --clean --background --artificial-delay 40
   script:
     - NETWORK='local' scripts/local-deploy.sh
     # TODO: Some bash script to provision a wallet and test a few interactions with the canisters
@@ -212,7 +212,7 @@ check canister ids:
     - dfx identity new --storage-mode plaintext testid
     - dfx identity use testid
     - dfx identity get-principal
-    - dfx start --clean --background
+    - dfx start --clean --background --artificial-delay 40
     - dfx identity export testid > testid.pem
   script:
     - dfx canister create --all
@@ -366,7 +366,7 @@ explorer production:
     - dfx identity new --storage-mode plaintext testid
     - dfx identity use testid
     - dfx identity get-principal
-    - dfx start --clean --background
+    - dfx start --clean --background --artificial-delay 40
     - dfx identity export testid > testid.pem
   script:
     - dfx canister create --all
