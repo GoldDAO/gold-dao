@@ -46,6 +46,7 @@ service : (Args) -> {
       vec record { record { NeuronId; nat64 }; NeuronInfo },
     ) query;
   get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
+  get_neuron_sub_account : (NeuronId) -> (opt vec nat8) query;
   get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
   sync_neurons_manual_trigger : () -> ();

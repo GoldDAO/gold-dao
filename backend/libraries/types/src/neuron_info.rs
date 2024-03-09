@@ -30,7 +30,7 @@ impl Storable for NeuronInfo {
 
 #[derive(Serialize, Clone, Deserialize, CandidType, Copy, Debug, PartialEq, Eq)]
 pub struct StoredSubaccount(pub Subaccount);
-const MAX_VALUE_SIZE_SUB_ACCOUNT : u32 = 40; 
+const MAX_VALUE_SIZE_SUB_ACCOUNT : u32 = 42; 
 
 impl Storable for StoredSubaccount {
     fn to_bytes(&self) -> Cow<[u8]> {

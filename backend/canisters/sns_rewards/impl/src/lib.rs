@@ -1,5 +1,6 @@
 use ic_cdk::export_candid;
 use candid::Principal;
+use icrc_ledger_types::icrc1::account::Subaccount;
 use sns_governance_canister::types::NeuronId;
 use queries::{ GetNeuronResponse, get_maturity_history_of_neuron::MaturityHistoryResponse };
 use lifecycle::Args;
