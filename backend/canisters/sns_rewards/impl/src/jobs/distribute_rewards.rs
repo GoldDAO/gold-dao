@@ -75,15 +75,10 @@ pub fn calculate_neuron_maturity_for_interval(
 
     // 1 day to act as the previous maturity and the rest to act as 7 days of maturity.
     // loop over all neurons
-    for neuron_id in neuron_maturity.keys() {
-        // get the latest entry
-        let history = maturity_history.get_latest_entry(&neuron_id);
+    for (neuron_id, neuron_info) in neuron_maturity.iter() {
 
-        // previous weekly maturity is always the first entry
-        let latest_entry = history.expect("There is no history for this neuron");
-
-        let accumilated_maturity = latest_entry.1.accumulated_maturity; // total accumilated
-        let previous_paid_maturity = latest_entry.1.rewarded_maturity; // last payout reward
+        let accumilated_maturity = neuron_info.accumulated_maturity; // total accumilated
+        let previous_paid_maturity = neuron_info.rewarded_maturity; // last payout reward
 
         let change_since_last_interval = accumilated_maturity
             .checked_sub(previous_paid_maturity)
@@ -294,10 +289,10 @@ mod tests {
 
         // fake paying the first week.
         mutate_state(|state| {
-            state
-                .data
-                .maturity_history
-                .set_rewarded_on_latest_entry(&neuron_id_1, 200);
+            // state
+            //     .data
+            //     .maturity_history
+            //     .set_rewarded_on_latest_entry(&neuron_id_1, 200);
             
             state.data.neuron_maturity.get_mut(&neuron_id_1).unwrap().rewarded_maturity = 200;
 
@@ -305,12 +300,12 @@ mod tests {
 
         // verify the latest entry for a neuron has the payment
         read_state(|state| {
-            let history = state
+            let neuron = state
                 .data
-                .maturity_history
-                .get_latest_entry(&neuron_id_1)
+                .neuron_maturity
+                .get(&neuron_id_1)
                 .unwrap();
-            assert_eq!(history.1.rewarded_maturity, 200);
+            assert_eq!(neuron.rewarded_maturity, 200);
         });
 
 
