@@ -97,7 +97,7 @@ pub async fn synchronise_neuron_data() {
 }
 
 // Function to update neuron maturity
-fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
+pub fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
     // This function only returns Some() if the neuron is initialised or its maturity has changed
     if let Some(id) = &neuron.id {
         let updated_neuron: Option<(NeuronId, NeuronInfo)>;
@@ -118,6 +118,7 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
             }
             btree_map::Entry::Occupied(mut entry) => {
                 let neuron_info_entry = entry.get_mut();
+
                 if let Some(delta) = maturity.checked_sub(neuron_info_entry.last_synced_maturity) {
                     // only add the difference if the maturity has increased
                     if delta == 0 {

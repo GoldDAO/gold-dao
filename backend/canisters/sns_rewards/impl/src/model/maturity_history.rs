@@ -51,6 +51,30 @@ impl MaturityHistory {
     pub fn get_keys(&self) -> Vec<NeuronId> {
         self.history.iter().map(|(key, _)| key.0.clone()).collect()
     }
+
+    pub fn get_latest_entry(&self, neuron_id: &NeuronId) -> Option<(TimestampMillis, NeuronInfo)> {
+        // Filter the history entries for the specified neuron ID
+        let filtered_entries = self.history.iter()
+            .filter(|((id, _), _)| id == neuron_id)
+            .map(|((_, ts), info)| (ts, info));
+
+        // Find the entry with the maximum timestamp (latest)
+        filtered_entries.max_by_key(|&(ts, _)| ts.clone())
+    }
+
+    pub fn set_rewarded_on_latest_entry(&mut self, neuron_id: &NeuronId, amount_rewarded: u64) {
+        let entry = self.get_latest_entry(neuron_id);
+       
+        match entry {
+            Some((ts, mut neuron_info)) => {
+                neuron_info.rewarded_maturity = amount_rewarded;
+                self.insert((neuron_id.clone(), ts + 1), neuron_info)
+                
+            },
+            None => {}
+        }
+
+    }
 }
 
 fn history_range(
