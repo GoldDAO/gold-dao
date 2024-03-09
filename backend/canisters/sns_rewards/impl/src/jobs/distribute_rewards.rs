@@ -81,12 +81,9 @@ pub fn calculate_neuron_maturity_for_interval(
 
         // previous weekly maturity is always the first entry
         let latest_entry = history.expect("There is no history for this neuron");
-        // println!("{:?}", latest_entry);
 
         let accumilated_maturity = latest_entry.1.accumulated_maturity; // total accumilated
         let previous_paid_maturity = latest_entry.1.rewarded_maturity; // last payout reward
-
-        println!("prev : {:?}", previous_paid_maturity);
 
         let change_since_last_interval = accumilated_maturity
             .checked_sub(previous_paid_maturity)
