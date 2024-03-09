@@ -86,7 +86,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     };
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
       })' --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
-    --wasm-path /builds/gldt/gldt-swap/.dfx/local/canisters/gldt_core/gldt_core.wasm.gz \
+    --wasm-path backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz \
     --title "Upgrade gldt_core to ${CI_COMMIT_TAG}" \
     --url ${DETAILS_URL} --summary-path proposal.md | quill send $QUILL_TEST --yes -
 fi
