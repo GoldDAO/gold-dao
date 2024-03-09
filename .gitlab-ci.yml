@@ -195,6 +195,37 @@ check canister ids:
       - canister_ids.json
     expire_in: 1 hour
 
+.asset canisters upgrade proposal tests:
+  stage: deploy
+  variables:
+    CANISTER_NAME: "swap_app"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["swap_app test build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: testid.pem
+        TEST_QUILL: "--dry-run"
+  cache:
+    policy: pull
+  before_script:
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx start --clean --background
+    - dfx identity export testid > testid.pem
+  script:
+    - dfx canister create --all
+    - export GLDT_FRONT_ID=$(dfx canister id gldt_swap_app)
+    - !reference [.asset canister staging deploy, script]
+  after_script:
+    - dfx stop
+  environment:
+    name: swap app
+    deployment_tier: staging
+    url: $SWAP_APP_URL
+    action: verify
+
 swap app staging:
   stage: deploy
   variables:
@@ -314,6 +345,34 @@ explorer production:
     deployment_tier: production
     url: https://explorer.gldt.org/
     action: start
+
+.backend canisters upgrade proposal tests:
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["gldt_core test build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: testid.pem
+  cache:
+    policy: pull
+  before_script:
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx start --clean --background
+    - dfx identity export testid > testid.pem
+  script:
+    - dfx canister create --all
+    - export GLDT_CORE_ID=$(dfx canister id gldt_core)
+    - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
+  after_script:
+    - dfx stop
+  environment:
+    name: gldt_core
+    deployment_tier: staging
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
+    action: verify
 
 gldt core staging:
   stage: deploy
