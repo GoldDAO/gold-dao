@@ -19,7 +19,7 @@
     "build:swap_app": "npm run --workspace swap_app build",
     "build:landing_page": "npm run --workspace landing_page build",
     "build:explorer": "npm run --workspace explorer build",
-    "build:back": "scripts/build-canister.sh gldt_core && scripts/build-canister.sh gldt_fee_compensation && scripts/build-canister.sh sns_rewards",
+    "build:back": "scripts/build-canister.sh gldt_core && scripts/build-canister.sh gldt_fee_compensation && scripts/build-canister.sh icp_neuron && scripts/build-canister.sh sns_rewards",
     "build:backdid": "scripts/build-canister.sh --wasmonly gldt_core && scripts/build-canister.sh --wasmonly gldt_fee_compensation && scripts/build-canister.sh --wasmonly sns_rewards && npm run build:candid && npm run build:declarations && npm run build:back",
     "build:candid": "scripts/generate-did.sh gldt_core & scripts/generate-did.sh gldt_fee_compensation & scripts/generate-did.sh sns_rewards",
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
