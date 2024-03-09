@@ -228,6 +228,7 @@ check canister ids:
 
 swap app staging:
   stage: deploy
+  resource_group: frontend staging deployment
   variables:
     CANISTER_NAME: "swap_app"
   rules:
@@ -248,6 +249,7 @@ swap app staging:
 
 swap app production:
   stage: deploy
+  resource_group: frontend production deployment
   variables:
     CANISTER_NAME: "swap_app"
   rules:
@@ -268,6 +270,7 @@ swap app production:
 
 landing page staging:
   stage: deploy
+  resource_group: frontend staging deployment
   variables:
     CANISTER_NAME: "landing_page"
   rules:
@@ -288,6 +291,7 @@ landing page staging:
 
 landing page production:
   stage: deploy
+  resource_group: frontend production deployment
   variables:
     CANISTER_NAME: "landing_page"
   rules:
@@ -308,6 +312,7 @@ landing page production:
 
 explorer staging:
   stage: deploy
+  resource_group: frontend staging deployment
   variables:
     CANISTER_NAME: "explorer"
   rules:
@@ -328,6 +333,7 @@ explorer staging:
 
 explorer production:
   stage: deploy
+  resource_group: frontend production deployment
   variables:
     CANISTER_NAME: "explorer"
   rules:
@@ -376,6 +382,7 @@ explorer production:
 
 gldt core staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -399,6 +406,7 @@ gldt core staging:
 
 gldt core:
   stage: deploy
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
   variables:
@@ -422,6 +430,7 @@ gldt core:
 
 icp neuron staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -440,6 +449,7 @@ icp neuron staging:
 
 icp neuron:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
   variables:
@@ -458,6 +468,7 @@ icp neuron:
 
 gldt ledger staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -476,6 +487,7 @@ gldt ledger staging:
 
 gldt ledger:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
       when: manual
@@ -495,6 +507,7 @@ gldt ledger:
 
 gldt ledger indexer staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -513,6 +526,7 @@ gldt ledger indexer staging:
 
 gldt ledger indexer:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^indexer-v\d+\.\d+\.\d+$/'
       when: manual
