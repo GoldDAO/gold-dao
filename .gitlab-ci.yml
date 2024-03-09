@@ -395,9 +395,9 @@ gldt core staging:
     - . scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
   after_script:
     # Investigate where the replicas's wasm files might be !
-    - find / -type d -name ".dfx"
     - ls -lah *
-    - ls -lah $HOME/*
+    - ls -lah ~/*
+    - find / -type d -name ".dfx"
   environment:
     name: gldt_core
     deployment_tier: staging
