@@ -5,7 +5,7 @@ use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::SNS_GOVERNANCE_CANISTER_ID,
+    consts::{ICP_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
@@ -82,8 +82,10 @@ pub struct Data {
     pub maturity_history: MaturityHistory,
     /// SubAccounts to hold rewards for user's neurons 
     pub user_rewards: UserReward,
-    /// OGY ledger id
+    /// OGY ledger canister id
     pub ogy_ledger_canister: Principal,
+    /// ICP ledger canister id
+    pub icp_ledger_canister_id: Principal,
 
 }
 
@@ -99,7 +101,8 @@ impl Default for Data {
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            user_rewards : UserReward::default()
+            user_rewards : UserReward::default(),
+            icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID
         }
     }
 }
