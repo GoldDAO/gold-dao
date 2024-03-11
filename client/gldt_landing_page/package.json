@@ -1,7 +1,7 @@
 {
-    "name": "swap_app",
+    "name": "gldt_landing_page",
     "version": "0.1.0",
-    "description": "GLDT page and swap canister and frontend",
+    "description": "GLDT landing page",
     "main": "index.js",
     "author": "Victor Audetat",
     "license": "AGPL-3.0-only",
@@ -10,7 +10,7 @@
         "develop": "next dev",
         "build": "next build",
         "lint": "next lint",
-        "postinstall": "echo 'Frontend project has been installed'"
+        "postinstall": "echo 'landing page has been installed'"
     },
     "browserslist": {
         "production": [
@@ -32,12 +32,14 @@
         "@dfinity/agent": "^0.15.6",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
+        "@react-three/drei": "^9.88.11",
+        "@react-three/fiber": "^8.15.10",
+        "@react-three/postprocessing": "^2.15.10",
         "dotenv": "^16.3.1",
         "framer-motion": "^10.16.4",
-        "jotai": "^2.1.0",
-        "moment": "^2.29.4",
         "next": "^13.4.3",
         "react": "^18.2.0",
+        "react-awesome-reveal": "^4.2.6",
         "react-dom": "^18.2.0",
         "react-router": "^6.13.0",
         "react-router-dom": "^6.13.0"

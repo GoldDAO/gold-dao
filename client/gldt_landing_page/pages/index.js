@@ -22,7 +22,7 @@ GLDT and GLDT Swapp dApp frontend
 
 import Layout from '@/components/layout/Layout';
 import Banner from '@/components/banner/Banner';
-import { content } from './../src/content';
+import { content } from '../src/content';
 import TextBloc from '@/components/text/TextBloc';
 import Partners from '@/components/partners/Partners';
 import { VStack } from '@chakra-ui/react';
