@@ -26,9 +26,7 @@ async fn stake_nns_neuron_validate() -> Result<String, String> {
     Ok("No arguments to validate".to_string())
 }
 
-// TODO activate safeguard before handing to SNS
-// #[update(guard = "caller_is_governance_principal")]
-#[update]
+#[update(guard = "caller_is_governance_principal")]
 #[trace]
 async fn stake_nns_neuron() -> StakeNnsNeuronResponse {
     match stake_nns_neuron_impl().await {
