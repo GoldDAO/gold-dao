@@ -27,6 +27,9 @@ $[[ inputs.src-folder ]] canister build:
   stage: build
   extends: .rust template
   script:
+    - env
+    - cargo --version
+    - rustc --version
     - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
     - scripts/generate-did.sh $[[ inputs.src-folder ]]
     - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
