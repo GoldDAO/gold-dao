@@ -6,10 +6,9 @@ All the different reward tokens are to be held in the 0 sub account.
 */
 
 use crate::state::{mutate_state, read_state, RuntimeState};
-use candid::{CandidType, Nat, Principal};
+use candid::{CandidType, Principal};
 use canister_time::{now_millis, run_interval, WEEK_IN_MS};
-use futures::{future::try_join_all, try_join};
-use ic_cdk::api::call::{call, RejectionCode};
+use futures::future::join_all;
 use ic_cdk::api::management_canister::main::CanisterId;
 use ic_ledger_types::{
     AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT,
@@ -20,9 +19,8 @@ use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use std::{collections::BTreeMap, ops::Mul};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 use types::{Milliseconds, NeuronInfo};
-use utils::consts::ICP_LEDGER_CANISTER_ID;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
 
@@ -97,7 +95,10 @@ pub fn update_neuron_reward(
         let neuron = state.data.neuron_maturity.get_mut(&neuron_id);
         match neuron {
             Some(neuron_info) => {
-                debug!("current reward maturity : {}", neuron_info.rewarded_maturity);
+                debug!(
+                    "current reward maturity : {}",
+                    neuron_info.rewarded_maturity
+                );
 
                 let neuron_maturity = neuron_interval_maturity
                     .iter()
@@ -105,7 +106,10 @@ pub fn update_neuron_reward(
                 match neuron_maturity {
                     Some((_, n_mat)) => {
                         let new_rewarded_maturity = neuron_info.rewarded_maturity + n_mat.clone();
-                        debug!("updating neuron maturity : {} with maturity reward of {}", neuron_id, new_rewarded_maturity);
+                        debug!(
+                            "updating neuron maturity : {} with maturity reward of {}",
+                            neuron_id, new_rewarded_maturity
+                        );
                         neuron_info.rewarded_maturity = new_rewarded_maturity;
                     }
                     None => {}
@@ -159,21 +163,7 @@ struct BalanceQuery {
 #[derive(CandidType, Deserialize)]
 struct BalanceResponse(u64);
 
-// async fn query_token_balance_icrc1(ledger_id: Principal) -> Result<Nat, String> {
-//     info!("aa processing request");
-//     let a = BalanceQuery {
-//         owner: ic_cdk::api::id(),
-//         subaccount: Some(DEFAULT_SUBACCOUNT), // Adjust according to your data type
-//     };
-//     info!("bb processing request");
-//     ic_ledger_types::
-//     if let Ok(res)  = call(ledger_id, "icrc1_balance_of", (a,)).await {
-//         return res
-//     } else {
-//         Err("failed to get icp balance".to_owned())
-//     }
 
-// }
 
 async fn get_icp_balance() -> Tokens {
     ic_ledger_types::account_balance(
@@ -204,7 +194,7 @@ async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Re
     .await
     {
         Ok(Ok(_)) => {
-            debug!("!!! TRANSFER SUCCESS!!! sub account");
+            debug!("!!! TRANSFER SUCCESS !!!");
             Ok(1)
         }
         Ok(Err(error)) => {
@@ -219,43 +209,68 @@ async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Re
 }
 
 async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Vec<NeuronId> {
+
     let mut successful_reward_transfers: Vec<NeuronId> = vec![];
+    let mut transfer_futures = Vec::new();
+
     for (neuron_id, percentage_to_reward) in neurons {
+        if percentage_to_reward.clone() <= 0.0f64 {
+            continue; // skip payment since this neuron 0 percentage
+        }
         debug!(
             "transfering for neuron id : {} || percentage to reward : {} || ",
             neuron_id, percentage_to_reward
         );
-        if percentage_to_reward.clone() <= 0.0f64 {
-            continue; // skip payment since this neuron has no percentage
-        }
+        // sub account id
         let neuron_id_as_bytes = neuron_id
             .clone()
             .into_array()
-            .expect("Error conerting NeuronId into u8");
+            .expect("Error converting NeuronId into u8");
         let sub_account = Subaccount(neuron_id_as_bytes);
 
         // handle ICP transfer
         let icp_reward = ((icp_balance as f64).mul(percentage_to_reward).floor()) as u64;
-        debug!("icp reward : {} - part e", icp_reward);
-        let icp_transfer = transfer_icp_to_sub_account(sub_account, icp_reward).await;
+        debug!("icp reward : {}", icp_reward);
 
-        match icp_transfer {
-            Ok(_) => {
-                successful_reward_transfers.push(neuron_id.clone());
-            }
+        let icp_transfer_future = transfer_icp_to_sub_account(sub_account, icp_reward);
+        transfer_futures.push((neuron_id, icp_transfer_future));
+
+        // handle OGY transfer
+        // ........
+        // transfer_futures.push((neuron_id, ogy_transfer_future))
+
+        // handle GLDGov transfer
+        // ........
+        // transfer_futures.push((neuron_id, gldgov_transfer_future))
+    }
+
+    // Execute all transfer futures concurrently and collect results
+    let results = join_all(transfer_futures.into_iter().map(|(neuron_id, future)| async move {
+        match future.await {
+            Ok(_) => Ok(neuron_id),
+            Err(_) => Err(()), // Handle error if needed
+        }
+    })).await;
+
+
+    // Collect successful transfers
+    for result in results {
+        match result {
+            Ok(neuron_id) => {
+                successful_reward_transfers.push(neuron_id);
+            },
             Err(_) => {
-                info!("something went wrong")
+                // Handle error if needed
             }
         }
     }
+
     successful_reward_transfers
 }
 
 #[cfg(test)]
 mod tests {
-    use ic_stable_structures::BTreeMap;
     use sns_governance_canister::types::{Neuron, NeuronId};
-    use tracing::debug;
 
     use crate::{
         jobs::{
@@ -502,8 +517,6 @@ mod tests {
     #[test]
     fn test_update_neuron_maturity() {
         init_runtime_state();
-     
-
 
         let neuron_id_1 =
             NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
@@ -525,7 +538,6 @@ mod tests {
 
         let rewarded_neurons = vec![neuron_id_1.clone()];
 
-
         let neuron_interval_maturity = vec![(neuron_id_1.clone(), 150)];
 
         mutate_state(|state| {
@@ -538,3 +550,20 @@ mod tests {
         })
     }
 }
+
+
+// async fn query_token_balance_icrc1(ledger_id: Principal) -> Result<Nat, String> {
+//     info!("aa processing request");
+//     let a = BalanceQuery {
+//         owner: ic_cdk::api::id(),
+//         subaccount: Some(DEFAULT_SUBACCOUNT), // Adjust according to your data type
+//     };
+//     info!("bb processing request");
+//     ic_ledger_types::
+//     if let Ok(res)  = call(ledger_id, "icrc1_balance_of", (a,)).await {
+//         return res
+//     } else {
+//         Err("failed to get icp balance".to_owned())
+//     }
+
+// }
