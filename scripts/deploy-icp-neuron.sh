@@ -57,8 +57,10 @@ if [[ $1 == "local" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^icp_neuron-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   if [[ $1 == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+    UPGRADEVERSION=$CI_COMMIT_TAG
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
+    UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
   . scripts/prepare_sns_canister_ids.sh $1 && \
   . scripts/parse_proposal_details.sh && \
@@ -67,8 +69,8 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
     --pem-file $PEM_FILE \
     --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
     --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
-    --wasm-path .dfx/local/icp_neuron/icp_neuron.wasm.gz \
-    --title "Upgrade icp_neuron to ${CI_COMMIT_TAG}" \
+    --wasm-path backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz \
+    --title "Upgrade icp_neuron to ${UPGRADEVERSION}" \
     --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
 fi
 return
