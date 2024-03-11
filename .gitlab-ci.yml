@@ -205,7 +205,7 @@ check canister ids:
 .asset canisters upgrade proposal tests:
   stage: deploy
   variables:
-    CANISTER_NAME: "swap_app"
+    CANISTER_NAME: "gldt_swap_app"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
       needs: ["swap_app test build"]
