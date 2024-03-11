@@ -1470,6 +1470,7 @@ dependencies = [
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
+ "serde_json",
  "serializer",
  "sha256",
  "sns_governance_canister",
