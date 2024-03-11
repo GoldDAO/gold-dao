@@ -15,7 +15,11 @@ default:
       - unknown_failure
 
 stages:
+  - preparation
+  - lint
+  - test
   - build
+  - deploy
 
 include:
   # Canister builds
