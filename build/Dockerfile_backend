@@ -1,4 +1,4 @@
-FROM rust:slim-bookworm
+FROM rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
 
 ENV CANISTER_NAME=gldt_core
 
