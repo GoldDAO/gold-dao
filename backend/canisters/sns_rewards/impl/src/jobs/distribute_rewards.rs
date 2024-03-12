@@ -11,18 +11,24 @@ use canister_time::{now_millis, run_interval, WEEK_IN_MS};
 use futures::future::join_all;
 use ic_cdk::api::management_canister::main::CanisterId;
 use ic_ledger_types::{
-    AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT,
-    MAINNET_LEDGER_CANISTER_ID,
+    AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID
 };
+use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
+use utils::consts::FAKENET_LEDGER_CANISTER_ID;
+use std::str::FromStr;
 use std::time::Duration;
 use std::{collections::BTreeMap, ops::Mul};
 use tracing::{debug, info};
 use types::{Milliseconds, NeuronInfo};
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
+
+
+
+
 
 pub fn start_job() {
     run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run);
@@ -167,7 +173,7 @@ struct BalanceResponse(u64);
 
 async fn get_icp_balance() -> Tokens {
     ic_ledger_types::account_balance(
-        MAINNET_LEDGER_CANISTER_ID,
+        FAKENET_LEDGER_CANISTER_ID,
         AccountBalanceArgs {
             account: AccountIdentifier::new(&ic_cdk::api::id(), &DEFAULT_SUBACCOUNT),
         },
@@ -178,7 +184,7 @@ async fn get_icp_balance() -> Tokens {
 
 async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Result<u64, String> {
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
-        MAINNET_LEDGER_CANISTER_ID,
+        FAKENET_LEDGER_CANISTER_ID,
         &(TransferArg {
             from_subaccount: None,
             to: Account {

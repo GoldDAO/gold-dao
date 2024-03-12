@@ -28,6 +28,10 @@ pub const CYCLES_MINTING_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 0, 0, 0, 4, 1, 1]
 );
 
+pub const FAKENET_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
+);
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,5 +98,13 @@ mod tests {
             CYCLES_MINTING_CANISTER_ID,
             Principal::from_text("rkp4c-7iaaa-aaaaa-aaaca-cai").unwrap()
         );
+    }
+
+    #[test]
+    fn fakenet_ledger_canister_id(){
+        assert_eq!(
+            FAKENET_LEDGER_CANISTER_ID,
+            Principal::from_text("ete3q-rqaaa-aaaal-qdlva-cai").unwrap()
+        )
     }
 }
