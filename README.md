@@ -61,6 +61,42 @@ The frontend development server will be available at `http://localhost:3000`.
 npm run build
 ```
 
+## Lima Docker for Reproducible Builds
+
+### Install Lima:
+Follow the instructions at https://github.com/lima-vm/lima#installation
+You can use this config file to start : https://github.com/lima-vm/lima/blob/master/examples/docker.yaml
+and run : 
+```
+limactl start docker.yaml
+docker context create lima-docker --docker "host=unix:///Users/gwojda/.lima/docker/sock/docker.sock"
+docker context use lima-docker
+```
+
+### Building the Reproducible Image:
+
+Command: `docker build -t gldt_core_reproductible_build -f ./build/Dockerfile_backend .`
+
+### Running the Reproducible Build:
+
+Command:
+```
+docker run -v /tmp/lima:/tmp/reproductible_build
+-v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/
+gldt_core_reproductible_build
+```
+### Generated WASM Files:
+
+```
+/tmp/lima/$CANISTER_NAME.wasm
+/tmp/lima/$CANISTER_NAME_canister.wasm
+/tmp/lima/$CANISTER_NAME_canister.wasm.gz
+```
+
+### Verify the integrity of the files by computing their SHA256 hashes.
+We are currently using the $CANISTER_NAME_canister.wasm.gz in production, so you can check using :
+`shasum -a 256 ~/Downloads/$CANISTER_NAME_canister.wasm.gz`
+
 
 ## Technical documentation
 - Developers documentation still :construction: WIP (See code comments for now. Documentation will be automatically generated and published at a later time)

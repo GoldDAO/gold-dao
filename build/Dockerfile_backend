@@ -11,11 +11,10 @@ RUN cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpauli
 
 ENV PATH="/.cargo/bin:$PATH"
 
-COPY . ./gldt
+COPY . /builds/gldt/gldt-swap
 
-WORKDIR /gldt
+WORKDIR /builds/gldt/gldt-swap
 
 CMD ./scripts/build-canister.sh --wasmonly $CANISTER_NAME && \
     ./scripts/generate-did.sh $CANISTER_NAME && \
-    ./scripts/build-canister.sh $CANISTER_NAME && \
-    cp backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm /tmp/reproductible_build/
+    ./scripts/build-canister.sh $CANISTER_NAME
