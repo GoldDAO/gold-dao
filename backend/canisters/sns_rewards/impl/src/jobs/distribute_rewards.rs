@@ -88,9 +88,10 @@ pub async fn distribute_rewards() {
     let time_finish = now_millis();
     mutate_state(|state| state.data.sync_info.last_distribution_end = time_finish);
     info!(
-        "|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {}",
+        "|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {} || total maturity distributed : {}",
         (time_finish - time_start),
-        &sucessful_neuron_transfers.len()
+        &sucessful_neuron_transfers.len(),
+        total_maturity_for_all_neurons
     );
 }
 
