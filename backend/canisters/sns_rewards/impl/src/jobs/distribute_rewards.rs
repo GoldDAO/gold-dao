@@ -18,7 +18,7 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
-use std::{collections::BTreeMap, ops::Mul};
+use std::collections::BTreeMap;
 use tracing::{debug, info};
 use types::{Milliseconds, NeuronInfo};
 
@@ -317,8 +317,6 @@ async fn transfer_rewards(neurons: Vec<(NeuronId, BigUint)>, icp_balance: u64) -
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
-
     use num_bigint::BigUint;
     use sns_governance_canister::types::{Neuron, NeuronId};
 
