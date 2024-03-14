@@ -10,9 +10,11 @@ use candid::{CandidType, Principal};
 use canister_time::{now_millis, run_interval, WEEK_IN_MS};
 use futures::future::join_all;
 use ic_ledger_types::{
-    AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID
+    AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT,
+    MAINNET_LEDGER_CANISTER_ID,
 };
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
+use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
@@ -21,10 +23,6 @@ use tracing::{debug, info};
 use types::{Milliseconds, NeuronInfo};
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
-
-
-
-
 
 pub fn start_job() {
     run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run);
@@ -45,7 +43,6 @@ pub async fn distribute_rewards() {
         state.data.sync_info.last_distribution_start = time_start;
     });
 
-
     // 1 ) Cacluating neuron reward percentage
     let neuron_maturity_for_interval =
         read_state(|state| calculate_neuron_maturity_for_interval(&state.data.neuron_maturity));
@@ -53,7 +50,7 @@ pub async fn distribute_rewards() {
     let total_maturity_for_all_neurons =
         calculate_aggregated_maturity(&neuron_maturity_for_interval);
 
-    let neuron_reward_percentage = calculate_neuron_reward_percentages(
+    let neuron_reward_percentage = calculate_neuron_percentages(
         &neuron_maturity_for_interval,
         &total_maturity_for_all_neurons,
     );
@@ -61,9 +58,7 @@ pub async fn distribute_rewards() {
     // 2 ) Get balances of all reward pools
     // let ogy_reward_pool_id = read_state(|state| state.data.ogy_ledger_canister);
     // let ogy_reward_pool_balance = query_token_balance_icrc1(ogy_reward_pool_id).await;
-    let fake_ledger_id = Principal::from_slice(
-        &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
-    );
+    let fake_ledger_id = Principal::from_slice(&[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]);
     info!("icp ledger id {}", fake_ledger_id);
     let icp_reward_pool_balance = get_icp_balance().await;
 
@@ -91,10 +86,17 @@ pub async fn distribute_rewards() {
     });
 
     let time_finish = now_millis();
-    mutate_state(|state| {
-        state.data.sync_info.last_distribution_end = time_finish
-    });
-    info!("|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {}", (time_finish - time_start), &sucessful_neuron_transfers.len());
+    mutate_state(|state| state.data.sync_info.last_distribution_end = time_finish);
+    info!(
+        "|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {}",
+        (time_finish - time_start),
+        &sucessful_neuron_transfers.len()
+    );
+}
+
+pub fn calculate_reward(percentage : BigUint, reward_pool : u64) -> u64 {
+    let reward = (BigUint::from(reward_pool) * percentage.clone()) / BigUint::from(100_000_000u64);
+    reward.try_into().expect("faild to convert bigint to u64")
 }
 
 pub fn update_neuron_reward(
@@ -153,14 +155,36 @@ pub fn calculate_aggregated_maturity(data: &Vec<(NeuronId, u64)>) -> u64 {
     data.iter().map(|entry| entry.1).sum()
 }
 
-pub fn calculate_neuron_reward_percentages(
-    data: &Vec<(NeuronId, u64)>,
+// pub fn calculate_neuron_reward_percentages(
+//     data: &Vec<(NeuronId, u64)>,
+//     total_maturity: &u64,
+// ) -> Vec<(NeuronId, f64)> {
+//     data.iter()
+//         .map(|entry| {
+//             let percentage = entry.1 as f64 / total_maturity.clone() as f64;
+//             (entry.0.clone(), percentage)
+//         })
+//         .collect()
+// }
+
+pub fn calculate_neuron_percentages(
+    data: &[(NeuronId, u64)],
     total_maturity: &u64,
-) -> Vec<(NeuronId, f64)> {
+) -> Vec<(NeuronId, BigUint)> {
+    // Convert total_maturity to BigUint
+    let total_maturity_big = BigUint::try_from(total_maturity.clone()).unwrap();
+
+    // Calculate percentage for each neuron
     data.iter()
-        .map(|entry| {
-            let percentage = entry.1 as f64 / total_maturity.clone() as f64;
-            (entry.0.clone(), percentage)
+        .map(|(neuron_id, maturity)| {
+            // Convert maturity to BigUint
+            let maturity_big = BigUint::try_from(*maturity).unwrap();
+
+            // Calculate percentage as (maturity / total_maturity) * 10000 (expressed in basis points)
+            let percentage =
+                (maturity_big * BigUint::from(100_000_000u64)) / total_maturity_big.clone();
+
+            (neuron_id.clone(), percentage)
         })
         .collect()
 }
@@ -174,7 +198,6 @@ struct BalanceQuery {
 #[derive(CandidType, Deserialize)]
 struct BalanceResponse(u64);
 
-
 async fn get_icp_balance() -> Tokens {
     ic_ledger_types::account_balance(
         MAINNET_LEDGER_CANISTER_ID,
@@ -187,9 +210,7 @@ async fn get_icp_balance() -> Tokens {
 }
 
 async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Result<u64, String> {
-    let fake_ledger_id = Principal::from_slice(
-        &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
-    );
+    let fake_ledger_id = Principal::from_slice(&[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]);
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
         fake_ledger_id,
         &(TransferArg {
@@ -221,7 +242,7 @@ async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Re
     }
 }
 
-async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Vec<NeuronId> {
+async fn transfer_rewards(neurons: Vec<(NeuronId, BigUint)>, icp_balance: u64) -> Vec<NeuronId> {
     let mut successful_reward_transfers: Vec<NeuronId> = vec![];
     let mut number_of_valid_neurons = 0;
 
@@ -233,7 +254,7 @@ async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Ve
         let mut transfer_futures = Vec::new();
 
         for (neuron_id, percentage_to_reward) in batch {
-            if *percentage_to_reward <= 0.0 {
+            if *percentage_to_reward <= BigUint::from(0u64) {
                 continue; // skip payment since this neuron 0 percentage
             }
             number_of_valid_neurons += 1;
@@ -249,7 +270,8 @@ async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Ve
             let sub_account = Subaccount(neuron_id_as_bytes);
 
             // handle ICP transfer
-            let icp_reward = ((icp_balance as f64) * percentage_to_reward).floor() as u64;
+            // let icp_reward = ((icp_balance as f64) * percentage_to_reward).floor() as u64;
+            let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance);
             debug!("icp reward : {}", icp_reward);
 
             let icp_transfer_future = transfer_icp_to_sub_account(sub_account, icp_reward);
@@ -257,22 +279,28 @@ async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Ve
         }
 
         // Execute all transfer futures concurrently and collect results
-        let results = join_all(transfer_futures.into_iter().map(|(neuron_id, future)| async move {
-            match future.await {
-                Ok(_) => Ok(neuron_id),
-                Err(e) => {
-                    debug!("!!error in transfer - neuron_id ::: {} - error ::: {}", neuron_id, e);    
-                    Err(())
-                }, // Handle error if needed
-            }
-        })).await;
+        let results = join_all(transfer_futures.into_iter().map(
+            |(neuron_id, future)| async move {
+                match future.await {
+                    Ok(_) => Ok(neuron_id),
+                    Err(e) => {
+                        debug!(
+                            "!!error in transfer - neuron_id ::: {} - error ::: {}",
+                            neuron_id, e
+                        );
+                        Err(())
+                    } // Handle error if needed
+                }
+            },
+        ))
+        .await;
 
         // Collect successful transfers
         for result in results {
             match result {
                 Ok(neuron_id) => {
                     successful_reward_transfers.push(neuron_id);
-                },
+                }
                 Err(_) => {
                     // Handle error if needed
                 }
@@ -280,19 +308,26 @@ async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Ve
         }
     }
 
-    debug!("||| number of neurons that should receive a payment : {} |||", number_of_valid_neurons);
+    debug!(
+        "||| number of neurons that should receive a payment : {} |||",
+        number_of_valid_neurons
+    );
     successful_reward_transfers
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
+    use num_bigint::BigUint;
     use sns_governance_canister::types::{Neuron, NeuronId};
 
     use crate::{
         jobs::{
-            distribute_rewards::calculate_aggregated_maturity,
-            distribute_rewards::calculate_neuron_reward_percentages,
-            distribute_rewards::update_neuron_reward, synchronise_neurons::update_neuron_maturity,
+            distribute_rewards::{
+                calculate_aggregated_maturity, calculate_neuron_percentages, calculate_reward, update_neuron_reward
+            },
+            synchronise_neurons::update_neuron_maturity,
         },
         state::{init_state, mutate_state, read_state, RuntimeState},
     };
@@ -395,6 +430,77 @@ mod tests {
             let maturity_for_interval = d.get(0).unwrap().1;
             assert_eq!(maturity_for_interval, 850);
         })
+    }
+
+    #[test]
+    fn test_neuron_percentages() {
+        // Example data with 200 neurons
+        // Generate 200 neurons with unique IDs and a single maturity value
+        let mut neuron_data: Vec<(NeuronId, u64)> = Vec::new();
+        for _ in 0..20000 {
+            let neuron_id =
+                NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                    .unwrap();
+            neuron_data.push((neuron_id, 1)); // Using 100 as the maturity value for each neuron
+        }
+
+        // Example total_maturity
+        let total_maturity: u64 = neuron_data.iter().map(|(_, m)| *m).sum();
+
+        // Calculate neuron percentages
+        let neuron_percentages = calculate_neuron_percentages(&neuron_data, &total_maturity);
+
+        // Ensure the sum of percentages equals 10000 (total basis points)
+        let sum_percentages: BigUint = neuron_percentages.iter().map(|(_, b)| b.clone()).sum();
+
+        let expected_sum = BigUint::from(100_000_000u64);
+        // let tolerance = BigUint::from(1u64); // Adjust tolerance as needed
+
+        assert_eq!(expected_sum, sum_percentages);
+        // let only_percentages: Vec<BigUint> =
+        //     neuron_percentages.iter().map(|(a, b)| b.clone()).collect();
+
+        // Print the result for verification
+    }
+
+    #[test]
+    fn test_rewards_calculation() {
+        // Example data with 200 neurons, each with a unique ID and maturity of 100
+        let mut neuron_data: Vec<(NeuronId, u64)> = Vec::new();
+        for _ in 0..200 {
+            let neuron_id =
+                NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                    .unwrap();
+            neuron_data.push((neuron_id, 100));
+        }
+
+        // Example total_maturity
+        let total_maturity: u64 = neuron_data.iter().map(|(_, m)| *m).sum();
+
+        // Calculate neuron percentages
+        let neuron_percentages = calculate_neuron_percentages(&neuron_data, &total_maturity);
+
+        // Example reward pool
+        let reward_pool = 10_000_000u64;
+
+        // Calculate rewards based on percentages
+        let rewards: Vec<(NeuronId, u64)> = neuron_percentages
+            .iter()
+            .map(|(neuron_id, percentage)| {
+                let reward = calculate_reward(percentage.clone(), reward_pool);
+                (neuron_id.clone(), reward)
+            })
+            .collect();
+
+        // Check if the sum of rewards equals the reward pool
+        let sum_rewards: u64 = rewards.iter().map(|(_, reward)| *reward).sum();
+
+        // let only_rewards: Vec<u64> = rewards.iter().map(|(_, b)| b.clone()).collect();
+
+        assert_eq!(
+            sum_rewards, reward_pool,
+            "Sum of rewards should equal the reward pool"
+        );
     }
 
     #[test]
@@ -514,14 +620,14 @@ mod tests {
         let total_maturity = calculate_aggregated_maturity(&neuron_list);
 
         let maturity_percentage_per_neuron =
-            calculate_neuron_reward_percentages(&neuron_list, &total_maturity);
-        let expected_vals: Vec<f64> = vec![0.16666666666666666, 0.33333333333333333, 0.50];
+        calculate_neuron_percentages(&neuron_list, &total_maturity);
+        let expected_vals: Vec<BigUint> = vec![BigUint::from(16666666u64), BigUint::from(33333333u64), BigUint::from(50000000u64)];
 
-        let test_run: Vec<((NeuronId, f64), f64)> = maturity_percentage_per_neuron
+        let test_run: Vec<((NeuronId, BigUint), BigUint)> = maturity_percentage_per_neuron
             .iter()
             .zip(expected_vals.iter())
             .map(|((neuron_id, percentage), expected_val)| {
-                ((neuron_id.clone(), *percentage), *expected_val)
+                ((neuron_id.clone(), percentage.clone()), expected_val.clone())
             })
             .collect();
 
@@ -566,7 +672,6 @@ mod tests {
         })
     }
 }
-
 
 // async fn query_token_balance_icrc1(ledger_id: Principal) -> Result<Nat, String> {
 //     info!("aa processing request");

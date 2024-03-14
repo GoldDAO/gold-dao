@@ -33,3 +33,4 @@ tracing = { workspace = true }
 sha256 = { path = "../../../libraries/sha256" }
 futures = { workspace = true }
 serde_json = {workspace = true}
+num-bigint = {workspace = true}
