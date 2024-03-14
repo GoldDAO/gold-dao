@@ -98,7 +98,7 @@ and run (make sure to replace `<YOUR-USER>` with your local user):
 
 ```sh
 limactl start docker.yaml
-docker context create lima-docker --docker "host=unix:///Users/<YOUR-USER>/.lima/docker/sock/docker.sock"
+docker context create lima-docker --docker "host=unix:///Users/$USER/.lima/docker/sock/docker.sock"
 docker context use lima-docker
 ```
 
@@ -107,15 +107,27 @@ docker context use lima-docker
 This step can take a while. Sit back and enjoy some coffee:
 
 ```sh
-docker build -t gldt_core_reproducible_build -f ./build/Dockerfile_backend .
+docker build -t gld_reproducible_build -f ./build/Dockerfile_backend .
 ```
 
 ### Running the Reproducible Build
 
-Command:
+Define the canister you want to build
 
 ```sh
-docker run -v /tmp/lima:/tmp/reproducible_build -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ gldt_core_reproducible_build
+export CANISTER_NAME=<THE_CANISTER_NAME>
+```
+
+e.g.
+
+```sh
+export CANISTER_NAME=gldt_core
+```
+
+Build the canister
+
+```sh
+docker run -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ gld_reproducible_build
 ```
 
 ### Generated WASM Files
@@ -129,7 +141,7 @@ docker run -v /tmp/lima:/tmp/reproducible_build -v /tmp/lima/:/builds/gldt/gldt-
 ### Verify the integrity of the files by computing their SHA256 hashes
 
 We are currently using the \$CANISTER_NAME_canister.wasm.gz in production, so you can check using :
-`shasum -a 256 ~/Downloads/$CANISTER_NAME_canister.wasm.gz`
+`shasum -a 256 /tmp/lima/$CANISTER_NAME_canister.wasm.gz`
 
 ## Technical documentation
 
