@@ -9,16 +9,12 @@ use crate::state::{mutate_state, read_state, RuntimeState};
 use candid::{CandidType, Principal};
 use canister_time::{now_millis, run_interval, WEEK_IN_MS};
 use futures::future::join_all;
-use ic_cdk::api::management_canister::main::CanisterId;
 use ic_ledger_types::{
     AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID
 };
-use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
-use utils::consts::FAKENET_LEDGER_CANISTER_ID;
-use std::str::FromStr;
 use std::time::Duration;
 use std::{collections::BTreeMap, ops::Mul};
 use tracing::{debug, info};
@@ -44,10 +40,11 @@ pub async fn distribute_rewards() {
     // 2 [TICK] get the percentage payout for each neuron
     // 3 ) Get total OGY, ICP, GLDGov in sub account 0
     // 4 ) Pay each sub account its perentage of OGY, ICP, GLDGov
-    let new_distribution_time = now_millis();
+    let time_start = now_millis();
     mutate_state(|state| {
-        state.data.sync_info.last_distribution_start = new_distribution_time;
+        state.data.sync_info.last_distribution_start = time_start;
     });
+
 
     // 1 ) Cacluating neuron reward percentage
     let neuron_maturity_for_interval =
@@ -64,8 +61,10 @@ pub async fn distribute_rewards() {
     // 2 ) Get balances of all reward pools
     // let ogy_reward_pool_id = read_state(|state| state.data.ogy_ledger_canister);
     // let ogy_reward_pool_balance = query_token_balance_icrc1(ogy_reward_pool_id).await;
-    let icp_canister_id = CanisterId::from_text("r7inp-6aaaa-aaaaa-aaabq-cai").unwrap();
-    info!("icp ledger id {}", icp_canister_id);
+    let fake_ledger_id = Principal::from_slice(
+        &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
+    );
+    info!("icp ledger id {}", fake_ledger_id);
     let icp_reward_pool_balance = get_icp_balance().await;
 
     info!(
@@ -89,7 +88,13 @@ pub async fn distribute_rewards() {
             state,
             &neuron_maturity_for_interval,
         );
-    })
+    });
+
+    let time_finish = now_millis();
+    mutate_state(|state| {
+        state.data.sync_info.last_distribution_end = time_finish
+    });
+    info!("|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {}", (time_finish - time_start), &sucessful_neuron_transfers.len());
 }
 
 pub fn update_neuron_reward(
@@ -170,10 +175,9 @@ struct BalanceQuery {
 struct BalanceResponse(u64);
 
 
-
 async fn get_icp_balance() -> Tokens {
     ic_ledger_types::account_balance(
-        FAKENET_LEDGER_CANISTER_ID,
+        MAINNET_LEDGER_CANISTER_ID,
         AccountBalanceArgs {
             account: AccountIdentifier::new(&ic_cdk::api::id(), &DEFAULT_SUBACCOUNT),
         },
@@ -183,10 +187,13 @@ async fn get_icp_balance() -> Tokens {
 }
 
 async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Result<u64, String> {
+    let fake_ledger_id = Principal::from_slice(
+        &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
+    );
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
-        FAKENET_LEDGER_CANISTER_ID,
+        fake_ledger_id,
         &(TransferArg {
-            from_subaccount: None,
+            from_subaccount: Some(DEFAULT_SUBACCOUNT.0),
             to: Account {
                 owner: ic_cdk::api::id(),
                 subaccount: Some(sub_account.0),
@@ -215,62 +222,65 @@ async fn transfer_icp_to_sub_account(sub_account: Subaccount, amount: u64) -> Re
 }
 
 async fn transfer_rewards(neurons: Vec<(NeuronId, f64)>, icp_balance: u64) -> Vec<NeuronId> {
-
     let mut successful_reward_transfers: Vec<NeuronId> = vec![];
-    let mut transfer_futures = Vec::new();
+    let mut number_of_valid_neurons = 0;
 
-    for (neuron_id, percentage_to_reward) in neurons {
-        if percentage_to_reward.clone() <= 0.0f64 {
-            continue; // skip payment since this neuron 0 percentage
+    // Split neurons into batches of 50
+    let mut batched_neurons = neurons.chunks(50);
+
+    // Process each batch sequentially
+    while let Some(batch) = batched_neurons.next() {
+        let mut transfer_futures = Vec::new();
+
+        for (neuron_id, percentage_to_reward) in batch {
+            if *percentage_to_reward <= 0.0 {
+                continue; // skip payment since this neuron 0 percentage
+            }
+            number_of_valid_neurons += 1;
+            debug!(
+                "transfering for neuron id : {} || percentage to reward : {} || ",
+                neuron_id, percentage_to_reward
+            );
+            // sub account id
+            let neuron_id_as_bytes = neuron_id
+                .clone()
+                .into_array()
+                .expect("Error converting NeuronId into u8");
+            let sub_account = Subaccount(neuron_id_as_bytes);
+
+            // handle ICP transfer
+            let icp_reward = ((icp_balance as f64) * percentage_to_reward).floor() as u64;
+            debug!("icp reward : {}", icp_reward);
+
+            let icp_transfer_future = transfer_icp_to_sub_account(sub_account, icp_reward);
+            transfer_futures.push((neuron_id.clone(), icp_transfer_future));
         }
-        debug!(
-            "transfering for neuron id : {} || percentage to reward : {} || ",
-            neuron_id, percentage_to_reward
-        );
-        // sub account id
-        let neuron_id_as_bytes = neuron_id
-            .clone()
-            .into_array()
-            .expect("Error converting NeuronId into u8");
-        let sub_account = Subaccount(neuron_id_as_bytes);
 
-        // handle ICP transfer
-        let icp_reward = ((icp_balance as f64).mul(percentage_to_reward).floor()) as u64;
-        debug!("icp reward : {}", icp_reward);
+        // Execute all transfer futures concurrently and collect results
+        let results = join_all(transfer_futures.into_iter().map(|(neuron_id, future)| async move {
+            match future.await {
+                Ok(_) => Ok(neuron_id),
+                Err(e) => {
+                    debug!("!!error in transfer - neuron_id ::: {} - error ::: {}", neuron_id, e);    
+                    Err(())
+                }, // Handle error if needed
+            }
+        })).await;
 
-        let icp_transfer_future = transfer_icp_to_sub_account(sub_account, icp_reward);
-        transfer_futures.push((neuron_id, icp_transfer_future));
-
-        // handle OGY transfer
-        // ........
-        // transfer_futures.push((neuron_id, ogy_transfer_future))
-
-        // handle GLDGov transfer
-        // ........
-        // transfer_futures.push((neuron_id, gldgov_transfer_future))
-    }
-
-    // Execute all transfer futures concurrently and collect results
-    let results = join_all(transfer_futures.into_iter().map(|(neuron_id, future)| async move {
-        match future.await {
-            Ok(_) => Ok(neuron_id),
-            Err(_) => Err(()), // Handle error if needed
-        }
-    })).await;
-
-
-    // Collect successful transfers
-    for result in results {
-        match result {
-            Ok(neuron_id) => {
-                successful_reward_transfers.push(neuron_id);
-            },
-            Err(_) => {
-                // Handle error if needed
+        // Collect successful transfers
+        for result in results {
+            match result {
+                Ok(neuron_id) => {
+                    successful_reward_transfers.push(neuron_id);
+                },
+                Err(_) => {
+                    // Handle error if needed
+                }
             }
         }
     }
 
+    debug!("||| number of neurons that should receive a payment : {} |||", number_of_valid_neurons);
     successful_reward_transfers
 }
 
