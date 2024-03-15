@@ -2,7 +2,9 @@
 # SNS reward distribution
 
 This job is responsible for distributing rewards to user's sub accounts.
-All the different reward tokens are to be held in the 0 sub account.
+
+There are reward pools ( ICP, OGY, GLDGov ) that exist on the 0 sub account
+Individual neuron rewards are transferred to a sub account based on the NeuronId
 */
 
 use crate::state::{mutate_state, read_state, RuntimeState};
