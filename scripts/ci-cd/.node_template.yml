@@ -1,0 +1,14 @@
+# NodeJS & NextJS job template
+
+.node template:
+  image: node:18
+  cache:
+  - key: "node-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .npm/
+      - node_modules/
+      - client/**/.next/
+      - client/**/.npm/
+      - client/**/node_modules/
+  before_script:
+    - npm ci --cache .npm --prefer-offline

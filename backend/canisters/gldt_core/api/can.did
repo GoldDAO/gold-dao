@@ -116,47 +116,12 @@ type CandyShared = variant {
   Array : vec CandyShared;
   Class : vec PropertyShared;
 };
-type CanisterLogFeature = variant {
-  filterMessageByContains;
-  filterMessageByRegex;
-};
-type CanisterLogMessages = record {
-  data : vec LogMessageData;
-  lastAnalyzedMessageTimeNanos : opt nat64;
-};
-type CanisterLogMessagesInfo = record {
-  features : vec opt CanisterLogFeature;
-  lastTimeNanos : opt nat64;
-  count : nat32;
-  firstTimeNanos : opt nat64;
-};
-type CanisterLogRequest = variant {
-  getMessagesInfo;
-  getMessages : GetLogMessagesParameters;
-  getLatestMessages : GetLatestLogMessagesParameters;
-};
-type CanisterLogResponse = variant {
-  messagesInfo : CanisterLogMessagesInfo;
-  messages : CanisterLogMessages;
-};
-type CanisterMetrics = record { data : CanisterMetricsData };
-type CanisterMetricsData = variant {
-  hourly : vec HourlyMetricsData;
-  daily : vec DailyMetricsData;
-};
-type CollectMetricsRequestType = variant { force; normal };
 type Conf = record {
   gldt_fee_compensation_canister_id : principal;
   gld_nft_canister_ids : vec record { principal; NftCanisterConf };
   gldt_ledger_canister_id : principal;
 };
-type DailyMetricsData = record {
-  updateCalls : nat64;
-  canisterHeapMemorySize : NumericEntity;
-  canisterCycles : NumericEntity;
-  canisterMemorySize : NumericEntity;
-  timeMillis : int;
-};
+type Custom = record { error_message : opt text; error_type : Type };
 type DutchParams = record {
   time_unit : DutchParams_time_unit;
   decay_type : DutchParams_decay_type;
@@ -170,38 +135,6 @@ type EscrowReceipt = record {
   seller : Account_1;
   buyer : Account_1;
   amount : nat;
-};
-type GetInformationRequest = record {
-  status : opt StatusRequest;
-  metrics : opt MetricsRequest;
-  logs : opt CanisterLogRequest;
-  version : bool;
-};
-type GetInformationResponse = record {
-  status : opt StatusResponse;
-  metrics : opt MetricsResponse;
-  logs : opt CanisterLogResponse;
-  version : opt nat;
-};
-type GetLatestLogMessagesParameters = record {
-  upToTimeNanos : opt nat64;
-  count : nat32;
-  filter : opt GetLogMessagesFilter;
-};
-type GetLogMessagesFilter = record {
-  analyzeCount : nat32;
-  messageRegex : opt text;
-  messageContains : opt text;
-};
-type GetLogMessagesParameters = record {
-  count : nat32;
-  filter : opt GetLogMessagesFilter;
-  fromTimeNanos : opt nat64;
-};
-type GetMetricsParameters = record {
-  dateToMillis : nat;
-  granularity : MetricsGranularity;
-  dateFromMillis : nat;
 };
 type GetRecordsRequest = record { page : opt nat64; limit : opt nat64 };
 type GetRecordsResponse = record { total : nat64; data : opt vec GldtRecord };
@@ -246,13 +179,6 @@ type GldtRegistryEntry = record {
   gldt_redeem : opt SwapInfo;
 };
 type GldtSwapped = record { index : nat; sale_id : text };
-type HourlyMetricsData = record {
-  updateCalls : vec nat64;
-  canisterHeapMemorySize : vec nat64;
-  canisterCycles : vec nat64;
-  canisterMemorySize : vec nat64;
-  timeMillis : int;
-};
 type ICTokenSpec = record {
   id : opt nat;
   fee : opt nat;
@@ -273,19 +199,8 @@ type LockedInfoResponse = record {
   total_weight_locked : nat64;
   total_number_of_bars_locked : nat64;
 };
-type LogMessageData = record { timeNanos : nat64; message : text };
-type MetricsGranularity = variant { hourly; daily };
-type MetricsRequest = record { parameters : GetMetricsParameters };
-type MetricsResponse = record { metrics : opt CanisterMetrics };
 type NftCanisterConf = record { grams : nat16 };
 type NftInfo = record { info : opt GldtRegistryEntry };
-type NumericEntity = record {
-  avg : nat64;
-  max : nat64;
-  min : nat64;
-  first : nat64;
-  last : nat64;
-};
 type PricingConfigShared = variant {
   ask : opt vec AskFeature;
   extensible : CandyShared;
@@ -298,6 +213,7 @@ type RecordStatusInfo = record { status : RecordStatus; message : opt text };
 type RecordType = variant { Burn; Mint };
 type Result = variant { Ok : GetRecordsResponse; Err : text };
 type Result_1 = variant { Ok : GetStatusResponse; Err : text };
+type Result_2 = variant { Ok : text; Err : Custom };
 type SaleStatusShared = record {
   token_id : text;
   sale_type : SaleStatusShared_sale_type;
@@ -306,16 +222,6 @@ type SaleStatusShared = record {
   sale_id : text;
 };
 type SaleStatusShared_sale_type = variant { auction : AuctionStateShared };
-type StatusRequest = record {
-  memory_size : bool;
-  cycles : bool;
-  heap_memory_size : bool;
-};
-type StatusResponse = record {
-  memory_size : opt nat64;
-  cycles : opt nat64;
-  heap_memory_size : opt nat64;
-};
 type SubAccountInfo = record {
   account_id : vec nat8;
   "principal" : principal;
@@ -345,21 +251,21 @@ type SwapInfo = record {
 };
 type SwappingStates = variant { Burned; Initialised; Swapped; Minted };
 type TokenSpec = variant { ic : ICTokenSpec; extensible : CandyShared };
-type UpdateInformationRequest = record {
-  metrics : opt CollectMetricsRequestType;
+type Type = variant {
+  TransferError;
+  Unauthorized;
+  CompensationDisabled;
+  Other;
 };
 service : (opt Conf) -> {
-  __get_candid_interface_tmp_hack : () -> (text) query;
-  getCanistergeekInformation : (GetInformationRequest) -> (
-      GetInformationResponse,
-    ) query;
+  fetch_metadata : () -> (text) query;
   get_conf : () -> (Conf) query;
   get_historical_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_locked_info : () -> (LockedInfoResponse) query;
   get_ongoing_swaps_by_user : (GetSwapsRequest) -> (Result) query;
   get_records : (GetRecordsRequest) -> (Result) query;
   get_status_of_swap : (GetStatusRequest) -> (Result_1) query;
+  import_data : (text) -> (Result_2);
   nft_info : (InfoRequest) -> (NftInfo) query;
   notify_sale_nft_origyn : (SubscriberNotification) -> ();
-  updateCanistergeekInformation : (UpdateInformationRequest) -> ();
 }

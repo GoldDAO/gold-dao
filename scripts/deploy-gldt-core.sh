@@ -17,6 +17,7 @@ Usage:
 
 Options:
   -h, --help        Show this message and exit
+  -t, --quill-test  To test-only (dry-run) quill deployment (will have no effect on local use)
   -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
 EOF
 }
@@ -28,6 +29,9 @@ if [[ $# -gt 0 ]]; then
       -h | --help )
         show_help
         exit
+        ;;
+      -t | --quill-test )
+        QUILL_TEST="--dry-run"
         ;;
       -r | --reinstall )
         REINSTALL="--mode reinstall"
@@ -57,12 +61,35 @@ if [[ $1 == "local" ]]; then
   gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
     })' --mode reinstall -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
-  dfx deploy gldt_core --network $1 --argument '(
+  if [[ $1 == "ic" ]]; then
+    PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+    UPGRADEVERSION=$CI_COMMIT_TAG
+  else
+    PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
+    UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
+  fi
+  . scripts/prepare_sns_canister_ids.sh $1 && \
+  . scripts/parse_proposal_details.sh && \
+#  dfx deploy gldt_core --network $1 --argument '(
+#    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
+#    gld_nft_canister_ids=vec{
+#      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
+#      record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
+#    };
+#    gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
+#      })' --no-wallet ${REINSTALL} --by-proposal -y && \
+  quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+    --pem-file $PEM_FILE \
+    --canister-upgrade-arg '(
     opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
     gld_nft_canister_ids=vec{
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_1g)"'"; record { grams=1}};
       record { principal "'"$(dfx canister id --network ${1} gldnft_backend_10g)"'"; record { grams=10}}
     };
     gldt_fee_compensation_canister_id=principal "'"$(dfx canister id --network ${1} gldt_fee_compensation)"'"
-      })' --no-wallet ${REINSTALL} -y
+      })' --target-canister-id $(cat canister_ids.json | jq -r .gldt_core.$1) \
+    --wasm-path backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz \
+    --title "Upgrade gldt_core to ${UPGRADEVERSION}" \
+    --url ${DETAILS_URL} --summary-path proposal.md | quill send $QUILL_TEST --yes -
 fi
+return

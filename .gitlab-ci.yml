@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.14.3@sha256:ae4a62ea83e1eaaebab3e5186b2a3b67ba8d45951719b6acdda5fa7bcd13376e
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.17.0@sha256:5c939c840efdca76e885a5b89b77172ed04404faa770c74632005262e1bcc698
   tags:
     - docker
   interruptible: true
@@ -26,40 +26,46 @@ stages:
   - build
   - deploy
 
-###############################################################################
-# Templates
-###############################################################################
-.node template: &node_template
-  image: node:18
-  cache:
-  - key: "node-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .npm/
-      - node_modules/
-      - client/**/.next/
-      - client/**/.npm/
-      - client/**/node_modules/
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-
-.rust template: &rust_template
-  tags:
-    - docker
-    - big
-  image: rust:slim-bookworm
-  cache:
-  - key: "rust-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .cargo
-      - backend/canisters/gldt_core/target
-      - backend/canisters/gldt_fee_compensation/target
-  before_script:
-    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
-    - rustup component add clippy
-    - rustup target add wasm32-unknown-unknown
-    - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
-    - export PATH="$PWD/.cargo/bin:$PATH"
+include:
+  # Templates:
+  - local: scripts/ci-cd/.node_template.yml
+  - local: scripts/ci-cd/.rust_template.yml
+  # Frontend linters:
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gldt_swap_app
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gldt_landing_page
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gldt_explorer
+  # Unit tests coverage
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_core
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: icp_neuron
+  # Canister builds
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_core
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: icp_neuron
+  # Frontend builds
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: gldt_swap_app
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: gldt_landing_page
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: gldt_explorer
+  # Deployments
+  - local: scripts/ci-cd/.dfx_templates.yml
 
 ################################################################################
 # Cache preparation
@@ -68,7 +74,7 @@ node cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *node_template
+  extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
     - node --version
@@ -78,7 +84,7 @@ cargo cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
+  extends: .rust template
   script:
     - cargo version
     - cargo verify-project
@@ -86,47 +92,8 @@ cargo cache:
 ################################################################################
 # Linters
 ################################################################################
-swap_app linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/swap_app/*.{js,json}"
-        - "client/swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:swap_app
 
-landing_page linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/landing_page/*.{js,json}"
-        - "client/landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:landing
-
-explorer linter:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/explorer/*.{js,json}"
-        - "client/explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *node_template
-  script:
-    - npm run lint:explorer
+# See includes above for frontends lint
 
 rust lint:
   stage: lint
@@ -134,124 +101,34 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{gldt_core,gldt_core/impl,gldt_core/impl/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{icp_neuron,icp_neuron/impl,icp_neuron/impl/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
+  extends: .rust template
   script:
     - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/gldt_fee_compensation/api/can.did
+    - touch backend/canisters/icp_neuron/api/can.did
     - cargo clippy
 
 ################################################################################
 # Unit tests
 ################################################################################
-gldt_core tests:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
-        - ".gitlab-ci.yml"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
-  tags:
-    - dind
-  services:
-    - docker:dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
-  script:
-    - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/gldt_fee_compensation/api/can.did
-    - cargo tarpaulin -p gldt_core -j 2 --lib -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
 
-gldt_fee_compensation tests:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_fee_compensation,gldt_fee_compensation/src,gldt_fee_compensation/src/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{gldt_core,gldt_core/src,gldt_core/src/**}/*.{rs,toml,lock}"
-        - ".gitlab-ci.yml"
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-  <<: *rust_template
-  tags:
-    - dind
-  services:
-    - docker:dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
-  script:
-    - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/gldt_fee_compensation/api/can.did
-    - cargo tarpaulin -p gldt_fee_compensation -j 2 --lib -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+# See includes above
 
 ################################################################################
-# Test builds
+# Builds
 ################################################################################
-gldt_core test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_core
-    - scripts/generate-did.sh gldt_core
-    - scripts/build-canister.sh gldt_core
-    - ic-wasm backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm info
-  artifacts:
-    name: "gldt_core-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
-    paths:
-      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_core/api/can.did
-    expire_in: 1 day
 
-gldt_fee_compensation test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  <<: *rust_template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
-    - scripts/generate-did.sh gldt_fee_compensation
-    - scripts/build-canister.sh gldt_fee_compensation
-    - ic-wasm backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm info
-  artifacts:
-    name: "gldt_fee_compensation-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
-    paths:
-      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_fee_compensation/api/can.did
-    expire_in: 1 day
+# See includes above for canister builds
 
 generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build","gldt_fee_compensation test build"]
+      needs: ["gldt_core test build", "icp_neuron test build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -261,94 +138,13 @@ generate test declarations:
       - backend/**/declarations
     expire_in: 1 day
 
-swap_app test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build","generate test declarations"]
-  <<: *node_template
-  script:
-    - npm run build:swap_app
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app-TEST"
-    paths:
-      - client/swap_app/out
-    expire_in: 1 day
-
-landing_page test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["generate test declarations"]
-  <<: *node_template
-  script:
-    - npm run build:landing
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-landing_page-TEST"
-    paths:
-      - client/landing_page/out
-    expire_in: 1 day
-
-explorer test build:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["generate test declarations"]
-  <<: *node_template
-  script:
-    - npm run build:explorer
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer-TEST"
-    paths:
-      - client/explorer/out
-    expire_in: 1 day
-
-################################################################################
-# Builds
-################################################################################
-gldt_core canister build:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  <<: *rust_template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_core
-    - scripts/generate-did.sh gldt_core
-    - scripts/build-canister.sh gldt_core
-  artifacts:
-    name: "${CI_PROJECT_NAME}-gldt_core-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
-    paths:
-      - backend/canisters/gldt_core/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_core/api/can.did
-    expire_in: 6 months
-
-gldt_fee_compensation canister build:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-  <<: *rust_template
-  script:
-    - scripts/build-canister.sh --wasmonly gldt_fee_compensation
-    - scripts/generate-did.sh gldt_fee_compensation
-    - scripts/build-canister.sh gldt_fee_compensation
-  artifacts:
-    name: "${CI_PROJECT_NAME}-gldt_fee_compensation-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
-    paths:
-      - backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release
-      - backend/canisters/gldt_fee_compensation/api/can.did
-    expire_in: 6 months
-
 generate declarations:
   stage: build
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:landing_page|explorer|swap_app)-v\d+\.\d+\.\d+$/'
-      needs: ["gldt_core canister build", "gldt_fee_compensation canister build"]
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gldt_landing_page|gldt_explorer|gldt_swap_app)-v\d+\.\d+\.\d+$/'
+      needs: ["gldt_core canister build", "icp_neuron canister build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -358,167 +154,7 @@ generate declarations:
       - backend/**/api
     expire_in: 6 months
 
-swap_app staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_swap_app"
-    NETWORK: "staging"
-  script:
-    - npm run build:swap_app
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "SWAP_APP_URL=$STAGING_URL" > swap_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-swap_app_STAGING_BUILD"
-    paths:
-      - client/swap_app/out
-    reports:
-      dotenv: swap_deploy.env
-    expire_in: 1 day
-  environment:
-    name: swap app
-    deployment_tier: staging
-    action: prepare
-
-landing_page staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_landing_page"
-    NETWORK: "staging"
-  script:
-    - npm run build:landing
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "LANDING_URL=$STAGING_URL" > landing_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-landing_STAGING_BUILD"
-    paths:
-      - client/landing_page/out
-    reports:
-      dotenv: landing_deploy.env
-    expire_in: 1 day
-  environment:
-    name: landing page
-    deployment_tier: staging
-    action: prepare
-
-explorer staging build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_explorer"
-    NETWORK: "staging"
-  script:
-    - npm run build:explorer
-    - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "EXPLORER_URL=$STAGING_URL" > explorer_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-explorer_STAGING_BUILD"
-    paths:
-      - client/explorer/out
-    reports:
-      dotenv: explorer_deploy.env
-    expire_in: 1 day
-  environment:
-    name: explorer
-    deployment_tier: staging
-    action: prepare
-
-swap_app production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "swap_app/*.{js,json}"
-        - "swap_app/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_swap_app"
-    NETWORK: "ic"
-  script:
-    - npm run build:swap_app
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "SWAP_APP_URL=$PRODUCTION_URL" > swap_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-swap_app"
-    paths:
-      - client/swap_app/out
-    reports:
-      dotenv: swap_deploy.env
-    expire_in: 6 months
-  environment:
-    name: swap app
-    deployment_tier: production
-    action: prepare
-
-landing_page production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "landing_page/*.{js,json}"
-        - "landing_page/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_landing_page"
-    NETWORK: "ic"
-  script:
-    - npm run build:landing
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "LANDING_URL=$PRODUCTION_URL" > landing_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - client/landing_page/out
-    reports:
-      dotenv: landing_deploy.env
-    expire_in: 6 months
-  environment:
-    name: landing page
-    deployment_tier: production
-    action: prepare
-
-explorer production build:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "explorer/*.{js,json}"
-        - "explorer/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
-  <<: *node_template
-  variables:
-    CANISTER_NAME: "gldt_explorer"
-    NETWORK: "ic"
-  script:
-    - npm run build:explorer
-    - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "EXPLORER_URL=$PRODUCTION_URL" > explorer_deploy.env
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-explorer"
-    paths:
-      - client/explorer/out
-    reports:
-      dotenv: explorer_deploy.env
-    expire_in: 6 months
-  environment:
-    name: explorer
-    deployment_tier: production
-    action: prepare
+# See includes above for frontend builds
 
 ################################################################################
 # Deployments
@@ -527,26 +163,23 @@ local deploy and tests:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build", "gldt_fee_compensation test build", "swap_app test build", "landing_page test build", "explorer test build"]
+      needs:
+        [
+          "gldt_core test build",
+          "icp_neuron test build",
+          "gldt_swap_app test build",
+          "gldt_landing_page test build",
+          "gldt_explorer test build",
+        ]
   before_script:
     - dfx --version
-    - dfx start --clean --background
+    - dfx start --clean --background --artificial-delay 40
   script:
     - NETWORK='local' scripts/local-deploy.sh
+    # TODO: Some bash script to provision a wallet and test a few interactions with the canisters
   after_script:
     - cat canister_ids.json
     - dfx stop
-
-.import dfx identity: &import_dfx_id
-  - dfx --version
-  - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
-  - dfx identity use gitlab-ci-gldt
-  - dfx identity whoami
-  - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi
-  - dfx identity get-principal
-
-.asset canister deploy: &asset_canister_deploy
-  - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y gldt_${CANISTER_NAME}
 
 check canister ids:
   stage: deploy
@@ -555,12 +188,12 @@ check canister ids:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(fee_compensation)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: "${PEM_FILE_PRODUCTION}"
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
     - scripts/pre-deploy.sh --network $TARGET_NETWORK
   artifacts:
@@ -569,128 +202,194 @@ check canister ids:
       - canister_ids.json
     expire_in: 1 hour
 
-swap app staging:
+.asset canisters upgrade proposal tests:
   stage: deploy
   variables:
-    CANISTER_NAME: "swap_app"
+    CANISTER_NAME: "gldt_swap_app"
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["swap_app staging build"]
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["swap_app test build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
+        PEM_FILE: testid.pem
+        TEST_QUILL: "--dry-run"
+  cache:
+    policy: pull
   before_script:
-    - *import_dfx_id
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx start --clean --background --artificial-delay 40
+    - dfx identity export testid > testid.pem
   script:
-    - *asset_canister_deploy
+    - dfx canister create --all
+    - export GLDT_FRONT_ID=$(dfx canister id gldt_swap_app)
+    - !reference [.asset canister staging deploy, script]
+  after_script:
+    - dfx stop
   environment:
     name: swap app
     deployment_tier: staging
     url: $SWAP_APP_URL
-    action: start
+    action: verify
 
-swap app production:
-  stage: deploy
-  variables:
-    CANISTER_NAME: "swap_app"
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^swap_app-v\d+\.\d+\.\d+$/'
-      needs: ["swap_app production build"]
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - *import_dfx_id
-  script:
-    - *asset_canister_deploy
-  environment:
-    name: swap app
-    deployment_tier: production
-    url: $SWAP_APP_URL
-    action: start
+# gldt swap app staging:
+#   stage: deploy
+#   resource_group: frontend staging deployment
+#   variables:
+#     CANISTER_NAME: "gldt_swap_app"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       needs: ["gldt_swap_app staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister staging deploy, script]
+#   environment:
+#     name: gldt swap app
+#     deployment_tier: staging
+#     url: $SWAP_APP_URL
+#     action: start
 
-landing page staging:
+# gldt swap app production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gldt_swap_app"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gldt_swap_app-v\d+\.\d+\.\d+$/'
+#       needs: ["gldt_swap_app production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gldt swap app
+#     deployment_tier: production
+#     url: $SWAP_APP_URL
+#     action: start
+
+# gldt landing page staging:
+#   stage: deploy
+#   resource_group: frontend staging deployment
+#   variables:
+#     CANISTER_NAME: "gldt_landing_page"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       needs: ["gldt_landing_page staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister staging deploy, script]
+#   environment:
+#     name: gldt landing page
+#     deployment_tier: staging
+#     url: $LANDING_URL
+#     action: start
+
+# gldt landing page production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gldt_landing_page"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gldt_landing_page-v\d+\.\d+\.\d+$/'
+#       needs: ["gldt_landing_page production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gldt landing page
+#     deployment_tier: production
+#     url: https://gldt.org/
+#     action: start
+
+# gldt explorer staging:
+#   stage: deploy
+#   resource_group: frontend staging deployment
+#   variables:
+#     CANISTER_NAME: "gldt_explorer"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       needs: ["gldt_explorer staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister staging deploy, script]
+#   environment:
+#     name: gldt explorer
+#     deployment_tier: staging
+#     url: https://staging.explorer.gldt.org/
+#     action: start
+
+# gldt explorer production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gldt_explorer"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gldt_explorer-v\d+\.\d+\.\d+$/'
+#       needs: ["gldt_explorer production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gldt explorer
+#     deployment_tier: production
+#     url: https://explorer.gldt.org/
+#     action: start
+
+.backend canisters upgrade proposal tests:
   stage: deploy
-  variables:
-    CANISTER_NAME: "landing_page"
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["landing_page staging build"]
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      needs: ["gldt_core test build"]
       variables:
         TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
+        PEM_FILE: testid.pem
+  cache:
+    policy: pull
   before_script:
-    - *import_dfx_id
+    - dfx identity new --storage-mode plaintext testid
+    - dfx identity use testid
+    - dfx identity get-principal
+    - dfx start --clean --background --artificial-delay 40
+    - dfx identity export testid > testid.pem
   script:
-    - *asset_canister_deploy
+    - dfx canister create --all
+    - export GLDT_CORE_ID=$(dfx canister id gldt_core)
+    - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
+  after_script:
+    - dfx stop
   environment:
-    name: landing page
+    name: gldt_core
     deployment_tier: staging
-    url: $LANDING_URL
-    action: start
-
-landing page production:
-  stage: deploy
-  variables:
-    CANISTER_NAME: "landing_page"
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^landing_page-v\d+\.\d+\.\d+$/'
-      needs: ["landing_page production build"]
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - *import_dfx_id
-  script:
-    - *asset_canister_deploy
-  environment:
-    name: landing page
-    deployment_tier: production
-    url: https://gldt.org/
-    action: start
-
-explorer staging:
-  stage: deploy
-  variables:
-    CANISTER_NAME: "explorer"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["explorer staging build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-  before_script:
-    - *import_dfx_id
-  script:
-    - *asset_canister_deploy
-  environment:
-    name: explorer
-    deployment_tier: staging
-    url: https://staging.explorer.gldt.org/
-    action: start
-
-explorer production:
-  stage: deploy
-  variables:
-    CANISTER_NAME: "explorer"
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^explorer-v\d+\.\d+\.\d+$/'
-      needs: ["explorer production build"]
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - *import_dfx_id
-  script:
-    - *asset_canister_deploy
-  environment:
-    name: explorer
-    deployment_tier: production
-    url: https://explorer.gldt.org/
-    action: start
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
+    action: verify
 
 gldt core staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -698,9 +397,9 @@ gldt core staging:
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["gldt_core canister build", "check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
+    - . scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
   environment:
     name: gldt_core
     deployment_tier: staging
@@ -709,6 +408,7 @@ gldt core staging:
 
 gldt core:
   stage: deploy
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
   variables:
@@ -716,9 +416,9 @@ gldt core:
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["gldt_core canister build", "check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-core.sh $TARGET_NETWORK
+    - . scripts/deploy-gldt-core.sh $TARGET_NETWORK
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
     paths:
@@ -730,44 +430,47 @@ gldt core:
     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m5bu4-7qaaa-aaaap-abrxq-cai
     action: start
 
-gldt fee compensation staging:
+icp neuron staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["gldt_fee_compensation canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-fee-compensation.sh --reinstall $TARGET_NETWORK
+    - . scripts/deploy-icp-neuron.sh --reinstall $TARGET_NETWORK
   environment:
-    name: gldt_fee_compensation
+    name: icp_neuron
     deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ccjse-eaaaa-aaaao-a2ixq-cai
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j2neh-vqaaa-aaaal-aduxq-cai
     action: start
 
-gldt fee compensation:
+icp neuron:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
-    - if: $CI_COMMIT_TAG =~ '/^fee_compensation-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["gldt_fee_compensation canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-gldt-fee-compensation.sh $TARGET_NETWORK
+    - . scripts/deploy-icp-neuron.sh $TARGET_NETWORK
   environment:
-    name: gldt_fee_compensation
+    name: icp_neuron
     deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oa42u-myaaa-aaaap-abrya-cai
+    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j4jiq-sqaaa-aaaap-ab23a-cai
     action: start
 
 gldt ledger staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -775,7 +478,7 @@ gldt ledger staging:
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
     - scripts/deploy-ledger.sh $TARGET_NETWORK
   environment:
@@ -786,6 +489,7 @@ gldt ledger staging:
 
 gldt ledger:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
       when: manual
@@ -794,7 +498,7 @@ gldt ledger:
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
     - scripts/deploy-ledger.sh $TARGET_NETWORK
   environment:
@@ -805,6 +509,7 @@ gldt ledger:
 
 gldt ledger indexer staging:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
   variables:
@@ -812,7 +517,7 @@ gldt ledger indexer staging:
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs: ["check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
     - scripts/deploy-ledger-indexer.sh $TARGET_NETWORK
   environment:
@@ -823,6 +528,7 @@ gldt ledger indexer staging:
 
 gldt ledger indexer:
   stage: deploy
+  resource_group: backend canister staging deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^indexer-v\d+\.\d+\.\d+$/'
       when: manual
@@ -831,7 +537,7 @@ gldt ledger indexer:
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs: ["check canister ids"]
   before_script:
-    - *import_dfx_id
+    - !reference [.import dfx identity, before_script]
   script:
     - scripts/deploy-ledger-indexer.sh $TARGET_NETWORK
   environment:

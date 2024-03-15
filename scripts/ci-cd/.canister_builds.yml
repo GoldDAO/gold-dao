@@ -1,0 +1,42 @@
+spec:
+  inputs:
+    src-folder:
+      description: Name of the source folder, should be the same as the canister's cargo package name.
+      options: ["gldt_core", "icp_neuron"]
+---
+# Rust canisters test and production builds
+
+$[[ inputs.src-folder ]] test build:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  extends: .rust template
+  script:
+    - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
+    - scripts/generate-did.sh $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
+    - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
+  artifacts:
+    name: "$[[ inputs.src-folder ]]-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
+    paths:
+      - backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release
+      - backend/canisters/$[[ inputs.src-folder ]]/api/can.did
+    expire_in: 1 day
+
+$[[ inputs.src-folder ]] canister build:
+  stage: build
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+  extends: .rust template
+  script:
+    - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
+    - scripts/generate-did.sh $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
+  artifacts:
+    name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
+    paths:
+      - backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release
+      - backend/canisters/$[[ inputs.src-folder ]]/api/can.did
+    expire_in: 6 months
