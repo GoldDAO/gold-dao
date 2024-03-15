@@ -269,6 +269,7 @@ async fn transfer_rewards(
 mod tests {
     use num_bigint::BigUint;
     use sns_governance_canister::types::{Neuron, NeuronId};
+    use types::NeuronInfo;
     use utils::consts::E8S_PER_ICP;
 
     use crate::{
@@ -289,96 +290,48 @@ mod tests {
     use super::calculate_neuron_maturity_for_interval;
 
     #[test]
-    fn test_calculate_neuron_maturity_for_interval() {
-        init_runtime_state();
+    fn test_calculate_neuron_maturity_for_first_sync() {
 
-        // ********************************
-        // 1. Insert new neuron and update its matuirty 8 times to act as a week's worth of data
-        // ********************************
-
-        //////////////////////////////////////////////
-        // neuron 1
-        //////////////////////////////////////////////
-        let neuron_id_1 =
+        let neuron_id =
             NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
                 .unwrap();
-        let mut neuron_1 = Neuron::default();
-        neuron_1.id = Some(neuron_id_1.clone());
 
-        mutate_state(|state| {
-            update_neuron_maturity(state, &neuron_1);
+        let mut state = RuntimeState::default();
+        state.data.neuron_maturity.insert(neuron_id,NeuronInfo {
+            last_synced_maturity : 100,
+            accumulated_maturity : 100,
+            rewarded_maturity: 0
         });
-
-        // day 1
-        neuron_1.maturity_e8s_equivalent = 100;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // dat 2
-        neuron_1.maturity_e8s_equivalent = 200;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 3
-        neuron_1.maturity_e8s_equivalent = 300;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 4
-        neuron_1.maturity_e8s_equivalent = 400;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 5
-        neuron_1.maturity_e8s_equivalent = 500;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 6
-        neuron_1.maturity_e8s_equivalent = 600;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 7
-        neuron_1.maturity_e8s_equivalent = 700;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 5
-        neuron_1.maturity_e8s_equivalent = 800;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
+        init_state(state);
 
         // calculate_neuron_maturity_for_interval
         read_state(|state| {
             let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);
             let maturity_for_interval = d.get(0).unwrap().1;
-            assert_eq!(maturity_for_interval, 850);
+            assert_eq!(maturity_for_interval, 100);
+        })
+    }
+
+    #[test]
+    fn test_calculate_neuron_maturity_for_nth_sync() {
+
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+
+        let mut state = RuntimeState::default();
+        state.data.neuron_maturity.insert(neuron_id,NeuronInfo {
+            last_synced_maturity : 200,
+            accumulated_maturity : 200,
+            rewarded_maturity: 123
+        });
+        init_state(state);
+
+        // calculate_neuron_maturity_for_interval
+        read_state(|state| {
+            let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);
+            let maturity_for_interval = d.get(0).unwrap().1;
+            assert_eq!(maturity_for_interval, 77);
         })
     }
 
@@ -438,89 +391,6 @@ mod tests {
             sum_rewards, reward_pool,
             "Sum of the distributed rewards should equal the initial reward pool size"
         );
-    }
-
-    #[test]
-    fn test_calculate_neuron_maturity_for_interval_second_cycle() {
-        init_runtime_state();
-
-        // ********************************
-        // 1. Insert new neuron and update its matuirty 8 times to act as a week's worth of data
-        // ********************************
-
-        //////////////////////////////////////////////
-        // neuron 1 - week 1
-        //////////////////////////////////////////////
-        let neuron_id_1 =
-            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
-                .unwrap();
-        let mut neuron_1 = Neuron::default();
-        neuron_1.id = Some(neuron_id_1.clone());
-
-        // day 1
-        mutate_state(|state| {
-            update_neuron_maturity(state, &neuron_1);
-        });
-
-        // day 2
-        neuron_1.maturity_e8s_equivalent = 100;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-        // day 3
-        neuron_1.maturity_e8s_equivalent = 150;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-
-        // calculate_neuron_maturity_for_interval for week 1
-        read_state(|state| {
-            let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);
-            let maturity_for_interval = d.get(0).unwrap().1;
-            assert_eq!(maturity_for_interval, 200);
-        });
-
-        // fake paying the first week.
-        mutate_state(|state| {
-            state
-                .data
-                .neuron_maturity
-                .get_mut(&neuron_id_1)
-                .unwrap()
-                .rewarded_maturity = 200;
-        });
-
-        // verify the latest entry for a neuron has the payment
-        read_state(|state| {
-            let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
-            assert_eq!(neuron.rewarded_maturity, 200);
-        });
-
-        //////////////////////////////////////////////
-        // neuron 1 - week 2
-        //////////////////////////////////////////////
-
-        // add more maturity
-        neuron_1.maturity_e8s_equivalent = 200;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            state.data.sync_info.last_synced_start += 100;
-            update_neuron_maturity(state, &neuron_1);
-        });
-
-        // calcualte maturity for the second week
-        read_state(|state| {
-            let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);
-            let maturity_for_interval = d.get(0).unwrap().1;
-            assert_eq!(maturity_for_interval, 50);
-        });
     }
 
     #[test]
