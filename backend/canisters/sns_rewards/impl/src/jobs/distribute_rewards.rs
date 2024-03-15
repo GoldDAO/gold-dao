@@ -329,7 +329,7 @@ mod tests {
             },
         );
         init_state(state);
-
+        
         // calculate_neuron_maturity_for_interval
         read_state(|state| {
             let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);

@@ -10,7 +10,7 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::model::{maturity_history::MaturityHistory, user_reward::UserReward};
+use crate::model::maturity_history::MaturityHistory;
 
 canister_state!(RuntimeState);
 
@@ -80,8 +80,6 @@ pub struct Data {
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
-    /// SubAccounts to hold rewards for user's neurons 
-    pub user_rewards: UserReward,
     /// OGY ledger canister id
     pub ogy_ledger_canister_id: Principal,
     /// ICP ledger canister id
@@ -97,7 +95,6 @@ impl Default for Data {
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            user_rewards : UserReward::default(),
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             ogy_ledger_canister_id: PROD_OGY_LEDGER_CANISTER_ID,
         }

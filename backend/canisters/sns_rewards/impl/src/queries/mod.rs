@@ -6,6 +6,5 @@ mod get_neuron_by_id;
 mod get_neurons_of_principal;
 mod http_request;
 mod test;
-mod get_neuron_sub_account;
 
 pub use get_neurons_of_principal::*;
