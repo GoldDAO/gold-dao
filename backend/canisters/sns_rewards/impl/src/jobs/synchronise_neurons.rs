@@ -9,7 +9,7 @@ is eligible for.
 
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
-use tracing::{ debug, error, info, warn};
+use tracing::{ debug, error, info, warn };
 use std::{ collections::btree_map, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo };
 
