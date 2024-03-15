@@ -6,7 +6,7 @@ All the different reward tokens are to be held in the 0 sub account.
 */
 
 use crate::state::{mutate_state, read_state, RuntimeState};
-use candid::{CandidType, Principal};
+use candid::Principal;
 use canister_time::{now_millis, run_interval, WEEK_IN_MS};
 use futures::future::join_all;
 use ic_ledger_types::{
@@ -14,8 +14,8 @@ use ic_ledger_types::{
 };
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use num_bigint::BigUint;
-use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
+use utils::consts::E8S_PER_ICP;
 use std::collections::BTreeMap;
 use std::time::Duration;
 use tracing::{debug, info};
@@ -83,7 +83,7 @@ pub async fn distribute_rewards() {
 }
 
 pub fn calculate_reward(percentage: BigUint, reward_pool: u64) -> u64 {
-    let reward = (BigUint::from(reward_pool) * percentage.clone()) / BigUint::from(100_000_000u64);
+    let reward = (BigUint::from(reward_pool) * percentage.clone()) / BigUint::from(E8S_PER_ICP);
     reward.try_into().expect("faild to convert bigint to u64")
 }
 
@@ -158,21 +158,12 @@ pub fn calculate_neuron_percentages(
 
             // Calculate percentage as (maturity / total_maturity) * 10000 (expressed in basis points)
             let percentage =
-                (maturity_big * BigUint::from(100_000_000u64)) / total_maturity_big.clone();
+                (maturity_big * BigUint::from(E8S_PER_ICP)) / total_maturity_big.clone();
 
             (neuron_id.clone(), percentage)
         })
         .collect()
 }
-
-#[derive(CandidType, Serialize, Deserialize)]
-struct BalanceQuery {
-    owner: Principal,
-    subaccount: Option<Subaccount>,
-}
-
-#[derive(CandidType, Deserialize)]
-struct BalanceResponse(u64);
 
 async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Tokens {
     ic_ledger_types::account_balance(
@@ -278,6 +269,7 @@ async fn transfer_rewards(
 mod tests {
     use num_bigint::BigUint;
     use sns_governance_canister::types::{Neuron, NeuronId};
+    use utils::consts::E8S_PER_ICP;
 
     use crate::{
         jobs::{
@@ -392,33 +384,26 @@ mod tests {
 
     #[test]
     fn test_neuron_percentages() {
-        // Example data with 200 neurons
         // Generate 200 neurons with unique IDs and a single maturity value
         let mut neuron_data: Vec<(NeuronId, u64)> = Vec::new();
         for _ in 0..20000 {
             let neuron_id =
                 NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
                     .unwrap();
-            neuron_data.push((neuron_id, 1)); // Using 100 as the maturity value for each neuron
+            neuron_data.push((neuron_id, 1));
         }
 
-        // Example total_maturity
         let total_maturity: u64 = neuron_data.iter().map(|(_, m)| *m).sum();
 
         // Calculate neuron percentages
         let neuron_percentages = calculate_neuron_percentages(&neuron_data, &total_maturity);
 
-        // Ensure the sum of percentages equals 10000 (total basis points)
+        // Ensure the sum of percentages equals the precision of e8s
         let sum_percentages: BigUint = neuron_percentages.iter().map(|(_, b)| b.clone()).sum();
-
-        let expected_sum = BigUint::from(100_000_000u64);
-        // let tolerance = BigUint::from(1u64); // Adjust tolerance as needed
+        let expected_sum = BigUint::from(E8S_PER_ICP);
 
         assert_eq!(expected_sum, sum_percentages);
-        // let only_percentages: Vec<BigUint> =
-        //     neuron_percentages.iter().map(|(a, b)| b.clone()).collect();
 
-        // Print the result for verification
     }
 
     #[test]
@@ -434,12 +419,9 @@ mod tests {
 
         // Example total_maturity
         let total_maturity: u64 = neuron_data.iter().map(|(_, m)| *m).sum();
+        let reward_pool = 927_235_512u64.checked_mul(E8S_PER_ICP).unwrap();
 
-        // Calculate neuron percentages
         let neuron_percentages = calculate_neuron_percentages(&neuron_data, &total_maturity);
-
-        // Example reward pool
-        let reward_pool = 10_000_000u64;
 
         // Calculate rewards based on percentages
         let rewards: Vec<(NeuronId, u64)> = neuron_percentages
@@ -450,14 +432,11 @@ mod tests {
             })
             .collect();
 
-        // Check if the sum of rewards equals the reward pool
         let sum_rewards: u64 = rewards.iter().map(|(_, reward)| *reward).sum();
-
-        // let only_rewards: Vec<u64> = rewards.iter().map(|(_, b)| b.clone()).collect();
 
         assert_eq!(
             sum_rewards, reward_pool,
-            "Sum of rewards should equal the reward pool"
+            "Sum of the distributed rewards should equal the initial reward pool size"
         );
     }
 
@@ -637,19 +616,3 @@ mod tests {
         })
     }
 }
-
-// async fn query_token_balance_icrc1(ledger_id: Principal) -> Result<Nat, String> {
-//     info!("aa processing request");
-//     let a = BalanceQuery {
-//         owner: ic_cdk::api::id(),
-//         subaccount: Some(DEFAULT_SUBACCOUNT), // Adjust according to your data type
-//     };
-//     info!("bb processing request");
-//     ic_ledger_types::
-//     if let Ok(res)  = call(ledger_id, "icrc1_balance_of", (a,)).await {
-//         return res
-//     } else {
-//         Err("failed to get icp balance".to_owned())
-//     }
-
-// }
