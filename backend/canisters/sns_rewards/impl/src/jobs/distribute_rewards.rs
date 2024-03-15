@@ -17,11 +17,11 @@ use ic_ledger_types::{
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use num_bigint::BigUint;
 use sns_governance_canister::types::NeuronId;
-use utils::consts::E8S_PER_ICP;
 use std::collections::BTreeMap;
 use std::time::Duration;
 use tracing::{debug, info};
 use types::{Milliseconds, NeuronInfo};
+use utils::consts::E8S_PER_ICP;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
 
@@ -41,8 +41,10 @@ pub async fn distribute_rewards() {
     });
 
     // 1 ) Cacluating neuron reward percentage
-    let neuron_maturity_for_interval = read_state(|state| calculate_neuron_maturity_for_interval(&state.data.neuron_maturity));
-    let total_maturity_for_all_neurons = calculate_aggregated_maturity(&neuron_maturity_for_interval);
+    let neuron_maturity_for_interval =
+        read_state(|state| calculate_neuron_maturity_for_interval(&state.data.neuron_maturity));
+    let total_maturity_for_all_neurons =
+        calculate_aggregated_maturity(&neuron_maturity_for_interval);
     let neuron_reward_percentage = calculate_neuron_percentages(
         &neuron_maturity_for_interval,
         &total_maturity_for_all_neurons,
@@ -61,7 +63,7 @@ pub async fn distribute_rewards() {
         icp_reward_pool_balance.e8s(),
         ogy_reward_pool_balance.e8s(),
         icp_ledger_id,
-        ogy_ledger_id
+        ogy_ledger_id,
     )
     .await;
 
@@ -181,7 +183,11 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Tokens {
     )
 }
 
-async fn transfer_token(ledger_id : Principal, sub_account: Subaccount, amount: u64) -> Result<u64, String> {
+async fn transfer_token(
+    ledger_id: Principal,
+    sub_account: Subaccount,
+    amount: u64,
+) -> Result<u64, String> {
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
         ledger_id,
         &(TransferArg {
@@ -217,8 +223,8 @@ async fn transfer_rewards(
     neurons: Vec<(NeuronId, BigUint)>,
     icp_balance: u64,
     ogy_balance: u64,
-    icp_ledger_id : Principal,
-    ogy_ledger_id : Principal,
+    icp_ledger_id: Principal,
+    ogy_ledger_id: Principal,
 ) -> Vec<NeuronId> {
     let mut successful_reward_transfers: Vec<NeuronId> = vec![];
     let batch_limit = 15; // 50 is the max but we do 3 transactions per neuron leaving 5 left ( 15 transactions x 3 token types + 5 retrys)
@@ -253,15 +259,13 @@ async fn transfer_rewards(
             |(neuron_id, future)| async move {
                 match future.await {
                     Ok(_) => Ok(neuron_id),
-                    Err(_) => {
-                        Err(())
-                    } // Handle error if needed
+                    Err(_) => Err(()), // Handle error if needed
                 }
             },
         ))
         .await;
 
-        // only add successful transfers to the return 
+        // only add successful transfers to the return
         successful_reward_transfers.extend(results.into_iter().filter_map(Result::ok));
     }
     successful_reward_transfers
@@ -270,40 +274,35 @@ async fn transfer_rewards(
 #[cfg(test)]
 mod tests {
     use num_bigint::BigUint;
-    use sns_governance_canister::types::{Neuron, NeuronId};
+    use sns_governance_canister::types::NeuronId;
     use types::NeuronInfo;
     use utils::consts::E8S_PER_ICP;
 
     use crate::{
-        jobs::{
-            distribute_rewards::{
-                calculate_aggregated_maturity, calculate_neuron_percentages, calculate_reward,
-                update_neuron_reward,
-            },
-            synchronise_neurons::update_neuron_maturity,
+        jobs::distribute_rewards::{
+            calculate_aggregated_maturity, calculate_neuron_percentages, calculate_reward,
+            update_neuron_reward,
         },
         state::{init_state, mutate_state, read_state, RuntimeState},
     };
-
-    fn init_runtime_state() {
-        init_state(RuntimeState::default());
-    }
 
     use super::calculate_neuron_maturity_for_interval;
 
     #[test]
     fn test_calculate_neuron_maturity_for_first_sync() {
-
         let neuron_id =
             NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
                 .unwrap();
 
         let mut state = RuntimeState::default();
-        state.data.neuron_maturity.insert(neuron_id,NeuronInfo {
-            last_synced_maturity : 100,
-            accumulated_maturity : 100,
-            rewarded_maturity: 0
-        });
+        state.data.neuron_maturity.insert(
+            neuron_id,
+            NeuronInfo {
+                last_synced_maturity: 100,
+                accumulated_maturity: 100,
+                rewarded_maturity: 0,
+            },
+        );
         init_state(state);
 
         // calculate_neuron_maturity_for_interval
@@ -316,17 +315,19 @@ mod tests {
 
     #[test]
     fn test_calculate_neuron_maturity_for_nth_sync() {
-
         let neuron_id =
             NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
                 .unwrap();
 
         let mut state = RuntimeState::default();
-        state.data.neuron_maturity.insert(neuron_id,NeuronInfo {
-            last_synced_maturity : 200,
-            accumulated_maturity : 200,
-            rewarded_maturity: 123
-        });
+        state.data.neuron_maturity.insert(
+            neuron_id,
+            NeuronInfo {
+                last_synced_maturity: 200,
+                accumulated_maturity: 200,
+                rewarded_maturity: 123,
+            },
+        );
         init_state(state);
 
         // calculate_neuron_maturity_for_interval
@@ -358,7 +359,6 @@ mod tests {
         let expected_sum = BigUint::from(E8S_PER_ICP);
 
         assert_eq!(expected_sum, sum_percentages);
-
     }
 
     #[test]
@@ -454,37 +454,32 @@ mod tests {
 
     #[test]
     fn test_update_neuron_maturity() {
-        init_runtime_state();
-
-        let neuron_id_1 =
+        let neuron_id =
             NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
                 .unwrap();
-        let mut neuron_1 = Neuron::default();
-        neuron_1.id = Some(neuron_id_1.clone());
 
-        mutate_state(|state| {
-            update_neuron_maturity(state, &neuron_1);
-        });
+        let mut state = RuntimeState::default();
+        state.data.neuron_maturity.insert(
+            neuron_id.clone(),
+            NeuronInfo {
+                last_synced_maturity: 200,
+                accumulated_maturity: 200,
+                rewarded_maturity: 0,
+            },
+        );
+        init_state(state);
+        // reward the neuron
 
-        // day 2
-        neuron_1.maturity_e8s_equivalent = 100;
-        neuron_1.staked_maturity_e8s_equivalent = Some(50);
-
-        mutate_state(|state| {
-            update_neuron_maturity(state, &neuron_1);
-        });
-
-        let rewarded_neurons = vec![neuron_id_1.clone()];
-
-        let neuron_interval_maturity = vec![(neuron_id_1.clone(), 150)];
+        let rewarded_neurons = vec![neuron_id.clone()];
+        let neuron_interval_maturity = vec![(neuron_id.clone(), 200)];
 
         mutate_state(|state| {
             update_neuron_reward(&rewarded_neurons, state, &neuron_interval_maturity);
         });
 
         read_state(|state| {
-            let updated_neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
-            assert_eq!(updated_neuron.rewarded_maturity, 150);
+            let updated_neuron = state.data.neuron_maturity.get(&neuron_id).unwrap();
+            assert_eq!(updated_neuron.rewarded_maturity, 200);
         })
     }
 }

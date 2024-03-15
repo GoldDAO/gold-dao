@@ -89,7 +89,7 @@ pub async fn synchronise_neuron_data() {
 }
 
 // Function to update neuron maturity
-pub fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
+fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
     // This function only returns Some() if the neuron is initialised or its maturity has changed
     if let Some(id) = &neuron.id {
         let updated_neuron: Option<(NeuronId, NeuronInfo)>;

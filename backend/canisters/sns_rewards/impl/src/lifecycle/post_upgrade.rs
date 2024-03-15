@@ -2,7 +2,7 @@ use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
-use tracing::{ info, warn};
+use tracing::info;
 
 use crate::{ memory::get_upgrades_memory, state::RuntimeState };
 
