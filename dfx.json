@@ -79,13 +79,13 @@
       "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz"
     },
     "gldt_explorer": {
-      "build": ["npm run postinstall", "npm run build:explorer"],
+      "build": ["npm run postinstall", "npm run build:gldt_explorer"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "source": ["client/explorer/out"],
+      "source": ["client/gldt_explorer/out"],
       "type": "assets"
     },
     "gldt_fee_compensation": {
@@ -101,14 +101,14 @@
       "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz"
     },
     "gldt_landing_page": {
-      "build": ["npm run postinstall", "npm run build:landing"],
+      "build": ["npm run postinstall", "npm run build:gldt_landing_page"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
       "frontend": {},
-      "source": ["client/landing_page/out"],
+      "source": ["client/gldt_landing_page/out"],
       "type": "assets"
     },
     "gldt_ledger": {
@@ -132,14 +132,14 @@
       "wasm": "https://download.dfinity.systems/ic/3bcccef07408921fe849c92dd2437adc157ef9c3/canisters/ic-icrc1-index-ng.wasm.gz"
     },
     "gldt_swap_app": {
-      "build": ["npm run postinstall", "npm run build:back", "npm run build:swap_app"],
+      "build": ["npm run postinstall", "npm run build:back", "npm run build:gldt_swap_app"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
       "frontend": {},
-      "source": ["client/swap_app/out"],
+      "source": ["client/gldt_swap_app/out"],
       "type": "assets"
     },
     "icp_neuron": {

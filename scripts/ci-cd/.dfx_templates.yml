@@ -13,12 +13,12 @@
   script:
     - . scripts/parse_proposal_details.sh
     - . scripts/prepare_sns_canister_ids.sh staging
-    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y ${CANISTER_NAME}
     - >
       quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_STAGING
       --pem-file $PEM_FILE
-      --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.staging)
-      --wasm-path /builds/gldt/gldt-swap/.dfx/local/canisters/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --target-canister-id $(cat canister_ids.json | jq -r .${CANISTER_NAME}.staging)
+      --wasm-path /builds/gldt/gldt-swap/.dfx/local/canisters/${CANISTER_NAME}/${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_SHORT_SHA}"
       --url ${DETAILS_URL} --summary-path proposal.md | quill send $TEST_QUILL --yes -
 
@@ -26,11 +26,11 @@
   script:
     - . scripts/parse_proposal_details.sh
     - . scripts/prepare_sns_canister_ids.sh ic
-    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y gldt_${CANISTER_NAME}
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y ${CANISTER_NAME}
     - >
       quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_PRODUCTION
       --pem-file $PEM_FILE
-      --target-canister-id $(cat canister_ids.json | jq -r .gldt_${CANISTER_NAME}.ic)
-      --wasm-path /builds/gldt/gldt-swap/.dfx/local/canisters/gldt_${CANISTER_NAME}/gldt_${CANISTER_NAME}.wasm.gz
+      --target-canister-id $(cat canister_ids.json | jq -r .${CANISTER_NAME}.ic)
+      --wasm-path /builds/gldt/gldt-swap/.dfx/local/canisters/${CANISTER_NAME}/${CANISTER_NAME}.wasm.gz
       --title "Upgrade ${CANISTER_NAME} to ${CI_COMMIT_TAG}"
       --url ${DETAILS_URL} --summary-path proposal.md | quill send $TEST_QUILL --yes -

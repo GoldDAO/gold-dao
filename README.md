@@ -75,9 +75,9 @@ All frontends are developed in React, using the NextJS compiler to generate the 
 To launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/):
 
 ```sh
-npm run dev:swap_app # For the swap application frontend
-npm run dev:landing_page # For the main landing page
-npm run dev:explorer # For the GLDT explorer frontend
+npm run dev:gldt_swap_app # For the GLDT swap application frontend
+npm run dev:gldt_landing_page # For the GLDT main landing page
+npm run dev:gldt_explorer # For the GLDT explorer frontend
 ```
 
 The frontend development server will be available at `http://localhost:3000`.

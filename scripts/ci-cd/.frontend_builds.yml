@@ -2,7 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options: ["swap_app", "landing_page", "explorer"]
+      options: ["gldt_swap_app", "gldt_landing_page", "gldt_explorer"]
 ---
 # Frontend builds
 
@@ -27,7 +27,7 @@ $[[ inputs.src-folder ]] staging build:
   needs: ["gldt_core canister build", "generate declarations"]
   extends: .node template
   variables:
-    CANISTER_NAME: "gldt_$[[ inputs.src-folder ]]"
+    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging"
   script:
     - npm run build:$[[ inputs.src-folder ]]
@@ -56,7 +56,7 @@ $[[ inputs.src-folder ]] production build:
   needs: ["gldt_core canister build", "generate declarations"]
   extends: .node template
   variables:
-    CANISTER_NAME: "gldt_$[[ inputs.src-folder ]]"
+    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic"
   script:
     - npm run build:$[[ inputs.src-folder ]]

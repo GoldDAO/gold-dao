@@ -86,8 +86,8 @@ echo -e "gldt_ledger    \033[1m${GLDT_LEDGER_ID}\033[0m${IMPORTANT_MSG}"
 export GLDT_LEDGER_INDEXER_ID=$(check_and_create_canister gldt_ledger_indexer $NETWORK 1073741824)
 export GLDT_FRONT_ID=$(check_and_create_canister gldt_swap_app $NETWORK)
 echo -e "gldt_swap_app  \033[1m${GLDT_FRONT_ID}\033[0m${IMPORTANT_MSG}\n"
-export GLDT_LANDING_ID=$(check_and_create_canister gldt_landing_page $NETWORK)
-echo -e "gldt_landing_page  \033[1m${GLDT_LANDING_ID}\033[0m${IMPORTANT_MSG}\n"
+export GLDT_LANDING_PAGE_ID=$(check_and_create_canister gldt_landing_page $NETWORK)
+echo -e "gldt_landing_page  \033[1m${GLDT_LANDING_PAGE_ID}\033[0m${IMPORTANT_MSG}\n"
 export GLDT_EXPLORER_ID=$(check_and_create_canister gldt_explorer $NETWORK)
 echo -e "gldt_explorer  \033[1m${GLDT_EXPLORER_ID}\033[0m${IMPORTANT_MSG}\n"
 export GLDT_COMPENSATION_ID=$(check_and_create_canister gldt_fee_compensation $NETWORK 1073741824)
