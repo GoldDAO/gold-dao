@@ -1,0 +1,19 @@
+FROM rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
+
+# Default value, will be overwritten at runtime if `-e CANISTER_NAME=$CANISTER_NAME` is set
+ENV CANISTER_NAME=gldt_core
+
+RUN apt update > /dev/null && \
+    apt install -y wget build-essential pkg-config libssl-dev > /dev/null
+RUN rustup component add clippy
+RUN rustup target add wasm32-unknown-unknown
+RUN mkdir -pv .cargo
+RUN cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
+
+ENV PATH="/.cargo/bin:$PATH"
+
+COPY . /builds/gldt/gldt-swap
+
+WORKDIR /builds/gldt/gldt-swap
+
+ENTRYPOINT [ "/builds/gldt/gldt-swap/build/docker-entrypoint.sh" ]

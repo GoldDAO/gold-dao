@@ -1,0 +1,8 @@
+{
+  "governance_canister_id": "tr3th-kiaaa-aaaaq-aab6q-cai",
+  "ledger_canister_id": "tyyy3-4aaaa-aaaaq-aab7a-cai",
+  "root_canister_id": "tw2vt-hqaaa-aaaaq-aab6a-cai",
+  "index_canister_id": "efv5g-kqaaa-aaaaq-aacaa-cai",
+  "swap_canister_id": "t7z6p-ryaaa-aaaaq-aab7q-cai",
+  "dapp_canister_id_list": ["oh54a-baaaa-aaaap-abryq-cai"]
+}
