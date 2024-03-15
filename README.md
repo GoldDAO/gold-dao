@@ -10,9 +10,9 @@ See the [official website](https://gldt.org/) for more informations about the pr
 
 All the backend canisters are included in the folder [`backend/canisters`](backend/canisters/). This includes
 
-- [`gldt_core`](backend/canisters/gldt_core/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
+- [`gldt_core (WIP)`](backend/canisters/gldt_core/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
 - [`icp_neuron`](backend/canisters/icp_neuron/): The canister that controls the ICP neurons of the Gold DAO.
-- [`sns_rewards`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
+- [`sns_rewards (WIP)`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
 
 ### Frontend canisters
 
