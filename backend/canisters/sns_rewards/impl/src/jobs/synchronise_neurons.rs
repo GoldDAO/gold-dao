@@ -109,7 +109,6 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
             }
             btree_map::Entry::Occupied(mut entry) => {
                 let neuron_info_entry = entry.get_mut();
-
                 if let Some(delta) = maturity.checked_sub(neuron_info_entry.last_synced_maturity) {
                     // only add the difference if the maturity has increased
                     if delta == 0 {
