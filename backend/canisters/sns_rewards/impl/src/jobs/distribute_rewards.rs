@@ -237,20 +237,24 @@ async fn transfer_rewards(
             if *percentage_to_reward <= BigUint::from(0u64) {
                 continue; // skip payment since this neuron 0 percentage
             }
-            // user's sub account
             let sub_account = Subaccount(neuron_id.into());
             // icp
-            let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance);
-            transfer_futures.push((
-                neuron_id.clone(),
-                transfer_token(icp_ledger_id, sub_account, icp_reward),
-            ));
+            if icp_balance > 0 {
+                let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance);
+                transfer_futures.push((
+                    neuron_id.clone(),
+                    transfer_token(icp_ledger_id, sub_account, icp_reward),
+                ));
+            }
+
             // ogy
-            let ogy_reward = calculate_reward(percentage_to_reward.clone(), ogy_balance);
-            transfer_futures.push((
-                neuron_id.clone(),
-                transfer_token(ogy_ledger_id, sub_account, ogy_reward),
-            ));
+            if ogy_balance > 0 {
+                let ogy_reward = calculate_reward(percentage_to_reward.clone(), ogy_balance);
+                transfer_futures.push((
+                    neuron_id.clone(),
+                    transfer_token(ogy_ledger_id, sub_account, ogy_reward),
+                ));
+            }
 
             // TODO goldgov
         }
