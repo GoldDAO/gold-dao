@@ -6,6 +6,7 @@
 # $ export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
 # $ docker ...
 
+# uncomment this line for ARM chips (e.g. Apple M1)
 arch: "x86_64"
 
 # This template requires Lima v0.8.0 or later
