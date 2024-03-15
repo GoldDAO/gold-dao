@@ -113,7 +113,7 @@ docker build -t gld_reproducible_build -f ./build/Dockerfile_backend .
 
 ### Running the Reproducible Build
 
-Define the canister you want to build
+Define the canister you want to build. Check the valid canister names in section [Backend Canisters](#backend-canisters).
 
 ```sh
 export CANISTER_NAME=<THE_CANISTER_NAME>
@@ -128,7 +128,7 @@ export CANISTER_NAME=gldt_core
 Build the canister
 
 ```sh
-docker run -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ gld_reproducible_build
+docker run -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ -e CANISTER_NAME=$CANISTER_NAME gld_reproducible_build
 ```
 
 ### Generated WASM Files
