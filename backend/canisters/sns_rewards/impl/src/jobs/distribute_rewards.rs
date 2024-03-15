@@ -248,8 +248,7 @@ async fn transfer_rewards(
             let sub_account = Subaccount(neuron_id.into());
             // icp
             if icp_balance > BigUint::from(0u64) {
-                let icp_balance = BigUint::from(300_000u64);
-                let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance);
+                let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance.clone());
                 transfer_futures.push((
                     neuron_id.clone(),
                     transfer_token(icp_ledger_id, sub_account, icp_reward),
@@ -317,7 +316,6 @@ mod tests {
             },
         );
         init_state(state);
-
         // calculate_neuron_maturity_for_interval
         read_state(|state| {
             let d = calculate_neuron_maturity_for_interval(&state.data.neuron_maturity);
