@@ -8,18 +8,18 @@ Individual neuron rewards are transferred to a sub account based on the NeuronId
 */
 
 use crate::state::{mutate_state, read_state, RuntimeState};
-use candid::Principal;
+use candid::{Nat, Principal};
 use canister_time::{now_millis, run_interval, WEEK_IN_MS};
 use futures::future::join_all;
 use ic_ledger_types::{
-    AccountBalanceArgs, AccountIdentifier, Subaccount, Tokens, DEFAULT_SUBACCOUNT,
+    Subaccount, DEFAULT_SUBACCOUNT,
 };
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use num_bigint::BigUint;
 use sns_governance_canister::types::NeuronId;
 use std::collections::BTreeMap;
 use std::time::Duration;
-use tracing::{debug, info};
+use tracing::{debug, error, info};
 use types::{Milliseconds, NeuronInfo};
 use utils::consts::E8S_PER_ICP;
 
@@ -35,6 +35,7 @@ pub fn run() {
 
 pub async fn distribute_rewards() {
     // Metrics
+    info!("|||| DISTRIBUTION START |||||");
     let time_start = now_millis();
     mutate_state(|state| {
         state.data.sync_info.last_distribution_start = time_start;
@@ -60,9 +61,9 @@ pub async fn distribute_rewards() {
     // 4 ) Pay all sub accounts
     let sucessful_neuron_transfers = transfer_rewards(
         neuron_reward_percentage,
-        icp_reward_pool_balance.e8s(),
-        ogy_reward_pool_balance.e8s(),
-        icp_ledger_id,
+        icp_reward_pool_balance.0,
+        ogy_reward_pool_balance.0,
+        icp_ledger_id,//
         ogy_ledger_id,
     )
     .await;
@@ -86,8 +87,8 @@ pub async fn distribute_rewards() {
     );
 }
 
-pub fn calculate_reward(percentage: BigUint, reward_pool: u64) -> u64 {
-    let reward = (BigUint::from(reward_pool) * percentage.clone()) / BigUint::from(E8S_PER_ICP);
+pub fn calculate_reward(percentage: BigUint, reward_pool: BigUint) -> u64 {
+    let reward = (reward_pool * percentage.clone()) / BigUint::from(E8S_PER_ICP);
     reward.try_into().expect("faild to convert bigint to u64")
 }
 
@@ -169,18 +170,25 @@ pub fn calculate_neuron_percentages(
         .collect()
 }
 
-async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Tokens {
-    ic_ledger_types::account_balance(
+async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
+    match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
-        AccountBalanceArgs {
-            account: AccountIdentifier::new(&ic_cdk::api::id(), &DEFAULT_SUBACCOUNT),
+        &Account {
+            owner: ic_cdk::api::id(),
+            subaccount: Some(DEFAULT_SUBACCOUNT.0),
         },
     )
     .await
-    .expect(
-        format!("Failed to fetch token balance of ledger canister id {ledger_canister_id}")
-            .as_str(),
-    )
+    {
+        Ok(t) => {
+            info!("Success - querying balance of {} - has {}", ledger_canister_id, t);
+            t
+        },
+        Err(e) => {
+            error!("Fail - to fetch token balance of ledger canister id {ledger_canister_id} with ERROR_CODE : {} . MESSAGE", e.1);
+            Nat::from(0u64)
+        }
+    }
 }
 
 async fn transfer_token(
@@ -221,8 +229,8 @@ async fn transfer_token(
 
 async fn transfer_rewards(
     neurons: Vec<(NeuronId, BigUint)>,
-    icp_balance: u64,
-    ogy_balance: u64,
+    icp_balance: BigUint,
+    ogy_balance: BigUint,
     icp_ledger_id: Principal,
     ogy_ledger_id: Principal,
 ) -> Vec<NeuronId> {
@@ -239,7 +247,8 @@ async fn transfer_rewards(
             }
             let sub_account = Subaccount(neuron_id.into());
             // icp
-            if icp_balance > 0 {
+            if icp_balance > BigUint::from(0u64) {
+                let icp_balance = BigUint::from(300_000u64);
                 let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance);
                 transfer_futures.push((
                     neuron_id.clone(),
@@ -248,8 +257,8 @@ async fn transfer_rewards(
             }
 
             // ogy
-            if ogy_balance > 0 {
-                let ogy_reward = calculate_reward(percentage_to_reward.clone(), ogy_balance);
+            if ogy_balance.clone() > BigUint::from(0u64) {
+                let ogy_reward = calculate_reward(percentage_to_reward.clone(), ogy_balance.clone());
                 transfer_futures.push((
                     neuron_id.clone(),
                     transfer_token(ogy_ledger_id, sub_account, ogy_reward),
@@ -378,7 +387,7 @@ mod tests {
 
         // Example total_maturity
         let total_maturity: u64 = neuron_data.iter().map(|(_, m)| *m).sum();
-        let reward_pool = 927_235_512u64.checked_mul(E8S_PER_ICP).unwrap();
+        let reward_pool = BigUint::from(927_235_512u64.checked_mul(E8S_PER_ICP).unwrap());
 
         let neuron_percentages = calculate_neuron_percentages(&neuron_data, &total_maturity);
 
@@ -386,12 +395,13 @@ mod tests {
         let rewards: Vec<(NeuronId, u64)> = neuron_percentages
             .iter()
             .map(|(neuron_id, percentage)| {
-                let reward = calculate_reward(percentage.clone(), reward_pool);
+                let reward = calculate_reward(percentage.clone(), reward_pool.clone());
                 (neuron_id.clone(), reward)
             })
             .collect();
-
-        let sum_rewards: u64 = rewards.iter().map(|(_, reward)| *reward).sum();
+        
+        let sum_rewards : u64 = rewards.iter().map(|(_, reward)| *reward).sum();
+        let sum_rewards = BigUint::from(sum_rewards);
 
         assert_eq!(
             sum_rewards, reward_pool,
