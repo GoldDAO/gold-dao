@@ -15,6 +15,4 @@ COPY . /builds/gldt/gldt-swap
 
 WORKDIR /builds/gldt/gldt-swap
 
-CMD ./scripts/build-canister.sh --wasmonly $CANISTER_NAME && \
-    ./scripts/generate-did.sh $CANISTER_NAME && \
-    ./scripts/build-canister.sh $CANISTER_NAME
+ENTRYPOINT [ "/builds/gldt/gldt-swap/build/docker-entrypoint.sh" ]
