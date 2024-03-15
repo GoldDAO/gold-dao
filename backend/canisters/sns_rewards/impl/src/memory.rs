@@ -28,4 +28,3 @@ pub fn get_maturity_history_memory() -> VM {
 fn get_memory(id: MemoryId) -> VM {
     MEMORY_MANAGER.with(|m| m.get(id))
 }
-
