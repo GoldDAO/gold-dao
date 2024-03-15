@@ -30,7 +30,5 @@ stable_memory = { path = '../../../libraries/stable_memory' }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
-sha256 = { path = "../../../libraries/sha256" }
 futures = { workspace = true }
-serde_json = {workspace = true}
 num-bigint = {workspace = true}
