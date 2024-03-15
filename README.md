@@ -93,8 +93,9 @@ npm run build
 ### Install Lima
 
 Follow the instructions at [https://github.com/lima-vm/lima#installation](https://github.com/lima-vm/lima#installation).
-You can use this config file to start: [https://github.com/lima-vm/lima/blob/master/examples/docker.yaml](https://github.com/lima-vm/lima/blob/master/examples/docker.yaml)
-and run (make sure to replace `<YOUR-USER>` with your local user):
+You can use this config file to start: [https://github.com/lima-vm/lima/blob/master/examples/docker.yaml](https://github.com/lima-vm/lima/blob/master/examples/docker.yaml) and run the commands below.
+
+Note: If you are running on an ARM chip (e.g. Apple M1), you have to add the line `arch: "x86_64"` to the top of the `docker.yaml` file (see more infos about this [here](https://lima-vm.io/docs/config/multi-arch/)). This will drastically reduce the execution speed of this (building can take >1hr), however, is required on ARM chips! See [`build/docker.yaml`](build/docker.yaml) for an example.
 
 ```sh
 limactl start docker.yaml
@@ -140,8 +141,13 @@ docker run -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME
 
 ### Verify the integrity of the files by computing their SHA256 hashes
 
-We are currently using the \$CANISTER_NAME_canister.wasm.gz in production, so you can check using :
-`shasum -a 256 /tmp/lima/$CANISTER_NAME_canister.wasm.gz`
+We are currently using the `$CANISTER_NAME_canister.wasm.gz` in production, so you can check using:
+
+```sh
+shasum -a 256 /tmp/lima/${CANISTER_NAME}_canister.wasm.gz
+```
+
+Compare this value to the wasm hash that is provided with the upgrade proposal.
 
 ## Technical documentation
 
