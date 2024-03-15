@@ -27,10 +27,16 @@ pub const ICP_LEDGER_CANISTER_ID: CanisterId = Principal::from_slice(
 pub const CYCLES_MINTING_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 0, 0, 0, 4, 1, 1]
 );
-
 pub const FAKENET_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 1, 112, 26, 234, 1, 1]
 );
+pub const DEV_OGY_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 80, 17, 179, 1, 1]
+);
+pub const PROD_OGY_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 32, 0, 185, 1, 1]
+);
+
 
 #[cfg(test)]
 mod tests {
@@ -105,6 +111,21 @@ mod tests {
         assert_eq!(
             FAKENET_LEDGER_CANISTER_ID,
             Principal::from_text("ete3q-rqaaa-aaaal-qdlva-cai").unwrap()
+        )
+    }
+
+    #[test]
+    fn ogy_ledger_canister_id_dev(){
+        assert_eq!(
+            DEV_OGY_LEDGER_CANISTER_ID,
+            Principal::from_text("kfsak-7aaaa-aaaak-qcgzq-cai").unwrap()
+        )
+    }
+    #[test]
+    fn ogy_ledger_canister_id_prod(){
+        assert_eq!(
+            PROD_OGY_LEDGER_CANISTER_ID,
+            Principal::from_text("jwcfb-hyaaa-aaaaj-aac4q-cai").unwrap()
         )
     }
 }

@@ -5,7 +5,7 @@ use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::{ICP_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
+    consts::{ICP_LEDGER_CANISTER_ID, PROD_OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
@@ -83,7 +83,7 @@ pub struct Data {
     /// SubAccounts to hold rewards for user's neurons 
     pub user_rewards: UserReward,
     /// OGY ledger canister id
-    pub ogy_ledger_canister: Principal,
+    pub ogy_ledger_canister_id: Principal,
     /// ICP ledger canister id
     pub icp_ledger_canister_id: Principal,
 
@@ -91,18 +91,15 @@ pub struct Data {
 
 impl Default for Data {
     fn default() -> Self {
-
-        let ogy_ledger_canister_id = Principal::from_text("jwcfb-hyaaa-aaaaj-aac4q-cai").expect("failed to parse OGY ledger canister id");
-
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
-            ogy_ledger_canister: ogy_ledger_canister_id,
             neuron_maturity: BTreeMap::new(),
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
             user_rewards : UserReward::default(),
-            icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID
+            icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
+            ogy_ledger_canister_id: PROD_OGY_LEDGER_CANISTER_ID,
         }
     }
 }

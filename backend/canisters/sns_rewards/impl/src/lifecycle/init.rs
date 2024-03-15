@@ -2,7 +2,7 @@ use candid::CandidType;
 use ic_cdk_macros::init;
 use serde::Deserialize;
 use tracing::info;
-use utils::env::CanisterEnv;
+use utils::{consts::{DEV_OGY_LEDGER_CANISTER_ID, FAKENET_LEDGER_CANISTER_ID, ICP_LEDGER_CANISTER_ID, PROD_OGY_LEDGER_CANISTER_ID}, env::CanisterEnv};
 
 use crate::state::{ Data, RuntimeState };
 
@@ -18,7 +18,11 @@ fn init(args: Args) {
     canister_logger::init(args.test_mode);
 
     let env = CanisterEnv::new(args.test_mode);
-    let data = Data::default();
+    let mut data = Data::default();
+
+    // use staging canister ids
+    data.icp_ledger_canister_id = if args.test_mode { FAKENET_LEDGER_CANISTER_ID } else { ICP_LEDGER_CANISTER_ID }; 
+    data.ogy_ledger_canister_id = if args.test_mode { DEV_OGY_LEDGER_CANISTER_ID } else { PROD_OGY_LEDGER_CANISTER_ID }; 
 
     let runtime_state = RuntimeState::new(env, data);
 
