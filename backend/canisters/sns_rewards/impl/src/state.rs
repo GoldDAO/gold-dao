@@ -5,7 +5,7 @@ use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::{ICP_LEDGER_CANISTER_ID, PROD_OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
+    consts::{ICP_LEDGER_CANISTER_ID, PROD_OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID, SNS_LEDGER_CANISTER_ID},
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
@@ -84,6 +84,8 @@ pub struct Data {
     pub ogy_ledger_canister_id: Principal,
     /// ICP ledger canister id
     pub icp_ledger_canister_id: Principal,
+    /// GLDGov ledger canister id
+    pub gldgov_ledger_canister_id: Principal,
 
 }
 
@@ -97,6 +99,7 @@ impl Default for Data {
             maturity_history: MaturityHistory::default(),
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             ogy_ledger_canister_id: PROD_OGY_LEDGER_CANISTER_ID,
+            gldgov_ledger_canister_id: SNS_LEDGER_CANISTER_ID,
         }
     }
 }

@@ -36,6 +36,9 @@ pub const DEV_OGY_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
 pub const PROD_OGY_LEDGER_CANISTER_ID : CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 1, 32, 0, 185, 1, 1]
 );
+pub const SNS_LEDGER_CANISTER_ID_STAGING : CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 224, 14, 185, 1, 1]
+);
 
 
 #[cfg(test)]
@@ -71,6 +74,14 @@ mod tests {
         assert_eq!(
             SNS_LEDGER_CANISTER_ID,
             Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn sns_ledger_canister_id_dev() {
+        assert_eq!(
+            SNS_LEDGER_CANISTER_ID_STAGING,
+            Principal::from_text("irhm6-5yaaa-aaaap-ab24q-cai").unwrap()
         );
     }
 

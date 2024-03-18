@@ -54,17 +54,21 @@ pub async fn distribute_rewards() {
     // 2 ) Get balances of all reward pools
     let icp_ledger_id = read_state(|state| state.data.icp_ledger_canister_id);
     let ogy_ledger_id = read_state(|state| state.data.ogy_ledger_canister_id);
+    let gldgov_ledger_id = read_state(|state| state.data.gldgov_ledger_canister_id);
 
     let icp_reward_pool_balance = fetch_reward_pool_balance(icp_ledger_id).await;
     let ogy_reward_pool_balance = fetch_reward_pool_balance(ogy_ledger_id).await;
+    let gldgov_reward_pool_balance = fetch_reward_pool_balance(gldgov_ledger_id).await;
 
     // 4 ) Pay all sub accounts
     let sucessful_neuron_transfers = transfer_rewards(
         neuron_reward_percentage,
         icp_reward_pool_balance.0,
         ogy_reward_pool_balance.0,
+        gldgov_reward_pool_balance.0,
         icp_ledger_id,//
         ogy_ledger_id,
+        gldgov_ledger_id
     )
     .await;
 
@@ -231,8 +235,10 @@ async fn transfer_rewards(
     neurons: Vec<(NeuronId, BigUint)>,
     icp_balance: BigUint,
     ogy_balance: BigUint,
+    gldgov_balance: BigUint,
     icp_ledger_id: Principal,
     ogy_ledger_id: Principal,
+    gldgov_ledger_id: Principal,
 ) -> Vec<NeuronId> {
     let mut successful_reward_transfers: Vec<NeuronId> = vec![];
     let batch_limit = 15; // 50 is the max but we do 3 transactions per neuron leaving 5 left ( 15 transactions x 3 token types + 5 retrys)
@@ -265,6 +271,13 @@ async fn transfer_rewards(
             }
 
             // TODO goldgov
+            if gldgov_balance.clone() > BigUint::from(0u64) {
+                let gldgov_reward = calculate_reward(percentage_to_reward.clone(), gldgov_balance.clone());
+                transfer_futures.push((
+                    neuron_id.clone(),
+                    transfer_token(gldgov_ledger_id, sub_account, gldgov_reward),
+                ));
+            }
         }
 
         let results = join_all(transfer_futures.into_iter().map(
