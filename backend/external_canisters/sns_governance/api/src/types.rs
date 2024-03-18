@@ -89,6 +89,12 @@ impl<'a> From<&'a NeuronId> for [u8; 32] {
     }
 }
 
+impl From<[u8; 32]> for NeuronId {
+    fn from(value: [u8; 32]) -> Self {
+        return Self { id : value.to_vec() }
+    }
+} 
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {

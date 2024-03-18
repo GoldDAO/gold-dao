@@ -270,8 +270,8 @@ async fn transfer_rewards(
 
         let results = join_all(transfer_futures).await;
 
-        let results : Vec<Subaccount> = results.into_iter().filter_map(|r| match r {
-            Ok(value) => Some(value),
+        let results : Vec<NeuronId> = results.into_iter().filter_map(|r| match r {
+            Ok(value) => Some(NeuronId::from(value.0)),
             Err(_) => None, // Handle error if needed
         }).collect();
         
