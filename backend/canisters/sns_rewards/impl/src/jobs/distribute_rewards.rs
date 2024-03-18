@@ -199,7 +199,7 @@ async fn transfer_token(
     ledger_id: Principal,
     sub_account: Subaccount,
     amount: u64,
-) -> Result<u64, String> {
+) -> Result<Subaccount, String> {
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
         ledger_id,
         &(TransferArg {
@@ -216,18 +216,9 @@ async fn transfer_token(
     )
     .await
     {
-        Ok(Ok(_)) => {
-            debug!("!!! TRANSFER SUCCESS !!!");
-            Ok(1)
-        }
-        Ok(Err(error)) => {
-            debug!("!!! TRANSFER ERROR!!! error : {}", error);
-            return Err(format!("Transfer error: {error:?}"));
-        }
-        Err(error) => {
-            debug!("!!! TRANSFER ERROR!!! error : {}", error.1);
-            return Err(format!("Network error: {error:?}"));
-        }
+        Ok(Ok(_)) => Ok(sub_account),
+        Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
+        Err(error) => Err(format!("Network error: {error:?}"))
     }
 }
 
@@ -255,43 +246,38 @@ async fn transfer_rewards(
             // icp
             if icp_balance > BigUint::from(0u64) {
                 let icp_reward = calculate_reward(percentage_to_reward.clone(), icp_balance.clone());
-                transfer_futures.push((
-                    neuron_id.clone(),
+                transfer_futures.push(
                     transfer_token(icp_ledger_id, sub_account, icp_reward),
-                ));
+                );
             }
 
             // ogy
             if ogy_balance.clone() > BigUint::from(0u64) {
                 let ogy_reward = calculate_reward(percentage_to_reward.clone(), ogy_balance.clone());
-                transfer_futures.push((
-                    neuron_id.clone(),
+                transfer_futures.push(
                     transfer_token(ogy_ledger_id, sub_account, ogy_reward),
-                ));
+                );
             }
 
             // TODO goldgov
             if gldgov_balance.clone() > BigUint::from(0u64) {
                 let gldgov_reward = calculate_reward(percentage_to_reward.clone(), gldgov_balance.clone());
-                transfer_futures.push((
-                    neuron_id.clone(),
+                transfer_futures.push(
                     transfer_token(gldgov_ledger_id, sub_account, gldgov_reward),
-                ));
+                );
             }
         }
 
-        let results = join_all(transfer_futures.into_iter().map(
-            |(neuron_id, future)| async move {
-                match future.await {
-                    Ok(_) => Ok(neuron_id),
-                    Err(_) => Err(()), // Handle error if needed
-                }
-            },
-        ))
-        .await;
+        let results = join_all(transfer_futures).await;
+
+        let results : Vec<Subaccount> = results.into_iter().filter_map(|r| match r {
+            Ok(value) => Some(value),
+            Err(_) => None, // Handle error if needed
+        }).collect();
+        
 
         // only add successful transfers to the return
-        successful_reward_transfers.extend(results.into_iter().filter_map(Result::ok));
+        successful_reward_transfers.extend(results);
     }
     successful_reward_transfers
 }
