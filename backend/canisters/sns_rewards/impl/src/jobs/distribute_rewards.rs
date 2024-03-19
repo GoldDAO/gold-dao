@@ -36,26 +36,29 @@ pub async fn distribute_rewards() {
 
     let reward_tokens = vec![Token::ICP, Token::OGY, Token::GLDGov];
     for token in reward_tokens {
-        // 1 check if new rewards have arrived
+        // check reward pool has a balance
         let tokens_to_distribute = fetch_reward_pool_balance(token).await;
         if tokens_to_distribute == 0 {
             return;
         }
 
+        // maturity delta per neuron
         let neuron_maturity_for_interval = read_state(|state|
             calculate_neuron_maturity_for_interval(&state.data.neuron_maturity, &token)
         );
-        // produces - (neuron_id, reward_e8s)
+
+        // rewards per neuron
         let neuron_share = calculate_neuron_shares(
-            neuron_maturity_per_interval,
+            neuron_maturity_for_interval,
             tokens_to_distribute
         );
 
-        // set a payment round in stable memory ?
+        // create a payment round
     }
 
+    // get payment rounds that need to be processed
     // process payment rounds
-    let successful_neuron_transfers = transfer_rewards(token, neuron_share);
+    // let successful_neuron_transfers = transfer_rewards(token, neuron_share);
 }
 
 pub fn calculate_neuron_maturity_for_interval(
@@ -74,6 +77,35 @@ pub fn calculate_neuron_maturity_for_interval(
                 .checked_sub(previous_rewarded)
                 .expect("overflow calculating maturity delta");
             (neuron_id.clone(), delta_maturity)
+        })
+        .collect()
+}
+
+pub fn calculate_neuron_shares(
+    neuron_deltas: Vec<(NeuronId, u64)>,
+    reward_pool: Nat
+) -> Vec<(NeuronId, u64)> {
+    let total_maturity: u64 = neuron_deltas
+        .iter()
+        .map(|entry| entry.1)
+        .sum();
+
+    let total_maturity_big = BigUint::try_from(total_maturity.clone()).unwrap();
+    let reward_pool_big = BigUint::from(reward_pool);
+    // Calculate the reward for each neuron
+    neuron_deltas
+        .iter()
+        .map(|(neuron_id, maturity)| {
+            // Convert maturity to BigUint
+            let maturity_big = BigUint::try_from(*maturity).unwrap();
+
+            // Calculate percentage as (maturity / total_maturity) * 10000 (expressed in basis points)
+            let percentage =
+                (maturity_big * BigUint::from(E8S_PER_ICP)) / total_maturity_big.clone();
+
+            let reward = (reward_pool_big * percentage) / BigUint::from(E8S_PER_ICP);
+            let reward: u64 = reward.try_into().expect("failed to convert bigint to u64");
+            (neuron_id.clone(), reward)
         })
         .collect()
 }
