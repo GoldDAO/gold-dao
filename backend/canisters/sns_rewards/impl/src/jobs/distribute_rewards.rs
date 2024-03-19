@@ -18,7 +18,7 @@ use sns_governance_canister::types::NeuronId;
 use std::collections::BTreeMap;
 use std::time::Duration;
 use tracing::{ debug, error, info };
-use types::{ Milliseconds, NeuronInfo };
+use types::{ Milliseconds, NeuronInfo, Token };
 use utils::consts::E8S_PER_ICP;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
@@ -32,60 +32,50 @@ pub fn run() {
 }
 
 pub async fn distribute_rewards() {
-    // Metrics
-    info!("|||| DISTRIBUTION START |||||");
-    let time_start = now_millis();
-    mutate_state(|state| {
-        state.data.sync_info.last_distribution_start = time_start;
-    });
+    // check if there are any payment rounds still present. if we still have a payment round present then go straight to transfers otherwise creating payment rounds.
 
-    // 1 ) Cacluating neuron reward percentage
-    let neuron_maturity_for_interval = read_state(|state|
-        calculate_neuron_maturity_for_interval(&state.data.neuron_maturity)
-    );
-    let total_maturity_for_all_neurons = calculate_aggregated_maturity(
-        &neuron_maturity_for_interval
-    );
-    let neuron_reward_percentage = calculate_neuron_percentages(
-        &neuron_maturity_for_interval,
-        &total_maturity_for_all_neurons
-    );
+    let reward_tokens = vec![Token::ICP, Token::OGY, Token::GLDGov];
+    for token in reward_tokens {
+        // 1 check if new rewards have arrived
+        let tokens_to_distribute = fetch_reward_pool_balance(token).await;
+        if tokens_to_distribute == 0 {
+            return;
+        }
 
-    // 2 ) Get balances of all reward pools
-    let icp_ledger_id = read_state(|state| state.data.icp_ledger_canister_id);
-    let ogy_ledger_id = read_state(|state| state.data.ogy_ledger_canister_id);
-    let gldgov_ledger_id = read_state(|state| state.data.gldgov_ledger_canister_id);
+        let neuron_maturity_for_interval = read_state(|state|
+            calculate_neuron_maturity_for_interval(&state.data.neuron_maturity, &token)
+        );
+        // produces - (neuron_id, reward_e8s)
+        let neuron_share = calculate_neuron_shares(
+            neuron_maturity_per_interval,
+            tokens_to_distribute
+        );
 
-    let icp_reward_pool_balance = fetch_reward_pool_balance(icp_ledger_id).await;
-    let ogy_reward_pool_balance = fetch_reward_pool_balance(ogy_ledger_id).await;
-    let gldgov_reward_pool_balance = fetch_reward_pool_balance(gldgov_ledger_id).await;
+        // set a payment round in stable memory ?
+    }
 
-    // 4 ) Pay all sub accounts
-    let sucessful_neuron_transfers = transfer_rewards(
-        neuron_reward_percentage,
-        icp_reward_pool_balance.0,
-        ogy_reward_pool_balance.0,
-        gldgov_reward_pool_balance.0,
-        icp_ledger_id, //
-        ogy_ledger_id,
-        gldgov_ledger_id
-    ).await;
+    // process payment rounds
+    let successful_neuron_transfers = transfer_rewards(token, neuron_share);
+}
 
-    // update the neuron info with the amount of maturity paid
-    mutate_state(|state| {
-        update_neuron_reward(&sucessful_neuron_transfers, state, &neuron_maturity_for_interval);
-    });
-
-    let time_finish = now_millis();
-    mutate_state(|state| {
-        state.data.sync_info.last_distribution_end = time_finish;
-    });
-    info!(
-        "|||| DISTRIBUTION COMPLETE ||||| time_taken : {} || number of neurons distributed to : {} || total maturity distributed : {}",
-        time_finish - time_start,
-        &sucessful_neuron_transfers.len(),
-        total_maturity_for_all_neurons
-    );
+pub fn calculate_neuron_maturity_for_interval(
+    neurons: &BTreeMap<NeuronId, NeuronInfo>,
+    token: &Token
+) -> Vec<(NeuronId, u64)> {
+    neurons
+        .into_iter()
+        .map(|(neuron_id, neuron_info)| {
+            let previous_rewarded = neuron_info.rewarded_maturity
+                .get(token)
+                .unwrap_or(&0u64)
+                .clone();
+            let accumulated = neuron_info.accumulated_maturity;
+            let delta_maturity = accumulated
+                .checked_sub(previous_rewarded)
+                .expect("overflow calculating maturity delta");
+            (neuron_id.clone(), delta_maturity)
+        })
+        .collect()
 }
 
 pub fn calculate_reward(percentage: BigUint, reward_pool: BigUint) -> u64 {
@@ -123,24 +113,6 @@ pub fn update_neuron_reward(
             None => {}
         }
     }
-}
-
-pub fn calculate_neuron_maturity_for_interval(
-    neuron_maturity: &BTreeMap<NeuronId, NeuronInfo>
-) -> Vec<(NeuronId, u64)> {
-    let mut latest_maturity_per_neuron: Vec<(NeuronId, u64)> = Vec::new();
-
-    for (neuron_id, neuron_info) in neuron_maturity.iter() {
-        let accumilated_maturity = neuron_info.accumulated_maturity; // total accumilated
-        let previous_paid_maturity = neuron_info.rewarded_maturity; // last payout reward
-
-        let change_since_last_interval = accumilated_maturity
-            .checked_sub(previous_paid_maturity)
-            .expect("overflow when subtracting");
-        latest_maturity_per_neuron.push((neuron_id.clone(), change_since_last_interval));
-    }
-
-    latest_maturity_per_neuron
 }
 
 pub fn calculate_aggregated_maturity(data: &Vec<(NeuronId, u64)>) -> u64 {
