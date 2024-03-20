@@ -1,8 +1,10 @@
 use std::{ borrow::Cow, collections::HashMap };
 
 use candid::{ CandidType, Decode, Encode };
-use ic_stable_structures::{ storable::Bound, BTreeMap, Storable };
+use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Deserialize, Serialize };
+
+use crate::Token;
 
 const MAX_VALUE_SIZE: u32 = 100;
 
@@ -25,11 +27,4 @@ impl Storable for NeuronInfo {
         max_size: MAX_VALUE_SIZE,
         is_fixed_size: false,
     };
-}
-
-#[derive(Debug, Serialize, Clone, Deserialize, CandidType, Copy, PartialEq, Eq, Hash)]
-pub enum Token {
-    OGY,
-    ICP,
-    GLDGov,
 }

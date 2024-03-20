@@ -7,7 +7,10 @@ There are reward pools ( ICP, OGY, GLDGov ) that exist on the 0 sub account
 Individual neuron rewards are transferred to a sub account based on the NeuronId
 */
 
-use crate::state::{ mutate_state, read_state, RuntimeState };
+use crate::{
+    model::payment_processor::{ PaymentRound, PaymentStatus },
+    state::{ mutate_state, read_state, RuntimeState },
+};
 use candid::{ Nat, Principal };
 use canister_time::{ now_millis, run_interval, WEEK_IN_MS };
 use futures::future::join_all;
@@ -15,7 +18,7 @@ use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use num_bigint::BigUint;
 use sns_governance_canister::types::NeuronId;
-use std::collections::BTreeMap;
+use std::collections::{ BTreeMap, HashMap };
 use std::time::Duration;
 use tracing::{ debug, error, info };
 use types::{ Milliseconds, NeuronInfo, Token };
@@ -37,8 +40,9 @@ pub async fn distribute_rewards() {
     let reward_tokens = vec![Token::ICP, Token::OGY, Token::GLDGov];
     for token in reward_tokens {
         // check reward pool has a balance
-        let tokens_to_distribute = fetch_reward_pool_balance(token).await;
-        if tokens_to_distribute == 0 {
+        let ledger_id = read_state(|state| get_ledger_id(state, token));
+        let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await;
+        if tokens_to_distribute == Nat::from(0u64) {
             return;
         }
 
@@ -47,18 +51,41 @@ pub async fn distribute_rewards() {
             calculate_neuron_maturity_for_interval(&state.data.neuron_maturity, &token)
         );
 
+        // total neuron_maturity
+        let total_neuron_maturity_for_interval = calculate_aggregated_maturity(
+            &neuron_maturity_for_interval
+        );
+
         // rewards per neuron
         let neuron_share = calculate_neuron_shares(
             neuron_maturity_for_interval,
-            tokens_to_distribute
+            tokens_to_distribute.clone()
         );
 
-        // create a payment round
+        // TODO create a payment round
+        // e.g state.payment_rounds.add_payment_round(neuron_share, token)
+        mutate_state(|state| {
+            let new_round = PaymentRound::new(
+                tokens_to_distribute,
+                ledger_id,
+                token,
+                total_neuron_maturity_for_interval,
+                neuron_share
+            );
+            state.data.payment_processor.add_payment_round(new_round);
+        });
     }
 
-    // get payment rounds that need to be processed
-    // process payment rounds
-    // let successful_neuron_transfers = transfer_rewards(token, neuron_share);
+    // TODO process payment rounds
+    // e.g state.payment_rounds.process_payment_rounds()
+}
+
+pub fn get_ledger_id(state: &RuntimeState, token: Token) -> Principal {
+    match token {
+        ICP => state.data.icp_ledger_canister_id,
+        OGY => state.data.ogy_ledger_canister_id,
+        GLDGov => state.data.gldgov_ledger_canister_id,
+    }
 }
 
 pub fn calculate_neuron_maturity_for_interval(
@@ -84,7 +111,7 @@ pub fn calculate_neuron_maturity_for_interval(
 pub fn calculate_neuron_shares(
     neuron_deltas: Vec<(NeuronId, u64)>,
     reward_pool: Nat
-) -> Vec<(NeuronId, u64)> {
+) -> HashMap<NeuronId, (u64, PaymentStatus)> {
     let total_maturity: u64 = neuron_deltas
         .iter()
         .map(|entry| entry.1)
@@ -93,7 +120,7 @@ pub fn calculate_neuron_shares(
     let total_maturity_big = BigUint::try_from(total_maturity.clone()).unwrap();
     let reward_pool_big = BigUint::from(reward_pool);
     // Calculate the reward for each neuron
-    neuron_deltas
+    let map: HashMap<NeuronId, (u64, PaymentStatus)> = neuron_deltas
         .iter()
         .map(|(neuron_id, maturity)| {
             // Convert maturity to BigUint
@@ -105,9 +132,11 @@ pub fn calculate_neuron_shares(
 
             let reward = (reward_pool_big * percentage) / BigUint::from(E8S_PER_ICP);
             let reward: u64 = reward.try_into().expect("failed to convert bigint to u64");
-            (neuron_id.clone(), reward)
+            (neuron_id.clone(), (reward, PaymentStatus::Pending))
         })
-        .collect()
+        .collect();
+
+    map
 }
 
 pub fn calculate_reward(percentage: BigUint, reward_pool: BigUint) -> u64 {

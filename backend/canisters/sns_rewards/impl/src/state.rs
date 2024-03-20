@@ -5,12 +5,17 @@ use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis };
 use utils::{
-    consts::{ICP_LEDGER_CANISTER_ID, OGY_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID, SNS_LEDGER_CANISTER_ID},
+    consts::{
+        ICP_LEDGER_CANISTER_ID,
+        OGY_LEDGER_CANISTER_ID,
+        SNS_GOVERNANCE_CANISTER_ID,
+        SNS_LEDGER_CANISTER_ID,
+    },
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
 
-use crate::model::maturity_history::MaturityHistory;
+use crate::model::{ maturity_history::MaturityHistory, payment_processor::PaymentProcessor };
 
 canister_state!(RuntimeState);
 
@@ -65,7 +70,7 @@ pub struct SyncInfo {
     pub last_synced_end: TimestampMillis,
     pub last_synced_number_of_neurons: usize,
     pub last_distribution_start: TimestampMillis,
-    pub last_distribution_end: TimestampMillis
+    pub last_distribution_end: TimestampMillis,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -86,7 +91,8 @@ pub struct Data {
     pub icp_ledger_canister_id: Principal,
     /// GLDGov ledger canister id
     pub gldgov_ledger_canister_id: Principal,
-
+    /// Payment processor - responsible for queing and processing rounds of payments
+    pub payment_processor: PaymentProcessor,
 }
 
 impl Default for Data {
@@ -100,6 +106,7 @@ impl Default for Data {
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             ogy_ledger_canister_id: OGY_LEDGER_CANISTER_ID,
             gldgov_ledger_canister_id: SNS_LEDGER_CANISTER_ID,
+            payment_processor: PaymentProcessor::default(),
         }
     }
 }
