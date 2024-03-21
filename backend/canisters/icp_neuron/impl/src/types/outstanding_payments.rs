@@ -99,3 +99,128 @@ pub enum PaymentStatus {
     Pending,
     Complete,
 }
+#[cfg(test)]
+mod tests {
+    use crate::testing::dummies::dummy_account;
+
+    use super::*;
+
+    #[test]
+    fn test_get_outstanding_payments() {
+        let mut list = OutstandingPaymentsList::default();
+        let neuron_id = 1;
+        let payments = PaymentsList::new(vec![(dummy_account(None), 100)]);
+        let _ = list.insert(neuron_id, payments.clone());
+
+        assert_eq!(list.get_outstanding_payments(neuron_id), Some(payments));
+        assert_eq!(list.get_outstanding_payments(2), None);
+    }
+
+    #[test]
+    fn test_remove_from_list() {
+        let mut list = OutstandingPaymentsList::default();
+        let neuron_id = 1;
+        let payments = PaymentsList::new(vec![(dummy_account(None), 100)]);
+        let _ = list.insert(neuron_id, payments.clone());
+
+        list.remove_from_list(neuron_id);
+        assert_eq!(list.get_outstanding_payments(neuron_id), None);
+    }
+
+    #[test]
+    fn test_update_status_of_entry_in_list() {
+        let mut list = OutstandingPaymentsList::default();
+        let neuron_id = 1;
+        let account = dummy_account(None);
+        let payments = PaymentsList::new(vec![(account.clone(), 100)]);
+        let _ = list.insert(neuron_id, payments.clone());
+
+        assert_eq!(
+            list.get_outstanding_payments(neuron_id).unwrap().0[&account].status,
+            PaymentStatus::Pending
+        );
+
+        list.update_status_of_entry_in_list(neuron_id, account.clone(), PaymentStatus::Complete);
+
+        assert_eq!(
+            list.get_outstanding_payments(neuron_id).unwrap().0[&account].status,
+            PaymentStatus::Complete
+        );
+    }
+
+    #[test]
+    fn test_new_outstanding_payments() {
+        let account1 = dummy_account(None);
+        let account2 = dummy_account(
+            Some([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1,
+            ])
+        );
+        let list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
+
+        assert_eq!(list.0[&account1].amount, 100);
+        assert_eq!(list.0[&account1].status, PaymentStatus::Pending);
+        assert_eq!(list.0[&account2].amount, 200);
+        assert_eq!(list.0[&account2].status, PaymentStatus::Pending);
+    }
+
+    #[test]
+    fn test_all_complete() {
+        let account1 = dummy_account(None);
+        let account2 = dummy_account(
+            Some([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1,
+            ])
+        );
+        let mut list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
+
+        assert_eq!(list.all_complete(), false);
+
+        list.update_status(account1.clone(), PaymentStatus::Complete);
+        assert_eq!(list.all_complete(), false);
+
+        list.update_status(account2.clone(), PaymentStatus::Complete);
+        assert_eq!(list.all_complete(), true);
+    }
+
+    #[test]
+    fn test_has_some() {
+        let account1 = dummy_account(None);
+        let account2 = dummy_account(
+            Some([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1,
+            ])
+        );
+        let list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
+
+        assert_eq!(list.has_some(), true);
+    }
+
+    #[test]
+    fn test_has_none() {
+        let list = PaymentsList::new(vec![]);
+
+        assert_eq!(list.has_none(), true);
+    }
+
+    #[test]
+    fn test_update_status() {
+        let account1 = dummy_account(None);
+        let account2 = dummy_account(
+            Some([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1,
+            ])
+        );
+        let mut list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
+
+        list.update_status(account1.clone(), PaymentStatus::Complete);
+        assert_eq!(list.0[&account1].status, PaymentStatus::Complete);
+
+        list.update_status(account2.clone(), PaymentStatus::Pending);
+        assert_eq!(list.0[&account2].status, PaymentStatus::Pending);
+    }
+}
