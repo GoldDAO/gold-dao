@@ -1,10 +1,7 @@
 use candid::CandidType;
-use ic_stable_structures::{storable::Bound, Storable};
-use serde::{Deserialize, Serialize};
-use std::{
-    borrow::Cow,
-    fmt::{self, Display, Formatter},
-};
+use ic_stable_structures::{ storable::Bound, Storable };
+use serde::{ Deserialize, Serialize };
+use std::{ borrow::Cow, fmt::{ self, Display, Formatter } };
 
 /// A principal with a particular set of permissions over a neuron.
 #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
@@ -26,7 +23,7 @@ pub struct NeuronPermission {
     PartialEq,
     PartialOrd,
     Ord,
-    Debug,
+    Debug
 )]
 pub struct NeuronId {
     id: Vec<u8>,
@@ -61,11 +58,7 @@ impl Default for NeuronId {
 
 impl NeuronId {
     pub fn new(id_as_hex: &str) -> Option<Self> {
-        if let Ok(id) = hex::decode(id_as_hex) {
-            Some(Self { id })
-        } else {
-            None
-        }
+        if let Ok(id) = hex::decode(id_as_hex) { Some(Self { id }) } else { None }
     }
 
     pub fn into_array(self) -> Option<[u8; 32]> {
@@ -80,9 +73,15 @@ impl NeuronId {
     }
 }
 
-
 impl<'a> From<&'a NeuronId> for [u8; 32] {
     fn from(neuron_id: &'a NeuronId) -> Self {
+        let mut array = [0u8; 32];
+        array.copy_from_slice(&neuron_id.id[..32]); // Copy the first 32 bytes
+        array
+    }
+}
+impl<'a> From<NeuronId> for [u8; 32] {
+    fn from(neuron_id: NeuronId) -> Self {
         let mut array = [0u8; 32];
         array.copy_from_slice(&neuron_id.id[..32]); // Copy the first 32 bytes
         array
@@ -91,9 +90,9 @@ impl<'a> From<&'a NeuronId> for [u8; 32] {
 
 impl From<[u8; 32]> for NeuronId {
     fn from(value: [u8; 32]) -> Self {
-        return Self { id : value.to_vec() }
+        return Self { id: value.to_vec() };
     }
-} 
+}
 
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
@@ -360,7 +359,7 @@ pub mod transfer_sns_treasury_funds {
         Eq,
         Hash,
         PartialOrd,
-        Ord,
+        Ord
     )]
     #[repr(i32)]
     pub enum TransferFrom {
@@ -532,7 +531,7 @@ pub mod governance_error {
         Eq,
         Hash,
         PartialOrd,
-        Ord,
+        Ord
     )]
     #[repr(i32)]
     pub enum ErrorType {
@@ -1230,7 +1229,7 @@ pub mod governance {
         Eq,
         Hash,
         PartialOrd,
-        Ord,
+        Ord
     )]
     #[repr(i32)]
     pub enum Mode {
@@ -1890,7 +1889,7 @@ pub struct Account {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum NeuronPermissionType {
@@ -1962,7 +1961,7 @@ impl NeuronPermissionType {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum Vote {
@@ -1998,7 +1997,7 @@ impl Vote {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum ProposalDecisionStatus {
@@ -2042,7 +2041,7 @@ impl ProposalDecisionStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum ProposalRewardStatus {
@@ -2088,7 +2087,7 @@ impl ProposalRewardStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum ClaimedSwapNeuronStatus {
@@ -2142,7 +2141,7 @@ impl ClaimedSwapNeuronStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord,
+    Ord
 )]
 #[repr(i32)]
 pub enum ClaimSwapNeuronsError {
@@ -2205,8 +2204,8 @@ impl ProposalData {
         const MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO: f64 = 0.03;
 
         if let Some(tally) = self.latest_tally.as_ref() {
-            (tally.yes as f64) >= (tally.total as f64) * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO
-                && tally.yes > tally.no
+            (tally.yes as f64) >= (tally.total as f64) * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO &&
+                tally.yes > tally.no
         } else {
             false
         }
@@ -2220,8 +2219,7 @@ impl ProposalData {
     fn get_deadline_timestamp_seconds(&self) -> u64 {
         self.wait_for_quiet_state
             .as_ref()
-            .expect("Proposal must have a wait_for_quiet_state.")
-            .current_deadline_timestamp_seconds
+            .expect("Proposal must have a wait_for_quiet_state.").current_deadline_timestamp_seconds
     }
 }
 
