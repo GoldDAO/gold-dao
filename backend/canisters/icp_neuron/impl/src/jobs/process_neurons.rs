@@ -1,4 +1,4 @@
-use crate::types::outstanding_payments::{ OutstandingPayments, PaymentStatus };
+use crate::types::outstanding_payments::{ PaymentsList, OutstandingPaymentsList, PaymentStatus };
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
@@ -83,17 +83,16 @@ async fn run_async() {
             });
 
             let mut neurons_updated = false;
-            // TODO - Deactivated neurons spawning and disbursing for now and will only activate
-            // TODO - once the sns rewards canister is fully ready
-            // if !neurons_to_spawn.is_empty() {
-            //     spawn_neurons(neurons_to_spawn).await;
-            //     neurons_updated = true;
-            // }
 
-            // if !neurons_to_disburse.is_empty() {
-            //     disburse_neurons(neurons_to_disburse).await;
-            //     neurons_updated = true;
-            // }
+            if !neurons_to_spawn.is_empty() {
+                spawn_neurons(neurons_to_spawn).await;
+                neurons_updated = true;
+            }
+
+            if !neurons_to_disburse.is_empty() {
+                disburse_neurons(neurons_to_disburse).await;
+                neurons_updated = true;
+            }
 
             if neurons_updated {
                 // Refresh the neurons again given that they've been updated
@@ -120,6 +119,11 @@ async fn spawn_neurons(neuron_ids: Vec<u64>) {
 async fn disburse_neurons(neurons: Vec<Neuron>) {
     let rewards_recipients = read_state(|state| state.data.rewards_recipients.clone());
 
+    if rewards_recipients.is_empty() {
+        warn!("Skipping disbursement of neurons because no reward recipients are defined.");
+        return;
+    }
+
     for neuron in neurons {
         let neuron_id: u64;
         if let Some(id) = neuron.id {
@@ -132,60 +136,87 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
 
         let total_amount = neuron.cached_neuron_stake_e8s;
 
-        let mut payments_list = mutate_state(|s| {
-            match s.data.outstanding_payments.get_outstanding_payments(neuron_id) {
-                // if there are still outstanding payments for this neuron, use those
-                Some(x) => x,
-                // Else create a new list and store it in the oustanding payments list
-                None => {
-                    match rewards_recipients.split_amount_to_each_recipient(total_amount) {
-                        Ok(list) => { OutstandingPayments::new(list) }
-                        Err(err) => {
-                            error!(
-                                "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
-                            );
-                            OutstandingPayments::new(vec![])
-                        }
-                    }
+        let mut payments_list: PaymentsList;
+        // If there are previous pending payments, take those, otherwise prepare the new list
+        // This may happen if the payment cycle is interrupted because of an upgrade and then the disburse_neurons()
+        // call would rerun on the same neuron. If a payment has already been made, some addresses could receive
+        // double payments and others receive less than they should.
+        if
+            let Some(previous_list) = read_state(|s|
+                s.data.outstanding_payments.get_outstanding_payments(neuron_id)
+            )
+        {
+            payments_list = previous_list;
+        } else {
+            payments_list = match rewards_recipients.split_amount_to_each_recipient(total_amount) {
+                Ok(list) => { PaymentsList::new(list) }
+                Err(err) => {
+                    error!(
+                        "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
+                    );
+                    continue;
                 }
-            }
-        });
+            };
+            // write to state to make sure its stored
+            mutate_state(|s| (
+                if
+                    let Err(previous_list) = s.data.outstanding_payments.insert(
+                        neuron_id,
+                        payments_list.clone()
+                    )
+                {
+                    // This means that there was already an entry in the list for this neuron.
+                    // This should not be possible as we previously checked if outstanding payments are left.
+                    // However, to handle this gracefully, we continue with the previous list and log a warning.
+                    warn!(
+                        "Previous payment found for {neuron_id} although it was previously checked. Continuing but this should not happen."
+                    );
+                    payments_list = previous_list;
+                }
+            ));
+        }
 
+        // would occur if no rewards_recipients are defined
         if payments_list.has_none() {
             continue;
         }
 
-        for payment in payments_list.0.iter_mut() {
-            if !payment.is_pending() {
+        for (&account, payment) in payments_list.0.iter() {
+            if payment.is_complete() {
                 continue;
             }
             let icp_ledger_account = nns_governance_canister::types::AccountIdentifier {
-                hash: icrc_account_to_legacy_account_id(payment.to).as_ref().to_vec(),
+                hash: icrc_account_to_legacy_account_id(account).as_ref().to_vec(),
             };
             match
                 manage_nns_neuron_impl(
                     neuron_id,
                     Command::Disburse(Disburse {
                         to_account: Some(icp_ledger_account),
-                        amount: Some(Amount { e8s: payment.amount }),
+                        amount: Some(Amount { e8s: payment.get_amount() }),
                     })
                 ).await
             {
                 Ok(_) => {
-                    payment.status = PaymentStatus::Complete;
+                    mutate_state(|s|
+                        s.data.outstanding_payments.update_status_of_entry_in_list(
+                            neuron_id,
+                            account,
+                            PaymentStatus::Complete
+                        )
+                    );
                 }
-                Err(err) =>
+                Err(err) => {
                     error!(
                         "Error processing disburse payment for neuron {neuron_id}. Error: {err}"
-                    ),
+                    );
+                }
             }
         }
 
         mutate_state(|s| {
-            if payments_list.all_settled() {
-                s.data.outstanding_payments.settle(neuron_id);
-            } else {
-                s.data.outstanding_payments.update(neuron_id, payments_list)
+            if payments_list.all_complete() {
+                s.data.outstanding_payments.remove_from_list(neuron_id);
             }
         });
     }

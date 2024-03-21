@@ -24,6 +24,10 @@ impl RewardsRecipientList {
         Self(vec![])
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.0.len() == 0
+    }
+
     pub fn set(&mut self, list: Vec<RewardsRecipient>) -> Result<(), String> {
         Self::validate(&list)?;
         *self = Self(list);
