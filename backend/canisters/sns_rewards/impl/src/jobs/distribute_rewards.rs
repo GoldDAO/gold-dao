@@ -5,6 +5,8 @@ This job is responsible for distributing rewards to user's sub accounts.
 
 There are reward pools ( ICP, OGY, GLDGov ) that exist on the 0 sub account
 Individual neuron rewards are transferred to a sub account based on the NeuronId
+
+TODO - update this.
 */
 
 use crate::{
@@ -19,8 +21,8 @@ use num_bigint::BigUint;
 use sns_governance_canister::types::NeuronId;
 use std::collections::{ BTreeMap, HashMap };
 use std::time::Duration;
-use tracing::{ error, info };
-use types::{ Milliseconds, NeuronInfo, Token };
+use tracing::{ debug, error, info };
+use types::{ Milliseconds, NeuronInfo, TokenSymbol };
 use utils::consts::E8S_PER_ICP;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
@@ -50,7 +52,7 @@ pub async fn retry_faulty_payment_rounds() {
         update_neuron_rewards(state, successful_neuron_payments);
     });
     // TODO
-    // if result contains completed payment rounds then update the neurons
+    // Add the job duration etc
 }
 
 // called once per week
@@ -66,15 +68,17 @@ pub async fn distribute_rewards() {
         );
     }
     // create a new payment run
-    let reward_tokens = vec![Token::ICP, Token::OGY, Token::GLDGov];
-    for token in reward_tokens {
+    // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov];
+    let reward_tokens = vec![TokenSymbol::ICP];
+    for token in &reward_tokens {
+        debug!("Creating new payment round for token : {:?}", token);
         // check reward pool has a balance
-        let ledger_id = read_state(|state| get_ledger_id(state, token));
+        let ledger_id = read_state(|state| get_ledger_id(state, token.clone()));
         let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await;
         if tokens_to_distribute == Nat::from(0u64) {
             return;
         }
-
+        debug!("Tokens to distribute {}", tokens_to_distribute);
         // maturity delta per neuron
         let neuron_maturity_for_interval = read_state(|state|
             calculate_neuron_maturity_for_interval(&state.data.neuron_maturity, &token)
@@ -97,34 +101,51 @@ pub async fn distribute_rewards() {
             let new_round = PaymentRound::new(
                 tokens_to_distribute,
                 ledger_id,
-                token,
+                token.clone(),
                 total_neuron_maturity_for_interval,
                 neuron_share
             );
+            debug!("New payment round created for token {:?}", new_round.token);
+
             state.data.payment_processor.add_payment_round(new_round);
         });
     }
 
-    let successful_neuron_payments = mutate_state(|state| {
-        state.data.payment_processor.process_pending_payment_rounds()
-    });
+    // let successful_neuron_payments = mutate_state(|state| {
+    //     state.data.payment_processor.process_pending_payment_rounds()
+    // });
 
-    mutate_state(|state| {
-        update_neuron_rewards(state, successful_neuron_payments);
-    });
+    // for token in reward_tokens {
+    //     let metrics: Vec<u64> = successful_neuron_payments
+    //         .iter()
+    //         .filter(|payment| payment.2 == token)
+    //         .map(|payment| payment.1)
+    //         .collect();
+    //     let total_mat: u64 = metrics.iter().sum();
+    //     debug!(
+    //         "METRICS || token : {:?}, number success completed : {}, total_maturity distributed : {}",
+    //         token,
+    //         metrics.len(),
+    //         total_mat
+    //     );
+    // }
+
+    // mutate_state(|state| {
+    //     update_neuron_rewards(state, successful_neuron_payments);
+    // });
 }
 
-pub fn get_ledger_id(state: &RuntimeState, token: Token) -> Principal {
+pub fn get_ledger_id(state: &RuntimeState, token: TokenSymbol) -> Principal {
     match token {
-        ICP => state.data.icp_ledger_canister_id,
-        OGY => state.data.ogy_ledger_canister_id,
-        GLDGov => state.data.gldgov_ledger_canister_id,
+        TokenSymbol::ICP => state.data.icp_ledger_canister_id,
+        TokenSymbol::OGY => state.data.ogy_ledger_canister_id,
+        TokenSymbol::GLDGov => state.data.gldgov_ledger_canister_id,
     }
 }
 
 pub fn calculate_neuron_maturity_for_interval(
     neurons: &BTreeMap<NeuronId, NeuronInfo>,
-    token: &Token
+    token: &TokenSymbol
 ) -> Vec<(NeuronId, u64)> {
     neurons
         .into_iter()
@@ -164,7 +185,7 @@ pub fn calculate_neuron_shares(
             let percentage =
                 (maturity_big * BigUint::from(E8S_PER_ICP)) / total_maturity_big.clone();
 
-            let reward = (reward_pool_big * percentage) / BigUint::from(E8S_PER_ICP);
+            let reward = (reward_pool_big.clone() * percentage) / BigUint::from(E8S_PER_ICP);
             let reward: u64 = reward.try_into().expect("failed to convert bigint to u64");
             (neuron_id.clone(), (reward, PaymentStatus::Pending, maturity.clone()))
         })
@@ -175,7 +196,7 @@ pub fn calculate_neuron_shares(
 
 pub fn update_neuron_rewards(
     state: &mut RuntimeState,
-    successful_neuron_transfers: Vec<(NeuronId, MaturityDelta, Token)>
+    successful_neuron_transfers: Vec<(NeuronId, MaturityDelta, TokenSymbol)>
 ) {
     for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
         let neuron = state.data.neuron_maturity.get_mut(&neuron_id);

@@ -67,7 +67,7 @@ pub async fn synchronise_neuron_data() {
                             None
                         },
                         |n| {
-                            continue_scanning = true;
+                            // continue_scanning = true;
                             n.id.clone()
                         }
                     );
@@ -104,7 +104,7 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
         // TODO - check age of neuron to avoid someone gaming the system by spawning neurons (check if really relevant)
         match state.data.neuron_maturity.entry(id.clone()) {
             btree_map::Entry::Vacant(entry) => {
-                entry.insert(neuron_info);
+                entry.insert(neuron_info.clone());
                 updated_neuron = Some((id.clone(), neuron_info));
             }
             btree_map::Entry::Occupied(mut entry) => {

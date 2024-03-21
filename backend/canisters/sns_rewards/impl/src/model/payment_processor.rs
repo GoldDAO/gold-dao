@@ -6,9 +6,10 @@ use futures::{ executor::block_on, future::join_all };
 use ic_ledger_types::Subaccount;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::{ neuron, NeuronId };
-use types::{ TimestampMillis, Token };
-use ic_stable_structures::{ storable::Bound, vec, StableBTreeMap, Storable };
+use sns_governance_canister::types::NeuronId;
+use tracing::debug;
+use types::{ TimestampMillis, TokenSymbol };
+use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 
 use crate::memory::{ get_payment_round_history_memory, VM };
 const MAX_VALUE_SIZE: u32 = 1000;
@@ -53,6 +54,8 @@ impl PaymentProcessor {
     }
 
     pub async fn add_payment_round(&mut self, round: PaymentRound) -> Result<(), String> {
+        debug!("inserting new payment round");
+
         let next_key = self.next_key();
         let funds = round.round_funds_total.clone();
         let ledger_id = round.ledger_id.clone();
@@ -64,8 +67,10 @@ impl PaymentProcessor {
             subaccount: Some(round_pool_subaccount.0),
         };
 
+        debug!("Transferring funds to payment round sub account for round id : {}", next_key);
         match transfer_token(from_sub_account, account, ledger_id, funds).await {
             Ok(_) => {
+                debug!("Funds transferred to payment round sub account successfully");
                 let mut new_round = round;
                 new_round.round_funds_subaccount = Some(round_pool_subaccount);
                 self.rounds.insert(next_key, new_round);
@@ -102,24 +107,38 @@ impl PaymentProcessor {
     }
 
     pub fn contains_faulty_payment_rounds(&self) -> bool {
-        let faulty_rounds = self.get_faulty_payment_rounds();
-        return faulty_rounds.len() > 0;
+        let rounds: Vec<(u16, PaymentRound)> = self.rounds
+            .iter()
+            .filter(|round| {
+                match round.1.round_status {
+                    PaymentRoundStatus::CompletedFull => false,
+                    PaymentRoundStatus::Pending => false,
+                    _ => true,
+                }
+            })
+            .collect();
+
+        return rounds.len() > 0;
     }
 
-    pub fn process_pending_payment_rounds(&mut self) -> Vec<(NeuronId, MaturityDelta, Token)> {
+    pub fn process_pending_payment_rounds(
+        &mut self
+    ) -> Vec<(NeuronId, MaturityDelta, TokenSymbol)> {
         // only process pending rounds and only return successful payments
         let rounds_to_process = self.get_pending_payment_rounds();
-        let mut finished: Vec<(NeuronId, MaturityDelta, Token)> = vec![];
+        let mut finished: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = vec![];
         for (round_id, mut payment_round) in rounds_to_process {
+            debug!("Start - processing pending payments for payment round id : {}", round_id);
+
             let result = block_on(payment_round.start_payment_round());
             match result {
                 Some(completed_payments) => {
-                    let result: Vec<(NeuronId, MaturityDelta, Token)> = completed_payments
+                    let result: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = completed_payments
                         .iter()
                         .map(|(neuron_id, (reward, status, maturity_delta))| (
-                            *neuron_id.clone(),
+                            neuron_id.clone(),
                             maturity_delta.clone(),
-                            payment_round.token.clone(),
+                            payment_round.token,
                         ))
                         .collect();
 
@@ -131,20 +150,20 @@ impl PaymentProcessor {
         finished
     }
 
-    pub fn process_faulty_rounds(&mut self) -> Vec<(NeuronId, MaturityDelta, Token)> {
+    pub fn process_faulty_rounds(&mut self) -> Vec<(NeuronId, MaturityDelta, TokenSymbol)> {
         // only process rounds that fully failed, contain some failed or InProgress
         // TODO - maybe we can hook into when the canister is trapped, get all payment rounds that are InProgress and then switch the payment round status to interrupted. thereby avoiding
         // a slightly confusing need to process a InProgress payment.
         let rounds_to_process = self.get_faulty_payment_rounds();
-        let mut finished: Vec<(NeuronId, MaturityDelta, Token)> = vec![];
+        let mut finished: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = vec![];
         for (round_id, mut payment_round) in rounds_to_process {
             let result = block_on(payment_round.start_payment_round());
             match result {
                 Some(completed_payments) => {
-                    let result: Vec<(NeuronId, MaturityDelta, Token)> = completed_payments
+                    let result: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = completed_payments
                         .iter()
                         .map(|(neuron_id, (reward, status, maturity_delta))| (
-                            *neuron_id.clone(),
+                            neuron_id.clone(),
                             maturity_delta.clone(),
                             payment_round.token.clone(),
                         ))
@@ -171,12 +190,12 @@ impl PaymentProcessor {
     }
 }
 
-#[derive(Serialize, Deserialize, CandidType)]
+#[derive(Serialize, Deserialize, CandidType, Debug)]
 pub struct PaymentRound {
     pub round_funds_subaccount: Option<Subaccount>, // holds the rewards for this round of payments
     pub round_funds_total: Nat, // total amount to be distributed from the funds sub account
     pub ledger_id: Principal, // the ledger associated with transferring funds for this round of specific token payments
-    pub token: Token, // the token associated with a specific payment round
+    pub token: TokenSymbol, // the token associated with a specific payment round
     pub date_initialized: TimestampMillis, //
     pub total_neuron_maturity: u64, // total maturity of all neurons for this specific period
     pub payments: HashMap<NeuronId, Payment>, // map of payments to process
@@ -191,7 +210,7 @@ impl PaymentRound {
     pub fn new(
         round_funds_total: Nat,
         ledger_id: Principal,
-        token: Token,
+        token: TokenSymbol,
         total_neuron_maturity: u64,
         payments: HashMap<NeuronId, Payment>
     ) -> Self {
@@ -207,7 +226,7 @@ impl PaymentRound {
         }
     }
 
-    pub async fn start_payment_round(&mut self) -> Option<Vec<(&NeuronId, &Payment)>> {
+    pub async fn start_payment_round(&mut self) -> Option<Vec<(NeuronId, Payment)>> {
         let batch_limit = 15; // 50 is the max but we do 3 transactions per neuron leaving 5 left ( 15 transactions x 3 token types)
         let round_pool_subaccount = match self.round_funds_subaccount {
             Some(value) => value,
@@ -215,6 +234,7 @@ impl PaymentRound {
                 self.round_status = PaymentRoundStatus::Failed(
                     "No subaccount for round pool found".to_string()
                 );
+                debug!("Fail - No sub account for payment round");
                 return None;
             }
         };
@@ -251,6 +271,7 @@ impl PaymentRound {
                         batch[i].1.1 = PaymentStatus::Completed;
                     }
                     Err(e) => {
+                        debug!("Transaction Failed - {}", e);
                         batch[i].1.1 = PaymentStatus::Failed(e);
                     }
                 }
@@ -265,16 +286,20 @@ impl PaymentRound {
         let payment_round_status = determine_payment_round_post_status(finished_payments);
         self.round_status = payment_round_status;
 
-        let only_successful_payments: Vec<(&NeuronId, &Payment)> = self.payments
+        let only_successful_payments: Vec<(NeuronId, Payment)> = self.payments
             .borrow()
             .into_iter()
             .filter(|(_, (_, status, _))| status == &PaymentStatus::Completed)
+            .map(|(neuron_id, (reward, status, maturity))| (
+                neuron_id.clone(),
+                (reward.clone(), status.clone(), maturity.clone()),
+            ))
             .collect();
         Some(only_successful_payments)
     }
 }
 
-#[derive(Serialize, Deserialize, CandidType, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, CandidType, PartialEq, Eq, Debug)]
 pub enum PaymentRoundStatus {
     Pending,
     InProgress,
@@ -283,7 +308,7 @@ pub enum PaymentRoundStatus {
     Failed(String),
 }
 
-#[derive(Serialize, Deserialize, CandidType, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, CandidType, PartialEq, Eq, Debug, Clone)]
 pub enum PaymentStatus {
     Pending,
     Triggered,
@@ -335,7 +360,7 @@ fn determine_payment_round_post_status(
     let mut completed_count = 0;
     let mut failed_count = 0;
 
-    for (_, (_, payment_status, _)) in payment_statuses {
+    for (_, (_, payment_status, _)) in &payment_statuses {
         match payment_status {
             PaymentStatus::Completed => {
                 completed_count += 1;
