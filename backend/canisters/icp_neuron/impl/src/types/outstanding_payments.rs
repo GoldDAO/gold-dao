@@ -3,6 +3,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
 use types::NnsNeuronId;
 use std::collections::HashMap;
+use serde_with::serde_as;
 
 #[derive(Default, Deserialize, Serialize, CandidType, Clone, PartialEq, Eq, Debug)]
 pub struct OutstandingPaymentsList(HashMap<NnsNeuronId, PaymentsList>);
@@ -42,8 +43,12 @@ impl OutstandingPaymentsList {
     }
 }
 
+#[serde_as]
 #[derive(Deserialize, Serialize, CandidType, Clone, PartialEq, Eq, Debug)]
-pub struct PaymentsList(pub HashMap<Account, Payment>);
+pub struct PaymentsList {
+    #[serde_as(as = "Vec<(_, _)>")] // needed to have it corrected serialised for the /metrics http endpoint
+    pub list: HashMap<Account, Payment>,
+}
 
 impl PaymentsList {
     pub fn new(list: Vec<(Account, u64)>) -> Self {
@@ -51,20 +56,20 @@ impl PaymentsList {
             .into_iter()
             .map(|(account, amount)| { (account, Payment::new(amount)) })
             .collect();
-        Self(map)
+        Self { list: map }
     }
     pub fn all_complete(&self) -> bool {
-        self.0.iter().all(|(_, payment)| payment.is_complete())
+        self.list.iter().all(|(_, payment)| payment.is_complete())
     }
     pub fn has_some(&self) -> bool {
-        self.0.len() > 0
+        self.list.len() > 0
     }
     pub fn has_none(&self) -> bool {
         !self.has_some()
     }
 
     pub fn update_status(&mut self, account: Account, status: PaymentStatus) {
-        if let Some(payment) = self.0.get_mut(&account) {
+        if let Some(payment) = self.list.get_mut(&account) {
             payment.update_status(status)
         }
     }
@@ -136,14 +141,14 @@ mod tests {
         let _ = list.insert(neuron_id, payments.clone());
 
         assert_eq!(
-            list.get_outstanding_payments(neuron_id).unwrap().0[&account].status,
+            list.get_outstanding_payments(neuron_id).unwrap().list[&account].status,
             PaymentStatus::Pending
         );
 
         list.update_status_of_entry_in_list(neuron_id, account.clone(), PaymentStatus::Complete);
 
         assert_eq!(
-            list.get_outstanding_payments(neuron_id).unwrap().0[&account].status,
+            list.get_outstanding_payments(neuron_id).unwrap().list[&account].status,
             PaymentStatus::Complete
         );
     }
@@ -159,10 +164,10 @@ mod tests {
         );
         let list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
-        assert_eq!(list.0[&account1].amount, 100);
-        assert_eq!(list.0[&account1].status, PaymentStatus::Pending);
-        assert_eq!(list.0[&account2].amount, 200);
-        assert_eq!(list.0[&account2].status, PaymentStatus::Pending);
+        assert_eq!(list.list[&account1].amount, 100);
+        assert_eq!(list.list[&account1].status, PaymentStatus::Pending);
+        assert_eq!(list.list[&account2].amount, 200);
+        assert_eq!(list.list[&account2].status, PaymentStatus::Pending);
     }
 
     #[test]
@@ -218,9 +223,9 @@ mod tests {
         let mut list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
         list.update_status(account1.clone(), PaymentStatus::Complete);
-        assert_eq!(list.0[&account1].status, PaymentStatus::Complete);
+        assert_eq!(list.list[&account1].status, PaymentStatus::Complete);
 
         list.update_status(account2.clone(), PaymentStatus::Pending);
-        assert_eq!(list.0[&account2].status, PaymentStatus::Pending);
+        assert_eq!(list.list[&account2].status, PaymentStatus::Pending);
     }
 }

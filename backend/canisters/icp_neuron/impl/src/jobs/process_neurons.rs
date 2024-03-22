@@ -1,4 +1,4 @@
-use crate::types::outstanding_payments::{ PaymentsList, OutstandingPaymentsList, PaymentStatus };
+use crate::types::outstanding_payments::{ PaymentsList, PaymentStatus };
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
 use crate::state::{ mutate_state, read_state, Neurons };
 use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
@@ -181,7 +181,7 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
             continue;
         }
 
-        for (&account, payment) in payments_list.0.iter() {
+        for (&account, payment) in payments_list.list.iter() {
             if payment.is_complete() {
                 continue;
             }
