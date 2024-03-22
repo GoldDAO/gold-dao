@@ -1,2 +1,2 @@
 type InitArgs = record { test_mode : bool };
-service : (opt InitArgs) -> { sync_gold : () -> () }
+service : (opt InitArgs) -> {}
