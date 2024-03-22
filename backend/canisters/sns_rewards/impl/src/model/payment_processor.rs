@@ -1,8 +1,7 @@
-use std::{ borrow::{ Borrow, BorrowMut, Cow }, collections::HashMap };
+use std::{ borrow::Cow, collections::HashMap };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
-use futures::{ executor::block_on, future::join_all };
 use ic_ledger_types::Subaccount;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
@@ -58,16 +57,6 @@ impl PaymentProcessor {
     pub fn add_payment_round(&mut self, round: PaymentRound) {
         self.rounds.insert(round.id, round);
         debug!("New payment round created");
-    }
-
-    pub fn get_pending_payment_rounds(&mut self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.rounds
-            .iter()
-            .filter(|round| round.1.round_status == PaymentRoundStatus::Pending)
-            .map(|(round_id, payment_round)| (round_id, payment_round))
-            .collect();
-
-        rounds
     }
 
     pub fn read_pending_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
@@ -138,73 +127,11 @@ impl PaymentProcessor {
         return rounds.len() > 0;
     }
 
-    pub fn process_pending_payment_rounds(
-        &mut self
-    ) -> Vec<(NeuronId, MaturityDelta, TokenSymbol)> {
-        // only process pending rounds and only return successful payments
-        let rounds_to_process = self.get_pending_payment_rounds();
-        debug!(
-            "rounds to process - processing pending payments for payment round id : {}",
-            &rounds_to_process.len()
-        );
-        let mut finished: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = vec![];
-        for (round_id, mut payment_round) in rounds_to_process {
-            debug!("Start - processing pending payments for payment round id : {}", round_id);
-
-            let result = block_on(payment_round.start_payment_round());
-            match result {
-                Some(completed_payments) => {
-                    let result: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = completed_payments
-                        .iter()
-                        .map(|(neuron_id, (reward, status, maturity_delta))| (
-                            neuron_id.clone(),
-                            maturity_delta.clone(),
-                            payment_round.token,
-                        ))
-                        .collect();
-
-                    finished.extend(result);
-                }
-                None => {}
-            }
-        }
-        finished
-    }
-
-    pub fn process_faulty_rounds(&mut self) -> Vec<(NeuronId, MaturityDelta, TokenSymbol)> {
-        // only process rounds that fully failed, contain some failed or InProgress
-        // TODO - maybe we can hook into when the canister is trapped, get all payment rounds that are InProgress and then switch the payment round status to interrupted. thereby avoiding
-        // a slightly confusing need to process a InProgress payment.
-        let rounds_to_process = self.get_faulty_payment_rounds();
-        let mut finished: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = vec![];
-        for (round_id, mut payment_round) in rounds_to_process {
-            let result = block_on(payment_round.start_payment_round());
-            match result {
-                Some(completed_payments) => {
-                    let result: Vec<(NeuronId, MaturityDelta, TokenSymbol)> = completed_payments
-                        .iter()
-                        .map(|(neuron_id, (reward, status, maturity_delta))| (
-                            neuron_id.clone(),
-                            maturity_delta.clone(),
-                            payment_round.token.clone(),
-                        ))
-                        .collect();
-
-                    finished.extend(result);
-                }
-                None => {}
-            }
-        }
-        finished
-    }
-
     pub fn get_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        debug!("1111111 logging rounds");
         let rounds = self.rounds
             .iter()
             .map(|(round_id, payment_round)| (round_id, payment_round))
             .collect();
-        debug!("logging get_payment_rounds : {:?}", rounds);
         let first_round = self.rounds.get(&1);
 
         match first_round {
@@ -261,88 +188,16 @@ impl PaymentRound {
         }
     }
 
+    /// converts a u16 to a valid sub account
+    /// payment round sub accounts should always have their ids at the END of a 32 byte array of 0's
     pub fn get_payment_round_sub_account_id(&self) -> Subaccount {
         let mut subaccount: [u8; 32] = [0; 32];
-
-        // Convert the u16 number to bytes
+        // u16 -> bytes
         let num_bytes: [u8; 2] = self.id.to_be_bytes();
-
-        // Copy the bytes of the u16 number to the end of the array
+        // add u16 bytes to end of 32 byte array
         subaccount[32 - 2..].copy_from_slice(&num_bytes);
 
         Subaccount(subaccount)
-    }
-
-    pub async fn start_payment_round(&mut self) -> Option<Vec<(NeuronId, Payment)>> {
-        let batch_limit = 15; // 50 is the max but we do 3 transactions per neuron leaving 5 left ( 15 transactions x 3 token types)
-        let round_pool_subaccount = match self.round_funds_subaccount {
-            Some(value) => value,
-            None => {
-                self.round_status = PaymentRoundStatus::Failed(
-                    "No subaccount for round pool found".to_string()
-                );
-                debug!("Fail - No sub account for payment round");
-                return None;
-            }
-        };
-        self.round_status = PaymentRoundStatus::InProgress;
-
-        let ledger_id = self.ledger_id;
-
-        let mut payments: Vec<(&NeuronId, &mut Payment)> = self
-            .borrow_mut()
-            .payments.iter_mut()
-            .collect();
-
-        let mut payments_chunks = payments.chunks_mut(batch_limit);
-
-        while let Some(batch) = payments_chunks.next() {
-            let transfer_futures = batch
-                .iter_mut()
-                .filter(|(_, (_, payment_status, _))| payment_status != &PaymentStatus::Completed)
-                .map(|(neuron_id, (reward, payment_status, _))| {
-                    let n_id = *neuron_id;
-                    let account = Account {
-                        owner: ic_cdk::api::id(),
-                        subaccount: Some(n_id.into()),
-                    };
-                    *payment_status = PaymentStatus::Triggered;
-                    transfer_token(round_pool_subaccount, account, ledger_id, Nat::from(*reward))
-                });
-
-            let results = join_all(transfer_futures).await;
-
-            for (i, result) in results.into_iter().enumerate() {
-                match result {
-                    Ok(_) => {
-                        batch[i].1.1 = PaymentStatus::Completed;
-                    }
-                    Err(e) => {
-                        debug!("Transaction Failed - {}", e);
-                        batch[i].1.1 = PaymentStatus::Failed(e);
-                    }
-                }
-            }
-        }
-        // TODO - update the payment round status
-        let finished_payments: Vec<(&NeuronId, &Payment)> = self.payments
-            .borrow()
-            .into_iter()
-            .collect();
-
-        let payment_round_status = determine_payment_round_post_status(finished_payments);
-        self.round_status = payment_round_status;
-
-        let only_successful_payments: Vec<(NeuronId, Payment)> = self.payments
-            .borrow()
-            .into_iter()
-            .filter(|(_, (_, status, _))| status == &PaymentStatus::Completed)
-            .map(|(neuron_id, (reward, status, maturity))| (
-                neuron_id.clone(),
-                (reward.clone(), status.clone(), maturity.clone()),
-            ))
-            .collect();
-        Some(only_successful_payments)
     }
 }
 
@@ -374,56 +229,4 @@ impl Storable for PaymentRound {
         max_size: MAX_VALUE_SIZE,
         is_fixed_size: false,
     };
-}
-
-async fn transfer_token(
-    from_sub_account: Subaccount,
-    to_account: Account,
-    ledger_id: Principal,
-    amount: Nat
-) -> Result<(), String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_transfer(
-            ledger_id,
-            &(TransferArg {
-                from_subaccount: Some(from_sub_account.0),
-                to: to_account,
-                fee: Some((10_000u32).into()),
-                created_at_time: None,
-                amount: amount,
-                memo: None,
-            })
-        ).await
-    {
-        Ok(Ok(_)) => Ok(()),
-        Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
-        Err(error) => Err(format!("Network error: {error:?}")),
-    }
-}
-
-fn determine_payment_round_post_status(
-    payment_statuses: Vec<(&NeuronId, &Payment)>
-) -> PaymentRoundStatus {
-    let mut completed_count = 0;
-    let mut failed_count = 0;
-
-    for (_, (_, payment_status, _)) in &payment_statuses {
-        match payment_status {
-            PaymentStatus::Completed => {
-                completed_count += 1;
-            }
-            PaymentStatus::Failed(_) => {
-                failed_count += 1;
-            }
-            _ => {} // Ignore other statuses
-        }
-    }
-
-    if completed_count > 0 && failed_count > 0 {
-        PaymentRoundStatus::CompletedPartial
-    } else if completed_count == payment_statuses.len() {
-        PaymentRoundStatus::CompletedFull
-    } else {
-        PaymentRoundStatus::Failed("All payments for payment round failed".to_string())
-    }
 }
