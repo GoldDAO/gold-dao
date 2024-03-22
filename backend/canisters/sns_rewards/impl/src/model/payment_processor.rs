@@ -68,6 +68,15 @@ impl PaymentProcessor {
 
         rounds
     }
+    pub fn read_in_progress_rounds(&self) -> Vec<(u16, PaymentRound)> {
+        let rounds = self.rounds
+            .iter()
+            .filter(|round| round.1.round_status == PaymentRoundStatus::InProgress)
+            .map(|(round_id, payment_round)| (round_id, payment_round))
+            .collect();
+
+        rounds
+    }
 
     pub fn get_faulty_payment_rounds(&mut self) -> Vec<(u16, PaymentRound)> {
         let rounds = self.rounds
