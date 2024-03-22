@@ -248,27 +248,20 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
         .map(|(neuron_id, (_, _, maturity))| (*neuron_id, maturity, &payment_round.token))
         .collect();
 
-    mutate_state(|state| {
-        for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
-            let neuron = state.data.neuron_maturity.get_mut(&neuron_id);
-            match neuron {
-                Some(neuron_info) => {
-                    let rewarded_maturity_token = neuron_info.rewarded_maturity.get_mut(&token);
-                    match rewarded_maturity_token {
-                        Some(value) => {
-                            value
-                                .checked_add(*maturity_delta)
-                                .expect(
-                                    "update_neuron_rewards - overflow when adding neuron maturity to existing maturity"
-                                );
-                        }
-                        None => {}
-                    }
+    for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
+        mutate_state(|state| {
+            if let Some(neuron) = state.data.neuron_maturity.get_mut(&neuron_id) {
+                if let Some(rewarded_maturity) = neuron.rewarded_maturity.get_mut(&token) {
+                    let new_maturity = rewarded_maturity
+                        .checked_add(*maturity_delta)
+                        .expect("update_neuron_rewards - overflow");
+                    *rewarded_maturity = new_maturity;
+                } else {
+                    neuron.rewarded_maturity.insert(*token, *maturity_delta);
                 }
-                None => {}
             }
-        }
-    });
+        });
+    }
 }
 
 pub fn calculate_aggregated_maturity(data: &Vec<(NeuronId, u64)>) -> u64 {
