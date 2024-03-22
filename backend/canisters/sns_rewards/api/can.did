@@ -40,7 +40,7 @@ type PaymentRoundStatus = variant {
   InProgress;
   Pending;
 };
-type PaymentStatus = variant { Failed; Triggered; Completed; Pending };
+type PaymentStatus = variant { Failed : text; Triggered; Completed; Pending };
 type StreamingStrategy = variant {
   Callback : record {
     token : Token;
