@@ -64,11 +64,11 @@ pub async fn retry_faulty_payment_rounds() {
 
 pub async fn distribute_rewards() {
     let contains_faulty_payment_rounds = read_state(|state|
-        state.data.payment_processor.contains_faulty_payment_rounds()
+        state.data.payment_processor.active_rounds_exist()
     );
 
     if contains_faulty_payment_rounds {
-        info!("will not create new payment rounds until previous are fixed");
+        info!("There are still active rounds present to process");
         return;
     }
 
@@ -114,7 +114,7 @@ pub async fn distribute_rewards() {
         match res {
             Ok(()) => {
                 mutate_state(|state| {
-                    state.data.payment_processor.add_payment_round(new_round);
+                    state.data.payment_processor.add_active_payment_round(new_round);
                 });
             }
             Err(e) => {
@@ -124,7 +124,7 @@ pub async fn distribute_rewards() {
     }
 
     let pending_payment_rounds = read_state(|state|
-        state.data.payment_processor.read_pending_payment_rounds()
+        state.data.payment_processor.read_active_pending_payment_rounds()
     );
 
     info!("current round status : {:?}", pending_payment_rounds[0].1.round_status);
@@ -134,7 +134,7 @@ pub async fn distribute_rewards() {
     }
 
     let processed_payment_rounds = read_state(|state|
-        state.data.payment_processor.read_in_progress_rounds()
+        state.data.payment_processor.read_active_in_progress_rounds()
     );
 
     info!("current round status : {:?}", processed_payment_rounds);
@@ -359,7 +359,7 @@ fn update_payment_round_status(payment_round: &PaymentRound) {
     }
     info!("new round status {:?}", new_status);
     mutate_state(|state|
-        state.data.payment_processor.set_round_status(&payment_round.id, new_status)
+        state.data.payment_processor.set_active_round_status(&payment_round.id, new_status)
     );
 }
 
@@ -369,7 +369,10 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
     let round_pool_subaccount = payment_round.get_payment_round_sub_account_id();
     let ledger_id = payment_round.ledger_id;
     mutate_state(|state| {
-        state.data.payment_processor.set_round_status(&round_id, PaymentRoundStatus::InProgress);
+        state.data.payment_processor.set_active_round_status(
+            &round_id,
+            PaymentRoundStatus::InProgress
+        );
     });
 
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
@@ -391,7 +394,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                     subaccount: Some(n_id.into()),
                 };
                 mutate_state(|state|
-                    state.data.payment_processor.set_payment_status(
+                    state.data.payment_processor.set_active_payment_status(
                         &round_id,
                         &neuron_id,
                         PaymentStatus::Triggered
@@ -405,7 +408,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
             match result {
                 Ok(_) => {
                     mutate_state(|state|
-                        state.data.payment_processor.set_payment_status(
+                        state.data.payment_processor.set_active_payment_status(
                             &round_id,
                             &neuron_id,
                             PaymentStatus::Completed
@@ -414,7 +417,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                 }
                 Err(e) => {
                     mutate_state(|state|
-                        state.data.payment_processor.set_payment_status(
+                        state.data.payment_processor.set_active_payment_status(
                             &round_id,
                             &neuron_id,
                             PaymentStatus::Failed(e.clone())

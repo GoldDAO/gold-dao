@@ -1,4 +1,4 @@
-use std::{ borrow::{ BorrowMut, Cow }, collections::HashMap };
+use std::{ borrow::{ BorrowMut, Cow }, collections::{ BTreeMap, HashMap }, ops::Deref };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
@@ -18,7 +18,8 @@ const MAX_VALUE_SIZE: u32 = 100000;
 #[derive(Serialize, Deserialize)]
 pub struct PaymentProcessor {
     #[serde(skip, default = "init_map")]
-    rounds: StableBTreeMap<u16, PaymentRound, VM>,
+    round_history: StableBTreeMap<u16, PaymentRound, VM>,
+    active_rounds: BTreeMap<u16, PaymentRound>,
 }
 
 fn init_map() -> StableBTreeMap<u16, PaymentRound, VM> {
@@ -28,7 +29,7 @@ fn init_map() -> StableBTreeMap<u16, PaymentRound, VM> {
 
 impl Default for PaymentProcessor {
     fn default() -> Self {
-        Self { rounds: init_map() }
+        Self { round_history: init_map(), active_rounds: BTreeMap::new() }
     }
 }
 
@@ -41,7 +42,7 @@ fn create_payment_round_sub_account_id(count: u16) -> Subaccount {
 
 impl PaymentProcessor {
     pub fn next_key(&self) -> u16 {
-        let mut next_key = match self.rounds.last_key_value() {
+        let mut next_key = match self.round_history.last_key_value() {
             Some((last_key, _)) => {
                 if last_key == 0 { 1 } else { last_key + 1 }
             } // Add 1 to the last key
@@ -54,32 +55,32 @@ impl PaymentProcessor {
         next_key
     }
 
-    pub fn add_payment_round(&mut self, round: PaymentRound) {
-        self.rounds.insert(round.id, round);
+    pub fn add_active_payment_round(&mut self, round: PaymentRound) {
+        self.active_rounds.insert(round.id, round);
         debug!("New payment round created");
     }
 
-    pub fn read_pending_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.rounds
+    pub fn read_active_pending_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
+        let rounds = self.active_rounds
             .iter()
             .filter(|round| round.1.round_status == PaymentRoundStatus::Pending)
-            .map(|(round_id, payment_round)| (round_id, payment_round))
+            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
         rounds
     }
-    pub fn read_in_progress_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.rounds
+    pub fn read_active_in_progress_rounds(&self) -> Vec<(u16, PaymentRound)> {
+        let rounds = self.active_rounds
             .iter()
             .filter(|round| round.1.round_status == PaymentRoundStatus::InProgress)
-            .map(|(round_id, payment_round)| (round_id, payment_round))
+            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
         rounds
     }
 
-    pub fn get_faulty_payment_rounds(&mut self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.rounds
+    pub fn get_active_faulty_payment_rounds(&mut self) -> Vec<(&u16, &PaymentRound)> {
+        let rounds = self.active_rounds
             .iter()
             .filter(|round| {
                 match round.1.round_status {
@@ -94,34 +95,27 @@ impl PaymentProcessor {
         rounds
     }
 
-    pub fn set_round_status(&mut self, id: &u16, status: PaymentRoundStatus) {
-        let round = self.rounds.get(id);
-        match round {
-            Some(mut round) => {
-                round.round_status = status;
-            }
-            None => {}
+    pub fn set_active_round_status(&mut self, id: &u16, status: PaymentRoundStatus) {
+        if let Some(round) = self.active_rounds.get_mut(id) {
+            round.round_status = status;
         }
     }
 
-    pub fn set_payment_status(
+    pub fn set_active_payment_status(
         &mut self,
         round_id: &u16,
         neuron_id: &NeuronId,
         new_status: PaymentStatus
     ) {
-        // let round = self.rounds.get(round_id);
-        let rounds = self.rounds.borrow_mut();
-
-        if let Some(mut round) = rounds.get(round_id) {
+        if let Some(round) = self.active_rounds.get_mut(round_id) {
             if let Some(payment) = round.payments.get_mut(&neuron_id) {
                 payment.1 = new_status;
             }
         }
     }
 
-    pub fn contains_faulty_payment_rounds(&self) -> bool {
-        let rounds: Vec<(u16, PaymentRound)> = self.rounds
+    pub fn active_rounds_exist(&self) -> bool {
+        let rounds: Vec<(&u16, &PaymentRound)> = self.active_rounds
             .iter()
             .filter(|round| {
                 match round.1.round_status {
@@ -135,25 +129,17 @@ impl PaymentProcessor {
         return rounds.len() > 0;
     }
 
-    pub fn get_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.rounds
+    pub fn get_active_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
+        let rounds = self.active_rounds
             .iter()
-            .map(|(round_id, payment_round)| (round_id, payment_round))
+            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
-        let first_round = self.rounds.get(&1);
-
-        match first_round {
-            Some(round) => {
-                debug!("aaaa : {:?}", round);
-            }
-            None => {}
-        }
 
         rounds
     }
 
-    pub fn get_payment_round_by_id(&self, id: &u16) -> Option<PaymentRound> {
-        self.rounds.get(id)
+    pub fn get_historic_payment_round_by_id(&self, id: &u16) -> Option<PaymentRound> {
+        self.round_history.get(id)
     }
 }
 
