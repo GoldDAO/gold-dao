@@ -1,4 +1,4 @@
-use std::{ borrow::Cow, collections::HashMap };
+use std::{ borrow::{ BorrowMut, Cow }, collections::HashMap };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
@@ -6,12 +6,12 @@ use ic_ledger_types::Subaccount;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use tracing::debug;
+use tracing::{ debug, info };
 use types::{ TimestampMillis, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 
 use crate::memory::{ get_payment_round_history_memory, VM };
-const MAX_VALUE_SIZE: u32 = 10000;
+const MAX_VALUE_SIZE: u32 = 100000;
 
 /// The history of each neuron's maturity.
 // NOTE: Stable structures don't need to be serialized, hence the #[serde(skip)].
@@ -101,14 +101,13 @@ impl PaymentProcessor {
         neuron_id: &NeuronId,
         new_status: PaymentStatus
     ) {
-        let round = self.rounds.get(round_id);
-        match round {
-            Some(mut round) => {
-                round.payments.entry(neuron_id.clone()).and_modify(|(_, status, _)| {
-                    *status = new_status;
-                });
+        // let round = self.rounds.get(round_id);
+        let rounds = self.rounds.borrow_mut();
+
+        if let Some(mut round) = rounds.get(round_id) {
+            if let Some(payment) = round.payments.get_mut(&neuron_id) {
+                payment.1 = new_status;
             }
-            None => {}
         }
     }
 

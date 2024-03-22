@@ -353,6 +353,7 @@ fn update_payment_round_status(payment_round: &PaymentRound) {
             "All payments for payment round failed".to_string()
         );
     }
+    info!("new round status {:?}", new_status);
     mutate_state(|state|
         state.data.payment_processor.set_round_status(&payment_round.id, new_status)
     );
