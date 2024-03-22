@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use candid::{ CandidType, Principal };
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
@@ -42,6 +44,12 @@ impl RewardsRecipientList {
         if list.len() > 5 {
             return Err("Invalid rewards recipients: too many recipients.".to_string());
         }
+        // only allow unique accounts
+        if !Self::validate_unique_accounts(list) {
+            return Err(
+                "Only unique accounts may be defined in the recipients list. Found duplicates.".to_string()
+            );
+        }
         let mut sum = 0;
         for recipient in list {
             if recipient.account.owner == Principal::anonymous() {
@@ -66,6 +74,18 @@ impl RewardsRecipientList {
             );
         }
         Ok(())
+    }
+
+    pub fn validate_unique_accounts(recipients: &[RewardsRecipient]) -> bool {
+        let mut accounts_seen = HashSet::new();
+        for recipient in recipients {
+            if !accounts_seen.insert(&recipient.account) {
+                // duplicate found
+                return false;
+            }
+        }
+        // No duplicates found
+        true
     }
 
     pub fn split_amount_to_each_recipient(
