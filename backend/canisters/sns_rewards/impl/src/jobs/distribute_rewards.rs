@@ -212,7 +212,7 @@ pub fn calculate_neuron_maturity_for_interval(
 pub fn calculate_neuron_shares(
     neuron_deltas: Vec<(NeuronId, u64)>,
     reward_pool: Nat
-) -> HashMap<NeuronId, Payment> {
+) -> BTreeMap<NeuronId, Payment> {
     let total_maturity: u64 = neuron_deltas
         .iter()
         .map(|entry| entry.1)
@@ -221,7 +221,7 @@ pub fn calculate_neuron_shares(
     let total_maturity_big = BigUint::try_from(total_maturity.clone()).unwrap();
     let reward_pool_big = BigUint::from(reward_pool);
     // Calculate the reward for each neuron
-    let map: HashMap<NeuronId, Payment> = neuron_deltas
+    let map: BTreeMap<NeuronId, Payment> = neuron_deltas
         .iter()
         .map(|(neuron_id, maturity)| {
             // Convert maturity to BigUint
@@ -364,18 +364,15 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
         );
     });
 
-    let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
+    let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments
+        .iter()
+        .filter(|(_, (_, payment_status, _))| payment_status != &PaymentStatus::Completed)
+        .collect();
     let mut payment_chunks = payments.chunks(batch_limit);
 
     while let Some(batch) = payment_chunks.next() {
-        let neuron_ids: Vec<&NeuronId> = batch
+        let (transfer_futures, neuron_ids): (Vec<_>, Vec<_>) = batch
             .iter()
-            .filter(|(_, (_, payment_status, _))| payment_status != &PaymentStatus::Completed)
-            .map(|payment| payment.0)
-            .collect();
-        let transfer_futures = batch
-            .iter()
-            .filter(|(_, (_, payment_status, _))| payment_status != &PaymentStatus::Completed)
             .map(|(neuron_id, (reward, _, _))| {
                 let n_id = *neuron_id;
                 let account = Account {
@@ -389,11 +386,19 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                         PaymentStatus::Triggered
                     )
                 );
-                transfer_token(round_pool_subaccount, account, ledger_id, Nat::from(*reward))
-            });
+                let transfer_future = transfer_token(
+                    round_pool_subaccount,
+                    account,
+                    ledger_id,
+                    Nat::from(*reward)
+                );
+                (transfer_future, *neuron_id) // Returning a tuple of future and neuron_id
+            })
+            .unzip();
+
         let results = join_all(transfer_futures).await;
 
-        for (result, neuron_id) in results.iter().zip(neuron_ids.iter()) {
+        for (result, neuron_id) in results.into_iter().zip(neuron_ids.into_iter()) {
             match result {
                 Ok(_) => {
                     mutate_state(|state|
@@ -437,6 +442,97 @@ mod tests {
 
     // use super::calculate_neuron_maturity_for_interval;
 
+    use std::collections::{ BTreeMap, HashMap };
+
+    use candid::Nat;
+    use sns_governance_canister::types::NeuronId;
+    use types::{ NeuronInfo, TokenSymbol };
+
+    use crate::jobs::distribute_rewards::calculate_neuron_shares;
+
+    use super::{ calculate_aggregated_maturity, calculate_neuron_maturity_for_interval };
+
     #[test]
     fn test_calculate_neuron_maturity_for_first_sync() {}
+
+    #[test]
+    fn test_calculate_neuron_shares() {
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_2 = NeuronId::new(
+            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_3 = NeuronId::new(
+            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let neuron_deltas = vec![(neuron_id_1, 10u64), (neuron_id_2, 20u64), (neuron_id_3, 30u64)];
+        let reward_pool = Nat::from(100_000_000u64); // 1 ICP
+        let expected: Vec<u64> = vec![16_666_666u64, 33_333_333u64, 50_000_000u64];
+
+        let result = calculate_neuron_shares(neuron_deltas, reward_pool);
+        result
+            .iter()
+            .zip(expected.iter())
+            .for_each(|(res, expected_value)| {
+                assert_eq!(&res.1.0, expected_value);
+            });
+    }
+
+    #[test]
+    fn test_calculate_neuron_maturity_for_interval() {
+        let mut neurons = BTreeMap::new();
+
+        // neuron 1
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let mut neuron_1_rewarded = HashMap::new();
+        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+
+        let neuron_info_1 = NeuronInfo {
+            accumulated_maturity: 150,
+            last_synced_maturity: 150,
+            rewarded_maturity: neuron_1_rewarded,
+        };
+        neurons.insert(neuron_id_1.clone(), neuron_info_1);
+
+        let result = calculate_neuron_maturity_for_interval(&neurons, &TokenSymbol::ICP);
+        let expected = 150;
+        assert_eq!(result[0].1, expected);
+
+        // simulate paying the user
+
+        // payout previous maturity ( 150 ) && update the neuron maturity ( simulate new neuron maturity data )
+        let n = neurons.get_mut(&neuron_id_1).unwrap();
+        n.accumulated_maturity = 542;
+        n.last_synced_maturity = 542;
+        let rewarded_mat = n.rewarded_maturity.get_mut(&TokenSymbol::ICP).unwrap();
+        *rewarded_mat += 150;
+
+        let result = calculate_neuron_maturity_for_interval(&neurons, &TokenSymbol::ICP);
+        println!("{:?}", neurons);
+        let expected = 392; // 542 (current maturity) - 150 (previous maturity)
+        assert_eq!(result[0].1, expected);
+    }
+
+    #[test]
+    fn test_calculate_aggregated_maturity() {
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_2 = NeuronId::new(
+            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_3 = NeuronId::new(
+            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let neuron_deltas = vec![(neuron_id_1, 10u64), (neuron_id_2, 20u64), (neuron_id_3, 30u64)];
+        let res = calculate_aggregated_maturity(&neuron_deltas);
+        let expected = 60u64;
+        assert_eq!(res, expected);
+    }
 }

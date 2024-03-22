@@ -152,7 +152,7 @@ pub struct PaymentRound {
     pub token: TokenSymbol, // the token associated with a specific payment round
     pub date_initialized: TimestampMillis, //
     pub total_neuron_maturity: u64, // total maturity of all neurons for this specific period
-    pub payments: HashMap<NeuronId, Payment>, // map of payments to process
+    pub payments: BTreeMap<NeuronId, Payment>, // map of payments to process
     pub round_status: PaymentRoundStatus, // status of weather all payments passed, failed etc
 }
 
@@ -167,7 +167,7 @@ impl PaymentRound {
         ledger_id: Principal,
         token: TokenSymbol,
         total_neuron_maturity: u64,
-        payments: HashMap<NeuronId, Payment>
+        payments: BTreeMap<NeuronId, Payment>
     ) -> Self {
         Self {
             id: id,
