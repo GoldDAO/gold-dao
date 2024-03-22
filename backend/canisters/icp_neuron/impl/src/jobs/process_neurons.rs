@@ -101,6 +101,8 @@ async fn run_async() {
                     ic_cdk::spawn(run_async())
                 );
             }
+
+            mutate_state(|s| s.data.outstanding_payments.cleanup())
         }
         Err(err) => { error!("Error fetching neuron list: {err:?}") }
     }

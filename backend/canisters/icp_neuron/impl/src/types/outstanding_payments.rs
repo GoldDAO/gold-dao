@@ -17,6 +17,17 @@ impl OutstandingPaymentsList {
         self.0.remove(&neuron_id);
     }
 
+    pub fn cleanup(&mut self) {
+        // removes any leftover outstanding payments which are complete, in case they were missed before
+        let mut keys_to_remove = vec![];
+        self.0.iter().for_each(|(&key, val)| {
+            if val.all_complete() {
+                keys_to_remove.push(key)
+            }
+        });
+        keys_to_remove.iter().for_each(|&neuron_id| self.remove_from_list(neuron_id))
+    }
+
     pub fn insert(
         &mut self,
         neuron_id: NnsNeuronId,
