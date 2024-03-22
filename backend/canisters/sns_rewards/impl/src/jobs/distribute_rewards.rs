@@ -127,8 +127,6 @@ pub async fn distribute_rewards() {
         state.data.payment_processor.read_active_pending_payment_rounds()
     );
 
-    info!("current round status : {:?}", pending_payment_rounds[0].1.round_status);
-
     for payment_round in &pending_payment_rounds {
         process_payment_round(payment_round).await;
     }
@@ -136,8 +134,6 @@ pub async fn distribute_rewards() {
     let processed_payment_rounds = read_state(|state|
         state.data.payment_processor.read_active_in_progress_rounds()
     );
-
-    info!("current round status : {:?}", processed_payment_rounds);
 
     for (_, payment_round) in &processed_payment_rounds {
         update_payment_round_status(&payment_round);
