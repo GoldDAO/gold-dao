@@ -96,7 +96,9 @@ pub async fn distribute_rewards() {
         );
 
         if total_neuron_maturity_for_interval == 0u64 {
-            info!("Maturity for all neurons had not changed - finishing payment round early");
+            info!(
+                "Maturity for all neurons has not changed since last distribution - finishing payment round early"
+            );
             return;
         }
 
@@ -275,10 +277,8 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
                     let new_maturity = rewarded_maturity
                         .checked_add(*maturity_delta)
                         .expect("update_neuron_rewards - overflow");
-                    println!("/// we here");
                     *rewarded_maturity = new_maturity;
                 } else {
-                    println!("/// we here 2");
                     neuron.rewarded_maturity.insert(*token, *maturity_delta);
                 }
             }
