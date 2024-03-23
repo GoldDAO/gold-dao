@@ -57,6 +57,7 @@ type TokenSymbol = variant { ICP; OGY; GLDGov };
 service : (Args) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   convert_neuron_disp : (NeuronId) -> (text) query;
+  get_active_payment_rounds : () -> (vec record { nat16; PaymentRound }) query;
   get_all_neuron_owners : () -> (vec principal) query;
   get_all_neurons : () -> (nat64) query;
   get_historic_payment_rounds : () -> (
@@ -70,8 +71,8 @@ service : (Args) -> {
     ) query;
   get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
   get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
-  get_payment_rounds : () -> (vec record { nat16; PaymentRound }) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
+  retry_failed_payment_rounds : () -> ();
   sync_neurons_manual_trigger : () -> ();
   sync_user_rewards : () -> ();
   update_info : () -> (text);

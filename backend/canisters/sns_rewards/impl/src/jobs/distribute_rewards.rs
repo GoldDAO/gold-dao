@@ -21,12 +21,12 @@ use crate::{
 };
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, DAY_IN_MS, WEEK_IN_MS };
-use futures::future::join_all;
+use futures::{ future::{ err, join_all }, Future };
 use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use num_bigint::BigUint;
 use sns_governance_canister::types::NeuronId;
-use std::collections::{ BTreeMap, HashMap };
+use std::collections::BTreeMap;
 use std::time::Duration;
 use tracing::{ debug, error, info };
 use types::{ Milliseconds, NeuronInfo, TokenSymbol };
@@ -50,22 +50,34 @@ pub fn run_retry_distribution() {
 
 // called once per day
 pub async fn retry_faulty_payment_rounds() {
-    let contains_faulty_payment_rounds = read_state(|state|
+    let faulty_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_faulty_payment_rounds()
     );
-    // if !contains_faulty_payment_rounds {
-    //     info!("All payment rounds are COMPLETED or PENDING");
-    //     return;
-    // }
-    // let successful_neuron_payments = mutate_state(|state| {
-    //     state.data.payment_processor.process_faulty_rounds()
-    // });
+    if faulty_payment_rounds.len() == 0 {
+        return;
+    }
+    for payment_round in &faulty_payment_rounds {
+        process_payment_round(payment_round).await;
+    }
 
-    // mutate_state(|state| {
-    //     update_neuron_rewards(state, successful_neuron_payments);
-    // });
-    // TODO
-    // Add the job duration etc
+    // update round status
+    let processed_payment_rounds = read_state(|state|
+        state.data.payment_processor.get_active_rounds()
+    );
+    for (_, payment_round) in &processed_payment_rounds {
+        update_payment_round_status(&payment_round);
+    }
+
+    // post processing
+    let processed_payment_rounds = read_state(|state|
+        state.data.payment_processor.get_active_rounds()
+    );
+    for (_, payment_round) in &processed_payment_rounds {
+        update_neuron_rewards(&payment_round);
+        move_payment_round_to_history(&payment_round);
+        log_payment_round_metrics(&payment_round);
+    }
+    debug!("END - finished processing distribution of payment rounds");
 }
 
 pub async fn distribute_rewards() {
@@ -217,7 +229,7 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     };
 
     let num_transactions = round.payments.len();
-    let fees: Nat = num_transactions.checked_mul(10_000).expect("error calcualting fees").into();
+    let fees: Nat = num_transactions.checked_mul(10_000).expect("error calculating fees").into();
     let total_to_transfer = fees + funds;
 
     info!("Transferring funds to payment round sub account for round id : {}", next_key);
@@ -369,6 +381,11 @@ async fn transfer_token(
     }
 }
 
+fn always_fail_future() -> impl Future<Output = Result<(), String>> {
+    // Create and return a future that always returns an Err
+    err("simulated failure".to_string())
+}
+
 fn update_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundStatus {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
 
@@ -443,7 +460,8 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                     ledger_id,
                     Nat::from(*reward)
                 );
-                (transfer_future, *neuron_id) // Returning a tuple of future and neuron_id
+                (transfer_future, *neuron_id) //
+                // (always_fail_future(), *neuron_id)
             })
             .unzip();
 
@@ -476,23 +494,6 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
 
 #[cfg(test)]
 mod tests {
-    // use num_bigint::BigUint;
-    // use sns_governance_canister::types::NeuronId;
-    // use types::NeuronInfo;
-    // use utils::consts::E8S_PER_ICP;
-
-    // use crate::{
-    //     jobs::distribute_rewards::{
-    //         calculate_aggregated_maturity,
-    //         calculate_neuron_percentages,
-    //         calculate_reward,
-    //         update_neuron_reward,
-    //     },
-    //     state::{ init_state, mutate_state, read_state, RuntimeState },
-    // };
-
-    // use super::calculate_neuron_maturity_for_interval;
-
     use std::collections::{ BTreeMap, HashMap };
 
     use candid::{ Nat, Principal };
