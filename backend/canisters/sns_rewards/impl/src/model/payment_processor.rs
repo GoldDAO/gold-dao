@@ -69,10 +69,9 @@ impl PaymentProcessor {
 
         rounds
     }
-    pub fn read_active_in_progress_rounds(&self) -> Vec<(u16, PaymentRound)> {
+    pub fn get_active_rounds(&self) -> Vec<(u16, PaymentRound)> {
         let rounds = self.active_rounds
             .iter()
-            .filter(|round| round.1.round_status == PaymentRoundStatus::InProgress)
             .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
@@ -138,8 +137,24 @@ impl PaymentProcessor {
         rounds
     }
 
+    pub fn get_payment_round_history(&self) -> Vec<(u16, PaymentRound)> {
+        let rounds = self.round_history
+            .iter()
+            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
+            .collect();
+
+        rounds
+    }
+
     pub fn get_historic_payment_round_by_id(&self, id: &u16) -> Option<PaymentRound> {
         self.round_history.get(id)
+    }
+    pub fn add_to_history(&mut self, payment_round: PaymentRound) {
+        self.round_history.insert(payment_round.id, payment_round);
+    }
+
+    pub fn delete_active_round(&mut self, payment_round_id: u16) {
+        self.active_rounds.remove_entry(&payment_round_id);
     }
 }
 

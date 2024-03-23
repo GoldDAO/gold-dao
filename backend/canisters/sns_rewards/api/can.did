@@ -59,6 +59,9 @@ service : (Args) -> {
   convert_neuron_disp : (NeuronId) -> (text) query;
   get_all_neuron_owners : () -> (vec principal) query;
   get_all_neurons : () -> (nat64) query;
+  get_historic_payment_rounds : () -> (
+      vec record { nat16; PaymentRound },
+    ) query;
   get_maturity_history_of_neuron : (NeuronId, opt nat64) -> (
       vec record { nat64; NeuronInfo },
     ) query;

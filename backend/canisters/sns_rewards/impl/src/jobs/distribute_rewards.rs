@@ -131,24 +131,47 @@ pub async fn distribute_rewards() {
         }
     }
 
+    // process active rounds
     let pending_payment_rounds = read_state(|state|
         state.data.payment_processor.read_active_pending_payment_rounds()
     );
-
     for payment_round in &pending_payment_rounds {
         process_payment_round(payment_round).await;
     }
 
+    // update round status
     let processed_payment_rounds = read_state(|state|
-        state.data.payment_processor.read_active_in_progress_rounds()
+        state.data.payment_processor.get_active_rounds()
     );
-
     for (_, payment_round) in &processed_payment_rounds {
         update_payment_round_status(&payment_round);
+    }
+
+    // post processing
+    let processed_payment_rounds = read_state(|state|
+        state.data.payment_processor.get_active_rounds()
+    );
+    for (_, payment_round) in &processed_payment_rounds {
         update_neuron_rewards(&payment_round);
+        move_payment_round_to_history(&payment_round);
         log_payment_round_metrics(&payment_round);
     }
     debug!("END - finished processing distribution of payment rounds");
+}
+
+pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
+    let payment_round_id = payment_round.id;
+    let status = payment_round.round_status.clone();
+
+    // only payment rounds that are fully completed may move to history
+    if status != PaymentRoundStatus::CompletedFull {
+        return;
+    }
+
+    // insert to history
+    mutate_state(|state| state.data.payment_processor.add_to_history(payment_round.clone()));
+    // delete from active
+    mutate_state(|state| state.data.payment_processor.delete_active_round(payment_round_id));
 }
 
 pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
@@ -192,7 +215,6 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let total_to_transfer = fees + funds;
 
     info!("Transferring funds to payment round sub account for round id : {}", next_key);
-    debug!("Id of sub account: {:?}", account);
     transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
 }
 
@@ -341,7 +363,7 @@ async fn transfer_token(
     }
 }
 
-fn update_payment_round_status(payment_round: &PaymentRound) {
+fn update_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundStatus {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
 
     let mut completed_count = 0;
@@ -370,8 +392,9 @@ fn update_payment_round_status(payment_round: &PaymentRound) {
     }
     info!("new round status {:?}", new_status);
     mutate_state(|state|
-        state.data.payment_processor.set_active_round_status(&payment_round.id, new_status)
+        state.data.payment_processor.set_active_round_status(&payment_round.id, new_status.clone())
     );
+    new_status
 }
 
 pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRound)) {
