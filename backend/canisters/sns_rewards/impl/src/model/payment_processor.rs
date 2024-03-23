@@ -1,12 +1,11 @@
-use std::{ borrow::{ BorrowMut, Cow }, collections::{ BTreeMap, HashMap }, ops::Deref };
+use std::{ borrow::Cow, collections::BTreeMap };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
 use ic_ledger_types::Subaccount;
-use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use tracing::{ debug, info };
+use tracing::debug;
 use types::{ TimestampMillis, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 
@@ -31,13 +30,6 @@ impl Default for PaymentProcessor {
     fn default() -> Self {
         Self { round_history: init_map(), active_rounds: BTreeMap::new() }
     }
-}
-
-fn create_payment_round_sub_account_id(count: u16) -> Subaccount {
-    let u16_bytes: [u8; 2] = count.to_le_bytes();
-    let mut array: [u8; 32] = [0; 32];
-    array[30..32].copy_from_slice(&u16_bytes);
-    Subaccount(array)
 }
 
 impl PaymentProcessor {
@@ -146,9 +138,6 @@ impl PaymentProcessor {
         rounds
     }
 
-    pub fn get_historic_payment_round_by_id(&self, id: &u16) -> Option<PaymentRound> {
-        self.round_history.get(id)
-    }
     pub fn add_to_history(&mut self, payment_round: PaymentRound) {
         self.round_history.insert(payment_round.id, payment_round);
     }

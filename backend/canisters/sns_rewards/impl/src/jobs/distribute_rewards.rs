@@ -551,7 +551,6 @@ mod tests {
 
         let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 0u64), (neuron_id_3, 0u64)];
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
-        let expected: Vec<u64> = vec![0u64, 0u64, 0u64];
 
         let result = calculate_neuron_shares(neuron_deltas, reward_pool).is_none();
         assert_eq!(result, true)
@@ -723,7 +722,7 @@ mod tests {
 
         update_neuron_rewards(&round);
 
-        /// test 1
+        // test 1
         read_state(|state| {
             let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
             let rewarded_amount = neuron.rewarded_maturity.get(&TokenSymbol::ICP).unwrap();
