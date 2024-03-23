@@ -82,7 +82,8 @@ pub async fn distribute_rewards() {
         // let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await;
         let tokens_to_distribute = Nat::from(300_000u64);
         if tokens_to_distribute == Nat::from(0u64) {
-            return;
+            info!("REWARD POOL {:?} has no rewards for distribution", token);
+            continue;
         }
         // maturity delta ( change ) per neuron
         let neuron_maturity_for_interval = read_state(|state|
@@ -94,11 +95,16 @@ pub async fn distribute_rewards() {
             &neuron_maturity_for_interval
         );
 
+        if total_neuron_maturity_for_interval == 0u64 {
+            info!("Maturity for all neurons had not changed - finishing payment round early");
+            return;
+        }
+
         // rewards per neuron
         let neuron_share = calculate_neuron_shares(
             neuron_maturity_for_interval,
             tokens_to_distribute.clone()
-        );
+        ).unwrap_or(BTreeMap::new());
 
         let new_round_key = read_state(|state| state.data.payment_processor.next_key());
 
@@ -219,20 +225,25 @@ pub fn calculate_neuron_maturity_for_interval(
 pub fn calculate_neuron_shares(
     neuron_deltas: Vec<(NeuronId, u64)>,
     reward_pool: Nat
-) -> BTreeMap<NeuronId, Payment> {
+) -> Option<BTreeMap<NeuronId, Payment>> {
     let total_maturity: u64 = neuron_deltas
         .iter()
         .map(|entry| entry.1)
         .sum();
 
-    let total_maturity_big = BigUint::try_from(total_maturity.clone()).unwrap();
+    let total_maturity_big = BigUint::from(total_maturity.clone());
+
+    if total_maturity_big == BigUint::from(0u64) {
+        // if we don't return early then a dividing error will occur
+        return None;
+    }
     let reward_pool_big = BigUint::from(reward_pool);
     // Calculate the reward for each neuron
     let map: BTreeMap<NeuronId, Payment> = neuron_deltas
         .iter()
         .map(|(neuron_id, maturity)| {
             // Convert maturity to BigUint
-            let maturity_big = BigUint::try_from(*maturity).unwrap();
+            let maturity_big = BigUint::from(*maturity);
 
             // Calculate percentage as (maturity / total_maturity) * 10000 (expressed in basis points)
             let percentage =
@@ -244,7 +255,7 @@ pub fn calculate_neuron_shares(
         })
         .collect();
 
-    map
+    Some(map)
 }
 
 pub fn update_neuron_rewards(payment_round: &PaymentRound) {
@@ -495,13 +506,32 @@ mod tests {
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
         let expected: Vec<u64> = vec![16_666_666u64, 33_333_333u64, 50_000_000u64];
 
-        let result = calculate_neuron_shares(neuron_deltas, reward_pool);
+        let result = calculate_neuron_shares(neuron_deltas, reward_pool).unwrap();
         result
             .iter()
             .zip(expected.iter())
             .for_each(|(res, expected_value)| {
                 assert_eq!(&res.1.0, expected_value);
             });
+    }
+    #[test]
+    fn test_calculate_neuron_shares_all_zeros() {
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_2 = NeuronId::new(
+            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_3 = NeuronId::new(
+            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 0u64), (neuron_id_3, 0u64)];
+        let reward_pool = Nat::from(100_000_000u64); // 1 ICP
+        let expected: Vec<u64> = vec![0u64, 0u64, 0u64];
+
+        let result = calculate_neuron_shares(neuron_deltas, reward_pool).is_none();
+        assert_eq!(result, true)
     }
 
     #[test]
@@ -539,6 +569,30 @@ mod tests {
         let result = calculate_neuron_maturity_for_interval(&neurons, &TokenSymbol::ICP);
         println!("{:?}", neurons);
         let expected = 392; // 542 (current maturity) - 150 (previous maturity)
+        assert_eq!(result[0].1, expected);
+    }
+
+    #[test]
+    fn test_calculate_neuron_maturity_for_interval_all_zeros() {
+        let mut neurons = BTreeMap::new();
+
+        // neuron 1
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let mut neuron_1_rewarded = HashMap::new();
+        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+
+        let neuron_info_1 = NeuronInfo {
+            accumulated_maturity: 0,
+            last_synced_maturity: 0,
+            rewarded_maturity: neuron_1_rewarded,
+        };
+        neurons.insert(neuron_id_1.clone(), neuron_info_1);
+
+        let result = calculate_neuron_maturity_for_interval(&neurons, &TokenSymbol::ICP);
+        let expected = 0;
         assert_eq!(result[0].1, expected);
     }
 
