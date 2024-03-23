@@ -20,7 +20,7 @@ use crate::{
     state::{ mutate_state, read_state, RuntimeState },
 };
 use candid::{ Nat, Principal };
-use canister_time::{ run_interval, WEEK_IN_MS };
+use canister_time::{ run_interval, DAY_IN_MS, WEEK_IN_MS };
 use futures::future::join_all;
 use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
@@ -33,20 +33,26 @@ use types::{ Milliseconds, NeuronInfo, TokenSymbol };
 use utils::consts::E8S_PER_ICP;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
+const DISTRIBUTION_RETRY_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run);
+    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
+    run_interval(Duration::from_millis(DISTRIBUTION_RETRY_INTERVAL), run_retry_distribution);
 }
 
-pub fn run() {
+pub fn run_distribution() {
     ic_cdk::spawn(distribute_rewards())
+}
+
+pub fn run_retry_distribution() {
+    ic_cdk::spawn(retry_faulty_payment_rounds())
 }
 
 // called once per day
 pub async fn retry_faulty_payment_rounds() {
-    // let contains_faulty_payment_rounds = read_state(|state|
-    //     state.data.payment_processor.contains_faulty_payment_rounds()
-    // );
+    let contains_faulty_payment_rounds = read_state(|state|
+        state.data.payment_processor.get_active_faulty_payment_rounds()
+    );
     // if !contains_faulty_payment_rounds {
     //     info!("All payment rounds are COMPLETED or PENDING");
     //     return;

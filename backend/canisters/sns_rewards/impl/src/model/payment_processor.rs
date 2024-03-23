@@ -70,7 +70,7 @@ impl PaymentProcessor {
         rounds
     }
 
-    pub fn get_active_faulty_payment_rounds(&mut self) -> Vec<(&u16, &PaymentRound)> {
+    pub fn get_active_faulty_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
         let rounds = self.active_rounds
             .iter()
             .filter(|round| {
@@ -80,7 +80,7 @@ impl PaymentProcessor {
                     _ => true,
                 }
             })
-            .map(|(round_id, payment_round)| (round_id, payment_round))
+            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
         rounds
