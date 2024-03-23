@@ -143,11 +143,11 @@ pub async fn distribute_rewards() {
     debug!("END - finished processing distribution of payment rounds");
 }
 
-pub fn log_payment_round_metrics(payment_round: &PaymentRound) {
+pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
     let successful_neuron_transfers: Vec<(&NeuronId, &MaturityDelta, &TokenSymbol)> = payments
         .iter()
-        .filter(|(_, (_, status, _))| status != &PaymentStatus::Completed)
+        .filter(|(_, (_, status, _))| status == &PaymentStatus::Completed)
         .map(|(neuron_id, (_, _, maturity))| (*neuron_id, maturity, &payment_round.token))
         .collect();
     let summed_success_maturity: u64 = successful_neuron_transfers
@@ -155,7 +155,7 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) {
         .map(|(_, maturity_delta, _)| *maturity_delta)
         .sum();
 
-    debug!(
+    let print_string = format!(
         "METRICS || round : {}, token : {:?}, number success completed : {}, successful maturity distributed : {}, round maturity : {}",
         payment_round.id,
         payment_round.token,
@@ -163,6 +163,8 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) {
         summed_success_maturity,
         payment_round.total_neuron_maturity
     );
+    debug!(print_string);
+    print_string
 }
 
 pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Result<(), String> {
@@ -177,8 +179,13 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
         subaccount: Some(round_pool_subaccount.0),
     };
 
-    debug!("Transferring funds to payment round sub account for round id : {}", next_key);
-    transfer_token(from_sub_account, account, ledger_id, funds).await
+    let num_transactions = round.payments.len();
+    let fees: Nat = num_transactions.checked_mul(10_000).expect("error calcualting fees").into();
+    let total_to_transfer = fees + funds;
+
+    info!("Transferring funds to payment round sub account for round id : {}", next_key);
+    debug!("Id of sub account: {:?}", account);
+    transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
 }
 
 pub fn get_ledger_id(state: &RuntimeState, token: TokenSymbol) -> Principal {
@@ -242,12 +249,14 @@ pub fn calculate_neuron_shares(
 
 pub fn update_neuron_rewards(payment_round: &PaymentRound) {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
+
     let successful_neuron_transfers: Vec<(&NeuronId, &MaturityDelta, &TokenSymbol)> = payments
         .iter()
-        .filter(|(_, (_, status, _))| status != &PaymentStatus::Completed)
+        .filter(|(_, (_, status, _))| status == &PaymentStatus::Completed)
         .map(|(neuron_id, (_, _, maturity))| (*neuron_id, maturity, &payment_round.token))
         .collect();
 
+    // println!("/// successful_neuron_transfers {:?}", successful_neuron_transfers);
     for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
         mutate_state(|state| {
             if let Some(neuron) = state.data.neuron_maturity.get_mut(&neuron_id) {
@@ -255,8 +264,10 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
                     let new_maturity = rewarded_maturity
                         .checked_add(*maturity_delta)
                         .expect("update_neuron_rewards - overflow");
+                    println!("/// we here");
                     *rewarded_maturity = new_maturity;
                 } else {
+                    println!("/// we here 2");
                     neuron.rewarded_maturity.insert(*token, *maturity_delta);
                 }
             }
@@ -444,13 +455,26 @@ mod tests {
 
     use std::collections::{ BTreeMap, HashMap };
 
-    use candid::Nat;
+    use candid::{ Nat, Principal };
     use sns_governance_canister::types::NeuronId;
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::jobs::distribute_rewards::calculate_neuron_shares;
+    use crate::{
+        jobs::distribute_rewards::calculate_neuron_shares,
+        model::payment_processor::{ PaymentRound, PaymentStatus },
+        state::{ init_state, mutate_state, read_state, RuntimeState },
+    };
 
-    use super::{ calculate_aggregated_maturity, calculate_neuron_maturity_for_interval };
+    use super::{
+        calculate_aggregated_maturity,
+        calculate_neuron_maturity_for_interval,
+        log_payment_round_metrics,
+        update_neuron_rewards,
+    };
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
 
     #[test]
     fn test_calculate_neuron_maturity_for_first_sync() {}
@@ -534,5 +558,116 @@ mod tests {
         let res = calculate_aggregated_maturity(&neuron_deltas);
         let expected = 60u64;
         assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_log_payment_round_metrics() {
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_2 = NeuronId::new(
+            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_3 = NeuronId::new(
+            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_4 = NeuronId::new(
+            "5a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+        let neuron_id_5 = NeuronId::new(
+            "6a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let mut payments = BTreeMap::new();
+        payments.insert(neuron_id_1, (1, PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_2, (1, PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_3, (1, PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_4, (1, PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_5, (1, PaymentStatus::Completed, 1));
+
+        let ledger_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+
+        let round = PaymentRound::new(
+            1u16,
+            Nat::from(100_000u64),
+            ledger_id,
+            TokenSymbol::ICP,
+            10u64,
+            payments
+        );
+
+        let result = log_payment_round_metrics(&round);
+
+        assert_eq!(
+            result,
+            "METRICS || round : 1, token : ICP, number success completed : 5, successful maturity distributed : 5, round maturity : 10"
+        );
+    }
+
+    #[test]
+    fn test_update_neuron_rewards() {
+        init_runtime_state();
+
+        let neuron_id_1 = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        // insert a neuron to neuron_maturity
+        let expected_result = 150u64;
+
+        let mut neuron_1_rewarded = HashMap::new();
+        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+
+        let neuron_info = NeuronInfo {
+            accumulated_maturity: 0,
+            last_synced_maturity: 0,
+            rewarded_maturity: neuron_1_rewarded,
+        };
+
+        mutate_state(|state| {
+            state.data.neuron_maturity.insert(neuron_id_1.clone(), neuron_info);
+        });
+
+        // create a payment round
+
+        let mut payments = BTreeMap::new();
+        payments.insert(neuron_id_1.clone(), (1, PaymentStatus::Completed, expected_result));
+
+        let ledger_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+
+        let round = PaymentRound::new(
+            1u16,
+            Nat::from(100_000u64),
+            ledger_id,
+            TokenSymbol::ICP,
+            10u64,
+            payments
+        );
+
+        update_neuron_rewards(&round);
+
+        /// test 1
+        read_state(|state| {
+            let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
+            let rewarded_amount = neuron.rewarded_maturity.get(&TokenSymbol::ICP).unwrap();
+            assert_eq!(rewarded_amount.clone(), expected_result);
+        });
+
+        // dont strictly need to do this
+        mutate_state(|state| {
+            let neuron_maturity = state.data.neuron_maturity.get_mut(&neuron_id_1).unwrap();
+            neuron_maturity.accumulated_maturity += 150; // 450 in total now
+        });
+        // use same payment round from before
+        update_neuron_rewards(&round);
+        let expected_result = 300u64; // two payments of 150
+
+        read_state(|state| {
+            let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
+            let rewarded_amount = neuron.rewarded_maturity.get(&TokenSymbol::ICP).unwrap();
+            assert_eq!(rewarded_amount.clone(), expected_result);
+        });
+
+        // update the neuron maturity
     }
 }
