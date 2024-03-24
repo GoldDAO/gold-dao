@@ -98,8 +98,8 @@ pub async fn distribute_rewards() {
         // check reward pool has a balance
         let ledger_id = read_state(|state| get_ledger_id(state, token.clone()));
         // let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await;
-        let tokens_to_distribute = Nat::from(300_000u64);
-        if tokens_to_distribute == Nat::from(0u64) {
+        let reward_pool_balance = Nat::from(300_000u64);
+        if reward_pool_balance == Nat::from(0u64) {
             info!("REWARD POOL for {:?} token has no rewards for distribution", token);
             continue;
         }
@@ -109,14 +109,14 @@ pub async fn distribute_rewards() {
         );
 
         let transaction_fees = calculate_transaction_fees(&neuron_maturity_for_interval);
-        if transaction_fees > tokens_to_distribute {
+        if transaction_fees > reward_pool_balance {
             info!(
                 "The fees exceed the amount in the reward pool for token : {:?} - skipping distribution for this token",
                 token.clone()
             );
             continue;
         }
-        let tokens_to_distribute = tokens_to_distribute - transaction_fees;
+        let tokens_to_distribute = reward_pool_balance - transaction_fees.clone();
 
         let total_neuron_maturity_for_interval = calculate_aggregated_maturity(
             &neuron_maturity_for_interval
@@ -140,6 +140,7 @@ pub async fn distribute_rewards() {
         let new_round = PaymentRound::new(
             new_round_key,
             tokens_to_distribute,
+            transaction_fees,
             ledger_id,
             token.clone(),
             total_neuron_maturity_for_interval,
@@ -216,8 +217,9 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let total_transfers = &payments.len();
 
     let print_string = format!(
-        "PAYMENT ROUND METRICS || round id : {}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}",
+        "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}",
         payment_round.id,
+        payment_round.round_status,
         payment_round.token,
         total_transfers,
         successful_neuron_transfers.len(),
@@ -230,7 +232,7 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
 
 pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Result<(), String> {
     let next_key = round.id;
-    let funds = round.round_funds_total.clone();
+    let total_to_transfer = round.round_funds_total.clone() + round.fees.clone();
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
 
@@ -241,7 +243,7 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     };
 
     info!("Transferring funds to payment round sub account for round id : {}", next_key);
-    transfer_token(from_sub_account, account, ledger_id, funds).await
+    transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
 }
 
 pub fn get_ledger_id(state: &RuntimeState, token: TokenSymbol) -> Principal {
@@ -721,6 +723,7 @@ mod tests {
         let round = PaymentRound::new(
             1u16,
             Nat::from(100_000u64),
+            Nat::from(50_000u64),
             ledger_id,
             TokenSymbol::ICP,
             5u64,
@@ -731,7 +734,7 @@ mod tests {
 
         assert_eq!(
             result,
-            "PAYMENT ROUND METRICS || round id : 1, token : ICP, total : 5, successful : 4, maturity distributed : 4, round maturity : 5"
+            "PAYMENT ROUND METRICS || round id : 1, round status : Pending, token : ICP, total : 5, successful : 4, maturity distributed : 4, round maturity : 5"
         );
     }
 
@@ -769,6 +772,7 @@ mod tests {
         let round = PaymentRound::new(
             1u16,
             Nat::from(100_000u64),
+            Nat::from(50_000u64),
             ledger_id,
             TokenSymbol::ICP,
             10u64,

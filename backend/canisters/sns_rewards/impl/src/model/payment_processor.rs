@@ -152,6 +152,7 @@ pub struct PaymentRound {
     pub id: u16,
     pub round_funds_subaccount: Option<Subaccount>, // holds the rewards for this round of payments
     pub round_funds_total: Nat, // total amount to be distributed from the funds sub account
+    pub fees: Nat,
     pub ledger_id: Principal, // the ledger associated with transferring funds for this round of specific token payments
     pub token: TokenSymbol, // the token associated with a specific payment round
     pub date_initialized: TimestampMillis, //
@@ -168,6 +169,7 @@ impl PaymentRound {
     pub fn new(
         id: u16,
         round_funds_total: Nat,
+        fees: Nat,
         ledger_id: Principal,
         token: TokenSymbol,
         total_neuron_maturity: u64,
@@ -177,6 +179,7 @@ impl PaymentRound {
             id: id,
             round_funds_subaccount: None,
             round_funds_total,
+            fees,
             ledger_id,
             token,
             date_initialized: now_millis(),
