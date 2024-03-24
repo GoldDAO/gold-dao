@@ -32,7 +32,6 @@ type PaymentRound = record {
   ledger_id : principal;
   round_status : PaymentRoundStatus;
   date_initialized : nat64;
-  round_funds_subaccount : opt vec nat8;
 };
 type PaymentRoundStatus = variant {
   Failed : text;
