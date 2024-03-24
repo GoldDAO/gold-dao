@@ -135,6 +135,9 @@ pub async fn distribute_rewards() {
     let pending_payment_rounds = read_state(|state|
         state.data.payment_processor.read_active_pending_payment_rounds()
     );
+    if pending_payment_rounds.len() == 0 {
+        return;
+    }
     for payment_round in &pending_payment_rounds {
         process_payment_round(payment_round).await;
     }
