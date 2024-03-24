@@ -150,7 +150,6 @@ impl PaymentProcessor {
 #[derive(Serialize, Deserialize, CandidType, Debug, Clone)]
 pub struct PaymentRound {
     pub id: u16,
-    pub round_funds_subaccount: Option<Subaccount>, // holds the rewards for this round of payments
     pub round_funds_total: Nat, // total amount to be distributed from the funds sub account
     pub fees: Nat,
     pub ledger_id: Principal, // the ledger associated with transferring funds for this round of specific token payments
@@ -177,7 +176,6 @@ impl PaymentRound {
     ) -> Self {
         Self {
             id: id,
-            round_funds_subaccount: None,
             round_funds_total,
             fees,
             ledger_id,
