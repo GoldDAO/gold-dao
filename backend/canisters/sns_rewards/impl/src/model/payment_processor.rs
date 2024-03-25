@@ -24,6 +24,7 @@ pub struct PaymentProcessor {
     #[serde(skip, default = "init_map")]
     round_history: StableBTreeMap<u16, PaymentRound, VM>,
     active_rounds: BTreeMap<u16, PaymentRound>,
+    is_processing_status: bool,
 }
 
 fn init_map() -> StableBTreeMap<u16, PaymentRound, VM> {
@@ -33,7 +34,11 @@ fn init_map() -> StableBTreeMap<u16, PaymentRound, VM> {
 
 impl Default for PaymentProcessor {
     fn default() -> Self {
-        Self { round_history: init_map(), active_rounds: BTreeMap::new() }
+        Self {
+            round_history: init_map(),
+            active_rounds: BTreeMap::new(),
+            is_processing_status: false,
+        }
     }
 }
 
@@ -50,6 +55,14 @@ impl PaymentProcessor {
             next_key = 1; // Wrap around to 0 if the key exceeds u16::MAX
         }
         next_key
+    }
+
+    pub fn toggle_is_processing_status(&mut self) {
+        self.is_processing_status = !self.is_processing_status;
+    }
+
+    pub fn get_is_processing_status(&self) -> bool {
+        self.is_processing_status
     }
 
     pub fn add_active_payment_round(&mut self, round: PaymentRound) {
@@ -208,7 +221,7 @@ impl PaymentRound {
         }
 
         // rewards per neuron
-        let payments = Self::calculate_neuron_shares(
+        let payments = Self::calculate_neuron_rewards(
             neuron_maturity_for_interval,
             tokens_to_distribute.clone()
         ).unwrap_or(BTreeMap::new());
@@ -266,7 +279,7 @@ impl PaymentRound {
             .sum()
     }
 
-    pub fn calculate_neuron_shares(
+    pub fn calculate_neuron_rewards(
         neuron_deltas: Vec<(NeuronId, u64)>,
         reward_pool: Nat
     ) -> Option<BTreeMap<NeuronId, Payment>> {
@@ -354,10 +367,17 @@ mod tests {
     use sns_governance_canister::types::NeuronId;
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::model::payment_processor::PaymentRound;
+    use crate::{
+        model::payment_processor::PaymentRound,
+        state::{ init_state, mutate_state, read_state, RuntimeState },
+    };
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
 
     #[test]
-    fn test_calculate_neuron_shares() {
+    fn test_calculate_neuron_rewards() {
         let neuron_id_1 = NeuronId::new(
             "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
         ).unwrap();
@@ -372,7 +392,7 @@ mod tests {
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
         let expected: Vec<u64> = vec![16_666_666u64, 33_333_333u64, 50_000_000u64];
 
-        let result = PaymentRound::calculate_neuron_shares(neuron_deltas, reward_pool).unwrap();
+        let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).unwrap();
         result
             .iter()
             .zip(expected.iter())
@@ -381,7 +401,7 @@ mod tests {
             });
     }
     #[test]
-    fn test_calculate_neuron_shares_all_zeros() {
+    fn test_calculate_neuron_rewards_all_zeros() {
         let neuron_id_1 = NeuronId::new(
             "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
         ).unwrap();
@@ -395,12 +415,12 @@ mod tests {
         let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 0u64), (neuron_id_3, 0u64)];
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
 
-        let result = PaymentRound::calculate_neuron_shares(neuron_deltas, reward_pool).is_none();
+        let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).is_none();
         assert_eq!(result, true)
     }
 
     #[test]
-    fn test_calculate_neuron_shares_with_no_maturity_change() {
+    fn test_calculate_neuron_rewards_with_no_maturity_change() {
         let neuron_id_1 = NeuronId::new(
             "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
         ).unwrap();
@@ -415,7 +435,7 @@ mod tests {
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
         let expected: Vec<u64> = vec![50_000_000u64, 50_000_000u64];
 
-        let result = PaymentRound::calculate_neuron_shares(neuron_deltas, reward_pool).unwrap();
+        let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).unwrap();
         result
             .iter()
             .zip(expected.iter())
@@ -530,5 +550,25 @@ mod tests {
 
         let result = PaymentRound::calculate_transaction_fees(&neuron_deltas);
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_toggle_is_processing() {
+        init_runtime_state();
+
+        // by default it should be false
+        let default_result = read_state(|state|
+            state.data.payment_processor.get_is_processing_status()
+        );
+
+        assert_eq!(default_result, false);
+
+        mutate_state(|state| state.data.payment_processor.toggle_is_processing_status());
+
+        let new_status = read_state(|state|
+            state.data.payment_processor.get_is_processing_status()
+        );
+
+        assert_eq!(new_status, true)
     }
 }

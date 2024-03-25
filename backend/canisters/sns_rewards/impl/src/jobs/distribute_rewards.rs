@@ -47,6 +47,8 @@ pub fn run_retry_distribution() {
 
 // called once per day
 pub async fn retry_faulty_payment_rounds() {
+    debug!("REWARD DISTRIBUTION RETRY - START");
+
     let faulty_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_faulty_payment_rounds()
     );
@@ -74,7 +76,7 @@ pub async fn retry_faulty_payment_rounds() {
         move_payment_round_to_history(&payment_round);
         log_payment_round_metrics(&payment_round);
     }
-    debug!("END - finished processing distribution of payment rounds");
+    debug!("REWARD DISTRIBUTION RETRY - END");
 }
 
 pub async fn distribute_rewards() {
@@ -82,13 +84,16 @@ pub async fn distribute_rewards() {
     let start_time = now_millis();
 
     // Check if there are active rounds - active rounds may be rounds that are in progress or failed / failed partially.
-    read_state(|state| {
-        let faulty_active_rounds_exist = state.data.payment_processor.active_rounds_exist();
-        if faulty_active_rounds_exist {
-            info!("There are still active rounds present to process. Ending early!");
-            return;
-        }
+    let faulty_active_rounds_exist = read_state(|state| {
+        state.data.payment_processor.active_rounds_exist()
     });
+
+    if faulty_active_rounds_exist {
+        info!(
+            "REWARD_DISTRIBUTION - ABORTED - reason : can't process new rounds when there are active rounds present"
+        );
+        return;
+    }
 
     // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov]; // TODO - uncomment when going live
     let reward_tokens = vec![TokenSymbol::ICP];
@@ -172,10 +177,8 @@ pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
     if status != PaymentRoundStatus::CompletedFull {
         return;
     }
-
-    // insert to history
+    // insert to history && delete from active
     mutate_state(|state| state.data.payment_processor.add_to_history(payment_round.clone()));
-    // delete from active
     mutate_state(|state| state.data.payment_processor.delete_active_round(payment_round_id));
 }
 
@@ -379,7 +382,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                     ledger_id,
                     Nat::from(*reward)
                 );
-                (transfer_future, *neuron_id) //
+                (transfer_future, *neuron_id)
                 // (always_fail_future(), *neuron_id)
             })
             .unzip();
