@@ -106,8 +106,8 @@ pub async fn distribute_rewards() {
     let reward_tokens = vec![TokenSymbol::ICP];
     for token in &reward_tokens {
         let ledger_id = read_state(|state| get_ledger_id(state, token.clone()));
-        // let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await;
-        let reward_pool_balance = Nat::from(300_000u64);
+        // let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await; // TODO - uncomment when going live
+        let reward_pool_balance = Nat::from(300_000u64); // TODO - remove when going live
         if reward_pool_balance == Nat::from(0u64) {
             info!("REWARD POOL for {:?} token has no rewards for distribution", token);
             continue;
