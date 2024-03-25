@@ -1,12 +1,19 @@
 /*!
 # SNS reward distribution
 
-This job is responsible for distributing rewards to user's sub accounts.
+fn distribute_rewards
+Distributes reward tokens based on a neuron's accumulated maturity 
+on a weekly basis. 
 
-There are reward pools ( ICP, OGY, GLDGov ) that exist on the 0 sub account
-Individual neuron rewards are transferred to a sub account based on the NeuronId
+Sub accounts
+reward pool - [0u8;32] -> holds ICP, OGY, GLDGOV pre distribution
+payment round pool - [0u8;30,u16] -> all 0's except fro the last 2. represents a reward pool for a specific distribution round
+neuron / user reward - [u8;32] -> based on the NeuronId ( since both are a [u8;32] )
 
-TODO - update this.
+payment rounds may only be created if there are no active payment rounds.
+active payment rounds may contain a round of any status except for PaymentRoundStatus::CompletedFull
+once a payment round is finished it is moved to history.
+
 */
 
 use crate::{
