@@ -51,7 +51,7 @@ impl PaymentProcessor {
             None => 1, // If the map is empty, start from 0
         };
 
-        if next_key > u16::MAX {
+        if next_key == u16::MAX {
             next_key = 1; // Wrap around to 0 if the key exceeds u16::MAX
         }
         next_key
@@ -224,7 +224,7 @@ impl PaymentRound {
         let payments = Self::calculate_neuron_rewards(
             neuron_maturity_for_interval,
             tokens_to_distribute.clone()
-        ).unwrap_or(BTreeMap::new());
+        ).unwrap_or_default();
 
         Ok(Self {
             id: id,
