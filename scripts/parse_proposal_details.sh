@@ -34,7 +34,7 @@ fi
 DETAILSURLFIELD=$(cat proposal_template.md | grep "details_url")
 export DETAILS_URL=${DETAILSURLFIELD:13}
 sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_template.md > proposal.md && \
-sed -i '' "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal.md && \
-sed -i '' "s/<<CANISTER>>/${CANISTER_NAME}/g" proposal.md && \
+sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal.md && \
+sed -i "s/<<CANISTER>>/${CANISTER_NAME}/g" proposal.md && \
 cat CHANGELOG.md >> proposal.md
 return
