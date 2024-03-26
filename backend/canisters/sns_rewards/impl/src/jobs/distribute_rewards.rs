@@ -105,11 +105,11 @@ pub async fn distribute_rewards() {
         return;
     }
 
+    let reward_tokens = read_state(|s| s.data.tokens.clone());
+
     // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov]; // TODO - uncomment when going live
-    let reward_tokens = vec![TokenSymbol::ICP];
-    for token in &reward_tokens {
-        let ledger_id = read_state(|state| get_ledger_id(state, token.clone()));
-        // let tokens_to_distribute = fetch_reward_pool_balance(ledger_id).await; // TODO - uncomment when going live
+    for (token, token_info) in reward_tokens.into_iter() {
+        // let tokens_to_distribute = fetch_reward_pool_balance(token_info.ledger_id).await; // TODO - uncomment when going live
         let reward_pool_balance = Nat::from(300_000u64); // TODO - remove when going live
         if reward_pool_balance == Nat::from(0u64) {
             info!("REWARD POOL for {:?} token has no rewards for distribution", token);
@@ -122,7 +122,7 @@ pub async fn distribute_rewards() {
         let new_round = PaymentRound::new(
             new_round_key,
             reward_pool_balance,
-            ledger_id,
+            token_info.ledger_id,
             token.clone(),
             neuron_data
         );
@@ -236,14 +236,6 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
 }
 
-pub fn get_ledger_id(state: &RuntimeState, token: TokenSymbol) -> Principal {
-    match token {
-        TokenSymbol::ICP => state.data.icp_ledger_canister_id,
-        TokenSymbol::OGY => state.data.ogy_ledger_canister_id,
-        TokenSymbol::GLDGov => state.data.gldgov_ledger_canister_id,
-    }
-}
-
 pub fn update_neuron_rewards(payment_round: &PaymentRound) {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
 
@@ -257,13 +249,13 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
     for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
         mutate_state(|state| {
             if let Some(neuron) = state.data.neuron_maturity.get_mut(&neuron_id) {
-                if let Some(rewarded_maturity) = neuron.rewarded_maturity.get_mut(&token) {
+                if let Some(rewarded_maturity) = neuron.rewarded_maturity.get_mut(&token.clone()) {
                     let new_maturity = rewarded_maturity
                         .checked_add(*maturity_delta)
                         .expect("update_neuron_rewards - overflow");
                     *rewarded_maturity = new_maturity;
                 } else {
-                    neuron.rewarded_maturity.insert(*token, *maturity_delta);
+                    neuron.rewarded_maturity.insert(token.clone(), *maturity_delta);
                 }
             }
         });
@@ -475,13 +467,14 @@ mod tests {
         payments.insert(neuron_id_5, (1, PaymentStatus::Completed, 1));
 
         let ledger_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
 
         let round = PaymentRound {
             id: 1u16,
             round_funds_total: Nat::from(100_000u64),
             fees: Nat::from(50_000u64),
             ledger_id,
-            token: TokenSymbol::ICP,
+            token: icp_symbol,
             date_initialized: timestamp_millis(),
             total_neuron_maturity: 5u64,
             payments,
@@ -508,7 +501,8 @@ mod tests {
         let expected_result = 150u64;
 
         let mut neuron_1_rewarded = HashMap::new();
-        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
+        neuron_1_rewarded.insert(icp_symbol.clone(), 0);
 
         let neuron_info = NeuronInfo {
             accumulated_maturity: 0,
@@ -532,7 +526,7 @@ mod tests {
             round_funds_total: Nat::from(100_000u64),
             fees: Nat::from(50_000u64),
             ledger_id,
-            token: TokenSymbol::ICP,
+            token: icp_symbol.clone(),
             date_initialized: timestamp_millis(),
             total_neuron_maturity: 5u64,
             payments,
@@ -544,7 +538,8 @@ mod tests {
         // test 1
         read_state(|state| {
             let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
-            let rewarded_amount = neuron.rewarded_maturity.get(&TokenSymbol::ICP).unwrap();
+
+            let rewarded_amount = neuron.rewarded_maturity.get(&icp_symbol).unwrap();
             assert_eq!(rewarded_amount.clone(), expected_result);
         });
 
@@ -559,7 +554,7 @@ mod tests {
 
         read_state(|state| {
             let neuron = state.data.neuron_maturity.get(&neuron_id_1).unwrap();
-            let rewarded_amount = neuron.rewarded_maturity.get(&TokenSymbol::ICP).unwrap();
+            let rewarded_amount = neuron.rewarded_maturity.get(&icp_symbol).unwrap();
             assert_eq!(rewarded_amount.clone(), expected_result);
         });
 

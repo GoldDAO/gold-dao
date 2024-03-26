@@ -8,5 +8,6 @@ mod http_request;
 mod test;
 pub mod get_active_payment_rounds;
 pub mod get_historic_payment_rounds;
+pub mod get_reward_token_types;
 
 pub use get_neurons_of_principal::*;

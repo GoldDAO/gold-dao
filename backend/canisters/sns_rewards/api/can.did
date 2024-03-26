@@ -18,14 +18,14 @@ type HttpResponse = record {
 };
 type NeuronId = record { id : vec nat8 };
 type NeuronInfo = record {
-  rewarded_maturity : vec record { TokenSymbol; nat64 };
+  rewarded_maturity : vec record { text; nat64 };
   accumulated_maturity : nat64;
   last_synced_maturity : nat64;
 };
 type PaymentRound = record {
   id : nat16;
   round_funds_total : nat;
-  token : TokenSymbol;
+  token : text;
   payments : vec record { NeuronId; record { nat64; PaymentStatus; nat64 } };
   total_neuron_maturity : nat64;
   fees : nat;
@@ -41,6 +41,10 @@ type PaymentRoundStatus = variant {
   Pending;
 };
 type PaymentStatus = variant { Failed : text; Triggered; Completed; Pending };
+type SetRewardTokenTypesRequest = record {
+  token_list : vec record { text; TokenInfo };
+};
+type SetRewardTokenTypesResponse = variant { Success; InternalError : text };
 type StreamingStrategy = variant {
   Callback : record {
     token : Token;
@@ -53,7 +57,11 @@ type Token = record {
   index : nat;
   content_encoding : text;
 };
-type TokenSymbol = variant { ICP; OGY; GLDGov };
+type TokenInfo = record {
+  fee : nat64;
+  decimals : nat64;
+  ledger_id : principal;
+};
 service : (Args) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   convert_neuron_disp : (NeuronId) -> (text) query;
@@ -71,8 +79,12 @@ service : (Args) -> {
     ) query;
   get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
   get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
+  get_reward_token_types : () -> (vec record { text; TokenInfo }) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
   retry_failed_payment_rounds : () -> ();
+  set_reward_token_types : (SetRewardTokenTypesRequest) -> (
+      SetRewardTokenTypesResponse,
+    );
   sync_neurons_manual_trigger : () -> ();
   sync_user_rewards : () -> ();
   update_info : () -> (text);

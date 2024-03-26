@@ -1,16 +1,11 @@
-use std::collections::BTreeMap;
+use std::collections::{ BTreeMap, HashMap };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ NeuronInfo, TimestampMillis };
+use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
 use utils::{
-    consts::{
-        ICP_LEDGER_CANISTER_ID,
-        OGY_LEDGER_CANISTER_ID,
-        SNS_GOVERNANCE_CANISTER_ID,
-        SNS_LEDGER_CANISTER_ID,
-    },
+    consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
@@ -45,6 +40,12 @@ impl RuntimeState {
             sync_info: self.data.sync_info,
         }
     }
+
+    pub fn is_caller_governance_principal(&self) -> bool {
+        let caller = self.env.caller();
+        // self.data.authorized_principals.contains(&caller) TODO - add authorized principals
+        true
+    }
 }
 
 #[derive(CandidType, Serialize)]
@@ -73,24 +74,20 @@ pub struct SyncInfo {
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    /// SNS governance cansiter
+    /// SNS governance canister
     pub sns_governance_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
     /// Stores the mapping of each principal to its neurons
     pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
-    /// Information about periodic synchronisation
+    /// Information about periodic synchronization
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
-    /// OGY ledger canister id
-    pub ogy_ledger_canister_id: Principal,
-    /// ICP ledger canister id
-    pub icp_ledger_canister_id: Principal,
-    /// GLDGov ledger canister id
-    pub gldgov_ledger_canister_id: Principal,
-    /// Payment processor - responsible for queing and processing rounds of payments
+    /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
+    // valid tokens and their associated ledger data
+    pub tokens: HashMap<TokenSymbol, TokenInfo>,
 }
 
 impl Default for Data {
@@ -101,10 +98,8 @@ impl Default for Data {
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
-            ogy_ledger_canister_id: OGY_LEDGER_CANISTER_ID,
-            gldgov_ledger_canister_id: SNS_LEDGER_CANISTER_ID,
             payment_processor: PaymentProcessor::default(),
+            tokens: HashMap::new(),
         }
     }
 }

@@ -1,26 +1,29 @@
-use std::borrow::Cow;
-
-use candid::{ CandidType, Decode, Encode };
-use ic_stable_structures::{ storable::Bound, Storable };
+use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
-#[derive(Debug, Serialize, Clone, Deserialize, CandidType, Copy, PartialEq, Eq, Hash)]
-pub enum TokenSymbol {
-    OGY,
-    ICP,
-    GLDGov,
+#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash)]
+pub struct TokenSymbol(String);
+
+#[derive(Debug)]
+pub enum TokenSymbolParseError {
+    InvalidTokenSymbol,
 }
 
-const MAX_VALUE_SIZE: u32 = 8;
-impl Storable for TokenSymbol {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+impl TokenSymbol {
+    pub fn parse(symbol: &str) -> Result<TokenSymbol, TokenSymbolParseError> {
+        let allowed_tokens = ["ICP", "OGY", "GLDGov"];
+        let valid_token = allowed_tokens.contains(&symbol);
+        if valid_token {
+            Ok(TokenSymbol(symbol.to_string()))
+        } else {
+            Err(TokenSymbolParseError::InvalidTokenSymbol)
+        }
     }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
-    }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+}
+
+#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash)]
+pub struct TokenInfo {
+    pub ledger_id: Principal,
+    pub fee: u64,
+    pub decimals: u64,
 }

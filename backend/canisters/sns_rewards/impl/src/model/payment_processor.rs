@@ -454,7 +454,8 @@ mod tests {
         ).unwrap();
 
         let mut neuron_1_rewarded = HashMap::new();
-        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
+        neuron_1_rewarded.insert(icp_symbol.clone(), 0);
 
         let neuron_info_1 = NeuronInfo {
             accumulated_maturity: 150,
@@ -463,10 +464,7 @@ mod tests {
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &TokenSymbol::ICP
-        );
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
         let expected = 150;
         assert_eq!(result[0].1, expected);
 
@@ -476,13 +474,10 @@ mod tests {
         let n = neurons.get_mut(&neuron_id_1).unwrap();
         n.accumulated_maturity = 542;
         n.last_synced_maturity = 542;
-        let rewarded_mat = n.rewarded_maturity.get_mut(&TokenSymbol::ICP).unwrap();
+        let rewarded_mat = n.rewarded_maturity.get_mut(&icp_symbol).unwrap();
         *rewarded_mat += 150;
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &TokenSymbol::ICP
-        );
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
         println!("{:?}", neurons);
         let expected = 392; // 542 (current maturity) - 150 (previous maturity)
         assert_eq!(result[0].1, expected);
@@ -491,6 +486,7 @@ mod tests {
     #[test]
     fn test_calculate_neuron_maturity_for_interval_all_zeros() {
         let mut neurons = BTreeMap::new();
+        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
 
         // neuron 1
         let neuron_id_1 = NeuronId::new(
@@ -498,7 +494,7 @@ mod tests {
         ).unwrap();
 
         let mut neuron_1_rewarded = HashMap::new();
-        neuron_1_rewarded.insert(TokenSymbol::ICP, 0);
+        neuron_1_rewarded.insert(icp_symbol.clone(), 0);
 
         let neuron_info_1 = NeuronInfo {
             accumulated_maturity: 0,
@@ -507,10 +503,7 @@ mod tests {
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &TokenSymbol::ICP
-        );
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
         let expected = 0;
         assert_eq!(result[0].1, expected);
     }
