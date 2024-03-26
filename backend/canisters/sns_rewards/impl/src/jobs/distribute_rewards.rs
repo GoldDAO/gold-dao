@@ -298,7 +298,7 @@ async fn transfer_token(
             &(TransferArg {
                 from_subaccount: Some(from_sub_account.0),
                 to: to_account,
-                fee: Some((10_000u32).into()),
+                fee: None,
                 created_at_time: None,
                 amount: amount,
                 memo: None,
