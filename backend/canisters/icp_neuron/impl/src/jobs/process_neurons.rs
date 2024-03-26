@@ -93,15 +93,15 @@ async fn run_async() {
                 neurons_updated = true;
             }
 
+            mutate_state(|s| s.data.outstanding_payments.cleanup());
+
             if neurons_updated {
-                // Refresh the neurons again given that they've been updated
-                // Add a delay of 2 minutes to give enough time for transactions to pass
-                ic_cdk_timers::set_timer(Duration::from_millis(2 * MINUTE_IN_MS), ||
+                // Refresh the neurons again given that they've been updated (spawned neurons and disbursed neurons)
+                // Add a delay of 5 minutes to give enough time for transactions to pass
+                ic_cdk_timers::set_timer(Duration::from_millis(5 * MINUTE_IN_MS), ||
                     ic_cdk::spawn(run_async())
                 );
             }
-
-            mutate_state(|s| s.data.outstanding_payments.cleanup())
         }
         Err(err) => { error!("Error fetching neuron list: {err:?}") }
     }
