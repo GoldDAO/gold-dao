@@ -1,7 +1,7 @@
 use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
-#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct TokenSymbol(String);
 
 #[derive(Debug)]

@@ -27,10 +27,10 @@ use crate::{
         PaymentRoundStatus,
         PaymentStatus,
     },
-    state::{ mutate_state, read_state, RuntimeState },
+    state::{ mutate_state, read_state },
 };
 use candid::{ Nat, Principal };
-use canister_time::{ now_millis, run_interval, DAY_IN_MS, WEEK_IN_MS };
+use canister_time::{ now_millis, run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
 use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
@@ -40,65 +40,61 @@ use tracing::{ debug, error, info };
 use types::{ Milliseconds, TokenSymbol };
 
 const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
-const DISTRIBUTION_RETRY_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
-    run_interval(Duration::from_millis(DISTRIBUTION_RETRY_INTERVAL), run_retry_distribution);
 }
 
 pub fn run_distribution() {
     ic_cdk::spawn(distribute_rewards())
 }
 
-pub fn run_retry_distribution() {
-    ic_cdk::spawn(retry_faulty_payment_rounds())
-}
+// pub fn run_retry_distribution() {
+//     ic_cdk::spawn(retry_faulty_payment_rounds())
+// }
 
-// called once per day
-pub async fn retry_faulty_payment_rounds() {
-    debug!("REWARD DISTRIBUTION RETRY - START");
+// // called once per day
+// pub async fn retry_faulty_payment_rounds() {
+//     debug!("REWARD DISTRIBUTION RETRY - START");
 
-    let faulty_payment_rounds = read_state(|state|
-        state.data.payment_processor.get_active_faulty_payment_rounds()
-    );
-    if faulty_payment_rounds.len() == 0 {
-        return;
-    }
-    for payment_round in &faulty_payment_rounds {
-        process_payment_round(payment_round).await;
-    }
+//     let faulty_payment_rounds = read_state(|state|
+//         state.data.payment_processor.get_active_faulty_payment_rounds()
+//     );
+//     if faulty_payment_rounds.len() == 0 {
+//         return;
+//     }
+//     for payment_round in &faulty_payment_rounds {
+//         process_payment_round(payment_round).await;
+//     }
 
-    // update round status
-    let processed_payment_rounds = read_state(|state|
-        state.data.payment_processor.get_active_rounds()
-    );
-    for (_, payment_round) in &processed_payment_rounds {
-        update_payment_round_status(&payment_round);
-    }
+//     // update round status
+//     let processed_payment_rounds = read_state(|state|
+//         state.data.payment_processor.get_active_rounds()
+//     );
+//     for (_, payment_round) in &processed_payment_rounds {
+//         update_payment_round_status(&payment_round);
+//     }
 
-    // post processing
-    let processed_payment_rounds = read_state(|state|
-        state.data.payment_processor.get_active_rounds()
-    );
-    for (_, payment_round) in &processed_payment_rounds {
-        update_neuron_rewards(&payment_round);
-        move_payment_round_to_history(&payment_round);
-        log_payment_round_metrics(&payment_round);
-    }
-    debug!("REWARD DISTRIBUTION RETRY - END");
-}
+//     // post processing
+//     let processed_payment_rounds = read_state(|state|
+//         state.data.payment_processor.get_active_rounds()
+//     );
+//     for (_, payment_round) in &processed_payment_rounds {
+//         update_neuron_rewards(&payment_round);
+//         move_payment_round_to_history(&payment_round);
+//         log_payment_round_metrics(&payment_round);
+//     }
+//     debug!("REWARD DISTRIBUTION RETRY - END");
+// }
 
 pub async fn distribute_rewards() {
     info!("REWARD_DISTRIBUTION - START");
     let start_time = now_millis();
 
     // Check if there are active rounds - active rounds may be rounds that are in progress or failed / failed partially.
-    let faulty_active_rounds_exist = read_state(|state| {
-        state.data.payment_processor.active_rounds_exist()
-    });
+    let active_rounds = read_state(|state| { state.data.payment_processor.get_active_rounds() });
 
-    if faulty_active_rounds_exist {
+    if active_rounds.len() > 0 {
         info!(
             "REWARD_DISTRIBUTION - ABORTED - reason : can't process new rounds when there are active rounds present"
         );
@@ -148,40 +144,32 @@ pub async fn distribute_rewards() {
 
     // process active rounds
     let pending_payment_rounds = read_state(|state|
-        state.data.payment_processor.read_active_pending_payment_rounds()
+        state.data.payment_processor.get_active_rounds()
     );
     if pending_payment_rounds.len() == 0 {
         return;
     }
-    for payment_round in &pending_payment_rounds {
+    for payment_round in pending_payment_rounds {
         process_payment_round(payment_round).await;
-    }
-
-    // update round status
-    let processed_payment_rounds = read_state(|state|
-        state.data.payment_processor.get_active_rounds()
-    );
-    for (_, payment_round) in &processed_payment_rounds {
-        update_payment_round_status(&payment_round);
     }
 
     // post processing
     let processed_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_rounds()
     );
-    for (_, payment_round) in &processed_payment_rounds {
+    for payment_round in &processed_payment_rounds {
         update_neuron_rewards(&payment_round);
         move_payment_round_to_history(&payment_round);
         log_payment_round_metrics(&payment_round);
     }
+
     let end_time = now_millis();
     let total_time = end_time - start_time;
     info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", total_time);
 }
 
 pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
-    let payment_round_id = payment_round.id;
-    let status = payment_round.round_status.clone();
+    let status = determine_payment_round_status(payment_round);
 
     // only payment rounds that are fully completed may move to history
     if status != PaymentRoundStatus::CompletedFull {
@@ -189,11 +177,14 @@ pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
     }
     // insert to history && delete from active
     mutate_state(|state| state.data.payment_processor.add_to_history(payment_round.clone()));
-    mutate_state(|state| state.data.payment_processor.delete_active_round(payment_round_id));
+    mutate_state(|state|
+        state.data.payment_processor.delete_active_round(payment_round.token.clone())
+    );
 }
 
 pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
+    let overall_status = determine_payment_round_status(payment_round);
 
     let successful_neuron_transfers: Vec<(&NeuronId, &MaturityDelta, &TokenSymbol)> = payments
         .iter()
@@ -209,7 +200,7 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let print_string = format!(
         "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}",
         payment_round.id,
-        payment_round.round_status,
+        overall_status,
         payment_round.token,
         total_transfers,
         successful_neuron_transfers.len(),
@@ -311,7 +302,7 @@ async fn transfer_token(
     }
 }
 
-fn update_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundStatus {
+fn determine_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundStatus {
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
 
     let mut completed_count = 0;
@@ -338,23 +329,18 @@ fn update_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundStat
             "All payments for payment round failed".to_string()
         );
     }
-    mutate_state(|state|
-        state.data.payment_processor.set_active_round_status(&payment_round.id, new_status.clone())
-    );
     new_status
 }
 
-pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRound)) {
-    debug!("START - payment processing of {:?} for round id : {}", payment_round.token, round_id);
+pub async fn process_payment_round(payment_round: PaymentRound) {
+    debug!(
+        "START - payment processing of token :{:?}, for round id : {:?}",
+        payment_round.token,
+        payment_round.id
+    );
     let batch_limit = 45;
     let round_pool_subaccount = payment_round.get_payment_round_sub_account_id();
     let ledger_id = payment_round.ledger_id;
-    mutate_state(|state| {
-        state.data.payment_processor.set_active_round_status(
-            &round_id,
-            PaymentRoundStatus::InProgress
-        );
-    });
 
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments
         .iter()
@@ -373,7 +359,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                 };
                 mutate_state(|state|
                     state.data.payment_processor.set_active_payment_status(
-                        &round_id,
+                        &payment_round.token,
                         &neuron_id,
                         PaymentStatus::Triggered
                     )
@@ -396,7 +382,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                 Ok(_) => {
                     mutate_state(|state|
                         state.data.payment_processor.set_active_payment_status(
-                            &round_id,
+                            &payment_round.token,
                             &neuron_id,
                             PaymentStatus::Completed
                         )
@@ -405,7 +391,7 @@ pub async fn process_payment_round((round_id, payment_round): &(u16, PaymentRoun
                 Err(e) => {
                     mutate_state(|state|
                         state.data.payment_processor.set_active_payment_status(
-                            &round_id,
+                            &payment_round.token,
                             &neuron_id,
                             PaymentStatus::Failed(e.clone())
                         )

@@ -6,7 +6,7 @@ use ic_ledger_types::Subaccount;
 use num_bigint::BigUint;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use tracing::debug;
+use tracing::{ debug, info };
 use types::{ NeuronInfo, TimestampMillis, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 use utils::consts::E8S_PER_ICP;
@@ -23,7 +23,7 @@ const MAX_VALUE_SIZE: u32 = 100000;
 pub struct PaymentProcessor {
     #[serde(skip, default = "init_map")]
     round_history: StableBTreeMap<u16, PaymentRound, VM>,
-    active_rounds: BTreeMap<u16, PaymentRound>,
+    active_rounds: BTreeMap<TokenSymbol, PaymentRound>,
     is_processing_status: bool,
 }
 
@@ -66,85 +66,39 @@ impl PaymentProcessor {
     }
 
     pub fn add_active_payment_round(&mut self, round: PaymentRound) {
-        self.active_rounds.insert(round.id, round);
+        self.active_rounds.insert(round.token.clone(), round);
         debug!("New payment round created");
     }
 
-    pub fn read_active_pending_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.active_rounds
+    pub fn get_active_rounds(&self) -> Vec<PaymentRound> {
+        self.active_rounds
             .iter()
-            .filter(|round| round.1.round_status == PaymentRoundStatus::Pending)
-            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
-            .collect();
-
-        rounds
-    }
-    pub fn get_active_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.active_rounds
-            .iter()
-            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
-            .collect();
-
-        rounds
-    }
-
-    pub fn get_active_faulty_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.active_rounds
-            .iter()
-            .filter(|round| {
-                match round.1.round_status {
-                    PaymentRoundStatus::CompletedFull => false,
-                    PaymentRoundStatus::Pending => false,
-                    _ => true,
-                }
-            })
-            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
-            .collect();
-
-        rounds
-    }
-
-    pub fn set_active_round_status(&mut self, id: &u16, status: PaymentRoundStatus) {
-        if let Some(round) = self.active_rounds.get_mut(id) {
-            round.round_status = status;
-        }
+            .map(|(_, payment_round)| payment_round.clone())
+            .collect()
     }
 
     pub fn set_active_payment_status(
         &mut self,
-        round_id: &u16,
+        round_token: &TokenSymbol,
         neuron_id: &NeuronId,
         new_status: PaymentStatus
     ) {
-        if let Some(round) = self.active_rounds.get_mut(round_id) {
+        if let Some(round) = self.active_rounds.get_mut(round_token) {
             if let Some(payment) = round.payments.get_mut(&neuron_id) {
                 payment.1 = new_status;
+            } else {
+                info!(
+                    "WARNING - set_active_payment_status failed - can't find payment for neuron id: {:?} in round for token {:?}",
+                    neuron_id,
+                    round_token
+                );
             }
+        } else {
+            info!(
+                "WARNING - set_active_payment_status failed - can't find active round for token {:?}",
+                round_token
+            );
         }
-    }
-
-    pub fn active_rounds_exist(&self) -> bool {
-        let rounds: Vec<(&u16, &PaymentRound)> = self.active_rounds
-            .iter()
-            .filter(|round| {
-                match round.1.round_status {
-                    PaymentRoundStatus::CompletedFull => false,
-                    PaymentRoundStatus::Pending => false,
-                    _ => true,
-                }
-            })
-            .collect();
-
-        return rounds.len() > 0;
-    }
-
-    pub fn get_active_payment_rounds(&self) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.active_rounds
-            .iter()
-            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
-            .collect();
-
-        rounds
     }
 
     pub fn get_payment_round_history(&self) -> Vec<(u16, PaymentRound)> {
@@ -160,8 +114,8 @@ impl PaymentProcessor {
         self.round_history.insert(payment_round.id, payment_round);
     }
 
-    pub fn delete_active_round(&mut self, payment_round_id: u16) {
-        self.active_rounds.remove_entry(&payment_round_id);
+    pub fn delete_active_round(&mut self, round_token: TokenSymbol) {
+        self.active_rounds.remove_entry(&round_token);
     }
 }
 
