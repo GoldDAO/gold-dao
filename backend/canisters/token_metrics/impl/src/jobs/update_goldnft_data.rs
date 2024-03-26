@@ -15,25 +15,32 @@ pub fn run() {
 
 async fn run_async() {
     let gold_nft_canisters = read_state(|s| s.data.gold_nft_canisters.clone());
-    let mut totalGrams:u64 = 0;
+    let mut total_grams: u64 = 0;
 
     for (gold_nft_canister_id, weight) in gold_nft_canisters {
-        let total_supply:u64 = match canister_client::make_c2c_call(gold_nft_canister_id, "dip721_total_supply", {}, ::candid::encode_one, |r| {
-            ::candid::decode_one(r)
-        })
-        .await {
-            Ok(val) => {val},
+        let total_supply: u64 = match
+            canister_client::make_c2c_call(
+                gold_nft_canister_id,
+                "dip721_total_supply",
+                {},
+                ::candid::encode_one,
+                |r| { ::candid::decode_one(r) }
+            ).await
+        {
+            Ok(val) => { val }
             Err(err) => {
-                let message: String = format!("The canister_client::make_c2c_call resulted into error : {err:?}");
+                let message: String = format!(
+                    "The canister_client::make_c2c_call resulted into error : {err:?}"
+                );
                 ic_cdk::api::print(message);
                 return ();
-            },
+            }
         };
 
-        totalGrams += total_supply * weight;
+        total_grams += total_supply * weight;
     }
 
     mutate_state(|state| {
-        state.data.total_gold_grams = totalGrams;
+        state.data.total_gold_grams = total_grams;
     });
 }

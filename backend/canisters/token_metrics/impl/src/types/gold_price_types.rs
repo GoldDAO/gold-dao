@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -16,7 +16,7 @@ struct Topology {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SpreadProfilePrice {
-    spreadProfile : String,
+    spreadProfile: String,
     bidSpread: f64,
     askSpread: f64,
     bid: f64,

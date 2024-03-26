@@ -5,7 +5,7 @@ use utils::{
     memory::MemorySize,
 };
 use canister_state_macros::canister_state;
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
 
 canister_state!(RuntimeState);
 
@@ -25,17 +25,17 @@ impl RuntimeState {
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    pub gold_price : f64,
-    pub gold_nft_canisters : Vec<(Principal, u64)>,
-    pub total_gold_grams : u64,
+    pub gold_price: f64,
+    pub gold_nft_canisters: Vec<(Principal, u64)>,
+    pub total_gold_grams: u64,
 }
 
 impl Data {
-    pub fn new(gold_nft_canisters : Vec<(Principal, u64)>) -> Self {
+    pub fn new(gold_nft_canisters: Vec<(Principal, u64)>) -> Self {
         Self {
             gold_price: 0.0,
             gold_nft_canisters: gold_nft_canisters,
-            total_gold_grams: 0
+            total_gold_grams: 0,
         }
     }
 }
