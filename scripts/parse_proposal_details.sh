@@ -20,6 +20,12 @@ if [[ -n $CI_COMMIT_TAG ]]; then
 	fi
 
 	./scripts/parse_changelog.sh $CANISTER_NAME $VERSION
+	exit_status=$? # Capture the exit status of the last command
+
+	if [[ $exit_status -eq 1 ]]; then
+			echo "Error: parse_changelog.sh exited with status 1." >&2
+			exit 1
+	fi
 else
 	VERSION="!STAGINGTEST!"
 	echo "No changelog for staging deployment" > CHANGELOG.md
