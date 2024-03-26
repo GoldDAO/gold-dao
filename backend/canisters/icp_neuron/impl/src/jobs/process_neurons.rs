@@ -13,8 +13,7 @@ use std::time::Duration;
 use tracing::{ error, info, warn };
 use types::Milliseconds;
 
-// We add a minute because spawning takes 7 days, and if we wait exactly 7 days, there may still be a few seconds left
-// before the neuron can be spawned
+// Refresh daily to distribute potential rewards but add 1 minute offset to leave enough time in case a neuron is spawned
 const REFRESH_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS + MINUTE_IN_MS;
 
 const SPAWN_LIMIT_ICP: u64 = 1000;
