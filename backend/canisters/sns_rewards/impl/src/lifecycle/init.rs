@@ -51,22 +51,22 @@ fn init(args: Args) {
     if let Ok(token) = TokenSymbol::parse("ICP") {
         data.tokens.insert(token, TokenInfo {
             ledger_id: icp_ledger_canister_id,
-            fee: 1u64,
-            decimals: 1u64,
+            fee: 10_000u64,
+            decimals: 8u64,
         });
     }
     if let Ok(token) = TokenSymbol::parse("OGY") {
         data.tokens.insert(token, TokenInfo {
             ledger_id: ogy_ledger_canister_id,
-            fee: 1u64,
-            decimals: 1u64,
+            fee: 200_000u64,
+            decimals: 8u64,
         });
     }
     if let Ok(token) = TokenSymbol::parse("GLDGov") {
         data.tokens.insert(token, TokenInfo {
             ledger_id: gldgov_ledger_canister_id,
-            fee: 1u64,
-            decimals: 1u64,
+            fee: 100_000u64,
+            decimals: 8u64,
         });
     }
 
