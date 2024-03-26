@@ -1460,7 +1460,6 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
- "ciborium",
  "futures",
  "http_request",
  "ic-cdk",
