@@ -11,8 +11,9 @@ pub enum TokenSymbolParseError {
 
 impl TokenSymbol {
     pub fn parse(symbol: &str) -> Result<TokenSymbol, TokenSymbolParseError> {
-        let allowed_tokens = ["ICP", "OGY", "GLDGov"];
-        let valid_token = allowed_tokens.contains(&symbol);
+        const ALLOWED_TOKENS: [&str; 3] = ["ICP", "OGY", "GLDGov"];
+
+        let valid_token = ALLOWED_TOKENS.contains(&symbol);
         if valid_token {
             Ok(TokenSymbol(symbol.to_string()))
         } else {
