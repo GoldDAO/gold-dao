@@ -7,8 +7,8 @@ CHANGELOG_FILE="backend/canisters/$CANISTER/CHANGELOG.md"
 
 awk -v version="$VERSION" '
   BEGIN {print_version_info = 0}
-  /^\#\# \[unreleased\]/ {print_version_info = 0}
-  /^\#\# \[/ {if ($2 == "["version"]") print_version_info = 1; else if (print_version_info) exit}
+  /^\#\#\# \[unreleased\]/ {print_version_info = 0}
+  /^\#\#\# \[/ {if ($2 == "["version"]") print_version_info = 1; else if (print_version_info) exit}
   print_version_info {print}
 ' "$CHANGELOG_FILE" > CHANGELOG.md
 
