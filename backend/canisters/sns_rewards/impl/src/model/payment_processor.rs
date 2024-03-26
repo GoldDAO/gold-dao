@@ -151,13 +151,13 @@ impl PaymentRound {
         let neuron_maturity_for_interval = Self::calculate_neuron_maturity_for_interval(
             &neuron_data,
             &token
-        );
+        )?;
 
         let total_neuron_maturity_for_interval = Self::calculate_aggregated_maturity(
             &neuron_maturity_for_interval
         );
 
-        let transaction_fees = Self::calculate_transaction_fees(&neuron_maturity_for_interval);
+        let transaction_fees = Self::calculate_transaction_fees(&neuron_maturity_for_interval)?;
         if transaction_fees > reward_pool_balance.clone() {
             let err = format!(
                 "The fees exceed the amount in the reward pool for token : {:?} - distribution will inevitably result in some transactions containing insufficient funds",
@@ -196,8 +196,8 @@ impl PaymentRound {
     pub fn calculate_neuron_maturity_for_interval(
         neurons: &BTreeMap<NeuronId, NeuronInfo>,
         token: &TokenSymbol
-    ) -> Vec<(NeuronId, u64)> {
-        neurons
+    ) -> Result<Vec<(NeuronId, u64)>, String> {
+        let neuron_maturity: Vec<(NeuronId, Option<u64>)> = neurons
             .into_iter()
             .map(|(neuron_id, neuron_info)| {
                 let previous_rewarded = neuron_info.rewarded_maturity
@@ -205,15 +205,24 @@ impl PaymentRound {
                     .unwrap_or(&0u64)
                     .clone();
                 let accumulated = neuron_info.accumulated_maturity;
-                let delta_maturity = accumulated
-                    .checked_sub(previous_rewarded)
-                    .expect("overflow calculating maturity delta");
+                let delta_maturity = accumulated.checked_sub(previous_rewarded);
                 (neuron_id.clone(), delta_maturity)
             })
-            .collect()
+            .collect();
+        if neuron_maturity.iter().all(|(_, mat)| mat.is_some()) {
+            let neuron_maturity_ok: Vec<(NeuronId, u64)> = neuron_maturity
+                .iter()
+                .map(|(neuron_id, maturity)| (neuron_id.clone(), maturity.unwrap()))
+                .collect();
+            Ok(neuron_maturity_ok)
+        } else {
+            Err("failed to calculate all neuron maturity for interval".to_string())
+        }
     }
 
-    pub fn calculate_transaction_fees(neuron_maturity_deltas: &Vec<(NeuronId, u64)>) -> Nat {
+    pub fn calculate_transaction_fees(
+        neuron_maturity_deltas: &Vec<(NeuronId, u64)>
+    ) -> Result<Nat, String> {
         let neurons_with_positive_maturity_delta: Vec<&(NeuronId, u64)> = neuron_maturity_deltas
             .iter()
             .filter(|(_, maturity)| *maturity > 0u64)
@@ -221,10 +230,12 @@ impl PaymentRound {
 
         let single_fee = 10_000u64; // TODO - is this the same for gldgov and ogy
         let number_of_valid_transactions = neurons_with_positive_maturity_delta.len() as u64;
-        let total_fees = number_of_valid_transactions
-            .checked_mul(single_fee)
-            .expect("overflow when calculating total fees");
-        Nat::from(total_fees)
+        let total_fees = number_of_valid_transactions.checked_mul(single_fee);
+
+        match total_fees {
+            Some(total) => Ok(Nat::from(total)),
+            None => Err("overflow when calculating total fees".to_string()),
+        }
     }
 
     pub fn calculate_aggregated_maturity(data: &Vec<(NeuronId, u64)>) -> u64 {
@@ -418,7 +429,10 @@ mod tests {
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(
+            &neurons,
+            &icp_symbol
+        ).unwrap();
         let expected = 150;
         assert_eq!(result[0].1, expected);
 
@@ -431,7 +445,10 @@ mod tests {
         let rewarded_mat = n.rewarded_maturity.get_mut(&icp_symbol).unwrap();
         *rewarded_mat += 150;
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(
+            &neurons,
+            &icp_symbol
+        ).unwrap();
         println!("{:?}", neurons);
         let expected = 392; // 542 (current maturity) - 150 (previous maturity)
         assert_eq!(result[0].1, expected);
@@ -457,7 +474,10 @@ mod tests {
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol);
+        let result = PaymentRound::calculate_neuron_maturity_for_interval(
+            &neurons,
+            &icp_symbol
+        ).unwrap();
         let expected = 0;
         assert_eq!(result[0].1, expected);
     }
@@ -495,7 +515,7 @@ mod tests {
         let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 30u64), (neuron_id_3, 30u64)];
         let expected = Nat::from(20_000u64); // 2 x neurons with positive maturity
 
-        let result = PaymentRound::calculate_transaction_fees(&neuron_deltas);
+        let result = PaymentRound::calculate_transaction_fees(&neuron_deltas).unwrap();
         assert_eq!(result, expected);
     }
 
