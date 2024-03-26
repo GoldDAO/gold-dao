@@ -31,8 +31,7 @@ else
 	COMMITSHA="00000000"
 fi
 
-DETAILSURLFIELD=$(cat proposal_template.md | grep "details_url")
-export DETAILS_URL=${DETAILSURLFIELD:13}
+export DETAILS_URL="https://github.com/GoldDAO/gldt-swap/commit/${COMMITSHA}"
 sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_template.md > proposal.md && \
 sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal.md && \
 sed -i "s/<<CANISTER>>/${CANISTER_NAME}/g" proposal.md && \
