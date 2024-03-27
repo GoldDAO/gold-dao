@@ -7,7 +7,7 @@ use num_bigint::BigUint;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use tracing::{ debug, info };
-use types::{ NeuronInfo, TimestampMillis, TokenSymbol };
+use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 use utils::consts::E8S_PER_ICP;
 
@@ -161,7 +161,7 @@ impl PaymentRound {
     pub fn new(
         id: u16,
         reward_pool_balance: Nat,
-        ledger_id: Principal,
+        token_info: TokenInfo,
         token: TokenSymbol,
         neuron_data: BTreeMap<NeuronId, NeuronInfo>
     ) -> Result<Self, String> {
@@ -174,7 +174,10 @@ impl PaymentRound {
             &neuron_maturity_for_interval
         );
 
-        let transaction_fees = Self::calculate_transaction_fees(&neuron_maturity_for_interval)?;
+        let transaction_fees = Self::calculate_transaction_fees(
+            &neuron_maturity_for_interval,
+            token_info.fee
+        )?;
         if transaction_fees > reward_pool_balance.clone() {
             let err = format!(
                 "The fees exceed the amount in the reward pool for token : {:?} - distribution will inevitably result in some transactions containing insufficient funds",
@@ -201,7 +204,7 @@ impl PaymentRound {
             id: id,
             round_funds_total: reward_pool_balance,
             fees: transaction_fees,
-            ledger_id,
+            ledger_id: token_info.ledger_id,
             token,
             date_initialized: now_millis(),
             total_neuron_maturity: total_neuron_maturity_for_interval,
@@ -239,14 +242,14 @@ impl PaymentRound {
     }
 
     pub fn calculate_transaction_fees(
-        neuron_maturity_deltas: &Vec<(NeuronId, u64)>
+        neuron_maturity_deltas: &Vec<(NeuronId, u64)>,
+        single_fee: u64
     ) -> Result<Nat, String> {
         let neurons_with_positive_maturity_delta: Vec<&(NeuronId, u64)> = neuron_maturity_deltas
             .iter()
             .filter(|(_, maturity)| *maturity > 0u64)
             .collect();
 
-        let single_fee = 10_000u64; // TODO - is this the same for gldgov and ogy
         let number_of_valid_transactions = neurons_with_positive_maturity_delta.len() as u64;
         let total_fees = number_of_valid_transactions.checked_mul(single_fee);
 
@@ -533,7 +536,7 @@ mod tests {
         let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 30u64), (neuron_id_3, 30u64)];
         let expected = Nat::from(20_000u64); // 2 x neurons with positive maturity
 
-        let result = PaymentRound::calculate_transaction_fees(&neuron_deltas).unwrap();
+        let result = PaymentRound::calculate_transaction_fees(&neuron_deltas, 10_000u64).unwrap();
         assert_eq!(result, expected);
     }
 

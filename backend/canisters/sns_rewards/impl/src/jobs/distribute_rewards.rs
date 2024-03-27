@@ -63,10 +63,11 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     }
 
     // process active rounds
-    if pending_payment_rounds.len() == 0 {
+    let active_rounds = read_state(|state| { state.data.payment_processor.get_active_rounds() });
+    if active_rounds.len() == 0 {
         return;
     }
-    for payment_round in pending_payment_rounds {
+    for payment_round in active_rounds {
         process_payment_round(payment_round, retry_attempt).await;
     }
 
@@ -84,20 +85,21 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt <= MAX_RETRIES {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
-        info!("REWARD_DISTRIBUTION - ERROR");
+        let end_time = now_millis();
+        let total_time = end_time - start_time;
+        info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", total_time);
     }
-
-    let end_time = now_millis();
-    let total_time = end_time - start_time;
-    info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", total_time);
 }
 
 pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
     // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov]; // TODO - uncomment when going live
     for (token, token_info) in reward_tokens.into_iter() {
-        // let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await; // TODO - uncomment when going live
-        let reward_pool_balance = Nat::from(300_000u64); // TODO - remove when going live
+        let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await; // TODO - uncomment when going live
+        // TODO - remove when going live
+        if token == TokenSymbol::parse("ICP").unwrap() {
+            reward_pool_balance = Nat::from(300_000u64);
+        }
         if reward_pool_balance == Nat::from(0u64) {
             info!("REWARD POOL for {:?} token has no rewards for distribution", token);
             continue;
@@ -109,7 +111,7 @@ pub async fn create_new_payment_rounds() {
         let new_round = PaymentRound::new(
             new_round_key,
             reward_pool_balance,
-            token_info.ledger_id,
+            token_info,
             token.clone(),
             neuron_data
         );
