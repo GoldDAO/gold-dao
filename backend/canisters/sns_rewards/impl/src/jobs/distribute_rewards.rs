@@ -30,7 +30,7 @@ use crate::{
     state::{ mutate_state, read_state },
 };
 use candid::{ Nat, Principal };
-use canister_time::{ now_millis, run_interval, WEEK_IN_MS };
+use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
 use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
@@ -400,8 +400,9 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
     }
 }
 
+// Create and return a future that always returns an Err
+#[allow(dead_code)]
 fn always_fail_future() -> impl Future<Output = Result<(), String>> {
-    // Create and return a future that always returns an Err
     err("simulated failure".to_string())
 }
 

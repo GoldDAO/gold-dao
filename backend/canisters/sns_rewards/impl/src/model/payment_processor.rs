@@ -6,7 +6,7 @@ use ic_ledger_types::Subaccount;
 use num_bigint::BigUint;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use tracing::{ debug, info };
+use tracing::debug;
 use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 use utils::consts::E8S_PER_ICP;
