@@ -223,7 +223,6 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
         subaccount: Some(round_pool_subaccount.0),
     };
 
-    info!("Transferring funds to payment round sub account for round id : {}", next_key);
     transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
 }
 
