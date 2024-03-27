@@ -98,14 +98,13 @@ pub async fn distribute_rewards(retry_attempt: u8) {
 
 pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
-    // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov]; // TODO - uncomment when going live
     for (token, token_info) in reward_tokens.into_iter() {
         let new_round_key = read_state(|state| state.data.payment_processor.next_key());
-        let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await; // TODO - uncomment when going live
-        // TODO - remove when going live
-        if token == TokenSymbol::parse("ICP").unwrap() {
-            reward_pool_balance = Nat::from(300_000u64);
-        }
+        let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
+        // testing purposes
+        // if token == TokenSymbol::parse("ICP").unwrap() {
+        //     reward_pool_balance = Nat::from(300_000u64);
+        // }
         if reward_pool_balance == Nat::from(0u64) {
             info!(
                 "ROUND ID : {} & TOKEN :{:?} - has no rewards for distribution",
