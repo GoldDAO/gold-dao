@@ -86,8 +86,7 @@ pub async fn distribute_rewards(retry_attempt: u8) {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
         let end_time = now_millis();
-        let total_time = end_time - start_time;
-        info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", total_time);
+        info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", end_time);
     }
 }
 
@@ -134,7 +133,7 @@ pub async fn create_new_payment_rounds() {
             }
             Err(s) => {
                 info!(
-                    "ROUND ID : {} & TOKEN :{:?} - Failed to create round : {}",
+                    "ROUND ID : {} & TOKEN :{:?} - ERROR - Failed to create round : {}",
                     new_round_key,
                     token,
                     s
@@ -212,8 +211,7 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
 }
 
 pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Result<(), String> {
-    let next_key = round.id;
-    let total_to_transfer = round.round_funds_total.clone() + round.fees.clone();
+    let total_to_transfer = round.round_funds_total.clone();
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
 
