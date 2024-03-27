@@ -57,14 +57,6 @@ impl PaymentProcessor {
         next_key
     }
 
-    pub fn toggle_is_processing_status(&mut self) {
-        self.is_processing_status = !self.is_processing_status;
-    }
-
-    pub fn get_is_processing_status(&self) -> bool {
-        self.is_processing_status
-    }
-
     pub fn add_active_payment_round(&mut self, round: PaymentRound) {
         self.active_rounds.insert(round.token.clone(), round);
     }
@@ -541,23 +533,23 @@ mod tests {
         assert_eq!(result, expected);
     }
 
-    #[test]
-    fn test_toggle_is_processing() {
-        init_runtime_state();
+    // #[test]
+    // fn test_toggle_is_processing() {
+    //     init_runtime_state();
 
-        // by default it should be false
-        let default_result = read_state(|state|
-            state.data.payment_processor.get_is_processing_status()
-        );
+    //     // by default it should be false
+    //     let default_result = read_state(|state|
+    //         state.data.payment_processor.get_is_processing_status()
+    //     );
 
-        assert_eq!(default_result, false);
+    //     assert_eq!(default_result, false);
 
-        mutate_state(|state| state.data.payment_processor.toggle_is_processing_status());
+    //     mutate_state(|state| state.data.payment_processor.toggle_is_processing_status());
 
-        let new_status = read_state(|state|
-            state.data.payment_processor.get_is_processing_status()
-        );
+    //     let new_status = read_state(|state|
+    //         state.data.payment_processor.get_is_processing_status()
+    //     );
 
-        assert_eq!(new_status, true)
-    }
+    //     assert_eq!(new_status, true)
+    // }
 }

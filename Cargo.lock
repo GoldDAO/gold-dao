@@ -1464,6 +1464,7 @@ dependencies = [
  "http_request",
  "ic-cdk",
  "ic-cdk-macros",
+ "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
  "icrc-ledger-types",

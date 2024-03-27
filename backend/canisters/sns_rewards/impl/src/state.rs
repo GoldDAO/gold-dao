@@ -45,6 +45,14 @@ impl RuntimeState {
         let caller = self.env.caller();
         self.data.authorized_principals.contains(&caller)
     }
+
+    pub fn set_is_synchronizing_neurons(&mut self, state: bool) {
+        self.data.is_synchronizing_neurons = state;
+    }
+
+    pub fn get_is_synchronizing_neurons(&self) -> bool {
+        self.data.is_synchronizing_neurons
+    }
 }
 
 #[derive(CandidType, Serialize)]
@@ -89,6 +97,7 @@ pub struct Data {
     pub tokens: HashMap<TokenSymbol, TokenInfo>,
     // authorized Principals for guarded calls
     pub authorized_principals: Vec<Principal>,
+    pub is_synchronizing_neurons: bool,
 }
 
 impl Default for Data {
@@ -102,6 +111,7 @@ impl Default for Data {
             payment_processor: PaymentProcessor::default(),
             tokens: HashMap::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
+            is_synchronizing_neurons: false,
         }
     }
 }

@@ -47,7 +47,15 @@ pub fn start_job() {
 }
 
 pub fn run_distribution() {
-    ic_cdk::spawn(distribute_rewards(0))
+    let is_sync_neurons_in_progress = read_state(|s| s.get_is_synchronizing_neurons());
+    if is_sync_neurons_in_progress {
+        debug!(
+            "REWARD_DISTRIBUTION - can't run whilst synchronise_neurons is in progress. rerunning in 3 minutes"
+        );
+        ic_cdk_timers::set_timer(Duration::from_secs(60 * 3), run_distribution);
+    } else {
+        ic_cdk::spawn(distribute_rewards(0))
+    }
 }
 
 pub async fn distribute_rewards(retry_attempt: u8) {
