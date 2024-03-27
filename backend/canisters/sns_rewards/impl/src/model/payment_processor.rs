@@ -156,6 +156,7 @@ impl PaymentRound {
         token: TokenSymbol,
         neuron_data: BTreeMap<NeuronId, NeuronInfo>
     ) -> Result<Self, String> {
+        let reward_pool_balance = reward_pool_balance - token_info.fee; // we must pay a single fee to transfer from the reward pool to the round reward pool
         let neuron_maturity_for_interval = Self::calculate_neuron_maturity_for_interval(
             &neuron_data,
             &token
