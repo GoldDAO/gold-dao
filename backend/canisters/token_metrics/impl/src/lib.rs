@@ -1,15 +1,6 @@
 use ic_cdk::export_candid;
 use lifecycle::init::InitArgs;
-use ic_cdk::api::management_canister::http_request::{
-    http_request,
-    CanisterHttpRequestArgument,
-    HttpHeader,
-    HttpMethod,
-    HttpResponse,
-    TransformArgs,
-    TransformContext,
-    TransformFunc,
-};
+use ::types::{ HttpRequest, HttpResponse };
 
 mod jobs;
 mod lifecycle;

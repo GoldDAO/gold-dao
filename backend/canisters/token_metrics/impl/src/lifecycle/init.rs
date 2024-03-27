@@ -29,7 +29,7 @@ fn init(init_args: Option<InitArgs>) {
     let args = init_args.ok_or("Must provide init arguments.".to_string()).unwrap();
     canister_logger::init(args.test_mode);
 
-    let gold_nft_canister: Vec<(Principal, u64)> = if args.test_mode {
+    let gold_nft_canister: Vec<(Principal, u128)> = if args.test_mode {
         vec![(STAGING_GOLD_1G_CANISTER_ID, 1), (STAGING_GOLD_10G_CANISTER_ID, 10)]
     } else {
         vec![

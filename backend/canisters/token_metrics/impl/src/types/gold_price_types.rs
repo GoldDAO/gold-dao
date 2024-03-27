@@ -1,24 +1,23 @@
 use serde::{ Serialize, Deserialize };
-use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct DataPoint {
-    topo: Topology,
-    pub spreadProfilePrices: Vec<SpreadProfilePrice>,
-    ts: u64,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct YumiApiResponse {
+    code: u32,
+    msg: String,
+    pub data: Vec<GoldData>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Topology {
-    platform: String,
-    server: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SpreadProfilePrice {
-    spreadProfile: String,
-    bidSpread: f64,
-    askSpread: f64,
-    bid: f64,
-    pub ask: f64,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GoldData {
+    #[serde(rename = "_id")]
+    id: String,
+    symbols: String,
+    unit: String,
+    #[serde(rename = "createdAt")]
+    created_at: String,
+    #[serde(rename = "tradeAt")]
+    trade_at: String,
+    pub price: f64,
+    #[serde(rename = "__v")]
+    v: u32,
 }

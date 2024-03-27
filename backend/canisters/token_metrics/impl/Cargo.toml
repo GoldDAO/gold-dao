@@ -31,3 +31,4 @@ tracing = { workspace = true }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 canister_client = { path = "../../../libraries/canister_client" }
+time = { workspace = true }

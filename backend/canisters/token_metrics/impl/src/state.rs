@@ -26,12 +26,12 @@ impl RuntimeState {
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub gold_price: f64,
-    pub gold_nft_canisters: Vec<(Principal, u64)>,
-    pub total_gold_grams: u64,
+    pub gold_nft_canisters: Vec<(Principal, u128)>,
+    pub total_gold_grams: u128,
 }
 
 impl Data {
-    pub fn new(gold_nft_canisters: Vec<(Principal, u64)>) -> Self {
+    pub fn new(gold_nft_canisters: Vec<(Principal, u128)>) -> Self {
         Self {
             gold_price: 0.0,
             gold_nft_canisters: gold_nft_canisters,

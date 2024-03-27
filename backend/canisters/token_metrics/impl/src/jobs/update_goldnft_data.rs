@@ -2,6 +2,7 @@ use canister_time::{ run_now_then_interval, MINUTE_IN_MS };
 use std::time::Duration;
 use types::Milliseconds;
 use crate::state::{ mutate_state, read_state };
+use tracing::{ info, error };
 
 const REFRESH_GOLD_SUPPLY_INTERVAL: Milliseconds = 10 * MINUTE_IN_MS;
 
@@ -14,11 +15,13 @@ pub fn run() {
 }
 
 async fn run_async() {
+    info!("Run gold nft data update.");
+
     let gold_nft_canisters = read_state(|s| s.data.gold_nft_canisters.clone());
-    let mut total_grams: u64 = 0;
+    let mut total_grams: u128 = 0;
 
     for (gold_nft_canister_id, weight) in gold_nft_canisters {
-        let total_supply: u64 = match
+        let total_supply: u128 = match
             canister_client::make_c2c_call(
                 gold_nft_canister_id,
                 "dip721_total_supply",
@@ -29,10 +32,7 @@ async fn run_async() {
         {
             Ok(val) => { val }
             Err(err) => {
-                let message: String = format!(
-                    "The canister_client::make_c2c_call resulted into error : {err:?}"
-                );
-                ic_cdk::api::print(message);
+                error!("The canister_client::make_c2c_call resulted into error : {err:?}");
                 return ();
             }
         };
@@ -43,4 +43,5 @@ async fn run_async() {
     mutate_state(|state| {
         state.data.total_gold_grams = total_grams;
     });
+    info!("Finished gold nft data update.");
 }

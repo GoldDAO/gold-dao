@@ -4,10 +4,14 @@ use ic_cdk::api::management_canister::http_request::{
     http_request,
     CanisterHttpRequestArgument,
     HttpMethod,
+    TransformContext,
 };
 use types::Milliseconds;
-use crate::types::gold_price_types::DataPoint;
+use crate::types::gold_price_types::YumiApiResponse;
 use crate::state::mutate_state;
+use tracing::{ info, error };
+use ic_cdk::api::time;
+use time::OffsetDateTime;
 
 const REFRESH_GOLD_PRICE_INTERVAL: Milliseconds = 10 * MINUTE_IN_MS;
 
@@ -19,18 +23,41 @@ pub fn run() {
     ic_cdk::spawn(run_async());
 }
 
+fn timestamp_to_date_string(nanoseconds: u64) -> (String, String) {
+    info!("get timestamp_to_date_string.");
+    let datetime = OffsetDateTime::from_unix_timestamp_nanos(nanoseconds as i128).unwrap_or_else(|_|
+        panic!("Invalid timestamp")
+    );
+
+    let year: i32 = datetime.year();
+    let month: u8 = datetime.month().into();
+    let day: u8 = datetime.day();
+
+    (
+        format!("{:04}-{:02}-{:02}", year - 1, month, day),
+        format!("{:04}-{:02}-{:02}", year, month, day),
+    )
+}
+
 async fn run_async() {
-    const URL: &str =
-        "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD";
+    info!("Run gold price update.");
+
+    let (last_year, today) = timestamp_to_date_string(time());
+
+    let url: &str = &format!(
+        "https://api2.yumi.io/gold/tradePrice?symbols=XAU&start_at={last_year}&end_at={today}"
+    ).to_string();
 
     let request_headers = vec![];
 
     let request = CanisterHttpRequestArgument {
-        url: URL.to_string(),
+        url: url.to_string(),
         method: HttpMethod::GET,
         body: None,
         max_response_bytes: None,
-        transform: None,
+        transform: Some(
+            TransformContext::from_name("transform_http_response".to_string(), Vec::new())
+        ),
         headers: request_headers,
     };
 
@@ -41,39 +68,38 @@ async fn run_async() {
             let message = match String::from_utf8(response.body) {
                 Ok(val) => { val }
                 Err(e) => {
-                    let message: String = format!(
-                        "Transformed response is not UTF-8 encoded : {e:?}"
-                    );
-                    ic_cdk::api::print(message);
+                    error!("Transformed response is not UTF-8 encoded : {e:?}");
                     return ();
                 }
             };
 
-            match serde_json::from_str::<Vec<DataPoint>>(message.as_str()) {
+            match serde_json::from_str::<YumiApiResponse>(message.as_str()) {
                 Ok(v) => {
-                    if v.len() > 0 {
-                        let spread_profile_prices = v[0].spreadProfilePrices.clone();
-                        if spread_profile_prices.len() > 0 {
+                    match v.data.last() {
+                        Some(val) => {
+                            let xau_price: f64 = (1 as f64) / val.price;
+
                             mutate_state(|state| {
                                 // convert price in Once to price in Gram
-                                state.data.gold_price = spread_profile_prices[0].ask / 31.1;
+                                state.data.gold_price = xau_price / 31.1;
                             });
                         }
-                    }
+                        _ => {
+                            error!("Error while getting last elem of returned array.");
+                            return ();
+                        }
+                    };
                 }
                 Err(err) => {
-                    let message: String = format!("The http_request resulted into error : {err:?}");
-                    ic_cdk::api::print(message);
+                    error!("The http_request resulted into error : {err:?}");
                     return ();
                 }
             };
         }
         Err((r, m)) => {
-            let message = format!(
-                "The http_request resulted into error. RejectionCode: {r:?}, Error: {m}"
-            );
-            ic_cdk::api::print(message);
+            error!("The http_request resulted into error. RejectionCode: {r:?}, Error: {m}");
             return ();
         }
-    };
+    }
+    info!("Finished gold price update.");
 }
