@@ -67,7 +67,6 @@ impl PaymentProcessor {
 
     pub fn add_active_payment_round(&mut self, round: PaymentRound) {
         self.active_rounds.insert(round.token.clone(), round);
-        debug!("New payment round created");
     }
 
     pub fn get_active_rounds(&self) -> Vec<PaymentRound> {
@@ -87,15 +86,16 @@ impl PaymentProcessor {
             if let Some(payment) = round.payments.get_mut(&neuron_id) {
                 payment.1 = new_status;
             } else {
-                info!(
-                    "WARNING - set_active_payment_status failed - can't find payment for neuron id: {:?} in round for token {:?}",
-                    neuron_id,
-                    round_token
+                debug!(
+                    "ERROR - ROUND ID : {} & TOKEN :{:?} - set_active_payment_status failed - can't find neuron id {:?}",
+                    round.id,
+                    round_token,
+                    neuron_id
                 );
             }
         } else {
-            info!(
-                "WARNING - set_active_payment_status failed - can't find active round for token {:?}",
+            debug!(
+                "ERROR - set_active_payment_status failed - can't find round {:?} in active_rounds",
                 round_token
             );
         }
@@ -127,8 +127,8 @@ impl PaymentProcessor {
         if let Some(round) = self.active_rounds.get_mut(token) {
             round.retries = attempt;
         } else {
-            info!(
-                "WARNING - set_active_payment_status failed - can't find active round for token {:?}",
+            debug!(
+                "ERROR - set_payment_round_retry_count - can't find active round for token {:?}",
                 token
             );
         }
@@ -179,7 +179,8 @@ impl PaymentRound {
         )?;
         if transaction_fees > reward_pool_balance.clone() {
             let err = format!(
-                "The fees exceed the amount in the reward pool for token : {:?} - distribution will inevitably result in some transactions containing insufficient funds",
+                "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. The fees exceed the amount in the reward pool. distribution will inevitably result in some transactions containing insufficient funds",
+                id,
                 token.clone()
             );
             return Err(err);
@@ -188,7 +189,9 @@ impl PaymentRound {
 
         if total_neuron_maturity_for_interval == 0u64 {
             let err = format!(
-                "Maturity for all neurons has not changed since last distribution - exiting distribution early"
+                "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. Maturity for all neurons has not changed since last distribution - exiting distribution early",
+                id,
+                token.clone()
             );
             return Err(err);
         }

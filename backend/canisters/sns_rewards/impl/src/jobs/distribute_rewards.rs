@@ -95,18 +95,22 @@ pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
     // let reward_tokens = vec![TokenSymbol::ICP, TokenSymbol::OGY, TokenSymbol::GLDGov]; // TODO - uncomment when going live
     for (token, token_info) in reward_tokens.into_iter() {
+        let new_round_key = read_state(|state| state.data.payment_processor.next_key());
         let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await; // TODO - uncomment when going live
         // TODO - remove when going live
         if token == TokenSymbol::parse("ICP").unwrap() {
             reward_pool_balance = Nat::from(300_000u64);
         }
         if reward_pool_balance == Nat::from(0u64) {
-            info!("REWARD POOL for {:?} token has no rewards for distribution", token);
+            info!(
+                "ROUND ID : {} & TOKEN :{:?} - has no rewards for distribution",
+                new_round_key,
+                token
+            );
             continue;
         }
 
         let neuron_data = read_state(|state| state.data.neuron_maturity.clone());
-        let new_round_key = read_state(|state| state.data.payment_processor.next_key());
 
         let new_round = PaymentRound::new(
             new_round_key,
@@ -129,7 +133,12 @@ pub async fn create_new_payment_rounds() {
                 }
             }
             Err(s) => {
-                debug!("PAYMENT ROUND is not valid - reason : {}", s);
+                info!(
+                    "ROUND ID : {} & TOKEN :{:?} - Failed to create round : {}",
+                    new_round_key,
+                    token,
+                    s
+                );
                 continue;
             }
         }
@@ -254,10 +263,7 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
             })
         ).await
     {
-        Ok(t) => {
-            info!("Success - querying balance of {} - has {}", ledger_canister_id, t);
-            t
-        }
+        Ok(t) => { t }
         Err(e) => {
             error!(
                 "Fail - to fetch token balance of ledger canister id {ledger_canister_id} with ERROR_CODE : {} . MESSAGE",
@@ -324,11 +330,7 @@ fn determine_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundS
 }
 
 pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u8) {
-    debug!(
-        "START - payment processing of token :{:?}, for round id : {:?}",
-        payment_round.token,
-        payment_round.id
-    );
+    info!("ROUND ID : {} & TOKEN :{:?} - STARTING PAYMENTS", payment_round.id, payment_round.token);
     let batch_limit = 45;
     let round_pool_subaccount = payment_round.get_payment_round_sub_account_id();
     let ledger_id = payment_round.ledger_id;
@@ -395,6 +397,11 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                 }
             }
         }
+        info!(
+            "ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS",
+            payment_round.id,
+            payment_round.token
+        );
     }
 }
 
@@ -413,7 +420,7 @@ mod tests {
     use types::{ NeuronInfo, TokenSymbol };
 
     use crate::{
-        model::payment_processor::{ PaymentRound, PaymentRoundStatus, PaymentStatus },
+        model::payment_processor::{ PaymentRound, PaymentStatus },
         state::{ init_state, mutate_state, read_state, RuntimeState },
     };
 
