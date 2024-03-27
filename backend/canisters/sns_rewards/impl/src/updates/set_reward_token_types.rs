@@ -1,7 +1,7 @@
 use crate::{ guards::caller_is_governance_principal, state::mutate_state };
 use candid::CandidType;
 use canister_tracing_macros::trace;
-use ic_cdk::{ update };
+use ic_cdk::update;
 use serde::{ Deserialize, Serialize };
 use types::{ TokenInfo, TokenSymbol };
 
@@ -16,8 +16,8 @@ pub struct SetRewardTokenTypesRequest {
     token_list: Vec<(String, TokenInfo)>,
 }
 
-// #[update(guard = "caller_is_governance_principal")]
-#[update()]
+#[update(guard = "caller_is_governance_principal")]
+// #[update()]
 #[trace]
 pub async fn set_reward_token_types(
     args: SetRewardTokenTypesRequest

@@ -43,8 +43,7 @@ impl RuntimeState {
 
     pub fn is_caller_governance_principal(&self) -> bool {
         let caller = self.env.caller();
-        // self.data.authorized_principals.contains(&caller) TODO - add authorized principals
-        true
+        self.data.authorized_principals.contains(&caller)
     }
 }
 
@@ -88,6 +87,8 @@ pub struct Data {
     pub payment_processor: PaymentProcessor,
     // valid tokens and their associated ledger data
     pub tokens: HashMap<TokenSymbol, TokenInfo>,
+    // authorized Principals for guarded calls
+    pub authorized_principals: Vec<Principal>,
 }
 
 impl Default for Data {
@@ -100,6 +101,7 @@ impl Default for Data {
             maturity_history: MaturityHistory::default(),
             payment_processor: PaymentProcessor::default(),
             tokens: HashMap::new(),
+            authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
         }
     }
 }
