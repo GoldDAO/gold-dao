@@ -1,10 +1,10 @@
-use canister_time::{ run_now_then_interval, MINUTE_IN_MS };
+use canister_time::{ run_now_then_interval, DAY_IN_MS };
 use std::time::Duration;
 use types::Milliseconds;
 use crate::state::{ mutate_state, read_state };
 use tracing::{ info, error };
 
-const REFRESH_GOLD_SUPPLY_INTERVAL: Milliseconds = 10 * MINUTE_IN_MS;
+const REFRESH_GOLD_SUPPLY_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     run_now_then_interval(Duration::from_millis(REFRESH_GOLD_SUPPLY_INTERVAL), run);

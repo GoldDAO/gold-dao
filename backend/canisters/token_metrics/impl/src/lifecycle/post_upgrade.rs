@@ -1,3 +1,4 @@
+use crate::lifecycle::init_canister;
 use crate::memory::get_upgrades_memory;
 use crate::state::RuntimeState;
 use canister_logger::LogEntry;
@@ -17,6 +18,7 @@ fn post_upgrade() {
         .unwrap();
 
     canister_logger::init_with_logs(runtime_state.env.is_test_mode(), logs, traces);
+    init_canister(runtime_state);
 
     info!("Post upgrade complete.")
 }

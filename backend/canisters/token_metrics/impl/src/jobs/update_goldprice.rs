@@ -1,4 +1,4 @@
-use canister_time::{ run_now_then_interval, MINUTE_IN_MS };
+use canister_time::{ run_now_then_interval, DAY_IN_MS };
 use std::time::Duration;
 use ic_cdk::api::management_canister::http_request::{
     http_request,
@@ -13,7 +13,7 @@ use tracing::{ info, error };
 use ic_cdk::api::time;
 use time::OffsetDateTime;
 
-const REFRESH_GOLD_PRICE_INTERVAL: Milliseconds = 10 * MINUTE_IN_MS;
+const REFRESH_GOLD_PRICE_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     run_now_then_interval(Duration::from_millis(REFRESH_GOLD_PRICE_INTERVAL), run);
