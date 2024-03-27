@@ -101,9 +101,14 @@ impl PaymentProcessor {
         }
     }
 
-    pub fn get_payment_round_history(&self) -> Vec<(u16, PaymentRound)> {
+    pub fn get_payment_round_history(
+        &self,
+        token: TokenSymbol,
+        id: u16
+    ) -> Vec<(u16, PaymentRound)> {
         let rounds = self.round_history
             .iter()
+            .filter(|(round_id, round)| { *round_id == id && round.token == token })
             .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
@@ -116,6 +121,17 @@ impl PaymentProcessor {
 
     pub fn delete_active_round(&mut self, round_token: TokenSymbol) {
         self.active_rounds.remove_entry(&round_token);
+    }
+
+    pub fn set_payment_round_retry_count(&mut self, token: &TokenSymbol, attempt: u8) {
+        if let Some(round) = self.active_rounds.get_mut(token) {
+            round.retries = attempt;
+        } else {
+            info!(
+                "WARNING - set_active_payment_status failed - can't find active round for token {:?}",
+                token
+            );
+        }
     }
 }
 
@@ -134,6 +150,7 @@ pub struct PaymentRound {
     pub total_neuron_maturity: u64, // total maturity of all neurons for this specific period
     pub payments: BTreeMap<NeuronId, Payment>, // map of payments to process
     pub round_status: PaymentRoundStatus, // status of weather all payments passed, failed etc
+    pub retries: u8,
 }
 
 pub type RewardShare = u64;
@@ -190,6 +207,7 @@ impl PaymentRound {
             total_neuron_maturity: total_neuron_maturity_for_interval,
             payments,
             round_status: PaymentRoundStatus::Pending,
+            retries: 0,
         })
     }
 
