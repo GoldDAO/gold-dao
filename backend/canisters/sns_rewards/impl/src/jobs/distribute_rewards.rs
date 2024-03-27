@@ -130,12 +130,7 @@ pub async fn create_new_payment_rounds() {
                 }
             }
             Err(s) => {
-                info!(
-                    "ROUND ID : {} & TOKEN :{:?} - ERROR - Failed to create round : {}",
-                    new_round_key,
-                    token,
-                    s
-                );
+                info!("ROUND ID : {} & TOKEN :{:?} - Invalid round : {}", new_round_key, token, s);
                 continue;
             }
         }
