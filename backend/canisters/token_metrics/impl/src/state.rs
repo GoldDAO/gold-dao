@@ -1,4 +1,5 @@
-use candid::Principal;
+use candid::{ CandidType, Principal };
+use types::TimestampMillis;
 use utils::{
     consts::{ ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID },
     env::{ CanisterEnv, Environment },
@@ -21,8 +22,30 @@ impl RuntimeState {
     pub fn new(env: CanisterEnv, data: Data) -> Self {
         Self { env, data }
     }
+
+    pub fn metrics(&self) -> Metrics {
+        Metrics {
+            canister_info: CanisterInfo {
+                now: self.env.now(),
+                test_mode: self.env.is_test_mode(),
+                memory_used: MemorySize::used(),
+                cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+            },
+        }
+    }
 }
 
+#[derive(CandidType, Serialize)]
+pub struct Metrics {
+    pub canister_info: CanisterInfo,
+}
+#[derive(CandidType, Deserialize, Serialize)]
+pub struct CanisterInfo {
+    pub now: TimestampMillis,
+    pub test_mode: bool,
+    pub memory_used: MemorySize,
+    pub cycles_balance_in_tc: f64,
+}
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub gold_price: f64,
