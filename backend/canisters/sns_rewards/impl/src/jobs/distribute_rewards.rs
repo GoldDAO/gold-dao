@@ -101,11 +101,11 @@ pub async fn create_new_payment_rounds() {
     let new_round_key = read_state(|state| state.data.payment_processor.next_key());
 
     for (token, token_info) in reward_tokens.into_iter() {
-        let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
-        // testing purposes
-        // if token == TokenSymbol::parse("ICP").unwrap() {
-        //     reward_pool_balance = Nat::from(300_000u64);
-        // }
+        let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
+        // TODO testing purposes - remove when going live
+        if token == TokenSymbol::parse("ICP").unwrap() {
+            reward_pool_balance = Nat::from(300_000u64);
+        }
         if reward_pool_balance == Nat::from(0u64) {
             info!(
                 "ROUND ID : {} & TOKEN :{:?} - has no rewards for distribution",
