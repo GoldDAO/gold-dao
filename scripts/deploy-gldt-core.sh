@@ -63,13 +63,13 @@ if [[ $1 == "local" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^core-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   if [[ $1 == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    UPGRADEVERSION=$CI_COMMIT_TAG
+    UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
     UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
   . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/parse_proposal_details.sh && \
+  . scripts/parse_proposal_details.sh gldt_core && \
 #  dfx deploy gldt_core --network $1 --argument '(
 #    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
 #    gld_nft_canister_ids=vec{
