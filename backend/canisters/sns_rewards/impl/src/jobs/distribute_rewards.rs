@@ -52,7 +52,6 @@ pub fn run_distribution() {
 
 pub async fn distribute_rewards(retry_attempt: u8) {
     info!("REWARD_DISTRIBUTION - START - retry attempt : {}", retry_attempt);
-    let start_time = now_millis();
 
     let pending_payment_rounds = read_state(|state| {
         state.data.payment_processor.get_active_rounds()
@@ -85,8 +84,7 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
-        let end_time = now_millis();
-        info!("REWARD_DISTRIBUTION - FINISH - time taken {}ms", end_time);
+        info!("REWARD_DISTRIBUTION - FINISH");
     }
 }
 
