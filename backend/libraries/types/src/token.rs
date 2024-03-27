@@ -1,4 +1,7 @@
-use candid::{ CandidType, Principal };
+use std::borrow::Cow;
+
+use candid::{ CandidType, Decode, Encode, Principal };
+use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Deserialize, Serialize };
 
 #[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -8,7 +11,7 @@ pub struct TokenSymbol(String);
 pub enum TokenSymbolParseError {
     InvalidTokenSymbol,
 }
-
+const MAX_VALUE_SIZE: u32 = 12;
 impl TokenSymbol {
     pub fn parse(symbol: &str) -> Result<TokenSymbol, TokenSymbolParseError> {
         const ALLOWED_TOKENS: [&str; 3] = ["ICP", "OGY", "GLDGov"];
@@ -20,6 +23,19 @@ impl TokenSymbol {
             Err(TokenSymbolParseError::InvalidTokenSymbol)
         }
     }
+}
+
+impl Storable for TokenSymbol {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(&bytes, Self).unwrap()
+    }
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
+    };
 }
 
 #[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash)]

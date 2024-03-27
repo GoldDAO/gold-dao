@@ -82,7 +82,7 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     }
 
     // retry failed payment rounds
-    if should_retry_distribution(&processed_payment_rounds) && retry_attempt <= MAX_RETRIES {
+    if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
         let end_time = now_millis();
@@ -188,14 +188,15 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let total_transfers = &payments.len();
 
     let print_string = format!(
-        "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}",
+        "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}, retries : {}",
         payment_round.id,
         overall_status,
         payment_round.token,
         total_transfers,
         successful_neuron_transfers.len(),
         total_successful,
-        payment_round.total_neuron_maturity
+        payment_round.total_neuron_maturity,
+        payment_round.retries
     );
     info!(print_string);
     print_string
@@ -459,7 +460,6 @@ mod tests {
             date_initialized: timestamp_millis(),
             total_neuron_maturity: 5u64,
             payments,
-            round_status: PaymentRoundStatus::CompletedPartial,
             retries: 0,
         };
 
@@ -467,7 +467,7 @@ mod tests {
 
         assert_eq!(
             result,
-            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : ICP, total : 5, successful : 4, maturity distributed : 4, round maturity : 5"
+            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : TokenSymbol(\"ICP\"), total : 5, successful : 4, maturity distributed : 4, round maturity : 5, retries : 0"
         );
     }
 
@@ -512,7 +512,6 @@ mod tests {
             date_initialized: timestamp_millis(),
             total_neuron_maturity: 5u64,
             payments,
-            round_status: PaymentRoundStatus::CompletedPartial,
             retries: 0,
         };
 

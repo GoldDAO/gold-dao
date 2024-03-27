@@ -30,16 +30,8 @@ type PaymentRound = record {
   total_neuron_maturity : nat64;
   fees : nat;
   ledger_id : principal;
-  round_status : PaymentRoundStatus;
   date_initialized : nat64;
   retries : nat8;
-};
-type PaymentRoundStatus = variant {
-  Failed : text;
-  CompletedPartial;
-  CompletedFull;
-  InProgress;
-  Pending;
 };
 type PaymentStatus = variant { Failed : text; Triggered; Completed; Pending };
 type SetRewardTokenTypesRequest = record {

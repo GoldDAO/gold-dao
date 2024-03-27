@@ -22,12 +22,12 @@ const MAX_VALUE_SIZE: u32 = 100000;
 #[derive(Serialize, Deserialize)]
 pub struct PaymentProcessor {
     #[serde(skip, default = "init_map")]
-    round_history: StableBTreeMap<u16, PaymentRound, VM>,
+    round_history: StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM>,
     active_rounds: BTreeMap<TokenSymbol, PaymentRound>,
     is_processing_status: bool,
 }
 
-fn init_map() -> StableBTreeMap<u16, PaymentRound, VM> {
+fn init_map() -> StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM> {
     let memory = get_payment_round_history_memory();
     StableBTreeMap::init(memory)
 }
@@ -45,8 +45,8 @@ impl Default for PaymentProcessor {
 impl PaymentProcessor {
     pub fn next_key(&self) -> u16 {
         let mut next_key = match self.round_history.last_key_value() {
-            Some((last_key, _)) => {
-                if last_key == 0 { 1 } else { last_key + 1 }
+            Some(((_, id), _)) => {
+                if id == 0 { 1 } else { id + 1 }
             } // Add 1 to the last key
             None => 1, // If the map is empty, start from 0
         };
@@ -108,15 +108,15 @@ impl PaymentProcessor {
     ) -> Vec<(u16, PaymentRound)> {
         let rounds = self.round_history
             .iter()
-            .filter(|(round_id, round)| { *round_id == id && round.token == token })
-            .map(|(round_id, payment_round)| (round_id.clone(), payment_round.clone()))
+            .filter(|((_, round_id), round)| { *round_id == id && round.token == token })
+            .map(|((_, round_id), payment_round)| (round_id.clone(), payment_round.clone()))
             .collect();
 
         rounds
     }
 
     pub fn add_to_history(&mut self, payment_round: PaymentRound) {
-        self.round_history.insert(payment_round.id, payment_round);
+        self.round_history.insert((payment_round.token.clone(), payment_round.id), payment_round);
     }
 
     pub fn delete_active_round(&mut self, round_token: TokenSymbol) {
@@ -149,7 +149,6 @@ pub struct PaymentRound {
     pub date_initialized: TimestampMillis, //
     pub total_neuron_maturity: u64, // total maturity of all neurons for this specific period
     pub payments: BTreeMap<NeuronId, Payment>, // map of payments to process
-    pub round_status: PaymentRoundStatus, // status of weather all payments passed, failed etc
     pub retries: u8,
 }
 
@@ -209,7 +208,6 @@ impl PaymentRound {
             date_initialized: now_millis(),
             total_neuron_maturity: total_neuron_maturity_for_interval,
             payments,
-            round_status: PaymentRoundStatus::Pending,
             retries: 0,
         })
     }
