@@ -12,7 +12,7 @@ use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
 use utils::consts::E8S_PER_ICP;
 
 use crate::memory::{ get_payment_round_history_memory, VM };
-const MAX_VALUE_SIZE: u32 = 100000;
+const MAX_VALUE_SIZE: u32 = 1000000;
 
 // ********************************
 //    Payment Processor

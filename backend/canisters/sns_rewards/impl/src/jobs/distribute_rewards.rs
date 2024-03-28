@@ -52,7 +52,7 @@ pub fn run_distribution() {
         debug!(
             "REWARD_DISTRIBUTION - can't run whilst synchronise_neurons is in progress. rerunning in 3 minutes"
         );
-        ic_cdk_timers::set_timer(Duration::from_secs(60 * 3), run_distribution);
+        ic_cdk_timers::set_timer(Duration::from_secs(60 * 5), run_distribution);
     } else {
         ic_cdk::spawn(distribute_rewards(0))
     }
@@ -106,7 +106,7 @@ pub async fn create_new_payment_rounds() {
 
         if is_test_mode {
             if token == TokenSymbol::parse("ICP").unwrap() {
-                reward_pool_balance = Nat::from(1_000_000_000u64);
+                reward_pool_balance = Nat::from(500_000_000u64);
             }
         }
 
@@ -243,9 +243,7 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
         mutate_state(|state| {
             if let Some(neuron) = state.data.neuron_maturity.get_mut(&neuron_id) {
                 if let Some(rewarded_maturity) = neuron.rewarded_maturity.get_mut(&token.clone()) {
-                    let new_maturity = rewarded_maturity
-                        .checked_add(*maturity_delta)
-                        .expect("update_neuron_rewards - overflow");
+                    let new_maturity = rewarded_maturity.clone() + maturity_delta.clone();
                     *rewarded_maturity = new_maturity;
                 } else {
                     neuron.rewarded_maturity.insert(token.clone(), *maturity_delta);
@@ -348,6 +346,9 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
         s.data.payment_processor.set_payment_round_retry_count(&payment_round.token, retry_attempt)
     );
 
+    let total_to_process = payments.len();
+    let mut processed_count = 0;
+
     while let Some(batch) = payment_chunks.next() {
         let (transfer_futures, neuron_ids): (Vec<_>, Vec<_>) = batch
             .iter()
@@ -376,8 +377,8 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
             .unzip();
 
         let results = join_all(transfer_futures).await;
-
         for (result, neuron_id) in results.into_iter().zip(neuron_ids.into_iter()) {
+            processed_count += 1;
             match result {
                 Ok(_) => {
                     mutate_state(|state|
@@ -399,6 +400,13 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                 }
             }
         }
+        info!(
+            "ROUND ID : {} & TOKEN :{:?} - processed count {} out of {} ",
+            payment_round.id,
+            payment_round.token,
+            processed_count,
+            total_to_process
+        );
     }
     info!("ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS", payment_round.id, payment_round.token);
 }
