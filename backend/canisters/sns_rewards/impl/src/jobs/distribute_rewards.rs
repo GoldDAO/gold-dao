@@ -399,12 +399,8 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                 }
             }
         }
-        info!(
-            "ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS",
-            payment_round.id,
-            payment_round.token
-        );
     }
+    info!("ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS", payment_round.id, payment_round.token);
 }
 
 // Create and return a future that always returns an Err

@@ -93,10 +93,11 @@ pub struct Data {
     pub maturity_history: MaturityHistory,
     /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
-    // valid tokens and their associated ledger data
+    /// valid tokens and their associated ledger data
     pub tokens: HashMap<TokenSymbol, TokenInfo>,
-    // authorized Principals for guarded calls
+    /// authorized Principals for guarded calls
     pub authorized_principals: Vec<Principal>,
+    /// a boolean check for if we're currently synchronizing neuron data into the canister.
     pub is_synchronizing_neurons: bool,
 }
 
