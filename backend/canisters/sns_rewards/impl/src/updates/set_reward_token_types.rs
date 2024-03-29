@@ -1,7 +1,10 @@
+use std::str::FromStr;
+
 use crate::{ guards::caller_is_governance_principal, state::mutate_state };
-use candid::CandidType;
+use candid::{ pretty::candid::is_valid_as_id, CandidType, Principal };
 use canister_tracing_macros::trace;
-use ic_cdk::update;
+use ic_cdk::{ query, update };
+use ic_stable_structures::Storable;
 use serde::{ Deserialize, Serialize };
 use types::{ TokenInfo, TokenSymbol };
 
@@ -17,7 +20,6 @@ pub struct SetRewardTokenTypesRequest {
 }
 
 #[update(guard = "caller_is_governance_principal")]
-// #[update()]
 #[trace]
 pub async fn set_reward_token_types(
     args: SetRewardTokenTypesRequest
@@ -43,4 +45,41 @@ pub(crate) fn set_reward_token_types_impl(
             Ok(())
         }
     )
+}
+
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn set_reward_token_types_validation(
+    args: SetRewardTokenTypesRequest
+) -> Result<String, String> {
+    for (token_string, token_info) in &args.token_list {
+        // Check token is in approved list and or return early if fail
+        let parsed_token_result = TokenSymbol::parse(&token_string);
+        match parsed_token_result {
+            Ok(_) => {}
+            Err(e) => {
+                let err_message = format!("Error parsing token {token_string}. error : {:?}", e);
+                return Err(err_message);
+            }
+        }
+
+        // Not sure we if need this check since a valid principal is required in the args
+        // if token_info.ledger_id {
+        //     return Err(format!("ledger field may not be empty for token {}", token_string));
+        // }
+
+        if token_info.decimals <= 0 {
+            return Err(format!("decimals for token {} may not be negative or 0", token_string));
+        }
+
+        if token_info.fee <= 0 {
+            return Err(format!("fee for token {} may not be negative or 0", token_string));
+        }
+
+        // TODO - more verification ideas
+        // we can verify the ledger is working and the symbols match by calling the ledger method - `icrc1_symbol`
+        // we can also verify the fee and decimals match
+    }
+
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
 }
