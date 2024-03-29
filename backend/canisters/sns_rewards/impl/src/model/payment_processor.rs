@@ -273,23 +273,17 @@ impl PaymentRound {
 
         let total_maturity_big = BigUint::from(total_maturity.clone());
 
+        // return early if 0 - prevent dividing error
         if total_maturity_big == BigUint::from(0u64) {
-            // if we don't return early then a dividing error will occur
             return None;
         }
         let reward_pool_big = BigUint::from(reward_pool);
-        // Calculate the reward for each neuron
         let map: BTreeMap<NeuronId, Payment> = neuron_deltas
             .iter()
             .map(|(neuron_id, maturity)| {
-                // Convert maturity to BigUint
                 let maturity_big = BigUint::from(*maturity);
-
-                // Calculate percentage as (maturity / total_maturity) * 10000 (expressed in basis points)
-                let percentage =
-                    (maturity_big * BigUint::from(E8S_PER_ICP)) / total_maturity_big.clone();
-
-                let reward = (reward_pool_big.clone() * percentage) / BigUint::from(E8S_PER_ICP);
+                let percentage = maturity_big / total_maturity_big.clone();
+                let reward = reward_pool_big.clone() * percentage;
                 let reward: u64 = reward.try_into().expect("failed to convert bigint to u64");
                 (neuron_id.clone(), (reward, PaymentStatus::Pending, maturity.clone()))
             })
@@ -364,9 +358,13 @@ mod tests {
             "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
         ).unwrap();
 
-        let neuron_deltas = vec![(neuron_id_1, 10u64), (neuron_id_2, 20u64), (neuron_id_3, 30u64)];
+        let neuron_deltas = vec![
+            (neuron_id_1, 1_000_000u64),
+            (neuron_id_2, 10u64),
+            (neuron_id_3, 10u64)
+        ];
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
-        let expected: Vec<u64> = vec![16_666_666u64, 33_333_333u64, 50_000_000u64];
+        let expected: Vec<u64> = vec![99_998_000u64, 999u64, 999u64];
 
         let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).unwrap();
         result
