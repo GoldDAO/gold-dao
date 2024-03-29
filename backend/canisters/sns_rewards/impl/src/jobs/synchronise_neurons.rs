@@ -37,6 +37,7 @@ pub async fn synchronise_neuron_data() {
     let mut continue_scanning = true;
     // the max limit of 100 is given by the list_neurons call implementation. Cannot increase it.
     let limit = 100;
+    // let mut i = 0;
 
     let mut args = sns_governance_canister::list_neurons::Args {
         limit,
@@ -68,7 +69,11 @@ pub async fn synchronise_neuron_data() {
                             None
                         },
                         |n| {
-                            continue_scanning = false;
+                            continue_scanning = true;
+                            // i += 100;
+                            // if i == 1000 {
+                            //     continue_scanning = false;
+                            // }
                             n.id.clone()
                         }
                     );

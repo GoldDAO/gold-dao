@@ -485,7 +485,7 @@ mod tests {
 
         assert_eq!(
             result,
-            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : TokenSymbol(\"ICP\"), total : 5, successful : 4, maturity distributed : 4, round maturity : 5, retries : 0"
+            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : TokenSymbol(\"ICP\"), total : 5, successful : 4, maturity distributed : 4, round maturity : 5, retries : 0, tokens_to_distribute : 94_000"
         );
     }
 
