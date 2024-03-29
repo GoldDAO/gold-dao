@@ -135,6 +135,7 @@ impl PaymentProcessor {
 pub struct PaymentRound {
     pub id: u16, // id of the round. must start at 1 and will go to 65,535 before cycling to 1. Can't be 0 because 0 is the id of the reward pool accounts
     pub round_funds_total: Nat, // total amount to be distributed from the funds sub account
+    pub tokens_to_distribute: Nat,
     pub fees: Nat, // total fees required for all valid transactions
     pub ledger_id: Principal, // the ledger associated with transferring funds for this round of specific token payments
     pub token: TokenSymbol, // the token associated with a specific payment round
@@ -198,6 +199,7 @@ impl PaymentRound {
         Ok(Self {
             id: id,
             round_funds_total: reward_pool_balance,
+            tokens_to_distribute,
             fees: transaction_fees,
             ledger_id: token_info.ledger_id,
             token,

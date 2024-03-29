@@ -201,7 +201,7 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
     let total_transfers = &payments.len();
 
     let print_string = format!(
-        "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}, retries : {}",
+        "PAYMENT ROUND METRICS || round id : {}, round status : {:?}, token : {:?}, total : {}, successful : {}, maturity distributed : {}, round maturity : {}, retries : {}, tokens_to_distribute : {}",
         payment_round.id,
         overall_status,
         payment_round.token,
@@ -209,7 +209,8 @@ pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
         successful_neuron_transfers.len(),
         total_successful,
         payment_round.total_neuron_maturity,
-        payment_round.retries
+        payment_round.retries,
+        payment_round.tokens_to_distribute
     );
     info!(print_string);
     print_string
@@ -472,7 +473,8 @@ mod tests {
         let round = PaymentRound {
             id: 1u16,
             round_funds_total: Nat::from(100_000u64),
-            fees: Nat::from(50_000u64),
+            tokens_to_distribute: Nat::from(94_000u64), // 5 payments + reward pool -> round pool
+            fees: Nat::from(50_000u64), // 5 payments
             ledger_id,
             token: icp_symbol,
             date_initialized: timestamp_millis(),
@@ -528,7 +530,8 @@ mod tests {
         let round = PaymentRound {
             id: 1u16,
             round_funds_total: Nat::from(100_000u64),
-            fees: Nat::from(50_000u64),
+            tokens_to_distribute: Nat::from(98_000u64), // 1 payment + 1 reward pool -> round pool transfer
+            fees: Nat::from(10_000u64),
             ledger_id,
             token: icp_symbol.clone(),
             date_initialized: timestamp_millis(),
