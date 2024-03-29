@@ -82,16 +82,15 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     let processed_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_rounds()
     );
-    for payment_round in &processed_payment_rounds {
-        update_neuron_rewards(&payment_round);
-        move_payment_round_to_history(&payment_round);
-        log_payment_round_metrics(&payment_round);
-    }
-
-    // retry failed payment rounds
+    // retry failed payment rounds, otherwise update the final state
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
+        for payment_round in &processed_payment_rounds {
+            update_neuron_rewards(&payment_round);
+            move_payment_round_to_history(&payment_round);
+            log_payment_round_metrics(&payment_round);
+        }
         info!("REWARD_DISTRIBUTION - FINISH");
     }
 }
