@@ -400,7 +400,7 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                 }
             }
         }
-        info!(
+        debug!(
             "ROUND ID : {} & TOKEN :{:?} - processed count {} out of {} ",
             payment_round.id,
             payment_round.token,
