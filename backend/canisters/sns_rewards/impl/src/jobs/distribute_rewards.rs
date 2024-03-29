@@ -106,7 +106,7 @@ pub async fn create_new_payment_rounds() {
 
         if is_test_mode {
             if token == TokenSymbol::parse("ICP").unwrap() {
-                reward_pool_balance = Nat::from(300_000u64);
+                reward_pool_balance = Nat::from(33_300_000_000u64);
             }
         }
 
