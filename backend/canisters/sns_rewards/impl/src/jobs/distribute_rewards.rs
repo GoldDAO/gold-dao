@@ -106,7 +106,7 @@ pub async fn create_new_payment_rounds() {
 
         if is_test_mode {
             if token == TokenSymbol::parse("ICP").unwrap() {
-                reward_pool_balance = Nat::from(500_000_000u64);
+                reward_pool_balance = Nat::from(300_000u64);
             }
         }
 
@@ -369,7 +369,7 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                     round_pool_subaccount,
                     account,
                     ledger_id,
-                    Nat::from(*reward)
+                    reward.clone()
                 );
                 (transfer_future, *neuron_id)
                 // (always_fail_future(), *neuron_id)
@@ -456,11 +456,15 @@ mod tests {
         ).unwrap();
 
         let mut payments = BTreeMap::new();
-        payments.insert(neuron_id_1, (1, PaymentStatus::Failed("simulated fail".to_string()), 1));
-        payments.insert(neuron_id_2, (1, PaymentStatus::Completed, 1));
-        payments.insert(neuron_id_3, (1, PaymentStatus::Completed, 1));
-        payments.insert(neuron_id_4, (1, PaymentStatus::Completed, 1));
-        payments.insert(neuron_id_5, (1, PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_1, (
+            Nat::from(1u64),
+            PaymentStatus::Failed("simulated fail".to_string()),
+            1,
+        ));
+        payments.insert(neuron_id_2, (Nat::from(1u64), PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_3, (Nat::from(1u64), PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_4, (Nat::from(1u64), PaymentStatus::Completed, 1));
+        payments.insert(neuron_id_5, (Nat::from(1u64), PaymentStatus::Completed, 1));
 
         let ledger_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
         let icp_symbol = TokenSymbol::parse("ICP").unwrap();
@@ -513,7 +517,11 @@ mod tests {
         // create a payment round
 
         let mut payments = BTreeMap::new();
-        payments.insert(neuron_id_1.clone(), (1, PaymentStatus::Completed, expected_result));
+        payments.insert(neuron_id_1.clone(), (
+            Nat::from(1u64),
+            PaymentStatus::Completed,
+            expected_result,
+        ));
 
         let ledger_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
 

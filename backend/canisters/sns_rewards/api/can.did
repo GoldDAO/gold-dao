@@ -26,7 +26,7 @@ type PaymentRound = record {
   id : nat16;
   round_funds_total : nat;
   token : text;
-  payments : vec record { NeuronId; record { nat64; PaymentStatus; nat64 } };
+  payments : vec record { NeuronId; record { nat; PaymentStatus; nat64 } };
   total_neuron_maturity : nat64;
   fees : nat;
   ledger_id : principal;

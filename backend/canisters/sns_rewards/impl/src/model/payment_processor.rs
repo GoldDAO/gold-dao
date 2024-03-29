@@ -144,7 +144,7 @@ pub struct PaymentRound {
     pub retries: u8,
 }
 
-pub type RewardShare = u64;
+pub type RewardShare = Nat;
 pub type MaturityDelta = u64;
 pub type Payment = (RewardShare, PaymentStatus, MaturityDelta);
 
@@ -282,12 +282,14 @@ impl PaymentRound {
             .iter()
             .map(|(neuron_id, maturity)| {
                 let maturity_big = BigUint::from(*maturity);
-                let percentage = maturity_big / total_maturity_big.clone();
-                let reward = reward_pool_big.clone() * percentage;
-                let reward: u64 = reward.try_into().expect("failed to convert bigint to u64");
+                let percentage =
+                    (maturity_big * BigUint::from(1_000_000_000u64)) / total_maturity_big.clone();
+                let reward =
+                    (reward_pool_big.clone() * percentage) / BigUint::from(1_000_000_000u64);
+                let reward = Nat::from(reward);
                 (neuron_id.clone(), (reward, PaymentStatus::Pending, maturity.clone()))
             })
-            .filter(|(_, (reward, _, _))| reward.clone() > 0u64)
+            .filter(|(_, (reward, _, _))| reward.clone() > Nat::from(0u64))
             .collect();
 
         Some(map)
@@ -363,10 +365,11 @@ mod tests {
             (neuron_id_2, 10u64),
             (neuron_id_3, 10u64)
         ];
-        let reward_pool = Nat::from(100_000_000u64); // 1 ICP
-        let expected: Vec<u64> = vec![99_998_000u64, 999u64, 999u64];
+        let reward_pool = Nat::from(300_000u64); // 1 ICP
+        let expected: Vec<u64> = vec![299_994u64, 2u64, 2u64];
 
         let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).unwrap();
+
         result
             .iter()
             .zip(expected.iter())
