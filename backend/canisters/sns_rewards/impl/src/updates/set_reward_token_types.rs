@@ -1,10 +1,7 @@
-use std::str::FromStr;
-
 use crate::{ guards::caller_is_governance_principal, state::mutate_state };
-use candid::{ pretty::candid::is_valid_as_id, CandidType, Principal };
+use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk::{ query, update };
-use ic_stable_structures::Storable;
 use serde::{ Deserialize, Serialize };
 use types::{ TokenInfo, TokenSymbol };
 
