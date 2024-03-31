@@ -27,7 +27,7 @@ pub fn run() {
 
 pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
-
+    let is_test_mode = read_state(|s| s.env.is_test_mode());
     mutate_state(|state| {
         state.data.sync_info.last_synced_start = now_millis();
         state.set_is_synchronizing_neurons(true);
@@ -69,6 +69,9 @@ pub async fn synchronise_neuron_data() {
                         },
                         |n| {
                             continue_scanning = true;
+                            if is_test_mode && number_of_scanned_neurons == 4000 {
+                                continue_scanning = false;
+                            }
                             n.id.clone()
                         }
                     );
