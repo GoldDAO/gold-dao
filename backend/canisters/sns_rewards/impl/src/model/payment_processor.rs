@@ -4,14 +4,11 @@ use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
 use ic_ledger_types::Subaccount;
 use num_bigint::BigUint;
-use rust_decimal::Decimal;
-use rust_decimal_macros::dec;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use tracing::debug;
 use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
 use ic_stable_structures::{ storable::Bound, StableBTreeMap, Storable };
-use utils::consts::E8S_PER_ICP;
 
 use crate::memory::{ get_payment_round_history_memory, VM };
 const MAX_VALUE_SIZE: u32 = 1000000;
