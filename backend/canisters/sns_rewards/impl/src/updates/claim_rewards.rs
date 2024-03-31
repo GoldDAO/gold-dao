@@ -167,4 +167,7 @@ pub async fn transfer_rewards(
     token: String
 ) -> Result<bool, UserClaimErrorResponse> {
     todo!();
+    // verify token is correct with a parse
+    // get balance of sub account
+    // transfer all from sub account to user_id
 }
