@@ -276,29 +276,33 @@ impl PaymentRound {
             .map(|entry| entry.1)
             .sum();
 
-        // let total_maturity_big = BigUint::from(total_maturity.clone());
+        let total_maturity_big = BigUint::from(total_maturity.clone());
         // return early if 0 - prevent dividing error
 
         if total_maturity <= 0u64 {
             return Err("No change in maturity - skipping round".to_string());
         }
 
-        let reward_pool: u64 = reward_pool.0.try_into().unwrap();
+        let reward_pool_big = BigUint::from(reward_pool);
 
-        // let reward_pool_big = BigUint::from(reward_pool);
+        // calculates percentage using integer division ( scales numbers and descales )
         let map: BTreeMap<NeuronId, Payment> = neuron_deltas
             .iter()
             .map(|(neuron_id, maturity)| {
-                let total_d: Decimal = total_maturity.into();
-                let maturity_d: Decimal = maturity.clone().into();
-                let reward_pool_d: Decimal = reward_pool.clone().into();
-                let percentage = maturity_d.checked_div(total_d).unwrap();
-                let reward = reward_pool_d * percentage;
-                let reward_64: u64 = reward.try_into().unwrap();
-                let reward = Nat::from(reward_64);
+                // Convert maturity to BigUint
+                let maturity_big = BigUint::from(*maturity);
+
+                // Calculate percentage as (maturity / total_maturity) * scaling factor ( for extra precision )
+                let percentage =
+                    (maturity_big * BigUint::from(100_000_000_000_000u64)) /
+                    total_maturity_big.clone();
+
+                let reward =
+                    (reward_pool_big.clone() * percentage) / BigUint::from(100_000_000_000_000u64);
+                let reward = Nat::from(reward);
                 (neuron_id.clone(), (reward, PaymentStatus::Pending, maturity.clone()))
             })
-            .filter(|(_, (reward, _, _))| reward.clone() > Nat::from(0u64))
+            .filter(|(_, (reward, _, _))| reward.clone() > 0u64)
             .collect();
 
         Ok(map)

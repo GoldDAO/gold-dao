@@ -33,5 +33,3 @@ utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
 futures = { workspace = true }
 num-bigint = {workspace = true}
-rust_decimal = {workspace = true }
-rust_decimal_macros = {workspace = true}
