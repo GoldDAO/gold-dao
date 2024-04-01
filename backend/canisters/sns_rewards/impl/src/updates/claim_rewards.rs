@@ -8,30 +8,17 @@ use tracing::{ debug, error };
 use crate::state::{ mutate_state, read_state };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum NeuronOwnershipError {
+pub enum UserClaimErrorResponse {
     NoHotkeysExist, // No hotkeys found for neuron
     InvalidOwnership(Principal), // Neuron has a hotkey owned by a different caller
     NotClaimed, // Nobody has claimed this neuron yet.
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum GenericError {
     InternalError(String),
     DoesNotExist,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum RewardClaimError {
     ZeroBalance,
     FailedTransfer(String),
 }
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum UserClaimErrorResponse {
-    NeuronOwnershipError(NeuronOwnershipError),
-    GenericError(GenericError),
-    RewardClaimError(RewardClaimError),
-}
+use UserClaimErrorResponse::*;
 
 #[update]
 async fn add_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
@@ -69,11 +56,7 @@ pub async fn add_neuron_impl(
                 return Ok(neuron_id);
             } else {
                 // if the principal is not the same as the caller - already added ( by someone else )
-                return Err(
-                    UserClaimErrorResponse::NeuronOwnershipError(
-                        NeuronOwnershipError::InvalidOwnership(principal)
-                    )
-                );
+                return Err(InvalidOwnership(principal));
             }
         }
         None => {
@@ -101,16 +84,10 @@ pub async fn remove_neuron_impl(
                 return Ok(neuron_id);
             } else {
                 // if the principal is not the same as the caller - already added ( by them )
-                return Err(
-                    UserClaimErrorResponse::NeuronOwnershipError(
-                        NeuronOwnershipError::InvalidOwnership(principal)
-                    )
-                );
+                return Err(InvalidOwnership(principal));
             }
         }
-        None => {
-            Err(UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NotClaimed))
-        }
+        None => { Err(NotClaimed) }
     }
 }
 
@@ -131,16 +108,10 @@ pub async fn claim_reward_impl(
                 return transfer_rewards(&neuron_id, caller, token).await;
             } else {
                 // if the principal is not the same as the caller - already added ( by them )
-                return Err(
-                    UserClaimErrorResponse::NeuronOwnershipError(
-                        NeuronOwnershipError::InvalidOwnership(principal)
-                    )
-                );
+                return Err(InvalidOwnership(principal));
             }
         }
-        None => {
-            Err(UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NotClaimed))
-        }
+        None => { Err(NotClaimed) }
     }
 }
 
@@ -161,7 +132,7 @@ pub async fn fetch_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClai
             if let Some(single_neuron) = neuron_data.neurons.get(0) {
                 Ok(single_neuron.clone())
             } else {
-                Err(UserClaimErrorResponse::GenericError(GenericError::DoesNotExist))
+                Err(DoesNotExist)
             }
         }
         Err(e) => {
@@ -171,7 +142,7 @@ pub async fn fetch_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClai
                 e.0,
                 e.1
             );
-            Err(UserClaimErrorResponse::GenericError(GenericError::InternalError(e.1)))
+            Err(InternalError(e.1))
         }
     }
 }
@@ -198,9 +169,7 @@ pub fn neuron_contains_hotkey_of_caller(
     if valid.len() == 1 {
         return Ok(true);
     } else {
-        return Err(
-            UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NoHotkeysExist)
-        );
+        return Err(NoHotkeysExist);
     }
 }
 
@@ -232,7 +201,7 @@ async fn fetch_neuron_rewards_balance(
         Ok(t) => { Ok(t) }
         Err(e) => {
             error!("Fail - to neuron rewards: {:?}", e.1);
-            Err(UserClaimErrorResponse::GenericError(GenericError::InternalError(e.1)))
+            Err(InternalError(e.1))
         }
     }
 }
