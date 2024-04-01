@@ -20,28 +20,28 @@ const MAX_VALUE_SIZE: u32 = 1000000;
 // NOTE: Stable structures don't need to be serialized, hence the #[serde(skip)].
 #[derive(Serialize, Deserialize)]
 pub struct PaymentProcessor {
+    /// Holds only PaymentRounds that are FULLY completed.
     #[serde(skip, default = "init_map")]
     round_history: StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM>,
+    /// Holds active PaymentRounds that are being processed
     active_rounds: BTreeMap<TokenSymbol, PaymentRound>,
-    is_processing_status: bool,
 }
 
 fn init_map() -> StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM> {
     let memory = get_payment_round_history_memory();
     StableBTreeMap::init(memory)
 }
-
 impl Default for PaymentProcessor {
     fn default() -> Self {
         Self {
             round_history: init_map(),
             active_rounds: BTreeMap::new(),
-            is_processing_status: false,
         }
     }
 }
 
 impl PaymentProcessor {
+    // gets the last key of the last completed payment round and circles from 1 - u16::MAX - each cycle is 125 years.
     pub fn next_key(&self) -> u16 {
         let mut next_key = match self.round_history.last_key_value() {
             Some(((_, id), _)) => {
@@ -214,6 +214,9 @@ impl PaymentRound {
         neurons: &BTreeMap<NeuronId, NeuronInfo>,
         token: &TokenSymbol
     ) -> Result<Vec<(NeuronId, u64)>, String> {
+        // creates a list of the NeuronIds and their respective change in maturity.
+        // A comparison is done against the rewarded_maturity ( maturity that has been already distributed to )
+        // in order to get difference in maturity.
         let (neuron_maturity_ok, neuron_maturity_err): (Vec<_>, Vec<_>) = neurons
             .iter()
             .map(|(neuron_id, neuron_info)| {
@@ -244,6 +247,7 @@ impl PaymentRound {
         neuron_maturity_deltas: &Vec<(NeuronId, u64)>,
         single_fee: u64
     ) -> Result<Nat, String> {
+        // get only the neurons that have a positive maturity delta/change.
         let neurons_with_positive_maturity_delta: Vec<&(NeuronId, u64)> = neuron_maturity_deltas
             .iter()
             .filter(|(_, maturity)| *maturity > 0u64)
@@ -264,6 +268,9 @@ impl PaymentRound {
             .sum()
     }
 
+    // in order to preserve high precision division we use integer division.
+    // in order to use integer division we need to scale some of our numbers using BigUint.
+    // calculates the percentage of a reward each neuron should get.
     pub fn calculate_neuron_rewards(
         neuron_deltas: Vec<(NeuronId, u64)>,
         reward_pool: Nat
@@ -274,8 +281,9 @@ impl PaymentRound {
             .sum();
 
         let total_maturity_big = BigUint::from(total_maturity.clone());
-        // return early if 0 - prevent dividing error
+        let scale_factor = BigUint::from(100_000_000_000_000u64);
 
+        // return early if 0 - prevent dividing error
         if total_maturity <= 0u64 {
             return Err("No change in maturity - skipping round".to_string());
         }
@@ -288,16 +296,11 @@ impl PaymentRound {
             .map(|(neuron_id, maturity)| {
                 // Convert maturity to BigUint
                 let maturity_big = BigUint::from(*maturity);
-
                 // Calculate percentage as (maturity / total_maturity) * scaling factor ( for extra precision )
-                let percentage =
-                    (maturity_big * BigUint::from(100_000_000_000_000u64)) /
-                    total_maturity_big.clone();
-
-                let reward =
-                    (reward_pool_big.clone() * percentage) / BigUint::from(100_000_000_000_000u64);
-                let reward = Nat::from(reward);
-                (neuron_id.clone(), (reward, PaymentStatus::Pending, maturity.clone()))
+                let percentage = (maturity_big * &scale_factor) / total_maturity_big.clone();
+                let reward = (reward_pool_big.clone() * percentage) / &scale_factor;
+                // return a new Payment
+                (neuron_id.clone(), (Nat::from(reward), PaymentStatus::Pending, maturity.clone()))
             })
             .filter(|(_, (reward, _, _))| reward.clone() > 0u64)
             .collect();

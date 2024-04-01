@@ -3,19 +3,16 @@
 
 - fn distribute_rewards
 Distributes reward tokens based on a neuron's accumulated maturity 
-on a weekly basis. 
+on a WEEKLY basis. 
 
 - Sub accounts
 reward pool - [0u8;32] -> holds ICP, OGY, GLDGov pre distribution
 payment round pool - [0u8;30,u16] -> all 0's except from the last 2. represents a reward pool for a specific distribution round
 neuron / user reward - [u8;32] -> based on the NeuronId ( since both are a [u8;32] )
 
-- Payments
-payment rounds may only be created if there are no active payment rounds.
-active payment rounds may contain a round of any status except for PaymentRoundStatus::CompletedFull
-once a payment round has a status of PaymentRoundStatus::CompletedFull it is moved to history.
-
-payments are done in batches and upon each successful transfer it's status is updated.
+- PaymentRounds & Payments
+new PaymentRounds may only be created if there are no active payment rounds.
+payments are done in batches and upon each individual transfer response it's status is updated.
 
 */
 
