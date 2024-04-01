@@ -11,7 +11,7 @@ use crate::state::{ mutate_state, read_state };
 pub enum UserClaimErrorResponse {
     NoHotkeysExist, // No hotkeys found for neuron
     InvalidOwnership(Option<Principal>), // Neuron has a hotkey owned by a different caller
-    NotClaimed, // Nobody has claimed this neuron yet.
+    NeuronNotClaimed, // Nobody has claimed this neuron yet.
     InternalError(String),
     DoesNotExist,
     ZeroBalance,
@@ -47,19 +47,19 @@ pub async fn add_neuron_impl(
     let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
-    // check if the neuron has already been claimed
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
-        Some(principal) => {
-            // if the principal is the same as the caller - already added ( by you )
-            if principal == caller {
+        Some(owner_principal) => {
+            if owner_principal == caller {
+                // neuron is owned by caller according to our state and has a valid hotkey - nothing to do
                 return Ok(neuron_id);
             } else {
-                // if the principal is not the same as the caller - already added ( by someone else )
-                return Err(InvalidOwnership(Some(principal)));
+                // hotkey is valid but neuron id is owned already
+                return Err(InvalidOwnership(Some(owner_principal)));
             }
         }
         None => {
+            // we have no record in our state of the neuron_id being owned and they passed hotkey validation
             mutate_state(|s| s.data.neuron_owners.add(&neuron_id, caller));
             Ok(neuron_id)
         }
@@ -73,21 +73,18 @@ pub async fn remove_neuron_impl(
     let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
-    // check if the neuron has already been claimed
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
-        Some(principal) => {
-            // if the principal is the same as the caller - already added ( by you )
-            if principal == caller {
-                // remove the neuron
+        Some(owner_principal) => {
+            if owner_principal == caller {
+                // neuron is owned by caller according to our state and has a valid hotkey
                 mutate_state(|s| s.data.neuron_owners.remove(&neuron_id, caller));
                 return Ok(neuron_id);
             } else {
-                // if the principal is not the same as the caller - already added ( by them )
-                return Err(InvalidOwnership(Some(principal)));
+                return Err(InvalidOwnership(Some(owner_principal)));
             }
         }
-        None => { Err(NotClaimed) }
+        None => { Err(NeuronNotClaimed) }
     }
 }
 
@@ -99,19 +96,17 @@ pub async fn claim_reward_impl(
     let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
-    // check if the neuron has already been claimed
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
-        Some(principal) => {
-            // if the principal is the same as the caller - already added ( by you )
-            if principal == caller {
+        Some(owner_principal) => {
+            if owner_principal == caller {
+                // neuron is owned by caller according to our state and has a valid hotkey
                 return transfer_rewards(&neuron_id, caller, token).await;
             } else {
-                // if the principal is not the same as the caller - already added ( by them )
-                return Err(InvalidOwnership(Some(principal)));
+                return Err(InvalidOwnership(Some(owner_principal)));
             }
         }
-        None => { Err(NotClaimed) }
+        None => { Err(NeuronNotClaimed) }
     }
 }
 
@@ -126,8 +121,7 @@ pub async fn fetch_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClai
         start_page_at: Some(neuron_id.clone()),
         of_principal: None,
     };
-    let res = sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await;
-    match res {
+    match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
         Ok(neuron_data) => {
             if let Some(single_neuron) = neuron_data.neurons.get(0) {
                 Ok(single_neuron.clone())
