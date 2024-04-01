@@ -63,6 +63,27 @@ impl NeuronId {
     }
 }
 
+impl<'a> From<&'a NeuronId> for [u8; 32] {
+    fn from(neuron_id: &'a NeuronId) -> Self {
+        let mut array = [0u8; 32];
+        array.copy_from_slice(&neuron_id.id[..32]); // Copy the first 32 bytes
+        array
+    }
+}
+impl<'a> From<NeuronId> for [u8; 32] {
+    fn from(neuron_id: NeuronId) -> Self {
+        let mut array = [0u8; 32];
+        array.copy_from_slice(&neuron_id.id[..32]); // Copy the first 32 bytes
+        array
+    }
+}
+
+impl From<[u8; 32]> for NeuronId {
+    fn from(value: [u8; 32]) -> Self {
+        return Self { id: value.to_vec() };
+    }
+}
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {

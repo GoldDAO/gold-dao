@@ -1,10 +1,9 @@
-use std::f32::consts::E;
-
-use candid::{ CandidType, Principal };
+use candid::{ CandidType, Nat, Principal };
 use ic_cdk::{ caller, update };
+use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
-use tracing::debug;
+use tracing::{ debug, error };
 
 use crate::state::{ mutate_state, read_state };
 
@@ -12,8 +11,7 @@ use crate::state::{ mutate_state, read_state };
 pub enum NeuronOwnershipError {
     NoHotkeysExist, // No hotkeys found for neuron
     InvalidOwnership(Principal), // Neuron has a hotkey owned by a different caller
-    InvalidPrincipal, // Principal is invalid
-    InvalidHotkeyPermissions(String), // Permissions of the hoykey are invalid
+    NotClaimed, // Nobody has claimed this neuron yet.
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
@@ -55,9 +53,29 @@ pub async fn add_neuron_impl(
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
     let neuron = get_neuron_by_id(&neuron_id).await?;
-    verify_ownership(&neuron, &caller)?;
-    add_owner_to_principal_neurons_map(&neuron_id, &caller);
-    Ok(neuron_id)
+    // check the neuron contains the hotkey of the callers principal
+    neuron_contains_hotkey_of_caller(&neuron, &caller)?;
+    // check if the neuron has already been claimed
+    let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
+    match owner {
+        Some(principal) => {
+            // if the principal is the same as the caller - already added ( by you )
+            if principal == caller {
+                return Ok(neuron_id);
+            } else {
+                // if the principal is not the same as the caller - already added ( by them )
+                return Err(
+                    UserClaimErrorResponse::NeuronOwnershipError(
+                        NeuronOwnershipError::InvalidOwnership(principal)
+                    )
+                );
+            }
+        }
+        None => {
+            mutate_state(|s| s.data.neuron_owners.add(&neuron_id, caller));
+            Ok(neuron_id)
+        }
+    }
 }
 
 pub async fn remove_neuron_impl(
@@ -65,9 +83,30 @@ pub async fn remove_neuron_impl(
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
     let neuron = get_neuron_by_id(&neuron_id).await?;
-    verify_ownership(&neuron, &caller)?;
-    remove_owner_from_principal_neurons_map(&neuron_id, &caller);
-    Ok(neuron_id)
+    // check the neuron contains the hotkey of the callers principal
+    neuron_contains_hotkey_of_caller(&neuron, &caller)?;
+    // check if the neuron has already been claimed
+    let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
+    match owner {
+        Some(principal) => {
+            // if the principal is the same as the caller - already added ( by you )
+            if principal == caller {
+                // remove the neuron
+                mutate_state(|s| s.data.neuron_owners.remove(&neuron_id, caller));
+                return Ok(neuron_id);
+            } else {
+                // if the principal is not the same as the caller - already added ( by them )
+                return Err(
+                    UserClaimErrorResponse::NeuronOwnershipError(
+                        NeuronOwnershipError::InvalidOwnership(principal)
+                    )
+                );
+            }
+        }
+        None => {
+            Err(UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NotClaimed))
+        }
+    }
 }
 
 pub async fn claim_reward_impl(
@@ -76,9 +115,28 @@ pub async fn claim_reward_impl(
     caller: Principal
 ) -> Result<bool, UserClaimErrorResponse> {
     let neuron = get_neuron_by_id(&neuron_id).await?;
-    verify_ownership(&neuron, &caller)?;
-    transfer_rewards(&neuron_id, caller, token).await?;
-    Ok(true)
+    // check the neuron contains the hotkey of the callers principal
+    neuron_contains_hotkey_of_caller(&neuron, &caller)?;
+    // check if the neuron has already been claimed
+    let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
+    match owner {
+        Some(principal) => {
+            // if the principal is the same as the caller - already added ( by you )
+            if principal == caller {
+                return transfer_rewards(&neuron_id, caller, token).await;
+            } else {
+                // if the principal is not the same as the caller - already added ( by them )
+                return Err(
+                    UserClaimErrorResponse::NeuronOwnershipError(
+                        NeuronOwnershipError::InvalidOwnership(principal)
+                    )
+                );
+            }
+        }
+        None => {
+            Err(UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NotClaimed))
+        }
+    }
 }
 
 pub async fn get_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClaimErrorResponse> {
@@ -109,80 +167,32 @@ pub async fn get_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClaimE
     }
 }
 
-pub fn verify_ownership(
+pub fn neuron_contains_hotkey_of_caller(
     neuron_data: &Neuron,
     caller: &Principal
 ) -> Result<bool, UserClaimErrorResponse> {
     // skip the first because that is always the owner of the neuron
-    let permissions: Vec<NeuronPermission> = neuron_data.permissions
+    let valid: Vec<NeuronPermission> = neuron_data.permissions
         .clone()
         .into_iter()
         .skip(1)
+        .filter(|permission| {
+            match permission.principal {
+                Some(principal) => {
+                    if &principal == caller { true } else { false }
+                }
+                None => { false }
+            }
+        })
         .collect();
-    match permissions.get(1) {
-        Some(permission) => {
-            if
-                !&permission.permission_type.contains(&3) &&
-                !&permission.permission_type.contains(&4)
-            {
-                return Err(
-                    UserClaimErrorResponse::NeuronOwnershipError(
-                        NeuronOwnershipError::InvalidHotkeyPermissions(
-                            "Should have permissions 3 and 4".to_string()
-                        )
-                    )
-                );
-            }
-            if let Some(neuron_principal) = permission.principal {
-                if &neuron_principal == caller {
-                    return Ok(true);
-                } else {
-                    return Err(
-                        UserClaimErrorResponse::NeuronOwnershipError(
-                            NeuronOwnershipError::InvalidOwnership(neuron_principal)
-                        )
-                    );
-                }
-            } else {
-                return Err(
-                    UserClaimErrorResponse::NeuronOwnershipError(
-                        NeuronOwnershipError::InvalidPrincipal
-                    )
-                );
-            }
-        }
-        None => {
-            return Err(
-                UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NoHotkeysExist)
-            );
-        }
+
+    if valid.len() == 1 {
+        return Ok(true);
+    } else {
+        return Err(
+            UserClaimErrorResponse::NeuronOwnershipError(NeuronOwnershipError::NoHotkeysExist)
+        );
     }
-}
-
-pub fn add_owner_to_principal_neurons_map(neuron_id: &NeuronId, user_id: &Principal) {
-    mutate_state(|s| {
-        let neurons = &mut s.data.principal_neurons;
-        neurons
-            .entry(user_id.clone())
-            .and_modify(|neurons| {
-                if !neurons.contains(&neuron_id) {
-                    neurons.push(neuron_id.clone());
-                }
-            })
-            .or_insert_with(|| { vec![neuron_id.clone()] });
-    })
-}
-
-pub fn remove_owner_from_principal_neurons_map(neuron_id: &NeuronId, user_id: &Principal) {
-    mutate_state(|s| {
-        let neurons = &mut s.data.principal_neurons;
-        neurons
-            .entry(user_id.clone())
-            .and_modify(|neurons| {
-                neurons.retain_mut(|n_id| n_id != neuron_id);
-            })
-            .or_insert_with(|| { vec![] });
-    })
 }
 
 pub async fn transfer_rewards(
@@ -191,8 +201,54 @@ pub async fn transfer_rewards(
     token: String
 ) -> Result<bool, UserClaimErrorResponse> {
     todo!();
-    // verify ownership
     // verify token is correct with a parse
     // get balance of sub account
+    // let balance = fetch_neuron_rewards_balance()
     // transfer all from sub account to user_id
+}
+
+async fn fetch_neuron_rewards_balance(
+    ledger_canister_id: Principal,
+    neuron_id: &NeuronId
+) -> Result<Nat, UserClaimErrorResponse> {
+    match
+        icrc_ledger_canister_c2c_client::icrc1_balance_of(
+            ledger_canister_id,
+            &(Account {
+                owner: ic_cdk::api::id(),
+                subaccount: Some(neuron_id.into()),
+            })
+        ).await
+    {
+        Ok(t) => { Ok(t) }
+        Err(e) => {
+            error!("Fail - to neuron rewards: {:?}", e.1);
+            Err(UserClaimErrorResponse::GenericError(GenericError::InternalError(e.1)))
+        }
+    }
+}
+
+async fn transfer_token(
+    from_sub_account: NeuronId,
+    to_account: Account,
+    ledger_id: Principal,
+    amount: Nat
+) -> Result<(), String> {
+    match
+        icrc_ledger_canister_c2c_client::icrc1_transfer(
+            ledger_id,
+            &(TransferArg {
+                from_subaccount: Some(from_sub_account.into()),
+                to: to_account,
+                fee: None,
+                created_at_time: None,
+                amount: amount,
+                memo: None,
+            })
+        ).await
+    {
+        Ok(Ok(_)) => Ok(()),
+        Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
+        Err(error) => Err(format!("Network error: {error:?}")),
+    }
 }

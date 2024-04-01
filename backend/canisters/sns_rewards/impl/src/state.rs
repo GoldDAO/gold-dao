@@ -10,7 +10,7 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::model::{ maturity_history::MaturityHistory, neuron_owners::NeuronOwners };
+use crate::model::{ maturity_history::MaturityHistory, neuron_owners::NeuronOwnership };
 
 canister_state!(RuntimeState);
 
@@ -79,7 +79,7 @@ pub struct Data {
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
     /// owners of neurons
-    pub neuron_owners: NeuronOwners,
+    pub neuron_owners: NeuronOwnership,
 }
 
 impl Default for Data {
@@ -90,7 +90,7 @@ impl Default for Data {
             principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            neuron_owners: NeuronOwners::default(),
+            neuron_owners: NeuronOwnership::default(),
         }
     }
 }

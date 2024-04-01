@@ -4,39 +4,59 @@ use candid::Principal;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 
-/// The history of each neuron's maturity.
-// NOTE: Stable structures don't need to be serialized, hence the #[serde(skip)].
 #[derive(Serialize, Deserialize)]
-pub struct NeuronOwners {
-    owners: BTreeMap<NeuronId, Principal>,
+pub struct NeuronOwnership {
+    owner_to_neurons: BTreeMap<Principal, Vec<NeuronId>>,
+    neuron_to_owner: BTreeMap<NeuronId, Principal>,
 }
 
-impl Default for NeuronOwners {
+impl Default for NeuronOwnership {
     fn default() -> Self {
-        Self { owners: BTreeMap::new() }
+        Self { owner_to_neurons: BTreeMap::new(), neuron_to_owner: BTreeMap::new() }
     }
 }
 
-impl NeuronOwners {
-    // pub fn insert(&mut self, key: (NeuronId, TimestampMillis), val: NeuronInfo) {
-    //     self.history.insert(key, val);
-    // }
+impl NeuronOwnership {
+    pub fn add(&mut self, neuron_id: &NeuronId, caller: Principal) {
+        self.owner_to_neurons
+            .entry(caller)
+            .and_modify(|neurons| {
+                if !neurons.contains(neuron_id) {
+                    neurons.push(neuron_id.clone())
+                }
+            })
+            .or_insert_with(|| { vec![neuron_id.clone()] });
 
-    // pub fn _insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {
-    //     for (neuron_id, ts, event) in events {
-    //         self.insert((neuron_id, ts), event);
-    //     }
-    // }
+        self.neuron_to_owner.insert(neuron_id.clone(), caller);
+    }
 
-    // pub fn get_maturity_history(
-    //     &self,
-    //     neuron_id: NeuronId,
-    //     len: usize
-    // ) -> Vec<(TimestampMillis, NeuronInfo)> {
-    //     history_range(&self.history, neuron_id, len).collect()
-    // }
+    pub fn remove(&mut self, neuron_id: &NeuronId, caller: Principal) {
+        // add to owner_to_neurons
+        self.owner_to_neurons
+            .entry(caller)
+            .and_modify(|neurons| {
+                if neurons.contains(neuron_id) {
+                    neurons.retain(|n_id| n_id != neuron_id)
+                }
+            })
+            .or_insert_with(|| { vec![] });
 
-    // pub fn get(&self, size: usize) -> Vec<((NeuronId, TimestampMillis), NeuronInfo)> {
-    //     self.history.iter().take(size).collect()
-    // }
+        self.neuron_to_owner.remove(&neuron_id);
+    }
+
+    pub fn get_neuron_ids_by_owner(&self, caller: Principal) -> Option<Vec<NeuronId>> {
+        let neuron_ids = self.owner_to_neurons.get(&caller);
+        match neuron_ids {
+            Some(n_ids) => Some(n_ids.clone()),
+            None => None,
+        }
+    }
+
+    pub fn get_owner_of_neuron_id(&self, neuron_id: &NeuronId) -> Option<Principal> {
+        let owner = self.neuron_to_owner.get(neuron_id);
+        match owner {
+            Some(o) => Some(o.clone()),
+            None => None,
+        }
+    }
 }

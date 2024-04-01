@@ -1466,6 +1466,7 @@ dependencies = [
  "ic-cdk-macros",
  "ic-stable-structures",
  "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
  "serde",
  "serializer",
  "sns_governance_canister",
