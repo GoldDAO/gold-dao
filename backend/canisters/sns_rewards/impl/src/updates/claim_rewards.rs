@@ -10,7 +10,7 @@ use crate::state::{ mutate_state, read_state };
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum UserClaimErrorResponse {
     NoHotkeysExist, // No hotkeys found for neuron
-    InvalidOwnership(Principal), // Neuron has a hotkey owned by a different caller
+    InvalidOwnership(Option<Principal>), // Neuron has a hotkey owned by a different caller
     NotClaimed, // Nobody has claimed this neuron yet.
     InternalError(String),
     DoesNotExist,
@@ -56,7 +56,7 @@ pub async fn add_neuron_impl(
                 return Ok(neuron_id);
             } else {
                 // if the principal is not the same as the caller - already added ( by someone else )
-                return Err(InvalidOwnership(principal));
+                return Err(InvalidOwnership(Some(principal)));
             }
         }
         None => {
@@ -84,7 +84,7 @@ pub async fn remove_neuron_impl(
                 return Ok(neuron_id);
             } else {
                 // if the principal is not the same as the caller - already added ( by them )
-                return Err(InvalidOwnership(principal));
+                return Err(InvalidOwnership(Some(principal)));
             }
         }
         None => { Err(NotClaimed) }
@@ -108,7 +108,7 @@ pub async fn claim_reward_impl(
                 return transfer_rewards(&neuron_id, caller, token).await;
             } else {
                 // if the principal is not the same as the caller - already added ( by them )
-                return Err(InvalidOwnership(principal));
+                return Err(InvalidOwnership(Some(principal)));
             }
         }
         None => { Err(NotClaimed) }
@@ -151,17 +151,21 @@ pub fn neuron_contains_hotkey_of_caller(
     neuron_data: &Neuron,
     caller: &Principal
 ) -> Result<bool, UserClaimErrorResponse> {
-    // skip the first because that is always the owner of the neuron
+    let len = neuron_data.permissions.clone().len();
+    // first is always the nns owner principal so if less than or equal to 1 then no hotkeys have been added.
+    if len <= 1 {
+        return Err(NoHotkeysExist);
+    }
+
+    // skip the first because that is always the nns owner of the neuron
     let valid: Vec<NeuronPermission> = neuron_data.permissions
         .clone()
         .into_iter()
         .skip(1)
         .filter(|permission| {
             match permission.principal {
-                Some(principal) => {
-                    if &principal == caller { true } else { false }
-                }
-                None => { false }
+                Some(principal) => &principal == caller,
+                None => false,
             }
         })
         .collect();
@@ -169,7 +173,8 @@ pub fn neuron_contains_hotkey_of_caller(
     if valid.len() == 1 {
         return Ok(true);
     } else {
-        return Err(NoHotkeysExist);
+        // TODO - its possible there may be many potential hotkeys, do we want to return them all since we won't know the correct one if it hasn't already been claimed
+        return Err(InvalidOwnership(None));
     }
 }
 
