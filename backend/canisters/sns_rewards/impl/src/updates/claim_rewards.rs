@@ -1,5 +1,5 @@
 use candid::{ CandidType, Nat, Principal };
-use ic_cdk::{ caller, update };
+use ic_cdk::{ caller, query, update };
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
@@ -48,11 +48,16 @@ async fn claim_reward(neuron_id: NeuronId, token: String) -> Result<bool, UserCl
     claim_reward_impl(neuron_id, token, caller()).await
 }
 
+#[query]
+async fn get_neurons_by_owner() -> Option<Vec<NeuronId>> {
+    get_neurons_by_owner_impl(caller())
+}
+
 pub async fn add_neuron_impl(
     neuron_id: NeuronId,
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
-    let neuron = get_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
     // check if the neuron has already been claimed
@@ -63,7 +68,7 @@ pub async fn add_neuron_impl(
             if principal == caller {
                 return Ok(neuron_id);
             } else {
-                // if the principal is not the same as the caller - already added ( by them )
+                // if the principal is not the same as the caller - already added ( by someone else )
                 return Err(
                     UserClaimErrorResponse::NeuronOwnershipError(
                         NeuronOwnershipError::InvalidOwnership(principal)
@@ -82,7 +87,7 @@ pub async fn remove_neuron_impl(
     neuron_id: NeuronId,
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
-    let neuron = get_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
     // check if the neuron has already been claimed
@@ -114,7 +119,7 @@ pub async fn claim_reward_impl(
     token: String,
     caller: Principal
 ) -> Result<bool, UserClaimErrorResponse> {
-    let neuron = get_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     neuron_contains_hotkey_of_caller(&neuron, &caller)?;
     // check if the neuron has already been claimed
@@ -139,7 +144,11 @@ pub async fn claim_reward_impl(
     }
 }
 
-pub async fn get_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClaimErrorResponse> {
+pub fn get_neurons_by_owner_impl(caller: Principal) -> Option<Vec<NeuronId>> {
+    read_state(|s| s.data.neuron_owners.get_neuron_ids_by_owner(caller))
+}
+
+pub async fn fetch_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClaimErrorResponse> {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let args = sns_governance_canister::list_neurons::Args {
         limit: 1,
