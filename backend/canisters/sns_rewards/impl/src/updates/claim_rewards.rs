@@ -179,11 +179,11 @@ pub async fn transfer_rewards(
     todo!();
     // verify token is correct with a parse
     // get balance of sub account
-    // let balance = fetch_neuron_rewards_balance()
+    // let balance = fetch_balance_of_neuron_id()
     // transfer all from sub account to user_id
 }
 
-async fn fetch_neuron_rewards_balance(
+async fn fetch_balance_of_neuron_id(
     ledger_canister_id: Principal,
     neuron_id: &NeuronId
 ) -> Result<Nat, UserClaimErrorResponse> {
