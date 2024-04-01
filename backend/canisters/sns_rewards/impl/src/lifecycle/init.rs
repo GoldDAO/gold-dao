@@ -7,9 +7,6 @@ use utils::{
     consts::{
         OGY_LEDGER_CANISTER_ID_STAGING,
         ICP_LEDGER_CANISTER_ID_STAGING,
-        ICP_LEDGER_CANISTER_ID,
-        OGY_LEDGER_CANISTER_ID,
-        SNS_LEDGER_CANISTER_ID,
         SNS_LEDGER_CANISTER_ID_STAGING,
     },
     env::CanisterEnv,
@@ -32,42 +29,32 @@ fn init(args: Args) {
     let mut data = Data::default();
 
     // use staging canister ids
-    let icp_ledger_canister_id = if args.test_mode {
-        ICP_LEDGER_CANISTER_ID_STAGING
-    } else {
-        ICP_LEDGER_CANISTER_ID
-    };
-    let ogy_ledger_canister_id = if args.test_mode {
-        OGY_LEDGER_CANISTER_ID_STAGING
-    } else {
-        OGY_LEDGER_CANISTER_ID
-    };
-    let gldgov_ledger_canister_id = if args.test_mode {
-        SNS_LEDGER_CANISTER_ID_STAGING
-    } else {
-        SNS_LEDGER_CANISTER_ID
-    };
+    if args.test_mode {
+        let icp_ledger_canister_id = ICP_LEDGER_CANISTER_ID_STAGING;
+        let ogy_ledger_canister_id = OGY_LEDGER_CANISTER_ID_STAGING;
+        let gldgov_ledger_canister_id = SNS_LEDGER_CANISTER_ID_STAGING;
 
-    if let Ok(token) = TokenSymbol::parse("ICP") {
-        data.tokens.insert(token, TokenInfo {
-            ledger_id: icp_ledger_canister_id,
-            fee: 10_000u64,
-            decimals: 8u64,
-        });
-    }
-    if let Ok(token) = TokenSymbol::parse("OGY") {
-        data.tokens.insert(token, TokenInfo {
-            ledger_id: ogy_ledger_canister_id,
-            fee: 200_000u64,
-            decimals: 8u64,
-        });
-    }
-    if let Ok(token) = TokenSymbol::parse("GLDGov") {
-        data.tokens.insert(token, TokenInfo {
-            ledger_id: gldgov_ledger_canister_id,
-            fee: 100_000u64,
-            decimals: 8u64,
-        });
+        if let Ok(token) = TokenSymbol::parse("ICP") {
+            data.tokens.insert(token, TokenInfo {
+                ledger_id: icp_ledger_canister_id,
+                fee: 10_000u64,
+                decimals: 8u64,
+            });
+        }
+        if let Ok(token) = TokenSymbol::parse("OGY") {
+            data.tokens.insert(token, TokenInfo {
+                ledger_id: ogy_ledger_canister_id,
+                fee: 200_000u64,
+                decimals: 8u64,
+            });
+        }
+        if let Ok(token) = TokenSymbol::parse("GLDGov") {
+            data.tokens.insert(token, TokenInfo {
+                ledger_id: gldgov_ledger_canister_id,
+                fee: 100_000u64,
+                decimals: 8u64,
+            });
+        }
     }
 
     let runtime_state = RuntimeState::new(env, data);

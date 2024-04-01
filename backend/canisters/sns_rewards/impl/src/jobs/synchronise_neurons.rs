@@ -69,7 +69,7 @@ pub async fn synchronise_neuron_data() {
                         },
                         |n| {
                             continue_scanning = true;
-                            if is_test_mode && number_of_scanned_neurons == 4000 {
+                            if is_test_mode && number_of_scanned_neurons == 400 {
                                 continue_scanning = false;
                             }
                             n.id.clone()
