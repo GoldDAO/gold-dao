@@ -151,7 +151,7 @@ pub fn authenticate_hotkey(
     }
 
     // skip the first because that is always the nns owner of the neuron
-    let valid: Vec<NeuronPermission> = neuron_data.permissions
+    let matching_caller_hotkey: Vec<NeuronPermission> = neuron_data.permissions
         .clone()
         .into_iter()
         .skip(1)
@@ -163,7 +163,7 @@ pub fn authenticate_hotkey(
         })
         .collect();
 
-    if valid.len() == 1 {
+    if matching_caller_hotkey.len() == 1 {
         return Ok(true);
     } else {
         // TODO - its possible there may be many potential hotkeys, do we want to return them all since we won't know the correct one if it hasn't already been claimed
