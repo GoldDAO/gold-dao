@@ -284,7 +284,7 @@ impl PaymentRound {
         let scale_factor = BigUint::from(100_000_000_000_000u64);
 
         // return early if 0 - prevent dividing error
-        if total_maturity <= 0u64 {
+        if total_maturity == 0u64 {
             return Err("No change in maturity - skipping round".to_string());
         }
 

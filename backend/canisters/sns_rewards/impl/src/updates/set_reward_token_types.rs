@@ -65,11 +65,11 @@ async fn set_reward_token_types_validation(
         //     return Err(format!("ledger field may not be empty for token {}", token_string));
         // }
 
-        if token_info.decimals <= 0 {
+        if token_info.decimals == 0u64 {
             return Err(format!("decimals for token {} may not be negative or 0", token_string));
         }
 
-        if token_info.fee <= 0 {
+        if token_info.fee == 0u64 {
             return Err(format!("fee for token {} may not be negative or 0", token_string));
         }
 
