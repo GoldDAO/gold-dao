@@ -25,6 +25,8 @@ pub enum UserClaimErrorResponse {
 
 use UserClaimErrorResponse::*;
 
+// TODO - frontend calls to these update calls will have to pass in something like 12505661337902198044. will we have to provide a convenient way for FE to convert to NeuronId?
+
 #[update]
 async fn add_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
     add_neuron_impl(neuron_id, caller()).await

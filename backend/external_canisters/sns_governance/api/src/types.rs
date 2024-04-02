@@ -93,6 +93,7 @@ impl From<[u8; 32]> for NeuronId {
         return Self { id: value.to_vec() };
     }
 }
+
 /// The id of a specific proposal.
 #[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
 pub struct ProposalId {
