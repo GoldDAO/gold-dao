@@ -1,6 +1,6 @@
 use candid::CandidType;
 use ic_stable_structures::{ storable::Bound, Storable };
-use serde::{ Serialize, Deserialize };
+use serde::{ Deserialize, Serialize };
 use std::{ borrow::Cow, fmt::{ self, Display, Formatter } };
 
 /// A principal with a particular set of permissions over a neuron.
@@ -34,9 +34,14 @@ impl Storable for NeuronId {
         Cow::Owned(self.id.clone())
     }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Self { id: bytes.into_owned() }
+        Self {
+            id: bytes.into_owned(),
+        }
     }
-    const BOUND: Bound = Bound::Bounded { max_size: 32, is_fixed_size: true };
+    const BOUND: Bound = Bound::Bounded {
+        max_size: 32,
+        is_fixed_size: true,
+    };
 }
 
 impl Display for NeuronId {
@@ -53,10 +58,15 @@ impl Default for NeuronId {
 
 impl NeuronId {
     pub fn new(id_as_hex: &str) -> Option<Self> {
-        if let Ok(id) = hex::decode(id_as_hex) {
-            Some(Self {
-                id,
-            })
+        if let Ok(id) = hex::decode(id_as_hex) { Some(Self { id }) } else { None }
+    }
+
+    pub fn into_array(self) -> Option<[u8; 32]> {
+        // Check if the Vec<u8> has exactly 32 elements
+        if self.id.len() == 32 {
+            let mut array = [0u8; 32];
+            array.copy_from_slice(&self.id);
+            Some(array)
         } else {
             None
         }
@@ -1923,8 +1933,9 @@ impl NeuronPermissionType {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             NeuronPermissionType::Unspecified => "NEURON_PERMISSION_TYPE_UNSPECIFIED",
-            NeuronPermissionType::ConfigureDissolveState =>
-                "NEURON_PERMISSION_TYPE_CONFIGURE_DISSOLVE_STATE",
+            NeuronPermissionType::ConfigureDissolveState => {
+                "NEURON_PERMISSION_TYPE_CONFIGURE_DISSOLVE_STATE"
+            }
             NeuronPermissionType::ManagePrincipals => "NEURON_PERMISSION_TYPE_MANAGE_PRINCIPALS",
             NeuronPermissionType::SubmitProposal => "NEURON_PERMISSION_TYPE_SUBMIT_PROPOSAL",
             NeuronPermissionType::Vote => "NEURON_PERMISSION_TYPE_VOTE",
@@ -1933,8 +1944,9 @@ impl NeuronPermissionType {
             NeuronPermissionType::MergeMaturity => "NEURON_PERMISSION_TYPE_MERGE_MATURITY",
             NeuronPermissionType::DisburseMaturity => "NEURON_PERMISSION_TYPE_DISBURSE_MATURITY",
             NeuronPermissionType::StakeMaturity => "NEURON_PERMISSION_TYPE_STAKE_MATURITY",
-            NeuronPermissionType::ManageVotingPermission =>
-                "NEURON_PERMISSION_TYPE_MANAGE_VOTING_PERMISSION",
+            NeuronPermissionType::ManageVotingPermission => {
+                "NEURON_PERMISSION_TYPE_MANAGE_VOTING_PERMISSION"
+            }
         }
     }
 }
@@ -2111,8 +2123,9 @@ impl ClaimedSwapNeuronStatus {
             ClaimedSwapNeuronStatus::Success => "CLAIMED_SWAP_NEURON_STATUS_SUCCESS",
             ClaimedSwapNeuronStatus::Invalid => "CLAIMED_SWAP_NEURON_STATUS_INVALID",
             ClaimedSwapNeuronStatus::AlreadyExists => "CLAIMED_SWAP_NEURON_STATUS_ALREADY_EXISTS",
-            ClaimedSwapNeuronStatus::MemoryExhausted =>
-                "CLAIMED_SWAP_NEURON_STATUS_MEMORY_EXHAUSTED",
+            ClaimedSwapNeuronStatus::MemoryExhausted => {
+                "CLAIMED_SWAP_NEURON_STATUS_MEMORY_EXHAUSTED"
+            }
         }
     }
 }
