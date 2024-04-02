@@ -1,13 +1,15 @@
 use candid::{ CandidType, Nat, Principal };
 use ic_cdk::{ caller, query, update };
 use ic_ledger_types::Subaccount;
-use ic_stable_structures::Storable;
-use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
+use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
+use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::{ debug, error };
 use types::{ TokenInfo, TokenSymbol };
-
+use sns_governance_canister::types::get_neuron_response::Result::{
+    Neuron as NeuronResponse,
+    Error as NeuronErrorResponse,
+};
 use crate::{ state::{ mutate_state, read_state, RuntimeState }, utils::transfer_token };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
@@ -135,17 +137,19 @@ pub async fn fetch_neuron_data_by_id(
     neuron_id: &NeuronId
 ) -> Result<Neuron, UserClaimErrorResponse> {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
-    let args = sns_governance_canister::list_neurons::Args {
-        limit: 1,
-        start_page_at: Some(neuron_id.clone()),
-        of_principal: None,
+    let args = sns_governance_canister::get_neuron::Args {
+        neuron_id: Some(neuron_id.clone()),
     };
-    match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
+    match sns_governance_canister_c2c_client::get_neuron(canister_id, &args).await {
         Ok(neuron_data) => {
-            if let Some(single_neuron) = neuron_data.neurons.get(0) {
-                Ok(single_neuron.clone())
-            } else {
-                Err(NeuronDoesNotExist)
+            match neuron_data.result {
+                Some(neuron) => {
+                    match neuron {
+                        NeuronResponse(n) => Ok(n),
+                        NeuronErrorResponse(_) => Err(NeuronDoesNotExist),
+                    }
+                }
+                None => Err(NeuronDoesNotExist),
             }
         }
         Err(e) => {
