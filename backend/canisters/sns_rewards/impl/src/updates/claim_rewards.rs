@@ -49,7 +49,7 @@ pub async fn add_neuron_impl(
 ) -> Result<NeuronId, UserClaimErrorResponse> {
     let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
-    authenticate_hotkey(&neuron, &caller)?;
+    authenticate_by_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
         Some(owner_principal) => {
@@ -75,7 +75,7 @@ pub async fn remove_neuron_impl(
 ) -> Result<NeuronId, UserClaimErrorResponse> {
     let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
-    authenticate_hotkey(&neuron, &caller)?;
+    authenticate_by_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
         Some(owner_principal) => {
@@ -112,7 +112,7 @@ pub async fn claim_reward_impl(
 
     let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
-    authenticate_hotkey(&neuron, &caller)?;
+    authenticate_by_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
         Some(owner_principal) => {
@@ -160,7 +160,7 @@ pub async fn fetch_neuron_data_by_id(
     }
 }
 
-pub fn authenticate_hotkey(
+pub fn authenticate_by_hotkey(
     neuron_data: &Neuron,
     caller: &Principal
 ) -> Result<bool, UserClaimErrorResponse> {
