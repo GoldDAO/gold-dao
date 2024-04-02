@@ -15,6 +15,7 @@ pub enum UserClaimErrorResponse {
     NeuronDoesNotExist,
     InternalError(String),
     TransferFailed(String),
+    TokenSymbolInvalid(String),
 }
 
 use UserClaimErrorResponse::*;
@@ -178,8 +179,29 @@ pub async fn transfer_rewards(
 ) -> Result<bool, UserClaimErrorResponse> {
     todo!();
     // verify token is correct with a parse
-    // get balance of sub account
-    // let balance = fetch_balance_of_neuron_id()
+
+    // PSEUDO CODE
+
+    // let (token, token_info) = match TokenSymbol::parse(token) {
+    //     Ok(token) => {
+    //         read_state(|s| {
+    //             s.data.token_info.get(token)
+    //         })
+    //     },
+    //     Err(e) => TokenSymbolInvalid(e)
+    // }
+
+    // // get balance of sub account
+    // let balance = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await;
+    // if balance == Nat::from(064) {
+    //     return Err(TransferFailed("no rewards to claim".to_string()))
+    // }
+
+    // match transfer_token(neuron_id, user_id, token_info.ledger_id, balance).await {
+    //     Ok(_) => Ok(true),
+    //     Err(e) => TransferFailed(e)
+    // }
+
     // transfer all from sub account to user_id
 }
 
