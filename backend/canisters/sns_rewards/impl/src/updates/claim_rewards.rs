@@ -96,7 +96,7 @@ pub async fn claim_reward_impl(
     token: String,
     caller: Principal
 ) -> Result<bool, UserClaimErrorResponse> {
-    // verify the token is valid
+    // verify the token symbol is valid
     let token_symbol = TokenSymbol::parse(&token).map_err(|err|
         TokenSymbolInvalid(
             format!("token of type {:?} is not a valid token symbol. error: {:?}", token, err)
