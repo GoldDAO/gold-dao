@@ -10,6 +10,7 @@ use types::{ HttpRequest, HttpResponse, NeuronInfo, TimestampMillis, TokenInfo, 
 use updates::set_reward_token_types::{ SetRewardTokenTypesRequest, SetRewardTokenTypesResponse };
 use updates::claim_rewards::UserClaimErrorResponse;
 
+mod utils;
 mod guards;
 mod jobs;
 mod lifecycle;

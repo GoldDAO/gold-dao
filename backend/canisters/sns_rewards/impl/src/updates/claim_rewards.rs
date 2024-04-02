@@ -1,12 +1,14 @@
 use candid::{ CandidType, Nat, Principal };
 use ic_cdk::{ caller, query, update };
+use ic_ledger_types::Subaccount;
+use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
 use tracing::{ debug, error };
 use types::{ TokenInfo, TokenSymbol };
 
-use crate::state::{ mutate_state, read_state, RuntimeState };
+use crate::{ state::{ mutate_state, read_state, RuntimeState }, utils::transfer_token };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum UserClaimErrorResponse {
@@ -55,7 +57,7 @@ pub async fn add_neuron_impl(
                 // neuron is owned by caller according to our state and has a valid hotkey - nothing to do
                 return Ok(neuron_id);
             } else {
-                // hotkey is valid but neuron id is owned already
+                // hotkey is valid but neuron id is owned already so we return the principal that owns it
                 return Err(NeuronOwnerInvalid(Some(owner_principal)));
             }
         }
@@ -197,11 +199,17 @@ pub async fn transfer_rewards(
     if balance_of_neuron_id == Nat::from(0u64) {
         return Err(TransferFailed("no rewards to claim".to_string()));
     }
+    let neuron_sub_account: [u8; 32] = neuron_id.clone().into();
+    let neuron_sub_account = Subaccount(neuron_sub_account);
 
+    let user_account = Account {
+        owner: user_id,
+        subaccount: None,
+    };
     // transfer the tokens to the claimer
     let transfer = transfer_token(
-        neuron_id.clone(),
-        Account::from(user_id),
+        neuron_sub_account,
+        user_account,
         token_info.ledger_id,
         balance_of_neuron_id
     ).await;
@@ -230,30 +238,5 @@ async fn fetch_balance_of_neuron_id(
             error!("Fail - to neuron rewards: {:?}", e.1);
             Err(InternalError(e.1))
         }
-    }
-}
-
-async fn transfer_token(
-    from_sub_account: NeuronId,
-    to_account: Account,
-    ledger_id: Principal,
-    amount: Nat
-) -> Result<(), String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_transfer(
-            ledger_id,
-            &(TransferArg {
-                from_subaccount: Some(from_sub_account.into()),
-                to: to_account,
-                fee: None,
-                created_at_time: None,
-                amount: amount,
-                memo: None,
-            })
-        ).await
-    {
-        Ok(Ok(_)) => Ok(()),
-        Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
-        Err(error) => Err(format!("Network error: {error:?}")),
     }
 }
