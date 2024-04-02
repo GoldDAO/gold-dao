@@ -176,7 +176,9 @@ pub fn authenticate_hotkey(
         .filter(|permission| permission.principal.as_ref() == Some(caller))
         .count();
 
-    if matching_caller_hotkey == 1 {
+    // TODO - is it possible the user may add a duplicate?
+    // TODO - do we want to return all possible hotkeys?
+    if matching_caller_hotkey >= 1 {
         Ok(true)
     } else {
         Err(NeuronOwnerInvalid(None))
