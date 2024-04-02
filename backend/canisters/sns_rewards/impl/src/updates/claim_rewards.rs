@@ -164,30 +164,22 @@ pub fn authenticate_hotkey(
     neuron_data: &Neuron,
     caller: &Principal
 ) -> Result<bool, UserClaimErrorResponse> {
-    let len = neuron_data.permissions.clone().len();
     // first is always the nns owner principal so if less than or equal to 1 then no hotkeys have been added.
-    if len <= 1 {
+    if neuron_data.permissions.len() <= 1 {
         return Err(NeuronHotKeyAbsent);
     }
 
-    // skip the first because that is always the nns owner of the neuron
-    let matching_caller_hotkey: Vec<NeuronPermission> = neuron_data.permissions
-        .clone()
-        .into_iter()
+    // Check if any of the permission principals contain an entry that matches the caller principal
+    let matching_caller_hotkey = neuron_data.permissions
+        .iter()
         .skip(1)
-        .filter(|permission| {
-            match permission.principal {
-                Some(principal) => &principal == caller,
-                None => false,
-            }
-        })
-        .collect();
+        .filter(|permission| permission.principal.as_ref() == Some(caller))
+        .count();
 
-    if matching_caller_hotkey.len() == 1 {
-        return Ok(true);
+    if matching_caller_hotkey == 1 {
+        Ok(true)
     } else {
-        // TODO - its possible there may be many potential hotkeys, do we want to return them all since we won't know the correct one if it hasn't already been claimed
-        return Err(NeuronOwnerInvalid(None));
+        Err(NeuronOwnerInvalid(None))
     }
 }
 
