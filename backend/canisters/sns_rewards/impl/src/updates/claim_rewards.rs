@@ -4,8 +4,9 @@ use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
 use tracing::{ debug, error };
+use types::{ TokenInfo, TokenSymbol };
 
-use crate::state::{ mutate_state, read_state };
+use crate::state::{ mutate_state, read_state, RuntimeState };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum UserClaimErrorResponse {
@@ -177,32 +178,38 @@ pub async fn transfer_rewards(
     user_id: Principal,
     token: String
 ) -> Result<bool, UserClaimErrorResponse> {
-    todo!();
-    // verify token is correct with a parse
+    // verify the token is valid
+    let token_symbol = TokenSymbol::parse(&token).map_err(|err|
+        TokenSymbolInvalid(
+            format!("token of type {:?} is not a valid token symbol. error: {:?}", token, err)
+        )
+    )?;
 
-    // PSEUDO CODE
+    // get the token meta information associated with the valid token
+    let token_info = read_state(|s: &RuntimeState|
+        s.data.tokens.get(&token_symbol).copied()
+    ).ok_or_else(||
+        TokenSymbolInvalid(format!("Token info for type {:?} not found in state", token_symbol))
+    )?;
 
-    // let (token, token_info) = match TokenSymbol::parse(token) {
-    //     Ok(token) => {
-    //         read_state(|s| {
-    //             s.data.token_info.get(token)
-    //         })
-    //     },
-    //     Err(e) => TokenSymbolInvalid(e)
-    // }
+    // get the balance of the sub account ( NeuronId is the sub account id )
+    let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
+    if balance_of_neuron_id == Nat::from(0u64) {
+        return Err(TransferFailed("no rewards to claim".to_string()));
+    }
 
-    // // get balance of sub account
-    // let balance = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await;
-    // if balance == Nat::from(064) {
-    //     return Err(TransferFailed("no rewards to claim".to_string()))
-    // }
+    // transfer the tokens to the claimer
+    let transfer = transfer_token(
+        neuron_id.clone(),
+        Account::from(user_id),
+        token_info.ledger_id,
+        balance_of_neuron_id
+    ).await;
 
-    // match transfer_token(neuron_id, user_id, token_info.ledger_id, balance).await {
-    //     Ok(_) => Ok(true),
-    //     Err(e) => TransferFailed(e)
-    // }
-
-    // transfer all from sub account to user_id
+    match transfer {
+        Ok(_) => { Ok(true) }
+        Err(e) => { Err(TransferFailed(e)) }
+    }
 }
 
 async fn fetch_balance_of_neuron_id(
