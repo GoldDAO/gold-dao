@@ -116,7 +116,7 @@ pub async fn claim_reward_impl(
         Some(owner_principal) => {
             if owner_principal == caller {
                 // neuron is owned by caller according to our state and has a valid hotkey
-                return transfer_rewards(&neuron_id, caller, &token_info).await;
+                return transfer_rewards(&neuron_id, owner_principal, &token_info).await;
             } else {
                 return Err(NeuronOwnerInvalid(Some(owner_principal)));
             }
