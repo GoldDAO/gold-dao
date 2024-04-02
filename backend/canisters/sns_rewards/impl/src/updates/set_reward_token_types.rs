@@ -51,7 +51,7 @@ async fn set_reward_token_types_validation(
 ) -> Result<String, String> {
     for (token_string, token_info) in &args.token_list {
         // Check token is in approved list and or return early if fail
-        let parsed_token_result = TokenSymbol::parse(&token_string);
+        let parsed_token_result = TokenSymbol::parse(token_string);
         match parsed_token_result {
             Ok(_) => {}
             Err(e) => {

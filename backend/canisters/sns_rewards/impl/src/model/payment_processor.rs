@@ -74,7 +74,7 @@ impl PaymentProcessor {
         new_status: PaymentStatus
     ) {
         if let Some(round) = self.active_rounds.get_mut(round_token) {
-            if let Some(payment) = round.payments.get_mut(&neuron_id) {
+            if let Some(payment) = round.payments.get_mut(neuron_id) {
                 payment.1 = new_status;
             } else {
                 debug!(
@@ -100,7 +100,7 @@ impl PaymentProcessor {
         let rounds = self.round_history
             .iter()
             .filter(|((_, round_id), round)| { *round_id == id && round.token == token })
-            .map(|((_, round_id), payment_round)| (round_id.clone(), payment_round.clone()))
+            .map(|((_, round_id), payment_round)| (round_id, payment_round.clone()))
             .collect();
 
         rounds
@@ -244,7 +244,7 @@ impl PaymentRound {
     }
 
     pub fn calculate_transaction_fees(
-        neuron_maturity_deltas: &Vec<(NeuronId, u64)>,
+        neuron_maturity_deltas: &[(NeuronId, u64)],
         single_fee: u64
     ) -> Result<Nat, String> {
         // get only the neurons that have a positive maturity delta/change.
@@ -262,7 +262,7 @@ impl PaymentRound {
         }
     }
 
-    pub fn calculate_aggregated_maturity(data: &Vec<(NeuronId, u64)>) -> u64 {
+    pub fn calculate_aggregated_maturity(data: &[(NeuronId, u64)]) -> u64 {
         data.iter()
             .map(|entry| entry.1)
             .sum()
@@ -280,7 +280,7 @@ impl PaymentRound {
             .map(|entry| entry.1)
             .sum();
 
-        let total_maturity_big = BigUint::from(total_maturity.clone());
+        let total_maturity_big = BigUint::from(total_maturity);
         let scale_factor = BigUint::from(100_000_000_000_000u64);
 
         // return early if 0 - prevent dividing error
@@ -300,7 +300,7 @@ impl PaymentRound {
                 let percentage = (maturity_big * &scale_factor) / total_maturity_big.clone();
                 let reward = (reward_pool_big.clone() * percentage) / &scale_factor;
                 // return a new Payment
-                (neuron_id.clone(), (Nat::from(reward), PaymentStatus::Pending, maturity.clone()))
+                (neuron_id.clone(), (Nat::from(reward), PaymentStatus::Pending, *maturity))
             })
             .filter(|(_, (reward, _, _))| reward.clone() > 0u64)
             .collect();
