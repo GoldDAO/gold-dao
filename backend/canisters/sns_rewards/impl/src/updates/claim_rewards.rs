@@ -47,7 +47,7 @@ pub async fn add_neuron_impl(
     neuron_id: NeuronId,
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
-    let neuron = fetch_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     authenticate_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
@@ -73,7 +73,7 @@ pub async fn remove_neuron_impl(
     neuron_id: NeuronId,
     caller: Principal
 ) -> Result<NeuronId, UserClaimErrorResponse> {
-    let neuron = fetch_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     authenticate_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
@@ -110,7 +110,7 @@ pub async fn claim_reward_impl(
         TokenSymbolInvalid(format!("Token info for type {:?} not found in state", token_symbol))
     )?;
 
-    let neuron = fetch_neuron_by_id(&neuron_id).await?;
+    let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     authenticate_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
@@ -131,7 +131,9 @@ pub fn get_neurons_by_owner_impl(caller: Principal) -> Option<Vec<NeuronId>> {
     read_state(|s| s.data.neuron_owners.get_neuron_ids_by_owner(caller))
 }
 
-pub async fn fetch_neuron_by_id(neuron_id: &NeuronId) -> Result<Neuron, UserClaimErrorResponse> {
+pub async fn fetch_neuron_data_by_id(
+    neuron_id: &NeuronId
+) -> Result<Neuron, UserClaimErrorResponse> {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let args = sns_governance_canister::list_neurons::Args {
         limit: 1,
