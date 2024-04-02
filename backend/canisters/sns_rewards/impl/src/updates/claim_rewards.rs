@@ -94,6 +94,20 @@ pub async fn claim_reward_impl(
     token: String,
     caller: Principal
 ) -> Result<bool, UserClaimErrorResponse> {
+    // verify the token is valid
+    let token_symbol = TokenSymbol::parse(&token).map_err(|err|
+        TokenSymbolInvalid(
+            format!("token of type {:?} is not a valid token symbol. error: {:?}", token, err)
+        )
+    )?;
+
+    // get the token meta information associated with the valid token
+    let token_info = read_state(|s: &RuntimeState|
+        s.data.tokens.get(&token_symbol).copied()
+    ).ok_or_else(||
+        TokenSymbolInvalid(format!("Token info for type {:?} not found in state", token_symbol))
+    )?;
+
     let neuron = fetch_neuron_by_id(&neuron_id).await?;
     // check the neuron contains the hotkey of the callers principal
     authenticate_hotkey(&neuron, &caller)?;
@@ -102,7 +116,7 @@ pub async fn claim_reward_impl(
         Some(owner_principal) => {
             if owner_principal == caller {
                 // neuron is owned by caller according to our state and has a valid hotkey
-                return transfer_rewards(&neuron_id, caller, token).await;
+                return transfer_rewards(&neuron_id, caller, &token_info).await;
             } else {
                 return Err(NeuronOwnerInvalid(Some(owner_principal)));
             }
@@ -176,22 +190,8 @@ pub fn authenticate_hotkey(
 pub async fn transfer_rewards(
     neuron_id: &NeuronId,
     user_id: Principal,
-    token: String
+    token_info: &TokenInfo
 ) -> Result<bool, UserClaimErrorResponse> {
-    // verify the token is valid
-    let token_symbol = TokenSymbol::parse(&token).map_err(|err|
-        TokenSymbolInvalid(
-            format!("token of type {:?} is not a valid token symbol. error: {:?}", token, err)
-        )
-    )?;
-
-    // get the token meta information associated with the valid token
-    let token_info = read_state(|s: &RuntimeState|
-        s.data.tokens.get(&token_symbol).copied()
-    ).ok_or_else(||
-        TokenSymbolInvalid(format!("Token info for type {:?} not found in state", token_symbol))
-    )?;
-
     // get the balance of the sub account ( NeuronId is the sub account id )
     let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
     if balance_of_neuron_id == Nat::from(0u64) {
