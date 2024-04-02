@@ -55,22 +55,28 @@ fi
 if [[ $1 == "local" ]]; then
   dfx deploy token_metrics --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^token_metrics-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
-  if [[ $1 == "ic" ]]; then
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    UPGRADEVERSION=$CI_COMMIT_TAG
-  else
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
-    UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
-  fi
-  . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/parse_proposal_details.sh && \
-#  dfx deploy token_metrics --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
-  quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
-    --pem-file $PEM_FILE \
-    --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
-    --target-canister-id $(cat canister_ids.json | jq -r .token_metrics.$1) \
-    --wasm-path backend/canisters/token_metrics/target/wasm32-unknown-unknown/release/token_metrics_canister.wasm.gz \
-    --title "Upgrade token_metrics to ${UPGRADEVERSION}" \
-    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
+
+  # This is for direct deployment via CICD identity
+  dfx deploy token_metrics --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+
+  # The following lines are for deployment via SNS. Only activate when handing over the canister
+  # TODO - make sure to improve this procedure, created issue #156 to address this
+
+  # if [[ $1 == "ic" ]]; then
+  #   PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+  #   UPGRADEVERSION=$CI_COMMIT_TAG
+  # else
+  #   PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
+  #   UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
+  # fi
+  # . scripts/prepare_sns_canister_ids.sh $1 && \
+  # . scripts/parse_proposal_details.sh && \
+  # quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
+  #   --pem-file $PEM_FILE \
+  #   --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
+  #   --target-canister-id $(cat canister_ids.json | jq -r .token_metrics.$1) \
+  #   --wasm-path backend/canisters/token_metrics/target/wasm32-unknown-unknown/release/token_metrics_canister.wasm.gz \
+  #   --title "Upgrade token_metrics to ${UPGRADEVERSION}" \
+  #   --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
 fi
 return
