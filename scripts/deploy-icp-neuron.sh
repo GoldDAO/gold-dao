@@ -57,13 +57,13 @@ if [[ $1 == "local" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^icp_neuron-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
   if [[ $1 == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    UPGRADEVERSION=$CI_COMMIT_TAG
+    UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
   else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
     UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
   . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/parse_proposal_details.sh && \
+  . scripts/parse_proposal_details.sh icp_neuron && \
 #  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
   quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \

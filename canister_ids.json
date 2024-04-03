@@ -54,5 +54,9 @@
   "sns_swap": {
     "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
     "staging": "ikcq3-haaaa-aaaap-ab26a-cai"
+  },
+  "token_metrics": {
+    "ic": "teiwz-pqaaa-aaaap-ag7hq-cai",
+    "staging": "yfjcz-3iaaa-aaaap-accjq-cai"
   }
 }

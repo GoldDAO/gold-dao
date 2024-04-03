@@ -153,6 +153,17 @@
       "type": "custom",
       "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz"
     },
+    "token_metrics": {
+      "build": ["./scripts/build-canister.sh token_metrics"],
+      "candid": "backend/canisters/token_metrics/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/token_metrics/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/token_metrics/target/wasm32-unknown-unknown/release/token_metrics_canister.wasm.gz"
+    },
     "sns_governance": {
       "build": "",
       "candid": "backend/external_canisters/sns_governance/api/can.did",

@@ -17,18 +17,18 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Adding the stake_nns_neuron method to the SNS to be able to stake ICP NNS neurons via the Gold DAO SNS.\";
+        summary=\"Adding the manage_reward_recipients method to allow to set the accounts to receive the maturity from the NNS neurons.\";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_002 : nat64);
-                name = \"Stake NNS neuron\";
-                description = \"Proposal to stake an ICP neuron under control of the Gold DAO.\";
+                id = (1_003 : nat64);
+                name = \"Manage NNS neuron reward recipients\";
+                description = opt \"Proposal to update the recipients of the NNS neuron maturity.\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
                         validator_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
                         target_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
-                        validator_method_name = \"stake_nns_neuron_validate\";
-                        target_method_name = \"stake_nns_neuron\"
+                        validator_method_name = opt \"manage_reward_recipients_validate\";
+                        target_method_name = opt \"manage_reward_recipients\"
                     }
                 }
             }

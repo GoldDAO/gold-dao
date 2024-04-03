@@ -49,7 +49,9 @@ jq --arg choice $1 '{
     .gldt_fee_compensation[$choice],
     .gldt_landing_page[$choice],
     .gldt_ledger_indexer[$choice],
-    .gldt_swap_app[$choice]
+    .gldt_swap_app[$choice],
+    .icp_neuron[$choice],
+    .token_metrics[$choice]
   ]
 }' $INPUT_FILE > $OUTPUT_FILE
 

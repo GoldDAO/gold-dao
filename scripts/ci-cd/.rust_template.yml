@@ -11,6 +11,7 @@
       - .cargo
       - backend/canisters/gldt_core/target
       - backend/canisters/icp_neuron/target
+      - backend/canisters/token_metrics/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
