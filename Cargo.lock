@@ -1860,6 +1860,7 @@ dependencies = [
  "serde_json",
  "serializer",
  "stable_memory",
+ "time",
  "tracing",
  "types",
  "utils",
