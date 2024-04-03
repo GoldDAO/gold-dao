@@ -2,6 +2,7 @@
 
 .import dfx identity:
   before_script:
+    - echo "Loading identity for network" $TARGET_NETWORK
     - dfx --version
     - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
     - dfx identity use gitlab-ci-gldt

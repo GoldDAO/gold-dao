@@ -6,7 +6,7 @@ use types::{ TokenInfo, TokenSymbol };
 use crate::state::read_state;
 
 // no real use for this, mainly for testing. Remove later
-#[query]
+#[query(hidden = true)]
 fn get_reward_token_types() -> HashMap<TokenSymbol, TokenInfo> {
     read_state(|state| { state.data.tokens.clone() })
 }
