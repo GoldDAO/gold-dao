@@ -3,7 +3,7 @@ use crate::jobs::synchronise_neurons::run;
 use ic_cdk::update;
 
 // Only for development, remove after
-#[update]
+#[update(hidden = true)]
 async fn sync_neurons_manual_trigger() {
     run()
 }

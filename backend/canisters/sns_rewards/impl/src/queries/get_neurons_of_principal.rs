@@ -12,7 +12,7 @@ pub struct GetNeuronResponse {
     info: NeuronInfo,
 }
 
-#[query]
+#[query(hidden = true)]
 fn get_neurons_of_principal(principal: Principal) -> Vec<GetNeuronResponse> {
     get_neurons_of_principal_int(principal)
 }

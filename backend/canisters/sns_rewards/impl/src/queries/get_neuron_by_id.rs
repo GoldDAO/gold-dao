@@ -3,7 +3,7 @@ use sns_governance_canister::types::NeuronId;
 use types::NeuronInfo;
 use crate::state::read_state;
 
-#[query]
+#[query(hidden = true)]
 fn get_neuron_by_id(id: NeuronId) -> Option<NeuronInfo> {
     read_state(|state| { state.data.neuron_maturity.get(&id).cloned() })
 }

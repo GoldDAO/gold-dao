@@ -3,7 +3,7 @@ use crate::jobs::distribute_rewards::run_distribution;
 use ic_cdk::update;
 
 // Only for development, remove after
-#[update]
+#[update(hidden = true)]
 async fn sync_user_rewards() {
     run_distribution()
 }
