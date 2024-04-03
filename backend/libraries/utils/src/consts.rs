@@ -27,6 +27,24 @@ pub const ICP_LEDGER_CANISTER_ID: CanisterId = Principal::from_slice(
 pub const CYCLES_MINTING_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 0, 0, 0, 4, 1, 1]
 );
+pub const GOLD_1G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 80, 16, 81, 1, 1]
+);
+pub const STAGING_GOLD_1G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 80, 17, 132, 1, 1]
+);
+pub const GOLD_10G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 192, 69, 198, 1, 1]
+);
+pub const STAGING_GOLD_10G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 112, 15, 122, 1, 1]
+);
+pub const GOLD_100G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 96, 17, 146, 1, 1]
+);
+pub const GOLD_1000G_CANISTER_ID: CanisterId = Principal::from_slice(
+    &[0, 0, 0, 0, 1, 128, 10, 88, 1, 1]
+);
 
 #[cfg(test)]
 mod tests {
@@ -93,6 +111,55 @@ mod tests {
         assert_eq!(
             CYCLES_MINTING_CANISTER_ID,
             Principal::from_text("rkp4c-7iaaa-aaaaa-aaaca-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn gold_1g_canister_id() {
+        assert_eq!(
+            GOLD_1G_CANISTER_ID,
+            Principal::from_text("io7gn-vyaaa-aaaak-qcbiq-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn gold_staging_1g_canister_id() {
+        assert_eq!(
+            STAGING_GOLD_1G_CANISTER_ID,
+            Principal::from_text("obapm-2iaaa-aaaak-qcgca-cai").unwrap()
+        );
+    }
+
+
+    #[test]
+    fn gold_10g_canister_id() {
+        assert_eq!(
+            GOLD_10G_CANISTER_ID,
+            Principal::from_text("sy3ra-iqaaa-aaaao-aixda-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn gold_staging_10g_canister_id() {
+        assert_eq!(
+            STAGING_GOLD_10G_CANISTER_ID,
+            Principal::from_text("xyo2o-gyaaa-aaaal-qb55a-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn gold_100g_canister_id() {
+        assert_eq!(
+            GOLD_100G_CANISTER_ID,
+            Principal::from_text("zhfjc-liaaa-aaaal-acgja-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn gold_1000g_canister_id() {
+        assert_eq!(
+            GOLD_1000G_CANISTER_ID,
+            Principal::from_text("7i7jl-6qaaa-aaaam-abjma-cai").unwrap()
         );
     }
 }
