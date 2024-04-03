@@ -46,7 +46,7 @@ pub(crate) fn set_reward_token_types_impl(
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
-async fn set_reward_token_types_validation(
+async fn set_reward_token_types_validate(
     args: SetRewardTokenTypesRequest
 ) -> Result<String, String> {
     for (token_string, token_info) in &args.token_list {
