@@ -1,5 +1,5 @@
 use candid::{ CandidType, Nat, Principal };
-use ic_cdk::{ caller, query, update };
+use ic_cdk::{ caller, update };
 use ic_ledger_types::Subaccount;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
@@ -40,11 +40,6 @@ async fn remove_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorRe
 #[update]
 async fn claim_reward(neuron_id: NeuronId, token: String) -> Result<bool, UserClaimErrorResponse> {
     claim_reward_impl(neuron_id, token, caller()).await
-}
-
-#[query]
-async fn get_neurons_by_owner() -> Option<Vec<NeuronId>> {
-    get_neurons_by_owner_impl(caller())
 }
 
 pub async fn add_neuron_impl(
@@ -129,10 +124,6 @@ pub async fn claim_reward_impl(
         }
         None => { Err(NeuronNotClaimed) }
     }
-}
-
-pub fn get_neurons_by_owner_impl(caller: Principal) -> Option<Vec<NeuronId>> {
-    read_state(|s| s.data.neuron_owners.get_neuron_ids_by_owner(caller))
 }
 
 pub async fn fetch_neuron_data_by_id(

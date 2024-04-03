@@ -9,5 +9,6 @@ mod test;
 pub mod get_active_payment_rounds;
 pub mod get_historic_payment_rounds;
 pub mod get_reward_token_types;
+pub mod get_neuron_ids_by_owner;
 
 pub use get_neurons_of_principal::*;
