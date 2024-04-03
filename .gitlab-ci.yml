@@ -567,7 +567,7 @@ token metrics staging:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-token-metrics.sh $TARGET_NETWORK
+    - . scripts/deploy-token-metrics.sh $TARGET_NETWORK
   environment:
     name: token_metrics
     deployment_tier: staging
@@ -587,7 +587,7 @@ token metrics:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - scripts/deploy-token-metrics.sh $TARGET_NETWORK
+    - . scripts/deploy-token-metrics.sh $TARGET_NETWORK
   environment:
     name: token_metrics
     deployment_tier: production
