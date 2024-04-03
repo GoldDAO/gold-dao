@@ -10,7 +10,7 @@ is eligible for.
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use tracing::{ debug, error, info, warn };
-use std::{ collections::btree_map, time::Duration };
+use std::{ collections::{ btree_map, HashMap }, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo };
 
 use crate::state::{ mutate_state, read_state, RuntimeState };
@@ -27,9 +27,10 @@ pub fn run() {
 
 pub async fn synchronise_neuron_data() {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
-
+    let is_test_mode = read_state(|s| s.env.is_test_mode());
     mutate_state(|state| {
         state.data.sync_info.last_synced_start = now_millis();
+        state.set_is_synchronizing_neurons(true);
     });
 
     let mut number_of_scanned_neurons = 0;
@@ -68,6 +69,9 @@ pub async fn synchronise_neuron_data() {
                         },
                         |n| {
                             continue_scanning = true;
+                            if is_test_mode && number_of_scanned_neurons == 400 {
+                                continue_scanning = false;
+                            }
                             n.id.clone()
                         }
                     );
@@ -84,6 +88,7 @@ pub async fn synchronise_neuron_data() {
     mutate_state(|state| {
         state.data.sync_info.last_synced_end = now_millis();
         state.data.sync_info.last_synced_number_of_neurons = number_of_scanned_neurons;
+        state.set_is_synchronizing_neurons(false);
     });
 }
 
@@ -97,13 +102,14 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
 
         let neuron_info = NeuronInfo {
             last_synced_maturity: maturity,
-            accumulated_maturity: 0,
+            accumulated_maturity: maturity,
+            rewarded_maturity: HashMap::new(),
         };
 
         // TODO - check age of neuron to avoid someone gaming the system by spawning neurons (check if really relevant)
         match state.data.neuron_maturity.entry(id.clone()) {
             btree_map::Entry::Vacant(entry) => {
-                entry.insert(neuron_info);
+                entry.insert(neuron_info.clone());
                 updated_neuron = Some((id.clone(), neuron_info));
             }
             btree_map::Entry::Occupied(mut entry) => {
@@ -166,6 +172,8 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use candid::Principal;
     use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
     use types::NeuronInfo;
@@ -201,7 +209,11 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        let mut expected_result = NeuronInfo { accumulated_maturity: 0, last_synced_maturity: 0 };
+        let mut expected_result = NeuronInfo {
+            accumulated_maturity: 0,
+            last_synced_maturity: 0,
+            rewarded_maturity: HashMap::new(),
+        };
         let mut result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -227,7 +239,11 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 150 };
+        expected_result = NeuronInfo {
+            accumulated_maturity: 150,
+            last_synced_maturity: 150,
+            rewarded_maturity: HashMap::new(),
+        };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -253,7 +269,11 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        expected_result = NeuronInfo {
+            accumulated_maturity: 150,
+            last_synced_maturity: 50,
+            rewarded_maturity: HashMap::new(),
+        };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
@@ -279,7 +299,11 @@ mod tests {
             update_neuron_maturity(state, &neuron);
         });
 
-        expected_result = NeuronInfo { accumulated_maturity: 150, last_synced_maturity: 50 };
+        expected_result = NeuronInfo {
+            accumulated_maturity: 150,
+            last_synced_maturity: 50,
+            rewarded_maturity: HashMap::new(),
+        };
         result = read_state(|state| {
             state.data.neuron_maturity.get(&neuron_id).cloned()
         }).unwrap();
