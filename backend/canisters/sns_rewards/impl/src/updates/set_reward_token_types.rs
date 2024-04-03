@@ -49,7 +49,7 @@ pub(crate) fn set_reward_token_types_impl(
 async fn set_reward_token_types_validate(
     args: SetRewardTokenTypesRequest
 ) -> Result<String, String> {
-    for (token_string, token_info) in &args.token_list {
+    for (token_string, _) in &args.token_list {
         // Check token is in approved list and or return early if fail
         let parsed_token_result = TokenSymbol::parse(token_string);
         match parsed_token_result {
@@ -59,23 +59,6 @@ async fn set_reward_token_types_validate(
                 return Err(err_message);
             }
         }
-
-        // Not sure we if need this check since a valid principal is required in the args
-        // if token_info.ledger_id {
-        //     return Err(format!("ledger field may not be empty for token {}", token_string));
-        // }
-
-        if token_info.decimals == 0u64 {
-            return Err(format!("decimals for token {} may not be negative or 0", token_string));
-        }
-
-        if token_info.fee == 0u64 {
-            return Err(format!("fee for token {} may not be negative or 0", token_string));
-        }
-
-        // TODO - more verification ideas
-        // we can verify the ledger is working and the symbols match by calling the ledger method - `icrc1_symbol`
-        // we can also verify the fee and decimals match
     }
 
     serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
