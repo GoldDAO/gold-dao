@@ -150,7 +150,7 @@ impl RewardsRecipientList {
 #[cfg(test)]
 mod tests {
     use candid::Principal;
-    use icrc_ledger_types::icrc1::account::Account;
+    use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 
     use crate::{ RewardsRecipient, RewardsRecipientList };
 
@@ -165,7 +165,9 @@ mod tests {
     #[test]
     fn initialise_rewards_recipient_list_wrong_sum() {
         let mut list = RewardsRecipientList::empty();
-        let result = list.set(vec![dummy_recipient(1000), dummy_recipient(1000)]);
+        let result = list.set(
+            vec![dummy_recipient(1000, Some([0; 32])), dummy_recipient(1000, Some([1; 32]))]
+        );
 
         assert_eq!(
             result,
@@ -181,10 +183,10 @@ mod tests {
     #[test]
     fn initialise_rewards_recipient_list_valid() {
         let recipients = vec![
-            dummy_recipient(3300),
-            dummy_recipient(3300),
-            dummy_recipient(3300),
-            dummy_recipient(100)
+            dummy_recipient(3300, Some([0; 32])),
+            dummy_recipient(3300, Some([1; 32])),
+            dummy_recipient(3300, Some([2; 32])),
+            dummy_recipient(100, Some([3; 32]))
         ];
 
         let mut list = RewardsRecipientList::empty();
@@ -207,10 +209,10 @@ mod tests {
         let mut list = RewardsRecipientList::empty();
         list.set(
             vec![
-                dummy_recipient(3300),
-                dummy_recipient(3300),
-                dummy_recipient(3300),
-                dummy_recipient(100)
+                dummy_recipient(3300, Some([0; 32])),
+                dummy_recipient(3300, Some([1; 32])),
+                dummy_recipient(3300, Some([2; 32])),
+                dummy_recipient(100, Some([3; 32]))
             ]
         ).unwrap();
 
@@ -220,10 +222,10 @@ mod tests {
 
         let expected_result1 = Ok(
             vec![
-                (dummy_account(), 33_000_000_000 as u64),
-                (dummy_account(), 33_000_000_000 as u64),
-                (dummy_account(), 33_000_000_000 as u64),
-                (dummy_account(), 1_000_000_000 as u64)
+                (dummy_account(Some([0; 32])), 33_000_000_000 as u64),
+                (dummy_account(Some([1; 32])), 33_000_000_000 as u64),
+                (dummy_account(Some([2; 32])), 33_000_000_000 as u64),
+                (dummy_account(Some([3; 32])), 1_000_000_000 as u64)
             ]
         );
 
@@ -235,10 +237,10 @@ mod tests {
 
         let expected_result2 = Ok(
             vec![
-                (dummy_account(), 183_333_333 as u64),
-                (dummy_account(), 183_333_333 as u64),
-                (dummy_account(), 183_333_333 as u64),
-                (dummy_account(), 5_555_556 as u64)
+                (dummy_account(Some([0; 32])), 183_333_333 as u64),
+                (dummy_account(Some([1; 32])), 183_333_333 as u64),
+                (dummy_account(Some([2; 32])), 183_333_333 as u64),
+                (dummy_account(Some([3; 32])), 5_555_556 as u64)
             ]
         );
 
@@ -249,10 +251,10 @@ mod tests {
         let mut list = RewardsRecipientList::empty();
         list.set(
             vec![
-                dummy_recipient(3300),
-                dummy_recipient(3300),
-                dummy_recipient(3300),
-                dummy_recipient(100)
+                dummy_recipient(3300, Some([0; 32])),
+                dummy_recipient(3300, Some([1; 32])),
+                dummy_recipient(3300, Some([2; 32])),
+                dummy_recipient(100, Some([3; 32]))
             ]
         ).unwrap();
 
@@ -268,18 +270,18 @@ mod tests {
         );
     }
 
-    fn dummy_account() -> Account {
+    fn dummy_account(subaccount: Option<Subaccount>) -> Account {
         Account {
             owner: Principal::from_text(
                 "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe"
             ).unwrap(),
-            subaccount: None,
+            subaccount,
         }
     }
 
-    fn dummy_recipient(reward_weight: u16) -> RewardsRecipient {
+    fn dummy_recipient(reward_weight: u16, subaccount: Option<Subaccount>) -> RewardsRecipient {
         RewardsRecipient {
-            account: dummy_account(),
+            account: dummy_account(subaccount),
             tag: "test".to_string(),
             reward_weight,
         }
