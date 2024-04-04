@@ -10,11 +10,13 @@ use sns_governance_canister::types::get_neuron_response::Result::{
     Neuron as NeuronResponse,
     Error as NeuronErrorResponse,
 };
+use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use crate::{ state::{ mutate_state, read_state, RuntimeState }, utils::transfer_token };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum UserClaimErrorResponse {
     NeuronHotKeyAbsent, // No hotkeys found for neuron
+    NeuronHotKeyInvalid, // Hotkeys exist but they dont match the caller's principal
     NeuronOwnerInvalid(Option<Principal>), // Neuron has a hotkey owned by a different caller
     NeuronNotClaimed, // Nobody has claimed this neuron yet.
     NeuronDoesNotExist,
@@ -109,6 +111,7 @@ pub async fn claim_reward_impl(
     )?;
 
     let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
+
     // check the neuron contains the hotkey of the callers principal
     authenticate_by_hotkey(&neuron, &caller)?;
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
@@ -128,7 +131,11 @@ pub async fn claim_reward_impl(
 pub async fn fetch_neuron_data_by_id(
     neuron_id: &NeuronId
 ) -> Result<Neuron, UserClaimErrorResponse> {
-    let canister_id = read_state(|state| state.data.sns_governance_canister);
+    let mut canister_id = read_state(|state| state.data.sns_governance_canister);
+    let is_test_mode = read_state(|s| s.env.is_test_mode());
+    if is_test_mode {
+        canister_id = SNS_GOVERNANCE_CANISTER_ID_STAGING;
+    }
     let args = sns_governance_canister::get_neuron::Args {
         neuron_id: Some(neuron_id.clone()),
     };
@@ -177,7 +184,7 @@ pub fn authenticate_by_hotkey(
     if matching_caller_hotkey >= 1 {
         Ok(true)
     } else {
-        Err(NeuronOwnerInvalid(None))
+        Err(NeuronHotKeyInvalid)
     }
 }
 
@@ -188,7 +195,8 @@ pub async fn transfer_rewards(
 ) -> Result<bool, UserClaimErrorResponse> {
     // get the balance of the sub account ( NeuronId is the sub account id )
     let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
-    if balance_of_neuron_id == Nat::from(0u64) {
+    let amount_to_transfer = balance_of_neuron_id - token_info.fee;
+    if amount_to_transfer == Nat::from(0u64) {
         return Err(TransferFailed("no rewards to claim".to_string()));
     }
     let neuron_sub_account: [u8; 32] = neuron_id.clone().into();
@@ -203,7 +211,7 @@ pub async fn transfer_rewards(
         neuron_sub_account,
         user_account,
         token_info.ledger_id,
-        balance_of_neuron_id
+        amount_to_transfer
     ).await;
 
     match transfer {

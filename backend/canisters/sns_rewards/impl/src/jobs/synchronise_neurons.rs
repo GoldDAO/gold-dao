@@ -10,6 +10,7 @@ is eligible for.
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use tracing::{ debug, error, info, warn };
+use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use std::{ collections::{ btree_map, HashMap }, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo };
 
@@ -26,8 +27,11 @@ pub fn run() {
 }
 
 pub async fn synchronise_neuron_data() {
-    let canister_id = read_state(|state| state.data.sns_governance_canister);
+    let mut canister_id = read_state(|state| state.data.sns_governance_canister);
     let is_test_mode = read_state(|s| s.env.is_test_mode());
+    if is_test_mode {
+        canister_id = SNS_GOVERNANCE_CANISTER_ID_STAGING;
+    }
     mutate_state(|state| {
         state.data.sync_info.last_synced_start = now_millis();
         state.set_is_synchronizing_neurons(true);
@@ -94,6 +98,7 @@ pub async fn synchronise_neuron_data() {
 
 // Function to update neuron maturity
 fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
+    let is_test_mode = &state.env.is_test_mode();
     // This function only returns Some() if the neuron is initialised or its maturity has changed
     if let Some(id) = &neuron.id {
         let updated_neuron: Option<(NeuronId, NeuronInfo)>;
@@ -101,8 +106,16 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
         let maturity = calculate_total_maturity(neuron);
 
         let neuron_info = NeuronInfo {
-            last_synced_maturity: maturity,
-            accumulated_maturity: maturity,
+            last_synced_maturity: if is_test_mode.clone() {
+                10000
+            } else {
+                maturity
+            },
+            accumulated_maturity: if is_test_mode.clone() {
+                10000
+            } else {
+                maturity
+            },
             rewarded_maturity: HashMap::new(),
         };
 
