@@ -179,8 +179,6 @@ pub fn authenticate_by_hotkey(
         .filter(|permission| permission.principal.as_ref() == Some(caller))
         .count();
 
-    // TODO - is it possible the user may add a duplicate?
-    // TODO - do we want to return all possible hotkeys?
     if matching_caller_hotkey >= 1 {
         Ok(true)
     } else {

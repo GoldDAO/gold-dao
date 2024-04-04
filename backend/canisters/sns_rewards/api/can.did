@@ -1,16 +1,4 @@
 type Args = record { test_mode : bool };
-type HttpRequest = record {
-  url : text;
-  method : text;
-  body : vec nat8;
-  headers : vec record { text; text };
-};
-type HttpResponse = record {
-  body : vec nat8;
-  headers : vec record { text; text };
-  streaming_strategy : opt StreamingStrategy;
-  status_code : nat16;
-};
 type NeuronId = record { id : vec nat8 };
 type Result = variant { Ok : NeuronId; Err : UserClaimErrorResponse };
 type Result_1 = variant { Ok : bool; Err : UserClaimErrorResponse };
@@ -18,18 +6,6 @@ type SetRewardTokenTypesRequest = record {
   token_list : vec record { text; TokenInfo };
 };
 type SetRewardTokenTypesResponse = variant { Success; InternalError : text };
-type StreamingStrategy = variant {
-  Callback : record {
-    token : Token;
-    callback : func (Token) -> (HttpResponse) query;
-  };
-};
-type Token = record {
-  key : text;
-  sha256 : opt vec nat8;
-  index : nat;
-  content_encoding : text;
-};
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
@@ -48,12 +24,9 @@ type UserClaimErrorResponse = variant {
 service : (Args) -> {
   add_neuron : (NeuronId) -> (Result);
   claim_reward : (NeuronId, text) -> (Result_1);
-  get_all_neurons : () -> (nat64) query;
   get_neurons_by_owner : () -> (opt vec NeuronId) query;
-  http_request : (HttpRequest) -> (HttpResponse) query;
   remove_neuron : (NeuronId) -> (Result);
   set_reward_token_types : (SetRewardTokenTypesRequest) -> (
       SetRewardTokenTypesResponse,
     );
-  sync_user_rewards : () -> ();
 }
