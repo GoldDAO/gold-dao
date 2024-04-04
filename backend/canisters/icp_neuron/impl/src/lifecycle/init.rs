@@ -5,7 +5,7 @@ use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use serde::Deserialize;
 use tracing::info;
-use utils::consts::STAGING_SNS_GOVERNANCE_CANISTER_ID;
+use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use utils::env::{ CanisterEnv, Environment };
 
 #[derive(Deserialize, CandidType, Debug)]
@@ -24,7 +24,7 @@ fn init(init_args: Option<InitArgs>) {
 
     if args.test_mode {
         data.authorized_principals.push(env.caller());
-        data.authorized_principals.push(STAGING_SNS_GOVERNANCE_CANISTER_ID);
+        data.authorized_principals.push(SNS_GOVERNANCE_CANISTER_ID_STAGING);
     }
 
     let runtime_state = RuntimeState::new(env, data);

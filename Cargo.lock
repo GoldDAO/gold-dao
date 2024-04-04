@@ -1678,13 +1678,18 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
- "ciborium",
+ "futures",
  "http_request",
  "ic-cdk",
  "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-ledger-types",
  "ic-stable-structures",
  "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
+ "num-bigint",
  "serde",
+ "serde_json",
  "serializer",
  "sns_governance_canister",
  "sns_governance_canister_c2c_client",
@@ -1839,6 +1844,34 @@ checksum = "7ba3a3ef41e6672a2f0f001392bb5dcd3ff0a9992d618ca761a11c3121547774"
 dependencies = [
  "num-conv",
  "time-core",
+]
+
+[[package]]
+name = "token_metrics"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_client",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "hex",
+ "http_request",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "serializer",
+ "stable_memory",
+ "time",
+ "tracing",
+ "types",
+ "utils",
 ]
 
 [[package]]

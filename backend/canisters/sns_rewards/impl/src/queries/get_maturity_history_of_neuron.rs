@@ -6,7 +6,7 @@ use crate::state::read_state;
 
 pub type MaturityHistoryResponse = Vec<(TimestampMillis, NeuronInfo)>;
 
-#[query]
+#[query(hidden = true)]
 fn get_maturity_history_of_neuron(
     neuron_id: NeuronId,
     size: Option<usize>
@@ -16,8 +16,7 @@ fn get_maturity_history_of_neuron(
     })
 }
 
-// no real use for this, mainly for testing. Remove later
-#[query]
+#[query(hidden = true)]
 fn get_n_history(size: Option<usize>) -> Vec<((NeuronId, TimestampMillis), NeuronInfo)> {
     read_state(|state| { state.data.maturity_history.get(size.unwrap_or(100)) })
 }

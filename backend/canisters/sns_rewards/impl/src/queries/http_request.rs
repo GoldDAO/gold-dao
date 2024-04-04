@@ -4,7 +4,7 @@ use types::{ HttpRequest, HttpResponse, TimestampMillis };
 
 use crate::state::{ read_state, RuntimeState };
 
-#[query]
+#[query(hidden = true)]
 fn http_request(request: HttpRequest) -> HttpResponse {
     fn get_logs_impl(since: Option<TimestampMillis>) -> HttpResponse {
         encode_logs(canister_logger::export_logs(), since.unwrap_or(0))
