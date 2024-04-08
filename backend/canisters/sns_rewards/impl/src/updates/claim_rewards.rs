@@ -10,7 +10,7 @@ use sns_governance_canister::types::get_neuron_response::Result::{
     Neuron as NeuronResponse,
     Error as NeuronErrorResponse,
 };
-use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
+use utils::{ consts::SNS_GOVERNANCE_CANISTER_ID_STAGING, env::Environment };
 use crate::{ state::{ mutate_state, read_state, RuntimeState }, utils::transfer_token };
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
@@ -30,17 +30,20 @@ use UserClaimErrorResponse::*;
 // TODO - frontend calls to these update calls will have to pass in something like 12505661337902198044. will we have to provide a convenient way for FE to convert to NeuronId?
 #[update]
 async fn add_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
-    add_neuron_impl(neuron_id, caller()).await
+    let caller = read_state(|s| s.env.caller());
+    add_neuron_impl(neuron_id, caller).await
 }
 
 #[update]
 async fn remove_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
-    remove_neuron_impl(neuron_id, caller()).await
+    let caller = read_state(|s| s.env.caller());
+    remove_neuron_impl(neuron_id, caller).await
 }
 
 #[update]
 async fn claim_reward(neuron_id: NeuronId, token: String) -> Result<bool, UserClaimErrorResponse> {
-    claim_reward_impl(neuron_id, token, caller()).await
+    let caller = read_state(|s| s.env.caller());
+    claim_reward_impl(neuron_id, token, caller).await
 }
 
 pub async fn add_neuron_impl(
