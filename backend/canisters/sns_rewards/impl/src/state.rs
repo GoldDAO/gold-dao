@@ -40,7 +40,6 @@ impl RuntimeState {
             },
             sns_governance_canister: self.data.sns_governance_canister,
             number_of_neurons: self.data.neuron_maturity.len(),
-            number_of_owners: self.data.principal_neurons.len(),
             sync_info: self.data.sync_info,
         }
     }
@@ -64,7 +63,6 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub sns_governance_canister: Principal,
     pub number_of_neurons: usize,
-    pub number_of_owners: usize,
     pub sync_info: SyncInfo,
 }
 
@@ -89,8 +87,6 @@ pub struct Data {
     pub sns_governance_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
-    /// Stores the mapping of each principal to its neurons
-    pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
     /// Information about periodic synchronization
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
@@ -112,7 +108,6 @@ impl Default for Data {
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
             neuron_maturity: BTreeMap::new(),
-            principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
             neuron_owners: NeuronOwnership::default(),
