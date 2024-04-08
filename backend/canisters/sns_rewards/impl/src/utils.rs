@@ -1,9 +1,7 @@
 use candid::{ Nat, Principal };
-use ic_ledger_types::Subaccount;
-use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
+use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
 use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::debug;
-use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 
 use crate::{ state::read_state, types::claim_neuron_response::UserClaimErrorResponse };
 
@@ -24,7 +22,7 @@ pub async fn transfer_token(
         icrc_ledger_canister_c2c_client::icrc1_transfer(
             ledger_id,
             &(TransferArg {
-                from_subaccount: Some(from_sub_account.0),
+                from_subaccount: Some(from_sub_account),
                 to: to_account,
                 fee: None,
                 created_at_time: None,

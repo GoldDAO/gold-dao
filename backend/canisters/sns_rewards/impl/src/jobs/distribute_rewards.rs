@@ -30,8 +30,8 @@ use crate::{
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
-use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
-use icrc_ledger_types::icrc1::account::Account;
+use ic_ledger_types::DEFAULT_SUBACCOUNT;
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use tracing::{ debug, error, info };
@@ -217,10 +217,10 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
 
-    let from_sub_account = Subaccount([0; 32]);
+    let from_sub_account: Subaccount = [0; 32];
     let account = Account {
         owner: ic_cdk::api::id(),
-        subaccount: Some(round_pool_subaccount.0),
+        subaccount: Some(round_pool_subaccount),
     };
 
     transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await

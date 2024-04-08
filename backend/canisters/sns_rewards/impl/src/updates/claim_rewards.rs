@@ -1,7 +1,6 @@
 use candid::{ Nat, Principal };
 use ic_cdk::update;
-use ic_ledger_types::Subaccount;
-use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use sns_governance_canister::types::NeuronId;
 use tracing::error;
 use types::{ TokenInfo, TokenSymbol };
@@ -69,8 +68,7 @@ pub async fn transfer_rewards(
     if amount_to_transfer == Nat::from(0u64) {
         return Err(TransferFailed("no rewards to claim".to_string()));
     }
-    let neuron_sub_account: [u8; 32] = neuron_id.clone().into();
-    let neuron_sub_account = Subaccount(neuron_sub_account);
+    let neuron_sub_account: Subaccount = neuron_id.clone().into();
 
     let user_account = Account {
         owner: user_id,
