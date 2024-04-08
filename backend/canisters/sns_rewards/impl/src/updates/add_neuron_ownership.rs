@@ -12,7 +12,7 @@ use crate::{
 use UserClaimErrorResponse::*;
 
 #[update]
-async fn add_neuron(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
+async fn add_neuron_ownership(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
     let caller = read_state(|s| s.env.caller());
     add_neuron_impl(neuron_id, caller).await
 }
