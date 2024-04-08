@@ -1,7 +1,7 @@
 use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum UserClaimErrorResponse {
     NeuronHotKeyAbsent, // No hotkeys found for neuron
     NeuronHotKeyInvalid, // Hotkeys exist but they don't match the caller's principal

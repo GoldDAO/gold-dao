@@ -90,3 +90,101 @@ pub fn authenticate_by_hotkey(
         Err(NeuronHotKeyInvalid)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use candid::Principal;
+    use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
+
+    use crate::state::{ init_state, RuntimeState };
+    use crate::types::claim_neuron_response::UserClaimErrorResponse::*;
+    use super::authenticate_by_hotkey;
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
+
+    #[test]
+    fn test_authenticate_by_hotkey_with_correct_data() {
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+        let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(sns_neuron_owner_id.clone()),
+            permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+        });
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(caller.clone()),
+            permission_type: vec![3, 4],
+        });
+
+        let result = authenticate_by_hotkey(&neuron, &caller).unwrap();
+
+        assert_eq!(result, true);
+    }
+
+    #[test]
+    fn test_authenticate_by_hotkey_with_no_hotkeys() {
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+        let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(sns_neuron_owner_id.clone()),
+            permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+        });
+        // neuron.permissions.push(NeuronPermission {
+        //     principal: Some(caller.clone()),
+        //     permission_type: vec![3, 4],
+        // });
+
+        let result = authenticate_by_hotkey(&neuron, &caller);
+
+        match result {
+            Ok(_) => {}
+            Err(e) => assert_eq!(e, NeuronHotKeyAbsent),
+        }
+    }
+
+    #[test]
+    fn test_authenticate_by_hotkey_with_invalid_hotkey() {
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+        let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(sns_neuron_owner_id.clone()),
+            permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+        });
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai").unwrap()),
+            permission_type: vec![3, 4],
+        });
+
+        let result = authenticate_by_hotkey(&neuron, &caller);
+
+        match result {
+            Ok(_) => {}
+            Err(e) => assert_eq!(e, NeuronHotKeyInvalid),
+        }
+    }
+}

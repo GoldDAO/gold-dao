@@ -60,3 +60,41 @@ impl NeuronOwnership {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use candid::Principal;
+    use sns_governance_canister::types::NeuronId;
+
+    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
+
+    #[test]
+    fn test_neuron_owners() {
+        init_runtime_state();
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+
+        mutate_state(|s| s.data.neuron_owners.add(&neuron_id, caller));
+        let neurons = read_state(|s|
+            s.data.neuron_owners.get_neuron_ids_by_owner(caller.clone()).unwrap()
+        );
+        assert_eq!(neurons.len(), 1);
+        let owner = read_state(|s|
+            s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id).unwrap()
+        );
+        assert_eq!(owner, caller);
+
+        mutate_state(|s| s.data.neuron_owners.remove(&neuron_id, caller));
+        let neurons = read_state(|s|
+            s.data.neuron_owners.get_neuron_ids_by_owner(caller.clone()).unwrap()
+        );
+        assert_eq!(neurons.len(), 0);
+    }
+}
