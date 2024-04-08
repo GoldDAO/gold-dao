@@ -5,8 +5,9 @@ use tracing::info;
 use types::{ TokenInfo, TokenSymbol };
 use utils::{
     consts::{
-        OGY_LEDGER_CANISTER_ID_STAGING,
         ICP_LEDGER_CANISTER_ID_STAGING,
+        OGY_LEDGER_CANISTER_ID_STAGING,
+        SNS_GOVERNANCE_CANISTER_ID_STAGING,
         SNS_LEDGER_CANISTER_ID_STAGING,
     },
     env::CanisterEnv,
@@ -55,6 +56,8 @@ fn init(args: Args) {
                 decimals: 8u64,
             });
         }
+
+        data.sns_governance_canister = SNS_GOVERNANCE_CANISTER_ID_STAGING;
     }
 
     let runtime_state = RuntimeState::new(env, data);
