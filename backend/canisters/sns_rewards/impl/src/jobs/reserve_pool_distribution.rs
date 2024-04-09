@@ -51,18 +51,24 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
+    let amount = match read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned()) {
+        Some(amount) => amount,
+        None => {
+            error!("ERROR: can't find daily transfer amount for token : {:?} in state", token);
+            return;
+        }
+    };
     let reward_pool_account = Account {
         owner: ic_cdk::api::id(),
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
-    let daily_transfer_amount = Nat::from(10_951_403_148_528u64); // 40M e8s / 365.25 days
 
     match
         transfer_token(
             RESERVE_POOL_SUB_ACCOUNT,
             reward_pool_account,
             gldgov_ledger_id,
-            daily_transfer_amount
+            amount
         ).await
     {
         Ok(_) => {
