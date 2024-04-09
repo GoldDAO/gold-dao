@@ -2,9 +2,9 @@
 # Reserve pool distribution
 
 - fn distribute_reserve_pool
-transfers tokens from reserve pool to the reward pool on a weekly basis.
-
-
+transfers tokens from reserve pool to the reward pool on a daily basis.
+- currently this only happens for GLDGov
+- the daily amount to be transferred is decided via a proposal
 
 */
 
