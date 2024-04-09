@@ -2,12 +2,9 @@
 # Reserve pool distribution
 
 - fn distribute_reserve_pool
-transfers tokens from reserve pool to the reward pool on a daily basis.
+transfers tokens from reserve pool to the reward pool on a weekly basis.
 
-at the moment only GLDGov needs to go through this process.
 
-GLDGov daily transfer is worked out via
-4,000,000,000,000,000 e8s / 365.25 days
 
 */
 
@@ -17,13 +14,13 @@ use crate::{
     utils::transfer_token,
 };
 use candid::Nat;
-use canister_time::{ run_interval, DAY_IN_MS };
+use canister_time::{ run_interval, WEEK_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ error, info };
 use types::{ Milliseconds, TokenSymbol };
 
-const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
+const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
 
 pub fn start_job() {
     run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);

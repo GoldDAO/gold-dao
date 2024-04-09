@@ -31,7 +31,7 @@ use crate::{
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use tracing::{ debug, error, info };
