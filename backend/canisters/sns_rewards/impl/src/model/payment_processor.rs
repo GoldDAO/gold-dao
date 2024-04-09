@@ -2,7 +2,7 @@ use std::{ borrow::Cow, collections::BTreeMap };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
-use ic_ledger_types::Subaccount;
+use icrc_ledger_types::icrc1::account::Subaccount;
 use num_bigint::BigUint;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
@@ -317,7 +317,7 @@ impl PaymentRound {
         // add u16 bytes to end of 32 byte array
         subaccount[32 - 2..].copy_from_slice(&num_bytes);
 
-        Subaccount(subaccount)
+        subaccount
     }
 }
 

@@ -10,6 +10,7 @@ is eligible for.
 use canister_time::{ now_millis, run_now_then_interval, DAY_IN_MS };
 use sns_governance_canister::types::{ NeuronId, Neuron };
 use tracing::{ debug, error, info, warn };
+use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use std::{ collections::{ btree_map, HashMap }, time::Duration };
 use types::{ Maturity, Milliseconds, NeuronInfo };
 
@@ -26,8 +27,11 @@ pub fn run() {
 }
 
 pub async fn synchronise_neuron_data() {
-    let canister_id = read_state(|state| state.data.sns_governance_canister);
+    let mut canister_id = read_state(|state| state.data.sns_governance_canister);
     let is_test_mode = read_state(|s| s.env.is_test_mode());
+    if is_test_mode {
+        canister_id = SNS_GOVERNANCE_CANISTER_ID_STAGING;
+    }
     mutate_state(|state| {
         state.data.sync_info.last_synced_start = now_millis();
         state.set_is_synchronizing_neurons(true);
@@ -53,7 +57,6 @@ pub async fn synchronise_neuron_data() {
                 mutate_state(|state| {
                     debug!("Updating neurons");
                     response.neurons.iter().for_each(|neuron| {
-                        update_principal_neuron_mapping(state, neuron);
                         update_neuron_maturity(state, neuron);
                     });
                 });
@@ -94,6 +97,7 @@ pub async fn synchronise_neuron_data() {
 
 // Function to update neuron maturity
 fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
+    let is_test_mode = &state.env.is_test_mode();
     // This function only returns Some() if the neuron is initialised or its maturity has changed
     if let Some(id) = &neuron.id {
         let updated_neuron: Option<(NeuronId, NeuronInfo)>;
@@ -101,8 +105,16 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
         let maturity = calculate_total_maturity(neuron);
 
         let neuron_info = NeuronInfo {
-            last_synced_maturity: maturity,
-            accumulated_maturity: maturity,
+            last_synced_maturity: if is_test_mode.clone() {
+                10000
+            } else {
+                maturity
+            },
+            accumulated_maturity: if is_test_mode.clone() {
+                10000
+            } else {
+                maturity
+            },
             rewarded_maturity: HashMap::new(),
         };
 
@@ -140,25 +152,6 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
 }
 
 // Function to update principal-neuron mapping
-fn update_principal_neuron_mapping(state: &mut RuntimeState, neuron: &Neuron) {
-    let prin = &mut state.data.principal_neurons;
-    // only look at the first permissioned principal, as this is in 99% cases the owner of the neuron
-    if let Some(permissioned_principal) = neuron.permissions.first() {
-        if let Some(pid) = permissioned_principal.principal {
-            prin.entry(pid)
-                .and_modify(|neurons| {
-                    if let Some(id) = &neuron.id {
-                        if !neurons.contains(id) {
-                            neurons.push(id.clone());
-                        }
-                    }
-                })
-                .or_insert_with(|| {
-                    if let Some(id) = &neuron.id { vec![id.clone()] } else { vec![] }
-                });
-        }
-    }
-}
 
 fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
     neuron.maturity_e8s_equivalent
@@ -174,14 +167,10 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
 mod tests {
     use std::collections::HashMap;
 
-    use candid::Principal;
-    use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
+    use sns_governance_canister::types::{ Neuron, NeuronId };
     use types::NeuronInfo;
 
-    use crate::{
-        jobs::synchronise_neurons::update_principal_neuron_mapping,
-        state::{ init_state, mutate_state, read_state, RuntimeState },
-    };
+    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
 
     use super::update_neuron_maturity;
 
@@ -316,69 +305,5 @@ mod tests {
         });
 
         assert_eq!(result_history, expected_result_history);
-    }
-
-    #[test]
-    fn test_principal_neuron_mapping() {
-        init_runtime_state();
-
-        let owner = Principal::from_text(
-            "7rsnd-jlslx-mihvm-ijuij-qaijh-bcher-p5twl-fohca-56vqv-nhfqv-wqe"
-        ).unwrap();
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-
-        let mut neuron = Neuron::default();
-        neuron.id = Some(neuron_id.clone());
-        neuron.permissions.push(NeuronPermission {
-            principal: Some(owner.clone()),
-            permission_type: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        });
-
-        mutate_state(|state| {
-            update_principal_neuron_mapping(state, &neuron);
-        });
-
-        let expected_result = vec![neuron_id.clone()];
-        let result = read_state(|state| state.data.principal_neurons.get(&owner).cloned())
-            .unwrap()
-            .clone();
-
-        assert_eq!(result, expected_result);
-    }
-
-    #[test]
-    fn test_multiple_principal_neuron_mapping() {
-        init_runtime_state();
-
-        let owner = Principal::from_text(
-            "7rsnd-jlslx-mihvm-ijuij-qaijh-bcher-p5twl-fohca-56vqv-nhfqv-wqe"
-        ).unwrap();
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-
-        let mut neuron = Neuron::default();
-        neuron.id = Some(neuron_id.clone());
-        neuron.permissions.push(NeuronPermission {
-            principal: Some(owner.clone()),
-            permission_type: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        });
-        neuron.permissions.push(NeuronPermission {
-            principal: Some(Principal::anonymous()),
-            permission_type: vec![0, 1, 2, 3, 4, 5, 6],
-        });
-
-        mutate_state(|state| {
-            update_principal_neuron_mapping(state, &neuron);
-        });
-
-        let expected_result = vec![neuron_id.clone()];
-        let result = read_state(|state| state.data.principal_neurons.get(&owner).cloned())
-            .unwrap()
-            .clone();
-
-        assert_eq!(result, expected_result);
     }
 }

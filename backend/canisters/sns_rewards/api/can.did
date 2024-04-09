@@ -1,84 +1,32 @@
 type Args = record { test_mode : bool };
-type GetNeuronResponse = record {
-  id : NeuronId;
-  owner : principal;
-  info : NeuronInfo;
-};
-type HttpRequest = record {
-  url : text;
-  method : text;
-  body : vec nat8;
-  headers : vec record { text; text };
-};
-type HttpResponse = record {
-  body : vec nat8;
-  headers : vec record { text; text };
-  streaming_strategy : opt StreamingStrategy;
-  status_code : nat16;
-};
 type NeuronId = record { id : vec nat8 };
-type NeuronInfo = record {
-  rewarded_maturity : vec record { text; nat64 };
-  accumulated_maturity : nat64;
-  last_synced_maturity : nat64;
-};
-type PaymentRound = record {
-  id : nat16;
-  round_funds_total : nat;
-  token : text;
-  tokens_to_distribute : nat;
-  payments : vec record { NeuronId; record { nat; PaymentStatus; nat64 } };
-  total_neuron_maturity : nat64;
-  fees : nat;
-  ledger_id : principal;
-  date_initialized : nat64;
-  retries : nat8;
-};
-type PaymentStatus = variant { Failed : text; Triggered; Completed; Pending };
+type Result = variant { Ok : NeuronId; Err : UserClaimErrorResponse };
+type Result_1 = variant { Ok : bool; Err : UserClaimErrorResponse };
 type SetRewardTokenTypesRequest = record {
   token_list : vec record { text; TokenInfo };
 };
 type SetRewardTokenTypesResponse = variant { Success; InternalError : text };
-type StreamingStrategy = variant {
-  Callback : record {
-    token : Token;
-    callback : func (Token) -> (HttpResponse) query;
-  };
-};
-type Token = record {
-  key : text;
-  sha256 : opt vec nat8;
-  index : nat;
-  content_encoding : text;
-};
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
   ledger_id : principal;
 };
+type UserClaimErrorResponse = variant {
+  NeuronHotKeyAbsent;
+  TokenSymbolInvalid : text;
+  NeuronNotClaimed;
+  NeuronOwnerInvalid : opt principal;
+  NeuronHotKeyInvalid;
+  TransferFailed : text;
+  NeuronDoesNotExist;
+  InternalError : text;
+};
 service : (Args) -> {
-  __get_candid_interface_tmp_hack : () -> (text) query;
-  convert_neuron_disp : (NeuronId) -> (text) query;
-  get_active_payment_rounds : () -> (vec PaymentRound) query;
-  get_all_neuron_owners : () -> (vec principal) query;
-  get_all_neurons : () -> (nat64) query;
-  get_historic_payment_round : (text, nat16) -> (
-      vec record { nat16; PaymentRound },
-    ) query;
-  get_maturity_history_of_neuron : (NeuronId, opt nat64) -> (
-      vec record { nat64; NeuronInfo },
-    ) query;
-  get_n_history : (opt nat64) -> (
-      vec record { record { NeuronId; nat64 }; NeuronInfo },
-    ) query;
-  get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
-  get_neurons_of_principal : (principal) -> (vec GetNeuronResponse) query;
-  get_reward_token_types : () -> (vec record { text; TokenInfo }) query;
-  http_request : (HttpRequest) -> (HttpResponse) query;
+  add_neuron : (NeuronId) -> (Result);
+  claim_reward : (NeuronId, text) -> (Result_1);
+  get_neurons_by_owner : () -> (opt vec NeuronId) query;
+  remove_neuron : (NeuronId) -> (Result);
   set_reward_token_types : (SetRewardTokenTypesRequest) -> (
       SetRewardTokenTypesResponse,
     );
-  sync_neurons_manual_trigger : () -> ();
-  sync_user_rewards : () -> ();
-  update_info : () -> (text);
 }

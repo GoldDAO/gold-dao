@@ -1,14 +1,11 @@
-use std::collections::HashMap;
-
 use ic_cdk::export_candid;
-use candid::Principal;
-use model::payment_processor::PaymentRound;
 use sns_governance_canister::types::NeuronId;
-use queries::{ GetNeuronResponse, get_maturity_history_of_neuron::MaturityHistoryResponse };
 use lifecycle::Args;
-use types::{ HttpRequest, HttpResponse, NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
+use types::claim_neuron_response::UserClaimErrorResponse;
 use updates::set_reward_token_types::{ SetRewardTokenTypesRequest, SetRewardTokenTypesResponse };
 
+mod types;
+mod utils;
 mod guards;
 mod jobs;
 mod lifecycle;
