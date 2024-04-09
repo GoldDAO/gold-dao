@@ -17,6 +17,7 @@ payments are done in batches and upon each individual transfer response it's sta
 */
 
 use crate::{
+    consts::REWARD_POOL_SUB_ACCOUNT,
     model::payment_processor::{
         MaturityDelta,
         Payment,
@@ -216,7 +217,7 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
 
-    let from_sub_account: Subaccount = [0; 32];
+    let from_sub_account = REWARD_POOL_SUB_ACCOUNT;
     let account = Account {
         owner: ic_cdk::api::id(),
         subaccount: Some(round_pool_subaccount),
