@@ -113,7 +113,7 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
             accumulated_maturity: if is_test_mode.clone() {
                 10000
             } else {
-                maturity
+                0
             },
             rewarded_maturity: HashMap::new(),
         };
