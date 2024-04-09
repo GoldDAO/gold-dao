@@ -31,7 +31,7 @@ use crate::{
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount, DEFAULT_SUBACCOUNT };
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use tracing::{ debug, error, info };
@@ -256,7 +256,7 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
             ledger_canister_id,
             &(Account {
                 owner: ic_cdk::api::id(),
-                subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+                subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
             })
         ).await
     {
