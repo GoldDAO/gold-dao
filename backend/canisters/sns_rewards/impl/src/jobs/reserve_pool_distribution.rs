@@ -14,13 +14,13 @@ use crate::{
     utils::transfer_token,
 };
 use candid::Nat;
-use canister_time::{ run_interval, WEEK_IN_MS };
+use canister_time::{ run_interval, DAY_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ error, info };
 use types::{ Milliseconds, TokenSymbol };
 
-const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
+const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
