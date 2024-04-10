@@ -10,10 +10,10 @@ transfers tokens from reserve pool to the reward pool on a daily basis.
 
 use crate::{
     consts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT },
-    state::read_state,
+    state::{ mutate_state, read_state },
     utils::transfer_token,
 };
-use canister_time::{ run_interval, DAY_IN_MS };
+use canister_time::{ now_millis, run_interval, DAY_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ debug, error, info };
@@ -36,6 +36,7 @@ pub async fn distribute_reserve_pool() {
 }
 
 async fn handle_gldgov_distribution() {
+    // chceck GLDGov is a valid token string
     let token = match TokenSymbol::parse("GLDGov") {
         Ok(t) => t,
         Err(e) => {
@@ -43,6 +44,7 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
+    // get the gldgov ledger id
     let gldgov_ledger_id = match read_state(|s| s.data.tokens.get(&token).copied()) {
         Some(token_info) => token_info.ledger_id,
         None => {
@@ -50,6 +52,7 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
+    // get the daily transfer amount of gldgov
     let amount = match read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned()) {
         Some(amount) => amount,
         None => {
@@ -57,6 +60,15 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
+    // check we're more than 1 day since the last distribution
+    let last_run = read_state(|s| s.data.last_daily_reserve_transfer_time);
+    let time_now = now_millis();
+    let interval = time_now - last_run;
+    if interval < DAY_IN_MS {
+        debug!("RESERVE POOL DISTRIBUTION: Time since last reserve distribution {} is less than one day. ", interval);
+        return;
+    }
+
     let reward_pool_account = Account {
         owner: ic_cdk::api::id(),
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
@@ -72,8 +84,12 @@ async fn handle_gldgov_distribution() {
     {
         Ok(_) => {
             info!("SUCCESS : {:?} GLDGov transferred to reward pool successfully", amount);
+            mutate_state(|s| {
+                s.data.last_daily_reserve_transfer_time = time_now;
+            })
         }
         Err(e) => {
+            // TODO - should we update the last_daily_reserve_transfer_time here even though it didn't succeed. If we see a failure we'd still want to correct it, upgrade and let the transfer run instead of stopping because it previously failed.
             error!(
                 "ERROR : GLDGov failed to transfer from reserve pool to reward pool with error : {:?}",
                 e

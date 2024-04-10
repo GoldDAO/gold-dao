@@ -103,6 +103,8 @@ pub struct Data {
     pub is_synchronizing_neurons: bool,
     /// The daily amount of tokens to transfer from the reserve pool sub account to the reward pool sub account in e8s for each token type
     pub daily_reserve_transfer: HashMap<TokenSymbol, Nat>,
+    /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
+    pub last_daily_reserve_transfer_time: TimestampMillis,
 }
 
 impl Default for Data {
@@ -118,6 +120,7 @@ impl Default for Data {
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             is_synchronizing_neurons: false,
             daily_reserve_transfer: HashMap::new(),
+            last_daily_reserve_transfer_time: TimestampMillis::default(),
         }
     }
 }
