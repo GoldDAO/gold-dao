@@ -27,6 +27,7 @@ pub async fn set_reserve_transfer_amounts(
     set_reserve_transfer_amounts_impl(args.transfer_amounts)
 }
 
+// this will overwrite the hashmap completely so any tokens not passed in will be removed.
 pub(crate) fn set_reserve_transfer_amounts_impl(
     transfer_amounts: HashMap<TokenSymbol, Nat>
 ) -> Result<SetReserveTransferAmountResponse, SetReserveTransferAmountResponse> {
