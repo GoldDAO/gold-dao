@@ -8,3 +8,4 @@ pub mod get_active_payment_rounds;
 pub mod get_historic_payment_rounds;
 pub mod get_reward_token_types;
 pub mod get_neuron_ids_by_owner;
+pub mod get_reserve_transfer_amounts;
