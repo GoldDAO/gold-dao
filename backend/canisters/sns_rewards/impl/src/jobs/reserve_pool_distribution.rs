@@ -64,7 +64,7 @@ async fn handle_gldgov_distribution() {
     let last_run = read_state(|s| s.data.last_daily_reserve_transfer_time);
     let time_now = now_millis();
     let interval = time_now - last_run;
-    if interval < DAY_IN_MS {
+    if interval < DISTRIBUTION_INTERVAL {
         debug!("RESERVE POOL DISTRIBUTION: Time since last reserve distribution {} is less than one day. ", interval);
         return;
     }
