@@ -64,7 +64,7 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
-    // check we're more than 1 day since the last distribution
+    // check we're more than 1 day since the last distribution. The last_daily_reserve_transfer_time will be 0 on the first distribution because in state it's initialized with ::default() // 0
     let last_run = read_state(|s| s.data.last_daily_reserve_transfer_time);
     let time_now = now_millis();
     let interval = time_now - last_run;
@@ -107,7 +107,7 @@ async fn handle_gldgov_distribution() {
     {
         Ok(_) => {
             info!(
-                "SUCCESS : {:?} GLDGov transferred to reward pool successfully",
+                "SUCCESS : {:?} GLDGov tokens transferred to reward pool successfully",
                 amount_to_transfer
             );
             mutate_state(|s| {
