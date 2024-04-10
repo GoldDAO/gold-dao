@@ -13,8 +13,9 @@ use crate::{
     state::{ mutate_state, read_state },
     utils::transfer_token,
 };
+use candid::{ Nat, Principal };
 use canister_time::{ now_millis, run_interval, DAY_IN_MS };
-use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use utils::env::Environment;
 use std::time::Duration;
 use tracing::{ debug, error, info };
@@ -46,15 +47,17 @@ async fn handle_gldgov_distribution() {
         }
     };
     // get the gldgov ledger id
-    let gldgov_ledger_id = match read_state(|s| s.data.tokens.get(&token).copied()) {
-        Some(token_info) => token_info.ledger_id,
+    let gldgov_token_info = match read_state(|s| s.data.tokens.get(&token).copied()) {
+        Some(token_info) => token_info,
         None => {
             error!("ERROR : failed to get token information and ledger id for token {:?}", &token);
             return;
         }
     };
     // get the daily transfer amount of gldgov
-    let amount = match read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned()) {
+    let amount_to_transfer = match
+        read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned())
+    {
         Some(amount) => amount,
         None => {
             error!("ERROR: can't find daily transfer amount for token : {:?} in state", token);
@@ -70,6 +73,25 @@ async fn handle_gldgov_distribution() {
         return;
     }
 
+    // check the reserve pool has enough GLDGov to correctly transfer
+    match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await {
+        Ok(balance) => {
+            if balance < amount_to_transfer.clone() + gldgov_token_info.fee {
+                debug!(
+                    "Balance of reserve pool : {} is too low to make a transfer of {} plus a fee of {} ",
+                    balance,
+                    amount_to_transfer,
+                    gldgov_token_info.fee
+                );
+                return;
+            }
+        }
+        Err(e) => {
+            error!(e);
+            return;
+        }
+    }
+
     let reward_pool_account = Account {
         owner: read_state(|s| s.env.canister_id()),
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
@@ -79,12 +101,15 @@ async fn handle_gldgov_distribution() {
         transfer_token(
             RESERVE_POOL_SUB_ACCOUNT,
             reward_pool_account,
-            gldgov_ledger_id,
-            amount.clone()
+            gldgov_token_info.ledger_id,
+            amount_to_transfer.clone()
         ).await
     {
         Ok(_) => {
-            info!("SUCCESS : {:?} GLDGov transferred to reward pool successfully", amount);
+            info!(
+                "SUCCESS : {:?} GLDGov transferred to reward pool successfully",
+                amount_to_transfer
+            );
             mutate_state(|s| {
                 s.data.last_daily_reserve_transfer_time = time_now;
             })
@@ -96,5 +121,23 @@ async fn handle_gldgov_distribution() {
                 e
             );
         }
+    }
+}
+
+async fn fetch_balance_of_sub_account(
+    ledger_canister_id: Principal,
+    sub_account: Subaccount
+) -> Result<Nat, String> {
+    match
+        icrc_ledger_canister_c2c_client::icrc1_balance_of(
+            ledger_canister_id,
+            &(Account {
+                owner: read_state(|s| s.env.canister_id()),
+                subaccount: Some(sub_account),
+            })
+        ).await
+    {
+        Ok(t) => { Ok(t) }
+        Err(e) => { Err(format!("ERROR: {:?}", e.1)) }
     }
 }
