@@ -8,5 +8,5 @@ use crate::state::read_state;
 
 #[query(hidden = true)]
 fn get_reserve_transfer_amounts() -> HashMap<TokenSymbol, Nat> {
-    read_state(|state| { state.data.daily_reserve_transfer })
+    read_state(|state| { state.data.daily_reserve_transfer.clone() })
 }

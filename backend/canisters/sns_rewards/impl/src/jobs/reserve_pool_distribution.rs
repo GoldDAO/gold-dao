@@ -13,11 +13,10 @@ use crate::{
     state::read_state,
     utils::transfer_token,
 };
-use candid::Nat;
 use canister_time::{ run_interval, DAY_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
-use tracing::{ error, info };
+use tracing::{ debug, error, info };
 use types::{ Milliseconds, TokenSymbol };
 
 const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
@@ -31,9 +30,9 @@ pub fn run_distribution() {
 }
 
 pub async fn distribute_reserve_pool() {
-    info!("RESERVE POOL DISTRIBUTION - START");
+    debug!("RESERVE POOL DISTRIBUTION - START");
     handle_gldgov_distribution().await;
-    info!("RESERVE POOL DISTRIBUTION - FINISH");
+    debug!("RESERVE POOL DISTRIBUTION - FINISH");
 }
 
 async fn handle_gldgov_distribution() {
@@ -68,11 +67,11 @@ async fn handle_gldgov_distribution() {
             RESERVE_POOL_SUB_ACCOUNT,
             reward_pool_account,
             gldgov_ledger_id,
-            amount
+            amount.clone()
         ).await
     {
         Ok(_) => {
-            info!("SUCCESS : GLDGov transferred to reward pool successfully");
+            info!("SUCCESS : {:?} GLDGov transferred to reward pool successfully", amount);
         }
         Err(e) => {
             error!(
