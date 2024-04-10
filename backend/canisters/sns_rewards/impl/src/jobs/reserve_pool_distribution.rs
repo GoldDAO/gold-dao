@@ -15,6 +15,7 @@ use crate::{
 };
 use canister_time::{ now_millis, run_interval, DAY_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
+use utils::env::Environment;
 use std::time::Duration;
 use tracing::{ debug, error, info };
 use types::{ Milliseconds, TokenSymbol };
@@ -70,7 +71,7 @@ async fn handle_gldgov_distribution() {
     }
 
     let reward_pool_account = Account {
-        owner: ic_cdk::api::id(),
+        owner: read_state(|s| s.env.canister_id()),
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
 
