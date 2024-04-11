@@ -1,19 +1,21 @@
-use candid::{ CandidType, Deserialize };
+use candid::{ CandidType, Deserialize, Principal };
+use serde::Serialize;
 
 #[derive(Deserialize, CandidType)]
 pub struct Args {
     test_mode: bool,
+    pocket_ic: bool,
 }
 
 #[cfg(test)]
 mod tests {
-    use std::{ ffi::OsString, io::Read };
+    use std::{ ffi::OsString };
 
     use ic_cdk::api::management_canister::main::CanisterId;
-    use pocket_ic::{ PocketIc, WasmResult };
+    use pocket_ic::{ PocketIc, PocketIcBuilder, WasmResult };
     use candid::{ decode_one, encode_one, Principal };
 
-    use crate::Args;
+    use crate::{ Args };
 
     // 10T cycles
     const INIT_CYCLES: u128 = 10_000_000_000_000;
@@ -24,9 +26,20 @@ mod tests {
         )
     }
 
-    fn get_wasm() -> Vec<u8> {
+    fn query_call(ic: &PocketIc, can_id: CanisterId, method: &str) -> WasmResult {
+        ic.query_call(can_id, Principal::anonymous(), method, encode_one(()).unwrap()).expect(
+            "Failed to query canister"
+        )
+    }
+
+    fn get_rewards_canister_wasm() -> Vec<u8> {
         let wasm_path: OsString =
             "../canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards.wasm".into();
+        std::fs::read(wasm_path).unwrap()
+    }
+
+    fn get_governance_canister_wasm() -> Vec<u8> {
+        let wasm_path: OsString = "./sns-governance-canister.wasm".into();
         std::fs::read(wasm_path).unwrap()
     }
 
@@ -41,7 +54,7 @@ mod tests {
 
     // test neuron sync works - happy path
     #[test]
-    fn neuron_synchronisation_happy_path() {
+    fn calls_a_dummy_method() {
         let pic = PocketIc::new();
 
         // Create a canister and charge it with 2T cycles.
@@ -49,8 +62,8 @@ mod tests {
         pic.add_cycles(can_id, INIT_CYCLES);
 
         // Install the counter canister wasm file on the canister.
-        let wasm = get_wasm();
-        let init_args = Args { test_mode: true };
+        let wasm = get_rewards_canister_wasm();
+        let init_args = Args { test_mode: true, pocket_ic: true };
         pic.install_canister(can_id, wasm, encode_one(init_args).unwrap(), None);
 
         // Make some calls to the canister.
@@ -61,5 +74,49 @@ mod tests {
             }
         };
         assert_eq!(reply.unwrap(), true);
+    }
+
+    #[test]
+    fn synchronise_neurons_happy_path() {
+        let config = SubnetConfigSet {
+            ..Default::default()
+        };
+        let pic = PocketIc::from_config(config);
+        // goes on NNS
+        let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+        let actual_canister_id = pic.create_canister_with_id(None, None, canister_id).unwrap();
+
+        let sns_subnet_id = pic.topology().get_sns().unwrap();
+
+        // ----------- install fake governance canister ----------
+        let governance_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+        pic.add_cycles(governance_canister, INIT_CYCLES);
+
+        let wasm = get_governance_canister_wasm();
+
+        pic.install_canister(governance_canister, wasm, encode_one(()).unwrap(), None);
+
+        // // install rewards canister
+        // let rewards_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+        // pic.add_cycles(rewards_canister, INIT_CYCLES);
+
+        // let wasm = get_rewards_canister_wasm();
+        // let init_args = Args { test_mode: true, pocket_ic: true };
+        // pic.install_canister(rewards_canister, wasm, encode_one(init_args).unwrap(), None);
+
+        // // test rewards canister
+        // let reply: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
+        //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
+        //     WasmResult::Reject(_) => {
+        //         return;
+        //     }
+        // };
+        // // there should be 0 neurons
+        // pic.advance_time(std::time::Duration::from_secs(20));
+        // assert_eq!(reply, 0);
+
+        // add some neurons
+
+        // advance time for maturity
     }
 }

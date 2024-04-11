@@ -11,3 +11,5 @@ pocket-ic = {workspace = true}
 candid = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+types = { path = '../libraries/types' }
+utils = { path = '../libraries/utils' }

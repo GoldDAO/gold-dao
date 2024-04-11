@@ -1222,6 +1222,8 @@ dependencies = [
  "pocket-ic",
  "serde",
  "serde_json",
+ "types",
+ "utils",
 ]
 
 [[package]]

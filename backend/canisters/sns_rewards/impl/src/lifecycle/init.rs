@@ -8,6 +8,7 @@ use utils::{
         ICP_LEDGER_CANISTER_ID_STAGING,
         OGY_LEDGER_CANISTER_ID_STAGING,
         SNS_GOVERNANCE_CANISTER_ID_STAGING,
+        SNS_GOVERNANCE_CANISTER_ID_TESTING,
         SNS_LEDGER_CANISTER_ID_STAGING,
     },
     env::CanisterEnv,
@@ -20,6 +21,7 @@ use super::init_canister;
 #[derive(Deserialize, CandidType)]
 pub struct Args {
     test_mode: bool,
+    pocket_ic: bool,
 }
 
 #[init]
@@ -59,6 +61,10 @@ fn init(args: Args) {
         }
 
         data.sns_governance_canister = SNS_GOVERNANCE_CANISTER_ID_STAGING;
+    }
+
+    if args.pocket_ic {
+        data.sns_governance_canister = SNS_GOVERNANCE_CANISTER_ID_TESTING;
     }
 
     let runtime_state = RuntimeState::new(env, data);
