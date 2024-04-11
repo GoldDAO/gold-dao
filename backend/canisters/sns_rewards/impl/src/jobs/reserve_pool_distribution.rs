@@ -19,7 +19,7 @@ use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use utils::env::Environment;
 use std::time::Duration;
 use tracing::{ debug, error, info };
-use types::{ Milliseconds, TokenSymbol };
+use types::{ Milliseconds, TimestampMillis, TokenSymbol };
 
 const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
 
@@ -67,12 +67,8 @@ async fn handle_gldgov_distribution() {
     // check we're more than 1 day since the last distribution. The last_daily_reserve_transfer_time will be 0 on the first distribution because in state it's initialized with ::default() // 0
     let previous_time_ms = read_state(|s| s.data.last_daily_reserve_transfer_time);
     let current_time_ms = now_millis();
-    // convert the milliseconds to the number of days since UNIX Epoch.
-    // integer division means partial days will be truncated down or effectively rounded down.
-    let previous_in_days = previous_time_ms / DISTRIBUTION_INTERVAL;
-    let current_in_days = current_time_ms / DISTRIBUTION_INTERVAL;
-    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
-    if current_in_days == previous_in_days {
+
+    if !is_valid_distribution_time(previous_time_ms, current_time_ms) {
         debug!(
             "RESERVE POOL DISTRIBUTION: Time since last reserve distribution is less than one day. "
         );
@@ -145,5 +141,53 @@ async fn fetch_balance_of_sub_account(
     {
         Ok(t) => { Ok(t) }
         Err(e) => { Err(format!("ERROR: {:?}", e.1)) }
+    }
+}
+
+pub fn is_valid_distribution_time(
+    previous_time: TimestampMillis,
+    now_time: TimestampMillis
+) -> bool {
+    // convert the milliseconds to the number of days since UNIX Epoch.
+    // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245
+    let previous_in_days = previous_time / DISTRIBUTION_INTERVAL;
+    let current_in_days = now_time / DISTRIBUTION_INTERVAL;
+    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
+    if current_in_days == previous_in_days {
+        false
+    } else {
+        true
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_valid_distribution_time;
+
+    #[test]
+    fn test_is_valid_distribution_time() {
+        // Scenario 1 - prev time is 1 day prior but less than 24 hours in interval - should be valid
+        let prev_time = 1712765654000; // 2024 Apr 10 16:14:14 UTC
+        let now_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
+        let is_valid_time = is_valid_distribution_time(prev_time, now_time);
+        assert_eq!(is_valid_time, true);
+
+        // Scenario 2 - prev time is 0 days prior ( same day ) - should NOT be valid
+        let prev_time = 1712793600000; // 2024 Apr 11 00:00:00 UTC
+        let now_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
+        let is_valid_time = is_valid_distribution_time(prev_time, now_time);
+        assert_eq!(is_valid_time, false);
+
+        // Scenario 3 - prev time is 2 days prior - should be valid
+        let prev_time = 1712620800000; // 2024 Apr 09 00:00:00 UTC
+        let now_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
+        let is_valid_time = is_valid_distribution_time(prev_time, now_time);
+        assert_eq!(is_valid_time, true);
+
+        // Scenario 4 - prev time is exactly the same as now time - should NOT be valid
+        let prev_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
+        let now_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
+        let is_valid_time = is_valid_distribution_time(prev_time, now_time);
+        assert_eq!(is_valid_time, false);
     }
 }
