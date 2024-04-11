@@ -1217,8 +1217,11 @@ dependencies = [
 name = "integration-testing"
 version = "0.1.0"
 dependencies = [
+ "candid",
  "ic-cdk",
  "pocket-ic",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

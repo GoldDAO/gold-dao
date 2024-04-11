@@ -6,3 +6,4 @@ pub mod set_reward_token_types;
 mod remove_neuron_ownership;
 mod add_neuron_ownership;
 pub mod set_reserve_transfer_amount;
+pub mod read;
