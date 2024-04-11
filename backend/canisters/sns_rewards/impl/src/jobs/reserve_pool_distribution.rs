@@ -65,11 +65,17 @@ async fn handle_gldgov_distribution() {
         }
     };
     // check we're more than 1 day since the last distribution. The last_daily_reserve_transfer_time will be 0 on the first distribution because in state it's initialized with ::default() // 0
-    let last_run = read_state(|s| s.data.last_daily_reserve_transfer_time);
-    let time_now = now_millis();
-    let interval = time_now - last_run;
-    if interval < DISTRIBUTION_INTERVAL {
-        debug!("RESERVE POOL DISTRIBUTION: Time since last reserve distribution {} is less than one day. ", interval);
+    let previous_time_ms = read_state(|s| s.data.last_daily_reserve_transfer_time);
+    let current_time_ms = now_millis();
+    // convert the milliseconds to the number of days since UNIX Epoch.
+    // integer division means partial days will be truncated down or effectively rounded down.
+    let previous_in_days = previous_time_ms / DISTRIBUTION_INTERVAL;
+    let current_in_days = current_time_ms / DISTRIBUTION_INTERVAL;
+    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
+    if current_in_days == previous_in_days {
+        debug!(
+            "RESERVE POOL DISTRIBUTION: Time since last reserve distribution is less than one day. "
+        );
         return;
     }
 
@@ -111,7 +117,7 @@ async fn handle_gldgov_distribution() {
                 amount_to_transfer
             );
             mutate_state(|s| {
-                s.data.last_daily_reserve_transfer_time = time_now;
+                s.data.last_daily_reserve_transfer_time = current_time_ms;
             })
         }
         Err(e) => {
