@@ -18,13 +18,13 @@ mod tests {
     // 10T cycles
     const INIT_CYCLES: u128 = 10_000_000_000_000;
 
-    fn call_counter_can(ic: &PocketIc, can_id: CanisterId, method: &str) -> WasmResult {
+    fn update_call(ic: &PocketIc, can_id: CanisterId, method: &str) -> WasmResult {
         ic.update_call(can_id, Principal::anonymous(), method, encode_one(()).unwrap()).expect(
             "Failed to call counter canister"
         )
     }
 
-    fn sns_rewards_wasm() -> Vec<u8> {
+    fn get_wasm() -> Vec<u8> {
         let wasm_path: OsString =
             "../canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards.wasm".into();
         std::fs::read(wasm_path).unwrap()
@@ -49,12 +49,12 @@ mod tests {
         pic.add_cycles(can_id, INIT_CYCLES);
 
         // Install the counter canister wasm file on the canister.
-        let wasm = sns_rewards_wasm();
+        let wasm = get_wasm();
         let init_args = Args { test_mode: true };
         pic.install_canister(can_id, wasm, encode_one(init_args).unwrap(), None);
 
         // Make some calls to the canister.
-        let reply: Result<bool, String> = match call_counter_can(&pic, can_id, "read") {
+        let reply: Result<bool, String> = match update_call(&pic, can_id, "read") {
             WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
             WasmResult::Reject(_) => {
                 return;
