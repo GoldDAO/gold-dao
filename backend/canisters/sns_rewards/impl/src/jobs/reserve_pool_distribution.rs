@@ -153,11 +153,7 @@ pub fn is_valid_distribution_time(
     let previous_in_days = previous_time / DISTRIBUTION_INTERVAL;
     let current_in_days = now_time / DISTRIBUTION_INTERVAL;
     // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
-    if current_in_days == previous_in_days {
-        false
-    } else {
-        true
-    }
+    current_in_days != previous_in_days
 }
 
 #[cfg(test)]
