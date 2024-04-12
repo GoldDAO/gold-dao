@@ -31,23 +31,12 @@ pub async fn set_reserve_transfer_amounts(
 pub(crate) fn set_reserve_transfer_amounts_impl(
     transfer_amounts: HashMap<TokenSymbol, Nat>
 ) -> Result<SetReserveTransferAmountResponse, SetReserveTransferAmountResponse> {
-    if transfer_amounts.len() < (1 as usize) {
-        return Err(
-            InternalError("Should contain at least 1 token symbol and amount to update".to_string())
-        );
-    }
-
-    for (token_symbol, amount) in &transfer_amounts {
-        // Check the amount is above 0.
-        if amount == &Nat::from(0u64) {
-            return Err(
-                InternalError(
-                    format!("ERROR : The amount for token : {:?} must be more than 0", token_symbol)
-                )
-            );
+    match validate_payload(&transfer_amounts) {
+        Ok(_) => {}
+        Err(e) => {
+            return Err(InternalError(e));
         }
     }
-
     mutate_state(|s| {
         s.data.daily_reserve_transfer = transfer_amounts;
     });
@@ -59,10 +48,21 @@ pub(crate) fn set_reserve_transfer_amounts_impl(
 async fn set_reserve_transfer_amounts_validate(
     args: SetReserveTransferAmountRequest
 ) -> Result<String, String> {
-    if args.transfer_amounts.len() < (1 as usize) {
+    match validate_payload(&args.transfer_amounts) {
+        Ok(_) => {}
+        Err(e) => {
+            return Err(e);
+        }
+    }
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+}
+
+pub fn validate_payload(args: &HashMap<TokenSymbol, Nat>) -> Result<(), String> {
+    if args.len() < (1 as usize) {
         return Err("Should contain at least 1 token symbol and amount to update".to_string());
     }
-    for (token_symbol, amount) in &args.transfer_amounts {
+
+    for (token_symbol, amount) in args {
         // Check the amount is above 0.
         if amount == &Nat::from(0u64) {
             return Err(
@@ -70,6 +70,5 @@ async fn set_reserve_transfer_amounts_validate(
             );
         }
     }
-
-    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+    Ok(())
 }
