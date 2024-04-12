@@ -7,15 +7,17 @@ pub struct Args {
     pocket_ic: bool,
 }
 
+mod sns_init_payload;
 #[cfg(test)]
 mod tests {
     use std::{ ffi::OsString };
 
     use ic_cdk::api::management_canister::main::CanisterId;
-    use pocket_ic::{ PocketIc, PocketIcBuilder, WasmResult };
+    use pocket_ic::{ common::rest::SubnetConfigSet, PocketIc, PocketIcBuilder, WasmResult };
     use candid::{ decode_one, encode_one, Principal };
+    use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 
-    use crate::{ Args };
+    use crate::{ sns_init_payload::SnsInitPayload, Args };
 
     // 10T cycles
     const INIT_CYCLES: u128 = 10_000_000_000_000;
@@ -78,23 +80,83 @@ mod tests {
 
     #[test]
     fn synchronise_neurons_happy_path() {
-        let config = SubnetConfigSet {
-            ..Default::default()
+        let pic = PocketIcBuilder::new().with_sns_subnet().build();
+
+        let sns_subnet = pic.topology().get_sns().unwrap();
+
+        let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet);
+        pic.add_cycles(sns_gov_id, INIT_CYCLES);
+
+        let sns_gov_init_args = SnsInitPayload {
+            confirmation_text: Some("Welcome to the jungle baby".to_string()),
+            transaction_fee_e8s: Some(10000u64),
+            token_name: Some("SIMGov".to_string()),
         };
-        let pic = PocketIc::from_config(config);
-        // goes on NNS
-        let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
-        let actual_canister_id = pic.create_canister_with_id(None, None, canister_id).unwrap();
 
-        let sns_subnet_id = pic.topology().get_sns().unwrap();
+        pic.install_canister(
+            sns_gov_id,
+            get_governance_canister_wasm(),
+            encode_one(()).unwrap(),
+            None
+        );
 
-        // ----------- install fake governance canister ----------
-        let governance_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
-        pic.add_cycles(governance_canister, INIT_CYCLES);
+        // let pic = PocketIc::from_config(config);
+        // // goes on NNS
+        // let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+        // let actual_canister_id = pic.create_canister_with_id(None, None, canister_id).unwrap();
 
-        let wasm = get_governance_canister_wasm();
+        // let sns_subnet_id = pic.topology().get_sns().unwrap();
 
-        pic.install_canister(governance_canister, wasm, encode_one(()).unwrap(), None);
+        // // ----------- install fake governance canister ----------
+        // let governance_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+        // pic.add_cycles(governance_canister, INIT_CYCLES);
+
+        // let wasm = get_governance_canister_wasm();
+
+        // pic.install_canister(governance_canister, wasm, encode_one(()).unwrap(), None);
+
+        // // install rewards canister
+        // let rewards_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+        // pic.add_cycles(rewards_canister, INIT_CYCLES);
+
+        // let wasm = get_rewards_canister_wasm();
+        // let init_args = Args { test_mode: true, pocket_ic: true };
+        // pic.install_canister(rewards_canister, wasm, encode_one(init_args).unwrap(), None);
+
+        // // test rewards canister
+        // let reply: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
+        //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
+        //     WasmResult::Reject(_) => {
+        //         return;
+        //     }
+        // };
+        // // there should be 0 neurons
+        // pic.advance_time(std::time::Duration::from_secs(20));
+        // assert_eq!(reply, 0);
+
+        // add some neurons
+
+        // advance time for maturity
+    }
+
+    fn synchronise_neurons_happy_path_old() {
+        // let config = SubnetConfigSet {
+        //     ..Default::default()
+        // };
+        // let pic = PocketIc::from_config(config);
+        // // goes on NNS
+        // let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+        // let actual_canister_id = pic.create_canister_with_id(None, None, canister_id).unwrap();
+
+        // let sns_subnet_id = pic.topology().get_sns().unwrap();
+
+        // // ----------- install fake governance canister ----------
+        // let governance_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+        // pic.add_cycles(governance_canister, INIT_CYCLES);
+
+        // let wasm = get_governance_canister_wasm();
+
+        // pic.install_canister(governance_canister, wasm, encode_one(()).unwrap(), None);
 
         // // install rewards canister
         // let rewards_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
