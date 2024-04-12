@@ -10,15 +10,21 @@ pub struct Args {
 mod sns_init_payload;
 #[cfg(test)]
 mod tests {
-    use std::{ ffi::OsString };
+    use std::{ collections::BTreeMap, ffi::OsString, fs, io::BufReader, path::PathBuf };
 
     use ic_cdk::api::management_canister::main::CanisterId;
     use pocket_ic::{ common::rest::SubnetConfigSet, PocketIc, PocketIcBuilder, WasmResult };
-    use candid::{ decode_one, encode_args, encode_one, Principal };
+    use candid::{ decode_one, encode_args, encode_one, Encode, Principal };
+    use sns_governance_canister::types::{ Governance, NervousSystemParameters };
     use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 
     use crate::{
-        sns_init_payload::{ FractionalDeveloperVotingPower, SnsInitArg, SnsInitPayload },
+        sns_init_payload::{
+            FractionalDeveloperVotingPower,
+            SnsInitArg,
+            SnsInitPayload,
+            SnsWasmCanisterInitPayload,
+        },
         Args,
     };
 
@@ -46,6 +52,18 @@ mod tests {
     fn get_governance_canister_wasm() -> Vec<u8> {
         let wasm_path: OsString = "./sns-governance-canister.wasm".into();
         std::fs::read(wasm_path).unwrap()
+    }
+    fn get_nns_wasm() -> Vec<u8> {
+        let wasm_path: OsString = "./nns.wasm".into();
+        std::fs::read(wasm_path).unwrap()
+    }
+
+    fn get_test_file_path() -> PathBuf {
+        // Get the directory containing the current file (assuming it's a test file)
+        let mut path = std::path::PathBuf::from(file!());
+        path.pop(); // Remove the filename, leaving the directory
+        path.push("sns.yml"); // Append the filename you want to open
+        path
     }
 
     #[test]
@@ -83,123 +101,62 @@ mod tests {
 
     #[test]
     fn synchronise_neurons_happy_path() {
-        let pic = PocketIcBuilder::new().with_sns_subnet().build();
+        let pic = PocketIcBuilder::new().with_nns_subnet().with_sns_subnet().build();
 
+        let master_principal = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
+        let sns_ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
+        let sns_swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
+
+        let nns_subnet = pic.topology().get_nns().unwrap();
         let sns_subnet = pic.topology().get_sns().unwrap();
 
-        let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet);
-        pic.add_cycles(sns_gov_id, INIT_CYCLES);
+        let sns_canister_id = pic.create_canister_on_subnet(None, None, sns_subnet);
+        pic.add_cycles(sns_canister_id, INIT_CYCLES);
 
-        let sns_controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]).to_string();
-
-        // let sns_gov_init_args = SnsInitPayload {
-        //     confirmation_text: Some("Welcome to the jungle baby".to_string()),
-        //     transaction_fee_e8s: Some(10000u64),
-        //     token_name: Some("Simulation Governance".to_string()),
-        //     token_symbol: Some("SIMG".to_string()),
-        //     proposal_reject_cost_e8s: Some(10000u64),
-        //     neuron_minimum_stake_e8s: Some(10000u64),
-        //     fallback_controller_principal_ids: vec![sns_controller.clone()],
-        //     logo: Some("data:image/png;base64,iVBORw0".to_string()),
-        //     url: Some("https://google.com".to_string()),
-        //     name: Some("Simulation Gov".to_string()),
-        //     description: Some("Simulation gov desc".to_string()),
-        //     neuron_minimum_dissolve_delay_to_vote_seconds: Some(1),
-        //     initial_reward_rate_basis_points: Some(10u64),
-        //     final_reward_rate_basis_points: Some(20u64),
-        //     reward_rate_transition_duration_seconds: Some(1u64),
-        //     max_dissolve_delay_seconds: Some(1u64),
-        //     max_neuron_age_seconds_for_age_bonus: Some(1u64),
-        //     max_dissolve_delay_bonus_percentage: Some(10u64),
-        //     max_age_bonus_percentage: Some(10u64),
-        //     initial_voting_period_seconds: Some(1u64),
-        //     wait_for_quiet_deadline_increase_seconds: Some(1u64),
-        //     restricted_countries: None,
-        //     dapp_canisters: None,
-        //     min_participants: Some(1),
-        //     min_icp_e8s: Some(1u64),
-        //     max_icp_e8s: Some(10_000_000_000u64),
-        //     min_direct_participation_icp_e8s: Some(10000u64),
-        //     min_participant_icp_e8s: Some(10000u64),
-        //     max_direct_participation_icp_e8s: Some(100_000u64),
-        //     max_participant_icp_e8s: Some(10000u64),
-        //     swap_start_timestamp_seconds: None,
-        //     swap_due_timestamp_seconds: Some(32512438014000u64), // year 3000 - hopefully we'll all be gone by then,
-        //     neuron_basket_construction_parameters: None,
-        //     nns_proposal_id: Some(1),
-        //     neurons_fund_participation: None,
-        //     neurons_fund_participants: None,
-        //     token_logo: Some("data:image/png;base64,iVBORw0".to_string()),
-        //     neurons_fund_participation_constraints: None,
-        //     initial_token_distribution: Some(
-        //         crate::sns_init_payload::InitialTokenDistribution::FractionalDeveloperVotingPower(
-        //             FractionalDeveloperVotingPower {
-        //                 airdrop_distribution: None,
-        //                 developer_distribution: None,
-        //                 treasury_distribution: None,
-        //                 swap_distribution: None,
-        //             }
-        //         )
-        //     ),
-        // };
-        let sns_gov_init_args = SnsInitPayload {
-            confirmation_text: Some("Welcome to the jungle baby".to_string()),
-            transaction_fee_e8s: Some(10000u64),
-            token_name: Some("Simulation Governance".to_string()),
-            token_symbol: Some("SIMG".to_string()),
-            proposal_reject_cost_e8s: Some(10000u64),
-            neuron_minimum_stake_e8s: Some(10000u64),
-            fallback_controller_principal_ids: vec![sns_controller.clone()],
-            logo: Some("data:image/png;base64,iVBORw0".to_string()),
-            url: Some("https://google.com".to_string()),
-            name: Some("Simulation Gov".to_string()),
-            description: Some("Simulation gov desc".to_string()),
-            neuron_minimum_dissolve_delay_to_vote_seconds: Some(1),
-            initial_reward_rate_basis_points: Some(10u64),
-            final_reward_rate_basis_points: Some(20u64),
-            reward_rate_transition_duration_seconds: Some(1u64),
-            max_dissolve_delay_seconds: Some(1u64),
-            max_neuron_age_seconds_for_age_bonus: Some(1u64),
-            max_dissolve_delay_bonus_percentage: Some(10u64),
-            max_age_bonus_percentage: Some(10u64),
-            initial_voting_period_seconds: Some(1u64),
-            wait_for_quiet_deadline_increase_seconds: Some(1u64),
-            restricted_countries: None,
-            dapp_canisters: None,
-            min_participants: Some(1),
-            min_icp_e8s: Some(1u64),
-            max_icp_e8s: Some(10_000_000_000u64),
-            min_direct_participation_icp_e8s: Some(10000u64),
-            min_participant_icp_e8s: Some(10000u64),
-            max_direct_participation_icp_e8s: Some(100_000u64),
-            max_participant_icp_e8s: Some(10000u64),
-            swap_start_timestamp_seconds: None,
-            swap_due_timestamp_seconds: Some(32512438014000u64), // year 3000 - hopefully we'll all be gone by then,
-            neuron_basket_construction_parameters: None,
-            nns_proposal_id: Some(1),
-            neurons_fund_participation: None,
-            neurons_fund_participants: None,
-            token_logo: Some("data:image/png;base64,iVBORw0".to_string()),
-            neurons_fund_participation_constraints: None,
-            initial_token_distribution: Some(
-                crate::sns_init_payload::InitialTokenDistribution::FractionalDeveloperVotingPower(
-                    FractionalDeveloperVotingPower {
-                        airdrop_distribution: None,
-                        developer_distribution: None,
-                        treasury_distribution: None,
-                        swap_distribution: None,
-                    }
-                )
-            ),
+        let init_args = Governance {
+            deployed_version: None,
+            neurons: BTreeMap::new(),
+            proposals: BTreeMap::new(),
+            parameters: Some(NervousSystemParameters {
+                default_followees: None,
+                reject_cost_e8s: Some(10000u64),
+            }),
+            latest_reward_event: None,
+            in_flight_commands: BTreeMap::new(),
+            genesis_timestamp_seconds: 1u64,
+            metrics: None,
+            ledger_canister_id: Some(sns_ledger_canister_id.clone()),
+            root_canister_id: Some(sns_root_canister_id.clone()),
+            id_to_nervous_system_functions: BTreeMap::new(),
+            mode: 1,
+            swap_canister_id: Some(sns_swap_canister_id.clone()),
+            sns_metadata: None,
+            sns_initialization_parameters: "".to_string(),
+            pending_version: None,
+            is_finalizing_disburse_maturity: None,
+            maturity_modulation: None,
         };
-        let init_args_two = SnsInitArg { sns_initialization_parameters: sns_gov_init_args };
 
         pic.install_canister(
-            sns_gov_id,
+            sns_canister_id,
             get_governance_canister_wasm(),
-            encode_one(init_args_two).unwrap(),
+            encode_one(&init_args).unwrap(),
             None
         );
+
+        // let init_args = SnsWasmCanisterInitPayload {
+        //     allowed_principals: vec![master_principal.clone()],
+        //     access_controls_enabled: false,
+        //     sns_subnet_ids: vec![nns_subnet.clone()],
+        // };
+
+        // pic.install_canister(
+        //     nns_canister_id,
+        //     get_nns_wasm(),
+        //     encode_one(&init_args).unwrap(),
+        //     None
+        // );
 
         // let pic = PocketIc::from_config(config);
         // // goes on NNS

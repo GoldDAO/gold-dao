@@ -5,7 +5,22 @@ use serde::{ Deserialize, Serialize };
 
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct SnsInitArg {
-    pub sns_initialization_parameters: SnsInitPayload,
+    pub sns_initialization_parameters: String,
+}
+
+#[derive(CandidType, Deserialize, Serialize)]
+pub struct SnsWasmCanisterInitPayload {
+    pub allowed_principals: Vec<Principal>,
+    pub access_controls_enabled: bool,
+    pub sns_subnet_ids: Vec<Principal>,
+}
+
+pub struct NeuronInFlightCommand {
+    /// The timestamp at which the command was issued, for debugging
+    /// purposes.
+    pub timestamp: u64,
+
+    pub command: Option<String>, // TODO - this should be Command https://github.com/dfinity/ic/blob/f9de69f460cced38e02afc614b5daed0a82a469b/rs/sns/governance/src/gen/ic_sns_governance.pb.v1.rs#L1487
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
