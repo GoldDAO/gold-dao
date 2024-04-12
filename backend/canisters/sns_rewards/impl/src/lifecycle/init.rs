@@ -1,4 +1,4 @@
-use candid::CandidType;
+use candid::{ CandidType, Nat };
 use ic_cdk_macros::init;
 use serde::Deserialize;
 use tracing::info;
@@ -50,11 +50,12 @@ fn init(args: Args) {
             });
         }
         if let Ok(token) = TokenSymbol::parse("GLDGov") {
-            data.tokens.insert(token, TokenInfo {
+            data.tokens.insert(token.clone(), TokenInfo {
                 ledger_id: gldgov_ledger_canister_id,
                 fee: 100_000u64,
                 decimals: 8u64,
             });
+            data.daily_reserve_transfer.insert(token, Nat::from(10000u64));
         }
 
         data.sns_governance_canister = SNS_GOVERNANCE_CANISTER_ID_STAGING;
