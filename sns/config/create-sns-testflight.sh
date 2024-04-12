@@ -1,7 +1,7 @@
 
 # download sns client
-# GIT_HASH="f72ad66cc01b5441da26a596abaa2117c023844d"
-GIT_HASH="25d05cb2d7f3ec39541c825659199610e3fcea48" # working version but
+# GIT_HASH="f72ad66cc01b5441da26a596abaa2117c023844d" # latest version
+GIT_HASH="25d05cb2d7f3ec39541c825659199610e3fcea48" # working version but not the latest one
 PLATFORM=$(uname | tr '[[:upper:]]' '[[:lower:]]')
 DOWNLOAD_NAME="sns"
 DEST=./sns-exec
@@ -15,4 +15,4 @@ dfx canister uninstall-code --network staging sns_ledger &&
 dfx canister uninstall-code --network staging sns_swap
 
 # execute sns
-./sns-exec deploy-testflight --verbose --network ic --init-config-file=$(pwd)/sns/config/sns_init_staging.yaml
+./sns-exec deploy-testflight --verbose --network staging --init-config-file=$(pwd)/sns/config/sns_init_staging.yaml
