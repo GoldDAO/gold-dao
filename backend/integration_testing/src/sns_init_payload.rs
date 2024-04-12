@@ -4,6 +4,11 @@ use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
 #[derive(CandidType, Deserialize, Serialize)]
+pub struct SnsInitArg {
+    pub sns_initialization_parameters: SnsInitPayload,
+}
+
+#[derive(CandidType, Deserialize, Serialize)]
 pub struct Init {
     /// The canister ID of the NNS governance canister. This is the only
     /// principal that can open the swap.
