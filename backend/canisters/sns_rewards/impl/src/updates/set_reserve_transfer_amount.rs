@@ -48,12 +48,7 @@ pub(crate) fn set_reserve_transfer_amounts_impl(
 async fn set_reserve_transfer_amounts_validate(
     args: SetReserveTransferAmountRequest
 ) -> Result<String, String> {
-    match validate_payload(&args.transfer_amounts) {
-        Ok(_) => {}
-        Err(e) => {
-            return Err(e);
-        }
-    }
+    validate_payload(&args.transfer_amounts)?;
     serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
 }
 
