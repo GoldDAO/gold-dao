@@ -91,22 +91,31 @@ pub fn generate_neuron_data_for_week(week: u64) -> (BTreeMap<String, Neuron>, Ve
 
     let user_1 = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
     let user_2 = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+    let neuron_ids = vec![
+        "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208",
+        "266f48a2d7c7f7852ed3facedd0b7d86a7316f52b8878f5c0332fd100be89316",
+        "2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9",
+        "5129ea7ec019c9a5f19b16ae3562870556b6f4cb424496f6255215a33465ea21",
+        "6075d75af4360f66c2e647b0f347cc521cdc122f45fecd4c10851d0a9dec2796",
+        "734ab35b7efbe5d8d1ae9707faba0f2ca7a44f1933d40ff842321d0b6ec50ccf",
+        "7b6217fabd56b82145ef5786b948878702183689efb465f5b3dc5a5a303d8a9f",
+        "883f337abdf3c8b64bce562f1a6c665779981025f4316c6c275b24a173aad93c",
+        "90132b8ad0bcac6eb903d3e41242b10f972aa2e612aeecc6ea0375012b41e878",
+        "9ac039bb64c76f1ff554eef3a4594a11d1611feaf9052e7ad8166461f997a12f"
+    ];
 
-    neurons.insert(
-        "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208".to_string(),
-        Neuron {
-            id: Some(
-                NeuronId::new(
-                    "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208"
-                ).unwrap()
-            ),
+    for (i, neuron_id) in neuron_ids.iter().enumerate() {
+        let user = if i < 7 { user_1 } else { user_2 };
+
+        neurons.insert(neuron_id.to_string(), Neuron {
+            id: Some(NeuronId::new(neuron_id).unwrap()),
             permissions: vec![
                 NeuronPermission {
                     principal: Some(Principal::anonymous()),
                     permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
                 },
                 NeuronPermission {
-                    principal: Some(user_1),
+                    principal: Some(user),
                     permission_type: vec![3, 4],
                 }
             ],
@@ -127,8 +136,8 @@ pub fn generate_neuron_data_for_week(week: u64) -> (BTreeMap<String, Neuron>, Ve
                     100000000000
                 )
             ),
-        }
-    );
+        });
+    }
 
     (neurons, vec![user_1, user_2])
 }

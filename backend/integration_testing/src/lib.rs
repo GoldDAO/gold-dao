@@ -162,85 +162,7 @@ mod tests {
             encode_one(week_2_init_args).unwrap(),
             None
         ).unwrap();
-
-        // sanity
-        let reply: GetNeuronResponse = match
-            query_call_with_arg(&pic, sns_canister_id, "get_neuron", GetNeuronRequest {
-                neuron_id: NeuronId::new(
-                    "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208"
-                ).unwrap(),
-            })
-        {
-            WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
-            WasmResult::Reject(_) => {
-                return;
-            }
-        };
-
-        assert_eq!(reply.result.is_some(), true);
-        let n = reply.result.unwrap();
-
-        let nn = if let sns_governance_canister::types::get_neuron_response::Result::Neuron(n) = n {
-            Some(n) // Assign Some(n) to nn when Result::Neuron(n) matches
-        } else {
-            None // Assign None to nn for other cases (like Result::Error(e))
-        };
-
-        nn.unwrap()
-            .permissions.iter()
-            .for_each(|n_pem| {
-                println!("{:?}", n_pem.principal);
-            });
-        // end sanity
-
-        assert_eq!(true, false)
-        // add some neurons
-
-        // advance time for maturity
     }
-
-    // fn synchronise_neurons_happy_path_old() {
-    //     // let config = SubnetConfigSet {
-    //     //     ..Default::default()
-    //     // };
-    //     // let pic = PocketIc::from_config(config);
-    //     // // goes on NNS
-    //     // let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
-    //     // let actual_canister_id = pic.create_canister_with_id(None, None, canister_id).unwrap();
-
-    //     // let sns_subnet_id = pic.topology().get_sns().unwrap();
-
-    //     // // ----------- install fake governance canister ----------
-    //     // let governance_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
-    //     // pic.add_cycles(governance_canister, INIT_CYCLES);
-
-    //     // let wasm = get_governance_canister_wasm();
-
-    //     // pic.install_canister(governance_canister, wasm, encode_one(()).unwrap(), None);
-
-    //     // // install rewards canister
-    //     // let rewards_canister = pic.create_canister_on_subnet(None, None, sns_subnet_id);
-    //     // pic.add_cycles(rewards_canister, INIT_CYCLES);
-
-    //     // let wasm = get_rewards_canister_wasm();
-    //     // let init_args = Args { test_mode: true, pocket_ic: true };
-    //     // pic.install_canister(rewards_canister, wasm, encode_one(init_args).unwrap(), None);
-
-    //     // // test rewards canister
-    //     // let reply: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
-    //     //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
-    //     //     WasmResult::Reject(_) => {
-    //     //         return;
-    //     //     }
-    //     // };
-    //     // // there should be 0 neurons
-    //     // pic.advance_time(std::time::Duration::from_secs(20));
-    //     // assert_eq!(reply, 0);
-
-    //     // add some neurons
-
-    //     // advance time for maturity
-    // }
 
     //  // sanity
     //     let reply: GetNeuronResponse = match
@@ -267,4 +189,34 @@ mod tests {
 
     //     println!("{:?}", nn.unwrap().maturity_e8s_equivalent);
     //     // end sanity
+
+    // sanity
+    // let reply: GetNeuronResponse = match
+    //     query_call_with_arg(&pic, sns_canister_id, "get_neuron", GetNeuronRequest {
+    //         neuron_id: NeuronId::new(
+    //             "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208"
+    //         ).unwrap(),
+    //     })
+    // {
+    //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
+    //     WasmResult::Reject(_) => {
+    //         return;
+    //     }
+    // };
+
+    // assert_eq!(reply.result.is_some(), true);
+    // let n = reply.result.unwrap();
+
+    // let nn = if let sns_governance_canister::types::get_neuron_response::Result::Neuron(n) = n {
+    //     Some(n) // Assign Some(n) to nn when Result::Neuron(n) matches
+    // } else {
+    //     None // Assign None to nn for other cases (like Result::Error(e))
+    // };
+
+    // nn.unwrap()
+    //     .permissions.iter()
+    //     .for_each(|n_pem| {
+    //         println!("{:?}", n_pem.principal);
+    //     });
+    // end sanity
 }
