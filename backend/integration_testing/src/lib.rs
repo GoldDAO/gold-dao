@@ -24,7 +24,7 @@ mod tests {
     use candid::{ decode_one, encode_one, CandidType, Decode, Principal };
     use sns_governance_canister::types::{ GetNeuronResponse, Governance, NeuronId };
 
-    use crate::{ sns_init_payload::get_sns_init_args, Args, GetNeuronRequest };
+    use crate::{ sns_init_payload::create_weekly_sns_canister_data, Args, GetNeuronRequest };
 
     // 10T cycles
     const INIT_CYCLES: u128 = 10_000_000_000_000;
@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "is out of cycles")]
-    fn test_sanity() {
+    fn test_sanity_with_cycles() {
         let pic = PocketIc::new();
         let canister_id = pic.create_canister();
         let wasm = b"\x00\x61\x73\x6d\x01\x00\x00\x00".to_vec();
@@ -101,9 +101,6 @@ mod tests {
         let pic = PocketIcBuilder::new().with_sns_subnet().build();
 
         let master_principal = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-        let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
-        let sns_ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
-        let sns_swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
 
         let sns_subnet = pic.topology().get_sns().unwrap();
 
@@ -114,17 +111,13 @@ mod tests {
         let sns_canister_id = pic.create_canister_on_subnet(None, None, sns_subnet);
         pic.add_cycles(sns_canister_id, INIT_CYCLES);
 
-        let init_args = get_sns_init_args(
-            sns_ledger_canister_id.clone(),
-            sns_root_canister_id.clone(),
-            sns_swap_canister_id.clone(),
-            1
-        );
+        let (week_1_init_args, users, neuron_data) = create_weekly_sns_canister_data(1);
+        // users, neurons, init_args
 
         pic.install_canister(
             sns_canister_id,
             get_governance_canister_wasm(),
-            encode_one(init_args.clone()).unwrap(),
+            encode_one(week_1_init_args.clone()).unwrap(),
             None
         );
 
@@ -146,36 +139,61 @@ mod tests {
 
         update_call(&pic, rewards_canister, "sync_neurons_manual_trigger");
 
-        pic.advance_time(std::time::Duration::from_secs(60 * 60 * 24 * 8));
+        // pic.advance_time(std::time::Duration::from_secs(60 * 60 * 24 * 8));
 
         // test rewards canister
-        let reply: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
+        let num_neurons: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
             WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
             WasmResult::Reject(_) => {
                 return;
             }
         };
-        assert_eq!(reply, 1);
+        assert_eq!(num_neurons, neuron_data.len());
 
         // ********************************
         // Reinstall SNS Gov canister + SECOND week of Neuron maturity
         // ********************************
 
-        let init_args = get_sns_init_args(
-            sns_ledger_canister_id.clone(),
-            sns_root_canister_id.clone(),
-            sns_swap_canister_id.clone(),
-            2
-        );
+        let (week_2_init_args, users, neuron_data) = create_weekly_sns_canister_data(1);
 
         pic.reinstall_canister(
             sns_canister_id,
             get_governance_canister_wasm(),
-            encode_one(init_args).unwrap(),
+            encode_one(week_2_init_args).unwrap(),
             None
         ).unwrap();
 
-        // assert_eq!(true, false)
+        // sanity
+        let reply: GetNeuronResponse = match
+            query_call_with_arg(&pic, sns_canister_id, "get_neuron", GetNeuronRequest {
+                neuron_id: NeuronId::new(
+                    "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208"
+                ).unwrap(),
+            })
+        {
+            WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
+            WasmResult::Reject(_) => {
+                return;
+            }
+        };
+
+        assert_eq!(reply.result.is_some(), true);
+        let n = reply.result.unwrap();
+
+        let nn = if let sns_governance_canister::types::get_neuron_response::Result::Neuron(n) = n {
+            Some(n) // Assign Some(n) to nn when Result::Neuron(n) matches
+        } else {
+            None // Assign None to nn for other cases (like Result::Error(e))
+        };
+
+        nn.unwrap()
+            .permissions.iter()
+            .for_each(|n_pem| {
+                println!("{:?}", n_pem.principal);
+            });
+        // end sanity
+
+        assert_eq!(true, false)
         // add some neurons
 
         // advance time for maturity
