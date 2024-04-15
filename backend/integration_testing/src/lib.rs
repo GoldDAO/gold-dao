@@ -62,10 +62,6 @@ mod tests {
         let wasm_path: OsString = "./sns-governance-canister.wasm".into();
         std::fs::read(wasm_path).unwrap()
     }
-    fn get_nns_wasm() -> Vec<u8> {
-        let wasm_path: OsString = "./nns.wasm".into();
-        std::fs::read(wasm_path).unwrap()
-    }
 
     #[test]
     #[should_panic(expected = "is out of cycles")]
