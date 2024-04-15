@@ -1,11 +1,15 @@
-use std::collections::BTreeMap;
+use std::collections::{ BTreeMap, HashMap };
 
 use candid::Principal;
 use sns_governance_canister::types::{
     governance::SnsMetadata,
     DefaultFollowees,
+    DisburseMaturityInProgress,
     Governance,
     NervousSystemParameters,
+    Neuron,
+    NeuronId,
+    NeuronPermission,
     NeuronPermissionList,
     VotingRewardsParameters,
 };
@@ -13,11 +17,12 @@ use sns_governance_canister::types::{
 pub fn get_sns_init_args(
     sns_ledger_canister_id: Principal,
     sns_root_canister_id: Principal,
-    sns_swap_canister_id: Principal
+    sns_swap_canister_id: Principal,
+    week: u64 // initializes the sns with week n's data
 ) -> Governance {
     return Governance {
         deployed_version: None,
-        neurons: BTreeMap::new(),
+        neurons: generate_neuron_data_for_week(week),
         proposals: BTreeMap::new(),
         parameters: Some(NervousSystemParameters {
             default_followees: Some(DefaultFollowees {
@@ -54,12 +59,12 @@ pub fn get_sns_init_args(
         }),
         latest_reward_event: None,
         in_flight_commands: BTreeMap::new(),
-        genesis_timestamp_seconds: 1u64,
+        genesis_timestamp_seconds: 1713164693u64,
         metrics: None,
         ledger_canister_id: Some(sns_ledger_canister_id.clone()),
         root_canister_id: Some(sns_root_canister_id.clone()),
         id_to_nervous_system_functions: BTreeMap::new(),
-        mode: 1,
+        mode: 2,
         swap_canister_id: Some(sns_swap_canister_id.clone()),
         sns_metadata: Some(SnsMetadata {
             logo: None,
@@ -72,4 +77,42 @@ pub fn get_sns_init_args(
         is_finalizing_disburse_maturity: None,
         maturity_modulation: None,
     };
+}
+
+pub fn generate_neuron_data_for_week(week: u64) -> BTreeMap<String, Neuron> {
+    let mut neurons = BTreeMap::new();
+
+    neurons.insert(
+        "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208".to_string(),
+        Neuron {
+            id: Some(
+                NeuronId::new(
+                    "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208"
+                ).unwrap()
+            ),
+            permissions: vec![NeuronPermission {
+                principal: Some(Principal::anonymous()),
+                permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+            }],
+            cached_neuron_stake_e8s: 20000u64,
+            neuron_fees_e8s: 10000u64,
+            created_timestamp_seconds: 1713164693,
+            aging_since_timestamp_seconds: 1713164693,
+            followees: BTreeMap::new(),
+            maturity_e8s_equivalent: 100_000 * week,
+            voting_power_percentage_multiplier: 1,
+            source_nns_neuron_id: None,
+            staked_maturity_e8s_equivalent: Some(123456),
+            auto_stake_maturity: Some(false),
+            vesting_period_seconds: Some(100000),
+            disburse_maturity_in_progress: vec![],
+            dissolve_state: Some(
+                sns_governance_canister::types::neuron::DissolveState::WhenDissolvedTimestampSeconds(
+                    100000000000
+                )
+            ),
+        }
+    );
+
+    neurons
 }
