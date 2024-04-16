@@ -64,7 +64,17 @@ pub async fn transfer_rewards(
 ) -> Result<bool, UserClaimErrorResponse> {
     // get the balance of the sub account ( NeuronId is the sub account id )
     let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
-    let amount_to_transfer = balance_of_neuron_id - token_info.fee;
+    if balance_of_neuron_id <= Nat::from(token_info.fee) {
+        return Err(
+            TransferFailed(
+                format!(
+                    "Your balance must be higher than the transfer fee of {}",
+                    Nat::from(token_info.fee)
+                )
+            )
+        );
+    }
+    let amount_to_transfer = balance_of_neuron_id - Nat::from(token_info.fee);
     if amount_to_transfer == Nat::from(0u64) {
         return Err(TransferFailed("no rewards to claim".to_string()));
     }
