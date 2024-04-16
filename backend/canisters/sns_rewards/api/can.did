@@ -51,4 +51,5 @@ service : (Args) -> {
   set_reward_token_types : (SetRewardTokenTypesRequest) -> (
       SetRewardTokenTypesResponse,
     );
+  sync_neurons_manual_trigger : () -> ();
 }

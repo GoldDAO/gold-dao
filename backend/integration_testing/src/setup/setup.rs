@@ -24,8 +24,8 @@ pub fn init() -> TestEnv {
 
     let controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
     let token_ledgers = setup_ledgers(&mut pic, controller);
-    let sns = setup_sns_by_week(&pic, controller, 1);
-    let rewards = setup_rewards_canister(&pic, &token_ledgers, &sns.sns_gov_id);
+    let sns = setup_sns_by_week(&mut pic, controller, 1, None);
+    let rewards = setup_rewards_canister(&mut pic, &token_ledgers, &sns.sns_gov_id);
     TestEnv {
         pic,
         controller,

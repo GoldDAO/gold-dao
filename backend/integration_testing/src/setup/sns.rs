@@ -22,16 +22,23 @@ pub struct SNSTestEnv {
 }
 
 impl SNSTestEnv {
-    pub fn setup_week(&mut self, pic: &PocketIc, controller: Principal, week: u64) {
-        let new_data = setup_sns_by_week(pic, controller, week);
+    pub fn setup_week(
+        &mut self,
+        pic: &mut PocketIc,
+        controller: Principal,
+        week: u64,
+        sns_gov_id: Principal
+    ) {
+        let new_data = setup_sns_by_week(pic, controller, week, Some(sns_gov_id));
         *self = new_data;
     }
 }
 
 pub fn setup_sns_by_week(
-    pic: &PocketIc,
+    pic: &mut PocketIc,
     controller: Principal,
-    week: u64 // initializes the sns with week n's data
+    week: u64, // initializes the sns with week n's data
+    sns_gov_canister_id: Option<Principal>
 ) -> SNSTestEnv {
     let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
     let sns_ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
@@ -51,7 +58,7 @@ pub fn setup_sns_by_week(
             neuron_minimum_stake_e8s: Some(20000u64),
             transaction_fee_e8s: Some(10000u64),
             max_proposals_to_keep_per_action: Some(10),
-            initial_voting_period_seconds: Some(86401),
+            initial_voting_period_seconds: Some(2591000),
             wait_for_quiet_deadline_increase_seconds: Some(60 * 60),
             max_number_of_neurons: Some(1000u64),
             neuron_minimum_dissolve_delay_to_vote_seconds: Some(1u64),
@@ -78,7 +85,7 @@ pub fn setup_sns_by_week(
         }),
         latest_reward_event: None,
         in_flight_commands: BTreeMap::new(),
-        genesis_timestamp_seconds: 1713164693u64,
+        genesis_timestamp_seconds: 1713271942u64,
         metrics: None,
         ledger_canister_id: Some(sns_ledger_canister_id.clone()),
         root_canister_id: Some(sns_root_canister_id.clone()),
@@ -106,12 +113,24 @@ pub fn setup_sns_by_week(
     pic.add_cycles(sns_gov_id, 10_000_000_000_000);
 
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
-    pic.install_canister(
-        sns_gov_id,
-        sns_gov_wasm,
-        encode_one(sns_init_args.clone()).unwrap(),
-        None
-    );
+    if week == 1 {
+        println!("++++++++++ week 1");
+        pic.install_canister(
+            sns_gov_id,
+            sns_gov_wasm,
+            encode_one(sns_init_args.clone()).unwrap(),
+            None
+        );
+    } else {
+        println!("++++++++++ week 2");
+
+        pic.reinstall_canister(
+            sns_gov_canister_id.unwrap().clone(),
+            sns_gov_wasm,
+            encode_one(sns_init_args.clone()).unwrap(),
+            None
+        ).unwrap();
+    }
 
     SNSTestEnv {
         neuron_test_data: neuron_data,
@@ -154,14 +173,14 @@ pub fn generate_neuron_data_for_week(week: u64) -> (BTreeMap<String, Neuron>, Ve
                 }
             ],
             cached_neuron_stake_e8s: 20000u64,
-            neuron_fees_e8s: 10000u64,
-            created_timestamp_seconds: 1713164693,
-            aging_since_timestamp_seconds: 1713164693,
+            neuron_fees_e8s: 0u64,
+            created_timestamp_seconds: 1713271942,
+            aging_since_timestamp_seconds: 1713271942,
             followees: BTreeMap::new(),
             maturity_e8s_equivalent: 100_000 * week,
             voting_power_percentage_multiplier: 1,
             source_nns_neuron_id: None,
-            staked_maturity_e8s_equivalent: Some(123456),
+            staked_maturity_e8s_equivalent: Some(100000),
             auto_stake_maturity: Some(false),
             vesting_period_seconds: Some(100000),
             disburse_maturity_in_progress: vec![],

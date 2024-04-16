@@ -1,8 +1,14 @@
+use std::{ borrow::BorrowMut, thread, time::Duration };
+
 use candid::{ CandidType, Deserialize, Principal };
+use pocket_ic::PocketIc;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
-use crate::{ client::rewards::get_all_neurons, setup::setup::{ init, TestEnv } };
+use crate::{
+    client::rewards::{ get_all_neurons, get_neuron_by_id, sync_neurons_manual_trigger },
+    setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
+};
 
 #[derive(Deserialize, CandidType, Serialize)]
 pub struct GetNeuronRequest {
@@ -12,11 +18,37 @@ pub struct GetNeuronRequest {
 #[test]
 fn synchronise_neurons_happy_path() {
     let env = init();
-    let TestEnv { pic, controller, token_ledgers, sns, rewards } = env;
+    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
+    sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+    pic.advance_time(Duration::from_secs(20));
+    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
+    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
 
-    let res = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
+    let single_neuron = get_neuron_by_id(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    ).unwrap();
+    println!("///////////////// accum {}", single_neuron.accumulated_maturity);
+    println!("///////////////// last synced {}", single_neuron.last_synced_maturity);
 
-    assert_eq!(res as usize, sns.neuron_test_data.len())
+    sns.setup_week(&mut pic, controller, 2, sns.sns_gov_id.clone());
+    pic.advance_time(Duration::from_secs(60 * 60 * 25));
+    sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+
+    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
+    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
+
+    let single_neuron = get_neuron_by_id(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    ).unwrap();
+    println!("///////////////// accum {}", single_neuron.accumulated_maturity);
+    println!("///////////////// last synced {}", single_neuron.last_synced_maturity);
+    assert_eq!(true, false);
     // synchronise should have 10 neurons
     // let num_neurons: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
     //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),

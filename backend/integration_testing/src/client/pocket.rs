@@ -57,7 +57,7 @@ pub fn execute_query<P: CandidType, R: CandidType + DeserializeOwned>(
 }
 
 pub fn execute_update<P: CandidType, R: CandidType + DeserializeOwned>(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     sender: Principal,
     canister_id: CanisterId,
     method_name: &str,

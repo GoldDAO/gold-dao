@@ -16,7 +16,7 @@ pub struct Args {
 }
 
 pub fn setup_rewards_canister(
-    pic: &PocketIc,
+    pic: &mut PocketIc,
     token_ledgers: &CanisterIds,
     sns_canister_id: &Principal
 ) -> Principal {
