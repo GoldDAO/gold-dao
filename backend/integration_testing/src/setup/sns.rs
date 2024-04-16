@@ -40,6 +40,7 @@ pub fn setup_sns_by_week(
     week: u64, // initializes the sns with week n's data
     sns_gov_canister_id: Option<Principal>
 ) -> SNSTestEnv {
+    println!("--- week {:?}", week);
     let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
     let sns_ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
     let sns_swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
@@ -114,7 +115,6 @@ pub fn setup_sns_by_week(
 
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
     if week == 1 {
-        println!("++++++++++ week 1");
         pic.install_canister(
             sns_gov_id,
             sns_gov_wasm,
@@ -122,7 +122,9 @@ pub fn setup_sns_by_week(
             None
         );
     } else {
-        println!("++++++++++ week 2");
+        println!("++++++++++ week {} ", week);
+
+        pic.stop_canister(sns_gov_canister_id.unwrap().clone(), None).unwrap();
 
         pic.reinstall_canister(
             sns_gov_canister_id.unwrap().clone(),
@@ -130,6 +132,8 @@ pub fn setup_sns_by_week(
             encode_one(sns_init_args.clone()).unwrap(),
             None
         ).unwrap();
+
+        pic.start_canister(sns_gov_canister_id.unwrap().clone(), None).unwrap();
     }
 
     SNSTestEnv {

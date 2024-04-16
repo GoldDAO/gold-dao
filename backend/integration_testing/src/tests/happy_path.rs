@@ -19,10 +19,42 @@ pub struct GetNeuronRequest {
 fn synchronise_neurons_happy_path() {
     let env = init();
     let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+    let sns_gov_id = sns.sns_gov_id.clone();
+    // week 1
+    // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+    // pic.advance_time(Duration::from_secs(20));
+
+    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
+    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
+
+    let single_neuron = get_neuron_by_id(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    ).unwrap();
+    assert_eq!(single_neuron.accumulated_maturity, 0);
+
+    // week 2
+    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
+    // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+    pic.tick();
+
+    let single_neuron = get_neuron_by_id(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    ).unwrap();
+    assert_eq!(single_neuron.accumulated_maturity, 100_000);
+
+    // week 3
+    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
+    // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+    pic.tick();
     pic.advance_time(Duration::from_secs(20));
-    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
-    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
 
     let single_neuron = get_neuron_by_id(
         &pic,
@@ -30,32 +62,7 @@ fn synchronise_neurons_happy_path() {
         rewards,
         &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
     ).unwrap();
-    println!("///////////////// accum {}", single_neuron.accumulated_maturity);
-    println!("///////////////// last synced {}", single_neuron.last_synced_maturity);
-
-    sns.setup_week(&mut pic, controller, 2, sns.sns_gov_id.clone());
-    pic.advance_time(Duration::from_secs(60 * 60 * 25));
-    sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
-
-    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
-    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
-
-    let single_neuron = get_neuron_by_id(
-        &pic,
-        Principal::anonymous(),
-        rewards,
-        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
-    ).unwrap();
-    println!("///////////////// accum {}", single_neuron.accumulated_maturity);
-    println!("///////////////// last synced {}", single_neuron.last_synced_maturity);
-    assert_eq!(true, false);
-    // synchronise should have 10 neurons
-    // let num_neurons: usize = match query_call(&pic, rewards_canister, "get_all_neurons") {
-    //     WasmResult::Reply(bytes) => decode_one(bytes.as_slice()).unwrap(),
-    //     WasmResult::Reject(_) => {
-    //         return;
-    //     }
-    // };
+    assert_eq!(single_neuron.accumulated_maturity, 200_000);
 }
 
 // 10T cycles
