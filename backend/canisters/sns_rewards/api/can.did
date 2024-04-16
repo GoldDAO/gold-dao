@@ -1,4 +1,10 @@
-type Args = record { test_mode : bool; pocket_ic : bool };
+type Args = record {
+  sns_gov_canister_id : principal;
+  test_mode : bool;
+  ogy_ledger_canister_id : principal;
+  icp_ledger_canister_id : principal;
+  sns_ledger_canister_id : principal;
+};
 type NeuronId = record { id : vec nat8 };
 type Result = variant { Ok : NeuronId; Err : UserClaimErrorResponse };
 type Result_1 = variant { Ok : bool; Err : UserClaimErrorResponse };
