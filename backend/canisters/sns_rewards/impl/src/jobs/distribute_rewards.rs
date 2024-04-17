@@ -100,11 +100,11 @@ pub async fn create_new_payment_rounds() {
     for (token, token_info) in reward_tokens.into_iter() {
         let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
 
-        if is_test_mode {
-            if token == TokenSymbol::parse("ICP").unwrap() {
-                reward_pool_balance = Nat::from(33_300_000_000u64);
-            }
-        }
+        // if is_test_mode {
+        //     if token == TokenSymbol::parse("ICP").unwrap() {
+        //         reward_pool_balance = Nat::from(33_300_000_000u64);
+        //     }
+        // }
 
         if reward_pool_balance == Nat::from(0u64) {
             info!(

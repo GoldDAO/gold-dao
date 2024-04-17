@@ -16,7 +16,7 @@ mod utils;
 mod guards;
 mod jobs;
 mod lifecycle;
-mod model;
+pub mod model;
 mod queries;
 mod state;
 mod memory;

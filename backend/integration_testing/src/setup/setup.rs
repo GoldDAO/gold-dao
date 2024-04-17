@@ -1,7 +1,8 @@
 use candid::Principal;
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use pocket_ic::{ PocketIc, PocketIcBuilder };
 
-use crate::{ utils::random_principal, CanisterIds };
+use crate::{ client::icrc1::happy_path::transfer, utils::random_principal, CanisterIds };
 
 use super::{
     ledger::setup_ledgers,
@@ -26,11 +27,33 @@ pub fn init() -> TestEnv {
     let token_ledgers = setup_ledgers(&mut pic, controller);
     let sns = setup_sns_by_week(&mut pic, controller, 1, None);
     let rewards = setup_rewards_canister(&mut pic, &token_ledgers, &sns.sns_gov_id);
+
+    setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000);
     TestEnv {
         pic,
         controller,
         token_ledgers,
         sns,
         rewards,
+    }
+}
+
+pub fn setup_reward_pools(
+    mut pic: &mut PocketIc,
+    minting_account: Principal,
+    reward_canister_id: Principal,
+    canister_ids: CanisterIds,
+    amount: u64
+) {
+    let reward_account = Account {
+        owner: reward_canister_id,
+        subaccount: Some([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0,
+        ]),
+    };
+
+    for canister_id in canister_ids.into_iter() {
+        transfer(&mut pic, minting_account, canister_id, reward_account, amount.into()).unwrap();
     }
 }

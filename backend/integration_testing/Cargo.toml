@@ -11,10 +11,9 @@ pocket-ic = {workspace = true}
 candid = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-types = { path = '../libraries/types' }
+types = { path = "../libraries/types" }
 utils = { path = '../libraries/utils' }
 serde_yaml = { workspace = true }
-
 canister_logger = { path = '../libraries/canister_logger' }
 canister_state_macros = { path = '../libraries/canister_state_macros' }
 canister_time = { path = '../libraries/canister_time' }
@@ -36,3 +35,5 @@ icrc_ledger_canister = { path = "../external_canisters/icrc_ledger/api" }
 num-bigint = {workspace = true}
 rand = "0.8.5"
 lazy_static = "1.4.0"
+hex = "0.4"
+sns_rewards = { path = '../canisters/sns_rewards/impl'}

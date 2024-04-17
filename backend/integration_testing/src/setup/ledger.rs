@@ -47,7 +47,7 @@ pub fn setup_ledgers(pic: &PocketIc, controller: Principal) -> CanisterIds {
 pub fn generate_ledger_canister_init_args(token: &str, controller: Principal) -> LedgerArgument {
     let payload = LedgerArgument::Init(InitArgs {
         minting_account: Account::from(controller),
-        initial_balances: Vec::new(),
+        initial_balances: vec![(Account::from(controller), Nat::from(1_000_000_000_000_000u64))],
         transfer_fee: Nat::from(10000u64),
         token_name: token.into(),
         token_symbol: token.into(),

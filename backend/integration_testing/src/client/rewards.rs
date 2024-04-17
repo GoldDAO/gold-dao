@@ -29,3 +29,11 @@ pub mod sync_neurons_manual_trigger {
     pub type Args = ();
     pub type Response = ();
 }
+
+pub mod get_active_payment_rounds {
+    use sns_rewards::model::payment_processor::PaymentRound;
+
+    use super::*;
+    pub type Args = ();
+    pub type Response = Vec<PaymentRound>;
+}
