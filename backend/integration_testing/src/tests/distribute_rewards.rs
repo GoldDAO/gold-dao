@@ -22,7 +22,10 @@ use crate::{
             sync_user_rewards,
         },
     },
-    setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
+    setup::{
+        setup::{ init, setup_reward_pools, TestEnv },
+        sns::{ generate_neuron_data_for_week, setup_sns_by_week },
+    },
     utils::{ decode_http_bytes, hex_to_subaccount },
 };
 
@@ -135,17 +138,6 @@ fn test_distribute_rewards_happy_path() {
     pic.tick();
     pic.tick();
 
-    // let single_neuron = get_neuron_by_id(
-    //     &pic,
-    //     Principal::anonymous(),
-    //     rewards,
-    //     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
-    // ).unwrap();
-    // assert_eq!(single_neuron.accumulated_maturity, 100_000);
-    // println!("{:?}", single_neuron);
-    // let icpToken = TokenSymbol::parse("ICP").unwrap();
-    // println!("{:?}", single_neuron.rewarded_maturity.get(&icpToken));
-
     // all neurons have the same accumulated maturity
     let fees = (sns.neuron_test_data.len() as u64) * 10_000 + 10_000;
     let amount_to_distribute = (100_000_000_000u64 - fees) as f64;
@@ -164,69 +156,158 @@ fn test_distribute_rewards_happy_path() {
     let neuron_icp_balance = balance_of(&pic, token_ledgers.icp_ledger_id, neuron_sub_account);
     assert_eq!(neuron_icp_balance, expected_reward);
 
+    pic.tick();
+    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    // add new rewards
+    // top up the reward pools again
+    setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
+    pic.tick();
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 3));
+    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+
+    let neuron_sub_account = Account {
+        owner: rewards,
+        subaccount: Some(
+            hex_to_subaccount("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208")
+        ),
+    };
+    let neuron_icp_balance = balance_of(&pic, token_ledgers.icp_ledger_id, neuron_sub_account);
+    assert_eq!(neuron_icp_balance, expected_reward * 2);
     // let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
     // println!("{:?}", p);
-    let res = http_request(
-        &pic,
-        Principal::anonymous(),
-        rewards,
-        &(types::HttpRequest {
-            method: "GET".to_string(),
-            url: "/trace".to_string(),
-            headers: vec![],
-            body: ByteBuf::new(),
-        })
-    );
-    println!("{}", decode_http_bytes(res.body.into_vec()));
-    // assert_eq!(true, false);
-    // assert_eq!(expected_reward, neuron_icp_balance);
-
-    // let token_info = TokenInfo {
-    //     ledger_id: token_ledgers.icp_ledger_id,
-    //     fee: 10_000u64,
-    //     decimals: 8u64,
-    // };
-    // let token = TokenSymbol::parse("ICP").unwrap();
-    // let neuron_data: BTreeMap<NeuronId, Neuron> = BTreeMap::new();
-    // for (_, neuron) in sns.neuron_test_data {
-    //     let n_info =
-    //     neuron_data.insert(neuron.id.unwrap(), neuron);
-    // }
-
-    // let icp_payment_round = PaymentRound::new(
-    //     1,
-    //     Nat::from(100_000_000_000u64),
-    //     token_info,
-    //     token,
-    //     neuron_data
-    // ).unwrap();
-
-    // // week 2
-    // sns.setup_week(&mut pic, controller, 2, sns_gov_id);
-    // pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
-    // // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
-    // pic.tick();
-
-    // let single_neuron = get_neuron_by_id(
+    // let res = http_request(
     //     &pic,
     //     Principal::anonymous(),
     //     rewards,
-    //     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
-    // ).unwrap();
-    // assert_eq!(single_neuron.accumulated_maturity, 100_000);
-
-    // // week 3
-    // sns.setup_week(&mut pic, controller, 3, sns_gov_id);
-    // pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
-    // // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
-    // pic.tick();
-    // pic.advance_time(Duration::from_secs(20));
-
-    // let single_neuron = get_neuron_by_id(
-    //     &pic,
-    //     Principal::anonymous(),
-    //     rewards,
-    //     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
-    // ).unwrap();
-    // assert_eq!(single_neuron.accumulated_maturity, 200_000);
+    //     &(types::HttpRequest {
+    //         method: "GET".to_string(),
+    //         url: "/trace".to_string(),
+    //         headers: vec![],
+    //         body: ByteBuf::new(),
+    //     })
+    // );
+    // println!("{}", decode_http_bytes(res.body.into_vec()));
 }
+
+// assert_eq!(true, false);
+// assert_eq!(expected_reward, neuron_icp_balance);
+
+// let token_info = TokenInfo {
+//     ledger_id: token_ledgers.icp_ledger_id,
+//     fee: 10_000u64,
+//     decimals: 8u64,
+// };
+// let token = TokenSymbol::parse("ICP").unwrap();
+// let neuron_data: BTreeMap<NeuronId, Neuron> = BTreeMap::new();
+// for (_, neuron) in sns.neuron_test_data {
+//     let n_info =
+//     neuron_data.insert(neuron.id.unwrap(), neuron);
+// }
+
+// let icp_payment_round = PaymentRound::new(
+//     1,
+//     Nat::from(100_000_000_000u64),
+//     token_info,
+//     token,
+//     neuron_data
+// ).unwrap();
+
+// // week 2
+// sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+// pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
+// // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+// pic.tick();
+
+// let single_neuron = get_neuron_by_id(
+//     &pic,
+//     Principal::anonymous(),
+//     rewards,
+//     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+// ).unwrap();
+// assert_eq!(single_neuron.accumulated_maturity, 100_000);
+
+// // week 3
+// sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+// pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
+// // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
+// pic.tick();
+// pic.advance_time(Duration::from_secs(20));
+
+// let single_neuron = get_neuron_by_id(
+//     &pic,
+//     Principal::anonymous(),
+//     rewards,
+//     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+// ).unwrap();
+// assert_eq!(single_neuron.accumulated_maturity, 200_000);
