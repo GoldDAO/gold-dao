@@ -37,3 +37,4 @@ rand = "0.8.5"
 lazy_static = "1.4.0"
 hex = "0.4"
 sns_rewards = { path = '../canisters/sns_rewards/impl'}
+serde_bytes = { workspace = true }

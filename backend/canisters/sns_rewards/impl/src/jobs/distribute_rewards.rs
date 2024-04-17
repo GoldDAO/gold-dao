@@ -41,7 +41,7 @@ const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
 const MAX_RETRIES: u8 = 3;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
+    run_interval(Duration::from_millis(WEEK_IN_MS), run_distribution);
 }
 
 pub fn run_distribution() {

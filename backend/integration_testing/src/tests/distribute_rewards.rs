@@ -4,15 +4,23 @@ use candid::{ CandidType, Deserialize, Nat, Principal };
 use canister_time::WEEK_IN_MS;
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use num_bigint::ToBigUint;
-use pocket_ic::PocketIc;
+use pocket_ic::{ call_candid, PocketIc };
 use serde::Serialize;
 use sns_governance_canister::types::{ Neuron, NeuronId };
 use types::TokenSymbol;
+use serde_bytes::ByteBuf;
 
 use crate::{
     client::{
         icrc1::happy_path::balance_of,
-        rewards::{ get_all_neurons, get_neuron_by_id, sync_neurons_manual_trigger },
+        rewards::{
+            get_active_payment_rounds,
+            get_all_neurons,
+            get_neuron_by_id,
+            http_request,
+            sync_neurons_manual_trigger,
+            sync_user_rewards,
+        },
     },
     setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
     utils::hex_to_subaccount,
@@ -49,11 +57,14 @@ fn test_distribute_rewards_happy_path() {
 
     // simulate neuron maturity change & allow 1 day for synchronise_neurons to process the change
     sns.setup_week(&mut pic, controller, 2, sns_gov_id);
-    pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     pic.tick();
 
     // simulate distribute_rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 168 + 60)); // 1 week + 30 seconds
+    pic.advance_time(Duration::from_secs(60 * 60 * 300)); // 6 days & 1 hour - full week + 1 hour
+    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+
+    // sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
     pic.tick();
 
     let single_neuron = get_neuron_by_id(
@@ -63,6 +74,7 @@ fn test_distribute_rewards_happy_path() {
         &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 100_000);
+    println!("{:?}", single_neuron);
     let icpToken = TokenSymbol::parse("ICP").unwrap();
     println!("{:?}", single_neuron.rewarded_maturity.get(&icpToken));
 
@@ -82,6 +94,21 @@ fn test_distribute_rewards_happy_path() {
         ),
     };
     let neuron_icp_balance = balance_of(&pic, token_ledgers.icp_ledger_id, neuron_sub_account);
+
+    let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
+    println!("{:?}", p);
+    let res = http_request(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &(types::HttpRequest {
+            method: "GET".to_string(),
+            url: "/trace".to_string(),
+            headers: vec![],
+            body: ByteBuf::new(),
+        })
+    );
+    println!("{:?}", res);
     assert_eq!(expected_reward, neuron_icp_balance);
 
     // let token_info = TokenInfo {
