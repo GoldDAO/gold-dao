@@ -78,7 +78,7 @@ async fn handle_gldgov_distribution() {
     // check the reserve pool has enough GLDGov to correctly transfer
     match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await {
         Ok(balance) => {
-            if balance <= amount_to_transfer.clone() + gldgov_token_info.fee {
+            if balance < amount_to_transfer.clone() + gldgov_token_info.fee {
                 debug!(
                     "Balance of reserve pool : {} is too low to make a transfer of {} plus a fee of {} ",
                     balance,
