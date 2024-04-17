@@ -12,9 +12,7 @@ lazy_static! {
 }
 
 fn get_rewards_canister_wasm() -> Vec<u8> {
-    let wasm_path: OsString =
-        "../canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards.wasm".into();
-    std::fs::read(wasm_path).unwrap()
+    read_file_from_local_bin(&format!("sns_rewards_canister.wasm.gz"))
 }
 
 fn get_canister_wasm(canister_name: &str) -> CanisterWasm {

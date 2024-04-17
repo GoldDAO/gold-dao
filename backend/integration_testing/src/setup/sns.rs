@@ -125,14 +125,14 @@ pub fn setup_sns_by_week(
         println!("++++++++++ week {} ", week);
 
         pic.stop_canister(sns_gov_canister_id.unwrap().clone(), None).unwrap();
-
+        pic.tick();
         pic.reinstall_canister(
             sns_gov_canister_id.unwrap().clone(),
             sns_gov_wasm,
             encode_one(sns_init_args.clone()).unwrap(),
             None
         ).unwrap();
-
+        pic.tick();
         pic.start_canister(sns_gov_canister_id.unwrap().clone(), None).unwrap();
     }
 

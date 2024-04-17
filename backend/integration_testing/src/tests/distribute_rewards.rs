@@ -3,6 +3,7 @@ use std::{ borrow::BorrowMut, collections::BTreeMap, thread, time::Duration };
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canister_time::WEEK_IN_MS;
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+use num_bigint::ToBigUint;
 use pocket_ic::PocketIc;
 use serde::Serialize;
 use sns_governance_canister::types::{ Neuron, NeuronId };
