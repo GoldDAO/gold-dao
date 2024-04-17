@@ -21,3 +21,8 @@ pub fn hex_to_subaccount(hx_str: &str) -> Subaccount {
         }
     };
 }
+
+pub fn decode_http_bytes(bytes: Vec<u8>) -> String {
+    let decoded_string = String::from_utf8_lossy(&bytes);
+    decoded_string.to_string()
+}

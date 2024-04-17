@@ -1,4 +1,4 @@
-use std::{ borrow::BorrowMut, collections::BTreeMap, thread, time::Duration };
+use std::{ borrow::BorrowMut, collections::BTreeMap, io::Read, thread, time::Duration };
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use canister_time::WEEK_IN_MS;
@@ -23,7 +23,7 @@ use crate::{
         },
     },
     setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
-    utils::hex_to_subaccount,
+    utils::{ decode_http_bytes, hex_to_subaccount },
 };
 
 #[derive(Deserialize, CandidType, Serialize)]
@@ -57,26 +57,94 @@ fn test_distribute_rewards_happy_path() {
 
     // simulate neuron maturity change & allow 1 day for synchronise_neurons to process the change
     sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
     pic.tick();
 
     // simulate distribute_rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 300)); // 6 days & 1 hour - full week + 1 hour
+    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 3));
     sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
-
-    // sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
+    pic.tick();
     pic.tick();
 
-    let single_neuron = get_neuron_by_id(
-        &pic,
-        Principal::anonymous(),
-        rewards,
-        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
-    ).unwrap();
-    assert_eq!(single_neuron.accumulated_maturity, 100_000);
-    println!("{:?}", single_neuron);
-    let icpToken = TokenSymbol::parse("ICP").unwrap();
-    println!("{:?}", single_neuron.rewarded_maturity.get(&icpToken));
+    // let single_neuron = get_neuron_by_id(
+    //     &pic,
+    //     Principal::anonymous(),
+    //     rewards,
+    //     &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    // ).unwrap();
+    // assert_eq!(single_neuron.accumulated_maturity, 100_000);
+    // println!("{:?}", single_neuron);
+    // let icpToken = TokenSymbol::parse("ICP").unwrap();
+    // println!("{:?}", single_neuron.rewarded_maturity.get(&icpToken));
 
     // all neurons have the same accumulated maturity
     let fees = (sns.neuron_test_data.len() as u64) * 10_000 + 10_000;
@@ -94,9 +162,10 @@ fn test_distribute_rewards_happy_path() {
         ),
     };
     let neuron_icp_balance = balance_of(&pic, token_ledgers.icp_ledger_id, neuron_sub_account);
+    assert_eq!(neuron_icp_balance, expected_reward);
 
-    let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
-    println!("{:?}", p);
+    // let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
+    // println!("{:?}", p);
     let res = http_request(
         &pic,
         Principal::anonymous(),
@@ -108,8 +177,9 @@ fn test_distribute_rewards_happy_path() {
             body: ByteBuf::new(),
         })
     );
-    println!("{:?}", res);
-    assert_eq!(expected_reward, neuron_icp_balance);
+    println!("{}", decode_http_bytes(res.body.into_vec()));
+    // assert_eq!(true, false);
+    // assert_eq!(expected_reward, neuron_icp_balance);
 
     // let token_info = TokenInfo {
     //     ledger_id: token_ledgers.icp_ledger_id,

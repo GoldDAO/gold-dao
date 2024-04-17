@@ -95,16 +95,9 @@ pub async fn distribute_rewards(retry_attempt: u8) {
 pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
     let new_round_key = read_state(|state| state.data.payment_processor.next_key());
-    let is_test_mode = read_state(|s| s.env.is_test_mode());
 
     for (token, token_info) in reward_tokens.into_iter() {
-        let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
-
-        // if is_test_mode {
-        //     if token == TokenSymbol::parse("ICP").unwrap() {
-        //         reward_pool_balance = Nat::from(33_300_000_000u64);
-        //     }
-        // }
+        let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
 
         if reward_pool_balance == Nat::from(0u64) {
             info!(
@@ -216,7 +209,8 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let total_to_transfer = round.round_funds_total.clone();
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
-
+    debug!("TOTAL {}", total_to_transfer);
+    debug!("TRANSACTION FEES {}", round.fees);
     let from_sub_account = REWARD_POOL_SUB_ACCOUNT;
     let account = Account {
         owner: ic_cdk::api::id(),
