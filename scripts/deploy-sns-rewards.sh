@@ -68,6 +68,8 @@ ARGS='(record {
   sns_gov_canister_id = principal "'$SNS_GOVERNANCE_CANISTER_ID'"
   })'
 
+echo "Deployment arguments: \n" $ARGS
+
 if [[ $1 == "local" ]]; then
   dfx deploy sns_rewards --network $1 ${REINSTALL} --argument $ARGS -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^sns_rewards-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
