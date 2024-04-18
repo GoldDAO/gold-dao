@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.17.0@sha256:5c939c840efdca76e885a5b89b77172ed04404faa770c74632005262e1bcc698
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.19.0@sha256:d50c09892e278e03cdf3789a72233638b479a97c8f455a191f6337f9a9409307
   tags:
     - docker
   interruptible: true
