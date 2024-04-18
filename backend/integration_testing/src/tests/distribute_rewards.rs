@@ -1,25 +1,36 @@
-use std::{ borrow::BorrowMut, collections::BTreeMap, io::Read, thread, time::Duration };
+use std::{
+    borrow::BorrowMut,
+    collections::BTreeMap,
+    io::Read,
+    mem::zeroed,
+    thread,
+    time::Duration,
+};
 
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{ encode_args, encode_one, CandidType, Deserialize, Nat, Principal };
 use canister_time::WEEK_IN_MS;
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use num_bigint::ToBigUint;
 use pocket_ic::{ call_candid, PocketIc };
 use serde::Serialize;
 use sns_governance_canister::types::{ Neuron, NeuronId };
+use sns_rewards::model::payment_processor::PaymentRound;
 use types::TokenSymbol;
 use serde_bytes::ByteBuf;
 
 use crate::{
     client::{
         icrc1::happy_path::balance_of,
+        pocket::execute_query,
         rewards::{
             get_active_payment_rounds,
             get_all_neurons,
+            get_historic_payment_round,
             get_neuron_by_id,
             http_request,
             sync_neurons_manual_trigger,
             sync_user_rewards,
+            A,
         },
     },
     setup::{
@@ -40,6 +51,9 @@ fn test_distribute_rewards_happy_path() {
     let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
     let sns_gov_id = sns.sns_gov_id.clone();
 
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let ogy_token = TokenSymbol::parse("OGY").unwrap();
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
     // ********************************
     // 1. Check all reward pools have a balance
     // ********************************
@@ -122,6 +136,37 @@ fn test_distribute_rewards_happy_path() {
     };
     let neuron_icp_balance = balance_of(&pic, token_ledgers.icp_ledger_id, neuron_sub_account);
     assert_eq!(neuron_icp_balance, expected_reward * 2);
+
+    // ********************************
+    // 4. There should be no active payment rounds
+    // ********************************
+
+    let active_payment_rounds = get_active_payment_rounds(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &()
+    );
+    assert_eq!(active_payment_rounds.len(), 0);
+
+    // ********************************
+    // 4. neuron should have rewared maturity
+    // ********************************
+
+    let single_neuron = get_neuron_by_id(
+        &pic,
+        Principal::anonymous(),
+        rewards,
+        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+    ).unwrap();
+    let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token).unwrap();
+    let rewarded_mat_ogy = single_neuron.rewarded_maturity.get(&ogy_token).unwrap();
+    let rewarded_mat_gldgov = single_neuron.rewarded_maturity.get(&gldgov_token).unwrap();
+    assert_eq!(rewarded_mat_icp, &200_000u64);
+    assert_eq!(rewarded_mat_ogy, &200_000u64);
+    assert_eq!(rewarded_mat_gldgov, &200_000u64);
+
+    // ********************************
 }
 
 // assert_eq!(true, false);
@@ -191,3 +236,21 @@ fn test_distribute_rewards_happy_path() {
 
 // let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
 // println!("{:?}", p);
+
+// ********************************
+// 4. There should be 2 historic rounds for each token type
+// let historic_payment_round = get_historic_payment_round(
+//     &pic,
+//     Principal::anonymous(),
+//     rewards,
+//     &("ICP".to_string(), 1)
+// );
+
+// let historic_payment_round: Vec<(u16, PaymentRound)> = execute_query(
+//     &pic,
+//     Principal::anonymous(),
+//     rewards,
+//     "get_historic_payment_round",
+//     &encode_args((icp_token, 1)).unwrap()
+// );
+// assert_eq!(historic_payment_round.len(), 1)

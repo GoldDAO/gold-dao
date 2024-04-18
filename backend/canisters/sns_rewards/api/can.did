@@ -6,6 +6,19 @@ type Args = record {
   sns_ledger_canister_id : principal;
 };
 type NeuronId = record { id : vec nat8 };
+type PaymentRound = record {
+  id : nat16;
+  round_funds_total : nat;
+  token : text;
+  tokens_to_distribute : nat;
+  payments : vec record { NeuronId; record { nat; PaymentStatus; nat64 } };
+  total_neuron_maturity : nat64;
+  fees : nat;
+  ledger_id : principal;
+  date_initialized : nat64;
+  retries : nat8;
+};
+type PaymentStatus = variant { Failed : text; Triggered; Completed; Pending };
 type Result = variant { Ok : NeuronId; Err : UserClaimErrorResponse };
 type Result_1 = variant { Ok : bool; Err : UserClaimErrorResponse };
 type Result_2 = variant { Ok : bool; Err : text };
@@ -42,6 +55,9 @@ type UserClaimErrorResponse = variant {
 service : (Args) -> {
   add_neuron_ownership : (NeuronId) -> (Result);
   claim_reward : (NeuronId, text) -> (Result_1);
+  get_historic_payment_round : (text, nat16) -> (
+      vec record { nat16; PaymentRound },
+    ) query;
   get_neurons_by_owner : () -> (opt vec NeuronId) query;
   read : () -> (Result_2);
   remove_neuron_ownership : (NeuronId) -> (Result);

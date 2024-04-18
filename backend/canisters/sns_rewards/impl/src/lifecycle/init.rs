@@ -51,7 +51,7 @@ fn init(args: Args) {
                 fee: 100_000u64,
                 decimals: 8u64,
             });
-            data.daily_reserve_transfer.insert(token, Nat::from(10000u64));
+            data.daily_reserve_transfer.insert(token, Nat::from(100_000_000u64));
         }
 
         data.sns_governance_canister = args.sns_gov_canister_id;
