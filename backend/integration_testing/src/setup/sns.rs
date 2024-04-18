@@ -143,8 +143,8 @@ pub fn setup_sns_by_week(
 pub fn generate_neuron_data_for_week(week: u64) -> (BTreeMap<String, Neuron>, Vec<Principal>) {
     let mut neurons = BTreeMap::new();
 
-    let user_1 = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-    let user_2 = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+    let user_1 = Principal::from_slice(&[0, 0, 0, 1, 0, 1, 0, 1, 0, 1]);
+    let user_2 = Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2]);
     let neuron_ids = vec![
         "146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208",
         "266f48a2d7c7f7852ed3facedd0b7d86a7316f52b8878f5c0332fd100be89316",

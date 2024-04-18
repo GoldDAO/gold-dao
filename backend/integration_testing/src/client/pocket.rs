@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use crate::T;
-use candid::{ CandidType, Principal };
+use candid::{ utils::ArgumentDecoder, CandidType, Principal };
 use pocket_ic::{ PocketIc, UserError, WasmResult };
 use serde::de::DeserializeOwned;
 use types::CanisterId;
@@ -65,6 +65,15 @@ pub fn execute_update<P: CandidType, R: CandidType + DeserializeOwned>(
 ) -> R {
     unwrap_response(
         pic.update_call(canister_id, sender, method_name, candid::encode_one(payload).unwrap())
+    )
+}
+
+pub fn execute_update_multi_args<
+    P: CandidType + candid::utils::ArgumentEncoder,
+    R: CandidType + DeserializeOwned
+>(pic: &PocketIc, sender: Principal, canister_id: CanisterId, method_name: &str, payload: P) -> R {
+    unwrap_response(
+        pic.update_call(canister_id, sender, method_name, candid::encode_args(payload).unwrap())
     )
 }
 

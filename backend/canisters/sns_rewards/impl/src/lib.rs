@@ -12,7 +12,7 @@ use updates::{
     set_reward_token_types::{ SetRewardTokenTypesRequest, SetRewardTokenTypesResponse },
 };
 
-mod types;
+pub mod types;
 pub mod consts;
 mod utils;
 mod guards;

@@ -10,12 +10,40 @@ generate_pocket_update_call!(sync_neurons_manual_trigger);
 generate_pocket_query_call!(get_active_payment_rounds);
 generate_pocket_update_call!(sync_user_rewards);
 generate_pocket_query_call!(http_request);
-generate_pocket_query_call!(get_historic_payment_round);
+generate_pocket_update_call!(add_neuron_ownership);
+generate_pocket_update_call!(remove_neuron_ownership);
+generate_pocket_update_call!(claim_reward);
 // Updates
 // generate_update_call!(icrc1_transfer);
+pub mod claim_reward {
+    use sns_governance_canister::types::NeuronId;
+    use sns_rewards::types::claim_neuron_response::UserClaimErrorResponse;
 
-#[derive(Serialize, Deserialize, CandidType)]
-pub struct A(pub String, pub u16);
+    use super::*;
+
+    pub type Args = (NeuronId, String);
+    pub type Response = Result<bool, UserClaimErrorResponse>;
+}
+
+pub mod add_neuron_ownership {
+    use sns_governance_canister::types::NeuronId;
+    use sns_rewards::types::claim_neuron_response::UserClaimErrorResponse;
+
+    use super::*;
+
+    pub type Args = NeuronId;
+    pub type Response = Result<NeuronId, UserClaimErrorResponse>;
+}
+
+pub mod remove_neuron_ownership {
+    use sns_governance_canister::types::NeuronId;
+    use sns_rewards::types::claim_neuron_response::UserClaimErrorResponse;
+
+    use super::*;
+
+    pub type Args = NeuronId;
+    pub type Response = Result<NeuronId, UserClaimErrorResponse>;
+}
 
 pub mod get_all_neurons {
     use super::*;
@@ -62,16 +90,4 @@ pub mod http_request {
 
     pub type Args = HttpRequest;
     pub type Response = HttpResponse;
-}
-
-pub mod get_historic_payment_round {
-    use candid::CandidType;
-    use serde::{ Deserialize, Serialize };
-    use sns_rewards::model::payment_processor::PaymentRound;
-    use types::TokenSymbol;
-
-    use super::*;
-
-    pub type Args = (String, u16);
-    pub type Response = Vec<(u16, PaymentRound)>;
 }

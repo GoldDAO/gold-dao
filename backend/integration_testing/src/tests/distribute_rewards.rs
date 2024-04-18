@@ -25,12 +25,10 @@ use crate::{
         rewards::{
             get_active_payment_rounds,
             get_all_neurons,
-            get_historic_payment_round,
             get_neuron_by_id,
             http_request,
             sync_neurons_manual_trigger,
             sync_user_rewards,
-            A,
         },
     },
     setup::{
