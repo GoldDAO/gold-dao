@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### [1.0.0] - 2024-04-18
 
 #### Description
-This release marks the first release of the SNS Rewards ( sns_rewards canister ). The sns_rewards calculates each GLDGov neuron's contribution as a percentage of the total for a given period. With the percentage we then and subsequently transfer any of the DAO's treasury neuron rewards based on said percentage.
+This marks the initial release of SNS Rewards (sns_rewards canister). SNS Rewards calculates the contribution of each GLDGov neuron as a percentage of the total over a specified period. Subsequently, it transfers the DAO's treasury neuron rewards based on these percentages.
 
 #### Added
 - **Daily GLDGov Neuron Synchronization** : Keeps track of each GLDGov neuron's maturity gains on a daily basis.
