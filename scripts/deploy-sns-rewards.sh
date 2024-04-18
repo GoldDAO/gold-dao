@@ -48,16 +48,32 @@ fi
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
+  ICP_LEDGER_CANISTER_ID=ete3q-rqaaa-aaaal-qdlva-cai
+  SNS_LEDGER_CANISTER_ID=irhm6-5yaaa-aaaap-ab24q-cai
+  OGY_LEDGER_CANISTER_ID=jwcfb-hyaaa-aaaaj-aac4q-cai # needs to be updated when staging is available
+  SNS_GOVERNANCE_CANISTER_ID=j3ioe-7iaaa-aaaap-ab23q-cai
 else
   TESTMODE="false"
+  ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
+  SNS_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
+  OGY_LEDGER_CANISTER_ID=jwcfb-hyaaa-aaaaj-aac4q-cai # needs to be updated after sns
+  SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
 fi
 
+ARGS='(record {
+  test_mode = '$TESTMODE';
+  icp_ledger_canister_id = principal "'$ICP_LEDGER_CANISTER_ID'";
+  sns_ledger_canister_id = principal "'$SNS_LEDGER_CANISTER_ID'";
+  ogy_ledger_canister_id = principal "'$OGY_LEDGER_CANISTER_ID'";
+  sns_gov_canister_id = principal "'$SNS_GOVERNANCE_CANISTER_ID'"
+  })'
+
 if [[ $1 == "local" ]]; then
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument $ARGS -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^sns_rewards-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument $ARGS -y
 
   # The following lines are for deployment via SNS. Only activate when handing over the canister
   # TODO - make sure to improve this procedure, created issue #156 to address this
@@ -73,7 +89,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^s
   # . scripts/parse_proposal_details.sh && \
   # quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
   #   --pem-file $PEM_FILE \
-  #   --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
+  #   --canister-upgrade-arg $ARGS \
   #   --target-canister-id $(cat canister_ids.json | jq -r .sns_rewards.$1) \
   #   --wasm-path backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz \
   #   --title "Upgrade sns_rewards to ${UPGRADEVERSION}" \
