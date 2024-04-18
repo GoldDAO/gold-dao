@@ -15,6 +15,8 @@ echo "Deploying icp_neuron on ${NETWORK}"
 . scripts/deploy-icp-neuron.sh $NETWORK
 echo "Deploying token_metrics on ${NETWORK}"
 . scripts/deploy-token-metrics.sh $NETWORK
+echo "Deploying sns_rewards on ${NETWORK}"
+. scripts/deploy-sns-rewards.sh $NETWORK
 echo "Deploying frontends on ${NETWORK}"
 dfx deploy --network ${NETWORK} --compute-evidence gldt_landing_page
 dfx deploy --network ${NETWORK} --compute-evidence gldt_swap_app
