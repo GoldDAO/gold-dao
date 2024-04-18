@@ -26,7 +26,7 @@ use crate::{
         setup::{ init, setup_reward_pools, TestEnv },
         sns::{ generate_neuron_data_for_week, setup_sns_by_week },
     },
-    utils::{ decode_http_bytes, hex_to_subaccount },
+    utils::{ decode_http_bytes, hex_to_subaccount, tick_n_blocks },
 };
 
 #[derive(Deserialize, CandidType, Serialize)]
@@ -62,82 +62,14 @@ fn test_distribute_rewards_happy_path() {
     sns.setup_week(&mut pic, controller, 2, sns_gov_id);
     pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
+    tick_n_blocks(&pic, 10);
 
     // simulate distribute_rewards
     pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
+    tick_n_blocks(&pic, 10);
     pic.advance_time(Duration::from_secs(60 * 3));
     sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-
+    tick_n_blocks(&pic, 100);
     // all neurons have the same accumulated maturity
     let fees = (sns.neuron_test_data.len() as u64) * 10_000 + 10_000;
     let amount_to_distribute = (100_000_000_000u64 - fees) as f64;
@@ -159,82 +91,17 @@ fn test_distribute_rewards_happy_path() {
     pic.tick();
     sns.setup_week(&mut pic, controller, 3, sns_gov_id);
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
+    tick_n_blocks(&pic, 4);
     // add new rewards
     // top up the reward pools again
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
     pic.tick();
     pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
+    tick_n_blocks(&pic, 10);
     pic.advance_time(Duration::from_secs(60 * 3));
     sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
-    pic.tick();
+    tick_n_blocks(&pic, 100);
 
     let neuron_sub_account = Account {
         owner: rewards,
