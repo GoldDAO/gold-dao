@@ -1,12 +1,10 @@
-use std::{ borrow::BorrowMut, thread, time::Duration };
-
+use std::time::Duration;
 use candid::{ CandidType, Deserialize, Principal };
-use pocket_ic::PocketIc;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
 use crate::{
-    client::rewards::{ get_all_neurons, get_neuron_by_id, sync_neurons_manual_trigger },
+    client::rewards::{ get_all_neurons, get_neuron_by_id },
     setup::{
         setup::{ init, TestEnv },
         setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
@@ -36,7 +34,7 @@ fn test_synchronise_neurons_happy_path() {
     assert_eq!(single_neuron.accumulated_maturity, 0);
 
     // week 2
-    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    sns.setup_week(&mut pic, 2, sns_gov_id);
     pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
     // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
     pic.tick();
@@ -50,7 +48,7 @@ fn test_synchronise_neurons_happy_path() {
     assert_eq!(single_neuron.accumulated_maturity, 100_000);
 
     // week 3
-    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    sns.setup_week(&mut pic, 3, sns_gov_id);
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
     // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
     pic.tick();

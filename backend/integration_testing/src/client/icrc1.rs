@@ -23,7 +23,7 @@ pub mod icrc1_transfer {
     pub type Response = Result<Nat, TransferError>;
 }
 
-pub mod happy_path {
+pub mod client {
     use super::*;
     use candid::Principal;
     use icrc_ledger_types::icrc1::account::Subaccount;

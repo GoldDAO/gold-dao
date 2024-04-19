@@ -2,9 +2,6 @@
 
 use std::vec::IntoIter;
 
-use candid::Principal;
-use pocket_ic::PocketIc;
-use setup::setup_sns::SNSTestEnv;
 use types::{ CanisterId, Cycles };
 
 mod client;

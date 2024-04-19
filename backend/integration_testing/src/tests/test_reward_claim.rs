@@ -1,35 +1,17 @@
-use std::{ borrow::BorrowMut, thread, time::Duration };
-
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{ CandidType, Deserialize, Nat };
 use icrc_ledger_types::icrc1::account::Account;
-use pocket_ic::PocketIc;
 use serde::Serialize;
-use serde_bytes::ByteBuf;
-use sns_governance_canister::types::{ neuron, NeuronId };
-use sns_rewards::{
-    consts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT },
-    types::claim_neuron_response::UserClaimErrorResponse,
-};
+use sns_governance_canister::types::NeuronId;
+use sns_rewards::types::claim_neuron_response::UserClaimErrorResponse;
 
 use crate::{
     client::{
-        icrc1::happy_path::{ balance_of, transfer },
+        icrc1::client::{ balance_of, transfer },
         pocket::execute_update_multi_args,
-        rewards::{
-            add_neuron_ownership,
-            claim_reward,
-            get_all_neurons,
-            get_neuron_by_id,
-            http_request,
-            remove_neuron_ownership,
-            sync_neurons_manual_trigger,
-        },
+        rewards::{ add_neuron_ownership, remove_neuron_ownership },
     },
-    setup::{
-        setup::{ init, TestEnv },
-        setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
-    },
-    utils::{ decode_http_bytes, hex_to_subaccount, tick_n_blocks },
+    setup::setup::{ init, TestEnv },
+    utils::{ hex_to_subaccount, tick_n_blocks },
 };
 
 fn is_transaction_fail_enum(value: &UserClaimErrorResponse) -> bool {
@@ -44,11 +26,9 @@ pub struct GetNeuronRequest {
 #[test]
 fn test_reward_claim_happy_path() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller, token_ledgers, sns, rewards } = env;
 
     let user_1 = sns.users.get(0).unwrap().clone();
-    let user_2 = sns.users.get(1).unwrap().clone();
 
     // simulate a distribution by add some ICP rewards to a neuron that is owned by user_1 - see sns.rs for which neurons have users as hotkeys
     let neuron_id_1 = &NeuronId::new(
@@ -99,10 +79,8 @@ fn test_reward_claim_happy_path() {
 #[test]
 fn test_add_neuron_ownership_failures() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller, token_ledgers, sns, rewards } = env;
 
-    let user_1 = sns.users.get(0).unwrap().clone();
     let user_2 = sns.users.get(1).unwrap().clone();
 
     // simulate a distribution by add some ICP rewards to a neuron that is owned by user_1 - see sns.rs for which neurons have users as hotkeys
@@ -144,8 +122,7 @@ fn test_add_neuron_ownership_failures() {
 #[test]
 fn test_remove_neuron_ownership_failures() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller: _, token_ledgers: _, sns, rewards } = env;
 
     let user_1 = sns.users.get(0).unwrap().clone();
     let user_2 = sns.users.get(1).unwrap().clone();
@@ -154,12 +131,6 @@ fn test_remove_neuron_ownership_failures() {
     let neuron_id_1 = &NeuronId::new(
         "5129ea7ec019c9a5f19b16ae3562870556b6f4cb424496f6255215a33465ea21"
     ).unwrap();
-    let neuron_account_1 = Account {
-        owner: rewards,
-        subaccount: Some(
-            hex_to_subaccount("5129ea7ec019c9a5f19b16ae3562870556b6f4cb424496f6255215a33465ea21")
-        ),
-    };
 
     // user_1 has ownership
     let res = add_neuron_ownership(&mut pic, user_1, rewards, &neuron_id_1.clone()).unwrap();
@@ -180,11 +151,9 @@ fn test_remove_neuron_ownership_failures() {
 #[test]
 fn test_neuron_with_no_hotkey() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller, token_ledgers, sns, rewards } = env;
 
     let user_1 = sns.users.get(0).unwrap().clone();
-    let user_2 = sns.users.get(1).unwrap().clone();
 
     // neuron with no hotkey
     let neuron_id_1 = &NeuronId::new(
@@ -236,8 +205,7 @@ fn test_neuron_with_no_hotkey() {
 #[test]
 fn test_claim_reward_failures() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller, token_ledgers, sns, rewards } = env;
 
     let user_1 = sns.users.get(0).unwrap().clone();
     let user_2 = sns.users.get(1).unwrap().clone();
@@ -284,11 +252,9 @@ fn test_claim_reward_failures() {
 #[test]
 fn test_claim_reward_fails_if_there_are_no_rewards() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let TestEnv { mut pic, controller, token_ledgers, sns, rewards } = env;
 
     let user_1 = sns.users.get(0).unwrap().clone();
-    let user_2 = sns.users.get(1).unwrap().clone();
 
     // simulate a distribution by add some ICP rewards to a neuron that is owned by user_1 - see sns.rs for which neurons have users as hotkeys
     let neuron_id_1 = &NeuronId::new(

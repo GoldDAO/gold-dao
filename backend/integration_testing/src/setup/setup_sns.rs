@@ -22,21 +22,14 @@ pub struct SNSTestEnv {
 }
 
 impl SNSTestEnv {
-    pub fn setup_week(
-        &mut self,
-        pic: &mut PocketIc,
-        controller: Principal,
-        week: u64,
-        sns_gov_id: Principal
-    ) {
-        let new_data = setup_sns_by_week(pic, controller, week, Some(sns_gov_id));
+    pub fn setup_week(&mut self, pic: &mut PocketIc, week: u64, sns_gov_id: Principal) {
+        let new_data = setup_sns_by_week(pic, week, Some(sns_gov_id));
         *self = new_data;
     }
 }
 
 pub fn setup_sns_by_week(
     pic: &mut PocketIc,
-    controller: Principal,
     week: u64, // initializes the sns with week n's data
     sns_gov_canister_id: Option<Principal>
 ) -> SNSTestEnv {

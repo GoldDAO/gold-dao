@@ -1,50 +1,20 @@
-use std::{
-    borrow::BorrowMut,
-    collections::BTreeMap,
-    io::Read,
-    mem::zeroed,
-    thread,
-    time::Duration,
-};
+use std::time::Duration;
 
-use candid::{
-    decode_one,
-    encode_args,
-    encode_one,
-    CandidType,
-    Decode,
-    Deserialize,
-    Nat,
-    Principal,
-};
-use canister_time::WEEK_IN_MS;
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount, DEFAULT_SUBACCOUNT };
-use num_bigint::ToBigUint;
-use pocket_ic::{ call_candid, PocketIc };
+use candid::{ CandidType, Deserialize, Nat, Principal };
+use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
-use sns_governance_canister::types::{ Neuron, NeuronId };
+use sns_governance_canister::types::NeuronId;
 use sns_rewards::{ consts::REWARD_POOL_SUB_ACCOUNT, model::payment_processor::PaymentRound };
 use types::TokenSymbol;
-use serde_bytes::ByteBuf;
 
 use crate::{
     client::{
-        icrc1::happy_path::{ balance_of, transfer },
-        pocket::{ execute_query, execute_update_multi_args },
-        rewards::{
-            get_active_payment_rounds,
-            get_all_neurons,
-            get_neuron_by_id,
-            http_request,
-            sync_neurons_manual_trigger,
-            sync_user_rewards,
-        },
+        icrc1::client::{ balance_of, transfer },
+        pocket::execute_update_multi_args,
+        rewards::{ get_active_payment_rounds, get_neuron_by_id },
     },
-    setup::{
-        setup::{ init, setup_reward_pools, TestEnv },
-        setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
-    },
-    utils::{ decode_http_bytes, hex_to_subaccount, tick_n_blocks },
+    setup::setup::{ init, setup_reward_pools, TestEnv },
+    utils::{ hex_to_subaccount, tick_n_blocks },
 };
 
 #[derive(Deserialize, CandidType, Serialize)]
@@ -87,7 +57,7 @@ fn test_distribute_rewards_happy_path() {
     // ********************************
 
     // increase maturity maturity
-    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    sns.setup_week(&mut pic, 2, sns_gov_id);
     pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     tick_n_blocks(&pic, 10);
@@ -122,7 +92,7 @@ fn test_distribute_rewards_happy_path() {
     // ********************************
 
     // increase maturity
-    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    sns.setup_week(&mut pic, 3, sns_gov_id);
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     tick_n_blocks(&pic, 4);
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
@@ -182,9 +152,6 @@ fn test_distribute_rewards_with_no_rewards() {
     let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
     let sns_gov_id = sns.sns_gov_id.clone();
 
-    let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
     // ********************************
     // 1. Check all reward pools have a balance - EXCEPT FOR ICP
     // ********************************
@@ -220,7 +187,7 @@ fn test_distribute_rewards_with_no_rewards() {
     // ********************************
 
     // increase maturity maturity
-    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    sns.setup_week(&mut pic, 2, sns_gov_id);
     pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     tick_n_blocks(&pic, 10);
@@ -261,7 +228,7 @@ fn test_distribute_rewards_with_no_rewards() {
     assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
 
     // distribute
-    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    sns.setup_week(&mut pic, 3, sns_gov_id);
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     tick_n_blocks(&pic, 4);
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
@@ -288,12 +255,9 @@ fn test_distribute_rewards_with_no_rewards() {
 #[test]
 fn test_distribute_rewards_with_not_enough_rewards() {
     let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
+    let TestEnv { mut pic, controller: _, token_ledgers, mut sns, rewards } = env;
     let sns_gov_id = sns.sns_gov_id.clone();
 
-    let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
     // ********************************
     // 1. Check all reward pools have a correct starting balance
     // ********************************
@@ -331,7 +295,7 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     // ********************************
 
     // increase maturity maturity
-    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    sns.setup_week(&mut pic, 2, sns_gov_id);
     pic.tick();
     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
     tick_n_blocks(&pic, 10);
@@ -354,7 +318,7 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     assert_eq!(res.len(), 0);
     // there should be no active round for ICP
     let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
-    assert_eq!(res.len(), 0);
+    assert_eq!(p.len(), 0);
 
     // the others should have historic rounds
     let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(

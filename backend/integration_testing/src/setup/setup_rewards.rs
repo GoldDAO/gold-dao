@@ -4,8 +4,6 @@ use serde::Deserialize;
 
 use crate::{ wasms, CanisterIds };
 
-use super::setup_sns::SNSTestEnv;
-
 #[derive(Deserialize, CandidType)]
 pub struct Args {
     test_mode: bool,
@@ -34,31 +32,4 @@ pub fn setup_rewards_canister(
     };
     pic.install_canister(rewards_canister, rewards_wasm, encode_one(init_args).unwrap(), None);
     rewards_canister
-}
-
-pub fn reinstall_rewards_canister(
-    pic: &mut PocketIc,
-    token_ledgers: &CanisterIds,
-    sns_canister_id: &Principal,
-    canister_id: Principal
-) {
-    let rewards_wasm = wasms::REWARDS.clone();
-    let init_args = Args {
-        test_mode: true,
-        icp_ledger_canister_id: token_ledgers.icp_ledger_id,
-        sns_ledger_canister_id: token_ledgers.gldgov_ledger_id,
-        ogy_ledger_canister_id: token_ledgers.ogy_ledger_id,
-        sns_gov_canister_id: sns_canister_id.clone(),
-    };
-
-    // pic.stop_canister(canister_id.clone(), None).unwrap();
-    // pic.tick();
-    pic.reinstall_canister(
-        canister_id.clone(),
-        rewards_wasm,
-        encode_one(init_args).unwrap(),
-        None
-    ).unwrap();
-    // pic.tick();
-    // pic.start_canister(canister_id.clone(), None).unwrap();
 }

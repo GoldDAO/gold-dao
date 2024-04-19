@@ -1,5 +1,3 @@
-use std::ffi::OsString;
-
 use candid::{ encode_one, Nat, Principal };
 use icrc_ledger_canister::init::{ ArchiveOptions as ArchiveOptionsIcrc, InitArgs, LedgerArgument };
 use icrc_ledger_types::icrc1::account::Account;
