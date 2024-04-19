@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
+use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
@@ -31,16 +32,14 @@ fn test_distribute_rewards_happy_path() {
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let ogy_token = TokenSymbol::parse("OGY").unwrap();
     let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+
     // ********************************
     // 1. Check all reward pools have a balance
     // ********************************
 
     let reward_pool = Account {
         owner: rewards,
-        subaccount: Some([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0,
-        ]),
+        subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
 
     let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
@@ -55,16 +54,14 @@ fn test_distribute_rewards_happy_path() {
     // ********************************
     // 2. Distribute rewards - week 1
     // ********************************
-
-    // increase maturity maturity
     sns.setup_week(&mut pic, 2, sns_gov_id);
-    pic.tick();
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    tick_n_blocks(&pic, 10);
 
-    // trigger the distribute rewards
-    // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    // TRIGGER - synchronize_neurons
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
+
+    // TRIGGER - distribute_rewards
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     tick_n_blocks(&pic, 100);
     pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
@@ -91,15 +88,16 @@ fn test_distribute_rewards_happy_path() {
     // 3. Distribute rewards - week 2
     // ********************************
 
-    // increase maturity
+    // set week 3 neuron data & give rewards to reward pool
     sns.setup_week(&mut pic, 3, sns_gov_id);
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    tick_n_blocks(&pic, 4);
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
-    pic.tick();
-    pic.tick();
-    // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+
+    // TRIGGER - synchronize_neurons
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
+
+    // TRIGGER - distribute_rewards
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     tick_n_blocks(&pic, 100);
     pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
@@ -153,14 +151,12 @@ fn test_distribute_rewards_with_no_rewards() {
     let sns_gov_id = sns.sns_gov_id.clone();
 
     // ********************************
-    // 1. Check all reward pools have a balance - EXCEPT FOR ICP
+    // 1. Remove the entire balance of only the ICP reward pool
     // ********************************
-    tick_n_blocks(&pic, 20);
     let reward_pool = Account {
         owner: rewards,
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
-    // remove starting ICP balance from reward pool
     transfer(
         &mut pic,
         rewards,
@@ -176,30 +172,23 @@ fn test_distribute_rewards_with_no_rewards() {
     let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
     assert_eq!(icp_reward_pool_balance, Nat::from(0u64));
 
-    let ogy_reward_pool_balance = balance_of(&pic, token_ledgers.ogy_ledger_id, reward_pool);
-    assert_eq!(ogy_reward_pool_balance, Nat::from(100_000_000_000u64));
-
-    let gldgov_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
-    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
-
     // ********************************
-    // 2. Distribute rewards - week 1
+    // 2. Distribute rewards - week 2
     // ********************************
 
     // increase maturity maturity
     sns.setup_week(&mut pic, 2, sns_gov_id);
-    pic.tick();
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    tick_n_blocks(&pic, 10);
+    // TRIGGER - synchronize_neurons
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
 
-    // trigger the distribute rewards
-    // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    // TRIGGER - distribute_rewards
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     tick_n_blocks(&pic, 100);
     pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
 
-    // there should be no historic payment round for ICP
+    // there should be no historic or active rounds for ICP because it didn't have any rewards to pay out
     let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
         &mut pic,
         Principal::anonymous(),
@@ -208,34 +197,21 @@ fn test_distribute_rewards_with_no_rewards() {
         ("ICP".to_string(), 1)
     );
     assert_eq!(res.len(), 0);
+    let res = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
+    assert_eq!(res.len(), 0);
 
     // ********************************
-    // 3. Distribute rewards - week 2 - ALL THREE now have rewards to distribute
+    // 3. Distribute rewards - week 3 - ALL THREE now have rewards to distribute
     // ********************************
-    // give some rewards to distribute for ICP
-    transfer(
-        &mut pic,
-        controller,
-        token_ledgers.icp_ledger_id,
-        None,
-        Account {
-            owner: rewards,
-            subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
-        },
-        100_000_000_000u128
-    ).unwrap();
-    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
-    assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
-
-    // distribute
-    sns.setup_week(&mut pic, 3, sns_gov_id);
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    tick_n_blocks(&pic, 4);
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
-    pic.tick();
-    pic.tick();
-    // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    sns.setup_week(&mut pic, 3, sns_gov_id);
+
+    // TRIGGER - synchronize_neurons
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
+
+    // TRIGGER - distribute_rewards
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     tick_n_blocks(&pic, 100);
     pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
