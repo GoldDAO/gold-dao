@@ -7,7 +7,16 @@ use std::{
     time::Duration,
 };
 
-use candid::{ encode_args, encode_one, CandidType, Deserialize, Nat, Principal };
+use candid::{
+    decode_one,
+    encode_args,
+    encode_one,
+    CandidType,
+    Decode,
+    Deserialize,
+    Nat,
+    Principal,
+};
 use canister_time::WEEK_IN_MS;
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount, DEFAULT_SUBACCOUNT };
 use num_bigint::ToBigUint;
@@ -84,11 +93,10 @@ fn test_distribute_rewards_happy_path() {
     tick_n_blocks(&pic, 10);
 
     // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    tick_n_blocks(&pic, 10);
-    pic.advance_time(Duration::from_secs(60 * 3));
-    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
     tick_n_blocks(&pic, 100);
+    pic.advance_time(Duration::from_secs(60 * 5));
 
     // calculate expected payment for every neuron ( they all have the same maturity - see neuron_data )
     let fees = (sns.neuron_test_data.len() as u64) * 10_000 + 10_000;
@@ -119,11 +127,10 @@ fn test_distribute_rewards_happy_path() {
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
     pic.tick();
     pic.tick();
-    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    tick_n_blocks(&pic, 10);
-    pic.advance_time(Duration::from_secs(60 * 3));
-    // trigger reward distribution
-    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    tick_n_blocks(&pic, 100);
+    pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
 
     let neuron_sub_account = Account {
@@ -218,10 +225,10 @@ fn test_distribute_rewards_with_no_rewards() {
     tick_n_blocks(&pic, 10);
 
     // trigger the distribute rewards
-    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    tick_n_blocks(&pic, 10);
-    pic.advance_time(Duration::from_secs(60 * 3));
-    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    tick_n_blocks(&pic, 100);
+    pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
 
     // there should be no historic payment round for ICP
@@ -259,11 +266,10 @@ fn test_distribute_rewards_with_no_rewards() {
     setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
     pic.tick();
     pic.tick();
-    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
-    tick_n_blocks(&pic, 10);
-    pic.advance_time(Duration::from_secs(60 * 3));
-    // trigger reward distribution
-    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    tick_n_blocks(&pic, 100);
+    pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&pic, 100);
 
     // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 2)
@@ -276,6 +282,165 @@ fn test_distribute_rewards_with_no_rewards() {
     );
     assert_eq!(res.len(), 1);
 }
+
+// if 1 reward pool doesn't have enough rewards it should be skipped
+#[test]
+fn test_distribute_rewards_with_not_enough_rewards() {
+    let env = init();
+    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
+    let sns_gov_id = sns.sns_gov_id.clone();
+
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let ogy_token = TokenSymbol::parse("OGY").unwrap();
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    // ********************************
+    // 1. Check all reward pools have a correct starting balance
+    // ********************************
+    tick_n_blocks(&pic, 20);
+    let reward_pool = Account {
+        owner: rewards,
+        subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
+    };
+    // calculate the minimum balance
+    let minimum_reward_pool_required = 10_000u64 * (sns.neuron_test_data.len() as u64) + 10_000u64;
+    let bad_starting_reward_amount = minimum_reward_pool_required - 10_000;
+    transfer(
+        &mut pic,
+        rewards,
+        token_ledgers.icp_ledger_id,
+        Some(REWARD_POOL_SUB_ACCOUNT),
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        },
+        100_000_000_000u128 - 10_000u128 - (bad_starting_reward_amount as u128)
+    ).unwrap();
+
+    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
+    assert_eq!(icp_reward_pool_balance, Nat::from(bad_starting_reward_amount));
+
+    let ogy_reward_pool_balance = balance_of(&pic, token_ledgers.ogy_ledger_id, reward_pool);
+    assert_eq!(ogy_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    let gldgov_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
+    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    // ********************************
+    // 2. Distribute rewards - week 1
+    // ********************************
+
+    // increase maturity maturity
+    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+    tick_n_blocks(&pic, 10);
+
+    // trigger the distribute rewards
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+    tick_n_blocks(&pic, 100);
+    pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&pic, 100);
+
+    // there should be no historic payment round for ICP
+    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
+        &mut pic,
+        Principal::anonymous(),
+        rewards,
+        "get_historic_payment_round",
+        ("ICP".to_string(), 1)
+    );
+    assert_eq!(res.len(), 0);
+    // there should be no active round for ICP
+    let p = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
+    assert_eq!(res.len(), 0);
+
+    // the others should have historic rounds
+    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
+        &mut pic,
+        Principal::anonymous(),
+        rewards,
+        "get_historic_payment_round",
+        ("OGY".to_string(), 1)
+    );
+    assert_eq!(res.len(), 1);
+}
+
+// #[test]
+// fn test_distribute_rewards_restart() {
+//     let env = init();
+//     let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
+//     let sns_gov_id = sns.sns_gov_id.clone();
+
+//     let icp_token = TokenSymbol::parse("ICP").unwrap();
+//     let ogy_token = TokenSymbol::parse("OGY").unwrap();
+//     let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+//     // ********************************
+//     // 1. Check ICP reward pool has a balance
+//     // ********************************
+
+//     let reward_pool = Account {
+//         owner: rewards,
+//         subaccount: Some([
+//             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//             0, 0,
+//         ]),
+//     };
+
+//     let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
+//     assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+//     let ogy_reward_pool_balance = balance_of(&pic, token_ledgers.ogy_ledger_id, reward_pool);
+//     assert_eq!(ogy_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+//     let gldgov_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
+//     assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+//     // ********************************
+//     // 2. Distribute rewards - week 1
+//     // ********************************
+
+//     // increase maturity maturity
+//     sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+//     pic.tick();
+//     pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+//     tick_n_blocks(&pic, 10);
+
+//     // trigger the distribute rewards
+//     pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
+//     tick_n_blocks(&pic, 100);
+//     pic.advance_time(Duration::from_secs(60 * 5)); // finish the daily neuron data sync which clashes with the same time
+//     tick_n_blocks(&pic, 100);
+//     let read_data = pic.get_stable_memory(rewards);
+//     // println!("{read_data:?}");
+//     // let des = Decode!(read_data.as_slice()).unwrap();
+//     // println!("{des:?}");
+//     // save_stable_memory(read_data);
+//     assert_eq!(true, false)
+
+//     // pic.stop_canister(rewards, None).unwrap();
+//     // tick_n_blocks(&pic, 200);
+//     // pic.start_canister(rewards, None).unwrap();
+//     // tick_n_blocks(&pic, 100);
+
+//     // let res = http_request(
+//     //     &pic,
+//     //     Principal::anonymous(),
+//     //     rewards,
+//     //     &(types::HttpRequest {
+//     //         method: "GET".to_string(),
+//     //         url: "/trace".to_string(),
+//     //         headers: vec![],
+//     //         body: ByteBuf::new(),
+//     //     })
+//     // );
+//     // println!("{}", decode_http_bytes(res.body.into_vec()));
+
+//     // // there should still be an active round because we stopped the canister
+//     // let active_rounds = get_active_payment_rounds(&pic, Principal::anonymous(), rewards, &());
+//     // assert_eq!(active_rounds.len(), 1);
+//     // ********************************
+// }
 
 // assert_eq!(true, false);
 // assert_eq!(expected_reward, neuron_icp_balance);

@@ -20,7 +20,7 @@ mod jobs;
 mod lifecycle;
 pub mod model;
 mod queries;
-mod state;
+pub mod state;
 mod memory;
 mod updates;
 
