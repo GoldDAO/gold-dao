@@ -173,9 +173,8 @@ impl PaymentRound {
             );
             return Err(err);
         }
-        // 2_000_000 - 10_000; = 1_990_000
-        let round_funds_total = reward_pool_balance.clone() - Nat::from(token_info.fee);
-        // 100_000
+        let round_funds_total = reward_pool_balance.clone() - token_info.fee;
+
         let transaction_fees = Self::calculate_transaction_fees(
             &neuron_maturity_for_interval,
             token_info.fee
