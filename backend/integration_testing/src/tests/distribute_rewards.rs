@@ -9,19 +9,19 @@ use std::{
 
 use candid::{ encode_args, encode_one, CandidType, Deserialize, Nat, Principal };
 use canister_time::WEEK_IN_MS;
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+use icrc_ledger_types::icrc1::account::{ Account, Subaccount, DEFAULT_SUBACCOUNT };
 use num_bigint::ToBigUint;
 use pocket_ic::{ call_candid, PocketIc };
 use serde::Serialize;
 use sns_governance_canister::types::{ Neuron, NeuronId };
-use sns_rewards::model::payment_processor::PaymentRound;
+use sns_rewards::{ consts::REWARD_POOL_SUB_ACCOUNT, model::payment_processor::PaymentRound };
 use types::TokenSymbol;
 use serde_bytes::ByteBuf;
 
 use crate::{
     client::{
-        icrc1::happy_path::balance_of,
-        pocket::execute_query,
+        icrc1::happy_path::{ balance_of, transfer },
+        pocket::{ execute_query, execute_update_multi_args },
         rewards::{
             get_active_payment_rounds,
             get_all_neurons,
@@ -165,6 +165,116 @@ fn test_distribute_rewards_happy_path() {
     assert_eq!(rewarded_mat_gldgov, &200_000u64);
 
     // ********************************
+}
+
+// if there are no rewards in the reward pool then it should not distribute for that token. other's with rewards should carry on.
+#[test]
+fn test_distribute_rewards_with_no_rewards() {
+    let env = init();
+    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
+    let sns_gov_id = sns.sns_gov_id.clone();
+
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let ogy_token = TokenSymbol::parse("OGY").unwrap();
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    // ********************************
+    // 1. Check all reward pools have a balance - EXCEPT FOR ICP
+    // ********************************
+    tick_n_blocks(&pic, 20);
+    let reward_pool = Account {
+        owner: rewards,
+        subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
+    };
+    // remove starting ICP balance from reward pool
+    transfer(
+        &mut pic,
+        rewards,
+        token_ledgers.icp_ledger_id,
+        Some(REWARD_POOL_SUB_ACCOUNT),
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        },
+        100_000_000_000u128 - 10_000u128
+    ).unwrap();
+
+    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
+    assert_eq!(icp_reward_pool_balance, Nat::from(0u64));
+
+    let ogy_reward_pool_balance = balance_of(&pic, token_ledgers.ogy_ledger_id, reward_pool);
+    assert_eq!(ogy_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    let gldgov_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
+    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    // ********************************
+    // 2. Distribute rewards - week 1
+    // ********************************
+
+    // increase maturity maturity
+    sns.setup_week(&mut pic, controller, 2, sns_gov_id);
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+    tick_n_blocks(&pic, 10);
+
+    // trigger the distribute rewards
+    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
+    tick_n_blocks(&pic, 10);
+    pic.advance_time(Duration::from_secs(60 * 3));
+    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    tick_n_blocks(&pic, 100);
+
+    // there should be no historic payment round for ICP
+    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
+        &mut pic,
+        Principal::anonymous(),
+        rewards,
+        "get_historic_payment_round",
+        ("ICP".to_string(), 1)
+    );
+    assert_eq!(res.len(), 0);
+
+    // ********************************
+    // 3. Distribute rewards - week 2 - ALL THREE now have rewards to distribute
+    // ********************************
+    // give some rewards to distribute for ICP
+    transfer(
+        &mut pic,
+        controller,
+        token_ledgers.icp_ledger_id,
+        None,
+        Account {
+            owner: rewards,
+            subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
+        },
+        100_000_000_000u128
+    ).unwrap();
+    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.icp_ledger_id, reward_pool);
+    assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    // distribute
+    sns.setup_week(&mut pic, controller, 3, sns_gov_id);
+    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
+    tick_n_blocks(&pic, 4);
+    setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000u64);
+    pic.tick();
+    pic.tick();
+    pic.advance_time(Duration::from_secs(60 * 60 * 148)); // 6 days & 1 hour - full week + 1 hour
+    tick_n_blocks(&pic, 10);
+    pic.advance_time(Duration::from_secs(60 * 3));
+    // trigger reward distribution
+    sync_user_rewards(&mut pic, Principal::anonymous(), rewards, &());
+    tick_n_blocks(&pic, 100);
+
+    // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 2)
+    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
+        &mut pic,
+        Principal::anonymous(),
+        rewards,
+        "get_historic_payment_round",
+        ("ICP".to_string(), 2)
+    );
+    assert_eq!(res.len(), 1);
 }
 
 // assert_eq!(true, false);

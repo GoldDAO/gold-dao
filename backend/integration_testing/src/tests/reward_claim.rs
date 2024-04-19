@@ -56,6 +56,7 @@ fn test_reward_claim_happy_path() {
         &mut pic,
         controller,
         token_ledgers.icp_ledger_id,
+        None,
         neuron_account_1,
         (100_000_000_00u64).into()
     ).unwrap();

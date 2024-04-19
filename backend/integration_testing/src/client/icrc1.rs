@@ -26,6 +26,7 @@ pub mod icrc1_transfer {
 pub mod happy_path {
     use super::*;
     use candid::Principal;
+    use icrc_ledger_types::icrc1::account::Subaccount;
     use pocket_ic::PocketIc;
     use types::CanisterId;
 
@@ -33,6 +34,7 @@ pub mod happy_path {
         pic: &mut PocketIc,
         sender: Principal,
         ledger_canister_id: CanisterId,
+        from: Option<Subaccount>,
         recipient: impl Into<Account>,
         amount: u128
     ) -> icrc1_transfer::Response {
@@ -41,7 +43,7 @@ pub mod happy_path {
             sender,
             ledger_canister_id,
             &(icrc1_transfer::Args {
-                from_subaccount: None,
+                from_subaccount: from,
                 to: recipient.into(),
                 fee: None,
                 created_at_time: None,

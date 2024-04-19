@@ -54,6 +54,13 @@ pub fn setup_reward_pools(
     };
 
     for canister_id in canister_ids.into_iter() {
-        transfer(&mut pic, minting_account, canister_id, reward_account, amount.into()).unwrap();
+        transfer(
+            &mut pic,
+            minting_account,
+            canister_id,
+            None,
+            reward_account,
+            amount.into()
+        ).unwrap();
     }
 }
