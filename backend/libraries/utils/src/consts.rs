@@ -12,9 +12,6 @@ pub const SNS_GOVERNANCE_CANISTER_ID: CanisterId = Principal::from_slice(
 pub const SNS_GOVERNANCE_CANISTER_ID_STAGING: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 1, 224, 14, 183, 1, 1]
 );
-pub const SNS_GOVERNANCE_CANISTER_ID_TESTING: CanisterId = Principal::from_slice(
-    &[255, 255, 255, 255, 255, 224, 0, 0, 1, 1]
-);
 pub const SNS_LEDGER_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 2, 0, 0, 126, 1, 1]
 );
@@ -204,16 +201,6 @@ mod tests {
         assert_eq!(
             GOLD_1000G_CANISTER_ID,
             Principal::from_text("7i7jl-6qaaa-aaaam-abjma-cai").unwrap()
-        );
-    }
-
-    #[test]
-    fn sns_governance_testing_canister_id() {
-        // let next = Principal::from_slice(&[255, 255, 255, 255, 255, 224, 0, 0, 1, 1]);
-        // println!("{:?}", next.to_string());
-        assert_eq!(
-            SNS_GOVERNANCE_CANISTER_ID_TESTING,
-            Principal::from_text("lxzze-o7777-77777-aaaaa-cai").unwrap()
         );
     }
 }
