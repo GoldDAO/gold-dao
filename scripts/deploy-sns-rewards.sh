@@ -71,11 +71,11 @@ ARGS="(record {
 echo "Deployment arguments: \n" $ARGS
 
 if [[ $1 == "local" ]]; then
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument ${ARGS} -y
+  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument "$ARGS" -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^sns_rewards-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument ${ARGS} -y
+  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument "$ARGS" -y
 
   # The following lines are for deployment via SNS. Only activate when handing over the canister
   # TODO - make sure to improve this procedure, created issue #156 to address this
