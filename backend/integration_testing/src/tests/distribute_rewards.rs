@@ -97,6 +97,7 @@ fn test_distribute_rewards_happy_path() {
     pic.advance_time(Duration::from_secs(60 * 60 * 144)); // 6 days - 1 week
     tick_n_blocks(&pic, 100);
     pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&pic, 100);
 
     // calculate expected payment for every neuron ( they all have the same maturity - see neuron_data )
     let fees = (sns.neuron_test_data.len() as u64) * 10_000 + 10_000;
