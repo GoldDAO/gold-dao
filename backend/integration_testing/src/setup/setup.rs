@@ -5,9 +5,9 @@ use pocket_ic::{ PocketIc, PocketIcBuilder };
 use crate::{ client::icrc1::happy_path::transfer, utils::random_principal, CanisterIds };
 
 use super::{
-    ledger::setup_ledgers,
-    rewards::setup_rewards_canister,
-    sns::{ setup_sns_by_week, SNSTestEnv },
+    setup_ledger::setup_ledgers,
+    setup_rewards::setup_rewards_canister,
+    setup_sns::{ setup_sns_by_week, SNSTestEnv },
 };
 
 pub struct TestEnv {

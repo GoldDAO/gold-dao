@@ -1,4 +1,4 @@
 pub mod setup;
-pub mod ledger;
-pub mod sns;
-pub mod rewards;
+pub mod setup_ledger;
+pub mod setup_sns;
+pub mod setup_rewards;

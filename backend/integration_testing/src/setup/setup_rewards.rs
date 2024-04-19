@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::{ wasms, CanisterIds };
 
-use super::sns::SNSTestEnv;
+use super::setup_sns::SNSTestEnv;
 
 #[derive(Deserialize, CandidType)]
 pub struct Args {

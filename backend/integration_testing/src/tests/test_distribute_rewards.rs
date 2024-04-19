@@ -42,7 +42,7 @@ use crate::{
     },
     setup::{
         setup::{ init, setup_reward_pools, TestEnv },
-        sns::{ generate_neuron_data_for_week, setup_sns_by_week },
+        setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
     },
     utils::{ decode_http_bytes, hex_to_subaccount, tick_n_blocks },
 };

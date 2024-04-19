@@ -25,7 +25,10 @@ use crate::{
             sync_neurons_manual_trigger,
         },
     },
-    setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
+    setup::{
+        setup::{ init, TestEnv },
+        setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
+    },
     utils::{ decode_http_bytes, hex_to_subaccount, tick_n_blocks },
 };
 
