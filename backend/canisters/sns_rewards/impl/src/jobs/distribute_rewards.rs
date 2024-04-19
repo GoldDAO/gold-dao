@@ -209,8 +209,7 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let total_to_transfer = round.round_funds_total.clone();
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
-    debug!("TOTAL {}", total_to_transfer);
-    debug!("TRANSACTION FEES {}", round.fees);
+
     let from_sub_account = REWARD_POOL_SUB_ACCOUNT;
     let account = Account {
         owner: ic_cdk::api::id(),
