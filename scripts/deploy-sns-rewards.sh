@@ -60,13 +60,13 @@ else
   SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
 fi
 
-ARGS="(record {
-  test_mode = $TESTMODE;
-  icp_ledger_canister_id = principal \"$ICP_LEDGER_CANISTER_ID\";
-  sns_ledger_canister_id = principal \"$SNS_LEDGER_CANISTER_ID\";
-  ogy_ledger_canister_id = principal \"$OGY_LEDGER_CANISTER_ID\";
-  sns_gov_canister_id = principal \"$SNS_GOVERNANCE_CANISTER_ID\"
-  })"
+ARGS='(record {
+  test_mode = '"$TESTMODE"';
+  icp_ledger_canister_id = principal "'"$ICP_LEDGER_CANISTER_ID"'";
+  sns_ledger_canister_id = principal "'"$SNS_LEDGER_CANISTER_ID"'";
+  ogy_ledger_canister_id = principal "'"$OGY_LEDGER_CANISTER_ID"'";
+  sns_gov_canister_id = principal "'"$SNS_GOVERNANCE_CANISTER_ID"'"
+})'
 
 echo "Deployment arguments: \n" $ARGS
 
