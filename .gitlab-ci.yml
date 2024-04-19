@@ -122,10 +122,6 @@ rust lint:
     - if: $CI_COMMIT_REF_NAME == "develop"
   extends: .rust template
   script:
-    - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/icp_neuron/api/can.did
-    - touch backend/canisters/token_metrics/api/can.did
-    - touch backend/canisters/sns_rewards/api/can.did
     - cargo clippy
 
 ################################################################################
