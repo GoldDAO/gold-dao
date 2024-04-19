@@ -5,7 +5,7 @@ use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Deserialize, Serialize };
 
 #[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct TokenSymbol(pub String);
+pub struct TokenSymbol(String);
 
 #[derive(Debug)]
 pub enum TokenSymbolParseError {
