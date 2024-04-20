@@ -22,7 +22,7 @@ pub fn random_principal() -> Principal {
 // }
 
 pub fn tick_n_blocks(pic: &PocketIc, times: u32) {
-    for i in 0..times {
+    for _ in 0..times {
         pic.tick();
     }
 }
