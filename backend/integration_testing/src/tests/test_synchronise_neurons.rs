@@ -1,5 +1,6 @@
 use std::time::Duration;
 use candid::{ CandidType, Deserialize, Principal };
+use canister_time::DAY_IN_MS;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
@@ -30,9 +31,9 @@ fn test_synchronise_neurons_happy_path() {
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 0);
 
-    // week 2
+    // day 1
     test_env.simulate_neuron_voting(2);
-    test_env.pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
     test_env.pic.tick();
 
     let single_neuron = get_neuron_by_id(
@@ -43,9 +44,9 @@ fn test_synchronise_neurons_happy_path() {
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 100_000);
 
-    // week 3
+    // day 2
     test_env.simulate_neuron_voting(3);
-    test_env.pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
     test_env.pic.tick();
     test_env.pic.advance_time(Duration::from_secs(20));
 
