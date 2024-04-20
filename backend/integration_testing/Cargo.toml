@@ -39,3 +39,4 @@ hex = "0.4"
 sns_rewards = { path = '../canisters/sns_rewards/impl'}
 serde_bytes = { workspace = true }
 serde_cbor = { workspace = true }
+sha2 = "0.10.8"
