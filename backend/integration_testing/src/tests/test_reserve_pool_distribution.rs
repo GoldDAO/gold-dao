@@ -1,20 +1,16 @@
-use std::{ borrow::BorrowMut, thread, time::Duration };
+use std::time::Duration;
 
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{ CandidType, Deserialize, Nat };
+use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
-use pocket_ic::PocketIc;
 use serde::Serialize;
-use serde_bytes::ByteBuf;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards::consts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT };
 
 use crate::{
-    client::{
-        icrc1::happy_path::{ balance_of, transfer },
-        rewards::{ get_all_neurons, get_neuron_by_id, http_request, sync_neurons_manual_trigger },
-    },
-    setup::{ setup::{ init, TestEnv }, sns::{ generate_neuron_data_for_week, setup_sns_by_week } },
-    utils::{ decode_http_bytes, tick_n_blocks },
+    client::icrc1::client::{ balance_of, transfer },
+    setup::default_test_setup,
+    utils::tick_n_blocks,
 };
 
 #[derive(Deserialize, CandidType, Serialize)]
@@ -24,54 +20,51 @@ pub struct GetNeuronRequest {
 
 #[test]
 fn test_reserve_pool_distribution_happy_path() {
-    let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let mut test_env = default_test_setup();
+
+    let gldgov_ledger_id = test_env.token_ledgers.get("gldgov_ledger_canister_id").unwrap().clone();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
 
     let reward_pool = Account {
-        owner: rewards,
+        owner: rewards_canister_id,
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
 
-    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
-    assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
-
-    pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 1 day + 1 hour
-    tick_n_blocks(&pic, 20);
-
-    // reward pool should be the same since there was nothing in the reserve pool to transfer
-    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
-    assert_eq!(icp_reward_pool_balance, Nat::from(100_000_000_000u64));
-
-    // transfer some gldgov to the reserve pool
     let reserve_pool_account = Account {
-        owner: rewards,
+        owner: rewards_canister_id,
         subaccount: Some(RESERVE_POOL_SUB_ACCOUNT),
     };
+
+    // setup always gives a starting amount to reward pools
+    let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
+    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    // TRIGGER - reserve_pool_distribution cron job
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // reward pool should be the same since there was nothing in the reserve pool to transfer
+    let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
+    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+
+    // transfer some gldgov to the reserve pool
     transfer(
-        &mut pic,
+        &mut test_env.pic,
         controller,
-        token_ledgers.gldgov_ledger_id,
+        gldgov_ledger_id,
+        None,
         reserve_pool_account,
-        (100_000_000_00u64).into()
+        (100_000_000_000u64).into()
     ).unwrap();
-    pic.tick();
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 1 day
-    tick_n_blocks(&pic, 200);
+
+    // TRIGGER - reserve_pool_distribution cron job
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
     // reward pool should now have double minus a fee
-    let icp_reward_pool_balance = balance_of(&pic, token_ledgers.gldgov_ledger_id, reward_pool);
-    let res = http_request(
-        &pic,
-        Principal::anonymous(),
-        rewards,
-        &(types::HttpRequest {
-            method: "GET".to_string(),
-            url: "/logs".to_string(),
-            headers: vec![],
-            body: ByteBuf::new(),
-        })
-    );
-    println!("{}", decode_http_bytes(res.body.into_vec()));
+    let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
+    tick_n_blocks(&test_env.pic, 2);
     let expected_balance_reward_pool = Nat::from(100_000_000_000u64 + 100_000_000u64);
-    assert_eq!(icp_reward_pool_balance, expected_balance_reward_pool);
+    assert_eq!(expected_balance_reward_pool, gldgov_reward_pool_balance);
 }

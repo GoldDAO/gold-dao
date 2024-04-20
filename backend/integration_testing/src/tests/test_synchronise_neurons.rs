@@ -3,13 +3,7 @@ use candid::{ CandidType, Deserialize, Principal };
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
-use crate::{
-    client::rewards::{ get_all_neurons, get_neuron_by_id },
-    setup::{
-        setup::{ init, TestEnv },
-        setup_sns::{ generate_neuron_data_for_week, setup_sns_by_week },
-    },
-};
+use crate::{ client::rewards::{ get_all_neurons, get_neuron_by_id }, setup::default_test_setup };
 
 #[derive(Deserialize, CandidType, Serialize)]
 pub struct GetNeuronRequest {
@@ -18,47 +12,48 @@ pub struct GetNeuronRequest {
 
 #[test]
 fn test_synchronise_neurons_happy_path() {
-    let env = init();
-    let TestEnv { mut pic, controller, token_ledgers, mut sns, rewards } = env;
-    let sns_gov_id = sns.sns_gov_id.clone();
+    let mut test_env = default_test_setup();
 
-    let all_neurons = get_all_neurons(&pic, Principal::anonymous(), rewards, &());
-    assert_eq!(all_neurons as usize, sns.neuron_test_data.len());
-
-    let single_neuron = get_neuron_by_id(
-        &pic,
+    let all_neurons = get_all_neurons(
+        &test_env.pic,
         Principal::anonymous(),
-        rewards,
-        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+        test_env.rewards_canister_id.clone(),
+        &()
+    );
+    assert_eq!(all_neurons as usize, test_env.neuron_data.len());
+    let neuron_id_1 = test_env.neuron_data.get(&1usize).unwrap().clone().id.unwrap();
+    let single_neuron = get_neuron_by_id(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id.clone(),
+        &neuron_id_1
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 0);
 
     // week 2
-    sns.setup_week(&mut pic, 2, sns_gov_id);
-    pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
-    // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
-    pic.tick();
+    test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_secs(60 * 60 * 25)); // 25 hours
+    test_env.pic.tick();
 
     let single_neuron = get_neuron_by_id(
-        &pic,
+        &test_env.pic,
         Principal::anonymous(),
-        rewards,
-        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+        test_env.rewards_canister_id.clone(),
+        &neuron_id_1
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 100_000);
 
     // week 3
-    sns.setup_week(&mut pic, 3, sns_gov_id);
-    pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
-    // sync_neurons_manual_trigger(&mut pic, Principal::anonymous(), rewards, &());
-    pic.tick();
-    pic.advance_time(Duration::from_secs(20));
+    test_env.simulate_neuron_voting(3);
+    test_env.pic.advance_time(Duration::from_secs(60 * 60 * 24)); // 25 hours
+    test_env.pic.tick();
+    test_env.pic.advance_time(Duration::from_secs(20));
 
     let single_neuron = get_neuron_by_id(
-        &pic,
+        &test_env.pic,
         Principal::anonymous(),
-        rewards,
-        &NeuronId::new("146ed81314556807536d74005f4121b8769bba1992fce6b90c2949e855d04208").unwrap()
+        test_env.rewards_canister_id.clone(),
+        &neuron_id_1
     ).unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 200_000);
 }

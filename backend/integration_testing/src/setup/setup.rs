@@ -1,4 +1,4 @@
-use std::{ borrow::Borrow, collections::HashMap };
+use std::collections::HashMap;
 
 use candid::{ Nat, Principal };
 use icrc_ledger_types::icrc1::account::Account;
@@ -8,75 +8,17 @@ use sns_governance_canister::types::Neuron;
 use crate::{
     client::icrc1::client::transfer,
     setup::{
-        setup_ledger::setup_ledgers_v2,
+        setup_ledger::setup_ledgers,
         setup_sns::{ create_sns_with_data, generate_neuron_data },
     },
     utils::random_principal,
-    CanisterIds,
 };
 
-use super::{
-    setup_ledger::setup_ledgers,
-    setup_rewards::{ setup_rewards_canister, setup_rewards_canister_v2 },
-    setup_sns::{ reinstall_sns_with_data, setup_sns_by_week, SNSTestEnv },
-};
-
-pub struct TestEnv {
-    pub pic: PocketIc,
-    pub controller: Principal,
-    pub token_ledgers: CanisterIds,
-    pub sns: SNSTestEnv,
-    pub rewards: Principal,
-}
+use super::{ setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data };
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
-pub fn init() -> TestEnv {
-    let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
-
-    let controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-    let token_ledgers = setup_ledgers(&mut pic, controller);
-    let sns = setup_sns_by_week(&mut pic, 1, None);
-    let rewards = setup_rewards_canister(&mut pic, &token_ledgers, &sns.sns_gov_id);
-
-    setup_reward_pools(&mut pic, controller, rewards, token_ledgers, 100_000_000_000);
-    TestEnv {
-        pic,
-        controller,
-        token_ledgers,
-        sns,
-        rewards,
-    }
-}
-
 pub fn setup_reward_pools(
-    mut pic: &mut PocketIc,
-    minting_account: Principal,
-    reward_canister_id: Principal,
-    canister_ids: CanisterIds,
-    amount: u64
-) {
-    let reward_account = Account {
-        owner: reward_canister_id,
-        subaccount: Some([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0,
-        ]),
-    };
-
-    for canister_id in canister_ids.into_iter() {
-        transfer(
-            &mut pic,
-            minting_account,
-            canister_id,
-            None,
-            reward_account,
-            amount.into()
-        ).unwrap();
-    }
-}
-
-pub fn setup_reward_pools_v2(
     mut pic: &mut PocketIc,
     minting_account: &Principal,
     reward_canister_id: &Principal,
@@ -182,7 +124,7 @@ impl RewardsTestEnvBuilder {
 
     pub fn build(self) -> RewardsTestEnv {
         let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
-        let token_ledgers = setup_ledgers_v2(
+        let token_ledgers = setup_ledgers(
             &pic,
             self.controller,
             self.token_symbols,
@@ -195,7 +137,7 @@ impl RewardsTestEnvBuilder {
             &self.users
         );
         let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data);
-        let rewards_canister_id = setup_rewards_canister_v2(
+        let rewards_canister_id = setup_rewards_canister(
             &mut pic,
             &token_ledgers,
             &sns_gov_canister_id
@@ -205,7 +147,7 @@ impl RewardsTestEnvBuilder {
             .iter()
             .map(|(_, id)| id.clone())
             .collect();
-        setup_reward_pools_v2(
+        setup_reward_pools(
             &mut pic,
             &self.controller,
             &rewards_canister_id,
@@ -223,30 +165,4 @@ impl RewardsTestEnvBuilder {
             neuron_owners,
         }
     }
-}
-
-//
-pub fn default_test_setup() -> RewardsTestEnv {
-    let users = vec![
-        Principal::from_slice(&[0, 0, 0, 1, 0, 1, 0, 1, 0, 1]),
-        Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2])
-    ];
-
-    RewardsTestEnvBuilder::new()
-        .add_random_neurons(10)
-        .add_token_ledger("ICP", &mut vec![])
-        .add_token_ledger("OGY", &mut vec![])
-        .add_token_ledger("GLDGov", &mut vec![])
-        .add_users(users)
-        .build()
-}
-
-pub fn test_setup_with_no_neuron_hotkeys() -> RewardsTestEnv {
-    RewardsTestEnvBuilder::new()
-        .add_random_neurons(10)
-        .add_token_ledger("ICP", &mut vec![])
-        .add_token_ledger("OGY", &mut vec![])
-        .add_token_ledger("GLDGov", &mut vec![])
-        .add_users(vec![])
-        .build()
 }
