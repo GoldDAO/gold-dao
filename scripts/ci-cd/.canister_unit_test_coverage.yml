@@ -2,7 +2,7 @@ spec:
   inputs:
     src-folder:
       description: Name of the source folder, should be the same as the canister's cargo package name.
-      options: ["gldt_core", "icp_neuron", "token_metrics"]
+      options: ["gldt_core", "icp_neuron", "token_metrics", "sns_rewards"]
 ---
 # Rust canister unit test with coverage
 
@@ -22,8 +22,6 @@ $[[ inputs.src-folder ]] tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - touch backend/canisters/gldt_core/api/can.did
-    - touch backend/canisters/icp_neuron/api/can.did
     - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
