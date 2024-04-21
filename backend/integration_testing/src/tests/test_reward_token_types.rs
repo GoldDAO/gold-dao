@@ -1,4 +1,4 @@
-use std::{ collections::HashMap, time::Duration };
+use std::collections::HashMap;
 
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use serde::Serialize;
@@ -12,7 +12,6 @@ use types::{ TokenInfo, TokenSymbol };
 use crate::{
     client::rewards::{ set_reward_token_types, set_reward_token_types_validate },
     setup::default_test_setup,
-    utils::tick_n_blocks,
 };
 
 fn is_fail_enum(value: &SetRewardTokenTypesResponse) -> bool {

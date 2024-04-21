@@ -1,5 +1,5 @@
 use std::time::Duration;
-use candid::{ CandidType, Deserialize, Principal };
+use candid::{ CandidType, Deserialize };
 use canister_time::DAY_IN_MS;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;

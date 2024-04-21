@@ -60,7 +60,7 @@ impl RewardsTestEnv {
     /// simulate neurons voting by reinstalling the sns gov canister with an increase in maturity
     /// each neuton's initial maturity is multiplied
     pub fn simulate_neuron_voting(&mut self, multiplier: u64) {
-        let (neuron_data, neuron_owners) = generate_neuron_data(
+        let (neuron_data, _) = generate_neuron_data(
             0,
             self.neuron_data.len(),
             multiplier,

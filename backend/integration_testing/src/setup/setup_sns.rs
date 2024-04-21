@@ -1,7 +1,6 @@
 use std::collections::{ BTreeMap, HashMap };
 
 use candid::{ encode_one, Principal };
-use ic_cdk::api::management_canister::main::CanisterSettings;
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::{
     governance::SnsMetadata,
@@ -129,7 +128,6 @@ pub fn reinstall_sns_with_data(
     controller: &Principal
 ) {
     let sns_init_args = generate_sns_init_args(neuron_data);
-    let sns_subnet_id = pic.topology().get_sns().unwrap();
 
     // let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet_id);
     // pic.add_cycles(sns_gov_id, 100_000_000_000_000);

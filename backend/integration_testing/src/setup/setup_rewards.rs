@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use candid::{ encode_one, CandidType, Nat, Principal };
+use candid::{ encode_one, CandidType, Principal };
 use pocket_ic::PocketIc;
 use serde::Deserialize;
 
