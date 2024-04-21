@@ -16,6 +16,7 @@ pub struct Args {
     sns_ledger_canister_id: Principal,
     ogy_ledger_canister_id: Principal,
     sns_gov_canister_id: Principal,
+    authorized_principals: Vec<Principal>,
 }
 
 #[init]
@@ -55,6 +56,7 @@ fn init(args: Args) {
         }
 
         data.sns_governance_canister = args.sns_gov_canister_id;
+        data.authorized_principals = args.authorized_principals;
     }
 
     let runtime_state = RuntimeState::new(env, data);

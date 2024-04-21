@@ -5,7 +5,7 @@ use ic_cdk::{ query, update };
 use serde::{ Deserialize, Serialize };
 use types::{ TokenInfo, TokenSymbol };
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum SetRewardTokenTypesResponse {
     Success,
     InternalError(String),
@@ -13,7 +13,7 @@ pub enum SetRewardTokenTypesResponse {
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct SetRewardTokenTypesRequest {
-    token_list: Vec<(String, TokenInfo)>,
+    pub token_list: Vec<(String, TokenInfo)>,
 }
 
 #[update(guard = "caller_is_governance_principal")]

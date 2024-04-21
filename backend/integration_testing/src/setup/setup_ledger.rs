@@ -19,7 +19,7 @@ pub fn setup_ledgers(
 
     for symbol in token_symbols {
         let canister_id = pic.create_canister_on_subnet(None, None, app_subnet_id);
-        pic.add_cycles(canister_id, 10_000_000_000_000);
+        pic.add_cycles(canister_id, 100_000_000_000_000_000);
         pic.install_canister(
             canister_id,
             icrc1_ledger_wasm.clone(),

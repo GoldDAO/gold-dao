@@ -4,6 +4,20 @@ use sns_rewards::types::claim_neuron_response::UserClaimErrorResponse;
 use types::NeuronInfo;
 use sns_rewards::model::payment_processor::PaymentRound;
 use types::{ HttpRequest, HttpResponse };
+use sns_rewards::updates::set_reserve_transfer_amount::{
+    SetReserveTransferAmountRequest,
+    SetReserveTransferAmountResponse,
+};
+use sns_rewards::updates::set_reward_token_types::{
+    SetRewardTokenTypesRequest,
+    SetRewardTokenTypesResponse,
+};
+use types::TokenInfo;
+
+use std::collections::HashMap;
+
+use candid::Nat;
+use types::TokenSymbol;
 
 generate_pocket_query_call!(get_all_neurons);
 generate_pocket_query_call!(get_neuron_by_id);
@@ -14,6 +28,12 @@ generate_pocket_query_call!(http_request);
 generate_pocket_update_call!(add_neuron_ownership);
 generate_pocket_update_call!(remove_neuron_ownership);
 generate_pocket_update_call!(claim_reward);
+generate_pocket_update_call!(set_reserve_transfer_amounts);
+generate_pocket_query_call!(set_reserve_transfer_amounts_validate);
+generate_pocket_query_call!(get_reserve_transfer_amounts);
+generate_pocket_query_call!(set_reward_token_types_validate);
+generate_pocket_query_call!(get_reward_token_types);
+generate_pocket_update_call!(set_reward_token_types);
 // Updates
 // generate_update_call!(icrc1_transfer);
 pub mod claim_reward {
@@ -70,4 +90,46 @@ pub mod http_request {
 
     pub type Args = HttpRequest;
     pub type Response = HttpResponse;
+}
+
+pub mod set_reserve_transfer_amounts {
+    use super::*;
+
+    pub type Args = SetReserveTransferAmountRequest;
+    pub type Response = Result<SetReserveTransferAmountResponse, SetReserveTransferAmountResponse>;
+}
+
+pub mod set_reserve_transfer_amounts_validate {
+    use super::*;
+
+    pub type Args = SetReserveTransferAmountRequest;
+    pub type Response = Result<String, String>;
+}
+
+pub mod get_reserve_transfer_amounts {
+    use super::*;
+
+    pub type Args = ();
+    pub type Response = HashMap<TokenSymbol, Nat>;
+}
+
+pub mod set_reward_token_types {
+    use super::*;
+
+    pub type Args = SetRewardTokenTypesRequest;
+    pub type Response = SetRewardTokenTypesResponse;
+}
+
+pub mod set_reward_token_types_validate {
+    use super::*;
+
+    pub type Args = SetRewardTokenTypesRequest;
+    pub type Response = Result<String, String>;
+}
+
+pub mod get_reward_token_types {
+    use super::*;
+
+    pub type Args = ();
+    pub type Response = HashMap<TokenSymbol, TokenInfo>;
 }

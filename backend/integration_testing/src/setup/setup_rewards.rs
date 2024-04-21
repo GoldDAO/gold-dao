@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use candid::{ encode_one, CandidType, Principal };
+use candid::{ encode_one, CandidType, Nat, Principal };
 use pocket_ic::PocketIc;
 use serde::Deserialize;
 
@@ -13,17 +13,30 @@ pub struct Args {
     sns_ledger_canister_id: Principal,
     ogy_ledger_canister_id: Principal,
     sns_gov_canister_id: Principal,
+    authorized_principals: Vec<Principal>,
 }
 
 pub fn setup_rewards_canister(
     pic: &mut PocketIc,
     token_ledgers: &HashMap<String, Principal>,
-    sns_canister_id: &Principal
+    sns_canister_id: &Principal,
+    controller: &Principal
 ) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
-    let rewards_canister = pic.create_canister_on_subnet(None, None, sns_subnet);
+    let rewards_canister = pic.create_canister_on_subnet(
+        Some(controller.clone()),
+        None,
+        sns_subnet
+    );
+
     let rewards_wasm = wasms::REWARDS.clone();
-    pic.add_cycles(rewards_canister, 1_000_000_000_000);
+    pic.add_cycles(rewards_canister, 100_000_000_000_000_000);
+    pic.set_controllers(
+        rewards_canister,
+        Some(controller.clone()),
+        vec![controller.clone()]
+    ).unwrap();
+    pic.tick();
 
     let icp_ledger_canister_id = token_ledgers
         .get("icp_ledger_canister_id")
@@ -44,7 +57,13 @@ pub fn setup_rewards_canister(
         sns_ledger_canister_id,
         ogy_ledger_canister_id,
         sns_gov_canister_id: sns_canister_id.clone(),
+        authorized_principals: vec![controller.clone()],
     };
-    pic.install_canister(rewards_canister, rewards_wasm, encode_one(init_args).unwrap(), None);
+    pic.install_canister(
+        rewards_canister,
+        rewards_wasm,
+        encode_one(init_args).unwrap(),
+        Some(controller.clone())
+    );
     rewards_canister
 }

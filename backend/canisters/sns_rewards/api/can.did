@@ -1,6 +1,7 @@
 type Args = record {
   sns_gov_canister_id : principal;
   test_mode : bool;
+  authorized_principals : vec principal;
   ogy_ledger_canister_id : principal;
   icp_ledger_canister_id : principal;
   sns_ledger_canister_id : principal;

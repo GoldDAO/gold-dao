@@ -88,6 +88,7 @@ fn test_reward_claim_happy_path() {
     let user_1_icp_balance = balance_of(&test_env.pic, icp_ledger_id, user_1_account);
     tick_n_blocks(&test_env.pic, 10);
     assert_eq!(user_1_icp_balance, Nat::from(100_000_000_00u64) - Nat::from(10_000u64));
+    tick_n_blocks(&test_env.pic, 20);
 }
 
 #[test]
@@ -151,6 +152,7 @@ fn test_add_neuron_ownership_failures() {
         .unwrap();
     tick_n_blocks(&test_env.pic, 10);
     assert_eq!(res, UserClaimErrorResponse::NeuronDoesNotExist);
+    tick_n_blocks(&test_env.pic, 20);
 }
 
 #[test]
@@ -200,6 +202,7 @@ fn test_remove_neuron_ownership_failures() {
         &neuron_id_1.clone()
     ).unwrap();
     assert_eq!(res, neuron_id_1.clone());
+    tick_n_blocks(&test_env.pic, 20);
 }
 
 #[test]
@@ -232,7 +235,6 @@ fn test_neuron_with_no_hotkey() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 10);
     assert_eq!(res, UserClaimErrorResponse::NeuronHotKeyAbsent);
 
     // ********************************
@@ -247,7 +249,6 @@ fn test_neuron_with_no_hotkey() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 10);
     assert_eq!(res, UserClaimErrorResponse::NeuronHotKeyAbsent);
 
     // ********************************
@@ -262,7 +263,6 @@ fn test_neuron_with_no_hotkey() {
         neuron_account_1,
         (100_000_000_00u64).into()
     ).unwrap();
-    tick_n_blocks(&test_env.pic, 10);
 
     let res = execute_update_multi_args::<(NeuronId, String), Result<bool, UserClaimErrorResponse>>(
         &mut test_env.pic,
@@ -273,7 +273,6 @@ fn test_neuron_with_no_hotkey() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 20);
     assert_eq!(res, UserClaimErrorResponse::NeuronHotKeyAbsent);
 }
 
@@ -307,7 +306,6 @@ fn test_claim_reward_failures() {
         neuron_account_1,
         (100_000_000_00u64).into()
     ).unwrap();
-    tick_n_blocks(&test_env.pic, 10);
 
     // ********************************
     // 1. Add ownership as user 1 - Ok
@@ -318,7 +316,6 @@ fn test_claim_reward_failures() {
         rewards_canister_id,
         &neuron_id_1.clone()
     ).unwrap();
-    tick_n_blocks(&test_env.pic, 10);
     assert_eq!(res, neuron_id_1.clone());
 
     // ********************************
@@ -333,7 +330,6 @@ fn test_claim_reward_failures() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 20);
     assert_eq!(res, UserClaimErrorResponse::NeuronHotKeyInvalid);
 }
 
@@ -364,7 +360,6 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
         rewards_canister_id,
         &neuron_id_1.clone()
     ).unwrap();
-    tick_n_blocks(&test_env.pic, 10);
     assert_eq!(res, neuron_id_1.clone());
 
     // ********************************
@@ -379,7 +374,6 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 20);
     assert!(is_transaction_fail_enum(&res));
 
     // ********************************
@@ -403,6 +397,5 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
     )
         .err()
         .unwrap();
-    tick_n_blocks(&test_env.pic, 20);
     assert!(is_transaction_fail_enum(&res));
 }

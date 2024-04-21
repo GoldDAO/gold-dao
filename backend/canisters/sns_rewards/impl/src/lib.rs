@@ -22,6 +22,6 @@ pub mod model;
 mod queries;
 pub mod state;
 mod memory;
-mod updates;
+pub mod updates;
 
 export_candid!();

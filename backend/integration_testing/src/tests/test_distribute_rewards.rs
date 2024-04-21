@@ -108,7 +108,7 @@ fn test_distribute_rewards_happy_path() {
 
     let active_payment_rounds = get_active_payment_rounds(
         &test_env.pic,
-        Principal::anonymous(),
+        controller,
         rewards_canister_id,
         &()
     );
@@ -120,7 +120,7 @@ fn test_distribute_rewards_happy_path() {
 
     let single_neuron = get_neuron_by_id(
         &test_env.pic,
-        Principal::anonymous(),
+        controller,
         rewards_canister_id,
         &neuron_id_1
     ).unwrap();
@@ -130,8 +130,6 @@ fn test_distribute_rewards_happy_path() {
     assert_eq!(rewarded_mat_icp, &200_000u64);
     assert_eq!(rewarded_mat_ogy, &200_000u64);
     assert_eq!(rewarded_mat_gldgov, &200_000u64);
-
-    // ********************************
 }
 
 // if there are no rewards in the reward pool then it should not distribute for that token. other's with rewards should carry on.

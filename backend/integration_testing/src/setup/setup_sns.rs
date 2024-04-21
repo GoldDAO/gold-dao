@@ -1,6 +1,7 @@
 use std::collections::{ BTreeMap, HashMap };
 
 use candid::{ encode_one, Principal };
+use ic_cdk::api::management_canister::main::CanisterSettings;
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::{
     governance::SnsMetadata,
@@ -97,45 +98,59 @@ pub fn neuron_id_from_number(n: usize) -> NeuronId {
     NeuronId::new(&hex_id).unwrap()
 }
 
-pub fn create_sns_with_data(pic: &mut PocketIc, neuron_data: &HashMap<usize, Neuron>) -> Principal {
+pub fn create_sns_with_data(
+    pic: &mut PocketIc,
+    neuron_data: &HashMap<usize, Neuron>,
+    controller: &Principal
+) -> Principal {
     let sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
-    let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet_id);
-    pic.add_cycles(sns_gov_id, 10_000_000_000_000);
+    let sns_gov_id = pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
+    pic.add_cycles(sns_gov_id, 100_000_000_000_000_000);
+    pic.set_controllers(sns_gov_id, Some(controller.clone()), vec![controller.clone()]).unwrap();
 
+    pic.tick();
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
     pic.install_canister(
         sns_gov_id,
         sns_gov_wasm,
         encode_one(sns_init_args.clone()).unwrap(),
-        None
+        Some(controller.clone())
     );
+
     sns_gov_id
 }
 
 pub fn reinstall_sns_with_data(
     pic: &mut PocketIc,
     neuron_data: &HashMap<usize, Neuron>,
-    sns_gov_canister_id: &Principal
+    sns_gov_canister_id: &Principal,
+    controller: &Principal
 ) {
     let sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
-    let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet_id);
-    pic.add_cycles(sns_gov_id, 10_000_000_000_000);
+    // let sns_gov_id = pic.create_canister_on_subnet(None, None, sns_subnet_id);
+    // pic.add_cycles(sns_gov_id, 100_000_000_000_000);
 
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
-    pic.stop_canister(sns_gov_canister_id.clone(), None).unwrap();
+    pic.stop_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
     pic.tick();
     pic.reinstall_canister(
         sns_gov_canister_id.clone(),
         sns_gov_wasm,
         encode_one(sns_init_args.clone()).unwrap(),
-        None
+        Some(controller.clone())
     ).unwrap();
     pic.tick();
-    pic.start_canister(sns_gov_canister_id.clone(), None).unwrap();
+    pic.start_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
+    pic.set_controllers(
+        sns_gov_canister_id.clone(),
+        Some(controller.clone()),
+        vec![controller.clone()]
+    ).unwrap();
+    pic.tick();
 }
 
 pub fn generate_sns_init_args(neuron_data: &HashMap<usize, Neuron>) -> Governance {

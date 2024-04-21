@@ -66,7 +66,13 @@ impl RewardsTestEnv {
             multiplier,
             &self.users
         );
-        reinstall_sns_with_data(&mut self.pic, &neuron_data, &self.sns_gov_canister_id);
+        self.pic.tick();
+        reinstall_sns_with_data(
+            &mut self.pic,
+            &neuron_data,
+            &self.sns_gov_canister_id,
+            &self.controller
+        );
         self.pic.tick();
     }
 }
@@ -136,13 +142,13 @@ impl RewardsTestEnvBuilder {
             1,
             &self.users
         );
-        let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data);
+        let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data, &self.controller);
         let rewards_canister_id = setup_rewards_canister(
             &mut pic,
             &token_ledgers,
-            &sns_gov_canister_id
+            &sns_gov_canister_id,
+            &self.controller
         );
-
         let token_ledger_ids: Vec<Principal> = token_ledgers
             .iter()
             .map(|(_, id)| id.clone())
