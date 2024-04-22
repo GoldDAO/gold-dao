@@ -140,7 +140,7 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build", "icp_neuron test build", "token_metrics test build", "sns_rewards test build"]
+      needs: ["gldt_core test build", "icp_neuron test build", "token_metrics test build", "sns_rewards test build", "integration_testing test build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
