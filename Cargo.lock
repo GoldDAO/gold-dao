@@ -1214,7 +1214,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "integration-testing"
+name = "integration_testing"
 version = "0.1.0"
 dependencies = [
  "candid",
