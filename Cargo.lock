@@ -190,9 +190,9 @@ checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 
 [[package]]
 name = "candid"
-version = "0.10.3"
+version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "182543fbc03b4ad0bfc384e6b68346e0b0aad0b11d075b71b4fcaa5d07f8862c"
+checksum = "818394610ed32d9e4c81025f97c8580698b69542527efde18514cf9ad1f8f5f0"
 dependencies = [
  "anyhow",
  "binread",
@@ -213,9 +213,9 @@ dependencies = [
 
 [[package]]
 name = "candid_derive"
-version = "0.6.5"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "970c220da8aa2fa6f7ef5dbbf3ea5b620a59eb3ac107cfb95ae8c6eebdfb7a08"
+checksum = "3de398570c386726e7a59d9887b68763c481477f9a043fb998a2e09d428df1a9"
 dependencies = [
  "lazy_static",
  "proc-macro2",
@@ -237,7 +237,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "canister_client_macros",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "serde",
  "tracing",
 ]
@@ -266,7 +266,7 @@ version = "0.1.0"
 name = "canister_time"
 version = "0.1.0"
 dependencies = [
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "ic-cdk-timers",
  "ic0",
  "types",
@@ -738,8 +738,8 @@ dependencies = [
  "candid",
  "clippy",
  "gldt_libs",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
@@ -755,8 +755,8 @@ dependencies = [
  "clippy",
  "futures",
  "gldt_libs",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
  "icrc-ledger-types",
  "serde",
@@ -771,8 +771,8 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "clippy",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "icrc-ledger-types",
  "serde",
  "serde_bytes",
@@ -972,7 +972,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4ec8231f413b8a4d74b99d7df26d6e917d6528a6245abde27f251210dcf9b72"
 dependencies = [
  "candid",
- "ic-cdk-macros",
+ "ic-cdk-macros 0.8.4",
+ "ic0",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "ic-cdk"
+version = "0.13.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8859bc2b863a77750acf199e1fb7e3fc403e1b475855ba13f59cb4e4036d238"
+dependencies = [
+ "candid",
+ "ic-cdk-macros 0.13.2",
  "ic0",
  "serde",
  "serde_bytes",
@@ -993,13 +1006,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "ic-cdk-timers"
-version = "0.6.0"
+name = "ic-cdk-macros"
+version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c43b9706fef3ad10c4192a14801d16bd9539068239f0f06f257857441364329"
+checksum = "a45800053d80a6df839a71aaea5797e723188c0b992618208ca3b941350c7355"
+dependencies = [
+ "candid",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_tokenstream",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "ic-cdk-timers"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "054727a3a1c486528b96349817d54290ff70df6addf417def456ea708a16f7fb"
 dependencies = [
  "futures",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "ic0",
  "serde",
  "serde_bytes",
@@ -1020,14 +1047,14 @@ dependencies = [
 
 [[package]]
 name = "ic-ledger-types"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1fea91d351eca80ffa8427e77df3210e37d292c6c75afbe1ca5e6437418e022"
+checksum = "1d162fc508161221cc57bec8c0c4e029ae7c9eb92db461237499bb38c811ed4e"
 dependencies = [
  "candid",
  "crc32fast",
  "hex",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "serde",
  "serde_bytes",
  "sha2",
@@ -1044,9 +1071,9 @@ dependencies = [
 
 [[package]]
 name = "ic-transport-types"
-version = "0.33.0"
+version = "0.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d595b9f72e5952bcb22e5cda37ae1c8d6579a24aaa224b63b8d245f386bdcbb2"
+checksum = "7c06d3c1292368c813f8104d9d8294bda5577ea6fe4501a65997d0b7f155f15f"
 dependencies = [
  "candid",
  "hex",
@@ -1094,7 +1121,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "canister_client",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "icp_ledger_canister",
  "types",
 ]
@@ -1111,8 +1138,8 @@ dependencies = [
  "getrandom 0.2.12",
  "hex",
  "http_request",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
@@ -1170,7 +1197,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "canister_client",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "icrc_ledger_canister",
  "types",
 ]
@@ -1225,8 +1252,8 @@ dependencies = [
  "futures",
  "hex",
  "http_request",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
@@ -1406,7 +1433,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "canister_client",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "nns_governance_canister",
  "types",
 ]
@@ -1555,7 +1582,7 @@ dependencies = [
  "base64 0.13.1",
  "candid",
  "hex",
- "ic-cdk",
+ "ic-cdk 0.12.0",
  "reqwest",
  "schemars",
  "serde",
@@ -2157,7 +2184,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "canister_client",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "sns_governance_canister",
  "types",
 ]
@@ -2173,8 +2200,8 @@ dependencies = [
  "canister_tracing_macros",
  "futures",
  "http_request",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
@@ -2222,7 +2249,7 @@ dependencies = [
 name = "stable_memory"
 version = "0.1.0"
 dependencies = [
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "ic-stable-structures",
 ]
 
@@ -2399,8 +2426,8 @@ dependencies = [
  "canister_tracing_macros",
  "hex",
  "http_request",
- "ic-cdk",
- "ic-cdk-macros",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
  "ic-stable-structures",
  "icrc-ledger-types",
@@ -2656,7 +2683,7 @@ dependencies = [
  "candid",
  "canister_time",
  "ciborium",
- "ic-cdk",
+ "ic-cdk 0.13.2",
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
