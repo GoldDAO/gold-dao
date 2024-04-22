@@ -15,6 +15,7 @@
       - backend/canisters/sns_rewards/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
+    - rustup toolchain install stable --target 
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
