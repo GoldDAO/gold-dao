@@ -53,6 +53,9 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: integration_testing
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
@@ -140,7 +143,7 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build", "icp_neuron test build", "token_metrics test build", "sns_rewards test build", "integration_testing test build"]
+      needs: ["gldt_core test build", "icp_neuron test build", "token_metrics test build", "sns_rewards test build"]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
