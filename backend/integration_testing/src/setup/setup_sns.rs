@@ -107,7 +107,11 @@ pub fn create_sns_with_data(
 
     let sns_gov_id = pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
     pic.add_cycles(sns_gov_id, 100_000_000_000_000_000);
-    pic.set_controllers(sns_gov_id, Some(controller.clone()), vec![controller.clone()]).unwrap();
+    pic.set_controllers(
+        sns_gov_id,
+        Some(controller.clone()),
+        vec![controller.clone(), sns_gov_id.clone()]
+    ).unwrap();
 
     pic.tick();
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
@@ -143,11 +147,11 @@ pub fn reinstall_sns_with_data(
     ).unwrap();
     pic.tick();
     pic.start_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
-    pic.set_controllers(
-        sns_gov_canister_id.clone(),
-        Some(controller.clone()),
-        vec![controller.clone()]
-    ).unwrap();
+    // pic.set_controllers(
+    //     controller.clone(),
+    //     Some(sns_gov_canister_id.clone()),
+    //     vec![controller.clone(), sns_gov_canister_id]
+    // ).unwrap();
     pic.tick();
 }
 

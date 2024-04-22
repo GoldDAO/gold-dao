@@ -55,6 +55,7 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
     let mut test_env = default_test_setup();
 
     let rewards_canister_id = test_env.rewards_canister_id;
+    let sns_gov_id = test_env.sns_gov_canister_id;
 
     let token_list = vec![(
         "ICP".to_string(),
@@ -66,7 +67,7 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
 
     let res = set_reward_token_types(
         &mut test_env.pic,
-        test_env.controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     );
@@ -79,6 +80,7 @@ fn test_set_reward_token_types_with_bad_token_symbol() {
     let mut test_env = default_test_setup();
 
     let rewards_canister_id = test_env.rewards_canister_id;
+    let sns_gov_id = test_env.sns_gov_canister_id;
 
     let token_list = vec![(
         "WONT_WORK".to_string(),
@@ -90,7 +92,7 @@ fn test_set_reward_token_types_with_bad_token_symbol() {
 
     let res = set_reward_token_types(
         &mut test_env.pic,
-        test_env.controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     );
@@ -124,6 +126,7 @@ fn test_set_reward_token_validate() {
     let mut test_env = default_test_setup();
 
     let rewards_canister_id = test_env.rewards_canister_id;
+    let sns_gov_id = test_env.sns_gov_canister_id;
 
     let token_list = vec![(
         "ICP".to_string(),
@@ -135,7 +138,7 @@ fn test_set_reward_token_validate() {
 
     let res = set_reward_token_types_validate(
         &mut test_env.pic,
-        test_env.controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     ).is_ok();

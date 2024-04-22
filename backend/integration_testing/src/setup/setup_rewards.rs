@@ -13,7 +13,6 @@ pub struct Args {
     sns_ledger_canister_id: Principal,
     ogy_ledger_canister_id: Principal,
     sns_gov_canister_id: Principal,
-    authorized_principals: Vec<Principal>,
 }
 
 pub fn setup_rewards_canister(
@@ -57,7 +56,6 @@ pub fn setup_rewards_canister(
         sns_ledger_canister_id,
         ogy_ledger_canister_id,
         sns_gov_canister_id: sns_canister_id.clone(),
-        authorized_principals: vec![controller.clone()],
     };
     pic.install_canister(
         rewards_canister,

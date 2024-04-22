@@ -114,8 +114,8 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
 #[test]
 fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
     let mut test_env = default_test_setup();
+    let sns_gov_id = test_env.sns_gov_canister_id;
 
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::parse("ICP").unwrap();
@@ -128,7 +128,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
     // should succeed
     let res = set_reserve_transfer_amounts(
         &mut test_env.pic,
-        controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     ).unwrap();
@@ -172,7 +172,7 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
 fn test_set_reserve_transfer_amounts_validate() {
     let test_env = default_test_setup();
 
-    let controller = test_env.controller;
+    let sns_gov_id = test_env.sns_gov_canister_id;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::parse("ICP").unwrap();
@@ -185,7 +185,7 @@ fn test_set_reserve_transfer_amounts_validate() {
     // should succeed
     let res = set_reserve_transfer_amounts_validate(
         &test_env.pic,
-        controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     ).is_ok();
@@ -197,7 +197,7 @@ fn test_set_reserve_transfer_amounts_validate() {
 fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
     let mut test_env = default_test_setup();
 
-    let controller = test_env.controller;
+    let sns_gov_id = test_env.sns_gov_canister_id;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::parse("ICP").unwrap();
@@ -211,7 +211,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
     // should succeed - caller is root nns key
     let res = set_reserve_transfer_amounts(
         &mut test_env.pic,
-        controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     ).unwrap();
@@ -236,7 +236,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
 
     let res = set_reserve_transfer_amounts(
         &mut test_env.pic,
-        controller,
+        sns_gov_id,
         rewards_canister_id,
         &reserve_args
     ).unwrap();
