@@ -18,7 +18,7 @@
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - curl -o ./pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/3.0.1/pocket-ic-x86_64-linux.gz
+    - wget -o ./pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/3.0.1/pocket-ic-x86_64-linux.gz
     - gzip -d pocket-ic.gz
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - chmod +x ./backend/integration_testing/pocket-ic
