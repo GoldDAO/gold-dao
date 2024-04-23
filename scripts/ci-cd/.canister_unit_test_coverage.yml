@@ -22,7 +22,7 @@ $[[ inputs.src-folder ]] tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml --rustflags="-C linker-flavor=gcc"
+    - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml --rustflags="-C linker-flavor=ld"
   coverage: /^\d+.\d+% coverage/
   artifacts:
     reports:
