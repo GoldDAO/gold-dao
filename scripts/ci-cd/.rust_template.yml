@@ -4,7 +4,7 @@
   tags:
     - docker
     - big
-  image: rust:latest
+  image: rust:bookworm-slim
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
@@ -14,7 +14,7 @@
       - backend/canisters/token_metrics/target
       - backend/canisters/sns_rewards/target
   before_script:
-    - apt install build-essential
+    - apt-get install build-essential
     - apt install pkg-config -y
     - apt update > /dev/null && apt install -y wget pkg-config libssl-dev > /dev/null
     - apt install gcc cmake -y
