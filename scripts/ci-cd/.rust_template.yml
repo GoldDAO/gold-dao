@@ -4,7 +4,7 @@
   tags:
     - docker
     - big
-  image: rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
+  image: rust:slim-bookworm@sha256:6f4e99235442c7e62420313392840288f1f3ac6a3fb99dda0d529aa893b3f36c
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
