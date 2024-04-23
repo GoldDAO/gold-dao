@@ -14,8 +14,10 @@
       - backend/canisters/token_metrics/target
       - backend/canisters/sns_rewards/target
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
-    - apt install gcc cmake -y
+    - sudo apt install build-essential
+    - apt install pkg-config -y
+    - apt update > /dev/null && apt install -y wget pkg-config libssl-dev > /dev/null
+    - sudo apt install gcc cmake -y
     - rustup toolchain install stable
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
