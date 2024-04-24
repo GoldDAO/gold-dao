@@ -16,8 +16,9 @@
   before_script:
     - apt update -y > /dev/null && apt install -y wget pkg-config libssl-dev > /dev/null
     - apt-get install build-essential -y
+    - apt-get install autoconf libtool -y
     - apt-get install gcc-multilib -y
-    - apt install gcc cmake -y
+    - apt-get install gcc cmake -y
     - rustup toolchain install stable
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
