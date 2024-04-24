@@ -42,7 +42,10 @@ impl RuntimeState {
             number_of_neurons: self.data.neuron_maturity.len(),
             sync_info: self.data.sync_info,
             authorized_principals: self.data.authorized_principals.clone(),
-            daily_reserve_transfer: self.data.daily_reserve_transfer.clone(),
+            daily_reserve_transfer: self.data.daily_reserve_transfer
+                .iter()
+                .map(|(token, val)| format!("{:?} - {}", token, val))
+                .collect(),
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
         }
     }
@@ -68,7 +71,7 @@ pub struct Metrics {
     pub number_of_neurons: usize,
     pub sync_info: SyncInfo,
     pub authorized_principals: Vec<Principal>,
-    pub daily_reserve_transfer: HashMap<TokenSymbol, Nat>,
+    pub daily_reserve_transfer: Vec<String>,
     pub last_daily_reserve_transfer_time: TimestampMillis,
 }
 
