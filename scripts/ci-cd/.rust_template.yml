@@ -4,7 +4,7 @@
   tags:
     - docker
     - big
-  image: rust:slim-bookworm
+  image: rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
   cache:
   - key: "rust-$CI_COMMIT_REF_SLUG"
     paths:
@@ -14,23 +14,9 @@
       - backend/canisters/token_metrics/target
       - backend/canisters/sns_rewards/target
   before_script:
-    - apt update -y > /dev/null && apt install -y wget pkg-config libssl-dev > /dev/null
-    - apt-get install build-essential -y
-    - apt-get install autoconf libtool -y
-    - apt-get install libssl-dev -y
-    - apt-get install gcc-multilib -y
-    - apt-get install gcc cmake -y
-    - rustup toolchain install stable
+    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
-    - rustup target add x86_64-unknown-linux-gnu
     - mkdir -pv .cargo
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/3.0.1/pocket-ic-x86_64-linux.gz
-    - gzip -d pocket-ic.gz
-    - mv ./pocket-ic ./backend/integration_testing/pocket-ic
-    - chmod +x ./backend/integration_testing/pocket-ic
     - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
-    - ulimit -n 102400
-    - ulimit -f 1024000 
-    - export PATH=$PATH:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
     - export PATH="$PWD/.cargo/bin:$PATH"
