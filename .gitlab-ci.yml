@@ -53,9 +53,6 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_rewards
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: integration_testing
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
