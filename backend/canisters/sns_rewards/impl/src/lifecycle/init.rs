@@ -54,8 +54,8 @@ fn init(args: Args) {
             data.daily_reserve_transfer.insert(token, Nat::from(100_000_000u64));
         }
 
-        data.sns_governance_canister = args.sns_gov_canister_id;
         data.authorized_principals = vec![args.sns_gov_canister_id];
+        data.sns_governance_canister = args.sns_gov_canister_id;
     }
 
     let runtime_state = RuntimeState::new(env, data);

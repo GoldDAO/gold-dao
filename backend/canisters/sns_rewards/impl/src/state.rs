@@ -41,6 +41,9 @@ impl RuntimeState {
             sns_governance_canister: self.data.sns_governance_canister,
             number_of_neurons: self.data.neuron_maturity.len(),
             sync_info: self.data.sync_info,
+            authorized_principals: self.data.authorized_principals.clone(),
+            daily_reserve_transfer: self.data.daily_reserve_transfer.clone(),
+            last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
         }
     }
 
@@ -64,6 +67,9 @@ pub struct Metrics {
     pub sns_governance_canister: Principal,
     pub number_of_neurons: usize,
     pub sync_info: SyncInfo,
+    pub authorized_principals: Vec<Principal>,
+    pub daily_reserve_transfer: HashMap<TokenSymbol, Nat>,
+    pub last_daily_reserve_transfer_time: TimestampMillis,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
