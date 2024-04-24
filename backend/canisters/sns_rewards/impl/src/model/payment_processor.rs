@@ -2,7 +2,7 @@ use std::{ borrow::Cow, collections::BTreeMap };
 
 use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::now_millis;
-use ic_ledger_types::Subaccount;
+use icrc_ledger_types::icrc1::account::Subaccount;
 use num_bigint::BigUint;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
@@ -165,21 +165,30 @@ impl PaymentRound {
         let total_neuron_maturity_for_interval = Self::calculate_aggregated_maturity(
             &neuron_maturity_for_interval
         );
-
-        let transaction_fees = Self::calculate_transaction_fees(
-            &neuron_maturity_for_interval,
-            token_info.fee
-        )?;
-        let transaction_fees = transaction_fees + token_info.fee;
-        if transaction_fees > reward_pool_balance.clone() {
+        if token_info.fee > reward_pool_balance.clone() {
             let err = format!(
-                "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. The fees exceed the amount in the reward pool. distribution will inevitably result in some transactions containing insufficient funds",
+                "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. it would cost more than the balance of the reward pool to send it to the round pool",
                 id,
                 token.clone()
             );
             return Err(err);
         }
-        let tokens_to_distribute = reward_pool_balance.clone() - transaction_fees.clone();
+        let round_funds_total = reward_pool_balance.clone() - token_info.fee;
+
+        let transaction_fees = Self::calculate_transaction_fees(
+            &neuron_maturity_for_interval,
+            token_info.fee
+        )?;
+
+        if transaction_fees > round_funds_total.clone() {
+            let err = format!(
+                "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. The fees for all payments in the payment round exceed the amount in the reward pool. distribution will inevitably result in some transactions containing insufficient funds",
+                id,
+                token.clone()
+            );
+            return Err(err);
+        }
+        let tokens_to_distribute = round_funds_total.clone() - transaction_fees.clone();
 
         if total_neuron_maturity_for_interval == 0u64 {
             let err = format!(
@@ -198,7 +207,7 @@ impl PaymentRound {
 
         Ok(Self {
             id: id,
-            round_funds_total: reward_pool_balance,
+            round_funds_total: round_funds_total,
             tokens_to_distribute,
             fees: transaction_fees,
             ledger_id: token_info.ledger_id,
@@ -317,7 +326,7 @@ impl PaymentRound {
         // add u16 bytes to end of 32 byte array
         subaccount[32 - 2..].copy_from_slice(&num_bytes);
 
-        Subaccount(subaccount)
+        subaccount
     }
 }
 

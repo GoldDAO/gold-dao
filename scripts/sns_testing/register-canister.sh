@@ -4,9 +4,10 @@ PEM_FILE="tmp.pem"
 DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
 CANISTER_IDS="sns_canister_ids.json"
 
-CID="j2neh-vqaaa-aaaal-aduxq-cai"
+CID="2f5ll-gqaaa-aaaak-qcfuq-cai"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
+./scripts/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
 

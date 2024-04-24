@@ -17,6 +17,7 @@ pub use token::*;
 pub struct Empty {}
 
 pub type CanisterId = Principal;
+pub type CanisterWasm = Vec<u8>;
 pub type Cycles = u64;
 pub type Hash = [u8; 32];
 pub type Maturity = u64;

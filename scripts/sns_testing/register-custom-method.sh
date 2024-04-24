@@ -4,8 +4,6 @@ PEM_FILE="tmp.pem"
 DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
 CANISTER_IDS="sns_canister_ids.json"
 
-CID="j2neh-vqaaa-aaaal-aduxq-cai"
-
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
 ./scripts/sns_testing/prepare_scripts.sh staging
@@ -17,18 +15,18 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Adding the manage_reward_recipients method to allow to set the accounts to receive the maturity from the NNS neurons.\";
+        summary=\"Adding the set_reserve_transfer_amounts method to allow to set the daily tokens sent to the reward pool as governance rewards.\";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_003 : nat64);
-                name = \"Manage NNS neuron reward recipients\";
-                description = opt \"Proposal to update the recipients of the NNS neuron maturity.\";
+                id = (1_004 : nat64);
+                name = \"Set GLDGov reserve transfer amount.\";
+                description = opt \"Proposal to update the daily reserve transfer amount of GLDGov that defines the reward rate of Gold DAO voters.\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
-                        validator_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
-                        target_canister_id = opt principal \"j2neh-vqaaa-aaaal-aduxq-cai\";
-                        validator_method_name = opt \"manage_reward_recipients_validate\";
-                        target_method_name = opt \"manage_reward_recipients\"
+                        validator_canister_id = opt principal \"2f5ll-gqaaa-aaaak-qcfuq-cai\";
+                        target_canister_id = opt principal \"2f5ll-gqaaa-aaaak-qcfuq-cai\";
+                        validator_method_name = opt \"set_reserve_transfer_amounts_validate\";
+                        target_method_name = opt \"set_reserve_transfer_amounts\"
                     }
                 }
             }

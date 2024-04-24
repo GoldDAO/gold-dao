@@ -38,7 +38,7 @@ impl Storable for TokenSymbol {
     };
 }
 
-#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, Copy)]
 pub struct TokenInfo {
     pub ledger_id: Principal,
     pub fee: u64,

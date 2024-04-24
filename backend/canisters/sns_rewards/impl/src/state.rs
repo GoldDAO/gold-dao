@@ -1,7 +1,7 @@
 use std::collections::{ BTreeMap, HashMap };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use candid::{ CandidType, Principal };
+use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
 use utils::{
@@ -10,7 +10,11 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::model::{ maturity_history::MaturityHistory, payment_processor::PaymentProcessor };
+use crate::model::{
+    maturity_history::MaturityHistory,
+    payment_processor::PaymentProcessor,
+    neuron_owners::NeuronOwnership,
+};
 
 canister_state!(RuntimeState);
 
@@ -36,8 +40,13 @@ impl RuntimeState {
             },
             sns_governance_canister: self.data.sns_governance_canister,
             number_of_neurons: self.data.neuron_maturity.len(),
-            number_of_owners: self.data.principal_neurons.len(),
             sync_info: self.data.sync_info,
+            authorized_principals: self.data.authorized_principals.clone(),
+            daily_reserve_transfer: self.data.daily_reserve_transfer
+                .iter()
+                .map(|(token, val)| format!("{:?} - {}", token, val))
+                .collect(),
+            last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
         }
     }
 
@@ -60,8 +69,10 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub sns_governance_canister: Principal,
     pub number_of_neurons: usize,
-    pub number_of_owners: usize,
     pub sync_info: SyncInfo,
+    pub authorized_principals: Vec<Principal>,
+    pub daily_reserve_transfer: Vec<String>,
+    pub last_daily_reserve_transfer_time: TimestampMillis,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -85,12 +96,12 @@ pub struct Data {
     pub sns_governance_canister: Principal,
     /// Stores the maturity information about each neuron
     pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
-    /// Stores the mapping of each principal to its neurons
-    pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
     /// Information about periodic synchronization
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
+    /// owners of neurons
+    pub neuron_owners: NeuronOwnership,
     /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
     /// valid tokens and their associated ledger data
@@ -99,6 +110,10 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     /// a boolean check for if we're currently synchronizing neuron data into the canister.
     pub is_synchronizing_neurons: bool,
+    /// The daily amount of tokens to transfer from the reserve pool sub account to the reward pool sub account in e8s for each token type
+    pub daily_reserve_transfer: HashMap<TokenSymbol, Nat>,
+    /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
+    pub last_daily_reserve_transfer_time: TimestampMillis,
 }
 
 impl Default for Data {
@@ -106,13 +121,15 @@ impl Default for Data {
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
             neuron_maturity: BTreeMap::new(),
-            principal_neurons: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
+            neuron_owners: NeuronOwnership::default(),
             payment_processor: PaymentProcessor::default(),
             tokens: HashMap::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             is_synchronizing_neurons: false,
+            daily_reserve_transfer: HashMap::new(),
+            last_daily_reserve_transfer_time: TimestampMillis::default(),
         }
     }
 }

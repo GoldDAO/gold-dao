@@ -17,6 +17,7 @@ payments are done in batches and upon each individual transfer response it's sta
 */
 
 use crate::{
+    consts::REWARD_POOL_SUB_ACCOUNT,
     model::payment_processor::{
         MaturityDelta,
         Payment,
@@ -25,12 +26,12 @@ use crate::{
         PaymentStatus,
     },
     state::{ mutate_state, read_state },
+    utils::transfer_token,
 };
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
-use ic_ledger_types::{ Subaccount, DEFAULT_SUBACCOUNT };
-use icrc_ledger_types::icrc1::{ account::Account, transfer::TransferArg };
+use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 use tracing::{ debug, error, info };
@@ -94,16 +95,9 @@ pub async fn distribute_rewards(retry_attempt: u8) {
 pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
     let new_round_key = read_state(|state| state.data.payment_processor.next_key());
-    let is_test_mode = read_state(|s| s.env.is_test_mode());
 
     for (token, token_info) in reward_tokens.into_iter() {
-        let mut reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
-
-        if is_test_mode {
-            if token == TokenSymbol::parse("ICP").unwrap() {
-                reward_pool_balance = Nat::from(33_300_000_000u64);
-            }
-        }
+        let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
 
         if reward_pool_balance == Nat::from(0u64) {
             info!(
@@ -216,10 +210,10 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
     let ledger_id = round.ledger_id.clone();
     let round_pool_subaccount = round.get_payment_round_sub_account_id();
 
-    let from_sub_account = Subaccount([0; 32]);
+    let from_sub_account = REWARD_POOL_SUB_ACCOUNT;
     let account = Account {
         owner: ic_cdk::api::id(),
-        subaccount: Some(round_pool_subaccount.0),
+        subaccount: Some(round_pool_subaccount),
     };
 
     transfer_token(from_sub_account, account, ledger_id, total_to_transfer).await
@@ -255,7 +249,7 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
             ledger_canister_id,
             &(Account {
                 owner: ic_cdk::api::id(),
-                subaccount: Some(DEFAULT_SUBACCOUNT.0),
+                subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
             })
         ).await
     {
@@ -267,31 +261,6 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
             );
             Nat::from(0u64)
         }
-    }
-}
-
-async fn transfer_token(
-    from_sub_account: Subaccount,
-    to_account: Account,
-    ledger_id: Principal,
-    amount: Nat
-) -> Result<(), String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_transfer(
-            ledger_id,
-            &(TransferArg {
-                from_subaccount: Some(from_sub_account.0),
-                to: to_account,
-                fee: None,
-                created_at_time: None,
-                amount: amount,
-                memo: None,
-            })
-        ).await
-    {
-        Ok(Ok(_)) => Ok(()),
-        Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
-        Err(error) => Err(format!("Network error: {error:?}")),
     }
 }
 

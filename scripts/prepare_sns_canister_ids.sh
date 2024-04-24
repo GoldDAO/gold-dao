@@ -51,7 +51,8 @@ jq --arg choice $1 '{
     .gldt_ledger_indexer[$choice],
     .gldt_swap_app[$choice],
     .icp_neuron[$choice],
-    .token_metrics[$choice]
+    .token_metrics[$choice],
+    .sns_rewards[$choice]
   ]
 }' $INPUT_FILE > $OUTPUT_FILE
 

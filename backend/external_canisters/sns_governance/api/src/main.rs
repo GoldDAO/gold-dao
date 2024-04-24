@@ -6,6 +6,7 @@ fn main() {
     generate_candid_method!(sns_governance, get_nervous_system_parameters, query);
     generate_candid_method!(sns_governance, list_neurons, query);
     generate_candid_method!(sns_governance, list_proposals, query);
+    generate_candid_method!(sns_governance, get_neuron, query);
 
     generate_candid_method!(sns_governance, manage_neuron, update);
 
