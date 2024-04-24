@@ -32,4 +32,6 @@
     - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
     - ulimit -n 102400
     - ulimit -f 1024000 
+    - ln -s /usr/bin/lld-11 /usr/bin/ld
+    - export PATH=$PATH:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
     - export PATH="$PWD/.cargo/bin:$PATH"
