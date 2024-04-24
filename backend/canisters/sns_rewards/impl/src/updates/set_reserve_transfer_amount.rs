@@ -7,7 +7,7 @@ use ic_cdk::{ query, update };
 use serde::{ Deserialize, Serialize };
 use types::TokenSymbol;
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum SetReserveTransferAmountResponse {
     Success,
     InternalError(String),
@@ -16,7 +16,7 @@ use SetReserveTransferAmountResponse::*;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct SetReserveTransferAmountRequest {
-    transfer_amounts: HashMap<TokenSymbol, Nat>,
+    pub transfer_amounts: HashMap<TokenSymbol, Nat>,
 }
 
 #[update(guard = "caller_is_governance_principal")]

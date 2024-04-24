@@ -101,16 +101,8 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
         let maturity = calculate_total_maturity(neuron);
 
         let neuron_info = NeuronInfo {
-            last_synced_maturity: if is_test_mode.clone() {
-                10000
-            } else {
-                maturity
-            },
-            accumulated_maturity: if is_test_mode.clone() {
-                10000
-            } else {
-                0
-            },
+            last_synced_maturity: maturity,
+            accumulated_maturity: 0,
             rewarded_maturity: HashMap::new(),
         };
 
