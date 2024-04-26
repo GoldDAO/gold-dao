@@ -3,14 +3,12 @@ use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::Tran
 use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::debug;
 
-use crate::{ state::read_state, types::claim_neuron_response::UserClaimErrorResponse };
+use crate::state::read_state;
 
 use sns_governance_canister::types::get_neuron_response::Result::{
     Neuron as NeuronResponse,
     Error as NeuronErrorResponse,
 };
-
-use UserClaimErrorResponse::*;
 
 pub async fn transfer_token(
     from_sub_account: Subaccount,
@@ -36,10 +34,13 @@ pub async fn transfer_token(
         Err(error) => Err(format!("Network error: {error:?}")),
     }
 }
+pub enum FetchNeuronDataByIdResponse {
+    NeuronDoesNotExist,
+    Ok(Neuron),
+    InternalError(String),
+}
 
-pub async fn fetch_neuron_data_by_id(
-    neuron_id: &NeuronId
-) -> Result<Neuron, UserClaimErrorResponse> {
+pub async fn fetch_neuron_data_by_id(neuron_id: &NeuronId) -> FetchNeuronDataByIdResponse {
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let args = sns_governance_canister::get_neuron::Args {
         neuron_id: Some(neuron_id.clone()),
@@ -49,11 +50,11 @@ pub async fn fetch_neuron_data_by_id(
             match neuron_data.result {
                 Some(neuron) => {
                     match neuron {
-                        NeuronResponse(n) => Ok(n),
-                        NeuronErrorResponse(_) => Err(NeuronDoesNotExist),
+                        NeuronResponse(n) => FetchNeuronDataByIdResponse::Ok(n),
+                        NeuronErrorResponse(_) => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
                     }
                 }
-                None => Err(NeuronDoesNotExist),
+                None => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
             }
         }
         Err(e) => {
@@ -63,18 +64,25 @@ pub async fn fetch_neuron_data_by_id(
                 e.0,
                 e.1
             );
-            Err(InternalError(e.1))
+            FetchNeuronDataByIdResponse::InternalError(e.1)
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum AuthenticateByHotkeyResponse {
+    NeuronHotKeyAbsent,
+    Ok(bool),
+    NeuronHotKeyInvalid,
 }
 
 pub fn authenticate_by_hotkey(
     neuron_data: &Neuron,
     caller: &Principal
-) -> Result<bool, UserClaimErrorResponse> {
+) -> AuthenticateByHotkeyResponse {
     // first is always the nns owner principal so if less than or equal to 1 then no hotkeys have been added.
     if neuron_data.permissions.len() <= 1 {
-        return Err(NeuronHotKeyAbsent);
+        return AuthenticateByHotkeyResponse::NeuronHotKeyAbsent;
     }
 
     // Check if any of the permission principals contain an entry that matches the caller principal
@@ -85,9 +93,9 @@ pub fn authenticate_by_hotkey(
         .count();
 
     if matching_caller_hotkey >= 1 {
-        Ok(true)
+        AuthenticateByHotkeyResponse::Ok(true)
     } else {
-        Err(NeuronHotKeyInvalid)
+        AuthenticateByHotkeyResponse::NeuronHotKeyInvalid
     }
 }
 
@@ -97,7 +105,7 @@ mod tests {
     use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
 
     use crate::state::{ init_state, RuntimeState };
-    use crate::types::claim_neuron_response::UserClaimErrorResponse::*;
+    use crate::utils::AuthenticateByHotkeyResponse;
     use super::authenticate_by_hotkey;
 
     fn init_runtime_state() {
@@ -125,9 +133,9 @@ mod tests {
             permission_type: vec![3, 4],
         });
 
-        let result = authenticate_by_hotkey(&neuron, &caller).unwrap();
+        let result = authenticate_by_hotkey(&neuron, &caller);
 
-        assert_eq!(result, true);
+        assert_eq!(result, AuthenticateByHotkeyResponse::Ok(true));
     }
 
     #[test]
@@ -146,17 +154,10 @@ mod tests {
             principal: Some(sns_neuron_owner_id.clone()),
             permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
         });
-        // neuron.permissions.push(NeuronPermission {
-        //     principal: Some(caller.clone()),
-        //     permission_type: vec![3, 4],
-        // });
 
         let result = authenticate_by_hotkey(&neuron, &caller);
 
-        match result {
-            Ok(_) => {}
-            Err(e) => assert_eq!(e, NeuronHotKeyAbsent),
-        }
+        assert_eq!(result, AuthenticateByHotkeyResponse::NeuronHotKeyAbsent)
     }
 
     #[test]
@@ -182,9 +183,6 @@ mod tests {
 
         let result = authenticate_by_hotkey(&neuron, &caller);
 
-        match result {
-            Ok(_) => {}
-            Err(e) => assert_eq!(e, NeuronHotKeyInvalid),
-        }
+        assert_eq!(result, AuthenticateByHotkeyResponse::NeuronHotKeyInvalid)
     }
 }
