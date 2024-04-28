@@ -1,11 +1,17 @@
 type Args = record { neuron_id : NeuronId };
 type Args_1 = record { token : text; neuron_id : NeuronId };
-type Args_2 = record {
-  sns_gov_canister_id : principal;
-  test_mode : bool;
-  ogy_ledger_canister_id : principal;
-  icp_ledger_canister_id : principal;
-  sns_ledger_canister_id : principal;
+type Args_2 = record { token_list : vec record { text; TokenInfo } };
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
 };
 type NeuronId = record { id : blob };
 type Response = variant {
@@ -36,33 +42,31 @@ type Response_2 = variant {
   NeuronDoesNotExist;
   InternalError : text;
 };
-type Result = variant {
-  Ok : SetReserveTransferAmountResponse;
-  Err : SetReserveTransferAmountResponse;
+type Response_3 = variant { Success; InternalError : text };
+type Response_4 = variant { Success; InternalError : text };
+type StreamingStrategy = variant {
+  Callback : record {
+    token : Token;
+    callback : func (Token) -> (HttpResponse) query;
+  };
 };
-type SetReserveTransferAmountRequest = record {
-  transfer_amounts : vec record { text; nat };
+type Token = record {
+  key : text;
+  sha256 : opt blob;
+  index : nat;
+  content_encoding : text;
 };
-type SetReserveTransferAmountResponse = variant {
-  Success;
-  InternalError : text;
-};
-type SetRewardTokenTypesRequest = record {
-  token_list : vec record { text; TokenInfo };
-};
-type SetRewardTokenTypesResponse = variant { Success; InternalError : text };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
   ledger_id : principal;
 };
-service : (Args_2) -> {
+service : (record {}) -> {
   add_neuron_ownership : (Args) -> (Response);
   claim_reward : (Args_1) -> (Response_1);
   get_neurons_by_owner : () -> (opt vec NeuronId) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
   remove_neuron_ownership : (Args) -> (Response_2);
-  set_reserve_transfer_amounts : (SetReserveTransferAmountRequest) -> (Result);
-  set_reward_token_types : (SetRewardTokenTypesRequest) -> (
-      SetRewardTokenTypesResponse,
-    );
+  set_reserve_transfer_amounts : (vec record { text; nat }) -> (Response_3);
+  set_reward_token_types : (Args_2) -> (Response_4);
 }

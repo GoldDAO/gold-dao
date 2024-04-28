@@ -2,7 +2,10 @@ use candid::{ Nat, Principal };
 use ic_cdk::update;
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::claim_reward::{ Args, Response };
+pub use sns_rewards_api_canister::claim_reward::{
+    Args as ClaimRewardArgs,
+    Response as ClaimRewardResponse,
+};
 use tracing::error;
 use types::{ TokenInfo, TokenSymbol };
 
@@ -19,17 +22,21 @@ use crate::{
 };
 
 #[update]
-async fn claim_reward(args: Args) -> Response {
+async fn claim_reward(args: ClaimRewardArgs) -> ClaimRewardResponse {
     let caller = read_state(|s| s.env.caller());
     claim_reward_impl(args.neuron_id, args.token, caller).await
 }
 
-pub async fn claim_reward_impl(neuron_id: NeuronId, token: String, caller: Principal) -> Response {
+pub async fn claim_reward_impl(
+    neuron_id: NeuronId,
+    token: String,
+    caller: Principal
+) -> ClaimRewardResponse {
     // verify the token symbol is valid
     let token_symbol = match TokenSymbol::parse(&token) {
         Ok(token) => token,
         Err(e) => {
-            return Response::TokenSymbolInvalid(
+            return ClaimRewardResponse::TokenSymbolInvalid(
                 format!("{e} : token of type {token:?} is not a valid token symbol.")
             );
         }
@@ -39,7 +46,7 @@ pub async fn claim_reward_impl(neuron_id: NeuronId, token: String, caller: Princ
     let token_info = match read_state(|s: &RuntimeState| s.data.tokens.get(&token_symbol).copied()) {
         Some(token) => token,
         None => {
-            return Response::TokenSymbolInvalid(
+            return ClaimRewardResponse::TokenSymbolInvalid(
                 format!("Token info for type {token_symbol:?} not found in state")
             );
         }
@@ -48,10 +55,10 @@ pub async fn claim_reward_impl(neuron_id: NeuronId, token: String, caller: Princ
     let neuron = fetch_neuron_data_by_id(&neuron_id).await;
     let neuron = match neuron {
         FetchNeuronDataByIdResponse::InternalError(e) => {
-            return Response::InternalError(e);
+            return ClaimRewardResponse::InternalError(e);
         }
         FetchNeuronDataByIdResponse::NeuronDoesNotExist => {
-            return Response::NeuronDoesNotExist;
+            return ClaimRewardResponse::NeuronDoesNotExist;
         }
         FetchNeuronDataByIdResponse::Ok(n) => n,
     };
@@ -59,10 +66,10 @@ pub async fn claim_reward_impl(neuron_id: NeuronId, token: String, caller: Princ
     // check the neuron contains the hotkey of the callers principal
     match authenticate_by_hotkey(&neuron, &caller) {
         AuthenticateByHotkeyResponse::NeuronHotKeyAbsent => {
-            return Response::NeuronHotKeyAbsent;
+            return ClaimRewardResponse::NeuronHotKeyAbsent;
         }
         AuthenticateByHotkeyResponse::NeuronHotKeyInvalid => {
-            return Response::NeuronHotKeyInvalid;
+            return ClaimRewardResponse::NeuronHotKeyInvalid;
         }
         AuthenticateByHotkeyResponse::Ok(_) => {}
     }
@@ -72,14 +79,14 @@ pub async fn claim_reward_impl(neuron_id: NeuronId, token: String, caller: Princ
             if owner_principal == caller {
                 // neuron is owned by caller according to our state and has a valid hotkey
                 match transfer_rewards(&neuron_id, owner_principal, &token_info).await {
-                    Ok(amount) => Response::Ok(amount),
-                    Err(e) => Response::TransferFailed(e),
+                    Ok(amount) => ClaimRewardResponse::Ok(amount),
+                    Err(e) => ClaimRewardResponse::TransferFailed(e),
                 }
             } else {
-                return Response::NeuronOwnerInvalid(Some(owner_principal));
+                return ClaimRewardResponse::NeuronOwnerInvalid(Some(owner_principal));
             }
         }
-        None => { Response::NeuronNotClaimed }
+        None => { ClaimRewardResponse::NeuronNotClaimed }
     }
 }
 

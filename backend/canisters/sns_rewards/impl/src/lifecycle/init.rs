@@ -1,6 +1,6 @@
-use candid::{ CandidType, Nat, Principal };
+use candid::Nat;
 use ic_cdk_macros::init;
-use serde::Deserialize;
+use sns_rewards_api_canister::init::Args;
 use tracing::info;
 use types::{ TokenInfo, TokenSymbol };
 use utils::env::CanisterEnv;
@@ -8,15 +8,6 @@ use utils::env::CanisterEnv;
 use crate::state::{ Data, RuntimeState };
 
 use super::init_canister;
-
-#[derive(Deserialize, CandidType)]
-pub struct Args {
-    test_mode: bool,
-    icp_ledger_canister_id: Principal,
-    sns_ledger_canister_id: Principal,
-    ogy_ledger_canister_id: Principal,
-    sns_gov_canister_id: Principal,
-}
 
 #[init]
 fn init(args: Args) {

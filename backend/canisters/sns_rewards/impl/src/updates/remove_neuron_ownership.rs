@@ -1,7 +1,10 @@
 use candid::Principal;
 use ic_cdk::update;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::remove_neuron_ownership::{ Args, Response };
+pub use sns_rewards_api_canister::remove_neuron_ownership::{
+    Args as RemoveNeuronOwnershipArgs,
+    Response as RemoveNeuronOwnershipResponse,
+};
 use utils::env::Environment;
 
 use crate::{
@@ -15,29 +18,32 @@ use crate::{
 };
 
 #[update]
-async fn remove_neuron_ownership(args: Args) -> Response {
+async fn remove_neuron_ownership(args: RemoveNeuronOwnershipArgs) -> RemoveNeuronOwnershipResponse {
     let caller = read_state(|s| s.env.caller());
     remove_neuron_impl(args.neuron_id, caller).await
 }
 
-pub async fn remove_neuron_impl(neuron_id: NeuronId, caller: Principal) -> Response {
+pub async fn remove_neuron_impl(
+    neuron_id: NeuronId,
+    caller: Principal
+) -> RemoveNeuronOwnershipResponse {
     let neuron = fetch_neuron_data_by_id(&neuron_id).await;
     let neuron = match neuron {
         FetchNeuronDataByIdResponse::InternalError(e) => {
-            return Response::InternalError(e);
+            return RemoveNeuronOwnershipResponse::InternalError(e);
         }
         FetchNeuronDataByIdResponse::NeuronDoesNotExist => {
-            return Response::NeuronDoesNotExist;
+            return RemoveNeuronOwnershipResponse::NeuronDoesNotExist;
         }
         FetchNeuronDataByIdResponse::Ok(n) => n,
     };
     // check the neuron contains the hotkey of the callers principal
     match authenticate_by_hotkey(&neuron, &caller) {
         AuthenticateByHotkeyResponse::NeuronHotKeyAbsent => {
-            return Response::NeuronHotKeyAbsent;
+            return RemoveNeuronOwnershipResponse::NeuronHotKeyAbsent;
         }
         AuthenticateByHotkeyResponse::NeuronHotKeyInvalid => {
-            return Response::NeuronHotKeyInvalid;
+            return RemoveNeuronOwnershipResponse::NeuronHotKeyInvalid;
         }
         AuthenticateByHotkeyResponse::Ok(_) => {}
     }
@@ -47,11 +53,11 @@ pub async fn remove_neuron_impl(neuron_id: NeuronId, caller: Principal) -> Respo
             if owner_principal == caller {
                 // neuron is owned by caller according to our state and has a valid hotkey
                 mutate_state(|s| s.data.neuron_owners.remove(&neuron_id, caller));
-                return Response::Ok(neuron_id);
+                return RemoveNeuronOwnershipResponse::Ok(neuron_id);
             } else {
-                return Response::NeuronOwnerInvalid(Some(owner_principal));
+                return RemoveNeuronOwnershipResponse::NeuronOwnerInvalid(Some(owner_principal));
             }
         }
-        None => { Response::NeuronNotClaimed }
+        None => { RemoveNeuronOwnershipResponse::NeuronNotClaimed }
     }
 }

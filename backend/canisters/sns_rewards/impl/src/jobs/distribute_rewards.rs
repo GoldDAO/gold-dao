@@ -18,13 +18,6 @@ payments are done in batches and upon each individual transfer response it's sta
 
 use crate::{
     consts::REWARD_POOL_SUB_ACCOUNT,
-    model::payment_processor::{
-        MaturityDelta,
-        Payment,
-        PaymentRound,
-        PaymentRoundStatus,
-        PaymentStatus,
-    },
     state::{ mutate_state, read_state },
     utils::transfer_token,
 };
@@ -33,6 +26,13 @@ use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
+use sns_rewards_api_canister::payment_round::{
+    MaturityDelta,
+    Payment,
+    PaymentRound,
+    PaymentRoundStatus,
+    PaymentStatus,
+};
 use std::time::Duration;
 use tracing::{ debug, error, info };
 use types::{ Milliseconds, TokenSymbol };
@@ -389,12 +389,10 @@ mod tests {
     use candid::{ Nat, Principal };
     use canister_time::timestamp_millis;
     use sns_governance_canister::types::NeuronId;
+    use sns_rewards_api_canister::payment_round::{ PaymentRound, PaymentStatus };
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::{
-        model::payment_processor::{ PaymentRound, PaymentStatus },
-        state::{ init_state, mutate_state, read_state, RuntimeState },
-    };
+    use crate::{ state::{ init_state, mutate_state, read_state, RuntimeState } };
 
     use super::{ log_payment_round_metrics, update_neuron_rewards };
 

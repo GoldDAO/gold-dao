@@ -5,21 +5,27 @@ use candid::Nat;
 use canister_tracing_macros::trace;
 use ic_cdk::{ query, update };
 
-use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{ Args, Response };
+pub use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{
+    Args as SetValidateReserveTransferAmountsArgs,
+    Response as SetValidateReserveTransferAmountsResponse,
+};
 use types::TokenSymbol;
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
-pub async fn set_reserve_transfer_amounts_validate(args: Args) -> Response {
+pub async fn set_reserve_transfer_amounts_validate(
+    args: SetValidateReserveTransferAmountsArgs
+) -> SetValidateReserveTransferAmountsResponse {
     match validate_set_reserve_transfer_amounts_payload(&args.transfer_amounts) {
         Ok(_) => {}
         Err(e) => {
-            return Response::Error(e);
+            return SetValidateReserveTransferAmountsResponse::Error(e);
         }
     }
     match serde_json::to_string_pretty(&args) {
-        Ok(json) => Response::Success(json),
-        Err(e) => Response::Error(format!("invalid payload : {e:?}")),
+        Ok(json) => SetValidateReserveTransferAmountsResponse::Success(json),
+        Err(e) =>
+            SetValidateReserveTransferAmountsResponse::Error(format!("invalid payload : {e:?}")),
     }
 }
 

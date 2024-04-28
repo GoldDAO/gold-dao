@@ -1,15 +1,18 @@
 use crate::{ guards::caller_is_governance_principal, state::mutate_state };
 use canister_tracing_macros::trace;
 use ic_cdk::update;
-use sns_rewards_api_canister::set_reward_token_types::{ Args, Response };
+pub use sns_rewards_api_canister::set_reward_token_types::{
+    Args as SetRewardTokenTypesArgs,
+    Response as SetRewardTokenTypesResponse,
+};
 use types::{ TokenInfo, TokenSymbol };
 
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
-pub async fn set_reward_token_types(args: Args) -> Response {
+pub async fn set_reward_token_types(args: SetRewardTokenTypesArgs) -> SetRewardTokenTypesResponse {
     match set_reward_token_types_impl(args.token_list) {
-        Ok(_) => Response::Success,
-        Err(err) => Response::InternalError(err),
+        Ok(_) => SetRewardTokenTypesResponse::Success,
+        Err(err) => SetRewardTokenTypesResponse::InternalError(err),
     }
 }
 

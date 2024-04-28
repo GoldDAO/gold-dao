@@ -1,6 +1,4 @@
 use ic_cdk::export_candid;
-use sns_governance_canister::types::NeuronId;
-use lifecycle::Args;
 use sns_governance_canister::get_metadata::*;
 
 pub mod types;
@@ -14,5 +12,8 @@ pub mod queries;
 pub mod state;
 mod memory;
 pub mod updates;
+use ::types::{ HttpRequest, HttpResponse };
+use updates::*;
+use queries::*;
 
 export_candid!();
