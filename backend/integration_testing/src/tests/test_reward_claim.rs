@@ -70,9 +70,7 @@ fn test_reward_claim_happy_path() {
         &mut test_env.pic,
         user_1,
         rewards_canister_id,
-        &(sns_rewards_api_canister::add_neuron_ownership::Args {
-            neuron_id: neuron_id_1.clone(),
-        })
+        &neuron_id_1.clone()
     );
     println!("{res:?}");
     tick_n_blocks(&test_env.pic, 10);
