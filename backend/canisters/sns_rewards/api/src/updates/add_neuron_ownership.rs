@@ -4,7 +4,7 @@ use sns_governance_canister::types::NeuronId;
 
 pub type Args = NeuronId;
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Response {
     Ok(NeuronId),
     NeuronHotKeyAbsent, // No hotkeys found for neuron

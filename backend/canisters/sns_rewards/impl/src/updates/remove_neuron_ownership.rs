@@ -18,9 +18,11 @@ use crate::{
 };
 
 #[update]
-async fn remove_neuron_ownership(args: RemoveNeuronOwnershipArgs) -> RemoveNeuronOwnershipResponse {
+async fn remove_neuron_ownership(
+    neuron_id: RemoveNeuronOwnershipArgs
+) -> RemoveNeuronOwnershipResponse {
     let caller = read_state(|s| s.env.caller());
-    remove_neuron_impl(args.neuron_id, caller).await
+    remove_neuron_impl(neuron_id, caller).await
 }
 
 pub async fn remove_neuron_impl(

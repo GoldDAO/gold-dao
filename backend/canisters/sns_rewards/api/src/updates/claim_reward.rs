@@ -8,7 +8,7 @@ pub struct Args {
     pub token: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Response {
     NeuronHotKeyAbsent, // No hotkeys found for neuron
     NeuronHotKeyInvalid, // Hotkeys exist but they don't match the caller's principal

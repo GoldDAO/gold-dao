@@ -1,6 +1,5 @@
 type Args = record { token : text; neuron_id : NeuronId };
-type Args_1 = record { neuron_id : NeuronId };
-type Args_2 = record { token_list : vec record { text; TokenInfo } };
+type Args_1 = record { token_list : vec record { text; TokenInfo } };
 type NeuronId = record { id : blob };
 type Response = variant {
   Ok : NeuronId;
@@ -41,7 +40,7 @@ service : (record {}) -> {
   add_neuron_ownership : (NeuronId) -> (Response);
   claim_reward : (Args) -> (Response_1);
   get_neurons_by_owner : () -> (opt vec NeuronId) query;
-  remove_neuron_ownership : (Args_1) -> (Response_2);
+  remove_neuron_ownership : (NeuronId) -> (Response_2);
   set_reserve_transfer_amounts : (vec record { text; nat }) -> (Response_3);
-  set_reward_token_types : (Args_2) -> (Response_4);
+  set_reward_token_types : (Args_1) -> (Response_4);
 }
