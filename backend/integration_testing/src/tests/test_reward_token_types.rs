@@ -3,15 +3,21 @@ use std::collections::HashMap;
 use candid::{ CandidType, Deserialize, Nat, Principal };
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards::updates::set_reward_token_types::{
-    SetRewardTokenTypesRequest,
-    SetRewardTokenTypesResponse,
-};
 use types::{ TokenInfo, TokenSymbol };
 
 use crate::{
     client::rewards::{ set_reward_token_types, set_reward_token_types_validate },
     setup::default_test_setup,
+};
+
+use sns_rewards_api_canister::set_reward_token_types::{
+    Args as SetRewardTokenTypesArgs,
+    Response as SetRewardTokenTypesResponse,
+};
+
+use sns_rewards_api_canister::set_reward_token_types_validate::{
+    Args as SetRewardTokenTypesValidateArgs,
+    Response as SetRewardTokenTypesValidateResponse,
 };
 
 fn is_fail_enum(value: &SetRewardTokenTypesResponse) -> bool {
@@ -33,7 +39,7 @@ fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetRewardTokenTypesRequest {
+    let reserve_args = SetRewardTokenTypesArgs {
         token_list: vec![(
             "ICP".to_string(),
             TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
@@ -61,7 +67,7 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
         "ICP".to_string(),
         TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
     )];
-    let reserve_args = SetRewardTokenTypesRequest {
+    let reserve_args = SetRewardTokenTypesArgs {
         token_list,
     };
 
@@ -86,7 +92,7 @@ fn test_set_reward_token_types_with_bad_token_symbol() {
         "WONT_WORK".to_string(),
         TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
     )];
-    let reserve_args = SetRewardTokenTypesRequest {
+    let reserve_args = SetRewardTokenTypesArgs {
         token_list,
     };
 
@@ -110,7 +116,7 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
         "ICP".to_string(),
         TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
     )];
-    let reserve_args = SetRewardTokenTypesRequest {
+    let reserve_args = SetRewardTokenTypesValidateArgs {
         token_list,
     };
 
@@ -119,7 +125,7 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 }
 #[test]
 fn test_set_reward_token_validate() {
@@ -132,7 +138,7 @@ fn test_set_reward_token_validate() {
         "ICP".to_string(),
         TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
     )];
-    let reserve_args = SetRewardTokenTypesRequest {
+    let reserve_args = SetRewardTokenTypesValidateArgs {
         token_list,
     };
 
@@ -141,7 +147,7 @@ fn test_set_reward_token_validate() {
         sns_gov_id,
         rewards_canister_id,
         &reserve_args
-    ).is_ok();
+    );
 
-    assert_eq!(res, true);
+    assert!(matches!(res, SetRewardTokenTypesValidateResponse::Success(_)));
 }
