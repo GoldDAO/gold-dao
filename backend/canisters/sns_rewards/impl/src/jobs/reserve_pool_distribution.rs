@@ -8,14 +8,11 @@ transfers tokens from reserve pool to the reward pool on a daily basis.
 
 */
 
-use crate::{
-    consts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT },
-    state::{ mutate_state, read_state },
-    utils::transfer_token,
-};
+use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
 use candid::{ Nat, Principal };
 use canister_time::{ now_millis, run_interval, DAY_IN_MS };
 use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+use sns_rewards_api_canister::subaccounts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT };
 use utils::env::Environment;
 use std::time::Duration;
 use tracing::{ debug, error, info };

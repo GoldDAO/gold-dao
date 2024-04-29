@@ -6,6 +6,6 @@ pub mod get_neurons_by_owner;
 pub mod get_neuron_by_id;
 pub mod get_n_history;
 pub mod get_maturity_history_of_neuron;
-pub mod get_historic_payment_rounds;
+pub mod get_historic_payment_round;
 pub mod get_all_neurons;
 pub mod get_active_payment_rounds;

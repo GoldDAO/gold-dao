@@ -1,5 +1,5 @@
 use ic_cdk_macros::query;
-pub use sns_rewards_api_canister::get_historic_payment_rounds::{
+pub use sns_rewards_api_canister::get_historic_payment_round::{
     Args as GetHistoricPaymentRoundsArgs,
     Response as GetHistoricPaymentRoundsResponse,
 };

@@ -2,7 +2,6 @@ use ic_cdk::export_candid;
 use sns_governance_canister::get_metadata::*;
 
 pub mod types;
-pub mod consts;
 mod utils;
 mod guards;
 mod jobs;

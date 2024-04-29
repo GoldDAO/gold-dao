@@ -16,22 +16,15 @@ payments are done in batches and upon each individual transfer response it's sta
 
 */
 
-use crate::{
-    consts::REWARD_POOL_SUB_ACCOUNT,
-    state::{ mutate_state, read_state },
-    utils::transfer_token,
-};
+use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
 use candid::{ Nat, Principal };
 use canister_time::{ run_interval, WEEK_IN_MS };
 use futures::{ future::{ err, join_all }, Future };
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::payment_round::{
-    MaturityDelta,
-    Payment,
-    PaymentRound,
-    PaymentRoundStatus,
-    PaymentStatus,
+use sns_rewards_api_canister::{
+    payment_round::{ MaturityDelta, Payment, PaymentRound, PaymentRoundStatus, PaymentStatus },
+    subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
 use std::time::Duration;
 use tracing::{ debug, error, info };
