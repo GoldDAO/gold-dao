@@ -5,14 +5,18 @@ use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards::{
-    consts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT },
-    updates::set_reserve_transfer_amount::{
-        SetReserveTransferAmountRequest,
-        SetReserveTransferAmountResponse,
-    },
-};
+
+use sns_rewards_api_canister::subaccounts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT };
 use types::TokenSymbol;
+
+use sns_rewards_api_canister::set_reserve_transfer_amounts::{
+    Args as SetReserveTransferAmountsArgs,
+    Response as SetReserveTransferAmountsResponse,
+};
+use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{
+    Args as SetReserveTransferAmountsValidateArgs,
+    Response as SetReserveTransferAmountsValidateResponse,
+};
 
 use crate::{
     client::{
@@ -27,8 +31,8 @@ use crate::{
     utils::tick_n_blocks,
 };
 
-fn is_set_reserve_pool_distribution_fail(value: &SetReserveTransferAmountResponse) -> bool {
-    matches!(value, SetReserveTransferAmountResponse::InternalError(_))
+fn is_set_reserve_pool_distribution_fail(value: &SetReserveTransferAmountsResponse) -> bool {
+    matches!(value, SetReserveTransferAmountsResponse::InternalError(_))
 }
 
 #[derive(Deserialize, CandidType, Serialize)]
@@ -96,7 +100,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsArgs {
         transfer_amounts: amounts,
     };
 
@@ -106,7 +110,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 
     assert!(is_set_reserve_pool_distribution_fail(&res));
 }
@@ -121,7 +125,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsArgs {
         transfer_amounts: amounts.clone(),
     };
 
@@ -131,9 +135,9 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
         sns_gov_id,
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 
-    assert_eq!(res, SetReserveTransferAmountResponse::Success);
+    assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
     let res = get_reserve_transfer_amounts(
@@ -155,17 +159,17 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsValidateArgs {
         transfer_amounts: amounts,
     };
 
     // should succeed
-    set_reserve_transfer_amounts_validate(
+    let res = set_reserve_transfer_amounts_validate(
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 }
 
 #[test]
@@ -178,7 +182,7 @@ fn test_set_reserve_transfer_amounts_validate() {
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsValidateArgs {
         transfer_amounts: amounts,
     };
 
@@ -188,9 +192,8 @@ fn test_set_reserve_transfer_amounts_validate() {
         sns_gov_id,
         rewards_canister_id,
         &reserve_args
-    ).is_ok();
-
-    assert_eq!(res, true);
+    );
+    assert!(matches!(res, SetReserveTransferAmountsValidateResponse::Success(_)))
 }
 
 #[test]
@@ -204,7 +207,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
     let ogy_token = TokenSymbol::parse("OGY").unwrap();
     let mut amounts = HashMap::new();
     amounts.insert(icp_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsArgs {
         transfer_amounts: amounts.clone(),
     };
 
@@ -214,9 +217,9 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         sns_gov_id,
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 
-    assert_eq!(res, SetReserveTransferAmountResponse::Success);
+    assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
     let res = get_reserve_transfer_amounts(
@@ -230,7 +233,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
     // only insert ogy
     let mut amounts = HashMap::new();
     amounts.insert(ogy_token, Nat::from(123456789123456789u64));
-    let reserve_args = SetReserveTransferAmountRequest {
+    let reserve_args = SetReserveTransferAmountsArgs {
         transfer_amounts: amounts.clone(),
     };
 
@@ -239,9 +242,9 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         sns_gov_id,
         rewards_canister_id,
         &reserve_args
-    ).unwrap();
+    );
 
-    assert_eq!(res, SetReserveTransferAmountResponse::Success);
+    assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
     let res = get_reserve_transfer_amounts(

@@ -13,12 +13,12 @@ pub use sns_rewards_api_canister::{
     ReserveTokenAmounts,
 };
 
-#[update(guard = "caller_is_governance_principal", name = "set_reserve_transfer_amounts")]
+#[update(guard = "caller_is_governance_principal")]
 #[trace]
 pub async fn set_reserve_transfer_amounts(
     args: SetReserveTransferAmountsArgs
 ) -> SetReserveTransferAmountsResponse {
-    set_reserve_transfer_amounts_impl(args)
+    set_reserve_transfer_amounts_impl(args.transfer_amounts)
 }
 
 // this will overwrite the hashmap completely so any tokens not passed in will be removed.
