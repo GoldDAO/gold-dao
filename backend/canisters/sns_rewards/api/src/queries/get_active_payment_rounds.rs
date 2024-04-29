@@ -1,4 +1,4 @@
-use crate::{ payment_round::PaymentRound, Empty };
+use crate::payment_round::PaymentRound;
 
 pub type Args = ();
 pub type Response = Vec<PaymentRound>;

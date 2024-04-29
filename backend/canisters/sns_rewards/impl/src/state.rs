@@ -1,10 +1,10 @@
 use std::collections::{ BTreeMap, HashMap };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use candid::{ CandidType, Nat, Principal };
+use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
-use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
+use types::{ NeuronInfo, TimestampMillis };
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },

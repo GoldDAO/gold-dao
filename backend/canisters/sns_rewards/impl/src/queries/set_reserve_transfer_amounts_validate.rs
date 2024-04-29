@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{ guards::caller_is_governance_principal, state::mutate_state };
 use candid::Nat;
 use canister_tracing_macros::trace;
-use ic_cdk::{ query, update };
+use ic_cdk::query;
 
 pub use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{
     Args as SetValidateReserveTransferAmountsArgs,

@@ -125,13 +125,8 @@ mod tests {
     use candid::Principal;
     use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
 
-    use crate::state::{ init_state, RuntimeState };
     use crate::utils::AuthenticateByHotkeyResponse;
     use super::authenticate_by_hotkey;
-
-    fn init_runtime_state() {
-        init_state(RuntimeState::default());
-    }
 
     #[test]
     fn test_authenticate_by_hotkey_with_correct_data() {

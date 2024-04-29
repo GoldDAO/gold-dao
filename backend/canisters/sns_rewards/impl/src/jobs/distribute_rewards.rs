@@ -385,7 +385,7 @@ mod tests {
     use sns_rewards_api_canister::payment_round::{ PaymentRound, PaymentStatus };
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::{ state::{ init_state, mutate_state, read_state, RuntimeState } };
+    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
 
     use super::{ log_payment_round_metrics, update_neuron_rewards };
 

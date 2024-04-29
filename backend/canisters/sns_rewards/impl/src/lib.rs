@@ -11,7 +11,8 @@ pub mod queries;
 pub mod state;
 mod memory;
 pub mod updates;
-use ::types::{ HttpRequest, HttpResponse };
+// use ::types::{ HttpRequest, HttpResponse };
+
 use updates::*;
 use queries::*;
 

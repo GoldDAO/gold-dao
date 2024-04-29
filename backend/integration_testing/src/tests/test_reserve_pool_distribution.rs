@@ -163,8 +163,8 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
         transfer_amounts: amounts,
     };
 
-    // should succeed
-    let res = set_reserve_transfer_amounts_validate(
+    // should panic
+    set_reserve_transfer_amounts_validate(
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,

@@ -3,18 +3,14 @@ use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
-    add_neuron_ownership::{
-        Args as AddNeuronOwnerShipArgs,
-        Response as AddNeuronOwnerShipResponse,
-    },
-    remove_neuron_ownership::{ Response as RemoveNeuronOwnershipResponse },
+    add_neuron_ownership::Response as AddNeuronOwnerShipResponse,
+    remove_neuron_ownership::Response as RemoveNeuronOwnershipResponse,
     claim_reward::{ Args as ClaimRewardArgs, Response as ClaimRewardResponse },
 };
 
 use crate::{
     client::{
         icrc1::client::{ balance_of, transfer },
-        pocket::execute_update_multi_args,
         rewards::{ add_neuron_ownership, claim_reward, remove_neuron_ownership },
     },
     setup::{ default_test_setup, test_setup_with_no_neuron_hotkeys },
