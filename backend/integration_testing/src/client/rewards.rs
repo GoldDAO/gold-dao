@@ -14,5 +14,6 @@ generate_pocket_query_call!(set_reward_token_types_validate);
 generate_pocket_query_call!(get_reward_token_types);
 generate_pocket_update_call!(set_reward_token_types);
 generate_pocket_query_call!(get_historic_payment_round);
+generate_pocket_query_call!(get_reserve_transfer_amounts);
 generate_pocket_update_call!(set_daily_gldgov_burn_rate);
 generate_pocket_query_call!(set_daily_gldgov_burn_rate_validate);
