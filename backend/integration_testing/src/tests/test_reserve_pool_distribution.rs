@@ -62,6 +62,22 @@ fn test_reserve_pool_distribution_happy_path() {
     let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
     assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
 
+    // set the daily reserve transfer amount
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    let mut amounts = HashMap::new();
+    amounts.insert(gldgov_token, Nat::from(500_000_000u64));
+
+    let res = set_reserve_transfer_amounts(
+        &mut test_env.pic,
+        test_env.sns_gov_canister_id,
+        rewards_canister_id,
+        &(SetReserveTransferAmountsArgs {
+            transfer_amounts: amounts,
+        })
+    );
+    assert_eq!(res, SetReserveTransferAmountsResponse::Success);
+    tick_n_blocks(&test_env.pic, 50);
+
     // TRIGGER - reserve_pool_distribution cron job
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
     tick_n_blocks(&test_env.pic, 100);
@@ -79,15 +95,16 @@ fn test_reserve_pool_distribution_happy_path() {
         reserve_pool_account,
         (100_000_000_000u64).into()
     ).unwrap();
-
-    // TRIGGER - reserve_pool_distribution cron job
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
     tick_n_blocks(&test_env.pic, 100);
 
-    // reward pool should now have double minus a fee
+    // TRIGGER - reserve_pool_distribution cron job
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS) + Duration::from_secs(10));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // reward pool should now have the same as the intial + 1 x reserve pool transfer
     let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
-    let expected_balance_reward_pool = Nat::from(100_000_000_000u64 + 100_000_000u64);
-    assert_eq!(expected_balance_reward_pool, gldgov_reward_pool_balance);
+    let expected_balance_reward_pool = Nat::from(100_000_000_000u64 + 500_000_000u64); // reward pool starts with 100_000_000_000 in test_env
+    assert_eq!(gldgov_reward_pool_balance, expected_balance_reward_pool);
 }
 
 #[test]
