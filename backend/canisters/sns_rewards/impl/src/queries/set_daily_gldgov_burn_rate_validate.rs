@@ -12,7 +12,7 @@ pub use sns_rewards_api_canister::set_daily_gldgov_burn_rate_validate::{
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
-pub async fn set_reserve_transfer_amounts_validate(
+pub async fn set_daily_gldgov_burn_rate_validate(
     amount: SetDailyGLDGovBurnRateValidateArgs
 ) -> SetDailyGLDGovBurnRateValidateResponse {
     match validate_set_daily_gldgov_burn_rate_payload(&amount) {
