@@ -111,3 +111,20 @@ fn test_set_reserve_transfer_amounts_validate() {
     );
     assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Success(_)))
 }
+
+#[test]
+fn test_set_reserve_transfer_amounts_validate_with_0_transfer_amount() {
+    let test_env = default_test_setup();
+
+    let rewards_canister_id = test_env.rewards_canister_id;
+
+    // Set the daily burn rate for GLDGov
+    let burn_rate = Nat::from(0u64);
+    let res = set_daily_gldgov_burn_rate_validate(
+        &test_env.pic,
+        test_env.sns_gov_canister_id,
+        rewards_canister_id,
+        &burn_rate
+    );
+    assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Error(_)))
+}
