@@ -48,6 +48,8 @@ impl RuntimeState {
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
+            last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn,
+            daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
         }
     }
 
@@ -74,6 +76,8 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub daily_reserve_transfer: Vec<String>,
     pub last_daily_reserve_transfer_time: TimestampMillis,
+    pub last_daily_gldgov_burn_time: TimestampMillis,
+    pub daily_gldgov_burn_amount: Option<Nat>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
