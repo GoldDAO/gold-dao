@@ -62,6 +62,38 @@ fn test_gldgov_burn_rate_happy_path() {
 }
 
 #[test]
+fn test_gldgov_burn_rate_when_reserve_pool_balance_is_zero() {
+    let mut test_env = default_test_setup();
+
+    let gldgov_ledger_id = test_env.token_ledgers.get("gldgov_ledger_canister_id").unwrap().clone();
+    let rewards_canister_id = test_env.rewards_canister_id;
+
+    let reserve_pool_account = Account {
+        owner: rewards_canister_id,
+        subaccount: Some(RESERVE_POOL_SUB_ACCOUNT),
+    };
+
+    // Set the daily burn rate for GLDGov
+    let burn_rate = Nat::from(500_000_000u64);
+    let res = set_daily_gldgov_burn_rate(
+        &mut test_env.pic,
+        test_env.sns_gov_canister_id,
+        rewards_canister_id,
+        &burn_rate
+    );
+    assert!(matches!(res, SetDailyGLDGovBurnRateResponse::Success));
+    tick_n_blocks(&test_env.pic, 5);
+
+    // TRIGGER - gldgov burn cron job - NOTE THAT WE SKIP ADDING TOKENS TO THE RESERVE POOL
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // test that reserve pool is still 0
+    let reserve_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reserve_pool_account);
+    assert_eq!(reserve_pool_balance, Nat::from(0u64));
+}
+
+#[test]
 #[should_panic(expected = "FATAL ERROR: Caller is not a governance principal")]
 fn test_set_daily_gldgov_burn_rate_when_caller_is_not_governance_principal() {
     let mut test_env = default_test_setup();
