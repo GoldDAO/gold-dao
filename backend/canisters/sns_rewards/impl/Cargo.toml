@@ -6,7 +6,7 @@ edition = "2021"
 
 [lib]
 path = "src/lib.rs"
-crate-type = ["cdylib", "lib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 candid = { workspace = true }
@@ -33,3 +33,5 @@ utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
 futures = { workspace = true }
 num-bigint = {workspace = true}
+sns_rewards_api_canister = { path = "../api" }
+candid_gen = { path = "../../../libraries/candid_gen" }

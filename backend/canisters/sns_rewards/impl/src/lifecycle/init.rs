@@ -1,6 +1,4 @@
-use candid::{ CandidType, Nat, Principal };
 use ic_cdk_macros::init;
-use serde::Deserialize;
 use tracing::info;
 use types::{ TokenInfo, TokenSymbol };
 use utils::env::CanisterEnv;
@@ -8,18 +6,10 @@ use utils::env::CanisterEnv;
 use crate::state::{ Data, RuntimeState };
 
 use super::init_canister;
-
-#[derive(Deserialize, CandidType)]
-pub struct Args {
-    test_mode: bool,
-    icp_ledger_canister_id: Principal,
-    sns_ledger_canister_id: Principal,
-    ogy_ledger_canister_id: Principal,
-    sns_gov_canister_id: Principal,
-}
+pub use sns_rewards_api_canister::init::*;
 
 #[init]
-fn init(args: Args) {
+fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
     let env = CanisterEnv::new(args.test_mode);
@@ -51,7 +41,6 @@ fn init(args: Args) {
                 fee: 100_000u64,
                 decimals: 8u64,
             });
-            data.daily_reserve_transfer.insert(token, Nat::from(100_000_000u64));
         }
 
         data.authorized_principals = vec![args.sns_gov_canister_id];

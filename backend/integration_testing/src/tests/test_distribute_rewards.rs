@@ -1,27 +1,19 @@
 use std::time::Duration;
 
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{ Nat, Principal };
 use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
-use serde::Serialize;
-use sns_governance_canister::types::NeuronId;
-use sns_rewards::{ consts::REWARD_POOL_SUB_ACCOUNT, model::payment_processor::PaymentRound };
+use sns_rewards_api_canister::{ get_historic_payment_round, subaccounts::REWARD_POOL_SUB_ACCOUNT };
 use types::TokenSymbol;
 
 use crate::{
     client::{
         icrc1::client::{ balance_of, transfer },
-        pocket::execute_update_multi_args,
-        rewards::{ get_active_payment_rounds, get_neuron_by_id },
+        rewards::{ get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id },
     },
     setup::{ default_test_setup, setup::setup_reward_pools },
     utils::tick_n_blocks,
 };
-
-#[derive(Deserialize, CandidType, Serialize)]
-pub struct GetNeuronRequest {
-    neuron_id: NeuronId,
-}
 
 #[test]
 fn test_distribute_rewards_happy_path() {
@@ -187,14 +179,14 @@ fn test_distribute_rewards_with_no_rewards() {
     tick_n_blocks(&test_env.pic, 100);
 
     // there should be no historic or active rounds for ICP because it didn't have any rewards to pay out
-    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
-        &mut test_env.pic,
+    let res = get_historic_payment_round(
+        &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        "get_historic_payment_round",
-        ("ICP".to_string(), 1)
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
     );
     assert_eq!(res.len(), 0);
+
     let res = get_active_payment_rounds(
         &test_env.pic,
         Principal::anonymous(),
@@ -209,7 +201,7 @@ fn test_distribute_rewards_with_no_rewards() {
         rewards_canister_id,
         &neuron_id_1
     ).unwrap();
-    let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token);
+    let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token.clone());
     let rewarded_mat_ogy = single_neuron.rewarded_maturity.get(&ogy_token).unwrap();
     let rewarded_mat_gldgov = single_neuron.rewarded_maturity.get(&gldgov_token).unwrap();
 
@@ -241,12 +233,11 @@ fn test_distribute_rewards_with_no_rewards() {
     tick_n_blocks(&test_env.pic, 100);
 
     // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 2)
-    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
-        &mut test_env.pic,
+    let res = get_historic_payment_round(
+        &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        "get_historic_payment_round",
-        ("ICP".to_string(), 2)
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 2 })
     );
     assert_eq!(res.len(), 1);
 
@@ -273,6 +264,10 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     let ogy_ledger_id = test_env.token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
     let gldgov_ledger_id = test_env.token_ledgers.get("gldgov_ledger_canister_id").unwrap().clone();
     let rewards_canister_id = test_env.rewards_canister_id;
+
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let ogy_token = TokenSymbol::parse("OGY").unwrap();
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
 
     // ********************************
     // 1. Give ICP reward pool balance less than the total in fees
@@ -324,12 +319,11 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     tick_n_blocks(&test_env.pic, 100);
 
     // there should be no historic payment round for ICP
-    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
-        &mut test_env.pic,
+    let res = get_historic_payment_round(
+        &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        "get_historic_payment_round",
-        ("ICP".to_string(), 1)
+        &(get_historic_payment_round::Args { token: icp_token, round_id: 1 })
     );
     assert_eq!(res.len(), 0);
     // there should be no active round for ICP
@@ -342,20 +336,18 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     assert_eq!(p.len(), 0);
 
     // the others should have historic rounds
-    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
-        &mut test_env.pic,
+    let res = get_historic_payment_round(
+        &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        "get_historic_payment_round",
-        ("OGY".to_string(), 1)
+        &(get_historic_payment_round::Args { token: ogy_token, round_id: 1 })
     );
     assert_eq!(res.len(), 1);
-    let res = execute_update_multi_args::<(String, u16), Vec<(u16, PaymentRound)>>(
-        &mut test_env.pic,
+    let res = get_historic_payment_round(
+        &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        "get_historic_payment_round",
-        ("GLDGov".to_string(), 1)
+        &(get_historic_payment_round::Args { token: gldgov_token, round_id: 1 })
     );
     assert_eq!(res.len(), 1);
 }

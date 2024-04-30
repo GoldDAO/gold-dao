@@ -61,9 +61,9 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "async-trait"
-version = "0.1.79"
+version = "0.1.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a507401cad91ec6a857ed5513a2073c82a9b9048762b885bb98655b306964681"
+checksum = "c6fa2087f2753a7da8cc1c0dbfcf89579dd57458e36769de5ac750b4671737ca"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1273,7 +1273,7 @@ dependencies = [
  "sha2",
  "sns_governance_canister",
  "sns_governance_canister_c2c_client",
- "sns_rewards",
+ "sns_rewards_api_canister",
  "stable_memory",
  "tracing",
  "types",
@@ -1854,9 +1854,9 @@ checksum = "d626bb9dae77e28219937af045c257c28bfd3f69333c512553507f5f9798cb76"
 
 [[package]]
 name = "rustls"
-version = "0.21.10"
+version = "0.21.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9d5a6813c0759e4609cd494e8e725babae6a2ca7b62a5536a13daaec6fcb7ba"
+checksum = "7fecbfb7b1444f477b345853b1fce097a2c6fb637b2bfb87e6bc5db0f043fae4"
 dependencies = [
  "log",
  "ring",
@@ -2194,6 +2194,39 @@ name = "sns_rewards"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "candid_gen",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "http_request",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
+ "num-bigint",
+ "serde",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "sns_rewards_api_canister",
+ "stable_memory",
+ "tracing",
+ "types",
+ "utils",
+]
+
+[[package]]
+name = "sns_rewards_api_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
  "canister_logger",
  "canister_state_macros",
  "canister_time",

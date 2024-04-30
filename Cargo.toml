@@ -3,6 +3,7 @@ members = [
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",
+  "backend/canisters/sns_rewards/api",
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/token_metrics/impl",
   "backend/canisters/gldt_libs",
