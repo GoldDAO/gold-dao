@@ -11,7 +11,11 @@ lazy_static! {
 }
 
 fn get_rewards_canister_wasm() -> Vec<u8> {
-    read_file_from_local_bin(&format!("sns_rewards_canister.wasm.gz"))
+    read_file_from_relative_bin(
+        &format!(
+            "../canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
+        )
+    ).unwrap()
 }
 
 fn get_canister_wasm(canister_name: &str) -> CanisterWasm {
@@ -36,4 +40,15 @@ pub fn local_bin() -> PathBuf {
     );
     file_path.push("wasms");
     file_path
+}
+
+fn read_file_from_relative_bin(file_path: &str) -> Result<Vec<u8>, std::io::Error> {
+    // Open the wasm file
+    let mut file = File::open(file_path)?;
+
+    // Read the contents of the file into a vector
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+
+    Ok(buffer)
 }
