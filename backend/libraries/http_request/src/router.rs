@@ -6,10 +6,15 @@ pub enum Route {
     Traces(Option<TimestampMillis>),
     Metrics,
     Other(String, String),
+    RawTotalSupply,
+    RawCirculatingSupply,
 }
 
 pub fn extract_route(path: &str) -> Route {
-    let trimmed = path.trim_start_matches('/').trim_end_matches('/').to_lowercase();
+    let trimmed = path
+        .trim_start_matches('/')
+        .trim_end_matches('/')
+        .to_lowercase();
 
     if trimmed.is_empty() {
         return Route::Other("".to_string(), "".to_string());
@@ -31,6 +36,11 @@ pub fn extract_route(path: &str) -> Route {
         "metrics" => {
             return Route::Metrics;
         }
+        "raw" => match parts[1] {
+            "total-supply" => return Route::RawTotalSupply,
+            "circulating-supply" => return Route::RawCirculatingSupply,
+            _ => (),
+        },
         _ => (),
     }
 
@@ -43,7 +53,10 @@ mod tests {
 
     #[test]
     fn logs() {
-        assert!(matches!(extract_route("/logs/1633649663014109000"), Route::Logs(_)));
+        assert!(matches!(
+            extract_route("/logs/1633649663014109000"),
+            Route::Logs(_)
+        ));
     }
 
     #[test]
