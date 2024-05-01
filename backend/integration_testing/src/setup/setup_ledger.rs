@@ -44,6 +44,15 @@ pub fn generate_ledger_canister_init_args(
     controller: Principal,
     initial_ledger_accounts: Vec<(Account, Nat)>
 ) -> LedgerArgument {
+    let initial_ledger_accounts = initial_ledger_accounts
+        .iter()
+        .cloned()
+        .chain(
+            vec![(Account::from(controller), Nat::from(1_000_000_000_000_000u64))]
+                .iter()
+                .cloned()
+        )
+        .collect();
     LedgerArgument::Init(InitArgs {
         minting_account: Account::from(controller),
         initial_balances: initial_ledger_accounts,

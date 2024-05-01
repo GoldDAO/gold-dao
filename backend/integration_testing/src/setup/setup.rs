@@ -83,21 +83,20 @@ pub struct RewardsTestEnvBuilder {
     token_symbols: Vec<String>,
     initial_ledger_accounts: Vec<(Account, Nat)>,
     neurons_to_create: usize,
+    initial_reward_pool_amount: Nat,
 }
 
 impl RewardsTestEnvBuilder {
     pub fn new() -> Self {
         let default_controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-        let default_ledger_accounts = vec![(
-            Account::from(default_controller),
-            Nat::from(1_000_000_000_000_000u64),
-        )];
+
         Self {
             controller: random_principal(),
             users: vec![],
             token_symbols: vec![],
             neurons_to_create: 0,
-            initial_ledger_accounts: default_ledger_accounts.clone(),
+            initial_ledger_accounts: vec![],
+            initial_reward_pool_amount: Nat::from(0u64),
         }
     }
 
@@ -128,14 +127,14 @@ impl RewardsTestEnvBuilder {
         self
     }
 
+    pub fn with_reward_pools(mut self, amount: Nat) -> Self {
+        self.initial_reward_pool_amount = amount; // Note - this counts as a mint and therefore increases total supply
+        self
+    }
+
     pub fn build(self) -> RewardsTestEnv {
         let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
-        let token_ledgers = setup_ledgers(
-            &pic,
-            self.controller,
-            self.token_symbols,
-            self.initial_ledger_accounts
-        );
+
         let (neuron_data, neuron_owners) = generate_neuron_data(
             0,
             self.neurons_to_create,
@@ -143,6 +142,12 @@ impl RewardsTestEnvBuilder {
             &self.users
         );
         let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data, &self.controller);
+        let token_ledgers = setup_ledgers(
+            &pic,
+            sns_gov_canister_id.clone(),
+            self.token_symbols,
+            self.initial_ledger_accounts
+        );
         let rewards_canister_id = setup_rewards_canister(
             &mut pic,
             &token_ledgers,
@@ -153,13 +158,16 @@ impl RewardsTestEnvBuilder {
             .iter()
             .map(|(_, id)| id.clone())
             .collect();
-        setup_reward_pools(
-            &mut pic,
-            &self.controller,
-            &rewards_canister_id,
-            &token_ledger_ids,
-            100_000_000_000
-        );
+        if self.initial_reward_pool_amount > Nat::from(0u64) {
+            setup_reward_pools(
+                &mut pic,
+                &sns_gov_canister_id,
+                &rewards_canister_id,
+                &token_ledger_ids,
+                self.initial_reward_pool_amount.0.try_into().unwrap()
+            );
+        }
+
         RewardsTestEnv {
             controller: self.controller,
             neuron_data,

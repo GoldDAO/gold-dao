@@ -71,7 +71,7 @@ fn test_distribute_rewards_happy_path() {
     test_env.simulate_neuron_voting(3);
     setup_reward_pools(
         &mut test_env.pic,
-        &controller,
+        &test_env.sns_gov_canister_id,
         &rewards_canister_id,
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64
@@ -130,7 +130,6 @@ fn test_distribute_rewards_with_no_rewards() {
     let mut test_env = default_test_setup();
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
     let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
 
@@ -214,7 +213,7 @@ fn test_distribute_rewards_with_no_rewards() {
     // ********************************
     setup_reward_pools(
         &mut test_env.pic,
-        &controller,
+        &test_env.sns_gov_canister_id,
         &rewards_canister_id,
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64

@@ -45,7 +45,6 @@ fn test_reserve_pool_distribution_happy_path() {
     let mut test_env = default_test_setup();
 
     let gldgov_ledger_id = test_env.token_ledgers.get("gldgov_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let reward_pool = Account {
@@ -89,7 +88,7 @@ fn test_reserve_pool_distribution_happy_path() {
     // transfer some gldgov to the reserve pool
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id.clone(),
         gldgov_ledger_id,
         None,
         reserve_pool_account,

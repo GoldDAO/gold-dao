@@ -35,7 +35,6 @@ fn test_reward_claim_happy_path() {
     let mut test_env = default_test_setup();
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
@@ -52,7 +51,7 @@ fn test_reward_claim_happy_path() {
     };
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id,
         icp_ledger_id,
         None,
         neuron_account_1,
@@ -109,7 +108,6 @@ fn test_add_neuron_ownership_failures() {
     let mut test_env = default_test_setup();
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
@@ -127,7 +125,7 @@ fn test_add_neuron_ownership_failures() {
     };
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id,
         icp_ledger_id,
         None,
         neuron_account_1,
@@ -217,7 +215,6 @@ fn test_neuron_with_no_hotkey() {
     let mut test_env = test_setup_with_no_neuron_hotkeys(); // every neuron has no hotkey
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let random_principal = Principal::anonymous();
@@ -260,7 +257,7 @@ fn test_neuron_with_no_hotkey() {
     // add some rewards to claim just incase.
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id,
         icp_ledger_id,
         None,
         neuron_account_1,
@@ -284,7 +281,6 @@ fn test_claim_reward_failures() {
     let mut test_env = default_test_setup();
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
@@ -303,7 +299,7 @@ fn test_claim_reward_failures() {
     // ********************************
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id,
         icp_ledger_id,
         None,
         neuron_account_1,
@@ -341,7 +337,6 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
     let mut test_env = default_test_setup();
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
-    let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
@@ -385,7 +380,7 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
     // ********************************
     transfer(
         &mut test_env.pic,
-        controller,
+        test_env.sns_gov_canister_id,
         icp_ledger_id,
         None,
         neuron_account_1,
