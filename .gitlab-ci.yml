@@ -169,7 +169,7 @@ generate declarations:
 
 # See includes above for frontend builds
 
-.integration tests:
+.integration:
   stage: integration_testing
   extends: .rust template
   tags:
