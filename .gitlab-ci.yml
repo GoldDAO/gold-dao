@@ -169,8 +169,20 @@ generate declarations:
 
 # See includes above for frontend builds
 
-.integration:
+.integration tests:
   stage: integration_testing
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      needs:
+        [
+          "gldt_core test build",
+          "icp_neuron test build",
+          "gldt_swap_app test build",
+          "gldt_landing_page test build",
+          "gldt_explorer test build",
+          "token_metrics test build",
+          "sns_rewards test build",
+        ]
   extends: .rust template
   tags:
     - dind
