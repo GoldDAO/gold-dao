@@ -169,6 +169,10 @@ generate declarations:
 
 # See includes above for frontend builds
 
+
+################################################################################
+# Integration tests
+################################################################################
 .integration tests:
   stage: integration_testing
   rules:
