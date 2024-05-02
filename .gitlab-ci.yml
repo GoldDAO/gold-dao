@@ -22,8 +22,8 @@ cache:
 stages:
   - preparation
   - lint
-  - test
   - build
+  - test
   - deploy
 
 include:
