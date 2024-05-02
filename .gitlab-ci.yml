@@ -187,7 +187,7 @@ integration tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - cargo tarpaulin -p [ integration_testing ] -j 2 --lib --no-fail-fast -o Xml
+    - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
     reports:
