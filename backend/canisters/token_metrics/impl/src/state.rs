@@ -1,15 +1,12 @@
-use candid::{CandidType, Principal};
+use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use std::collections::BTreeMap;
 use types::TimestampMillis;
 use utils::{
-    consts::{
-        ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID,
-        SNS_LEDGER_CANISTER_ID,
-    },
-    env::{CanisterEnv, Environment},
+    consts::{ SNS_GOVERNANCE_CANISTER_ID, SNS_LEDGER_CANISTER_ID },
+    env::{ CanisterEnv, Environment },
     memory::MemorySize,
 };
 
@@ -63,12 +60,12 @@ pub struct CanisterInfo {
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }
-#[derive(Serialize, Deserialize, Clone, Copy, Default, CandidType)]
+#[derive(Serialize, Deserialize, Clone, Default, CandidType)]
 pub struct GovernanceStats {
-    pub total_staked: u64,
-    pub total_locked: u64,
-    pub total_unlocked: u64,
-    pub total_rewards: u64,
+    pub total_staked: Nat,
+    pub total_locked: Nat,
+    pub total_unlocked: Nat,
+    pub total_rewards: Nat,
 }
 #[derive(Serialize, Deserialize)]
 pub struct Data {
