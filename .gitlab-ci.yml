@@ -184,21 +184,9 @@ generate declarations:
           "sns_rewards test build",
         ]
   extends: .rust template
-  tags:
-    - dind
-  services:
-    - docker:dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+
 
 
 
