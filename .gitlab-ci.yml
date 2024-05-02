@@ -22,8 +22,9 @@ cache:
 stages:
   - preparation
   - lint
-  - build
   - test
+  - build
+  - integration_testing
   - deploy
 
 include:
@@ -53,9 +54,7 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_rewards
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
-      src-folder: integration_testing
+  - local: scripts/ci-cd/.integration_testing.yml
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
