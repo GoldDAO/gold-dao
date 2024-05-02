@@ -173,14 +173,11 @@ generate declarations:
 ################################################################################
 # Integration tests
 ################################################################################
-integration_tests:
+integration tests:
   stage: integration_testing
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "sns_rewards build",
-        ]
+      needs: ["sns_rewards build"]
   extends: .rust template
   script:
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
