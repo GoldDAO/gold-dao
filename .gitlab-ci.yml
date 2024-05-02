@@ -178,6 +178,10 @@ integration tests:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       needs: ["sns_rewards test build"]
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      needs: ["sns_rewards test build"]
   extends: .rust template
   tags:
     - dind
@@ -187,6 +191,12 @@ integration tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
+    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/3.0.1/pocket-ic-x86_64-linux.gz
+    - gzip -d pocket-ic.gz
+    - chmod +x ./pocket-ic
+    - mv ./pocket-ic ./backend/integration_testing/pocket-ic
+    - ulimit -n 102400
+    - ulimit -f 1024000 
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
