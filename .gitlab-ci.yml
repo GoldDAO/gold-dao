@@ -173,7 +173,7 @@ generate declarations:
 ################################################################################
 # Integration tests
 ################################################################################
-integration tests:
+integration_tests:
   stage: integration_testing
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
