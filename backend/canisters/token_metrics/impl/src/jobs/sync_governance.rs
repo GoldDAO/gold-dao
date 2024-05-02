@@ -11,11 +11,11 @@ use crate::{
     state::{mutate_state, read_state, GovernanceStats},
 };
 
-const SYNC_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS;
+const SYNC_GOVERNANCE_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     debug!("Starting the governance sync job..");
-    run_now_then_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run)
+    run_now_then_interval(Duration::from_millis(SYNC_GOVERNANCE_INTERVAL), run)
 }
 
 pub fn run() {
@@ -53,8 +53,6 @@ pub async fn sync_neurons_data() {
 
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
-                // info!("{:?}", response);
-                // Mutate the state to update the principal with governance data
                 info!("Iterating neurons");
                 response.neurons.iter().for_each(|neuron| {
                     update_principal_neuron_mapping(
@@ -63,22 +61,14 @@ pub async fn sync_neurons_data() {
                         &mut temp_all_gov_stats,
                         neuron,
                     );
-                    // update_neuron_maturity(state, neuron);
                 });
 
-                // Check if we hit the end of the list
                 let number_of_received_neurons = response.neurons.len();
-                if ((number_of_received_neurons as u32) == 100) {
-                    args.start_page_at = response.neurons.last().map_or_else(
-                        || {
-                            error!("we should not be here, last neurons from response is missing?");
-                            None
-                        },
-                        |n| {
-                            continue_scanning = true;
-                            n.id.clone()
-                        },
-                    );
+                if number_of_received_neurons == 100 {
+                    if let Some(n) = response.neurons.last() {
+                        continue_scanning = true;
+                        args.start_page_at = n.id.clone();
+                    }
                 }
                 number_of_scanned_neurons += number_of_received_neurons;
             }
@@ -88,7 +78,6 @@ pub async fn sync_neurons_data() {
             }
         }
     }
-    info!("Successfully scanned {number_of_scanned_neurons} neurons.");
 
     mutate_state(|state| {
         state.data.sync_info.last_synced_end = now_millis();
@@ -110,6 +99,7 @@ pub async fn sync_neurons_data() {
         *all_gov_stats = temp_all_gov_stats;
     });
 
+    debug!("Successfully scanned {number_of_scanned_neurons} neurons.");
     // After we have computed governance stats, update the total supply and circulating supply
     sync_supply_data::run();
 }

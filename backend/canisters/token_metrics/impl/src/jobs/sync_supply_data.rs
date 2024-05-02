@@ -1,19 +1,12 @@
-use canister_time::run_now_then_interval;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::account::Account;
-use std::time::Duration;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 use types::Milliseconds;
 use utils::consts::TEAM_PRINCIPALS;
 
 use crate::state::{mutate_state, read_state};
 
 const SYNC_SUPPLY_DATA_INTERVAL: Milliseconds = 3_600 * 1_000;
-
-pub fn _start_job_if_not_started() {
-    debug!("Starting the sync supply data job...");
-    run_now_then_interval(Duration::from_millis(SYNC_SUPPLY_DATA_INTERVAL), run)
-}
 
 pub fn run() {
     ic_cdk::spawn(sync_supply_data())
