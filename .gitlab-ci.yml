@@ -24,7 +24,7 @@ stages:
   - lint
   - test
   - build
-  - integrationTesting
+  - integration_testing
   - deploy
 
 include:
@@ -169,10 +169,10 @@ generate declarations:
 
 # See includes above for frontend builds
 
-.integration:
-  stage: integrationTesting
+.integration tests:
+  stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
       needs:
         [
           "gldt_core test build",
