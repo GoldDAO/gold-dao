@@ -90,8 +90,8 @@ export GLDT_LANDING_PAGE_ID=$(check_and_create_canister gldt_landing_page $NETWO
 echo -e "gldt_landing_page  \033[1m${GLDT_LANDING_PAGE_ID}\033[0m${IMPORTANT_MSG}\n"
 export GLDT_EXPLORER_ID=$(check_and_create_canister gldt_explorer $NETWORK)
 echo -e "gldt_explorer  \033[1m${GLDT_EXPLORER_ID}\033[0m${IMPORTANT_MSG}\n"
-export GLD_DASHBOARD_ID=$(check_and_create_canister gld_dashboard $NETWORK)
-echo -e "gld_dashboard  \033[1m${GLD_DASHBOARD_ID}\033[0m${IMPORTANT_MSG}\n"
+# export GLD_DASHBOARD_ID=$(check_and_create_canister gld_dashboard $NETWORK)
+# echo -e "gld_dashboard  \033[1m${GLD_DASHBOARD_ID}\033[0m${IMPORTANT_MSG}\n"
 export GLDT_COMPENSATION_ID=$(check_and_create_canister gldt_fee_compensation $NETWORK 1073741824)
 echo -e "gldt_fee_compensation  \033[1m${GLDT_COMPENSATION_ID}\033[0m${IMPORTANT_MSG}\n"
 
