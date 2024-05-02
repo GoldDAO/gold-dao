@@ -2,7 +2,7 @@
 .integration tests:
   stage: integration_testing
   rules:
-     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   extends: .rust template
   tags:
     - dind
