@@ -11,7 +11,8 @@ pub fn setup_ledgers(
     pic: &PocketIc,
     controller: Principal,
     token_symbols: Vec<String>,
-    initial_ledger_accounts: Vec<(Account, Nat)>
+    initial_ledger_accounts: Vec<(Account, Nat)>,
+    ledger_fees: HashMap<String, Nat>
 ) -> HashMap<String, Principal> {
     let app_subnet_id = pic.topology().get_app_subnets()[0];
     let mut token_ledgers: HashMap<String, Principal> = HashMap::new();
@@ -19,6 +20,7 @@ pub fn setup_ledgers(
 
     for symbol in token_symbols {
         let canister_id = pic.create_canister_on_subnet(None, None, app_subnet_id);
+        let transaction_fee = ledger_fees.get(&symbol).unwrap();
         pic.add_cycles(canister_id, 100_000_000_000_000_000);
         pic.install_canister(
             canister_id,
@@ -27,7 +29,8 @@ pub fn setup_ledgers(
                 generate_ledger_canister_init_args(
                     &symbol,
                     controller,
-                    initial_ledger_accounts.clone()
+                    initial_ledger_accounts.clone(),
+                    transaction_fee
                 )
             ).unwrap(),
             None
@@ -42,12 +45,22 @@ pub fn setup_ledgers(
 pub fn generate_ledger_canister_init_args(
     token: &str,
     controller: Principal,
-    initial_ledger_accounts: Vec<(Account, Nat)>
+    initial_ledger_accounts: Vec<(Account, Nat)>,
+    fee: &Nat
 ) -> LedgerArgument {
+    let initial_ledger_accounts = initial_ledger_accounts
+        .iter()
+        .cloned()
+        .chain(
+            vec![(Account::from(controller), Nat::from(1_000_000_000_000_000u64))]
+                .iter()
+                .cloned()
+        )
+        .collect();
     LedgerArgument::Init(InitArgs {
         minting_account: Account::from(controller),
         initial_balances: initial_ledger_accounts,
-        transfer_fee: Nat::from(10000u64),
+        transfer_fee: fee.clone(),
         token_name: token.into(),
         token_symbol: token.into(),
         metadata: Vec::new(),

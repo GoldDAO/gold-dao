@@ -156,3 +156,9 @@ Compare this value to the wasm hash that is provided with the upgrade proposal.
 ## DevOps documentation
 
 - :construction: WIP on DAOlink's internal Gitlab wiki
+
+### Notes
+
+## Integration tests
+
+you may need to set the max open files on your current shell before running `cargo test` by first running `ulimit -n 10240`
