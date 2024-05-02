@@ -661,7 +661,7 @@ sns rewards:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["sns_rewards canister build", "check canister ids"]
+  needs: ["sns_rewards canister build test", "check canister ids"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
