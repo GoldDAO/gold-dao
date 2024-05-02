@@ -15,9 +15,9 @@ pub fn default_test_setup() -> RewardsTestEnv {
 
     RewardsTestEnvBuilder::new()
         .add_random_neurons(10)
-        .add_token_ledger("ICP", &mut vec![])
-        .add_token_ledger("OGY", &mut vec![])
-        .add_token_ledger("GLDGov", &mut vec![])
+        .add_token_ledger("ICP", &mut vec![], Nat::from(10_000u64))
+        .add_token_ledger("OGY", &mut vec![], Nat::from(200_000u64))
+        .add_token_ledger("GLDGov", &mut vec![], Nat::from(100_000u64))
         .with_reward_pools(Nat::from(100_000_000_000u64))
         .add_users(users)
         .build()
@@ -26,9 +26,9 @@ pub fn default_test_setup() -> RewardsTestEnv {
 pub fn test_setup_with_no_neuron_hotkeys() -> RewardsTestEnv {
     RewardsTestEnvBuilder::new()
         .add_random_neurons(10)
-        .add_token_ledger("ICP", &mut vec![])
-        .add_token_ledger("OGY", &mut vec![])
-        .add_token_ledger("GLDGov", &mut vec![])
+        .add_token_ledger("ICP", &mut vec![], Nat::from(10_000u64))
+        .add_token_ledger("OGY", &mut vec![], Nat::from(200_000u64))
+        .add_token_ledger("GLDGov", &mut vec![], Nat::from(100_000u64))
         .with_reward_pools(Nat::from(100_000_000_000u64))
         .add_users(vec![])
         .build()
@@ -43,9 +43,9 @@ pub fn test_setup_with_no_reward_pool_mint() -> RewardsTestEnv {
 
     RewardsTestEnvBuilder::new()
         .add_random_neurons(10)
-        .add_token_ledger("ICP", &mut vec![])
-        .add_token_ledger("OGY", &mut vec![])
-        .add_token_ledger("GLDGov", &mut vec![])
+        .add_token_ledger("ICP", &mut vec![], Nat::from(10_000u64))
+        .add_token_ledger("OGY", &mut vec![], Nat::from(200_000u64))
+        .add_token_ledger("GLDGov", &mut vec![], Nat::from(100_000u64))
         .add_users(users)
         .build()
 }

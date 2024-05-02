@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use candid::{ Nat, Principal };
-use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::{ icrc::generic_value::Hash, icrc1::account::Account };
 use pocket_ic::{ PocketIc, PocketIcBuilder };
 use sns_governance_canister::types::Neuron;
 
@@ -84,6 +84,7 @@ pub struct RewardsTestEnvBuilder {
     initial_ledger_accounts: Vec<(Account, Nat)>,
     neurons_to_create: usize,
     initial_reward_pool_amount: Nat,
+    ledger_fees: HashMap<String, Nat>,
 }
 
 impl RewardsTestEnvBuilder {
@@ -97,6 +98,7 @@ impl RewardsTestEnvBuilder {
             neurons_to_create: 0,
             initial_ledger_accounts: vec![],
             initial_reward_pool_amount: Nat::from(0u64),
+            ledger_fees: HashMap::new(),
         }
     }
 
@@ -115,10 +117,12 @@ impl RewardsTestEnvBuilder {
     pub fn add_token_ledger(
         mut self,
         symbol: &str,
-        initial_balances: &mut Vec<(Account, Nat)>
+        initial_balances: &mut Vec<(Account, Nat)>,
+        transaction_fee: Nat
     ) -> Self {
         self.token_symbols.push(symbol.to_string());
         self.initial_ledger_accounts.append(initial_balances);
+        self.ledger_fees.insert(symbol.to_string(), transaction_fee);
         self
     }
 
@@ -146,7 +150,8 @@ impl RewardsTestEnvBuilder {
             &pic,
             sns_gov_canister_id.clone(),
             self.token_symbols,
-            self.initial_ledger_accounts
+            self.initial_ledger_accounts,
+            self.ledger_fees
         );
         let rewards_canister_id = setup_rewards_canister(
             &mut pic,
