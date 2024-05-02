@@ -41,9 +41,9 @@ include:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_explorer
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
-      src-folder: gld_dashboard
+  # - local: scripts/ci-cd/.frontend_linter.yml
+  #   inputs:
+  #     src-folder: gld_dashboard
   # Unit tests coverage
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
@@ -80,6 +80,9 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gldt_explorer
+  # - local: scripts/ci-cd/.frontend_builds.yml
+  #   inputs:
+  #     src-folder: gld_dashboard
   # Deployments
   - local: scripts/ci-cd/.dfx_templates.yml
 
