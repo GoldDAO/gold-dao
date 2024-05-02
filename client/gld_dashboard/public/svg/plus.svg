@@ -1,0 +1,18 @@
+  <svg
+            
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="40" height="40" rx="20" fill="#C6C6C6" />
+            <path d="M10 20H20H10ZM30 20H20H30ZM20 20V10V20ZM20 20V30V20Z" fill="#C6C6C6" />
+            <path
+              d="M10 20H20M20 20H30M20 20V10M20 20V30"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
