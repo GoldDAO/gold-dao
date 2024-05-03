@@ -177,11 +177,11 @@ integration tests:
   stage: integration_testing
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["build"]
+      needs: ["generate test declarations", "generate declarations"]  # Adjust as per your specific jobs in the build stage
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
-      needs: ["build"]
+      needs: ["generate test declarations", "generate declarations"] 
   extends: .rust template
   tags:
     - dind
