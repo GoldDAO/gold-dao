@@ -41,6 +41,9 @@ include:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_explorer
+  # - local: scripts/ci-cd/.frontend_linter.yml
+  #   inputs:
+  #     src-folder: gld_dashboard
   # Unit tests coverage
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
@@ -77,6 +80,9 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gldt_explorer
+  # - local: scripts/ci-cd/.frontend_builds.yml
+  #   inputs:
+  #     src-folder: gld_dashboard
   # Deployments
   - local: scripts/ci-cd/.dfx_templates.yml
 
@@ -141,7 +147,13 @@ generate test declarations:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["gldt_core test build", "icp_neuron test build", "token_metrics test build", "sns_rewards test build"]
+      needs:
+        [
+          "gldt_core test build",
+          "icp_neuron test build",
+          "token_metrics test build",
+          "sns_rewards test build",
+        ]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -157,7 +169,13 @@ generate declarations:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gldt_landing_page|gldt_explorer|gldt_swap_app)-v\d+\.\d+\.\d+$/'
-      needs: ["gldt_core canister build", "icp_neuron canister build", "token_metrics canister build", "sns_rewards canister build"]
+      needs:
+        [
+          "gldt_core canister build",
+          "icp_neuron canister build",
+          "token_metrics canister build",
+          "sns_rewards canister build",
+        ]
   script:
     - dfx generate
     - scripts/refactor_nft_declarations.sh
@@ -168,7 +186,6 @@ generate declarations:
     expire_in: 6 months
 
 # See includes above for frontend builds
-
 
 ################################################################################
 # Integration tests
@@ -408,6 +425,48 @@ check canister ids:
 #     name: gldt explorer
 #     deployment_tier: production
 #     url: https://explorer.gldt.org/
+#     action: start
+
+# gld dashboard staging:
+#   stage: deploy
+#   resource_group: frontend staging deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       needs: ["gld_dashboard staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister staging deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: staging
+#     url: https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io/
+#     action: start
+
+# gld dashboard production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
+#       needs: ["gld_dashboard production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: production
+#     url: https://dashboard.gold-dao.org/
 #     action: start
 
 .backend canisters upgrade proposal tests:
