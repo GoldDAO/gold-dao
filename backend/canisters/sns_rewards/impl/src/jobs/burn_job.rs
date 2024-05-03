@@ -60,7 +60,7 @@ async fn handle_burn_job_impl() {
         }
     };
     // check we're more than 1 day since the last burn. The last_daily_gldgov_burn will be 0 on the first burn because in state it's initialized with ::default() // 0
-    let previous_time_ms = read_state(|s| s.data.last_daily_gldgov_burn);
+    let previous_time_ms = read_state(|s| s.data.last_daily_gldgov_burn.unwrap_or(0));
     let current_time_ms = now_millis();
 
     if !is_interval_more_than_1_day(previous_time_ms, current_time_ms) {
@@ -103,7 +103,7 @@ async fn handle_burn_job_impl() {
         Ok(_) => {
             info!("SUCCESS : {:?} GLDGov tokens burned from reserve pool", amount_to_burn);
             mutate_state(|s| {
-                s.data.last_daily_gldgov_burn = current_time_ms;
+                s.data.last_daily_gldgov_burn = Some(current_time_ms);
             })
         }
         Err(e) => {
