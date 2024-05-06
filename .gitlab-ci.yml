@@ -238,6 +238,7 @@ local deploy and tests:
           "gldt_explorer test build",
           "token_metrics test build",
           "sns_rewards test build",
+          "integration tests"
         ]
   before_script:
     - dfx --version
