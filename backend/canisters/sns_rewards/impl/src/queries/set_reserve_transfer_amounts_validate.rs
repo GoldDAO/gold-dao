@@ -19,13 +19,12 @@ pub async fn set_reserve_transfer_amounts_validate(
     match validate_set_reserve_transfer_amounts_payload(&args.transfer_amounts) {
         Ok(_) => {}
         Err(e) => {
-            return SetValidateReserveTransferAmountsResponse::Error(e);
+            return Err(e);
         }
     }
     match serde_json::to_string_pretty(&args) {
-        Ok(json) => SetValidateReserveTransferAmountsResponse::Success(json),
-        Err(e) =>
-            SetValidateReserveTransferAmountsResponse::Error(format!("invalid payload : {e:?}")),
+        Ok(json) => Ok(json),
+        Err(e) => Err(format!("invalid payload : {e:?}")),
     }
 }
 

@@ -7,8 +7,4 @@ pub struct Args {
     pub token_list: Vec<(String, TokenInfo)>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub enum Response {
-    Success(String),
-    Error(String),
-}
+pub type Response = Result<String, String>;

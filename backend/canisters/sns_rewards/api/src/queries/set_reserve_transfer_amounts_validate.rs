@@ -8,8 +8,4 @@ pub struct Args {
     pub transfer_amounts: HashMap<TokenSymbol, Nat>,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub enum Response {
-    Success(String),
-    Error(String),
-}
+pub type Response = Result<String, String>;
