@@ -19,13 +19,13 @@ async fn set_reward_token_types_validate(
             Ok(_) => {}
             Err(e) => {
                 let err_message = format!("Error parsing token {token_string}. error : {:?}", e);
-                return SetRewardTokenTypesValidateResponse::Err(err_message);
+                return Err(err_message);
             }
         }
     }
 
     match serde_json::to_string_pretty(&args) {
-        Ok(json) => SetRewardTokenTypesValidateResponse::Ok(json),
-        Err(e) => SetRewardTokenTypesValidateResponse::Err(format!("invalid payload : {e:?}")),
+        Ok(json) => Ok(json),
+        Err(e) => Err(format!("invalid payload : {e:?}")),
     }
 }
