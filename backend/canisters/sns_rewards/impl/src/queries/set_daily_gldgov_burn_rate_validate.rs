@@ -18,11 +18,11 @@ pub async fn set_daily_gldgov_burn_rate_validate(
     match validate_set_daily_gldgov_burn_rate_payload(&amount) {
         Ok(_) => {}
         Err(e) => {
-            return SetDailyGLDGovBurnRateValidateResponse::Error(e);
+            return SetDailyGLDGovBurnRateValidateResponse::Err(e);
         }
     }
     match serde_json::to_string_pretty(&amount) {
-        Ok(json) => SetDailyGLDGovBurnRateValidateResponse::Success(json),
-        Err(e) => SetDailyGLDGovBurnRateValidateResponse::Error(format!("invalid payload : {e:?}")),
+        Ok(json) => SetDailyGLDGovBurnRateValidateResponse::Ok(json),
+        Err(e) => SetDailyGLDGovBurnRateValidateResponse::Err(format!("invalid payload : {e:?}")),
     }
 }

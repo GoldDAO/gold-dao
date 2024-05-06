@@ -209,7 +209,7 @@ fn test_set_reserve_transfer_amounts_validate() {
         rewards_canister_id,
         &reserve_args
     );
-    assert!(matches!(res, SetReserveTransferAmountsValidateResponse::Success(_)))
+    assert!(matches!(res, SetReserveTransferAmountsValidateResponse::Ok(_)))
 }
 
 #[test]

@@ -125,7 +125,7 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args
-    );
+    ).unwrap();
 }
 #[test]
 fn test_set_reward_token_validate() {
@@ -149,5 +149,5 @@ fn test_set_reward_token_validate() {
         &reserve_args
     );
 
-    assert!(matches!(res, SetRewardTokenTypesValidateResponse::Success(_)));
+    assert!(matches!(res, SetRewardTokenTypesValidateResponse::Ok(_)));
 }

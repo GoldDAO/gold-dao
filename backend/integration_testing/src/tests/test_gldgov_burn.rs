@@ -166,7 +166,7 @@ fn test_set_reserve_transfer_amounts_validate() {
         rewards_canister_id,
         &burn_rate
     );
-    assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Success(_)))
+    assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Ok(_)))
 }
 
 #[test]
@@ -183,5 +183,5 @@ fn test_set_reserve_transfer_amounts_validate_with_0_transfer_amount() {
         rewards_canister_id,
         &burn_rate
     );
-    assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Error(_)))
+    assert!(matches!(res, SetDailyGLDGovBurnRateValidateResponse::Err(_)))
 }

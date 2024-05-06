@@ -1,10 +1,5 @@
-use candid::{ CandidType, Nat };
-use serde::{ Deserialize, Serialize };
+use candid::Nat;
 
 pub type Args = Nat;
 
-#[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub enum Response {
-    Success(String),
-    Error(String),
-}
+pub type Response = Result<String, String>;
