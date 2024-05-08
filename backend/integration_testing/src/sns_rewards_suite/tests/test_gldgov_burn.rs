@@ -9,7 +9,7 @@ use sns_rewards_api_canister::set_daily_gldgov_burn_rate_validate::Response as S
 
 use crate::client::icrc1::icrc1_total_supply;
 use crate::client::rewards::{ set_daily_gldgov_burn_rate, set_daily_gldgov_burn_rate_validate };
-use crate::setup::test_setup_with_no_reward_pool_mint;
+use crate::sns_rewards_suite::setup::test_setup_with_no_reward_pool_mint;
 use crate::{ client::icrc1::client::{ balance_of, transfer }, utils::tick_n_blocks };
 
 #[test]
@@ -149,7 +149,7 @@ fn test_set_daily_gldgov_burn_rate_validate_when_caller_is_not_governance_princi
         Principal::anonymous(),
         rewards_canister_id,
         &burn_rate
-    );
+    ).unwrap();
 }
 
 #[test]

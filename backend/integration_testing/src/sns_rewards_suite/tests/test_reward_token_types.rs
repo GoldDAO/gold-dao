@@ -7,7 +7,7 @@ use types::{ TokenInfo, TokenSymbol };
 
 use crate::{
     client::rewards::{ set_reward_token_types, set_reward_token_types_validate },
-    setup::default_test_setup,
+    sns_rewards_suite::setup::default_test_setup,
 };
 
 use sns_rewards_api_canister::set_reward_token_types::{

@@ -1,7 +1,6 @@
 #![cfg(test)]
 
-mod client;
-mod setup;
-mod tests;
 mod utils;
+mod client;
 mod wasms;
+pub mod sns_rewards_suite;

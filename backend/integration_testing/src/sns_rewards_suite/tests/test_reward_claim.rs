@@ -13,7 +13,7 @@ use crate::{
         icrc1::client::{ balance_of, transfer },
         rewards::{ add_neuron_ownership, claim_reward, remove_neuron_ownership },
     },
-    setup::{ default_test_setup, test_setup_with_no_neuron_hotkeys },
+    sns_rewards_suite::setup::{ default_test_setup, test_setup_with_no_neuron_hotkeys },
     utils::tick_n_blocks,
 };
 
