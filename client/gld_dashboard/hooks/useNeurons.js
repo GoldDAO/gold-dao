@@ -131,7 +131,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   // call this function in a loop for each neuron the user has to claim all.
   const claimOneReward = async (id, tok) => {
     try {
-      const response = await snsRewards.claim_reward({ id }, tok);
+      const response = await snsRewards.claim_reward({token: tok, neuron_id : { id }} );
       return response;
     } catch (err) {
       console.log(err);
