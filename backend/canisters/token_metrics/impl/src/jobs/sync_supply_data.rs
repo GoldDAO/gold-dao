@@ -15,14 +15,14 @@ pub fn run() {
 pub async fn sync_supply_data() {
     let ledger_canister_id = read_state(|state| state.data.sns_ledger_canister);
 
+    let total_foundation_balance = get_total_ledger_balance_of_accounts(
+        TEAM_PRINCIPALS.to_vec()
+    ).await;
+
     match icrc_ledger_canister_c2c_client::icrc1_total_supply(ledger_canister_id).await {
         Ok(response) => {
             let total_supply = response;
             let total_locked = read_state(|state| state.data.all_gov_stats.total_locked);
-            let total_foundation_balance = get_total_ledger_balance_of_accounts(
-                TEAM_PRINCIPALS.to_vec()
-            ).await;
-            debug!(total_foundation_balance, "Total team balance");
             let circulating_supply = total_supply - total_locked - total_foundation_balance;
 
             mutate_state(|state| {
