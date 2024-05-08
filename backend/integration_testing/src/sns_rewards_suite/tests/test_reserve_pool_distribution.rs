@@ -27,7 +27,7 @@ use crate::{
             set_reserve_transfer_amounts_validate,
         },
     },
-    setup::default_test_setup,
+    sns_rewards_suite::setup::default_test_setup,
     utils::tick_n_blocks,
 };
 
@@ -185,7 +185,7 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args
-    );
+    ).unwrap();
 }
 
 #[test]

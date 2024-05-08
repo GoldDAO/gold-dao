@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 use candid::{ Nat, Principal };
-use icrc_ledger_types::{ icrc::generic_value::Hash, icrc1::account::Account };
+use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{ PocketIc, PocketIcBuilder };
 use sns_governance_canister::types::Neuron;
 
 use crate::{
     client::icrc1::client::transfer,
-    setup::{
+    sns_rewards_suite::setup::{
         setup_ledger::setup_ledgers,
         setup_sns::{ create_sns_with_data, generate_neuron_data },
     },

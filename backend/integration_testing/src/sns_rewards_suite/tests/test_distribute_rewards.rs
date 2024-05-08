@@ -11,7 +11,7 @@ use crate::{
         icrc1::client::{ balance_of, transfer },
         rewards::{ get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id },
     },
-    setup::{ default_test_setup, setup::setup_reward_pools },
+    sns_rewards_suite::setup::{ default_test_setup, setup::setup_reward_pools },
     utils::tick_n_blocks,
 };
 
