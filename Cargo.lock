@@ -232,6 +232,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "canister_api_macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_tokenstream 0.2.0",
+ "syn 2.0.50",
+]
+
+[[package]]
 name = "canister_client"
 version = "0.1.0"
 dependencies = [
@@ -432,6 +443,50 @@ checksum = "1bfb12502f3fc46cca1bb51ac28df9d618d813cdc3d2f25b9fe775a34af26bb3"
 dependencies = [
  "generic-array",
  "typenum",
+]
+
+[[package]]
+name = "cycles_manager_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "human_readable",
+ "ic-ledger-types",
+ "serde",
+ "types",
+]
+
+[[package]]
+name = "cycles_manager_canister_impl"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_api_macros",
+ "canister_client",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "cycles_manager_canister",
+ "human_readable",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icp_ledger_canister_c2c_client",
+ "ledger_utils",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "serializer",
+ "sns_root_canister",
+ "sns_root_canister_c2c_client",
+ "stable_memory",
+ "tracing",
+ "types",
+ "utils",
 ]
 
 [[package]]
@@ -905,6 +960,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
+name = "human_readable"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "human_readable_derive",
+ "serde",
+ "serde_json",
+ "sha256",
+ "types",
+]
+
+[[package]]
+name = "human_readable_derive"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.50",
+]
+
+[[package]]
 name = "hyper"
 version = "0.14.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1001,7 +1076,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde",
- "serde_tokenstream",
+ "serde_tokenstream 0.1.7",
  "syn 1.0.109",
 ]
 
@@ -1015,7 +1090,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde",
- "serde_tokenstream",
+ "serde_tokenstream 0.1.7",
  "syn 1.0.109",
 ]
 
@@ -2033,6 +2108,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_tokenstream"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a00ffd23fd882d096f09fcaae2a9de8329a328628e86027e049ee051dc1621f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "syn 2.0.50",
+]
+
+[[package]]
 name = "serde_urlencoded"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2250,6 +2337,27 @@ dependencies = [
  "tracing",
  "types",
  "utils",
+]
+
+[[package]]
+name = "sns_root_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "serde",
+ "types",
+]
+
+[[package]]
+name = "sns_root_canister_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_client",
+ "ic-cdk 0.13.2",
+ "sns_root_canister",
+ "types",
 ]
 
 [[package]]

@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "backend/canisters/cycles_manager/impl",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",
@@ -14,9 +15,12 @@ members = [
   "backend/libraries/canister_client_macros",
   "backend/libraries/canister_logger",
   "backend/libraries/canister_state_macros",
+  "backend/libraries/canister_api_macros",
   "backend/libraries/canister_time",
   "backend/libraries/canister_tracing_macros",
   "backend/libraries/http_request",
+  "backend/libraries/human_readable",
+  "backend/libraries/human_readable_derive",
   "backend/libraries/serializer",
   "backend/libraries/stable_memory",
   "backend/libraries/types",
@@ -54,6 +58,7 @@ serde_cbor = "0.11.2"
 serde_json = "1.0.108"
 serde_with = "3.7.0"
 serde_yaml = "0.9.29"
+serde_tokenstream = "0.2.0"
 sha2 = "0.10.8"
 syn = "2.0.39"
 tracing = "0.1.40"
