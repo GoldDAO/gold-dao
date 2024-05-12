@@ -1,9 +1,9 @@
-use crate::state::{read_state, RuntimeState};
-use http_request::{build_json_response, encode_logs, extract_route, Route};
+use crate::state::{ read_state, RuntimeState };
+use http_request::{ build_json_response, encode_logs, extract_route, Route };
 use ic_cdk_macros::query;
 use std::collections::HashMap;
 use tracing::info;
-use types::{HttpRequest, HttpResponse, TimestampMillis};
+use types::{ HttpRequest, HttpResponse, TimestampMillis };
 
 #[query(hidden = true)]
 fn http_request(request: HttpRequest) -> HttpResponse {
@@ -49,10 +49,20 @@ fn http_request(request: HttpRequest) -> HttpResponse {
     match extract_route(&request.url) {
         Route::Logs(since) => get_logs_impl(since),
         Route::Traces(since) => get_traces_impl(since),
-        Route::RawTotalSupply => read_state(get_total_supply),
-        Route::RawCirculatingSupply => read_state(get_circulating_supply),
         Route::Metrics => read_state(get_metrics_impl),
-        Route::Other(path, _) if path == "gold_nft_metrics" => get_gold_nft_metrics(),
+        Route::Other(path, _) => {
+            if path == "gold_nft_metrics" {
+                return get_gold_nft_metrics();
+            }
+            if path == "total-supply" {
+                return read_state(get_total_supply);
+            }
+            if path == "circulating-supply" {
+                return read_state(get_circulating_supply);
+            } else {
+                HttpResponse::not_found()
+            }
+        }
         _ => HttpResponse::not_found(),
     }
 }

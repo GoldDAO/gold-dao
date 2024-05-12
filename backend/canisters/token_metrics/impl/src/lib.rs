@@ -4,6 +4,7 @@ use candid::Principal;
 use crate::state::GovernanceStats;
 use crate::state::TokenSupplyData;
 
+mod consts;
 mod jobs;
 mod lifecycle;
 mod memory;

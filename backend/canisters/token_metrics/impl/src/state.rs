@@ -3,7 +3,7 @@ use canister_state_macros::canister_state;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use std::collections::BTreeMap;
-use types::TimestampMillis;
+use types::{ CanisterId, TimestampMillis };
 use utils::{
     consts::{ SNS_GOVERNANCE_CANISTER_ID, SNS_LEDGER_CANISTER_ID },
     env::{ CanisterEnv, Environment },
@@ -85,23 +85,29 @@ pub struct Data {
     pub supply_data: TokenSupplyData,
     /// Stores the mapping of each principal to its neurons
     pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
+    // The cansiter id of the sns rewards cansiter
+    pub sns_rewards_canister_id: CanisterId,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Default, CandidType)]
+#[derive(Serialize, Deserialize, Clone, Default, CandidType)]
 pub struct PrincipalBalance {
     pub governance: GovernanceStats,
     pub ledger: u64,
 }
-#[derive(Serialize, Deserialize, Clone, Copy, Default, CandidType)]
+#[derive(Serialize, Deserialize, Clone, Default, CandidType)]
 pub struct TokenSupplyData {
-    pub total_supply: u64,
-    pub circulating_supply: u64,
+    pub total_supply: Nat,
+    pub circulating_supply: Nat,
 }
 impl Data {
-    pub fn new(gold_nft_canisters: Vec<(Principal, u128)>) -> Self {
+    pub fn new(
+        gold_nft_canisters: Vec<(Principal, u128)>,
+        sns_rewards_canister_id: CanisterId
+    ) -> Self {
         Self {
             sns_governance_canister: SNS_GOVERNANCE_CANISTER_ID,
             sns_ledger_canister: SNS_LEDGER_CANISTER_ID,
+            sns_rewards_canister_id,
             gold_price: 0.0,
             gold_nft_canisters: gold_nft_canisters,
             total_gold_grams: 0,
