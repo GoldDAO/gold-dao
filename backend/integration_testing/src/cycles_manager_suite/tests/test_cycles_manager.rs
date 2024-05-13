@@ -16,7 +16,7 @@ fn test_cycles_management() {
 
     // Get cycles_manager balance
     let initial_cycles_manager_balance = test_env.pic.cycle_balance(cycles_manager_id);
-    assert_eq!(99999999096306155, initial_cycles_manager_balance);
+    assert_eq!(99999992533685572, initial_cycles_manager_balance);
 
     // Get rewards_canister balance (initially it's greater than the threshold)
     let initial_rewards_canister_balance = test_env.pic.cycle_balance(rewards_canister_id);

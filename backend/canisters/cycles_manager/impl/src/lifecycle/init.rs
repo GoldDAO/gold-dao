@@ -3,7 +3,6 @@ use crate::Data;
 use canister_tracing_macros::trace;
 use cycles_manager_canister::init::Args;
 use ic_cdk_macros::init;
-use ic_ledger_types::Tokens;
 use tracing::info;
 use utils::env::Environment;
 

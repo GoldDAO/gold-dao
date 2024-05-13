@@ -446,25 +446,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cycles_manager_canister"
-version = "0.1.0"
-dependencies = [
- "candid",
- "candid_gen",
- "canister_logger",
- "human_readable",
- "ic-cdk 0.13.2",
- "ic-cdk-macros 0.13.2",
- "ic-ledger-types",
- "serde",
- "serializer",
- "stable_memory",
- "tracing",
- "types",
-]
-
-[[package]]
-name = "cycles_manager_canister_impl"
+name = "cycles_manager"
 version = "0.1.0"
 dependencies = [
  "candid",
@@ -493,6 +475,24 @@ dependencies = [
  "tracing",
  "types",
  "utils",
+]
+
+[[package]]
+name = "cycles_manager_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "canister_logger",
+ "human_readable",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
+ "ic-ledger-types",
+ "serde",
+ "serializer",
+ "stable_memory",
+ "tracing",
+ "types",
 ]
 
 [[package]]
@@ -1330,6 +1330,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "cycles_manager",
  "cycles_manager_canister",
  "futures",
  "hex",
@@ -2837,6 +2838,7 @@ dependencies = [
  "serde",
  "serde_bytes",
  "stable_memory",
+ "tracing",
  "types",
 ]
 

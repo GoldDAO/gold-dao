@@ -19,11 +19,12 @@ fn get_rewards_canister_wasm() -> Vec<u8> {
     ).unwrap()
 }
 
+// Run to compile to wasm:
 // scripts/build-canister.sh cycles_manager_canister
 fn get_cycles_manager_canister_wasm() -> Vec<u8> {
     read_file_from_relative_bin(
         &format!(
-            "../canisters/cycles_manager_canister/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
+            "../canisters/cycles_manager/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
         )
     ).unwrap()
 }
