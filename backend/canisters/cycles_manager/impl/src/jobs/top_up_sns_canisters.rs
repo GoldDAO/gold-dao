@@ -5,9 +5,11 @@ use std::time::Duration;
 use types::{CanisterId, Cycles, Empty};
 use utils::canister::deposit_cycles;
 
-const INTERVAL: Duration = Duration::from_secs(24 * 60 * 60); // 1 day
-const T: Cycles = 1_000_000_000_000;
-const TOP_UP_THRESHOLD: u64 = 100 * T;
+// const INTERVAL: Duration = Duration::from_secs(24 * 60 * 60); // 1 day
+
+const INTERVAL: Duration = Duration::from_secs(1);
+const T: Cycles = 1_000_000_000;
+const TOP_UP_THRESHOLD: u64 = 2 * T;
 
 pub fn start_job() {
     run_now_then_interval(INTERVAL, run);

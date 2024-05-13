@@ -451,9 +451,15 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "candid_gen",
+ "canister_logger",
  "human_readable",
+ "ic-cdk 0.13.2",
+ "ic-cdk-macros 0.13.2",
  "ic-ledger-types",
  "serde",
+ "serializer",
+ "stable_memory",
+ "tracing",
  "types",
 ]
 
@@ -1324,6 +1330,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "cycles_manager_canister",
  "futures",
  "hex",
  "http_request",

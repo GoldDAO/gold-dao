@@ -20,9 +20,8 @@ fn init(args: Args) {
         args.max_top_up_amount,
         args.min_interval,
         args.min_cycles_balance,
-        Tokens::from_e8s(args.icp_burn_amount_e8s),
-        args.ledger_canister,
-        args.cycles_minting_canister,
+        // Tokens::from_e8s(args.icp_burn_amount_e8s),
+        // args.ledger_canister,
         env.now(),
         args.test_mode,
     );

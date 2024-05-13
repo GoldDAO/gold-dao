@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use types::{ Milliseconds, TimestampMillis, TimestampNanos };
+use types::{Milliseconds, TimestampMillis, TimestampNanos};
 
 pub const SECOND_IN_MS: Milliseconds = 1000;
 pub const MINUTE_IN_MS: Milliseconds = SECOND_IN_MS * 60;
@@ -31,7 +31,10 @@ pub fn timestamp_nanos() -> u64 {
 pub fn timestamp_nanos() -> u64 {
     use std::time::SystemTime;
 
-    SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_nanos() as u64
+    SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos() as u64
 }
 
 pub fn now_millis() -> TimestampMillis {
@@ -49,8 +52,8 @@ pub fn now_nanos() -> TimestampNanos {
 }
 
 pub fn run_now_then_interval(interval: Duration, func: fn()) {
-    ic_cdk_timers::set_timer_interval(interval, func);
     ic_cdk_timers::set_timer(Duration::ZERO, func);
+    ic_cdk_timers::set_timer_interval(interval, func);
 }
 
 pub fn run_interval(interval: Duration, func: fn()) {
