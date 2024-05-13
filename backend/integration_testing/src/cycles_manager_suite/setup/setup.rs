@@ -163,14 +163,17 @@ impl CyclesManagerTestEnvBuilder {
             governance_principals: vec![self.controller],
             canisters: vec![rewards_canister_id],
             max_top_up_amount: 1 * T,
-            min_interval: 5 * 60 * 1000,             // 5 minutes
-            min_cycles_balance: 200_000_000_000_000, // 200_000_000_000_000
+            min_interval: 5 * 60 * 1000, // 5 minutes
+            min_cycles_balance: 200 * T,
             wasm_version: BuildVersion::min(),
         };
 
-        // Make setup
-        let cycles_manager_id: Principal =
-            setup_cycle_manager_canister(&mut pic, &self.controller, cycles_dispenser_init_args);
+        // Setup cycle manager canister
+        let cycles_manager_id: Principal = setup_cycle_manager_canister(
+            &mut pic,
+            &sns_gov_canister_id,
+            cycles_dispenser_init_args,
+        );
 
         CyclesManagerEnv {
             controller: self.controller,
