@@ -18,5 +18,5 @@
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin@=0.29.2
     - export PATH="$PWD/.cargo/bin:$PATH"
