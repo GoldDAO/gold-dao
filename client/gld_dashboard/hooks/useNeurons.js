@@ -202,7 +202,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       setRequestSent(true);
       setLoading(true);
       const neurons = {};
-      let neuronIds = await snsRewards.get_neurons_by_owner();
+      let neuronIds = await snsRewards.get_neurons_by_owner([]);
       const neuronsParameters = await nervousSystemParameters();
       if (neuronIds.length) {
         neuronIds = neuronIds.flat();
