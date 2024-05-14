@@ -1,4 +1,4 @@
-export default({ IDL }) => {
+export default ({ IDL }) => {
   const InitArgs = IDL.Record({
     'sns_gov_canister_id' : IDL.Principal,
     'test_mode' : IDL.Bool,
@@ -59,7 +59,7 @@ export default({ IDL }) => {
     'add_neuron_ownership' : IDL.Func([NeuronId], [Response], []),
     'claim_reward' : IDL.Func([Args], [Response_1], []),
     'get_neurons_by_owner' : IDL.Func(
-        [],
+        [IDL.Opt(IDL.Principal)],
         [IDL.Opt(IDL.Vec(NeuronId))],
         ['query'],
       ),
