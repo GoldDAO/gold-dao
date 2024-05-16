@@ -5,7 +5,10 @@ use serde::Deserialize;
 use serde_tokenstream::from_tokenstream;
 use std::fmt::Formatter;
 use syn::parse::{Parse, ParseStream};
-use syn::{parse_macro_input, Block, FnArg, Ident, ItemFn, LitBool, Pat, PatIdent, PatType, Signature, Token};
+use syn::{
+    parse_macro_input, Block, FnArg, Ident, ItemFn, LitBool, Pat, PatIdent, PatType, Signature,
+    Token,
+};
 
 enum MethodType {
     Update,
@@ -49,7 +52,12 @@ pub fn query_msgpack(attr: TokenStream, item: TokenStream) -> TokenStream {
     canister_api_method(MethodType::Query, attr, item, false)
 }
 
-fn canister_api_method(method_type: MethodType, attr: TokenStream, item: TokenStream, include_candid: bool) -> TokenStream {
+fn canister_api_method(
+    method_type: MethodType,
+    attr: TokenStream,
+    item: TokenStream,
+    include_candid: bool,
+) -> TokenStream {
     let attr: AttributeInput = from_tokenstream(&attr.into()).unwrap();
     let item = parse_macro_input!(item as ItemFn);
 
@@ -57,7 +65,9 @@ fn canister_api_method(method_type: MethodType, attr: TokenStream, item: TokenSt
 
     let name = attr.name.unwrap_or_else(|| item.sig.ident.to_string());
     let guard = attr.guard.map(|g| quote! { guard = #g, });
-    let manual_reply = attr.manual_reply.then_some(quote! { manual_reply = "true", });
+    let manual_reply = attr
+        .manual_reply
+        .then_some(quote! { manual_reply = "true", });
 
     let msgpack_name = format!("{name}_msgpack");
 
@@ -101,10 +111,14 @@ pub fn proposal(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr: AttributeInput = from_tokenstream(&attr.into()).unwrap();
     let original_fn = parse_macro_input!(item as ItemFn);
 
-    let name = attr.name.unwrap_or_else(|| original_fn.sig.ident.to_string());
+    let name = attr
+        .name
+        .unwrap_or_else(|| original_fn.sig.ident.to_string());
     let validate_fn_name = format!("{name}_validate");
     let guard = attr.guard.map(|g| quote! { guard = #g, });
-    let manual_reply = attr.manual_reply.then_some(quote! { manual_reply = "true", });
+    let manual_reply = attr
+        .manual_reply
+        .then_some(quote! { manual_reply = "true", });
 
     let validate_fn = convert_to_validate_fn(original_fn.clone());
 
@@ -123,7 +137,11 @@ pub fn proposal_validation(input: TokenStream) -> TokenStream {
 
     let their_service_name = format_ident!("{}", attribute.service_name);
     let their_function_name = format_ident!("{}", attribute.function_name);
-    let our_function_name = format_ident!("{}_{}_validate", attribute.service_name, attribute.function_name);
+    let our_function_name = format_ident!(
+        "{}_{}_validate",
+        attribute.service_name,
+        attribute.function_name
+    );
 
     let args_type = quote! { #their_service_name::#their_function_name::Args };
 

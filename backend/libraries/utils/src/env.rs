@@ -1,7 +1,7 @@
 use candid::Principal;
+use serde::{ Deserialize, Serialize };
+use types::{ CanisterId, Cycles, TimestampMillis, TimestampNanos };
 use canister_time::now_nanos;
-use serde::{Deserialize, Serialize};
-use types::{CanisterId, Cycles, TimestampMillis, TimestampNanos};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct CanisterEnv {
@@ -24,7 +24,9 @@ pub trait Environment {
 
 impl CanisterEnv {
     pub fn new(test_mode: bool) -> Self {
-        Self { test_mode }
+        Self {
+            test_mode,
+        }
     }
 
     pub fn is_test_mode(&self) -> bool {
