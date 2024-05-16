@@ -18,10 +18,6 @@ fn test_cycles_management() {
     // Get canisters ID:
     let cycles_manager_id = test_env.cycles_manager_id;
     let rewards_canister_id = test_env.rewards_canister_id;
-    println!("cycles_manager_id: {}", cycles_manager_id);
-    println!("rewards_canister_id: {}", rewards_canister_id);
-    // cycles_manager_id: lz3um-vp777-77777-aaaba-cai
-    // rewards_canister_id: lqy7q-dh777-77777-aaaaq-cai
 
     // Get cycles_manager balance
     let initial_cycles_manager_balance = test_env.pic.cycle_balance(cycles_manager_id);
@@ -29,7 +25,6 @@ fn test_cycles_management() {
         "initial_cycles_manager_balance: {}",
         initial_cycles_manager_balance
     );
-    // assert_eq!(99999992533685572, initial_cycles_manager_balance);
 
     // Get rewards_canister balance (initially it's greater than the threshold)
     let initial_rewards_canister_balance = test_env.pic.cycle_balance(rewards_canister_id);
@@ -37,18 +32,6 @@ fn test_cycles_management() {
         "initial_rewards_canister_balance: {}",
         initial_rewards_canister_balance
     );
-    // assert_eq!(200027320473955, initial_rewards_canister_balance);
-
-    let p = test_env
-        .pic
-        .canister_status(test_env.sns_root_canister_id, Some(test_env.controller))
-        .unwrap();
-    println!("Status: {:#?}", p);
-
-    let memory = test_env
-        .pic
-        .get_stable_memory(test_env.sns_root_canister_id);
-    println!("Memory: {:#?}", p);
 
     cycles_manager::update_config(
         &mut test_env.pic,

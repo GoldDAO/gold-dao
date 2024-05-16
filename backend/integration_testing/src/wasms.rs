@@ -21,7 +21,7 @@ fn get_rewards_canister_wasm() -> Vec<u8> {
 }
 
 // NOTE: Run to compile to wasm:
-// scripts/build-canister.sh cycles_manager_canister
+// scripts/build-canister.sh cycles_manager
 fn get_cycles_manager_canister_wasm() -> Vec<u8> {
     read_file_from_relative_bin(
         &format!(

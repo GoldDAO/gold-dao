@@ -57,6 +57,9 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: cycles_manager
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
@@ -70,6 +73,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: cycles_manager
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -124,6 +130,7 @@ rust lint:
         - "backend/canisters/{icp_neuron,icp_neuron/impl,icp_neuron/impl/**}/*.{rs,toml,lock}"
         - "backend/canisters/{token_metrics,token_metrics/impl,token_metrics/impl/**}/*.{rs,toml,lock}"
         - "backend/canisters/{sns_rewards,sns_rewards/impl,sns_rewards/impl/**}/*.{rs,toml,lock}"
+        - "backend/canisters/{cycles_manager,cycles_manager/impl,cycles_manager/impl/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
@@ -153,6 +160,7 @@ generate test declarations:
           "icp_neuron test build",
           "token_metrics test build",
           "sns_rewards test build",
+          "cycles_manager test build",
         ]
   script:
     - dfx generate
@@ -175,6 +183,7 @@ generate declarations:
           "icp_neuron canister build",
           "token_metrics canister build",
           "sns_rewards canister build",
+          "cycles_manager canister build",
         ]
   script:
     - dfx generate
@@ -194,9 +203,15 @@ integration tests:
   stage: integration_testing
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs: ["sns_rewards test build", "sns_rewards tests"]
+      needs:
+        [
+          "sns_rewards test build",
+          "sns_rewards tests",
+          "cycles_manager test build",
+          "cycles_manager tests",
+        ]
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["sns_rewards canister build"]
+      needs: ["sns_rewards canister build", "cycles_manager canister build"]
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
   extends: .rust template
@@ -213,7 +228,7 @@ integration tests:
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - ulimit -n 102400
-    - ulimit -f 1024000 
+    - ulimit -f 1024000
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
@@ -238,7 +253,8 @@ local deploy and tests:
           "gldt_explorer test build",
           "token_metrics test build",
           "sns_rewards test build",
-          "integration tests"
+          "cycles_manager test build",
+          "integration tests",
         ]
   before_script:
     - dfx --version
@@ -257,7 +273,7 @@ check canister ids:
       variables:
         TARGET_NETWORK: staging
         PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)|(token_metrics)|(sns_rewards)-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)|(token_metrics)|(sns_rewards)|(cycles_manager)-v\d+\.\d+\.\d+$/'
       variables:
         TARGET_NETWORK: ic
         PEM_FILE: "${PEM_FILE_PRODUCTION}"
@@ -704,7 +720,8 @@ sns rewards staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["sns_rewards canister build", "check canister ids", "integration tests"]
+  needs:
+    ["sns_rewards canister build", "check canister ids", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -724,7 +741,8 @@ sns rewards:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["sns_rewards canister build", "check canister ids", "integration tests"]
+  needs:
+    ["sns_rewards canister build", "check canister ids", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
