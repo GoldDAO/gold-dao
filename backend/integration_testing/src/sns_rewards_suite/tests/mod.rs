@@ -1,7 +1,6 @@
 pub mod test_distribute_rewards;
 pub mod test_get_neurons_by_owner;
 pub mod test_gldgov_burn;
-pub mod test_gldgov_burn;
 pub mod test_reserve_pool_distribution;
 pub mod test_reward_claim;
 pub mod test_reward_token_types;
