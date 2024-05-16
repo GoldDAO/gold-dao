@@ -1,14 +1,14 @@
 use crate::lifecycle::{init_env, init_state};
 use crate::Data;
 use canister_tracing_macros::trace;
-use cycles_manager_canister::init::Args;
+use cycles_manager_canister::init::InitArgs;
 use ic_cdk_macros::init;
 use tracing::info;
 use utils::env::Environment;
 
 #[init]
 #[trace]
-fn init(args: Args) {
+fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
     let env = init_env([0; 32]);

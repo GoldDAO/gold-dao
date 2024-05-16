@@ -16,7 +16,7 @@ pub struct Args {
 pub fn setup_cycle_manager_canister(
     pic: &mut PocketIc,
     controller: &Principal,
-    init_args: cycles_manager_canister::init::Args,
+    init_args: cycles_manager_canister::init::InitArgs,
 ) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
     let cycles_manager_canister =

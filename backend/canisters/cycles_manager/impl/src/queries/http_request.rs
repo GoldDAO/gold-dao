@@ -7,7 +7,7 @@ use serde_bytes::ByteBuf;
 use std::io::Write;
 use types::{HeaderField, HttpRequest, HttpResponse};
 
-#[query]
+#[query(hidden = true)]
 fn http_request(request: HttpRequest) -> HttpResponse {
     let path = request.url.trim_matches('/').to_lowercase();
 

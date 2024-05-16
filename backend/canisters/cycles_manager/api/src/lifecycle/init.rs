@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use types::{BuildVersion, CanisterId, Cycles, Milliseconds};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct Args {
+pub struct InitArgs {
     pub authorized_principals: Vec<Principal>,
     pub canisters: Vec<CanisterId>,
     pub sns_root_canister: Option<CanisterId>,

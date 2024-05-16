@@ -157,7 +157,6 @@ pub fn create_sns_with_data(
 
     pic.tick();
     let sns_root_canister_wasm = wasms::SNS_ROOT.clone();
-    // TODO: use a different init arguments
     pic.install_canister(
         sns_root_canister_id,
         sns_root_canister_wasm,

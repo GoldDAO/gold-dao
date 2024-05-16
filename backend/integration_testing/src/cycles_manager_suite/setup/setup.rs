@@ -164,12 +164,12 @@ impl CyclesManagerTestEnvBuilder {
         // bwcas-wqaaa-aaaaa-aaaaa-aaq
 
         // Args
-        let cycles_dispenser_init_args = cycles_manager_canister::init::Args {
+        let cycles_dispenser_init_args = cycles_manager_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![rewards_canister_id],
             sns_root_canister: Some(sns_root_canister_id),
-            max_top_up_amount: 200 * T,
+            max_top_up_amount: 20 * T,
             min_interval: 5 * 60 * 1000, // 5 minutes
             min_cycles_balance: 200 * T,
             wasm_version: BuildVersion::min(),
