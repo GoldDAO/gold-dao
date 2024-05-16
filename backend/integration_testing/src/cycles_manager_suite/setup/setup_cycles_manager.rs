@@ -4,9 +4,6 @@ use candid::{CandidType, Principal};
 use pocket_ic::PocketIc;
 use serde::Deserialize;
 
-// use types::Cycles;
-// const T: Cycles = 1_000_000_000_000;
-
 #[derive(Deserialize, CandidType)]
 pub struct Args {
     test_mode: bool,

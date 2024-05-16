@@ -1,28 +1,35 @@
-use std::collections::{ BTreeMap, HashMap };
+use std::collections::{BTreeMap, HashMap};
 
-use candid::{ encode_one, Principal };
+use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
+use sha2::{Digest, Sha256};
 use sns_governance_canister::types::{
-    governance::SnsMetadata,
-    DefaultFollowees,
-    Governance,
-    NervousSystemParameters,
-    Neuron,
-    NeuronId,
-    NeuronPermission,
-    NeuronPermissionList,
-    VotingRewardsParameters,
+    governance::SnsMetadata, DefaultFollowees, Governance, NervousSystemParameters, Neuron,
+    NeuronId, NeuronPermission, NeuronPermissionList, VotingRewardsParameters,
 };
-use sha2::{ Digest, Sha256 };
 
 use crate::wasms;
+
+use candid::CandidType;
+use candid::Deserialize;
+#[derive(Deserialize, CandidType)]
+pub struct Args {
+    pub dapp_canister_ids: Vec<Principal>,
+    pub testflight: bool,
+    pub latest_ledger_archive_poll_timestamp_seconds: Option<u64>,
+    pub archive_canister_ids: Vec<Principal>,
+    pub governance_canister_id: Option<Principal>,
+    pub index_canister_id: Option<Principal>,
+    pub swap_canister_id: Option<Principal>,
+    pub ledger_canister_id: Option<Principal>,
+}
 
 // generates random neurons
 pub fn generate_neuron_data(
     start_at: usize,
     n: usize,
     maturity_multiplier: u64,
-    users: &Vec<Principal>
+    users: &Vec<Principal>,
 ) -> (HashMap<usize, Neuron>, HashMap<Principal, usize>) {
     let mut neuron_data = HashMap::new();
     let mut owner_map = HashMap::new();
@@ -47,7 +54,7 @@ pub fn generate_neuron_data(
 pub fn create_neuron(
     id: NeuronId,
     maturity_multiplier: u64,
-    perms: Vec<NeuronPermission>
+    perms: Vec<NeuronPermission>,
 ) -> Neuron {
     Neuron {
         id: Some(id),
@@ -66,8 +73,8 @@ pub fn create_neuron(
         disburse_maturity_in_progress: vec![],
         dissolve_state: Some(
             sns_governance_canister::types::neuron::DissolveState::WhenDissolvedTimestampSeconds(
-                100000000000
-            )
+                100000000000,
+            ),
         ),
     }
 }
@@ -100,9 +107,9 @@ pub fn neuron_id_from_number(n: usize) -> NeuronId {
 pub fn create_sns_with_data(
     pic: &mut PocketIc,
     neuron_data: &HashMap<usize, Neuron>,
-    controller: &Principal
-) -> Principal {
-    let sns_init_args = generate_sns_init_args(neuron_data);
+    controller: &Principal,
+) -> (Principal, Governance) {
+    let mut sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
     let sns_gov_id = pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
@@ -110,8 +117,20 @@ pub fn create_sns_with_data(
     pic.set_controllers(
         sns_gov_id,
         Some(controller.clone()),
-        vec![controller.clone(), sns_gov_id.clone()]
-    ).unwrap();
+        vec![controller.clone(), sns_gov_id.clone()],
+    )
+    .unwrap();
+
+    let sns_root_canister_id =
+        pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
+    pic.add_cycles(sns_root_canister_id, 100_000_000_000_000_000);
+    pic.set_controllers(
+        sns_root_canister_id,
+        Some(controller.clone()),
+        vec![controller.clone(), sns_root_canister_id.clone()],
+    )
+    .unwrap();
+    sns_init_args.root_canister_id = Some(sns_root_canister_id);
 
     pic.tick();
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
@@ -119,43 +138,48 @@ pub fn create_sns_with_data(
         sns_gov_id,
         sns_gov_wasm,
         encode_one(sns_init_args.clone()).unwrap(),
-        Some(controller.clone())
+        Some(controller.clone()),
     );
 
-    sns_gov_id
-}
-
-pub fn reinstall_sns_with_data(
-    pic: &mut PocketIc,
-    neuron_data: &HashMap<usize, Neuron>,
-    sns_gov_canister_id: &Principal,
-    controller: &Principal
-) {
-    let sns_init_args = generate_sns_init_args(neuron_data);
-
-    let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
-    pic.stop_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
-    pic.tick();
-    pic.reinstall_canister(
-        sns_gov_canister_id.clone(),
-        sns_gov_wasm,
-        encode_one(sns_init_args.clone()).unwrap(),
-        Some(controller.clone())
-    ).unwrap();
-    pic.tick();
-    pic.start_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
+    let index_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
+    let swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
+    let ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
+    let root_init_args = Args {
+        dapp_canister_ids: vec![],
+        testflight: true,
+        latest_ledger_archive_poll_timestamp_seconds: None,
+        archive_canister_ids: vec![],
+        governance_canister_id: Some(sns_gov_id),
+        index_canister_id: Some(index_canister_id),
+        swap_canister_id: Some(swap_canister_id),
+        ledger_canister_id: Some(ledger_canister_id),
+    };
 
     pic.tick();
+    let sns_root_canister_wasm = wasms::SNS_ROOT.clone();
+    // TODO: use a different init arguments
+    pic.install_canister(
+        sns_root_canister_id,
+        sns_root_canister_wasm,
+        encode_one(root_init_args).unwrap(),
+        Some(controller.clone()),
+    );
+    (sns_gov_id, sns_init_args)
 }
 
 pub fn generate_sns_init_args(neuron_data: &HashMap<usize, Neuron>) -> Governance {
-    let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
+    // let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
     let sns_ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
     let sns_swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
 
     let neuron_data_with_neuron_keys: BTreeMap<String, Neuron> = neuron_data
         .iter() // Iterate over the entries of the original map
-        .map(|(key, value)| (neuron_id_from_number(key.clone()).to_string(), value.clone())) // Convert usize keys to String
+        .map(|(key, value)| {
+            (
+                neuron_id_from_number(key.clone()).to_string(),
+                value.clone(),
+            )
+        }) // Convert usize keys to String
         .collect();
 
     Governance {
@@ -200,7 +224,7 @@ pub fn generate_sns_init_args(neuron_data: &HashMap<usize, Neuron>) -> Governanc
         genesis_timestamp_seconds: 1713271942u64,
         metrics: None,
         ledger_canister_id: Some(sns_ledger_canister_id.clone()),
-        root_canister_id: Some(sns_root_canister_id.clone()),
+        root_canister_id: None,
         id_to_nervous_system_functions: BTreeMap::new(),
         mode: 2,
         swap_canister_id: Some(sns_swap_canister_id.clone()),

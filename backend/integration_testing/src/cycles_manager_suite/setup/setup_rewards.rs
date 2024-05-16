@@ -26,7 +26,7 @@ pub fn setup_rewards_canister(
         pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet);
 
     let rewards_wasm = wasms::REWARDS.clone();
-    pic.add_cycles(rewards_canister, 200_040_000_000_000);
+    pic.add_cycles(rewards_canister, 2000_000_000_000_000);
     pic.set_controllers(
         rewards_canister,
         Some(controller.clone()),

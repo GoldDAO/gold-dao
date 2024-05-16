@@ -1,20 +1,19 @@
-use std::collections::{ BTreeMap, HashMap };
-use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::NeuronId;
-use candid::{ CandidType, Nat, Principal };
+use candid::{CandidType, Nat, Principal};
 use canister_state_macros::canister_state;
-use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
-use types::{ NeuronInfo, TimestampMillis };
+use serde::{Deserialize, Serialize};
+use sns_governance_canister::types::NeuronId;
+use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
+use std::collections::{BTreeMap, HashMap};
+use types::{NeuronInfo, TimestampMillis};
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
-    env::{ CanisterEnv, Environment },
+    env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
 
 use crate::model::{
-    maturity_history::MaturityHistory,
+    maturity_history::MaturityHistory, neuron_owners::NeuronOwnership,
     payment_processor::PaymentProcessor,
-    neuron_owners::NeuronOwnership,
 };
 
 canister_state!(RuntimeState);
@@ -43,7 +42,9 @@ impl RuntimeState {
             number_of_neurons: self.data.neuron_maturity.len(),
             sync_info: self.data.sync_info,
             authorized_principals: self.data.authorized_principals.clone(),
-            daily_reserve_transfer: self.data.daily_reserve_transfer
+            daily_reserve_transfer: self
+                .data
+                .daily_reserve_transfer
                 .iter()
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),

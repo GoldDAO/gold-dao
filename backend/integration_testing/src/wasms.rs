@@ -7,6 +7,7 @@ use types::CanisterWasm;
 lazy_static! {
     pub static ref IC_ICRC1_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
     pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
+    pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm("sns_root");
     pub static ref REWARDS: CanisterWasm = get_rewards_canister_wasm();
     pub static ref CYCLES_MANAGER: CanisterWasm = get_cycles_manager_canister_wasm();
 }
@@ -19,7 +20,7 @@ fn get_rewards_canister_wasm() -> Vec<u8> {
     ).unwrap()
 }
 
-// Run to compile to wasm:
+// NOTE: Run to compile to wasm:
 // scripts/build-canister.sh cycles_manager_canister
 fn get_cycles_manager_canister_wasm() -> Vec<u8> {
     read_file_from_relative_bin(

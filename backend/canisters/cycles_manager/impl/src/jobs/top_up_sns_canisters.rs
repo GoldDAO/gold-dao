@@ -1,13 +1,14 @@
 use crate::state::{mutate_state, read_state};
 use canister_time::run_now_then_interval;
+use canister_tracing_macros::trace;
 use sns_root_canister::get_sns_canisters_summary::CanisterSummary;
 use std::time::Duration;
+use tracing::error;
 use types::{CanisterId, Cycles, Empty};
 use utils::canister::deposit_cycles;
 
-// const INTERVAL: Duration = Duration::from_secs(24 * 60 * 60); // 1 day
+const INTERVAL: Duration = Duration::from_secs(12 * 60 * 60); // 12 hours
 
-const INTERVAL: Duration = Duration::from_secs(60);
 const T: Cycles = 1_000_000_000_000;
 const TOP_UP_THRESHOLD: u64 = 20 * T;
 
@@ -21,10 +22,12 @@ fn run() {
     }
 }
 
+#[trace]
 async fn run_async(canister_id: CanisterId) {
     if let Ok(response) =
         sns_root_canister_c2c_client::get_sns_canisters_summary(canister_id, &Empty {}).await
     {
+        ic_cdk::println!("Got SNS canisters summary: {:?}", response);
         let canisters: Vec<_> = [
             response.root,
             response.governance,
@@ -59,6 +62,8 @@ async fn run_async(canister_id: CanisterId) {
                 let _ = deposit_cycles(canister_id, top_up_amount).await;
             }
         }
+    } else {
+        error!("Failed to get SNS canisters summary");
     }
 }
 

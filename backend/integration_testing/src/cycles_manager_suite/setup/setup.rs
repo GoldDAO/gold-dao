@@ -17,7 +17,7 @@ use crate::{
     utils::random_principal,
 };
 
-use super::{setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data};
+use super::setup_rewards::setup_rewards_canister;
 
 const T: Cycles = 1_000_000_000_000;
 
@@ -57,6 +57,7 @@ pub struct CyclesManagerEnv {
     pub cycles_manager_id: Principal,
     pub rewards_canister_id: Principal,
     pub sns_gov_canister_id: Principal,
+    pub sns_root_canister_id: Principal,
     pub pic: PocketIc,
     pub neuron_owners: HashMap<Principal, usize>,
 }
@@ -130,7 +131,8 @@ impl CyclesManagerTestEnvBuilder {
 
         let (neuron_data, neuron_owners) =
             generate_neuron_data(0, self.neurons_to_create, 1, &self.users);
-        let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data, &self.controller);
+        let (sns_gov_canister_id, data) =
+            create_sns_with_data(&mut pic, &neuron_data, &self.controller);
         let token_ledgers = setup_ledgers(
             &pic,
             sns_gov_canister_id.clone(),
@@ -157,23 +159,25 @@ impl CyclesManagerTestEnvBuilder {
             );
         }
 
+        let sns_root_canister_id = data.root_canister_id.unwrap();
+        println!("SNS root canister: {}", sns_root_canister_id);
+        // bwcas-wqaaa-aaaaa-aaaaa-aaq
+
         // Args
         let cycles_dispenser_init_args = cycles_manager_canister::init::Args {
             test_mode: true,
-            governance_principals: vec![self.controller],
+            authorized_principals: vec![self.controller],
             canisters: vec![rewards_canister_id],
-            max_top_up_amount: 1 * T,
+            sns_root_canister: Some(sns_root_canister_id),
+            max_top_up_amount: 200 * T,
             min_interval: 5 * 60 * 1000, // 5 minutes
             min_cycles_balance: 200 * T,
             wasm_version: BuildVersion::min(),
         };
 
         // Setup cycle manager canister
-        let cycles_manager_id: Principal = setup_cycle_manager_canister(
-            &mut pic,
-            &sns_gov_canister_id,
-            cycles_dispenser_init_args,
-        );
+        let cycles_manager_id: Principal =
+            setup_cycle_manager_canister(&mut pic, &self.controller, cycles_dispenser_init_args);
 
         CyclesManagerEnv {
             controller: self.controller,
@@ -183,6 +187,7 @@ impl CyclesManagerTestEnvBuilder {
             cycles_manager_id,
             rewards_canister_id,
             sns_gov_canister_id,
+            sns_root_canister_id,
             pic,
             neuron_owners,
         }

@@ -14,15 +14,14 @@ fn init(args: Args) {
     let env = init_env([0; 32]);
 
     let data = Data::new(
-        args.governance_principals,
+        args.test_mode,
+        args.authorized_principals,
         args.canisters,
+        args.sns_root_canister,
         args.max_top_up_amount,
         args.min_interval,
         args.min_cycles_balance,
-        // Tokens::from_e8s(args.icp_burn_amount_e8s),
-        // args.ledger_canister,
         env.now(),
-        args.test_mode,
     );
 
     init_state(env, data, args.wasm_version);

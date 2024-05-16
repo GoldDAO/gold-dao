@@ -478,6 +478,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "cycles_manager_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_client",
+ "cycles_manager_canister",
+ "ic-cdk 0.13.2",
+ "tracing",
+ "types",
+]
+
+[[package]]
 name = "cycles_manager_canister"
 version = "0.1.0"
 dependencies = [
@@ -1359,6 +1371,7 @@ dependencies = [
  "sns_rewards_api_canister",
  "stable_memory",
  "tracing",
+ "tracing-subscriber",
  "types",
  "utils",
 ]
