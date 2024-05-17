@@ -22,7 +22,7 @@ pub fn setup_cycle_manager_canister(
     let cycles_manager_canister =
         pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet);
 
-    let rewards_wasm = CYCLES_MANAGER.clone();
+    let cycles_manager_wasm = CYCLES_MANAGER.clone();
     pic.add_cycles(cycles_manager_canister, 100_000_000_000_000_000);
     pic.set_controllers(
         cycles_manager_canister,
@@ -34,7 +34,7 @@ pub fn setup_cycle_manager_canister(
 
     pic.install_canister(
         cycles_manager_canister,
-        rewards_wasm,
+        cycles_manager_wasm,
         encode_one(init_args).unwrap(),
         Some(controller.clone()),
     );

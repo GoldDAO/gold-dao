@@ -1,0 +1,25 @@
+type Args = record {
+  min_cycles_balance : opt nat64;
+  max_top_up_amount : opt nat64;
+  min_interval : opt nat64;
+};
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type InitArgs = record {
+  sns_root_canister : opt principal;
+  test_mode : bool;
+  wasm_version : BuildVersion;
+  min_cycles_balance : nat64;
+  authorized_principals : vec principal;
+  canisters : vec principal;
+  max_top_up_amount : nat64;
+  min_interval : nat64;
+};
+type Response = variant { Success };
+type Result = variant { Ok : text; Err : text };
+service : (InitArgs) -> {
+  add_canister : (Args) -> (Response);
+  add_canister_validate : (Args) -> (Result) query;
+  c2c_request_cycles : (Args) -> (Response);
+  update_config : (Args) -> (Response);
+  update_config_validate : (Args) -> (Result) query;
+}

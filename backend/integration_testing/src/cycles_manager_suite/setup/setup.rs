@@ -2,90 +2,40 @@ use std::collections::HashMap;
 
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
 use candid::{Nat, Principal};
-use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
 use types::BuildVersion;
 use types::Cycles;
 
-use crate::{
-    client::icrc1::client::transfer,
-    cycles_manager_suite::setup::{
-        setup_ledger::setup_ledgers,
-        setup_sns::{create_sns_with_data, generate_neuron_data},
-    },
-    utils::random_principal,
-};
+use crate::cycles_manager_suite::setup::setup_root::setup_root_canister;
+use crate::utils::random_principal;
 
-use super::setup_rewards::setup_rewards_canister;
+use super::setup_burner::setup_burner_canister;
 
 const T: Cycles = 1_000_000_000_000;
 
-pub fn setup_reward_pools(
-    mut pic: &mut PocketIc,
-    minting_account: &Principal,
-    reward_canister_id: &Principal,
-    canister_ids: &Vec<Principal>,
-    amount: u64,
-) {
-    let reward_account = Account {
-        owner: reward_canister_id.clone(),
-        subaccount: Some([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0,
-        ]),
-    };
-
-    for canister_id in canister_ids.into_iter() {
-        transfer(
-            &mut pic,
-            minting_account.clone(),
-            canister_id.clone(),
-            None,
-            reward_account,
-            amount.into(),
-        )
-        .unwrap();
-    }
-}
-
 pub struct CyclesManagerEnv {
     pub controller: Principal,
-    pub neuron_data: HashMap<usize, Neuron>,
-    pub users: Vec<Principal>,
-    pub token_ledgers: HashMap<String, Principal>,
     pub cycles_manager_id: Principal,
-    pub rewards_canister_id: Principal,
-    pub sns_gov_canister_id: Principal,
+    pub burner_canister_id: Principal,
     pub sns_root_canister_id: Principal,
     pub pic: PocketIc,
-    pub neuron_owners: HashMap<Principal, usize>,
 }
 
 impl CyclesManagerEnv {}
 
 pub struct CyclesManagerTestEnvBuilder {
     controller: Principal,
-    users: Vec<Principal>,
-    token_symbols: Vec<String>,
-    initial_ledger_accounts: Vec<(Account, Nat)>,
-    neurons_to_create: usize,
-    initial_reward_pool_amount: Nat,
-    ledger_fees: HashMap<String, Nat>,
+    // pub cycles_manager_id: Principal,
+    // pub burner_canister_id: Principal,
+    // pub sns_gov_canister_id: Principal,
+    // pub sns_root_canister_id: Principal,
 }
 
 impl CyclesManagerTestEnvBuilder {
     pub fn new() -> Self {
-        let default_controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-
         Self {
             controller: random_principal(),
-            users: vec![],
-            token_symbols: vec![],
-            neurons_to_create: 0,
-            initial_ledger_accounts: vec![],
-            initial_reward_pool_amount: Nat::from(0u64),
-            ledger_fees: HashMap::new(),
         }
     }
 
@@ -95,82 +45,28 @@ impl CyclesManagerTestEnvBuilder {
         self
     }
 
-    /// users for neuron data - they will be added as hotkeys to neurons // each user users get added to neurons.len() / users.len(), repeating every users.len()
-    pub fn add_users(mut self, users: Vec<Principal>) -> Self {
-        self.users = users;
-        self
-    }
-
-    pub fn add_token_ledger(
-        mut self,
-        symbol: &str,
-        initial_balances: &mut Vec<(Account, Nat)>,
-        transaction_fee: Nat,
-    ) -> Self {
-        self.token_symbols.push(symbol.to_string());
-        self.initial_ledger_accounts.append(initial_balances);
-        self.ledger_fees.insert(symbol.to_string(), transaction_fee);
-        self
-    }
-
-    pub fn add_random_neurons(mut self, amount: usize) -> Self {
-        self.neurons_to_create = amount;
-        self
-    }
-
-    pub fn with_reward_pools(mut self, amount: Nat) -> Self {
-        self.initial_reward_pool_amount = amount; // Note - this counts as a mint and therefore increases total supply
-        self
-    }
-
     pub fn build(self) -> CyclesManagerEnv {
+        let mut neuron_data = HashMap::new();
+        neuron_data.insert(1, Neuron::default());
         let mut pic = PocketIcBuilder::new()
             .with_sns_subnet()
             .with_application_subnet()
             .build();
 
-        let (neuron_data, neuron_owners) =
-            generate_neuron_data(0, self.neurons_to_create, 1, &self.users);
-        let (sns_gov_canister_id, data) =
-            create_sns_with_data(&mut pic, &neuron_data, &self.controller);
-        let token_ledgers = setup_ledgers(
-            &pic,
-            sns_gov_canister_id.clone(),
-            self.token_symbols,
-            self.initial_ledger_accounts,
-            self.ledger_fees,
-        );
-        let rewards_canister_id = setup_rewards_canister(
-            &mut pic,
-            &token_ledgers,
-            &sns_gov_canister_id,
-            &self.controller,
-        );
+        let burner_canister_id = setup_burner_canister(&mut pic, &self.controller);
+        // println!("Burner canister: {}", burner_canister_id);
 
-        let token_ledger_ids: Vec<Principal> =
-            token_ledgers.iter().map(|(_, id)| id.clone()).collect();
-        if self.initial_reward_pool_amount > Nat::from(0u64) {
-            setup_reward_pools(
-                &mut pic,
-                &sns_gov_canister_id,
-                &rewards_canister_id,
-                &token_ledger_ids,
-                self.initial_reward_pool_amount.0.try_into().unwrap(),
-            );
-        }
-
-        let sns_root_canister_id = data.root_canister_id.unwrap();
+        let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller);
         println!("SNS root canister: {}", sns_root_canister_id);
-        // bwcas-wqaaa-aaaaa-aaaaa-aaq
-
+        pic.tick();
         // Args
         let cycles_dispenser_init_args = cycles_manager_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.controller],
-            canisters: vec![rewards_canister_id],
+            canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),
-            max_top_up_amount: 20 * T,
-            min_interval: 5 * 60 * 1000, // 5 minutes
+            max_top_up_amount: 2000 * T,
+            min_interval: 60,
             min_cycles_balance: 200 * T,
             wasm_version: BuildVersion::min(),
         };
@@ -181,15 +77,10 @@ impl CyclesManagerTestEnvBuilder {
 
         CyclesManagerEnv {
             controller: self.controller,
-            neuron_data,
-            users: self.users,
-            token_ledgers,
             cycles_manager_id,
-            rewards_canister_id,
-            sns_gov_canister_id,
+            burner_canister_id,
             sns_root_canister_id,
             pic,
-            neuron_owners,
         }
     }
 }
