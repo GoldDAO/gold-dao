@@ -6,17 +6,19 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 // use types::{BuildVersion, Timestamped};
 use types::{CanisterId, Cycles, Milliseconds, TimestampMillis};
+use utils::env::CanisterEnv;
 use utils::env::Environment;
 
 canister_state!(State);
 
+#[derive(Serialize, Deserialize)]
 pub struct State {
-    pub env: Box<dyn Environment>,
+    pub env: CanisterEnv,
     pub data: Data,
 }
 
 impl State {
-    pub fn new(env: Box<dyn Environment>, data: Data) -> State {
+    pub fn new(env: CanisterEnv, data: Data) -> State {
         State { env, data }
     }
 
@@ -49,7 +51,6 @@ pub struct Data {
     pub max_top_up_amount: Cycles,
     pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
-    // pub cycles_top_up_pending_notification: Option<BlockIndex>,
     pub rng_seed: [u8; 32],
 }
 
@@ -73,7 +74,6 @@ impl Data {
             max_top_up_amount,
             min_interval,
             min_cycles_balance,
-            // cycles_top_up_pending_notification: None,
             rng_seed: [0; 32],
         }
     }

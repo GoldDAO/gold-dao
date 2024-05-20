@@ -10,7 +10,7 @@ use tracing::info;
 fn pre_upgrade() {
     info!("Pre-upgrade starting");
 
-    let mut state = take_state();
+    let state = take_state();
 
     let logs = canister_logger::export_logs();
     let traces = canister_logger::export_traces();

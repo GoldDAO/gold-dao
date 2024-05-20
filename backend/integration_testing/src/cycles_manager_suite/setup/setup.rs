@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
-use candid::{Nat, Principal};
+use candid::Principal;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
 use types::BuildVersion;
@@ -26,10 +26,6 @@ impl CyclesManagerEnv {}
 
 pub struct CyclesManagerTestEnvBuilder {
     controller: Principal,
-    // pub cycles_manager_id: Principal,
-    // pub burner_canister_id: Principal,
-    // pub sns_gov_canister_id: Principal,
-    // pub sns_root_canister_id: Principal,
 }
 
 impl CyclesManagerTestEnvBuilder {
@@ -60,7 +56,7 @@ impl CyclesManagerTestEnvBuilder {
         println!("SNS root canister: {}", sns_root_canister_id);
         pic.tick();
         // Args
-        let cycles_dispenser_init_args = cycles_manager_canister::init::InitArgs {
+        let cycles_manager_init_args = cycles_manager_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
@@ -73,7 +69,7 @@ impl CyclesManagerTestEnvBuilder {
 
         // Setup cycle manager canister
         let cycles_manager_id: Principal =
-            setup_cycle_manager_canister(&mut pic, &self.controller, cycles_dispenser_init_args);
+            setup_cycle_manager_canister(&mut pic, &self.controller, cycles_manager_init_args);
 
         CyclesManagerEnv {
             controller: self.controller,

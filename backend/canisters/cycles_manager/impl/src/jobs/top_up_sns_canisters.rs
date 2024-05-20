@@ -6,8 +6,9 @@ use std::time::Duration;
 use tracing::error;
 use types::{CanisterId, Cycles, Empty};
 use utils::canister::deposit_cycles;
+use utils::env::Environment;
 
-const INTERVAL: Duration = Duration::from_secs(60); // 12 hours
+const INTERVAL: Duration = Duration::from_secs(60); // Adjust as needed
 
 const T: Cycles = 1_000_000_000_000;
 const TOP_UP_THRESHOLD: u64 = 200 * T;
@@ -24,70 +25,60 @@ fn run() {
 
 #[trace]
 async fn run_async(canister_id: CanisterId) {
-    if let Ok(response) =
-        sns_root_canister_c2c_client::get_sns_canisters_summary(canister_id, &Empty {}).await
-    {
-        ic_cdk::println!("Got SNS canisters summary: {:#?}", response);
-        let canisters: Vec<_> = [
-            response.root,
-            response.governance,
-            response.ledger,
-            response.swap,
-            response.index,
-        ]
-        .into_iter()
-        .flatten()
-        .chain(response.dapps)
-        .chain(response.archives)
-        .collect();
-
-        // Add SNS canisters to the whitelist
-        mutate_state(|state| {
-            let now = state.env.now();
-            for canister_id in canisters.iter().flat_map(|c| c.canister_id) {
-                state.data.canisters.add(canister_id, now);
-            }
-        });
-
-        let to_top_up: Vec<_> = canisters
+    match sns_root_canister_c2c_client::get_sns_canisters_summary(canister_id, &Empty {}).await {
+        Ok(response) => {
+            // ic_cdk::println!("Got SNS canisters summary: {:#?}", response);
+            let canisters: Vec<_> = [
+                response.root,
+                response.governance,
+                response.ledger,
+                response.swap,
+                response.index,
+            ]
             .into_iter()
-            .filter(requires_top_up)
-            .map(|s| s.canister_id.unwrap())
+            .flatten()
+            .chain(response.dapps)
+            .chain(response.archives)
             .collect();
 
-        ic_cdk::println!("Canisters to TOP UP: {:#?}", to_top_up);
+            // Add SNS canisters to the whitelist
+            mutate_state(|state| {
+                let now = state.env.now();
+                for canister_id in canisters.iter().flat_map(|c| c.canister_id) {
+                    state.data.canisters.add(canister_id, now);
+                }
+            });
 
-        if !to_top_up.is_empty() {
-            let top_up_amount = read_state(|state| state.data.max_top_up_amount);
+            let to_top_up: Vec<_> = canisters
+                .into_iter()
+                .filter(requires_top_up)
+                .map(|s| s.canister_id.unwrap())
+                .collect();
 
-            for canister_id in to_top_up {
-                let _ = deposit_cycles(canister_id, top_up_amount).await;
+            // ic_cdk::println!("Canisters to TOP UP: {:#?}", to_top_up);
+
+            if !to_top_up.is_empty() {
+                let top_up_amount = read_state(|state| state.data.max_top_up_amount);
+
+                let top_up_futures: Vec<_> = to_top_up
+                    .clone()
+                    .into_iter()
+                    .map(|canister_id| deposit_cycles(canister_id, top_up_amount))
+                    .collect();
+
+                futures::future::join_all(top_up_futures).await;
             }
         }
-    } else {
-        error!("Failed to get SNS canisters summary");
+        Err(e) => {
+            error!("Failed to get SNS canisters summary: {:?}", e);
+        }
     }
 }
 
-// TODO: fix here: Panicked at 'called `Option::unwrap()` on a `None` value'
-// fn requires_top_up(summary: &CanisterSummary) -> bool {
-//     let cycles: Cycles = summary
-//         .status
-//         .as_ref()
-//         .unwrap()
-//         .cycles
-//         .0
-//         .clone()
-//         .try_into()
-//         .unwrap();
-
-//     cycles < TOP_UP_THRESHOLD
-// }
-
 fn requires_top_up(summary: &CanisterSummary) -> bool {
     if let Some(status) = summary.status.as_ref() {
-        let cycles: u64 = status.cycles.0.clone().try_into().unwrap();
-        return cycles < TOP_UP_THRESHOLD;
+        let cycles = status.cycles.0.clone();
+        cycles < TOP_UP_THRESHOLD.into()
     } else {
         false
     }

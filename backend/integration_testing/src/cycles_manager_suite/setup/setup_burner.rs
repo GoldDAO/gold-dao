@@ -1,12 +1,15 @@
 use candid::{encode_one, CandidType, Principal};
 use pocket_ic::PocketIc;
 use serde::{Deserialize, Serialize};
-use types::BuildVersion;
 
 use crate::wasms;
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
-pub struct Empty {}
+#[derive(Debug, CandidType, Serialize, Deserialize)]
+pub struct InitArgs {
+    /// Interval between timers in seconds.
+    pub interval_between_timers_in_seconds: u128,
+    /// Amount of burned cycles per timer.
+    pub burn_amount: u128,
+}
 
 pub fn setup_burner_canister(pic: &mut PocketIc, controller: &Principal) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
@@ -24,22 +27,15 @@ pub fn setup_burner_canister(pic: &mut PocketIc, controller: &Principal) -> Prin
     .unwrap();
     pic.tick();
 
-    let sns_root_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 9]);
-    let cycles_dispenser_init_args = cycles_manager_canister::init::InitArgs {
-        test_mode: true,
-        authorized_principals: vec![root_canister_id], //*controller,
-        canisters: vec![],
-        sns_root_canister: Some(sns_root_canister_id),
-        max_top_up_amount: 0,
-        min_interval: 5 * 60 * 1000, // 5 minutes
-        min_cycles_balance: 10000000000000000000,
-        wasm_version: BuildVersion::min(),
+    let burner_canister_init_args = InitArgs {
+        interval_between_timers_in_seconds: 5 * 60 * 60,
+        burn_amount: 100_000_000_000_00,
     };
 
     pic.install_canister(
         burner_canister,
         burner_wasm,
-        encode_one(cycles_dispenser_init_args).unwrap(),
+        encode_one(burner_canister_init_args).unwrap(),
         Some(root_canister_id.clone()),
     );
     burner_canister

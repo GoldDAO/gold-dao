@@ -1,6 +1,5 @@
 use candid::CandidType;
 use human_readable::HumanReadable;
-// use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use types::{Cycles, Milliseconds};
 

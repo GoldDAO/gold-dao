@@ -6,6 +6,7 @@ use serde::Serialize;
 use serde_bytes::ByteBuf;
 use std::io::Write;
 use types::{HeaderField, HttpRequest, HttpResponse};
+use utils::env::Environment;
 
 #[query(hidden = true)]
 fn http_request(request: HttpRequest) -> HttpResponse {

@@ -1,9 +1,10 @@
-use crate::lifecycle::{init_env, init_state};
+use crate::lifecycle::init_canister;
 use crate::Data;
 use canister_tracing_macros::trace;
 use cycles_manager_canister::init::InitArgs;
 use ic_cdk_macros::init;
 use tracing::info;
+use utils::env::CanisterEnv;
 use utils::env::Environment;
 
 #[init]
@@ -11,7 +12,7 @@ use utils::env::Environment;
 fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
-    let env = init_env([0; 32]);
+    let env = CanisterEnv::new(args.test_mode);
 
     let data = Data::new(
         args.test_mode,
@@ -24,7 +25,8 @@ fn init(args: InitArgs) {
         env.now(),
     );
 
-    init_state(env, data, args.wasm_version);
+    let state = crate::State::new(env, data);
+    init_canister(state);
 
     info!(version = %args.wasm_version, "Initialization complete");
 }

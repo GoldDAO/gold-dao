@@ -8,17 +8,9 @@ lazy_static! {
     pub static ref IC_ICRC1_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
     pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
     pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm("sns_root");
+    pub static ref BURNER: CanisterWasm = get_canister_wasm("cycles_burner");
     pub static ref REWARDS: CanisterWasm = get_rewards_canister_wasm();
-    pub static ref BURNER: CanisterWasm = get_cycles_burner_canister_wasm();
     pub static ref CYCLES_MANAGER: CanisterWasm = get_cycles_manager_canister_wasm();
-}
-
-fn get_cycles_burner_canister_wasm() -> Vec<u8> {
-    read_file_from_relative_bin(
-        &format!(
-            "../canisters/cycles_burner/target/wasm32-unknown-unknown/release/cycles_burner_canister.wasm.gz"
-        )
-    ).unwrap()
 }
 
 fn get_rewards_canister_wasm() -> Vec<u8> {

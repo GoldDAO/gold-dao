@@ -1,5 +1,3 @@
-use candid::{Nat, Principal};
-
 use self::setup::{CyclesManagerEnv, CyclesManagerTestEnvBuilder};
 
 pub mod setup;

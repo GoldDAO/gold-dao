@@ -3,6 +3,7 @@ use crate::state::{mutate_state, State};
 use canister_api_macros::proposal;
 use canister_tracing_macros::trace;
 use cycles_manager_canister::add_canister::{Response::*, *};
+use utils::env::Environment;
 
 #[proposal(guard = "caller_is_governance_principal")]
 #[trace]

@@ -1,14 +1,5 @@
-use std::collections::{BTreeMap, HashMap};
-
-use crate::cycles_manager_suite::setup::setup_burner::setup_burner_canister;
 use candid::{encode_one, Principal};
-use ic_stable_structures::vec;
 use pocket_ic::PocketIc;
-use sha2::{Digest, Sha256};
-use sns_governance_canister::types::{
-    governance::SnsMetadata, DefaultFollowees, Governance, NervousSystemParameters, Neuron,
-    NeuronId, NeuronPermission, NeuronPermissionList, VotingRewardsParameters,
-};
 
 use crate::wasms;
 
@@ -42,7 +33,6 @@ pub fn setup_root_canister(pic: &mut PocketIc, controller: &Principal) -> Princi
     .unwrap();
     pic.tick();
 
-    let governance_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
     let index_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
     let swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
     let ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);

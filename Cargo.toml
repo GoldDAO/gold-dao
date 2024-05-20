@@ -3,7 +3,6 @@ members = [
   "backend/canisters/cycles_manager/impl",
   "backend/canisters/cycles_manager/c2c_client",
   "backend/canisters/cycles_manager/api",
-  "backend/canisters/cycles_burner/impl",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",

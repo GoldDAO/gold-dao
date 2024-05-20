@@ -1,18 +1,15 @@
-// Import the necessary modules and types
 use crate::client::cycles_manager;
 use crate::cycles_manager_suite::setup::default_test_setup;
 use crate::utils::tick_n_blocks;
 use candid::Nat;
 use candid::{encode_one, CandidType, Principal};
-use pocket_ic::WasmResult;
 use serde::Deserialize;
 use serde::Serialize;
 use std::time::Duration;
 use tracing_subscriber::FmtSubscriber;
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(CandidType, Serialize, Deserialize)]
 pub struct Empty {}
-pub type Args = Empty;
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct RegisterDappCanisterRequest {
@@ -55,9 +52,6 @@ fn test_cycles_management() {
     let cycles_manager_id = test_env.cycles_manager_id;
     let cycles_burner_id = test_env.burner_canister_id;
 
-    let ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
-    println!("ledger_canister_id: {}", ledger_canister_id);
-
     // Get cycles_manager balance
     let initial_cycles_manager_balance = test_env.pic.cycle_balance(cycles_manager_id);
     println!(
@@ -78,21 +72,18 @@ fn test_cycles_management() {
         cycles_manager_id,
         &cycles_manager_canister::update_config::Args {
             min_cycles_balance: Some(200_000_000_000_000),
-            //                       199_982_083_761_043
-            min_interval: Some(60),
-            max_top_up_amount: Some(500_000_000_000_000),
+            min_interval: Some(0),
+            max_top_up_amount: Some(250_000_000_000_000),
         },
     );
     test_env.pic.tick();
-
-    println!("controller: {}", test_env.controller);
-    // tjlnb-uqaaa-aaaaa-aaaaa-aci
 
     let register_canister_args = RegisterDappCanisterRequest {
         canister_id: Some(cycles_burner_id),
     };
 
-    let resp = test_env
+    // Add cycles burner to the root canister dapps array
+    let _ = test_env
         .pic
         .update_call(
             test_env.sns_root_canister_id,
@@ -102,36 +93,44 @@ fn test_cycles_management() {
         )
         .unwrap();
 
-    let payload = Args {};
-    let resp_raw = test_env
+    let _ = test_env
         .pic
         .update_call(
             test_env.sns_root_canister_id,
             test_env.controller,
             "get_sns_canisters_summary",
-            encode_one(payload).unwrap(),
+            encode_one(Empty {}).unwrap(),
         )
         .unwrap();
     // println!("Status: {:#?}", resp_raw);
 
-    match resp_raw {
-        WasmResult::Reply(bytebuf) => {
-            // `bytebuf` contains the deserialized byte buffer
-            // https://github.com/TaxLintDAO/taxlint/blob/master/backend/i_test/src/client/mod.rs#L130
-            let data: Response = candid::decode_one(&bytebuf).unwrap();
-            println!("Deserialized data: {:#?}", data);
-        }
-        WasmResult::Reject(reason) => {
-            // Handle rejection
-            println!("Rejected: {}", reason);
-        }
-    }
+    // NOTE: Uncomment to see the deserialized response
+    // match resp_raw {
+    //     WasmResult::Reply(bytebuf) => {
+    //         // `bytebuf` contains the deserialized byte buffer
+    //         // https://github.com/TaxLintDAO/taxlint/blob/master/backend/i_test/src/client/mod.rs#L130
+    //         let data: Response = candid::decode_one(&bytebuf).unwrap();
+    //         println!("Deserialized data: {:#?}", data);
+    //     }
+    //     WasmResult::Reject(reason) => {
+    //         // Handle rejection
+    //         println!("Rejected: {}", reason);
+    //     }
+    // }
 
-    // Simulate the time passing ()
-    test_env
-        .pic
-        .advance_time(Duration::from_secs(100 * 24 * 60 * 60)); // 20 days
-    tick_n_blocks(&test_env.pic, 100);
+    // 20_000_000_000_000 - per hour is burned
+    // 50 hours
+    // 100_000_000_000_000 should be burned at all
+    // Initial burner balance - 200_000_000_000_000
+    // Then 800_000_000_000_000 should be supplied from the cycles manager + min balance should be 200_000_000_000_000
+    // Also, the max supply - 250_000_000_000_000.
+    // Then there should be 100_200_000_000_000_000 (common balance) - 100_000_000_000_000 = ~100_100_000_000_000_000 (common balance)
+    // Should be: 100_100_000_000_000_000
+    // Result: 98_499_992_153_133_604 + 449_994_888_487_834 = 98_949_986_000_000_000
+    for _ in 1..10 {
+        test_env.pic.advance_time(Duration::from_secs(30 * 60)); // 20 days
+        tick_n_blocks(&test_env.pic, 10);
+    }
 
     let current_cycles_manager_balance = test_env.pic.cycle_balance(cycles_manager_id);
     println!(
@@ -146,6 +145,6 @@ fn test_cycles_management() {
         current_burner_canister_balance
     );
 
-    // The threshold is set up to 200_000_000_000_000
+    // Assert that the final balance is bigger that the threshold
     assert!(current_burner_canister_balance > 200_000_000_000_000);
 }
