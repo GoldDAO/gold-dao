@@ -15,10 +15,7 @@ type InitArgs = record {
   min_interval : nat64;
 };
 type Response = variant { Success };
-type Result = variant { Ok : text; Err : text };
 service : (InitArgs) -> {
   add_canister : (Args) -> (Response);
-  add_canister_validate : (Args) -> (Result) query;
   update_config : (Args) -> (Response);
-  update_config_validate : (Args) -> (Result) query;
 }

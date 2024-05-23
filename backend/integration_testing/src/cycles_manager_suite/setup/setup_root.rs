@@ -18,7 +18,11 @@ pub struct Args {
     pub ledger_canister_id: Option<Principal>,
 }
 
-pub fn setup_root_canister(pic: &mut PocketIc, controller: &Principal) -> Principal {
+pub fn setup_root_canister(
+    pic: &mut PocketIc,
+    controller: &Principal,
+    root_init_args: Args,
+) -> Principal {
     // let mut sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
@@ -32,24 +36,6 @@ pub fn setup_root_canister(pic: &mut PocketIc, controller: &Principal) -> Princi
     )
     .unwrap();
     pic.tick();
-
-    let index_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
-    let swap_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
-    let ledger_canister_id = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
-
-    // let burner_canister_id = setup_burner_canister(pic, controller);
-    // println!("Burner canister: {}", burner_canister_id);
-
-    let root_init_args = Args {
-        dapp_canister_ids: vec![],
-        testflight: true,
-        latest_ledger_archive_poll_timestamp_seconds: None,
-        archive_canister_ids: vec![],
-        governance_canister_id: Some(*controller),
-        index_canister_id: Some(index_canister_id),
-        swap_canister_id: Some(swap_canister_id),
-        ledger_canister_id: Some(ledger_canister_id),
-    };
 
     pic.tick();
     let sns_root_canister_wasm = wasms::SNS_ROOT.clone();

@@ -1,13 +1,12 @@
 use crate::model::canisters::{CanisterMetrics, Canisters};
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-// use ic_ledger_types::BlockIndex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-// use types::{BuildVersion, Timestamped};
 use types::{CanisterId, Cycles, Milliseconds, TimestampMillis};
 use utils::env::CanisterEnv;
 use utils::env::Environment;
+use utils::memory::MemorySize;
 
 canister_state!(State);
 
@@ -28,10 +27,12 @@ impl State {
 
     pub fn metrics(&self) -> Metrics {
         Metrics {
-            now: self.env.now(),
-            cycles_balance: self.env.cycles_balance(),
-            // wasm_version: WASM_VERSION.with_borrow(|v| **v),
-            // git_commit_id: utils::git::git_commit_id().to_string(),
+            canister_info: CanisterInfo {
+                now: self.env.now(),
+                test_mode: self.env.is_test_mode(),
+                memory_used: MemorySize::used(),
+                cycles_balance: self.env.cycles_balance(),
+            },
             authorized_principals: self.data.authorized_principals.iter().copied().collect(),
             canisters: self.data.canisters.metrics(),
             sns_root_canister: self.data.sns_root_canister,
@@ -39,6 +40,25 @@ impl State {
             min_interval: self.data.min_interval,
             min_cycles_balance: self.data.min_cycles_balance,
         }
+        // Metrics {
+        //     canister_info: CanisterInfo {
+        //         now: self.env.now(),
+        //         test_mode: self.env.is_test_mode(),
+        //         memory_used: MemorySize::used(),
+        //         cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+        //     },
+        //     sns_governance_canister: self.data.sns_governance_canister,
+        //     number_of_neurons: self.data.neuron_maturity.len(),
+        //     sync_info: self.data.sync_info,
+        //     authorized_principals: self.data.authorized_principals.clone(),
+        //     daily_reserve_transfer: self.data.daily_reserve_transfer
+        //         .iter()
+        //         .map(|(token, val)| format!("{:?} - {}", token, val))
+        //         .collect(),
+        //     last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
+        //     last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
+        //     daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
+        // }
     }
 }
 
@@ -51,7 +71,6 @@ pub struct Data {
     pub max_top_up_amount: Cycles,
     pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
-    pub rng_seed: [u8; 32],
 }
 
 impl Data {
@@ -74,21 +93,26 @@ impl Data {
             max_top_up_amount,
             min_interval,
             min_cycles_balance,
-            rng_seed: [0; 32],
         }
     }
 }
 
-#[derive(CandidType, Serialize, Debug)]
+#[derive(CandidType, Serialize)]
 pub struct Metrics {
-    pub now: TimestampMillis,
-    pub cycles_balance: Cycles,
-    // pub wasm_version: BuildVersion,
-    // pub git_commit_id: String,
+    pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub canisters: Vec<CanisterMetrics>,
     pub sns_root_canister: Option<CanisterId>,
     pub max_top_up_amount: Cycles,
     pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
+}
+
+#[derive(CandidType, Deserialize, Serialize)]
+pub struct CanisterInfo {
+    pub now: TimestampMillis,
+    pub test_mode: bool,
+    pub memory_used: MemorySize,
+    // pub cycles_balance_in_tc: f64,
+    pub cycles_balance: Cycles,
 }

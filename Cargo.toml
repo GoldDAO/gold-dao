@@ -1,7 +1,6 @@
 [workspace]
 members = [
   "backend/canisters/cycles_manager/impl",
-  "backend/canisters/cycles_manager/c2c_client",
   "backend/canisters/cycles_manager/api",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
@@ -17,18 +16,14 @@ members = [
   "backend/libraries/canister_client_macros",
   "backend/libraries/canister_logger",
   "backend/libraries/canister_state_macros",
-  "backend/libraries/canister_api_macros",
   "backend/libraries/canister_time",
   "backend/libraries/canister_tracing_macros",
   "backend/libraries/http_request",
-  "backend/libraries/human_readable",
-  "backend/libraries/human_readable_derive",
   "backend/libraries/serializer",
   "backend/libraries/stable_memory",
   "backend/libraries/types",
   "backend/libraries/utils",
-  "backend/integration_testing"
-]
+  "backend/integration_testing"]
 resolver = "2"
 
 [profile.release]

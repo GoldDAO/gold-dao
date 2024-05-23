@@ -11,7 +11,11 @@ pub struct InitArgs {
     pub burn_amount: u128,
 }
 
-pub fn setup_burner_canister(pic: &mut PocketIc, controller: &Principal) -> Principal {
+pub fn setup_burner_canister(
+    pic: &mut PocketIc,
+    controller: &Principal,
+    burner_canister_init_args: InitArgs,
+) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
     let burner_canister = pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet);
 
@@ -26,11 +30,6 @@ pub fn setup_burner_canister(pic: &mut PocketIc, controller: &Principal) -> Prin
     )
     .unwrap();
     pic.tick();
-
-    let burner_canister_init_args = InitArgs {
-        interval_between_timers_in_seconds: 5 * 60 * 60,
-        burn_amount: 100_000_000_000_00,
-    };
 
     pic.install_canister(
         burner_canister,

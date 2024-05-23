@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry::Vacant;
 use std::collections::{BinaryHeap, HashMap};
 use types::{CanisterId, Cycles, TimestampMillis};
-
 #[derive(Serialize, Deserialize)]
 pub struct Canisters {
     canisters: HashMap<CanisterId, Canister>,

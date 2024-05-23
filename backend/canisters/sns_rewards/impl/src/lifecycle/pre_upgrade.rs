@@ -2,7 +2,7 @@ use ic_cdk_macros::pre_upgrade;
 use stable_memory::get_writer;
 use tracing::info;
 
-use crate::{memory::get_upgrades_memory, state::take_state};
+use crate::{ memory::get_upgrades_memory, state::take_state };
 
 #[pre_upgrade]
 fn pre_upgrade() {

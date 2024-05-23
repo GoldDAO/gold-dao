@@ -1,9 +1,6 @@
-use std::collections::HashMap;
-
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
 use candid::Principal;
 use pocket_ic::{PocketIc, PocketIcBuilder};
-use sns_governance_canister::types::Neuron;
 use types::BuildVersion;
 use types::Cycles;
 
@@ -36,26 +33,46 @@ impl CyclesManagerTestEnvBuilder {
     }
 
     /// is the controller of everything - no real need for this but nice to have if you want to be specific
-    pub fn add_controller(mut self, principal: Principal) -> Self {
-        self.controller = principal;
-        self
+    pub fn new_with_controller(principal: Principal) -> Self {
+        Self {
+            controller: principal,
+        }
     }
 
     pub fn build(self) -> CyclesManagerEnv {
-        let mut neuron_data = HashMap::new();
-        neuron_data.insert(1, Neuron::default());
         let mut pic = PocketIcBuilder::new()
             .with_sns_subnet()
             .with_application_subnet()
             .build();
 
-        let burner_canister_id = setup_burner_canister(&mut pic, &self.controller);
-        // println!("Burner canister: {}", burner_canister_id);
+        // Define initialization arguments for burner canister
+        let burner_canister_init_args =
+            crate::cycles_manager_suite::setup::setup_burner::InitArgs {
+                interval_between_timers_in_seconds: 5 * 60 * 60,
+                burn_amount: 100_000_000_000_00,
+            };
 
-        let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller);
+        let burner_canister_id =
+            setup_burner_canister(&mut pic, &self.controller, burner_canister_init_args);
+        pic.tick();
+
+        // Define initialization arguments for root canister
+        let root_init_args = crate::cycles_manager_suite::setup::setup_root::Args {
+            dapp_canister_ids: vec![],
+            testflight: true,
+            latest_ledger_archive_poll_timestamp_seconds: None,
+            archive_canister_ids: vec![],
+            governance_canister_id: Some(self.controller),
+            index_canister_id: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2])),
+            swap_canister_id: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 3])),
+            ledger_canister_id: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4])),
+        };
+
+        let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller, root_init_args);
         println!("SNS root canister: {}", sns_root_canister_id);
         pic.tick();
-        // Args
+
+        // Define initialization arguments for cycles manager canister
         let cycles_manager_init_args = cycles_manager_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.controller],
@@ -67,7 +84,6 @@ impl CyclesManagerTestEnvBuilder {
             wasm_version: BuildVersion::min(),
         };
 
-        // Setup cycle manager canister
         let cycles_manager_id: Principal =
             setup_cycle_manager_canister(&mut pic, &self.controller, cycles_manager_init_args);
 
