@@ -1,7 +1,6 @@
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
 use candid::Principal;
 use pocket_ic::{PocketIc, PocketIcBuilder};
-use types::BuildVersion;
 use types::Cycles;
 
 use crate::cycles_manager_suite::setup::setup_root::setup_root_canister;
@@ -33,7 +32,7 @@ impl CyclesManagerTestEnvBuilder {
     }
 
     /// is the controller of everything - no real need for this but nice to have if you want to be specific
-    pub fn new_with_controller(principal: Principal) -> Self {
+    pub fn _new_with_controller(principal: Principal) -> Self {
         Self {
             controller: principal,
         }
@@ -48,8 +47,8 @@ impl CyclesManagerTestEnvBuilder {
         // Define initialization arguments for burner canister
         let burner_canister_init_args =
             crate::cycles_manager_suite::setup::setup_burner::InitArgs {
-                interval_between_timers_in_seconds: 5 * 60 * 60,
-                burn_amount: 100_000_000_000_00,
+                interval_between_timers_in_seconds: 5 * 60, // Burn once in 5 minutes
+                burn_amount: 10_000_000_000_000,
             };
 
         let burner_canister_id =
@@ -69,19 +68,17 @@ impl CyclesManagerTestEnvBuilder {
         };
 
         let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller, root_init_args);
-        println!("SNS root canister: {}", sns_root_canister_id);
         pic.tick();
 
         // Define initialization arguments for cycles manager canister
         let cycles_manager_init_args = cycles_manager_canister::init::InitArgs {
-            test_mode: true,
+            // test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),
             max_top_up_amount: 2000 * T,
             min_interval: 60,
             min_cycles_balance: 200 * T,
-            wasm_version: BuildVersion::min(),
         };
 
         let cycles_manager_id: Principal =

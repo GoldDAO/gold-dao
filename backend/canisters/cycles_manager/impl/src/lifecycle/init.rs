@@ -10,12 +10,11 @@ use utils::env::Environment;
 #[init]
 #[trace]
 fn init(args: InitArgs) {
-    canister_logger::init(args.test_mode);
+    canister_logger::init(true);
 
-    let env = CanisterEnv::new(args.test_mode);
+    let env = CanisterEnv::new(true);
 
     let data = Data::new(
-        args.test_mode,
         args.authorized_principals,
         args.canisters,
         args.sns_root_canister,
@@ -28,5 +27,5 @@ fn init(args: InitArgs) {
     let state = crate::State::new(env, data);
     init_canister(state);
 
-    info!(version = %args.wasm_version, "Initialization complete");
+    info!("Initialization complete");
 }

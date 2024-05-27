@@ -295,6 +295,11 @@
         "env_override": null,
         "output": "backend/canisters/cycles_manager/api/declarations"
       },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
       "type": "custom",
       "wasm": "backend/canisters/cycles_manager/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
     },

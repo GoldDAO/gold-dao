@@ -10,7 +10,7 @@ use utils::memory::MemorySize;
 
 canister_state!(State);
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct State {
     pub env: CanisterEnv,
     pub data: Data,
@@ -29,7 +29,6 @@ impl State {
         Metrics {
             canister_info: CanisterInfo {
                 now: self.env.now(),
-                test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance: self.env.cycles_balance(),
             },
@@ -40,31 +39,11 @@ impl State {
             min_interval: self.data.min_interval,
             min_cycles_balance: self.data.min_cycles_balance,
         }
-        // Metrics {
-        //     canister_info: CanisterInfo {
-        //         now: self.env.now(),
-        //         test_mode: self.env.is_test_mode(),
-        //         memory_used: MemorySize::used(),
-        //         cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
-        //     },
-        //     sns_governance_canister: self.data.sns_governance_canister,
-        //     number_of_neurons: self.data.neuron_maturity.len(),
-        //     sync_info: self.data.sync_info,
-        //     authorized_principals: self.data.authorized_principals.clone(),
-        //     daily_reserve_transfer: self.data.daily_reserve_transfer
-        //         .iter()
-        //         .map(|(token, val)| format!("{:?} - {}", token, val))
-        //         .collect(),
-        //     last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
-        //     last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
-        //     daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
-        // }
     }
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    pub test_mode: bool,
     pub authorized_principals: HashSet<Principal>,
     pub canisters: Canisters,
     pub sns_root_canister: Option<CanisterId>,
@@ -76,7 +55,6 @@ pub struct Data {
 impl Data {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        test_mode: bool,
         authorized_principals: Vec<Principal>,
         canisters: Vec<CanisterId>,
         sns_root_canister: Option<CanisterId>,
@@ -86,7 +64,6 @@ impl Data {
         now: TimestampMillis,
     ) -> Data {
         Data {
-            test_mode,
             authorized_principals: authorized_principals.into_iter().collect(),
             canisters: Canisters::new(canisters, now),
             sns_root_canister,
@@ -111,8 +88,19 @@ pub struct Metrics {
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct CanisterInfo {
     pub now: TimestampMillis,
-    pub test_mode: bool,
     pub memory_used: MemorySize,
-    // pub cycles_balance_in_tc: f64,
     pub cycles_balance: Cycles,
+}
+
+impl Default for Data {
+    fn default() -> Self {
+        Self {
+            authorized_principals: HashSet::default(),
+            canisters: Canisters::default(),
+            sns_root_canister: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2])),
+            max_top_up_amount: 300_000_000_000_000,
+            min_interval: 60,
+            min_cycles_balance: 200_000_000_000_000,
+        }
+    }
 }

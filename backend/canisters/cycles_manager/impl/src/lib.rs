@@ -20,6 +20,7 @@
 [Bochsler Assets & Securities (BAS) SA]: https://bas.tech
 [Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
 */
+use cycles_manager_canister::get_latest_top_ups::Response as TopUpsResponse;
 use cycles_manager_canister::init::InitArgs;
 use cycles_manager_canister::update_config::Args;
 use cycles_manager_canister::update_config::Response;
@@ -28,7 +29,7 @@ use ic_cdk::export_candid;
 use crate::state::take_state;
 use crate::state::Data;
 use crate::state::State;
-use types::{BuildVersion, Timestamped};
+use types::Cycles;
 
 mod guards;
 mod jobs;
@@ -38,10 +39,5 @@ mod model;
 mod queries;
 mod state;
 mod updates;
-use std::cell::RefCell;
-
-thread_local! {
-    static WASM_VERSION: RefCell<Timestamped<BuildVersion>> = RefCell::default();
-}
 
 export_candid!();

@@ -1,6 +1,6 @@
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
-use types::{BuildVersion, CanisterId, Cycles, Milliseconds};
+use types::{CanisterId, Cycles, Milliseconds};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
@@ -10,6 +10,4 @@ pub struct InitArgs {
     pub max_top_up_amount: Cycles,
     pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
-    pub wasm_version: BuildVersion,
-    pub test_mode: bool,
 }

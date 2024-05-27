@@ -16,8 +16,7 @@ fn post_upgrade() {
     let (state, logs, traces): (State, Vec<LogEntry>, Vec<LogEntry>) =
         serializer::deserialize(reader).unwrap();
 
-    // canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
-    canister_logger::init_with_logs(true, logs, traces);
+    canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
     init_canister(state);
 
     info!("Post upgrade complete.")

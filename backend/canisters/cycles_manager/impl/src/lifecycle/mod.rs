@@ -1,7 +1,6 @@
 use crate::State;
 
 mod init;
-mod inspect_message;
 mod post_upgrade;
 mod pre_upgrade;
 

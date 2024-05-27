@@ -1,8 +1,6 @@
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
 
-mod build_version;
-mod canister_wasm;
 mod http;
 mod neuron_info;
 mod proposals;
@@ -10,8 +8,6 @@ mod rewards_recipients;
 mod timestamped;
 mod token;
 
-pub use build_version::*;
-pub use canister_wasm::*;
 pub use http::*;
 pub use neuron_info::*;
 pub use proposals::*;

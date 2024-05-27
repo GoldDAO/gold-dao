@@ -1,9 +1,10 @@
 use candid::CandidType;
+use cycles_manager_canister::get_latest_top_ups::CanisterTopUp;
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry::Vacant;
 use std::collections::{BinaryHeap, HashMap};
 use types::{CanisterId, Cycles, TimestampMillis};
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Canisters {
     canisters: HashMap<CanisterId, Canister>,
 }
@@ -79,12 +80,12 @@ impl Canisters {
     }
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
-pub struct CanisterTopUp {
-    pub timestamp: TimestampMillis,
-    pub canister_id: CanisterId,
-    pub amount: Cycles,
-}
+// #[derive(Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
+// pub struct CanisterTopUp {
+//     pub timestamp: TimestampMillis,
+//     pub canister_id: CanisterId,
+//     pub amount: Cycles,
+// }
 
 #[derive(Serialize, Deserialize)]
 pub struct Canister {

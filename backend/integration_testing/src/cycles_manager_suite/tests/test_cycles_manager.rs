@@ -6,7 +6,7 @@ use candid::{encode_one, CandidType, Principal};
 use serde::Deserialize;
 use serde::Serialize;
 use std::time::Duration;
-use tracing_subscriber::FmtSubscriber;
+// use tracing_subscriber::FmtSubscriber;
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct Empty {}
@@ -43,10 +43,10 @@ pub struct CanisterStatusResult {
 fn test_cycles_management() {
     let mut test_env = default_test_setup();
 
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(tracing::Level::ERROR)
-        .finish();
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+    // let subscriber = FmtSubscriber::builder()
+    //     .with_max_level(tracing::Level::ERROR)
+    //     .finish();
+    // tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // Get canisters ID:
     let cycles_manager_id = test_env.cycles_manager_id;
@@ -59,11 +59,11 @@ fn test_cycles_management() {
         initial_cycles_manager_balance
     );
 
-    // Get rewards_canister balance (initially it's greater than the threshold)
-    let initial_rewards_canister_balance = test_env.pic.cycle_balance(cycles_burner_id);
+    // Get burner_canister balance (initially it's greater than the threshold)
+    let initial_burner_canister_balance = test_env.pic.cycle_balance(cycles_burner_id);
     println!(
-        "initial_rewards_canister_balance: {}",
-        initial_rewards_canister_balance
+        "initial_burner_canister_balance: {}",
+        initial_burner_canister_balance
     );
 
     cycles_manager::update_config(
@@ -118,19 +118,13 @@ fn test_cycles_management() {
     //     }
     // }
 
-    // 20_000_000_000_000 - per hour is burned
-    // 50 hours
-    // 100_000_000_000_000 should be burned at all
-    // Initial burner balance - 200_000_000_000_000
-    // Then 800_000_000_000_000 should be supplied from the cycles manager + min balance should be 200_000_000_000_000
-    // Also, the max supply - 250_000_000_000_000.
-    // Then there should be 100_200_000_000_000_000 (common balance) - 100_000_000_000_000 = ~100_100_000_000_000_000 (common balance)
-    // Should be: 100_100_000_000_000_000
-    // Result: 98_499_992_153_133_604 + 449_994_888_487_834 = 98_949_986_000_000_000
-    for _ in 1..10 {
-        test_env.pic.advance_time(Duration::from_secs(30 * 60)); // 20 days
-        tick_n_blocks(&test_env.pic, 10);
+    for _ in 1..15 {
+        test_env.pic.advance_time(Duration::from_secs(10 * 60)); // 20 days
+        tick_n_blocks(&test_env.pic, 100);
     }
+
+    // test_env.pic.advance_time(Duration::from_secs(15 * 60));
+    // tick_n_blocks(&test_env.pic, 10);
 
     let current_cycles_manager_balance = test_env.pic.cycle_balance(cycles_manager_id);
     println!(
@@ -138,10 +132,10 @@ fn test_cycles_management() {
         current_cycles_manager_balance
     );
 
-    // Check if the rewards canister has low balance
+    // Check if the burner canister has low balance
     let current_burner_canister_balance = test_env.pic.cycle_balance(cycles_burner_id);
     println!(
-        "current_rewards_canister_balance: {}",
+        "current_burner_canister_balance: {}",
         current_burner_canister_balance
     );
 
