@@ -1,6 +1,7 @@
 use crate::model::canisters::{CanisterMetrics, Canisters};
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
+use cycles_manager_canister::get_config::ConfigResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use types::{CanisterId, Cycles, Milliseconds, TimestampMillis};
@@ -23,6 +24,14 @@ impl State {
 
     pub fn is_caller_governance_principal(&self) -> bool {
         self.data.authorized_principals.contains(&self.env.caller())
+    }
+
+    pub fn get_config(&self) -> ConfigResponse {
+        ConfigResponse {
+            max_top_up_amount: self.data.max_top_up_amount,
+            min_interval: self.data.min_interval,
+            min_cycles_balance: self.data.min_cycles_balance,
+        }
     }
 
     pub fn metrics(&self) -> Metrics {
