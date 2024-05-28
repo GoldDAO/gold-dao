@@ -15,7 +15,7 @@ fn pre_upgrade() {
     let logs = canister_logger::export_logs();
     let traces = canister_logger::export_traces();
 
-    let stable_state = (state.data, logs, traces);
+    let stable_state = (state, logs, traces);
 
     let mut memory = get_upgrades_memory();
     let writer = get_writer(&mut memory);
