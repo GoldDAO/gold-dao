@@ -1,7 +1,7 @@
 use crate::lifecycle::init_canister;
 use crate::Data;
 use canister_tracing_macros::trace;
-use cycles_manager_canister::init::InitArgs;
+pub use cycles_manager_canister::init::InitArgs;
 use ic_cdk_macros::init;
 use tracing::info;
 use utils::env::CanisterEnv;

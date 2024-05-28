@@ -20,24 +20,23 @@
 [Bochsler Assets & Securities (BAS) SA]: https://bas.tech
 [Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
 */
-use cycles_manager_canister::get_latest_top_ups::Response as TopUpsResponse;
-use cycles_manager_canister::init::InitArgs;
-use cycles_manager_canister::update_config::Args;
-use cycles_manager_canister::update_config::Response;
 use ic_cdk::export_candid;
 
 use crate::state::take_state;
 use crate::state::Data;
 use crate::state::State;
-use types::Cycles;
 
 mod guards;
 mod jobs;
-mod lifecycle;
+pub mod lifecycle;
 mod memory;
 mod model;
-mod queries;
+pub mod queries;
 mod state;
-mod updates;
+pub mod updates;
+
+use lifecycle::*;
+// use queries::*;
+use updates::*;
 
 export_candid!();

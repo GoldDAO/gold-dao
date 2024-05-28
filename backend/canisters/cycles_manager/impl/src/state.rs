@@ -1,7 +1,8 @@
-use crate::model::canisters::{CanisterMetrics, Canisters};
+use crate::model::canisters::Canisters;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-use cycles_manager_canister::get_config::ConfigResponse;
+use cycles_manager_canister::get_canisters_summary::CanisterMetrics;
+use cycles_manager_canister::get_config::Response as GetConfigResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use types::{CanisterId, Cycles, Milliseconds, TimestampMillis};
@@ -26,8 +27,8 @@ impl State {
         self.data.authorized_principals.contains(&self.env.caller())
     }
 
-    pub fn get_config(&self) -> ConfigResponse {
-        ConfigResponse {
+    pub fn get_top_up_config(&self) -> GetConfigResponse {
+        GetConfigResponse {
             max_top_up_amount: self.data.max_top_up_amount,
             min_interval: self.data.min_interval,
             min_cycles_balance: self.data.min_cycles_balance,

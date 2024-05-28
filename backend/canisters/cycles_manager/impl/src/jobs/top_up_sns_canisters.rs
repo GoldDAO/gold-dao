@@ -17,7 +17,7 @@ pub fn start_job() {
     run_now_then_interval(INTERVAL, run);
 }
 
-fn run() {
+pub fn run() {
     if let Some(canister_id) = read_state(|state| state.data.sns_root_canister) {
         ic_cdk::spawn(run_async(canister_id));
     }
@@ -27,7 +27,6 @@ fn run() {
 async fn run_async(canister_id: CanisterId) {
     match sns_root_canister_c2c_client::get_sns_canisters_summary(canister_id, &Empty {}).await {
         Ok(response) => {
-            // ic_cdk::println!("Got SNS canisters summary: {:#?}", response);
             let canisters: Vec<_> = [
                 response.root,
                 response.governance,
@@ -41,6 +40,7 @@ async fn run_async(canister_id: CanisterId) {
             .chain(response.archives)
             .collect();
 
+            // TODO: Fix with join_all()
             // Add SNS canisters to the whitelist
             mutate_state(|state| {
                 let now = state.env.now();
@@ -54,8 +54,6 @@ async fn run_async(canister_id: CanisterId) {
                 .filter(requires_top_up)
                 .map(|s| s.canister_id.unwrap())
                 .collect();
-
-            // ic_cdk::println!("Canisters to TOP UP: {:#?}", to_top_up);
 
             if !to_top_up.is_empty() {
                 let top_up_amount = read_state(|state| state.data.max_top_up_amount);

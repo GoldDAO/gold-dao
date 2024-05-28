@@ -1,4 +1,4 @@
-use candid::CandidType;
+use cycles_manager_canister::get_canisters_summary::{CanisterMetrics, CyclesTopUp};
 use cycles_manager_canister::get_latest_top_ups::CanisterTopUp;
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry::Vacant;
@@ -80,13 +80,6 @@ impl Canisters {
     }
 }
 
-// #[derive(Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
-// pub struct CanisterTopUp {
-//     pub timestamp: TimestampMillis,
-//     pub canister_id: CanisterId,
-//     pub amount: Cycles,
-// }
-
 #[derive(Serialize, Deserialize)]
 pub struct Canister {
     added: TimestampMillis,
@@ -112,15 +105,15 @@ impl Canister {
     }
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-struct CyclesTopUp {
-    pub date: TimestampMillis,
-    pub amount: Cycles,
-}
+// #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+// struct CyclesTopUp {
+//     pub date: TimestampMillis,
+//     pub amount: Cycles,
+// }
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct CanisterMetrics {
-    canister_id: CanisterId,
-    added: TimestampMillis,
-    top_ups: Vec<CyclesTopUp>,
-}
+// #[derive(CandidType, Serialize, Deserialize, Debug)]
+// pub struct CanisterMetrics {
+//     canister_id: CanisterId,
+//     added: TimestampMillis,
+//     top_ups: Vec<CyclesTopUp>,
+// }
