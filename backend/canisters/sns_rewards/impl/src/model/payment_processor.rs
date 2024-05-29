@@ -37,17 +37,15 @@ impl Default for PaymentProcessor {
 
 impl PaymentProcessor {
     // gets the last key of the last completed payment round and circles from 1 - u16::MAX - each cycle is 125 years.
-    pub fn next_key(&self) -> u16 {
-        let mut next_key = match self.round_history.last_key_value() {
-            Some(((_, id), _)) => {
-                if id == 0 { 1 } else { id + 1 }
-            } // Add 1 to the last key
-            None => 1, // If the map is empty, start from 0
-        };
-
-        if next_key == u16::MAX {
-            next_key = 1; // Wrap around to 0 if the key exceeds u16::MAX
+    pub fn next_key(&self, token_symbol: &TokenSymbol) -> u16 {
+        let mut max_key = 0;
+        for ((symbol, id), _) in self.round_history.iter() {
+            if id > max_key && token_symbol == &symbol {
+                max_key = id;
+            }
         }
+
+        let next_key = if max_key == u16::MAX { 1 } else { max_key + 1 };
         next_key
     }
 
@@ -118,5 +116,124 @@ impl PaymentProcessor {
                 token
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use candid::{ Nat, Principal };
+    use sns_governance_canister::types::NeuronId;
+    use sns_rewards_api_canister::payment_round::PaymentRound;
+    use types::{ TimestampMillis, TokenSymbol };
+
+    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
+
+    #[test]
+    fn test_key_incrementation() {
+        init_runtime_state();
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let icp_token = TokenSymbol::parse("ICP").unwrap();
+        let ogy_token = TokenSymbol::parse("OGY").unwrap();
+        let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+
+        mutate_state(|s|
+            s.data.payment_processor.add_to_history(PaymentRound {
+                id: 1,
+                round_funds_total: Nat::from(100u64),
+                tokens_to_distribute: Nat::from(100u64),
+                fees: Nat::from(100u64),
+                ledger_id: Principal::anonymous(),
+                token: icp_token.clone(),
+                date_initialized: 1,
+                total_neuron_maturity: 100,
+                payments: BTreeMap::default(),
+                retries: 0,
+            })
+        );
+        mutate_state(|s|
+            s.data.payment_processor.add_to_history(PaymentRound {
+                id: 1,
+                round_funds_total: Nat::from(100u64),
+                tokens_to_distribute: Nat::from(100u64),
+                fees: Nat::from(100u64),
+                ledger_id: Principal::anonymous(),
+                token: ogy_token.clone(),
+                date_initialized: 1,
+                total_neuron_maturity: 100,
+                payments: BTreeMap::default(),
+                retries: 0,
+            })
+        );
+
+        read_state(|s| {
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
+        });
+
+        mutate_state(|s|
+            s.data.payment_processor.add_to_history(PaymentRound {
+                id: 2,
+                round_funds_total: Nat::from(100u64),
+                tokens_to_distribute: Nat::from(100u64),
+                fees: Nat::from(100u64),
+                ledger_id: Principal::anonymous(),
+                token: icp_token.clone(),
+                date_initialized: 200,
+                total_neuron_maturity: 100,
+                payments: BTreeMap::default(),
+                retries: 0,
+            })
+        );
+
+        read_state(|s| {
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 3);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
+        });
+
+        mutate_state(|s|
+            s.data.payment_processor.add_to_history(PaymentRound {
+                id: 3,
+                round_funds_total: Nat::from(100u64),
+                tokens_to_distribute: Nat::from(100u64),
+                fees: Nat::from(100u64),
+                ledger_id: Principal::anonymous(),
+                token: icp_token.clone(),
+                date_initialized: 1,
+                total_neuron_maturity: 100,
+                payments: BTreeMap::default(),
+                retries: 0,
+            })
+        );
+        mutate_state(|s|
+            s.data.payment_processor.add_to_history(PaymentRound {
+                id: 2,
+                round_funds_total: Nat::from(100u64),
+                tokens_to_distribute: Nat::from(100u64),
+                fees: Nat::from(100u64),
+                ledger_id: Principal::anonymous(),
+                token: ogy_token.clone(),
+                date_initialized: 1,
+                total_neuron_maturity: 100,
+                payments: BTreeMap::default(),
+                retries: 0,
+            })
+        );
+
+        read_state(|s| {
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 4);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 3);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
+        });
     }
 }
