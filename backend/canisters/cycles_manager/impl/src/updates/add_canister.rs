@@ -7,7 +7,7 @@ use ic_cdk::api::id;
 use ic_cdk_macros::update;
 use utils::env::Environment;
 
-#[update(guard = "caller_is_governance_principal")]
+#[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 fn add_canister(args: AddCanisterArgs) -> AddCanisterResponse {
     mutate_state(|state| add_canister_impl(args, state))
