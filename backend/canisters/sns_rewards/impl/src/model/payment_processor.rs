@@ -37,10 +37,10 @@ impl Default for PaymentProcessor {
 
 impl PaymentProcessor {
     // gets the last key of the last completed payment round and circles from 1 - u16::MAX - each cycle is 125 years.
-    pub fn next_key(&self) -> u16 {
+    pub fn next_key(&self, token_symbol: &TokenSymbol) -> u16 {
         let mut max_key = 0;
-        for ((_, id), _) in self.round_history.iter() {
-            if id > max_key {
+        for ((symbol, id), _) in self.round_history.iter() {
+            if id > max_key && token_symbol == &symbol {
                 max_key = id;
             }
         }
@@ -143,6 +143,7 @@ mod tests {
 
         let icp_token = TokenSymbol::parse("ICP").unwrap();
         let ogy_token = TokenSymbol::parse("OGY").unwrap();
+        let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
 
         mutate_state(|s|
             s.data.payment_processor.add_to_history(PaymentRound {
@@ -174,7 +175,9 @@ mod tests {
         );
 
         read_state(|s| {
-            assert_eq!(s.data.payment_processor.next_key(), 2);
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
         });
 
         mutate_state(|s|
@@ -193,7 +196,9 @@ mod tests {
         );
 
         read_state(|s| {
-            assert_eq!(s.data.payment_processor.next_key(), 3);
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 3);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 2);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
         });
 
         mutate_state(|s|
@@ -212,7 +217,7 @@ mod tests {
         );
         mutate_state(|s|
             s.data.payment_processor.add_to_history(PaymentRound {
-                id: 3,
+                id: 2,
                 round_funds_total: Nat::from(100u64),
                 tokens_to_distribute: Nat::from(100u64),
                 fees: Nat::from(100u64),
@@ -226,7 +231,9 @@ mod tests {
         );
 
         read_state(|s| {
-            assert_eq!(s.data.payment_processor.next_key(), 4);
+            assert_eq!(s.data.payment_processor.next_key(&icp_token), 4);
+            assert_eq!(s.data.payment_processor.next_key(&ogy_token), 3);
+            assert_eq!(s.data.payment_processor.next_key(&gldgov_token), 1);
         });
     }
 }
