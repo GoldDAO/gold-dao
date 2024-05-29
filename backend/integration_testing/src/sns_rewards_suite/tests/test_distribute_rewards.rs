@@ -234,12 +234,12 @@ fn test_distribute_rewards_with_no_rewards() {
     test_env.pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&test_env.pic, 100);
 
-    // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 2)
+    // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 1)
     let res = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 2 })
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
     );
     assert_eq!(res.len(), 1);
 
