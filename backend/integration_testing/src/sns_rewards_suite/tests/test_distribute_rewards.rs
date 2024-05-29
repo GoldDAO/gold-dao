@@ -239,7 +239,7 @@ fn test_distribute_rewards_with_no_rewards() {
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 2 })
     );
     assert_eq!(res.len(), 1);
 
@@ -579,7 +579,7 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         test_env.rewards_canister_id,
         &(GetHistoricPaymentRoundArgs {
             token: ogy_token.clone(),
-            round_id: 3,
+            round_id: 5,
         })
     );
     assert_eq!(historic_icp_rounds.len(), 1);
