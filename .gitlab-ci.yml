@@ -229,7 +229,7 @@ integration tests:
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - ulimit -n 102400
     - ulimit -f 1024000
-    - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
+    - cargo tarpaulin --verbose -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
     reports:

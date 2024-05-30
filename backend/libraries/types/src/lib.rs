@@ -5,14 +5,12 @@ mod http;
 mod neuron_info;
 mod proposals;
 mod rewards_recipients;
-mod timestamped;
 mod token;
 
 pub use http::*;
 pub use neuron_info::*;
 pub use proposals::*;
 pub use rewards_recipients::*;
-pub use timestamped::*;
 pub use token::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
