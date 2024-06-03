@@ -1,7 +1,7 @@
 {
-    "gld_dashboard": {
-        "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
-        "staging": "mpece-iqaaa-aaaal-qizma-cai",
-        "preprod" : "pmjzm-tyaaa-aaaan-qmmda-cai"
-      }
+  "gld_dashboard": {
+    "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
+    "staging": "mpece-iqaaa-aaaal-qizma-cai",
+    "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai"
+  }
 }

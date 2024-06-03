@@ -11,11 +11,10 @@ import snsRewards from './idls/snsRewards';
 
 // eslint-disable-next-line import/prefer-default-export
 
-const isProd = process.env.ENV === 'production';
+const isProd = process.env.ENV === 'prod' || 'preprod';
 
 export const canisters = {
   governance: { canisterId: isProd ? 'tr3th-kiaaa-aaaaq-aab6q-cai' : 'j3ioe-7iaaa-aaaap-ab23q-cai', idlFactory: idlGovernance },
-  // governanceStaging: { canisterId: 'j3ioe-7iaaa-aaaap-ab23q-cai', idlFactory: idlGovernance },
   archive: { canisterId: 'fgzua-6iaaa-aaaaq-aacgq-cai', idlFactory: idlArchive },
   ledger: { canisterId: isProd ? 'tyyy3-4aaaa-aaaaq-aab7a-cai' : 'irhm6-5yaaa-aaaap-ab24q-cai', idlFactory: idlLedger },
   root: { canisterId: isProd ? 'tw2vt-hqaaa-aaaaq-aab6a-cai' : 'i7fbw-giaaa-aaaap-ab25q-cai', idlFactory: idlRoot },
@@ -25,10 +24,5 @@ export const canisters = {
   icpNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpNeuron },
   icpSwap: { canisterId: 'moe7a-tiaaa-aaaag-qclfq-cai', idlFactory: icpSwap },
   snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : '2f5ll-gqaaa-aaaak-qcfuq-cai', idlFactory: snsRewards },
-  // snsRewardsStaging: { canisterId: '2f5ll-gqaaa-aaaak-qcfuq-cai', idlFactory: snsRewards }, // STAGING
   icpAllInfoNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpAllInfoNeuron },
-  // icpAllInfoNeuronStaging: {
-  //   canisterId: 'j2neh-vqaaa-aaaal-aduxq-cai',
-  //   idlFactory: icpAllInfoNeuron,
-  // }, // STAGING
 };

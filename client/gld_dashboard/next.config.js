@@ -1,7 +1,5 @@
-// const env = process.env.ENV || "local";
 /** @type {import('next').NextConfig} */
 
-const env = process.env.ENV;
 const nextConfig = {
   output: "export",
   images: {
@@ -19,7 +17,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {
-    ENV: env,
+    ENV: process.env.ENV,
   },
 };
 
