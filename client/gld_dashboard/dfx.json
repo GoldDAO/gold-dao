@@ -1,22 +1,20 @@
 {
   "canisters": {
-    "frontend": {
-      "frontend": { "entryPoint": "out/index.html" },
-      "source": ["out"],
-      "type": "assets"
+    "gld_dashboard": {
+      "type": "assets",
+      "source": ["out"]
+    }
+  },
+  "networks": {
+    "staging": {
+      "providers": ["https://icp0.io"],
+      "type": "persistent"
     },
-    "devfront": {
-      "frontend": { "entryPoint": "out/index.html" },
-      "source": ["out"],
-      "type": "assets"
+    "preprod": {
+      "providers": ["https://icp0.io"],
+      "type": "persistent"
     }
   },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
-    }
-  },
-  "output_env_file": ".env",
+  "dfx": "0.19.0",
   "version": 1
 }

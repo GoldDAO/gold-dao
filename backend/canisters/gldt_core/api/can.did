@@ -1,9 +1,9 @@
-type Account = record { owner : principal; subaccount : opt vec nat8 };
+type Account = record { owner : principal; subaccount : opt blob };
 type Account_1 = variant {
   account_id : text;
   "principal" : principal;
   extensible : CandyShared;
-  account : record { owner : principal; sub_account : opt vec nat8 };
+  account : record { owner : principal; sub_account : opt blob };
 };
 type AskFeature = variant {
   kyc : principal;
@@ -72,14 +72,14 @@ type Box = variant {
   Nat16 : nat16;
   Nat32 : nat32;
   Nat64 : nat64;
-  Blob : vec nat8;
+  Blob : blob;
   Bool : bool;
   Int8 : int8;
   Ints : vec int;
   Nat8 : nat8;
   Nats : vec nat;
   Text : text;
-  Bytes : vec nat8;
+  Bytes : blob;
   Int16 : int16;
   Int32 : int32;
   Int64 : int64;
@@ -98,14 +98,14 @@ type CandyShared = variant {
   Nat16 : nat16;
   Nat32 : nat32;
   Nat64 : nat64;
-  Blob : vec nat8;
+  Blob : blob;
   Bool : bool;
   Int8 : int8;
   Ints : vec int;
   Nat8 : nat8;
   Nats : vec nat;
   Text : text;
-  Bytes : vec nat8;
+  Bytes : blob;
   Int16 : int16;
   Int32 : int32;
   Int64 : int64;
@@ -165,7 +165,7 @@ type GldtRecord = record {
   status : RecordStatusInfo;
   record_type : RecordType;
   num_tokens : GldtNumTokens;
-  escrow_subaccount : vec nat8;
+  escrow_subaccount : blob;
   counterparty : Account;
   grams : nat16;
   timestamp : nat64;
@@ -223,14 +223,14 @@ type SaleStatusShared = record {
 };
 type SaleStatusShared_sale_type = variant { auction : AuctionStateShared };
 type SubAccountInfo = record {
-  account_id : vec nat8;
+  account_id : blob;
   "principal" : principal;
   account_id_text : text;
   account : SubAccountInfo_account;
 };
 type SubAccountInfo_account = record {
   "principal" : principal;
-  sub_account : vec nat8;
+  sub_account : blob;
 };
 type SubscriberNotification = record {
   collection : principal;
@@ -239,10 +239,10 @@ type SubscriberNotification = record {
   escrow_info : SubAccountInfo;
 };
 type SwapInfo = record {
-  requested_memo : vec nat8;
+  requested_memo : blob;
   ledger_entry : opt GldtLedgerEntry;
   num_tokens : GldtNumTokens;
-  escrow_subaccount : vec nat8;
+  escrow_subaccount : blob;
   swapped : opt GldtSwapped;
   receiving_account : Account;
   swap_request_timestamp : nat64;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import getConfig from 'next/config';
 import CollapseContainer from '../components/Home/Collapse/CollapseContainer';
 import MobileRedirectButtons from '../components/Home/MobileRedirectButtons';
 import GLDGovInfo from '../components/Home/GLDGovInfo';
@@ -8,6 +9,7 @@ import GraphCard from '../components/Home/GraphCard';
 import Neurons from '../components/Home/Neurons';
 import StakingReturn from '../components/Home/StakingReturn';
 import TradeOn from '../components/Home/TradeOn';
+
 
 export const viewport = {
   themeColor: '#c6c6c6',
@@ -26,6 +28,8 @@ export default function Home() {
 
     metaTag.setAttribute('content', '#c6c6c6');
   }, []);
+
+  console.log(process.env.ENV);
 
   return (
     <main className="flex flex-col justify-center w-full sm:pl-[30px] sm:pr-[18px]">

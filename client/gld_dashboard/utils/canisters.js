@@ -11,7 +11,7 @@ import snsRewards from './idls/snsRewards';
 
 // eslint-disable-next-line import/prefer-default-export
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.ENV === 'production';
 
 export const canisters = {
   governance: { canisterId: isProd ? 'tr3th-kiaaa-aaaaq-aab6q-cai' : 'j3ioe-7iaaa-aaaap-ab23q-cai', idlFactory: idlGovernance },
