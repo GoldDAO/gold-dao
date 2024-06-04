@@ -29,8 +29,6 @@ export default function Home() {
     metaTag.setAttribute('content', '#c6c6c6');
   }, []);
 
-  console.log(process.env.ENV);
-
   return (
     <main className="flex flex-col justify-center w-full sm:pl-[30px] sm:pr-[18px]">
       <GLDGovInfo />
