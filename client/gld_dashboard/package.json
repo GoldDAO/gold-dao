@@ -9,8 +9,12 @@
     "lint": "next lint",
     "build:gld_dashboard:staging": "ENV=staging && npm run build",
     "build:gld_dashboard:preprod": "ENV=preprod && npm run build",
+    "build:gld_dashboard:prod": "ENV=prod && npm run build",
+    "build:gld_dashboard:local": "ENV=local && npm run build",
     "deploy:gld_dashboard:staging": "ENV=staging && npm run build:gld_dashboard:staging && ENV=staging dfx deploy gld_dashboard --network=staging --mode reinstall",
-    "deploy:gld_dashboard:preprod": "ENV=preprod && npm run build && dfx deploy gld_dashboard --network=preprod"
+    "deploy:gld_dashboard:preprod": "ENV=preprod && npm run build && dfx deploy gld_dashboard --network=preprod",
+    "deploy:gld_dashboard:prod": "ENV=prod && npm run build && dfx deploy gld_dashboard --network=ic",
+    "deploy:gld_dashboard:local": "ENV=local && npm run build && dfx deploy gld_dashboard --network=local"
   },
   "dependencies": {
     "@dfinity/auth-client": "^1.0.0",

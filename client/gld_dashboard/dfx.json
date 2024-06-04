@@ -1,20 +1,21 @@
 {
-  "canisters": {
-    "gld_dashboard": {
-      "type": "assets",
-      "source": ["out"]
-    }
-  },
-  "networks": {
-    "staging": {
-      "providers": ["https://icp0.io"],
-      "type": "persistent"
+    "canisters": {
+      "gld_dashboard": {
+        "type": "assets",
+        "source": ["out"]
+      }
     },
-    "preprod": {
-      "providers": ["https://icp0.io"],
-      "type": "persistent"
-    }
-  },
-  "dfx": "0.19.0",
-  "version": 1
-}
+    "networks": {
+      "staging": {
+        "providers": ["https://icp0.io"],
+        "type": "persistent"
+      },
+      "preprod": {
+        "providers": ["https://icp0.io"],
+        "type": "persistent"
+      }
+    },
+    "dfx": "0.19.0",
+    "version": 1
+  }
+  
