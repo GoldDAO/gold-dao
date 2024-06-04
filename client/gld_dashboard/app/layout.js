@@ -3,7 +3,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { Inter } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
-import getConfig from 'next/config';
 
 import Footer from '../components/shared/Footer';
 import Maintenance from '../components/Maintenance/index';
@@ -26,9 +25,6 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   const isMaintenanceMode = process.env.MAINTENANCE_MODE;
-  console.log(process.env);
-  console.log(getConfig());
-  console.log(isMaintenanceMode);
 
   if (isMaintenanceMode) {
     return <Maintenance />;
