@@ -89,6 +89,7 @@
       "type": "assets"
     },
     "gld_dashboard": {
+      "build": ["npm run postinstall", "npm run build:gld_dashboard"],
       "declarations": {
         "bindings": [],
         "env_override": null,
