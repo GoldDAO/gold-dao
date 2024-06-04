@@ -37,7 +37,7 @@
     "deploy:gld_dashboard:maintenance" : "ENV=prod MAINTENANCE_MODE=true dfx deploy gld_dashboard --network=ic",
     "deploy:gld_dashboard:staging" : "ENV=staging dfx deploy gld_dashboard --network=staging",
     "deploy:gld_dashboard:preprod" : "ENV=preprod dfx deploy gld_dashboard --network=preprod",
-    "deploy:gld_dashboard:prod" : "ENVprod dfx deploy gld_dashboard --network=ic",
+    "deploy:gld_dashboard:prod" : "ENV=prod dfx deploy gld_dashboard --network=ic",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",
     "test": "npm run build:backdid && cargo tarpaulin --count -o html",
