@@ -45,7 +45,7 @@ const LoginButton = () => {
       // start the login process and wait for it to finish
       await authClient.login({
         identityProvider: 'https://identity.ic0.app',
-        derivationOrigin: process.env.ENV === 'ic' ? 'https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io' : null,
+        derivationOrigin: process.env.ENV === 'prod' ? 'https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io' : null,
         onSuccess: onConnect,
         onError: () => console.log('onError'),
       });
