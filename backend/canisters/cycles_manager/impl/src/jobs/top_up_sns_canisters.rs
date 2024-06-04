@@ -4,14 +4,14 @@ use canister_tracing_macros::trace;
 use sns_root_canister::get_sns_canisters_summary::CanisterSummary;
 use std::time::Duration;
 use tracing::error;
-use types::{CanisterId, Cycles, Empty};
+use types::Cycles;
+use types::{CanisterId, Empty};
 use utils::canister::deposit_cycles;
 use utils::env::Environment;
 
-const INTERVAL: Duration = Duration::from_secs(60); // Adjust as needed
-
-const T: Cycles = 1_000_000_000_000;
-const TOP_UP_THRESHOLD: u64 = 200 * T;
+const INTERVAL: Duration = Duration::from_secs(1 * 60 * 60); // 1 hourconst T: Cycles = 1_000_000_000_000;
+                                                             // const TOP_UP_THRESHOLD: u64 = 200 * T;
+                                                             // const T: Cycles = 1_000_000_000_000;
 
 pub fn start_job() {
     run_now_then_interval(INTERVAL, run);
@@ -49,9 +49,12 @@ async fn run_async(canister_id: CanisterId) {
                 }
             });
 
+            let top_up_threshold = read_state(|state| state.data.min_cycles_balance);
+
             let to_top_up: Vec<_> = canisters
                 .into_iter()
-                .filter(requires_top_up)
+                .filter(|s| requires_top_up(s, top_up_threshold))
+                // .filter(requires_top_up)
                 .map(|s| s.canister_id.unwrap())
                 .collect();
 
@@ -73,11 +76,20 @@ async fn run_async(canister_id: CanisterId) {
     }
 }
 
-fn requires_top_up(summary: &CanisterSummary) -> bool {
+fn requires_top_up(summary: &CanisterSummary, top_up_threshold: u64) -> bool {
     if let Some(status) = summary.status.as_ref() {
         let cycles = status.cycles.0.clone();
-        cycles < TOP_UP_THRESHOLD.into()
+        cycles < top_up_threshold.into()
     } else {
         false
     }
 }
+
+// fn requires_top_up(summary: &CanisterSummary) -> bool {
+//     if let Some(status) = summary.status.as_ref() {
+//         let cycles = status.cycles.0.clone();
+//         cycles < TOP_UP_THRESHOLD.into()
+//     } else {
+//         false
+//     }
+// }

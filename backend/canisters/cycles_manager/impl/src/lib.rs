@@ -2,7 +2,7 @@
 # TODO: add canister description
 
 ## Copyright
-© 2023  [Bochsler Assets & Securities (BAS) SA], [Switzerland]
+© 2023  [DAO.LINK Sàrl], [Switzerland]
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,8 +17,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[Bochsler Assets & Securities (BAS) SA]: https://bas.tech
-[Switzerland]: https://www.zefix.ch/fr/search/entity/list/firm/1579921
+[DAO.LINK Sàrl]: https://daolink.org/about
+[Switzerland]: https://www.zefix.ch/en/search/entity/list/firm/1264770
 */
 use ic_cdk::export_candid;
 

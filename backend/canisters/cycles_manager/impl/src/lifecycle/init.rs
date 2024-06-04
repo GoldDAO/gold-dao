@@ -19,7 +19,6 @@ fn init(args: InitArgs) {
         args.canisters,
         args.sns_root_canister,
         args.max_top_up_amount,
-        args.min_interval,
         args.min_cycles_balance,
         env.now(),
     );

@@ -47,7 +47,7 @@ impl CyclesManagerTestEnvBuilder {
         // Define initialization arguments for burner canister
         let burner_canister_init_args =
             crate::cycles_manager_suite::setup::setup_burner::InitArgs {
-                interval_between_timers_in_seconds: 5 * 60, // Burn once in 5 minutes
+                interval_between_timers_in_seconds: 2 * 60 * 60, // Burn once in 5 minutes
                 burn_amount: 10_000_000_000_000,
             };
 
@@ -72,7 +72,6 @@ impl CyclesManagerTestEnvBuilder {
 
         // Define initialization arguments for cycles manager canister
         let cycles_manager_init_args = cycles_manager_canister::init::InitArgs {
-            // test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),

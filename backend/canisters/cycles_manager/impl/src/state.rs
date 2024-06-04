@@ -5,7 +5,7 @@ use cycles_manager_canister::get_canisters_summary::CanisterMetrics;
 use cycles_manager_canister::get_config::Response as GetConfigResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-use types::{CanisterId, Cycles, Milliseconds, TimestampMillis};
+use types::{CanisterId, Cycles, TimestampMillis};
 use utils::env::CanisterEnv;
 use utils::env::Environment;
 use utils::memory::MemorySize;
@@ -30,7 +30,6 @@ impl State {
     pub fn get_top_up_config(&self) -> GetConfigResponse {
         GetConfigResponse {
             max_top_up_amount: self.data.max_top_up_amount,
-            min_interval: self.data.min_interval,
             min_cycles_balance: self.data.min_cycles_balance,
         }
     }
@@ -46,7 +45,6 @@ impl State {
             canisters: self.data.canisters.metrics(),
             sns_root_canister: self.data.sns_root_canister,
             max_top_up_amount: self.data.max_top_up_amount,
-            min_interval: self.data.min_interval,
             min_cycles_balance: self.data.min_cycles_balance,
         }
     }
@@ -58,7 +56,6 @@ pub struct Data {
     pub canisters: Canisters,
     pub sns_root_canister: Option<CanisterId>,
     pub max_top_up_amount: Cycles,
-    pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
 }
 
@@ -69,7 +66,6 @@ impl Data {
         canisters: Vec<CanisterId>,
         sns_root_canister: Option<CanisterId>,
         max_top_up_amount: Cycles,
-        min_interval: Milliseconds,
         min_cycles_balance: Cycles,
         now: TimestampMillis,
     ) -> Data {
@@ -78,7 +74,6 @@ impl Data {
             canisters: Canisters::new(canisters, now),
             sns_root_canister,
             max_top_up_amount,
-            min_interval,
             min_cycles_balance,
         }
     }
@@ -91,7 +86,6 @@ pub struct Metrics {
     pub canisters: Vec<CanisterMetrics>,
     pub sns_root_canister: Option<CanisterId>,
     pub max_top_up_amount: Cycles,
-    pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
 }
 
@@ -109,7 +103,6 @@ impl Default for Data {
             canisters: Canisters::default(),
             sns_root_canister: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2])),
             max_top_up_amount: 300_000_000_000_000,
-            min_interval: 60,
             min_cycles_balance: 200_000_000_000_000,
         }
     }

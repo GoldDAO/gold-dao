@@ -38,6 +38,11 @@ pub struct CanisterStatusResult {
     pub cycles: Nat,
 }
 
+// NOTE: Probably to test this part better, it could be useful to use pocket_ic 3.1.0
+// There is an auto_progress method:
+// NOTE: https://github.com/search?q=pic.auto_progress&type=code
+// NOTE: example https://github.com/dfinity/ic/blob/9ab763c49cca40142edbfaad05acb35576e36396/packages/pocket-ic/tests/tests.rs#L251
+
 // Define the test function
 #[test]
 fn test_cycles_management() {
@@ -118,10 +123,8 @@ fn test_cycles_management() {
     //     }
     // }
 
-    for _ in 1..15 {
-        test_env.pic.advance_time(Duration::from_secs(10 * 60)); // 20 days
-        tick_n_blocks(&test_env.pic, 100);
-    }
+    test_env.pic.advance_time(Duration::from_secs(5 * 60 * 60)); // 20 days
+    tick_n_blocks(&test_env.pic, 10);
 
     // test_env.pic.advance_time(Duration::from_secs(15 * 60));
     // tick_n_blocks(&test_env.pic, 10);
