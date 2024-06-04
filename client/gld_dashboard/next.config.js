@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  output: "export",
+  output: 'export',
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "*",
+        protocol: 'https',
+        hostname: '*',
       },
     ],
     unoptimized: true,
@@ -18,6 +18,10 @@ const nextConfig = {
   },
   env: {
     ENV: process.env.ENV,
+    MAINTENANCE_MODE: process.env.MAINTENANCE_MODE,
+  },
+  publicRuntimeConfig: {
+    NEXT_PUBLIC_MAINTENANCE_MODE: process.env.MAINTENANCE_MODE,
   },
 };
 
