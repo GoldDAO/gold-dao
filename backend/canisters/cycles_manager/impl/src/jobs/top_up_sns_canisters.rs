@@ -4,14 +4,11 @@ use canister_tracing_macros::trace;
 use sns_root_canister::get_sns_canisters_summary::CanisterSummary;
 use std::time::Duration;
 use tracing::error;
-use types::Cycles;
 use types::{CanisterId, Empty};
 use utils::canister::deposit_cycles;
 use utils::env::Environment;
 
-const INTERVAL: Duration = Duration::from_secs(1 * 60 * 60); // 1 hourconst T: Cycles = 1_000_000_000_000;
-                                                             // const TOP_UP_THRESHOLD: u64 = 200 * T;
-                                                             // const T: Cycles = 1_000_000_000_000;
+const INTERVAL: Duration = Duration::from_secs(1 * 60 * 60); // 1 hour
 
 pub fn start_job() {
     run_now_then_interval(INTERVAL, run);
@@ -54,7 +51,6 @@ async fn run_async(canister_id: CanisterId) {
             let to_top_up: Vec<_> = canisters
                 .into_iter()
                 .filter(|s| requires_top_up(s, top_up_threshold))
-                // .filter(requires_top_up)
                 .map(|s| s.canister_id.unwrap())
                 .collect();
 
@@ -84,12 +80,3 @@ fn requires_top_up(summary: &CanisterSummary, top_up_threshold: u64) -> bool {
         false
     }
 }
-
-// fn requires_top_up(summary: &CanisterSummary) -> bool {
-//     if let Some(status) = summary.status.as_ref() {
-//         let cycles = status.cycles.0.clone();
-//         cycles < TOP_UP_THRESHOLD.into()
-//     } else {
-//         false
-//     }
-// }

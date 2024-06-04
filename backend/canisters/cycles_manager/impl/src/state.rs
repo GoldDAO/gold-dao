@@ -101,9 +101,10 @@ impl Default for Data {
         Self {
             authorized_principals: HashSet::default(),
             canisters: Canisters::default(),
-            sns_root_canister: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 2])),
-            max_top_up_amount: 300_000_000_000_000,
-            min_cycles_balance: 200_000_000_000_000,
+            // tw2vt-hqaaa-aaaaq-aab6a-cai
+            sns_root_canister: Some(Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 124, 1, 1])),
+            max_top_up_amount: 150_000_000_000_000,
+            min_cycles_balance: 10_000_000_000_000,
         }
     }
 }
