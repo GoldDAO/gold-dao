@@ -37,7 +37,6 @@ async fn run_async(canister_id: CanisterId) {
             .chain(response.archives)
             .collect();
 
-            // TODO: Fix with join_all()
             // Add SNS canisters to the whitelist
             mutate_state(|state| {
                 let now = state.env.now();

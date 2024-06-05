@@ -45,21 +45,29 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
-# TODO: change parameters to the valid
-ARGS=$(cat <<EOF
-'(
+
+if [[ $1 =~ ^(local|staging)$ ]]; then
+SNS_ROOT_CANISTER_ID=eefug-cuaaa-aaaaa-qaa4a-cai
+AUTHORIZED_PRONCOPAL=pl7dv-exerb-4tciu-c7hf3-qjtxg-ba6gh-7w45s-3lgzu-5ww5j-yupk6-uae # TODO: change to the valid one
+else
+SNS_ROOT_CANISTER_ID=i7fbw-giaaa-aaaap-ab25q-cai
+AUTHORIZED_PRONCOPAL=pl7dv-exerb-4tciu-c7hf3-qjtxg-ba6gh-7w45s-3lgzu-5ww5j-yupk6-uae # TODO: change to the valid one
+fi
+
+export MIN_CYCLES_BALANCE=20_000_000_000_000
+export MAX_TOP_UP_AMOUNT=10_000_000_000_000
+
+ARGS='(
   record {
-    sns_root_canister = null;
-    min_cycles_balance = 200000000000000 : nat64;
+    sns_root_canister = opt principal "'"$SNS_ROOT_CANISTER_ID"'";
+    min_cycles_balance = "'"$MIN_CYCLES_BALANCE"'" : nat64;
     authorized_principals = vec {
-      principal "pl7dv-exerb-4tciu-c7hf3-qjtxg-ba6gh-7w45s-3lgzu-5ww5j-yupk6-uae";
+      principal "'"$AUTHORIZED_PRONCOPAL"'";
     };
     canisters = vec {};
-    max_top_up_amount = 500000000000000 : nat64;
+    max_top_up_amount = "'"$MAX_TOP_UP_AMOUNT"'" : nat64;
   },
 )'
-EOF
-)
 
 echo "Deployment arguments: \n" $ARGS
 
