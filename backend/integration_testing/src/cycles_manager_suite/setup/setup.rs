@@ -76,7 +76,6 @@ impl CyclesManagerTestEnvBuilder {
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),
             max_top_up_amount: 2000 * T,
-            min_interval: 60,
             min_cycles_balance: 200 * T,
         };
 

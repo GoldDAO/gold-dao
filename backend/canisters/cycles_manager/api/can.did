@@ -4,6 +4,5 @@ type InitArgs = record {
   authorized_principals : vec principal;
   canisters : vec principal;
   max_top_up_amount : nat64;
-  min_interval : nat64;
 };
 service : (InitArgs) -> {}

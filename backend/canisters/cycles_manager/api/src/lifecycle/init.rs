@@ -8,6 +8,5 @@ pub struct InitArgs {
     pub canisters: Vec<CanisterId>,
     pub sns_root_canister: Option<CanisterId>,
     pub max_top_up_amount: Cycles,
-    pub min_interval: Milliseconds,
     pub min_cycles_balance: Cycles,
 }

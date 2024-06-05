@@ -77,7 +77,6 @@ fn test_cycles_management() {
         cycles_manager_id,
         &cycles_manager_canister::update_config::Args {
             min_cycles_balance: Some(200_000_000_000_000),
-            min_interval: Some(0),
             max_top_up_amount: Some(250_000_000_000_000),
         },
     );

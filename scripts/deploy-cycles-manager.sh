@@ -21,7 +21,6 @@ Options:
 EOF
 }
 
-# TODO: add a --identity option ?? (See dfx deploy --identity)
 if [[ $# -gt 0 ]]; then
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
     case $1 in
@@ -46,6 +45,7 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
+# TODO: change parameters to the valid
 ARGS=$(cat <<EOF
 '(
   record {
@@ -56,7 +56,6 @@ ARGS=$(cat <<EOF
     };
     canisters = vec {};
     max_top_up_amount = 500000000000000 : nat64;
-    min_interval = 60 : nat64;
   },
 )'
 EOF
@@ -65,11 +64,11 @@ EOF
 echo "Deployment arguments: \n" $ARGS
 
 if [[ $1 == "local" ]]; then
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument "$ARGS" -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^sns_rewards-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
+elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^cycles_manager-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy sns_rewards --network $1 ${REINSTALL} --argument "$ARGS" -y
+  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
 
 
 fi
