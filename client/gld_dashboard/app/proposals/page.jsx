@@ -1,4 +1,4 @@
-import ProposalsTable from '../../components/Proposals/ProposalsTable.jsx';
+import ProposalsTable from '../../components/Proposals/ProposalsTable';
 
 export const viewport = {
   themeColor: '#c6c6c6',

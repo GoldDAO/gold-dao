@@ -1,7 +1,6 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-const NotFound = () => {
-  return (
+const NotFound = () => (
     <main className="flex flex-col items-center gap-2">
       <h2 className="text-4xl font-bold">
         <span className="font-extrabold">404</span> - Not Found
@@ -11,7 +10,6 @@ const NotFound = () => {
         Return Home
       </Link>
     </main>
-  );
-};
+);
 
 export default NotFound;
