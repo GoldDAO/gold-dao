@@ -1,30 +1,30 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import Chart from "./Chart";
-import { GLDGovIcon } from "../../utils/svgs";
-import Image from "next/image";
-import Modal from "../shared/modal/modal";
-import ModalChartMobile from "../shared/modal/modal-chart-mobile";
-import { data1 } from "../../utils/datas";
-import { parseNumbers } from "../../utils/parsers";
-import useServices from "../../hooks/useServices";
+import Image from 'next/image';
+import Chart from './Chart';
+import { GLDGovIcon } from '../../utils/svgs';
+import Modal from '../shared/modal/modal';
+import ModalChartMobile from '../shared/modal/modal-chart-mobile';
+import { data1 } from '../../utils/datas';
+import { parseNumbers } from '../../utils/parsers';
+import useServices from '../../hooks/useServices';
 
 export default function Graphs() {
-  const [selectedTab, setSelectedTab] = useState("Treasury");
+  const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
   const [amount, setAmount] = useState();
   const [infoModal, setInfoModal] = useState(null);
 
-  const tabs = ["Treasury", "Staked", "Liquid", "Burned", "Holders"];
+  const tabs = ['Treasury', 'Staked', 'Liquid', 'Burned', 'Holders'];
 
   const handleTabClick = (tab) => setSelectedTab(tab);
-  //const [isMobile, setIsMobile] = useState(null);
+  // const [isMobile, setIsMobile] = useState(null);
   useEffect(() => {
     getSupplyChart();
     getTreasuryChart();
-    //setAmount(gldGovTreasury());
+    // setAmount(gldGovTreasury());
   }, []);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Graphs() {
 
         setAmount(result);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -51,18 +51,18 @@ export default function Graphs() {
             <span
               key={tab}
               className={`sm:focus:bg-Gold flex-1 border-t-2 px-3 sm:px-5 text-left h-17 flex justify-between sm:justify-start items-center w-full 
-              ${index === 0 ? " rounded-t-[36px] sm:rounded-tr-none" : ""} 
-              ${index === tabs.length - 1 ? "rounded-b-[36px] sm:rounded-br-none" : ""}
-              ${tab === selectedTab ? "sm:bg-Gold sm:border-t-2 sm:border-r-2 sm:border-Gold sm:text-white sm:font-extrabold" : ""} py-4`}
+              ${index === 0 ? ' rounded-t-[36px] sm:rounded-tr-none' : ''} 
+              ${index === tabs.length - 1 ? 'rounded-b-[36px] sm:rounded-br-none' : ''}
+              ${tab === selectedTab ? 'sm:bg-Gold sm:border-t-2 sm:border-r-2 sm:border-Gold sm:text-white sm:font-extrabold' : ''} py-4`}
               onClick={() => {
-                if (window.matchMedia("(max-width: 768px)").matches) {
-                  document.getElementById("chartmodalgraph").showModal();
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                  document.getElementById('chartmodalgraph').showModal();
                 }
                 setInfoModal({
                   title: selectedTab,
-                  image: "image",
-                  info: "info",
-                  amount: amount,
+                  image: 'image',
+                  info: 'info',
+                  amount,
                   data: data1,
                 });
                 handleTabClick(tab);
@@ -71,7 +71,7 @@ export default function Graphs() {
               <div className="flex w-[60%] justify-between items-center">
                 <h3 className="max-md:text-xs pl-2 sm:pl-5 max-md:font-bold">{tab}</h3>
                 <Image
-                  src={"/svg/chartIcon.svg"}
+                  src={'/svg/chartIcon.svg'}
                   alt=""
                   width={72}
                   height={36}
@@ -80,7 +80,7 @@ export default function Graphs() {
               </div>
               <div className="flex justify-end min-w-[120px] sm:hidden items-center gap-1">
                 <h5 className="font-bold text-xs">
-                  {tab !== "Treasury" ? "N/A" : parseNumbers(amount)}
+                  {tab !== 'Treasury' ? 'N/A' : parseNumbers(amount)}
                 </h5>
                 <GLDGovIcon />
               </div>
