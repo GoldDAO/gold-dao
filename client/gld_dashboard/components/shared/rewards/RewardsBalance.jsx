@@ -18,17 +18,17 @@ export default function RewardsBalance({
     // icp balance
     (async () => {
       const balance = await getBalance();
-      setIcp({ loading: false, balance });
+      setIcp({ loading: false, amount: balance });
     })();
     // ogy balance
     (async () => {
       const balance = await getBalance('ogy');
-      setOgy({ loading: false, balance });
+      setOgy({ loading: false, amount: balance });
     })();
     // gold
     (async () => {
       const balance = await getBalance('ledger');
-      setGold({ loading: false, balance });
+      setGold({ loading: false, amount: balance });
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
