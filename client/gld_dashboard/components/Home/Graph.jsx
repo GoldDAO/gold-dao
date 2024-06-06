@@ -1,19 +1,21 @@
-"use client";
+'use client';
 
-import "chart.js/auto";
+import 'chart.js/auto';
 
-import { Chart, Interaction } from "chart.js";
-import { CrosshairPlugin, Interpolate } from "chartjs-plugin-crosshair";
-import { data2, data3, data4, data5 } from "../../utils/datas";
-import { useEffect, useRef, useState } from "react";
+import { Chart, Interaction } from 'chart.js';
+import { CrosshairPlugin, Interpolate } from 'chartjs-plugin-crosshair';
+import { useEffect, useRef, useState } from 'react';
 
-import { Line } from "react-chartjs-2";
-import { useCharts } from "../../hooks/useCharts";
+import { Line } from 'react-chartjs-2';
+import {
+  data2, data3, data4, data5,
+} from '../../utils/datas';
+import { useCharts } from '../../hooks/useCharts';
 
 Chart.register(CrosshairPlugin);
 Interaction.modes.interpolate = Interpolate;
 
-export default function Graph({ name, timestamp }) {
+export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
   const { copyGldGovSupply, copyGldGovTreasury } = useCharts();
@@ -24,7 +26,7 @@ export default function Graph({ name, timestamp }) {
   useEffect(() => {
     (async () => {
       switch (name) {
-        case "Treasury":
+        case 'Treasury':
           if (copyGldGovTreasury?.loading) break;
           // await getTreasuryChart();
           // const data = await treasuryData({ timestamp });
@@ -34,32 +36,32 @@ export default function Graph({ name, timestamp }) {
             suggestedMax: 800000000,
           });
           break;
-        case "Staked":
+        case 'Staked':
           setData({ loading: false, data: data2, suggestedMax: 1200 });
           break;
-        case "Liquid":
+        case 'Liquid':
           setData({ loading: false, data: data3, suggestedMax: 1200 });
           break;
-        case "Burned":
+        case 'Burned':
           setData({ loading: false, data: data4, suggestedMax: 1200 });
           break;
-        case "Holders":
+        case 'Holders':
           setData({ loading: false, data: data5, suggestedMax: 1200 });
           break;
-        case "Total GLDGov Supply":
+        case 'Total GLDGov Supply':
           if (copyGldGovSupply?.loading) break;
 
           // await getSupplyChart();
           // await supplyData({ timestamp });
           setData({
             loading: false,
-            data: copyGldGovSupply.data, //,
+            data: copyGldGovSupply.data, // ,
             suggestedMax: 1000010000,
             suggestedMin: 999905000,
           });
           break;
         default:
-          //console.log("default");
+          // console.log("default");
           setData({ loading: false, data: [], suggestedMax: 1200 });
           break;
       }
@@ -69,19 +71,18 @@ export default function Graph({ name, timestamp }) {
       if (chart && monthsCount > 0) {
         const xAxis = chart.scales.x;
         if (xAxis) {
-          const stepSize = Math.ceil(monthsCount / 4);
           xAxis.options.gridLines = {
             display: true,
             drawBorder: false,
             drawOnChartArea: false,
-            color: "#ccc",
+            color: '#ccc',
             lineWidth: 1,
             tickLength: 0,
             borderDash: [5, 5],
             z: 0,
 
-            drawTicks: function (context) {
-              const ticks = xAxis.ticks;
+            drawTicks(context) {
+              const { ticks } = xAxis;
               const tickStep = Math.floor(ticks.length / 4);
               for (let i = 0; i < ticks.length; i += tickStep) {
                 const xPos = xAxis.getPixelForTick(i);
@@ -116,7 +117,7 @@ export default function Graph({ name, timestamp }) {
   return (
     <div className="mt-[30px]  h-[250px]">
       {data.loading && data.data.length > 0 ? (
-        "loading"
+        'loading'
       ) : (
         <Line
           ref={chartRef}
@@ -126,13 +127,12 @@ export default function Graph({ name, timestamp }) {
               {
                 data: data.data ? data.data.map((value) => value?.value) : [],
                 label: name,
-                backgroundColor: "rgba(211,184,113,0.2)",
-                borderColor: "#D3B871",
+                borderColor: '#D3B871',
                 fill: true,
                 pointStyle: false,
                 backgroundColor: (context) => {
-                  const bgColor = ["#D3B871CC", "#D3B87100"];
-                  if (!context.chart.chartArea) return;
+                  const bgColor = ['#D3B871CC', '#D3B87100'];
+                  if (!context.chart.chartArea) return 'rgba(211,184,113,0.2)'; // Explicitly return null
                   const {
                     ctx,
                     chartArea: { top, bottom },
@@ -148,7 +148,7 @@ export default function Graph({ name, timestamp }) {
           options={{
             plugins: {
               tooltip: {
-                mode: "nearest",
+                mode: 'nearest',
                 intersect: false,
               },
               legend: {
@@ -159,7 +159,7 @@ export default function Graph({ name, timestamp }) {
               },
               crosshair: {
                 line: {
-                  color: "#D3B871CC",
+                  color: '#D3B871CC',
                   widht: 1,
                 },
               },
@@ -172,9 +172,9 @@ export default function Graph({ name, timestamp }) {
             scales: {
               x: {
                 display: true,
-                type: "category",
+                type: 'category',
                 ticks: {
-                  display: innerWidth < 641 ? false : true,
+                  display: !(innerWidth < 641),
                 },
                 grid: {
                   display: true,
@@ -183,22 +183,21 @@ export default function Graph({ name, timestamp }) {
               y: {
                 suggestedMin: data?.suggestedMin || 0,
                 suggestedMax: data.suggestedMax,
-                position: "right",
+                position: 'right',
                 ticks: {
-                  callback: function (value, index, values) {
+                  callback(value) {
                     // Array of unit suffixes
-                    var suffixes = ["", "K", "M", "B", "T"]; // Find the index of appropriate suffix
-                    var suffixIndex = Math.floor(("" + value).length / 3); // Apply the suffix
+                    const suffixes = ['', 'K', 'M', 'B', 'T']; // Find the index of appropriate suffix
+                    let suffixIndex = Math.floor((`${value}`).length / 3); // Apply the suffix
+                    let shortValue;
                     if (suffixIndex >= 2) {
                       // If it's greater than or equal to "M", use "m" instead of "M"
                       suffixIndex = 2; // Set index to "M"
-                      var shortValue =
-                        parseFloat((value / Math.pow(1000, suffixIndex)).toFixed(1)) +
-                        suffixes[suffixIndex].toLowerCase();
+                      shortValue = parseFloat((value / 1000 ** suffixIndex).toFixed(1))
+                        + suffixes[suffixIndex].toLowerCase();
                     } else {
-                      var shortValue =
-                        parseFloat((value / Math.pow(1000, suffixIndex)).toFixed(1)) +
-                        suffixes[suffixIndex];
+                      shortValue = parseFloat((value / 1000 ** suffixIndex).toFixed(1))
+                        + suffixes[suffixIndex];
                     }
                     return shortValue;
                   },

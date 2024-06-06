@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { parseNumbers } from '../../../utils/parsers';
-import NavbarModal from '../../shared/modal/NavbarModal.jsx';
+import NavbarModal from '../../shared/modal/NavbarModal';
 
 const OverviewItem = ({
   status,

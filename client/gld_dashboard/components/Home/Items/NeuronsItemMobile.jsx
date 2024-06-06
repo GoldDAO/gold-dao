@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { arrayToHex, elapsedTime, formatDateFromSeconds } from "../../../utils/functions";
+import { useState } from 'react';
+import { arrayToHex, elapsedTime, formatDateFromSeconds } from '../../../utils/functions';
 
-import { parseNumbers } from "../../../utils/parsers";
-import { useState } from "react";
+import { parseNumbers } from '../../../utils/parsers';
 
 const NeuronsItemMobile = ({ neuron }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +11,7 @@ const NeuronsItemMobile = ({ neuron }) => {
     <div className="border-t border-[#C6C6C6]">
       <div className="flex items-center cursor-pointer " onClick={() => setIsOpen(!isOpen)}>
         <div
-          className={`w-10 h-10 flex justify-center items-center  ${isOpen ? " rotate-180" : "rotate-0"}`}
+          className={`w-10 h-10 flex justify-center items-center  ${isOpen ? ' rotate-180' : 'rotate-0'}`}
         >
           <svg
             width="10"
@@ -32,11 +32,11 @@ const NeuronsItemMobile = ({ neuron }) => {
 
         <div className="w-full  sm:w-[100%] pl-3 grid grid-cols-7 gap-5 text-center py-6  border-[#C6C6C6]">
           <div className=" flex justify-start items-center">
-            {" "}
+            {' '}
             <p className="text-[#C6C6C6] text-[12px] underline">
-              {`${neuron.id && arrayToHex(neuron.id)?.replace(/0/g, "")?.slice(0, 3)}
+              {`${neuron.id && arrayToHex(neuron.id)?.replace(/0/g, '')?.slice(0, 3)}
               ...
-              ${neuron.id && arrayToHex(neuron.id)?.replace(/0/g, "")?.slice(3, 6)}`}
+              ${neuron.id && arrayToHex(neuron.id)?.replace(/0/g, '')?.slice(3, 6)}`}
             </p>
           </div>
 
@@ -47,7 +47,7 @@ const NeuronsItemMobile = ({ neuron }) => {
           </div>
 
           <div className="flex justify-start items-center">
-            {" "}
+            {' '}
             <p className="text-[12px]">
               <span className="font-bold whitespace-nowrap truncate">
                 {parseNumbers(neuron.stakedAmount)}
@@ -56,22 +56,22 @@ const NeuronsItemMobile = ({ neuron }) => {
             </p>
           </div>
           <div className=" flex justify-start items-center text-[12px]">
-            {" "}
+            {' '}
             <p className="font-bold">{(neuron.maturity / 10e7).toFixed(2) || 0}</p>
           </div>
           <div className=" flex justify-start items-center text-[12px]">
             <p className="font-bold ">
-              {elapsedTime(neuron.dissolveDelay) === "a minute"
-                ? "1 minute"
+              {elapsedTime(neuron.dissolveDelay) === 'a minute'
+                ? '1 minute'
                 : elapsedTime(neuron.dissolveDelay)}
             </p>
           </div>
           <div className="flex justify-start items-center text-[12px]">
-            {" "}
+            {' '}
             <p className="font-bold  ">{elapsedTime(neuron.age)}</p>
           </div>
           <div className="flex justify-start items-center text-[12px]  ">
-            {" "}
+            {' '}
             <p className="font-bold ">{neuron.votingPower}</p>
           </div>
         </div>
@@ -80,18 +80,18 @@ const NeuronsItemMobile = ({ neuron }) => {
       {isOpen && (
         <section
           className="flex justify-start w-[100%] gap-10 px-20 py-5"
-          style={{ transition: "height 0.3s ease" }}
+          style={{ transition: 'height 0.3s ease' }}
         >
           <div>
             <p className="text-2xs font-bold text-[#D3B871]">Date Created</p>
             <p className="text-2xs font-bold mt-2">
-              {formatDateFromSeconds(neuron.dateCreated)},{" "}
+              {formatDateFromSeconds(neuron.dateCreated)},{' '}
               {elapsedTime(Math.round(new Date().getTime() / 1000) - neuron.dateCreated)}
             </p>
           </div>
           <div>
             <p className="text-2xs font-bold text-[#D3B871]">Auto-Stake Maturity</p>
-            <p className="text-2xs font-bold mt-2">{neuron.autoStakeMaturity ? "Yes" : "No"}</p>
+            <p className="text-2xs font-bold mt-2">{neuron.autoStakeMaturity ? 'Yes' : 'No'}</p>
           </div>
           <div>
             <p className="text-2xs font-bold text-[#D3B871]">Dissolve Delay Bonus</p>

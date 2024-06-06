@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import React from "react";
-import { parseNumbers } from "../../utils/parsers";
+import Image from 'next/image';
+import React from 'react';
+import { parseNumbers } from '../../utils/parsers';
 
 const DataCardCopy = ({
   title,
@@ -10,27 +10,26 @@ const DataCardCopy = ({
   image,
   info,
   isPrice,
-  setDataNeuron,
   setInfoModal,
   data,
   openModal,
 }) => {
-  let mql = window.matchMedia("(max-width: 600px)");
-  
+  const mql = window.matchMedia('(max-width: 600px)');
+
   return (
     <article
       className='flex flex-col justify-between w-full h-21 sm:h-[164px] p-5 sm:p-[36px] border-[0.5px] border-DarkGrey bg-SoftGrey rounded-3xl sm:rounded-4xl shadow-[0_0_6px_0_#00000026]'
       onClick={() => {
         setInfoModal({
-          title: title,
-          image: image,
-          info: info,
-          amount: amount,
+          title,
+          image,
+          info,
+          amount,
           data,
         });
-        openModal && mql.matches === true
-          ? document.getElementById(`chartmodalheader`).showModal()
-          : "";
+        if (openModal && mql.matches === true) {
+          document.getElementById('chartmodalheader').showModal();
+        }
       }}
     >
       <section className="flex">
@@ -42,25 +41,10 @@ const DataCardCopy = ({
             </button>
           </div>
         </div>
-        {/* <button
-          onClick={() => {
-            openModal ? document.getElementById(`chartmodal`).showModal() : "";
-            setInfoModal({
-              title: title,
-              image: image,
-              info: info,
-              amount: amount,
-              data,
-            });
-          }}
-          className="hidden sm:flex justify-center items-center  rounded-full bg-[#C6C6C6] h-8 w-8 mt-[-10px]"
-        >
-          <Image alt="expand data" height={10} width={10} src="svg/expand.svg" />
-        </button> */}
       </section>
       <section className="flex gap-2 items-center -mb-2">
         <h1 className="text-[28px] sm:text-[36px] font-bold">
-          {isPrice && "$"}
+          {isPrice && '$'}
           {parseNumbers(amount)}
         </h1>
         {image && (
