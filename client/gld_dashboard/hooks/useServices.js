@@ -214,22 +214,29 @@ const useServices = () => {
     try {
       const canisters = await root.get_sns_canisters_summary({ update_canister_list: [] });
       const keys = Object.keys(canisters);
-      const parsed = keys.map((k) => ({
-        type: k.replace(/^\w/, (c) => c.toUpperCase()),
-        id: canisters[k][0]?.canister_id?.toString(),
-        cycles: parseCycles(Number(canisters[k][0]?.status?.[0]?.cycles)).toFixed(4),
-        memory: (Number(canisters[k][0]?.status?.[0]?.memory_size) / 1048576).toFixed(2),
-        status: Object.keys(canisters[k][0]?.status?.[0].status)?.[0]?.replace(/^\w/, (c) => c.toUpperCase()),
-        idleCycles: parseNumbers(Number(canisters[k][0]?.status?.[0]?.idle_cycles_burned_per_day)),
-        freezingCycles: (
-          (Number(canisters[k][0]?.status?.[0]?.idle_cycles_burned_per_day) / (24 * 3600))
-          * (Number(canisters[k][0].status[0].settings.freezing_threshold) / 10e11)
-        ).toFixed(4),
-        ModuleHash: canisters[k][0].status[0].module_hash[0],
-        freezing_threshold: Number(canisters[k][0].status[0].settings.freezing_threshold),
-        controllers: canisters[k][0].status[0].settings.controllers[0].toString(),
-      }));
-      return parsed;
+      const parsed = keys.map((k) => {
+        if (canisters[k].length === 0) {
+          return null;
+        }
+        return {
+          type: k.replace(/^\w/, (c) => c.toUpperCase()),
+          id: canisters[k][0]?.canister_id?.toString(),
+          cycles: parseCycles(Number(canisters[k][0]?.status?.[0]?.cycles ?? 0)).toFixed(4),
+          memory: (Number(canisters[k][0]?.status?.[0]?.memory_size ?? 0) / 1048576).toFixed(2),
+          status: Object.keys(canisters[k][0]?.status?.[0]?.status ?? { 'out of cycles': null })?.[0]?.replace(/^\w/, (c) => c.toUpperCase()),
+          idleCycles:
+            parseNumbers(Number(canisters[k][0]?.status?.[0]?.idle_cycles_burned_per_day ?? 0)),
+          freezingCycles: (
+            (Number(canisters[k][0]?.status?.[0]?.idle_cycles_burned_per_day ?? 0) / (24 * 3600))
+            * (Number(canisters[k][0]?.status?.[0]?.settings.freezing_threshold ?? 0) / 10e11)
+          ).toFixed(4),
+          ModuleHash: canisters[k][0].status[0]?.module_hash[0],
+          freezing_threshold:
+            Number(canisters[k][0]?.status?.[0]?.settings?.freezing_threshold ?? 0),
+          controllers: canisters[k][0].status[0]?.settings.controllers[0].toString(),
+        };
+      });
+      return parsed.filter((canister) => canister !== null);
     } catch (err) {
       console.log('get canisters error:', err);
     }
