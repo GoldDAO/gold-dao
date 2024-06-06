@@ -1,7 +1,5 @@
-import React from "react";
+import React from 'react';
 
-const buttonClaim = () => {
-  return <div>buttonClaim</div>;
-};
+const buttonClaim = () => <div>buttonClaim</div>;
 
 export default buttonClaim;
