@@ -1,8 +1,8 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{mutate_state, State};
 use canister_tracing_macros::trace;
-pub use cycles_manager_canister::update_config::Args as UpdateConfigArgs;
-pub use cycles_manager_canister::update_config::Response as UpdateConfigResponse;
+pub use cycles_manager_api_canister::update_config::Args as UpdateConfigArgs;
+pub use cycles_manager_api_canister::update_config::Response as UpdateConfigResponse;
 use ic_cdk_macros::update;
 
 #[update(guard = "caller_is_governance_principal", hidden = true)]

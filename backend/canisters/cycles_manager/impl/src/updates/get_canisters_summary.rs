@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::read_state;
-use cycles_manager_canister::get_canisters_summary::Response as CanistersSummaryResponse;
+use cycles_manager_api_canister::get_canisters_summary::Response as CanistersSummaryResponse;
 use ic_cdk_macros::update;
 
 #[update(guard = "caller_is_governance_principal", hidden = true)]

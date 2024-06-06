@@ -1,5 +1,5 @@
-use cycles_manager_canister::get_canisters_summary::{CanisterMetrics, CyclesTopUp};
-use cycles_manager_canister::get_latest_top_ups::CanisterTopUp;
+use cycles_manager_api_canister::get_canisters_summary::{CanisterMetrics, CyclesTopUp};
+use cycles_manager_api_canister::get_latest_top_ups::CanisterTopUp;
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry::Vacant;
 use std::collections::{BinaryHeap, HashMap};

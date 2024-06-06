@@ -359,7 +359,9 @@
       "type": "persistent"
     },
     "preprod": {
-      "providers": ["https://icp0.io"],
+      "providers": [
+        "https://icp0.io"
+      ],
       "type": "persistent"
     }
   }

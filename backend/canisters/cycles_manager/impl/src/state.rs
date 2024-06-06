@@ -1,8 +1,8 @@
 use crate::model::canisters::Canisters;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-use cycles_manager_canister::get_canisters_summary::CanisterMetrics;
-use cycles_manager_canister::get_config::Response as GetConfigResponse;
+use cycles_manager_api_canister::get_canisters_summary::CanisterMetrics;
+use cycles_manager_api_canister::get_config::Response as GetConfigResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use types::{CanisterId, Cycles, TimestampMillis};

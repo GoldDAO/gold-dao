@@ -1,5 +1,5 @@
 [package]
-name = "cycles_manager_canister"
+name = "cycles_manager_api_canister"
 version = "0.1.0"
 edition = "2021"
 

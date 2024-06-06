@@ -71,7 +71,7 @@ impl CyclesManagerTestEnvBuilder {
         pic.tick();
 
         // Define initialization arguments for cycles manager canister
-        let cycles_manager_init_args = cycles_manager_canister::init::InitArgs {
+        let cycles_manager_init_args = cycles_manager_api_canister::init::InitArgs {
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),

@@ -1,8 +1,8 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{mutate_state, State};
 use canister_tracing_macros::trace;
-pub use cycles_manager_canister::add_canister::Args as AddCanisterArgs;
-pub use cycles_manager_canister::add_canister::Response as AddCanisterResponse;
+pub use cycles_manager_api_canister::add_canister::Args as AddCanisterArgs;
+pub use cycles_manager_api_canister::add_canister::Response as AddCanisterResponse;
 use ic_cdk::api::id;
 use ic_cdk_macros::update;
 use utils::env::Environment;
