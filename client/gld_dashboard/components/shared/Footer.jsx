@@ -81,13 +81,14 @@ export default function Footer() {
                             <a href={e.link} target="_blank" rel="noopener noreferrer">
                               <div className="flex justify-start items-center gap-2">
                                 {' '}
-                                <Image
+                                {e.icon && (<Image
                                   className={`${e.icon ? '' : 'hidden'}`}
                                   src={e.icon}
                                   height={20}
                                   width={20}
                                   alt="gold dao"
-                                />{' '}
+                                />)}
+                                {' '}
                                 <p className="py-2 text-xs sm:text-[14px]"> {e.text} </p>
                               </div>
                             </a>
@@ -95,13 +96,14 @@ export default function Footer() {
                             <Link href={e.link}>
                               <div className="flex justify-start items-center gap-2">
                                 {' '}
-                                <Image
+                                { e.icon && (<Image
                                   className={`${e.icon ? '' : 'hidden'}`}
                                   src={e.icon}
                                   height={20}
                                   width={20}
                                   alt="gold dao"
-                                />{' '}
+                                />)}
+                                {' '}
                                 <p className="py-2"> {e.text} </p>
                               </div>
                             </Link>

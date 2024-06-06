@@ -1,3 +1,5 @@
+'use client';
+
 import OverviewTable from '../../components/Overview/OverviewTable';
 
 export const viewport = {

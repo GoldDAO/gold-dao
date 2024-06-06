@@ -1,3 +1,5 @@
+'use client';
+
 import ProposalsTable from '../../components/Proposals/ProposalsTable';
 
 export const viewport = {

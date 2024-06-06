@@ -1,3 +1,5 @@
+'use client';
+
 import NeuronsTable from '../../components/Neurons/NeuronsTable';
 
 export const viewport = {

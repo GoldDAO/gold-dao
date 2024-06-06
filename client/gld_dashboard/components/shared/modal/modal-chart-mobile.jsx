@@ -63,7 +63,7 @@ export default function ModalChartMobile({ name }) {
         </div>
       </div>
       <section className="mb-6">
-        <Graph name={name} timestamp={verifyTimestamp(selectedTimestamp.t)} />
+        <Graph key="mobile-graph" name={name} timestamp={verifyTimestamp(selectedTimestamp.t)} />
       </section>
       <span className="text-base text-[#C6C6C6]">Total amount of GLDGov tokens minted.</span>
     </div>

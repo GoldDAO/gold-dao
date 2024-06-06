@@ -39,7 +39,7 @@ export default function ModalAdd({ setNeuronModify }) {
 
   return (
     <div className="flex-col mt-6 mb-32 overflow-y-auto sm:mb-0 flex justify-around items-center">
-      <p className="text-left font-normal text-lg w-full flex flex-wrap gap-[36px]">
+      <div className="text-left font-normal text-lg w-full flex flex-wrap gap-[36px]">
         <p>
           To successfully add each neuron to the dashboard,
           please complete the following two steps for every individual neuron:
@@ -103,7 +103,7 @@ export default function ModalAdd({ setNeuronModify }) {
             <p>copied</p>
           </div>
         )}
-      </p>
+      </div>
       <div className="mt-6 w-full flex flex-col justify-between items-center">
         <p className="text-left w-full font-normal text-lg mb-2">
           2. Enter your <span className="font-bold">Gold DAO neuron ID</span> here:

@@ -1,3 +1,5 @@
+'use client';
+
 import CanistersTable from '../../components/Canisters/CanistersTable';
 
 export const viewport = {

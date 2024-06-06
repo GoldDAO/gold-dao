@@ -73,7 +73,7 @@ const CollapseContainer = ({ className }) => {
             </section>
           </article>
         ) : overview?.data?.length > 0 ? (
-          overview?.data?.map((c) => <OverviewItem key={c.id} {...c} />)
+          overview?.data?.map((c) => <OverviewItem key={`overview-${c.id}`} {...c} />)
         ) : (
           <article className="collapse w-full border-[1px] rounded-none flex justify-center">
             <section className="collapse-title flex gap-2 justify-center items-center h-20">
@@ -120,7 +120,7 @@ const CollapseContainer = ({ className }) => {
             </section>
           </article>
         ) : transactions?.data?.length > 0 ? (
-          transactions?.data?.map((c) => <TransactionItem key={c.id} {...c} />)
+          transactions?.data?.map((c) => <TransactionItem key={`transaction-${c.id}`} {...c} />)
         ) : (
           <article className="collapse w-full border-[1px] rounded-none flex justify-center">
             <section className="collapse-title flex gap-2 justify-center items-center h-20">

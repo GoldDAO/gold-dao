@@ -49,7 +49,7 @@ export default function Graphs() {
         <div className="flex flex-col sm:border-r-2 w-full sm:w-[33%]">
           {tabs.map((tab, index) => (
             <span
-              key={tab}
+              key={`${tab}-${index}`}
               className={`sm:focus:bg-Gold flex-1 border-t-2 px-3 sm:px-5 text-left h-17 flex justify-between sm:justify-start items-center w-full 
               ${index === 0 ? ' rounded-t-[36px] sm:rounded-tr-none' : ''} 
               ${index === tabs.length - 1 ? 'rounded-b-[36px] sm:rounded-br-none' : ''}

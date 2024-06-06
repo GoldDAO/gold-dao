@@ -25,15 +25,15 @@ export default function ModalChart({ name }) {
   ];
 
   return (
-    <div>
+    <>
       <div className="h-20"></div>
 
       <div className="w-full h-fit flex border-b-[0.5px] border-t-[0.5px]">
-        {dates.map(({ timestamp }) => (
+        {dates.map(({ timestamp }, index) => (
           <button
             className={`
           text-center text-xs w-full ${selectedTimestamp.date === name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
-            key={name}
+            key={`${name}-${index}`}
             onClick={() => {
               setSelectedTimestamp({ date: name, t: timestamp });
               setSelectedDistance(timestamp);
@@ -46,6 +46,6 @@ export default function ModalChart({ name }) {
       <div className="h-20"></div>
 
       <Graph name={name} timestamp={verifyTimestamp(selectedTimestamp.t)} />
-    </div>
+    </>
   );
 }

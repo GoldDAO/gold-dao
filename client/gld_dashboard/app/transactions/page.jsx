@@ -1,3 +1,5 @@
+'use client';
+
 import TransactionsTable from '../../components/Transactions/TransactionsTable';
 
 export const viewport = {
