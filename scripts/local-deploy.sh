@@ -21,8 +21,8 @@ echo "Deploying frontends on ${NETWORK}"
 dfx deploy --network ${NETWORK} --compute-evidence gldt_landing_page
 dfx deploy --network ${NETWORK} --compute-evidence gldt_swap_app
 dfx deploy --network ${NETWORK} --compute-evidence gldt_explorer
-# dfx deploy --network ${NETWORK} --compute-evidence gld_dashboard
+dfx deploy --network ${NETWORK} --compute-evidence gld_dashboard
 dfx deploy --network ${NETWORK} gldt_landing_page
 dfx deploy --network ${NETWORK} gldt_swap_app
 dfx deploy --network ${NETWORK} gldt_explorer
-# dfx deploy --network ${NETWORK} gld_dashboard
+dfx deploy --network ${NETWORK} gld_dashboard

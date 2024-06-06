@@ -3,7 +3,10 @@ use std::time::Duration;
 use candid::{ Nat, Principal };
 use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
-use sns_rewards_api_canister::{ get_historic_payment_round, subaccounts::REWARD_POOL_SUB_ACCOUNT };
+use sns_rewards_api_canister::{
+    get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
+    subaccounts::REWARD_POOL_SUB_ACCOUNT,
+};
 use types::TokenSymbol;
 
 use crate::{
@@ -231,7 +234,7 @@ fn test_distribute_rewards_with_no_rewards() {
     test_env.pic.advance_time(Duration::from_secs(60 * 5));
     tick_n_blocks(&test_env.pic, 100);
 
-    // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 2)
+    // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 1)
     let res = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -349,4 +352,236 @@ fn test_distribute_rewards_with_not_enough_rewards() {
         &(get_historic_payment_round::Args { token: gldgov_token, round_id: 1 })
     );
     assert_eq!(res.len(), 1);
+}
+
+#[test]
+fn test_distribute_rewards_adds_to_history_correctly() {
+    let mut test_env = default_test_setup();
+
+    let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let ogy_ledger_id = test_env.token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let ogy_token = TokenSymbol::parse("OGY").unwrap();
+    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+
+    let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
+
+    // ********************************
+    // 1. Distribute rewards
+    // ********************************
+
+    test_env.simulate_neuron_voting(2);
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 2. Check the history
+    // ********************************
+
+    let historic_icp_rounds = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: icp_token.clone(),
+            round_id: 1,
+        })
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    test_env.pic.tick();
+
+    // ********************************
+    // 3. Distribute rewards
+    // ********************************
+
+    test_env.simulate_neuron_voting(3);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 4. Check the history
+    // ********************************
+
+    let historic_icp_rounds = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: icp_token.clone(),
+            round_id: 2,
+        })
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    test_env.pic.tick();
+
+    // ********************************
+    // 5. Distribute rewards
+    // ********************************
+    // give all reward pools tokens
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 50);
+    // remove all tokens from OGY reward pool
+    transfer(
+        &mut test_env.pic,
+        rewards_canister_id,
+        ogy_ledger_id,
+        Some(REWARD_POOL_SUB_ACCOUNT),
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        },
+        100_000_000_000u128 - 200_000u128
+    ).unwrap();
+    tick_n_blocks(&test_env.pic, 10);
+    // increase maturity of neurons
+    test_env.simulate_neuron_voting(4);
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 6. Check the history
+    // ********************************
+
+    let historic_icp_rounds = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: icp_token.clone(),
+            round_id: 3,
+        })
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    test_env.pic.tick();
+
+    // ********************************
+    // 7. Distribute rewards
+    // ********************************
+    // increase maturity of neurons
+    test_env.simulate_neuron_voting(5);
+    // give all reward pools tokens
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    // remove all tokens from OGY reward pool
+    transfer(
+        &mut test_env.pic,
+        rewards_canister_id,
+        ogy_ledger_id,
+        Some(REWARD_POOL_SUB_ACCOUNT),
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        },
+        100_000_000_000u128 - 200_000u128
+    ).unwrap();
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 8. Check the history
+    // ********************************
+
+    let historic_icp_rounds = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: icp_token.clone(),
+            round_id: 4,
+        })
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    test_env.pic.tick();
+
+    // ********************************
+    // 9. Distribute rewards
+    // ********************************
+
+    test_env.simulate_neuron_voting(6);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 10. Check the history
+    // ********************************
+
+    let historic_icp_rounds = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: ogy_token.clone(),
+            round_id: 5,
+        })
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    test_env.pic.tick();
 }

@@ -3,7 +3,9 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { Inter } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
+
 import Footer from '../components/shared/Footer';
+import Maintenance from '../components/Maintenance/index';
 import Header from '../components/shared/Header/Header';
 import Navbar from '../components/shared/Navbar';
 import Providers from './providers';
@@ -22,6 +24,12 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const isMaintenanceMode = process.env.MAINTENANCE_MODE;
+
+  if (isMaintenanceMode) {
+    return <Maintenance />;
+  }
+
   return (
     <html lang="en">
       <head>
