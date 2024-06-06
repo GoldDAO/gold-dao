@@ -3,6 +3,7 @@
 import { Bounce, toast } from 'react-toastify';
 import { useState } from 'react';
 import { calculateVotingPower, neuronState, uint8ArrayToHexString } from '../utils/functions';
+import mapResponseErrorCodeToFriendlyError from '../utils/errorMap';
 
 import canisters from '../utils/canisters';
 import { p } from '../utils/parsers';
@@ -44,38 +45,38 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
           theme: 'light',
           transition: Bounce,
         });
-      } else {
-        setLoading(false);
-        toast.error(
-          Object.keys(response.Err)[0]
-            .split(/(?=[A-Z])/)
-            .join(' '),
-          {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-            transition: Bounce,
-          },
-        );
+        return true;
       }
+      setLoading(false);
+      toast.error(
+        mapResponseErrorCodeToFriendlyError(response),
+        {
+          position: 'top-right',
+          autoClose: 10000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+          theme: 'light',
+          transition: Bounce,
+        },
+      );
+      return false;
     } catch (err) {
       setLoading(false);
       toast.error('Something went wrong', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
       });
+      return false;
     }
   };
 
@@ -99,28 +100,31 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
         });
       } else {
         setLoading(false);
-        toast.error('Something went wrong', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        });
+        toast.error(
+          mapResponseErrorCodeToFriendlyError(response),
+          {
+            position: 'top-right',
+            autoClose: 10000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+            theme: 'light',
+            transition: Bounce,
+          },
+        );
       }
       return { loading };
     } catch (err) {
       setLoading(false);
       toast.error('Something went wrong', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
@@ -172,19 +176,20 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
     setNeuronError({ ...neuronError, neuronId });
     const hexNeuronId = uint8ArrayToHexString(neuronId);
     toast.error(
-      `${Object.values(response.Err)[0]} claiming neuron ${hexNeuronId} with token ${token}`,
+      `claiming neuron ${hexNeuronId} with token ${token}. ${mapResponseErrorCodeToFriendlyError(response)}`,
       {
         position: 'top-right',
-        autoClose: 7000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
       },
     );
+
     setLoading(false);
   };
 

@@ -32,7 +32,9 @@ export default function ModalAdd({ setNeuronModify }) {
 
   const handleAddNeuron = async () => {
     await addNeuron();
+
     setNeuronModify((prev) => !prev);
+    document.getElementById('my_modal_add')?.close();
   };
 
   return (
