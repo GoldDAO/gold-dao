@@ -10,7 +10,7 @@ import { Line } from 'react-chartjs-2';
 import {
   data2, data3, data4, data5,
 } from '../../utils/datas';
-import { useCharts } from '../../hooks/useCharts';
+import useCharts from '../../hooks/useCharts';
 
 Chart.register(CrosshairPlugin);
 Interaction.modes.interpolate = Interpolate;

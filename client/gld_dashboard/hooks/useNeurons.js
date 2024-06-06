@@ -4,7 +4,7 @@ import { Bounce, toast } from 'react-toastify';
 import { useState } from 'react';
 import { calculateVotingPower, neuronState, uint8ArrayToHexString } from '../utils/functions';
 
-import { canisters } from '../utils/canisters';
+import canisters from '../utils/canisters';
 import { p } from '../utils/parsers';
 import useActor from './useActor';
 
@@ -131,7 +131,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   // call this function in a loop for each neuron the user has to claim all.
   const claimOneReward = async (id, tok) => {
     try {
-      const response = await snsRewards.claim_reward({token: tok, neuron_id : { id }} );
+      const response = await snsRewards.claim_reward({ token: tok, neuron_id: { id } });
       return response;
     } catch (err) {
       console.log(err);

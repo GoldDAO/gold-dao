@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { calculateTimestamp, verifyTimestamp } from '../../../utils/functions';
 
-import Graph from '../../Home/Graph.jsx';
-import { useCharts } from '../../../hooks/useCharts';
+import Graph from '../../Home/Graph';
+import useCharts from '../../../hooks/useCharts';
 
 export default function ModalChartMobile({ name }) {
   const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '1M', t: 86400 * 31 });

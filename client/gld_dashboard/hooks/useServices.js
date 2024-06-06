@@ -13,7 +13,7 @@ import {
 import { supplyData, treasuryData } from '../services/icpApi';
 
 import useActor from './useActor';
-import { useCharts } from './useCharts';
+import useCharts from './useCharts';
 
 const useServices = () => {
   const [icpSwap] = useActor('icpSwap');

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import useBalances from '../../../hooks/useBalances';
 import useNeurons from '../../../hooks/useNeurons';
-import { useSession } from '../../../hooks/useSession';
+import useSession from '../../../hooks/useSession';
 
 export default function ModalClaimAll({
   neuronAmountsToClaim, setGold, setIcp, setNeuronModify,

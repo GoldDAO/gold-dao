@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FooterGoldDaoIcon } from '../../utils/svgs.jsx';
+import { FooterGoldDaoIcon } from '../../utils/svgs';
 
 export default function Footer() {
   const footerInfo = [
@@ -47,8 +47,8 @@ export default function Footer() {
           link: 'https://www.linkedin.com/showcase/gold-dao/',
           icon: 'svg/linkedin.svg',
         },
-        { text: "Medium", link: "https://medium.com/@GoldDAO", icon: "svg/medium.svg" },
-        { text: "Telegram", link: "https://t.me/TheGoldDAO", icon: "svg/telegram.svg" },
+        { text: 'Medium', link: 'https://medium.com/@GoldDAO', icon: 'svg/medium.svg' },
+        { text: 'Telegram', link: 'https://t.me/TheGoldDAO', icon: 'svg/telegram.svg' },
       ],
     },
   ];

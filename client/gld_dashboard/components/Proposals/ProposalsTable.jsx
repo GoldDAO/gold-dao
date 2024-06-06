@@ -69,7 +69,7 @@ const ProposalsTable = () => {
     activePage,
     onNext,
     onPrevious,
-    setPage,
+    setPage: setPageFn,
     className,
   }) => {
     if (value === PaginationItemType.NEXT) {
@@ -121,7 +121,7 @@ const ProposalsTable = () => {
         key={key}
         ref={ref}
         className={`text-xs font-normal ${isActive ? 'text-white bg-[#D9D9D9] font-bold' : 'bg-transparent'}`}
-        onClick={() => setPage(value)}
+        onClick={() => setPageFn(value)}
       >
         {value}
       </Button>

@@ -13,7 +13,7 @@ import {
 } from '../../../utils/svgs';
 import { copyContent, truncatePrincipal } from '../../../utils/functions';
 import { shortPrincipal } from '../../../utils/parsers';
-import { useSession } from '../../../hooks/useSession';
+import useSession from '../../../hooks/useSession';
 
 const LoginButton = () => {
   const {

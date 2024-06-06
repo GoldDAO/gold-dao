@@ -4,7 +4,7 @@ import Graph from './Graph';
 import Modal from '../shared/modal/modal';
 import ModalChart from '../shared/modal/modal-chart';
 import { calculateTimestamp } from '../../utils/functions';
-import { useCharts } from '../../hooks/useCharts';
+import useCharts from '../../hooks/useCharts';
 
 const Chart = ({ name, amount }) => {
   const { setSelectedDistance } = useCharts();

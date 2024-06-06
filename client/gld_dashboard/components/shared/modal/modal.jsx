@@ -2,7 +2,7 @@ import './modal.css';
 
 import Image from 'next/image';
 import { useEffect } from 'react';
-import Navbar from '../Navbar.jsx';
+import Navbar from '../Navbar';
 import { parseNumbers } from '../../../utils/parsers';
 
 export default function Modal({

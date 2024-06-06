@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import CanistersItemMobile from '../../Home/Items/CanisterItemMobile.jsx';
-import NavbarModal from './NavbarModal.jsx';
+import CanistersItemMobile from '../../Home/Items/CanisterItemMobile';
+import NavbarModal from './NavbarModal';
 
 const ModalCanisters = ({ canisters }) => {
   const headerItems = [

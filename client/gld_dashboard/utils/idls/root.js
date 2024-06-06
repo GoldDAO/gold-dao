@@ -1,4 +1,7 @@
-export default ({ IDL }) => {
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
+export const idlFactory = ({ IDL }) => {
   const SnsRootCanister = IDL.Record({
     dapp_canister_ids: IDL.Vec(IDL.Principal),
     testflight: IDL.Bool,
@@ -114,17 +117,17 @@ export default ({ IDL }) => {
   return IDL.Service({
     canister_status: IDL.Func([CanisterIdRecord], [CanisterStatusResult], []),
     change_canister: IDL.Func([ChangeCanisterRequest], [], []),
-    get_build_metadata: IDL.Func([], [IDL.Text], ["query"]),
+    get_build_metadata: IDL.Func([], [IDL.Text], ['query']),
     get_sns_canisters_summary: IDL.Func(
       [GetSnsCanistersSummaryRequest],
       [GetSnsCanistersSummaryResponse],
-      []
+      [],
     ),
-    list_sns_canisters: IDL.Func([IDL.Record({})], [ListSnsCanistersResponse], ["query"]),
+    list_sns_canisters: IDL.Func([IDL.Record({})], [ListSnsCanistersResponse], ['query']),
     manage_dapp_canister_settings: IDL.Func(
       [ManageDappCanisterSettingsRequest],
       [ManageDappCanisterSettingsResponse],
-      []
+      [],
     ),
     register_dapp_canister: IDL.Func([RegisterDappCanisterRequest], [IDL.Record({})], []),
     register_dapp_canisters: IDL.Func([RegisterDappCanistersRequest], [IDL.Record({})], []),

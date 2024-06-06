@@ -7,10 +7,10 @@ import AutosizeInput from 'react-input-autosize';
 import Image from 'next/image';
 import QRCode from 'qrcode.react';
 import QrScanner from 'qr-scanner';
-import { CopyButton } from '../../../utils/svgs.jsx';
+import { CopyButton } from '../../../utils/svgs';
 import { copyContent } from '../../../utils/functions';
 import useBalances from '../../../hooks/useBalances';
-import { useSession } from '../../../hooks/useSession';
+import useSession from '../../../hooks/useSession';
 import useTransfer from '../../../hooks/useTransfer';
 
 export default function ModalTransfer({
@@ -74,13 +74,13 @@ export default function ModalTransfer({
   const handleTransfer = async () => {
     await icrc1Transfer();
     const newAmount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
-    if (title === 'GLDGov') setGold({ loading: false,amount: newAmount });
-    else setIcp({ loading: false,amount: newAmount });
+    if (title === 'GLDGov') setGold({ loading: false, amount: newAmount });
+    else setIcp({ loading: false, amount: newAmount });
     setInputValue('');
     setToPrincipal('');
     setAmount(newAmount / 1e8 / 1e8);
   };
-  const disable = amount * 1e8 < inputValue + (title ==='GLDGov'?100000:10000)
+  const disable = amount * 1e8 < inputValue + (title === 'GLDGov' ? 100000 : 10000)
     || amount === 0
     || inputValue === 0
     || !inputValue
@@ -89,7 +89,7 @@ export default function ModalTransfer({
     || loading;
 
   const handleMaxButtonClick = () => {
-    setInputValue(amount === 0 ? amount : (amount * 1e8 - (title ==='GLDGov'?100000:10000) / 1e8).toFixed(8));
+    setInputValue(amount === 0 ? amount : (amount * 1e8 - (title === 'GLDGov' ? 100000 : 10000) / 1e8).toFixed(8));
   };
 
   const handleToggle = () => {

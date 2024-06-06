@@ -1,4 +1,7 @@
-export default ({ IDL }) => {
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
+export const idlFactory = ({ IDL }) => {
   const InitArgs = IDL.Record({ test_mode: IDL.Bool });
   const Account = IDL.Record({
     owner: IDL.Principal,
@@ -39,7 +42,7 @@ export default ({ IDL }) => {
   });
   const By = IDL.Variant({
     NeuronIdOrSubaccount: IDL.Record({}),
-    MemoAndController: MemoAndController,
+    MemoAndController,
     Memo: IDL.Nat64,
   });
   const ClaimOrRefresh = IDL.Record({ by: IDL.Opt(By) });
@@ -57,15 +60,15 @@ export default ({ IDL }) => {
     dissolve_timestamp_seconds: IDL.Nat64,
   });
   const Operation = IDL.Variant({
-    RemoveHotKey: RemoveHotKey,
-    AddHotKey: AddHotKey,
-    ChangeAutoStakeMaturity: ChangeAutoStakeMaturity,
+    RemoveHotKey,
+    AddHotKey,
+    ChangeAutoStakeMaturity,
     StopDissolving: IDL.Record({}),
     StartDissolving: IDL.Record({}),
-    IncreaseDissolveDelay: IncreaseDissolveDelay,
+    IncreaseDissolveDelay,
     JoinCommunityFund: IDL.Record({}),
     LeaveCommunityFund: IDL.Record({}),
-    SetDissolveTimestamp: SetDissolveTimestamp,
+    SetDissolveTimestamp,
   });
   const Configure = IDL.Record({ operation: IDL.Opt(Operation) });
   const RegisterVote = IDL.Record({
@@ -91,17 +94,17 @@ export default ({ IDL }) => {
     amount: IDL.Opt(Amount),
   });
   const Command = IDL.Variant({
-    Spawn: Spawn,
-    Split: Split,
-    Follow: Follow,
-    ClaimOrRefresh: ClaimOrRefresh,
-    Configure: Configure,
-    RegisterVote: RegisterVote,
-    Merge: Merge,
-    DisburseToNeuron: DisburseToNeuron,
-    StakeMaturity: StakeMaturity,
-    MergeMaturity: MergeMaturity,
-    Disburse: Disburse,
+    Spawn,
+    Split,
+    Follow,
+    ClaimOrRefresh,
+    Configure,
+    RegisterVote,
+    Merge,
+    DisburseToNeuron,
+    StakeMaturity,
+    MergeMaturity,
+    Disburse,
   });
   const ManageNnsNeuronRequest = IDL.Record({
     command: Command,
@@ -128,12 +131,12 @@ export default ({ IDL }) => {
     InternalError: IDL.Text,
   });
   return IDL.Service({
-    list_neurons: IDL.Func([], [ListNeuronsResponse], ["query"]),
+    list_neurons: IDL.Func([], [ListNeuronsResponse], ['query']),
     manage_nns_neuron: IDL.Func([ManageNnsNeuronRequest], [ManageNnsNeuronResponse], []),
     manage_reward_recipients: IDL.Func(
       [ManageRewardRecipientsRequest],
       [ManageRewardRecipientsResponse],
-      []
+      [],
     ),
     stake_nns_neuron: IDL.Func([], [StakeNnsNeuronResponse], []),
   });
