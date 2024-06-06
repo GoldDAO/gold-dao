@@ -3,7 +3,7 @@ use candid::Principal;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use types::Cycles;
 
-use crate::cycles_manager_suite::setup::setup_root::setup_root_canister;
+use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
 use crate::utils::random_principal;
 
 use super::setup_burner::setup_burner_canister;
@@ -47,8 +47,8 @@ impl CyclesManagerTestEnvBuilder {
         // Define initialization arguments for burner canister
         let burner_canister_init_args =
             crate::cycles_manager_suite::setup::setup_burner::InitArgs {
-                interval_between_timers_in_seconds: 2 * 60 * 60, // Burn once in 5 minutes
-                burn_amount: 10_000_000_000_000,
+                interval_between_timers_in_seconds: 2 * 60 * 60, // Burn once in 2 hours
+                burn_amount: 500_000_000_000,
             };
 
         let burner_canister_id =
@@ -56,7 +56,7 @@ impl CyclesManagerTestEnvBuilder {
         pic.tick();
 
         // Define initialization arguments for root canister
-        let root_init_args = crate::cycles_manager_suite::setup::setup_root::Args {
+        let root_init_args = crate::cycles_manager_suite::setup::setup_sns_root::Args {
             dapp_canister_ids: vec![],
             testflight: true,
             latest_ledger_archive_poll_timestamp_seconds: None,
@@ -75,8 +75,8 @@ impl CyclesManagerTestEnvBuilder {
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: Some(sns_root_canister_id),
-            max_top_up_amount: 2000 * T,
-            min_cycles_balance: 200 * T,
+            max_top_up_amount: 20 * T,
+            min_cycles_balance: 10 * T,
         };
 
         let cycles_manager_id: Principal =

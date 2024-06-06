@@ -1,6 +1,6 @@
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use types::{Cycles, Milliseconds};
+use types::Cycles;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Args {

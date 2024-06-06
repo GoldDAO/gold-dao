@@ -22,7 +22,7 @@ pub fn setup_burner_canister(
     let root_canister_id = Principal::from_text("lqy7q-dh777-77777-aaaaq-cai").unwrap();
 
     let burner_wasm = wasms::BURNER.clone();
-    pic.add_cycles(burner_canister, 200_000_000_000_000);
+    pic.add_cycles(burner_canister, 20_000_000_000_000);
     pic.set_controllers(
         burner_canister,
         Some(controller.clone()),

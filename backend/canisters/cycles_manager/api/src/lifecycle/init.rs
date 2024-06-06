@@ -1,6 +1,6 @@
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
-use types::{CanisterId, Cycles, Milliseconds};
+use types::{CanisterId, Cycles};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {

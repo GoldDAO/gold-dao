@@ -1,17 +1,7 @@
 use crate::wasms::CYCLES_MANAGER;
 use candid::encode_one;
-use candid::{CandidType, Principal};
+use candid::Principal;
 use pocket_ic::PocketIc;
-use serde::Deserialize;
-
-#[derive(Deserialize, CandidType)]
-pub struct Args {
-    test_mode: bool,
-    icp_ledger_canister_id: Principal,
-    sns_ledger_canister_id: Principal,
-    ogy_ledger_canister_id: Principal,
-    sns_gov_canister_id: Principal,
-}
 
 pub fn setup_cycle_manager_canister(
     pic: &mut PocketIc,
@@ -23,7 +13,7 @@ pub fn setup_cycle_manager_canister(
         pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet);
 
     let cycles_manager_wasm = CYCLES_MANAGER.clone();
-    pic.add_cycles(cycles_manager_canister, 100_000_000_000_000_000);
+    pic.add_cycles(cycles_manager_canister, 1_000_000_000_000_000);
     pic.set_controllers(
         cycles_manager_canister,
         Some(controller.clone()),
