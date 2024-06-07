@@ -51,7 +51,7 @@ TESTMODE="true"
 SNS_ROOT_CANISTER_ID=i7fbw-giaaa-aaaap-ab25q-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 else
-TESTMODE="true"
+TESTMODE="false"
 SNS_ROOT_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 fi
