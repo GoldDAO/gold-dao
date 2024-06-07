@@ -114,7 +114,7 @@ export default function ModalAdd({ setNeuronModify }) {
             className="grow"
             placeholder="Neuron ID"
             value={neuronIdToAdd}
-            onChange={(e) => setNeuronIdToAdd(e.target.value)}
+            onChange={(e) => setNeuronIdToAdd(e.target.value.trim())}
             disabled={loading}
           />{' '}
         </label>

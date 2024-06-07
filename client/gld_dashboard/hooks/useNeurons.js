@@ -160,6 +160,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
     setLoading(true);
     const response = await claimOneReward(neuronId, token);
     if (response.Ok) {
+      setLoading(false);
+      setRequestSent(false);
       toast.success('Reward successfully claimed!', {
         position: 'top-right',
         autoClose: 5000,
