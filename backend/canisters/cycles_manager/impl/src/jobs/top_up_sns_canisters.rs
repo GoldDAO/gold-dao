@@ -38,8 +38,18 @@ pub async fn sync_canister_stats(canister_id: CanisterId) -> Result<Vec<Canister
             // Add SNS canisters to the whitelist
             mutate_state(|state| {
                 let now = state.env.now();
-                for canister_id in canisters.iter().flat_map(|c| c.canister_id) {
-                    state.data.canisters.add(canister_id, now);
+                for (canister_id, opt_status) in canisters
+                    .iter()
+                    .map(|c| (c.canister_id.unwrap(), &c.status))
+                {
+                    if let Some(status) = opt_status {
+                        state
+                            .data
+                            .canisters
+                            .add(canister_id, Some(status.cycles.clone()), now);
+                    } else {
+                        state.data.canisters.add(canister_id, None, now);
+                    }
                 }
             });
             Ok(canisters)

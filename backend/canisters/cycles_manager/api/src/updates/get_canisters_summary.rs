@@ -1,5 +1,6 @@
 use candid::CandidType;
 use candid::Empty;
+use candid::Nat;
 use serde::{Deserialize, Serialize};
 use types::CanisterId;
 use types::Cycles;
@@ -12,6 +13,7 @@ pub struct CanisterMetrics {
     pub canister_id: CanisterId,
     pub added: TimestampMillis,
     pub top_ups: Vec<CyclesTopUp>,
+    pub balance: Option<Nat>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]

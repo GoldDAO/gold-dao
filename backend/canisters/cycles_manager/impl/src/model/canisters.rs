@@ -1,3 +1,4 @@
+use candid::Nat;
 use cycles_manager_api_canister::get_canisters_summary::{CanisterMetrics, CyclesTopUp};
 use cycles_manager_api_canister::get_latest_top_ups::CanisterTopUp;
 use serde::{Deserialize, Serialize};
@@ -21,6 +22,7 @@ impl Canisters {
                             added: now,
                             top_ups: Vec::new(),
                             top_up_in_progress: false,
+                            balance: None,
                         },
                     )
                 })
@@ -28,12 +30,18 @@ impl Canisters {
         }
     }
 
-    pub fn add(&mut self, canister_id: CanisterId, now: TimestampMillis) -> bool {
+    pub fn add(
+        &mut self,
+        canister_id: CanisterId,
+        balance: Option<Nat>,
+        now: TimestampMillis,
+    ) -> bool {
         if let Vacant(e) = self.canisters.entry(canister_id) {
             e.insert(Canister {
                 added: now,
                 top_ups: Vec::new(),
                 top_up_in_progress: false,
+                balance,
             });
             true
         } else {
@@ -52,6 +60,7 @@ impl Canisters {
                 canister_id: *id,
                 added: c.added,
                 top_ups: c.top_ups.clone(),
+                balance: c.balance.clone(),
             })
             .collect()
     }
@@ -85,6 +94,7 @@ pub struct Canister {
     added: TimestampMillis,
     top_ups: Vec<CyclesTopUp>,
     top_up_in_progress: bool,
+    balance: Option<Nat>,
 }
 
 impl Canister {
@@ -104,16 +114,3 @@ impl Canister {
         self.top_ups.push(CyclesTopUp { date: now, amount });
     }
 }
-
-// #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-// struct CyclesTopUp {
-//     pub date: TimestampMillis,
-//     pub amount: Cycles,
-// }
-
-// #[derive(CandidType, Serialize, Deserialize, Debug)]
-// pub struct CanisterMetrics {
-//     canister_id: CanisterId,
-//     added: TimestampMillis,
-//     top_ups: Vec<CyclesTopUp>,
-// }

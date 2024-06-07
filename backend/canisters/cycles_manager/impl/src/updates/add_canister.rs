@@ -18,7 +18,7 @@ fn add_canister_impl(args: AddCanisterArgs, state: &mut State) -> AddCanisterRes
     let my_id = id().to_string();
     println!("Canister ID: {}", my_id);
     if id() != args.canister_id {
-        if state.data.canisters.add(args.canister_id, now) {
+        if state.data.canisters.add(args.canister_id, None, now) {
             AddCanisterResponse::Success
         } else {
             AddCanisterResponse::AlreadyAdded
