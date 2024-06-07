@@ -1,12 +1,10 @@
+use super::setup_burner::setup_burner_canister;
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
+use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
+use crate::utils::random_principal;
 use candid::Principal;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use types::Cycles;
-
-use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
-use crate::utils::random_principal;
-
-use super::setup_burner::setup_burner_canister;
 
 const T: Cycles = 1_000_000_000_000;
 
@@ -74,7 +72,7 @@ impl CyclesManagerTestEnvBuilder {
         let cycles_manager_init_args = cycles_manager_api_canister::init::InitArgs {
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
-            sns_root_canister: Some(sns_root_canister_id),
+            sns_root_canister: sns_root_canister_id,
             max_top_up_amount: 20 * T,
             min_cycles_balance: 10 * T,
         };

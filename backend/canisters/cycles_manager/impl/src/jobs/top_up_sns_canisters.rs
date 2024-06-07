@@ -15,9 +15,8 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    if let Some(canister_id) = read_state(|state| state.data.sns_root_canister) {
-        ic_cdk::spawn(run_async(canister_id));
-    }
+    let canister_id = read_state(|state| state.data.sns_root_canister);
+    ic_cdk::spawn(run_async(canister_id));
 }
 
 #[trace]

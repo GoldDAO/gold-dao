@@ -5,7 +5,7 @@ pub use cycles_manager_api_canister::update_config::Args as UpdateConfigArgs;
 pub use cycles_manager_api_canister::update_config::Response as UpdateConfigResponse;
 use ic_cdk_macros::update;
 
-#[update(guard = "caller_is_governance_principal", hidden = true)]
+#[update(guard = "caller_is_governance_principal")]
 #[trace]
 fn update_config(args: UpdateConfigArgs) -> UpdateConfigResponse {
     mutate_state(|state| update_config_impl(args, state))

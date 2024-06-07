@@ -12,7 +12,7 @@ use utils::memory::MemorySize;
 
 canister_state!(State);
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize)]
 pub struct State {
     pub env: CanisterEnv,
     pub data: Data,
@@ -54,7 +54,7 @@ impl State {
 pub struct Data {
     pub authorized_principals: HashSet<Principal>,
     pub canisters: Canisters,
-    pub sns_root_canister: Option<CanisterId>,
+    pub sns_root_canister: CanisterId,
     pub max_top_up_amount: Cycles,
     pub min_cycles_balance: Cycles,
 }
@@ -64,7 +64,7 @@ impl Data {
     pub fn new(
         authorized_principals: Vec<Principal>,
         canisters: Vec<CanisterId>,
-        sns_root_canister: Option<CanisterId>,
+        sns_root_canister: CanisterId,
         max_top_up_amount: Cycles,
         min_cycles_balance: Cycles,
         now: TimestampMillis,
@@ -84,7 +84,7 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub canisters: Vec<CanisterMetrics>,
-    pub sns_root_canister: Option<CanisterId>,
+    pub sns_root_canister: CanisterId,
     pub max_top_up_amount: Cycles,
     pub min_cycles_balance: Cycles,
 }
@@ -94,17 +94,4 @@ pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
-}
-
-impl Default for Data {
-    fn default() -> Self {
-        Self {
-            authorized_principals: HashSet::default(),
-            canisters: Canisters::default(),
-            // tw2vt-hqaaa-aaaaq-aab6a-cai
-            sns_root_canister: Some(Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 124, 1, 1])),
-            max_top_up_amount: 150_000_000_000_000,
-            min_cycles_balance: 10_000_000_000_000,
-        }
-    }
 }

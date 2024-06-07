@@ -6,7 +6,6 @@ use candid::{encode_one, CandidType, Principal};
 use serde::Deserialize;
 use serde::Serialize;
 use std::time::Duration;
-// use tracing_subscriber::FmtSubscriber;
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct Empty {}
