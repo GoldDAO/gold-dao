@@ -47,9 +47,11 @@ fi
 
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
+TESTMODE="true"
 SNS_ROOT_CANISTER_ID=i7fbw-giaaa-aaaap-ab25q-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 else
+TESTMODE="true"
 SNS_ROOT_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 fi
@@ -59,13 +61,14 @@ export MAX_TOP_UP_AMOUNT=10_000_000_000_000
 
 ARGS='(
   record {
-    sns_root_canister = opt principal "'"$SNS_ROOT_CANISTER_ID"'";
-    min_cycles_balance = "'"$MIN_CYCLES_BALANCE"'" : nat64;
+    test_mode = '"$TESTMODE"';
+    sns_root_canister = principal "'"$SNS_ROOT_CANISTER_ID"'";
+    min_cycles_balance = '"$MIN_CYCLES_BALANCE"' : nat64;
     authorized_principals = vec {
       principal "'"$AUTHORIZED_PRINCIPAL"'";
     };
     canisters = vec {};
-    max_top_up_amount = "'"$MAX_TOP_UP_AMOUNT"'" : nat64;
+    max_top_up_amount = '"$MAX_TOP_UP_AMOUNT"' : nat64;
   },
 )'
 
