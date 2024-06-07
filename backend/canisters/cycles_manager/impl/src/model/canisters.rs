@@ -104,16 +104,3 @@ impl Canister {
         self.top_ups.push(CyclesTopUp { date: now, amount });
     }
 }
-
-// #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-// struct CyclesTopUp {
-//     pub date: TimestampMillis,
-//     pub amount: Cycles,
-// }
-
-// #[derive(CandidType, Serialize, Deserialize, Debug)]
-// pub struct CanisterMetrics {
-//     canister_id: CanisterId,
-//     added: TimestampMillis,
-//     top_ups: Vec<CyclesTopUp>,
-// }

@@ -8,7 +8,7 @@ use types::{CanisterId, Empty};
 use utils::canister::deposit_cycles;
 use utils::env::Environment;
 
-const INTERVAL: Duration = Duration::from_secs(1 * 60 * 60); // 1 hour
+const INTERVAL: Duration = Duration::from_secs(60 * 60); // 1 hour
 
 pub fn start_job() {
     run_now_then_interval(INTERVAL, run);
