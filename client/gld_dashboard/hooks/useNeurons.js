@@ -325,8 +325,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
         });
         setLoading(false);
       }
-      res.forEach((elem) => {
-        if (!elem.value.Err) {
+      res.forEach((elem, i) => {
+        if (elem.value.Ok) {
           setLoading(false);
           toast.success('Rewards successfully claimed', {
             position: 'top-right',
@@ -340,7 +340,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             transition: Bounce,
           });
         } else {
-          toast.error(`${Object.values(elem.value.Err)[0]}`, {
+          const hexNeuronId = uint8ArrayToHexString(neuronsToClaim[i].id);
+          toast.error(`claiming neuron ${hexNeuronId} with token ${token}. ${mapResponseErrorCodeToFriendlyError(elem.value)}`, {
             position: 'top-right',
             autoClose: 5000,
             hideProgressBar: false,
