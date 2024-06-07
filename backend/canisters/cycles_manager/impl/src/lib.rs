@@ -36,5 +36,7 @@ mod state;
 pub mod updates;
 
 use lifecycle::*;
+use queries::*;
+use updates::*;
 
 export_candid!();
