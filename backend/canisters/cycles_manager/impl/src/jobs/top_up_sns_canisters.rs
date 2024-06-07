@@ -16,11 +16,10 @@ pub fn start_job() {
 
 pub fn run() {
     let canister_id = read_state(|state| state.data.sns_root_canister);
-    ic_cdk::spawn(run_async(canister_id));
+    ic_cdk::spawn(top_up_canisters(canister_id));
 }
 
-#[trace]
-async fn run_async(canister_id: CanisterId) {
+pub async fn sync_canister_stats(canister_id: CanisterId) -> Result<Vec<CanisterSummary>, String> {
     match sns_root_canister_c2c_client::get_sns_canisters_summary(canister_id, &Empty {}).await {
         Ok(response) => {
             let canisters: Vec<_> = [
@@ -43,30 +42,37 @@ async fn run_async(canister_id: CanisterId) {
                     state.data.canisters.add(canister_id, now);
                 }
             });
-
-            let top_up_threshold = read_state(|state| state.data.min_cycles_balance);
-
-            let to_top_up: Vec<_> = canisters
-                .into_iter()
-                .filter(|s| requires_top_up(s, top_up_threshold))
-                .map(|s| s.canister_id.unwrap())
-                .collect();
-
-            if !to_top_up.is_empty() {
-                let top_up_amount = read_state(|state| state.data.max_top_up_amount);
-
-                let top_up_futures: Vec<_> = to_top_up
-                    .clone()
-                    .into_iter()
-                    .map(|canister_id| deposit_cycles(canister_id, top_up_amount))
-                    .collect();
-
-                futures::future::join_all(top_up_futures).await;
-            }
+            Ok(canisters)
         }
         Err(e) => {
             error!("Failed to get SNS canisters summary: {:?}", e);
+            Err("Failed to get SNS canisters summary".to_string())
         }
+    }
+}
+
+#[trace]
+async fn top_up_canisters(canister_id: CanisterId) {
+    let canisters = sync_canister_stats(canister_id).await.unwrap();
+
+    let top_up_threshold = read_state(|state| state.data.min_cycles_balance);
+
+    let to_top_up: Vec<_> = canisters
+        .into_iter()
+        .filter(|s| requires_top_up(s, top_up_threshold))
+        .map(|s| s.canister_id.unwrap())
+        .collect();
+
+    if !to_top_up.is_empty() {
+        let top_up_amount = read_state(|state| state.data.max_top_up_amount);
+
+        let top_up_futures: Vec<_> = to_top_up
+            .clone()
+            .into_iter()
+            .map(|canister_id| deposit_cycles(canister_id, top_up_amount))
+            .collect();
+
+        futures::future::join_all(top_up_futures).await;
     }
 }
 

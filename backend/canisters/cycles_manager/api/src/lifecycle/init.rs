@@ -4,6 +4,7 @@ use types::{CanisterId, Cycles};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
+    pub test_mode: bool,
     pub authorized_principals: Vec<Principal>,
     pub canisters: Vec<CanisterId>,
     pub sns_root_canister: CanisterId,

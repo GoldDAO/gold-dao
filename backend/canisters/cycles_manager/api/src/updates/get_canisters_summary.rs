@@ -6,7 +6,6 @@ use types::Cycles;
 use types::TimestampMillis;
 
 pub type Args = Empty;
-pub type Response = Vec<CanisterMetrics>;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct CanisterMetrics {
@@ -19,4 +18,10 @@ pub struct CanisterMetrics {
 pub struct CyclesTopUp {
     pub date: TimestampMillis,
     pub amount: Cycles,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub enum Response {
+    Success(Vec<CanisterMetrics>),
+    FailedGetCanisterSummary,
 }

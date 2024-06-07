@@ -38,6 +38,7 @@ impl State {
         Metrics {
             canister_info: CanisterInfo {
                 now: self.env.now(),
+                test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance: self.env.cycles_balance(),
             },
@@ -92,6 +93,7 @@ pub struct Metrics {
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct CanisterInfo {
     pub now: TimestampMillis,
+    pub test_mode: bool,
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }

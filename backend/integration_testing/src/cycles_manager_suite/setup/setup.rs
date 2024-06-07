@@ -70,6 +70,7 @@ impl CyclesManagerTestEnvBuilder {
 
         // Define initialization arguments for cycles manager canister
         let cycles_manager_init_args = cycles_manager_api_canister::init::InitArgs {
+            test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: sns_root_canister_id,

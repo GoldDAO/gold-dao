@@ -10,9 +10,8 @@ use utils::env::Environment;
 #[init]
 #[trace]
 fn init(args: InitArgs) {
-    canister_logger::init(true);
-
-    let env = CanisterEnv::new(true);
+    canister_logger::init(args.test_mode);
+    let env = CanisterEnv::new(args.test_mode);
 
     let data = Data::new(
         args.authorized_principals,
