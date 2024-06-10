@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "backend/canisters/cycles_manager/impl",
+  "backend/canisters/cycles_manager/api",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",
@@ -21,8 +23,7 @@ members = [
   "backend/libraries/stable_memory",
   "backend/libraries/types",
   "backend/libraries/utils",
-  "backend/integration_testing"
-]
+  "backend/integration_testing"]
 resolver = "2"
 
 [profile.release]
@@ -54,6 +55,7 @@ serde_cbor = "0.11.2"
 serde_json = "1.0.108"
 serde_with = "3.7.0"
 serde_yaml = "0.9.29"
+serde_tokenstream = "0.2.0"
 sha2 = "0.10.8"
 syn = "2.0.39"
 tracing = "0.1.40"

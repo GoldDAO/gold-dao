@@ -53,7 +53,10 @@
     "gldnft_backend_1g": {
       "candid": "backend/external_canisters/gld_nft/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/gld_nft/api/declarations"
       },
@@ -67,10 +70,15 @@
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
     },
     "gldt_core": {
-      "build": ["npm run build:back"],
+      "build": [
+        "npm run build:back"
+      ],
       "candid": "backend/canisters/gldt_core/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/gldt_core/api/declarations"
       },
@@ -79,30 +87,45 @@
       "wasm": "backend/canisters/gldt_core/target/wasm32-unknown-unknown/release/gldt_core_canister.wasm.gz"
     },
     "gldt_explorer": {
-      "build": ["npm run postinstall", "npm run build:gldt_explorer"],
+      "build": [
+        "npm run postinstall",
+        "npm run build:gldt_explorer"
+      ],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "source": ["client/gldt_explorer/out"],
+      "source": [
+        "client/gldt_explorer/out"
+      ],
       "type": "assets"
     },
     "gld_dashboard": {
-      "build": ["npm run postinstall", "npm run build:gld_dashboard"],
+      "build": [
+        "npm run postinstall",
+        "npm run build:gld_dashboard"
+      ],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "source": ["client/gld_dashboard/out"],
+      "source": [
+        "client/gld_dashboard/out"
+      ],
       "type": "assets"
     },
     "gldt_fee_compensation": {
-      "build": ["npm run build:back"],
+      "build": [
+        "npm run build:back"
+      ],
       "candid": "backend/canisters/gldt_fee_compensation/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/gldt_fee_compensation/api/declarations"
       },
@@ -111,20 +134,28 @@
       "wasm": "backend/canisters/gldt_fee_compensation/target/wasm32-unknown-unknown/release/gldt_fee_compensation_canister.wasm.gz"
     },
     "gldt_landing_page": {
-      "build": ["npm run postinstall", "npm run build:gldt_landing_page"],
+      "build": [
+        "npm run postinstall",
+        "npm run build:gldt_landing_page"
+      ],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
       "frontend": {},
-      "source": ["client/gldt_landing_page/out"],
+      "source": [
+        "client/gldt_landing_page/out"
+      ],
       "type": "assets"
     },
     "gldt_ledger": {
       "candid": "backend/canisters/gldt_ledger/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/gldt_ledger/api/declarations"
       },
@@ -134,7 +165,10 @@
     "gldt_ledger_indexer": {
       "candid": "backend/canisters/gldt_ledger_indexer/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/gldt_ledger_indexer/api/declarations"
       },
@@ -153,14 +187,21 @@
         "output": null
       },
       "frontend": {},
-      "source": ["client/gldt_swap_app/out"],
+      "source": [
+        "client/gldt_swap_app/out"
+      ],
       "type": "assets"
     },
     "icp_neuron": {
-      "build": ["./scripts/build-canister.sh icp_neuron"],
+      "build": [
+        "./scripts/build-canister.sh icp_neuron"
+      ],
       "candid": "backend/canisters/icp_neuron/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/icp_neuron/api/declarations"
       },
@@ -168,10 +209,15 @@
       "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz"
     },
     "token_metrics": {
-      "build": ["./scripts/build-canister.sh token_metrics"],
+      "build": [
+        "./scripts/build-canister.sh token_metrics"
+      ],
       "candid": "backend/canisters/token_metrics/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/token_metrics/api/declarations"
       },
@@ -182,7 +228,10 @@
       "build": "",
       "candid": "backend/external_canisters/sns_governance/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/sns_governance/api/declarations"
       },
@@ -193,7 +242,10 @@
       "build": "",
       "candid": "backend/external_canisters/sns_index/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/sns_index/api/declarations"
       },
@@ -204,7 +256,10 @@
       "build": "",
       "candid": "backend/external_canisters/sns_ledger/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/sns_ledger/api/declarations"
       },
@@ -212,21 +267,50 @@
       "wasm": ""
     },
     "sns_rewards": {
-      "build": ["./scripts/build-canister.sh sns_rewards"],
+      "build": [
+        "./scripts/build-canister.sh sns_rewards"
+      ],
       "candid": "backend/canisters/sns_rewards/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/canisters/sns_rewards/api/declarations"
       },
       "type": "custom",
       "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
     },
+    "cycles_manager": {
+      "build": [
+        "./scripts/build-canister.sh cycles_manager"
+      ],
+      "candid": "backend/canisters/cycles_manager/api/can.did",
+      "declarations": {
+        "bindings": [
+          "js",
+          "did"
+        ],
+        "env_override": null,
+        "output": "backend/canisters/cycles_manager/api/declarations"
+      },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
+      "type": "custom",
+      "wasm": "backend/canisters/cycles_manager/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
+    },
     "sns_root": {
       "build": "",
       "candid": "backend/external_canisters/sns_root/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/sns_root/api/declarations"
       },
@@ -237,7 +321,10 @@
       "build": "",
       "candid": "backend/external_canisters/sns_swap/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/sns_swap/api/declarations"
       },
@@ -247,7 +334,10 @@
     "yumi_kyc": {
       "candid": "backend/external_canisters/yumi_kyc/api/can.did",
       "declarations": {
-        "bindings": ["js", "did"],
+        "bindings": [
+          "js",
+          "did"
+        ],
         "env_override": null,
         "output": "backend/external_canisters/yumi_kyc/api/declarations"
       },
@@ -263,11 +353,15 @@
   },
   "networks": {
     "staging": {
-      "providers": ["https://icp0.io"],
+      "providers": [
+        "https://icp0.io"
+      ],
       "type": "persistent"
     },
     "preprod": {
-      "providers": ["https://icp0.io"],
+      "providers": [
+        "https://icp0.io"
+      ],
       "type": "persistent"
     }
   }
