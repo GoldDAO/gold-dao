@@ -1,5 +1,11 @@
 /*!
-# TODO: add canister description
+# Cycles manager canister
+
+The Cycles Manager Canister solves the problem of overseeing and
+managing the cycle balance in designated canisters. When a canister's
+balance falls below a predefined threshold, the Cycles Manager Canister
+automatically tops it up, thereby preventing service disruptions and
+maintaining optimal performance.
 
 ## Copyright
 © 2023  [DAO.LINK Sàrl], [Switzerland]
