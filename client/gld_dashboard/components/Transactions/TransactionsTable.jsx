@@ -307,7 +307,7 @@ const TransactionsTable = () => {
               <div className='flex justify-between gap-16 mx-6 items-center text-start text-base font-normal'>
                 <h2 className='w-1/12'>{tx.index}</h2>
                 <h2 className='sm:w-1/12'>{(tx.amount / 1e8) % 1 !== 0 ? (tx.amount / 1e8).toFixed(2) : tx.amount / 1e8} GLDGov</h2>
-                <h2 className='w-1/12 py-2 px-4 text-white text-center font-bold rounded-full bg-[#C6C6C6] flex justify-center items-center gap-2'>{tx.kind} {TransferIcon}</h2>
+                <h2 className='w-1/12 py-2 px-4 text-white text-center font-bold rounded-full bg-[#C6C6C6] flex justify-center items-center gap-2'>{tx.kind.charAt(0).toUpperCase() + tx.kind.slice(1)} {TransferIcon}</h2>
 
                 <h2 className='w-1/6'>{formatDateFromSeconds((tx.timestamp / 1000000000))},{' '}
                         {elapsedTime(Math.round(new Date().getTime() / 1000)
