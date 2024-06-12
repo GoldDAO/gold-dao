@@ -446,6 +446,7 @@ dependencies = [
  "canister_tracing_macros",
  "cycles_manager_api_canister",
  "futures",
+ "http_request",
  "ic-cdk 0.13.2",
  "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",

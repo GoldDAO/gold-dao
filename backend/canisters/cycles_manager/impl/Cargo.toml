@@ -31,3 +31,4 @@ tracing = { workspace = true }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 futures = { workspace = true }
+http_request = { path = '../../../libraries/http_request' }
