@@ -66,7 +66,7 @@ fn test_cycles_management() {
         cycles_manager_id,
         &cycles_manager_api_canister::update_config::Args {
             max_top_up_amount: Some(20_000_000_000_000),
-            min_cycles_balance: Some(10_000_000_000_000),
+            min_cycles_balance: Some(20_000_000_000_000),
         },
     );
     test_env.pic.tick();
@@ -129,5 +129,5 @@ fn test_cycles_management() {
     );
 
     // Assert that the final balance is bigger that the threshold
-    assert!(current_burner_canister_balance > 10_000_000_000_000);
+    assert!(current_burner_canister_balance > 20_000_000_000_000);
 }

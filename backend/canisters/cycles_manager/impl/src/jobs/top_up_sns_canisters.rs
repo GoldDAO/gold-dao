@@ -66,10 +66,10 @@ async fn top_up_canisters(canister_id: CanisterId) {
             if !to_top_up.is_empty() {
                 let top_up_amount = read_state(|state| state.data.max_top_up_amount);
 
-                let top_up_futures: Vec<_> = to_top_up
-                    .iter()
-                    .map(|&canister_id| deposit_cycles(canister_id, top_up_amount))
-                    .collect();
+                let mut top_up_futures = Vec::new();
+                for canister_id in to_top_up {
+                    top_up_futures.push(deposit_cycles(canister_id, top_up_amount));
+                }
 
                 futures::future::join_all(top_up_futures).await;
             }
