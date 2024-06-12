@@ -10,7 +10,7 @@
   "gld_dashboard": {
     "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
     "staging": "mpece-iqaaa-aaaal-qizma-cai",
-    "preprod" : "pmjzm-tyaaa-aaaan-qmmda-cai"
+    "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai"
   },
   "gldt_fee_compensation": {
     "ic": "oa42u-myaaa-aaaap-abrya-cai",
@@ -35,6 +35,10 @@
   "icp_neuron": {
     "ic": "j4jiq-sqaaa-aaaap-ab23a-cai",
     "staging": "j2neh-vqaaa-aaaal-aduxq-cai"
+  },
+  "cycles_manager": {
+    "ic": "atslz-hiaaa-aaaam-acq6q-cai",
+    "staging": "y4bmn-taaaa-aaaak-qillq-cai"
   },
   "sns_governance": {
     "ic": "tr3th-kiaaa-aaaaq-aab6q-cai",
