@@ -40,12 +40,12 @@ const LoginButton = () => {
   };
   const handleLogin = async () => {
     if (!authClient) return;
-
+    console.log(process.env.ENV);
     try {
       // start the login process and wait for it to finish
       await authClient.login({
         identityProvider: 'https://identity.ic0.app',
-        derivationOrigin: process.env.ENV === 'prod' ? 'https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io' : null,
+        derivationOrigin: process.env.ENV === 'local' ? null : 'https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io',
         onSuccess: onConnect,
         onError: () => console.log('onError'),
       });
