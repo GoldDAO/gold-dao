@@ -23,7 +23,7 @@ export default function Footer() {
         { text: 'GLD NFT', link: 'https://6mrot-oaaaa-aaaal-qdfna-cai.icp0.io/gold' },
         { text: 'GLDT', link: 'https://gldt.org/' },
         // { text: "GLDT Swap", link: "#" },
-        { text: 'OGY', link: 'https://governance.origyn.network/' },
+        { text: 'OGY', link: 'https://dashboard.origyn.com/' },
         { text: 'ICP', link: 'https://dashboard.internetcomputer.org/' },
       ],
     },
