@@ -14,6 +14,10 @@
   script:
      - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y ${CANISTER_NAME}
 
+.asset canister preprod deploy:
+  script:
+     - ENV=preprod dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y ${CANISTER_NAME}
+
 .asset canister production deploy:
   script:
     - . scripts/parse_proposal_details.sh
