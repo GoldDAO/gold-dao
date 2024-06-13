@@ -466,6 +466,28 @@ gld dashboard staging:
     url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
     action: start
 
+
+gld dashboard preprod:
+  stage: deploy
+  resource_group: frontend preprod deployment
+  variables:
+    CANISTER_NAME: "gld_dashboard"
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      needs: ["gld_dashboard preprod build"]
+      variables:
+        TARGET_NETWORK: preprod
+        PEM_FILE: "${PEM_FILE_STAGING}"
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - !reference [.asset canister preprod deploy, script]
+  environment:
+    name: gld dashboard
+    deployment_tier: staging
+    url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
+    action: start
+
 # gld dashboard production:
 #   stage: deploy
 #   resource_group: frontend production deployment
