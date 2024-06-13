@@ -445,26 +445,26 @@ check canister ids:
 #     url: https://explorer.gldt.org/
 #     action: start
 
-# gld dashboard staging:
-#   stage: deploy
-#   resource_group: frontend staging deployment
-#   variables:
-#     CANISTER_NAME: "gld_dashboard"
-#   rules:
-#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-#       needs: ["gld_dashboard staging build"]
-#       variables:
-#         TARGET_NETWORK: staging
-#         PEM_FILE: "${PEM_FILE_STAGING}"
-#   before_script:
-#     - !reference [.import dfx identity, before_script]
-#   script:
-#     - !reference [.asset canister staging deploy, script]
-#   environment:
-#     name: gld dashboard
-#     deployment_tier: staging
-#     url: https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io/
-#     action: start
+gld dashboard staging:
+  stage: deploy
+  resource_group: frontend staging deployment
+  variables:
+    CANISTER_NAME: "gld_dashboard"
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      needs: ["gld_dashboard staging build"]
+      variables:
+        TARGET_NETWORK: staging
+        PEM_FILE: "${PEM_FILE_STAGING}"
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - !reference [.asset canister staging deploy, script]
+  environment:
+    name: gld dashboard
+    deployment_tier: staging
+    url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
+    action: start
 
 # gld dashboard production:
 #   stage: deploy
