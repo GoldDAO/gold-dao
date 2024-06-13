@@ -14,7 +14,7 @@
   script:
     - . scripts/parse_proposal_details.sh
     - . scripts/prepare_sns_canister_ids.sh staging
-    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y ${CANISTER_NAME}
+    - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y ${CANISTER_NAME}
     - >
       quill sns --canister-ids-file sns/scripts/sns_canister_ids.json make-upgrade-canister-proposal $SNS_PROPOSER_NEURON_ID_STAGING
       --pem-file $PEM_FILE
