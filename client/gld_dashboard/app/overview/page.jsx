@@ -1,4 +1,6 @@
-import OverviewTable from '../../components/Overview/OverviewTable.jsx';
+'use client';
+
+import OverviewTable from '../../components/Overview/OverviewTable';
 
 export const viewport = {
   themeColor: '#c6c6c6',

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import NeuronsItemMobile from '../../Home/Items/NeuronsItemMobile.jsx';
-import NavbarModal from './NavbarModal.jsx';
+import NeuronsItemMobile from '../../Home/Items/NeuronsItemMobile';
+import NavbarModal from './NavbarModal';
 
 const ModalNeurons = ({ neurons }) => {
   const headerItems = [

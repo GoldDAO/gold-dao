@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FooterGoldDaoIcon } from '../../utils/svgs.jsx';
+import { FooterGoldDaoIcon } from '../../utils/svgs';
 
 export default function Footer() {
   const footerInfo = [
@@ -23,7 +23,7 @@ export default function Footer() {
         { text: 'GLD NFT', link: 'https://6mrot-oaaaa-aaaal-qdfna-cai.icp0.io/gold' },
         { text: 'GLDT', link: 'https://gldt.org/' },
         // { text: "GLDT Swap", link: "#" },
-        { text: 'OGY', link: 'https://governance.origyn.network/' },
+        { text: 'OGY', link: 'https://dashboard.origyn.com/' },
         { text: 'ICP', link: 'https://dashboard.internetcomputer.org/' },
       ],
     },
@@ -47,8 +47,8 @@ export default function Footer() {
           link: 'https://www.linkedin.com/showcase/gold-dao/',
           icon: 'svg/linkedin.svg',
         },
-        { text: "Medium", link: "https://medium.com/@GoldDAO", icon: "svg/medium.svg" },
-        { text: "Telegram", link: "https://t.me/TheGoldDAO", icon: "svg/telegram.svg" },
+        { text: 'Medium', link: 'https://medium.com/@GoldDAO', icon: 'svg/medium.svg' },
+        { text: 'Telegram', link: 'https://t.me/TheGoldDAO', icon: 'svg/telegram.svg' },
       ],
     },
   ];
@@ -81,13 +81,14 @@ export default function Footer() {
                             <a href={e.link} target="_blank" rel="noopener noreferrer">
                               <div className="flex justify-start items-center gap-2">
                                 {' '}
-                                <Image
+                                {e.icon && (<Image
                                   className={`${e.icon ? '' : 'hidden'}`}
                                   src={e.icon}
                                   height={20}
                                   width={20}
                                   alt="gold dao"
-                                />{' '}
+                                />)}
+                                {' '}
                                 <p className="py-2 text-xs sm:text-[14px]"> {e.text} </p>
                               </div>
                             </a>
@@ -95,13 +96,14 @@ export default function Footer() {
                             <Link href={e.link}>
                               <div className="flex justify-start items-center gap-2">
                                 {' '}
-                                <Image
+                                { e.icon && (<Image
                                   className={`${e.icon ? '' : 'hidden'}`}
                                   src={e.icon}
                                   height={20}
                                   width={20}
                                   alt="gold dao"
-                                />{' '}
+                                />)}
+                                {' '}
                                 <p className="py-2"> {e.text} </p>
                               </div>
                             </Link>

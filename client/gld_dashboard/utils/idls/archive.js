@@ -1,10 +1,13 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
 export const idlFactory = ({ IDL }) => {
   const Value = IDL.Rec();
   const Map = IDL.Vec(IDL.Tuple(IDL.Text, Value));
   Value.fill(
     IDL.Variant({
       Int: IDL.Int,
-      Map: Map,
+      Map,
       Nat: IDL.Nat,
       Nat64: IDL.Nat64,
       Blob: IDL.Vec(IDL.Nat8),
@@ -51,17 +54,15 @@ export const idlFactory = ({ IDL }) => {
     get_blocks: IDL.Func(
       [IDL.Record({ start: IDL.Nat, length: IDL.Nat })],
       [IDL.Record({ blocks: IDL.Vec(Block) })],
-      ["query"],
+      ['query'],
     ),
-    get_transaction: IDL.Func([IDL.Nat64], [IDL.Opt(Transaction)], ["query"]),
+    get_transaction: IDL.Func([IDL.Nat64], [IDL.Opt(Transaction)], ['query']),
     get_transactions: IDL.Func(
       [IDL.Record({ start: IDL.Nat, length: IDL.Nat })],
       [IDL.Record({ transactions: IDL.Vec(Transaction) })],
-      ["query"],
+      ['query'],
     ),
-    remaining_capacity: IDL.Func([], [IDL.Nat64], ["query"]),
+    remaining_capacity: IDL.Func([], [IDL.Nat64], ['query']),
   });
 };
-export const init = ({ IDL }) => {
-  return [IDL.Principal, IDL.Nat64, IDL.Opt(IDL.Nat64)];
-};
+export const init = ({ IDL }) => [IDL.Principal, IDL.Nat64, IDL.Opt(IDL.Nat64)];

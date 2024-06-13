@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import RewardsContent from '../../components/Rewards/RewardsContent.jsx';
+import RewardsContent from '../../components/Rewards/RewardsContent';
 
 export const viewport = {
   themeColor: '#c6c6c6',

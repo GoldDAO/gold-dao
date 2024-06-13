@@ -1,3 +1,6 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
 export const idlFactory = ({ IDL }) => {
   const Value = IDL.Rec();
   const Vec = IDL.Rec();
@@ -33,7 +36,7 @@ export const idlFactory = ({ IDL }) => {
     callback: IDL.Func(
       [GetBlocksRequest],
       [IDL.Record({ blocks: IDL.Vec(Value) })],
-      ["query"],
+      ['query'],
     ),
     start: IDL.Nat,
     length: IDL.Nat,
@@ -97,7 +100,7 @@ export const idlFactory = ({ IDL }) => {
     callback: IDL.Func(
       [GetBlocksRequest],
       [IDL.Record({ transactions: IDL.Vec(Transaction) })],
-      ["query"],
+      ['query'],
     ),
     start: IDL.Nat,
     length: IDL.Nat,
@@ -206,37 +209,35 @@ export const idlFactory = ({ IDL }) => {
   });
   const Result_2 = IDL.Variant({ Ok: IDL.Nat, Err: TransferFromError });
   return IDL.Service({
-    get_blocks: IDL.Func([GetBlocksRequest], [GetBlocksResponse], ["query"]),
-    get_data_certificate: IDL.Func([], [DataCertificate], ["query"]),
+    get_blocks: IDL.Func([GetBlocksRequest], [GetBlocksResponse], ['query']),
+    get_data_certificate: IDL.Func([], [DataCertificate], ['query']),
     get_transactions: IDL.Func(
       [GetBlocksRequest],
       [GetTransactionsResponse],
-      ["query"],
+      ['query'],
     ),
-    http_request: IDL.Func([HttpRequest], [HttpResponse], ["query"]),
-    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ["query"]),
-    icrc1_decimals: IDL.Func([], [IDL.Nat8], ["query"]),
-    icrc1_fee: IDL.Func([], [IDL.Nat], ["query"]),
+    http_request: IDL.Func([HttpRequest], [HttpResponse], ['query']),
+    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ['query']),
+    icrc1_decimals: IDL.Func([], [IDL.Nat8], ['query']),
+    icrc1_fee: IDL.Func([], [IDL.Nat], ['query']),
     icrc1_metadata: IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))],
-      ["query"],
+      ['query'],
     ),
-    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ["query"]),
-    icrc1_name: IDL.Func([], [IDL.Text], ["query"]),
+    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ['query']),
+    icrc1_name: IDL.Func([], [IDL.Text], ['query']),
     icrc1_supported_standards: IDL.Func(
       [],
       [IDL.Vec(StandardRecord)],
-      ["query"],
+      ['query'],
     ),
-    icrc1_symbol: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_total_supply: IDL.Func([], [IDL.Nat], ["query"]),
+    icrc1_symbol: IDL.Func([], [IDL.Text], ['query']),
+    icrc1_total_supply: IDL.Func([], [IDL.Nat], ['query']),
     icrc1_transfer: IDL.Func([TransferArg], [Result], []),
-    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ["query"]),
+    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ['query']),
     icrc2_approve: IDL.Func([ApproveArgs], [Result_1], []),
     icrc2_transfer_from: IDL.Func([TransferFromArgs], [Result_2], []),
   });
 };
-export const init = ({ IDL }) => {
-  return [];
-};
+export const init = ({ IDL }) => [];

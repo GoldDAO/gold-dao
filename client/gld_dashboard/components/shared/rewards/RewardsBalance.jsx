@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import LoaderDataCard from '../../Home/LoaderDataCard.jsx';
-import Modal from '../modal/modal.jsx';
-import ModalTransfer from '../modal/modal-transfer.jsx';
-import RewardsCards from './RewardsCards.jsx';
+import LoaderDataCard from '../../Home/LoaderDataCard';
+import Modal from '../modal/modal';
+import ModalTransfer from '../modal/modal-transfer';
+import RewardsCards from './RewardsCards';
 import useBalances from '../../../hooks/useBalances';
 
 export default function RewardsBalance({
@@ -17,18 +17,18 @@ export default function RewardsBalance({
   useEffect(() => {
     // icp balance
     (async () => {
-      const amount = await getBalance();
-      setIcp({ loading: false, amount });
+      const balance = await getBalance();
+      setIcp({ loading: false, amount: balance });
     })();
     // ogy balance
     (async () => {
-      const amount = await getBalance('ogy');
-      setOgy({ loading: false, amount });
+      const balance = await getBalance('ogy');
+      setOgy({ loading: false, amount: balance });
     })();
     // gold
     (async () => {
-      const amount = await getBalance('ledger');
-      setGold({ loading: false, amount });
+      const balance = await getBalance('ledger');
+      setGold({ loading: false, amount: balance });
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

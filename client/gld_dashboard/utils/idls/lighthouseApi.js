@@ -1,5 +1,7 @@
-// eslint-disable-next-line import/no-anonymous-default-export
-export default ({ IDL }) => {
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
+export const idlFactory = ({ IDL }) => {
   const List = IDL.Rec();
   const List_1 = IDL.Rec();
   const Amount = IDL.Nat;
@@ -122,7 +124,7 @@ export default ({ IDL }) => {
       IDL.Record({
         owner: IDL.Principal,
         subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-      })
+      }),
     ),
     orderType: OrderType__1,
     filled: IDL.Vec(OrderFilled),
@@ -196,7 +198,7 @@ export default ({ IDL }) => {
         FOK: IDL.Null,
         LMT: IDL.Null,
         MKT: IDL.Null,
-      })
+      }),
     ),
     filled: IDL.Record({
       token0Value: BalanceChange__1,
@@ -213,7 +215,7 @@ export default ({ IDL }) => {
         token0Value: BalanceChange__1,
         counterparty: Txid__3,
         token1Value: BalanceChange__1,
-      })
+      }),
     ),
     caller: AccountId__1,
     index: IDL.Nat,
@@ -221,7 +223,7 @@ export default ({ IDL }) => {
   });
   const DRC205Data = IDL.Record({
     accountLastTxns: IDL.Vec(
-      IDL.Tuple(AccountId__3, IDL.Tuple(IDL.Vec(Txid__4), IDL.Vec(Txid__4)))
+      IDL.Tuple(AccountId__3, IDL.Tuple(IDL.Vec(Txid__4), IDL.Vec(Txid__4))),
     ),
     setting: Setting__1,
     globalLastTxns: IDL.Tuple(IDL.Vec(Txid__4), IDL.Vec(Txid__4)),
@@ -338,7 +340,7 @@ export default ({ IDL }) => {
       deposit: IDL.Tuple(
         IDL.Variant({ token0: IDL.Null, token1: IDL.Null }),
         IDL.Nat,
-        IDL.Opt(Sa__2)
+        IDL.Opt(Sa__2),
       ),
     }),
     ICRC1: IDL.Variant({
@@ -348,15 +350,15 @@ export default ({ IDL }) => {
     This: IDL.Variant({
       updatePoolLocalBalance: IDL.Tuple(
         IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat })),
-        IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat }))
+        IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat })),
       ),
       batchTransfer: IDL.Vec(
         IDL.Tuple(
           IDL.Variant({ add: IDL.Null, sub: IDL.Null }),
           IDL.Vec(IDL.Nat8),
           IDL.Variant({ token0: IDL.Null, token1: IDL.Null }),
-          IDL.Variant({ locked: IDL.Nat, available: IDL.Nat })
-        )
+          IDL.Variant({ locked: IDL.Nat, available: IDL.Nat }),
+        ),
       ),
       dexDepositFallback: IDL.Tuple(IDL.Principal, IDL.Opt(IDL.Vec(IDL.Nat8))),
     }),
@@ -374,11 +376,11 @@ export default ({ IDL }) => {
                 Percent: IDL.Opt(Ppm__1),
                 Token0: IDL.Nat,
                 Token1: IDL.Nat,
-              })
+              }),
             ),
           }),
         }),
-        IDL.Opt(Sa__3)
+        IDL.Opt(Sa__3),
       ),
       sto_createProOrder: IDL.Tuple(
         IDL.Variant({
@@ -393,7 +395,7 @@ export default ({ IDL }) => {
             }),
           }),
         }),
-        IDL.Opt(Sa__3)
+        IDL.Opt(Sa__3),
       ),
       sto_cancelPendingOrders: IDL.Tuple(Soid__1, IDL.Opt(Sa__3)),
     }),
@@ -403,7 +405,7 @@ export default ({ IDL }) => {
         IDL.Vec(Amount__4),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       transferFrom: IDL.Tuple(
         From,
@@ -411,7 +413,7 @@ export default ({ IDL }) => {
         Amount__4,
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       approve: IDL.Tuple(Spender, Amount__4, IDL.Opt(Nonce__4), IDL.Opt(Sa__1), IDL.Opt(Data__2)),
       balanceOf: Address__1,
@@ -423,7 +425,7 @@ export default ({ IDL }) => {
         IDL.Opt(Decider),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       transfer: IDL.Tuple(To, Amount__4, IDL.Opt(Nonce__4), IDL.Opt(Sa__1), IDL.Opt(Data__2)),
       dropAccount: IDL.Opt(Sa__1),
@@ -433,7 +435,7 @@ export default ({ IDL }) => {
         IDL.Opt(To),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       lockTransferFrom: IDL.Tuple(
         From,
@@ -443,7 +445,7 @@ export default ({ IDL }) => {
         IDL.Opt(Decider),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
     }),
     ICRC1New: IDL.Variant({
@@ -643,7 +645,7 @@ export default ({ IDL }) => {
         IDL.Record({
           token0: IDL.Record({ locked: IDL.Nat, available: IDL.Nat }),
           token1: IDL.Record({ locked: IDL.Nat, available: IDL.Nat }),
-        })
+        }),
       ),
       dexDepositFallback: IDL.Tuple(IDL.Nat, IDL.Nat),
     }),
@@ -841,16 +843,16 @@ export default ({ IDL }) => {
         gridBottom: Price__2,
         buyingBlankLocked: IDL.Vec(IDL.Tuple(Price__2, Price__2)),
         sellingBlankLocked: IDL.Vec(IDL.Tuple(Price__2, Price__2)),
-      })
+      }),
     ),
     gridPrices: GridPrices,
   });
   const STStrategy = IDL.Variant({
-    TWAP: TWAP,
-    VWAP: VWAP,
-    IcebergOrder: IcebergOrder,
-    StopLossOrder: StopLossOrder,
-    GridOrder: GridOrder,
+    TWAP,
+    VWAP,
+    IcebergOrder,
+    StopLossOrder,
+    GridOrder,
   });
   const ICRC1Account = IDL.Record({
     owner: IDL.Principal,
@@ -893,7 +895,7 @@ export default ({ IDL }) => {
     icdex_keepingBalances: IDL.Vec(IDL.Tuple(AccountId__3, KeepingBalance__1)),
     timeSortedTxids: IDL.Tuple(
       IDL.Vec(IDL.Tuple(Txid__4, Time)),
-      IDL.Vec(IDL.Tuple(Txid__4, Time))
+      IDL.Vec(IDL.Tuple(Txid__4, Time)),
     ),
     icdex_failedOrders: IDL.Vec(IDL.Tuple(Txid__4, TradingOrder)),
     icdex_makers: IDL.Vec(IDL.Tuple(AccountId__3, IDL.Tuple(IDL.Nat, IDL.Principal))),
@@ -942,9 +944,9 @@ export default ({ IDL }) => {
           IDL.Record({
             owner: IDL.Principal,
             subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-          })
-        )
-      )
+          }),
+        ),
+      ),
     ),
     traderReferrerTemps: IDL.Vec(IDL.Tuple(AccountId__3, IDL.Tuple(AccountId__3, IDL.Text, Time))),
     ambassadors: IDL.Vec(IDL.Tuple(AccountId__3, AmbassadorData)),
@@ -965,8 +967,8 @@ export default ({ IDL }) => {
           count: IDL.Nat,
           rate: IDL.Float64,
           commission: Vol,
-        })
-      )
+        }),
+      ),
     ),
     totalPage: IDL.Nat,
   });
@@ -1047,7 +1049,7 @@ export default ({ IDL }) => {
         FOK: IDL.Null,
         LMT: IDL.Null,
         MKT: IDL.Null,
-      })
+      }),
     ),
     filled: IDL.Record({
       token0Value: BalanceChange__1,
@@ -1064,7 +1066,7 @@ export default ({ IDL }) => {
         token0Value: BalanceChange__1,
         counterparty: Txid__3,
         token1Value: BalanceChange__1,
-      })
+      }),
     ),
     caller: AccountId__1,
     index: IDL.Nat,
@@ -1108,7 +1110,7 @@ export default ({ IDL }) => {
       deposit: IDL.Tuple(
         IDL.Variant({ token0: IDL.Null, token1: IDL.Null }),
         IDL.Nat,
-        IDL.Opt(Sa__2)
+        IDL.Opt(Sa__2),
       ),
     }),
     ICRC1: IDL.Variant({
@@ -1118,15 +1120,15 @@ export default ({ IDL }) => {
     This: IDL.Variant({
       updatePoolLocalBalance: IDL.Tuple(
         IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat })),
-        IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat }))
+        IDL.Opt(IDL.Variant({ add: IDL.Nat, set: IDL.Nat, sub: IDL.Nat })),
       ),
       batchTransfer: IDL.Vec(
         IDL.Tuple(
           IDL.Variant({ add: IDL.Null, sub: IDL.Null }),
           IDL.Vec(IDL.Nat8),
           IDL.Variant({ token0: IDL.Null, token1: IDL.Null }),
-          IDL.Variant({ locked: IDL.Nat, available: IDL.Nat })
-        )
+          IDL.Variant({ locked: IDL.Nat, available: IDL.Nat }),
+        ),
       ),
       dexDepositFallback: IDL.Tuple(IDL.Principal, IDL.Opt(IDL.Vec(IDL.Nat8))),
     }),
@@ -1144,11 +1146,11 @@ export default ({ IDL }) => {
                 Percent: IDL.Opt(Ppm__1),
                 Token0: IDL.Nat,
                 Token1: IDL.Nat,
-              })
+              }),
             ),
           }),
         }),
-        IDL.Opt(Sa__3)
+        IDL.Opt(Sa__3),
       ),
       sto_createProOrder: IDL.Tuple(
         IDL.Variant({
@@ -1163,7 +1165,7 @@ export default ({ IDL }) => {
             }),
           }),
         }),
-        IDL.Opt(Sa__3)
+        IDL.Opt(Sa__3),
       ),
       sto_cancelPendingOrders: IDL.Tuple(Soid__1, IDL.Opt(Sa__3)),
     }),
@@ -1173,7 +1175,7 @@ export default ({ IDL }) => {
         IDL.Vec(Amount__4),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       transferFrom: IDL.Tuple(
         From,
@@ -1181,7 +1183,7 @@ export default ({ IDL }) => {
         Amount__4,
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       approve: IDL.Tuple(Spender, Amount__4, IDL.Opt(Nonce__4), IDL.Opt(Sa__1), IDL.Opt(Data__2)),
       balanceOf: Address__1,
@@ -1193,7 +1195,7 @@ export default ({ IDL }) => {
         IDL.Opt(Decider),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       transfer: IDL.Tuple(To, Amount__4, IDL.Opt(Nonce__4), IDL.Opt(Sa__1), IDL.Opt(Data__2)),
       dropAccount: IDL.Opt(Sa__1),
@@ -1203,7 +1205,7 @@ export default ({ IDL }) => {
         IDL.Opt(To),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
       lockTransferFrom: IDL.Tuple(
         From,
@@ -1213,7 +1215,7 @@ export default ({ IDL }) => {
         IDL.Opt(Decider),
         IDL.Opt(Nonce__4),
         IDL.Opt(Sa__1),
-        IDL.Opt(Data__2)
+        IDL.Opt(Data__2),
       ),
     }),
     ICRC1New: IDL.Variant({
@@ -1295,8 +1297,8 @@ export default ({ IDL }) => {
           orders: IDL.Nat,
           commission: Vol,
           filledCount: IDL.Nat,
-        })
-      )
+        }),
+      ),
     ),
     totalPage: IDL.Nat,
   });
@@ -1312,7 +1314,7 @@ export default ({ IDL }) => {
       IDL.Record({
         owner: IDL.Principal,
         subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-      })
+      }),
     ),
     orderType: OrderType__1,
     filled: IDL.Vec(OrderFilled),
@@ -1349,7 +1351,7 @@ export default ({ IDL }) => {
         FOK: IDL.Null,
         LMT: IDL.Null,
         MKT: IDL.Null,
-      })
+      }),
     ),
     filled: IDL.Record({
       token0Value: BalanceChange__1,
@@ -1366,7 +1368,7 @@ export default ({ IDL }) => {
         token0Value: BalanceChange__1,
         counterparty: Txid__3,
         token1Value: BalanceChange__1,
-      })
+      }),
     ),
     caller: AccountId__1,
     index: IDL.Nat,
@@ -1511,26 +1513,26 @@ export default ({ IDL }) => {
     IDO_getConfig: IDL.Func(
       [],
       [IDL.Opt(IDL.Principal), IDOSetting, IDL.Opt(IDORequirement)],
-      ["query"]
+      ['query'],
     ),
     IDO_qualification: IDL.Func(
       [IDL.Opt(Address)],
       [IDL.Vec(IDL.Tuple(Address, Participant))],
-      ["query"]
+      ['query'],
     ),
     IDO_removeWhitelist: IDL.Func([IDL.Vec(Address)], [], []),
     IDO_setFunder: IDL.Func([IDL.Opt(IDL.Principal), IDL.Opt(IDORequirement)], [], []),
     IDO_setWhitelist: IDL.Func([IDL.Vec(IDL.Tuple(Address, Amount))], [], []),
     IDO_updateQualification: IDL.Func([IDL.Opt(Sa)], [IDL.Opt(Participant)], []),
-    accountBalance: IDL.Func([Address], [KeepingBalance], ["query"]),
+    accountBalance: IDL.Func([Address], [KeepingBalance], ['query']),
     accountConfig: IDL.Func(
       [IDL.Variant({ PoolMode: IDL.Null, TunnelMode: IDL.Null }), IDL.Bool, IDL.Opt(Sa)],
       [],
-      []
+      [],
     ),
-    accountSetting: IDL.Func([Address], [AccountSetting__1], ["query"]),
+    accountSetting: IDL.Func([Address], [AccountSetting__1], ['query']),
     backup: IDL.Func([BackupRequest], [BackupResponse], []),
-    brokerList: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_5], ["query"]),
+    brokerList: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_5], ['query']),
     cancel: IDL.Func([Nonce, IDL.Opt(Sa)], [], []),
     cancelAll: IDL.Func(
       [
@@ -1541,7 +1543,7 @@ export default ({ IDL }) => {
         IDL.Opt(OrderSide),
       ],
       [],
-      []
+      [],
     ),
     cancelByTxid: IDL.Func([Txid__1, IDL.Opt(Sa)], [], []),
     checkPoolBalance: IDL.Func(
@@ -1554,33 +1556,33 @@ export default ({ IDL }) => {
           pool: IDL.Record({ token0: Amount, token1: Amount }),
         }),
       ],
-      []
+      [],
     ),
     clearAccountSetting: IDL.Func([], [], []),
     clearNonCoreData: IDL.Func([], [], []),
     config: IDL.Func([DexConfig], [IDL.Bool], []),
-    count: IDL.Func([IDL.Opt(Address)], [IDL.Nat], ["query"]),
+    count: IDL.Func([IDL.Opt(Address)], [IDL.Nat], ['query']),
     debug_gridOrders: IDL.Func([], [IDL.Vec(IDL.Tuple(Soid, ICRC1Account__1, OrderPrice))], []),
     deposit: IDL.Func(
       [IDL.Variant({ token0: IDL.Null, token1: IDL.Null }), Amount, IDL.Opt(Sa)],
       [],
-      []
+      [],
     ),
     depositFallback: IDL.Func([IDL.Opt(Sa)], [Amount, Amount], []),
-    drc205_canisterId: IDL.Func([], [IDL.Principal], ["query"]),
+    drc205_canisterId: IDL.Func([], [IDL.Principal], ['query']),
     drc205_config: IDL.Func([Config], [IDL.Bool], []),
-    drc205_dexInfo: IDL.Func([], [DexInfo], ["query"]),
-    drc205_events: IDL.Func([IDL.Opt(Address__2)], [IDL.Vec(TxnRecord__3)], ["query"]),
+    drc205_dexInfo: IDL.Func([], [DexInfo], ['query']),
+    drc205_events: IDL.Func([IDL.Opt(Address__2)], [IDL.Vec(TxnRecord__3)], ['query']),
     drc205_events_filter: IDL.Func(
       [IDL.Opt(Address__2), IDL.Opt(Time), IDL.Opt(Time)],
       [IDL.Vec(TxnRecord__3), IDL.Bool],
-      ["query"]
+      ['query'],
     ),
-    drc205_getConfig: IDL.Func([], [Setting__1], ["query"]),
-    drc205_pool: IDL.Func([], [IDL.Vec(IDL.Tuple(Txid__1, TxnRecord__3, IDL.Nat))], ["query"]),
-    drc205_txn: IDL.Func([Txid__6], [IDL.Opt(TxnRecord__3)], ["query"]),
+    drc205_getConfig: IDL.Func([], [Setting__1], ['query']),
+    drc205_pool: IDL.Func([], [IDL.Vec(IDL.Tuple(Txid__1, TxnRecord__3, IDL.Nat))], ['query']),
+    drc205_txn: IDL.Func([Txid__6], [IDL.Opt(TxnRecord__3)], ['query']),
     drc205_txn2: IDL.Func([Txid__6], [IDL.Opt(TxnRecord__3)], []),
-    drc207: IDL.Func([], [DRC207Support], ["query"]),
+    drc207: IDL.Func([], [DRC207Support], ['query']),
     fallback: IDL.Func([Nonce, IDL.Opt(Sa)], [IDL.Bool], []),
     fallbackByTxid: IDL.Func([Txid__1, IDL.Opt(Sa)], [IDL.Bool], []),
     fee: IDL.Func(
@@ -1591,12 +1593,12 @@ export default ({ IDL }) => {
           taker: IDL.Record({ buy: IDL.Float64, sell: IDL.Float64 }),
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    feeStatus: IDL.Func([], [FeeStatus], ["query"]),
-    getAuctionMode: IDL.Func([], [IDL.Bool, AccountId], ["query"]),
-    getConfig: IDL.Func([], [DexSetting], ["query"]),
-    getDepositAccount: IDL.Func([Address], [Account__1, Address], ["query"]),
+    feeStatus: IDL.Func([], [FeeStatus], ['query']),
+    getAuctionMode: IDL.Func([], [IDL.Bool, AccountId], ['query']),
+    getConfig: IDL.Func([], [DexSetting], ['query']),
+    getDepositAccount: IDL.Func([Address], [Account__1, Address], ['query']),
     getPairAddress: IDL.Func(
       [],
       [
@@ -1605,9 +1607,9 @@ export default ({ IDL }) => {
           pool: IDL.Tuple(Account__1, Address),
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    getQuotes: IDL.Func([KInterval], [IDL.Vec(KBar)], ["query"]),
+    getQuotes: IDL.Func([KInterval], [IDL.Vec(KBar)], ['query']),
     getRole: IDL.Func(
       [Address],
       [
@@ -1617,10 +1619,10 @@ export default ({ IDL }) => {
           vipMaker: IDL.Bool,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    getTxAccount: IDL.Func([Address], [Account__1, TxAccount, Nonce, Txid__1], ["query"]),
-    ictc_TM: IDL.Func([], [IDL.Text], ["query"]),
+    getTxAccount: IDL.Func([Address], [Account__1, TxAccount, Nonce, Txid__1], ['query']),
+    ictc_TM: IDL.Func([], [IDL.Text], ['query']),
     ictc_addAdmin: IDL.Func([IDL.Principal], [], []),
     ictc_appendTT: IDL.Func(
       [
@@ -1632,7 +1634,7 @@ export default ({ IDL }) => {
         IDL.Vec(Ttid__2),
       ],
       [Ttid__2],
-      []
+      [],
     ),
     ictc_blockTO: IDL.Func([Toid__4], [IDL.Opt(Toid__4)], []),
     ictc_clearLog: IDL.Func([IDL.Opt(IDL.Int), IDL.Bool], [], []),
@@ -1640,8 +1642,8 @@ export default ({ IDL }) => {
     ictc_completeTO: IDL.Func([Toid__4, OrderStatus], [IDL.Bool], []),
     ictc_doneTO: IDL.Func([Toid__4, OrderStatus, IDL.Bool], [IDL.Bool], []),
     ictc_doneTT: IDL.Func([Toid__4, Ttid__2, IDL.Bool], [IDL.Opt(Ttid__2)], []),
-    ictc_getAdmins: IDL.Func([], [IDL.Vec(IDL.Principal)], ["query"]),
-    ictc_getCalleeStatus: IDL.Func([IDL.Principal], [IDL.Opt(CalleeStatus)], ["query"]),
+    ictc_getAdmins: IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+    ictc_getCalleeStatus: IDL.Func([IDL.Principal], [IDL.Opt(CalleeStatus)], ['query']),
     ictc_getPool: IDL.Func(
       [],
       [
@@ -1656,11 +1658,11 @@ export default ({ IDL }) => {
           }),
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    ictc_getTO: IDL.Func([Toid__4], [IDL.Opt(Order__1)], ["query"]),
-    ictc_getTOCount: IDL.Func([], [IDL.Nat], ["query"]),
-    ictc_getTOPool: IDL.Func([], [IDL.Vec(IDL.Tuple(Toid__4, IDL.Opt(Order__1)))], ["query"]),
+    ictc_getTO: IDL.Func([Toid__4], [IDL.Opt(Order__1)], ['query']),
+    ictc_getTOCount: IDL.Func([], [IDL.Nat], ['query']),
+    ictc_getTOPool: IDL.Func([], [IDL.Vec(IDL.Tuple(Toid__4, IDL.Opt(Order__1)))], ['query']),
     ictc_getTOs: IDL.Func(
       [IDL.Nat, IDL.Nat],
       [
@@ -1670,10 +1672,10 @@ export default ({ IDL }) => {
           totalPage: IDL.Nat,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    ictc_getTT: IDL.Func([Ttid__2], [IDL.Opt(TaskEvent)], ["query"]),
-    ictc_getTTByTO: IDL.Func([Toid__4], [IDL.Vec(TaskEvent)], ["query"]),
+    ictc_getTT: IDL.Func([Ttid__2], [IDL.Opt(TaskEvent)], ['query']),
+    ictc_getTTByTO: IDL.Func([Toid__4], [IDL.Vec(TaskEvent)], ['query']),
     ictc_getTTErrors: IDL.Func(
       [IDL.Nat, IDL.Nat],
       [
@@ -1683,9 +1685,9 @@ export default ({ IDL }) => {
           totalPage: IDL.Nat,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    ictc_getTTPool: IDL.Func([], [IDL.Vec(IDL.Tuple(Ttid__2, Task__2))], ["query"]),
+    ictc_getTTPool: IDL.Func([], [IDL.Vec(IDL.Tuple(Ttid__2, Task__2))], ['query']),
     ictc_getTTs: IDL.Func(
       [IDL.Nat, IDL.Nat],
       [
@@ -1695,7 +1697,7 @@ export default ({ IDL }) => {
           totalPage: IDL.Nat,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
     ictc_redoTT: IDL.Func([Toid__4, Ttid__2], [IDL.Opt(Ttid__2)], []),
     ictc_removeAdmin: IDL.Func([IDL.Principal], [], []),
@@ -1715,14 +1717,14 @@ export default ({ IDL }) => {
           paused: IDL.Bool,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
     init: IDL.Func([], [], []),
-    isAccountIctcDone: IDL.Func([AccountId], [IDL.Bool, IDL.Vec(Toid__3)], ["query"]),
+    isAccountIctcDone: IDL.Func([AccountId], [IDL.Bool, IDL.Vec(Toid__3)], ['query']),
     latestFilled: IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(Timestamp__5, Txid__1, OrderFilled__1, OrderSide__2))],
-      ["query"]
+      ['query'],
     ),
     level10: IDL.Func(
       [],
@@ -1733,7 +1735,7 @@ export default ({ IDL }) => {
           bid: IDL.Vec(PriceResponse),
         }),
       ],
-      ["query"]
+      ['query'],
     ),
     level100: IDL.Func(
       [],
@@ -1744,24 +1746,24 @@ export default ({ IDL }) => {
           bid: IDL.Vec(PriceResponse),
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    liquidity: IDL.Func([IDL.Opt(Address)], [Liquidity], ["query"]),
-    liquidity2: IDL.Func([IDL.Opt(Address)], [Liquidity2], ["query"]),
-    makerList: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_4], ["query"]),
-    makerRebate: IDL.Func([Address], [IDL.Float64, IDL.Float64], ["query"]),
+    liquidity: IDL.Func([IDL.Opt(Address)], [Liquidity], ['query']),
+    liquidity2: IDL.Func([IDL.Opt(Address)], [Liquidity2], ['query']),
+    makerList: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_4], ['query']),
+    makerRebate: IDL.Func([Address], [IDL.Float64, IDL.Float64], ['query']),
     mergePair: IDL.Func([IDL.Principal], [IDL.Bool], []),
-    name: IDL.Func([], [IDL.Text], ["query"]),
-    orderExpirationDuration: IDL.Func([], [IDL.Int], ["query"]),
+    name: IDL.Func([], [IDL.Text], ['query']),
+    orderExpirationDuration: IDL.Func([], [IDL.Int], ['query']),
     pending: IDL.Func(
       [IDL.Opt(Address), IDL.Opt(ListPage), IDL.Opt(ListSize)],
       [TrieList_3],
-      ["query"]
+      ['query'],
     ),
-    pendingAll: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_3], ["query"]),
-    pendingCount: IDL.Func([], [IDL.Nat], ["query"]),
-    poolBalance: IDL.Func([], [IDL.Record({ token0: Amount, token1: Amount })], ["query"]),
-    prepare: IDL.Func([Address], [TxAccount, Nonce], ["query"]),
+    pendingAll: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_3], ['query']),
+    pendingCount: IDL.Func([], [IDL.Nat], ['query']),
+    poolBalance: IDL.Func([], [IDL.Record({ token0: Amount, token1: Amount })], ['query']),
+    prepare: IDL.Func([Address], [TxAccount, Nonce], ['query']),
     recovery: IDL.Func([BackupResponse], [IDL.Bool], []),
     removeVipMaker: IDL.Func([Address], [], []),
     safeAccountBalance: IDL.Func(
@@ -1774,7 +1776,7 @@ export default ({ IDL }) => {
           unitSize: IDL.Nat,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
     setAuctionMode: IDL.Func([IDL.Bool, IDL.Opt(AccountId)], [IDL.Bool, AccountId], []),
     setOrderFail: IDL.Func([IDL.Text, Amount, Amount], [IDL.Bool], []),
@@ -1791,10 +1793,10 @@ export default ({ IDL }) => {
           price: IDL.Float64,
         }),
       ],
-      ["query"]
+      ['query'],
     ),
-    status: IDL.Func([Address, Nonce], [OrderStatusResponse], ["query"]),
-    statusByTxid: IDL.Func([Txid__1], [OrderStatusResponse], ["query"]),
+    status: IDL.Func([Address, Nonce], [OrderStatusResponse], ['query']),
+    statusByTxid: IDL.Func([Txid__1], [OrderStatusResponse], ['query']),
     sto_cancelPendingOrders: IDL.Func([Soid, IDL.Opt(Sa)], [], []),
     sto_clearTxidLog: IDL.Func([], [], []),
     sto_config: IDL.Func(
@@ -1810,7 +1812,7 @@ export default ({ IDL }) => {
         }),
       ],
       [],
-      []
+      [],
     ),
     sto_createProOrder: IDL.Func(
       [
@@ -1823,7 +1825,7 @@ export default ({ IDL }) => {
         IDL.Opt(Sa),
       ],
       [Soid],
-      []
+      [],
     ),
     sto_createStopLossOrder: IDL.Func(
       [
@@ -1838,20 +1840,20 @@ export default ({ IDL }) => {
         IDL.Opt(Sa),
       ],
       [Soid],
-      []
+      [],
     ),
     sto_enableStratOrder: IDL.Func([IDL.Variant({ Enable: IDL.Null, Disable: IDL.Null })], [], []),
-    sto_getAccountProOrders: IDL.Func([Address], [IDL.Vec(STOrder)], ["query"]),
-    sto_getAccountStopLossOrders: IDL.Func([Address], [IDL.Vec(STOrder)], ["query"]),
+    sto_getAccountProOrders: IDL.Func([Address], [IDL.Vec(STOrder)], ['query']),
+    sto_getAccountStopLossOrders: IDL.Func([Address], [IDL.Vec(STOrder)], ['query']),
     sto_getActiveProOrders: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_2], []),
     sto_getActiveStopLossOrders: IDL.Func(
       [IDL.Variant({ Buy: IDL.Null, Sell: IDL.Null }), IDL.Opt(ListPage), IDL.Opt(ListSize)],
       [TrieList_2],
-      []
+      [],
     ),
-    sto_getConfig: IDL.Func([], [Setting], ["query"]),
-    sto_getStratOrder: IDL.Func([Soid], [IDL.Opt(STOrder)], ["query"]),
-    sto_getStratOrderByTxid: IDL.Func([Txid__1], [IDL.Opt(STOrder)], ["query"]),
+    sto_getConfig: IDL.Func([], [Setting], ['query']),
+    sto_getStratOrder: IDL.Func([Soid], [IDL.Opt(STOrder)], ['query']),
+    sto_getStratOrderByTxid: IDL.Func([Txid__1], [IDL.Opt(STOrder)], ['query']),
     sto_getStratTxids: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList_1], []),
     sto_updateProOrder: IDL.Func(
       [
@@ -1879,14 +1881,14 @@ export default ({ IDL }) => {
                 Percent: IDL.Opt(Ppm),
                 Token0: IDL.Nat,
                 Token1: IDL.Nat,
-              })
+              }),
             ),
           }),
         }),
         IDL.Opt(Sa),
       ],
       [Soid],
-      []
+      [],
     ),
     sto_updateStopLossOrder: IDL.Func(
       [
@@ -1898,32 +1900,32 @@ export default ({ IDL }) => {
               side: OrderSide,
               quantity: IDL.Nat,
               price: Price__1,
-            })
+            }),
           ),
           triggerPrice: IDL.Opt(Price__1),
         }),
         IDL.Opt(Sa),
       ],
       [Soid],
-      []
+      [],
     ),
     sync: IDL.Func([], [], []),
-    sysMode: IDL.Func([], [IDL.Record({ mode: SysMode, openingTime: Time })], ["query"]),
-    ta_ambassador: IDL.Func([Address], [IDL.Bool, IDL.Text, IDL.Nat, Vol], ["query"]),
-    ta_description: IDL.Func([], [IDL.Text], ["query"]),
-    ta_getReferrer: IDL.Func([Address], [IDL.Opt(IDL.Tuple(Address, IDL.Bool))], ["query"]),
+    sysMode: IDL.Func([], [IDL.Record({ mode: SysMode, openingTime: Time })], ['query']),
+    ta_ambassador: IDL.Func([Address], [IDL.Bool, IDL.Text, IDL.Nat, Vol], ['query']),
+    ta_description: IDL.Func([], [IDL.Text], ['query']),
+    ta_getReferrer: IDL.Func([Address], [IDL.Opt(IDL.Tuple(Address, IDL.Bool))], ['query']),
     ta_setDescription: IDL.Func([IDL.Text], [], []),
     ta_setReferrer: IDL.Func([Address, IDL.Opt(IDL.Text), IDL.Opt(Sa)], [IDL.Bool], []),
-    ta_stats: IDL.Func([IDL.Opt(IDL.Text)], [IDL.Nat, IDL.Nat, Vol], ["query"]),
+    ta_stats: IDL.Func([IDL.Opt(IDL.Text)], [IDL.Nat, IDL.Nat, Vol], ['query']),
     timerStart: IDL.Func([IDL.Nat], [], []),
     timerStop: IDL.Func([], [], []),
-    token0: IDL.Func([], [TokenType, IDL.Opt(TokenStd)], ["query"]),
-    token1: IDL.Func([], [TokenType, IDL.Opt(TokenStd)], ["query"]),
-    tpsStats: IDL.Func([], [IDL.Nat, IDL.Float64, IDL.Nat, IDL.Nat, IDL.Int, IDL.Int], ["query"]),
+    token0: IDL.Func([], [TokenType, IDL.Opt(TokenStd)], ['query']),
+    token1: IDL.Func([], [TokenType, IDL.Opt(TokenStd)], ['query']),
+    tpsStats: IDL.Func([], [IDL.Nat, IDL.Float64, IDL.Nat, IDL.Nat, IDL.Int, IDL.Int], ['query']),
     trade: IDL.Func(
       [OrderPrice, OrderType, IDL.Opt(PeriodNs), IDL.Opt(Nonce), IDL.Opt(Sa), IDL.Opt(Data)],
       [TradingResult],
-      []
+      [],
     ),
     tradeCore: IDL.Func(
       [
@@ -1937,12 +1939,12 @@ export default ({ IDL }) => {
         IDL.Opt(IDL.Bool),
       ],
       [TradingResult],
-      []
+      [],
     ),
     tradeMKT: IDL.Func(
       [DebitToken, Amount, IDL.Opt(Nonce), IDL.Opt(Sa), IDL.Opt(Data)],
       [TradingResult],
-      []
+      [],
     ),
     tradeMKT_b: IDL.Func(
       [
@@ -1955,7 +1957,7 @@ export default ({ IDL }) => {
         IDL.Opt(IDL.Record({ broker: IDL.Principal, rate: IDL.Float64 })),
       ],
       [TradingResult],
-      []
+      [],
     ),
     trade_b: IDL.Func(
       [
@@ -1968,21 +1970,19 @@ export default ({ IDL }) => {
         IDL.Opt(IDL.Record({ broker: IDL.Principal, rate: IDL.Float64 })),
       ],
       [TradingResult],
-      []
+      [],
     ),
-    userCount: IDL.Func([], [IDL.Nat], ["query"]),
-    version: IDL.Func([], [IDL.Text], ["query"]),
-    volsAll: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList], ["query"]),
+    userCount: IDL.Func([], [IDL.Nat], ['query']),
+    version: IDL.Func([], [IDL.Text], ['query']),
+    volsAll: IDL.Func([IDL.Opt(ListPage), IDL.Opt(ListSize)], [TrieList], ['query']),
     wallet_receive: IDL.Func([], [], []),
     withdraw: IDL.Func([IDL.Opt(Amount), IDL.Opt(Amount), IDL.Opt(Sa)], [Amount, Amount], []),
     withdraw2: IDL.Func(
       [IDL.Opt(Amount), IDL.Opt(Amount), IDL.Opt(Sa)],
       [Amount, Amount, IDL.Variant({ Completed: IDL.Null, Pending: IDL.Null })],
-      []
+      [],
     ),
     withdraw_cycles: IDL.Func([IDL.Nat], [], []),
   });
 };
-export const init = ({ IDL }) => {
-  return [];
-};
+export const init = ({ IDL }) => [];

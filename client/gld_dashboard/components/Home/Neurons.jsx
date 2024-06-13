@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import DataCard from './DataCard.jsx';
-import Modal from '../shared/modal/modal.jsx';
-import ModalNeuron from '../shared/modal/modal-neuron.jsx';
+import DataCard from './DataCard';
+import Modal from '../shared/modal/modal';
+import ModalNeuron from '../shared/modal/modal-neuron';
 
 export default function Neurons() {
   const [dataNeuron, setDataNeuron] = useState(null);

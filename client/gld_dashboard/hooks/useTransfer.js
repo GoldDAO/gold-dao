@@ -3,7 +3,7 @@ import { Bounce, toast } from 'react-toastify';
 import { useState } from 'react';
 import { p } from '../utils/parsers';
 import useActor from './useActor';
-import { useSession } from './useSession';
+import useSession from './useSession';
 
 const useTransfer = ({ selectedToken, amount, to }) => {
   const [loading, setLoading] = useState(false);

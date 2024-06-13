@@ -1,19 +1,19 @@
-import { KeyboardArrow } from "../../../utils/svgs";
-import React from "react";
+import React from 'react';
+import { KeyboardArrow } from '../../../utils/svgs';
 
 const Keyboard = ({ onKeyPress, inputValue }) => {
   const handleKeyPress = (key) => {
-    if (key === "DEL") {
+    if (key === 'DEL') {
       onKeyPress(inputValue.slice(0, -1));
     } else {
       onKeyPress(inputValue + key);
     }
   };
   const keyboardButtons = [
-    ["1", "2", "3"],
-    ["4", "5", "6"],
-    ["7", "8", "9"],
-    [",", "0", "DEL"],
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    [',', '0', 'DEL'],
   ];
 
   return (
@@ -26,7 +26,7 @@ const Keyboard = ({ onKeyPress, inputValue }) => {
               className="my-1 p-2 rounded text-2xl flex justify-center items-center"
               onClick={() => handleKeyPress(button)}
             >
-              {button === "DEL" ? KeyboardArrow : button}
+              {button === 'DEL' ? KeyboardArrow : button}
             </button>
           ))}
         </div>

@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import OverviewItem from '../../Home/Items/OverviewItem.jsx';
+import OverviewItem from '../../Home/Items/OverviewItem';
 
 const ModalCollapseOverView = ({ overview }) => (
     <div className="mb-[55%]">

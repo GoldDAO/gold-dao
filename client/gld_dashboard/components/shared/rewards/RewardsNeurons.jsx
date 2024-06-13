@@ -11,7 +11,7 @@ import {
   uint8ArrayToHexString,
 } from '../../../utils/functions';
 import Modal from '../modal/modal';
-import ModalAdd from '../modal/modal-add.tsx';
+import ModalAdd from '../modal/modal-add';
 import ModalClaimAll from '../modal/modal-claim-all';
 import ModalClaimMobile from '../modal/modal-claim-mobile';
 import ModalConfirm from '../modal/modal-confirm';
