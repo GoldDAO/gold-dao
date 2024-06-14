@@ -67,6 +67,7 @@ fn test_cycles_management() {
         &cycles_manager_api_canister::update_config::Args {
             max_top_up_amount: Some(20_000_000_000_000),
             min_cycles_balance: Some(20_000_000_000_000),
+            icp_burn_amount: None,
         },
     );
     test_env.pic.tick();

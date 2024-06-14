@@ -1,5 +1,4 @@
 use candid::{CandidType, Principal};
-use ic_ledger_types::BlockIndex;
 use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use types::{CanisterId, Cycles};

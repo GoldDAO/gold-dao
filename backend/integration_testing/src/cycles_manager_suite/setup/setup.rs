@@ -1,11 +1,20 @@
 use super::setup_burner::setup_burner_canister;
+use super::setup_cycles_minting::setup_cycles_minting;
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
+use crate::cycles_manager_suite::setup::setup_icp_ledger::setup_icp_ledger;
 use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
 use crate::utils::random_principal;
 use candid::Principal;
+use ic_ledger_types::AccountIdentifier;
+use ic_ledger_types::Subaccount;
 use ic_ledger_types::Tokens;
 use pocket_ic::{PocketIc, PocketIcBuilder};
+use std::collections::HashMap;
+use std::collections::HashSet;
+use types::CanisterId;
 use types::Cycles;
+
+pub const DEFAULT_SUBACCOUNT: Subaccount = Subaccount([0; 32]);
 
 const T: Cycles = 1_000_000_000_000;
 
@@ -14,6 +23,8 @@ pub struct CyclesManagerEnv {
     pub cycles_manager_id: Principal,
     pub burner_canister_id: Principal,
     pub sns_root_canister_id: Principal,
+    pub icp_ledger_canister_id: CanisterId,
+    pub cycles_minting_canister_id: CanisterId,
     pub pic: PocketIc,
 }
 
@@ -21,20 +32,37 @@ impl CyclesManagerEnv {}
 
 pub struct CyclesManagerTestEnvBuilder {
     controller: Principal,
+    pub max_top_up_amount: Cycles,
+    pub min_cycles_balance: Cycles,
+    pub icp_burn_amount: Tokens,
+}
+
+impl Default for CyclesManagerTestEnvBuilder {
+    fn default() -> Self {
+        Self {
+            controller: random_principal(),
+            max_top_up_amount: T,
+            min_cycles_balance: T,
+            icp_burn_amount: Tokens::from_e8s(10_000_000_000),
+        }
+    }
 }
 
 impl CyclesManagerTestEnvBuilder {
     pub fn new() -> Self {
-        Self {
-            controller: random_principal(),
-        }
+        CyclesManagerTestEnvBuilder::default()
     }
-
-    /// is the controller of everything - no real need for this but nice to have if you want to be specific
-    pub fn _new_with_controller(principal: Principal) -> Self {
-        Self {
-            controller: principal,
-        }
+    pub fn with_controller(mut self, principal: Principal) {
+        self.controller = principal;
+    }
+    pub fn with_max_top_up_amount(mut self, max_top_up_amount: Cycles) {
+        self.max_top_up_amount = max_top_up_amount;
+    }
+    pub fn with_min_cycles_balance(mut self, min_cycles_balance: Cycles) {
+        self.min_cycles_balance = min_cycles_balance;
+    }
+    pub fn with_icp_burn_amount(mut self, icp_burn_amount: Tokens) {
+        self.icp_burn_amount = icp_burn_amount;
     }
 
     pub fn build(self) -> CyclesManagerEnv {
@@ -69,17 +97,39 @@ impl CyclesManagerTestEnvBuilder {
         let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller, root_init_args);
         pic.tick();
 
+        let minting_account = AccountIdentifier::new(&self.controller, &DEFAULT_SUBACCOUNT);
+        let icp_ledger_init_args = crate::cycles_manager_suite::setup::setup_icp_ledger::Args {
+            minting_account: minting_account.to_string(),
+            initial_values: HashMap::new(),
+            send_whitelist: HashSet::new(),
+            transfer_fee: Some(Tokens::from_e8s(10_000)),
+        };
+        let icp_ledger_canister_id =
+            setup_icp_ledger(&mut pic, &self.controller, icp_ledger_init_args);
+
+        let cycles_minting_init_args =
+            crate::cycles_manager_suite::setup::setup_cycles_minting::Args {
+                ledger_canister_id: icp_ledger_canister_id,
+                governance_canister_id: CanisterId::anonymous(),
+                minting_account_id: Some(minting_account.to_string()),
+                last_purged_notification: Some(0),
+            };
+
+        let cycles_minting_canister_id =
+            setup_cycles_minting(&mut pic, &self.controller, cycles_minting_init_args);
+        pic.tick();
+
         // Define initialization arguments for cycles manager canister
         let cycles_manager_init_args = cycles_manager_api_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.controller],
             canisters: vec![burner_canister_id, sns_root_canister_id],
             sns_root_canister: sns_root_canister_id,
-            max_top_up_amount: 20 * T,
-            min_cycles_balance: 10 * T,
-            icp_burn_amount: Tokens::from_e8s(0),
-            ledger_canister: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 5]),
-            cycles_minting_canister: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 6]),
+            max_top_up_amount: self.max_top_up_amount,
+            min_cycles_balance: self.min_cycles_balance,
+            icp_burn_amount: self.icp_burn_amount,
+            ledger_canister: icp_ledger_canister_id,
+            cycles_minting_canister: cycles_minting_canister_id,
         };
 
         let cycles_manager_id: Principal =
@@ -90,6 +140,8 @@ impl CyclesManagerTestEnvBuilder {
             cycles_manager_id,
             burner_canister_id,
             sns_root_canister_id,
+            icp_ledger_canister_id,
+            cycles_minting_canister_id,
             pic,
         }
     }

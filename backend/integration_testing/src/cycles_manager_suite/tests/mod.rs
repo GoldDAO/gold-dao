@@ -1,1 +1,2 @@
-pub mod test_cycles_manager;
+pub mod test_burn_icp_into_cycles;
+pub mod test_top_up;
