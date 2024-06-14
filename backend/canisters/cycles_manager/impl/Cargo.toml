@@ -15,10 +15,14 @@ canister_state_macros = { path = "../../../libraries/canister_state_macros" }
 canister_tracing_macros = { path = "../../../libraries/canister_tracing_macros" }
 canister_time = { path = "../../../libraries/canister_time" }
 cycles_manager_api_canister = { path = "../api" }
+cycles_minting_canister = { path = "../../../external_canisters/cycles_minting_canister/api" }
+cycles_minting_canister_c2c_client = { path = "../../../external_canisters/cycles_minting_canister/c2c_client" }
 ic-cdk = { workspace = true }
 ic-cdk-timers = { workspace = true }
 ic-cdk-macros = { workspace = true }
 ic-stable-structures = { workspace = true }
+ic-ledger-types = { workspace = true }
+icp_ledger_canister_c2c_client = { path = "../../../external_canisters/icp_ledger/c2c_client" }
 #rand = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }

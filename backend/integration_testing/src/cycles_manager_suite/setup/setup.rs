@@ -3,6 +3,7 @@ use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manage
 use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
 use crate::utils::random_principal;
 use candid::Principal;
+use ic_ledger_types::Tokens;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use types::Cycles;
 
@@ -76,6 +77,9 @@ impl CyclesManagerTestEnvBuilder {
             sns_root_canister: sns_root_canister_id,
             max_top_up_amount: 20 * T,
             min_cycles_balance: 10 * T,
+            icp_burn_amount: Tokens::from_e8s(0),
+            ledger_canister: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 5]),
+            cycles_minting_canister: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 6]),
         };
 
         let cycles_manager_id: Principal =

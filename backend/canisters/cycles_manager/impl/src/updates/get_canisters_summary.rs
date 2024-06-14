@@ -5,7 +5,8 @@ use ic_cdk_macros::update;
 
 #[update]
 async fn get_canisters_summary() -> CanistersSummaryResponse {
-    let sns_root_canister = read_state(|state: &crate::state::State| state.data.sns_root_canister);
+    let sns_root_canister =
+        read_state(|state: &crate::state::State| state.data.top_up_config.sns_root_canister);
 
     match sync_canister_stats(sns_root_canister).await {
         Ok(_) => CanistersSummaryResponse::Success(read_state(|state| state.metrics().canisters)),

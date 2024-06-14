@@ -445,12 +445,16 @@ dependencies = [
  "canister_time",
  "canister_tracing_macros",
  "cycles_manager_api_canister",
+ "cycles_minting_canister",
+ "cycles_minting_canister_c2c_client",
  "futures",
  "http_request",
  "ic-cdk 0.13.2",
  "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
+ "ic-ledger-types",
  "ic-stable-structures",
+ "icp_ledger_canister_c2c_client",
  "serde",
  "serde_bytes",
  "serde_json",
@@ -477,6 +481,26 @@ dependencies = [
  "serializer",
  "stable_memory",
  "tracing",
+ "types",
+]
+
+[[package]]
+name = "cycles_minting_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "serde",
+]
+
+[[package]]
+name = "cycles_minting_canister_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_client",
+ "cycles_minting_canister",
+ "ic-cdk 0.13.2",
  "types",
 ]
 

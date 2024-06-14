@@ -15,7 +15,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    let canister_id = read_state(|state| state.data.sns_root_canister);
+    let canister_id = read_state(|state| state.data.top_up_config.sns_root_canister);
     ic_cdk::spawn(top_up_canisters(canister_id));
 }
 
@@ -55,7 +55,7 @@ pub async fn sync_canister_stats(canister_id: CanisterId) -> Result<Vec<Canister
 async fn top_up_canisters(canister_id: CanisterId) {
     match sync_canister_stats(canister_id).await {
         Ok(canisters) => {
-            let top_up_threshold = read_state(|state| state.data.min_cycles_balance);
+            let top_up_threshold = read_state(|state| state.data.top_up_config.min_cycles_balance);
 
             let to_top_up: Vec<_> = canisters
                 .into_iter()
@@ -64,7 +64,7 @@ async fn top_up_canisters(canister_id: CanisterId) {
                 .collect();
 
             if !to_top_up.is_empty() {
-                let top_up_amount = read_state(|state| state.data.max_top_up_amount);
+                let top_up_amount = read_state(|state| state.data.top_up_config.max_top_up_amount);
 
                 let top_up_futures = to_top_up
                     .iter()
