@@ -488,26 +488,55 @@ gld dashboard preprod:
     url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
     action: start
 
-# gld dashboard production:
-#   stage: deploy
-#   resource_group: frontend production deployment
-#   variables:
-#     CANISTER_NAME: "gld_dashboard"
-#   rules:
-#     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
-#       needs: ["gld_dashboard production build"]
-#       variables:
-#         TARGET_NETWORK: ic
-#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
-#   before_script:
-#     - !reference [.import dfx identity, before_script]
-#   script:
-#     - !reference [.asset canister production deploy, script]
-#   environment:
-#     name: gld dashboard
-#     deployment_tier: production
-#     url: https://dashboard.gold-dao.org/
-#     action: start
+gld dashboard production:
+  stage: deploy
+  resource_group: frontend production deployment
+  variables:
+    CANISTER_NAME: "gld_dashboard"
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
+      changes:
+        - "gld_dashboard/*.{js,json}"
+        - "gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+      needs: ["gld_dashboard production build"]
+      variables:
+        TARGET_NETWORK: ic
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - !reference [.asset canister production deploy, script]
+  environment:
+    name: gld dashboard
+    deployment_tier: production
+    url: https://dashboard.gold-dao.org/
+    action: start
+
+
+gld dashboard maintenance:
+  stage: deploy
+  resource_group: frontend production deployment
+  variables:
+    CANISTER_NAME: "gld_dashboard"
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-maintenance-v\d+\.\d+\.\d+$/'
+      changes:
+        - "gld_dashboard/*.{js,json}"
+        - "gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+      needs: ["gld_dashboard maintenance build"]
+      variables:
+        TARGET_NETWORK: ic
+        PEM_FILE: "${PEM_FILE_PRODUCTION}"
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - !reference [.asset canister maintenance deploy, script]
+  environment:
+    name: gld dashboard
+    deployment_tier: production
+    url: https://dashboard.gold-dao.org/
+    action: start
+
 
 .backend canisters upgrade proposal tests:
   stage: deploy
