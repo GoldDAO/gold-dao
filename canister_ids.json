@@ -36,6 +36,10 @@
     "ic": "j4jiq-sqaaa-aaaap-ab23a-cai",
     "staging": "j2neh-vqaaa-aaaal-aduxq-cai"
   },
+  "management" : {
+    "staging": "t5uzw-sqaaa-aaaan-qmoaq-cai",
+    "prod": "g5je6-yaaaa-aaaap-ahkza-cai"
+  },
   "cycles_manager": {
     "ic": "atslz-hiaaa-aaaam-acq6q-cai",
     "staging": "y4bmn-taaaa-aaaak-qillq-cai"
