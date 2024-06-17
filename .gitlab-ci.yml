@@ -809,7 +809,7 @@ management staging:
     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t5uzw-sqaaa-aaaan-qmoaq-cai
     action: start
 
-management:
+management prod:
   stage: deploy
   resource_group: backend canister staging deployment
   rules:

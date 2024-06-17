@@ -9,7 +9,7 @@ spec:
           "token_metrics",
           "sns_rewards",
           "cycles_manager",
-          "maintenance",
+          "management",
         ]
 ---
 # Rust canisters test and production builds
