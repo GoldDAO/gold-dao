@@ -13,10 +13,6 @@ const nextConfig = {
   },
   env: {
     ENV: process.env.ENV,
-    MAINTENANCE_MODE: process.env.MAINTENANCE_MODE,
-  },
-  publicRuntimeConfig: {
-    NEXT_PUBLIC_MAINTENANCE_MODE: process.env.MAINTENANCE_MODE,
   },
 };
 
