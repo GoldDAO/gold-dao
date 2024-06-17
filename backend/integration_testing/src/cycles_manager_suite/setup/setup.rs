@@ -16,8 +16,6 @@ use types::Cycles;
 
 pub const DEFAULT_SUBACCOUNT: Subaccount = Subaccount([0; 32]);
 
-const T: Cycles = 1_000_000_000_000;
-
 pub struct CyclesManagerEnv {
     pub controller: Principal,
     pub cycles_manager_id: Principal,
@@ -41,9 +39,9 @@ impl Default for CyclesManagerTestEnvBuilder {
     fn default() -> Self {
         Self {
             controller: random_principal(),
-            max_top_up_amount: T,
-            min_cycles_balance: T,
-            icp_burn_amount: Tokens::from_e8s(10_000_000_000),
+            max_top_up_amount: 20_000_000_000_000,
+            min_cycles_balance: 20_000_000_000_000,
+            icp_burn_amount: Tokens::from_e8s(1_000_000_000),
         }
     }
 }
@@ -52,17 +50,21 @@ impl CyclesManagerTestEnvBuilder {
     pub fn new() -> Self {
         CyclesManagerTestEnvBuilder::default()
     }
-    pub fn with_controller(mut self, principal: Principal) {
+    pub fn with_controller(mut self, principal: Principal) -> Self {
         self.controller = principal;
+        self
     }
-    pub fn with_max_top_up_amount(mut self, max_top_up_amount: Cycles) {
+    pub fn with_max_top_up_amount(mut self, max_top_up_amount: Cycles) -> Self {
         self.max_top_up_amount = max_top_up_amount;
+        self
     }
-    pub fn with_min_cycles_balance(mut self, min_cycles_balance: Cycles) {
+    pub fn with_min_cycles_balance(mut self, min_cycles_balance: Cycles) -> Self {
         self.min_cycles_balance = min_cycles_balance;
+        self
     }
-    pub fn with_icp_burn_amount(mut self, icp_burn_amount: Tokens) {
-        self.icp_burn_amount = icp_burn_amount;
+    pub fn with_icp_burn_amount(mut self, icp_burn_amount: u64) -> Self {
+        self.icp_burn_amount = Tokens::from_e8s(icp_burn_amount);
+        self
     }
 
     pub fn build(self) -> CyclesManagerEnv {

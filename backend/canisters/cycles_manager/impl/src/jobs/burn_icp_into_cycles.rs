@@ -59,11 +59,14 @@ fn get_next_action(state: &mut State) -> Action {
     } else {
         let cycles_balance = state.env.cycles_balance();
 
-        // TODO: make here check that it would be enough funds to top up min_cycles_balance X times. X - amount of canisters to top up
-
-        // Burn ICP into cycles whenever the cycles balance is < 2 * min_cycles_balance, this prevents
-        // the balance from ever falling below `min_cycles_balance`
-        if cycles_balance < 2 * state.data.top_up_config.min_cycles_balance {
+        // NOTE: here we make sure that it would be enough funds to top up min_cycles_balance X times. X - amount of canisters to top up
+        let canisters_to_top_up: u64 = state
+            .data
+            .canisters
+            .get_canisters_quantity()
+            .try_into()
+            .unwrap();
+        if cycles_balance < canisters_to_top_up * state.data.top_up_config.min_cycles_balance {
             Action::BurnIcp(BurnIcpDetails {
                 amount: state.data.burn_config.icp_burn_amount,
                 this_canister_id: state.env.canister_id(),

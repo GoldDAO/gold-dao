@@ -64,38 +64,47 @@ async fn top_up_canisters(canister_id: CanisterId) {
                 .collect();
 
             if !to_top_up.is_empty() {
+                let cycles_balance = read_state(|state| state.env.cycles_balance());
                 let top_up_amount = read_state(|state| state.data.top_up_config.max_top_up_amount);
+                let canisters_amount: u64 = to_top_up.len().try_into().unwrap();
+                let summary_top_up_amount = top_up_amount * canisters_amount;
 
-                let top_up_futures = to_top_up
-                    .iter()
-                    .map(|&canister_id| deposit_cycles(canister_id, top_up_amount));
+                if summary_top_up_amount < cycles_balance {
+                    let top_up_futures = to_top_up
+                        .iter()
+                        .map(|&canister_id| deposit_cycles(canister_id, top_up_amount));
 
-                let results = futures::future::join_all(top_up_futures).await;
+                    let results = futures::future::join_all(top_up_futures).await;
 
-                mutate_state(|state| {
-                    let now = state.env.now();
-                    for (index, result) in results.into_iter().enumerate() {
-                        let canister_id = to_top_up[index];
-                        match result {
-                            Ok(_) => {
-                                if let Some(canister) = state.data.canisters.get_mut(&canister_id) {
-                                    canister.record_top_up(top_up_amount, now);
-                                } else {
-                                    state.data.canisters.add(canister_id, now);
+                    mutate_state(|state| {
+                        let now = state.env.now();
+                        for (index, result) in results.into_iter().enumerate() {
+                            let canister_id = to_top_up[index];
+                            match result {
+                                Ok(_) => {
                                     if let Some(canister) =
                                         state.data.canisters.get_mut(&canister_id)
                                     {
                                         canister.record_top_up(top_up_amount, now);
+                                    } else {
+                                        state.data.canisters.add(canister_id, now);
+                                        if let Some(canister) =
+                                            state.data.canisters.get_mut(&canister_id)
+                                        {
+                                            canister.record_top_up(top_up_amount, now);
+                                        }
                                     }
                                 }
-                            }
-                            Err(e) => {
-                                // TODO: add journaling here
-                                error!("Failed to top up canister {}: {:?}", canister_id, e);
+                                Err(e) => {
+                                    // TODO: add journaling here
+                                    error!("Failed to top up canister {}: {:?}", canister_id, e);
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                } else {
+                    error!("Failed to top up canisters: the cycles manager canister balance is too low");
+                }
             }
         }
         Err(e) => {

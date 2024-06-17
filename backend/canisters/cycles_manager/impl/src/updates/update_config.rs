@@ -18,5 +18,8 @@ fn update_config_impl(args: UpdateConfigArgs, state: &mut State) -> UpdateConfig
     if let Some(min_cycles_balance) = args.min_cycles_balance {
         state.data.top_up_config.min_cycles_balance = min_cycles_balance;
     }
+    if let Some(icp_burn_amount) = args.icp_burn_amount {
+        state.data.burn_config.icp_burn_amount = icp_burn_amount;
+    }
     UpdateConfigResponse::Success
 }

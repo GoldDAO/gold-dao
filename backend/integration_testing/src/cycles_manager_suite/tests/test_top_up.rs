@@ -1,5 +1,5 @@
 use crate::client::cycles_manager;
-use crate::cycles_manager_suite::setup::default_test_setup;
+use crate::cycles_manager_suite::setup::default_top_up_test_setup;
 use crate::utils::tick_n_blocks;
 use candid::Nat;
 use candid::{encode_one, CandidType, Principal};
@@ -40,7 +40,7 @@ pub struct CanisterStatusResult {
 // Define the test function
 #[test]
 fn test_cycles_management() {
-    let mut test_env = default_test_setup();
+    let mut test_env = default_top_up_test_setup();
 
     // Get canisters ID:
     let cycles_manager_id = test_env.cycles_manager_id;

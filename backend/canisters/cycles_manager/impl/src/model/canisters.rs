@@ -45,6 +45,10 @@ impl Canisters {
         self.canisters.get_mut(canister_id)
     }
 
+    pub fn get_canisters_quantity(&self) -> usize {
+        self.canisters.len()
+    }
+
     pub fn metrics(&self) -> Vec<CanisterMetrics> {
         self.canisters
             .iter()

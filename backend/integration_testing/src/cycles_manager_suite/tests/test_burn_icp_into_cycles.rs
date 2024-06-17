@@ -1,13 +1,13 @@
 use crate::client::cycles_manager;
 use crate::client::icrc1::client::{balance_of, transfer};
-use crate::cycles_manager_suite::setup::default_test_setup;
+use crate::cycles_manager_suite::setup::default_burn_icp_into_cycles_test_setup;
 use crate::utils::tick_n_blocks;
 use ic_ledger_types::Tokens;
 use std::time::Duration;
 
 #[test]
 fn icp_is_burned_into_cycles() {
-    let mut test_env = default_test_setup();
+    let mut test_env = default_burn_icp_into_cycles_test_setup();
 
     let cycles_manager_id = test_env.cycles_manager_id;
 
@@ -33,13 +33,13 @@ fn icp_is_burned_into_cycles() {
         test_env.controller,
         cycles_manager_id,
         &cycles_manager_api_canister::update_config::Args {
-            max_top_up_amount: Some((cycles_balance + 10_000_000_000_000).try_into().unwrap()),
+            max_top_up_amount: Some((cycles_balance + 100_000_000_000_000).try_into().unwrap()),
             min_cycles_balance: None,
             icp_burn_amount: Some(Tokens::from_e8s(10_000_000_000)),
         },
     );
 
-    test_env.pic.advance_time(Duration::from_secs(5 * 60 * 60)); // 5 hours
+    test_env.pic.advance_time(Duration::from_secs(5 * 60 * 60));
     tick_n_blocks(&test_env.pic, 10);
 
     let new_icp_balance = balance_of(
@@ -48,6 +48,12 @@ fn icp_is_burned_into_cycles() {
         cycles_manager_id,
     );
     let new_cycles_balance = test_env.pic.cycle_balance(test_env.cycles_manager_id);
+
+    println!("icp_balance: {}", icp_balance);
+    println!("new_icp_balance: {}", new_icp_balance);
+
+    println!("cycles_balance: {}", cycles_balance);
+    println!("new_cycles_balance: {}", new_cycles_balance);
 
     assert!(new_icp_balance < icp_balance);
     assert!(
