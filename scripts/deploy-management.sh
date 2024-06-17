@@ -4,7 +4,7 @@
 
 show_help() {
   cat << EOF
-maintenance canister deployment script.
+management canister deployment script.
 Must be run from the repository's root folder, and with a running replica if for local deployment.
 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
 The NETWORK argument should preferably be passed from the env variable that was previously defined
@@ -62,11 +62,11 @@ ARGS='(record {
 echo "Deployment arguments: \n" $ARGS
 
 if [[ $1 == "local" ]]; then
-  dfx deploy maintenance --network $1 ${REINSTALL} --argument "$ARGS" -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^maintenance-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  dfx deploy management --network $1 ${REINSTALL} --argument "$ARGS" -y
+elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^management-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy maintenance --network $1 ${REINSTALL} --argument "$ARGS" -y
+  dfx deploy management --network $1 ${REINSTALL} --argument "$ARGS" -y
 
 fi
 return
