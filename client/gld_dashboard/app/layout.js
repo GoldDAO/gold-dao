@@ -12,7 +12,7 @@ import Maintenance from '../components/Maintenance/index';
 import Header from '../components/shared/Header/Header';
 import Navbar from '../components/shared/Navbar';
 import Providers from './providers';
-import useManagement from '../hooks/useMangement';
+import useManagement from '../hooks/useManagement';
 
 const inter = Inter({ subsets: ['latin'] });
 

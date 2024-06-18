@@ -27,6 +27,7 @@ impl RuntimeState {
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
             },
             gld_dashbaord_maintenance_mode: self.data.gld_dashbaord_maintenance_mode,
+            authorized_principals: self.data.authorized_principals.clone(),
         }
     }
 
@@ -40,6 +41,7 @@ impl RuntimeState {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub gld_dashbaord_maintenance_mode: bool,
+    pub authorized_principals: Vec<Principal>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
