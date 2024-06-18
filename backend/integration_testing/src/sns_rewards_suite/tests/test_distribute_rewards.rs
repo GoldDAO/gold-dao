@@ -7,7 +7,7 @@ use sns_rewards_api_canister::{
     get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
     subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
-use types::TokenSymbol;
+use types::{ TimestampMillis, TokenSymbol };
 
 use crate::{
     client::{
@@ -584,4 +584,87 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     );
     assert_eq!(historic_icp_rounds.len(), 1);
     test_env.pic.tick();
+}
+
+#[test]
+fn test_distribution_occurs_within_correct_time_intervals() {
+    let mut test_env = default_test_setup();
+
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+
+    // ********************************
+    // 1. Distribute rewards - first week
+    // ********************************
+
+    test_env.simulate_neuron_voting(2);
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 2. Distribute rewards - second week
+    // ********************************
+
+    test_env.simulate_neuron_voting(3);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // ********************************
+    // 2. tests
+    // ********************************
+
+    let distribution_1_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
+    );
+    let distribution_2_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 2 })
+    );
+    assert_eq!(distribution_1_record.len(), 1);
+    assert_eq!(distribution_2_record.len(), 1);
+    let first_distribution_time = distribution_1_record[0].1.date_initialized;
+    let second_distribution_time = distribution_2_record[0].1.date_initialized;
+    assert!(is_interval_more_than_7_days(first_distribution_time, second_distribution_time))
+}
+
+pub fn is_interval_more_than_7_days(
+    previous_time: TimestampMillis,
+    now_time: TimestampMillis
+) -> bool {
+    // convert the milliseconds to the number of days since UNIX Epoch.
+    // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245
+    let previous_in_days = previous_time / DAY_IN_MS;
+    let current_in_days = now_time / DAY_IN_MS;
+    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
+    current_in_days >= previous_in_days + 7
 }

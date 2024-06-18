@@ -50,6 +50,7 @@ impl RuntimeState {
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
             last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
             daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
+            last_reward_distribution_time: self.data.last_reward_distribution_time.clone(),
         }
     }
 
@@ -78,6 +79,7 @@ pub struct Metrics {
     pub last_daily_reserve_transfer_time: TimestampMillis,
     pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
     pub daily_gldgov_burn_amount: Option<Nat>,
+    pub last_reward_distribution_time: Option<TimestampMillis>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -123,6 +125,8 @@ pub struct Data {
     pub daily_gldgov_burn_rate: Option<Nat>,
     /// The last time a burn of GLDGov was done
     pub last_daily_gldgov_burn: Option<TimestampMillis>,
+    /// The last time a distribution of rewards was done ( 7 day cycle )
+    pub last_reward_distribution_time: Option<TimestampMillis>,
 }
 
 impl Default for Data {
@@ -141,6 +145,7 @@ impl Default for Data {
             last_daily_reserve_transfer_time: TimestampMillis::default(),
             daily_gldgov_burn_rate: None,
             last_daily_gldgov_burn: None,
+            last_reward_distribution_time: None,
         }
     }
 }
