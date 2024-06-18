@@ -56,7 +56,7 @@ fi
 
 ARGS='(record {
   test_mode = '"$TESTMODE"';
-  authorized_principals = vec { principal \"'$AUTHORIZED_PRINCIPALS'\" };
+  authorized_principals = vec { principal "'"$AUTHORIZED_PRINCIPAL"'"; };
 })'
 
 echo "Deployment arguments: \n" $ARGS
