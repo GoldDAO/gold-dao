@@ -4,6 +4,8 @@ members = [
   "backend/canisters/cycles_manager/api",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
+  "backend/canisters/management/impl",
+  "backend/canisters/management/api",
   "backend/canisters/sns_rewards/impl",
   "backend/canisters/sns_rewards/api",
   "backend/canisters/icp_neuron/impl",

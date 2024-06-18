@@ -2,6 +2,7 @@
 
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect, useState } from 'react';
 
 import { Inter } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
@@ -11,6 +12,7 @@ import Maintenance from '../components/Maintenance/index';
 import Header from '../components/shared/Header/Header';
 import Navbar from '../components/shared/Navbar';
 import Providers from './providers';
+import useManagement from '../hooks/useManagement';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,7 +21,17 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
-  const isMaintenanceMode = process.env.MAINTENANCE_MODE;
+  const [isMaintenanceMode, setMaintenanceMode] = useState(false);
+  const { getMaintenanceMode } = useManagement();
+
+  useEffect(() => {
+    // icp balance
+    (async () => {
+      const mode = await getMaintenanceMode();
+      setMaintenanceMode(mode);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMaintenanceMode]);
 
   if (isMaintenanceMode) {
     return <Maintenance />;

@@ -14,6 +14,7 @@
       - backend/canisters/token_metrics/target
       - backend/canisters/sns_rewards/target
       - backend/canisters/cycles_manager/target
+      - backend/canisters/management/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
