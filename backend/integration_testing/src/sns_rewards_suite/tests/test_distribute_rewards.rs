@@ -654,5 +654,97 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_2_record.len(), 1);
     let first_distribution_time = distribution_1_record[0].1.date_initialized;
     let second_distribution_time = distribution_2_record[0].1.date_initialized;
-    assert!(is_interval_more_than_7_days(first_distribution_time, second_distribution_time))
+    assert!(is_interval_more_than_7_days(first_distribution_time, second_distribution_time));
+
+    // *********************************
+    // 3. Test distributions didn't occur between the 7 days
+    // *********************************
+
+    test_env.simulate_neuron_voting(4);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+
+    // TRIGGER - synchronize_neurons
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 100);
+
+    // check for a distribution 1 day in
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 2 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 3 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 4 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 5 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 6 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 0);
+
+    // check for a distribution 7 days in
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 1);
 }
