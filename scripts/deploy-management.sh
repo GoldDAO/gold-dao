@@ -48,11 +48,14 @@ fi
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
-  AUTHORIZED_PRINCIPALS=$(dfx identity get-principal)
 else
   TESTMODE="false"
-  AUTHORIZED_PRINCIPALS=$(dfx identity get-principal)
 fi
+
+AUTHORIZED_PRINCIPALS=$(dfx identity get-principal)
+echo "////// AUTHORIZED_PRINCIPAL: $AUTHORIZED_PRINCIPAL"
+
+
 
 ARGS='(record {
   test_mode = '"$TESTMODE"';
