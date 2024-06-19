@@ -589,33 +589,27 @@ fn test_distribute_rewards_adds_to_history_correctly() {
 #[test]
 fn test_distribution_occurs_within_correct_time_intervals() {
     let mut test_env = default_test_setup();
-
     let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
-
     let icp_token = TokenSymbol::parse("ICP").unwrap();
 
     // ********************************
     // 1. Distribute rewards - first week
+    // Note - 1 day after a canister install will trigger the distribution since the cron schedule is daily but there is no previous timestamp recorded.
     // ********************************
-
     test_env.simulate_neuron_voting(2);
 
     // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
+    test_env.pic.advance_time(Duration::from_secs(180 * 60));
     tick_n_blocks(&test_env.pic, 100);
 
     // ********************************
     // 2. Distribute rewards - second week
     // ********************************
-
     test_env.simulate_neuron_voting(3);
+    tick_n_blocks(&test_env.pic, 2);
     setup_reward_pools(
         &mut test_env.pic,
         &test_env.sns_gov_canister_id,
@@ -623,19 +617,18 @@ fn test_distribution_occurs_within_correct_time_intervals() {
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64
     );
-
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 2);
 
     // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_secs(180 * 60));
+    tick_n_blocks(&test_env.pic, 10);
 
     // ********************************
-    // 2. tests
+    // 3. Verify more than 7 days passed between both historic payment rounds
     // ********************************
 
     let distribution_1_record = get_historic_payment_round(
@@ -670,9 +663,9 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     );
 
     // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
     tick_n_blocks(&test_env.pic, 100);
-
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
     // check for a distribution 1 day in
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
@@ -683,8 +676,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 2 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -694,8 +689,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 3 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -705,8 +702,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 4 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -716,8 +715,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 5 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -727,8 +728,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 6 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -738,8 +741,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     assert_eq!(distribution_3_record.len(), 0);
 
     // check for a distribution 7 days in
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
     tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&test_env.pic, 1);
+
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
