@@ -46,16 +46,13 @@ if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   exit 2
 fi
 
-if [[ $1 =~ ^(local|staging)$ ]]; then
+if [[ $1 =~ ^(local|staging|preprod)$ ]]; then
   TESTMODE="true"
+  AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 else
   TESTMODE="false"
+  AUTHORIZED_PRINCIPAL=2we4k-xim55-asne3-m7o22-fliz6-lmu6q-5pwc5-evfit-4scxr-itg7g-xae
 fi
-
-AUTHORIZED_PRINCIPALS=$(dfx identity get-principal)
-echo "////// AUTHORIZED_PRINCIPAL: $AUTHORIZED_PRINCIPAL"
-
-
 
 ARGS='(record {
   test_mode = '"$TESTMODE"';
