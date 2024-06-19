@@ -662,94 +662,19 @@ fn test_distribution_occurs_within_correct_time_intervals() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-    // check for a distribution 1 day in
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 2 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 3 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 4 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 5 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 6 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 0);
-
-    // check for a distribution 7 days in
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 1);
-
-    let distribution_3_record = get_historic_payment_round(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
-    );
-    assert_eq!(distribution_3_record.len(), 1);
+    for i in 1..=7 {
+        let expect = if i == 7 { 1 } else { 0 };
+        // TRIGGER - synchronize_neurons
+        tick_n_blocks(&test_env.pic, 100);
+        test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+        tick_n_blocks(&test_env.pic, 1);
+        // check for a distribution 1 day in
+        let distribution_3_record = get_historic_payment_round(
+            &test_env.pic,
+            Principal::anonymous(),
+            rewards_canister_id,
+            &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+        );
+        assert_eq!(distribution_3_record.len(), expect);
+    }
 }
