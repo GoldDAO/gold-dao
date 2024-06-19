@@ -7,7 +7,7 @@ use sns_rewards_api_canister::{
     get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
     subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
-use types::{ TimestampMillis, TokenSymbol };
+use types::TokenSymbol;
 
 use crate::{
     client::{
@@ -15,7 +15,7 @@ use crate::{
         rewards::{ get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id },
     },
     sns_rewards_suite::setup::{ default_test_setup, setup::setup_reward_pools },
-    utils::tick_n_blocks,
+    utils::{ is_interval_more_than_7_days, tick_n_blocks },
 };
 
 #[test]
@@ -655,16 +655,4 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     let first_distribution_time = distribution_1_record[0].1.date_initialized;
     let second_distribution_time = distribution_2_record[0].1.date_initialized;
     assert!(is_interval_more_than_7_days(first_distribution_time, second_distribution_time))
-}
-
-pub fn is_interval_more_than_7_days(
-    previous_time: TimestampMillis,
-    now_time: TimestampMillis
-) -> bool {
-    // convert the milliseconds to the number of days since UNIX Epoch.
-    // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245
-    let previous_in_days = previous_time / DAY_IN_MS;
-    let current_in_days = now_time / DAY_IN_MS;
-    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
-    current_in_days >= previous_in_days + 7
 }
