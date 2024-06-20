@@ -49,6 +49,16 @@ fn icp_is_burned_into_cycles() {
     );
     let new_cycles_balance = test_env.pic.cycle_balance(test_env.cycles_manager_id);
 
+    let manager_status = test_env
+        .pic
+        .canister_status(cycles_manager_id, Some(test_env.controller));
+    println!("{:?}", manager_status.unwrap().status);
+
+    let burner_status = test_env
+        .pic
+        .canister_status(test_env.burner_canister_id, Some(test_env.controller));
+    println!("{:?}", burner_status.unwrap().status);
+
     println!("icp_balance: {}", icp_balance);
     println!("new_icp_balance: {}", new_icp_balance);
 

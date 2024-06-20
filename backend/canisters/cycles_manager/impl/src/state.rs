@@ -29,10 +29,11 @@ impl State {
         self.data.authorized_principals.contains(&self.env.caller())
     }
 
-    pub fn get_top_up_config(&self) -> GetConfigResponse {
+    pub fn get_config(&self) -> GetConfigResponse {
         GetConfigResponse {
             max_top_up_amount: self.data.top_up_config.max_top_up_amount,
             min_cycles_balance: self.data.top_up_config.min_cycles_balance,
+            icp_burn_amount: self.data.burn_config.icp_burn_amount,
         }
     }
 

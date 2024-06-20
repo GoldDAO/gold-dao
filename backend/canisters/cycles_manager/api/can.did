@@ -1,5 +1,6 @@
 type Args = record { canister_id : principal };
 type Args_1 = record {
+  icp_burn_amount : opt Tokens;
   min_cycles_balance : opt nat64;
   max_top_up_amount : opt nat64;
 };
@@ -31,6 +32,7 @@ type Response_1 = variant {
   FailedGetCanisterSummary;
 };
 type Response_2 = record {
+  icp_burn_amount : Tokens;
   min_cycles_balance : nat64;
   max_top_up_amount : nat64;
 };

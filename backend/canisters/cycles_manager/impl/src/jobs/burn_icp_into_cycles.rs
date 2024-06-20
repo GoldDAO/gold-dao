@@ -9,7 +9,8 @@ use tracing::{error, info};
 use types::{CanisterId, TimestampMillis};
 use utils::env::Environment;
 
-const INTERVAL: Duration = Duration::from_secs(10 * 60); // 10 minutes
+// const INTERVAL: Duration = Duration::from_secs(10 * 60); // 10 minutes
+const INTERVAL: Duration = Duration::from_secs(300);
 const MEMO_TOP_UP_CANISTER: Memo = Memo(0x50555054); // == 'TPUP'
 
 pub fn start_job() {
@@ -25,12 +26,12 @@ fn run() {
 }
 
 enum Action {
-    BurnIcp(BurnIcpDetails),
+    BurnIcp(BurnIcpArgs),
     NotifyTopUp(NotifyTopUpDetails),
     None,
 }
 
-struct BurnIcpDetails {
+struct BurnIcpArgs {
     amount: Tokens,
     this_canister_id: CanisterId,
     ledger: CanisterId,
@@ -59,15 +60,18 @@ fn get_next_action(state: &mut State) -> Action {
     } else {
         let cycles_balance = state.env.cycles_balance();
 
-        // NOTE: here we make sure that it would be enough funds to top up min_cycles_balance X times. X - amount of canisters to top up
-        let canisters_to_top_up: u64 = state
+        // NOTE: here we make sure that it would be enough funds to top up all the canisters. min_cycles_balance * X, where X - amount of canisters to top up
+        // TODO: it would be better to store the canisters to top up quantity in the state, but it should always be relevant and updated on time, which seems to be not reachable.
+        let monitored_canisters_quantity: u64 = state
             .data
             .canisters
             .get_canisters_quantity()
             .try_into()
             .unwrap();
-        if cycles_balance < canisters_to_top_up * state.data.top_up_config.min_cycles_balance {
-            Action::BurnIcp(BurnIcpDetails {
+        if cycles_balance
+            < (monitored_canisters_quantity + 1) * state.data.top_up_config.min_cycles_balance
+        {
+            Action::BurnIcp(BurnIcpArgs {
                 amount: state.data.burn_config.icp_burn_amount,
                 this_canister_id: state.env.canister_id(),
                 ledger: state.data.burn_config.ledger_canister,
@@ -80,22 +84,22 @@ fn get_next_action(state: &mut State) -> Action {
     }
 }
 
-async fn burn_icp(burn_details: BurnIcpDetails) {
-    info!(%burn_details.amount, "Burning ICP into cycles");
+async fn burn_icp(burn_args: BurnIcpArgs) {
+    info!(%burn_args.amount, "Burning ICP into cycles");
 
     match icp_ledger_canister_c2c_client::transfer(
-        burn_details.ledger,
+        burn_args.ledger,
         &TransferArgs {
             memo: MEMO_TOP_UP_CANISTER,
-            amount: burn_details.amount,
+            amount: burn_args.amount,
             fee: ic_ledger_types::DEFAULT_FEE,
             from_subaccount: None,
             to: AccountIdentifier::new(
-                &burn_details.cmc,
-                &Subaccount::from(burn_details.this_canister_id),
+                &burn_args.cmc,
+                &Subaccount::from(burn_args.this_canister_id),
             ),
             created_at_time: Some(Timestamp {
-                timestamp_nanos: burn_details.now * 1_000_000,
+                timestamp_nanos: burn_args.now * 1_000_000,
             }),
         },
     )
@@ -104,8 +108,8 @@ async fn burn_icp(burn_details: BurnIcpDetails) {
         Ok(Ok(block_index)) => {
             info!(block_index, "Transferred ICP to CMC");
             notify_cmc(NotifyTopUpDetails {
-                this_canister_id: burn_details.this_canister_id,
-                cmc: burn_details.cmc,
+                this_canister_id: burn_args.this_canister_id,
+                cmc: burn_args.cmc,
                 block_index,
             })
             .await;
