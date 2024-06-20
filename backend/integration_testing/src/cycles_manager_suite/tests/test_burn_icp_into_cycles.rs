@@ -28,6 +28,7 @@ fn icp_is_burned_into_cycles() {
     );
     let cycles_balance = test_env.pic.cycle_balance(test_env.cycles_manager_id);
 
+    // Make the top up amout higher in order to initiate icp burn
     cycles_manager::update_config(
         &mut test_env.pic,
         test_env.controller,

@@ -9,8 +9,7 @@ use tracing::{error, info};
 use types::{CanisterId, TimestampMillis};
 use utils::env::Environment;
 
-// const INTERVAL: Duration = Duration::from_secs(10 * 60); // 10 minutes
-const INTERVAL: Duration = Duration::from_secs(300);
+const INTERVAL: Duration = Duration::from_secs(10 * 60); // 10 minutes
 const MEMO_TOP_UP_CANISTER: Memo = Memo(0x50555054); // == 'TPUP'
 
 pub fn start_job() {

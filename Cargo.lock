@@ -472,15 +472,10 @@ name = "cycles_manager_api_canister"
 version = "0.1.0"
 dependencies = [
  "candid",
- "candid_gen",
- "canister_logger",
  "ic-cdk 0.13.2",
  "ic-cdk-macros 0.13.2",
  "ic-ledger-types",
  "serde",
- "serializer",
- "stable_memory",
- "tracing",
  "types",
 ]
 
