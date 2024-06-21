@@ -140,7 +140,7 @@ impl RewardsTestEnvBuilder {
         let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
 
         // set the date
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1718814600));
+        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718812800855));
 
         let (neuron_data, neuron_owners) = generate_neuron_data(
             0,

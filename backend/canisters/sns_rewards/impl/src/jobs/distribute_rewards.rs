@@ -51,6 +51,9 @@ pub fn run_distribution(initial_run_time: TimestampMillis) {
     }
 
     if let Some(interval) = distribution_interval {
+        mutate_state(|s| {
+            s.data.last_distribution_time.push(initial_run_time);
+        });
         let is_within_interval = interval.is_within_interval(initial_run_time.clone());
         if !is_within_interval {
             debug!(

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 use candid::{ CandidType, Nat, Principal };
+use time::macros::datetime;
 use time::{ error::ComponentRange, Weekday };
 use time;
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
@@ -41,7 +42,6 @@ impl Default for RewardDistributionInterval {
 impl RewardDistributionInterval {
     pub fn is_within_interval(&self, timestamp_millis: TimestampMillis) -> bool {
         let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
-
         // Create a DateTime equivalent using time crate
         let timestamp = match time::OffsetDateTime::from_unix_timestamp(timestamp_secs as i64) {
             Ok(t) => t,
@@ -294,6 +294,9 @@ mod tests {
         assert_eq!(distribution_interval.is_within_interval(time_now), false);
 
         let time_now = 1718722800855; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), false);
+
+        let time_now = 1719430200000; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
         assert_eq!(distribution_interval.is_within_interval(time_now), false);
     }
 }

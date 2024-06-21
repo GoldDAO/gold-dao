@@ -12,6 +12,7 @@ pub mod set_reward_token_types_validate;
 pub mod get_n_history;
 pub mod set_daily_gldgov_burn_rate_validate;
 pub mod candid;
+pub mod get_random_state;
 
 pub use get_reward_token_types::*;
 pub use get_reserve_transfer_amounts::*;
@@ -26,3 +27,4 @@ pub use set_reserve_transfer_amounts_validate::*;
 pub use set_reward_token_types_validate::*;
 pub use get_n_history::*;
 pub use set_daily_gldgov_burn_rate_validate::*;
+pub use get_random_state::*;

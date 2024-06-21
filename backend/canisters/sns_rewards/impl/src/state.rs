@@ -132,6 +132,7 @@ pub struct Data {
     pub reward_distribution_interval: Option<RewardDistributionInterval>,
     /// an internal check if the distribution is running
     pub reward_distribution_in_progress: Option<bool>,
+    pub last_distribution_time: Vec<u64>,
 }
 
 impl Default for Data {
@@ -152,6 +153,7 @@ impl Default for Data {
             last_daily_gldgov_burn: None,
             reward_distribution_interval: Some(RewardDistributionInterval::default()),
             reward_distribution_in_progress: Some(false),
+            last_distribution_time: vec![],
         }
     }
 }

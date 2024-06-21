@@ -10,3 +10,4 @@ pub mod get_historic_payment_round;
 pub mod get_all_neurons;
 pub mod get_active_payment_rounds;
 pub mod set_daily_gldgov_burn_rate_validate;
+pub mod get_random_state;

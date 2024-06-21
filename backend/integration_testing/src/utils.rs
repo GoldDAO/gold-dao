@@ -3,6 +3,11 @@ use canister_time::DAY_IN_MS;
 use pocket_ic::PocketIc;
 use rand::{ RngCore, thread_rng };
 use types::TimestampMillis;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref HOURS_IN_WEEK: u64 = 168;
+}
 
 pub fn random_principal() -> Principal {
     let mut bytes = [0u8; 29];
