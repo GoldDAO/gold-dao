@@ -1,4 +1,4 @@
-use std::time::{ Duration, SystemTime };
+use std::time::Duration;
 
 use candid::{ Nat, Principal };
 use canister_time::{ DAY_IN_MS, HOUR_IN_MS };
@@ -7,18 +7,12 @@ use sns_rewards_api_canister::{
     get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
     subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
-use tracing::Instrument;
 use types::TokenSymbol;
 
 use crate::{
     client::{
         icrc1::client::{ balance_of, transfer },
-        rewards::{
-            get_active_payment_rounds,
-            get_historic_payment_round,
-            get_neuron_by_id,
-            get_random_state,
-        },
+        rewards::{ get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id },
     },
     sns_rewards_suite::setup::{ default_test_setup, setup::setup_reward_pools },
     utils::{ is_interval_more_than_7_days, tick_n_blocks, HOURS_IN_WEEK },
@@ -649,7 +643,7 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     );
     tick_n_blocks(&test_env.pic, 10);
 
-    for i in 0..166 {
+    for i in 0..HOURS_IN_WEEK.clone() - 2 {
         // TRIGGER - synchronize_neurons
         test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 1));
         tick_n_blocks(&test_env.pic, 1);
