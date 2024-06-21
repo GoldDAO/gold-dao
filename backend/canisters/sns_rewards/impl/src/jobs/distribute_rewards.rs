@@ -40,7 +40,7 @@ pub fn start_job() {
 }
 
 pub fn run_distribution(initial_run_time: TimestampMillis) {
-    let distribution_interval = read_state(|s| s.data.reward_distribution_interval);
+    let distribution_interval = read_state(|s| s.data.reward_distribution_interval.clone());
     let is_reward_distribution_in_progress = read_state(
         |s| s.data.reward_distribution_in_progress
     ).unwrap_or(false);
@@ -51,21 +51,21 @@ pub fn run_distribution(initial_run_time: TimestampMillis) {
     }
 
     if let Some(interval) = distribution_interval {
-        let is_within_interval = interval.is_within_interval(initial_run_time);
+        let is_within_interval = interval.is_within_interval(initial_run_time.clone());
         if !is_within_interval {
             debug!(
                 "REWARD_DISTRIBUTION : Time since last run is less than 7 days. terminating early"
             );
             return;
+        } else {
+            mutate_state(|s| {
+                s.data.reward_distribution_in_progress = Some(true);
+            });
         }
     } else {
         debug!("ERROR : No distribution interval has been set");
         return;
     }
-
-    mutate_state(|s| {
-        s.data.reward_distribution_in_progress = Some(true);
-    });
 
     let is_sync_neurons_in_progress = read_state(|s| s.get_is_synchronizing_neurons());
     if is_sync_neurons_in_progress {

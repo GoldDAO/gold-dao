@@ -1,12 +1,14 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use candid::{ CandidType, Nat, Principal };
-use chrono::{ Datelike, TimeZone, Timelike, Utc, Weekday };
+use time::{ error::ComponentRange, Weekday };
+use time;
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::debug;
-use types::TokenSymbol;
+use types::{ TimestampMillis, TokenSymbol };
 
 use crate::state::read_state;
 
@@ -16,20 +18,20 @@ use sns_governance_canister::types::get_neuron_response::Result::{
 };
 
 // specifies a range that the reward interval can occur. e.g on a certain weekday and between a start hour and end hour
-#[derive(CandidType, Deserialize, Serialize, Clone, Copy)]
+#[derive(CandidType, Deserialize, Serialize, Clone)]
 pub struct RewardDistributionInterval {
-    /// numerical index of the weekday -  Monday = 0, Tuesday = 1, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
-    weekday: u8,
+    /// weekday - e.g  Monday, Tuesday, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
+    weekday: String,
     /// 24 hour clock - 0 = 00, 14 = 14:00
-    start_hour: u32,
+    start_hour: u8,
     /// 24 hour clock - 0 = 00, 14 = 14:00
-    end_hour: u32,
+    end_hour: u8,
 }
 
 impl Default for RewardDistributionInterval {
     fn default() -> Self {
         Self {
-            weekday: 2, // Wednesday
+            weekday: "Wednesday".to_string(),
             start_hour: 14, // 2pm
             end_hour: 16, // 4pm
         }
@@ -37,15 +39,24 @@ impl Default for RewardDistributionInterval {
 }
 
 impl RewardDistributionInterval {
-    pub fn is_within_interval(&self, timestamp_millis: u64) -> bool {
-        let weekday = Weekday::try_from(self.weekday).unwrap();
+    pub fn is_within_interval(&self, timestamp_millis: TimestampMillis) -> bool {
+        let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
 
-        // Convert the timestamp in milliseconds to a DateTime<Utc> instance
-        let timestamp = match Utc.timestamp_millis_opt(timestamp_millis as i64) {
-            chrono::LocalResult::Single(t) => t,
-            _ => {
+        // Create a DateTime equivalent using time crate
+        let timestamp = match time::OffsetDateTime::from_unix_timestamp(timestamp_secs as i64) {
+            Ok(t) => t,
+            Err(_) => {
                 return false;
             } // Invalid timestamp
+        };
+
+        // Convert weekday index to time crate's Weekday enum
+        let weekday = match Weekday::from_str(&self.weekday) {
+            Ok(w) => w,
+            Err(e) => {
+                debug!("Invalid Weekday set for distribution reward interval");
+                return false;
+            } // Invalid weekday index
         };
 
         // Check if the given timestamp is on the specified weekday
@@ -56,6 +67,7 @@ impl RewardDistributionInterval {
                 return true;
             }
         }
+
         false
     }
 }
@@ -261,7 +273,7 @@ mod tests {
     #[test]
     fn test_reward_distribution_interval() {
         let distribution_interval = RewardDistributionInterval {
-            weekday: 2,
+            weekday: "Wednesday".to_string(),
             start_hour: 14,
             end_hour: 16,
         }; // wednesday between 14:00 and 16:00

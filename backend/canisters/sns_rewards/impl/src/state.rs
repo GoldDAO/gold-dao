@@ -1,5 +1,4 @@
 use std::collections::{ BTreeMap, HashMap };
-use chrono::Weekday;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Nat, Principal };

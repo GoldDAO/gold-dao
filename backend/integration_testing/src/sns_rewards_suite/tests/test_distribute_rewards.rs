@@ -1,7 +1,7 @@
-use std::time::Duration;
+use std::time::{ Duration, SystemTime };
 
 use candid::{ Nat, Principal };
-use canister_time::DAY_IN_MS;
+use canister_time::{ DAY_IN_MS, HOUR_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
 use sns_rewards_api_canister::{
     get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
@@ -592,18 +592,31 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
     let icp_token = TokenSymbol::parse("ICP").unwrap();
+    println!("time is {:?}", test_env.pic.get_time());
 
     // ********************************
-    // 1. Distribute rewards - first week
-    // Note - 1 day after a canister install will trigger the distribution since the cron schedule is daily but there is no previous timestamp recorded.
+    // 2. Distribute rewards - first week
     // ********************************
-    // test_env.simulate_neuron_voting(2);
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 100);
 
-    // // TRIGGER - synchronize_neurons
-    // test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    // tick_n_blocks(&test_env.pic, 100);
-    // test_env.pic.advance_time(Duration::from_secs(180 * 60));
-    // tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 20));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 60));
+    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(60 * 60));
+    tick_n_blocks(&test_env.pic, 100);
+    println!("time is {:?}", test_env.pic.get_time());
 
     // ********************************
     // 2. Distribute rewards - second week
@@ -617,15 +630,16 @@ fn test_distribution_occurs_within_correct_time_intervals() {
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64
     );
-    tick_n_blocks(&test_env.pic, 2);
+    tick_n_blocks(&test_env.pic, 100);
 
     // TRIGGER - distribute_rewards
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
+    tick_n_blocks(&test_env.pic, 100);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 10);
+    tick_n_blocks(&test_env.pic, 100);
     test_env.pic.advance_time(Duration::from_secs(180 * 60));
-    tick_n_blocks(&test_env.pic, 10);
+    tick_n_blocks(&test_env.pic, 100);
+    println!("time is {:?}", test_env.pic.get_time());
 
     // ********************************
     // 3. Verify more than 7 days passed between both historic payment rounds
