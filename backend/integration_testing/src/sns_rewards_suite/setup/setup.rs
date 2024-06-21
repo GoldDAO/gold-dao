@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{ collections::HashMap, time::SystemTime };
 
 use candid::{ Nat, Principal };
 use icrc_ledger_types::icrc1::account::Account;
@@ -138,6 +138,9 @@ impl RewardsTestEnvBuilder {
 
     pub fn build(self) -> RewardsTestEnv {
         let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
+
+        // set the date
+        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1718755200));
 
         let (neuron_data, neuron_owners) = generate_neuron_data(
             0,

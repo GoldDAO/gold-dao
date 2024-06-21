@@ -18,8 +18,8 @@ payments are done in batches and upon each individual transfer response it's sta
 
 use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
 use candid::{ Nat, Principal };
-use canister_time::{ now_millis, run_interval, DAY_IN_MS, WEEK_IN_MS };
-use futures::{ future::{ err, join_all }, Future };
+use canister_time::{ now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS, WEEK_IN_MS };
+use futures::{ future::{ err, join_all }, Future, FutureExt };
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
@@ -30,30 +30,60 @@ use std::time::Duration;
 use tracing::{ debug, error, info };
 use types::{ Milliseconds, TimestampMillis, TokenSymbol };
 
-const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
+const DISTRIBUTION_INTERVAL: Milliseconds = HOUR_IN_MS;
 const MAX_RETRIES: u8 = 3;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
+    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), || {
+        run_distribution(now_millis())
+    });
 }
 
-pub fn run_distribution() {
-    let previous_time_ms = read_state(|s| s.data.last_reward_distribution_time.unwrap_or(0));
-    let current_time_ms = now_millis();
+pub fn run_distribution(initial_run_time: TimestampMillis) {
+    let distribution_interval = read_state(|s| s.data.reward_distribution_interval);
+    let is_reward_distribution_in_progress = read_state(
+        |s| s.data.reward_distribution_in_progress
+    ).unwrap_or(false);
 
-    if !is_interval_more_than_7_days(previous_time_ms, current_time_ms) {
-        debug!("REWARD_DISTRIBUTION : Time since last run is less than 7 days. terminating early");
+    if is_reward_distribution_in_progress {
+        debug!("REWARD_DISTRIBUTION - distribution is already in progress. terminating early");
         return;
     }
+
+    if let Some(interval) = distribution_interval {
+        let is_within_interval = interval.is_within_interval(initial_run_time);
+        if !is_within_interval {
+            debug!(
+                "REWARD_DISTRIBUTION : Time since last run is less than 7 days. terminating early"
+            );
+            return;
+        }
+    } else {
+        debug!("ERROR : No distribution interval has been set");
+        return;
+    }
+
+    mutate_state(|s| {
+        s.data.reward_distribution_in_progress = Some(true);
+    });
 
     let is_sync_neurons_in_progress = read_state(|s| s.get_is_synchronizing_neurons());
     if is_sync_neurons_in_progress {
         debug!(
             "REWARD_DISTRIBUTION - can't run whilst synchronise_neurons is in progress. rerunning in 3 minutes"
         );
-        ic_cdk_timers::set_timer(Duration::from_secs(60 * 5), run_distribution);
+        ic_cdk_timers::set_timer(Duration::from_secs(60 * 5), move ||
+            run_distribution(initial_run_time.clone())
+        );
     } else {
-        ic_cdk::spawn(distribute_rewards(0))
+        ic_cdk::spawn(
+            distribute_rewards(0).then(move |_| {
+                mutate_state(|s| {
+                    s.data.reward_distribution_in_progress = Some(false);
+                });
+                async {}
+            })
+        )
     }
 }
 
@@ -89,9 +119,6 @@ pub async fn distribute_rewards(retry_attempt: u8) {
             move_payment_round_to_history(&payment_round);
             log_payment_round_metrics(&payment_round);
         }
-        mutate_state(|s| {
-            s.data.last_reward_distribution_time = Some(current_time_ms);
-        });
     }
     info!("REWARD_DISTRIBUTION - FINISH");
 }
@@ -381,18 +408,6 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
     info!("ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS", payment_round.id, payment_round.token);
 }
 
-pub fn is_interval_more_than_7_days(
-    previous_time: TimestampMillis,
-    now_time: TimestampMillis
-) -> bool {
-    // convert the milliseconds to the number of days since UNIX Epoch.
-    // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245
-    let previous_in_days = previous_time / DAY_IN_MS;
-    let current_in_days = now_time / DAY_IN_MS;
-    // never allow distributions to happen twice i.e if the last run distribution in days since UNIX epoch is the same as the current time in days since the last UNIX Epoch then return early.
-    current_in_days >= previous_in_days + 7
-}
-
 // Create and return a future that always returns an Err
 #[allow(dead_code)]
 fn always_fail_future() -> impl Future<Output = Result<(), String>> {
@@ -409,10 +424,7 @@ mod tests {
     use sns_rewards_api_canister::payment_round::{ PaymentRound, PaymentStatus };
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::{
-        jobs::distribute_rewards::is_interval_more_than_7_days,
-        state::{ init_state, mutate_state, read_state, RuntimeState },
-    };
+    use crate::{ state::{ init_state, mutate_state, read_state, RuntimeState } };
 
     use super::{ log_payment_round_metrics, update_neuron_rewards };
 
@@ -548,50 +560,5 @@ mod tests {
         });
 
         // update the neuron maturity
-    }
-
-    #[test]
-    fn test_is_interval_more_than_7_days() {
-        // Scenario 1 - prev time is more than 7 days ago
-        let prev_time = 1717977600000; // 2024 June 10 00:00:00 UTC
-        let now_time = 1718582401000; // 2024 June 17 00:00:01 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, true);
-
-        // Scenario 2 - now time is 5 hours into the future
-        let prev_time = 1717977600000; // 2024 June 10 00:00:00 UTC
-        let now_time = 1717995600000; // 2024 June 10 00:05:00 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, false);
-
-        // Scenario 3 - only 12 hours until a correct distribution
-        let prev_time = 1717977600000; // 2024 June 10 00:00:00 UTC
-        let now_time = 1718539200000; // 2024 June 16 12:00:00 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, false);
-
-        // Scenario 4 - only 1 second until a correct distribution time - should fail
-        let prev_time = 1717977600000; // 2024 June 10 00:00:00 UTC
-        let now_time = 1718582399000; // 2024 June 16 12:00:00 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, false);
-
-        // Scenario 5 - interval is exactly 7 days
-        let prev_time = 1717977600000; // 2024 June 10 00:00:00 UTC
-        let now_time = 1718582400000; // 2024 June 16 12:00:00 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, true);
-
-        // Scenario 5 - prev time is 0
-        let prev_time = 0; // 2024 June 10 00:00:00 UTC
-        let now_time = 1718582400000; // 2024 June 16 12:00:00 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, true);
-
-        // Scenario 6 - prev time is exactly the same as now time - should NOT be valid
-        let prev_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
-        let now_time = 1712834054000; // 2024 Apr 11 11:14:14 UTC
-        let is_valid_time = is_interval_more_than_7_days(prev_time, now_time);
-        assert_eq!(is_valid_time, false);
     }
 }

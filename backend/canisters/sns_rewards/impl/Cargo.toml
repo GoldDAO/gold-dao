@@ -35,3 +35,5 @@ futures = { workspace = true }
 num-bigint = {workspace = true}
 sns_rewards_api_canister = { path = "../api" }
 candid_gen = { path = "../../../libraries/candid_gen" }
+chrono = { version = "0.4.38", features = ["serde"] }
+

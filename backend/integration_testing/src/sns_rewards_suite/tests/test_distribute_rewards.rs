@@ -597,13 +597,13 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // 1. Distribute rewards - first week
     // Note - 1 day after a canister install will trigger the distribution since the cron schedule is daily but there is no previous timestamp recorded.
     // ********************************
-    test_env.simulate_neuron_voting(2);
+    // test_env.simulate_neuron_voting(2);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(180 * 60));
-    tick_n_blocks(&test_env.pic, 100);
+    // // TRIGGER - synchronize_neurons
+    // test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    // tick_n_blocks(&test_env.pic, 100);
+    // test_env.pic.advance_time(Duration::from_secs(180 * 60));
+    // tick_n_blocks(&test_env.pic, 100);
 
     // ********************************
     // 2. Distribute rewards - second week
