@@ -669,3 +669,48 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     );
     assert_eq!(distribution_3_record.len(), 1);
 }
+
+#[test]
+fn test_distribution_interval_is_consistant_across_upgrades() {
+    let mut test_env = default_test_setup();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    // ********************************
+    // 2. Distribute rewards - first week
+    // ********************************
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 10);
+
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 2));
+    tick_n_blocks(&test_env.pic, 1);
+
+    // trigger the upgrade
+    test_env.upgrade_rewards_canister();
+
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 4));
+    tick_n_blocks(&test_env.pic, 1);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 10);
+
+    // ********************************
+    // 3. There should be 1 historic payment round even though we upgraded
+    // ********************************
+
+    let distribution_1_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
+    );
+    assert_eq!(distribution_1_record.len(), 1);
+}
