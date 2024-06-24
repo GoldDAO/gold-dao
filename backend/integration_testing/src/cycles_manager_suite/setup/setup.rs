@@ -39,9 +39,10 @@ impl Default for CyclesManagerTestEnvBuilder {
     fn default() -> Self {
         Self {
             controller: random_principal(),
-            max_top_up_amount: 20_000_000_000_000,
+            // max_top_up_amount: 20_000_000_000_000,
+            max_top_up_amount: 200_000_000_000_000,
             min_cycles_balance: 20_000_000_000_000,
-            icp_burn_amount: Tokens::from_e8s(1_000_000_000),
+            icp_burn_amount: Tokens::from_e8s(10_000_000_000),
         }
     }
 }

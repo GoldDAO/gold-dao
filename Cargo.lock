@@ -807,9 +807,7 @@ dependencies = [
  "ic-cdk-macros 0.13.2",
  "icrc-ledger-types",
  "serde",
- "serde_bytes",
  "serde_json",
- "tokio",
 ]
 
 [[package]]

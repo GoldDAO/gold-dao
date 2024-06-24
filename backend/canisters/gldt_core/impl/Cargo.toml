@@ -25,11 +25,8 @@ ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
-# serde_derive = { workspace = true }
-serde_bytes = { workspace = true }
 gldt_libs = { path = "../../gldt_libs" }
 serde_json = { workspace = true }
 
 [dev-dependencies]
 clippy = "0.0.302"
-tokio = { version = "1.33.0", features = ["full"] }

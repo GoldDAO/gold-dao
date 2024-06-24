@@ -59,7 +59,7 @@ fn get_next_action(state: &mut State) -> Action {
     } else {
         let cycles_balance = state.env.cycles_balance();
 
-        // NOTE: here we make sure that it would be enough funds to top up all the canisters. min_cycles_balance * X, where X - amount of canisters to top up
+        // NOTE: here we make sure that it would be enough funds to top up all the canisters. min_cycles_balance * X, where X - amount of canisters to top up + 1 (to save some cycles for the cycles manager itself)
         // TODO: it would be better to store the canisters to top up quantity in the state, but it should always be relevant and updated on time, which seems to be not reachable.
         let monitored_canisters_quantity: u64 = state
             .data
