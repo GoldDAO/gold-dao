@@ -91,11 +91,3 @@ fn full_flow() {
     assert!(new_cycles_balance > 200_000_000_000_000);
     assert!(current_burner_canister_balance > 200_000_000_000_000);
 }
-
-// icp_balance: 10_000_000_000_000_000
-// new_icp_balance: 9_999_999_999_960_000
-// init_cycles_balance: 999965449379364
-// cycles_balance: 799991852787565
-// new_cycles_balance: 399991804300908
-// initial_burner_canister_balance: 52061211356
-// current_burner_canister_balance: 200052051717099
