@@ -4,6 +4,9 @@ use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manage
 use crate::cycles_manager_suite::setup::setup_icp_ledger::setup_icp_ledger;
 use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
 use crate::utils::random_principal;
+use candid::encode_one;
+use candid::CandidType;
+use candid::Deserialize;
 use candid::Principal;
 use ic_ledger_types::AccountIdentifier;
 use ic_ledger_types::Subaccount;
@@ -15,6 +18,11 @@ use types::CanisterId;
 use types::Cycles;
 
 pub const DEFAULT_SUBACCOUNT: Subaccount = Subaccount([0; 32]);
+
+#[derive(CandidType, Deserialize, Debug)]
+pub struct RegisterDappCanisterRequest {
+    pub canister_id: Option<Principal>,
+}
 
 pub struct CyclesManagerEnv {
     pub controller: Principal,
@@ -41,8 +49,9 @@ impl Default for CyclesManagerTestEnvBuilder {
             controller: random_principal(),
             // max_top_up_amount: 20_000_000_000_000,
             max_top_up_amount: 200_000_000_000_000,
-            min_cycles_balance: 20_000_000_000_000,
-            icp_burn_amount: Tokens::from_e8s(10_000_000_000),
+            min_cycles_balance: 200_000_000_000_000,
+            // icp_burn_amount: Tokens::from_e8s(10_000_000_000),
+            icp_burn_amount: Tokens::from_e8s(0),
         }
     }
 }
@@ -100,6 +109,20 @@ impl CyclesManagerTestEnvBuilder {
         let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller, root_init_args);
         pic.tick();
 
+        // Arguments to register dapp in the sns_root_canister
+        let register_canister_args = RegisterDappCanisterRequest {
+            canister_id: Some(burner_canister_id),
+        };
+
+        let _ = pic
+            .update_call(
+                sns_root_canister_id,
+                self.controller,
+                "register_dapp_canister",
+                encode_one(register_canister_args).unwrap(),
+            )
+            .unwrap();
+
         let minting_account = AccountIdentifier::new(&self.controller, &DEFAULT_SUBACCOUNT);
         let icp_ledger_init_args = crate::cycles_manager_suite::setup::setup_icp_ledger::Args {
             minting_account: minting_account.to_string(),
@@ -131,7 +154,7 @@ impl CyclesManagerTestEnvBuilder {
             max_top_up_amount: self.max_top_up_amount,
             min_cycles_balance: self.min_cycles_balance,
             icp_burn_amount: self.icp_burn_amount,
-            ledger_canister: icp_ledger_canister_id,
+            icp_ledger_canister: icp_ledger_canister_id,
             cycles_minting_canister: cycles_minting_canister_id,
         };
 

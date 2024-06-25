@@ -36,7 +36,9 @@ fn icp_is_burned_into_cycles() {
         &cycles_manager_api_canister::update_config::Args {
             max_top_up_amount: Some((cycles_balance + 100_000_000_000_000).try_into().unwrap()),
             min_cycles_balance: None,
-            icp_burn_amount: Some(Tokens::from_e8s(10_000_000_000)),
+            // NOTE: There is some limit on the amount of ICP that can be burned
+            // TODO: check the limit
+            icp_burn_amount: Some(Tokens::from_e8s(15_000_000_000)),
         },
     );
 

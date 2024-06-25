@@ -68,12 +68,12 @@ fn get_next_action(state: &mut State) -> Action {
             .try_into()
             .unwrap();
         if cycles_balance
-            < (monitored_canisters_quantity + 1) * state.data.top_up_config.min_cycles_balance
+            < (monitored_canisters_quantity + 1) * state.data.top_up_config.max_top_up_amount
         {
             Action::BurnIcp(BurnIcpArgs {
                 amount: state.data.burn_config.icp_burn_amount,
                 this_canister_id: state.env.canister_id(),
-                ledger: state.data.burn_config.ledger_canister,
+                ledger: state.data.burn_config.icp_ledger_canister,
                 cmc: state.data.burn_config.cycles_minting_canister,
                 now: state.env.now(),
             })

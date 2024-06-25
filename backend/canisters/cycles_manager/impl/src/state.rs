@@ -71,7 +71,7 @@ impl Data {
         max_top_up_amount: Cycles,
         min_cycles_balance: Cycles,
         icp_burn_amount: Tokens,
-        ledger_canister: CanisterId,
+        icp_ledger_canister: CanisterId,
         cycles_minting_canister: CanisterId,
         now: TimestampMillis,
     ) -> Data {
@@ -85,7 +85,7 @@ impl Data {
             },
             burn_config: BurnConfig {
                 icp_burn_amount,
-                ledger_canister,
+                icp_ledger_canister,
                 cycles_minting_canister,
                 cycles_top_up_pending_notification: None,
             },
@@ -121,7 +121,7 @@ pub struct TopUpConfig {
 #[derive(CandidType, Deserialize, Serialize)]
 pub struct BurnConfig {
     pub icp_burn_amount: Tokens,
-    pub ledger_canister: CanisterId,
+    pub icp_ledger_canister: CanisterId,
     pub cycles_minting_canister: CanisterId,
     pub cycles_top_up_pending_notification: Option<BlockIndex>,
 }

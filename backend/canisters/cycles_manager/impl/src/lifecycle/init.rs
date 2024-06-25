@@ -20,7 +20,7 @@ fn init(args: InitArgs) {
         args.max_top_up_amount,
         args.min_cycles_balance,
         args.icp_burn_amount,
-        args.ledger_canister,
+        args.icp_ledger_canister,
         args.cycles_minting_canister,
         env.now(),
     );
