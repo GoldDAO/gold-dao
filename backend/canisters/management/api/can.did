@@ -1,0 +1,8 @@
+type InitArgs = record {
+  test_mode : bool;
+  authorized_principals : vec principal;
+};
+service : (InitArgs) -> {
+  get_gld_dashboard_maintenance_mode : () -> (bool) query;
+  update_gld_dashboard_maintenance_mode : (bool) -> (null);
+}

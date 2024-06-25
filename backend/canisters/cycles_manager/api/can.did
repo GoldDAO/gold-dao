@@ -1,0 +1,42 @@
+type Args = record { canister_id : principal };
+type Args_1 = record {
+  min_cycles_balance : opt nat64;
+  max_top_up_amount : opt nat64;
+};
+type CanisterMetrics = record {
+  added : nat64;
+  canister_id : principal;
+  top_ups : vec CyclesTopUp;
+};
+type CanisterTopUp = record {
+  canister_id : principal;
+  timestamp : nat64;
+  amount : nat64;
+};
+type CyclesTopUp = record { date : nat64; amount : nat64 };
+type InitArgs = record {
+  sns_root_canister : principal;
+  test_mode : bool;
+  min_cycles_balance : nat64;
+  authorized_principals : vec principal;
+  canisters : vec principal;
+  max_top_up_amount : nat64;
+};
+type Response = variant { Success; CannotAddSelf; AlreadyAdded };
+type Response_1 = variant {
+  Success : vec CanisterMetrics;
+  FailedGetCanisterSummary;
+};
+type Response_2 = record {
+  min_cycles_balance : nat64;
+  max_top_up_amount : nat64;
+};
+type Response_3 = variant { Success };
+service : (InitArgs) -> {
+  add_canister : (Args) -> (Response);
+  get_canisters_summary : () -> (Response_1);
+  get_config : () -> (Response_2) query;
+  get_cycles_manager_balance : () -> (nat64) query;
+  latest_top_ups : () -> (vec CanisterTopUp) query;
+  update_config : (Args_1) -> (Response_3);
+}

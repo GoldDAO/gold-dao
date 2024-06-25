@@ -2,7 +2,16 @@ spec:
   inputs:
     src-folder:
       description: Name of the source folder, should be the same as the canister's cargo package name.
-      options: ["gldt_core", "icp_neuron", "token_metrics", "sns_rewards", "integration_testing"]
+      options:
+        [
+          "gldt_core",
+          "icp_neuron",
+          "token_metrics",
+          "sns_rewards",
+          "cycles_manager",
+          "integration_testing",
+          "management",
+        ]
 ---
 # Rust canister unit test with coverage
 

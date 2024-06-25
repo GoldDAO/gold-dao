@@ -1,7 +1,7 @@
 use std::collections::{ BTreeMap, HashMap };
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
-use candid::{ CandidType, Principal };
+use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
 use types::{ NeuronInfo, TimestampMillis };
@@ -48,6 +48,8 @@ impl RuntimeState {
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
+            last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
+            daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
         }
     }
 
@@ -74,6 +76,8 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub daily_reserve_transfer: Vec<String>,
     pub last_daily_reserve_transfer_time: TimestampMillis,
+    pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
+    pub daily_gldgov_burn_amount: Option<Nat>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -115,6 +119,10 @@ pub struct Data {
     pub daily_reserve_transfer: ReserveTokenAmounts,
     /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
     pub last_daily_reserve_transfer_time: TimestampMillis,
+    /// The daily burn rate of GLDGov - settable via a proposal
+    pub daily_gldgov_burn_rate: Option<Nat>,
+    /// The last time a burn of GLDGov was done
+    pub last_daily_gldgov_burn: Option<TimestampMillis>,
 }
 
 impl Default for Data {
@@ -131,6 +139,8 @@ impl Default for Data {
             is_synchronizing_neurons: false,
             daily_reserve_transfer: HashMap::new(),
             last_daily_reserve_transfer_time: TimestampMillis::default(),
+            daily_gldgov_burn_rate: None,
+            last_daily_gldgov_burn: None,
         }
     }
 }

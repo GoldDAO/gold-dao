@@ -47,8 +47,9 @@ type TokenInfo = record {
 service : (InitArgs) -> {
   add_neuron_ownership : (NeuronId) -> (Response);
   claim_reward : (Args) -> (Response_1);
-  get_neurons_by_owner : () -> (opt vec NeuronId) query;
+  get_neurons_by_owner : (opt principal) -> (opt vec NeuronId) query;
   remove_neuron_ownership : (NeuronId) -> (Response_2);
+  set_daily_gldgov_burn_rate : (nat) -> (Response_3);
   set_reserve_transfer_amounts : (Args_1) -> (Response_3);
   set_reward_token_types : (Args_2) -> (Response_4);
 }

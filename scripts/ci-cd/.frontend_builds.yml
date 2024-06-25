@@ -2,7 +2,8 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options: ["gldt_swap_app", "gldt_landing_page", "gldt_explorer"]
+      options:
+        ["gldt_swap_app", "gldt_landing_page", "gldt_explorer", "gld_dashboard"]
 ---
 # Frontend builds
 
@@ -30,11 +31,36 @@ $[[ inputs.src-folder ]] staging build:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging"
   script:
-    - npm run build:$[[ inputs.src-folder ]]
+    - ENV=staging npm run build:$[[ inputs.src-folder ]]
     - STAGING_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$STAGING_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_STAGING_BUILD"
+    paths:
+      - client/$[[ inputs.src-folder ]]/out
+    reports:
+      dotenv: $[[ inputs.src-folder ]]_deploy.env
+    expire_in: 1 day
+  environment:
+    name: $[[ inputs.src-folder ]] frontend app
+    deployment_tier: staging
+    action: prepare
+
+$[[ inputs.src-folder ]] preprod build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  needs: ["gldt_core canister build", "generate declarations"]
+  extends: .node template
+  variables:
+    CANISTER_NAME: "$[[ inputs.src-folder ]]"
+    NETWORK: "preprod"
+  script:
+    - ENV=preprod npm run build:$[[ inputs.src-folder ]]
+    - PREPROD_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
+    - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$preprod_URL" > $[[ inputs.src-folder ]]_deploy.env
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_PREPROD_BUILD"
     paths:
       - client/$[[ inputs.src-folder ]]/out
     reports:
@@ -59,7 +85,7 @@ $[[ inputs.src-folder ]] production build:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic"
   script:
-    - npm run build:$[[ inputs.src-folder ]]
+    - ENV=prod npm run build:$[[ inputs.src-folder ]]
     - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$PRODUCTION_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:

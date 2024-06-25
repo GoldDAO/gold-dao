@@ -120,6 +120,14 @@ pub fn validate_set_reserve_transfer_amounts_payload(
     Ok(())
 }
 
+pub fn validate_set_daily_gldgov_burn_rate_payload(amount: &Nat) -> Result<(), String> {
+    if amount == &Nat::from(0u64) {
+        return Err(format!("ERROR : The amount for burning must be more than 0"));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use candid::Principal;
