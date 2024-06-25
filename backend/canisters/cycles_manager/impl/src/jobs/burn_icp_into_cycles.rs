@@ -83,8 +83,18 @@ fn get_next_action(state: &mut State) -> Action {
     }
 }
 
+// Helper to print messages in yellow
+fn print(msg: impl AsRef<str>) {
+    ic_cdk::api::print(msg)
+}
+
 async fn burn_icp(burn_args: BurnIcpArgs) {
     info!(%burn_args.amount, "Burning ICP into cycles");
+    // print(format!(
+    //     "Topping up canister {} by {} cycles.",
+    //     canister_id, cycles
+    // ));
+    print("Burning ICP into cycles");
 
     match icp_ledger_canister_c2c_client::transfer(
         burn_args.ledger,
@@ -106,6 +116,7 @@ async fn burn_icp(burn_args: BurnIcpArgs) {
     {
         Ok(Ok(block_index)) => {
             info!(block_index, "Transferred ICP to CMC");
+            print("Transferred ICP to CMC");
             notify_cmc(NotifyTopUpDetails {
                 this_canister_id: burn_args.this_canister_id,
                 cmc: burn_args.cmc,
@@ -115,9 +126,11 @@ async fn burn_icp(burn_args: BurnIcpArgs) {
         }
         Ok(Err(err)) => {
             error!(?err, "Failed to burn ICP into cycles");
+            print(format!("Failed to burn ICP into cycles {}.", err));
         }
         Err((code, message)) => {
             error!(?code, message, "Failed to burn ICP into cycles");
+            print(format!("Failed to burn ICP into cycles {}.", message));
         }
     }
 }
@@ -135,9 +148,12 @@ async fn notify_cmc(notify_details: NotifyTopUpDetails) {
     match response {
         Ok(Ok(cycles)) => {
             info!(cycles, "Canister topped up with cycles");
+            print("Canister topped up with cycles");
         }
+        // NOTE: here an error could occure: Failed to notify the CMC Some(Refunded { reason: "More than 50_000_000_000_000_000 cycles have been minted in the last 3600 seconds, please try again later." }).
         err => {
             error!(?err, "Failed to notify the CMC");
+            print(format!("Failed to notify the CMC {:?}.", err));
             mutate_state(|state| {
                 state.data.burn_config.cycles_top_up_pending_notification =
                     Some(notify_details.block_index)

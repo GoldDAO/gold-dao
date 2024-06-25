@@ -34,6 +34,26 @@ pub struct CyclesManagerEnv {
     pub pic: PocketIc,
 }
 
+use std::fmt::Debug;
+impl Debug for CyclesManagerEnv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CyclesManagerEnv")
+            .field("controller", &self.controller.to_text())
+            .field("cycles_manager_id", &self.cycles_manager_id.to_text())
+            .field("burner_canister_id", &self.burner_canister_id.to_text())
+            .field("sns_root_canister_id", &self.sns_root_canister_id.to_text())
+            .field(
+                "icp_ledger_canister_id",
+                &self.icp_ledger_canister_id.to_text(),
+            )
+            .field(
+                "cycles_minting_canister_id",
+                &self.cycles_minting_canister_id.to_text(),
+            )
+            .finish()
+    }
+}
+
 impl CyclesManagerEnv {}
 
 pub struct CyclesManagerTestEnvBuilder {
@@ -47,10 +67,8 @@ impl Default for CyclesManagerTestEnvBuilder {
     fn default() -> Self {
         Self {
             controller: random_principal(),
-            // max_top_up_amount: 20_000_000_000_000,
             max_top_up_amount: 200_000_000_000_000,
             min_cycles_balance: 200_000_000_000_000,
-            // icp_burn_amount: Tokens::from_e8s(10_000_000_000),
             icp_burn_amount: Tokens::from_e8s(0),
         }
     }
@@ -79,6 +97,7 @@ impl CyclesManagerTestEnvBuilder {
 
     pub fn build(self) -> CyclesManagerEnv {
         let mut pic = PocketIcBuilder::new()
+            // .with_nns_subnet()
             .with_sns_subnet()
             .with_application_subnet()
             .build();
@@ -158,8 +177,12 @@ impl CyclesManagerTestEnvBuilder {
             cycles_minting_canister: cycles_minting_canister_id,
         };
 
-        let cycles_manager_id: Principal =
-            setup_cycle_manager_canister(&mut pic, &self.controller, cycles_manager_init_args);
+        let cycles_manager_id: Principal = setup_cycle_manager_canister(
+            &mut pic,
+            self.controller,
+            icp_ledger_canister_id,
+            cycles_manager_init_args,
+        );
 
         CyclesManagerEnv {
             controller: self.controller,
