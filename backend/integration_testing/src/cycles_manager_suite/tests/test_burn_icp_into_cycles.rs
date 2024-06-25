@@ -9,8 +9,6 @@ use std::time::Duration;
 fn icp_is_burned_into_cycles() {
     let mut test_env = default_burn_icp_into_cycles_test_setup();
 
-    println!("test_env: {:?}", test_env);
-
     let cycles_manager_id = test_env.cycles_manager_id;
 
     let icp_balance = balance_of(

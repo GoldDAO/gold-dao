@@ -16,14 +16,26 @@ pub struct Args {
 
 pub fn setup_cycles_minting(
     pic: &mut PocketIc,
-    controller: &Principal,
+    controller: Principal,
     cycles_minting_init_args: Args,
 ) -> Principal {
-    // let mut sns_init_args = generate_sns_init_args(neuron_data);
-    let sns_subnet_id = pic.topology().get_sns().unwrap();
+    // let nns_subnet_id = pic.topology().get_nns().unwrap();
 
-    let cycles_minting_canister_id =
-        pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
+    // let cycles_minting_canister_id =
+    // pic.create_canister_on_subnet(Some(controller.clone()), None, nns_subnet_id);
+
+    let cycles_minting_canister_id = pic
+        .create_canister_with_id(
+            Some(controller.clone()),
+            None,
+            Principal::from_text("rkp4c-7iaaa-aaaaa-aaaca-cai").expect("Failed to parse Principal"),
+        )
+        .expect("Failed to create a cycles_minting_canister");
+
+    // let sns_subnet_id = pic.topology().get_sns().unwrap();
+    // let cycles_minting_canister_id =
+    //     pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet_id);
+
     pic.add_cycles(cycles_minting_canister_id, 200_000_000_000_000);
     pic.set_controllers(
         cycles_minting_canister_id,

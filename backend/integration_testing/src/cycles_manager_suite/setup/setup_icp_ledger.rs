@@ -20,10 +20,9 @@ pub struct Args {
 
 pub fn setup_icp_ledger(
     pic: &mut PocketIc,
-    controller: &Principal,
+    controller: Principal,
     cycles_minting_init_args: Args,
 ) -> Principal {
-    // let mut sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
     let icp_ledger_canister_id =

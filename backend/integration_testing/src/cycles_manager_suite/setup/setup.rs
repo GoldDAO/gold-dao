@@ -2,7 +2,7 @@ use super::setup_burner::setup_burner_canister;
 use super::setup_cycles_minting::setup_cycles_minting;
 use crate::cycles_manager_suite::setup::setup_cycles_manager::setup_cycle_manager_canister;
 use crate::cycles_manager_suite::setup::setup_icp_ledger::setup_icp_ledger;
-use crate::cycles_manager_suite::setup::setup_sns_root::setup_root_canister;
+use crate::cycles_manager_suite::setup::setup_sns_root::setup_sns_root_canister;
 use crate::utils::random_principal;
 use candid::encode_one;
 use candid::CandidType;
@@ -32,26 +32,6 @@ pub struct CyclesManagerEnv {
     pub icp_ledger_canister_id: CanisterId,
     pub cycles_minting_canister_id: CanisterId,
     pub pic: PocketIc,
-}
-
-use std::fmt::Debug;
-impl Debug for CyclesManagerEnv {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CyclesManagerEnv")
-            .field("controller", &self.controller.to_text())
-            .field("cycles_manager_id", &self.cycles_manager_id.to_text())
-            .field("burner_canister_id", &self.burner_canister_id.to_text())
-            .field("sns_root_canister_id", &self.sns_root_canister_id.to_text())
-            .field(
-                "icp_ledger_canister_id",
-                &self.icp_ledger_canister_id.to_text(),
-            )
-            .field(
-                "cycles_minting_canister_id",
-                &self.cycles_minting_canister_id.to_text(),
-            )
-            .finish()
-    }
 }
 
 impl CyclesManagerEnv {}
@@ -97,24 +77,13 @@ impl CyclesManagerTestEnvBuilder {
 
     pub fn build(self) -> CyclesManagerEnv {
         let mut pic = PocketIcBuilder::new()
-            // .with_nns_subnet()
+            .with_nns_subnet()
             .with_sns_subnet()
             .with_application_subnet()
             .build();
 
-        // Define initialization arguments for burner canister
-        let burner_canister_init_args =
-            crate::cycles_manager_suite::setup::setup_burner::InitArgs {
-                interval_between_timers_in_seconds: 2 * 60 * 60, // Burn once in 2 hours
-                burn_amount: 500_000_000_000,
-            };
-
-        let burner_canister_id =
-            setup_burner_canister(&mut pic, &self.controller, burner_canister_init_args);
-        pic.tick();
-
         // Define initialization arguments for root canister
-        let root_init_args = crate::cycles_manager_suite::setup::setup_sns_root::Args {
+        let sns_root_init_args = crate::cycles_manager_suite::setup::setup_sns_root::Args {
             dapp_canister_ids: vec![],
             testflight: true,
             latest_ledger_archive_poll_timestamp_seconds: None,
@@ -125,7 +94,23 @@ impl CyclesManagerTestEnvBuilder {
             ledger_canister_id: Some(Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 4])),
         };
 
-        let sns_root_canister_id = setup_root_canister(&mut pic, &self.controller, root_init_args);
+        let sns_root_canister_id =
+            setup_sns_root_canister(&mut pic, &self.controller, sns_root_init_args);
+        pic.tick();
+
+        // Define initialization arguments for burner canister
+        let burner_canister_init_args =
+            crate::cycles_manager_suite::setup::setup_burner::InitArgs {
+                interval_between_timers_in_seconds: 2 * 60 * 60, // Burn once in 2 hours
+                burn_amount: 500_000_000_000,
+            };
+
+        let burner_canister_id = setup_burner_canister(
+            &mut pic,
+            &self.controller,
+            burner_canister_init_args,
+            sns_root_canister_id,
+        );
         pic.tick();
 
         // Arguments to register dapp in the sns_root_canister
@@ -147,10 +132,10 @@ impl CyclesManagerTestEnvBuilder {
             minting_account: minting_account.to_string(),
             initial_values: HashMap::new(),
             send_whitelist: HashSet::new(),
-            transfer_fee: Some(Tokens::from_e8s(10_000)),
+            transfer_fee: None,
         };
         let icp_ledger_canister_id =
-            setup_icp_ledger(&mut pic, &self.controller, icp_ledger_init_args);
+            setup_icp_ledger(&mut pic, self.controller, icp_ledger_init_args);
 
         let cycles_minting_init_args =
             crate::cycles_manager_suite::setup::setup_cycles_minting::Args {
@@ -161,7 +146,7 @@ impl CyclesManagerTestEnvBuilder {
             };
 
         let cycles_minting_canister_id =
-            setup_cycles_minting(&mut pic, &self.controller, cycles_minting_init_args);
+            setup_cycles_minting(&mut pic, self.controller, cycles_minting_init_args);
         pic.tick();
 
         // Define initialization arguments for cycles manager canister

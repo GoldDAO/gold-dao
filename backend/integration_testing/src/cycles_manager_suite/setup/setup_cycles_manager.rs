@@ -23,7 +23,7 @@ pub fn setup_cycle_manager_canister(
         icp_ledger_canister_id,
         None,
         cycles_manager_canister,
-        100_000_000, // 0.00000100 - 100
+        1_000_000_000_000, // 0.00000100 - 100 ICP
     );
 
     pic.set_controllers(
