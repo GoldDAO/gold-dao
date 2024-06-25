@@ -1,4 +1,5 @@
 use candid::Principal;
+use icrc_ledger_types::icrc1::account::Account;
 use types::CanisterId;
 
 pub const E8S_PER_ICP: u64 = 100_000_000;
