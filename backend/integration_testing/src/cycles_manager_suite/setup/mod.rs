@@ -20,6 +20,6 @@ pub fn default_burn_icp_into_cycles_test_setup() -> CyclesManagerEnv {
 pub fn default_full_flow() -> CyclesManagerEnv {
     CyclesManagerTestEnvBuilder::new()
         .with_min_cycles_balance(2_000_000_000_000_000)
-        .with_icp_burn_amount(10_000_000_000)
+        .with_icp_burn_amount(500_000_000) // 5 ICP
         .build()
 }

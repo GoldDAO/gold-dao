@@ -19,6 +19,7 @@ fn full_flow() {
     // Get burner_canister balance (initially it's greater than the top_up threshold)
     let burner_canister_balance = test_env.pic.cycle_balance(cycles_burner_id);
 
+    // NOTE: here it takes more time in order to process all the top_ups (and ICP burnings)
     test_env.pic.advance_time(Duration::from_secs(10 * 60 * 60));
     tick_n_blocks(&test_env.pic, 100);
     test_env.pic.advance_time(Duration::from_secs(10 * 60 * 60));

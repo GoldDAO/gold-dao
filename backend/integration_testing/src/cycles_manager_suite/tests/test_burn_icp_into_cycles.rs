@@ -28,7 +28,7 @@ fn icp_is_burned_into_cycles() {
             min_cycles_balance: None,
             // NOTE: There is some limit on the amount of ICP that can be burned
             // TODO: check the limit
-            icp_burn_amount: Some(Tokens::from_e8s(50_000_000)),
+            icp_burn_amount: Some(Tokens::from_e8s(500_000_000)), // 5 ICP
         },
     );
 
