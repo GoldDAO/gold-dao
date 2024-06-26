@@ -1,4 +1,6 @@
-import CanistersTable from '../../components/Canisters/CanistersTable.jsx';
+'use client';
+
+import CanistersTable from '../../components/Canisters/CanistersTable';
 
 export const viewport = {
   themeColor: '#c6c6c6',

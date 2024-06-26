@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import Image from "next/image";
+import Image from 'next/image';
 
-const RangeSlider = ({ step, initialValue, onChange }) => {
-  const [max, setMax] = useState(100);
-  const [min, setMin] = useState(10);
+const RangeSlider = ({ step, onChange }) => {
+  const [max] = useState(100);
+  const [min] = useState(10);
   const [value, setValue] = useState(30);
   const [percentage, setPercentage] = useState((value / 1000) * 100);
 
   const handleChange = (event) => {
-    const newValue = parseInt(event.target.value);
+    const newValue = parseInt(event.target.value, 10);
 
     const clampedValue = Math.max(newValue, 20);
     setValue(clampedValue);
@@ -42,7 +42,7 @@ const RangeSlider = ({ step, initialValue, onChange }) => {
           className="bg-[#D3B871] text-xl  h-[50px] w-[100%] font-medium text-blue-100 text-center pl-10 pr-0.5 cursor-pointer leading-none rounded-full flex justify-between items-center"
           style={{ width: `${value}%` }}
         >
-          {" "}
+          {' '}
           <div className="text-white">{value * 10} days</div>
           <div>
             <button

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Bounce, toast } from "react-toastify";
-import { copyContent, elapsedTime } from "../../../utils/functions";
-import { useEffect, useState } from "react";
+import { Bounce, toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import { copyContent, elapsedTime } from '../../../utils/functions';
 
-import { CopyIcon } from "../../../utils/svgs";
+import { CopyIcon } from '../../../utils/svgs';
 
 const CanistersItemMobile = ({
   id,
@@ -15,28 +15,27 @@ const CanistersItemMobile = ({
   memory,
   status,
   ModuleHash,
-  freezing_threshold,
+  freezingThreshold,
   controllers,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const array = new Uint8Array(ModuleHash);
-  const hexString = Array.from(array, (byte) => ("0" + (byte & 0xff).toString(16)).slice(-2)).join(
-    ""
-  );
+  // eslint-disable-next-line no-bitwise
+  const hexString = Array.from(array, (byte) => (`0${(byte & 0xff).toString(16)}`).slice(-2)).join('');
 
   const [copyState, setCopyState] = useState(false);
 
   useEffect(() => {
     if (copyState) {
-      toast.success("Copied", {
-        position: "top-right",
+      toast.success('Copied', {
+        position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: 'light',
         transition: Bounce,
       });
       setCopyState(false);
@@ -47,7 +46,7 @@ const CanistersItemMobile = ({
     <div className="border-t border-[#C6C6C6]">
       <div className="flex items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
         <div
-          className={`w-10 h-10 flex justify-center items-center  ${isOpen ? " rotate-180" : "rotate-0"}`}
+          className={`w-10 h-10 flex justify-center items-center  ${isOpen ? ' rotate-180' : 'rotate-0'}`}
         >
           <svg
             width="10"
@@ -85,7 +84,7 @@ const CanistersItemMobile = ({
           </div>
 
           <div className="">
-            {" "}
+            {' '}
             <p className="w-full flex flex-grow items-center  text-[12px] justify-start">
               <span className="font-bold">{cycles}</span> T
             </p>
@@ -96,7 +95,7 @@ const CanistersItemMobile = ({
             </p>
           </div>
           <div className="w-full  flex flex-grow items-center  justify-start text-[12px]">
-            {" "}
+            {' '}
             <p className="font-bold flex justify-center">{idleCycles}</p>
           </div>
           <div className="w-full  flex flex-grow items-center  justify-start text-[10px]">
@@ -117,23 +116,23 @@ const CanistersItemMobile = ({
       {isOpen && (
         <section
           className="flex start w-[100%] gap-5 px-12 py-5"
-          style={{ transition: "height 0.3s ease" }}
+          style={{ transition: 'height 0.3s ease' }}
         >
           <div>
             <p className="text-[12px] font-bold text-[#D3B871]">Freezing Threshold Time</p>
             <p className="text-[12px] font-bold mt-2">
-              {elapsedTime(freezing_threshold) === "a month"
-                ? "30 days"
-                : elapsedTime(freezing_threshold)}
+              {elapsedTime(freezingThreshold) === 'a month'
+                ? '30 days'
+                : elapsedTime(freezingThreshold)}
             </p>
           </div>
           <div>
             <p className="text-[12px] font-bold text-[#D3B871]">Controllers</p>
-            <p className="text-[12px] font-bold mt-2">{controllers.substring(0, 5) + "..."}</p>
+            <p className="text-[12px] font-bold mt-2">{`${controllers.substring(0, 5)}...`}</p>
           </div>
           <div>
             <p className="text-[12px] font-bold text-[#D3B871]">Module Hash</p>
-            <p className="text-[12px] font-bold mt-2"> {hexString.substring(0, 20) + "..."}</p>
+            <p className="text-[12px] font-bold mt-2"> {`${hexString.substring(0, 20)}...`}</p>
           </div>
         </section>
       )}

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import useBalances from '../../../hooks/useBalances';
 import useNeurons from '../../../hooks/useNeurons';
-import { useSession } from '../../../hooks/useSession';
+import useSession from '../../../hooks/useSession';
 
 export default function ModalClaimAll({
   neuronAmountsToClaim, setGold, setIcp, setNeuronModify,
@@ -38,7 +38,7 @@ export default function ModalClaimAll({
         </p>
         <p className="text-center font-regular text-base sm:font-medium sm:text-lg">
           The rewards will be sent to your account
-          <p className="font-bold">{principal}</p>
+          <span className="font-bold">{principal}</span>
         </p>
         <button
           className={`px-10 py-4 rounded-full bg-[#D3B871] text-white text-md font-bold flex items-center justify-center h-10 w-full sm:w-fit sm:h-fit ${(!neuronAmountsToClaim.icpAmount && !neuronAmountsToClaim.ledgerAmount) || loading ? 'opacity-35 cursor-not-allowed' : ''}`}

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Spinner, Tooltip } from '@nextui-org/react';
 import useServices from '../../hooks/useServices';
-import { InfoIcon } from '../../utils/svgs.jsx';
+import { InfoIcon } from '../../utils/svgs';
 import { parseNumbers } from '../../utils/parsers';
 
 const OverviewTable = () => {

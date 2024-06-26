@@ -63,6 +63,7 @@ const CollapseContainer = ({ className }) => {
         setInfoModal={setInfoModal}
         item={overview} name={'overview'}
         redirect='overview'
+        key={'overview'}
       >
         {overview.loading ? (
           <article className="collapse w-full border-[1px] rounded-none flex justify-center">
@@ -72,7 +73,7 @@ const CollapseContainer = ({ className }) => {
             </section>
           </article>
         ) : overview?.data?.length > 0 ? (
-          overview?.data?.map((c) => <OverviewItem key={c.id} {...c} />)
+          overview?.data?.map((c) => <OverviewItem key={`overview-${c.id}`} {...c} />)
         ) : (
           <article className="collapse w-full border-[1px] rounded-none flex justify-center">
             <section className="collapse-title flex gap-2 justify-center items-center h-20">
@@ -81,7 +82,7 @@ const CollapseContainer = ({ className }) => {
           </article>
         )}
       </Collapse>
-      <Collapse title="Proposals" setInfoModal={setInfoModal} item={proposals} name={'proposals'} redirect='proposals'>
+      <Collapse title="Proposals" setInfoModal={setInfoModal} item={proposals} name={'proposals'} redirect='proposals' key={'proposals'}>
         <ProposalsHeader />
         <div className="divide-y">
           {proposals.loading ? (
@@ -108,6 +109,7 @@ const CollapseContainer = ({ className }) => {
         item={transactions}
         name={'transactions'}
         redirect='transactions'
+        key={'transactions'}
       >
         <TransactionsHeader />
         {transactions.loading ? (
@@ -118,7 +120,7 @@ const CollapseContainer = ({ className }) => {
             </section>
           </article>
         ) : transactions?.data?.length > 0 ? (
-          transactions?.data?.map((c) => <TransactionItem key={c.id} {...c} />)
+          transactions?.data?.map((c) => <TransactionItem key={`transaction-${c.id}`} {...c} />)
         ) : (
           <article className="collapse w-full border-[1px] rounded-none flex justify-center">
             <section className="collapse-title flex gap-2 justify-center items-center h-20">
@@ -133,6 +135,7 @@ const CollapseContainer = ({ className }) => {
         item={canisters}
         name={'canisters'}
         redirect='canisters'
+        key={'canisters'}
       >
         <CanistersHeader />
         {canisters.loading ? (
@@ -158,6 +161,7 @@ const CollapseContainer = ({ className }) => {
         item={neurons}
         name={'neurons'}
         redirect='neurons'
+        key={'neurons'}
       >
         <NeuronsHeader />
         {neurons.loading ? (

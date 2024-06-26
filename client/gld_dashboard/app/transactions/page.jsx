@@ -1,4 +1,6 @@
-import TransactionsTable from '../../components/Transactions/TransactionsTable.jsx';
+'use client';
+
+import TransactionsTable from '../../components/Transactions/TransactionsTable';
 
 export const viewport = {
   themeColor: '#c6c6c6',

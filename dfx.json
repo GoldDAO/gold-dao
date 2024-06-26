@@ -282,6 +282,22 @@
       "type": "custom",
       "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
     },
+    "management": {
+      "build": [
+        "./scripts/build-canister.sh management"
+      ],
+      "candid": "backend/canisters/management/api/can.did",
+      "declarations": {
+        "bindings": [
+          "js",
+          "did"
+        ],
+        "env_override": null,
+        "output": "backend/canisters/management/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/management/target/wasm32-unknown-unknown/release/management_canister.wasm.gz"
+    },
     "cycles_manager": {
       "build": [
         "./scripts/build-canister.sh cycles_manager"

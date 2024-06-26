@@ -37,6 +37,7 @@ const Collapse = ({
         isMobile ? document.getElementById(name).showModal() : '';
         isMobile ? setInfoModal(item) : '';
       }}
+      key={name}
     >
       <div
         className="flex items-center justify-between px-7 py-5 cursor-pointer"

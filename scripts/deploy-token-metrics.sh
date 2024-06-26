@@ -48,16 +48,24 @@ fi
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
+  SNS_REWARDS_CANISTER_ID=$(dfx canister id --network $1 sns_rewards)
 else
   TESTMODE="false"
+  SNS_REWARDS_CANISTER_ID=$(dfx canister id --ic sns_rewards)
 fi
 
+INIT_ARGS="(opt record {
+  test_mode = $TESTMODE;
+  sns_rewards_canister_id = principal \"$SNS_REWARDS_CANISTER_ID\"
+  })"
+
 if [[ $1 == "local" ]]; then
-  dfx deploy token_metrics --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+  dfx deploy token_metrics --network $1 ${REINSTALL} --argument "$INIT_ARGS"  -y
 elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^token_metrics-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
+  echo "Deploying token_metrics with args \n $INIT_ARGS"
   # This is for direct deployment via CICD identity
-  dfx deploy token_metrics --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
+  dfx deploy token_metrics --network $1 ${REINSTALL} --argument "$INIT_ARGS" -y
 
   # The following lines are for deployment via SNS. Only activate when handing over the canister
   # TODO - make sure to improve this procedure, created issue #156 to address this

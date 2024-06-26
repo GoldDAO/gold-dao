@@ -22,9 +22,7 @@ const CanistersItem = ({
   const [isOpen, setIsOpen] = useState(false);
   const array = new Uint8Array(ModuleHash);
   // eslint-disable-next-line no-bitwise
-  const hexString = Array.from(array, (byte) => (`0${(byte & 0xff).toString(16)}`).slice(-2)).join(
-    '',
-  );
+  const hexString = Array.from(array, (byte) => (`0${(byte & 0xff).toString(16)}`).slice(-2)).join('');
   const [copyState, setCopyState] = useState(false);
 
   useEffect(() => {

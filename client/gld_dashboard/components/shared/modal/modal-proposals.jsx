@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import Image from 'next/image';
 import React from 'react';
-import ProposalItem from '../../Home/Items/ProposalItem.jsx';
-import NavbarModal from './NavbarModal.jsx';
+import ProposalItem from '../../Home/Items/ProposalItem';
+import NavbarModal from './NavbarModal';
 
 const ModalProposals = ({ proposals }) => {
   const headerItems = [

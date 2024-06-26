@@ -1,4 +1,7 @@
-export default ({ IDL }) => {
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
+export const idlFactory = ({ IDL }) => {
   const TransactionType = IDL.Variant({
     decreaseLiquidity: IDL.Null,
     claim: IDL.Null,
@@ -114,32 +117,30 @@ export default ({ IDL }) => {
     batchUpdatePoolTvl: IDL.Func([IDL.Vec(PoolTvlData)], [], []),
     clean: IDL.Func([], [], []),
     cycleAvailable: IDL.Func([], [NatResult], []),
-    cycleBalance: IDL.Func([], [NatResult], ["query"]),
-    getAllTokens: IDL.Func([], [IDL.Vec(PublicTokenOverview)], ["query"]),
+    cycleBalance: IDL.Func([], [NatResult], ['query']),
+    getAllTokens: IDL.Func([], [IDL.Vec(PublicTokenOverview)], ['query']),
     getOwners: IDL.Func([], [IDL.Vec(IDL.Principal)], []),
-    getPoolTvl: IDL.Func([], [IDL.Vec(PoolTvlData)], ["query"]),
-    getPoolsForToken: IDL.Func([IDL.Text], [IDL.Vec(PoolInfo)], ["query"]),
-    getToken: IDL.Func([IDL.Text], [PublicTokenOverview], ["query"]),
+    getPoolTvl: IDL.Func([], [IDL.Vec(PoolTvlData)], ['query']),
+    getPoolsForToken: IDL.Func([IDL.Text], [IDL.Vec(PoolInfo)], ['query']),
+    getToken: IDL.Func([IDL.Text], [PublicTokenOverview], ['query']),
     getTokenChartData: IDL.Func(
       [IDL.Text, IDL.Nat, IDL.Nat],
       [IDL.Vec(PublicTokenChartDayData)],
-      ["query"]
+      ['query'],
     ),
     getTokenPricesData: IDL.Func(
       [IDL.Text, IDL.Int, IDL.Int, IDL.Nat],
       [IDL.Vec(PublicTokenPricesData)],
-      ["query"]
+      ['query'],
     ),
-    getTokenTransactions: IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Vec(Transaction)], ["query"]),
+    getTokenTransactions: IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Vec(Transaction)], ['query']),
     insert: IDL.Func([IDL.Text, Transaction], [], []),
     updateDayData: IDL.Func(
       [IDL.Text, IDL.Nat, IDL.Float64, IDL.Float64, IDL.Float64, IDL.Float64],
       [],
-      []
+      [],
     ),
     updateOverview: IDL.Func([IDL.Vec(OldPublicTokenOverview)], [], []),
   });
 };
-export const init = ({ IDL }) => {
-  return [];
-};
+export const init = ({ IDL }) => [];

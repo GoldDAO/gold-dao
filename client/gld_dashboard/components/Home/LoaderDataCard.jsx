@@ -1,4 +1,4 @@
-import ContentLoader from "react-content-loader";
+import ContentLoader from 'react-content-loader';
 
 const LoaderDataCard = (props) => (
   <ContentLoader

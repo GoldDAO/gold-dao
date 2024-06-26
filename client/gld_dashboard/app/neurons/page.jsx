@@ -1,4 +1,6 @@
-import NeuronsTable from '../../components/Neurons/NeuronsTable.jsx';
+'use client';
+
+import NeuronsTable from '../../components/Neurons/NeuronsTable';
 
 export const viewport = {
   themeColor: '#c6c6c6',

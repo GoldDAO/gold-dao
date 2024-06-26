@@ -1,3 +1,6 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
 export const idlFactory = ({ IDL }) => {
   const GenericNervousSystemFunction = IDL.Record({
     validator_canister_id: IDL.Opt(IDL.Principal),
@@ -7,7 +10,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const FunctionType = IDL.Variant({
     NativeNervousSystemFunction: IDL.Record({}),
-    GenericNervousSystemFunction: GenericNervousSystemFunction,
+    GenericNervousSystemFunction,
   });
   const NervousSystemFunction = IDL.Record({
     id: IDL.Nat64,
@@ -157,16 +160,16 @@ export const idlFactory = ({ IDL }) => {
     AddGenericNervousSystemFunction: NervousSystemFunction,
     RemoveGenericNervousSystemFunction: IDL.Nat64,
     UpgradeSnsToNextVersion: IDL.Record({}),
-    RegisterDappCanisters: RegisterDappCanisters,
-    TransferSnsTreasuryFunds: TransferSnsTreasuryFunds,
-    UpgradeSnsControlledCanister: UpgradeSnsControlledCanister,
-    DeregisterDappCanisters: DeregisterDappCanisters,
-    MintSnsTokens: MintSnsTokens,
+    RegisterDappCanisters,
+    TransferSnsTreasuryFunds,
+    UpgradeSnsControlledCanister,
+    DeregisterDappCanisters,
+    MintSnsTokens,
     Unspecified: IDL.Record({}),
-    ManageSnsMetadata: ManageSnsMetadata,
-    ExecuteGenericNervousSystemFunction: ExecuteGenericNervousSystemFunction,
-    ManageLedgerParameters: ManageLedgerParameters,
-    Motion: Motion,
+    ManageSnsMetadata,
+    ExecuteGenericNervousSystemFunction,
+    ManageLedgerParameters,
+    Motion,
   });
   const Proposal = IDL.Record({
     url: IDL.Text,
@@ -223,11 +226,11 @@ export const idlFactory = ({ IDL }) => {
     dissolve_timestamp_seconds: IDL.Nat64,
   });
   const Operation = IDL.Variant({
-    ChangeAutoStakeMaturity: ChangeAutoStakeMaturity,
+    ChangeAutoStakeMaturity,
     StopDissolving: IDL.Record({}),
     StartDissolving: IDL.Record({}),
-    IncreaseDissolveDelay: IncreaseDissolveDelay,
-    SetDissolveTimestamp: SetDissolveTimestamp,
+    IncreaseDissolveDelay,
+    SetDissolveTimestamp,
   });
   const Configure = IDL.Record({ operation: IDL.Opt(Operation) });
   const RegisterVote = IDL.Record({
@@ -243,7 +246,7 @@ export const idlFactory = ({ IDL }) => {
     memo: IDL.Nat64,
   });
   const By = IDL.Variant({
-    MemoAndController: MemoAndController,
+    MemoAndController,
     NeuronId: IDL.Record({}),
   });
   const ClaimOrRefresh = IDL.Record({ by: IDL.Opt(By) });
@@ -262,19 +265,19 @@ export const idlFactory = ({ IDL }) => {
     amount: IDL.Opt(Amount),
   });
   const Command_2 = IDL.Variant({
-    Split: Split,
-    Follow: Follow,
-    DisburseMaturity: DisburseMaturity,
-    Configure: Configure,
-    RegisterVote: RegisterVote,
+    Split,
+    Follow,
+    DisburseMaturity,
+    Configure,
+    RegisterVote,
     SyncCommand: IDL.Record({}),
     MakeProposal: Proposal,
-    FinalizeDisburseMaturity: FinalizeDisburseMaturity,
+    FinalizeDisburseMaturity,
     ClaimOrRefreshNeuron: ClaimOrRefresh,
-    RemoveNeuronPermissions: RemoveNeuronPermissions,
-    AddNeuronPermissions: AddNeuronPermissions,
-    MergeMaturity: MergeMaturity,
-    Disburse: Disburse,
+    RemoveNeuronPermissions,
+    AddNeuronPermissions,
+    MergeMaturity,
+    Disburse,
   });
   const NeuronInFlightCommand = IDL.Record({
     command: IDL.Opt(Command_2),
@@ -368,7 +371,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const GetModeResponse = IDL.Record({ mode: IDL.Opt(IDL.Int32) });
   const GetNeuron = IDL.Record({ neuron_id: IDL.Opt(NeuronId) });
-  const Result = IDL.Variant({ Error: GovernanceError, Neuron: Neuron });
+  const Result = IDL.Variant({ Error: GovernanceError, Neuron });
   const GetNeuronResponse = IDL.Record({ result: IDL.Opt(Result) });
   const GetProposal = IDL.Record({ proposal_id: IDL.Opt(ProposalId) });
   const Result_1 = IDL.Variant({
@@ -426,18 +429,18 @@ export const idlFactory = ({ IDL }) => {
     percentage_to_stake: IDL.Opt(IDL.Nat32),
   });
   const Command = IDL.Variant({
-    Split: Split,
-    Follow: Follow,
-    DisburseMaturity: DisburseMaturity,
-    ClaimOrRefresh: ClaimOrRefresh,
-    Configure: Configure,
-    RegisterVote: RegisterVote,
+    Split,
+    Follow,
+    DisburseMaturity,
+    ClaimOrRefresh,
+    Configure,
+    RegisterVote,
     MakeProposal: Proposal,
-    StakeMaturity: StakeMaturity,
-    RemoveNeuronPermissions: RemoveNeuronPermissions,
-    AddNeuronPermissions: AddNeuronPermissions,
-    MergeMaturity: MergeMaturity,
-    Disburse: Disburse,
+    StakeMaturity,
+    RemoveNeuronPermissions,
+    AddNeuronPermissions,
+    MergeMaturity,
+    Disburse,
   });
   const ManageNeuron = IDL.Record({
     subaccount: IDL.Vec(IDL.Nat8),
@@ -480,24 +483,24 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     claim_swap_neurons: IDL.Func([ClaimSwapNeuronsRequest], [ClaimSwapNeuronsResponse], []),
     fail_stuck_upgrade_in_progress: IDL.Func([IDL.Record({})], [IDL.Record({})], []),
-    get_build_metadata: IDL.Func([], [IDL.Text], ["query"]),
-    get_latest_reward_event: IDL.Func([], [RewardEvent], ["query"]),
+    get_build_metadata: IDL.Func([], [IDL.Text], ['query']),
+    get_latest_reward_event: IDL.Func([], [RewardEvent], ['query']),
     get_maturity_modulation: IDL.Func([IDL.Record({})], [GetMaturityModulationResponse], []),
-    get_metadata: IDL.Func([IDL.Record({})], [GetMetadataResponse], ["query"]),
-    get_mode: IDL.Func([IDL.Record({})], [GetModeResponse], ["query"]),
-    get_nervous_system_parameters: IDL.Func([], [NervousSystemParameters], ["query"]),
-    get_neuron: IDL.Func([GetNeuron], [GetNeuronResponse], ["query"]),
-    get_proposal: IDL.Func([GetProposal], [GetProposalResponse], ["query"]),
+    get_metadata: IDL.Func([IDL.Record({})], [GetMetadataResponse], ['query']),
+    get_mode: IDL.Func([IDL.Record({})], [GetModeResponse], ['query']),
+    get_nervous_system_parameters: IDL.Func([], [NervousSystemParameters], ['query']),
+    get_neuron: IDL.Func([GetNeuron], [GetNeuronResponse], ['query']),
+    get_proposal: IDL.Func([GetProposal], [GetProposalResponse], ['query']),
     get_root_canister_status: IDL.Func([IDL.Null], [CanisterStatusResultV2], []),
-    get_running_sns_version: IDL.Func([IDL.Record({})], [GetRunningSnsVersionResponse], ["query"]),
+    get_running_sns_version: IDL.Func([IDL.Record({})], [GetRunningSnsVersionResponse], ['query']),
     get_sns_initialization_parameters: IDL.Func(
       [IDL.Record({})],
       [GetSnsInitializationParametersResponse],
-      ["query"]
+      ['query'],
     ),
-    list_nervous_system_functions: IDL.Func([], [ListNervousSystemFunctionsResponse], ["query"]),
-    list_neurons: IDL.Func([ListNeurons], [ListNeuronsResponse], ["query"]),
-    list_proposals: IDL.Func([ListProposals], [ListProposalsResponse], ["query"]),
+    list_nervous_system_functions: IDL.Func([], [ListNervousSystemFunctionsResponse], ['query']),
+    list_neurons: IDL.Func([ListNeurons], [ListNeuronsResponse], ['query']),
+    list_proposals: IDL.Func([ListProposals], [ListProposalsResponse], ['query']),
     manage_neuron: IDL.Func([ManageNeuron], [ManageNeuronResponse], []),
     set_mode: IDL.Func([SetMode], [IDL.Record({})], []),
   });
@@ -511,7 +514,7 @@ export const init = ({ IDL }) => {
   });
   const FunctionType = IDL.Variant({
     NativeNervousSystemFunction: IDL.Record({}),
-    GenericNervousSystemFunction: GenericNervousSystemFunction,
+    GenericNervousSystemFunction,
   });
   const NervousSystemFunction = IDL.Record({
     id: IDL.Nat64,
@@ -661,16 +664,16 @@ export const init = ({ IDL }) => {
     AddGenericNervousSystemFunction: NervousSystemFunction,
     RemoveGenericNervousSystemFunction: IDL.Nat64,
     UpgradeSnsToNextVersion: IDL.Record({}),
-    RegisterDappCanisters: RegisterDappCanisters,
-    TransferSnsTreasuryFunds: TransferSnsTreasuryFunds,
-    UpgradeSnsControlledCanister: UpgradeSnsControlledCanister,
-    DeregisterDappCanisters: DeregisterDappCanisters,
-    MintSnsTokens: MintSnsTokens,
+    RegisterDappCanisters,
+    TransferSnsTreasuryFunds,
+    UpgradeSnsControlledCanister,
+    DeregisterDappCanisters,
+    MintSnsTokens,
     Unspecified: IDL.Record({}),
-    ManageSnsMetadata: ManageSnsMetadata,
-    ExecuteGenericNervousSystemFunction: ExecuteGenericNervousSystemFunction,
-    ManageLedgerParameters: ManageLedgerParameters,
-    Motion: Motion,
+    ManageSnsMetadata,
+    ExecuteGenericNervousSystemFunction,
+    ManageLedgerParameters,
+    Motion,
   });
   const Proposal = IDL.Record({
     url: IDL.Text,
@@ -727,11 +730,11 @@ export const init = ({ IDL }) => {
     dissolve_timestamp_seconds: IDL.Nat64,
   });
   const Operation = IDL.Variant({
-    ChangeAutoStakeMaturity: ChangeAutoStakeMaturity,
+    ChangeAutoStakeMaturity,
     StopDissolving: IDL.Record({}),
     StartDissolving: IDL.Record({}),
-    IncreaseDissolveDelay: IncreaseDissolveDelay,
-    SetDissolveTimestamp: SetDissolveTimestamp,
+    IncreaseDissolveDelay,
+    SetDissolveTimestamp,
   });
   const Configure = IDL.Record({ operation: IDL.Opt(Operation) });
   const RegisterVote = IDL.Record({
@@ -747,7 +750,7 @@ export const init = ({ IDL }) => {
     memo: IDL.Nat64,
   });
   const By = IDL.Variant({
-    MemoAndController: MemoAndController,
+    MemoAndController,
     NeuronId: IDL.Record({}),
   });
   const ClaimOrRefresh = IDL.Record({ by: IDL.Opt(By) });
@@ -766,19 +769,19 @@ export const init = ({ IDL }) => {
     amount: IDL.Opt(Amount),
   });
   const Command_2 = IDL.Variant({
-    Split: Split,
-    Follow: Follow,
-    DisburseMaturity: DisburseMaturity,
-    Configure: Configure,
-    RegisterVote: RegisterVote,
+    Split,
+    Follow,
+    DisburseMaturity,
+    Configure,
+    RegisterVote,
     SyncCommand: IDL.Record({}),
     MakeProposal: Proposal,
-    FinalizeDisburseMaturity: FinalizeDisburseMaturity,
+    FinalizeDisburseMaturity,
     ClaimOrRefreshNeuron: ClaimOrRefresh,
-    RemoveNeuronPermissions: RemoveNeuronPermissions,
-    AddNeuronPermissions: AddNeuronPermissions,
-    MergeMaturity: MergeMaturity,
-    Disburse: Disburse,
+    RemoveNeuronPermissions,
+    AddNeuronPermissions,
+    MergeMaturity,
+    Disburse,
   });
   const NeuronInFlightCommand = IDL.Record({
     command: IDL.Opt(Command_2),
