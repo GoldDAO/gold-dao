@@ -6,10 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
-### [unreleased]
-  
+### [1.0.1] - 2024-06-26
+
+#### Added
+
+- Add http requests to expose total supply and circulating supply.
+
 ### [1.0.0] - 2024-04-02
 
 #### Added
 
 - first release /gold-nft-metrics endpoint for data about "total value locked", "gold_price" and "total_gold_grams"
+
+### [unreleased]
