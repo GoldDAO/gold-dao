@@ -16,3 +16,4 @@ serde = { workspace = true }
 serde_bytes = { workspace = true }
 stable_memory = { path = "../stable_memory" }
 types = { path = "../types" }
+tracing = { workspace = true }

@@ -5,6 +5,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tracing-subscriber = "0.3.18"
 ic-cdk = {workspace = true}
 pocket-ic = {workspace = true}
 candid = { workspace = true }
@@ -35,7 +36,8 @@ num-bigint = {workspace = true}
 rand = "0.8.5"
 lazy_static = "1.4.0"
 hex = "0.4"
-sns_rewards = { path = '../canisters/sns_rewards/impl'}
 serde_bytes = { workspace = true }
 serde_cbor = { workspace = true }
 sha2 = "0.10.8"
+sns_rewards_api_canister = { path = "../canisters/sns_rewards/api" }
+cycles_manager_api_canister = { path = "../canisters/cycles_manager/api" }

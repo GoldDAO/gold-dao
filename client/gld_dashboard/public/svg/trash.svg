@@ -1,0 +1,38 @@
+ <svg
+                className="z-10"
+              
+                width="27"
+                height="28"
+                viewBox="0 0 27 28"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.2223 12.6111V25.6667C23.2223 26.1269 22.8492 26.5 22.3889 26.5H4.61117C4.15093 26.5 3.77783 26.1269 3.77783 25.6667V12.6111"
+                  stroke="black"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10.7222 20.9444V12.6111"
+                  stroke="black"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M16.2778 20.9444V12.6111"
+                  stroke="black"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M26 7.05556H19.0556M19.0556 7.05556V2.33333C19.0556 1.8731 18.6825 1.5 18.2222 1.5H8.77778C8.31754 1.5 7.94444 1.8731 7.94444 2.33333V7.05556M19.0556 7.05556H7.94444M1 7.05556H7.94444"
+                  stroke="black"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>

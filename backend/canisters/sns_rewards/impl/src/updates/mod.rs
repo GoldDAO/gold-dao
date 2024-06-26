@@ -1,8 +1,13 @@
-mod sync_neurons;
+pub mod add_neuron_ownership;
+pub mod remove_neuron_ownership;
 pub mod claim_rewards;
-// mod sync_user_rewards;
-// mod sync_neurons;
 pub mod set_reward_token_types;
-mod remove_neuron_ownership;
-mod add_neuron_ownership;
-pub mod set_reserve_transfer_amount;
+pub mod set_reserve_transfer_amounts;
+pub mod set_daily_gldgov_burn_rate;
+
+pub use add_neuron_ownership::*;
+pub use remove_neuron_ownership::*;
+pub use claim_rewards::*;
+pub use set_reward_token_types::*;
+pub use set_reserve_transfer_amounts::*;
+pub use set_daily_gldgov_burn_rate::*;

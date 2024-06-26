@@ -6,6 +6,10 @@ CANISTER_IDS="sns_canister_ids.json"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
+CID="j2neh-vqaaa-aaaal-aduxq-cai"
+METHOD_NAME="manage_reward_recipients"
+VALIDATE_METHOD_NAME="manage_reward_recipients_validate"
+
 ./scripts/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
@@ -15,18 +19,18 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Adding the set_reserve_transfer_amounts method to allow to set the daily tokens sent to the reward pool as governance rewards.\";
+        summary=\"Adding the manage_reward_recipients method of the icp_neuron canister to the SNS to be able to manage the reward recipients of the neurons' maturities. As described in proposal #5, the rewards of the neurons are split in 4 parts - 33% to GLDGov stakers, 33% to development team, 33% for listings and 1% for the Good DAO. This method allows to set these recipients.\";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_004 : nat64);
-                name = \"Set GLDGov reserve transfer amount.\";
-                description = opt \"Proposal to update the daily reserve transfer amount of GLDGov that defines the reward rate of Gold DAO voters.\";
+                id = (1_002 : nat64);
+                name = \"Manage NNS neuron maturity recipients.\";
+                description = opt \"Proposal to manage the recipients of the disbursed maturity of the NNS neurons.\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
-                        validator_canister_id = opt principal \"2f5ll-gqaaa-aaaak-qcfuq-cai\";
-                        target_canister_id = opt principal \"2f5ll-gqaaa-aaaak-qcfuq-cai\";
-                        validator_method_name = opt \"set_reserve_transfer_amounts_validate\";
-                        target_method_name = opt \"set_reserve_transfer_amounts\"
+                        validator_canister_id = opt principal \"$CID\";
+                        target_canister_id = opt principal \"$CID\";
+                        validator_method_name = opt \"$VALIDATE_METHOD_NAME\";
+                        target_method_name = opt \"$METHOD_NAME\"
                     }
                 }
             }

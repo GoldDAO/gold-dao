@@ -5,6 +5,7 @@ use icrc_ledger_types::icrc1::transfer::{ TransferArg, TransferError };
 
 // Queries
 generate_pocket_query_call!(icrc1_balance_of);
+generate_pocket_query_call!(icrc1_total_supply);
 
 // Updates
 generate_pocket_update_call!(icrc1_transfer);
@@ -21,6 +22,13 @@ pub mod icrc1_transfer {
 
     pub type Args = TransferArg;
     pub type Response = Result<Nat, TransferError>;
+}
+
+pub mod icrc1_total_supply {
+    use super::*;
+
+    pub type Args = ();
+    pub type Response = Nat;
 }
 
 pub mod client {

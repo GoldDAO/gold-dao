@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{ borrow::Cow, fmt::Display };
 
 use candid::{ CandidType, Decode, Encode, Principal };
 use ic_stable_structures::{ storable::Bound, Storable };
@@ -11,6 +11,15 @@ pub struct TokenSymbol(String);
 pub enum TokenSymbolParseError {
     InvalidTokenSymbol,
 }
+
+impl Display for TokenSymbolParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidTokenSymbol => write!(f, "InvalidTokenSymbol"),
+        }
+    }
+}
+
 const MAX_VALUE_SIZE: u32 = 12;
 impl TokenSymbol {
     pub fn parse(symbol: &str) -> Result<TokenSymbol, TokenSymbolParseError> {

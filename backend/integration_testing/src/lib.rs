@@ -1,7 +1,7 @@
 #![cfg(test)]
 
 mod client;
-mod setup;
-mod tests;
+pub mod cycles_manager_suite;
+pub mod sns_rewards_suite;
 mod utils;
 mod wasms;

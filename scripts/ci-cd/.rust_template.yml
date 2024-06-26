@@ -13,10 +13,12 @@
       - backend/canisters/icp_neuron/target
       - backend/canisters/token_metrics/target
       - backend/canisters/sns_rewards/target
+      - backend/canisters/cycles_manager/target
+      - backend/canisters/management/target
   before_script:
     - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
     - rustup component add clippy
     - rustup target add wasm32-unknown-unknown
     - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin
+    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor cargo-tarpaulin@=0.29.2
     - export PATH="$PWD/.cargo/bin:$PATH"

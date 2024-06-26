@@ -3,7 +3,8 @@ use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
-use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
+use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
+use types::{ NeuronInfo, TimestampMillis };
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },
@@ -47,6 +48,8 @@ impl RuntimeState {
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
+            last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
+            daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
         }
     }
 
@@ -73,6 +76,8 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub daily_reserve_transfer: Vec<String>,
     pub last_daily_reserve_transfer_time: TimestampMillis,
+    pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
+    pub daily_gldgov_burn_amount: Option<Nat>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -105,15 +110,19 @@ pub struct Data {
     /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
     /// valid tokens and their associated ledger data
-    pub tokens: HashMap<TokenSymbol, TokenInfo>,
+    pub tokens: TokenRewardTypes,
     /// authorized Principals for guarded calls
     pub authorized_principals: Vec<Principal>,
     /// a boolean check for if we're currently synchronizing neuron data into the canister.
     pub is_synchronizing_neurons: bool,
     /// The daily amount of tokens to transfer from the reserve pool sub account to the reward pool sub account in e8s for each token type
-    pub daily_reserve_transfer: HashMap<TokenSymbol, Nat>,
+    pub daily_reserve_transfer: ReserveTokenAmounts,
     /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
     pub last_daily_reserve_transfer_time: TimestampMillis,
+    /// The daily burn rate of GLDGov - settable via a proposal
+    pub daily_gldgov_burn_rate: Option<Nat>,
+    /// The last time a burn of GLDGov was done
+    pub last_daily_gldgov_burn: Option<TimestampMillis>,
 }
 
 impl Default for Data {
@@ -130,6 +139,8 @@ impl Default for Data {
             is_synchronizing_neurons: false,
             daily_reserve_transfer: HashMap::new(),
             last_daily_reserve_transfer_time: TimestampMillis::default(),
+            daily_gldgov_burn_rate: None,
+            last_daily_gldgov_burn: None,
         }
     }
 }

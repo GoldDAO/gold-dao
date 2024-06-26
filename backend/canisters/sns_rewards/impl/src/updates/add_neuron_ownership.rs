@@ -1,29 +1,60 @@
 use candid::Principal;
 use ic_cdk::update;
 use sns_governance_canister::types::NeuronId;
+pub use sns_rewards_api_canister::add_neuron_ownership::{
+    Args as AddNeuronOwnershipArgs,
+    Response as AddNeuronOwnershipResponse,
+};
+
 use utils::env::Environment;
 
 use crate::{
     state::{ mutate_state, read_state },
-    types::claim_neuron_response::UserClaimErrorResponse,
-    utils::{ authenticate_by_hotkey, fetch_neuron_data_by_id },
+    utils::{
+        authenticate_by_hotkey,
+        fetch_neuron_data_by_id,
+        AuthenticateByHotkeyResponse,
+        FetchNeuronDataByIdResponse,
+    },
 };
 
-use UserClaimErrorResponse::*;
+use AddNeuronOwnershipResponse::{
+    Ok,
+    InternalError,
+    NeuronDoesNotExist,
+    NeuronHotKeyAbsent,
+    NeuronHotKeyInvalid,
+    NeuronOwnerInvalid,
+};
 
 #[update]
-async fn add_neuron_ownership(neuron_id: NeuronId) -> Result<NeuronId, UserClaimErrorResponse> {
+async fn add_neuron_ownership(neuron_id: AddNeuronOwnershipArgs) -> AddNeuronOwnershipResponse {
     let caller = read_state(|s| s.env.caller());
     add_neuron_impl(neuron_id, caller).await
 }
 
-pub async fn add_neuron_impl(
-    neuron_id: NeuronId,
-    caller: Principal
-) -> Result<NeuronId, UserClaimErrorResponse> {
-    let neuron = fetch_neuron_data_by_id(&neuron_id).await?;
+pub async fn add_neuron_impl(neuron_id: NeuronId, caller: Principal) -> AddNeuronOwnershipResponse {
+    let neuron = fetch_neuron_data_by_id(&neuron_id).await;
+    let neuron = match neuron {
+        FetchNeuronDataByIdResponse::InternalError(e) => {
+            return InternalError(e);
+        }
+        FetchNeuronDataByIdResponse::NeuronDoesNotExist => {
+            return NeuronDoesNotExist;
+        }
+        FetchNeuronDataByIdResponse::Ok(n) => n,
+    };
+
     // check the neuron contains the hotkey of the callers principal
-    authenticate_by_hotkey(&neuron, &caller)?;
+    match authenticate_by_hotkey(&neuron, &caller) {
+        AuthenticateByHotkeyResponse::NeuronHotKeyAbsent => {
+            return NeuronHotKeyAbsent;
+        }
+        AuthenticateByHotkeyResponse::NeuronHotKeyInvalid => {
+            return NeuronHotKeyInvalid;
+        }
+        AuthenticateByHotkeyResponse::Ok(_) => {}
+    }
     let owner = read_state(|s| s.data.neuron_owners.get_owner_of_neuron_id(&neuron_id));
     match owner {
         Some(owner_principal) => {
@@ -32,7 +63,7 @@ pub async fn add_neuron_impl(
                 return Ok(neuron_id);
             } else {
                 // hotkey is valid but neuron id is owned already so we return the principal that owns it
-                return Err(NeuronOwnerInvalid(Some(owner_principal)));
+                return NeuronOwnerInvalid(Some(owner_principal));
             }
         }
         None => {

@@ -1,0 +1,25 @@
+<svg
+            className="cursor-pointer"
+            
+            width="50"
+            height="50"
+            viewBox="0 0 50 50"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="50" height="50" rx="25" fill="black" />
+            <path
+              d="M15 31.25L35 31.25M35 31.25L31.25 35M35 31.25L31.25 27.5"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M35 18.75L15 18.75M15 18.75L18.75 22.5M15 18.75L18.75 15"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
