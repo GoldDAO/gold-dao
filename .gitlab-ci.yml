@@ -236,8 +236,8 @@ integration tests:
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
-    - ulimit -n 102400
-    - ulimit -f 1024000 
+    - ulimit -n 202400
+    - ulimit -f 2024000 
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
