@@ -50,18 +50,16 @@ if [[ $1 =~ ^(local|staging)$ ]]; then
 TESTMODE="true"
 SNS_ROOT_CANISTER_ID=i7fbw-giaaa-aaaap-ab25q-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-ICP_LEDGER_CANISTER_ID=ete3q-rqaaa-aaaal-qdlva-cai
 else
 TESTMODE="false"
 SNS_ROOT_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
 fi
-
 
 export MIN_CYCLES_BALANCE=20_000_000_000_000
 export MAX_TOP_UP_AMOUNT=10_000_000_000_000
 export ICP_BURN_AMOUNT=500_000_000
+export ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
 export CYCLES_MINTING_CANISTER_ID=rkp4c-7iaaa-aaaaa-aaaca-cai
 
 ARGS='(
