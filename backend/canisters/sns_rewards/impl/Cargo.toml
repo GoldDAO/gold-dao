@@ -8,6 +8,9 @@ edition = "2021"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 canister_logger = { path = '../../../libraries/canister_logger' }

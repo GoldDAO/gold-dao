@@ -19,9 +19,9 @@ $[[ inputs.src-folder ]] test build:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   extends: .rust template
   script:
-    - scripts/build-canister.sh --wasmonly $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh -it --wasmonly $[[ inputs.src-folder ]]
     - scripts/generate-did.sh $[[ inputs.src-folder ]]
-    - scripts/build-canister.sh --checksum $[[ inputs.src-folder ]]
+    - scripts/build-canister.sh -it --checksum $[[ inputs.src-folder ]]
     - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
   artifacts:
     name: "$[[ inputs.src-folder ]]-${CI_COMMIT_SHORT_SHA}-wasm-TEST_BUILD"
