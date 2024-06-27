@@ -72,9 +72,9 @@ ARGS='(
     canisters = vec {};
     min_cycles_balance = '"$MIN_CYCLES_BALANCE"' : nat64;
     max_top_up_amount = '"$MAX_TOP_UP_AMOUNT"' : nat64;
-    icp_burn_amount = record { e8s = '"$ICP_BURN_AMOUNT"' : nat64 },
-    icp_ledger_canister = principal "'"$ICP_LEDGER_CANISTER_ID"'",
-    cycles_minting_canister = principal "'"$CYCLES_MINTING_CANISTER_ID"'",
+    icp_burn_amount = record { e8s = '"$ICP_BURN_AMOUNT"' : nat64 };
+    icp_ledger_canister = principal "'"$ICP_LEDGER_CANISTER_ID"'";
+    cycles_minting_canister = principal "'"$CYCLES_MINTING_CANISTER_ID"'";
   },
 )'
 
