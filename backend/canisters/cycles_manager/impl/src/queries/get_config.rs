@@ -4,5 +4,5 @@ use ic_cdk_macros::query;
 
 #[query]
 fn get_config() -> GetConfigResponse {
-    read_state(|state| state.get_top_up_config())
+    read_state(|state| state.get_config())
 }

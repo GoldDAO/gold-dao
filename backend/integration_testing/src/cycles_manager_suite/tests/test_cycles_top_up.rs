@@ -1,19 +1,14 @@
 use crate::client::cycles_manager;
-use crate::cycles_manager_suite::setup::default_test_setup;
+use crate::cycles_manager_suite::setup::default_top_up_test_setup;
 use crate::utils::tick_n_blocks;
 use candid::Nat;
-use candid::{encode_one, CandidType, Principal};
+use candid::{CandidType, Principal};
 use serde::Deserialize;
 use serde::Serialize;
 use std::time::Duration;
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct Empty {}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub struct RegisterDappCanisterRequest {
-    pub canister_id: Option<Principal>,
-}
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Response {
@@ -40,7 +35,7 @@ pub struct CanisterStatusResult {
 // Define the test function
 #[test]
 fn test_cycles_management() {
-    let mut test_env = default_test_setup();
+    let mut test_env = default_top_up_test_setup();
 
     // Get canisters ID:
     let cycles_manager_id = test_env.cycles_manager_id;
@@ -67,25 +62,10 @@ fn test_cycles_management() {
         &cycles_manager_api_canister::update_config::Args {
             max_top_up_amount: Some(20_000_000_000_000),
             min_cycles_balance: Some(20_000_000_000_000),
+            icp_burn_amount: None,
         },
     );
     test_env.pic.tick();
-
-    // Arguments to register dapp in the sns_root_canister
-    let register_canister_args = RegisterDappCanisterRequest {
-        canister_id: Some(cycles_burner_id),
-    };
-
-    // Add cycles burner to the sns_root canister dapps array
-    let _ = test_env
-        .pic
-        .update_call(
-            test_env.sns_root_canister_id,
-            test_env.controller,
-            "register_dapp_canister",
-            encode_one(register_canister_args).unwrap(),
-        )
-        .unwrap();
 
     // NOTE: Uncomment to see the deserialized get_sns_canisters_summary response
     // let resp_raw = test_env

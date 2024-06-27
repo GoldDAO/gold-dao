@@ -1,4 +1,5 @@
 use candid::{CandidType, Principal};
+use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use types::{CanisterId, Cycles};
 
@@ -10,4 +11,7 @@ pub struct InitArgs {
     pub sns_root_canister: CanisterId,
     pub max_top_up_amount: Cycles,
     pub min_cycles_balance: Cycles,
+    pub icp_burn_amount: Tokens,
+    pub icp_ledger_canister: CanisterId,
+    pub cycles_minting_canister: CanisterId,
 }

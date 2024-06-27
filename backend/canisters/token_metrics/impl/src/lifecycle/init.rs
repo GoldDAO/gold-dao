@@ -19,6 +19,7 @@ use crate::lifecycle::init_canister;
 #[derive(Deserialize, CandidType, Debug)]
 pub struct InitArgs {
     test_mode: bool,
+    pub sns_rewards_canister_id: Principal,
 }
 
 #[init]
@@ -41,7 +42,7 @@ fn init(init_args: Option<InitArgs>) {
     };
 
     let env = CanisterEnv::new(args.test_mode);
-    let data = Data::new(gold_nft_canister);
+    let data = Data::new(gold_nft_canister, args.sns_rewards_canister_id);
 
     let runtime_state = RuntimeState::new(env, data);
 

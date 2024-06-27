@@ -463,12 +463,16 @@ dependencies = [
  "canister_time",
  "canister_tracing_macros",
  "cycles_manager_api_canister",
+ "cycles_minting_canister",
+ "cycles_minting_canister_c2c_client",
  "futures",
  "http_request",
  "ic-cdk",
  "ic-cdk-macros",
  "ic-cdk-timers",
+ "ic-ledger-types",
  "ic-stable-structures",
+ "icp_ledger_canister_c2c_client",
  "serde",
  "serde_bytes",
  "serde_json",
@@ -486,15 +490,30 @@ name = "cycles_manager_api_canister"
 version = "0.1.0"
 dependencies = [
  "candid",
- "candid_gen",
- "canister_logger",
  "ic-cdk",
  "ic-cdk-macros",
  "ic-ledger-types",
  "serde",
- "serializer",
- "stable_memory",
- "tracing",
+ "types",
+]
+
+[[package]]
+name = "cycles_minting_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "serde",
+]
+
+[[package]]
+name = "cycles_minting_canister_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "canister_client",
+ "cycles_minting_canister",
+ "ic-cdk",
  "types",
 ]
 
@@ -797,9 +816,7 @@ dependencies = [
  "ic-cdk-macros",
  "icrc-ledger-types",
  "serde",
- "serde_bytes",
  "serde_json",
- "tokio",
 ]
 
 [[package]]
@@ -1424,6 +1441,69 @@ name = "log"
 version = "0.4.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
+
+[[package]]
+name = "management"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "http_request",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
+ "management_api_canister",
+ "num-bigint",
+ "serde",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "stable_memory",
+ "tracing",
+ "types",
+ "utils",
+]
+
+[[package]]
+name = "management_api_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "candid_gen",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "http_request",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
+ "num-bigint",
+ "serde",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "stable_memory",
+ "tracing",
+ "types",
+ "utils",
+]
 
 [[package]]
 name = "matchers"
@@ -2636,6 +2716,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "futures",
  "hex",
  "http_request",
  "ic-cdk",
@@ -2643,10 +2724,13 @@ dependencies = [
  "ic-cdk-timers",
  "ic-stable-structures",
  "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
  "serde",
  "serde_bytes",
  "serde_json",
  "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
  "stable_memory",
  "time",
  "tracing",

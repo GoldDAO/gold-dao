@@ -8,6 +8,8 @@ lazy_static! {
     pub static ref IC_ICRC1_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
     pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
     pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm("sns_root");
+    pub static ref CYCLES_MINTING_CANISTER: CanisterWasm = get_canister_wasm("cycles_minting");
+    pub static ref ICP_LEDGER: CanisterWasm = get_canister_wasm("ledger");
     pub static ref BURNER: CanisterWasm = get_canister_wasm("cycles_burner");
     pub static ref REWARDS: CanisterWasm = get_rewards_canister_wasm();
     pub static ref CYCLES_MANAGER: CanisterWasm = get_cycles_manager_canister_wasm();
