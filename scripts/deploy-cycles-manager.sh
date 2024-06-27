@@ -58,17 +58,23 @@ fi
 
 export MIN_CYCLES_BALANCE=20_000_000_000_000
 export MAX_TOP_UP_AMOUNT=10_000_000_000_000
+export ICP_BURN_AMOUNT=500_000_000
+export ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
+export CYCLES_MINTING_CANISTER_ID=rkp4c-7iaaa-aaaaa-aaaca-cai
 
 ARGS='(
   record {
     test_mode = '"$TESTMODE"';
     sns_root_canister = principal "'"$SNS_ROOT_CANISTER_ID"'";
-    min_cycles_balance = '"$MIN_CYCLES_BALANCE"' : nat64;
     authorized_principals = vec {
       principal "'"$AUTHORIZED_PRINCIPAL"'";
     };
     canisters = vec {};
+    min_cycles_balance = '"$MIN_CYCLES_BALANCE"' : nat64;
     max_top_up_amount = '"$MAX_TOP_UP_AMOUNT"' : nat64;
+    icp_burn_amount = record { e8s = '"$ICP_BURN_AMOUNT"' : nat64 },
+    icp_ledger_canister = principal "'"$ICP_LEDGER_CANISTER_ID"'",
+    cycles_minting_canister = principal "'"$CYCLES_MINTING_CANISTER_ID"'",
   },
 )'
 

@@ -1,5 +1,5 @@
 [package]
-name = "cycles_manager_api_canister"
+name = "cycles_minting_canister"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,8 +7,5 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-ic-ledger-types = { workspace = true }
+candid_gen = { path = "../../../libraries/candid_gen" }
 serde = { workspace = true }
-types = { path = "../../../libraries/types" }
-ic-cdk = { workspace = true }
-ic-cdk-macros = { workspace = true }

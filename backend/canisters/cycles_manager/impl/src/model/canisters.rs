@@ -20,7 +20,7 @@ impl Canisters {
                         Canister {
                             added: now,
                             top_ups: Vec::new(),
-                            top_up_in_progress: false,
+                            // top_up_in_progress: false,
                         },
                     )
                 })
@@ -33,7 +33,7 @@ impl Canisters {
             e.insert(Canister {
                 added: now,
                 top_ups: Vec::new(),
-                top_up_in_progress: false,
+                // top_up_in_progress: false,
             });
             true
         } else {
@@ -43,6 +43,10 @@ impl Canisters {
 
     pub fn get_mut(&mut self, canister_id: &CanisterId) -> Option<&mut Canister> {
         self.canisters.get_mut(canister_id)
+    }
+
+    pub fn get_canisters_quantity(&self) -> usize {
+        self.canisters.len()
     }
 
     pub fn metrics(&self) -> Vec<CanisterMetrics> {
@@ -84,18 +88,9 @@ impl Canisters {
 pub struct Canister {
     added: TimestampMillis,
     top_ups: Vec<CyclesTopUp>,
-    top_up_in_progress: bool,
 }
 
 impl Canister {
-    pub fn top_up_in_progress(&self) -> bool {
-        self.top_up_in_progress
-    }
-
-    pub fn set_top_up_in_progress(&mut self, in_progress: bool) {
-        self.top_up_in_progress = in_progress;
-    }
-
     pub fn latest_top_up(&self) -> Option<TimestampMillis> {
         self.top_ups.last().map(|t| t.date)
     }
