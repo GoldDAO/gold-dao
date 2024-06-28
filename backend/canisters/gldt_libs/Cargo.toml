@@ -5,6 +5,9 @@ description = "Common libs for the GLDT project that are shared between canister
 authors = ["Dustin Becker <dustin@bochslerfinance.com>"]
 edition = "2021"
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 ic-cdk = { workspace = true }

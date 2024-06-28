@@ -214,13 +214,13 @@ integration tests:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       needs:
         [
-          "sns_rewards test build",
+          "sns_rewards integration-test build",
           "sns_rewards tests",
           "cycles_manager test build",
           "cycles_manager tests",
         ]
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["sns_rewards canister build", "cycles_manager canister build"] 
+      needs: ["sns_rewards integration-test build", "cycles_manager canister build"] 
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
   extends: .rust template
@@ -232,7 +232,7 @@ integration tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/3.0.1/pocket-ic-x86_64-linux.gz
+    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-linux.gz
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic

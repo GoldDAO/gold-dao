@@ -8,6 +8,9 @@ edition = "2021"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 canister_logger = { path = '../../../libraries/canister_logger' }
@@ -35,3 +38,5 @@ futures = { workspace = true }
 num-bigint = {workspace = true}
 sns_rewards_api_canister = { path = "../api" }
 candid_gen = { path = "../../../libraries/candid_gen" }
+time = { workspace = true }
+

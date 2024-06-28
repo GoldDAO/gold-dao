@@ -8,11 +8,11 @@ use crate::wasms;
 
 #[derive(Deserialize, CandidType)]
 pub struct Args {
-    test_mode: bool,
-    icp_ledger_canister_id: Principal,
-    sns_ledger_canister_id: Principal,
-    ogy_ledger_canister_id: Principal,
-    sns_gov_canister_id: Principal,
+    pub test_mode: bool,
+    pub icp_ledger_canister_id: Principal,
+    pub sns_ledger_canister_id: Principal,
+    pub ogy_ledger_canister_id: Principal,
+    pub sns_gov_canister_id: Principal,
 }
 
 pub fn setup_rewards_canister(
