@@ -722,6 +722,7 @@ fn test_distribution_interval_is_consistant_across_upgrades() {
     assert_eq!(distribution_1_record.len(), 1);
 }
 
+#[cfg(feature = "inttest")]
 #[test]
 fn test_distribution_recovery() {
     let mut test_env = default_test_setup();
