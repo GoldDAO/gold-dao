@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-candid = { workspace = true }
 canister_logger = { path = "../canister_logger" }
 serde = { workspace = true }
 serde_bytes = { workspace = true }

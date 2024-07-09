@@ -8,12 +8,9 @@ edition = "2021"
 [dependencies]
 candid = { workspace = true }
 canister_time = { path = "../canister_time" }
-ciborium = { workspace = true }
 icrc-ledger-types = { workspace = true }
 ic-cdk = { workspace = true }
-ic-stable-structures = { workspace = true }
 serde = { workspace = true }
-serde_bytes = { workspace = true }
 stable_memory = { path = "../stable_memory" }
 types = { path = "../types" }
 tracing = { workspace = true }

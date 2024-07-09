@@ -7,7 +7,5 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-canister_time = { path = "../../../libraries/canister_time" }
 serde = { workspace = true }
-serde_json = { workspace = true }
 types = { path = "../../../libraries/types" }
