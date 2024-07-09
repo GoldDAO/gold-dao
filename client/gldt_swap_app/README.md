@@ -1,58 +1,30 @@
-# GLDT swap frontend
+# React + TypeScript + Vite
 
-This repository contains the source code for the GLDT page frontend, including swap interface, and the swap canister.  
-As the front-end will be hosted on the Internet Computer, this projects uses [NextJS](https://nextjs.org/docs) and bundles a full static website with [client-side fetching](https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side).
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-> :bulb: This project uses the [`pages` routing](https://nextjs.org/docs/getting-started/project-structure#pages-routing-conventions), and not the [`app` routing that just went out of beta](https://nextjs.org/blog/next-13-4#nextjs-app-router).
+Currently, two official plugins are available:
 
-## Development
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### Dfinity SDK
+## Expanding the ESLint configuration
 
-To be able to work on canisters development, or to test in a local canister execution environment, you may need to install the [Dfinity SDK](https://github.com/dfinity/sdk), and especially the [`dfx`](https://internetcomputer.org/docs/current/references/cli-reference/) CLI.
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-### Dependencies and local scripts
+- Configure the top-level `parserOptions` property like this:
 
-First install the dependencies with
-
-```sh
-npm install
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
 ```
 
-Then you can launch a **front-end only** development server, with [HMR](https://webpack.js.org/concepts/hot-module-replacement/) with
-
-```sh
-npm run dev:gldt_swap_app
-```
-
-or you can deploy the canister(s) and frontend to test in a [local replica](https://internetcomputer.org/docs/current/references/cli-reference/dfx-start#local-server-configuration) with
-
-```sh
-npm start
-```
-
-And if you want to see some changes in the code, run
-
-```sh
-npm run restart
-```
-
-Once you finished your work, simply type `npm run stop` to stop the local canister execution.
-
-## Deployment
-
-TBD
-
-### Keys management
-
-TBD
-
-...
-
-## TODO
-
-- [x] Scaffold project for selected development frameworks
-- [ ] Initialize basic CI/CD (lint, test build, etc)
-- [ ] Write CONTRIBUTING guide
-- [ ] Setup keys management
-- [ ] Update this README
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

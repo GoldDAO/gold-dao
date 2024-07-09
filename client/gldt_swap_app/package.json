@@ -1,48 +1,28 @@
 {
-    "name": "gldt_swap_app",
-    "version": "0.1.0",
-    "description": "GLDT page and swap canister and frontend",
-    "main": "index.js",
-    "author": "Victor Audetat",
-    "license": "AGPL-3.0-only",
-    "private": true,
-    "scripts": {
-        "develop": "next dev",
-        "build": "next build",
-        "lint": "next lint",
-        "postinstall": "echo 'Frontend project has been installed'"
-    },
-    "browserslist": {
-        "production": [
-            "Firefox ESR",
-            "> 2%",
-            "not dead"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    },
-    "dependencies": {
-        "@chakra-ui/icons": "^2.1.1",
-        "@chakra-ui/react": "^2.8.1",
-        "@connect2ic/core": "^0.2.0-beta.23",
-        "@connect2ic/react": "^0.2.0-beta.23",
-        "@dfinity/agent": "^0.15.6",
-        "@emotion/react": "^11.11.1",
-        "@emotion/styled": "^11.11.0",
-        "dotenv": "^16.3.1",
-        "framer-motion": "^10.16.4",
-        "jotai": "^2.1.0",
-        "moment": "^2.29.4",
-        "next": "^13.4.3",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-router": "^6.13.0",
-        "react-router-dom": "^6.13.0"
-    },
-    "devDependencies": {
-        "eslint-config-next": "13.4.3"
-    }
+  "name": "gldt_swap_app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1"
+  }
 }
