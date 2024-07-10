@@ -1,0 +1,49 @@
+[package]
+name = "sns_neuron_controller"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+canister_logger = { path = "../../../libraries/canister_logger" }
+canister_state_macros = { path = "../../../libraries/canister_state_macros" }
+canister_time = { path = "../../../libraries/canister_time" }
+canister_tracing_macros = { path = "../../../libraries/canister_tracing_macros" }
+getrandom = { workspace = true }
+hex = { workspace = true }
+http_request = { path = "../../../libraries/http_request" }
+ic-cdk = { workspace = true }
+ic-cdk-macros = { workspace = true }
+ic-cdk-timers = { workspace = true }
+ic-ledger-types = { workspace = true }
+ic-stable-structures = { workspace = true }
+ic-transport-types = { workspace = true }
+icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
+icrc-ledger-types = { workspace = true }
+k256 = { workspace = true }
+ledger_utils = { path = "../../../libraries/ledger_utils" }
+sns_governance_canister = { path = "../../../external_canisters/sns_governance/api" }
+sns_governance_canister_c2c_client = { path = "../../../external_canisters/sns_governance/c2c_client" }
+ogy_sns_rewards_api_canister = { path = "../../../external_canisters/origyn_sns_rewards/api" }
+ogy_sns_rewards_c2c_client = { path = "../../../external_canisters/origyn_sns_rewards/c2c_client" }
+sns_ledger_canister_c2c_client = { path = "../../../external_canisters/sns_ledger/c2c_client" }
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+serde_cbor = { workspace = true }
+serde_json = { workspace = true }
+serde_with = { workspace = true }
+serializer = { path = "../../../libraries/serializer" }
+sha256 = { path = "../../../libraries/sha256" }
+stable_memory = { path = "../../../libraries/stable_memory" }
+tracing = { workspace = true }
+types = { path = "../../../libraries/types" }
+utils = { path = "../../../libraries/utils" }

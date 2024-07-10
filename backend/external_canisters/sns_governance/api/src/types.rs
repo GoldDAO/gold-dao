@@ -1,10 +1,13 @@
 use candid::CandidType;
-use ic_stable_structures::{ storable::Bound, Storable };
-use serde::{ Deserialize, Serialize };
-use std::{ borrow::Cow, fmt::{ self, Display, Formatter } };
+use ic_stable_structures::{storable::Bound, Storable};
+use serde::{Deserialize, Serialize};
+use std::{
+    borrow::Cow,
+    fmt::{self, Display, Formatter},
+};
 
 /// A principal with a particular set of permissions over a neuron.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Serialize, Clone, PartialEq)]
 pub struct NeuronPermission {
     /// The principal that has the permissions.
     pub principal: Option<candid::Principal>,
@@ -23,10 +26,10 @@ pub struct NeuronPermission {
     PartialEq,
     PartialOrd,
     Ord,
-    Debug
+    Debug,
 )]
 pub struct NeuronId {
-    id: Vec<u8>,
+    pub id: Vec<u8>,
 }
 
 impl Storable for NeuronId {
@@ -58,7 +61,11 @@ impl Default for NeuronId {
 
 impl NeuronId {
     pub fn new(id_as_hex: &str) -> Option<Self> {
-        if let Ok(id) = hex::decode(id_as_hex) { Some(Self { id }) } else { None }
+        if let Ok(id) = hex::decode(id_as_hex) {
+            Some(Self { id })
+        } else {
+            None
+        }
     }
 
     pub fn into_array(self) -> Option<[u8; 32]> {
@@ -95,18 +102,18 @@ impl From<[u8; 32]> for NeuronId {
 }
 
 /// The id of a specific proposal.
-#[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq, Debug)]
 pub struct ProposalId {
     pub id: u64,
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Serialize, Clone, PartialEq)]
 pub struct DisburseMaturityInProgress {
     pub amount_e8s: u64,
     pub timestamp_of_disbursement_seconds: u64,
     pub account_to_disburse_to: Option<Account>,
 }
 /// A neuron in the governance system.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Default)]
+#[derive(candid::CandidType, candid::Deserialize, Serialize, Clone, PartialEq, Default)]
 pub struct Neuron {
     /// The unique id of this neuron.
     pub id: Option<NeuronId>,
@@ -202,7 +209,7 @@ pub struct Neuron {
 /// Nested message and enum types in `Neuron`.
 pub mod neuron {
     /// A list of a neuron's followees for a specific function.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, PartialEq)]
     pub struct Followees {
         pub followees: Vec<super::NeuronId>,
     }
@@ -221,7 +228,7 @@ pub mod neuron {
     /// `Dissolved`. All other states represent the dissolved
     /// state. That is, (a) `when_dissolved_timestamp_seconds` is set and in the past,
     /// (b) `when_dissolved_timestamp_seconds` is set to zero, (c) neither value is set.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, PartialEq)]
     pub enum DissolveState {
         /// When the dissolve timer is running, this stores the timestamp,
         /// in seconds from the Unix epoch, at which the neuron is dissolved.
@@ -359,7 +366,7 @@ pub mod transfer_sns_treasury_funds {
         Eq,
         Hash,
         PartialOrd,
-        Ord
+        Ord,
     )]
     #[repr(i32)]
     pub enum TransferFrom {
@@ -531,7 +538,7 @@ pub mod governance_error {
         Eq,
         Hash,
         PartialOrd,
-        Ord
+        Ord,
     )]
     #[repr(i32)]
     pub enum ErrorType {
@@ -1229,7 +1236,7 @@ pub mod governance {
         Eq,
         Hash,
         PartialOrd,
-        Ord
+        Ord,
     )]
     #[repr(i32)]
     pub enum Mode {
@@ -1308,6 +1315,8 @@ pub struct ManageNeuron {
 }
 /// Nested message and enum types in `ManageNeuron`.
 pub mod manage_neuron {
+    use serde::Serialize;
+
     /// The operation that increases a neuron's dissolve delay. It can be
     /// increased up to a maximum defined in the nervous system parameters.
     #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
@@ -1556,17 +1565,17 @@ pub struct ManageNeuronResponse {
 /// Nested message and enum types in `ManageNeuronResponse`.
 pub mod manage_neuron_response {
     /// The response to the ManageNeuron command 'configure'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct ConfigureResponse {}
     /// The response to the ManageNeuron command 'disburse'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct DisburseResponse {
         /// The block height of the ledger where the tokens were disbursed to the
         /// given account.
         pub transfer_block_height: u64,
     }
     /// The response to the ManageNeuron command 'merge_maturity'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct MergeMaturityResponse {
         /// The maturity that was merged in fractions of
         /// 10E-8 of a governance token.
@@ -1575,48 +1584,48 @@ pub mod manage_neuron_response {
         /// in fractions of 10E-8 of a governance token.
         pub new_stake_e8s: u64,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct DisburseMaturityResponse {
         /// The amount disbursed in e8s of the governance token.
         pub amount_disbursed_e8s: u64,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct StakeMaturityResponse {
         pub maturity_e8s: u64,
         pub staked_maturity_e8s: u64,
     }
     /// The response to the ManageNeuron command 'follow'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct FollowResponse {}
     /// The response to the ManageNeuron command 'make_proposal'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct MakeProposalResponse {
         /// The ID of the created proposal.
         pub proposal_id: Option<super::ProposalId>,
     }
     /// The response to the ManageNeuron command 'register_vote'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct RegisterVoteResponse {}
     /// The response to the ManageNeuron command 'split'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct SplitResponse {
         /// The ID of the 'child neuron' that was newly created.
         pub created_neuron_id: Option<super::NeuronId>,
     }
     /// The response to the ManageNeuron command 'claim_or_refresh'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct ClaimOrRefreshResponse {
         /// The neuron ID of the neuron that was newly claimed or
         /// refreshed.
         pub refreshed_neuron_id: Option<super::NeuronId>,
     }
     /// The response to the ManageNeuron command 'add_neuron_permissions'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct AddNeuronPermissionsResponse {}
     /// The response to the ManageNeuron command 'remove_neuron_permissions'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub struct RemoveNeuronPermissionsResponse {}
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
     pub enum Command {
         Error(super::GovernanceError),
         Configure(ConfigureResponse),
@@ -1633,6 +1642,7 @@ pub mod manage_neuron_response {
         StakeMaturity(StakeMaturityResponse),
     }
 }
+
 /// An operation that attempts to get a neuron by a given neuron ID.
 #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
 pub struct GetNeuron {
@@ -1862,14 +1872,14 @@ pub struct GetMaturityModulationResponse {
     pub maturity_modulation: Option<governance::MaturityModulation>,
 }
 /// A Ledger subaccount.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Serialize, Clone, PartialEq)]
 pub struct Subaccount {
     pub subaccount: Vec<u8>,
 }
 /// A Ledger account identified by the owner of the account `of` and
 /// the `subaccount`. If the `subaccount` is not specified then the default
 /// one is used.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Serialize, Clone, PartialEq)]
 pub struct Account {
     /// The owner of the account.
     pub owner: Option<candid::Principal>,
@@ -1889,7 +1899,7 @@ pub struct Account {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum NeuronPermissionType {
@@ -1961,7 +1971,7 @@ impl NeuronPermissionType {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum Vote {
@@ -1997,7 +2007,7 @@ impl Vote {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum ProposalDecisionStatus {
@@ -2041,7 +2051,7 @@ impl ProposalDecisionStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum ProposalRewardStatus {
@@ -2087,7 +2097,7 @@ impl ProposalRewardStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum ClaimedSwapNeuronStatus {
@@ -2141,7 +2151,7 @@ impl ClaimedSwapNeuronStatus {
     Eq,
     Hash,
     PartialOrd,
-    Ord
+    Ord,
 )]
 #[repr(i32)]
 pub enum ClaimSwapNeuronsError {
@@ -2204,8 +2214,8 @@ impl ProposalData {
         const MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO: f64 = 0.03;
 
         if let Some(tally) = self.latest_tally.as_ref() {
-            (tally.yes as f64) >= (tally.total as f64) * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO &&
-                tally.yes > tally.no
+            (tally.yes as f64) >= (tally.total as f64) * MIN_NUMBER_VOTES_FOR_PROPOSAL_RATIO
+                && tally.yes > tally.no
         } else {
             false
         }
@@ -2219,7 +2229,8 @@ impl ProposalData {
     fn get_deadline_timestamp_seconds(&self) -> u64 {
         self.wait_for_quiet_state
             .as_ref()
-            .expect("Proposal must have a wait_for_quiet_state.").current_deadline_timestamp_seconds
+            .expect("Proposal must have a wait_for_quiet_state.")
+            .current_deadline_timestamp_seconds
     }
 }
 

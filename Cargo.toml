@@ -9,6 +9,7 @@ members = [
   "backend/canisters/sns_rewards/impl",
   "backend/canisters/sns_rewards/api",
   "backend/canisters/icp_neuron/impl",
+  "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
   "backend/canisters/gldt_libs",
   "backend/external_canisters/sns_governance/api",
