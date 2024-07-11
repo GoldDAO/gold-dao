@@ -1,9 +1,9 @@
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{ Deserialize, Serialize };
-use types::NnsNeuronId;
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+use std::collections::HashMap;
+use types::NnsNeuronId;
 
 #[derive(Default, Deserialize, Serialize, CandidType, Clone, PartialEq, Eq, Debug)]
 pub struct OutstandingPaymentsList(HashMap<NnsNeuronId, PaymentsList>);
@@ -25,13 +25,15 @@ impl OutstandingPaymentsList {
                 keys_to_remove.push(key)
             }
         });
-        keys_to_remove.iter().for_each(|&neuron_id| self.remove_from_list(neuron_id))
+        keys_to_remove
+            .iter()
+            .for_each(|&neuron_id| self.remove_from_list(neuron_id))
     }
 
     pub fn insert(
         &mut self,
         neuron_id: NnsNeuronId,
-        payment: PaymentsList
+        payment: PaymentsList,
     ) -> Result<(), PaymentsList> {
         if let Some(payment) = self.0.get(&neuron_id) {
             Err(payment.clone())
@@ -45,11 +47,10 @@ impl OutstandingPaymentsList {
         &mut self,
         neuron_id: NnsNeuronId,
         account: Account,
-        status: PaymentStatus
+        status: PaymentStatus,
     ) {
-        match self.0.get_mut(&neuron_id) {
-            Some(entry) => entry.update_status(account, status),
-            None => (),
+        if let Some(entry) = self.0.get_mut(&neuron_id) {
+            entry.update_status(account, status)
         }
     }
 }
@@ -57,7 +58,8 @@ impl OutstandingPaymentsList {
 #[serde_as]
 #[derive(Deserialize, Serialize, CandidType, Clone, PartialEq, Eq, Debug)]
 pub struct PaymentsList {
-    #[serde_as(as = "Vec<(_, _)>")] // needed to have it corrected serialised for the /metrics http endpoint
+    #[serde_as(as = "Vec<(_, _)>")]
+    // needed to have it corrected serialised for the /metrics http endpoint
     pub list: HashMap<Account, Payment>,
 }
 
@@ -65,7 +67,7 @@ impl PaymentsList {
     pub fn new(list: Vec<(Account, u64)>) -> Self {
         let map: HashMap<Account, Payment> = list
             .into_iter()
-            .map(|(account, amount)| { (account, Payment::new(amount)) })
+            .map(|(account, amount)| (account, Payment::new(amount)))
             .collect();
         Self { list: map }
     }
@@ -73,7 +75,7 @@ impl PaymentsList {
         self.list.iter().all(|(_, payment)| payment.is_complete())
     }
     pub fn has_some(&self) -> bool {
-        self.list.len() > 0
+        !self.list.is_empty()
     }
     pub fn has_none(&self) -> bool {
         !self.has_some()
@@ -167,12 +169,10 @@ mod tests {
     #[test]
     fn test_new_outstanding_payments() {
         let account1 = dummy_account(None);
-        let account2 = dummy_account(
-            Some([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1,
-            ])
-        );
+        let account2 = dummy_account(Some([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1,
+        ]));
         let list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
         assert_eq!(list.list[&account1].amount, 100);
@@ -184,12 +184,10 @@ mod tests {
     #[test]
     fn test_all_complete() {
         let account1 = dummy_account(None);
-        let account2 = dummy_account(
-            Some([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1,
-            ])
-        );
+        let account2 = dummy_account(Some([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1,
+        ]));
         let mut list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
         assert_eq!(list.all_complete(), false);
@@ -204,12 +202,10 @@ mod tests {
     #[test]
     fn test_has_some() {
         let account1 = dummy_account(None);
-        let account2 = dummy_account(
-            Some([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1,
-            ])
-        );
+        let account2 = dummy_account(Some([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1,
+        ]));
         let list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
         assert_eq!(list.has_some(), true);
@@ -225,12 +221,10 @@ mod tests {
     #[test]
     fn test_update_status() {
         let account1 = dummy_account(None);
-        let account2 = dummy_account(
-            Some([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1,
-            ])
-        );
+        let account2 = dummy_account(Some([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1,
+        ]));
         let mut list = PaymentsList::new(vec![(account1.clone(), 100), (account2.clone(), 200)]);
 
         list.update_status(account1.clone(), PaymentStatus::Complete);

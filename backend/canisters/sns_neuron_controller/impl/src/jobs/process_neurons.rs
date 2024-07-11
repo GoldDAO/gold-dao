@@ -1,4 +1,4 @@
-use crate::state::{mutate_state, read_state, Neurons};
+use crate::state::read_state;
 use crate::utils::fetch_neuron_reward_balance;
 use crate::utils::transfer_token;
 use candid::Nat;
@@ -31,7 +31,7 @@ async fn run_async() {
     let is_test_mode = read_state(|s| s.env.is_test_mode());
     let canister_id = read_state(|s| s.env.canister_id());
 
-    // TODO: add neurons storing
+    // TODO: add neurons sync (mutate_state)
     let neurons = fetch_neurons(sns_governance_canister_id, canister_id, is_test_mode)
         .await
         .unwrap();
@@ -124,14 +124,14 @@ async fn calculate_available_rewards(
 ) -> Nat {
     let mut available_rewards_amount: Nat = Nat::from(0u64);
     for neuron in neurons {
-        if let Some(_) = &neuron.id {
+        if neuron.id.is_some() {
             let neuron_rewrds = fetch_neuron_reward_balance(
                 sns_ledger_canister_id,
                 ogy_sns_rewards_canister_id,
                 neuron.id.as_ref().unwrap(),
             )
             .await;
-            available_rewards_amount = available_rewards_amount + neuron_rewrds;
+            available_rewards_amount += neuron_rewrds;
         }
     }
     available_rewards_amount

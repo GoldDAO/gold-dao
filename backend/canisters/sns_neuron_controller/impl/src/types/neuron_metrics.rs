@@ -8,7 +8,7 @@ use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
 #[derive(CandidType, Serialize, Debug, PartialEq, Eq)]
 pub struct NeuronWithMetric {
     pub id: Vec<u8>,
-    pub deposit_account: Option<DepositAccount>,
+    pub deposit_account: DepositAccount,
     pub staked_amount: u64,
     pub maturity: u64,
     pub dissolve_delay: u64,
@@ -32,21 +32,15 @@ impl From<Neuron> for NeuronWithMetric {
             }
         }
 
-        let subaccount_bytes: Result<[u8; 32], _> =
-            neuron.id.clone().unwrap_or_default().try_into();
-        let deposit_account = match subaccount_bytes {
-            Ok(bytes) => {
-                let icrc_account = Account {
-                    owner: NNS_GOVERNANCE_CANISTER_ID,
-                    subaccount: Some(bytes),
-                };
-                let legacy_account_id = icrc_account_to_legacy_account_id(icrc_account).to_hex();
-                Some(DepositAccount {
-                    icrc_account,
-                    legacy_account_id,
-                })
-            }
-            Err(_) => None,
+        let subaccount_bytes: [u8; 32] = neuron.id.clone().unwrap_or_default().into();
+        let icrc_account = Account {
+            owner: NNS_GOVERNANCE_CANISTER_ID,
+            subaccount: Some(subaccount_bytes),
+        };
+        let legacy_account_id = icrc_account_to_legacy_account_id(icrc_account).to_hex();
+        let deposit_account = DepositAccount {
+            icrc_account,
+            legacy_account_id,
         };
 
         Self {
@@ -110,7 +104,7 @@ mod tests {
                 149, 128, 178, 23, 182, 54, 48, 115, 178, 174, 154, 119, 21, 182, 104, 106, 141,
                 106, 190, 141, 3, 144, 216, 56, 228, 185, 230, 194, 1, 119, 126, 193,
             ],
-            deposit_account: Some(DepositAccount {
+            deposit_account: DepositAccount {
                 icrc_account: Account {
                     owner: NNS_GOVERNANCE_CANISTER_ID,
                     subaccount: Some([
@@ -120,7 +114,7 @@ mod tests {
                 },
                 legacy_account_id:
                     "6601afb37d5807c9ed17c8343bb1c7180f98eca73a64727f56134c720cf0304a".to_string(),
-            }),
+            },
             staked_amount: 0,
             maturity: 0,
             dissolve_delay: 0,

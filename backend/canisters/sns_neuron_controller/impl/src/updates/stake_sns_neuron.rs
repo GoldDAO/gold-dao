@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::manage_neuron::claim_or_refresh::{By, MemoAndController};
 use sns_governance_canister::types::manage_neuron::{ClaimOrRefresh, Command};
 use sns_governance_canister::types::{manage_neuron_response, ManageNeuron};
-use tracing::{error, info};
+use tracing::error;
 use types::CanisterId;
 use utils::env::Environment;
 use utils::rand::generate_rand_nonce;
@@ -101,7 +101,7 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
             // FIXME: add here debug
             _response => {
                 // return Err(format!("Governance error: {:?}", response.unwrap()));
-                return Err("manage_neuron error".to_string());
+                Err("manage_neuron error".to_string())
             }
         },
         Err(error) => Err(format!("Network error: {error:?}")),

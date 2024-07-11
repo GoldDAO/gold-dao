@@ -47,11 +47,11 @@ pub(crate) async fn manage_sns_neuron_impl(
         // TODO: Handle the response somehow. Can I implement Debug here?
         Ok(_response) => {
             info!("Succesfully executed a neuron command");
-            return Ok(("Succesfully executed a neuron command").to_string());
+            Ok(("Succesfully executed a neuron command").to_string())
         }
         Err(e) => {
             error!("Failed to executed a neuron command: {:?}", e);
-            return Err(("Failed to executed a neuron command: {e:?}").to_string());
+            Err(("Failed to executed a neuron command: {e:?}").to_string())
         }
     }
 }

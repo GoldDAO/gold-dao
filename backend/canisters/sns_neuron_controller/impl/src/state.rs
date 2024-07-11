@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
 use types::{CanisterId, RewardsRecipientList, TimestampMillis};
 use utils::{
-    consts::{ICP_LEDGER_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID, SNS_REWARDS_CANISTER_ID},
+    consts::{SNS_GOVERNANCE_CANISTER_ID, SNS_REWARDS_CANISTER_ID},
     env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
