@@ -84,12 +84,13 @@ pub async fn fetch_neuron_data_by_id(
 
 pub async fn fetch_neuron_reward_balance(
     ledger_canister_id: Principal,
-    neuron_id: NeuronId,
+    ogy_sns_rewards_canister_id: Principal,
+    neuron_id: &NeuronId,
 ) -> Nat {
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
         &(Account {
-            owner: ic_cdk::api::id(),
+            owner: ogy_sns_rewards_canister_id,
             subaccount: Some(neuron_id.into()),
         }),
     )
@@ -98,8 +99,8 @@ pub async fn fetch_neuron_reward_balance(
         Ok(t) => t,
         Err(e) => {
             error!(
-                "Fail - to fetch token balance of ledger canister id {ledger_canister_id} with ERROR_CODE : {} . MESSAGE",
-                e.1
+                "Failed to fetch token balance of ledger canister id {} with ERROR : {:?}",
+                ledger_canister_id, e
             );
             Nat::from(0u64)
         }

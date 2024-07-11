@@ -101,7 +101,7 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
             // FIXME: add here debug
             _response => {
                 // return Err(format!("Governance error: {:?}", response.unwrap()));
-                return Err(format!("manage_neuron error"));
+                return Err("manage_neuron error".to_string());
             }
         },
         Err(error) => Err(format!("Network error: {error:?}")),
@@ -116,8 +116,8 @@ struct PrepareResult {
 
 fn prepare(state: &RuntimeState) -> Result<PrepareResult, String> {
     Ok(PrepareResult {
-        sns_governance_canister_id: state.data.sns_governance_canister_id,
-        icp_ledger_canister_id: state.data.icp_ledger_canister_id,
+        sns_governance_canister_id: state.data.ogy_sns_governance_canister_id,
+        icp_ledger_canister_id: state.data.ogy_sns_ledger_canister_id,
         principal: state.env.canister_id(),
     })
 }

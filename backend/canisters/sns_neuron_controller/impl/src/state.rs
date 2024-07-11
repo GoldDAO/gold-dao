@@ -43,8 +43,9 @@ impl RuntimeState {
             .to_string(),
             authorized_principals: self.data.authorized_principals.clone(),
             neurons: self.data.get_ogy_neuron_list(),
-            sns_governance_canister_id: self.data.sns_governance_canister_id,
-            icp_ledger_canister_id: self.data.icp_ledger_canister_id,
+            ogy_sns_governance_canister_id: self.data.ogy_sns_governance_canister_id,
+            ogy_sns_ledger_canister_id: self.data.ogy_sns_ledger_canister_id,
+            ogy_sns_rewards_canister_id: self.data.ogy_sns_rewards_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
             outstanding_payments: self.data.outstanding_payments.clone(),
         }
@@ -61,8 +62,9 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub canister_default_account_id: String,
     pub authorized_principals: Vec<Principal>,
-    pub sns_governance_canister_id: Principal,
-    pub icp_ledger_canister_id: Principal,
+    pub ogy_sns_governance_canister_id: CanisterId,
+    pub ogy_sns_ledger_canister_id: CanisterId,
+    pub ogy_sns_rewards_canister_id: CanisterId,
     pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
     pub outstanding_payments: OutstandingPaymentsList,
@@ -81,12 +83,11 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     // TODO: take out all the OGY parameters into separate struct and try to make it abstract while adding WTN: sns_governance_canister_id, sns_ledger_canister_id
     pub ogy_neurons: Neurons,
-    pub sns_governance_canister_id: Principal,
-    pub sns_ledger_canister_id: Principal,
-    pub icp_ledger_canister_id: Principal,
+    pub ogy_sns_governance_canister_id: Principal,
+    pub ogy_sns_ledger_canister_id: Principal,
+    pub ogy_sns_rewards_canister_id: CanisterId,
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
-    pub sns_rewards_canister_id: CanisterId,
 }
 
 impl Data {
@@ -96,12 +97,11 @@ impl Data {
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             ogy_neurons: Neurons::default(),
             // FIXME: change this value to valid:
-            sns_ledger_canister_id: SNS_GOVERNANCE_CANISTER_ID,
+            ogy_sns_ledger_canister_id: SNS_GOVERNANCE_CANISTER_ID,
             // FIXME: change this value to valid:
-            sns_governance_canister_id: SNS_GOVERNANCE_CANISTER_ID,
-            icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
+            ogy_sns_governance_canister_id: SNS_GOVERNANCE_CANISTER_ID,
             outstanding_payments: OutstandingPaymentsList::default(),
-            sns_rewards_canister_id: SNS_REWARDS_CANISTER_ID,
+            ogy_sns_rewards_canister_id: SNS_REWARDS_CANISTER_ID,
         }
     }
 
