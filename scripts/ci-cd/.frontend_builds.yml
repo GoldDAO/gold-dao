@@ -11,7 +11,7 @@ $[[ inputs.src-folder ]] test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs: ["gldt_core test build", "generate test declarations"]
+  needs: ["generate test declarations"]
   extends: .node template
   script:
     - npm run build:$[[ inputs.src-folder ]]
@@ -25,7 +25,7 @@ $[[ inputs.src-folder ]] staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["gldt_core canister build", "generate declarations"]
+  needs: ["generate declarations"]
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -50,7 +50,7 @@ $[[ inputs.src-folder ]] preprod build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  needs: ["gldt_core canister build", "generate declarations"]
+  needs: ["generate declarations"]
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -79,7 +79,7 @@ $[[ inputs.src-folder ]] production build:
       changes:
         - "$[[ inputs.src-folder ]]/*.{js,json}"
         - "$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-  needs: ["gldt_core canister build", "generate declarations"]
+  needs: ["generate declarations"]
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
