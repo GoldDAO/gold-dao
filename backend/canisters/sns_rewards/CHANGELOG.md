@@ -17,3 +17,14 @@ This marks the initial release of SNS Rewards (sns_rewards canister). SNS Reward
 - **Weekly Reward Distribution** : Calculate and distribute rewards weekly based on the proportional accumulated maturity of each neuron for that week.
 - **Daily Reserve Pool Transfer** : Transfers GLDGov tokens to a dedicated reward pool within the canister daily, ensuring a consistent payout amount each week for the weekly reward distribution of GLDGov tokens.
 - **Neuron Ownership & Reward Claims** : Easily claim ownership of a neuron via hotkeys and subsequently claim any distributed rewards.
+
+### [1.0.1] - 2024-07-16
+
+#### Description
+This includes fixes and improvements
+
+#### Added
+- **Consistent distribution times across upgrades** : Upgrading a canister would mean a distribution timer would get reset and so this could result in an almost 2 week delay depending on the time of the upgrade. This new feature allows the distribution to always start at a specific time of UTC 14 - 16. 
+
+#### Fixed
+- **History overwrite** : the history would sometimes be overwritten for early distributions, although this isn't a problem now, we have changed how history is added and added unit tests to make sure historic distributions are added to the history state correctly.
