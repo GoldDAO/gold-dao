@@ -79,6 +79,25 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: cycles_manager
+  # Canister generate declaration
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: cycles_manager
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: gldt_core
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: icp_neuron
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: management
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: sns_rewards
+  - local: scripts/ci-cd/.generate_declaration.yml
+    inputs:
+      src-folder: token_metrics
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -150,54 +169,6 @@ rust lint:
 ################################################################################
 
 # See includes above for canister builds
-
-generate test declarations:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "gldt_core test build",
-          "icp_neuron test build",
-          "token_metrics test build",
-          "sns_rewards test build",
-          "management test build",
-          "cycles_manager test build",
-        ]
-  script:
-    - dfx generate
-    - scripts/refactor_nft_declarations.sh
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
-    paths:
-      - backend/**/declarations
-    expire_in: 1 day
-
-generate declarations:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gldt_landing_page|gldt_explorer|gldt_swap_app)-v\d+\.\d+\.\d+$/'
-      needs:
-        [
-          "gldt_core canister build",
-          "icp_neuron canister build",
-          "token_metrics canister build",
-          "sns_rewards canister build",
-          "management canister build",
-          "cycles_manager canister build",
-        ]
-  script:
-    - dfx generate
-    - scripts/refactor_nft_declarations.sh
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
-    paths:
-      - backend/**/api
-    expire_in: 6 months
-
-# See includes above for frontend builds
 
 ################################################################################
 # Integration tests
