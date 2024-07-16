@@ -19,9 +19,17 @@ $[[ inputs.src-folder ]] tests:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
+      changes:
+        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml,lock}"
   extends: .rust template
   tags:
     - dind
@@ -31,10 +39,11 @@ $[[ inputs.src-folder ]] tests:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+    # - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
+    - cargo test -p $[[ inputs.src-folder ]]
+  # coverage: /^\d+.\d+% coverage/
+  # artifacts:
+  #   reports:
+  #     coverage_report:
+  #       coverage_format: cobertura
+  #       path: cobertura.xml
