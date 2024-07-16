@@ -4,12 +4,12 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
+          "cycles_manager",
           "gldt_core",
           "icp_neuron",
-          "token_metrics",
-          "sns_rewards",
-          "cycles_manager",
           "management",
+          "sns_rewards",
+          "token_metrics",
         ]
 ---
 # Rust canisters test and production builds
