@@ -34,9 +34,6 @@ include:
   # Frontend linters:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
-      src-folder: gldt_swap_app
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
       src-folder: gldt_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
@@ -83,9 +80,6 @@ include:
     inputs:
       src-folder: cycles_manager
   # Frontend builds
-  - local: scripts/ci-cd/.frontend_builds.yml
-    inputs:
-      src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gldt_landing_page
