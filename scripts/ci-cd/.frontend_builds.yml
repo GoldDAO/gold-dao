@@ -11,6 +11,8 @@ $[[ inputs.src-folder ]] test build:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/**/*"
   extends: .node template
   script:
     - npm run build:$[[ inputs.src-folder ]]
@@ -24,6 +26,8 @@ $[[ inputs.src-folder ]] staging build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/**/*"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -48,6 +52,8 @@ $[[ inputs.src-folder ]] preprod build:
   stage: build
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/**/*"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -72,10 +78,6 @@ $[[ inputs.src-folder ]] production build:
   stage: build
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
-    - if: $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "$[[ inputs.src-folder ]]/*.{js,json}"
-        - "$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
