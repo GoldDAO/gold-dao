@@ -214,7 +214,7 @@ integration tests:
           "cycles_manager tests",
         ]
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["sns_rewards integration-test build", "cycles_manager canister build"] 
+      needs: ["sns_rewards integration-test build", "cycles_manager canister build"]
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
   extends: .rust template
@@ -231,7 +231,7 @@ integration tests:
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - ulimit -n 202400
-    - ulimit -f 2024000 
+    - ulimit -f 2024000
     - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
   coverage: /^\d+.\d+% coverage/
   artifacts:
