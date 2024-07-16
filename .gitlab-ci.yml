@@ -177,13 +177,7 @@ integration tests:
   stage: integration_testing
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "sns_rewards integration-test build",
-          "sns_rewards tests",
-          "cycles_manager test build",
-          "cycles_manager tests",
-        ]
+      when: never
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       needs: ["sns_rewards integration-test build", "cycles_manager canister build"]
     - if: $CI_OPEN_MERGE_REQUESTS
