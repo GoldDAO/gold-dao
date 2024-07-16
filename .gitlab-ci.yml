@@ -243,32 +243,6 @@ integration tests:
 ################################################################################
 # Deployments
 ################################################################################
-local deploy and tests:
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "gldt_core test build",
-          "icp_neuron test build",
-          "gldt_landing_page test build",
-          "gldt_explorer test build",
-          "gld_dashboard test build",
-          "token_metrics test build",
-          "sns_rewards test build",
-          "management test build",
-          "cycles_manager test build",
-          "integration tests",
-        ]
-  before_script:
-    - dfx --version
-    - dfx start --clean --background --artificial-delay 40
-  script:
-    - NETWORK='local' scripts/local-deploy.sh
-    # TODO: Some bash script to provision a wallet and test a few interactions with the canisters
-  after_script:
-    - cat canister_ids.json
-    - dfx stop
 
 check canister ids:
   stage: deploy
