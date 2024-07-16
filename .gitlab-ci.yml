@@ -257,7 +257,6 @@ local deploy and tests:
         [
           "gldt_core test build",
           "icp_neuron test build",
-          "gldt_swap_app test build",
           "gldt_landing_page test build",
           "gldt_explorer test build",
           "gld_dashboard test build",

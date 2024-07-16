@@ -3,7 +3,7 @@ spec:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
       options:
-        ["gldt_swap_app", "gldt_landing_page", "gldt_explorer", "gld_dashboard"]
+        ["gldt_landing_page", "gldt_explorer", "gld_dashboard"]
 ---
 # Frontend builds
 
