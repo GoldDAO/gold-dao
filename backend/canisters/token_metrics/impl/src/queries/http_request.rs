@@ -39,11 +39,17 @@ fn http_request(request: HttpRequest) -> HttpResponse {
     }
 
     fn get_total_supply(state: &RuntimeState) -> HttpResponse {
-        build_json_response(&state.data.supply_data.total_supply)
+        let result = state.data.supply_data.total_supply.clone();
+        let result_u64: u64 = result.0.try_into().unwrap_or(0);
+        let result_float: f64 = (result_u64 as f64) / 1e8;
+        build_json_response(&result_float)
     }
 
     fn get_circulating_supply(state: &RuntimeState) -> HttpResponse {
-        build_json_response(&state.data.supply_data.circulating_supply)
+        let result = state.data.supply_data.circulating_supply.clone();
+        let result_u64: u64 = result.0.try_into().unwrap_or(0);
+        let result_float: f64 = (result_u64 as f64) / 1e8;
+        build_json_response(&result_float)
     }
 
     match extract_route(&request.url) {
