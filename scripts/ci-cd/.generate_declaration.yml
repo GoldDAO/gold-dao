@@ -18,12 +18,12 @@ $[[ inputs.src-folder ]] generate test declaration:
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        - "$[[ inputs.src-folder ]] test build"
       changes:
         - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"
         - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
         - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
+      needs:
+        - "$[[ inputs.src-folder ]] test build"
   script:
     - dfx generate $[[ inputs.src-folder ]]
   artifacts:
@@ -42,12 +42,12 @@ $[[ inputs.src-folder ]] generate declaration:
         - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
         - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gld_dashboard)-v\d+\.\d+\.\d+$/'
-      needs:
-        - "$[[ inputs.src-folder ]] canister build"
       changes:
         - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"
         - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
         - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
+      needs:
+        - "$[[ inputs.src-folder ]] canister build"
   script:
     - dfx generate $[[ inputs.src-folder ]]
   artifacts:
