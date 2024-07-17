@@ -37,10 +37,6 @@ $[[ inputs.src-folder ]] generate declaration:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-      changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gld_dashboard)-v\d+\.\d+\.\d+$/'
       changes:
         - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"

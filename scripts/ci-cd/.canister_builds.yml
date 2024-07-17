@@ -15,7 +15,7 @@ spec:
 # Rust canisters test and production builds
 
 $[[ inputs.src-folder ]] test build:
-  stage: test
+  stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
@@ -40,10 +40,6 @@ $[[ inputs.src-folder ]] canister build:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
-      changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"

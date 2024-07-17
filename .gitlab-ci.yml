@@ -141,9 +141,6 @@ rust lint:
         - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
-      changes:
-        - "Cargo.{lock,toml}"
-        - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "Cargo.{lock,toml}"
