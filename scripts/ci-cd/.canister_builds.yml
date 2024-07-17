@@ -9,7 +9,7 @@ spec:
           "icp_neuron",
           "management",
           "sns_rewards",
-          "token_metrics",
+          "token_metrics"
         ]
 ---
 # Rust canisters test and production builds
@@ -40,6 +40,10 @@ $[[ inputs.src-folder ]] canister build:
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
+      changes:
+        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
