@@ -11,9 +11,9 @@ $[[ inputs.src-folder ]] linter:
   stage: lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      # changes:
+      #   - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+      #   - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
