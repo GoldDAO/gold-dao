@@ -15,7 +15,7 @@ spec:
 ---
 # Rust canister unit test with coverage
 
-$[[ inputs.src-folder ]] tests:
+$[[ inputs.src-folder ]] unit tests:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
