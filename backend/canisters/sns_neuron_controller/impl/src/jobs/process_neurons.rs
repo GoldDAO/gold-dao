@@ -1,4 +1,4 @@
-use crate::state::read_state;
+use crate::state::{mutate_state, read_state};
 use crate::types::neuron_manager::NeuronManager;
 use canister_time::{run_now_then_interval, DAY_IN_MS};
 use std::time::Duration;
@@ -18,7 +18,7 @@ pub fn run() {
 
 async fn run_async() {
     // NOTE: doublecheck here all the state mutations
-    let ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
+    let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
     let _ = ogy_neuron_manager.fetch_and_sync_neurons().await.unwrap();
 
     let available_rewards = ogy_neuron_manager.get_available_rewards().await.unwrap();
@@ -28,4 +28,8 @@ async fn run_async() {
     if CLAIM_REWARDS_THRESHOLD > available_rewards {
         let _ = ogy_neuron_manager.distribute_rewards().await;
     }
+
+    // NOTE: Wrtie all the changes into the state. Here the 'neurons: Neurons' are updated and 'timestamp: TimestampMillis'
+    // Q: doesn't it seem stupid to do this in this way?
+    mutate_state(|s| s.data.neuron_managers.ogy = ogy_neuron_manager);
 }

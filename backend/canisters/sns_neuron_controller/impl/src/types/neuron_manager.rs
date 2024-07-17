@@ -19,8 +19,8 @@ use async_trait::async_trait;
 #[typetag::serde(tag = "type")]
 pub trait NeuronManager: Send + Sync {
     fn get_governance_canister_id(&self) -> CanisterId;
-    fn sync_neurons(&self, neurons: Vec<Neuron>) -> Result<(), String>;
-    async fn fetch_and_sync_neurons(&self) -> Result<(), String> {
+    fn sync_neurons(&mut self, neurons: Vec<Neuron>) -> Result<(), String>;
+    async fn fetch_and_sync_neurons(&mut self) -> Result<(), String> {
         let sns_governance_canister_id = self.get_governance_canister_id();
         let is_test_mode = read_state(|s| s.env.is_test_mode());
         let canister_id = read_state(|s| s.env.canister_id());
@@ -65,8 +65,8 @@ impl NeuronManager for OgyManager {
     fn get_governance_canister_id(&self) -> CanisterId {
         self.ogy_sns_governance_canister_id
     }
-    fn sync_neurons(&self, neurons: Vec<Neuron>) -> Result<(), String> {
-        // self.neurons.all_neurons = neurons;
+    fn sync_neurons(&mut self, neurons: Vec<Neuron>) -> Result<(), String> {
+        self.neurons.all_neurons = neurons;
         Ok(())
     }
     async fn get_available_rewards(&self) -> Result<Nat, String> {
@@ -81,12 +81,12 @@ impl NeuronManager for OgyManager {
         Ok(available_rewards)
     }
     async fn claim_rewards(&self) -> Result<(), String> {
-        ogy_claim_rewards(&self.neurons.all_neurons, self.ogy_sns_ledger_canister_id);
+        ogy_claim_rewards(&self.neurons.all_neurons, self.ogy_sns_ledger_canister_id).await;
         Ok(())
     }
     async fn distribute_rewards(&self) -> Result<(), String> {
         let available_rewards = self.get_available_rewards().await.unwrap();
-        distribute_rewards(self.ogy_sns_ledger_canister_id, available_rewards);
+        distribute_rewards(self.ogy_sns_ledger_canister_id, available_rewards).await;
         Ok(())
     }
 }
@@ -117,7 +117,7 @@ impl NeuronManager for WtnManager {
     fn get_governance_canister_id(&self) -> CanisterId {
         self.wtn_sns_governance_canister_id
     }
-    fn sync_neurons(&self, _neurons: Vec<Neuron>) -> Result<(), String> {
+    fn sync_neurons(&mut self, _neurons: Vec<Neuron>) -> Result<(), String> {
         Ok(())
     }
     async fn get_available_rewards(&self) -> Result<Nat, String> {
