@@ -47,14 +47,14 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
 
     let PrepareResult {
         sns_governance_canister_id,
-        icp_ledger_canister_id,
+        sns_ledger_canister_id,
         principal,
     } = read_state(prepare)?;
 
     let subaccount = compute_neuron_staking_subaccount_bytes(principal, nonce);
 
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
-        icp_ledger_canister_id,
+        sns_ledger_canister_id,
         &(TransferArg {
             from_subaccount: None,
             to: Account {
@@ -110,14 +110,18 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
 
 struct PrepareResult {
     sns_governance_canister_id: CanisterId,
-    icp_ledger_canister_id: CanisterId,
+    sns_ledger_canister_id: CanisterId,
     principal: Principal,
 }
 
 fn prepare(state: &RuntimeState) -> Result<PrepareResult, String> {
     Ok(PrepareResult {
-        sns_governance_canister_id: state.data.ogy_sns_governance_canister_id,
-        icp_ledger_canister_id: state.data.ogy_sns_ledger_canister_id,
+        sns_governance_canister_id: state
+            .data
+            .neuron_managers
+            .ogy
+            .ogy_sns_governance_canister_id,
+        sns_ledger_canister_id: state.data.neuron_managers.ogy.ogy_sns_ledger_canister_id,
         principal: state.env.canister_id(),
     })
 }

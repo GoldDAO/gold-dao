@@ -1,5 +1,5 @@
 use crate::guards::caller_is_governance_principal;
-use crate::state::read_state;
+use crate::types::neuron_manager::NeuronType;
 use candid::CandidType;
 use ic_cdk::update;
 use serde::{Deserialize, Serialize};
@@ -9,9 +9,9 @@ use tracing::error;
 use tracing::info;
 use types::CanisterId;
 
-// #[derive(CandidType, Serialize, Deserialize, Clone)]
 #[derive(CandidType, Deserialize, Clone)]
 pub struct ManageSnsNeuronRequest {
+    pub neuron_type: NeuronType,
     pub neuron_id: Vec<u8>,
     pub command: Command,
 }
@@ -25,7 +25,7 @@ pub enum ManageSnsNeuronResponse {
 #[update(guard = "caller_is_governance_principal")]
 // #[trace]
 async fn manage_sns_neuron(args: ManageSnsNeuronRequest) -> ManageSnsNeuronResponse {
-    let canister_id = read_state(|state| state.data.ogy_sns_governance_canister_id);
+    let canister_id = args.neuron_type.get_governance_canister_id();
 
     match manage_sns_neuron_impl(canister_id, args.neuron_id, args.command).await {
         Ok(ok) => ManageSnsNeuronResponse::Success(ok),

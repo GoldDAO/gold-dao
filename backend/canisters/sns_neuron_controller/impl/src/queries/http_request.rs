@@ -18,7 +18,7 @@ fn http_request(request: HttpRequest) -> HttpResponse {
     }
 
     fn get_neurons(state: &RuntimeState) -> HttpResponse {
-        build_json_response(&state.data.ogy_neurons)
+        build_json_response(&state.data.neuron_managers.ogy.neurons)
     }
 
     match extract_route(&request.url) {

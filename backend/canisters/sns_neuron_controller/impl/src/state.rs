@@ -1,11 +1,13 @@
+use crate::types::neuron_manager::OgyManager;
+use crate::types::neuron_manager::WtnManager;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use ledger_utils::principal_to_legacy_account_id;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
-use types::{CanisterId, RewardsRecipientList, TimestampMillis};
+use types::{RewardsRecipientList, TimestampMillis};
 use utils::{
-    consts::{SNS_GOVERNANCE_CANISTER_ID, SNS_REWARDS_CANISTER_ID},
+    consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
@@ -42,10 +44,6 @@ impl RuntimeState {
             )
             .to_string(),
             authorized_principals: self.data.authorized_principals.clone(),
-            neurons: self.data.get_ogy_neuron_list(),
-            ogy_sns_governance_canister_id: self.data.ogy_sns_governance_canister_id,
-            ogy_sns_ledger_canister_id: self.data.ogy_sns_ledger_canister_id,
-            ogy_sns_rewards_canister_id: self.data.ogy_sns_rewards_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
             outstanding_payments: self.data.outstanding_payments.clone(),
         }
@@ -62,11 +60,7 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub canister_default_account_id: String,
     pub authorized_principals: Vec<Principal>,
-    pub ogy_sns_governance_canister_id: CanisterId,
-    pub ogy_sns_ledger_canister_id: CanisterId,
-    pub ogy_sns_rewards_canister_id: CanisterId,
     pub rewards_recipients: RewardsRecipientList,
-    pub neurons: NeuronList,
     pub outstanding_payments: OutstandingPaymentsList,
 }
 
@@ -81,11 +75,8 @@ pub struct CanisterInfo {
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
-    // TODO: take out all the OGY parameters into separate struct and try to make it abstract while adding WTN: sns_governance_canister_id, sns_ledger_canister_id
-    pub ogy_neurons: Neurons,
-    pub ogy_sns_governance_canister_id: Principal,
-    pub ogy_sns_ledger_canister_id: Principal,
-    pub ogy_sns_rewards_canister_id: CanisterId,
+    // NOTE: it seems to be not the best practice to store the manager struct inside the state, because then it makes all the mutations more complex and harder to handle
+    pub neuron_managers: NeuronManagers,
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
 }
@@ -95,49 +86,32 @@ impl Data {
         Self {
             rewards_recipients: RewardsRecipientList::empty(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
-            ogy_neurons: Neurons::default(),
-            // FIXME: change this value to valid:
-            ogy_sns_ledger_canister_id: SNS_GOVERNANCE_CANISTER_ID,
-            // FIXME: change this value to valid:
-            ogy_sns_governance_canister_id: SNS_GOVERNANCE_CANISTER_ID,
+            neuron_managers: NeuronManagers::default(),
             outstanding_payments: OutstandingPaymentsList::default(),
-            ogy_sns_rewards_canister_id: SNS_REWARDS_CANISTER_ID,
-        }
-    }
-
-    pub fn get_ogy_neuron_list(&self) -> NeuronList {
-        NeuronList {
-            active: self
-                .ogy_neurons
-                .active_neurons
-                .iter()
-                .map(|n| NeuronWithMetric::from(n.clone()))
-                .collect(),
-            // TODO: think of .clone()
-            spawning: self
-                .ogy_neurons
-                .spawning_neurons
-                .iter()
-                .filter_map(|n| n.id.as_ref().map(|id| id.id.clone()))
-                .collect(),
-            disbursed: self.ogy_neurons.disbursed_neurons.clone(),
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
-pub struct Neurons {
+#[derive(Serialize, Deserialize, Default, Clone)]
+pub struct NeuronManagers {
     pub timestamp: TimestampMillis,
-    pub all_neurons: Vec<Neuron>,
-    // TODO: think more of how to classify sns neurons and validate them
-    pub active_neurons: Vec<Neuron>,
-    pub spawning_neurons: Vec<Neuron>,
-    pub disbursed_neurons: Vec<u64>,
+    pub ogy: OgyManager,
+    pub wtn: WtnManager,
+    // TODO: impl also other neuron manager
+    pub others: Vec<u64>,
+}
+
+impl NeuronManagers {
+    pub fn get_neurons(&self) -> NeuronList {
+        NeuronList {
+            ogy_neurons: self.ogy.neurons.all_neurons.clone(),
+            wtn_neurons: self.wtn.neurons.all_neurons.clone(),
+        }
+    }
 }
 
 #[derive(CandidType, Serialize)]
 pub struct NeuronList {
-    active: Vec<NeuronWithMetric>,
-    spawning: Vec<Vec<u8>>,
-    disbursed: Vec<u64>,
+    ogy_neurons: Vec<Neuron>,
+    wtn_neurons: Vec<Neuron>,
 }
