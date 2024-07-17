@@ -459,7 +459,7 @@ gldt core staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["gldt_core canister build", "check canister ids"]
+  needs: ["gldt_core canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -483,7 +483,7 @@ gldt core:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["gldt_core canister build", "check canister ids"]
+  needs: ["gldt_core canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -511,7 +511,7 @@ icp neuron staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["icp_neuron canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -535,7 +535,7 @@ icp neuron:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["icp_neuron canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -558,7 +558,7 @@ token metrics staging:
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["token_metrics canister build", "check canister ids"]
+  needs: ["token_metrics canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -582,7 +582,7 @@ token metrics:
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["token_metrics canister build", "check canister ids"]
+  needs: ["token_metrics canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -606,7 +606,7 @@ sns rewards staging:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
+    ["sns_rewards canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -631,7 +631,7 @@ sns rewards:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
+    ["sns_rewards canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -655,7 +655,7 @@ management staging:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["management canister build", "check canister ids", "integration tests"]
+    ["management canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -680,7 +680,7 @@ management prod:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["management canister build", "check canister ids", "integration tests"]
+    ["management canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -704,7 +704,7 @@ cycles manager staging:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["cycles_manager canister build", "check canister ids", "integration tests"]
+    ["cycles_manager canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -729,7 +729,7 @@ cycles manager:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["cycles_manager canister build", "check canister ids", "integration tests"]
+    ["cycles_manager canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
