@@ -79,25 +79,6 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: cycles_manager
-  # Canister generate declaration
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: cycles_manager
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: gldt_core
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: icp_neuron
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: management
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: sns_rewards
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: token_metrics
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
