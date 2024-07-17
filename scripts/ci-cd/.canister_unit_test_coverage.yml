@@ -18,18 +18,13 @@ spec:
 $[[ inputs.src-folder ]] tests:
   stage: test
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock}"
         - "backend/external_canisters/**/*.{rs,toml,lock}"
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
-    - if: $CI_COMMIT_REF_NAME == "develop"
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
   extends: .rust template
   tags:
     - dind
