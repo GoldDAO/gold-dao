@@ -21,6 +21,9 @@ $[[ inputs.src-folder ]] staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" # for testing REMOVE THIS !!!
+      changes:
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
