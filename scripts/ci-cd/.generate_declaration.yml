@@ -19,9 +19,9 @@ $[[ inputs.src-folder ]] generate test declaration:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
+        - "backend/libraries/**/*.{rs,toml}"
+        - "backend/external_canisters/**/*.{rs,toml}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml}"
       needs:
         - "$[[ inputs.src-folder ]] test build"
   script:
@@ -39,9 +39,9 @@ $[[ inputs.src-folder ]] generate declaration:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gld_dashboard)-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml}"
+        - "backend/libraries/**/*.{rs,toml}"
+        - "backend/external_canisters/**/*.{rs,toml}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml}"
       needs:
         - "$[[ inputs.src-folder ]] canister build"
   script:
