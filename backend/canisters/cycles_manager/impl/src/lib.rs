@@ -46,5 +46,3 @@ use queries::*;
 use updates::*;
 
 export_candid!();
-
-//test change
