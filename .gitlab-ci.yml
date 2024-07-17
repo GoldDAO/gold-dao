@@ -190,27 +190,6 @@ integration tests:
 # Deployments
 ################################################################################
 
-check canister ids:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)|(token_metrics)|(sns_rewards)|(management)|(cycles_manager)-v\d+\.\d+\.\d+$/'
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/pre-deploy.sh --network $TARGET_NETWORK
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
-    paths:
-      - canister_ids.json
-    expire_in: 1 hour
-
 .asset canisters upgrade proposal tests:
   stage: deploy
   variables:
