@@ -22,8 +22,8 @@ cache:
 stages:
   - preparation
   - lint
-  - test
   - build
+  - test
   - integration_testing
   - deploy
 
@@ -118,20 +118,13 @@ node cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "./frontend/{**,**/**,**/**/**}/*.{js,json,jsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
     - node --version
     - npm --version
-
-cargo cache:
-  stage: preparation
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  extends: .rust template
-  script:
-    - cargo version
-    - cargo verify-project
 
 ################################################################################
 # Linters
@@ -145,15 +138,13 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_core,gldt_core/impl,gldt_core/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{icp_neuron,icp_neuron/impl,icp_neuron/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{token_metrics,token_metrics/impl,token_metrics/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{sns_rewards,sns_rewards/impl,sns_rewards/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{management,management/impl,management/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{cycles_manager,cycles_manager/impl,cycles_manager/impl/**}/*.{rs,toml,lock}"
+        - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
   extends: .rust template
   script:
     - cargo clippy
@@ -179,7 +170,8 @@ integration tests:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["sns_rewards integration-test build", "cycles_manager canister build"]
+      needs:
+        ["sns_rewards integration-test build", "cycles_manager canister build"]
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
   extends: .rust template
@@ -394,6 +386,9 @@ gld dashboard staging:
     CANISTER_NAME: "gld_dashboard"
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/gld_dashboard/*.{js,json}"
+        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard staging build"]
       variables:
         TARGET_NETWORK: staging
@@ -408,7 +403,6 @@ gld dashboard staging:
     url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
     action: start
 
-
 gld dashboard preprod:
   stage: deploy
   resource_group: frontend preprod deployment
@@ -416,6 +410,9 @@ gld dashboard preprod:
     CANISTER_NAME: "gld_dashboard"
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/gld_dashboard/*.{js,json}"
+        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard preprod build"]
       variables:
         TARGET_NETWORK: preprod
@@ -438,8 +435,8 @@ gld dashboard production:
   rules:
     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
       changes:
-        - "gld_dashboard/*.{js,json}"
-        - "gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
+        - "client/gld_dashboard/*.{js,json}"
+        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard production build"]
       variables:
         TARGET_NETWORK: ic

@@ -2,8 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options:
-        ["gldt_landing_page", "gldt_explorer", "gld_dashboard"]
+      options: ["gldt_landing_page", "gldt_explorer", "gld_dashboard"]
 ---
 # Frontend builds
 
@@ -12,7 +11,8 @@ $[[ inputs.src-folder ]] test build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "client/$[[ inputs.src-folder ]]/**/*"
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm run build:$[[ inputs.src-folder ]]
@@ -27,7 +27,8 @@ $[[ inputs.src-folder ]] staging build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "client/$[[ inputs.src-folder ]]/**/*"
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -53,7 +54,8 @@ $[[ inputs.src-folder ]] preprod build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "client/$[[ inputs.src-folder ]]/**/*"
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
@@ -78,6 +80,10 @@ $[[ inputs.src-folder ]] production build:
   stage: build
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"

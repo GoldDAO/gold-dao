@@ -10,7 +10,7 @@ spec:
           "sns_rewards",
           "cycles_manager",
           "integration_testing",
-          "management",
+          "management"
         ]
 ---
 # Rust canister unit test with coverage

@@ -3,22 +3,16 @@
 .rust template:
   tags:
     - docker
-    - big
-  image: rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
-  cache:
-  - key: "rust-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .cargo
-      - backend/canisters/gldt_core/target
-      - backend/canisters/icp_neuron/target
-      - backend/canisters/token_metrics/target
-      - backend/canisters/sns_rewards/target
-      - backend/canisters/cycles_manager/target
-      - backend/canisters/management/target
+    # - big
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters/rust-dfinity-build-ci:latest@sha256:6b841e86ec586bc2e64bee556ae480a567ab6fbf3e87890db28ca0fbfccb834b
   before_script:
-    - apt update > /dev/null && apt install -y wget build-essential pkg-config libssl-dev > /dev/null
-    - rustup component add clippy
-    - rustup target add wasm32-unknown-unknown
-    - mkdir -pv .cargo
-    - cargo install -q --root .cargo ic-wasm@0.5.0 candid-extractor
-    - export PATH="$PWD/.cargo/bin:$PATH"
+    - cargo --version
+    - rustc --version
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - api_failure
+      - runner_unsupported
+      - unknown_failure
