@@ -29,7 +29,7 @@ $[[ inputs.src-folder ]] staging:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - . scripts/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
+    - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
   environment:
     name: $[[ inputs.src-folder ]]
     deployment_tier: staging
@@ -53,7 +53,7 @@ $[[ inputs.src-folder ]] production:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - . scripts/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
+    - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
   environment:
     name: $[[ inputs.src-folder ]]
     deployment_tier: production
