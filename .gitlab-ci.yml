@@ -22,9 +22,9 @@ cache:
 stages:
   - preparation
   - lint
-  - build
   - test
   - integration_testing
+  - build
   - deploy
 
 include:
@@ -41,7 +41,7 @@ include:
   # - local: scripts/ci-cd/.frontend_linter.yml
   #   inputs:
   #     src-folder: gld_dashboard
-  # Unit tests coverage
+  # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_core
