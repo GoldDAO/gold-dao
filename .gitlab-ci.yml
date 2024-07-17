@@ -167,13 +167,20 @@ rust lint:
 integration tests:
   stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/**/*.{rs,toml,lock}"
       needs:
-        ["sns_rewards integration-test build", "cycles_manager canister build"]
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
+        [
+        "cycles_manager integration-test build",
+        "gldt_core integration-test build",
+        "icp_neuron integration-test build",
+        "management integration-test build",
+        "sns_rewards integration-test build",
+        "token_metrics integration-test build"
+        ]
   extends: .rust template
   tags:
     - dind
@@ -189,13 +196,14 @@ integration tests:
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - ulimit -n 202400
     - ulimit -f 2024000
-    - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+    # - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
+    - cargo test -p integration_testing
+  # coverage: /^\d+.\d+% coverage/
+  # artifacts:
+  #   reports:
+  #     coverage_report:
+  #       coverage_format: cobertura
+  #       path: cobertura.xml
 
 ################################################################################
 # Deployments

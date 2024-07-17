@@ -59,13 +59,13 @@ $[[ inputs.src-folder ]] canister build:
     expire_in: 6 months
 
 $[[ inputs.src-folder ]] integration-test build:
-  stage: test
+  stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/**/*.{rs,toml,lock}"
   extends: .rust template
   script:
     - scripts/build-canister.sh -it $[[ inputs.src-folder ]]
