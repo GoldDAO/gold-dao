@@ -22,9 +22,9 @@ cache:
 stages:
   - preparation
   - lint
-  - build
   - test
   - integration_testing
+  - build
   - deploy
 
 include:
@@ -41,7 +41,7 @@ include:
   # - local: scripts/ci-cd/.frontend_linter.yml
   #   inputs:
   #     src-folder: gld_dashboard
-  # Unit tests coverage
+  # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_core
@@ -79,25 +79,6 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: cycles_manager
-  # Canister generate declaration
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: cycles_manager
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: gldt_core
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: icp_neuron
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: management
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: sns_rewards
-  - local: scripts/ci-cd/.generate_declaration.yml
-    inputs:
-      src-folder: token_metrics
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -119,7 +100,7 @@ node cache:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "./frontend/{**,**/**,**/**/**}/*.{js,json,jsx,md,mdx,css,html,svg}"
+        - "./frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
@@ -138,13 +119,13 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/**/*.{rs,toml,lock}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/**/*.{rs,toml,lock}"
   extends: .rust template
   script:
     - cargo clippy
@@ -167,13 +148,20 @@ rust lint:
 integration tests:
   stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/**/*.{rs,toml,lock}"
       needs:
-        ["sns_rewards integration-test build", "cycles_manager canister build"]
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
+        [
+        "cycles_manager integration-test build",
+        "gldt_core integration-test build",
+        "icp_neuron integration-test build",
+        "management integration-test build",
+        "sns_rewards integration-test build",
+        "token_metrics integration-test build"
+        ]
   extends: .rust template
   tags:
     - dind
@@ -189,38 +177,18 @@ integration tests:
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
     - ulimit -n 202400
     - ulimit -f 2024000
-    - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+    # - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
+    - cargo test -p integration_testing
+  # coverage: /^\d+.\d+% coverage/
+  # artifacts:
+  #   reports:
+  #     coverage_report:
+  #       coverage_format: cobertura
+  #       path: cobertura.xml
 
 ################################################################################
 # Deployments
 ################################################################################
-
-check canister ids:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)|(token_metrics)|(sns_rewards)|(management)|(cycles_manager)-v\d+\.\d+\.\d+$/'
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/pre-deploy.sh --network $TARGET_NETWORK
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
-    paths:
-      - canister_ids.json
-    expire_in: 1 hour
 
 .asset canisters upgrade proposal tests:
   stage: deploy
@@ -388,7 +356,7 @@ gld dashboard staging:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard staging build"]
       variables:
         TARGET_NETWORK: staging
@@ -412,7 +380,7 @@ gld dashboard preprod:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard preprod build"]
       variables:
         TARGET_NETWORK: preprod
@@ -436,7 +404,7 @@ gld dashboard production:
     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
       changes:
         - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       needs: ["gld_dashboard production build"]
       variables:
         TARGET_NETWORK: ic
@@ -485,13 +453,13 @@ gldt core staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/gldt_core/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/gldt_core/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["gldt_core canister build", "check canister ids"]
+  needs: ["gldt_core canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -508,14 +476,14 @@ gldt core:
   rules:
     - if: $CI_COMMIT_TAG =~ '/^gldt_core-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/gldt_core/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/gldt_core/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["gldt_core canister build", "check canister ids"]
+  needs: ["gldt_core canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -537,13 +505,13 @@ icp neuron staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/icp_neuron/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/icp_neuron/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["icp_neuron canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -556,18 +524,18 @@ icp neuron staging:
 
 icp neuron:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/icp_neuron/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/icp_neuron/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["icp_neuron canister build", "check canister ids"]
+  needs: ["icp_neuron canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -584,13 +552,13 @@ token metrics staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/token_metrics/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/token_metrics/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["token_metrics canister build", "check canister ids"]
+  needs: ["token_metrics canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -603,18 +571,18 @@ token metrics staging:
 
 token metrics:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^token_metrics-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/token_metrics/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/token_metrics/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["token_metrics canister build", "check canister ids"]
+  needs: ["token_metrics canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -631,14 +599,14 @@ sns rewards staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/sns_rewards/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/sns_rewards/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
+    ["sns_rewards canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -651,19 +619,19 @@ sns rewards staging:
 
 sns rewards:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^sns_rewards-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/sns_rewards/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/sns_rewards/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
+    ["sns_rewards canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -680,14 +648,14 @@ management staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/management/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/management/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["management canister build", "check canister ids", "integration tests"]
+    ["management canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -700,19 +668,19 @@ management staging:
 
 management prod:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^management-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/management/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/management/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["management canister build", "check canister ids", "integration tests"]
+    ["management canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -729,14 +697,14 @@ cycles manager staging:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/cycles_manager/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/cycles_manager/**/*.{rs,toml,lock}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["cycles_manager canister build", "check canister ids", "integration tests"]
+    ["cycles_manager canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -749,19 +717,19 @@ cycles manager staging:
 
 cycles manager:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^cycles_manager-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/external_canisters/{**,**/**,**/**/**}/*.{rs,toml,lock}"
-        - "backend/canisters/cycles_manager/{**,**/**,**/**/**}/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/cycles_manager/**/*.{rs,toml,lock}"
       when: manual
   variables:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["cycles_manager canister build", "check canister ids", "integration tests"]
+    ["cycles_manager canister build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:

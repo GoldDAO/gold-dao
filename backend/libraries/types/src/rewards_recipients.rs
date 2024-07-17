@@ -40,7 +40,7 @@ impl RewardsRecipientList {
         if list.is_empty() {
             return Err("Invalid rewards recipients: empty list.".to_string());
         }
-        // expecting 4 recipients in the current design. Limit can be lifted if needed.
+        // expecting 4 recipients in the current design. Limit can be lifted if needed
         if list.len() > 5 {
             return Err("Invalid rewards recipients: too many recipients.".to_string());
         }
