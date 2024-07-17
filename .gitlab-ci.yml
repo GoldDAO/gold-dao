@@ -91,6 +91,9 @@ include:
       src-folder: gld_dashboard
   # Deployments
   - local: scripts/ci-cd/.dfx_templates.yml
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: management
 
 ################################################################################
 # Cache preparation
@@ -642,54 +645,54 @@ sns rewards:
     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=iyehc-lqaaa-aaaap-ab25a-cai
     action: start
 
-management staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/management/**/*.{rs,toml,lock}"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs:
-    ["management canister build", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-management.sh $TARGET_NETWORK
-  environment:
-    name: management
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t5uzw-sqaaa-aaaan-qmoaq-cai
-    action: start
+# management staging:
+#   stage: deploy
+#   resource_group: backend canister staging deployment
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "backend/libraries/**/*.{rs,toml,lock}"
+#         - "backend/external_canisters/**/*.{rs,toml,lock}"
+#         - "backend/canisters/management/**/*.{rs,toml,lock}"
+#   variables:
+#     TARGET_NETWORK: staging
+#     PEM_FILE: "${PEM_FILE_STAGING}"
+#   needs:
+#     ["management canister build", "integration tests"]
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - . scripts/deploy-management.sh $TARGET_NETWORK
+#   environment:
+#     name: management
+#     deployment_tier: staging
+#     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t5uzw-sqaaa-aaaan-qmoaq-cai
+#     action: start
 
-management prod:
-  stage: deploy
-  resource_group: backend canister production deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^management-v\d+\.\d+\.\d+$/'
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/management/**/*.{rs,toml,lock}"
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs:
-    ["management canister build", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-management.sh $TARGET_NETWORK
-  environment:
-    name: management
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g5je6-yaaaa-aaaap-ahkza-cai
-    action: start
+# management prod:
+#   stage: deploy
+#   resource_group: backend canister production deployment
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^management-v\d+\.\d+\.\d+$/'
+#       changes:
+#         - "backend/libraries/**/*.{rs,toml,lock}"
+#         - "backend/external_canisters/**/*.{rs,toml,lock}"
+#         - "backend/canisters/management/**/*.{rs,toml,lock}"
+#       when: manual
+#   variables:
+#     TARGET_NETWORK: ic
+#     PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   needs:
+#     ["management canister build", "integration tests"]
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - . scripts/deploy-management.sh $TARGET_NETWORK
+#   environment:
+#     name: management
+#     deployment_tier: production
+#     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g5je6-yaaaa-aaaap-ahkza-cai
+#     action: start
 
 cycles manager staging:
   stage: deploy
