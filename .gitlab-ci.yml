@@ -564,7 +564,7 @@ icp neuron staging:
 
 icp neuron:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
       changes:
@@ -611,7 +611,7 @@ token metrics staging:
 
 token metrics:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^token_metrics-v\d+\.\d+\.\d+$/'
       changes:
@@ -659,7 +659,7 @@ sns rewards staging:
 
 sns rewards:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^sns_rewards-v\d+\.\d+\.\d+$/'
       changes:
@@ -708,7 +708,7 @@ management staging:
 
 management prod:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^management-v\d+\.\d+\.\d+$/'
       changes:
@@ -757,7 +757,7 @@ cycles manager staging:
 
 cycles manager:
   stage: deploy
-  resource_group: backend canister staging deployment
+  resource_group: backend canister production deployment
   rules:
     - if: $CI_COMMIT_TAG =~ '/^cycles_manager-v\d+\.\d+\.\d+$/'
       changes:
