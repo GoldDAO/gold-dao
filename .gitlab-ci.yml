@@ -109,6 +109,10 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: token_metrics
+  # Frontend deployments
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: gld_dashboard
       canister-id: "mpece-iqaaa-aaaal-qizma-cai"
 
 ################################################################################
