@@ -172,6 +172,8 @@ integration tests trigger:
         - "backend/external_canisters/**/*.{rs,toml,lock}"
         - "backend/canisters/**/*.{rs,toml,lock}"
       when: manual
+  script:
+    - echo "Running integration tests"
 
 integration tests:
   stage: integration_testing
