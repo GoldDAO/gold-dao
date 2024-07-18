@@ -45,7 +45,7 @@ spec:
   extends: .node template
   script:
     - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
-    - CAN_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
+    - CAN_URL=$(CAN=$[[ inputs.src-folder ]] NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$CAN_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_${ENV}_BUILD"
@@ -63,7 +63,6 @@ $[[ inputs.src-folder ]] test build:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
-    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "local" # local | staging | preprod | ic
     ENV: "local" # local | staging | preprod | prod
   environment:
@@ -79,7 +78,6 @@ $[[ inputs.src-folder ]] staging build:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
-    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging" # local | staging | preprod | ic
     ENV: "staging" # local | staging | preprod | prod
   environment:
@@ -95,7 +93,6 @@ $[[ inputs.src-folder ]] preprod build:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
-    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "preprod" # local | staging | preprod | ic
     ENV: "preprod" # local | staging | preprod | prod
   environment:
@@ -111,7 +108,6 @@ $[[ inputs.src-folder ]] production build:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
-    CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic" # local | staging | preprod | ic
     ENV: "prod" # local | staging | preprod | prod
   environment:
