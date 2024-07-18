@@ -17,7 +17,7 @@ use crate::{
         neuron_owners::NeuronOwnership,
         payment_processor::PaymentProcessor,
     },
-    utils::RewardDistributionInterval,
+    utils::{ TimeInterval },
 };
 
 canister_state!(RuntimeState);
@@ -82,7 +82,7 @@ pub struct Metrics {
     pub last_daily_reserve_transfer_time: TimestampMillis,
     pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
     pub daily_gldgov_burn_amount: Option<Nat>,
-    pub reward_distribution_interval: Option<RewardDistributionInterval>,
+    pub reward_distribution_interval: Option<TimeInterval>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -128,10 +128,12 @@ pub struct Data {
     pub daily_gldgov_burn_rate: Option<Nat>,
     /// The last time a burn of GLDGov was done
     pub last_daily_gldgov_burn: Option<TimestampMillis>,
-    /// The last time a distribution of rewards was done ( 7 day cycle )
-    pub reward_distribution_interval: Option<RewardDistributionInterval>,
-    /// an internal check if the distribution is running
+    /// The weekly interval for which a reward distribution occurs
+    pub reward_distribution_interval: Option<TimeInterval>,
+    /// An internal check if the distribution is running
     pub reward_distribution_in_progress: Option<bool>,
+    /// The daily interval for which a neuron sync occurs
+    pub neuron_sync_interval: Option<TimeInterval>,
 }
 
 impl Default for Data {
@@ -150,8 +152,9 @@ impl Default for Data {
             last_daily_reserve_transfer_time: TimestampMillis::default(),
             daily_gldgov_burn_rate: None,
             last_daily_gldgov_burn: None,
-            reward_distribution_interval: Some(RewardDistributionInterval::default()),
+            reward_distribution_interval: Some(TimeInterval::default()),
             reward_distribution_in_progress: Some(false),
+            neuron_sync_interval: Some(TimeInterval { weekday: None, start_hour: 9, end_hour: 11 }),
         }
     }
 }
