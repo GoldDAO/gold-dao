@@ -39,16 +39,16 @@ $[[ inputs.src-folder ]] canister build:
 $[[ inputs.src-folder ]] integration-test build:
   stage: integration_testing
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock}"
         - "backend/external_canisters/**/*.{rs,toml,lock}"
         - "backend/canisters/**/*.{rs,toml,lock}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/**/*.{rs,toml,lock}"
+      # changes:
+      #   - "backend/libraries/**/*.{rs,toml,lock}"
+      #   - "backend/external_canisters/**/*.{rs,toml,lock}"
+      #   - "backend/canisters/**/*.{rs,toml,lock}"
       needs: ["integration tests trigger"]
   extends: .rust template
   script:
