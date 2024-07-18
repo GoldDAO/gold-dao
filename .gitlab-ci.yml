@@ -89,7 +89,7 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
-  # Deployments
+  # Backend deployments
   - local: scripts/ci-cd/.dfx_templates.yml
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
