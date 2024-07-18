@@ -8,31 +8,64 @@ spec:
 ---
 # Frontend deploys
 
-
-$[[ inputs.src-folder ]] test:
+.deploy template:
   stage: deploy
-  resource_group: frontend staging deployment
+  resource_group: frontend $ENV deployment
   variables:
     CANISTER_NAME: $[[ inputs.src-folder ]]
-  rules:
-    # - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-      needs: ["$[[ inputs.src-folder ]] test build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
+  # rules:
+  #   - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  #     changes:
+  #       - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+  #       - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      # needs: ["$[[ inputs.src-folder ]] staging build"]
+      # variables:
+      #   TARGET_NETWORK: staging
+      #   PEM_FILE: "${PEM_FILE_STAGING}"
+  needs: ["$[[ inputs.src-folder ]] $ENV build"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-    - !reference [.asset canister staging deploy, script]
+    - !reference [.asset canister $ENV deploy, script]
+
+
+$[[ inputs.src-folder ]] staging:
+  extends: .deploy template
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+  variables:
+    TARGET_NETWORK: staging
+    PEM_FILE: "${PEM_FILE_STAGING}"
   environment:
     name: $[[ inputs.src-folder ]]
     deployment_tier: staging
     url: https://$[[ inputs.canister-id ]].icp0.io/
     action: start
+  # stage: deploy
+  # resource_group: frontend staging deployment
+  # variables:
+  #   CANISTER_NAME: $[[ inputs.src-folder ]]
+  # rules:
+  #   - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  #     changes:
+  #       - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+  #       - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+  #     needs: ["$[[ inputs.src-folder ]] staging build"]
+  #     variables:
+  #       TARGET_NETWORK: staging
+  #       PEM_FILE: "${PEM_FILE_STAGING}"
+  # before_script:
+  #   - !reference [.import dfx identity, before_script]
+  # script:
+  #   - !reference [.asset canister staging deploy, script]
+  # environment:
+  #   name: $[[ inputs.src-folder ]]
+  #   deployment_tier: staging
+  #   url: https://$[[ inputs.canister-id ]].icp0.io/
+  #   action: start
 
 # gld dashboard preprod:
 #   stage: deploy
