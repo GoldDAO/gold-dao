@@ -61,7 +61,7 @@ $[[ inputs.src-folder ]] staging:
   script:
     - !reference [.asset canister staging deploy, script]
   environment:
-    name: $[[ inputs.src-folder ]]
+    name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
     url: https://$[[ inputs.canister-id ]].icp0.io/
     action: start

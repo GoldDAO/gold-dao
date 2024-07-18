@@ -44,7 +44,8 @@ spec:
   stage: build
   extends: .node template
   script:
-    - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
+    # - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
+    - npm run build:$[[ inputs.src-folder ]]
     - CAN_URL=$(CAN=$[[ inputs.src-folder ]] NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$CAN_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:
@@ -66,7 +67,7 @@ $[[ inputs.src-folder ]] test build:
     NETWORK: "local" # local | staging | preprod | ic
     ENV: "local" # local | staging | preprod | prod
   environment:
-    name: $[[ inputs.src-folder ]] frontend app
+    name: $[[ inputs.src-folder ]] frontend
     deployment_tier: development
     action: prepare
 
@@ -81,7 +82,7 @@ $[[ inputs.src-folder ]] staging build:
     NETWORK: "staging" # local | staging | preprod | ic
     ENV: "staging" # local | staging | preprod | prod
   environment:
-    name: $[[ inputs.src-folder ]] frontend app
+    name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
     action: prepare
 
@@ -96,8 +97,8 @@ $[[ inputs.src-folder ]] preprod build:
     NETWORK: "preprod" # local | staging | preprod | ic
     ENV: "preprod" # local | staging | preprod | prod
   environment:
-    name: $[[ inputs.src-folder ]] frontend app
-    deployment_tier: staging
+    name: $[[ inputs.src-folder ]] frontend
+    deployment_tier: testing
     action: prepare
 
 $[[ inputs.src-folder ]] production build:
@@ -111,7 +112,7 @@ $[[ inputs.src-folder ]] production build:
     NETWORK: "ic" # local | staging | preprod | ic
     ENV: "prod" # local | staging | preprod | prod
   environment:
-    name: $[[ inputs.src-folder ]] frontend app
+    name: $[[ inputs.src-folder ]] frontend
     deployment_tier: production
     action: prepare
 
