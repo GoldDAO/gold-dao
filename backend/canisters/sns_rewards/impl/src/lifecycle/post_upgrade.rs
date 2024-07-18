@@ -22,30 +22,12 @@ fn post_upgrade() {
 
     // Migrations
 
-    if runtime_state.data.daily_gldgov_burn_rate.is_none() {
-        runtime_state.data.daily_gldgov_burn_rate = None;
-    } else {
-        runtime_state.data.daily_gldgov_burn_rate = runtime_state.data.daily_gldgov_burn_rate;
-    }
-
-    if runtime_state.data.last_daily_gldgov_burn.is_none() {
-        runtime_state.data.last_daily_gldgov_burn = None;
-    } else {
-        runtime_state.data.last_daily_gldgov_burn = runtime_state.data.last_daily_gldgov_burn;
-    }
-
     if runtime_state.data.reward_distribution_interval.is_none() {
         runtime_state.data.reward_distribution_interval = Some(TimeInterval::default());
-    } else {
-        runtime_state.data.reward_distribution_interval =
-            runtime_state.data.reward_distribution_interval;
     }
 
     if runtime_state.data.reward_distribution_in_progress.is_none() {
         runtime_state.data.reward_distribution_in_progress = Some(false);
-    } else {
-        runtime_state.data.reward_distribution_in_progress =
-            runtime_state.data.reward_distribution_in_progress;
     }
 
     if runtime_state.data.neuron_sync_interval.is_none() {
@@ -54,8 +36,6 @@ fn post_upgrade() {
             start_hour: 9,
             end_hour: 11,
         });
-    } else {
-        runtime_state.data.neuron_sync_interval = runtime_state.data.neuron_sync_interval;
     }
 
     // End migrations
