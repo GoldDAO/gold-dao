@@ -31,6 +31,7 @@ include:
   # Templates:
   - local: scripts/ci-cd/.node_template.yml
   - local: scripts/ci-cd/.rust_template.yml
+  - local: scripts/ci-cd/.dfx_templates.yml
   # Frontend linters:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
@@ -38,9 +39,9 @@ include:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_explorer
-  # - local: scripts/ci-cd/.frontend_linter.yml
-  #   inputs:
-  #     src-folder: gld_dashboard
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gld_dashboard
   # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
@@ -89,8 +90,7 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
-  # Deployments
-  - local: scripts/ci-cd/.dfx_templates.yml
+  # Backend deployments
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: cycles_manager
@@ -109,6 +109,11 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: token_metrics
+  # Frontend deployments
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: gld_dashboard
+      canister-id: "mpece-iqaaa-aaaal-qizma-cai"
 
 ################################################################################
 # Cache preparation
@@ -370,77 +375,77 @@ integration tests:
 #     url: https://explorer.gldt.org/
 #     action: start
 
-gld dashboard staging:
-  stage: deploy
-  resource_group: frontend staging deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-      needs: ["gld_dashboard staging build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister staging deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: staging
-    url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
-    action: start
+# gld dashboard staging:
+#   stage: deploy
+#   resource_group: frontend staging deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister staging deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: staging
+#     url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
+#     action: start
 
-gld dashboard preprod:
-  stage: deploy
-  resource_group: frontend preprod deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-      needs: ["gld_dashboard preprod build"]
-      variables:
-        TARGET_NETWORK: preprod
-        PEM_FILE: "${PEM_FILE_STAGING}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister preprod deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: staging
-    url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
-    action: start
+# gld dashboard preprod:
+#   stage: deploy
+#   resource_group: frontend preprod deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard preprod build"]
+#       variables:
+#         TARGET_NETWORK: preprod
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister preprod deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: staging
+#     url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
+#     action: start
 
-gld dashboard production:
-  stage: deploy
-  resource_group: frontend production deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
-      changes:
-        - "client/gld_dashboard/*.{js,json}"
-        - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-      needs: ["gld_dashboard production build"]
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister production deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: production
-    url: https://dashboard.gold-dao.org/
-    action: start
+# gld dashboard production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: production
+#     url: https://dashboard.gold-dao.org/
+#     action: start
 
 .backend canisters upgrade proposal tests:
   stage: deploy
