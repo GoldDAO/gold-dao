@@ -166,7 +166,7 @@ rust lint:
 integration tests trigger:
   stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock}"
         - "backend/external_canisters/**/*.{rs,toml,lock}"
