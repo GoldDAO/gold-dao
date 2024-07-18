@@ -42,10 +42,6 @@ spec:
 
 .build template:
   stage: build
-  rules:
-    changes:
-      - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-      - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
@@ -59,14 +55,29 @@ spec:
       dotenv: $[[ inputs.src-folder ]]_deploy.env
     expire_in: 1 month
 
+$[[ inputs.src-folder ]] test build:
+  extends: .build template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+  variables:
+    CANISTER_NAME: "$[[ inputs.src-folder ]]"
+    NETWORK: "staging" # staging | preprod | ic
+    ENV: "staging" # staging | preprod | prod
+  environment:
+    name: $[[ inputs.src-folder ]] frontend app
+    deployment_tier: development
+    action: prepare
+
 $[[ inputs.src-folder ]] staging build:
   extends: .build template
   rules:
-    # - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_PIPELINE_SOURCE == "merge_request_event"
-      # changes:
-      #   - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-      #   - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging" # staging | preprod | ic
