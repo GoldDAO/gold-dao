@@ -1,48 +1,58 @@
 {
-    "name": "gldt_swap_app",
-    "version": "0.1.0",
-    "description": "GLDT page and swap canister and frontend",
-    "main": "index.js",
-    "author": "Victor Audetat",
-    "license": "AGPL-3.0-only",
-    "private": true,
-    "scripts": {
-        "develop": "next dev",
-        "build": "next build",
-        "lint": "next lint",
-        "postinstall": "echo 'Frontend project has been installed'"
-    },
-    "browserslist": {
-        "production": [
-            "Firefox ESR",
-            "> 2%",
-            "not dead"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    },
-    "dependencies": {
-        "@chakra-ui/icons": "^2.1.1",
-        "@chakra-ui/react": "^2.8.1",
-        "@connect2ic/core": "^0.2.0-beta.23",
-        "@connect2ic/react": "^0.2.0-beta.23",
-        "@dfinity/agent": "^0.15.6",
-        "@emotion/react": "^11.11.1",
-        "@emotion/styled": "^11.11.0",
-        "dotenv": "^16.3.1",
-        "framer-motion": "^10.16.4",
-        "jotai": "^2.1.0",
-        "moment": "^2.29.4",
-        "next": "^13.4.3",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-router": "^6.13.0",
-        "react-router-dom": "^6.13.0"
-    },
-    "devDependencies": {
-        "eslint-config-next": "13.4.3"
-    }
+  "name": "gldt_swap_app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode dev",
+    "dev:preprod": "vite --mode preprod",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@amerej/artemis-react": "^1.0.26",
+    "@dfinity/agent": "^1.4.0",
+    "@dfinity/candid": "^1.4.0",
+    "@dfinity/ledger-icp": "^2.3.1",
+    "@dfinity/nns-proto": "^2.0.1",
+    "@dfinity/principal": "^1.4.0",
+    "@dfinity/utils": "^2.3.1",
+    "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.4",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/typography": "^0.5.13",
+    "@tanstack/react-form": "^0.26.1",
+    "@tanstack/react-query": "^5.50.1",
+    "@tanstack/react-table": "^8.19.2",
+    "axios": "^1.7.2",
+    "headless-stepper": "^1.11.0",
+    "lodash": "^4.17.21",
+    "luxon": "^3.4.4",
+    "react": "^18.3.1",
+    "react-copy-to-clipboard": "^5.1.0",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-loading-skeleton": "^3.4.0",
+    "react-router-dom": "^6.24.1",
+    "react-tooltip": "^5.27.1",
+    "styled-components": "^6.1.11"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vite-tsconfig-paths": "^4.3.2"
+  }
 }

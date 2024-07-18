@@ -1,0 +1,60 @@
+spec:
+  inputs:
+    src-folder:
+      description: Name of the source folder, should be the same as the canister's cargo package name.
+      options:
+        [
+          "cycles_manager",
+          "gldt_core",
+          "icp_neuron",
+          "management",
+          "sns_rewards",
+          "token_metrics"
+        ]
+---
+# Rust canisters deployments
+
+$[[ inputs.src-folder ]] staging:
+  stage: deploy
+  resource_group: backend canister staging deployment
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+  variables:
+    TARGET_NETWORK: staging
+    PEM_FILE: "${PEM_FILE_STAGING}"
+  needs:
+    ["$[[ inputs.src-folder ]] canister build", "integration tests"]
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
+  environment:
+    name: $[[ inputs.src-folder ]]
+    deployment_tier: staging
+    action: start
+
+$[[ inputs.src-folder ]] production:
+  stage: deploy
+  resource_group: backend canister production deployment
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+      changes:
+        - "backend/libraries/**/*.{rs,toml,lock}"
+        - "backend/external_canisters/**/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+      when: manual
+  variables:
+    TARGET_NETWORK: ic
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
+  needs:
+    ["$[[ inputs.src-folder ]] canister build", "integration tests"]
+  before_script:
+    - !reference [.import dfx identity, before_script]
+  script:
+    - . scripts/canister-deploy/deploy-$[[ inputs.src-folder ]].sh $TARGET_NETWORK
+  environment:
+    name: $[[ inputs.src-folder ]]
+    deployment_tier: production
+    action: start
