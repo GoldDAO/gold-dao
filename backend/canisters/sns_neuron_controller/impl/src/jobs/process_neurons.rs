@@ -17,6 +17,7 @@ pub fn run() {
 }
 
 async fn run_async() {
+    // TODO: add errors handling
     // NOTE: doublecheck here all the state mutations
     let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
     let _ = ogy_neuron_manager.fetch_and_sync_neurons().await.unwrap();

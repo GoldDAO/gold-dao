@@ -1,10 +1,12 @@
 use candid::{Nat, Principal};
+use futures::future::join_all;
 use icrc_ledger_types::icrc1::{
     account::{Account, Subaccount},
     transfer::TransferArg,
 };
 use sns_governance_canister::types::NeuronId;
-use tracing::error;
+use tracing::{error, info};
+use utils::consts::SNS_REWARDS_CANISTER_ID;
 
 pub async fn transfer_token(
     from_sub_account: Subaccount,
@@ -121,32 +123,33 @@ pub async fn fetch_neurons(
     Ok(neurons)
 }
 
-// Calculate total available rewards for given neurons
 pub async fn calculate_available_rewards(
     neurons: &[Neuron],
     ogy_sns_rewards_canister_id: Principal,
     sns_ledger_canister_id: Principal,
 ) -> Nat {
+    let futures: Vec<_> = neurons
+        .iter()
+        .filter_map(|neuron| {
+            neuron.id.as_ref().map(|id| {
+                fetch_neuron_reward_balance(sns_ledger_canister_id, ogy_sns_rewards_canister_id, id)
+            })
+        })
+        .collect();
+
+    let results = join_all(futures).await;
+
     let mut available_rewards_amount: Nat = Nat::from(0u64);
-    for neuron in neurons {
-        if neuron.id.is_some() {
-            let neuron_rewrds = fetch_neuron_reward_balance(
-                sns_ledger_canister_id,
-                ogy_sns_rewards_canister_id,
-                neuron.id.as_ref().unwrap(),
-            )
-            .await;
-            available_rewards_amount += neuron_rewrds;
-        }
+    for reward in results {
+        available_rewards_amount += reward;
     }
+
     available_rewards_amount
 }
-use tracing::info;
-use utils::consts::SNS_REWARDS_CANISTER_ID;
 
 // Function to claim rewards for each neuron
-// TODO: handle an error here
-pub async fn ogy_claim_rewards(neurons: &[Neuron], sns_governance_canister_id: Principal) {
+// TODO: handle an error here and make it parallel
+pub async fn claim_rewards(neurons: &[Neuron], sns_governance_canister_id: Principal) {
     for neuron in neurons {
         if let Some(neuron_id) = &neuron.id {
             let args = ogy_sns_rewards_api_canister::claim_reward::Args {

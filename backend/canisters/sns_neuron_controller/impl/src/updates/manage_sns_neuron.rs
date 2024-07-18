@@ -1,12 +1,9 @@
-use crate::guards::caller_is_governance_principal;
-use crate::types::neuron_manager::NeuronType;
+use crate::{guards::caller_is_governance_principal, types::neuron_manager::NeuronType};
 use candid::CandidType;
 use ic_cdk::update;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::manage_neuron::Command;
-use sns_governance_canister::types::ManageNeuron;
-use tracing::error;
-use tracing::info;
+use sns_governance_canister::types::{manage_neuron::Command, ManageNeuron};
+use tracing::{error, info};
 use types::CanisterId;
 
 #[derive(CandidType, Deserialize, Clone)]

@@ -1,5 +1,7 @@
-use crate::types::neuron_manager::OgyManager;
-use crate::types::neuron_manager::WtnManager;
+use crate::types::neuron_manager::{OgyManager, WtnManager};
+use crate::types::{
+    neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList,
+};
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use ledger_utils::principal_to_legacy_account_id;
@@ -10,10 +12,6 @@ use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{CanisterEnv, Environment},
     memory::MemorySize,
-};
-
-use crate::types::{
-    neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList,
 };
 
 canister_state!(RuntimeState);

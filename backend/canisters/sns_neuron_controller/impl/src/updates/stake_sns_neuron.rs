@@ -1,19 +1,23 @@
-use crate::guards::caller_is_governance_principal;
-use crate::state::{read_state, RuntimeState};
+use crate::{
+    guards::caller_is_governance_principal,
+    state::{read_state, RuntimeState},
+};
 use candid::{CandidType, Principal};
 use canister_tracing_macros::trace;
 use ic_cdk::{query, update};
-use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc1::transfer::TransferArg;
+use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::manage_neuron::claim_or_refresh::{By, MemoAndController};
-use sns_governance_canister::types::manage_neuron::{ClaimOrRefresh, Command};
-use sns_governance_canister::types::{manage_neuron_response, ManageNeuron};
+use sns_governance_canister::types::{
+    manage_neuron::{
+        claim_or_refresh::{By, MemoAndController},
+        ClaimOrRefresh, Command,
+    },
+    manage_neuron_response, ManageNeuron,
+};
 use tracing::error;
 use types::CanisterId;
-use utils::env::Environment;
-use utils::rand::generate_rand_nonce;
+use utils::{env::Environment, rand::generate_rand_nonce};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum StakeSnsNeuronResponse {

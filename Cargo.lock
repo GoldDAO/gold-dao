@@ -2538,6 +2538,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "futures",
  "getrandom 0.2.12",
  "hex",
  "http_request",

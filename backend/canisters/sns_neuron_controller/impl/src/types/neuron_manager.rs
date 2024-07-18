@@ -1,39 +1,56 @@
-use crate::state::read_state;
-use crate::utils::calculate_available_rewards;
-use crate::utils::distribute_rewards;
-use crate::utils::fetch_neurons;
-use crate::utils::ogy_claim_rewards;
-use candid::CandidType;
-use candid::Nat;
-use candid::Principal;
-use serde::Deserialize;
-use serde::Serialize;
+use async_trait::async_trait;
+use candid::{CandidType, Nat, Principal};
+use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
-use types::CanisterId;
-use types::TimestampMillis;
+use types::{CanisterId, TimestampMillis};
 use utils::env::Environment;
 
-use async_trait::async_trait;
+use crate::state::read_state;
+use crate::utils::{calculate_available_rewards, claim_rewards, distribute_rewards, fetch_neurons};
 
 #[async_trait]
 #[typetag::serde(tag = "type")]
 pub trait NeuronManager: Send + Sync {
-    fn get_governance_canister_id(&self) -> CanisterId;
-    fn sync_neurons(&mut self, neurons: Vec<Neuron>) -> Result<(), String>;
+    fn get_sns_governance_canister_id(&self) -> CanisterId;
+    fn get_sns_ledger_canister_id(&self) -> CanisterId;
+    fn get_sns_rewards_canister_id(&self) -> CanisterId;
+    fn get_neurons_mut(&mut self) -> &mut Neurons;
+    fn get_neurons(&self) -> &Neurons;
+    fn sync_neurons(&mut self, neurons: &[Neuron]) -> Result<(), String> {
+        self.get_neurons_mut().all_neurons = neurons.to_vec();
+        Ok(())
+    }
     async fn fetch_and_sync_neurons(&mut self) -> Result<(), String> {
-        let sns_governance_canister_id = self.get_governance_canister_id();
+        let sns_governance_canister_id = self.get_sns_governance_canister_id();
         let is_test_mode = read_state(|s| s.env.is_test_mode());
         let canister_id = read_state(|s| s.env.canister_id());
 
         let neurons = fetch_neurons(sns_governance_canister_id, canister_id, is_test_mode)
             .await
             .unwrap();
-        let _ = self.sync_neurons(neurons.clone());
+        let _ = self.sync_neurons(&neurons);
         Ok(())
     }
-    async fn get_available_rewards(&self) -> Result<Nat, String>;
-    async fn claim_rewards(&self) -> Result<(), String>;
-    async fn distribute_rewards(&self) -> Result<(), String>;
+    async fn get_available_rewards(&self) -> Result<Nat, String> {
+        let neurons = self.get_neurons().as_ref();
+        let available_rewards = calculate_available_rewards(
+            neurons,
+            self.get_sns_rewards_canister_id(),
+            self.get_sns_ledger_canister_id(),
+        )
+        .await;
+        Ok(available_rewards)
+    }
+    async fn claim_rewards(&self) -> Result<(), String> {
+        let neurons = self.get_neurons().as_ref();
+        claim_rewards(neurons, self.get_sns_ledger_canister_id()).await;
+        Ok(())
+    }
+    async fn distribute_rewards(&self) -> Result<(), String> {
+        let available_rewards = self.get_available_rewards().await.unwrap();
+        distribute_rewards(self.get_sns_ledger_canister_id(), available_rewards).await;
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -62,32 +79,20 @@ impl Default for OgyManager {
 #[async_trait]
 #[typetag::serde]
 impl NeuronManager for OgyManager {
-    fn get_governance_canister_id(&self) -> CanisterId {
+    fn get_sns_governance_canister_id(&self) -> CanisterId {
         self.ogy_sns_governance_canister_id
     }
-    fn sync_neurons(&mut self, neurons: Vec<Neuron>) -> Result<(), String> {
-        self.neurons.all_neurons = neurons;
-        Ok(())
+    fn get_sns_ledger_canister_id(&self) -> CanisterId {
+        self.ogy_sns_ledger_canister_id
     }
-    async fn get_available_rewards(&self) -> Result<Nat, String> {
-        let neurons = &self.neurons.all_neurons;
-        let available_rewards = calculate_available_rewards(
-            neurons,
-            self.ogy_sns_rewards_canister_id,
-            self.ogy_sns_ledger_canister_id,
-        )
-        .await;
-        // self.sync_available_rewards(available_rewards);
-        Ok(available_rewards)
+    fn get_sns_rewards_canister_id(&self) -> CanisterId {
+        self.ogy_sns_rewards_canister_id
     }
-    async fn claim_rewards(&self) -> Result<(), String> {
-        ogy_claim_rewards(&self.neurons.all_neurons, self.ogy_sns_ledger_canister_id).await;
-        Ok(())
+    fn get_neurons(&self) -> &Neurons {
+        &self.neurons
     }
-    async fn distribute_rewards(&self) -> Result<(), String> {
-        let available_rewards = self.get_available_rewards().await.unwrap();
-        distribute_rewards(self.ogy_sns_ledger_canister_id, available_rewards).await;
-        Ok(())
+    fn get_neurons_mut(&mut self) -> &mut Neurons {
+        &mut self.neurons
     }
 }
 
@@ -114,20 +119,23 @@ impl Default for WtnManager {
 #[async_trait]
 #[typetag::serde]
 impl NeuronManager for WtnManager {
-    fn get_governance_canister_id(&self) -> CanisterId {
+    fn get_sns_governance_canister_id(&self) -> CanisterId {
         self.wtn_sns_governance_canister_id
     }
-    fn sync_neurons(&mut self, _neurons: Vec<Neuron>) -> Result<(), String> {
-        Ok(())
+    fn get_sns_ledger_canister_id(&self) -> CanisterId {
+        self.wtn_sns_ledger_canister_id
+    }
+    fn get_sns_rewards_canister_id(&self) -> CanisterId {
+        Principal::anonymous()
+    }
+    fn get_neurons(&self) -> &Neurons {
+        &self.neurons
+    }
+    fn get_neurons_mut(&mut self) -> &mut Neurons {
+        &mut self.neurons
     }
     async fn get_available_rewards(&self) -> Result<Nat, String> {
         Ok(Nat::default())
-    }
-    async fn claim_rewards(&self) -> Result<(), String> {
-        Ok(())
-    }
-    async fn distribute_rewards(&self) -> Result<(), String> {
-        Ok(())
     }
 }
 
@@ -159,9 +167,35 @@ impl NeuronType {
         }
     }
 }
-
 #[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Neurons {
     pub timestamp: TimestampMillis,
     pub all_neurons: Vec<Neuron>,
+}
+
+impl Neurons {
+    pub fn new(timestamp: TimestampMillis, all_neurons: Vec<Neuron>) -> Self {
+        Neurons {
+            timestamp,
+            all_neurons,
+        }
+    }
+
+    pub fn timestamp(&self) -> TimestampMillis {
+        self.timestamp
+    }
+}
+
+// AsRef for immutable access to the slice of neurons
+impl AsRef<[Neuron]> for Neurons {
+    fn as_ref(&self) -> &[Neuron] {
+        &self.all_neurons
+    }
+}
+
+// AsMut for mutable access to the slice of neurons
+impl AsMut<[Neuron]> for Neurons {
+    fn as_mut(&mut self) -> &mut [Neuron] {
+        &mut self.all_neurons
+    }
 }

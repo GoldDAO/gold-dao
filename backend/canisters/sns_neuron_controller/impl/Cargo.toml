@@ -49,3 +49,4 @@ types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 async-trait = { workspace = true }
 typetag = { workspace = true }
+futures = { workspace = true }
