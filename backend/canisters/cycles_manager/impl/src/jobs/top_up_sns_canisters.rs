@@ -15,7 +15,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    let canister_id = read_state(|state| state.data.sns_root_canister);
+    let canister_id = read_state(|state| state.data.top_up_config.sns_root_canister);
     ic_cdk::spawn(top_up_canisters(canister_id));
 }
 
@@ -55,7 +55,7 @@ pub async fn sync_canister_stats(canister_id: CanisterId) -> Result<Vec<Canister
 async fn top_up_canisters(canister_id: CanisterId) {
     match sync_canister_stats(canister_id).await {
         Ok(canisters) => {
-            let top_up_threshold = read_state(|state| state.data.min_cycles_balance);
+            let top_up_threshold = read_state(|state| state.data.top_up_config.min_cycles_balance);
 
             let to_top_up: Vec<_> = canisters
                 .into_iter()
@@ -64,14 +64,47 @@ async fn top_up_canisters(canister_id: CanisterId) {
                 .collect();
 
             if !to_top_up.is_empty() {
-                let top_up_amount = read_state(|state| state.data.max_top_up_amount);
+                let cycles_balance = read_state(|state| state.env.cycles_balance());
+                let top_up_amount = read_state(|state| state.data.top_up_config.max_top_up_amount);
+                let canisters_amount: u64 = to_top_up.len().try_into().unwrap();
+                let summary_top_up_amount = top_up_amount * canisters_amount;
 
-                let mut top_up_futures = Vec::new();
-                for canister_id in to_top_up {
-                    top_up_futures.push(deposit_cycles(canister_id, top_up_amount));
+                if summary_top_up_amount < cycles_balance {
+                    let top_up_futures = to_top_up
+                        .iter()
+                        .map(|&canister_id| deposit_cycles(canister_id, top_up_amount));
+
+                    let results = futures::future::join_all(top_up_futures).await;
+
+                    mutate_state(|state| {
+                        let now = state.env.now();
+                        for (index, result) in results.into_iter().enumerate() {
+                            let canister_id = to_top_up[index];
+                            match result {
+                                Ok(_) => {
+                                    if let Some(canister) =
+                                        state.data.canisters.get_mut(&canister_id)
+                                    {
+                                        canister.record_top_up(top_up_amount, now);
+                                    } else {
+                                        state.data.canisters.add(canister_id, now);
+                                        if let Some(canister) =
+                                            state.data.canisters.get_mut(&canister_id)
+                                        {
+                                            canister.record_top_up(top_up_amount, now);
+                                        }
+                                    }
+                                }
+                                Err(e) => {
+                                    // TODO: add journaling here
+                                    error!("Failed to top up canister {}: {:?}", canister_id, e);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    error!("Failed to top up canisters: the cycles manager canister balance is too low");
                 }
-
-                futures::future::join_all(top_up_futures).await;
             }
         }
         Err(e) => {
@@ -82,8 +115,7 @@ async fn top_up_canisters(canister_id: CanisterId) {
 
 fn requires_top_up(summary: &CanisterSummary, top_up_threshold: u64) -> bool {
     if let Some(status) = summary.status.as_ref() {
-        let cycles = status.cycles.0.clone();
-        cycles < top_up_threshold.into()
+        status.cycles.0 < top_up_threshold.into()
     } else {
         false
     }

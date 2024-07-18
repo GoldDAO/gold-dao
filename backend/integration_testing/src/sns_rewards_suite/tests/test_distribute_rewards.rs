@@ -1,10 +1,12 @@
 use std::time::Duration;
 
 use candid::{ Nat, Principal };
-use canister_time::DAY_IN_MS;
+use canister_time::{ DAY_IN_MS, HOUR_IN_MS };
 use icrc_ledger_types::icrc1::account::Account;
+use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
     get_historic_payment_round::{ self, Args as GetHistoricPaymentRoundArgs },
+    payment_round::PaymentStatus,
     subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
 use types::TokenSymbol;
@@ -12,10 +14,15 @@ use types::TokenSymbol;
 use crate::{
     client::{
         icrc1::client::{ balance_of, transfer },
-        rewards::{ get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id },
+        rewards::{
+            force_payment_round_to_fail,
+            get_active_payment_rounds,
+            get_historic_payment_round,
+            get_neuron_by_id,
+        },
     },
     sns_rewards_suite::setup::{ default_test_setup, setup::setup_reward_pools },
-    utils::tick_n_blocks,
+    utils::{ is_interval_more_than_7_days, tick_n_blocks, HOURS_IN_WEEK },
 };
 
 #[test]
@@ -38,15 +45,13 @@ fn test_distribute_rewards_happy_path() {
 
     test_env.simulate_neuron_voting(2);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 2. Check Neuron sub account got paid correctly
@@ -80,15 +85,12 @@ fn test_distribute_rewards_happy_path() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     let neuron_sub_account = Account {
         owner: rewards_canister_id,
@@ -170,15 +172,13 @@ fn test_distribute_rewards_with_no_rewards() {
 
     test_env.simulate_neuron_voting(2);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 30);
 
     // there should be no historic or active rounds for ICP because it didn't have any rewards to pay out
     let res = get_historic_payment_round(
@@ -224,15 +224,12 @@ fn test_distribute_rewards_with_no_rewards() {
     // increase maturity maturity
     test_env.simulate_neuron_voting(3);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 1)
     let res = get_historic_payment_round(
@@ -310,15 +307,13 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     // increase maturity maturity
     test_env.simulate_neuron_voting(2);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 30);
 
     // there should be no historic payment round for ICP
     let res = get_historic_payment_round(
@@ -375,15 +370,13 @@ fn test_distribute_rewards_adds_to_history_correctly() {
 
     test_env.simulate_neuron_voting(2);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 2. Check the history
@@ -414,15 +407,12 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 4. Check the history
@@ -468,15 +458,12 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // increase maturity of neurons
     test_env.simulate_neuron_voting(4);
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 6. Check the history
@@ -520,15 +507,12 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u128 - 200_000u128
     ).unwrap();
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 8. Check the history
@@ -559,15 +543,12 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
-
-    // TRIGGER - distribute_rewards
+    // TRIGGER - synchronize_neurons and distribute
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(&test_env.pic, 100);
-    test_env.pic.advance_time(Duration::from_secs(60 * 5));
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
     // 10. Check the history
@@ -584,4 +565,218 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     );
     assert_eq!(historic_icp_rounds.len(), 1);
     test_env.pic.tick();
+}
+
+#[test]
+fn test_distribution_occurs_within_correct_time_intervals() {
+    let mut test_env = default_test_setup();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    // ********************************
+    // 2. Distribute rewards - first week
+    // ********************************
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 10);
+
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 30);
+
+    // ********************************
+    // 2. Distribute rewards - second week
+    // ********************************
+    test_env.simulate_neuron_voting(3);
+    tick_n_blocks(&test_env.pic, 2);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 10);
+
+    // TRIGGER - distribute_rewards
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(&test_env.pic, 30);
+
+    // ********************************
+    // 3. Verify more than 7 days passed between both historic payment rounds
+    // ********************************
+
+    let distribution_1_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
+    );
+    let distribution_2_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 2 })
+    );
+    assert_eq!(distribution_1_record.len(), 1);
+    assert_eq!(distribution_2_record.len(), 1);
+    let first_distribution_time = distribution_1_record[0].1.date_initialized;
+    let second_distribution_time = distribution_2_record[0].1.date_initialized;
+    assert!(is_interval_more_than_7_days(first_distribution_time, second_distribution_time));
+
+    // *********************************
+    // 3. Test distributions didn't occur between the 7 days
+    // *********************************
+
+    test_env.simulate_neuron_voting(4);
+    tick_n_blocks(&test_env.pic, 2);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 10);
+
+    for i in 0..HOURS_IN_WEEK.clone() - 2 {
+        // TRIGGER - synchronize_neurons
+        test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 1));
+        tick_n_blocks(&test_env.pic, 1);
+        // check for a distribution 1 day in
+        let distribution_3_record = get_historic_payment_round(
+            &test_env.pic,
+            Principal::anonymous(),
+            rewards_canister_id,
+            &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+        );
+        println!("/// i is {}", i);
+        assert_eq!(distribution_3_record.len(), 0);
+    }
+
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 2));
+    tick_n_blocks(&test_env.pic, 50);
+    // check for a distribution 1 day in
+    let distribution_3_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 3 })
+    );
+    assert_eq!(distribution_3_record.len(), 1);
+}
+
+#[test]
+fn test_distribution_interval_is_consistant_across_upgrades() {
+    let mut test_env = default_test_setup();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    // ********************************
+    // 2. Distribute rewards - first week
+    // ********************************
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    tick_n_blocks(&test_env.pic, 10);
+
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 2));
+    tick_n_blocks(&test_env.pic, 1);
+
+    // trigger the upgrade
+    test_env.upgrade_rewards_canister();
+
+    tick_n_blocks(&test_env.pic, 10);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 4));
+    tick_n_blocks(&test_env.pic, 1);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
+    tick_n_blocks(&test_env.pic, 10);
+
+    // ********************************
+    // 3. There should be 1 historic payment round even though we upgraded
+    // ********************************
+
+    let distribution_1_record = get_historic_payment_round(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &(get_historic_payment_round::Args { token: icp_token.clone(), round_id: 1 })
+    );
+    assert_eq!(distribution_1_record.len(), 1);
+}
+
+#[cfg(feature = "inttest")]
+#[test]
+fn test_distribution_recovery() {
+    let mut test_env = default_test_setup();
+    let controller = test_env.controller;
+    let rewards_canister_id = test_env.rewards_canister_id;
+    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let sns_gov_id = test_env.sns_gov_canister_id;
+    let neurons: Vec<NeuronId> = test_env.neuron_data
+        .iter()
+        .map(|(a, n)| n.id.clone().unwrap().clone())
+        .collect();
+    // ********************************
+    // 2. Distribute rewards - first week
+    // ********************************
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    setup_reward_pools(
+        &mut test_env.pic,
+        &test_env.sns_gov_canister_id,
+        &rewards_canister_id,
+        &test_env.token_ledgers.values().cloned().collect(),
+        100_000_000_000u64
+    );
+    // allow neuron data to sync
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
+    tick_n_blocks(&test_env.pic, 10);
+
+    // create a new payment round for all three token types with all payments failed
+    force_payment_round_to_fail(&mut test_env.pic, sns_gov_id, rewards_canister_id, &neurons);
+    tick_n_blocks(&test_env.pic, 10);
+
+    // check all the payments are failed
+    let active_rounds = get_active_payment_rounds(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &()
+    );
+    assert_eq!(active_rounds.len(), 3);
+    for round in active_rounds {
+        for (_, (_, payment_status, _)) in round.payments {
+            assert_eq!(payment_status, PaymentStatus::Failed(format!("Fake testing failure")));
+        }
+    }
+
+    // wait 1 hour.
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 2));
+    tick_n_blocks(&test_env.pic, 10);
+
+    let active_rounds = get_active_payment_rounds(
+        &test_env.pic,
+        Principal::anonymous(),
+        rewards_canister_id,
+        &()
+    );
+    assert_eq!(active_rounds.len(), 0);
 }

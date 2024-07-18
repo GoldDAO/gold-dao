@@ -1,10 +1,15 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
-use candid::{ Nat, Principal };
+use candid::{ CandidType, Nat, Principal };
+use time::macros::datetime;
+use time::{ error::ComponentRange, Weekday };
+use time;
 use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
+use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::debug;
-use types::TokenSymbol;
+use types::{ TimestampMillis, TokenSymbol };
 
 use crate::state::read_state;
 
@@ -12,6 +17,60 @@ use sns_governance_canister::types::get_neuron_response::Result::{
     Neuron as NeuronResponse,
     Error as NeuronErrorResponse,
 };
+
+// specifies a range that the reward interval can occur. e.g on a certain weekday and between a start hour and end hour
+#[derive(CandidType, Deserialize, Serialize, Clone)]
+pub struct RewardDistributionInterval {
+    /// weekday - e.g  Monday, Tuesday, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
+    weekday: String,
+    /// 24 hour clock - 0 = 00, 14 = 14:00
+    start_hour: u8,
+    /// 24 hour clock - 0 = 00, 14 = 14:00
+    end_hour: u8,
+}
+
+impl Default for RewardDistributionInterval {
+    fn default() -> Self {
+        Self {
+            weekday: "Wednesday".to_string(),
+            start_hour: 14, // 2pm
+            end_hour: 16, // 4pm
+        }
+    }
+}
+
+impl RewardDistributionInterval {
+    pub fn is_within_interval(&self, timestamp_millis: TimestampMillis) -> bool {
+        let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
+        // Create a DateTime equivalent using time crate
+        let timestamp = match time::OffsetDateTime::from_unix_timestamp(timestamp_secs as i64) {
+            Ok(t) => t,
+            Err(_) => {
+                return false;
+            } // Invalid timestamp
+        };
+
+        // Convert weekday index to time crate's Weekday enum
+        let weekday = match Weekday::from_str(&self.weekday) {
+            Ok(w) => w,
+            Err(e) => {
+                debug!("Invalid Weekday set for distribution reward interval");
+                return false;
+            } // Invalid weekday index
+        };
+
+        // Check if the given timestamp is on the specified weekday
+        if timestamp.weekday() == weekday {
+            // Check if the given timestamp is within the specified hour range
+            let hour = timestamp.hour();
+            if hour >= self.start_hour && hour < self.end_hour {
+                return true;
+            }
+        }
+
+        false
+    }
+}
 
 pub async fn transfer_token(
     from_sub_account: Subaccount,
@@ -132,8 +191,9 @@ pub fn validate_set_daily_gldgov_burn_rate_payload(amount: &Nat) -> Result<(), S
 mod tests {
     use candid::Principal;
     use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
+    use types::TimestampMillis;
 
-    use crate::utils::AuthenticateByHotkeyResponse;
+    use crate::utils::{ AuthenticateByHotkeyResponse, RewardDistributionInterval };
     use super::authenticate_by_hotkey;
 
     #[test]
@@ -208,5 +268,35 @@ mod tests {
         let result = authenticate_by_hotkey(&neuron, &caller);
 
         assert_eq!(result, AuthenticateByHotkeyResponse::NeuronHotKeyInvalid)
+    }
+
+    #[test]
+    fn test_reward_distribution_interval() {
+        let distribution_interval = RewardDistributionInterval {
+            weekday: "Wednesday".to_string(),
+            start_hour: 14,
+            end_hour: 16,
+        }; // wednesday between 14:00 and 16:00
+
+        let time_now = 1718809200855; // UTC - wednesday Jun 19, 2024, 3:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), true);
+
+        let time_now = 1718805600855; // UTC - wednesday Jun 19, 2024, 14:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), true);
+
+        let time_now = 1718812799855; // UTC - wednesday Jun 19, 2024, 15:59:59 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), true);
+
+        let time_now = 1718812800855; // UTC - wednesday Jun 19, 2024, 16:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), false);
+
+        let time_now = 1718805599855; // UTC - wednesday Jun 19, 2024, 13:59:59 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), false);
+
+        let time_now = 1718722800855; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), false);
+
+        let time_now = 1719430200000; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
+        assert_eq!(distribution_interval.is_within_interval(time_now), false);
     }
 }

@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.1] - 2024-06-12
+
+#### Added
+- **Automatic burning of ICP tokens into Cycles** : Checks the Cycles Manager canister's cycles balance and automatically converts ICP into Cycles to be able to top up all the monitored canisters.
+
 ### [1.0.0] - 2024-06-12
 
 #### Description

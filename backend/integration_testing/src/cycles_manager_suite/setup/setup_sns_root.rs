@@ -18,12 +18,11 @@ pub struct Args {
     pub ledger_canister_id: Option<Principal>,
 }
 
-pub fn setup_root_canister(
+pub fn setup_sns_root_canister(
     pic: &mut PocketIc,
     controller: &Principal,
     root_init_args: Args,
 ) -> Principal {
-    // let mut sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
 
     let sns_root_canister_id =
@@ -36,6 +35,8 @@ pub fn setup_root_canister(
     )
     .unwrap();
     pic.tick();
+
+    println!("SNS root canister id: {}", sns_root_canister_id);
 
     pic.tick();
     let sns_root_canister_wasm = wasms::SNS_ROOT.clone();

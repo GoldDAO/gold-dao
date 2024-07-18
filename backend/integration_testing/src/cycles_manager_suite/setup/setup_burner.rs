@@ -15,18 +15,17 @@ pub fn setup_burner_canister(
     pic: &mut PocketIc,
     controller: &Principal,
     burner_canister_init_args: InitArgs,
+    sns_root_canister_id: Principal,
 ) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
     let burner_canister = pic.create_canister_on_subnet(Some(controller.clone()), None, sns_subnet);
-
-    let root_canister_id = Principal::from_text("lqy7q-dh777-77777-aaaaq-cai").unwrap();
 
     let burner_wasm = wasms::BURNER.clone();
     pic.add_cycles(burner_canister, 20_000_000_000_000);
     pic.set_controllers(
         burner_canister,
         Some(controller.clone()),
-        vec![controller.clone(), root_canister_id],
+        vec![controller.clone(), sns_root_canister_id],
     )
     .unwrap();
     pic.tick();
@@ -35,7 +34,7 @@ pub fn setup_burner_canister(
         burner_canister,
         burner_wasm,
         encode_one(burner_canister_init_args).unwrap(),
-        Some(root_canister_id.clone()),
+        Some(sns_root_canister_id.clone()),
     );
     burner_canister
 }

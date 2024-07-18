@@ -1,0 +1,12 @@
+@import "./theme/preset.css";
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
