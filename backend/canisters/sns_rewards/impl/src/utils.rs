@@ -19,7 +19,7 @@ use sns_governance_canister::types::get_neuron_response::Result::{
 };
 
 // specifies a range that the reward interval can occur. e.g on a certain weekday and between a start hour and end hour
-#[derive(CandidType, Deserialize, Serialize, Clone)]
+#[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct TimeInterval {
     /// weekday - e.g  Monday, Tuesday, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
     pub weekday: Option<String>,

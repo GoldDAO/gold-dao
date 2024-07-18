@@ -54,6 +54,7 @@ impl RuntimeState {
             last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
             daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
+            neuron_sync_interval: self.data.neuron_sync_interval.clone(),
         }
     }
 
@@ -83,6 +84,7 @@ pub struct Metrics {
     pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
     pub daily_gldgov_burn_amount: Option<Nat>,
     pub reward_distribution_interval: Option<TimeInterval>,
+    pub neuron_sync_interval: Option<TimeInterval>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
