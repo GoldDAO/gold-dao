@@ -64,8 +64,8 @@ $[[ inputs.src-folder ]] test build:
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
-    NETWORK: "staging" # staging | preprod | ic
-    ENV: "staging" # staging | preprod | prod
+    NETWORK: "local" # local | staging | preprod | ic
+    ENV: "local" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend app
     deployment_tier: development
@@ -80,8 +80,8 @@ $[[ inputs.src-folder ]] staging build:
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
-    NETWORK: "staging" # staging | preprod | ic
-    ENV: "staging" # staging | preprod | prod
+    NETWORK: "staging" # local | staging | preprod | ic
+    ENV: "staging" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend app
     deployment_tier: staging
@@ -96,8 +96,8 @@ $[[ inputs.src-folder ]] preprod build:
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
-    NETWORK: "preprod" # staging | preprod | ic
-    ENV: "preprod" # staging | preprod | prod
+    NETWORK: "preprod" # local | staging | preprod | ic
+    ENV: "preprod" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend app
     deployment_tier: staging
@@ -112,8 +112,8 @@ $[[ inputs.src-folder ]] production build:
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
-    NETWORK: "ic" # staging | preprod | ic
-    ENV: "prod" # staging | preprod | prod
+    NETWORK: "ic" # local | staging | preprod | ic
+    ENV: "prod" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend app
     deployment_tier: production
