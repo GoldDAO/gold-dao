@@ -42,10 +42,10 @@ spec:
 
 .build template:
   stage: build
-  rules:
-    changes:
-      - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-      - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+  # rules:
+  #   changes:
+  #     - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+  #     - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
@@ -63,6 +63,9 @@ $[[ inputs.src-folder ]] staging build:
   extends: .build template
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging" # staging | preprod | ic
@@ -76,6 +79,9 @@ $[[ inputs.src-folder ]] preprod build:
   extends: .build template
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "preprod" # staging | preprod | ic
@@ -89,6 +95,9 @@ $[[ inputs.src-folder ]] production build:
   extends: .build template
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/' && $CI_COMMIT_REF_NAME == "master"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic" # staging | preprod | ic
