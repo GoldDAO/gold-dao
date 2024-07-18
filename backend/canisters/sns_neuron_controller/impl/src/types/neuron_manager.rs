@@ -10,12 +10,7 @@ use crate::utils::{calculate_available_rewards, claim_rewards, distribute_reward
 
 #[async_trait]
 #[typetag::serde(tag = "type")]
-pub trait NeuronManager: Send + Sync {
-    fn get_sns_governance_canister_id(&self) -> CanisterId;
-    fn get_sns_ledger_canister_id(&self) -> CanisterId;
-    fn get_sns_rewards_canister_id(&self) -> CanisterId;
-    fn get_neurons_mut(&mut self) -> &mut Neurons;
-    fn get_neurons(&self) -> &Neurons;
+pub trait NeuronManager: Send + Sync + NeuronConfig {
     fn sync_neurons(&mut self, neurons: &[Neuron]) -> Result<(), String> {
         self.get_neurons_mut().all_neurons = neurons.to_vec();
         Ok(())
@@ -53,6 +48,14 @@ pub trait NeuronManager: Send + Sync {
     }
 }
 
+pub trait NeuronConfig {
+    fn get_sns_governance_canister_id(&self) -> CanisterId;
+    fn get_sns_ledger_canister_id(&self) -> CanisterId;
+    fn get_sns_rewards_canister_id(&self) -> CanisterId;
+    fn get_neurons_mut(&mut self) -> &mut Neurons;
+    fn get_neurons(&self) -> &Neurons;
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct OgyManager {
     pub ogy_sns_governance_canister_id: CanisterId,
@@ -76,9 +79,7 @@ impl Default for OgyManager {
     }
 }
 
-#[async_trait]
-#[typetag::serde]
-impl NeuronManager for OgyManager {
+impl NeuronConfig for OgyManager {
     fn get_sns_governance_canister_id(&self) -> CanisterId {
         self.ogy_sns_governance_canister_id
     }
@@ -95,6 +96,10 @@ impl NeuronManager for OgyManager {
         &mut self.neurons
     }
 }
+
+#[async_trait]
+#[typetag::serde]
+impl NeuronManager for OgyManager {}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct WtnManager {
@@ -116,9 +121,7 @@ impl Default for WtnManager {
     }
 }
 
-#[async_trait]
-#[typetag::serde]
-impl NeuronManager for WtnManager {
+impl NeuronConfig for WtnManager {
     fn get_sns_governance_canister_id(&self) -> CanisterId {
         self.wtn_sns_governance_canister_id
     }
@@ -134,10 +137,11 @@ impl NeuronManager for WtnManager {
     fn get_neurons_mut(&mut self) -> &mut Neurons {
         &mut self.neurons
     }
-    async fn get_available_rewards(&self) -> Result<Nat, String> {
-        Ok(Nat::default())
-    }
 }
+
+#[async_trait]
+#[typetag::serde]
+impl NeuronManager for WtnManager {}
 
 #[derive(CandidType, Deserialize, Clone)]
 pub enum NeuronType {

@@ -117,6 +117,7 @@ pub async fn fetch_neurons(
             }
             Err(e) => {
                 error!("Failed to obtain all neurons data {:?}", e);
+                return Err(format!("Failed to obtain all neurons data {:?}", e));
             }
         }
     }
@@ -146,7 +147,6 @@ pub async fn calculate_available_rewards(
 
     available_rewards_amount
 }
-
 // Function to claim rewards for each neuron
 // TODO: handle an error here and make it parallel
 pub async fn claim_rewards(neurons: &[Neuron], sns_governance_canister_id: Principal) {
