@@ -31,6 +31,7 @@ include:
   # Templates:
   - local: scripts/ci-cd/.node_template.yml
   - local: scripts/ci-cd/.rust_template.yml
+  - local: scripts/ci-cd/.dfx_templates.yml
   # Frontend linters:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
@@ -90,7 +91,6 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Backend deployments
-  - local: scripts/ci-cd/.dfx_templates.yml
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: cycles_manager
