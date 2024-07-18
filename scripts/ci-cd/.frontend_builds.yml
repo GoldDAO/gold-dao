@@ -40,81 +40,129 @@ spec:
 #         dotenv: $[[ inputs.src-folder ]]_deploy.env
 #       expire_in: 6 months
 
-.build template:
+$[[ inputs.src-folder ]] build:
   stage: build
   extends: .node template
   script:
     # - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
     - npm run build:$[[ inputs.src-folder ]]
-    - CAN_URL=$(CAN=$[[ inputs.src-folder ]] NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
-    - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$CAN_URL" > $[[ inputs.src-folder ]]_deploy.env
+    # - CAN_URL=$(CAN=$[[ inputs.src-folder ]] NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
+    # - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$CAN_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_${ENV}_BUILD"
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_BUILD"
     paths:
       - client/$[[ inputs.src-folder ]]/out
-    reports:
-      dotenv: $[[ inputs.src-folder ]]_deploy.env
     expire_in: 1 month
-
-$[[ inputs.src-folder ]] test build:
-  extends: .build template
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME != "develop" || $CI_COMMIT_REF_NAME != "master"
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-  variables:
-    NETWORK: "local" # local | staging | preprod | ic
-    ENV: "local" # local | staging | preprod | prod
+  # variables:
+  #   NETWORK: "local" # local | staging | preprod | ic
+  #   ENV: "local" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: development
+    # deployment_tier: development
     action: prepare
 
-$[[ inputs.src-folder ]] staging build:
-  extends: .build template
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-  variables:
-    NETWORK: "staging" # local | staging | preprod | ic
-    ENV: "staging" # local | staging | preprod | prod
-  environment:
-    name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: staging
-    action: prepare
 
-$[[ inputs.src-folder ]] preprod build:
-  extends: .build template
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-  variables:
-    NETWORK: "preprod" # local | staging | preprod | ic
-    ENV: "preprod" # local | staging | preprod | prod
-  environment:
-    name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: testing
-    action: prepare
 
-$[[ inputs.src-folder ]] production build:
-  extends: .build template
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/' && $CI_COMMIT_REF_NAME == "master"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-  variables:
-    NETWORK: "ic" # local | staging | preprod | ic
-    ENV: "prod" # local | staging | preprod | prod
-  environment:
-    name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: production
-    action: prepare
+
+
+
+
+
+# .build template:
+#   stage: build
+#   extends: .node template
+#   script:
+#     # - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
+#     - npm run build:$[[ inputs.src-folder ]]
+#     - CAN_URL=$(CAN=$[[ inputs.src-folder ]] NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
+#     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$CAN_URL" > $[[ inputs.src-folder ]]_deploy.env
+#   artifacts:
+#     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_${ENV}_BUILD"
+#     paths:
+#       - client/$[[ inputs.src-folder ]]/out
+#     reports:
+#       dotenv: $[[ inputs.src-folder ]]_deploy.env
+#     expire_in: 1 month
+
+# $[[ inputs.src-folder ]] test build:
+#   extends: .build template
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+#       changes:
+#         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+#         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#   variables:
+#     NETWORK: "local" # local | staging | preprod | ic
+#     ENV: "local" # local | staging | preprod | prod
+#   environment:
+#     name: $[[ inputs.src-folder ]] frontend
+#     deployment_tier: development
+#     action: prepare
+
+# $[[ inputs.src-folder ]] staging build:
+#   extends: .build template
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+#         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#   variables:
+#     NETWORK: "staging" # local | staging | preprod | ic
+#     ENV: "staging" # local | staging | preprod | prod
+#   environment:
+#     name: $[[ inputs.src-folder ]] frontend
+#     deployment_tier: staging
+#     action: prepare
+
+# $[[ inputs.src-folder ]] preprod build:
+#   extends: .build template
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+#         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#   variables:
+#     NETWORK: "preprod" # local | staging | preprod | ic
+#     ENV: "preprod" # local | staging | preprod | prod
+#   environment:
+#     name: $[[ inputs.src-folder ]] frontend
+#     deployment_tier: testing
+#     action: prepare
+
+# $[[ inputs.src-folder ]] production build:
+#   extends: .build template
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/' && $CI_COMMIT_REF_NAME == "master"
+#       changes:
+#         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+#         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#   variables:
+#     NETWORK: "ic" # local | staging | preprod | ic
+#     ENV: "prod" # local | staging | preprod | prod
+#   environment:
+#     name: $[[ inputs.src-folder ]] frontend
+#     deployment_tier: production
+#     action: prepare
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # $[[ inputs.src-folder ]] staging build:
 #   stage: build
