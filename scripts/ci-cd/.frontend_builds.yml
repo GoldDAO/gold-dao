@@ -60,7 +60,7 @@ spec:
     expire_in: 1 month
   environment:
     name: $[[ inputs.src-folder ]] frontend app
-    deployment_tier: $ENV
+    deployment_tier: $DEPLOYMENT_TIER
     action: prepare
 
 $[[ inputs.src-folder ]] staging build:
@@ -71,6 +71,7 @@ $[[ inputs.src-folder ]] staging build:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging" # staging | preprod | ic
     ENV: "staging" # staging | preprod | prod
+    DEPLOYMENT_TIER: "staging"
 
 $[[ inputs.src-folder ]] preprod build:
   extends: .build template
@@ -80,6 +81,7 @@ $[[ inputs.src-folder ]] preprod build:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "preprod" # staging | preprod | ic
     ENV: "preprod" # staging | preprod | prod
+    DEPLOYMENT_TIER: "staging"
 
 $[[ inputs.src-folder ]] prod build:
   extends: .build template
@@ -89,6 +91,7 @@ $[[ inputs.src-folder ]] prod build:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic" # staging | preprod | ic
     ENV: "prod" # staging | preprod | prod
+    DEPLOYMENT_TIER: "production"
 
 
 # $[[ inputs.src-folder ]] staging build:
