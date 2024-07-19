@@ -39,8 +39,8 @@ $[[ inputs.src-folder ]] canister build:
 $[[ inputs.src-folder ]] integration-test build:
   stage: integration_testing
   rules:
-  # This will run on merges to develop, MR from develop to master and merges to master
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master"
+  # This will run on merges to develop, MR from develop to master and when a release tag is added
+    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_TAG =~ /^[a-zA-Z]-v\d+\.\d+\.\d+$/
       changes:
         - "backend/libraries/**/*.{rs,toml,lock}"
         - "backend/external_canisters/**/*.{rs,toml,lock}"
