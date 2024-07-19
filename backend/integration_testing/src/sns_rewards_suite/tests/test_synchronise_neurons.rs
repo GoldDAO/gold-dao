@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::time::{ Duration, SystemTime };
 use candid::{ CandidType, Deserialize };
-use canister_time::DAY_IN_MS;
+use canister_time::{ DAY_IN_MS, HOUR_IN_MS };
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
@@ -18,6 +18,10 @@ pub struct GetNeuronRequest {
 #[test]
 fn test_synchronise_neurons_happy_path() {
     let mut test_env = default_test_setup();
+    test_env.pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)); // Wednesday Jun 19, 2024, 6:00:00 AM
+
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3));
+    tick_n_blocks(&test_env.pic, 10);
 
     let all_neurons = get_all_neurons(
         &test_env.pic,
