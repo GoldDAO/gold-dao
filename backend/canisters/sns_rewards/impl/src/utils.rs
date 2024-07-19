@@ -209,6 +209,12 @@ pub fn validate_set_daily_gldgov_burn_rate_payload(amount: &Nat) -> Result<(), S
     Ok(())
 }
 
+pub fn tracer(msg: &str) {
+    unsafe {
+        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use candid::Principal;
@@ -326,32 +332,29 @@ mod tests {
     fn test_daily_distribution_interval() {
         let distribution_interval = TimeInterval {
             weekday: None,
-            start_hour: 14,
-            end_hour: 16,
-        }; // wednesday between 14:00 and 16:00
+            start_hour: 9,
+            end_hour: 11,
+        }; // any day between 9:00:00 and 11:00:00
 
-        let time_now = 1718809200855; // UTC - wednesday Jun 19, 2024, 3:00:00 PM
+        let time_now = 1718787600000; // UTC - wednesday Jun 19, 2024, 09:00:00
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
 
-        let time_now = 1718805600855; // UTC - wednesday Jun 19, 2024, 14:00:00 PM
+        let time_now = 1718791200000; // UTC - wednesday Jun 19, 2024, 10:00:00
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
 
-        let time_now = 1718812799855; // UTC - wednesday Jun 19, 2024, 15:59:59 PM
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
-
-        let time_now = 1718812800855; // UTC - wednesday Jun 19, 2024, 16:00:00 PM
+        let time_now = 1718794800000; // UTC - wednesday Jun 19, 2024, 11:00:00
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
 
-        let time_now = 1718805599855; // UTC - wednesday Jun 19, 2024, 13:59:59 PM
+        let time_now = 1718794801000; // UTC - wednesday Jun 19, 2024, 11:00:01
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
 
-        let time_now = 1718722800855; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
+        let time_now = 1718787599000; // UTC - wednesday Jun 19, 2024, 08:59:59
+        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
+
+        let time_now = 1718874000000; // UTC - Thursday Jun 20, 2024, 09:00:00
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
 
-        let time_now = 1719430200000; // UTC - Wednesday Jun 26, 2024, 7:30:00 PM
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
-
-        let time_now = 1721290471006; // UTC - Thursday Jul 18, 2024, 8:14:31 AM
+        let time_now = 1718830800000; // UTC - Thursday Jun 20, 2024, 09:00:00
         assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
     }
 }
