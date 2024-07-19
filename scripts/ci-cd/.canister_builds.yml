@@ -21,7 +21,7 @@ $[[ inputs.src-folder ]] canister build:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
     - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
   extends: .rust template
   script:
@@ -45,15 +45,15 @@ $[[ inputs.src-folder ]] integration-test build:
   # This will run on merges to develop or MR from develop to master
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/**/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock,md}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/**/*.{rs,toml,lock,md}"
   # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/**/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock,md}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/**/*.{rs,toml,lock,md}"
       needs: ["integration tests trigger"]
   extends: .rust template
   script:
