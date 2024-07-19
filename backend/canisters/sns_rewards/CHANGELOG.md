@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.1] - 2024-07-16
+
+#### Description
+This includes fixes and improvements
+
+#### Added
+- **Consistent distribution times across upgrades** : Upgrading a canister would mean a distribution timer would get reset and so this could result in an almost 2 week delay depending on the time of the upgrade. This new feature allows the distribution to always start at a specific time of UTC 14 - 16. 
+- sns_rewards canister ugprade via SNS proposal
+
+#### Fixed
+- **History overwrite** : the history would sometimes be overwritten for early distributions, although this isn't a problem now, we have changed how history is added and added unit tests to make sure historic distributions are added to the history state correctly.
+
 ### [1.0.0] - 2024-04-18
 
 #### Description

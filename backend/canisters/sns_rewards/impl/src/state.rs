@@ -17,7 +17,7 @@ use crate::{
         neuron_owners::NeuronOwnership,
         payment_processor::PaymentProcessor,
     },
-    utils::{ TimeInterval },
+    utils::TimeInterval,
 };
 
 canister_state!(RuntimeState);
@@ -55,6 +55,18 @@ impl RuntimeState {
             daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
             neuron_sync_interval: self.data.neuron_sync_interval.clone(),
+            registered_tokens: self.data.tokens
+                .iter()
+                .map(|(token, details)|
+                    format!(
+                        "{:?} - id: {}, fee: {}, decimals: {}",
+                        token,
+                        details.ledger_id,
+                        details.fee,
+                        details.decimals
+                    )
+                )
+                .collect(),
         }
     }
 
@@ -85,6 +97,7 @@ pub struct Metrics {
     pub daily_gldgov_burn_amount: Option<Nat>,
     pub reward_distribution_interval: Option<TimeInterval>,
     pub neuron_sync_interval: Option<TimeInterval>,
+    pub registered_tokens: Vec<String>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]

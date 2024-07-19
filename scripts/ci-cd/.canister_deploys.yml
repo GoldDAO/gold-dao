@@ -20,7 +20,7 @@ $[[ inputs.src-folder ]] staging deploy:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
@@ -41,9 +41,9 @@ $[[ inputs.src-folder ]] production deploy:
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock}"
-        - "backend/external_canisters/**/*.{rs,toml,lock}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock}"
+        - "backend/libraries/**/*.{rs,toml,lock,md}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
       when: manual
   variables:
     TARGET_NETWORK: ic
