@@ -54,6 +54,18 @@ impl RuntimeState {
             last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
             daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
+            registered_tokens: self.data.tokens
+                .iter()
+                .map(|(token, details)|
+                    format!(
+                        "{:?} - id: {}, fee: {}, decimals: {}",
+                        token,
+                        details.ledger_id,
+                        details.fee,
+                        details.decimals
+                    )
+                )
+                .collect(),
         }
     }
 
@@ -83,6 +95,7 @@ pub struct Metrics {
     pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
     pub daily_gldgov_burn_amount: Option<Nat>,
     pub reward_distribution_interval: Option<RewardDistributionInterval>,
+    pub registered_tokens: Vec<String>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
