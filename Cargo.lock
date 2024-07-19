@@ -2564,11 +2564,24 @@ dependencies = [
  "sns_governance_canister",
  "sns_governance_canister_c2c_client",
  "sns_ledger_canister_c2c_client",
+ "sns_neuron_controller_api_canister",
  "stable_memory",
  "tracing",
  "types",
  "typetag",
  "utils",
+]
+
+[[package]]
+name = "sns_neuron_controller_api_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "ic-ledger-types",
+ "serde",
+ "types",
 ]
 
 [[package]]

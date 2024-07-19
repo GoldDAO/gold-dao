@@ -14,9 +14,6 @@ pub const SNS_LEDGER_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 126, 1, 1]);
 pub const SNS_LEDGER_INDEX_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 128, 1, 1]);
-// FIXME: This should be fixed to real address and add tests
-pub const SNS_REWARDS_CANISTER_ID: CanisterId =
-    Principal::from_slice(&[0, 0, 0, 0, 2, 0, 0, 125, 1, 1]);
 pub const NNS_GOVERNANCE_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 1, 1, 1]);
 pub const ICP_LEDGER_CANISTER_ID: CanisterId =

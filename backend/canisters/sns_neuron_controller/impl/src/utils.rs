@@ -1,12 +1,17 @@
+use std::ptr::read;
+
+use crate::state::read_state;
 use candid::{Nat, Principal};
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::{
     account::{Account, Subaccount},
     transfer::TransferArg,
 };
+use sns_governance_canister::types::ListNeurons;
+use sns_governance_canister::types::Neuron;
 use sns_governance_canister::types::NeuronId;
+use tracing::debug;
 use tracing::{error, info};
-use utils::consts::SNS_REWARDS_CANISTER_ID;
 
 pub async fn transfer_token(
     from_sub_account: Subaccount,
@@ -59,9 +64,6 @@ pub async fn fetch_neuron_reward_balance(
     }
 }
 
-use sns_governance_canister::types::ListNeurons;
-use sns_governance_canister::types::Neuron;
-use tracing::debug;
 // Fetch all neurons from SNS governance canister
 pub async fn fetch_neurons(
     sns_governance_canister_id: Principal,
@@ -265,6 +267,7 @@ pub async fn claim_rewards(
 
 // FIXME: think of outstanding payments struct in this context
 pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(), String> {
+    let sns_rewards_canister_id = read_state(|state| state.data.sns_rewards_canister_id);
     // Transfer all the tokens to sns_rewards to be distributed
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         sns_ledger_canister_id,
@@ -278,7 +281,7 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
         Ok(balance) => {
             match transfer_token(
                 [0; 32],
-                SNS_REWARDS_CANISTER_ID.into(),
+                sns_rewards_canister_id.into(),
                 sns_ledger_canister_id,
                 balance,
             )

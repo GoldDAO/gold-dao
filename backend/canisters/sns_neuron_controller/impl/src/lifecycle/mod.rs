@@ -4,6 +4,8 @@ pub mod pre_upgrade;
 
 use crate::state::{init_state, RuntimeState};
 
+pub use init::*;
+
 pub fn init_canister(runtime_state: RuntimeState) {
     crate::jobs::start();
     init_state(runtime_state);

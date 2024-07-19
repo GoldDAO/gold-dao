@@ -1,104 +1,203 @@
-type Account = record { owner : principal; subaccount : opt vec nat8 };
-type AccountIdentifier = record { hash : vec nat8 };
-type AddHotKey = record { new_hot_key : opt principal };
+type Account = record { owner : opt principal; subaccount : opt Subaccount };
+type Action = variant {
+  ManageNervousSystemParameters : NervousSystemParameters;
+  AddGenericNervousSystemFunction : NervousSystemFunction;
+  RemoveGenericNervousSystemFunction : nat64;
+  UpgradeSnsToNextVersion : record {};
+  RegisterDappCanisters : RegisterDappCanisters;
+  TransferSnsTreasuryFunds : TransferSnsTreasuryFunds;
+  UpgradeSnsControlledCanister : UpgradeSnsControlledCanister;
+  DeregisterDappCanisters : DeregisterDappCanisters;
+  Unspecified : record {};
+  ManageSnsMetadata : ManageSnsMetadata;
+  ExecuteGenericNervousSystemFunction : ExecuteGenericNervousSystemFunction;
+  Motion : Motion;
+};
+type AddNeuronPermissions = record {
+  permissions_to_add : opt NeuronPermissionList;
+  principal_id : opt principal;
+};
 type Amount = record { e8s : nat64 };
 type By = variant {
-  NeuronIdOrSubaccount : record {};
   MemoAndController : MemoAndController;
-  Memo : nat64;
+  NeuronId : record {};
 };
 type ChangeAutoStakeMaturity = record {
   requested_setting_for_auto_stake_maturity : bool;
 };
 type ClaimOrRefresh = record { by : opt By };
 type Command = variant {
-  Spawn : Spawn;
   Split : Split;
   Follow : Follow;
+  DisburseMaturity : DisburseMaturity;
   ClaimOrRefresh : ClaimOrRefresh;
   Configure : Configure;
   RegisterVote : RegisterVote;
-  Merge : Merge;
-  DisburseToNeuron : DisburseToNeuron;
+  MakeProposal : Proposal;
   StakeMaturity : StakeMaturity;
+  RemoveNeuronPermissions : RemoveNeuronPermissions;
+  AddNeuronPermissions : AddNeuronPermissions;
   MergeMaturity : MergeMaturity;
   Disburse : Disburse;
 };
 type Configure = record { operation : opt Operation };
-type DepositAccount = record {
-  legacy_account_id : text;
-  icrc_account : Account;
+type DefaultFollowees = record { followees : vec record { nat64; Followees } };
+type DeregisterDappCanisters = record {
+  canister_ids : vec principal;
+  new_controllers : vec principal;
 };
-type Disburse = record {
-  to_account : opt AccountIdentifier;
-  amount : opt Amount;
+type Disburse = record { to_account : opt Account; amount : opt Amount };
+type DisburseMaturity = record {
+  to_account : opt Account;
+  percentage_to_disburse : nat32;
 };
-type DisburseToNeuron = record {
-  dissolve_delay_seconds : nat64;
-  kyc_verified : bool;
+type DisburseMaturityInProgress = record {
+  timestamp_of_disbursement_seconds : nat64;
   amount_e8s : nat64;
-  new_controller : opt principal;
-  nonce : nat64;
+  account_to_disburse_to : opt Account;
 };
-type Follow = record { topic : int32; followees : vec NeuronId };
+type DissolveState = variant {
+  DissolveDelaySeconds : nat64;
+  WhenDissolvedTimestampSeconds : nat64;
+};
+type ExecuteGenericNervousSystemFunction = record {
+  function_id : nat64;
+  payload : blob;
+};
+type Follow = record { function_id : nat64; followees : vec NeuronId };
+type Followees = record { followees : vec NeuronId };
+type FunctionType = variant {
+  NativeNervousSystemFunction : record {};
+  GenericNervousSystemFunction : GenericNervousSystemFunction;
+};
+type GenericNervousSystemFunction = record {
+  validator_canister_id : opt principal;
+  target_canister_id : opt principal;
+  validator_method_name : opt text;
+  target_method_name : opt text;
+};
 type IncreaseDissolveDelay = record {
   additional_dissolve_delay_seconds : nat32;
 };
-type InitArgs = record { test_mode : bool };
+type InitArgs = record {
+  test_mode : bool;
+  sns_rewards_canister_id : principal;
+};
 type ListNeuronsResponse = record { neurons : NeuronList };
-type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
-type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
-type ManageRewardRecipientsRequest = record { list : vec RewardsRecipient };
-type ManageRewardRecipientsResponse = variant { Success; InternalError : text };
+type ManageSnsMetadata = record {
+  url : opt text;
+  logo : opt text;
+  name : opt text;
+  description : opt text;
+};
+type ManageSnsNeuronRequest = record {
+  neuron_type : NeuronType;
+  command : Command;
+  neuron_id : blob;
+};
+type ManageSnsNeuronResponse = variant { Success : text; InternalError : text };
 type MemoAndController = record { controller : opt principal; memo : nat64 };
-type Merge = record { source_neuron_id : opt NeuronId };
 type MergeMaturity = record { percentage_to_merge : nat32 };
-type NeuronId = record { id : nat64 };
-type NeuronList = record {
-  active : vec NeuronWithMetric;
-  disbursed : vec nat64;
-  spawning : vec nat64;
-};
-type NeuronWithMetric = record {
+type Motion = record { motion_text : text };
+type NervousSystemFunction = record {
   id : nat64;
-  dissolve_delay : nat64;
-  maturity : nat64;
-  staked_amount : nat64;
-  deposit_account : opt DepositAccount;
-  dissolving : bool;
+  name : text;
+  description : opt text;
+  function_type : opt FunctionType;
 };
+type NervousSystemParameters = record {
+  default_followees : opt DefaultFollowees;
+  max_dissolve_delay_seconds : opt nat64;
+  max_dissolve_delay_bonus_percentage : opt nat64;
+  max_followees_per_function : opt nat64;
+  neuron_claimer_permissions : opt NeuronPermissionList;
+  neuron_minimum_stake_e8s : opt nat64;
+  max_neuron_age_for_age_bonus : opt nat64;
+  initial_voting_period_seconds : opt nat64;
+  neuron_minimum_dissolve_delay_to_vote_seconds : opt nat64;
+  reject_cost_e8s : opt nat64;
+  max_proposals_to_keep_per_action : opt nat32;
+  wait_for_quiet_deadline_increase_seconds : opt nat64;
+  max_number_of_neurons : opt nat64;
+  transaction_fee_e8s : opt nat64;
+  max_number_of_proposals_with_ballots : opt nat64;
+  max_age_bonus_percentage : opt nat64;
+  neuron_grantable_permissions : opt NeuronPermissionList;
+  voting_rewards_parameters : opt VotingRewardsParameters;
+  maturity_modulation_disabled : opt bool;
+  max_number_of_principals_per_neuron : opt nat64;
+};
+type Neuron = record {
+  id : opt NeuronId;
+  staked_maturity_e8s_equivalent : opt nat64;
+  permissions : vec NeuronPermission;
+  maturity_e8s_equivalent : nat64;
+  cached_neuron_stake_e8s : nat64;
+  created_timestamp_seconds : nat64;
+  source_nns_neuron_id : opt nat64;
+  auto_stake_maturity : opt bool;
+  aging_since_timestamp_seconds : nat64;
+  dissolve_state : opt DissolveState;
+  voting_power_percentage_multiplier : nat64;
+  vesting_period_seconds : opt nat64;
+  disburse_maturity_in_progress : vec DisburseMaturityInProgress;
+  followees : vec record { nat64; Followees };
+  neuron_fees_e8s : nat64;
+};
+type NeuronId = record { id : blob };
+type NeuronList = record { ogy_neurons : vec Neuron; wtn_neurons : vec Neuron };
+type NeuronPermission = record {
+  "principal" : opt principal;
+  permission_type : vec int32;
+};
+type NeuronPermissionList = record { permissions : vec int32 };
+type NeuronType = variant { Ogy; Wtn; Other : principal };
 type Operation = variant {
-  RemoveHotKey : RemoveHotKey;
-  AddHotKey : AddHotKey;
   ChangeAutoStakeMaturity : ChangeAutoStakeMaturity;
   StopDissolving : record {};
   StartDissolving : record {};
   IncreaseDissolveDelay : IncreaseDissolveDelay;
-  JoinCommunityFund : record {};
-  LeaveCommunityFund : record {};
   SetDissolveTimestamp : SetDissolveTimestamp;
 };
-type RegisterVote = record { vote : int32; proposal : opt NeuronId };
-type RemoveHotKey = record { hot_key_to_remove : opt principal };
-type RewardsRecipient = record {
-  tag : text;
-  reward_weight : nat16;
-  account : Account;
+type Proposal = record {
+  url : text;
+  title : text;
+  action : opt Action;
+  summary : text;
+};
+type ProposalId = record { id : nat64 };
+type RegisterDappCanisters = record { canister_ids : vec principal };
+type RegisterVote = record { vote : int32; proposal : opt ProposalId };
+type RemoveNeuronPermissions = record {
+  permissions_to_remove : opt NeuronPermissionList;
+  principal_id : opt principal;
 };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
-type Spawn = record {
-  percentage_to_spawn : opt nat32;
-  new_controller : opt principal;
-  nonce : opt nat64;
-};
-type Split = record { amount_e8s : nat64 };
+type Split = record { memo : nat64; amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
-type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
-service : (opt InitArgs) -> {
-  list_neurons : () -> (ListNeuronsResponse) query;
-  manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
-  manage_reward_recipients : (ManageRewardRecipientsRequest) -> (
-      ManageRewardRecipientsResponse,
-    );
-  stake_nns_neuron : () -> (StakeNnsNeuronResponse);
+type StakeSnsNeuronResponse = variant { Success : blob; InternalError : text };
+type Subaccount = record { subaccount : blob };
+type TransferSnsTreasuryFunds = record {
+  from_treasury : int32;
+  to_principal : opt principal;
+  to_subaccount : opt Subaccount;
+  memo : opt nat64;
+  amount_e8s : nat64;
+};
+type UpgradeSnsControlledCanister = record {
+  new_canister_wasm : blob;
+  mode : opt int32;
+  canister_id : opt principal;
+  canister_upgrade_arg : opt blob;
+};
+type VotingRewardsParameters = record {
+  final_reward_rate_basis_points : opt nat64;
+  initial_reward_rate_basis_points : opt nat64;
+  reward_rate_transition_duration_seconds : opt nat64;
+  round_duration_seconds : opt nat64;
+};
+service : (InitArgs) -> {
+  list_ogy_neurons : () -> (ListNeuronsResponse) query;
+  manage_sns_neuron : (ManageSnsNeuronRequest) -> (ManageSnsNeuronResponse);
+  stake_sns_neuron : () -> (StakeSnsNeuronResponse);
 }

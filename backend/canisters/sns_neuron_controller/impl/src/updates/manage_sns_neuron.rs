@@ -41,7 +41,7 @@ pub(crate) async fn manage_sns_neuron_impl(
     };
 
     match sns_governance_canister_c2c_client::manage_neuron(canister_id, &args).await {
-        // TODO: Handle the response somehow. Can I implement Debug here?
+        // FIXME: Handle the response somehow.
         Ok(_response) => {
             info!("Succesfully executed a neuron command");
             Ok(("Succesfully executed a neuron command").to_string())

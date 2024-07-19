@@ -1,13 +1,13 @@
+use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::{OgyManager, WtnManager};
-use crate::types::{
-    neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList,
-};
+// use crate::types::neuron_metrics::NeuronWithMetric;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-use ledger_utils::principal_to_legacy_account_id;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
-use types::{RewardsRecipientList, TimestampMillis};
+use types::CanisterId;
+use types::Cycles;
+use types::TimestampMillis;
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{CanisterEnv, Environment},
@@ -34,16 +34,11 @@ impl RuntimeState {
                 now: self.env.now(),
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
-                cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                cycles_balance: self.env.cycles_balance(),
             },
-            canister_default_account_id: principal_to_legacy_account_id(
-                self.env.canister_id(),
-                None,
-            )
-            .to_string(),
+
             authorized_principals: self.data.authorized_principals.clone(),
-            rewards_recipients: self.data.rewards_recipients.clone(),
-            outstanding_payments: self.data.outstanding_payments.clone(),
+            sns_rewards_canister_id: self.data.sns_rewards_canister_id,
         }
     }
 
@@ -56,10 +51,10 @@ impl RuntimeState {
 #[derive(CandidType, Serialize)]
 pub struct Metrics {
     pub canister_info: CanisterInfo,
-    pub canister_default_account_id: String,
     pub authorized_principals: Vec<Principal>,
-    pub rewards_recipients: RewardsRecipientList,
-    pub outstanding_payments: OutstandingPaymentsList,
+    pub sns_rewards_canister_id: Principal,
+    // FIXME
+    // pub neuron_manager_metrics:
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -67,7 +62,8 @@ pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
     pub memory_used: MemorySize,
-    pub cycles_balance_in_tc: f64,
+    // pub cycles_balance_in_tc: f64,
+    pub cycles_balance: Cycles,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -75,28 +71,28 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     // NOTE: it seems to be not the best practice to store the manager struct inside the state, because then it makes all the mutations more complex and harder to handle
     pub neuron_managers: NeuronManagers,
-    pub rewards_recipients: RewardsRecipientList,
-    pub outstanding_payments: OutstandingPaymentsList,
+    pub sns_rewards_canister_id: CanisterId,
 }
 
 impl Data {
-    pub fn new() -> Self {
+    pub fn new(sns_rewards_canister_id: CanisterId) -> Self {
         Self {
-            rewards_recipients: RewardsRecipientList::empty(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             neuron_managers: NeuronManagers::default(),
-            outstanding_payments: OutstandingPaymentsList::default(),
+            sns_rewards_canister_id,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Clone)]
+// Think of how to not clone it each time. Probably, the best
+// option would be to implement Rc<RefCell<T>> on top of this,
+// but I'm not sure how it would match with current memory layout
+#[derive(Serialize, Deserialize, Default)]
 pub struct NeuronManagers {
     pub timestamp: TimestampMillis,
     pub ogy: OgyManager,
     pub wtn: WtnManager,
-    // TODO: impl also other neuron manager
-    pub others: Vec<u64>,
+    pub others: Vec<Box<dyn NeuronManager>>,
 }
 
 impl NeuronManagers {
