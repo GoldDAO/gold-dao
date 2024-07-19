@@ -6,6 +6,7 @@ use types::{CanisterId, TimestampMillis};
 use utils::env::Environment;
 
 use crate::state::read_state;
+use crate::utils::ClaimRewardResult;
 use crate::utils::{calculate_available_rewards, claim_rewards, distribute_rewards, fetch_neurons};
 
 #[async_trait]
@@ -15,36 +16,36 @@ pub trait NeuronManager: Send + Sync + NeuronConfig {
         self.get_neurons_mut().all_neurons = neurons.to_vec();
         Ok(())
     }
+
     async fn fetch_and_sync_neurons(&mut self) -> Result<(), String> {
         let sns_governance_canister_id = self.get_sns_governance_canister_id();
         let is_test_mode = read_state(|s| s.env.is_test_mode());
         let canister_id = read_state(|s| s.env.canister_id());
 
-        let neurons = fetch_neurons(sns_governance_canister_id, canister_id, is_test_mode)
-            .await
-            .unwrap();
+        // Error is handled in fetch_neurons
+        let neurons = fetch_neurons(sns_governance_canister_id, canister_id, is_test_mode).await?;
         let _ = self.sync_neurons(&neurons);
         Ok(())
     }
-    async fn get_available_rewards(&self) -> Result<Nat, String> {
+
+    async fn get_available_rewards(&self) -> Nat {
         let neurons = self.get_neurons().as_ref();
-        let available_rewards = calculate_available_rewards(
+        calculate_available_rewards(
             neurons,
             self.get_sns_rewards_canister_id(),
             self.get_sns_ledger_canister_id(),
         )
-        .await;
-        Ok(available_rewards)
+        .await
+        .get_internal()
     }
-    async fn claim_rewards(&self) -> Result<(), String> {
+
+    async fn claim_rewards(&self) -> ClaimRewardResult {
         let neurons = self.get_neurons().as_ref();
-        claim_rewards(neurons, self.get_sns_ledger_canister_id()).await;
-        Ok(())
+        claim_rewards(neurons, self.get_sns_ledger_canister_id()).await
     }
+
     async fn distribute_rewards(&self) -> Result<(), String> {
-        let available_rewards = self.get_available_rewards().await.unwrap();
-        distribute_rewards(self.get_sns_ledger_canister_id(), available_rewards).await;
-        Ok(())
+        distribute_rewards(self.get_sns_ledger_canister_id()).await
     }
 }
 

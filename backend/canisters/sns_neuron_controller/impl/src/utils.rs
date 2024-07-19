@@ -37,7 +37,7 @@ pub async fn fetch_neuron_reward_balance(
     ledger_canister_id: Principal,
     ogy_sns_rewards_canister_id: Principal,
     neuron_id: &NeuronId,
-) -> Nat {
+) -> Result<Nat, String> {
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
         &(Account {
@@ -47,13 +47,14 @@ pub async fn fetch_neuron_reward_balance(
     )
     .await
     {
-        Ok(t) => t,
+        Ok(t) => Ok(t),
         Err(e) => {
-            error!(
+            let error_message = format!(
                 "Failed to fetch token balance of ledger canister id {} with ERROR : {:?}",
                 ledger_canister_id, e
             );
-            Nat::from(0u64)
+            error!("{}", error_message);
+            Err(error_message)
         }
     }
 }
@@ -124,11 +125,31 @@ pub async fn fetch_neurons(
     Ok(neurons)
 }
 
+pub enum RewardSumResult {
+    Full(Nat),
+    // Needed for update call in orer to return error
+    Partial(Nat, String),
+    Empty,
+}
+
+impl RewardSumResult {
+    pub fn get_internal(self) -> Nat {
+        match self {
+            RewardSumResult::Full(nat) => nat,
+            RewardSumResult::Partial(nat, _) => nat,
+            RewardSumResult::Empty => Nat::from(0u8),
+        }
+    }
+}
+
+// NOTE: the following function calculates the general rewards as sum of all neurons rewards.
+// If one of the rewards cannot be fetched, the general reward is calculated anyway, but it's
+// defined as RewardSumResult::Partial
 pub async fn calculate_available_rewards(
     neurons: &[Neuron],
     ogy_sns_rewards_canister_id: Principal,
     sns_ledger_canister_id: Principal,
-) -> Nat {
+) -> RewardSumResult {
     let futures: Vec<_> = neurons
         .iter()
         .filter_map(|neuron| {
@@ -141,48 +162,146 @@ pub async fn calculate_available_rewards(
     let results = join_all(futures).await;
 
     let mut available_rewards_amount: Nat = Nat::from(0u64);
-    for reward in results {
-        available_rewards_amount += reward;
+    let mut error_messages = Vec::new();
+    for result in results {
+        match result {
+            Ok(reward) => {
+                available_rewards_amount += reward;
+            }
+            Err(error) => {
+                error!("Failed to fetch neuron reward balance: {error}");
+                error_messages.push(error);
+            }
+        }
     }
 
-    available_rewards_amount
-}
-// Function to claim rewards for each neuron
-// TODO: handle an error here and make it parallel
-pub async fn claim_rewards(neurons: &[Neuron], sns_governance_canister_id: Principal) {
-    for neuron in neurons {
-        if let Some(neuron_id) = &neuron.id {
-            let args = ogy_sns_rewards_api_canister::claim_reward::Args {
-                neuron_id: neuron_id.clone(),
-                token: String::from("OGY"),
-            };
-
-            match ogy_sns_rewards_c2c_client::claim_reward(sns_governance_canister_id, &args).await
-            {
-                Ok(_) => info!("Successfully claimed rewards for neuron {}", neuron_id),
-                Err(e) => error!("Failed to claim rewards for neuron {}: {:?}", neuron_id, e),
-            }
+    if error_messages.is_empty() {
+        info!("Successfully got available rewards amount");
+        RewardSumResult::Full(available_rewards_amount)
+    } else {
+        let error_message = error_messages.join("\n");
+        // NOTE: uncomment to be able to debug the errors
+        // error!(
+        //     "Failed to get available rewards amount: {:?}",
+        //     error_message
+        // );
+        if error_messages.len() >= neurons.len() {
+            error!("Failed to get ALL neurons available rewards amount");
+            RewardSumResult::Empty
         } else {
-            error!("Neuron has no ID, cannot claim rewards");
+            error!("Failed to get SOME neurons available rewards amount");
+            RewardSumResult::Partial(available_rewards_amount, error_message)
         }
     }
 }
 
-pub async fn distribute_rewards(sns_ledger_canister_id: Principal, available_rewards_amount: Nat) {
+pub enum ClaimRewardResult {
+    Succesfull,
+    Partial(String),
+    Failed,
+}
+
+impl ClaimRewardResult {
+    pub fn is_not_failed(&self) -> bool {
+        !matches!(self, ClaimRewardResult::Failed)
+    }
+}
+
+// FIXME: handle an error like in calculate_available_rewards, use also Empty result
+pub async fn claim_rewards(
+    neurons: &[Neuron],
+    sns_governance_canister_id: Principal,
+) -> ClaimRewardResult {
+    let futures: Vec<_> = neurons
+        .iter()
+        .filter_map(|neuron| {
+            neuron.id.as_ref().map(|neuron_id| {
+                let args = ogy_sns_rewards_api_canister::claim_reward::Args {
+                    neuron_id: neuron_id.clone(),
+                    token: String::from("OGY"),
+                };
+
+                async move {
+                    match ogy_sns_rewards_c2c_client::claim_reward(
+                        sns_governance_canister_id,
+                        &args,
+                    )
+                    .await
+                    {
+                        Ok(_) => Ok(()),
+                        Err(e) => Err(format!(
+                            "Failed to claim rewards for Neuron ID {}: {:?}",
+                            neuron_id, e
+                        )),
+                    }
+                }
+            })
+        })
+        .collect();
+
+    let results = join_all(futures).await;
+
+    let mut error_messages = Vec::new();
+    for result in results {
+        if let Err(e) = result {
+            error_messages.push(e);
+        }
+    }
+
+    if error_messages.is_empty() {
+        info!("Successfully claimed rewards for all neurons");
+        ClaimRewardResult::Succesfull
+    } else {
+        // NOTE: uncomment to be able to debug the errors
+        // let error_message = error_messages.join("\n");
+        // error!(
+        //     "Failed to claim rewards for some neurons:\n{}",
+        //     error_message
+        // );
+        error!("Failed to claim rewards for neurons");
+        ClaimRewardResult::Partial(error_messages.join("\n"))
+    }
+}
+
+// FIXME: think of outstanding payments struct in this context
+pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(), String> {
     // Transfer all the tokens to sns_rewards to be distributed
-    match transfer_token(
-        [0; 32],
-        SNS_REWARDS_CANISTER_ID.into(),
+    match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         sns_ledger_canister_id,
-        available_rewards_amount,
+        &(Account {
+            owner: ic_cdk::api::id(),
+            subaccount: None,
+        }),
     )
     .await
     {
-        Ok(_) => {
-            info!("Successfully transferred rewards");
+        Ok(balance) => {
+            match transfer_token(
+                [0; 32],
+                SNS_REWARDS_CANISTER_ID.into(),
+                sns_ledger_canister_id,
+                balance,
+            )
+            .await
+            {
+                Ok(_) => {
+                    info!("Successfully transferred rewards");
+                    Ok(())
+                }
+                Err(error_message) => {
+                    let error_message = format!("Error during transfer rewards: {}", error_message);
+                    error!(error_message);
+                    Err(error_message)
+                }
+            }
         }
-        Err(error_message) => {
-            error!("Error during transfer: {}", error_message);
+        Err(e) => {
+            let error_message = format!(
+                "Failed to fetch token balance of sns_neuron_controller from ledger canister id {} with ERROR : {:?}",
+                sns_ledger_canister_id, e
+            );
+            error!("{}", error_message);
+            Err(error_message)
         }
     }
 }
