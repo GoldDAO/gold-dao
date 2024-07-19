@@ -135,7 +135,7 @@ $[[ inputs.src-folder ]] production build:
     ENV: "prod" # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: deployment
+    deployment_tier: production
     action: prepare
 
 
