@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { data1 } from '../../utils/datas';
+import {useEffect, useState} from 'react';
+import {data1} from '../../utils/datas';
 
 import DataCardCopy from './DataCardCopy';
 import LoaderDataCard from './LoaderDataCard';
@@ -11,20 +11,20 @@ import useServices from '../../hooks/useServices';
 import ModalChartMobile from '../shared/modal/modal-chart-mobile';
 
 export default function GLDGovInfo() {
-  const { gldGovTotalSupply, gldGovPrice } = useServices();
-  const [totalSupply, setTotalSupply] = useState({ loading: true, amount: 0 });
-  const [price, setPrice] = useState({ loading: true, amount: 0 });
-  const [marketcap, setMarketcap] = useState({ loading: true, amount: 0 });
+  const {gldGovTotalSupply, gldGovPrice} = useServices();
+  const [totalSupply, setTotalSupply] = useState({loading: true, amount: 0});
+  const [price, setPrice] = useState({loading: true, amount: 0});
+  const [marketcap, setMarketcap] = useState({loading: true, amount: 0});
   const [infoModal, setInfoModal] = useState(null);
   // getters
   useEffect(() => {
     (async () => {
       const amount = await gldGovTotalSupply();
-      setTotalSupply({ loading: false, amount });
+      setTotalSupply({loading: false, amount});
     })();
     (async () => {
       const amount = await gldGovPrice();
-      setPrice({ loading: false, amount });
+      setPrice({loading: false, amount});
     })();
   }, []);
 
@@ -42,35 +42,35 @@ export default function GLDGovInfo() {
 
   return (
     <>
-      <section className="grid grid-cols-1 lg:grid-cols-3 w-full gap-2">
+      <section className='grid grid-cols-1 lg:grid-cols-3 w-full gap-2'>
         {allDataLoaded ? (
           <>
             <DataCardCopy
-              title="Total GLDGov Supply"
-              image="svg/g-logo.svg"
-              info="Total amount of GLDGov tokens in existence..."
+              title='Total GLDGov Supply'
+              image='svg/g-logo.svg'
+              info='Total amount of GLDGov tokens in existence..'
               amount={totalSupply.amount}
-              className="basis-1/3"
+              className='basis-1/3'
               setInfoModal={setInfoModal}
               data={data1}
               openModal={false}
             />
             <DataCardCopy
-              title="GLDGov Price"
+              title='GLDGov Price'
               isPrice={true}
-              info="Average price of GLDGov on the market."
+              info='Average price of GLDGov on the market.'
               amount={price.amount}
-              className="basis-1/3"
+              className='basis-1/3'
               setInfoModal={setInfoModal}
               data={data1}
               openModal={false}
             />
             <DataCardCopy
-              title="GLDGov Marketcap"
+              title='GLDGov Marketcap'
               isPrice={true}
-              info="Total amount of GLDGov multiplied by the average price."
+              info='Total amount of GLDGov multiplied by the average price.'
               amount={marketcap.amount}
-              className="basis-1/3"
+              className='basis-1/3'
               setInfoModal={setInfoModal}
               data={data1}
               openModal={false}
@@ -78,22 +78,18 @@ export default function GLDGovInfo() {
           </>
         ) : (
           <>
-            <LoaderDataCard className="basis-1/3" />
-            <LoaderDataCard className="basis-1/3" />
-            <LoaderDataCard className="basis-1/3" />
+            <LoaderDataCard className='basis-1/3' />
+            <LoaderDataCard className='basis-1/3' />
+            <LoaderDataCard className='basis-1/3' />
           </>
         )}
       </section>
-      <Modal
-        title={`chart ${infoModal?.title}`}
-        idModal="chartmodal"
-        amount={infoModal?.amount}
-      >
+      <Modal title={`chart ${infoModal?.title}`} idModal='chartmodal' amount={infoModal?.amount}>
         <ModalChart name={infoModal?.title} />
       </Modal>
       <Modal
         title={`chart ${infoModal?.title}`}
-        idModal="chartmodalheader"
+        idModal='chartmodalheader'
         amount={infoModal?.amount}
       >
         <ModalChartMobile name={infoModal?.title} />
