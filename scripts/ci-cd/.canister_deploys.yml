@@ -14,7 +14,7 @@ spec:
 ---
 # Rust canisters deployments
 
-$[[ inputs.src-folder ]] staging:
+$[[ inputs.src-folder ]] staging deploy:
   stage: deploy
   resource_group: backend canister staging deployment
   rules:
@@ -35,7 +35,7 @@ $[[ inputs.src-folder ]] staging:
     deployment_tier: staging
     action: start
 
-$[[ inputs.src-folder ]] production:
+$[[ inputs.src-folder ]] production deploy:
   stage: deploy
   resource_group: backend canister production deployment
   rules:
