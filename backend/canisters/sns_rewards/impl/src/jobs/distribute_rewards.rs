@@ -73,7 +73,7 @@ fn is_distribution_allowed(initial_run_time: TimestampMillis) -> bool {
             return false;
         }
     };
-    let is_distribution_time_valid = distribution_interval.is_within_interval(
+    let is_distribution_time_valid = distribution_interval.is_within_weekly_interval(
         initial_run_time.clone()
     );
 
