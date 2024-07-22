@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{ Duration, SystemTime };
 
 use candid::{ Nat, Principal };
 use canister_time::{ DAY_IN_MS, HOUR_IN_MS };
@@ -43,15 +43,14 @@ fn test_distribute_rewards_happy_path() {
     // 1. Distribute rewards
     // ********************************
 
+    // TRIGGER - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+    tick_n_blocks(&test_env.pic, 10);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 30);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
     // 2. Check Neuron sub account got paid correctly
@@ -76,7 +75,6 @@ fn test_distribute_rewards_happy_path() {
     // 3. Distribute rewards
     // ********************************
 
-    test_env.simulate_neuron_voting(3);
     setup_reward_pools(
         &mut test_env.pic,
         &test_env.sns_gov_canister_id,
@@ -85,11 +83,13 @@ fn test_distribute_rewards_happy_path() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // Trigger - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(3);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     let neuron_sub_account = Account {
@@ -170,15 +170,14 @@ fn test_distribute_rewards_with_no_rewards() {
     // 2. Distribute rewards
     // ********************************
 
+    // TRIGGER - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+    tick_n_blocks(&test_env.pic, 10);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 30);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // there should be no historic or active rounds for ICP because it didn't have any rewards to pay out
     let res = get_historic_payment_round(
@@ -221,14 +220,13 @@ fn test_distribute_rewards_with_no_rewards() {
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64
     );
-    // increase maturity maturity
+    // Trigger - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(3);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 1)
@@ -304,16 +302,14 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     // 2. Distribute rewards
     // ********************************
 
-    // increase maturity maturity
+    // TRIGGER - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+    tick_n_blocks(&test_env.pic, 10);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 30);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // there should be no historic payment round for ICP
     let res = get_historic_payment_round(
@@ -352,6 +348,7 @@ fn test_distribute_rewards_with_not_enough_rewards() {
 #[test]
 fn test_distribute_rewards_adds_to_history_correctly() {
     let mut test_env = default_test_setup();
+    // test_env.pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)); // Wednesday Jun 19, 2024, 6:00:00 AM
 
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
     let ogy_ledger_id = test_env.token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
@@ -364,19 +361,14 @@ fn test_distribute_rewards_adds_to_history_correctly() {
 
     let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
 
-    // ********************************
-    // 1. Distribute rewards
-    // ********************************
-
+    // TRIGGER - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+    tick_n_blocks(&test_env.pic, 10);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 30);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
     // 2. Check the history
@@ -398,7 +390,6 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // 3. Distribute rewards
     // ********************************
 
-    test_env.simulate_neuron_voting(3);
     setup_reward_pools(
         &mut test_env.pic,
         &test_env.sns_gov_canister_id,
@@ -407,11 +398,13 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // Trigger - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(3);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -455,14 +448,14 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u128 - 200_000u128
     ).unwrap();
     tick_n_blocks(&test_env.pic, 10);
-    // increase maturity of neurons
-    test_env.simulate_neuron_voting(4);
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // Trigger - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(4);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -485,7 +478,7 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // 7. Distribute rewards
     // ********************************
     // increase maturity of neurons
-    test_env.simulate_neuron_voting(5);
+
     // give all reward pools tokens
     setup_reward_pools(
         &mut test_env.pic,
@@ -507,11 +500,13 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u128 - 200_000u128
     ).unwrap();
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // Trigger - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(5);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -534,7 +529,6 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // 9. Distribute rewards
     // ********************************
 
-    test_env.simulate_neuron_voting(6);
     setup_reward_pools(
         &mut test_env.pic,
         &test_env.sns_gov_canister_id,
@@ -543,11 +537,13 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         100_000_000_000u64
     );
 
-    // TRIGGER - synchronize_neurons and distribute
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    // Trigger - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(6);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -576,7 +572,6 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // ********************************
     // 2. Distribute rewards - first week
     // ********************************
-    test_env.simulate_neuron_voting(2);
     tick_n_blocks(&test_env.pic, 10);
     setup_reward_pools(
         &mut test_env.pic,
@@ -585,18 +580,19 @@ fn test_distribution_occurs_within_correct_time_intervals() {
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64
     );
+    // TRIGGER - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
     tick_n_blocks(&test_env.pic, 10);
 
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 5));
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 30);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
     // 2. Distribute rewards - second week
     // ********************************
-    test_env.simulate_neuron_voting(3);
+
     tick_n_blocks(&test_env.pic, 2);
     setup_reward_pools(
         &mut test_env.pic,
@@ -607,10 +603,12 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     );
     tick_n_blocks(&test_env.pic, 10);
 
-    // TRIGGER - distribute_rewards
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1));
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    test_env.simulate_neuron_voting(3);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -686,7 +684,6 @@ fn test_distribution_interval_is_consistant_across_upgrades() {
     // ********************************
     // 2. Distribute rewards - first week
     // ********************************
-    test_env.simulate_neuron_voting(2);
     tick_n_blocks(&test_env.pic, 10);
     setup_reward_pools(
         &mut test_env.pic,
@@ -697,17 +694,17 @@ fn test_distribution_interval_is_consistant_across_upgrades() {
     );
     tick_n_blocks(&test_env.pic, 10);
 
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 2));
-    tick_n_blocks(&test_env.pic, 1);
+    // TRIGGER - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(2);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+    tick_n_blocks(&test_env.pic, 10);
 
     // trigger the upgrade
     test_env.upgrade_rewards_canister();
 
-    tick_n_blocks(&test_env.pic, 10);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS * 4));
-    tick_n_blocks(&test_env.pic, 1);
-    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 22));
-    tick_n_blocks(&test_env.pic, 10);
+    // TRIGGER - distribution
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+    tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
     // 3. There should be 1 historic payment round even though we upgraded

@@ -2,6 +2,7 @@ use crate::state::mutate_state;
 use crate::state::read_state;
 use crate::State;
 use canister_time::run_now_then_interval;
+use canister_tracing_macros::trace;
 use ic_ledger_types::{
     AccountIdentifier, BlockIndex, Memo, Subaccount, Timestamp, Tokens, TransferArgs,
 };
@@ -31,6 +32,7 @@ enum Action {
     None,
 }
 
+#[derive(Debug)]
 struct BurnIcpArgs {
     amount: Tokens,
     this_canister_id: CanisterId,
@@ -39,6 +41,7 @@ struct BurnIcpArgs {
     now: TimestampMillis,
 }
 
+#[derive(Debug)]
 struct NotifyTopUpDetails {
     this_canister_id: CanisterId,
     cmc: CanisterId,
@@ -79,6 +82,7 @@ fn get_next_action(state: &State) -> Action {
     }
 }
 
+#[trace]
 async fn burn_icp(burn_args: BurnIcpArgs) {
     info!(%burn_args.amount, "Burning ICP into cycles");
 
@@ -118,6 +122,7 @@ async fn burn_icp(burn_args: BurnIcpArgs) {
     }
 }
 
+#[trace]
 async fn notify_cmc(notify_details: NotifyTopUpDetails) {
     let response = cycles_minting_canister_c2c_client::notify_top_up(
         notify_details.cmc,

@@ -23,28 +23,26 @@ stages:
   - preparation
   - lint
   - test
-  - build
   - integration_testing
+  - build
   - deploy
 
 include:
   # Templates:
   - local: scripts/ci-cd/.node_template.yml
   - local: scripts/ci-cd/.rust_template.yml
+  - local: scripts/ci-cd/.dfx_templates.yml
   # Frontend linters:
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
-      src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_explorer
-  # - local: scripts/ci-cd/.frontend_linter.yml
-  #   inputs:
-  #     src-folder: gld_dashboard
-  # Unit tests coverage
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gld_dashboard
+  # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_core
@@ -63,29 +61,28 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: cycles_manager
+  # Integration tests
+  - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
+      src-folder: cycles_manager
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
       src-folder: gldt_core
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: icp_neuron
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: token_metrics
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: management
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: cycles_manager
-  # Frontend builds
-  - local: scripts/ci-cd/.frontend_builds.yml
+      src-folder: icp_neuron
+  - local: scripts/ci-cd/.canister_builds.yml
     inputs:
-      src-folder: gldt_swap_app
+      src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: token_metrics
+  # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gldt_landing_page
@@ -95,8 +92,30 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
-  # Deployments
-  - local: scripts/ci-cd/.dfx_templates.yml
+  # Backend deployments
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: cycles_manager
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_core
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: management
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: icp_neuron
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: token_metrics
+  # Frontend deployments
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: gld_dashboard
+      canister-id: "mpece-iqaaa-aaaal-qizma-cai"
 
 ################################################################################
 # Cache preparation
@@ -105,20 +124,13 @@ node cache:
   stage: preparation
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "./frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
     - node --version
     - npm --version
-
-cargo cache:
-  stage: preparation
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  extends: .rust template
-  script:
-    - cargo version
-    - cargo verify-project
 
 ################################################################################
 # Linters
@@ -132,15 +144,13 @@ rust lint:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Cargo.{lock,toml}"
-        - "backend/canisters/{gldt_core,gldt_core/impl,gldt_core/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{icp_neuron,icp_neuron/impl,icp_neuron/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{token_metrics,token_metrics/impl,token_metrics/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{sns_rewards,sns_rewards/impl,sns_rewards/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{management,management/impl,management/impl/**}/*.{rs,toml,lock}"
-        - "backend/canisters/{cycles_manager,cycles_manager/impl,cycles_manager/impl/**}/*.{rs,toml,lock}"
+        - "backend/**/*.{rs,toml,lock,md}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
+      changes:
+        - "Cargo.{lock,toml}"
+        - "backend/**/*.{rs,toml,lock,md}"
   extends: .rust template
   script:
     - cargo clippy
@@ -157,177 +167,91 @@ rust lint:
 
 # See includes above for canister builds
 
-generate test declarations:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "gldt_core test build",
-          "icp_neuron test build",
-          "token_metrics test build",
-          "sns_rewards test build",
-          "management test build",
-          "cycles_manager test build",
-        ]
-  script:
-    - dfx generate
-    - scripts/refactor_nft_declarations.sh
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-TEST-declarations"
-    paths:
-      - backend/**/declarations
-    expire_in: 1 day
-
-generate declarations:
-  stage: build
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-      when: never
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME =~ '/^(?:gldt_landing_page|gldt_explorer|gldt_swap_app)-v\d+\.\d+\.\d+$/'
-      needs:
-        [
-          "gldt_core canister build",
-          "icp_neuron canister build",
-          "token_metrics canister build",
-          "sns_rewards canister build",
-          "management canister build",
-          "cycles_manager canister build",
-        ]
-  script:
-    - dfx generate
-    - scripts/refactor_nft_declarations.sh
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-declarations"
-    paths:
-      - backend/**/api
-    expire_in: 6 months
-
-# See includes above for frontend builds
-
 ################################################################################
 # Integration tests
 ################################################################################
-integration tests:
-  stage: integration_testing
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "sns_rewards integration-test build",
-          "sns_rewards tests",
-          "cycles_manager test build",
-          "cycles_manager tests",
-        ]
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["sns_rewards integration-test build", "cycles_manager canister build"] 
-    - if: $CI_OPEN_MERGE_REQUESTS
-      when: never
-  extends: .rust template
-  tags:
-    - dind
-  services:
-    - docker:dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
-  script:
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-linux.gz
-    - gzip -d pocket-ic.gz
-    - chmod +x ./pocket-ic
-    - mv ./pocket-ic ./backend/integration_testing/pocket-ic
-    - ulimit -n 202400
-    - ulimit -f 2024000 
-    - cargo tarpaulin -p integration_testing -j 2 --lib --no-fail-fast -o Xml
-  coverage: /^\d+.\d+% coverage/
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cobertura.xml
+# integration tests trigger:
+#   stage: integration_testing
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+#       changes:
+#         - "backend/libraries/**/*.{rs,toml,lock,md}"
+#         - "backend/external_canisters/**/*.{rs,toml,lock,md}"
+#         - "backend/canisters/**/*.{rs,toml,lock,md}"
+#       when: manual
+#   script:
+#     - echo "Running integration tests"
+
+# integration tests:
+#   stage: integration_testing
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z_]+-v\d+\.\d+\.\d+$/'
+#       when: always
+#     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_PIPELINE_SOURCE == "merge_request_event"
+#       changes:
+#         - "backend/libraries/**/*.{rs,toml,lock,md}"
+#         - "backend/external_canisters/**/*.{rs,toml,lock,md}"
+#         - "backend/canisters/**/*.{rs,toml,lock,md}"
+#   needs:
+#     [
+#     "cycles_manager integration-test build",
+#     "gldt_core integration-test build",
+#     "icp_neuron integration-test build",
+#     "management integration-test build",
+#     "sns_rewards integration-test build",
+#     "token_metrics integration-test build"
+#     ]
+#   extends: .rust template
+#   tags:
+#     - dind
+#   services:
+#     - docker:dind
+#   variables:
+#     DOCKER_TLS_CERTDIR: "/certs"
+#     DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
+#   script:
+#     - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-linux.gz
+#     - gzip -d pocket-ic.gz
+#     - chmod +x ./pocket-ic
+#     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
+#     - ulimit -n 202400
+#     - ulimit -f 2024000
+#     - cargo test -p integration_testing
 
 ################################################################################
 # Deployments
 ################################################################################
-local deploy and tests:
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      needs:
-        [
-          "gldt_core test build",
-          "icp_neuron test build",
-          "gldt_swap_app test build",
-          "gldt_landing_page test build",
-          "gldt_explorer test build",
-          "gld_dashboard test build",
-          "token_metrics test build",
-          "sns_rewards test build",
-          "management test build",
-          "cycles_manager test build",
-          "integration tests",
-        ]
-  before_script:
-    - dfx --version
-    - dfx start --clean --background --artificial-delay 40
-  script:
-    - NETWORK='local' scripts/local-deploy.sh
-    # TODO: Some bash script to provision a wallet and test a few interactions with the canisters
-  after_script:
-    - cat canister_ids.json
-    - dfx stop
 
-check canister ids:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-    - if: $CI_COMMIT_TAG =~ '/^(core)|(icp_neuron)|(ledger)|(indexer)|(token_metrics)|(sns_rewards)|(management)|(cycles_manager)-v\d+\.\d+\.\d+$/'
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/pre-deploy.sh --network $TARGET_NETWORK
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
-    paths:
-      - canister_ids.json
-    expire_in: 1 hour
-
-.asset canisters upgrade proposal tests:
-  stage: deploy
-  variables:
-    CANISTER_NAME: "gldt_swap_app"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
-      needs: ["swap_app test build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: testid.pem
-        TEST_QUILL: "--dry-run"
-  cache:
-    policy: pull
-  before_script:
-    - dfx identity new --storage-mode plaintext testid
-    - dfx identity use testid
-    - dfx identity get-principal
-    - dfx start --clean --background --artificial-delay 40
-    - dfx identity export testid > testid.pem
-  script:
-    - dfx canister create --all
-    - export GLDT_FRONT_ID=$(dfx canister id gldt_swap_app)
-    - !reference [.asset canister staging deploy, script]
-  after_script:
-    - dfx stop
-  environment:
-    name: swap app
-    deployment_tier: staging
-    url: $SWAP_APP_URL
-    action: verify
+# .asset canisters upgrade proposal tests:
+#   stage: deploy
+#   variables:
+#     CANISTER_NAME: "gldt_swap_app"
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+#       needs: ["swap_app test build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: testid.pem
+#         TEST_QUILL: "--dry-run"
+#   cache:
+#     policy: pull
+#   before_script:
+#     - dfx identity new --storage-mode plaintext testid
+#     - dfx identity use testid
+#     - dfx identity get-principal
+#     - dfx start --clean --background --artificial-delay 40
+#     - dfx identity export testid > testid.pem
+#   script:
+#     - dfx canister create --all
+#     - export GLDT_FRONT_ID=$(dfx canister id gldt_swap_app)
+#     - !reference [.asset canister staging deploy, script]
+#   after_script:
+#     - dfx stop
+#   environment:
+#     name: swap app
+#     deployment_tier: staging
+#     url: $SWAP_APP_URL
+#     action: verify
 
 # gldt swap app staging:
 #   stage: deploy
@@ -455,418 +379,102 @@ check canister ids:
 #     url: https://explorer.gldt.org/
 #     action: start
 
-gld dashboard staging:
-  stage: deploy
-  resource_group: frontend staging deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["gld_dashboard staging build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: "${PEM_FILE_STAGING}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister staging deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: staging
-    url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
-    action: start
-
-
-gld dashboard preprod:
-  stage: deploy
-  resource_group: frontend preprod deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      needs: ["gld_dashboard preprod build"]
-      variables:
-        TARGET_NETWORK: preprod
-        PEM_FILE: "${PEM_FILE_STAGING}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister preprod deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: staging
-    url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
-    action: start
-
-gld dashboard production:
-  stage: deploy
-  resource_group: frontend production deployment
-  variables:
-    CANISTER_NAME: "gld_dashboard"
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
-      changes:
-        - "gld_dashboard/*.{js,json}"
-        - "gld_dashboard/{**,**/**,**/**/**}/*.{js,jsx,md,mdx,css,html,svg}"
-      needs: ["gld_dashboard production build"]
-      variables:
-        TARGET_NETWORK: ic
-        PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - !reference [.asset canister production deploy, script]
-  environment:
-    name: gld dashboard
-    deployment_tier: production
-    url: https://dashboard.gold-dao.org/
-    action: start
-
-.backend canisters upgrade proposal tests:
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
-      needs: ["gldt_core test build"]
-      variables:
-        TARGET_NETWORK: staging
-        PEM_FILE: testid.pem
-  cache:
-    policy: pull
-  before_script:
-    - dfx identity new --storage-mode plaintext testid
-    - dfx identity use testid
-    - dfx identity get-principal
-    - dfx start --clean --background --artificial-delay 40
-    - dfx identity export testid > testid.pem
-  script:
-    - dfx canister create --all
-    - export GLDT_CORE_ID=$(dfx canister id gldt_core)
-    - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
-  after_script:
-    - dfx stop
-  environment:
-    name: gldt_core
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
-    action: verify
-
-gldt core staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["gldt_core canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-gldt-core.sh --reinstall $TARGET_NETWORK
-  environment:
-    name: gldt_core
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
-    action: start
-
-gldt core:
-  stage: deploy
-  resource_group: backend canister production deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^core-v\d+\.\d+\.\d+$/'
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["gldt_core canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-gldt-core.sh $TARGET_NETWORK
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-canister-ids"
-    paths:
-      - canister_ids.json
-    expire_in: 6 months
-  environment:
-    name: gldt_core
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m5bu4-7qaaa-aaaap-abrxq-cai
-    action: start
-
-icp neuron staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["icp_neuron canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-icp-neuron.sh --reinstall $TARGET_NETWORK
-  environment:
-    name: icp_neuron
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j2neh-vqaaa-aaaal-aduxq-cai
-    action: start
-
-icp neuron:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^icp_neuron-v\d+\.\d+\.\d+$/'
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["icp_neuron canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-icp-neuron.sh $TARGET_NETWORK
-  environment:
-    name: icp_neuron
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=j4jiq-sqaaa-aaaap-ab23a-cai
-    action: start
-
-gldt ledger staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/deploy-ledger.sh $TARGET_NETWORK
-  environment:
-    name: gldt_ledger
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=6uad6-fqaaa-aaaam-abovq-cai
-    action: start
-
-gldt ledger:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^ledger-v\d+\.\d+\.\d+$/'
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/deploy-ledger.sh $TARGET_NETWORK
-  environment:
-    name: gldt_ledger
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oh54a-baaaa-aaaap-abryq-cai
-    action: start
-
-gldt ledger indexer staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/deploy-ledger-indexer.sh $TARGET_NETWORK
-  environment:
-    name: gldt_ledger_indexer
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=wusb2-uiaaa-aaaao-a2lca-cai
-    action: start
-
-gldt ledger indexer:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^indexer-v\d+\.\d+\.\d+$/'
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - scripts/deploy-ledger-indexer.sh $TARGET_NETWORK
-  environment:
-    name: gldt_ledger_indexer
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=oo6x4-xiaaa-aaaap-abrza-cai
-    action: start
-
-token metrics staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs: ["token_metrics canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-token-metrics.sh $TARGET_NETWORK
-  environment:
-    name: token_metrics
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=yfjcz-3iaaa-aaaap-accjq-cai
-    action: start
-
-token metrics:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^token_metrics-v\d+\.\d+\.\d+$/'
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs: ["token_metrics canister build", "check canister ids"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-token-metrics.sh $TARGET_NETWORK
-  environment:
-    name: token_metrics
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=teiwz-pqaaa-aaaap-ag7hq-cai
-    action: start
-
-sns rewards staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-sns-rewards.sh $TARGET_NETWORK
-  environment:
-    name: sns_rewards
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=2f5ll-gqaaa-aaaak-qcfuq-cai
-    action: start
-
-sns rewards:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^sns_rewards-v\d+\.\d+\.\d+$/'
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs:
-    ["sns_rewards canister build", "check canister ids", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-sns-rewards.sh $TARGET_NETWORK
-  environment:
-    name: sns_rewards
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=iyehc-lqaaa-aaaap-ab25a-cai
-    action: start
-
-management staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs:
-    ["management canister build", "check canister ids", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-management.sh $TARGET_NETWORK
-  environment:
-    name: management
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=t5uzw-sqaaa-aaaan-qmoaq-cai
-    action: start
-
-management prod:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_TAG =~ '/^management-v\d+\.\d+\.\d+$/'
-      when: manual
-  variables:
-    TARGET_NETWORK: ic
-    PEM_FILE: "${PEM_FILE_PRODUCTION}"
-  needs:
-    ["management canister build", "check canister ids", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-management.sh $TARGET_NETWORK
-  environment:
-    name: management
-    deployment_tier: production
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=g5je6-yaaaa-aaaap-ahkza-cai
-    action: start
-
-cycles manager staging:
-  stage: deploy
-  resource_group: backend canister staging deployment
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-  variables:
-    TARGET_NETWORK: staging
-    PEM_FILE: "${PEM_FILE_STAGING}"
-  needs:
-    ["cycles_manager canister build", "check canister ids", "integration tests"]
-  before_script:
-    - !reference [.import dfx identity, before_script]
-  script:
-    - . scripts/deploy-cycles-manager.sh $TARGET_NETWORK
-  environment:
-    name: cycles_manager
-    deployment_tier: staging
-    url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=y4bmn-taaaa-aaaak-qillq-cai
-    action: start
-
-# cycles manager:
+# gld dashboard staging:
 #   stage: deploy
-#   resource_group: backend canister staging deployment
-#   rules:
-#     - if: $CI_COMMIT_TAG =~ '/^cycles_manager-v\d+\.\d+\.\d+$/'
-#       when: manual
+#   resource_group: frontend staging deployment
 #   variables:
-#     TARGET_NETWORK: ic
-#     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-#   needs:
-#     ["cycles_manager canister build", "check canister ids", "integration tests"]
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard staging build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: "${PEM_FILE_STAGING}"
 #   before_script:
 #     - !reference [.import dfx identity, before_script]
 #   script:
-#     - . scripts/deploy-cycles-manager.sh $TARGET_NETWORK
+#     - !reference [.asset canister staging deploy, script]
 #   environment:
-#     name: cycles_manager
-#     deployment_tier: production
-#     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=atslz-hiaaa-aaaam-acq6q-cai
+#     name: gld dashboard
+#     deployment_tier: staging
+#     url: https://mpece-iqaaa-aaaal-qizma-cai.icp0.io/
 #     action: start
+
+# gld dashboard preprod:
+#   stage: deploy
+#   resource_group: frontend preprod deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard preprod build"]
+#       variables:
+#         TARGET_NETWORK: preprod
+#         PEM_FILE: "${PEM_FILE_STAGING}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister preprod deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: staging
+#     url: https://pmjzm-tyaaa-aaaan-qmmda-cai.icp0.io/
+#     action: start
+
+# gld dashboard production:
+#   stage: deploy
+#   resource_group: frontend production deployment
+#   variables:
+#     CANISTER_NAME: "gld_dashboard"
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ '/^gld_dashboard-v\d+\.\d+\.\d+$/'
+#       changes:
+#         - "client/gld_dashboard/*.{js,json}"
+#         - "client/gld_dashboard/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+#       needs: ["gld_dashboard production build"]
+#       variables:
+#         TARGET_NETWORK: ic
+#         PEM_FILE: "${PEM_FILE_PRODUCTION}"
+#   before_script:
+#     - !reference [.import dfx identity, before_script]
+#   script:
+#     - !reference [.asset canister production deploy, script]
+#   environment:
+#     name: gld dashboard
+#     deployment_tier: production
+#     url: https://dashboard.gold-dao.org/
+#     action: start
+
+# .backend canisters upgrade proposal tests:
+#   stage: deploy
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+#       needs: ["gldt_core test build"]
+#       variables:
+#         TARGET_NETWORK: staging
+#         PEM_FILE: testid.pem
+#   cache:
+#     policy: pull
+#   before_script:
+#     - dfx identity new --storage-mode plaintext testid
+#     - dfx identity use testid
+#     - dfx identity get-principal
+#     - dfx start --clean --background --artificial-delay 40
+#     - dfx identity export testid > testid.pem
+#   script:
+#     - dfx canister create --all
+#     - export GLDT_CORE_ID=$(dfx canister id gldt_core)
+#     - . scripts/deploy-gldt-core.sh --quill-test --reinstall $TARGET_NETWORK
+#   after_script:
+#     - dfx stop
+#   environment:
+#     name: gldt_core
+#     deployment_tier: staging
+#     url: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=m45be-jaaaa-aaaak-qcgnq-cai
+#     action: verify
