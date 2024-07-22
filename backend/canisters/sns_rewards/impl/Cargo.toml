@@ -39,4 +39,4 @@ num-bigint = {workspace = true}
 sns_rewards_api_canister = { path = "../api" }
 candid_gen = { path = "../../../libraries/candid_gen" }
 time = { workspace = true }
-
+ic0 = "0.23.0"
