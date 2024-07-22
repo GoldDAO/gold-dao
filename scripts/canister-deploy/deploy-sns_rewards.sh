@@ -68,9 +68,9 @@ REINSTALL_ARGS='(record {
   sns_gov_canister_id = principal "'"$SNS_GOVERNANCE_CANISTER_ID"'"
 })'
 
-UPGRADE_ARGS=''
+UPGRADE_ARGS='()'
 
-[ -v REINSTALL ] && ARGS = $REINSTALL_ARGS || ARGS = $UPGRADE_ARGS;
+[ -v REINSTALL ] && ARGS=$REINSTALL_ARGS || ARGS=$UPGRADE_ARGS;
 
 echo "Deployment arguments: \n" $ARGS
 

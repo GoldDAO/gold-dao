@@ -17,6 +17,7 @@ This includes fixes and improvements
 - sns_rewards canister ugprade via SNS proposal
 
 #### Fixed
+
 - **History overwrite** : the history would sometimes be overwritten for early distributions, although this isn't a problem now, we have changed how history is added and added unit tests to make sure historic distributions are added to the history state correctly.
 
 ### [1.0.0] - 2024-04-18
