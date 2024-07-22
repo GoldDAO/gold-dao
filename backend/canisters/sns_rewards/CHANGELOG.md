@@ -23,6 +23,7 @@ This includes fixes and improvements
 ### [1.0.0] - 2024-04-18
 
 #### Description
+
 This marks the initial release of SNS Rewards (sns_rewards canister). SNS Rewards calculates the contribution of each GLDGov neuron as a percentage of the total over a specified period. Subsequently, it transfers the DAO's treasury neuron rewards based on these percentages.
 
 #### Added

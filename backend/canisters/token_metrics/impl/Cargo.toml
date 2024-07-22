@@ -19,15 +19,12 @@ canister_state_macros = { path = "../../../libraries/canister_state_macros" }
 canister_time = { path = "../../../libraries/canister_time" }
 canister_tracing_macros = { path = "../../../libraries/canister_tracing_macros" }
 futures = "0.3"
-hex = { workspace = true }
 http_request = { path = "../../../libraries/http_request" }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
-ic-cdk-timers = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
-serde_bytes = { workspace = true }
 serde_json = { workspace = true }
 serializer = { path = "../../../libraries/serializer" }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
