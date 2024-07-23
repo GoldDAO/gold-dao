@@ -7,7 +7,7 @@ const useManagement = () => {
     try {
       const result = await management.get_gld_dashboard_maintenance_mode();
       if (process.env.ENV !== 'prod') {
-        return true;
+        return false;
       }
       return result;
     } catch (err) {
