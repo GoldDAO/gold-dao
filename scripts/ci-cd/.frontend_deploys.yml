@@ -64,6 +64,7 @@ $[[ inputs.src-folder ]] production deploy:
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      when: manual
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
