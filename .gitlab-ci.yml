@@ -115,7 +115,7 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gld_dashboard
-      canister-id: "mpece-iqaaa-aaaal-qizma-cai"
+      sns-controlled: true
 
 ################################################################################
 # Cache preparation

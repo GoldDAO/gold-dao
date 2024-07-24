@@ -3,8 +3,9 @@ spec:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
       options: ["gldt_landing_page", "gldt_explorer", "gld_dashboard", "gldt_swap_app"]
-    canister-id:
-      description: The canister id of the frontend
+    sns-controlled:
+      description: Whether or not the canister is SNS controlled
+      options: [true, false]
 ---
 
 # STAGING AND PREPROD DEPLOYMENT
@@ -26,6 +27,7 @@ $[[ inputs.src-folder ]] staging deploy:
   extends: .staging deploy template
   variables:
     TARGET_NETWORK: staging
+    IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
   needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
      - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
@@ -55,6 +57,7 @@ $[[ inputs.src-folder ]] production deploy:
   resource_group: frontend production deployment
   variables:
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
+    IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
     TARGET_NETWORK: ic
   needs: ["$[[ inputs.src-folder ]] production build"]
   rules:
