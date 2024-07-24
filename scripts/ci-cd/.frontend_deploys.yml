@@ -8,6 +8,9 @@ spec:
       options: ["true", "false"]
 ---
 
+variables:
+  DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
+
 # STAGING AND PREPROD DEPLOYMENT
 
 .staging deploy template:
@@ -36,7 +39,13 @@ $[[ inputs.src-folder ]] staging deploy:
   # needs: ["$[[ inputs.src-folder ]] staging build"]
   needs: ["$[[ inputs.src-folder ]] testing build"]  # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   script:
-     - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+    #  - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+    - |
+      if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
+        ENV=staging dfx deploy --network $TARGET_NETWORK --by-proposal $[[ inputs.src-folder ]]
+      else
+        ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+      fi
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
