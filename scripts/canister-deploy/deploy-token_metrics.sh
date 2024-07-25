@@ -78,7 +78,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^t
   #   UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   # fi
   # . scripts/prepare_sns_canister_ids.sh $1 && \
-  # . scripts/parse_proposal_details.sh && \
+  # . scripts/parse_proposal_details.sh token_metrics && \
   # quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
   #   --pem-file $PEM_FILE \
   #   --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \

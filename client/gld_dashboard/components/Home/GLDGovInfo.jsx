@@ -48,7 +48,7 @@ export default function GLDGovInfo() {
             <DataCardCopy
               title="Total GLDGov Supply"
               image="svg/g-logo.svg"
-              info="Total amount of GLDGov tokens minted."
+              info="Total amount of GLDGov tokens in existence."
               amount={totalSupply.amount}
               className="basis-1/3"
               setInfoModal={setInfoModal}
