@@ -42,11 +42,7 @@ $[[ inputs.src-folder ]] staging deploy:
     #  - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
-        OUTPUT=$(ENV=staging dfx deploy --network $TARGET_NETWORK --by-proposal $[[ inputs.src-folder ]])
-        LAST_LINE=$(echo "$OUTPUT" | tail -n 1)
-        BATCH_NUMBER=$(echo "$LAST_LINE" | awk '{print $4}' )
-        EVIDENCE=$(echo "$LAST_LINE" | awk '{print $7}' )
-        echo "Batch number: $BATCH_NUMBER, Evidence: $EVIDENCE"
+        . scripts/frontend-deploy/frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
       else
         ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
       fi

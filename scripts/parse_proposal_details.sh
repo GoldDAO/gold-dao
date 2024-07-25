@@ -1,6 +1,41 @@
 #!/usr/bin/env bash
 
+
+show_help() {
+  cat << EOF
+Script to prase proposal template and generate the proposal text.
+Needs to receive
+* <CANISTER-NAME> (e.g. icp_neuron or gld_dashboard)
+* <CANISTER-TYPE> (backend or frontend)
+
+Usage:
+  parse_proposal_details.sh [options] <CANISTER-NAME> <CANISTER-TYPE>
+
+Options:
+  -h, --help        Show this message and exit
+EOF
+}
+
+if [[ $# -gt 2 ]]; then
+  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
+    case $1 in
+      -h | --help )
+        show_help
+        exit
+        ;;
+    esac;
+    shift;
+  done
+  if [[ "$1" == '--' ]]; then shift; fi
+else
+  echo "Error: missing <CANISTER-NAME> and/or <CANISTER-TYPE> argument"
+  exit 1
+fi
+
+PROPOSAL_SUMMARY_FILE=proposal.md
+
 CANISTER_NAME="$1"
+CANISTER_TYPE=$2
 
 if [[ -z $CANISTER_NAME ]]; then
     echo "Error: CANISTER_NAME is not defined." >&2
@@ -38,8 +73,14 @@ else
 fi
 
 export DETAILS_URL="https://github.com/GoldDAO/gldt-swap/commit/${COMMITSHA}"
-sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_template.md > proposal.md && \
-sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" proposal.md && \
-sed -i "s/<<CANISTER>>/${CANISTER_NAME}/g" proposal.md && \
-cat CHANGELOG.md >> proposal.md
+sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_${CANISTER_TYPE}_template.md > $PROPOSAL_SUMMARY_FILE
+sed -i "s/<<COMMITHASH>>/${COMMITSHA}/g" $PROPOSAL_SUMMARY_FILE
+sed -i "s/<<CANISTER>>/${CANISTER_NAME}/g" $PROPOSAL_SUMMARY_FILE
+
+if [[ $CANISTER_TYPE == "frontend"]]; then
+	sed -i "s/<<BATCH_ID>>/${BATCH_ID}/g" $PROPOSAL_SUMMARY_FILE
+	sed -i "s/<<EVIDENCE>>/${EVIDENCE}/g" $PROPOSAL_SUMMARY_FILE
+fi
+
+cat CHANGELOG.md >> $PROPOSAL_SUMMARY_FILE
 return
