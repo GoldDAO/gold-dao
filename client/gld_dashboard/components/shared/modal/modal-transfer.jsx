@@ -251,7 +251,7 @@ export default function ModalTransfer({
                 <div className="flex items-center">
                   <input
                     ref={inputRef}
-                    type="text"
+                    type="number"
                     value={inputValue}
                     className="focus:outline-none max-w-[200px] sm:max-w-[240px] text-3xl box-content sm:text-6xl font-bold focus:outline-none bg-CardBackground"
                     placeholder="0.00"
