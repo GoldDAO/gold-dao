@@ -19,7 +19,7 @@ export default function RewardsCards({
     rewardValue /= 10 ** 8;
   }
   const openModal = (clickedTitle) => {
-    setAmount(rewardValue);
+    setAmount(value);
     setModalTitle(clickedTitle);
     document.getElementById('my_modal_1').showModal();
   };
