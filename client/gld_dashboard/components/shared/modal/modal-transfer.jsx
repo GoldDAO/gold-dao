@@ -1,16 +1,16 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable consistent-return */
-import { Bounce, toast } from "react-toastify";
-import { useEffect, useRef, useState } from "react";
+import { Bounce, toast } from 'react-toastify';
+import { useEffect, useRef, useState } from 'react';
 
-import Image from "next/image";
-import QRCode from "qrcode.react";
-import QrScanner from "qr-scanner";
-import { CopyButton } from "../../../utils/svgs";
-import { copyContent } from "../../../utils/functions";
-import useBalances from "../../../hooks/useBalances";
-import useSession from "../../../hooks/useSession";
-import useTransfer from "../../../hooks/useTransfer";
+import Image from 'next/image';
+import QRCode from 'qrcode.react';
+import QrScanner from 'qr-scanner';
+import { CopyButton } from '../../../utils/svgs';
+import { copyContent } from '../../../utils/functions';
+import useBalances from '../../../hooks/useBalances';
+import useSession from '../../../hooks/useSession';
+import useTransfer from '../../../hooks/useTransfer';
 
 export default function ModalTransfer({
   title,
@@ -20,9 +20,9 @@ export default function ModalTransfer({
   setAmount,
 }) {
   const [copyState, setCopyState] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [isReceive, setIsReceive] = useState(false);
-  const [toPrincipal, setToPrincipal] = useState("");
+  const [toPrincipal, setToPrincipal] = useState('');
   const { principal } = useSession();
   const videoRef = useRef(null);
   const [loadingQrScan, setLoadingQrScan] = useState(false);
@@ -31,7 +31,7 @@ export default function ModalTransfer({
   const inputRef = useRef(null);
   const measureRef = useRef(null);
   const [fontSize, setFontSize] = useState(60); // initial font size
-  
+
   let decimalBalance = amount;
   if (decimalBalance !== 0) {
     decimalBalance /= 10 ** 8;
@@ -44,7 +44,7 @@ export default function ModalTransfer({
       const startCamera = async () => {
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "environment" }, // Usa la cámara trasera
+            video: { facingMode: 'environment' }, // Usa la cámara trasera
           });
           videoRef.current.srcObject = stream;
           const qrScanner = new QrScanner(videoRef.current, (result) => {
@@ -62,7 +62,7 @@ export default function ModalTransfer({
             stream.getTracks().forEach((track) => track.stop());
           };
         } catch (error) {
-          console.error("Error al acceder a la cámara:", error);
+          console.error('Error al acceder a la cámara:', error);
         }
       };
       startCamera();
@@ -71,15 +71,6 @@ export default function ModalTransfer({
       tracks.forEach((track) => track.stop());
     }
   }, [scanning]);
-
-  useEffect(() => {
-    adjustFontSize();
-    if (inputValue.length === 0) {
-      setFontSize((prevFontSize) => {
-        return 60;
-      });
-    }
-  }, [inputValue]);
 
   const adjustFontSize = () => {
     if (measureRef.current && inputRef.current) {
@@ -99,44 +90,50 @@ export default function ModalTransfer({
     }
   };
 
+  useEffect(() => {
+    adjustFontSize();
+    if (inputValue.length === 0) {
+      setFontSize(() => 60);
+    }
+  }, [inputValue]);
+
   const handleScanButtonClick = () => {
     setScanning(true);
   };
 
   const { icrc1Transfer, loading } = useTransfer({
-    selectedToken: title === "GLDGov" ? "ledger" : "icp",
+    selectedToken: title === 'GLDGov' ? 'ledger' : 'icp',
     amount: inputValue,
     to: toPrincipal,
   });
 
   const handleTransfer = async () => {
     await icrc1Transfer();
-    const newAmount = await getBalance(title === "GLDGov" ? "ledger" : "icp");
-    
-    if (title === "GLDGov") setGold({ loading: false, amount: newAmount });
+    const newAmount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
+
+    if (title === 'GLDGov') setGold({ loading: false, amount: newAmount });
     else setIcp({ loading: false, amount: newAmount });
-    setInputValue("");
-    setToPrincipal("");
+    setInputValue('');
+    setToPrincipal('');
     setAmount(newAmount);
   };
 
-  const disable =  Number(inputValue) + ( (title === "GLDGov" ? 0.001 : 0.0001))  >  decimalBalance  ||
-  decimalBalance === 0 ||
-  Number(inputValue) < 0.00000001 ||
-  loading
-  
+  const disable = Number(inputValue) + ((title === 'GLDGov' ? 0.001 : 0.0001)) > decimalBalance
+  || decimalBalance === 0
+  || Number(inputValue) < 0.00000001
+  || loading;
 
   const handleMaxButtonClick = () => {
-    let rewardValue = amount
-    rewardValue = rewardValue === 0 ? rewardValue : rewardValue - (title === "GLDGov" ? 100000 : 10000)
+    let rewardValue = amount;
+    rewardValue = rewardValue === 0 ? rewardValue : rewardValue - (title === 'GLDGov' ? 100000 : 10000);
 
     if (rewardValue !== 0) {
       rewardValue /= 10 ** 8;
     }
     setInputValue(
-      rewardValue?.toString()?.slice(0, 7)
+      rewardValue?.toString()?.slice(0, 7),
     );
-    adjustFontSize()
+    adjustFontSize();
   };
 
   const handleToggle = () => {
@@ -157,15 +154,15 @@ export default function ModalTransfer({
 
   useEffect(() => {
     if (copyState) {
-      toast.success("Copied", {
-        position: "top-right",
+      toast.success('Copied', {
+        position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: 'light',
         transition: Bounce,
       });
       setCopyState(false);
@@ -181,7 +178,7 @@ export default function ModalTransfer({
       ) : (
         <>
           <div
-            className={`mt-6 width-[100%] flex justify-between items-center ${scanning && "hidden"} text-xs`}
+            className={`mt-6 width-[100%] flex justify-between items-center ${scanning && 'hidden'} text-xs`}
           >
             <label className="switch">
               <input type="checkbox" onClick={handleToggle}></input>
@@ -202,7 +199,7 @@ export default function ModalTransfer({
 
           {isReceive ? (
             <div className="mt-6 width-[90%] flex flex-col justify-center items-center">
-              <div style={{ position: "relative" }}>
+              <div style={{ position: 'relative' }}>
                 <QRCode
                   value={principal}
                   size={200}
@@ -214,10 +211,10 @@ export default function ModalTransfer({
                 />
                 <div
                   style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
                     zIndex: 1,
                   }}
                 >
@@ -248,7 +245,7 @@ export default function ModalTransfer({
             </div>
           ) : (
             <div
-              className={`mt-6 w-full flex justify-between flex-col items-center ${scanning && "hidden"}`}
+              className={`mt-6 w-full flex justify-between flex-col items-center ${scanning && 'hidden'}`}
             >
               <div className="flex max-w-[600px] justify-between items-center w-[350px] sm:w-[540px]">
                 <div className="flex items-center">
@@ -263,23 +260,23 @@ export default function ModalTransfer({
                     onChange={(e) => setInputValue(e.target.value)}
                     style={{
                       fontSize: `${fontSize}px`,
-                      width: "100%",
-                      transition: "font-size 0.2s ease", // Smooth transition
+                      width: '100%',
+                      transition: 'font-size 0.2s ease', // Smooth transition
                     }}
                   />
                   <div
                     ref={measureRef}
                     style={{
                       fontSize: `${fontSize}px`,
-                      visibility: "hidden",
-                      whiteSpace: "nowrap",
-                      position: "absolute",
+                      visibility: 'hidden',
+                      whiteSpace: 'nowrap',
+                      position: 'absolute',
                       top: 0,
                       left: 0,
-                      pointerEvents: "none",
+                      pointerEvents: 'none',
                     }}
                   >
-                    {inputValue || " "}
+                    {inputValue || ' '}
                   </div>
                   <h3 className="text-[#C6C6C6] text-3xl sm:text-5xl ml-1">
                     {title}
@@ -304,7 +301,7 @@ export default function ModalTransfer({
                   onChange={(e) => setToPrincipal(e.target.value)}
                   className="grow"
                   placeholder="Principal"
-                />{" "}
+                />{' '}
                 <Image
                   src="svg/qr.svg"
                   alt="qr button"
@@ -320,30 +317,30 @@ export default function ModalTransfer({
                 <button
                   onClick={handleTransfer}
                   className={
-                    "py-4 px-7 rounded-full bg-[#D3B871] text-white text-xs font-bold disabled:opacity-50 hidden sm:flex"
+                    'py-4 px-7 rounded-full bg-[#D3B871] text-white text-xs font-bold disabled:opacity-50 hidden sm:flex'
                   }
                   disabled={disable}
                 >
-                  {loading === true ? "loading..." : "Confirm"}
+                  {loading === true ? 'loading...' : 'Confirm'}
                 </button>
               </div>
             </div>
           )}
-          <div className={`${scanning === true ? "" : "hidden"}`}>
+          <div className={`${scanning === true ? '' : 'hidden'}`}>
             <video
               ref={videoRef}
               className="w-full h-80"
               style={{
-                transform: "scaleX(-1)", // Voltea horizontalmente para usar la cámara trasera
-                objectFit: "cover", // Ajusta el video para cubrir todo el contenedor
+                transform: 'scaleX(-1)', // Voltea horizontalmente para usar la cámara trasera
+                objectFit: 'cover', // Ajusta el video para cubrir todo el contenedor
               }}
             />
           </div>
-          <div className={`mt-20 ${scanning === false ? "hidden" : ""}`}>
+          <div className={`mt-20 ${scanning === false ? 'hidden' : ''}`}>
             <button
               onClick={() => setScanning(false)}
               className={
-                "px-10 py-4 rounded-3xl bg-[#D3B871] text-white text-md font-bold disabled:opacity-50 sm:hidden flex w-full justify-center"
+                'px-10 py-4 rounded-3xl bg-[#D3B871] text-white text-md font-bold disabled:opacity-50 sm:hidden flex w-full justify-center'
               }
             >
               Cancel
@@ -351,7 +348,7 @@ export default function ModalTransfer({
           </div>
           <div className="w-[100%] pt-5 ">
             {!inputValue && !isReceive ? (
-              <div className={`${scanning === true ? "hidden" : ""}`}>
+              <div className={`${scanning === true ? 'hidden' : ''}`}>
                 <button
                   className="py-2 px-4 rounded-3xl justify-center w-full bg-[white] text-black border text-sm font-bold flex sm:hidden"
                   onClick={handleMaxButtonClick}
@@ -365,7 +362,7 @@ export default function ModalTransfer({
                 className="py-2 px-7 rounded-full bg-[#D3B871] text-white text-xs font-bold sm:hidden flex w-full justify-center disabled:opacity-35"
                 disabled={disable}
               >
-                {loading === true ? "Loading..." : "Check Order"}
+                {loading === true ? 'Loading...' : 'Check Order'}
               </button>
             ) : null}
           </div>
