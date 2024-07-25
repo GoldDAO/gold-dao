@@ -31,6 +31,11 @@ export default function ModalTransfer({
   const inputRef = useRef(null);
   const measureRef = useRef(null);
   const [fontSize, setFontSize] = useState(60); // initial font size
+  
+  let decimalBalance = amount;
+  if (decimalBalance !== 0) {
+    decimalBalance /= 10 ** 8;
+  }
 
   useEffect(() => {
     let stream = null;
@@ -107,29 +112,31 @@ export default function ModalTransfer({
   const handleTransfer = async () => {
     await icrc1Transfer();
     const newAmount = await getBalance(title === "GLDGov" ? "ledger" : "icp");
+    
     if (title === "GLDGov") setGold({ loading: false, amount: newAmount });
     else setIcp({ loading: false, amount: newAmount });
     setInputValue("");
     setToPrincipal("");
-    setAmount(newAmount / 1e8 / 1e8);
+    setAmount(newAmount);
   };
-  const disable =
-    amount * 1e8 < inputValue + (title === "GLDGov" ? 100000 : 10000) ||
-    amount === 0 ||
-    inputValue === 0 ||
-    !inputValue ||
-    !toPrincipal ||
-    inputValue < 0.00000001 ||
-    loading;
+
+  const disable =  Number(inputValue) + ( (title === "GLDGov" ? 0.001 : 0.0001))  >  decimalBalance  ||
+  decimalBalance === 0 ||
+  Number(inputValue) < 0.00000001 ||
+  loading
+  
 
   const handleMaxButtonClick = () => {
+    let rewardValue = amount
+    rewardValue = rewardValue === 0 ? rewardValue : rewardValue - (title === "GLDGov" ? 100000 : 10000)
+
+    if (rewardValue !== 0) {
+      rewardValue /= 10 ** 8;
+    }
     setInputValue(
-      amount === 0
-        ? amount
-        : (amount * 1e8 - (title === "GLDGov" ? 100000 : 10000) / 1e8).toFixed(
-            8
-          )
+      rewardValue?.toString()?.slice(0, 7)
     );
+    adjustFontSize()
   };
 
   const handleToggle = () => {
@@ -185,7 +192,7 @@ export default function ModalTransfer({
             </label>
             <div>
               <button className="px-4 py-2 sm:px-10 mt-5 rounded-3xl text-black border-[black] border-[2px] font-bold">
-                {(amount * 10e7)?.toString()?.slice(0, 7)} {title}
+                {decimalBalance} {title}
               </button>
               <div className="w-full flex justify-center text-xs mt-1">
                 Total balance
