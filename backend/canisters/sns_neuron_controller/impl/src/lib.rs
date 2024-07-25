@@ -25,8 +25,6 @@
 
 use ic_cdk::export_candid;
 use queries::list_ogy_neurons::ListNeuronsResponse;
-use updates::manage_sns_neuron::{ManageSnsNeuronRequest, ManageSnsNeuronResponse};
-use updates::stake_sns_neuron::StakeSnsNeuronResponse;
 
 mod guards;
 mod jobs;

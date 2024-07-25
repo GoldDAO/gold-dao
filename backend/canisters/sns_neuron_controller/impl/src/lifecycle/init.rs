@@ -14,7 +14,13 @@ fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
     let env = CanisterEnv::new(args.test_mode);
-    let mut data = Data::new(args.sns_rewards_canister_id);
+    let mut data = Data::new(
+        args.ogy_sns_governance_canister_id,
+        args.ogy_sns_ledger_canister_id,
+        args.ogy_sns_rewards_canister_id,
+        args.sns_rewards_canister_id,
+        env.now(),
+    );
 
     if args.test_mode {
         data.authorized_principals.push(env.caller());

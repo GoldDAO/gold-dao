@@ -1,5 +1,3 @@
-use std::ptr::read;
-
 use crate::state::read_state;
 use candid::{Nat, Principal};
 use futures::future::join_all;
@@ -38,7 +36,7 @@ pub async fn transfer_token(
     }
 }
 
-pub async fn fetch_neuron_reward_balance(
+pub async fn ogy_fetch_neuron_reward_balance(
     ledger_canister_id: Principal,
     ogy_sns_rewards_canister_id: Principal,
     neuron_id: &NeuronId,
@@ -147,7 +145,7 @@ impl RewardSumResult {
 // NOTE: the following function calculates the general rewards as sum of all neurons rewards.
 // If one of the rewards cannot be fetched, the general reward is calculated anyway, but it's
 // defined as RewardSumResult::Partial
-pub async fn calculate_available_rewards(
+pub async fn ogy_calculate_available_rewards(
     neurons: &[Neuron],
     ogy_sns_rewards_canister_id: Principal,
     sns_ledger_canister_id: Principal,
@@ -156,7 +154,11 @@ pub async fn calculate_available_rewards(
         .iter()
         .filter_map(|neuron| {
             neuron.id.as_ref().map(|id| {
-                fetch_neuron_reward_balance(sns_ledger_canister_id, ogy_sns_rewards_canister_id, id)
+                ogy_fetch_neuron_reward_balance(
+                    sns_ledger_canister_id,
+                    ogy_sns_rewards_canister_id,
+                    id,
+                )
             })
         })
         .collect();
@@ -210,7 +212,7 @@ impl ClaimRewardResult {
 }
 
 // FIXME: handle an error like in calculate_available_rewards, use also Empty result
-pub async fn claim_rewards(
+pub async fn ogy_claim_rewards(
     neurons: &[Neuron],
     sns_governance_canister_id: Principal,
 ) -> ClaimRewardResult {

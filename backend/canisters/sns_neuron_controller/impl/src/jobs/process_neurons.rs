@@ -1,5 +1,6 @@
 use crate::state::{mutate_state, read_state};
 use crate::types::neuron_manager::NeuronManager;
+use crate::types::neuron_manager::NeuronRewardsManager;
 use canister_time::{run_now_then_interval, DAY_IN_MS};
 use canister_tracing_macros::trace;
 use std::time::Duration;
@@ -28,7 +29,7 @@ async fn run_async() {
             let available_rewards = ogy_neuron_manager.get_available_rewards().await;
             // TODO: Once the balance exceeds a certain threshold (e.g. 1 million OGY) the rewards should be claimed and distributed
             // Q: Should it be 1 million OGY for all controlled neurons or for each one?
-            if CLAIM_REWARDS_THRESHOLD > available_rewards
+            if available_rewards >= CLAIM_REWARDS_THRESHOLD
                 && ogy_neuron_manager.claim_rewards().await.is_not_failed()
             {
                 let _ = ogy_neuron_manager.distribute_rewards().await;

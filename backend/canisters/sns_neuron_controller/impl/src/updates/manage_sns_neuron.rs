@@ -1,28 +1,18 @@
-use crate::{guards::caller_is_governance_principal, types::neuron_manager::NeuronType};
-use candid::CandidType;
+use crate::guards::caller_is_governance_principal;
+use crate::state::read_state;
+use canister_tracing_macros::trace;
 use ic_cdk::update;
-use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{manage_neuron::Command, ManageNeuron};
+pub use sns_neuron_controller_api_canister::manage_sns_neuron::Args as ManageSnsNeuronArgs;
+pub use sns_neuron_controller_api_canister::manage_sns_neuron::Response as ManageSnsNeuronResponse;
+use sns_neuron_controller_api_canister::neuron_type::NeuronType;
 use tracing::{error, info};
 use types::CanisterId;
 
-#[derive(CandidType, Deserialize, Clone)]
-pub struct ManageSnsNeuronRequest {
-    pub neuron_type: NeuronType,
-    pub neuron_id: Vec<u8>,
-    pub command: Command,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum ManageSnsNeuronResponse {
-    Success(String),
-    InternalError(String),
-}
-
 #[update(guard = "caller_is_governance_principal")]
-// #[trace]
-async fn manage_sns_neuron(args: ManageSnsNeuronRequest) -> ManageSnsNeuronResponse {
-    let canister_id = args.neuron_type.get_governance_canister_id();
+#[trace]
+async fn manage_sns_neuron(args: ManageSnsNeuronArgs) -> ManageSnsNeuronResponse {
+    let canister_id = get_governance_canister_id(args.neuron_type);
 
     match manage_sns_neuron_impl(canister_id, args.neuron_id, args.command).await {
         Ok(ok) => ManageSnsNeuronResponse::Success(ok),
@@ -50,5 +40,24 @@ pub(crate) async fn manage_sns_neuron_impl(
             error!("Failed to executed a neuron command: {:?}", e);
             Err(("Failed to executed a neuron command: {e:?}").to_string())
         }
+    }
+}
+
+pub fn get_governance_canister_id(neuron_type: NeuronType) -> CanisterId {
+    match neuron_type {
+        NeuronType::Ogy => read_state(|state| {
+            state
+                .data
+                .neuron_managers
+                .ogy
+                .ogy_sns_governance_canister_id
+        }),
+        NeuronType::Wtn => read_state(|state| {
+            state
+                .data
+                .neuron_managers
+                .wtn
+                .wtn_sns_governance_canister_id
+        }),
     }
 }

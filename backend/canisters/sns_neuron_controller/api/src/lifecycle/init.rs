@@ -5,4 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct InitArgs {
     pub test_mode: bool,
     pub sns_rewards_canister_id: Principal,
+    pub ogy_sns_governance_canister_id: Principal,
+    pub ogy_sns_ledger_canister_id: Principal,
+    pub ogy_sns_rewards_canister_id: Principal,
 }

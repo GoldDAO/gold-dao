@@ -1555,6 +1555,25 @@ pub mod manage_neuron {
         RemoveNeuronPermissions(RemoveNeuronPermissions),
         StakeMaturity(StakeMaturity),
     }
+
+    impl std::fmt::Debug for Command {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Command::Configure(_) => write!(f, "Configure"),
+                Command::Disburse(_) => write!(f, "Disburse"),
+                Command::Follow(_) => write!(f, "Follow"),
+                Command::MakeProposal(_) => write!(f, "MakeProposal"),
+                Command::RegisterVote(_) => write!(f, "RegisterVote"),
+                Command::Split(_) => write!(f, "Split"),
+                Command::ClaimOrRefresh(_) => write!(f, "ClaimOrRefresh"),
+                Command::MergeMaturity(_) => write!(f, "MergeMaturity"),
+                Command::DisburseMaturity(_) => write!(f, "DisburseMaturity"),
+                Command::AddNeuronPermissions(_) => write!(f, "AddNeuronPermissions"),
+                Command::RemoveNeuronPermissions(_) => write!(f, "RemoveNeuronPermissions"),
+                Command::StakeMaturity(_) => write!(f, "StakeMaturity"),
+            }
+        }
+    }
 }
 /// The response of a ManageNeuron command.
 /// There is a dedicated response type for each `ManageNeuron.command` field.

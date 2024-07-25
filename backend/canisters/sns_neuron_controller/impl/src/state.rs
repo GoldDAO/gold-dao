@@ -1,6 +1,6 @@
-use crate::types::neuron_manager::NeuronManager;
-use crate::types::neuron_manager::{OgyManager, WtnManager};
+use crate::types::{OgyManager, WtnManager};
 // use crate::types::neuron_metrics::NeuronWithMetric;
+use crate::types::neuron_manager::Neurons;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use serde::{Deserialize, Serialize};
@@ -69,33 +69,57 @@ pub struct CanisterInfo {
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
-    // NOTE: it seems to be not the best practice to store the manager struct inside the state, because then it makes all the mutations more complex and harder to handle
     pub neuron_managers: NeuronManagers,
     pub sns_rewards_canister_id: CanisterId,
 }
 
 impl Data {
-    pub fn new(sns_rewards_canister_id: CanisterId) -> Self {
+    pub fn new(
+        ogy_sns_governance_canister_id: CanisterId,
+        ogy_sns_ledger_canister_id: CanisterId,
+        ogy_sns_rewards_canister_id: CanisterId,
+        sns_rewards_canister_id: CanisterId,
+        now: TimestampMillis,
+    ) -> Self {
         Self {
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
-            neuron_managers: NeuronManagers::default(),
+            neuron_managers: NeuronManagers::init(
+                ogy_sns_governance_canister_id,
+                ogy_sns_ledger_canister_id,
+                ogy_sns_rewards_canister_id,
+                now,
+            ),
             sns_rewards_canister_id,
         }
     }
 }
 
-// Think of how to not clone it each time. Probably, the best
-// option would be to implement Rc<RefCell<T>> on top of this,
-// but I'm not sure how it would match with current memory layout
 #[derive(Serialize, Deserialize, Default)]
 pub struct NeuronManagers {
-    pub timestamp: TimestampMillis,
+    pub now: TimestampMillis,
     pub ogy: OgyManager,
     pub wtn: WtnManager,
-    pub others: Vec<Box<dyn NeuronManager>>,
 }
 
 impl NeuronManagers {
+    pub fn init(
+        ogy_sns_governance_canister_id: CanisterId,
+        ogy_sns_ledger_canister_id: CanisterId,
+        ogy_sns_rewards_canister_id: CanisterId,
+        now: TimestampMillis,
+    ) -> Self {
+        Self {
+            now,
+            ogy: OgyManager {
+                ogy_sns_governance_canister_id,
+                ogy_sns_ledger_canister_id,
+                ogy_sns_rewards_canister_id,
+                neurons: Neurons::default(),
+            },
+            wtn: WtnManager::default(),
+        }
+    }
+
     pub fn get_neurons(&self) -> NeuronList {
         NeuronList {
             ogy_neurons: self.ogy.neurons.all_neurons.clone(),
