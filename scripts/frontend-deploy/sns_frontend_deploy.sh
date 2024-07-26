@@ -39,9 +39,26 @@ if [[ ! $NETWORK =~ ^(staging|ic)$ ]]; then
   exit 2
 fi
 
-
+# Extract version info and commit sha from CICD pipeline variables
 . ./scripts/extract_version_and_commit_sha.sh $CANISTER_NAME
-. ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK
-# ./scripts/frontend-deploy/sns_commit_assets.sh
 
+if [ $? -ne 0 ]; then
+  echo "Error in extract_version_and_commit_sha.sh"
+  exit 1
+fi
+
+# Compiles the frontend code and uploads the assets to canister memory in prepare stage. Needs to be committed in the next stage
+. ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK
+
+if [ $? -ne 0 ]; then
+  echo "Error in sns_prepare_assets.sh"
+  exit 1
+fi
+
+# Commits the previously prepared assets and creates a proposal on the SNS to vote about the upgrade.
 ./scripts/frontend-deploy/sns_commit_assets.sh $CANISTER_NAME $NETWORK $BATCH_ID $EVIDENCE $VERSION $COMMIT_SHA
+
+if [ $? -ne 0 ]; then
+  echo "Error in sns_commit_assets.sh"
+  exit 1
+fi

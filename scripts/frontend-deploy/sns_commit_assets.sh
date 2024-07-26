@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# local testing
-PEM_FILE="tmp.pem"
-dfx identity export gitlab_ci_gldt_staging > $PEM_FILE
-SNS_PROPOSER_NEURON_ID_STAGING="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
-
 
 CONFIG_FRONTEND="scripts/frontend-deploy/frontend_config.json"
 CANISTER_IDS_FILE="sns_canister_ids.json"
@@ -48,7 +43,19 @@ else
 fi
 
 ./scripts/prepare_proposal_summary.sh $CANISTER_NAME $VERSION frontend $BATCH_ID $EVIDENCE_RAW
+
+if [ $? -ne 0 ]; then
+  echo "Error in prepare_proposal_summary.sh"
+  exit 1
+fi
+
 ./scripts/prepare_sns_canister_ids.sh $NETWORK
+
+if [ $? -ne 0 ]; then
+  echo "Error in prepare_sns_canister_ids.sh"
+  exit 1
+fi
+
 
 PROPOSAL_SUMMARY=$(cat proposal.md)
 
