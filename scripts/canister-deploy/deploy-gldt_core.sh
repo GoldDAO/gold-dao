@@ -69,7 +69,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
     UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
   . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/parse_proposal_details.sh gldt_core && \
+  . scripts/prepare_proposal_summary.sh gldt_core && \
 #  dfx deploy gldt_core --network $1 --argument '(
 #    opt record {gldt_ledger_canister_id=principal "'"$(dfx canister id --network ${1} gldt_ledger)"'";
 #    gld_nft_canister_ids=vec{

@@ -23,7 +23,7 @@
 #     - ENV=prod dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y ${CANISTER_NAME}
 
 
-    # - . scripts/parse_proposal_details.sh
+    # - . scripts/prepare_proposal_summary.sh
     # - . scripts/prepare_sns_canister_ids.sh ic
     # - ENV=prod dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall --by-proposal -y ${CANISTER_NAME}
     # - >
