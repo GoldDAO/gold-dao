@@ -24,20 +24,48 @@ else
 	echo "No changelog for staging deployment" > CHANGELOG.md
 fi
 
+echo "
+  Creating proposal summary with
 
+  ** CANISTER_NAME: $CANISTER_NAME
+  ** VERSION: $VERSION
+  ** COMMIT_SHA: $COMMIT_SHA
+  ** CANISTER_TYPE: $CANISTER_TYPE
+  ** BATCH_ID: $BATCH_ID
+  ** EVIDENCE: $EVIDENCE
+"
 
 export DETAILS_URL="https://github.com/GoldDAO/gldt-swap/commit/${COMMIT_SHA}"
 sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_${CANISTER_TYPE}_template.md > $PROPOSAL_SUMMARY_FILE
-sed -i '' "s/<<COMMITHASH>>/${COMMIT_SHA}/g" $PROPOSAL_SUMMARY_FILE
-sed -i '' "s/<<CANISTER>>/${CANISTER_NAME}/g" $PROPOSAL_SUMMARY_FILE
 
-if [[ $CANISTER_TYPE == "frontend" ]]; then
-	sed -i '' "s/<<BATCH_ID>>/${BATCH_ID}/g" $PROPOSAL_SUMMARY_FILE
-	sed -i '' "s/<<EVIDENCE>>/${EVIDENCE}/g" $PROPOSAL_SUMMARY_FILE
+if [[ "$(uname -s)" == "Darwin" ]]; then
+# mac requires to run set with '' -> sed -i '' ... whereas pipeline doesn't
+  sed -i '' "s/<<COMMITHASH>>/${COMMIT_SHA}/g" $PROPOSAL_SUMMARY_FILE
+  sed -i '' "s/<<CANISTER>>/${CANISTER_NAME}/g" $PROPOSAL_SUMMARY_FILE
+
+  if [[ $CANISTER_TYPE == "frontend" ]]; then
+    sed -i '' "s/<<BATCH_ID>>/${BATCH_ID}/g" $PROPOSAL_SUMMARY_FILE
+    sed -i '' "s/<<EVIDENCE>>/${EVIDENCE}/g" $PROPOSAL_SUMMARY_FILE
+  fi
+else
+  sed -i "s/<<COMMITHASH>>/${COMMIT_SHA}/g" $PROPOSAL_SUMMARY_FILE
+  sed -i "s/<<CANISTER>>/${CANISTER_NAME}/g" $PROPOSAL_SUMMARY_FILE
+
+  if [[ $CANISTER_TYPE == "frontend" ]]; then
+    sed -i "s/<<BATCH_ID>>/${BATCH_ID}/g" $PROPOSAL_SUMMARY_FILE
+    sed -i "s/<<EVIDENCE>>/${EVIDENCE}/g" $PROPOSAL_SUMMARY_FILE
+  fi
 fi
 
 cat CHANGELOG.md >> $PROPOSAL_SUMMARY_FILE
 
+echo "
+******************************************
+Proposal summary:
+"
+
 cat $PROPOSAL_SUMMARY_FILE
 
-return
+echo "
+******************************************
+"

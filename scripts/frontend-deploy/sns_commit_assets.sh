@@ -12,12 +12,16 @@ VERSION=$5
 COMMIT_SHA=$6
 
 echo "
-    *********
-    Creating proposal to deploy $CANISTER_NAME on $NETWORK and upgrading to version $VERSION from commit $COMMIT_SHA.
-    *********
-    Committing batch $BATCH_ID with evidence $EVIDENCE.
-    *********
-    "
+******************************************************************************************
+
+Creating proposal to deploy $CANISTER_NAME on $NETWORK and upgrading to version $VERSION from commit $COMMIT_SHA.
+
+******************************************************************************************
+
+Committing batch $BATCH_ID with evidence $EVIDENCE.
+
+******************************************************************************************
+"
 
 FID=$(cat $CONFIG_FRONTEND | jq --arg fe $CANISTER_NAME '.[$fe].sns_function_id')
 URL=$(cat $CONFIG_FRONTEND | jq --arg fe $CANISTER_NAME '.[$fe].url')
@@ -36,10 +40,14 @@ export BLOB="$(didc encode --format blob "(record {
 
 if [[ $NETWORK == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    # UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
 else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
-    # UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
+fi
+
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    echo "Running locally on Mac. Overwriting proposer id."
+    PROPOSER="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
+    PEM_FILE="tmp.pem"
 fi
 
 ./scripts/prepare_proposal_summary.sh $CANISTER_NAME $VERSION frontend $BATCH_ID $EVIDENCE_RAW
@@ -56,10 +64,15 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-
 PROPOSAL_SUMMARY=$(cat proposal.md)
 
 [ -e message.json ] && rm message.json
+
+echo "
+***********************************
+Sending proposal
+***********************************
+"
 
 quill sns \
     --canister-ids-file $CANISTER_IDS_FILE \
@@ -83,3 +96,9 @@ quill sns \
 quill send message.json -y
 
 rm message.json && rm $CANISTER_IDS_FILE
+
+echo "
+***********************************
+Proposal sent successfully.
+***********************************
+"
