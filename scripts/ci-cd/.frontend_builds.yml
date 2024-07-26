@@ -10,7 +10,8 @@ spec:
   stage: build
   extends: .node template
   script:
-    - ENV=$ENV npm run build:$[[ inputs.src-folder ]]
+    - VERSION_STRING="${CI_COMMIT_REF}_${CI_COMMIT_SHORT_SHA}"
+    - ENV=$ENV VERSION=$VERSION_STRING npm run build:$[[ inputs.src-folder ]]
 
 .short-artifact-template:
   extends: .build template

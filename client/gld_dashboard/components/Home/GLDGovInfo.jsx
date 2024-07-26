@@ -46,7 +46,7 @@ export default function GLDGovInfo() {
         {allDataLoaded ? (
           <>
             <DataCardCopy
-              title="Total GLDGov Supply 14"
+              title="Total GLDGov Supply"
               image="svg/g-logo.svg"
               info="Total amount of GLDGov tokens in existence."
               amount={totalSupply.amount}
