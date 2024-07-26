@@ -40,5 +40,8 @@ if [[ ! $NETWORK =~ ^(staging|ic)$ ]]; then
 fi
 
 
-. ./scripts/frontend-deploy/sns_prepare_assets.sh
-. ./scripts/frontend-deploy/sns_commit_assets.sh $CANISTER_NAME $NETWORK $BATCH_ID $EVIDENCE
+. ./scripts/extract_version_and_commit_sha.sh $CANISTER_NAME
+. ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK
+# ./scripts/frontend-deploy/sns_commit_assets.sh
+
+./scripts/frontend-deploy/sns_commit_assets.sh $CANISTER_NAME $NETWORK $BATCH_ID $EVIDENCE $VERSION $COMMIT_SHA

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+CANISTER_NAME=$1
+NETWORK=$2
+
 LOG_FILE=console.log
 
 ENV=$NETWORK dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE

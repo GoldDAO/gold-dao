@@ -7,14 +7,12 @@ SNS_PROPOSER_NEURON_ID_STAGING="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344e
 
 
 CONFIG_FRONTEND="scripts/frontend-deploy/frontend_config.json"
-CANISTER_IDS="sns_canister_ids.json"
+CANISTER_IDS_FILE="sns_canister_ids.json"
 
 CANISTER_NAME=$1
 NETWORK=$2
-
 BATCH_ID=$3
 EVIDENCE_RAW=$4
-
 VERSION=$5
 COMMIT_SHA=$6
 
@@ -43,21 +41,21 @@ export BLOB="$(didc encode --format blob "(record {
 
 if [[ $NETWORK == "ic" ]]; then
     PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
+    # UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
 else
     PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
-    UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
+    # UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
 fi
 
-. ./scripts/prepare_proposal_summary.sh $CANISTER_NAME $VERSION frontend $BATCH_ID $EVIDENCE_RAW
-. ./scripts/prepare_sns_canister_ids.sh $NETWORK
+./scripts/prepare_proposal_summary.sh $CANISTER_NAME $VERSION frontend $BATCH_ID $EVIDENCE_RAW
+./scripts/prepare_sns_canister_ids.sh $NETWORK
 
 PROPOSAL_SUMMARY=$(cat proposal.md)
 
 [ -e message.json ] && rm message.json
 
 quill sns \
-    --canister-ids-file $CANISTER_IDS \
+    --canister-ids-file $CANISTER_IDS_FILE \
     --pem-file $PEM_FILE \
     make-proposal \
     $PROPOSER \
@@ -77,4 +75,4 @@ quill sns \
 
 quill send message.json -y
 
-rm message.json && rm $CANISTER_IDS
+rm message.json && rm $CANISTER_IDS_FILE
