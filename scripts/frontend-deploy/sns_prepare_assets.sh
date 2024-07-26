@@ -2,20 +2,24 @@
 
 CANISTER_NAME=$1
 NETWORK=$2
-VERSION_STRING=$3
 
 LOG_FILE=console.log
 
 echo "
 **********************************************************************
 
-Preparing assets for $CANISTER_NAME on $NETWORK to version $VERSION_STRING
+Preparing assets for $CANISTER_NAME on $NETWORK
 
 **********************************************************************
 "
 
-# ENV=$NETWORK dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
-ENV=$NETWORK VERSION=$VERSION_STRING dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  echo "Deploying from local systen."
+  ENV=$NETWORK VERSION="local-deploy" dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+else
+  dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+fi
 
 echo "Last line: $(tail -n 1 $LOG_FILE)"
 
