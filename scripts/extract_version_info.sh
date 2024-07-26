@@ -28,7 +28,7 @@ if [[ -n $CI_COMMIT_TAG ]]; then
 	# 		exit 1
 	# fi
 else
-	VERSION="!STAGINGTEST!"
+	VERSION="_STAGINGTEST_"
 	# echo "No changelog for staging deployment" > CHANGELOG.md
 fi
 
