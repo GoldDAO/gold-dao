@@ -42,7 +42,7 @@ $[[ inputs.src-folder ]] staging deploy:
     #  - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
-        . scripts/frontend-deploy/frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
+        . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
       else
         ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
       fi
