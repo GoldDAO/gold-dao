@@ -74,6 +74,8 @@ Sending proposal
 ***********************************
 "
 
+echo "BLOB: $BLOB"
+
 quill sns \
     --canister-ids-file $CANISTER_IDS_FILE \
     --pem-file $PEM_FILE \
@@ -94,6 +96,11 @@ quill sns \
 )" > message.json
 
 quill send message.json -y
+
+if [ $? -ne 0 ]; then
+  echo "Error in sending proposal."
+  exit 1
+fi
 
 rm message.json && rm $CANISTER_IDS_FILE
 
