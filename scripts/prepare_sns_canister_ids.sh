@@ -57,4 +57,5 @@ jq --arg choice $1 '{
 }' $INPUT_FILE > $OUTPUT_FILE
 
 echo "SNS canister ids file generation complete based on $1. Output saved to $OUTPUT_FILE."
+
 cat $OUTPUT_FILE

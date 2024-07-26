@@ -1,7 +1,7 @@
 {
   "gld_dashboard": {
     "name": "GLD dashboard",
-    "url": "dashboard.gold-dao.org",
+    "url": "http://dashboard.gold-dao.org",
     "sns_function_id": 2001
   }
 }
