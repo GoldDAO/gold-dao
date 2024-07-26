@@ -21,7 +21,7 @@ fi
 if [[ -n $CI_COMMIT_SHORT_SHA ]]; then
 	COMMIT_SHA=$CI_COMMIT_SHORT_SHA
 else
-	COMMIT_SHA="00000000"
+	COMMIT_SHA="$(git rev-parse --short HEAD)"
 fi
 
 

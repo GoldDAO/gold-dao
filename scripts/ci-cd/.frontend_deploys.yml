@@ -56,7 +56,8 @@ $[[ inputs.src-folder ]] preprod deploy:
     TARGET_NETWORK: preprod
   needs: ["$[[ inputs.src-folder ]] preprod build"]
   script:
-     - ENV=preprod dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+     - VERSION_STRING="PREPROD_$(git rev-parse --short HEAD)"
+     - ENV=preprod VERSION=$VERSION_STRING dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: testing

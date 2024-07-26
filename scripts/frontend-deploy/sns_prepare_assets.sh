@@ -2,10 +2,20 @@
 
 CANISTER_NAME=$1
 NETWORK=$2
+VERSION_STRING=$3
 
 LOG_FILE=console.log
 
-ENV=$NETWORK dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+echo "
+**********************************************************************
+
+Preparing assets for $CANISTER_NAME on $NETWORK to version $VERSION_STRING
+
+**********************************************************************
+"
+
+# ENV=$NETWORK dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
+ENV=$NETWORK VERSION=$VERSION_STRING dfx deploy --network staging --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
 
 echo "Last line: $(tail -n 1 $LOG_FILE)"
 
@@ -27,5 +37,12 @@ else
   echo "Invalid evidence: $EVIDENCE"
   exit 1
 fi
+
+echo "
+
+Finished preparing assets. Uploaded in batch $BATCH_ID with evidence $EVIDENCE
+
+**********************************************************************
+"
 
 return
