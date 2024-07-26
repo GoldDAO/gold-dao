@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
-
 show_help() {
   cat << EOF
 Frontend canister deploy script via SNS proposal.

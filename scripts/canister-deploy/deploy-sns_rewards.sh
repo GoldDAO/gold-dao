@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
-
 show_help() {
   cat << EOF
 sns_rewards canister deployment script.
 Must be run from the repository's root folder, and with a running replica if for local deployment.
 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
-The NETWORK argument should preferably be passed from the env variable that was previously defined
-by the pre-deploy script (using the dot notation, or inside a macro deploy script).
 
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
