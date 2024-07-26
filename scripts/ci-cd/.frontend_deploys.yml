@@ -39,12 +39,11 @@ $[[ inputs.src-folder ]] staging deploy:
   # needs: ["$[[ inputs.src-folder ]] staging build"]
   needs: ["$[[ inputs.src-folder ]] testing build"]  # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   script:
-    #  - ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
         . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
       else
-        ENV=staging dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+        ENV=$TARGET_NETWORK dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
       fi
   environment:
     name: $[[ inputs.src-folder ]] frontend
@@ -62,8 +61,6 @@ $[[ inputs.src-folder ]] preprod deploy:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: testing
     action: start
-
-
 
 # PRODUCTION DEPLOYMENT
 
@@ -84,7 +81,12 @@ $[[ inputs.src-folder ]] production deploy:
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
-     - ENV=prod dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+    - |
+      if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
+        . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
+      else
+        ENV=$TARGET_NETWORK dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+      fi
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: production
