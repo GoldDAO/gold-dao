@@ -12,6 +12,6 @@
       - client/**/node_modules/
   before_script:
     - release=$(curl --silent "https://api.github.com/repos/dfinity/candid/releases/latest" | grep -e '"tag_name"' | cut -c 16-25)
-    - curl -fsSL https://github.com/dfinity/candid/releases/download/${release}/didc-linux64 > /usr/bin/didc
+    - curl -fsSL https://github.com/dfinity/candid/releases/download/${release}/didc-linux64 > didc
     - didc --version
     - npm ci --cache .npm --prefer-offline
