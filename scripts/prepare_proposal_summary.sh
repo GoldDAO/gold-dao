@@ -72,15 +72,15 @@ else
 	COMMITSHA="00000000"
 fi
 
-echo $COMMIT_SHA
-echo $VERSION
-echo $CANISTER_NAME
-echo $BATCH_ID
-echo $EVIDENCE
+# echo $COMMIT_SHA
+# echo $VERSION
+# echo $CANISTER_NAME
+# echo $BATCH_ID
+# echo $EVIDENCE
 
 export DETAILS_URL="https://github.com/GoldDAO/gldt-swap/commit/${COMMITSHA}"
-sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_${CANISTER_TYPE}_template.md > $PROPOSAL_SUMMARY_FILE && /
-sed -i '' "s/<<COMMITHASH>>/${COMMITSHA}/g" $PROPOSAL_SUMMARY_FILE && /
+sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_${CANISTER_TYPE}_template.md > $PROPOSAL_SUMMARY_FILE
+sed -i '' "s/<<COMMITHASH>>/${COMMITSHA}/g" $PROPOSAL_SUMMARY_FILE
 sed -i '' "s/<<CANISTER>>/${CANISTER_NAME}/g" $PROPOSAL_SUMMARY_FILE
 
 if [[ $CANISTER_TYPE == "frontend" ]]; then
