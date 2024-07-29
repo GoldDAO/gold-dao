@@ -29,16 +29,10 @@ variables:
 
 $[[ inputs.src-folder ]] staging deploy:
   extends: .staging deploy template
-  rules: # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"  # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      changes: # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}" # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}" # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   variables:
     TARGET_NETWORK: staging
     IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
-  # needs: ["$[[ inputs.src-folder ]] staging build"]
-  needs: ["$[[ inputs.src-folder ]] testing build"]  # TEMPORARY REMOVE AT THE END OF TESTING THE PIPELINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
