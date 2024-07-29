@@ -25,7 +25,7 @@ variables:
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   before_script:
     - !reference [.import dfx identity, before_script]
-  extends: .include didc
+    - !reference [.include didc, before_script]
 
 $[[ inputs.src-folder ]] staging deploy:
   extends: .staging deploy template
