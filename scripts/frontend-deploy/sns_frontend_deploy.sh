@@ -47,10 +47,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-VERSION_STRING="$VERSION-$COMMIT_SHA"
-
 # Compiles the frontend code and uploads the assets to canister memory in prepare stage. Needs to be committed in the next stage
-. ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK $VERSION_STRING
+. ./scripts/frontend-deploy/sns_prepare_assets.sh $CANISTER_NAME $NETWORK
 
 if [ $? -ne 0 ]; then
   echo "Error in sns_prepare_assets.sh"
