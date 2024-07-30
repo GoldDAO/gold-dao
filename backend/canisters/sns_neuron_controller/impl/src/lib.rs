@@ -32,7 +32,6 @@ mod lifecycle;
 mod memory;
 mod queries;
 mod state;
-mod testing;
 mod types;
 mod updates;
 mod utils;

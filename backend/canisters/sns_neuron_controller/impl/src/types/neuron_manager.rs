@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use candid::{CandidType, Nat};
+use candid::Nat;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
 use types::{CanisterId, TimestampMillis};

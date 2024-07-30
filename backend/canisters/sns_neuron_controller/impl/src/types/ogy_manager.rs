@@ -209,7 +209,7 @@ pub async fn ogy_claim_rewards(
         ClaimRewardResult::Succesfull
     } else {
         // NOTE: uncomment to be able to debug the errors
-        let error_message = error_messages.join("\n");
+        // let error_message = error_messages.join("\n");
         // error!(
         //     "Failed to claim rewards for some neurons:\n{}",
         //     error_message

@@ -13,6 +13,7 @@ pub struct GetNeuronRequest {
 }
 
 #[test]
+// TODO: extend this test too
 fn test_process_neurons_happy_path() {
     let mut test_env = default_test_setup();
 

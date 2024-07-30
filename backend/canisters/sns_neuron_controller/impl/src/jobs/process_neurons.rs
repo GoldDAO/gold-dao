@@ -6,17 +6,16 @@ use canister_time::{run_now_then_interval, MINUTE_IN_MS};
 use canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
+use tracing::info;
 use types::Milliseconds;
 use utils::env::Environment;
 
 const PROCESS_NEURONS_INTERVAL: Milliseconds = MINUTE_IN_MS; // 1 day
-
 const MAX_ATTEMPTS: u8 = 3;
-
 const CLAIM_REWARDS_THRESHOLD: u64 = 100_000_000 * 1_000_000; // 1_000_000 tokens
+const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
 pub fn start_job() {
-    // run_interval(Duration::from_millis(PROCESS_NEURONS_INTERVAL), run);
     run_now_then_interval(Duration::from_millis(PROCESS_NEURONS_INTERVAL), run);
 }
 
@@ -28,7 +27,7 @@ pub fn run() {
 async fn run_async() {
     ic_cdk::println!("Starting neuron processing loop");
 
-    if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, || async {
+    if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
         let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
         fetch_and_process_neurons(&mut ogy_neuron_manager).await
     })
@@ -68,19 +67,25 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
     Ok(())
 }
 
-async fn retry_with_attempts<F, Fut>(max_attempts: u8, mut f: F) -> Result<(), String>
+// TODO: think on how to add delay here
+async fn retry_with_attempts<F, Fut>(
+    max_attempts: u8,
+    delay_duration: Duration,
+    mut f: F,
+) -> Result<(), String>
 where
     F: FnMut() -> Fut,
     Fut: std::future::Future<Output = Result<(), String>>,
 {
     for attempt in 1..=max_attempts {
-        if let Err(err) = f().await {
-            error!("Attempt {}: Error - {:?}", attempt, err);
-            if attempt == max_attempts {
-                return Err(err);
+        match f().await {
+            Ok(_) => return Ok(()),
+            Err(err) => {
+                error!("Attempt {}: Error - {:?}", attempt, err);
+                if attempt == max_attempts {
+                    return Err(err);
+                }
             }
-        } else {
-            return Ok(());
         }
     }
     Ok(())

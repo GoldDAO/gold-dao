@@ -9,6 +9,7 @@ spec:
           "token_metrics",
           "sns_rewards",
           "cycles_manager",
+          "sns_neuron_controller",
           "integration_testing",
           "management"
         ]
