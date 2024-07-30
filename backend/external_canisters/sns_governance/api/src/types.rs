@@ -102,7 +102,7 @@ impl From<[u8; 32]> for NeuronId {
 }
 
 /// The id of a specific proposal.
-#[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq, Debug)]
+#[derive(candid::CandidType, candid::Deserialize, Eq, Copy, Clone, PartialEq, Debug, Serialize)]
 pub struct ProposalId {
     pub id: u64,
 }
@@ -260,7 +260,7 @@ pub mod neuron {
 ///
 /// Note that the target, validator and rendering methods can all coexist in
 /// the same canister or be on different canisters.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct NervousSystemFunction {
     /// The unique id of this function.
     ///
@@ -275,7 +275,7 @@ pub struct NervousSystemFunction {
 }
 /// Nested message and enum types in `NervousSystemFunction`.
 pub mod nervous_system_function {
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct GenericNervousSystemFunction {
         /// The id of the target canister that will be called to execute the proposal.
         pub target_canister_id: Option<candid::Principal>,
@@ -292,7 +292,7 @@ pub mod nervous_system_function {
         /// <method_name>(proposal_data: ProposalData) -> Result<String, String>
         pub validator_method_name: Option<String>,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub enum FunctionType {
         /// Whether this is a native function (i.e. a Action::Motion or
         /// Action::UpgradeSnsControlledCanister) or one of user-defined
@@ -307,7 +307,7 @@ pub mod nervous_system_function {
 /// that is not build into the standard SNS and calls a canister outside
 /// the SNS for execution.
 /// The canister and method to call are derived from the `function_id`.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ExecuteGenericNervousSystemFunction {
     /// This enum value determines what canister to call and what
     /// function to call on that canister.
@@ -320,14 +320,14 @@ pub struct ExecuteGenericNervousSystemFunction {
 }
 /// A proposal function that should guide the future strategy of the SNS's
 /// ecosystem but does not have immediate effect in the sense that a method is executed.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Motion {
     /// The text of the motion, which can at most be 100kib.
     pub motion_text: String,
 }
 /// A proposal function that upgrades a canister that is controlled by the
 /// SNS governance canister.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct UpgradeSnsControlledCanister {
     /// The id of the canister that is upgraded.
     pub canister_id: Option<candid::Principal>,
@@ -340,7 +340,7 @@ pub struct UpgradeSnsControlledCanister {
 }
 /// A proposal to transfer SNS treasury funds to (optionally a Subaccount of) the
 /// target principal.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct TransferSnsTreasuryFunds {
     pub from_treasury: i32,
     /// The amount to transfer, in e8s.
@@ -390,7 +390,7 @@ pub mod transfer_sns_treasury_funds {
 }
 /// A proposal function to change the values of SNS metadata.
 /// Fields with None values will remain unchanged.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ManageSnsMetadata {
     /// Base64 representation of the logo. Max length is 341334 characters, roughly 256 Kb.
     pub logo: Option<String>,
@@ -404,10 +404,10 @@ pub struct ManageSnsMetadata {
 /// A proposal function to upgrade the SNS to the next version.  The versions are such that only
 /// one kind of canister will update at the same time.
 /// This returns an error if the canister cannot be upgraded or no upgrades are available.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct UpgradeSnsToNextVersion {}
 /// A proposal to register a list of dapps in the root canister.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct RegisterDappCanisters {
     /// The canister IDs to be registered (i.e. under the management of the SNS).
     /// The canisters must be already controlled by the SNS root canister before
@@ -417,7 +417,7 @@ pub struct RegisterDappCanisters {
     pub canister_ids: Vec<candid::Principal>,
 }
 /// A proposal to remove a list of dapps from the SNS and assign them to new controllers
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct DeregisterDappCanisters {
     /// The canister IDs to be deregistered (i.e. removed from the management of the SNS).
     pub canister_ids: Vec<candid::Principal>,
@@ -425,7 +425,7 @@ pub struct DeregisterDappCanisters {
     pub new_controllers: Vec<candid::Principal>,
 }
 /// A proposal is the immutable input of a proposal submission.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Proposal {
     /// The proposal's title as a text, which can be at most 256 bytes.
     pub title: String,
@@ -449,6 +449,8 @@ pub struct Proposal {
 }
 /// Nested message and enum types in `Proposal`.
 pub mod proposal {
+    use serde::Serialize;
+
     /// The action that the proposal proposes to take on adoption.
     ///
     /// Each action is associated with an function id that can be used for following.
@@ -460,7 +462,7 @@ pub mod proposal {
     /// of this mapping.
     #[derive(candid::CandidType, candid::Deserialize)]
     #[allow(clippy::large_enum_variant)]
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, PartialEq, Serialize)]
     pub enum Action {
         /// The `Unspecified` action is used as a fallback when
         /// following. That is, if no followees are specified for a given
@@ -521,7 +523,7 @@ pub mod proposal {
         DeregisterDappCanisters(super::DeregisterDappCanisters),
     }
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, Debug, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, Debug, PartialEq, Serialize)]
 pub struct GovernanceError {
     pub error_type: i32,
     pub error_message: String,
@@ -618,7 +620,7 @@ pub mod governance_error {
 /// automatically caused by a neuron following other neurons.
 ///
 /// Once a ballot's vote is set it cannot be changed.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Ballot {
     /// The ballot's vote.
     pub vote: i32,
@@ -633,7 +635,7 @@ pub struct Ballot {
     pub cast_timestamp_seconds: u64,
 }
 /// A tally of votes associated with a proposal.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Tally {
     /// The time when this tally was made, in seconds from the Unix epoch.
     pub timestamp_seconds: u64,
@@ -649,7 +651,7 @@ pub struct Tally {
 }
 /// The wait-for-quiet state associated with a proposal, storing the
 /// data relevant to the "wait-for-quiet" implementation.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct WaitForQuietState {
     /// The current deadline of the proposal associated with this
     /// WaitForQuietState, in seconds from the Unix epoch.
@@ -657,7 +659,7 @@ pub struct WaitForQuietState {
 }
 /// The ProposalData that contains everything related to a proposal:
 /// the proposal itself (immutable), as well as mutable data such as ballots.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ProposalData {
     /// The proposal's action.
     /// Types 0-999 are reserved for current (and future) core governance
@@ -775,7 +777,7 @@ pub struct ProposalData {
 /// on the subnet).
 ///
 /// Required invariant: the canister code assumes that all system parameters are always set.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct NervousSystemParameters {
     /// The number of e8s (10E-8 of a token) that a rejected
     /// proposal costs the proposer.
@@ -893,7 +895,7 @@ pub struct NervousSystemParameters {
     /// (enabled) agree.
     pub maturity_modulation_disabled: Option<bool>,
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct VotingRewardsParameters {
     /// The amount of time between reward events.
     ///
@@ -930,18 +932,18 @@ pub struct VotingRewardsParameters {
 }
 /// The set of default followees that every newly created neuron will follow per function.
 /// This is specified as a mapping of proposal functions to followees for that function.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct DefaultFollowees {
     pub followees: std::collections::BTreeMap<u64, neuron::Followees>,
 }
 /// A wrapper for a list of neuron permissions.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct NeuronPermissionList {
     pub permissions: Vec<i32>,
 }
 /// A record of when voting rewards were determined, and neuron maturity
 /// increased for participation in voting on proposals.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct RewardEvent {
     /// DEPRECATED: Use end_timestamp_seconds instead.
     ///
@@ -1010,7 +1012,7 @@ pub struct RewardEvent {
 /// The representation of the whole governance system, containting all
 /// information about the governance system that must be kept
 /// across upgrades of the governance system, i.e. kept in stable memory.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Governance {
     /// The current set of neurons registered in governance as a map from
     /// neuron IDs to neurons.
@@ -1078,7 +1080,7 @@ pub struct Governance {
 /// Nested message and enum types in `Governance`.
 pub mod governance {
     /// The commands that require a neuron lock.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct NeuronInFlightCommand {
         /// The timestamp at which the command was issued, for debugging
         /// purposes.
@@ -1094,9 +1096,9 @@ pub mod governance {
         /// to prevent interleaving with another async command. Thus there's
         /// no value in actually storing the command itself, and this placeholder
         /// can generally be used in all sync cases.
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub struct SyncCommand {}
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub enum Command {
             Disburse(super::super::manage_neuron::Disburse),
             Split(super::super::manage_neuron::Split),
@@ -1115,7 +1117,7 @@ pub mod governance {
     }
     /// Metrics that are too costly to compute each time when they are
     /// requested.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct GovernanceCachedMetrics {
         /// The timestamp when these metrics were computed, as seconds since
         /// Unix epoch.
@@ -1173,7 +1175,7 @@ pub mod governance {
         pub neurons_with_less_than_6_months_dissolve_delay_e8s: u64,
     }
     /// Metadata about this SNS.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct SnsMetadata {
         /// The logo for the SNS project represented as a base64 encoded string.
         pub logo: Option<String>,
@@ -1185,7 +1187,7 @@ pub mod governance {
         pub description: Option<String>,
     }
     /// A version of the SNS defined by the WASM hashes of its canisters.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct Version {
         /// The hash of the Root canister WASM.
         pub root_wasm_hash: Vec<u8>,
@@ -1201,7 +1203,7 @@ pub mod governance {
         pub index_wasm_hash: Vec<u8>,
     }
     /// An upgrade in progress, defined as a version target and a time at which it is considered failed.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct UpgradeInProgress {
         /// Version to  be upgraded to
         pub target_version: Option<Version>,
@@ -1213,7 +1215,7 @@ pub mod governance {
         /// The proposal that initiated this upgrade
         pub proposal_id: u64,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct MaturityModulation {
         /// When X maturity is disbursed, the amount that goes to the destination
         /// account is X * (1 + y) where y = current_basis_points / 10_000.
@@ -1263,10 +1265,10 @@ pub mod governance {
     }
 }
 /// Request message for 'get_metadata'.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetMetadataRequest {}
 /// Response message for 'get_metadata'.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetMetadataResponse {
     pub logo: Option<String>,
     pub url: Option<String>,
@@ -1274,19 +1276,19 @@ pub struct GetMetadataResponse {
     pub description: Option<String>,
 }
 /// Request message for 'get_sns_initialization_parameters'
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetSnsInitializationParametersRequest {}
 /// Response message for 'get_sns_initialization_parameters'
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetSnsInitializationParametersResponse {
     pub sns_initialization_parameters: String,
 }
 /// Request for the SNS's currently running version.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetRunningSnsVersionRequest {}
 /// Response with the SNS's currently running version and any upgrades
 /// that are in progress.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetRunningSnsVersionResponse {
     /// The currently deployed version of the SNS.
     pub deployed_version: Option<governance::Version>,
@@ -1297,17 +1299,17 @@ pub struct GetRunningSnsVersionResponse {
 /// Failed if it is past the time when it should have been marked as failed.
 /// This is useful in the case where the asynchronous process may have failed to
 /// complete
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct FailStuckUpgradeInProgressRequest {}
 /// Response to FailStuckUpgradeInProgressRequest
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct FailStuckUpgradeInProgressResponse {}
 /// Empty message to use in oneof fields that represent empty
 /// enums.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct Empty {}
 /// An operation that modifies a neuron.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ManageNeuron {
     /// The modified neuron's subaccount which also serves as the neuron's ID.
     pub subaccount: Vec<u8>,
@@ -1319,7 +1321,7 @@ pub mod manage_neuron {
 
     /// The operation that increases a neuron's dissolve delay. It can be
     /// increased up to a maximum defined in the nervous system parameters.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct IncreaseDissolveDelay {
         /// The additional dissolve delay that should be added to the neuron's
         /// current dissolve delay.
@@ -1327,15 +1329,15 @@ pub mod manage_neuron {
     }
     /// The operation that starts dissolving a neuron, i.e., changes a neuron's
     /// state such that it is dissolving.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct StartDissolving {}
     /// The operation that stops dissolving a neuron, i.e., changes a neuron's
     /// state such that it is non-dissolving.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct StopDissolving {}
     /// An (idempotent) alternative to IncreaseDissolveDelay where the dissolve delay
     /// is passed as an absolute timestamp in seconds since the Unix epoch.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct SetDissolveTimestamp {
         /// The time when the neuron (newly) should become dissolved, in seconds
         /// since the Unix epoch.
@@ -1345,20 +1347,20 @@ pub mod manage_neuron {
     /// maturity will cause all the maturity generated by voting rewards
     /// to this neuron to be automatically staked and contribute to the
     /// voting power of the neuron.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct ChangeAutoStakeMaturity {
         pub requested_setting_for_auto_stake_maturity: bool,
     }
     /// Commands that only configure a given neuron, but do not interact
     /// with the outside world. They all require the caller to have
     /// `NeuronPermissionType::ConfigureDissolveState` for the neuron.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
     pub struct Configure {
         pub operation: Option<configure::Operation>,
     }
     /// Nested message and enum types in `Configure`.
     pub mod configure {
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub enum Operation {
             IncreaseDissolveDelay(super::IncreaseDissolveDelay),
             StartDissolving(super::StartDissolving),
@@ -1372,7 +1374,7 @@ pub mod manage_neuron {
     /// Thereby, the neuron's accumulated fees are burned and (if relevant in
     /// the given nervous system) the token equivalent of the neuron's accumulated
     /// maturity are minted and also transferred to the specified account.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct Disburse {
         /// The (optional) amount to disburse out of the neuron. If not specified the cached
         /// stake is used.
@@ -1382,7 +1384,7 @@ pub mod manage_neuron {
     }
     /// Nested message and enum types in `Disburse`.
     pub mod disburse {
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub struct Amount {
             pub e8s: u64,
         }
@@ -1396,7 +1398,7 @@ pub mod manage_neuron {
     /// the dissolve state. The parent neuron's fees and maturity (if applicable in the given
     /// nervous system) remain in the parent neuron and the child neuron's fees and maturity
     /// are initialized to be zero.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct Split {
         /// The amount of governance tokens (in measured in fractions of 10E-8 of
         /// a governance token) to be split to the child neuron.
@@ -1409,7 +1411,7 @@ pub mod manage_neuron {
     }
     /// The operation that merges a given percentage of a neuron's maturity (if applicable
     /// to the nervous system) to the neuron's stake.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct MergeMaturity {
         /// The percentage of maturity to merge, from 1 to 100.
         pub percentage_to_merge: u32,
@@ -1418,7 +1420,7 @@ pub mod manage_neuron {
     /// The caller can choose a percentage of of the current maturity to stake.
     /// If 'percentage_to_stake' is not provided, all of the neuron's current
     /// maturity will be staked.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct StakeMaturity {
         /// The percentage of maturity to stake, from 1 to 100 (inclusive).
         pub percentage_to_stake: Option<u32>,
@@ -1428,14 +1430,14 @@ pub mod manage_neuron {
     /// a percentage of the current maturity to disburse to the ledger account. The
     /// resulting amount to disburse must be greater than or equal to the
     /// transaction fee.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct DisburseMaturity {
         /// The percentage to disburse, from 1 to 100
         pub percentage_to_disburse: u32,
         /// The (optional) principal to which to transfer the stake.
         pub to_account: Option<super::Account>,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct FinalizeDisburseMaturity {
         /// The amount to be disbursed in e8s of the governance token.
         pub amount_to_be_disbursed_e8s: u64,
@@ -1462,7 +1464,7 @@ pub mod manage_neuron {
     /// then it becomes a catch-all follow rule, which will be used to vote
     /// automatically on proposals with actions for which no
     /// specific rule has been specified.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct Follow {
         /// The function id of the proposal function defining for which proposals
         /// this follow relation is relevant.
@@ -1473,7 +1475,7 @@ pub mod manage_neuron {
     /// The operation that registers a given vote from the neuron for a given
     /// proposal (a directly cast vote as opposed to a vote that is cast as
     /// a result of a follow relation).
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct RegisterVote {
         /// The ID of the proposal that the vote is cast for.
         pub proposal: Option<super::ProposalId>,
@@ -1482,14 +1484,14 @@ pub mod manage_neuron {
     }
     /// The operation that claims a new neuron (if it does not exist yet) or
     /// refreshes the stake of the neuron (if it already exists).
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct ClaimOrRefresh {
         pub by: Option<claim_or_refresh::By>,
     }
     /// Nested message and enum types in `ClaimOrRefresh`.
     pub mod claim_or_refresh {
         /// (see MemoAndController below)
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub struct MemoAndController {
             /// The memo(nonce) that is used to compute the neuron's subaccount
             /// (where the tokens were staked to).
@@ -1497,7 +1499,7 @@ pub mod manage_neuron {
             /// The principal for which the neuron should be claimed.
             pub controller: Option<candid::Principal>,
         }
-        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+        #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
         pub enum By {
             /// The memo and principal used to define the neuron to be claimed
             /// or refreshed. Specifically, the memo (nonce) and the given principal
@@ -1518,7 +1520,7 @@ pub mod manage_neuron {
     /// If the PrincipalId doesn't have existing permissions, a new entry will be added for it
     /// with the provided permissions. If a principalId already has permissions for the neuron,
     /// the new permissions will be added to the existing set.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct AddNeuronPermissions {
         /// The PrincipalId that the permissions will be granted to.
         pub principal_id: Option<candid::Principal>,
@@ -1529,7 +1531,7 @@ pub mod manage_neuron {
     /// its permissions removed, it will be removed from the neuron's permissions list. This is a dangerous
     /// operation as its possible to remove all permissions for a neuron and no longer be able to modify
     /// it's state, i.e. disbursing the neuron back into the governance token.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct RemoveNeuronPermissions {
         /// The PrincipalId that the permissions will be revoked from.
         pub principal_id: Option<candid::Principal>,
@@ -1538,7 +1540,7 @@ pub mod manage_neuron {
     }
     #[derive(candid::CandidType, candid::Deserialize)]
     #[allow(clippy::large_enum_variant)]
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, PartialEq, Serialize)]
     pub enum Command {
         Configure(Configure),
         Disburse(Disburse),
@@ -1577,24 +1579,30 @@ pub mod manage_neuron {
 }
 /// The response of a ManageNeuron command.
 /// There is a dedicated response type for each `ManageNeuron.command` field.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ManageNeuronResponse {
     pub command: Option<manage_neuron_response::Command>,
 }
 /// Nested message and enum types in `ManageNeuronResponse`.
 pub mod manage_neuron_response {
     /// The response to the ManageNeuron command 'configure'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct ConfigureResponse {}
     /// The response to the ManageNeuron command 'disburse'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct DisburseResponse {
         /// The block height of the ledger where the tokens were disbursed to the
         /// given account.
         pub transfer_block_height: u64,
     }
     /// The response to the ManageNeuron command 'merge_maturity'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct MergeMaturityResponse {
         /// The maturity that was merged in fractions of
         /// 10E-8 of a governance token.
@@ -1603,48 +1611,68 @@ pub mod manage_neuron_response {
         /// in fractions of 10E-8 of a governance token.
         pub new_stake_e8s: u64,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct DisburseMaturityResponse {
         /// The amount disbursed in e8s of the governance token.
         pub amount_disbursed_e8s: u64,
     }
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct StakeMaturityResponse {
         pub maturity_e8s: u64,
         pub staked_maturity_e8s: u64,
     }
     /// The response to the ManageNeuron command 'follow'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct FollowResponse {}
     /// The response to the ManageNeuron command 'make_proposal'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct MakeProposalResponse {
         /// The ID of the created proposal.
         pub proposal_id: Option<super::ProposalId>,
     }
     /// The response to the ManageNeuron command 'register_vote'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct RegisterVoteResponse {}
     /// The response to the ManageNeuron command 'split'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct SplitResponse {
         /// The ID of the 'child neuron' that was newly created.
         pub created_neuron_id: Option<super::NeuronId>,
     }
     /// The response to the ManageNeuron command 'claim_or_refresh'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct ClaimOrRefreshResponse {
         /// The neuron ID of the neuron that was newly claimed or
         /// refreshed.
         pub refreshed_neuron_id: Option<super::NeuronId>,
     }
     /// The response to the ManageNeuron command 'add_neuron_permissions'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct AddNeuronPermissionsResponse {}
     /// The response to the ManageNeuron command 'remove_neuron_permissions'.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub struct RemoveNeuronPermissionsResponse {}
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
+    #[derive(
+        candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, serde::Serialize,
+    )]
     pub enum Command {
         Error(super::GovernanceError),
         Configure(ConfigureResponse),
@@ -1663,12 +1691,12 @@ pub mod manage_neuron_response {
 }
 
 /// An operation that attempts to get a neuron by a given neuron ID.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetNeuron {
     pub neuron_id: Option<NeuronId>,
 }
 /// A response to the GetNeuron command.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetNeuronResponse {
     /// The response to a GetNeuron command is either an error or
     /// the requested neuron.
@@ -1678,19 +1706,19 @@ pub struct GetNeuronResponse {
 pub mod get_neuron_response {
     /// The response to a GetNeuron command is either an error or
     /// the requested neuron.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub enum Result {
         Error(super::GovernanceError),
         Neuron(super::Neuron),
     }
 }
 /// An operation that attempts to get a proposal by a given proposal ID.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetProposal {
     pub proposal_id: Option<ProposalId>,
 }
 /// A response to the GetProposal command.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetProposalResponse {
     /// The response to a GetProposal command is either an error or
     /// the proposal data corresponding to the requested proposal.
@@ -1702,7 +1730,7 @@ pub mod get_proposal_response {
     /// the proposal data corresponding to the requested proposal.
     #[derive(candid::CandidType, candid::Deserialize)]
     #[allow(clippy::large_enum_variant)]
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, PartialEq, serde::Serialize)]
     pub enum Result {
         Error(super::GovernanceError),
         Proposal(super::ProposalData),
@@ -1746,7 +1774,7 @@ pub struct ListProposals {
     pub include_status: Vec<i32>,
 }
 /// A response to the ListProposals command.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ListProposalsResponse {
     /// The returned list of proposals' ProposalData.
     pub proposals: Vec<ProposalData>,
@@ -1755,7 +1783,7 @@ pub struct ListProposalsResponse {
 /// paginated fashion.
 /// Listing of all neurons can be accomplished using `limit` and `start_page_at`.
 /// To only list neurons associated with a given principal, use `of_principal`.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ListNeurons {
     /// Limit the number of Neurons returned in each page, from 1 to 100.
     /// If a value outside of this range is provided, 100 will be used.
@@ -1773,13 +1801,13 @@ pub struct ListNeurons {
     pub of_principal: Option<candid::Principal>,
 }
 /// A response to the ListNeurons command.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ListNeuronsResponse {
     /// The returned list of neurons.
     pub neurons: Vec<Neuron>,
 }
 /// The response to the list_nervous_system_functions query.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ListNervousSystemFunctionsResponse {
     /// Current set of nervous system function, both native and user-defined,
     /// that can be executed by proposal.
@@ -1788,20 +1816,20 @@ pub struct ListNervousSystemFunctionsResponse {
     /// used to add new NervousSystemFunctions.
     pub reserved_ids: Vec<u64>,
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct SetMode {
     pub mode: i32,
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct SetModeResponse {}
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetMode {}
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetModeResponse {
     pub mode: Option<i32>,
 }
 /// The request for the `claim_swap_neurons` method.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ClaimSwapNeuronsRequest {
     /// The set of parameters that define the neurons created in `claim_swap_neurons`. For
     /// each NeuronParameter, one neuron will be created.
@@ -1811,7 +1839,7 @@ pub struct ClaimSwapNeuronsRequest {
 pub mod claim_swap_neurons_request {
     /// NeuronParameters groups parameters for creating a neuron in the
     /// `claim_swap_neurons` method.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct NeuronParameters {
         /// The PrincipalId that will have permissions when the neuron is created.
         /// The permissions that are granted are controlled my
@@ -1849,7 +1877,7 @@ pub mod claim_swap_neurons_request {
     }
 }
 /// The response for the `claim_swap_neurons` method.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct ClaimSwapNeuronsResponse {
     /// ClaimSwapNeurons will either return an error, in which
     /// no requested neurons were claimed, or a vector with
@@ -1861,7 +1889,7 @@ pub mod claim_swap_neurons_response {
     /// The ok result from `claim_swap_neurons. For every requested neuron,
     /// a SwapNeuron message is returned, and should equal the count of
     /// `ClaimSwapNeuronsRequest.neuron_parameters`.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct ClaimedSwapNeurons {
         pub swap_neurons: Vec<SwapNeuron>,
     }
@@ -1869,7 +1897,7 @@ pub mod claim_swap_neurons_response {
     /// claimed with a NeuronId. The `id` field will correspond with a
     /// `ClaimSwapNeuronsRequest.neuron_parameters.neuron_id` field in
     /// the request object used in `claim_swap_neurons`.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub struct SwapNeuron {
         pub id: Option<super::NeuronId>,
         /// The status of claiming of a requested Sale neuron.
@@ -1878,15 +1906,15 @@ pub mod claim_swap_neurons_response {
     /// ClaimSwapNeurons will either return an error, in which
     /// no requested neurons were claimed, or a vector with
     /// various neuron statuses for the requested neuron ids.
-    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+    #[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, serde::Serialize)]
     pub enum ClaimSwapNeuronsResult {
         Ok(ClaimedSwapNeurons),
         Err(i32),
     }
 }
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetMaturityModulationRequest {}
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
 pub struct GetMaturityModulationResponse {
     pub maturity_modulation: Option<governance::MaturityModulation>,
 }

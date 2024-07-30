@@ -14,19 +14,23 @@ use sns_governance_canister::types::{
     },
     manage_neuron_response, ManageNeuron,
 };
+pub use sns_neuron_controller_api_canister::stake_sns_neuron::Args as StakeSnsNeuronArgs;
 pub use sns_neuron_controller_api_canister::stake_sns_neuron::Response as StakeSnsNeuronResponse;
 use tracing::error;
 use types::CanisterId;
 use utils::{env::Environment, rand::generate_rand_nonce};
 
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn stake_sns_neuron_validate(args: StakeSnsNeuronArgs) -> Result<String, String> {
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+}
+
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
-async fn stake_ogy_neuron(amount: u64) -> StakeSnsNeuronResponse {
-    match stake_ogy_neuron_impl(amount).await {
-        Ok(neuron_id) => {
-            // info!(neuron_id, "Created new neuron.");
-            StakeSnsNeuronResponse::Success(neuron_id)
-        }
+async fn stake_ogy_neuron(args: StakeSnsNeuronArgs) -> StakeSnsNeuronResponse {
+    match stake_ogy_neuron_impl(args.amount).await {
+        Ok(neuron_id) => StakeSnsNeuronResponse::Success(neuron_id),
         Err(error) => {
             error!(error);
             StakeSnsNeuronResponse::InternalError(error)

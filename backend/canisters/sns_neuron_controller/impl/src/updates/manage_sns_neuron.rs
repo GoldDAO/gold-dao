@@ -1,6 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::read_state;
 use canister_tracing_macros::trace;
+use ic_cdk::query;
 use ic_cdk::update;
 use sns_governance_canister::types::{manage_neuron::Command, ManageNeuron};
 pub use sns_neuron_controller_api_canister::manage_sns_neuron::Args as ManageSnsNeuronArgs;
@@ -8,6 +9,12 @@ pub use sns_neuron_controller_api_canister::manage_sns_neuron::Response as Manag
 use sns_neuron_controller_api_canister::neuron_type::NeuronType;
 use tracing::{error, info};
 use types::CanisterId;
+
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn manage_sns_neuron_validate(args: ManageSnsNeuronArgs) -> Result<String, String> {
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+}
 
 #[update(guard = "caller_is_governance_principal")]
 #[trace]

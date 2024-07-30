@@ -1,11 +1,9 @@
-use crate::neuron_type::NeuronType;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 
-#[derive(CandidType, Deserialize, Clone, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct Args {
-    pub neuron_type: NeuronType,
-    pub neuron_id: Vec<u8>,
+    pub amount: u64,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]

@@ -3,7 +3,7 @@ use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::manage_neuron::Command;
 
-#[derive(CandidType, Deserialize, Clone, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct Args {
     pub neuron_type: NeuronType,
     pub neuron_id: Vec<u8>,

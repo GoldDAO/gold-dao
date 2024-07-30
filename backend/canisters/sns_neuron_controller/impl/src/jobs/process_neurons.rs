@@ -6,7 +6,6 @@ use canister_time::{run_now_then_interval, MINUTE_IN_MS};
 use canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
-use tracing::info;
 use types::Milliseconds;
 use utils::env::Environment;
 
@@ -70,7 +69,7 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
 // TODO: think on how to add delay here
 async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
-    delay_duration: Duration,
+    _delay_duration: Duration,
     mut f: F,
 ) -> Result<(), String>
 where
