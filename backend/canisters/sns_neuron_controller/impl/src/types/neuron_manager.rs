@@ -19,11 +19,6 @@ pub trait NeuronConfig {
 #[async_trait]
 #[typetag::serde(tag = "type")]
 pub trait NeuronManager: NeuronConfig {
-    fn sync_neurons(&mut self, neurons: &[Neuron]) -> Result<(), String> {
-        self.get_neurons_mut().all_neurons = neurons.to_vec();
-        Ok(())
-    }
-
     async fn fetch_and_sync_neurons(&mut self) -> Result<(), String> {
         let sns_governance_canister_id = self.get_sns_governance_canister_id();
         let is_test_mode = read_state(|s| s.env.is_test_mode());
@@ -31,7 +26,8 @@ pub trait NeuronManager: NeuronConfig {
 
         // Error is handled in fetch_neurons
         let neurons = fetch_neurons(sns_governance_canister_id, canister_id, is_test_mode).await?;
-        let _ = self.sync_neurons(&neurons);
+
+        self.get_neurons_mut().all_neurons = neurons.to_vec();
         Ok(())
     }
 }

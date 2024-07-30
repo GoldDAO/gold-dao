@@ -1,17 +1,22 @@
 use crate::state::{mutate_state, read_state};
 use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::NeuronRewardsManager;
-use canister_time::{run_now_then_interval, DAY_IN_MS};
+use crate::types::OgyManager;
+use canister_time::{run_now_then_interval, MINUTE_IN_MS};
 use canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
+use utils::env::Environment;
 
-const PROCESS_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS; // 1 day
+const PROCESS_NEURONS_INTERVAL: Milliseconds = MINUTE_IN_MS; // 1 day
+
+const MAX_ATTEMPTS: u8 = 3;
 
 const CLAIM_REWARDS_THRESHOLD: u64 = 100_000_000 * 1_000_000; // 1_000_000 tokens
 
 pub fn start_job() {
+    // run_interval(Duration::from_millis(PROCESS_NEURONS_INTERVAL), run);
     run_now_then_interval(Duration::from_millis(PROCESS_NEURONS_INTERVAL), run);
 }
 
@@ -21,25 +26,62 @@ pub fn run() {
 
 #[trace]
 async fn run_async() {
-    // NOTE: doublecheck here all the state mutations. Now it seems the most simple way, because
-    // if there would be any error with ogy_neuron_manager then it will not affect the state
-    let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
-    match ogy_neuron_manager.fetch_and_sync_neurons().await {
-        Ok(_) => {
-            let available_rewards = ogy_neuron_manager.get_available_rewards().await;
-            // TODO: Once the balance exceeds a certain threshold (e.g. 1 million OGY) the rewards should be claimed and distributed
-            // Q: Should it be 1 million OGY for all controlled neurons or for each one?
-            if available_rewards >= CLAIM_REWARDS_THRESHOLD
-                && ogy_neuron_manager.claim_rewards().await.is_not_failed()
-            {
-                let _ = ogy_neuron_manager.distribute_rewards().await;
-            }
-            // NOTE: Wrtie all the changes into the state. Here the 'neurons: Neurons' are updated and 'timestamp: TimestampMillis'
-            // Q: doesn't it seem stupid to do this in this way?
-            mutate_state(|s| s.data.neuron_managers.ogy = ogy_neuron_manager);
-        }
-        Err(err) => {
+    ic_cdk::println!("Starting neuron processing loop");
+
+    if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, || async {
+        let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
+        fetch_and_process_neurons(&mut ogy_neuron_manager).await
+    })
+    .await
+    {
+        error!(
+            "Failed to process neurons after {} attempts: {:?}",
+            MAX_ATTEMPTS, err
+        );
+        ic_cdk::println!("Failed to process neurons after");
+        crate::jobs::process_neurons::run();
+    }
+}
+
+async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Result<(), String> {
+    ogy_neuron_manager
+        .fetch_and_sync_neurons()
+        .await
+        .map_err(|err| {
             error!("Error fetching and syncing neurons: {:?}", err);
+            ic_cdk::println!("Error fetching and syncing neurons");
+            err.to_string()
+        })?;
+
+    let available_rewards = ogy_neuron_manager.get_available_rewards().await;
+    if available_rewards >= CLAIM_REWARDS_THRESHOLD
+        && ogy_neuron_manager.claim_rewards().await.is_not_failed()
+    {
+        let _ = ogy_neuron_manager.distribute_rewards().await;
+    }
+
+    mutate_state(|s| {
+        s.data.neuron_managers.ogy = ogy_neuron_manager.clone();
+        s.data.neuron_managers.now = s.env.now();
+    });
+
+    Ok(())
+}
+
+async fn retry_with_attempts<F, Fut>(max_attempts: u8, mut f: F) -> Result<(), String>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<(), String>>,
+{
+    for attempt in 1..=max_attempts {
+        if let Err(err) = f().await {
+            error!("Attempt {}: Error - {:?}", attempt, err);
+            if attempt == max_attempts {
+                return Err(err);
+            }
+        } else {
+            return Ok(());
         }
     }
+    Ok(())
 }

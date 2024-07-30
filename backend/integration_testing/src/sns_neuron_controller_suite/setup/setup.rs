@@ -1,151 +1,101 @@
-use std::{ collections::HashMap, time::SystemTime };
-
-use candid::{ encode_one, Nat, Principal };
+use crate::client::sns_neuron_controller;
+use crate::sns_neuron_controller_suite::setup::setup_ledger::setup_ledgers;
+use crate::sns_neuron_controller_suite::setup::setup_rewards::setup_rewards_canister;
+use crate::sns_neuron_controller_suite::setup::setup_sns::create_sns_with_data;
+use crate::sns_neuron_controller_suite::setup::setup_sns::generate_neuron_data;
+use crate::sns_neuron_controller_suite::setup::setup_sns_neuron_controller::setup_sns_neuron_controller_canister;
+use crate::sns_neuron_controller_suite::setup::*;
+use crate::utils::random_principal;
+use candid::encode_one;
+use candid::CandidType;
+use candid::Deserialize;
+use candid::Principal;
+use ic_ledger_types::AccountIdentifier;
+use ic_ledger_types::Subaccount;
+use ic_ledger_types::Tokens;
 use icrc_ledger_types::icrc1::account::Account;
-use pocket_ic::{ PocketIc, PocketIcBuilder };
+use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use types::CanisterId;
 
-use crate::{
-    client::icrc1::client::transfer,
-    sns_rewards_suite::setup::{
-        setup_ledger::setup_ledgers,
-        setup_sns::{ create_sns_with_data, generate_neuron_data },
-    },
-    utils::random_principal,
-    wasms,
-};
+pub const DEFAULT_SUBACCOUNT: Subaccount = Subaccount([0; 32]);
 
-use super::{ setup_rewards::{ setup_rewards_canister, Args }, setup_sns::reinstall_sns_with_data };
-
-pub static POCKET_IC_BIN: &str = "./pocket-ic";
-
-pub fn setup_reward_pools(
-    mut pic: &mut PocketIc,
-    minting_account: &Principal,
-    reward_canister_id: &Principal,
-    canister_ids: &Vec<Principal>,
-    amount: u64
-) {
-    let reward_account = Account {
-        owner: reward_canister_id.clone(),
-        subaccount: Some([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0,
-        ]),
-    };
-
-    for canister_id in canister_ids.into_iter() {
-        transfer(
-            &mut pic,
-            minting_account.clone(),
-            canister_id.clone(),
-            None,
-            reward_account,
-            amount.into()
-        ).unwrap();
-    }
+#[derive(CandidType, Deserialize, Debug)]
+pub struct RegisterDappCanisterRequest {
+    pub canister_id: Option<Principal>,
 }
 
-pub struct RewardsTestEnv {
+pub struct SNCTestEnv {
     pub controller: Principal,
     pub neuron_data: HashMap<usize, Neuron>,
-    pub users: Vec<Principal>,
     pub token_ledgers: HashMap<String, Principal>,
-    pub rewards_canister_id: Principal,
-    pub sns_gov_canister_id: Principal,
+    pub sns_neuron_controller_id: CanisterId,
+    pub sns_governance_id: CanisterId,
+    pub ogy_rewards_canister_id: CanisterId,
+    pub gldt_rewards_canister_id: CanisterId, // could be mocked
     pub pic: PocketIc,
-    pub neuron_owners: HashMap<Principal, usize>,
 }
 
-impl RewardsTestEnv {
-    /// simulate neurons voting by reinstalling the sns gov canister with an increase in maturity
-    /// each neuton's initial maturity is multiplied
-    pub fn simulate_neuron_voting(&mut self, multiplier: u64) {
-        let (neuron_data, _) = generate_neuron_data(
-            0,
-            self.neuron_data.len(),
-            multiplier,
-            &self.users
-        );
-        self.pic.tick();
-        reinstall_sns_with_data(
-            &mut self.pic,
-            &neuron_data,
-            &self.sns_gov_canister_id,
-            &self.controller
-        );
-        self.pic.tick();
-    }
-
-    pub fn upgrade_rewards_canister(&mut self) {
-        let icp_ledger_canister_id = self.token_ledgers
-            .get("icp_ledger_canister_id")
-            .expect("couldn't find ledger with 'icp_ledger_canister_id'")
-            .clone();
-        let sns_ledger_canister_id = self.token_ledgers
-            .get("gldgov_ledger_canister_id")
-            .expect("couldn't find ledger with 'gldgov_ledger_canister_id'")
-            .clone();
-        let ogy_ledger_canister_id = self.token_ledgers
-            .get("ogy_ledger_canister_id")
-            .expect("couldn't find ledger with 'ogy_ledger_canister_id'")
-            .clone();
-
-        let init_args = Args {
-            test_mode: true,
-            icp_ledger_canister_id,
-            sns_ledger_canister_id,
-            ogy_ledger_canister_id,
-            sns_gov_canister_id: self.sns_gov_canister_id.clone(),
-        };
-        match
-            self.pic.upgrade_canister(
-                self.rewards_canister_id,
-                wasms::REWARDS.clone(),
-                encode_one(()).unwrap(),
-                Some(self.controller.clone())
+use std::fmt;
+use std::fmt::Debug;
+use std::fmt::Formatter;
+impl Debug for SNCTestEnv {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SNCTestEnv")
+            .field("controller", &self.controller.to_text())
+            .field(
+                "sns_neuron_controller_id",
+                &self.sns_neuron_controller_id.to_text(),
             )
-        {
-            Ok(m) => println!("{}", "upgrade success"),
-            Err(m) => println!("{m:?}"),
-        }
+            .field("sns_governance_id", &self.sns_governance_id.to_text())
+            .field(
+                "ogy_rewards_canister_id",
+                &self.ogy_rewards_canister_id.to_text(),
+            )
+            .field(
+                "gldt_rewards_canister_id",
+                &self.gldt_rewards_canister_id.to_text(),
+            )
+            .finish()
     }
 }
-
-pub struct RewardsTestEnvBuilder {
+pub struct SNCTestEnvBuilder {
     controller: Principal,
-    users: Vec<Principal>,
     token_symbols: Vec<String>,
+    // Canister ids parameters
+    sns_neuron_controller_id: CanisterId,
+    sns_governance_id: CanisterId,
+    ogy_rewards_canister_id: CanisterId,
+    gldt_rewards_canister_id: CanisterId, // could be mocked
+    // Ledger parameters
     initial_ledger_accounts: Vec<(Account, Nat)>,
-    neurons_to_create: usize,
-    initial_reward_pool_amount: Nat,
     ledger_fees: HashMap<String, Nat>,
 }
 
-impl RewardsTestEnvBuilder {
-    pub fn new() -> Self {
-        let default_controller = Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-
+impl Default for SNCTestEnvBuilder {
+    fn default() -> Self {
         Self {
             controller: random_principal(),
-            users: vec![],
+            sns_neuron_controller_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            sns_governance_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            ogy_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            gldt_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             token_symbols: vec![],
-            neurons_to_create: 0,
             initial_ledger_accounts: vec![],
-            initial_reward_pool_amount: Nat::from(0u64),
             ledger_fees: HashMap::new(),
         }
     }
+}
 
-    /// is the controller of everything - no real need for this but nice to have if you want to be specific
-    pub fn add_controller(mut self, principal: Principal) -> Self {
-        self.controller = principal;
-        self
+impl SNCTestEnvBuilder {
+    pub fn new() -> Self {
+        SNCTestEnvBuilder::default()
     }
 
-    /// users for neuron data - they will be added as hotkeys to neurons // each user users get added to neurons.len() / users.len(), repeating every users.len()
-    pub fn add_users(mut self, users: Vec<Principal>) -> Self {
-        self.users = users;
+    pub fn with_controller(mut self, principal: Principal) -> Self {
+        self.controller = principal;
         self
     }
 
@@ -153,7 +103,7 @@ impl RewardsTestEnvBuilder {
         mut self,
         symbol: &str,
         initial_balances: &mut Vec<(Account, Nat)>,
-        transaction_fee: Nat
+        transaction_fee: Nat,
     ) -> Self {
         self.token_symbols.push(symbol.to_string());
         self.initial_ledger_accounts.append(initial_balances);
@@ -161,65 +111,77 @@ impl RewardsTestEnvBuilder {
         self
     }
 
-    pub fn add_random_neurons(mut self, amount: usize) -> Self {
-        self.neurons_to_create = amount;
-        self
-    }
+    pub fn build(&mut self) -> SNCTestEnv {
+        let mut pic = PocketIcBuilder::new()
+            .with_sns_subnet()
+            .with_application_subnet()
+            .build();
 
-    pub fn with_reward_pools(mut self, amount: Nat) -> Self {
-        self.initial_reward_pool_amount = amount; // Note - this counts as a mint and therefore increases total supply
-        self
-    }
+        let sns_subnet = pic.topology().get_sns().unwrap();
+        self.ogy_rewards_canister_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+        self.sns_governance_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+        self.sns_neuron_controller_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+        self.gldt_rewards_canister_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
 
-    pub fn build(self) -> RewardsTestEnv {
-        let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
-
-        // set the date
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718812800855));
-
-        let (neuron_data, neuron_owners) = generate_neuron_data(
-            0,
-            self.neurons_to_create,
-            1,
-            &self.users
+        // NOTE: Neuron Permissions should be granted to the controller
+        let (neuron_data, neuron_owners) =
+            generate_neuron_data(0, 1, 1, &vec![self.sns_neuron_controller_id]);
+        let sns_gov_canister_id = create_sns_with_data(
+            &mut pic,
+            self.sns_governance_id,
+            &neuron_data,
+            &self.controller,
         );
-        let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data, &self.controller);
         let token_ledgers = setup_ledgers(
             &pic,
             sns_gov_canister_id.clone(),
-            self.token_symbols,
-            self.initial_ledger_accounts,
-            self.ledger_fees
+            self.token_symbols.clone(),
+            self.initial_ledger_accounts.clone(),
+            self.ledger_fees.clone(),
         );
-        let rewards_canister_id = setup_rewards_canister(
-            &mut pic,
-            &token_ledgers,
-            &sns_gov_canister_id,
-            &self.controller
-        );
-        let token_ledger_ids: Vec<Principal> = token_ledgers
-            .iter()
-            .map(|(_, id)| id.clone())
-            .collect();
-        if self.initial_reward_pool_amount > Nat::from(0u64) {
-            setup_reward_pools(
-                &mut pic,
-                &sns_gov_canister_id,
-                &rewards_canister_id,
-                &token_ledger_ids,
-                self.initial_reward_pool_amount.0.try_into().unwrap()
-            );
-        }
 
-        RewardsTestEnv {
+        let ogy_sns_rewards_canister_id = setup_rewards_canister(
+            &mut pic,
+            self.ogy_rewards_canister_id,
+            &token_ledgers,
+            sns_gov_canister_id,
+            &self.controller,
+        );
+
+        // let token_ledger_ids: Vec<Principal> =
+        //     token_ledgers.iter().map(|(_, id)| id.clone()).collect();
+
+        let ogy_sns_ledger_canister_id =
+            token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
+
+        let snc_init_args = sns_neuron_controller_api_canister::init::InitArgs {
+            test_mode: true,
+            sns_rewards_canister_id: self.gldt_rewards_canister_id,
+            ogy_sns_governance_canister_id: self.sns_governance_id,
+            ogy_sns_ledger_canister_id,
+            ogy_sns_rewards_canister_id,
+        };
+
+        let snc_canister_id = setup_sns_neuron_controller_canister(
+            &mut pic,
+            self.sns_neuron_controller_id,
+            snc_init_args,
+            self.controller,
+        );
+
+        SNCTestEnv {
             controller: self.controller,
             neuron_data,
-            users: self.users,
             token_ledgers,
-            rewards_canister_id,
-            sns_gov_canister_id,
+            sns_neuron_controller_id: snc_canister_id,
+            sns_governance_id: self.sns_governance_id,
+            ogy_rewards_canister_id: ogy_sns_rewards_canister_id,
+            gldt_rewards_canister_id: self.gldt_rewards_canister_id,
             pic,
-            neuron_owners,
         }
     }
 }
