@@ -13,7 +13,7 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-cycles-manager.sh [options] <NETWORK>
+  scripts/deploy-sns-neuron-controller.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
@@ -48,44 +48,39 @@ fi
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
 TESTMODE="true"
-SNS_ROOT_CANISTER_ID=i7fbw-giaaa-aaaap-ab25q-cai
+SNS_REWARDS_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
+OGY_SNS_GOVERNANCE_CANISTER_ID=jtpnb-waaaa-aaaal-ajc6q-cai
+OGY_SNS_LEDGER_CANISTER_ID=j5naj-nqaaa-aaaal-ajc7q-cai
+OGY_SNS_REWARDS_CANISTER_ID=fpmqz-aaaaa-aaaag-qjvua-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 else
 TESTMODE="false"
-SNS_ROOT_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
+SNS_REWARDS_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
+OGY_SNS_GOVERNANCE_CANISTER_ID=lnxxh-yaaaa-aaaaq-aadha-cai
+OGY_SNS_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
+OGY_SNS_REWARDS_CANISTER_ID=yuijc-oiaaa-aaaap-ahezq-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 fi
-
-export MIN_CYCLES_BALANCE=20_000_000_000_000
-export MAX_TOP_UP_AMOUNT=10_000_000_000_000
-export ICP_BURN_AMOUNT=500_000_000
-export ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
-export CYCLES_MINTING_CANISTER_ID=rkp4c-7iaaa-aaaaa-aaaca-cai
 
 ARGS='(
   record {
     test_mode = '"$TESTMODE"';
-    sns_root_canister = principal "'"$SNS_ROOT_CANISTER_ID"'";
-    authorized_principals = vec {
+        authorized_principals = vec {
       principal "'"$AUTHORIZED_PRINCIPAL"'";
     };
-    canisters = vec {};
-    min_cycles_balance = '"$MIN_CYCLES_BALANCE"' : nat64;
-    max_top_up_amount = '"$MAX_TOP_UP_AMOUNT"' : nat64;
-    icp_burn_amount = record { e8s = '"$ICP_BURN_AMOUNT"' : nat64 };
-    icp_ledger_canister = principal "'"$ICP_LEDGER_CANISTER_ID"'";
-    cycles_minting_canister = principal "'"$CYCLES_MINTING_CANISTER_ID"'";
+    sns_rewards_canister_id = principal "'"$SNS_REWARDS_CANISTER_ID"'";
+    ogy_sns_governance_canister_id = principal "'"$OGY_SNS_GOVERNANCE_CANISTER_ID"'";
+    ogy_sns_ledger_canister_id = principal "'"$OGY_SNS_LEDGER_CANISTER_ID"'";
+    ogy_sns_rewards_canister_id = principal "'"$OGY_SNS_REWARDS_CANISTER_ID"'";
   },
 )'
 
 echo "Deployment arguments: \n" $ARGS
 
 if [[ $1 == "local" ]]; then
-  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^cycles_manager-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  dfx deploy sns_neuron_controller --network $1 ${REINSTALL} --argument "$ARGS" -y
+elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^sns_neuron_controller-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
-
-
+  dfx deploy sns_neuron_controller --network $1 ${REINSTALL} --argument "$ARGS" -y
 fi

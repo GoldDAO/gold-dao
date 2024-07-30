@@ -126,6 +126,10 @@ impl ClaimRewardResult {
 pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(), String> {
     let sns_rewards_canister_id = read_state(|state| state.data.sns_rewards_canister_id);
 
+    let fee = icrc_ledger_canister_c2c_client::icrc1_fee(sns_ledger_canister_id)
+        .await
+        .unwrap();
+    ic_cdk::println!("Fee: {}", fee);
     // Transfer all the tokens to sns_rewards to be distributed
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         sns_ledger_canister_id,
@@ -141,7 +145,7 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
                 [0; 32],
                 sns_rewards_canister_id.into(),
                 sns_ledger_canister_id,
-                balance - Nat::from(10000000000000u64),
+                balance - fee,
             )
             .await
             {

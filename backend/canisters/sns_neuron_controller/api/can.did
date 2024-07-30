@@ -18,6 +18,11 @@ type AddNeuronPermissions = record {
   principal_id : opt principal;
 };
 type Amount = record { e8s : nat64 };
+type Args = record {
+  neuron_type : NeuronType;
+  command : Command;
+  neuron_id : blob;
+};
 type By = variant {
   MemoAndController : MemoAndController;
   NeuronId : record {};
@@ -81,7 +86,11 @@ type IncreaseDissolveDelay = record {
 };
 type InitArgs = record {
   test_mode : bool;
+  ogy_sns_ledger_canister_id : principal;
+  ogy_sns_rewards_canister_id : principal;
+  authorized_principals : vec principal;
   sns_rewards_canister_id : principal;
+  ogy_sns_governance_canister_id : principal;
 };
 type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageSnsMetadata = record {
@@ -90,12 +99,6 @@ type ManageSnsMetadata = record {
   name : opt text;
   description : opt text;
 };
-type ManageSnsNeuronRequest = record {
-  neuron_type : NeuronType;
-  command : Command;
-  neuron_id : blob;
-};
-type ManageSnsNeuronResponse = variant { Success : text; InternalError : text };
 type MemoAndController = record { controller : opt principal; memo : nat64 };
 type MergeMaturity = record { percentage_to_merge : nat32 };
 type Motion = record { motion_text : text };
@@ -151,7 +154,7 @@ type NeuronPermission = record {
   permission_type : vec int32;
 };
 type NeuronPermissionList = record { permissions : vec int32 };
-type NeuronType = variant { Ogy; Wtn; Other : principal };
+type NeuronType = variant { Ogy; Wtn };
 type Operation = variant {
   ChangeAutoStakeMaturity : ChangeAutoStakeMaturity;
   StopDissolving : record {};
@@ -172,10 +175,11 @@ type RemoveNeuronPermissions = record {
   permissions_to_remove : opt NeuronPermissionList;
   principal_id : opt principal;
 };
+type Response = variant { Success : text; InternalError : text };
+type Response_1 = variant { Success : blob; InternalError : text };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
 type Split = record { memo : nat64; amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
-type StakeSnsNeuronResponse = variant { Success : blob; InternalError : text };
 type Subaccount = record { subaccount : blob };
 type TransferSnsTreasuryFunds = record {
   from_treasury : int32;
@@ -198,6 +202,6 @@ type VotingRewardsParameters = record {
 };
 service : (InitArgs) -> {
   list_ogy_neurons : () -> (ListNeuronsResponse) query;
-  manage_sns_neuron : (ManageSnsNeuronRequest) -> (ManageSnsNeuronResponse);
-  stake_sns_neuron : () -> (StakeSnsNeuronResponse);
+  manage_sns_neuron : (Args) -> (Response);
+  stake_sns_neuron : () -> (Response_1);
 }

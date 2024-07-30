@@ -1,4 +1,3 @@
-use crate::client::sns_neuron_controller;
 use crate::sns_neuron_controller_suite::setup::setup_ledger::setup_ledgers;
 use crate::sns_neuron_controller_suite::setup::setup_rewards::setup_rewards_canister;
 use crate::sns_neuron_controller_suite::setup::setup_sns::create_sns_with_data;
@@ -6,21 +5,15 @@ use crate::sns_neuron_controller_suite::setup::setup_sns::generate_neuron_data;
 use crate::sns_neuron_controller_suite::setup::setup_sns_neuron_controller::setup_sns_neuron_controller_canister;
 use crate::sns_neuron_controller_suite::setup::*;
 use crate::utils::random_principal;
-use candid::encode_one;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
-use ic_ledger_types::AccountIdentifier;
-use ic_ledger_types::Subaccount;
-use ic_ledger_types::Tokens;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
 use std::collections::HashMap;
-use std::collections::HashSet;
-use types::CanisterId;
 
-pub const DEFAULT_SUBACCOUNT: Subaccount = Subaccount([0; 32]);
+use types::CanisterId;
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct RegisterDappCanisterRequest {
@@ -128,8 +121,7 @@ impl SNCTestEnvBuilder {
             pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
 
         // NOTE: Neuron Permissions should be granted to the controller
-        let (neuron_data, neuron_owners) =
-            generate_neuron_data(0, 1, 1, &vec![self.sns_neuron_controller_id]);
+        let (neuron_data, _) = generate_neuron_data(0, 1, 1, &vec![self.sns_neuron_controller_id]);
         let sns_gov_canister_id = create_sns_with_data(
             &mut pic,
             self.sns_governance_id,
@@ -160,6 +152,7 @@ impl SNCTestEnvBuilder {
 
         let snc_init_args = sns_neuron_controller_api_canister::init::InitArgs {
             test_mode: true,
+            authorized_principals: vec![self.sns_governance_id],
             sns_rewards_canister_id: self.gldt_rewards_canister_id,
             ogy_sns_governance_canister_id: self.sns_governance_id,
             ogy_sns_ledger_canister_id,
