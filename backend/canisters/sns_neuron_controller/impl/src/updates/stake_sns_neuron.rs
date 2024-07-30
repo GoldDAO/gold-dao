@@ -19,16 +19,10 @@ use tracing::error;
 use types::CanisterId;
 use utils::{env::Environment, rand::generate_rand_nonce};
 
-#[query(guard = "caller_is_governance_principal", hidden = true)]
-#[trace]
-async fn stake_sns_neuron_validate() -> Result<String, String> {
-    Ok("No arguments to validate".to_string())
-}
-
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
-async fn stake_sns_neuron() -> StakeSnsNeuronResponse {
-    match stake_sns_neuron_impl().await {
+async fn stake_ogy_neuron(amount: u64) -> StakeSnsNeuronResponse {
+    match stake_ogy_neuron_impl(amount).await {
         Ok(neuron_id) => {
             // info!(neuron_id, "Created new neuron.");
             StakeSnsNeuronResponse::Success(neuron_id)
@@ -40,29 +34,33 @@ async fn stake_sns_neuron() -> StakeSnsNeuronResponse {
     }
 }
 
-async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
+async fn stake_ogy_neuron_impl(amount: u64) -> Result<Vec<u8>, String> {
     let nonce = generate_rand_nonce().await?;
 
     let PrepareResult {
-        sns_governance_canister_id,
-        sns_ledger_canister_id,
+        ogy_governance_canister_id,
+        ogy_ledger_canister_id,
         principal,
     } = read_state(prepare)?;
 
     let subaccount = compute_neuron_staking_subaccount_bytes(principal, nonce);
 
     match icrc_ledger_canister_c2c_client::icrc1_transfer(
-        sns_ledger_canister_id,
+        ogy_ledger_canister_id,
         &(TransferArg {
             from_subaccount: None,
             to: Account {
-                owner: sns_governance_canister_id,
+                owner: ogy_governance_canister_id,
                 subaccount: Some(subaccount),
             },
-            fee: Some((10_000u32).into()),
+            fee: Some(
+                icrc_ledger_canister_c2c_client::icrc1_fee(ogy_ledger_canister_id)
+                    .await
+                    .unwrap(),
+            ),
             created_at_time: None,
             memo: Some(nonce.into()),
-            amount: (100_000_000u32).into(), // initialised with 1 ICP, further can be added afterwards
+            amount: amount.into(),
         }),
     )
     .await
@@ -77,7 +75,7 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
     }
 
     match sns_governance_canister_c2c_client::manage_neuron(
-        sns_governance_canister_id,
+        ogy_governance_canister_id,
         &(ManageNeuron {
             // TODO: fix
             subaccount: vec![],
@@ -107,19 +105,19 @@ async fn stake_sns_neuron_impl() -> Result<Vec<u8>, String> {
 }
 
 struct PrepareResult {
-    sns_governance_canister_id: CanisterId,
-    sns_ledger_canister_id: CanisterId,
+    ogy_governance_canister_id: CanisterId,
+    ogy_ledger_canister_id: CanisterId,
     principal: Principal,
 }
 
 fn prepare(state: &RuntimeState) -> Result<PrepareResult, String> {
     Ok(PrepareResult {
-        sns_governance_canister_id: state
+        ogy_governance_canister_id: state
             .data
             .neuron_managers
             .ogy
             .ogy_sns_governance_canister_id,
-        sns_ledger_canister_id: state.data.neuron_managers.ogy.ogy_sns_ledger_canister_id,
+        ogy_ledger_canister_id: state.data.neuron_managers.ogy.ogy_sns_ledger_canister_id,
         principal: state.env.canister_id(),
     })
 }
