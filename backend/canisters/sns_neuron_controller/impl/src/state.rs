@@ -1,6 +1,7 @@
-use crate::types::{OgyManager, WtnManager};
-// use crate::types::neuron_metrics::NeuronWithMetric;
+use crate::types::neuron_manager::NeuronConfig;
 use crate::types::neuron_manager::Neurons;
+use crate::types::neuron_metrics::NeuronWithMetric;
+use crate::types::{OgyManager, WtnManager};
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use serde::{Deserialize, Serialize};
@@ -39,6 +40,15 @@ impl RuntimeState {
 
             authorized_principals: self.data.authorized_principals.clone(),
             sns_rewards_canister_id: self.data.sns_rewards_canister_id,
+            ogy_neuron_manager_metrics: self
+                .data
+                .neuron_managers
+                .ogy
+                .get_neurons()
+                .all_neurons
+                .iter()
+                .map(|n| NeuronWithMetric::from(n.clone()))
+                .collect(),
         }
     }
 
@@ -53,8 +63,7 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub sns_rewards_canister_id: Principal,
-    // FIXME
-    // pub neuron_manager_metrics:
+    pub ogy_neuron_manager_metrics: Vec<NeuronWithMetric>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]

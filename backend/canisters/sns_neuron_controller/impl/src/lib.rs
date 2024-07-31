@@ -1,7 +1,9 @@
 /*!
 # SNS neuron controller canister
 
-// TODO: add description
+The SNS neuron controller canister is responsible for managing
+neurons. It automatically processes all the neurons: fetches updates,
+claims rewards and re-distribute them to sns_rewards canister.
 
 ## Copyright
 © 2023  [DAO.LINK Sàrl], [Switzerland]

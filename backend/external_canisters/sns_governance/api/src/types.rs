@@ -1579,7 +1579,7 @@ pub mod manage_neuron {
 }
 /// The response of a ManageNeuron command.
 /// There is a dedicated response type for each `ManageNeuron.command` field.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug, Serialize)]
 pub struct ManageNeuronResponse {
     pub command: Option<manage_neuron_response::Command>,
 }

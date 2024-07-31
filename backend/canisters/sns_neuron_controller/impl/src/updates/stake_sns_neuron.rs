@@ -71,9 +71,11 @@ async fn stake_ogy_neuron_impl(amount: u64) -> Result<Vec<u8>, String> {
     {
         Ok(Ok(_)) => {}
         Ok(Err(error)) => {
+            error!("Transfer error: {:?}", error);
             return Err(format!("Transfer error: {error:?}"));
         }
         Err(error) => {
+            error!("Transfer error: {:?}", error);
             return Err(format!("Network error: {error:?}"));
         }
     }
@@ -99,8 +101,8 @@ async fn stake_ogy_neuron_impl(amount: u64) -> Result<Vec<u8>, String> {
                 Ok(neuron_id)
             }
             // FIXME: add here debug
-            _response => {
-                // return Err(format!("Governance error: {:?}", response.unwrap()));
+            response => {
+                error!("Error while executing manage_neuron: {:?}", response);
                 Err("manage_neuron error".to_string())
             }
         },

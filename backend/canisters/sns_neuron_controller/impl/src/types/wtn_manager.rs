@@ -16,7 +16,7 @@ pub struct WtnManager {
 impl Default for WtnManager {
     fn default() -> Self {
         Self {
-            // FIXME: Change to the valid params
+            // TODO: Change to the valid params
             wtn_sns_governance_canister_id: Principal::from_text("lnxxh-yaaaa-aaaaq-aadha-cai")
                 .unwrap(),
             wtn_sns_ledger_canister_id: Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")
