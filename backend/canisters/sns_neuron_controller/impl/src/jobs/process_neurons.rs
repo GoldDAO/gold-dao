@@ -24,8 +24,6 @@ pub fn run() {
 
 #[trace]
 async fn run_async() {
-    ic_cdk::println!("Starting neuron processing loop");
-
     if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
         let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
         fetch_and_process_neurons(&mut ogy_neuron_manager).await
@@ -36,7 +34,6 @@ async fn run_async() {
             "Failed to process neurons after {} attempts: {:?}",
             MAX_ATTEMPTS, err
         );
-        ic_cdk::println!("Failed to process neurons after");
         crate::jobs::process_neurons::run();
     }
 }
@@ -47,7 +44,6 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
         .await
         .map_err(|err| {
             error!("Error fetching and syncing neurons: {:?}", err);
-            ic_cdk::println!("Error fetching and syncing neurons");
             err.to_string()
         })?;
 

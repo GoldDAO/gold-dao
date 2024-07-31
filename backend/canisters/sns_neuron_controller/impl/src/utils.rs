@@ -87,7 +87,6 @@ pub async fn fetch_neurons(
             }
             Err(e) => {
                 error!("Failed to obtain all neurons data {:?}", e);
-                ic_cdk::println!("Failed to fetch n data: {:?}", e);
                 return Err(format!("Failed to obtain all neurons data {:?}", e));
             }
         }
@@ -130,7 +129,6 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
     let fee = icrc_ledger_canister_c2c_client::icrc1_fee(sns_ledger_canister_id)
         .await
         .unwrap();
-    ic_cdk::println!("Fee: {}", fee);
     // Transfer all the tokens to sns_rewards to be distributed
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         sns_ledger_canister_id,
@@ -157,7 +155,6 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
                 }
                 Err(error_message) => {
                     let error_message = format!("Error during transfer rewards: {}", error_message);
-                    ic_cdk::println!("Error during transfer rewards: {}", error_message);
                     error!(error_message);
                     Err(error_message)
                 }

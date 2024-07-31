@@ -103,10 +103,6 @@ pub async fn ogy_fetch_neuron_reward_balance(
                 "Failed to fetch token balance of ledger canister id {} with ERROR : {:?}",
                 ledger_canister_id, e
             );
-            // ic_cdk::println!(
-            //     "Failed to fetch token balance of ledger canister id: {:?}",
-            //     error_message
-            // );
             error!("{}", error_message);
             Err(error_message)
         }
@@ -189,17 +185,10 @@ pub async fn ogy_claim_rewards(
                         .await
                     {
                         Ok(_) => Ok(()),
-                        Err(e) => {
-                            ic_cdk::println!(
-                                "Failed to claim rewards for Neuron ID {}: {:?}",
-                                neuron_id,
-                                e
-                            );
-                            Err(format!(
-                                "Failed to claim rewards for Neuron ID {}: {:?}",
-                                neuron_id, e
-                            ))
-                        }
+                        Err(e) => Err(format!(
+                            "Failed to claim rewards for Neuron ID {}: {:?}",
+                            neuron_id, e
+                        )),
                     }
                 }
             })

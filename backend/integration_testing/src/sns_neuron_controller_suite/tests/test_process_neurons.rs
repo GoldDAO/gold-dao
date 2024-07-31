@@ -1,5 +1,4 @@
 use crate::client::rewards::add_neuron_ownership;
-use candid::Nat;
 use candid::{CandidType, Deserialize};
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
@@ -95,8 +94,8 @@ fn test_process_neurons_happy_path() {
         initial_neuron_rewards_balance
     );
 
-    test_env.pic.advance_time(Duration::from_secs(1 * 60 * 60));
-    tick_n_blocks(&test_env.pic, 100);
+    test_env.pic.advance_time(Duration::from_secs(24 * 60 * 60));
+    tick_n_blocks(&test_env.pic, 10);
 
     let current_sns_rewards_balance = balance_of(
         &mut test_env.pic,
