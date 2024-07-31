@@ -16,9 +16,10 @@ This marks the initial release of SNS Neuron Controller Canister (sns_neuron_con
 #### Added
 
 - first release with all management methods of any SNS neuron
-- Introduced NeuronManager trait for managing SNS neurons
-- Implemented NeuronManager functionality for OGYNeuron:
+- Introduced NeuronManager and NeuronRewardsManager traits for managing SNS neurons with the following methods:
     - fetch_and_sync_neurons
     - get_available_rewards
     - claim_rewards
     - distribute_rewards
+- Implemented NeuronManager functionality for OGYNeuron
+- Implemented NeuronRewardsManager functionality for OGYNeuron
