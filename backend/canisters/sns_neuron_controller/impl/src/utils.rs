@@ -87,6 +87,7 @@ pub async fn fetch_neurons(
             }
             Err(e) => {
                 error!("Failed to obtain all neurons data {:?}", e);
+                ic_cdk::println!("Failed to fetch n data: {:?}", e);
                 return Err(format!("Failed to obtain all neurons data {:?}", e));
             }
         }
