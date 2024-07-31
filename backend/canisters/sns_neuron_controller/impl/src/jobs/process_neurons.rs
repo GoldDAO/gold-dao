@@ -2,14 +2,14 @@ use crate::state::{mutate_state, read_state};
 use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::NeuronRewardsManager;
 use crate::types::OgyManager;
-use canister_time::{run_now_then_interval, MINUTE_IN_MS};
+use canister_time::{run_now_then_interval, DAY_IN_MS};
 use canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
 use utils::env::Environment;
 
-const PROCESS_NEURONS_INTERVAL: Milliseconds = MINUTE_IN_MS; // 1 day
+const PROCESS_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS; // 1 day
 const MAX_ATTEMPTS: u8 = 3;
 const CLAIM_REWARDS_THRESHOLD: u64 = 100_000_000 * 1_000_000; // 1_000_000 tokens
 const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
@@ -24,8 +24,6 @@ pub fn run() {
 
 #[trace]
 async fn run_async() {
-    ic_cdk::println!("Starting neuron processing loop");
-
     if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
         let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
         fetch_and_process_neurons(&mut ogy_neuron_manager).await
@@ -36,7 +34,6 @@ async fn run_async() {
             "Failed to process neurons after {} attempts: {:?}",
             MAX_ATTEMPTS, err
         );
-        ic_cdk::println!("Failed to process neurons after");
         crate::jobs::process_neurons::run();
     }
 }
@@ -47,7 +44,6 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
         .await
         .map_err(|err| {
             error!("Error fetching and syncing neurons: {:?}", err);
-            ic_cdk::println!("Error fetching and syncing neurons");
             err.to_string()
         })?;
 
