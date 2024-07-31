@@ -1,4 +1,5 @@
 use crate::client::rewards::add_neuron_ownership;
+use candid::Nat;
 use candid::{CandidType, Deserialize};
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
@@ -32,7 +33,7 @@ fn test_process_neurons_happy_path() {
         &mut test_env.pic,
         ogy_ledger_canister_id,
         Account {
-            owner: test_env.gldt_rewards_canister_id,
+            owner: test_env.gld_rewards_canister_id,
             subaccount: None,
         },
     );
@@ -102,7 +103,7 @@ fn test_process_neurons_happy_path() {
         &mut test_env.pic,
         ogy_ledger_canister_id,
         Account {
-            owner: test_env.gldt_rewards_canister_id,
+            owner: test_env.gld_rewards_canister_id,
             subaccount: None,
         },
     );
@@ -120,4 +121,12 @@ fn test_process_neurons_happy_path() {
 
     assert!(initial_sns_rewards_balance < current_sns_rewards_balance);
     assert!(initial_neuron_rewards_balance > current_neuron_rewards_balance);
+
+    // Should be 0 as all were claimed
+    assert_eq!(current_neuron_rewards_balance, Nat::from(0u8));
+    //Sshould be the initial balance - 2x fees as two transactions happen in the claiming and distribution process.
+    assert_eq!(
+        current_sns_rewards_balance,
+        initial_neuron_rewards_balance - Nat::from(2u32 * 200_000u32)
+    );
 }

@@ -27,7 +27,7 @@ pub struct SNCTestEnv {
     pub sns_neuron_controller_id: CanisterId,
     pub sns_governance_id: CanisterId,
     pub ogy_rewards_canister_id: CanisterId,
-    pub gldt_rewards_canister_id: CanisterId, // could be mocked
+    pub gld_rewards_canister_id: CanisterId, // could be mocked
     pub pic: PocketIc,
 }
 
@@ -48,8 +48,8 @@ impl Debug for SNCTestEnv {
                 &self.ogy_rewards_canister_id.to_text(),
             )
             .field(
-                "gldt_rewards_canister_id",
-                &self.gldt_rewards_canister_id.to_text(),
+                "gld_rewards_canister_id",
+                &self.gld_rewards_canister_id.to_text(),
             )
             .finish()
     }
@@ -61,7 +61,7 @@ pub struct SNCTestEnvBuilder {
     sns_neuron_controller_id: CanisterId,
     sns_governance_id: CanisterId,
     ogy_rewards_canister_id: CanisterId,
-    gldt_rewards_canister_id: CanisterId, // could be mocked
+    gld_rewards_canister_id: CanisterId, // could be mocked
     // Ledger parameters
     initial_ledger_accounts: Vec<(Account, Nat)>,
     ledger_fees: HashMap<String, Nat>,
@@ -74,7 +74,7 @@ impl Default for SNCTestEnvBuilder {
             sns_neuron_controller_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             sns_governance_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             ogy_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            gldt_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            gld_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             token_symbols: vec![],
             initial_ledger_accounts: vec![],
             ledger_fees: HashMap::new(),
@@ -117,7 +117,7 @@ impl SNCTestEnvBuilder {
             pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
         self.sns_neuron_controller_id =
             pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
-        self.gldt_rewards_canister_id =
+        self.gld_rewards_canister_id =
             pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
 
         // NOTE: Neuron Permissions should be granted to the controller
@@ -153,7 +153,7 @@ impl SNCTestEnvBuilder {
         let snc_init_args = sns_neuron_controller_api_canister::init::InitArgs {
             test_mode: true,
             authorized_principals: vec![self.sns_governance_id],
-            sns_rewards_canister_id: self.gldt_rewards_canister_id,
+            sns_rewards_canister_id: self.gld_rewards_canister_id,
             ogy_sns_governance_canister_id: self.sns_governance_id,
             ogy_sns_ledger_canister_id,
             ogy_sns_rewards_canister_id,
@@ -173,7 +173,7 @@ impl SNCTestEnvBuilder {
             sns_neuron_controller_id: snc_canister_id,
             sns_governance_id: self.sns_governance_id,
             ogy_rewards_canister_id: ogy_sns_rewards_canister_id,
-            gldt_rewards_canister_id: self.gldt_rewards_canister_id,
+            gld_rewards_canister_id: self.gld_rewards_canister_id,
             pic,
         }
     }
