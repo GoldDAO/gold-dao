@@ -113,6 +113,9 @@ include:
       src-folder: icp_neuron
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
+      src-folder: sns_neuron_controller
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
       src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
