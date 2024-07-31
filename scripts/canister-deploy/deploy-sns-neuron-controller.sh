@@ -48,19 +48,20 @@ fi
 
 if [[ $1 =~ ^(local|staging)$ ]]; then
 TESTMODE="true"
-SNS_REWARDS_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
+SNS_REWARDS_CANISTER_ID=2f5ll-gqaaa-aaaak-qcfuq-cai
 OGY_SNS_GOVERNANCE_CANISTER_ID=jtpnb-waaaa-aaaal-ajc6q-cai
 OGY_SNS_LEDGER_CANISTER_ID=j5naj-nqaaa-aaaal-ajc7q-cai
 OGY_SNS_REWARDS_CANISTER_ID=fpmqz-aaaaa-aaaag-qjvua-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 else
 TESTMODE="false"
-SNS_REWARDS_CANISTER_ID=tw2vt-hqaaa-aaaaq-aab6a-cai
+SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
 OGY_SNS_GOVERNANCE_CANISTER_ID=lnxxh-yaaaa-aaaaq-aadha-cai
 OGY_SNS_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
 OGY_SNS_REWARDS_CANISTER_ID=yuijc-oiaaa-aaaap-ahezq-cai
 AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
 fi
+
 
 ARGS='(
   record {
