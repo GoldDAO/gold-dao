@@ -59,7 +59,7 @@ SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
 OGY_SNS_GOVERNANCE_CANISTER_ID=lnxxh-yaaaa-aaaaq-aadha-cai
 OGY_SNS_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
 OGY_SNS_REWARDS_CANISTER_ID=yuijc-oiaaa-aaaap-ahezq-cai
-AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
+AUTHORIZED_PRINCIPAL=tr3th-kiaaa-aaaaq-aab6q-cai
 fi
 
 
