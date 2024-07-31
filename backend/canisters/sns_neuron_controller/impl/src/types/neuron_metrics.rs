@@ -62,7 +62,6 @@ pub struct DepositAccount {
 
 #[cfg(test)]
 mod tests {
-    // use std::collections::HashMap;
     use icrc_ledger_types::icrc1::account::Account;
     use sns_governance_canister::types::{Neuron, NeuronId};
     use std::collections::BTreeMap;
