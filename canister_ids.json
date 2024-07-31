@@ -36,7 +36,7 @@
     "ic": "j4jiq-sqaaa-aaaap-ab23a-cai",
     "staging": "j2neh-vqaaa-aaaal-aduxq-cai"
   },
-  "management" : {
+  "management": {
     "ic": "g5je6-yaaaa-aaaap-ahkza-cai",
     "staging": "t5uzw-sqaaa-aaaan-qmoaq-cai"
   },
@@ -67,6 +67,10 @@
   "sns_swap": {
     "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
     "staging": "ikcq3-haaaa-aaaap-ab26a-cai"
+  },
+  "sns_neuron_controller": {
+    "ic": "54vkq-taaaa-aaaap-ahqra-cai",
+    "staging": "s2ryu-oyaaa-aaaap-qhq2q-cai"
   },
   "token_metrics": {
     "ic": "teiwz-pqaaa-aaaap-ag7hq-cai",
