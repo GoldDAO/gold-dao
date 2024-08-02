@@ -1,3 +1,4 @@
+// use crate::types::neuron_manager::NeuronRewardsManager;
 // use candid::CandidType;
 // use ic_cdk::query;
 
@@ -11,6 +12,6 @@
 // #[query]
 // fn list_ogy_neurons() -> ListNeuronsResponse {
 //     read_state(|s| ListNeuronsResponse {
-//         neurons: s.data.get_ogy_neuron_list(),
+//         neurons: s.data.neuron_managers.ogy.get_available_rewards().await,
 //     })
 // }
