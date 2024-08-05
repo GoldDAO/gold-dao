@@ -71,7 +71,6 @@ pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
     pub memory_used: MemorySize,
-    // pub cycles_balance_in_tc: f64,
     pub cycles_balance: Cycles,
 }
 
@@ -84,6 +83,7 @@ pub struct Data {
 
 impl Data {
     pub fn new(
+        authorized_principals: Vec<Principal>,
         ogy_sns_governance_canister_id: CanisterId,
         ogy_sns_ledger_canister_id: CanisterId,
         ogy_sns_rewards_canister_id: CanisterId,
@@ -91,7 +91,7 @@ impl Data {
         now: TimestampMillis,
     ) -> Self {
         Self {
-            authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
+            authorized_principals,
             neuron_managers: NeuronManagers::init(
                 ogy_sns_governance_canister_id,
                 ogy_sns_ledger_canister_id,
