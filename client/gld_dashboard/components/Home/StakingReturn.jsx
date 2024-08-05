@@ -1,7 +1,8 @@
-"use client";
-import { useState } from "react";
-import RangeSlider from "./RangeSlider";
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import RangeSlider from './RangeSlider';
 
 const StakingReturn = () => {
   const [value, setValue] = useState(60);

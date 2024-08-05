@@ -5,10 +5,12 @@ description = "Common libs for the GLDT project that are shared between canister
 authors = ["Dustin Becker <dustin@bochslerfinance.com>"]
 edition = "2021"
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 ic-cdk = { workspace = true }
-ic-cdk-macros = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
 # serde_derive = { workspace = true}
@@ -16,4 +18,3 @@ serde_bytes = { workspace = true }
 
 [dev-dependencies]
 clippy = "0.0.302"
-tokio = { version = "1.33.0", features = ["full"] }

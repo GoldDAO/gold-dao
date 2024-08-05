@@ -3,8 +3,9 @@
 import { Bounce, toast } from 'react-toastify';
 import { useState } from 'react';
 import { calculateVotingPower, neuronState, uint8ArrayToHexString } from '../utils/functions';
+import mapResponseErrorCodeToFriendlyError from '../utils/errorMap';
 
-import { canisters } from '../utils/canisters';
+import canisters from '../utils/canisters';
 import { p } from '../utils/parsers';
 import useActor from './useActor';
 
@@ -44,38 +45,38 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
           theme: 'light',
           transition: Bounce,
         });
-      } else {
-        setLoading(false);
-        toast.error(
-          Object.keys(response.Err)[0]
-            .split(/(?=[A-Z])/)
-            .join(' '),
-          {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-            transition: Bounce,
-          },
-        );
+        return true;
       }
+      setLoading(false);
+      toast.error(
+        mapResponseErrorCodeToFriendlyError(response),
+        {
+          position: 'top-right',
+          autoClose: 10000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+          theme: 'light',
+          transition: Bounce,
+        },
+      );
+      return false;
     } catch (err) {
       setLoading(false);
       toast.error('Something went wrong', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
       });
+      return false;
     }
   };
 
@@ -99,28 +100,31 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
         });
       } else {
         setLoading(false);
-        toast.error('Something went wrong', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        });
+        toast.error(
+          mapResponseErrorCodeToFriendlyError(response),
+          {
+            position: 'top-right',
+            autoClose: 10000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+            theme: 'light',
+            transition: Bounce,
+          },
+        );
       }
       return { loading };
     } catch (err) {
       setLoading(false);
       toast.error('Something went wrong', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
@@ -131,7 +135,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   // call this function in a loop for each neuron the user has to claim all.
   const claimOneReward = async (id, tok) => {
     try {
-      const response = await snsRewards.claim_reward({token: tok, neuron_id : { id }} );
+      const response = await snsRewards.claim_reward({ token: tok, neuron_id: { id } });
       return response;
     } catch (err) {
       console.log(err);
@@ -156,6 +160,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
     setLoading(true);
     const response = await claimOneReward(neuronId, token);
     if (response.Ok) {
+      setLoading(false);
+      setRequestSent(false);
       toast.success('Reward successfully claimed!', {
         position: 'top-right',
         autoClose: 5000,
@@ -172,19 +178,20 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
     setNeuronError({ ...neuronError, neuronId });
     const hexNeuronId = uint8ArrayToHexString(neuronId);
     toast.error(
-      `${Object.values(response.Err)[0]} claiming neuron ${hexNeuronId} with token ${token}`,
+      `claiming neuron ${hexNeuronId} with token ${token}. ${mapResponseErrorCodeToFriendlyError(response)}`,
       {
         position: 'top-right',
-        autoClose: 7000,
+        autoClose: 10000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
+        draggable: false,
         progress: undefined,
         theme: 'light',
         transition: Bounce,
       },
     );
+
     setLoading(false);
   };
 
@@ -318,8 +325,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
         });
         setLoading(false);
       }
-      res.forEach((elem) => {
-        if (!elem.value.Err) {
+      res.forEach((elem, i) => {
+        if (elem.value.Ok) {
           setLoading(false);
           toast.success('Rewards successfully claimed', {
             position: 'top-right',
@@ -333,7 +340,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             transition: Bounce,
           });
         } else {
-          toast.error(`${Object.values(elem.value.Err)[0]}`, {
+          const hexNeuronId = uint8ArrayToHexString(neuronsToClaim[i].id);
+          toast.error(`claiming neuron ${hexNeuronId} with token ${token}. ${mapResponseErrorCodeToFriendlyError(elem.value)}`, {
             position: 'top-right',
             autoClose: 5000,
             hideProgressBar: false,

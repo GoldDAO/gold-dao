@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import LoginButton from './LoginButton.jsx';
+import LoginButton from './LoginButton';
 import { currentPage } from '../../../utils/parsers';
 
 export default function Header() {

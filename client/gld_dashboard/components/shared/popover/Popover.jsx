@@ -1,7 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const Popover = () => {
-  return (
+const Popover = () => (
     <p className="flex items-center text-sm text-gray-500 dark:text-gray-400">
       This is just some informational text
       <button
@@ -25,7 +24,6 @@ const Popover = () => {
         <span className="sr-only">Show information</span>
       </button>
     </p>
-  );
-};
+);
 
 export default Popover;

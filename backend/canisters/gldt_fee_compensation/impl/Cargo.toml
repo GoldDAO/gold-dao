@@ -10,6 +10,9 @@ license = "AGPL-3.0-only"
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 gldt_libs = { path = "../../gldt_libs" }
 candid = { workspace = true }
@@ -20,9 +23,6 @@ ic-cdk-timers = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-# serde_derive = { workspace = true }
-serde_bytes = { workspace = true }
 
 [dev-dependencies]
 clippy = "0.0.302"
-tokio = { version = "1.33.0", features = ["full"] }

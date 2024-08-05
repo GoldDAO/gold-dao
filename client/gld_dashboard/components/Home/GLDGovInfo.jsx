@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { data1 } from '../../utils/datas';
 
-import DataCardCopy from './DataCardCopy.jsx';
-import LoaderDataCard from './LoaderDataCard.jsx';
-import Modal from '../shared/modal/modal.jsx';
-import ModalChart from '../shared/modal/modal-chart.jsx';
+import DataCardCopy from './DataCardCopy';
+import LoaderDataCard from './LoaderDataCard';
+import Modal from '../shared/modal/modal';
+import ModalChart from '../shared/modal/modal-chart';
 import useServices from '../../hooks/useServices';
-import ModalChartMobile from '../shared/modal/modal-chart-mobile.jsx';
+import ModalChartMobile from '../shared/modal/modal-chart-mobile';
 
 export default function GLDGovInfo() {
   const { gldGovTotalSupply, gldGovPrice } = useServices();
@@ -48,7 +48,7 @@ export default function GLDGovInfo() {
             <DataCardCopy
               title="Total GLDGov Supply"
               image="svg/g-logo.svg"
-              info="Total amount of GLDGov tokens minted."
+              info="Total amount of GLDGov tokens in existence."
               amount={totalSupply.amount}
               className="basis-1/3"
               setInfoModal={setInfoModal}

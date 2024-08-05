@@ -1,0 +1,12 @@
+[package]
+name = "management_api_canister"
+version = "0.1.0"
+description = "Management canister that serves as a config"
+edition = "2021"
+
+[features]
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+serde = { workspace = true, features = ["derive"] }

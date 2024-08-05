@@ -1,2 +1,16 @@
-type InitArgs = record { test_mode : bool };
-service : (opt InitArgs) -> {}
+type GovernanceStats = record {
+  total_rewards : nat;
+  total_staked : nat;
+  total_locked : nat;
+  total_unlocked : nat;
+};
+type InitArgs = record {
+  test_mode : bool;
+  sns_rewards_canister_id : principal;
+};
+type TokenSupplyData = record { circulating_supply : nat; total_supply : nat };
+service : (opt InitArgs) -> {
+  get_all_neuron_owners : () -> (vec principal) query;
+  get_neurons_stats : (opt principal) -> (GovernanceStats) query;
+  get_supply_data : () -> (TokenSupplyData) query;
+}

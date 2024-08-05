@@ -18,3 +18,4 @@ generate_pocket_query_call!(get_historic_payment_round);
 generate_pocket_update_call!(set_daily_gldgov_burn_rate);
 generate_pocket_query_call!(set_daily_gldgov_burn_rate_validate);
 generate_pocket_query_call!(get_neurons_by_owner);
+generate_pocket_update_call!(force_payment_round_to_fail);

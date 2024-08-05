@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { truncatePrincipal } from '../../../utils/functions';
 import useNeurons from '../../../hooks/useNeurons';
-import { useSession } from '../../../hooks/useSession';
+import useSession from '../../../hooks/useSession';
 import useBalances from '../../../hooks/useBalances';
 
 export default function ModalConfirm({
@@ -27,6 +27,7 @@ export default function ModalConfirm({
     setIcp({ loading: false, amount: amountIcp });
     const newAmount = await getBalance('ledger');
     setGold({ loading: false, amount: newAmount });
+    document.getElementById('my_modal_confirm').close();
   };
   return (
     <>

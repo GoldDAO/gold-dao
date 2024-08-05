@@ -1,23 +1,24 @@
-export const fakeData = [
+const fakeData = [
   {
     id: 1,
-    title: "OGY",
+    title: 'OGY',
     value: 1,
-    svg: "../../png/origyn.png",
+    svg: '../../png/origyn.png',
     status: true,
   },
   {
     id: 2,
-    title: "ICP",
+    title: 'ICP',
     value: 2,
-    svg: "../../png/dfinity.png",
+    svg: '../../png/dfinity.png',
     status: true,
   },
   {
     id: 3,
-    title: "GLDGov",
+    title: 'GLDGov',
     value: 1,
-    svg: "svg/g-logo.svg",
+    svg: 'svg/g-logo.svg',
     status: false,
   },
 ];
+export default fakeData;

@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use std::{ collections::HashMap, time::SystemTime };
 
-use candid::{ Nat, Principal };
+use candid::{ encode_one, Nat, Principal };
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{ PocketIc, PocketIcBuilder };
 use sns_governance_canister::types::Neuron;
@@ -12,9 +12,10 @@ use crate::{
         setup_sns::{ create_sns_with_data, generate_neuron_data },
     },
     utils::random_principal,
+    wasms,
 };
 
-use super::{ setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data };
+use super::{ setup_rewards::{ setup_rewards_canister, Args }, setup_sns::reinstall_sns_with_data };
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
@@ -74,6 +75,40 @@ impl RewardsTestEnv {
             &self.controller
         );
         self.pic.tick();
+    }
+
+    pub fn upgrade_rewards_canister(&mut self) {
+        let icp_ledger_canister_id = self.token_ledgers
+            .get("icp_ledger_canister_id")
+            .expect("couldn't find ledger with 'icp_ledger_canister_id'")
+            .clone();
+        let sns_ledger_canister_id = self.token_ledgers
+            .get("gldgov_ledger_canister_id")
+            .expect("couldn't find ledger with 'gldgov_ledger_canister_id'")
+            .clone();
+        let ogy_ledger_canister_id = self.token_ledgers
+            .get("ogy_ledger_canister_id")
+            .expect("couldn't find ledger with 'ogy_ledger_canister_id'")
+            .clone();
+
+        let init_args = Args {
+            test_mode: true,
+            icp_ledger_canister_id,
+            sns_ledger_canister_id,
+            ogy_ledger_canister_id,
+            sns_gov_canister_id: self.sns_gov_canister_id.clone(),
+        };
+        match
+            self.pic.upgrade_canister(
+                self.rewards_canister_id,
+                wasms::REWARDS.clone(),
+                encode_one(()).unwrap(),
+                Some(self.controller.clone())
+            )
+        {
+            Ok(m) => println!("{}", "upgrade success"),
+            Err(m) => println!("{m:?}"),
+        }
     }
 }
 
@@ -139,6 +174,9 @@ impl RewardsTestEnvBuilder {
     pub fn build(self) -> RewardsTestEnv {
         let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
 
+        // set the date
+        // Wednesday Jun 19, 2024, 7:00:00 AM
+
         let (neuron_data, neuron_owners) = generate_neuron_data(
             0,
             self.neurons_to_create,
@@ -172,6 +210,7 @@ impl RewardsTestEnvBuilder {
                 self.initial_reward_pool_amount.0.try_into().unwrap()
             );
         }
+        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718701200000)); // Tuesday Jun 18, 2024, 9:00:00 AM
 
         RewardsTestEnv {
             controller: self.controller,

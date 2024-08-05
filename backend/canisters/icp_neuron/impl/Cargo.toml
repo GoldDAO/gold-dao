@@ -9,6 +9,9 @@ edition = "2021"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 canister_logger = { path = "../../../libraries/canister_logger" }
@@ -21,7 +24,6 @@ http_request = { path = "../../../libraries/http_request" }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 ic-cdk-timers = { workspace = true }
-ic-ledger-types = { workspace = true }
 ic-stable-structures = { workspace = true }
 ic-transport-types = { workspace = true }
 icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }

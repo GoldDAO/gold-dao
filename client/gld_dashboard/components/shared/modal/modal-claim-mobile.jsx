@@ -5,7 +5,6 @@ import { elapsedTime } from '../../../utils/functions';
 
 export default function ModalClaimMobile({ item, setClaimState }) {
   if (!item) return;
-  const dissolveState = item.dissolve_state[0];
 
   const { votingPower } = item;
 

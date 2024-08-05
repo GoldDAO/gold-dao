@@ -1,4 +1,7 @@
-export default ({ IDL }) => {
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+
+export const idlFactory = ({ IDL }) => {
   const Account = IDL.Record({
     owner: IDL.Principal,
     subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
@@ -186,7 +189,7 @@ export default ({ IDL }) => {
   });
   const Result_3 = IDL.Variant({ Ok: BlockRange, Err: GetBlocksError });
   const ArchivedBlocksRange = IDL.Record({
-    callback: IDL.Func([GetBlocksArgs], [Result_3], ["query"]),
+    callback: IDL.Func([GetBlocksArgs], [Result_3], ['query']),
     start: IDL.Nat64,
     length: IDL.Nat64,
   });
@@ -202,7 +205,7 @@ export default ({ IDL }) => {
     Err: GetBlocksError,
   });
   const ArchivedEncodedBlocksRange = IDL.Record({
-    callback: IDL.Func([GetBlocksArgs], [Result_4], ["query"]),
+    callback: IDL.Func([GetBlocksArgs], [Result_4], ['query']),
     start: IDL.Nat64,
     length: IDL.Nat64,
   });
@@ -240,31 +243,31 @@ export default ({ IDL }) => {
   const Result_5 = IDL.Variant({ Ok: IDL.Nat64, Err: TransferError_1 });
   const TransferFee = IDL.Record({ transfer_fee: Tokens });
   return IDL.Service({
-    account_balance: IDL.Func([BinaryAccountBalanceArgs], [Tokens], ["query"]),
-    account_balance_dfx: IDL.Func([AccountBalanceArgs], [Tokens], ["query"]),
-    account_identifier: IDL.Func([Account], [IDL.Vec(IDL.Nat8)], ["query"]),
-    archives: IDL.Func([], [Archives], ["query"]),
-    decimals: IDL.Func([], [Decimals], ["query"]),
-    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ["query"]),
-    icrc1_decimals: IDL.Func([], [IDL.Nat8], ["query"]),
-    icrc1_fee: IDL.Func([], [IDL.Nat], ["query"]),
-    icrc1_metadata: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))], ["query"]),
-    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ["query"]),
-    icrc1_name: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ["query"]),
-    icrc1_symbol: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_total_supply: IDL.Func([], [IDL.Nat], ["query"]),
+    account_balance: IDL.Func([BinaryAccountBalanceArgs], [Tokens], ['query']),
+    account_balance_dfx: IDL.Func([AccountBalanceArgs], [Tokens], ['query']),
+    account_identifier: IDL.Func([Account], [IDL.Vec(IDL.Nat8)], ['query']),
+    archives: IDL.Func([], [Archives], ['query']),
+    decimals: IDL.Func([], [Decimals], ['query']),
+    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ['query']),
+    icrc1_decimals: IDL.Func([], [IDL.Nat8], ['query']),
+    icrc1_fee: IDL.Func([], [IDL.Nat], ['query']),
+    icrc1_metadata: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))], ['query']),
+    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ['query']),
+    icrc1_name: IDL.Func([], [IDL.Text], ['query']),
+    icrc1_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ['query']),
+    icrc1_symbol: IDL.Func([], [IDL.Text], ['query']),
+    icrc1_total_supply: IDL.Func([], [IDL.Nat], ['query']),
     icrc1_transfer: IDL.Func([TransferArg], [Result], []),
-    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ["query"]),
+    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ['query']),
     icrc2_approve: IDL.Func([ApproveArgs], [Result_1], []),
     icrc2_transfer_from: IDL.Func([TransferFromArgs], [Result_2], []),
-    name: IDL.Func([], [Name], ["query"]),
-    query_blocks: IDL.Func([GetBlocksArgs], [QueryBlocksResponse], ["query"]),
-    query_encoded_blocks: IDL.Func([GetBlocksArgs], [QueryEncodedBlocksResponse], ["query"]),
+    name: IDL.Func([], [Name], ['query']),
+    query_blocks: IDL.Func([GetBlocksArgs], [QueryBlocksResponse], ['query']),
+    query_encoded_blocks: IDL.Func([GetBlocksArgs], [QueryEncodedBlocksResponse], ['query']),
     send_dfx: IDL.Func([SendArgs], [IDL.Nat64], []),
-    symbol: IDL.Func([], [Symbol], ["query"]),
+    symbol: IDL.Func([], [Symbol], ['query']),
     transfer: IDL.Func([TransferArgs], [Result_5], []),
-    transfer_fee: IDL.Func([IDL.Record({})], [TransferFee], ["query"]),
+    transfer_fee: IDL.Func([IDL.Record({})], [TransferFee], ['query']),
   });
 };
 export const init = ({ IDL }) => {

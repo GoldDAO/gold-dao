@@ -1,16 +1,15 @@
-import { toast, Bounce } from "react-toastify";
-import { p } from "../utils/parsers";
-import useActor from "./useActor";
-import { useSession } from "./useSession";
+import { p } from '../utils/parsers';
+import useActor from './useActor';
+import useSession from './useSession';
 
 const useBalances = () => {
-  const [ogy] = useActor("ogy");
-  const [icp] = useActor("icp");
-  const [ledger] = useActor("ledger");
+  const [ogy] = useActor('ogy');
+  const [icp] = useActor('icp');
+  const [ledger] = useActor('ledger');
   const tokens = { ogy, icp, ledger };
   const { principal, isConnected } = useSession();
 
-  const getBalance = async (tokenName = "icp") => {
+  const getBalance = async (tokenName = 'icp') => {
     if (!isConnected) {
       return 0;
     }
@@ -22,7 +21,7 @@ const useBalances = () => {
 
       return Number(balance);
     } catch (err) {
-      console.log("get balance error");
+      console.log('get balance error');
 
       return 0;
     }

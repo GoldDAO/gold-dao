@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import useBalances from "../../../hooks/useBalances";
-import { useEffect, useState } from "react";
+import Image from 'next/image';
+import { useState } from 'react';
+import useBalances from '../../../hooks/useBalances';
 
 export default function RewardsCards({
   title,
@@ -14,44 +14,50 @@ export default function RewardsCards({
   setIcp,
   setGold,
 }) {
-  value = value === 0 ? value : value / 10 ** 8;
+  let rewardValue = value;
+  if (rewardValue !== 0) {
+    rewardValue /= 10 ** 8;
+  }
   const openModal = (clickedTitle) => {
-    setAmount(value === 0 ? value : value / 10 ** 8);
+    setAmount(value);
     setModalTitle(clickedTitle);
-    document.getElementById("my_modal_1").showModal();
+    document.getElementById('my_modal_1').showModal();
   };
   const [loading, setLoading] = useState(false);
   const { getBalance } = useBalances();
 
-
-  // const additionalStatus = value <= 0 ? false : status;
+  // const additionalStatus = rewardValue <= 0 ? false : status;
 
   const handleReloadClick = async () => {
     setLoading(true);
-    const amount = await getBalance(title === "GLDGov" ? "ledger" : "icp");
-    title === "GLDGov" ? setGold({ loading: false, amount }) : setIcp({ loading: false, amount });
+    const amount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
+    if (title === 'GLDGov') {
+      setGold({ loading: false, amount });
+    } else {
+      setIcp({ loading: false, amount });
+    }
     setAmount(amount);
     setLoading(false);
   };
 
   return (
     <div
-      className={`cardshadow flex flex-col justify-center border-[#c6c6c6] border w-full sm:w-full h-[8rem] sm:h-[200px] rounded-[2rem] bg-[${status ? "#F3F3F3" : "#F3F3F3"}] ${status ? "" : "pointer-events-none opacity-50"} ${status ? "" : "blur-[12]"}`}
+      className={`cardshadow flex flex-col justify-center border-[#c6c6c6] border w-full sm:w-full h-[8rem] sm:h-[200px] rounded-[2rem] bg-[${status ? '#F3F3F3' : '#F3F3F3'}] ${status ? '' : 'pointer-events-none opacity-50'} ${status ? '' : 'blur-[12]'}`}
     >
       <div className="flex p-6 items-center justify-between w-full relative h-[30%]">
         <h1 className="text-[#000000] font-medium text-xl">{title} Balance</h1>
 
         <div
-          className={`bg-[#C6C6C6] hidden sm:flex rounded-full h-10 w-10  justify-center items-center cursor-pointer ${loading ? "animate-spin" : ""}`}
+          className={`bg-[#C6C6C6] hidden sm:flex rounded-full h-10 w-10  justify-center items-center cursor-pointer ${loading ? 'animate-spin' : ''}`}
           onClick={handleReloadClick}
         >
-          <Image src={"/svg/reload.svg"} alt="" height={15} width={15} />
+          <Image src={'/svg/reload.svg'} alt="" height={15} width={15} />
         </div>
       </div>
 
       <div className="flex p-6 items-center justify-between w-full relative h-[30%] sm:h-[50%]">
         <div className="text-[2rem]  sm:text-[3rem] font-bold flex gap-4 justify-center items-center">
-          {loading ? "..." : value?.toString()?.slice(0, 7)}
+          {loading ? '...' : rewardValue?.toString()?.slice(0, 7)}
           <Image
             width={8}
             height={8}

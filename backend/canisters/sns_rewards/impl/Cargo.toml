@@ -8,6 +8,9 @@ edition = "2021"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 canister_logger = { path = '../../../libraries/canister_logger' }
@@ -21,7 +24,6 @@ ic-cdk-timers = { workspace = true }
 ic-stable-structures = { workspace = true }
 serde_json = { workspace = true }
 icrc-ledger-types = { workspace = true }
-ic-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serializer = { path = '../../../libraries/serializer' }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
@@ -32,6 +34,6 @@ types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
 futures = { workspace = true }
-num-bigint = {workspace = true}
 sns_rewards_api_canister = { path = "../api" }
-candid_gen = { path = "../../../libraries/candid_gen" }
+time = { workspace = true }
+ic0 = "0.23.0"

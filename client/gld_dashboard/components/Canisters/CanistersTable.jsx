@@ -43,7 +43,6 @@ const CanistersTable = () => {
     window.scrollTo(0, 0);
     (async () => {
       const data = await getCanisters();
-      console.log({ data });
       setItemsAmount(data.length);
       setCanisters({ loading: false, data });
     })();
@@ -68,7 +67,7 @@ const CanistersTable = () => {
     activePage,
     onNext,
     onPrevious,
-    setPage,
+    setPage: setPageFn,
     className,
   }) => {
     if (value === PaginationItemType.NEXT) {
@@ -116,7 +115,7 @@ const CanistersTable = () => {
         key={key}
         ref={ref}
         className={`text-xs font-normal ${isActive ? 'text-white bg-[#D9D9D9] font-bold' : 'bg-transparent'}`}
-        onClick={() => setPage(value)}
+        onClick={() => setPageFn(value)}
       >
         {value}
       </Button>

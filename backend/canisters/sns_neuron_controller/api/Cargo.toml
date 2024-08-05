@@ -1,0 +1,17 @@
+[package]
+name = "sns_neuron_controller_api_canister"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+ic-ledger-types = { workspace = true }
+serde = { workspace = true }
+types = { path = "../../../libraries/types" }
+ic-cdk = { workspace = true }
+ic-cdk-macros = { workspace = true }
+sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }

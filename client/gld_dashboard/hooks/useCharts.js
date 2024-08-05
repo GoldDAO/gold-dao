@@ -1,8 +1,7 @@
-import { currentTimestamp, filterDates } from "../utils/functions";
+import { create } from 'zustand';
+import { currentTimestamp, filterDates } from '../utils/functions';
 
-import { create } from "zustand";
-
-export const useCharts = create((set, get) => ({
+export default create((set, get) => ({
   selectedDistance: 86400 * 31 * 6,
   gldGovSupply: { loading: true, data: [] },
   copyGldGovSupply: { loading: true, data: [] },
@@ -11,12 +10,12 @@ export const useCharts = create((set, get) => ({
   setSelectedDistance: (selectedDistance) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
-      ({ label }) => new Date(label) >= new Date(distance * 1000)
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
     );
     const copyGldGovSupply = filterDates(filteredSupply);
 
     const filteredTreasury = get().gldGovTreasury.data.filter(
-      ({ label }) => new Date(label) >= new Date(distance * 1000)
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
     );
     const copyGldGovTreasury = filterDates(filteredTreasury);
 

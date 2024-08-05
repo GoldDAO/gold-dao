@@ -1,12 +1,13 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-export const useSession = create((set, get) => ({
+export default create((set) => ({
   identity: null,
   principal: null,
   isConnected: false,
   isConnecting: true,
-  setIdentity: (identity, principal) =>
-    set({ identity, principal, isConnected: true, isConnecting: false }),
+  setIdentity: (identity, principal) => set({
+    identity, principal, isConnected: true, isConnecting: false,
+  }),
   setConnecting: (isConnecting) => set({ isConnecting }),
   logout: () => set({ identity: null, principal: null, isConnected: false }),
 }));

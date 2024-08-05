@@ -18,8 +18,8 @@ payments are done in batches and upon each individual transfer response it's sta
 
 use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
 use candid::{ Nat, Principal };
-use canister_time::{ run_interval, WEEK_IN_MS };
-use futures::{ future::{ err, join_all }, Future };
+use canister_time::{ now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS, WEEK_IN_MS };
+use futures::{ future::{ err, join_all }, Future, FutureExt };
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
@@ -28,60 +28,123 @@ use sns_rewards_api_canister::{
 };
 use std::time::Duration;
 use tracing::{ debug, error, info };
-use types::{ Milliseconds, TokenSymbol };
+use types::{ Milliseconds, TimestampMillis, TokenSymbol };
 
-const DISTRIBUTION_INTERVAL: Milliseconds = WEEK_IN_MS;
+const DISTRIBUTION_INTERVAL: Milliseconds = HOUR_IN_MS;
 const MAX_RETRIES: u8 = 3;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
+    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), || {
+        run_distribution(now_millis())
+    });
 }
 
-pub fn run_distribution() {
-    let is_sync_neurons_in_progress = read_state(|s| s.get_is_synchronizing_neurons());
-    if is_sync_neurons_in_progress {
+pub fn run_distribution(initial_run_time: TimestampMillis) {
+    if read_state(|s| s.get_is_synchronizing_neurons()) {
         debug!(
-            "REWARD_DISTRIBUTION - can't run whilst synchronise_neurons is in progress. rerunning in 3 minutes"
+            "REWARD_DISTRIBUTION - can't run whilst synchronize_neurons is in progress. rerunning in 5 minutes"
         );
-        ic_cdk_timers::set_timer(Duration::from_secs(60 * 5), run_distribution);
-    } else {
-        ic_cdk::spawn(distribute_rewards(0))
+        schedule_retry(initial_run_time, Duration::from_secs(60 * 5));
+        return;
+    }
+
+    if !is_distribution_allowed(initial_run_time) {
+        return;
+    }
+
+    ic_cdk::spawn(
+        distribute_rewards(0).then(move |_| {
+            mutate_state(|s| {
+                s.data.reward_distribution_in_progress = Some(false);
+            });
+            async {}
+        })
+    );
+}
+
+fn is_distribution_allowed(initial_run_time: TimestampMillis) -> bool {
+    let distribution_in_progress = match read_state(|s| s.data.reward_distribution_in_progress) {
+        Some(boolean) => boolean,
+        None => false,
+    };
+    let distribution_interval = match read_state(|s| s.data.reward_distribution_interval.clone()) {
+        Some(interval) => interval,
+        None => {
+            return false;
+        }
+    };
+    let is_distribution_time_valid = distribution_interval.is_within_weekly_interval(
+        initial_run_time.clone()
+    );
+
+    // in_progress
+    if distribution_in_progress {
+        return false;
+    }
+    if is_distribution_time_valid {
+        mutate_state(|s| {
+            s.data.reward_distribution_in_progress = Some(true);
+        });
+        return true;
+    }
+    if should_retry_existing_distribution() {
+        mutate_state(|s| {
+            s.data.reward_distribution_in_progress = Some(true);
+        });
+        return true;
+    }
+
+    false
+    // should_retry_existing_distribution()
+    // valid time
+}
+
+fn should_retry_existing_distribution() -> bool {
+    let active_rounds = read_state(|state| state.data.payment_processor.get_active_rounds());
+    active_rounds.iter().any(|round| round.retries < MAX_RETRIES)
+}
+
+fn schedule_retry(initial_run_time: TimestampMillis, delay: Duration) {
+    ic_cdk_timers::set_timer(delay, move || run_distribution(initial_run_time.clone()));
+}
+
+fn finalize_distribution(processed_payment_rounds: Vec<PaymentRound>) {
+    for payment_round in processed_payment_rounds {
+        update_neuron_rewards(&payment_round);
+        move_payment_round_to_history(&payment_round);
+        log_payment_round_metrics(&payment_round);
     }
 }
 
 pub async fn distribute_rewards(retry_attempt: u8) {
     info!("REWARD_DISTRIBUTION - START - retry attempt : {}", retry_attempt);
-
-    let pending_payment_rounds = read_state(|state| {
+    let current_time_ms = now_millis();
+    let pending_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_rounds()
-    });
-    // if there are active rounds or we're retrying other rounds, do not create a new payment round
-    if pending_payment_rounds.len() == 0 && retry_attempt == 0 {
+    );
+
+    if pending_payment_rounds.is_empty() && retry_attempt == 0 {
         create_new_payment_rounds().await;
     }
 
-    // process active rounds
-    let active_rounds = read_state(|state| { state.data.payment_processor.get_active_rounds() });
-    if active_rounds.len() == 0 {
+    let active_rounds = read_state(|state| state.data.payment_processor.get_active_rounds());
+    if active_rounds.is_empty() {
         return;
     }
+
     for payment_round in active_rounds {
-        process_payment_round(payment_round, retry_attempt).await;
+        process_payment_round(payment_round.clone(), retry_attempt).await;
     }
 
-    // post processing && retry failed payment rounds
     let processed_payment_rounds = read_state(|state|
         state.data.payment_processor.get_active_rounds()
     );
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
         ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
     } else {
-        for payment_round in &processed_payment_rounds {
-            update_neuron_rewards(&payment_round);
-            move_payment_round_to_history(&payment_round);
-            log_payment_round_metrics(&payment_round);
-        }
+        finalize_distribution(processed_payment_rounds);
     }
+
     info!("REWARD_DISTRIBUTION - FINISH");
 }
 
@@ -386,7 +449,7 @@ mod tests {
     use sns_rewards_api_canister::payment_round::{ PaymentRound, PaymentStatus };
     use types::{ NeuronInfo, TokenSymbol };
 
-    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+    use crate::{ state::{ init_state, mutate_state, read_state, RuntimeState } };
 
     use super::{ log_payment_round_metrics, update_neuron_rewards };
 

@@ -60,7 +60,7 @@ const ModalNeuron = ({ name, image }) => {
             proposals.
           </p>
           <div className="bg-white size-25 rounded-full flex justify-center items-center">
-            <Image src={image} width={62} height={30} alt="icp" className="w-15 h-[30px] object-cover" />
+            { image && (<Image src={image} width={62} height={30} alt="icp" className="w-15 h-[30px] object-cover" />)}
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ const ModalNeuron = ({ name, image }) => {
             <div className="flex justify-start p-2 items-center">
               <div className="text-2xl font-bold mr-2">{Number(neuron.staked_amount) / 10 ** 8}</div>
               <div>
-                <Image src={image} height={24} width={24} alt="icp" className="size-6" />
+                {image && (<Image src={image} height={24} width={24} alt="icp" className="size-6" />)}
               </div>
             </div>
 
