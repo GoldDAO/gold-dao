@@ -15,6 +15,7 @@ fn init(args: InitArgs) {
 
     let env = CanisterEnv::new(args.test_mode);
     let mut data = Data::new(
+        args.authorized_principals,
         args.ogy_sns_governance_canister_id,
         args.ogy_sns_ledger_canister_id,
         args.ogy_sns_rewards_canister_id,
