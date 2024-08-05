@@ -13,6 +13,7 @@ lazy_static! {
     pub static ref BURNER: CanisterWasm = get_canister_wasm("cycles_burner");
     pub static ref REWARDS: CanisterWasm = get_rewards_canister_wasm();
     pub static ref CYCLES_MANAGER: CanisterWasm = get_cycles_manager_canister_wasm();
+    pub static ref SNS_NEURON_CONTROLLER: CanisterWasm = get_snc_canister_wasm();
 }
 
 fn get_rewards_canister_wasm() -> Vec<u8> {
@@ -23,12 +24,18 @@ fn get_rewards_canister_wasm() -> Vec<u8> {
     ).unwrap()
 }
 
-// NOTE: Run to compile to wasm:
-// scripts/build-canister.sh cycles_manager
 fn get_cycles_manager_canister_wasm() -> Vec<u8> {
     read_file_from_relative_bin(
         &format!(
             "../canisters/cycles_manager/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
+        )
+    ).unwrap()
+}
+
+fn get_snc_canister_wasm() -> Vec<u8> {
+    read_file_from_relative_bin(
+        &format!(
+            "../canisters/sns_neuron_controller/target/wasm32-unknown-unknown/release/sns_neuron_controller_canister.wasm.gz"
         )
     ).unwrap()
 }

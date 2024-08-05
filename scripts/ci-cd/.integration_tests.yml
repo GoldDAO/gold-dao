@@ -26,6 +26,7 @@ integration tests:
     "gldt_core integration-test build",
     "icp_neuron integration-test build",
     "management integration-test build",
+    "sns_neuron_controller integration-test build",
     "sns_rewards integration-test build",
     "token_metrics integration-test build"
     ]

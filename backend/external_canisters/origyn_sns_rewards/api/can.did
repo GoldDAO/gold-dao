@@ -1,0 +1,53 @@
+type Args = record { token : text; neuron_id : NeuronId };
+type Args_1 = record { transfer_amounts : vec record { text; nat } };
+type Args_2 = record { token_list : vec record { text; TokenInfo } };
+type InitArgs = record {
+  sns_gov_canister_id : principal;
+  test_mode : bool;
+  sns_ledger_canister_id : principal;
+};
+type NeuronId = record { id : blob };
+type Response = variant {
+  Ok : NeuronId;
+  NeuronHotKeyAbsent;
+  NeuronOwnerInvalid : opt principal;
+  NeuronHotKeyInvalid;
+  NeuronDoesNotExist;
+  InternalError : text;
+};
+type Response_1 = variant {
+  Ok : bool;
+  NeuronHotKeyAbsent;
+  TokenSymbolInvalid : text;
+  NeuronNotClaimed;
+  NeuronOwnerInvalid : opt principal;
+  NeuronHotKeyInvalid;
+  TransferFailed : text;
+  NeuronDoesNotExist;
+  InternalError : text;
+};
+type Response_2 = variant {
+  Ok : NeuronId;
+  NeuronHotKeyAbsent;
+  NeuronNotClaimed;
+  NeuronOwnerInvalid : opt principal;
+  NeuronHotKeyInvalid;
+  NeuronDoesNotExist;
+  InternalError : text;
+};
+type Response_3 = variant { Success; InternalError : text };
+type Response_4 = variant { Success; InternalError : text };
+type TokenInfo = record {
+  fee : nat64;
+  decimals : nat64;
+  ledger_id : principal;
+};
+service : (InitArgs) -> {
+  add_neuron_ownership : (NeuronId) -> (Response);
+  claim_reward : (Args) -> (Response_1);
+  get_neurons_by_owner : () -> (opt vec NeuronId) query;
+  remove_neuron_ownership : (NeuronId) -> (Response_2);
+  set_daily_ogy_burn_rate : (nat) -> (Response_3);
+  set_reserve_transfer_amounts : (Args_1) -> (Response_3);
+  set_reward_token_types : (Args_2) -> (Response_4);
+}

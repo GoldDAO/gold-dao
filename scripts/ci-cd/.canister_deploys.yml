@@ -8,6 +8,7 @@ spec:
           "gldt_core",
           "icp_neuron",
           "management",
+          "sns_neuron_controller",
           "sns_rewards",
           "token_metrics"
         ]
