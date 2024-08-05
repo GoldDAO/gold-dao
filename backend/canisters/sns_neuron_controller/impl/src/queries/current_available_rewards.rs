@@ -1,7 +1,6 @@
 // use crate::types::neuron_manager::NeuronRewardsManager;
 // use candid::CandidType;
 // use ic_cdk::query;
-
 // use crate::state::{read_state, NeuronList};
 
 // #[derive(CandidType)]
