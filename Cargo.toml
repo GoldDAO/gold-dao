@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "backend/canisters/buyback_burn/impl",
+  "backend/canisters/buyback_burn/api",
   "backend/canisters/gldt_core/impl",
   "backend/canisters/gldt_fee_compensation/impl",
   "backend/canisters/sns_rewards/impl",
@@ -15,8 +17,10 @@ members = [
   "backend/libraries/canister_logger",
   "backend/libraries/canister_state_macros",
   "backend/libraries/canister_time",
+    "backend/libraries/canister_timer_jobs",
   "backend/libraries/canister_tracing_macros",
   "backend/libraries/http_request",
+  "backend/libraries/icpswap_client",
   "backend/libraries/serializer",
   "backend/libraries/stable_memory",
   "backend/libraries/types",
@@ -30,6 +34,7 @@ lto = "thin"
 panic = "abort"
 
 [workspace.dependencies]
+async-trait = "0.1.74"
 candid = { version = "0.10.2" }
 ciborium = "0.2.2"
 futures = "0.3.29"
@@ -39,7 +44,7 @@ hex = "0.4.3"
 ic-cdk = "0.13.2"
 ic-cdk-macros = "0.13.2"
 ic-cdk-timers = "0.7.0"
-ic-ledger-types = "0.10.0"
+ic-ledger-types = "0.11.0"
 ic-stable-structures = "0.6.4"
 ic-transport-types = "0.34.0"
 ic0 = "0.21.1"
