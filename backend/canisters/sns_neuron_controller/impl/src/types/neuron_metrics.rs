@@ -39,10 +39,9 @@ impl NeuronWithMetric {
             owner: sns_governance_canister_id,
             subaccount: Some(subaccount_bytes),
         };
-        let icrc_account_as_string = icrc_account.to_string();
         let deposit_account = DepositAccount {
             icrc_account,
-            icrc_account_as_string,
+            icrc_account_as_string: icrc_account.to_string(),
         };
 
         Self {
