@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [unreleased]
+
 ### [1.0.2] - 2024-08-06
 
 #### Description
@@ -23,15 +25,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### [1.0.0] - 2024-07-18
 
 #### Description
+
 This marks the initial release of SNS Neuron Controller Canister (sns_neuron_controller canister). It implements the NeuronManager trait, providing functionality to interact with the SNS governance canisters. Key features include daily processing of neurons, claiming rewards, and distributing these rewards based on specified thresholds.
 
 #### Added
 
 - first release with all management methods of any SNS neuron
 - Introduced NeuronManager and NeuronRewardsManager traits for managing SNS neurons with the following methods:
-    - fetch_and_sync_neurons
-    - get_available_rewards
-    - claim_rewards
-    - distribute_rewards
+  - fetch_and_sync_neurons
+  - get_available_rewards
+  - claim_rewards
+  - distribute_rewards
 - Implemented NeuronManager functionality for OGYNeuron
 - Implemented NeuronRewardsManager functionality for OGYNeuron
