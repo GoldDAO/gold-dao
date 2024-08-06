@@ -6,6 +6,7 @@ use types::{CanisterId, TimestampMillis};
 use utils::env::Environment;
 
 use crate::state::read_state;
+use crate::types::neuron_metrics::NeuronWithMetric;
 use crate::utils::ClaimRewardResult;
 use crate::utils::{distribute_rewards, fetch_neurons};
 
@@ -29,6 +30,19 @@ pub trait NeuronManager: NeuronConfig {
 
         self.get_neurons_mut().all_neurons = neurons.to_vec();
         Ok(())
+    }
+
+    fn get_neuron_metrics(&self) -> Vec<NeuronWithMetric> {
+        self.get_neurons()
+            .all_neurons
+            .iter()
+            .map(|n| {
+                NeuronWithMetric::from_neuron_with_sns_gov_id(
+                    n.clone(),
+                    self.get_sns_governance_canister_id(),
+                )
+            })
+            .collect()
     }
 }
 

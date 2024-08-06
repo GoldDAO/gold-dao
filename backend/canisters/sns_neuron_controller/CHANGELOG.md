@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.2] - 2024-08-06
+
+#### Description
+
+#### Fixed
+
+- **Neuron Metrics** : Fixed an issue where the incorrect deposit account was displayed for neuron metrics due to incorrect account owner specification. The fix involved extending the NeuronManager trait with a get_neuron_metrics function that automatically handles adding the respective SNS governance canister ID.
+
 ### [1.0.1] - 2024-08-06
 
 #### Changed

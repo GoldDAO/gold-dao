@@ -100,7 +100,6 @@ async fn stake_ogy_neuron_impl(amount: u64) -> Result<Vec<u8>, String> {
                 let neuron_id = c.refreshed_neuron_id.unwrap().id;
                 Ok(neuron_id)
             }
-            // FIXME: add here debug
             response => {
                 error!("Error while executing manage_neuron: {:?}", response);
                 Err("manage_neuron error".to_string())
