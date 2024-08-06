@@ -1,4 +1,4 @@
-use crate::types::neuron_manager::NeuronConfig;
+use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::Neurons;
 use crate::types::neuron_metrics::NeuronWithMetric;
 use crate::types::{OgyManager, WtnManager};
@@ -10,7 +10,6 @@ use types::CanisterId;
 use types::Cycles;
 use types::TimestampMillis;
 use utils::{
-    consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
@@ -40,15 +39,7 @@ impl RuntimeState {
 
             authorized_principals: self.data.authorized_principals.clone(),
             sns_rewards_canister_id: self.data.sns_rewards_canister_id,
-            ogy_neuron_manager_metrics: self
-                .data
-                .neuron_managers
-                .ogy
-                .get_neurons()
-                .all_neurons
-                .iter()
-                .map(|n| NeuronWithMetric::from(n.clone()))
-                .collect(),
+            ogy_neuron_manager_metrics: self.data.neuron_managers.ogy.get_neuron_metrics(),
         }
     }
 
