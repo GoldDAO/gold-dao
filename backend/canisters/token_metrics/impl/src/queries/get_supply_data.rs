@@ -1,8 +1,8 @@
 use ic_cdk_macros::query;
-
-use crate::state::{ read_state, TokenSupplyData };
+pub use token_metrics_api::queries::get_supply_data::Response as GetSupplyDataResponse;
+use crate::state::read_state;
 
 #[query]
-fn get_supply_data() -> TokenSupplyData {
+fn get_supply_data() -> GetSupplyDataResponse {
     read_state(|state| state.data.supply_data.clone())
 }

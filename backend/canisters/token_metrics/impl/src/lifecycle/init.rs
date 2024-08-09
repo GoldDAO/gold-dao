@@ -1,50 +1,27 @@
-use crate::state::{ Data, RuntimeState };
-use candid::CandidType;
-use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
-use serde::Deserialize;
+pub use token_metrics_api::init::InitArgs;
 use tracing::info;
-use utils::consts::{
-    STAGING_GOLD_1G_CANISTER_ID,
-    STAGING_GOLD_10G_CANISTER_ID,
-    GOLD_1G_CANISTER_ID,
-    GOLD_10G_CANISTER_ID,
-    GOLD_100G_CANISTER_ID,
-    GOLD_1000G_CANISTER_ID,
-};
 use utils::env::CanisterEnv;
-use candid::Principal;
-use crate::lifecycle::init_canister;
 
-#[derive(Deserialize, CandidType, Debug)]
-pub struct InitArgs {
-    test_mode: bool,
-    pub sns_rewards_canister_id: Principal,
-}
+use crate::state::{ Data, RuntimeState };
+
+use super::init_canister;
 
 #[init]
-#[trace]
-fn init(init_args: Option<InitArgs>) {
-    ic_cdk::api::print(format!("init_args : {init_args:?}"));
-
-    let args = init_args.ok_or("Must provide init arguments.".to_string()).unwrap();
+fn init(args: InitArgs) {
     canister_logger::init(args.test_mode);
 
-    let gold_nft_canister: Vec<(Principal, u128)> = if args.test_mode {
-        vec![(STAGING_GOLD_1G_CANISTER_ID, 1), (STAGING_GOLD_10G_CANISTER_ID, 10)]
-    } else {
-        vec![
-            (GOLD_1G_CANISTER_ID, 1),
-            (GOLD_10G_CANISTER_ID, 10),
-            (GOLD_100G_CANISTER_ID, 100),
-            (GOLD_1000G_CANISTER_ID, 1000)
-        ]
-    };
-
     let env = CanisterEnv::new(args.test_mode);
-    let data = Data::new(gold_nft_canister, args.sns_rewards_canister_id);
+    let data = Data::new(
+        args.ogy_new_ledger_canister_id,
+        args.sns_governance_canister_id,
+        args.super_stats_canister_id,
+        args.sns_rewards_canister_id,
+        args.treasury_account,
+        args.foundation_accounts
+    );
 
-    let runtime_state = RuntimeState::new(env, data);
+    let runtime_state = RuntimeState::new(env.clone(), data);
 
     init_canister(runtime_state);
 

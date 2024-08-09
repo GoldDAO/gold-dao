@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use ic_stable_structures::{
     memory_manager::{ MemoryId, MemoryManager, VirtualMemory },
     DefaultMemoryImpl,
@@ -7,18 +5,18 @@ use ic_stable_structures::{
 
 const UPGRADES: MemoryId = MemoryId::new(0);
 
-pub type Memory = VirtualMemory<DefaultMemoryImpl>;
+pub type VM = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
-        MemoryManager::init_with_bucket_size(DefaultMemoryImpl::default(), 1)
+    static MEMORY_MANAGER: MemoryManager<DefaultMemoryImpl> = MemoryManager::init(
+        DefaultMemoryImpl::default()
     );
 }
 
-pub fn get_upgrades_memory() -> Memory {
+pub fn get_upgrades_memory() -> VM {
     get_memory(UPGRADES)
 }
 
-fn get_memory(id: MemoryId) -> Memory {
-    MEMORY_MANAGER.with(|m| m.borrow().get(id))
+fn get_memory(id: MemoryId) -> VM {
+    MEMORY_MANAGER.with(|m| m.get(id))
 }
