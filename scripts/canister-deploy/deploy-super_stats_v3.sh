@@ -4,7 +4,7 @@
 
 show_help() {
   cat << EOF
-token_metrics canister deployment script.
+super_stats_v3 canister deployment script.
 Must be run from the repository's root folder, and with a running replica if for local deployment.
 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
 The NETWORK argument should preferably be passed from the env variable that was previously defined
@@ -13,7 +13,7 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-token_metrics.sh [options] <NETWORK>
+  scripts/deploy-super_stats_v3.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
@@ -48,31 +48,30 @@ fi
 
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
-  OGY_LEDGER=$(dfx canister id sns_ledger --network staging)
-  SNS_GOVERNANCE=$(dfx canister id sns_governance --network staging)
-  SUPER_STATS=$(dfx canister id super_stats_v3 --network staging)
-  SNS_REWARDS=$(dfx canister id sns_rewards --network staging)
-  GOLD_TREASURY_ACCOUNT="$SNS_GOVERNANCE.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 else
   TESTMODE="false"
-  OGY_LEDGER=$(dfx canister id sns_ledger --network $NETWORK)
-  SNS_GOVERNANCE=$(dfx canister id sns_governance --network $NETWORK)
-  SUPER_STATS=$(dfx canister id super_stats_v3 --network $NETWORK)
-  SNS_REWARDS=$(dfx canister id sns_rewards --network $NETWORK)
-  GOLD_TREASURY_ACCOUNT="$SNS_GOVERNANCE.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 fi
-
+ADMIN=$(dfx identity get-principal)
 ARGUMENTS="(record {
   test_mode = $TESTMODE;
-  ogy_new_ledger_canister_id = principal \"$OGY_LEDGER\";
-  sns_governance_canister_id = principal \"$SNS_GOVERNANCE\";
-  sns_rewards_canister_id = principal \"$SNS_REWARDS\";
-  super_stats_canister_id = principal \"$SUPER_STATS\";
-  treasury_account = \"$ORIGYN_TREASURY_ACCOUNT\";
-  foundation_accounts = vec {
-    \"$GOLD_TREASURY_ACCOUNT\"
-    }
+  admin = \"$ADMIN\";
   } )"
 
 
+. ./scripts/deploy-backend-canister.sh super_stats_v3 $NETWORK "$ARGUMENTS" $MODE
+
+TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
+LEDGER_CANISTER_ID=$(dfx canister id sns_ledger --network $NETWORK)
+INIT_ARGUMENTS="'(record {
+    target = record {
+        target_ledger = "$LEDGER_CANISTER_ID";
+        hourly_size = 24;
+        daily_size = 30;
+    };
+    index_type = variant { "DfinityIcrc2" }
+})'"
 dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode=$MODE
+dfx canister call super_stats_v3 --network $NETWORK init_target_ledger $INIT_ARGUMENTS
+dfx canister call super_stats_v3 --network $NETWORK start_processing_timer '(60: nat64)'
+dfx canister call super_stats_v3 --network $NETWORK add_authorised "2vxsx-fae"
+dfx canister call super_stats_v3 --network $NETWORK add_authorised "$TOKEN_METRICS_CANISTER_ID"
