@@ -27,6 +27,7 @@ ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 ic-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 serializer = { path = '../../../libraries/serializer' }
 super_stats_v3_c2c_client = { path = "../../../canisters/super_stats_v3/c2c_client" }
 super_stats_v3_api = { path = "../../../canisters/super_stats_v3/api" }
@@ -41,3 +42,5 @@ tracing = { workspace = true }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 token_metrics_api = { path = "../api" }
+canister_client = { path = "../../../libraries/canister_client" }
+time = { workspace = true }

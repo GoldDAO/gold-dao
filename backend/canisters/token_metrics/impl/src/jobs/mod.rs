@@ -1,8 +1,10 @@
 pub mod sync_governance;
-pub mod sync_supply_data;
-pub mod update_balance_list;
 pub mod sync_governance_history;
 pub mod sync_proposals_stats;
+pub mod sync_supply_data;
+pub mod update_balance_list;
+pub mod update_goldnft_data;
+pub mod update_goldprice;
 
 pub(crate) fn start() {
     // Computes the staked value for the last 2k days
