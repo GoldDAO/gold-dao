@@ -11,6 +11,7 @@ spec:
           "sns_neuron_controller",
           "sns_rewards",
           "token_metrics"
+          "super_stats_v3"
         ]
 ---
 # Rust canisters builds

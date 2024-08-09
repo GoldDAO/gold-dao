@@ -208,6 +208,18 @@
       "type": "custom",
       "wasm": "backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz"
     },
+    "super_stats_v3": {
+      "type": "custom",
+      "candid": "backend/canisters/super_stats_v3/api/can.did",
+      "optimize": "cycles",
+      "package": "super_stats_v3",
+      "wasm": "backend/canisters/super_stats_v3/target/wasm32-unknown-unknown/release/super_stats_v3_canister.wasm.gz",
+      "declarations": {
+        "bindings": ["js", "did", "ts"],
+        "env_override": null,
+        "output": "backend/canisters/super_stats_v3/api/declarations"
+      }
+    },
     "token_metrics": {
       "build": [
         "./scripts/build-canister.sh token_metrics"

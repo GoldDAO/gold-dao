@@ -11,7 +11,8 @@ spec:
           "cycles_manager",
           "sns_neuron_controller",
           "integration_testing",
-          "management"
+          "management",
+          "super_stats_v3",
         ]
 ---
 # Rust canister unit test with coverage
