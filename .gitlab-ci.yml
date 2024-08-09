@@ -49,6 +49,9 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: icp_neuron
+  # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+  #   inputs:
+  #     src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: token_metrics
@@ -87,6 +90,9 @@ include:
       src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
+      src-folder: super_stats_v3
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
       src-folder: token_metrics
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
@@ -117,6 +123,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: token_metrics
@@ -163,7 +172,6 @@ rust lint:
   extends: .rust template
   script:
     - cargo clippy
-
 ################################################################################
 # Unit tests
 ################################################################################

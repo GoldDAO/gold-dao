@@ -1,16 +1,16 @@
 use ic_cdk::export_candid;
-use lifecycle::init::InitArgs;
-use candid::Principal;
-use crate::state::GovernanceStats;
-use crate::state::TokenSupplyData;
 
-mod consts;
+mod guards;
 mod jobs;
 mod lifecycle;
 mod memory;
-mod queries;
-mod updates;
-mod state;
-mod types;
+pub mod model;
+pub mod queries;
+pub mod state;
+pub mod types;
+pub mod utils;
+
+use lifecycle::*;
+use queries::*;
 
 export_candid!();
