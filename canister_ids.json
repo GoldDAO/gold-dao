@@ -75,5 +75,9 @@
   "token_metrics": {
     "ic": "teiwz-pqaaa-aaaap-ag7hq-cai",
     "staging": "yfjcz-3iaaa-aaaap-accjq-cai"
+  },
+  "super_stats_v3": {
+    "ic": "",
+    "staging": ""
   }
 }

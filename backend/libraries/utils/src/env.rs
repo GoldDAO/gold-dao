@@ -3,7 +3,7 @@ use serde::{ Deserialize, Serialize };
 use types::{ CanisterId, Cycles, TimestampMillis, TimestampNanos };
 use canister_time::now_nanos;
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CanisterEnv {
     test_mode: bool,
 }

@@ -1,11 +1,12 @@
-use crate::lifecycle::init_canister;
-use crate::memory::get_upgrades_memory;
-use crate::state::RuntimeState;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
+
+use crate::{ memory::get_upgrades_memory, state::RuntimeState };
+
+use super::init_canister;
 
 #[post_upgrade]
 #[trace]
