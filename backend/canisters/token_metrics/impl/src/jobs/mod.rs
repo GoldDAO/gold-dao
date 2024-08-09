@@ -10,6 +10,8 @@ pub(crate) fn start() {
     // Computes the staked value for the last 2k days
     sync_governance_history::start_job();
     sync_proposals_stats::start_job();
+    update_goldprice::start_job();
+    update_goldnft_data::start_job();
     // Computes the governance stats, total staked, rewards
     // Updates the balance list (ledger + governance) for each acc
     // Also calculates circulating supply
