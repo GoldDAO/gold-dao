@@ -58,20 +58,21 @@ ARGUMENTS="(record {
   } )"
 
 
-. ./scripts/deploy-backend-canister.sh super_stats_v3 $NETWORK "$ARGUMENTS" $MODE
-
-TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
-LEDGER_CANISTER_ID=$(dfx canister id sns_ledger --network $NETWORK)
-INIT_ARGUMENTS="'(record {
-    target = record {
-        target_ledger = "$LEDGER_CANISTER_ID";
-        hourly_size = 24;
-        daily_size = 30;
-    };
-    index_type = variant { "DfinityIcrc2" }
-})'"
 dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode=$MODE
-dfx canister call super_stats_v3 --network $NETWORK init_target_ledger $INIT_ARGUMENTS
-dfx canister call super_stats_v3 --network $NETWORK start_processing_timer '(60: nat64)'
-dfx canister call super_stats_v3 --network $NETWORK add_authorised "2vxsx-fae"
-dfx canister call super_stats_v3 --network $NETWORK add_authorised "$TOKEN_METRICS_CANISTER_ID"
+
+if [ "$MODE" = "reinstall" ]; then
+  TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
+  LEDGER_CANISTER_ID=$(dfx canister id sns_ledger --network $NETWORK)
+  INIT_ARGUMENTS="'(record {
+      target = record {
+          target_ledger = "$LEDGER_CANISTER_ID";
+          hourly_size = 24;
+          daily_size = 30;
+      };
+      index_type = variant { "DfinityIcrc2" }
+  })'"
+  dfx canister call super_stats_v3 --network $NETWORK init_target_ledger $INIT_ARGUMENTS
+  dfx canister call super_stats_v3 --network $NETWORK start_processing_timer '(60: nat64)'
+  dfx canister call super_stats_v3 --network $NETWORK add_authorised "2vxsx-fae"
+  dfx canister call super_stats_v3 --network $NETWORK add_authorised "$TOKEN_METRICS_CANISTER_ID"
+fi
