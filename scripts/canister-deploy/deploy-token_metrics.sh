@@ -75,4 +75,4 @@ ARGUMENTS="(record {
   } )"
 
 
-dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode=$MODE
+dfx deploy token_metrics --network $NETWORK --argument "$ARGUMENTS" --mode reinstall -y
