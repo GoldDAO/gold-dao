@@ -39,7 +39,7 @@ else
 fi
 
 NETWORK=$1
-MODE="direct"
+MODE="reinstall"
 
 if [[ ! $NETWORK =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"

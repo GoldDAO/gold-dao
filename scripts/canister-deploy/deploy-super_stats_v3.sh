@@ -39,7 +39,7 @@ else
 fi
 
 NETWORK=$1
-MODE="direct"
+MODE="reinstall"
 
 if [[ ! $NETWORK =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
@@ -58,7 +58,7 @@ ARGUMENTS="(record {
   } )"
 
 
-dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode reinstall -y
+dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode $MODE -y
 
 if [ "$MODE" = "reinstall" ]; then
   TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
