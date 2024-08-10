@@ -48,10 +48,10 @@ fi
 
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
-  OGY_LEDGER=$(dfx canister id sns_ledger --network staging)
-  SNS_GOVERNANCE=$(dfx canister id sns_governance --network staging)
+  OGY_LEDGER=$(dfx canister id sns_ledger --network ic)
+  SNS_GOVERNANCE=$(dfx canister id sns_governance --network ic)
   SUPER_STATS=$(dfx canister id super_stats_v3 --network staging)
-  SNS_REWARDS=$(dfx canister id sns_rewards --network staging)
+  SNS_REWARDS=$(dfx canister id sns_rewards --network ic)
   GOLD_TREASURY_ACCOUNT="$SNS_GOVERNANCE.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 else
   TESTMODE="false"
