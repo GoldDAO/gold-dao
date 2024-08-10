@@ -64,7 +64,7 @@ echo $ARGUMENTS
 dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode $MODE -y
 
 if [ "$MODE" = "reinstall" ]; then
-  TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
+  TOKEN_METRICS_CANISTER_ID=$(dfx canister id token_metrics --network $NETWORK)
   LEDGER_CANISTER_ID=$(dfx canister id sns_ledger --network ic) # pass prod canister
   INIT_ARGUMENTS="(record {
       target = record {
