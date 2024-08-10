@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [1.0.4] - 2024-08-07
 
 - Added checksum validation for account queries.
-- Fixed an issue where the history for account/principals balances was returning 0 when fewer days were used as an input. 
+- Fixed an issue where the history for account/principals balances was returning 0 when fewer days were used as an input.
 
 ## [1.0.3] - 2024-06-08
 

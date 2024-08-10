@@ -52,27 +52,33 @@ else
   TESTMODE="false"
 fi
 ADMIN=$(dfx identity get-principal)
-ARGUMENTS="(record {
-  test_mode = $TESTMODE;
-  admin = \"$ADMIN\";
-  } )"
+ARGUMENTS='(record {
+  test_mode = '$TESTMODE';
+  admin = "'"$ADMIN"'";
+  } )'
 
+
+echo $ADMIN
+echo $ARGUMENTS
 
 dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode $MODE -y
 
 if [ "$MODE" = "reinstall" ]; then
   TOKEN_METRICS_CANISTER_ID=$(dfx canister id sns_rewards --network $NETWORK)
   LEDGER_CANISTER_ID=$(dfx canister id sns_ledger --network $NETWORK)
-  INIT_ARGUMENTS="'(record {
+  INIT_ARGUMENTS="(record {
       target = record {
-          target_ledger = "$LEDGER_CANISTER_ID";
+          target_ledger = \"$LEDGER_CANISTER_ID\";
           hourly_size = 24;
           daily_size = 30;
       };
-      index_type = variant { "DfinityIcrc2" }
-  })'"
-  dfx canister call super_stats_v3 --network $NETWORK init_target_ledger $INIT_ARGUMENTS
+      index_type = variant { \"DfinityIcrc2\" }
+  })"
+  echo "Initialising canister"
+  dfx canister call super_stats_v3 --network $NETWORK init_target_ledger "$INIT_ARGUMENTS"
+  echo "Start processing timer"
   dfx canister call super_stats_v3 --network $NETWORK start_processing_timer '(60: nat64)'
+  echo "Adding authorized principals"
   dfx canister call super_stats_v3 --network $NETWORK add_authorised "2vxsx-fae"
   dfx canister call super_stats_v3 --network $NETWORK add_authorised "$TOKEN_METRICS_CANISTER_ID"
 fi
