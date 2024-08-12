@@ -1,16 +1,80 @@
+type Account = record { owner : principal; subaccount : opt blob };
+type ActiveUsers = record {
+  active_principals_count : nat64;
+  active_accounts_count : nat64;
+};
+type GetHoldersArgs = record {
+  offset : nat64;
+  limit : nat64;
+  merge_accounts_to_principals : bool;
+};
+type GetHoldersResponse = record {
+  current_offset : nat64;
+  data : vec record { Account; WalletOverview };
+  limit : nat64;
+  total_count : nat64;
+};
+type GetVotingParticipationHistoryArgs = record { days : nat64 };
+type GetVotingPowerRatioHistory = record { days : nat64 };
 type GovernanceStats = record {
   total_rewards : nat;
   total_staked : nat;
   total_locked : nat;
   total_unlocked : nat;
 };
+type HistoryData = record { balance : nat };
 type InitArgs = record {
   test_mode : bool;
+  foundation_accounts : vec text;
+  treasury_account : text;
   sns_rewards_canister_id : principal;
+  ogy_new_ledger_canister_id : principal;
+  super_stats_canister_id : principal;
+  sns_governance_canister_id : principal;
+};
+type LockedNeuronsAmount = record {
+  one_year : nat64;
+  two_years : nat64;
+  three_years : nat64;
+  four_years : nat64;
+  five_years : nat64;
+};
+type Overview = record {
+  balance : nat;
+  sent : record { nat32; nat };
+  last_active : nat64;
+  first_active : nat64;
+  received : record { nat32; nat };
+  max_balance : nat;
+};
+type ProposalsMetrics = record {
+  daily_voting_rewards : nat64;
+  reward_base_current_year : nat64;
+  average_voting_participation : nat64;
+  average_voting_power : nat64;
+  total_voting_power : nat64;
+  total_proposals : nat64;
 };
 type TokenSupplyData = record { circulating_supply : nat; total_supply : nat };
-service : (opt InitArgs) -> {
+type WalletOverview = record {
+  total : nat64;
+  ledger : Overview;
+  governance : GovernanceStats;
+};
+service : (InitArgs) -> {
+  get_active_users_count : () -> (ActiveUsers) query;
   get_all_neuron_owners : () -> (vec principal) query;
+  get_foundation_assets : () -> (vec record { text; WalletOverview }) query;
+  get_holders : (GetHoldersArgs) -> (GetHoldersResponse) query;
+  get_locked_neurons_period : () -> (LockedNeuronsAmount) query;
   get_neurons_stats : (opt principal) -> (GovernanceStats) query;
+  get_proposals_metrics : () -> (ProposalsMetrics) query;
+  get_stake_history : (nat64) -> (vec record { nat64; HistoryData }) query;
   get_supply_data : () -> (TokenSupplyData) query;
+  get_voting_participation_history : (GetVotingParticipationHistoryArgs) -> (
+      vec record { nat64; nat64 },
+    ) query;
+  get_voting_power_ratio_history : (GetVotingPowerRatioHistory) -> (
+      vec record { nat64; nat64 },
+    ) query;
 }

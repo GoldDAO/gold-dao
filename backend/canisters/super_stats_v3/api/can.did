@@ -1,0 +1,119 @@
+
+type ActivitySnapshot = record {
+  principals_active_during_snapshot : nat64;
+  accounts_active_during_snapshot : nat64;
+  total_unique_accounts : nat64;
+  end_time : nat64;
+  start_time : nat64;
+  total_unique_principals : nat64;
+};
+type GetAccountHistoryArgs = record { days : nat64; account : text };
+type GetHoldersArgs = record { offset : nat64; limit : nat64 };
+type HistoryData = record { balance : nat };
+type HolderBalanceResponse = record { data : Overview; holder : text };
+type IndexerType = variant { DfinityIcrc2; DfinityIcrc3; DfinityIcp };
+type InitArgs = record { admin : text; test_mode : bool };
+type InitLedgerArgs = record { index_type : IndexerType; target : TargetArgs };
+type LogEntry = record { "text" : text; timestamp : text };
+type MemoryData = record { memory : nat64; heap_memory : nat64 };
+type Metrics = record { total_errors : nat64; total_api_requests : nat64 };
+type Overview = record {
+  balance : nat;
+  sent : record { nat32; nat };
+  last_active : nat64;
+  first_active : nat64;
+  received : record { nat32; nat };
+  max_balance : nat;
+};
+type ProcessedTX = record {
+  hash : text;
+  to_account : text;
+  tx_value : nat;
+  from_account : text;
+  block : nat64;
+  tx_fee : opt nat;
+  tx_time : nat64;
+  tx_type : text;
+  spender : opt text;
+};
+type TargetArgs = record {
+  daily_size : nat8;
+  target_ledger : text;
+  hourly_size : nat8;
+};
+type TimeChunkStats = record {
+  mint_count : nat64;
+  transfer_count : nat64;
+  end_time : nat64;
+  start_time : nat64;
+  burn_count : nat64;
+  approve_count : nat64;
+  total_count : nat64;
+};
+type TimeStats = record {
+  top_transfers : vec ProcessedTX;
+  total_unique_accounts : nat64;
+  top_burns : vec ProcessedTX;
+  mint_stats : TotCntAvg;
+  total_transaction_average : float64;
+  most_active_principals : vec record { text; nat64 };
+  transfer_stats : TotCntAvg;
+  top_mints : vec ProcessedTX;
+  total_transaction_value : nat;
+  most_active_accounts : vec record { text; nat64 };
+  count_over_time : vec TimeChunkStats;
+  total_transaction_count : nat;
+  total_unique_principals : nat64;
+  burn_stats : TotCntAvg;
+  approve_stats : TotCntAvg;
+};
+type TotCntAvg = record { count : nat; average : float64; total_value : nat };
+type TotalHolderResponse = record {
+  total_accounts : nat64;
+  total_principals : nat64;
+};
+type WorkingStats = record {
+  metrics : Metrics;
+  next_block : nat64;
+  last_update_time : nat64;
+  ledger_tip_of_chain : nat64;
+  timer_active : bool;
+  is_upto_date : bool;
+  directory_count : nat64;
+  is_busy : bool;
+};
+service : (InitArgs) -> {
+  add_admin : (text) -> (text);
+  add_authorised : (text) -> (text);
+  deposit_cycles : () -> ();
+  get_account_history : (GetAccountHistoryArgs) -> (
+      vec record { nat64; HistoryData },
+    ) query;
+  get_account_holders : (GetHoldersArgs) -> (vec HolderBalanceResponse) query;
+  get_account_overview : (text) -> (opt Overview) query;
+  get_activity_stats : (nat64) -> (vec ActivitySnapshot) query;
+  get_all_admins : () -> (vec text) query;
+  get_all_authorised : () -> (vec text) query;
+  get_canister_version : () -> (text) query;
+  get_cycles_balance : () -> (nat64) query;
+  get_daily_stats : () -> (TimeStats) query;
+  get_hourly_stats : () -> (TimeStats) query;
+  get_logs : () -> (opt vec LogEntry) query;
+  get_memory_stats : () -> (MemoryData) query;
+  get_principal_history : (GetAccountHistoryArgs) -> (
+      vec record { nat64; HistoryData },
+    ) query;
+  get_principal_holders : (GetHoldersArgs) -> (vec HolderBalanceResponse) query;
+  get_principal_overview : (text) -> (opt Overview) query;
+  get_top_account_holders : (nat64) -> (vec HolderBalanceResponse) query;
+  get_top_principal_holders : (nat64) -> (vec HolderBalanceResponse) query;
+  get_total_holders : () -> (TotalHolderResponse) query;
+  get_working_stats : () -> (WorkingStats) query;
+  init_target_ledger : (InitLedgerArgs) -> (text);
+  remove_admin : (text) -> (text);
+  remove_authorised : (text) -> (text);
+  self_call : () -> ();
+  self_call2 : () -> ();
+  start_processing_timer : (nat64) -> (text);
+  stop_all_timers : () -> (text);
+}
