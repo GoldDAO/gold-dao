@@ -56,3 +56,15 @@ pub fn run_now_then_interval(interval: Duration, func: fn()) {
 pub fn run_interval(interval: Duration, func: fn()) {
     ic_cdk_timers::set_timer_interval(interval, func);
 }
+
+// The way this function should work:
+//
+// func --> func -------> func -------> func -------> func
+//     delay     interval      interval      interval
+pub fn run_now_then_interval_with_delay(interval: Duration, delay: Duration, func: fn()) {
+    ic_cdk_timers::set_timer(Duration::ZERO, func);
+    ic_cdk_timers::set_timer(delay, move || {
+        ic_cdk_timers::set_timer(Duration::ZERO, func);
+        ic_cdk_timers::set_timer_interval(interval, func);
+    });
+}

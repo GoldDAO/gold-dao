@@ -14,7 +14,6 @@ canister_logger = { path = "../../../libraries/canister_logger" }
 canister_state_macros = { path = "../../../libraries/canister_state_macros" }
 canister_tracing_macros = { path = "../../../libraries/canister_tracing_macros" }
 canister_time = { path = "../../../libraries/canister_time" }
-canister_timer_jobs = { path = "../../../libraries/canister_timer_jobs" }
 buyback_burn_canister = { path = "../api" }
 ic-cdk = { workspace = true }
 ic-cdk-timers = { workspace = true }
@@ -40,3 +39,4 @@ icrc-ledger-types = { workspace = true }
 icpswap_client = { path = "../../../libraries/icpswap_client" }
 async-trait = { workspace = true }
 http_request = { path = '../../../libraries/http_request' }
+typetag = { workspace = true }

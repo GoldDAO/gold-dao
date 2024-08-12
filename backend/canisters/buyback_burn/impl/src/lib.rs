@@ -24,16 +24,16 @@ use ic_cdk::export_candid;
 
 use crate::state::take_state;
 use crate::state::Data;
-use crate::state::State;
+use crate::state::RuntimeState;
 
 mod guards;
 mod jobs;
+mod utils;
 pub mod lifecycle;
 mod memory;
-mod model;
 pub mod queries;
 mod state;
-pub mod timer_job_types;
+pub mod types;
 pub mod token_swap;
 pub mod updates;
 

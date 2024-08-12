@@ -6,16 +6,12 @@ mod neuron_info;
 mod proposals;
 mod rewards_recipients;
 mod token;
-mod icpswap;
-mod cryptocurrency;
 
 pub use http::*;
 pub use neuron_info::*;
 pub use proposals::*;
 pub use rewards_recipients::*;
 pub use token::*;
-pub use icpswap::*;
-pub use cryptocurrency::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Empty {}

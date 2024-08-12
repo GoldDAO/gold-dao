@@ -1,18 +1,18 @@
 use candid::Nat;
-use ic_cdk::api::call::{CallResult, RejectionCode};
+use ic_cdk::api::call::{ CallResult, RejectionCode };
 use ic_ledger_types::Subaccount;
-use icpswap_swap_pool_canister::{ICPSwapError, ICPSwapResult};
+use icpswap_swap_pool_canister::{ ICPSwapError, ICPSwapResult };
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
-use types::{CanisterId, ICPSwapTokenInfo};
+use serde::{ Deserialize, Serialize };
+use types::{ CanisterId, TokenInfo };
 
 // NOTE: we use one ICPSwapClient to swap concrete token pair
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ICPSwapClient {
     this_canister_id: CanisterId,
     swap_canister_id: CanisterId,
-    token0: ICPSwapTokenInfo,
-    token1: ICPSwapTokenInfo,
+    token0: TokenInfo,
+    token1: TokenInfo,
     // TODO: zero_for_one means which token is sold. There could be another neat solution
     zero_for_one: bool,
 }
@@ -21,9 +21,9 @@ impl ICPSwapClient {
     pub fn new(
         this_canister_id: CanisterId,
         swap_canister_id: CanisterId,
-        token0: ICPSwapTokenInfo,
-        token1: ICPSwapTokenInfo,
-        zero_for_one: bool,
+        token0: TokenInfo,
+        token1: TokenInfo,
+        zero_for_one: bool
     ) -> Self {
         ICPSwapClient {
             this_canister_id,
@@ -37,8 +37,6 @@ impl ICPSwapClient {
     pub fn deposit_account(&self) -> Account {
         Account {
             owner: self.swap_canister_id,
-            // NOTE: in open-chat we can see another convertation function,
-            // but it seems like From trait could be used here
             subaccount: Some(Subaccount::from(self.this_canister_id).0),
         }
     }
@@ -47,7 +45,7 @@ impl ICPSwapClient {
     pub async fn deposit(&self, amount: u128) -> CallResult<u128> {
         let token = self.input_token();
         let args = icpswap_swap_pool_canister::deposit::Args {
-            token: token.ledger.to_string(),
+            token: token.ledger_id.to_string(),
             amount: amount.into(),
             fee: token.fee.into(),
         };
@@ -60,7 +58,7 @@ impl ICPSwapClient {
     pub async fn swap(
         &self,
         amount: u128,
-        min_amount_out: u128,
+        min_amount_out: u128
     ) -> CallResult<Result<u128, String>> {
         let args = icpswap_swap_pool_canister::swap::Args {
             operator: self.this_canister_id,
@@ -74,16 +72,10 @@ impl ICPSwapClient {
         }
     }
 
-    // TODO: try here swap again (?)
-    //
     pub async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128> {
-        let token = if successful_swap {
-            self.output_token()
-        } else {
-            self.input_token()
-        };
+        let token = if successful_swap { self.output_token() } else { self.input_token() };
         let args = icpswap_swap_pool_canister::withdraw::Args {
-            token: token.ledger.to_string(),
+            token: token.ledger_id.to_string(),
             amount: amount.into(),
             fee: token.fee.into(),
         };
@@ -93,20 +85,24 @@ impl ICPSwapClient {
         }
     }
 
-    fn input_token(&self) -> &ICPSwapTokenInfo {
-        if self.zero_for_one {
-            &self.token0
-        } else {
-            &self.token1
-        }
+    pub fn input_token(&self) -> TokenInfo {
+        if self.zero_for_one { self.token0 } else { self.token1 }
     }
 
-    fn output_token(&self) -> &ICPSwapTokenInfo {
-        if self.zero_for_one {
-            &self.token1
-        } else {
-            &self.token0
-        }
+    pub fn output_token(&self) -> TokenInfo {
+        if self.zero_for_one { self.token1 } else { self.token0 }
+    }
+
+    pub fn this_canister_id(&self) -> CanisterId {
+        self.this_canister_id
+    }
+
+    pub fn swap_canister_id(&self) -> CanisterId {
+        self.swap_canister_id
+    }
+
+    pub fn zero_for_one(&self) -> bool {
+        self.zero_for_one
     }
 }
 

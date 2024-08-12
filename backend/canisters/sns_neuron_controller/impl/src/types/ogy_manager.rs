@@ -9,10 +9,10 @@ use candid::Nat;
 use candid::Principal;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::Neuron;
 use sns_governance_canister::types::NeuronId;
-use tracing::{error, info};
+use tracing::{ error, info };
 use types::CanisterId;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -27,12 +27,15 @@ pub struct OgyManager {
 impl Default for OgyManager {
     fn default() -> Self {
         Self {
-            ogy_sns_governance_canister_id: Principal::from_text("lnxxh-yaaaa-aaaaq-aadha-cai")
-                .unwrap(),
-            ogy_sns_ledger_canister_id: Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")
-                .unwrap(),
-            ogy_sns_rewards_canister_id: Principal::from_text("yuijc-oiaaa-aaaap-ahezq-cai")
-                .unwrap(),
+            ogy_sns_governance_canister_id: Principal::from_text(
+                "lnxxh-yaaaa-aaaaq-aadha-cai"
+            ).unwrap(),
+            ogy_sns_ledger_canister_id: Principal::from_text(
+                "lkwrt-vyaaa-aaaaq-aadhq-cai"
+            ).unwrap(),
+            ogy_sns_rewards_canister_id: Principal::from_text(
+                "yuijc-oiaaa-aaaap-ahezq-cai"
+            ).unwrap(),
             neurons: Neurons::default(),
         }
     }
@@ -71,10 +74,8 @@ impl NeuronRewardsManager for OgyManager {
         ogy_calculate_available_rewards(
             neurons,
             self.get_sns_rewards_canister_id(),
-            self.get_sns_ledger_canister_id(),
-        )
-        .await
-        .get_internal()
+            self.get_sns_ledger_canister_id()
+        ).await.get_internal()
     }
 
     async fn claim_rewards(&self) -> ClaimRewardResult {
@@ -86,22 +87,23 @@ impl NeuronRewardsManager for OgyManager {
 pub async fn ogy_fetch_neuron_reward_balance(
     ledger_canister_id: Principal,
     ogy_sns_rewards_canister_id: Principal,
-    neuron_id: &NeuronId,
+    neuron_id: &NeuronId
 ) -> Result<Nat, String> {
-    match icrc_ledger_canister_c2c_client::icrc1_balance_of(
-        ledger_canister_id,
-        &(Account {
-            owner: ogy_sns_rewards_canister_id,
-            subaccount: Some(neuron_id.into()),
-        }),
-    )
-    .await
+    match
+        icrc_ledger_canister_c2c_client::icrc1_balance_of(
+            ledger_canister_id,
+            &(Account {
+                owner: ogy_sns_rewards_canister_id,
+                subaccount: Some(neuron_id.into()),
+            })
+        ).await
     {
         Ok(t) => Ok(t),
         Err(e) => {
             let error_message = format!(
                 "Failed to fetch token balance of ledger canister id {} with ERROR : {:?}",
-                ledger_canister_id, e
+                ledger_canister_id,
+                e
             );
             error!("{}", error_message);
             Err(error_message)
@@ -115,18 +117,20 @@ pub async fn ogy_fetch_neuron_reward_balance(
 pub async fn ogy_calculate_available_rewards(
     neurons: &[Neuron],
     ogy_sns_rewards_canister_id: Principal,
-    sns_ledger_canister_id: Principal,
+    sns_ledger_canister_id: Principal
 ) -> RewardSumResult {
     let futures: Vec<_> = neurons
         .iter()
         .filter_map(|neuron| {
-            neuron.id.as_ref().map(|id| {
-                ogy_fetch_neuron_reward_balance(
-                    sns_ledger_canister_id,
-                    ogy_sns_rewards_canister_id,
-                    id,
-                )
-            })
+            neuron.id
+                .as_ref()
+                .map(|id| {
+                    ogy_fetch_neuron_reward_balance(
+                        sns_ledger_canister_id,
+                        ogy_sns_rewards_canister_id,
+                        id
+                    )
+                })
         })
         .collect();
 
@@ -169,7 +173,7 @@ pub async fn ogy_calculate_available_rewards(
 // FIXME: handle an error like in calculate_available_rewards, use also Empty result
 pub async fn ogy_claim_rewards(
     neurons: &[Neuron],
-    sns_rewards_canister_id: Principal,
+    sns_rewards_canister_id: Principal
 ) -> ClaimRewardResult {
     let futures: Vec<_> = neurons
         .iter()
@@ -181,14 +185,21 @@ pub async fn ogy_claim_rewards(
                 };
 
                 async move {
-                    match ogy_sns_rewards_c2c_client::claim_reward(sns_rewards_canister_id, &args)
-                        .await
+                    match
+                        ogy_sns_rewards_c2c_client::claim_reward(
+                            sns_rewards_canister_id,
+                            &args
+                        ).await
                     {
                         Ok(_) => Ok(()),
-                        Err(e) => Err(format!(
-                            "Failed to claim rewards for Neuron ID {}: {:?}",
-                            neuron_id, e
-                        )),
+                        Err(e) =>
+                            Err(
+                                format!(
+                                    "Failed to claim rewards for Neuron ID {}: {:?}",
+                                    neuron_id,
+                                    e
+                                )
+                            ),
                     }
                 }
             })

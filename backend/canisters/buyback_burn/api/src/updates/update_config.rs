@@ -1,9 +1,12 @@
 use candid::CandidType;
-use serde::{Deserialize, Serialize};
+use ic_ledger_types::Tokens;
+use serde::{ Deserialize, Serialize };
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Args {
-    pub min_burn_amount: Option<u128>,
+    pub burn_rate: Option<u8>,
+    pub min_icp_burn_amount: Option<Tokens>,
+    pub burn_interval_in_secs: Option<u64>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]

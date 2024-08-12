@@ -1,6 +1,5 @@
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use types::ResultLowercase;
 
 mod queries;
 mod updates;
@@ -16,4 +15,12 @@ pub enum ICPSwapError {
     InternalError(String),
     UnsupportedToken(String),
     InsufficientFunds,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum ResultLowercase<T, E> {
+    #[serde(rename = "ok")]
+    Ok(T),
+    #[serde(rename = "err")]
+    Err(E),
 }

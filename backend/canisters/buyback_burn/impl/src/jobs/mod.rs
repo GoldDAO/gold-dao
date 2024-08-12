@@ -1,8 +1,6 @@
-pub mod check_journal;
-pub mod create_proposal;
+pub mod burn_tokens;
 pub mod swap_tokens;
 
 pub(crate) fn start() {
-    create_proposal::start_job();
-    check_journal::start_job();
+    burn_tokens::start_job();
 }

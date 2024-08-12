@@ -1,27 +1,25 @@
 use candid::CandidType;
-use ic_ledger_types::{BlockIndex, Subaccount};
-use serde::{Deserialize, Serialize};
+use ic_ledger_types::{ BlockIndex, Subaccount };
+use serde::{ Deserialize, Serialize };
 use std::collections::HashMap;
 use types::TimestampMillis;
-// use user_canister::token_swap_status::TokenSwapStatus;
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
-use crate::model::token_swap_status::TokenSwapStatus;
+use crate::types::token_swap_status::SwapStatus;
 use crate::state::SwapConfig;
 use ic_stable_structures::StableBTreeMap;
 use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::account::Account;
+use tracing::error;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
     swaps: HashMap<u128, TokenSwap>,
-    // #[serde(skip, default = "init_map")]
-    // history: HashMap<u128, TokenSwap>,
     #[serde(skip, default = "init_map")]
-    history: StableBTreeMap<BlockIndex, TokenSwap, VM>,
+    history: StableBTreeMap<u128, TokenSwap, VM>,
 }
 
-fn init_map() -> StableBTreeMap<BlockIndex, TokenSwap, VM> {
+fn init_map() -> StableBTreeMap<u128, TokenSwap, VM> {
     let memory = get_swap_history_memory();
     StableBTreeMap::init(memory)
 }
@@ -49,12 +47,14 @@ impl Default for TokenSwaps {
 impl TokenSwaps {
     pub fn push_new(&mut self, args: SwapConfig, now: TimestampMillis) -> TokenSwap {
         let token_swap = TokenSwap::new(args, now);
+        // FIXME: fix here the swap id
         self.upsert(token_swap.clone());
         token_swap
     }
 
     pub fn upsert(&mut self, swap: TokenSwap) {
-        self.swaps.insert(swap.args.swap_id, swap);
+        // FIXME: fix here the swap id
+        self.swaps.insert(0, swap);
     }
 
     pub fn get(&self, swap_id: u128) -> Option<&TokenSwap> {
@@ -64,12 +64,43 @@ impl TokenSwaps {
     pub fn iter(&self) -> impl Iterator<Item = &TokenSwap> {
         self.swaps.values()
     }
+
+    pub fn get_swap_info(&self, swap_id: u128) -> Option<TokenSwap> {
+        let swap_info_incomplete = self.swaps.get(&swap_id).cloned();
+        let swap_info_completed = self.history.get(&swap_id);
+        swap_info_incomplete.or(swap_info_completed)
+    }
+
+    pub fn archive_swap(&mut self, swap_id: u128) -> Result<(), ()> {
+        let swap_info = self.swaps.get(&swap_id);
+        match swap_info {
+            Some(swap) => {
+                let mut modified_swap = swap.clone();
+                modified_swap.is_archived = true;
+                self.history.insert(swap_id, modified_swap.clone());
+                self.swaps.remove(&swap_id);
+                Ok(())
+            }
+            None => {
+                error!("Failed to archive {swap_id} because it doesn't exist in swap heap memory");
+                Err(())
+            }
+        }
+    }
+
+    // pub total_amount_swapped: u64,
+    // pub number_of_completed_swaps: u64,
+    // pub number_of_attempted_swaps: u64,
+    // pub number_of_failed_swaps: u64,
+    // pub user_swaps: HashMap<Principal, UserSwap>,
+    pub fn get_metrics(&self) {}
 }
 
 // #[derive(Serialize, Deserialize, Clone, Debug)]
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct TokenSwap {
-    pub args: SwapConfig,
+    // pub args: SwapConfig,
+    pub status: SwapStatus,
     pub started: TimestampMillis,
     pub deposit_account: SwapSubtask<Account>,
     pub transfer: SwapSubtask<u64>, // Block Index
@@ -77,6 +108,7 @@ pub struct TokenSwap {
     pub amount_swapped: SwapSubtask<Result<u128, String>>,
     pub withdrawn_from_dex_at: SwapSubtask<u128>,
     pub success: Option<bool>,
+    pub is_archived: bool,
 }
 
 use candid::Decode;
@@ -103,7 +135,8 @@ type SwapSubtask<T = ()> = Option<Result<T, String>>;
 impl TokenSwap {
     pub fn new(args: SwapConfig, now: TimestampMillis) -> TokenSwap {
         TokenSwap {
-            args,
+            // args,
+            status: SwapStatus::Init,
             started: now,
             deposit_account: None,
             transfer: None,
@@ -111,6 +144,7 @@ impl TokenSwap {
             amount_swapped: None,
             withdrawn_from_dex_at: None,
             success: None,
+            is_archived: false,
         }
     }
 }

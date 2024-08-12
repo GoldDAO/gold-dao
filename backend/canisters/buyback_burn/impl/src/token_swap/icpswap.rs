@@ -3,11 +3,24 @@ use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
+use crate::state::SwapConfig;
 
 #[async_trait]
+#[typetag::serde]
 // TODO: when async traits would be stable, rewrite without async_trait usage:
 // https://blog.rust-lang.org/2023/12/21/async-fn-rpit-in-traits.html
 impl SwapClient for ICPSwapClient {
+    fn get_config(&self) -> SwapConfig {
+        SwapConfig {
+            // FIXME: fix the id
+            swap_client_id: 0,
+            input_token: self.input_token(),
+            output_token: self.output_token(),
+            swap_canister_id: self.swap_canister_id(),
+            zero_for_one: self.zero_for_one(),
+        }
+    }
+
     async fn deposit_account(&self) -> CallResult<Account> {
         Ok(self.deposit_account())
     }

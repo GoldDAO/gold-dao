@@ -24,7 +24,6 @@ members = [
   "backend/libraries/canister_logger",
   "backend/libraries/canister_state_macros",
   "backend/libraries/canister_time",
-    "backend/libraries/canister_timer_jobs",
   "backend/libraries/canister_tracing_macros",
   "backend/libraries/http_request",
   "backend/libraries/icpswap_client",
@@ -40,7 +39,6 @@ lto = "thin"
 panic = "abort"
 
 [workspace.dependencies]
-async-trait = "0.1.74"
 candid = { version = "0.10.2" }
 ciborium = "0.2.2"
 futures = "0.3.29"
