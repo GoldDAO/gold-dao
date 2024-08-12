@@ -62,6 +62,7 @@ pub async fn sync_neurons_data() {
     while continue_scanning {
         continue_scanning = false;
 
+        debug!("Scanning neurons with args {args:?}");
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
                 // info!("{:?}", response);

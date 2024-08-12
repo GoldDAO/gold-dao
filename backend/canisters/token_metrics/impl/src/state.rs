@@ -143,6 +143,7 @@ pub struct Data {
 
 impl Data {
     pub fn new(
+        gold_nft_canisters: Vec<(Principal, u128)>,
         ogy_new_ledger: CanisterId,
         sns_governance_canister_id: CanisterId,
         super_stats_canister_id: CanisterId,
