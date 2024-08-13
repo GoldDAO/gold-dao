@@ -42,6 +42,7 @@ impl RuntimeState {
             number_of_owners: self.data.principal_neurons.len(),
             sns_governance_canister: self.data.sns_governance_canister,
             sns_ledger_canister: self.data.sns_ledger_canister,
+            sync_config: SyncConfig { gld_nft_canister_ids: self.data.gold_nft_canisters.clone() },
         }
     }
 
@@ -59,6 +60,7 @@ pub struct Metrics {
     pub sns_ledger_canister: Principal,
     pub number_of_owners: usize,
     pub sync_info: SyncInfo,
+    pub sync_config: SyncConfig,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -67,6 +69,11 @@ pub struct CanisterInfo {
     pub test_mode: bool,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
+}
+
+#[derive(CandidType, Deserialize, Serialize, Clone, Default)]
+pub struct SyncConfig {
+    pub gld_nft_canister_ids: Vec<(Principal, u128)>,
 }
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Default)]
@@ -153,7 +160,7 @@ impl Data {
     ) -> Self {
         Self {
             gold_price: 0.0,
-            gold_nft_canisters: Vec::new(),
+            gold_nft_canisters,
             total_gold_grams: 0,
             super_stats_canister: super_stats_canister_id,
             sns_governance_canister: sns_governance_canister_id,

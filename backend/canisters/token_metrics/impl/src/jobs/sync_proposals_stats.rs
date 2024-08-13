@@ -95,13 +95,13 @@ pub async fn sync_proposals_metrics_data() {
         }
     }
 
-    info!("Successfully scanned {number_of_scanned_proposals} proposals.");
+    debug!("Successfully scanned {number_of_scanned_proposals} proposals.");
 
     mutate_state(|state| {
         state.data.sync_info.last_synced_number_of_proposals = number_of_scanned_proposals;
     });
 
-    info!("Voting metrics updated successfully.");
+    debug!("Voting metrics updated successfully.");
 }
 
 pub async fn recheck_ongoing_proposals() {

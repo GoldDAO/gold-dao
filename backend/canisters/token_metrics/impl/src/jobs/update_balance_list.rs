@@ -129,10 +129,10 @@ pub async fn update_balance_list() {
         state.data.active_users.active_accounts_count = count_active_users(&temp_wallets_list);
     });
     mutate_state(|state| state.data.update_foundation_accounts_data());
-    info!("update_balance_list -> done, mutated the state")
+    debug!("update_balance_list -> done, mutated the state")
 }
 async fn get_all_holders() -> (HashMap<String, LedgerOverview>, HashMap<String, LedgerOverview>) {
-    info!("getting all holders..");
+    debug!("getting all holders..");
     let super_stats_canister_id = read_state(|state| state.data.super_stats_canister);
 
     let mut principal_holders_map: HashMap<String, LedgerOverview> = HashMap::new();
