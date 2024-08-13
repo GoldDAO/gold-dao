@@ -1,17 +1,14 @@
-use canister_time::{ run_now_then_interval, DAY_IN_MS };
-use std::time::Duration;
-use ic_cdk::api::management_canister::http_request::{
-    http_request,
-    CanisterHttpRequestArgument,
-    HttpMethod,
-    TransformContext,
-};
-use types::Milliseconds;
-use crate::types::gold_price_types::YumiApiResponse;
 use crate::state::mutate_state;
-use tracing::{ info, error };
+use crate::types::gold_price_types::YumiApiResponse;
+use canister_time::{run_now_then_interval, DAY_IN_MS};
+use ic_cdk::api::management_canister::http_request::{
+    http_request, CanisterHttpRequestArgument, HttpMethod, TransformContext,
+};
 use ic_cdk::api::time;
+use std::time::Duration;
 use time::OffsetDateTime;
+use tracing::{error, info};
+use types::Milliseconds;
 
 const REFRESH_GOLD_PRICE_INTERVAL: Milliseconds = DAY_IN_MS;
 
@@ -25,9 +22,8 @@ pub fn run() {
 
 fn timestamp_to_date_string(nanoseconds: u64) -> (String, String) {
     info!("get timestamp_to_date_string.");
-    let datetime = OffsetDateTime::from_unix_timestamp_nanos(nanoseconds as i128).unwrap_or_else(|_|
-        panic!("Invalid timestamp")
-    );
+    let datetime = OffsetDateTime::from_unix_timestamp_nanos(nanoseconds as i128)
+        .unwrap_or_else(|_| panic!("Invalid timestamp"));
 
     let year: i32 = datetime.year();
     let month: u8 = datetime.month().into();
@@ -46,7 +42,8 @@ async fn run_async() {
 
     let url: &str = &format!(
         "https://api2.yumi.io/gold/tradePrice?symbols=XAU&start_at={last_year}&end_at={today}"
-    ).to_string();
+    )
+    .to_string();
 
     let request_headers = vec![];
 
@@ -55,9 +52,10 @@ async fn run_async() {
         method: HttpMethod::GET,
         body: None,
         max_response_bytes: None,
-        transform: Some(
-            TransformContext::from_name("transform_http_response".to_string(), Vec::new())
-        ),
+        transform: Some(TransformContext::from_name(
+            "transform_http_response".to_string(),
+            Vec::new(),
+        )),
         headers: request_headers,
     };
 
@@ -66,7 +64,7 @@ async fn run_async() {
     match http_request(request, cycles).await {
         Ok((response,)) => {
             let message = match String::from_utf8(response.body) {
-                Ok(val) => { val }
+                Ok(val) => val,
                 Err(e) => {
                     error!("Transformed response is not UTF-8 encoded : {e:?}");
                     return ();

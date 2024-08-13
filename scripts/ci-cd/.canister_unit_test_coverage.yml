@@ -2,8 +2,7 @@ spec:
   inputs:
     src-folder:
       description: Name of the source folder, should be the same as the canister's cargo package name.
-      options:
-        [
+      options: [
           "gldt_core",
           "icp_neuron",
           "token_metrics",
@@ -11,7 +10,8 @@ spec:
           "cycles_manager",
           "sns_neuron_controller",
           "integration_testing",
-          "management"
+          "management",
+          # "super_stats_v3",
         ]
 ---
 # Rust canister unit test with coverage

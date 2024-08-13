@@ -13,24 +13,21 @@ by the pre-deploy script (using the dot notation, or inside a macro deploy scrip
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
 Usage:
-  scripts/deploy-icp-neuron.sh [options] <NETWORK>
+  scripts/deploy-token_metrics.sh [options] <NETWORK>
 
 Options:
   -h, --help        Show this message and exit
-  -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
 EOF
 }
 
-# TODO: add a --identity option ?? (See dfx deploy --identity)
+
+
 if [[ $# -gt 0 ]]; then
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
     case $1 in
       -h | --help )
         show_help
         exit
-        ;;
-      -r | --reinstall )
-        REINSTALL="--mode reinstall"
         ;;
     esac;
     shift;
@@ -41,50 +38,41 @@ else
   exit 1
 fi
 
-if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
+NETWORK=$1
+MODE="reinstall"
+
+if [[ ! $NETWORK =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
   exit 2
 fi
 
-if [[ $1 =~ ^(local|staging)$ ]]; then
+if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
-  SNS_REWARDS_CANISTER_ID=$(dfx canister id --network $1 sns_rewards)
+  OGY_LEDGER=$(dfx canister id sns_ledger --network ic)
+  SNS_GOVERNANCE=$(dfx canister id sns_governance --network ic)
+  SUPER_STATS=$(dfx canister id super_stats_v3 --network staging)
+  SNS_REWARDS=$(dfx canister id sns_rewards --network ic)
+  GOLD_TREASURY_ACCOUNT="$SNS_GOVERNANCE.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 else
   TESTMODE="false"
-  SNS_REWARDS_CANISTER_ID=$(dfx canister id --ic sns_rewards)
+  OGY_LEDGER=$(dfx canister id sns_ledger --network $NETWORK)
+  SNS_GOVERNANCE=$(dfx canister id sns_governance --network $NETWORK)
+  SUPER_STATS=$(dfx canister id super_stats_v3 --network $NETWORK)
+  SNS_REWARDS=$(dfx canister id sns_rewards --network $NETWORK)
+  GOLD_TREASURY_ACCOUNT="$SNS_GOVERNANCE.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 fi
 
-INIT_ARGS="(opt record {
+ARGUMENTS="(record {
   test_mode = $TESTMODE;
-  sns_rewards_canister_id = principal \"$SNS_REWARDS_CANISTER_ID\"
-  })"
+  ogy_new_ledger_canister_id = principal \"$OGY_LEDGER\";
+  sns_governance_canister_id = principal \"$SNS_GOVERNANCE\";
+  sns_rewards_canister_id = principal \"$SNS_REWARDS\";
+  super_stats_canister_id = principal \"$SUPER_STATS\";
+  treasury_account = \"$ORIGYN_TREASURY_ACCOUNT\";
+  foundation_accounts = vec {
+    \"$GOLD_TREASURY_ACCOUNT\"
+    }
+  } )"
 
-if [[ $1 == "local" ]]; then
-  dfx deploy token_metrics --network $1 ${REINSTALL} --argument "$INIT_ARGS"  -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^token_metrics-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
-  echo "Deploying token_metrics with args \n $INIT_ARGS"
-  # This is for direct deployment via CICD identity
-  dfx deploy token_metrics --network $1 ${REINSTALL} --argument "$INIT_ARGS" -y
-
-  # The following lines are for deployment via SNS. Only activate when handing over the canister
-  # TODO - make sure to improve this procedure, created issue #156 to address this
-
-  # if [[ $1 == "ic" ]]; then
-  #   PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-  #   UPGRADEVERSION=$CI_COMMIT_TAG
-  # else
-  #   PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
-  #   UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
-  # fi
-  # . scripts/prepare_sns_canister_ids.sh $1 && \
-  # . scripts/parse_proposal_details.sh token_metrics && \
-  # quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
-  #   --pem-file $PEM_FILE \
-  #   --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
-  #   --target-canister-id $(cat canister_ids.json | jq -r .token_metrics.$1) \
-  #   --wasm-path backend/canisters/token_metrics/target/wasm32-unknown-unknown/release/token_metrics_canister.wasm.gz \
-  #   --title "Upgrade token_metrics to ${UPGRADEVERSION}" \
-  #   --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
-fi
-return
+dfx deploy token_metrics --network $NETWORK --argument "$ARGUMENTS" --mode reinstall -y
