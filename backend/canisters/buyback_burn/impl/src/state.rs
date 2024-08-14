@@ -1,18 +1,15 @@
-use crate::types::token_swaps::TokenSwaps;
-use crate::utils::build_icpswap_client;
-use buyback_burn_canister::get_config::Response as GetConfigResponse;
+use std::collections::HashMap;
+use std::time::Duration;
 use candid::{ CandidType, Principal };
+use serde::{ Deserialize, Serialize };
+use buyback_burn_canister::get_config::Response as GetConfigResponse;
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
-use icpswap_client::ICPSwapClient;
-use serde::{ Deserialize, Serialize };
-use types::CanisterId;
-use types::TokenInfo;
-use types::{ Cycles, TimestampMillis };
-use utils::env::CanisterEnv;
-use utils::env::Environment;
+use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
-use crate::token_swap::SwapClient;
+use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo, TokenSymbol };
+use crate::token_swap::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
+use crate::types::token_swaps::TokenSwaps;
 
 canister_state!(RuntimeState);
 
@@ -53,16 +50,12 @@ impl RuntimeState {
     // }
 }
 
-use types::TokenSymbol;
-use std::collections::HashMap;
-use std::time::Duration;
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub gldgov_ledger_canister_id: CanisterId,
-    // pub tokens: HashMap<TokenSymbol, TokenInfo>,
-    // pub icpswap_clients: Vec<CanisterId>,
-    pub icpswap_client: Box<dyn SwapClient>,
+    pub swap_interval: Duration,
+    pub swap_clients: SwapClinets,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
 }
@@ -78,19 +71,29 @@ pub struct BurnConfig {
 impl Data {
     pub fn new(
         authorized_principals: Vec<Principal>,
-        tokens: HashMap<TokenSymbol, TokenInfo>,
+        tokens: Vec<TokenInfo>,
         gldgov_ledger_canister_id: CanisterId,
+        swap_interval_in_secs: u64,
         sns_governance_canister_id: Principal,
         burn_rate: u8,
         min_icp_burn_amount: Tokens,
         burn_interval_in_secs: u64,
         this_canister_id: Principal
     ) -> Data {
+        let mut swap_clients = SwapClinets::init(this_canister_id);
+        // TODO: add other tokens support
+        swap_clients.add_swap_client(SwapConfig {
+            swap_client_id: 0,
+            input_token: TokenInfo::icp(),
+            output_token: TokenInfo::gldgov(),
+            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
+        });
         Data {
             authorized_principals: authorized_principals.into_iter().collect(),
             gldgov_ledger_canister_id,
-            // tokens,
-            icpswap_client: build_icpswap_client(&SwapConfig::default(), this_canister_id),
+            swap_interval: Duration::from_secs(swap_interval_in_secs),
+            // icpswap_client: ,
+            swap_clients,
             burn_config: BurnConfig {
                 burn_address: sns_governance_canister_id,
                 burn_rate,
@@ -102,34 +105,11 @@ impl Data {
     }
 }
 
-// #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub struct SwapConfig {
-    pub swap_client_id: u128,
-    pub input_token: TokenInfo,
-    pub output_token: TokenInfo,
-    pub swap_canister_id: Principal,
-    pub zero_for_one: bool,
-}
-
-impl Default for SwapConfig {
-    fn default() -> Self {
-        Self {
-            swap_client_id: 0,
-            input_token: TokenInfo::icp(),
-            output_token: TokenInfo::gldgov(),
-            swap_canister_id: Principal::from_text("7eikv-2iaaa-aaaag-qdgwa-cai").unwrap(),
-            zero_for_one: true,
-        }
-    }
-}
-
 #[derive(CandidType, Serialize)]
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub sns_governance_canister: CanisterId,
-    // pub cycles_minting_canister: CanisterId,
     pub min_burn_amount: u128,
 }
 

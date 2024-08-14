@@ -18,6 +18,7 @@ fn init(args: InitArgs) {
         args.authorized_principals,
         args.tokens,
         args.gldgov_ledger_canister_id,
+        args.swap_interval_in_secs,
         args.sns_governance_canister_id,
         args.burn_rate,
         args.min_icp_burn_amount,

@@ -3,7 +3,8 @@ use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::state::SwapConfig;
+use crate::token_swap::SwapConfig;
+use crate::token_swap::ExchangeConfig;
 
 #[async_trait]
 #[typetag::serde]
@@ -16,13 +17,19 @@ impl SwapClient for ICPSwapClient {
             swap_client_id: 0,
             input_token: self.input_token(),
             output_token: self.output_token(),
-            swap_canister_id: self.swap_canister_id(),
-            zero_for_one: self.zero_for_one(),
+            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig {
+                swap_canister_id: self.swap_canister_id(),
+                zero_for_one: self.zero_for_one(),
+            }),
         }
     }
 
+    fn clone_box(&self) -> Box<dyn SwapClient> {
+        Box::new(self.clone())
+    }
+
     async fn deposit_account(&self) -> CallResult<Account> {
-        Ok(self.deposit_account())
+        Ok(self.deposit_account_internal())
     }
 
     async fn deposit(&self, amount: u128) -> CallResult<()> {
@@ -35,5 +42,25 @@ impl SwapClient for ICPSwapClient {
 
     async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128> {
         self.withdraw(successful_swap, amount).await
+    }
+}
+
+use types::CanisterId;
+use serde::{ Deserialize, Serialize };
+use candid::CandidType;
+use candid::Principal;
+
+#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+pub struct ICPSwapConfig {
+    pub swap_canister_id: CanisterId,
+    pub zero_for_one: bool,
+}
+
+impl Default for ICPSwapConfig {
+    fn default() -> Self {
+        Self {
+            swap_canister_id: Principal::from_text("7eikv-2iaaa-aaaag-qdgwa-cai").unwrap(),
+            zero_for_one: true,
+        }
     }
 }

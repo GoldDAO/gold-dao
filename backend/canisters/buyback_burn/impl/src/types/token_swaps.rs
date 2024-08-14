@@ -5,8 +5,8 @@ use std::collections::HashMap;
 use types::TimestampMillis;
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
+use crate::token_swap::SwapConfig;
 use crate::types::token_swap_status::SwapStatus;
-use crate::state::SwapConfig;
 use ic_stable_structures::StableBTreeMap;
 use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::account::Account;
@@ -46,7 +46,7 @@ impl Default for TokenSwaps {
 
 impl TokenSwaps {
     pub fn push_new(&mut self, args: SwapConfig, now: TimestampMillis) -> TokenSwap {
-        let token_swap = TokenSwap::new(args, now);
+        let token_swap = TokenSwap::new(now);
         // FIXME: fix here the swap id
         self.upsert(token_swap.clone());
         token_swap
@@ -133,7 +133,7 @@ impl Storable for TokenSwap {
 type SwapSubtask<T = ()> = Option<Result<T, String>>;
 
 impl TokenSwap {
-    pub fn new(args: SwapConfig, now: TimestampMillis) -> TokenSwap {
+    pub fn new(now: TimestampMillis) -> TokenSwap {
         TokenSwap {
             // args,
             status: SwapStatus::Init,

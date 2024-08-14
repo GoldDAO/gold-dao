@@ -59,9 +59,9 @@ AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe
 fi
 
 export BURN_RATE=33
-export MIN_ICP_BURN_AMOUNT=300
+export MIN_ICP_BURN_AMOUNT=30_000_000_000
 # 6 hours
-export BURN_INTERVAL_IN_SECS=21600 
+export BURN_INTERVAL_IN_SECS=21_600 
 
 ARGS='(
   record {

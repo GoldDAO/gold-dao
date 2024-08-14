@@ -1,7 +1,5 @@
-use crate::jobs::swap_tokens::Response::InternalError;
 use crate::types::token_swaps::TokenSwap;
-use crate::state::SwapConfig;
-use crate::state::{ mutate_state, read_state, Data, RuntimeState };
+use crate::state::{ mutate_state, read_state, RuntimeState };
 use candid::CandidType;
 use canister_time::run_now_then_interval;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
@@ -9,37 +7,57 @@ use serde::{ Deserialize, Serialize };
 use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
-use types::TimestampMillis;
+use crate::token_swap::SwapConfig;
+
+use canister_tracing_macros::trace;
 
 use utils::env::Environment;
 
 pub const NANOS_PER_MILLISECOND: u64 = 1_000_000;
-pub const SECOND_IN_MS: Milliseconds = 1000;
-
-const INTERVAL: Duration = Duration::from_secs(7 * 24 * 60 * 60); // 1 week
+const MAX_ATTEMPTS: u8 = 3;
+const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    run_now_then_interval(INTERVAL, run);
+    let swap_interval = read_state(|s| s.data.swap_interval);
+    run_now_then_interval(swap_interval, run);
 }
 
-fn prepare(args: SwapConfig, state: &mut RuntimeState) -> Result<TokenSwap, Response> {
+fn prepare(args: SwapConfig, state: &mut RuntimeState) -> TokenSwap {
     let now = state.env.now();
-    Ok(state.data.token_swaps.push_new(args, now))
+    // TODO: implement that swap_client_id is stored in TokenSwap. All the clients should be queried in loop and for each of them the token swap should be created
+    state.data.token_swaps.push_new(args, now)
 }
 
 pub fn run() {
-    // let token_swap = match mutate_state(|state| prepare(state.data., state)) {
-    //     Ok(ts) => ts,
-    //     Err(response) => return response,
-    // };
-
-    // ic_cdk::spawn(create_proposal(canister_id, args));
+    ic_cdk::spawn(run_async());
 }
 
-pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) -> Response {
-    let swap_client = read_state(|state| state.data.icpswap_client);
+// FIXME
+async fn run_async() {
+    let swap_clients = read_state(|state| { state.data.swap_clients.clone() });
+
+    for swap_client in swap_clients.iter() {
+        let args = swap_client.get_config();
+        let token_swap = mutate_state(|state| prepare(args, state));
+
+        if
+            let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
+                process_token_swap(token_swap.clone()).await
+            }).await
+        {
+            error!("Failed to swap tokens after {} attempts: {:?}", MAX_ATTEMPTS, err);
+        }
+    }
+}
+
+#[trace]
+pub(crate) async fn process_token_swap(mut token_swap: TokenSwap) -> Result<(), String> {
+    let swap_client = read_state(|state| {
+        state.data.swap_clients.swap_clients.get(0).unwrap().clone()
+    });
+
     let args = swap_client.get_config();
 
     let account = if let Some(a) = extract_result(&token_swap.deposit_account) {
@@ -48,7 +66,7 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
         match swap_client.deposit_account().await {
             Ok(a) => {
                 mutate_state(|state| {
-                    let now = state.env.now();
+                    // let now = state.env.now();
                     token_swap.deposit_account = Some(Ok(a));
                     // FIXME: fix here an id
                     state.data.token_swaps.upsert(token_swap.clone());
@@ -58,13 +76,13 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
             Err(error) => {
                 let msg = format!("{error:?}");
                 mutate_state(|state| {
-                    let now = state.env.now();
+                    // let now = state.env.now();
                     token_swap.deposit_account = Some(Err(msg.clone()));
                     token_swap.success = Some(false);
                     state.data.token_swaps.upsert(token_swap);
                 });
-                // log_error("Failed to get deposit account", msg.as_str(), attempt);
-                return InternalError(msg);
+                error!("Failed to deposit tokens while swap: {}", msg.as_str());
+                return Err(msg);
             }
         }
     };
@@ -72,11 +90,13 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
     // Get the ICP balance
 
     // FIXME: make this dynamic
-    let amount_to_dex = 0;
-    // let amount_to_dex = args.input_amount.saturating_sub(args.input_token.fee.into());
+    // let amount_to_dex = 0;
+    let input_amount: u128 = 1;
+    let amount_to_dex = input_amount.saturating_sub(args.input_token.fee.into());
 
     if extract_result(&token_swap.transfer).is_none() {
         let now = read_state(|state| state.env.now());
+        // FIXME: check that here it would work with ICP
         let transfer_result = match
             icrc_ledger_canister_c2c_client::icrc1_transfer(
                 args.input_token.ledger_id,
@@ -98,20 +118,18 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
         match transfer_result {
             Ok(index) => {
                 mutate_state(|state| {
-                    let now = state.env.now();
                     token_swap.transfer = Some(Ok(index.0.try_into().unwrap()));
                     state.data.token_swaps.upsert(token_swap.clone());
                 });
             }
             Err(msg) => {
                 mutate_state(|state| {
-                    let now = state.env.now();
                     token_swap.transfer = Some(Err(msg.clone()));
                     token_swap.success = Some(false);
                     state.data.token_swaps.upsert(token_swap);
                 });
-                log_error("Failed to transfer tokens", msg.as_str(), &args, attempt);
-                return InternalError(msg);
+                error!("Failed to transfer tokens: {}", msg.as_str());
+                return Err(msg);
             }
         }
     }
@@ -120,21 +138,23 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
         if let Err(error) = swap_client.deposit(amount_to_dex).await {
             let msg = format!("{error:?}");
             mutate_state(|state| {
-                let now = state.env.now();
                 token_swap.notified_dex_at = Some(Err(msg.clone()));
                 state.data.token_swaps.upsert(token_swap.clone());
-                enqueue_token_swap(token_swap, attempt, now, &mut state.data);
             });
-            log_error("Failed to deposit tokens", msg.as_str(), &args, attempt);
-            return InternalError(msg);
+            error!("Failed to deposit tokens: {}", msg.as_str());
+            return Err(msg);
         } else {
             mutate_state(|state| {
-                let now = state.env.now();
+                // let now = state.env.now();
                 token_swap.notified_dex_at = Some(Ok(()));
                 state.data.token_swaps.upsert(token_swap.clone());
             });
         }
     }
+
+    // TODO: Should we use this parameter? We can try to also store the minimum ICP/GLDGov
+    // price and then calculate the min_output_amount
+    let min_output_amount = 0;
 
     let swap_result = if let Some(a) = extract_result(&token_swap.amount_swapped).cloned() {
         a
@@ -142,13 +162,11 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
         match
             swap_client.swap(
                 amount_to_dex.saturating_sub(args.input_token.fee.into()),
-                // FIXME: make this dynamic
-                0
+                min_output_amount
             ).await
         {
             Ok(a) => {
                 mutate_state(|state| {
-                    let now = state.env.now();
                     token_swap.amount_swapped = Some(Ok(a.clone()));
                     state.data.token_swaps.upsert(token_swap.clone());
                 });
@@ -157,13 +175,11 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
             Err(error) => {
                 let msg = format!("{error:?}");
                 mutate_state(|state| {
-                    let now = state.env.now();
                     token_swap.amount_swapped = Some(Err(msg.clone()));
                     state.data.token_swaps.upsert(token_swap.clone());
-                    enqueue_token_swap(token_swap, attempt, now, &mut state.data);
                 });
-                log_error("Failed to swap tokens", msg.as_str(), &args, attempt);
-                return InternalError(msg);
+                error!("Failed to swap tokens: {}", msg.as_str());
+                return Err(msg);
             }
         }
     };
@@ -178,16 +194,13 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
         if let Err(error) = swap_client.withdraw(successful_swap, amount_out).await {
             let msg = format!("{error:?}");
             mutate_state(|state| {
-                let now = state.env.now();
                 token_swap.withdrawn_from_dex_at = Some(Err(msg.clone()));
                 state.data.token_swaps.upsert(token_swap.clone());
-                enqueue_token_swap(token_swap, attempt, now, &mut state.data);
             });
-            log_error("Failed to withdraw tokens", msg.as_str(), &args, attempt);
-            return InternalError(msg);
+            error!("Failed to withdraw tokens: {}", msg.as_str());
+            return Err(msg);
         } else {
             mutate_state(|state| {
-                let now = state.env.now();
                 token_swap.withdrawn_from_dex_at = Some(Ok(amount_out));
                 token_swap.success = Some(successful_swap);
                 state.data.token_swaps.upsert(token_swap);
@@ -196,26 +209,26 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap, attempt: u32) 
     }
 
     if successful_swap {
-        Response::Success(SuccessResult { amount_out })
+        Ok(())
     } else {
-        Response::SwapFailed
+        Err("The swap failed".to_string())
     }
 }
 
-fn enqueue_token_swap(token_swap: TokenSwap, attempt: u32, now: TimestampMillis, data: &mut Data) {
-    if attempt < 20 {
-        data.timer_jobs.enqueue_job(
-            TimerJob::ProcessTokenSwap(
-                Box::new(ProcessTokenSwapJob {
-                    token_swap,
-                    attempt: attempt + 1,
-                })
-            ),
-            now + 5 * SECOND_IN_MS,
-            now
-        );
-    }
-}
+// fn enqueue_token_swap(token_swap: TokenSwap, attempt: u32, now: TimestampMillis, data: &mut Data) {
+//     if attempt < 20 {
+//         data.timer_jobs.enqueue_job(
+//             TimerJob::ProcessTokenSwap(
+//                 Box::new(ProcessTokenSwapJob {
+//                     token_swap,
+//                     attempt: attempt + 1,
+//                 })
+//             ),
+//             now + 5 * SECOND_IN_MS,
+//             now
+//         );
+//     }
+// }
 
 // TODO: think on how to add delay here
 async fn retry_with_attempts<F, Fut>(
@@ -246,23 +259,10 @@ fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
     subtask.as_ref().and_then(|t| t.as_ref().ok())
 }
 
-fn log_error(message: &str, error: &str, args: &SwapConfig, attempt: u32) {
-    // TODO: fix here
-    error!(
-        input_token = args.input_token.ledger_id.to_string(),
-        output_token = args.output_token.ledger_id.to_string(),
-        error,
-        attempt,
-        message
-    );
-}
-
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum Response {
     Success(SuccessResult),
     SwapFailed,
-    PinRequired,
-    PinIncorrect(Milliseconds),
     TooManyFailedPinAttempts(Milliseconds),
     InternalError(String),
 }

@@ -34,7 +34,7 @@ impl ICPSwapClient {
         }
     }
 
-    pub fn deposit_account(&self) -> Account {
+    pub fn deposit_account_internal(&self) -> Account {
         Account {
             owner: self.swap_canister_id,
             subaccount: Some(Subaccount::from(self.this_canister_id).0),
