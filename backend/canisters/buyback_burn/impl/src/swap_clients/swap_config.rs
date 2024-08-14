@@ -2,8 +2,8 @@ use candid::{ CandidType, Principal };
 use icpswap_client::ICPSwapClient;
 use serde::{ Deserialize, Serialize };
 use types::TokenInfo;
-use crate::token_swap::icpswap::ICPSwapConfig;
-use crate::token_swap::SwapClient;
+use crate::swap_clients::icpswap::ICPSwapConfig;
+use crate::swap_clients::SwapClient;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct SwapConfig {

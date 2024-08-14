@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use types::TimestampMillis;
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
-use crate::token_swap::SwapConfig;
+use crate::swap_clients::SwapConfig;
 use crate::types::token_swap_status::SwapStatus;
 use ic_stable_structures::StableBTreeMap;
 use ic_stable_structures::Storable;

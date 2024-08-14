@@ -3,8 +3,8 @@ use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::token_swap::SwapConfig;
-use crate::token_swap::ExchangeConfig;
+use crate::swap_clients::SwapConfig;
+use crate::swap_clients::ExchangeConfig;
 
 #[async_trait]
 #[typetag::serde]

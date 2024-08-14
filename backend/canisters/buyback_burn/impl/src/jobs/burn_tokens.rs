@@ -13,7 +13,7 @@ pub fn start_job() {
     run_now_then_interval(burn_interval, run);
 }
 
-// FIXME Process retry here
+// TODO Add retry here
 pub fn run() {
     ic_cdk::spawn(process_token_burn());
 }

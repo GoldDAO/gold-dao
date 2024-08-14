@@ -8,7 +8,7 @@ use ic_ledger_types::Tokens;
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
 use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo, TokenSymbol };
-use crate::token_swap::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
+use crate::swap_clients::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
 use crate::types::token_swaps::TokenSwaps;
 
 canister_state!(RuntimeState);

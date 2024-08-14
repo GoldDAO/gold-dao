@@ -34,7 +34,7 @@ mod memory;
 pub mod queries;
 mod state;
 pub mod types;
-pub mod token_swap;
+pub mod swap_clients;
 pub mod updates;
 
 use lifecycle::*;

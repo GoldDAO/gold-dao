@@ -7,7 +7,7 @@ use serde::{ Deserialize, Serialize };
 use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
-use crate::token_swap::SwapConfig;
+use crate::swap_clients::SwapConfig;
 
 use canister_tracing_macros::trace;
 
