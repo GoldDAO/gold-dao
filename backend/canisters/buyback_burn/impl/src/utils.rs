@@ -1,5 +1,33 @@
 use candid::Nat;
+use std::time::Duration;
 use tracing::{ error, debug };
+
+pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
+
+// TODO: think on how to add delay here
+pub async fn retry_with_attempts<F, Fut>(
+    max_attempts: u8,
+    _delay_duration: Duration,
+    mut f: F
+)
+    -> Result<(), String>
+    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
+{
+    for attempt in 1..=max_attempts {
+        match f().await {
+            Ok(_) => {
+                return Ok(());
+            }
+            Err(err) => {
+                error!("Attempt {}: Error - {:?}", attempt, err);
+                if attempt == max_attempts {
+                    return Err(err);
+                }
+            }
+        }
+    }
+    Ok(())
+}
 
 /// Calculates the burn amount based on the current balance and burn rate.
 /// Returns the calculated amount or zero if there's an issue.

@@ -13,7 +13,7 @@ const SYNC_SUPPLY_DATA_INTERVAL: Milliseconds = 3_600 * 1_000;
 
 pub fn _start_job_if_not_started() {
     debug!("Starting the sync supply data job...");
-    run_now_then_interval(Duration::from_millis(SYNC_SUPPLY_DATA_INTERVAL), run)
+    run_now_then_interval(Duration::from_millis(SYNC_SUPPLY_DATA_INTERVAL), run);
 }
 
 pub fn run() {

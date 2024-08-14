@@ -1,21 +1,16 @@
 use crate::types::token_swaps::TokenSwap;
 use crate::state::{ mutate_state, read_state, RuntimeState };
-use candid::CandidType;
 use canister_time::run_now_then_interval;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use serde::{ Deserialize, Serialize };
-use std::time::Duration;
 use tracing::error;
-use types::Milliseconds;
 use crate::swap_clients::SwapConfig;
-
 use canister_tracing_macros::trace;
-
 use utils::env::Environment;
+use crate::utils::retry_with_attempts;
+use crate::utils::RETRY_DELAY;
 
 pub const NANOS_PER_MILLISECOND: u64 = 1_000_000;
 const MAX_ATTEMPTS: u8 = 3;
-const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
@@ -34,7 +29,6 @@ pub fn run() {
     ic_cdk::spawn(run_async());
 }
 
-// FIXME
 async fn run_async() {
     let swap_clients = read_state(|state| { state.data.swap_clients.clone() });
 
@@ -215,59 +209,6 @@ pub(crate) async fn process_token_swap(mut token_swap: TokenSwap) -> Result<(), 
     }
 }
 
-// fn enqueue_token_swap(token_swap: TokenSwap, attempt: u32, now: TimestampMillis, data: &mut Data) {
-//     if attempt < 20 {
-//         data.timer_jobs.enqueue_job(
-//             TimerJob::ProcessTokenSwap(
-//                 Box::new(ProcessTokenSwapJob {
-//                     token_swap,
-//                     attempt: attempt + 1,
-//                 })
-//             ),
-//             now + 5 * SECOND_IN_MS,
-//             now
-//         );
-//     }
-// }
-
-// TODO: think on how to add delay here
-async fn retry_with_attempts<F, Fut>(
-    max_attempts: u8,
-    _delay_duration: Duration,
-    mut f: F
-)
-    -> Result<(), String>
-    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
-{
-    for attempt in 1..=max_attempts {
-        match f().await {
-            Ok(_) => {
-                return Ok(());
-            }
-            Err(err) => {
-                error!("Attempt {}: Error - {:?}", attempt, err);
-                if attempt == max_attempts {
-                    return Err(err);
-                }
-            }
-        }
-    }
-    Ok(())
-}
-
 fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
     subtask.as_ref().and_then(|t| t.as_ref().ok())
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum Response {
-    Success(SuccessResult),
-    SwapFailed,
-    TooManyFailedPinAttempts(Milliseconds),
-    InternalError(String),
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct SuccessResult {
-    pub amount_out: u128,
 }

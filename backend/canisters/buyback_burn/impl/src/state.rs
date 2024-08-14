@@ -68,6 +68,13 @@ pub struct BurnConfig {
     pub burn_interval: Duration,
 }
 
+impl BurnConfig {
+    fn validate_burn_rate(&self) -> bool {
+        // the burn rate should be between 1 and 100
+        self.burn_rate > 100 || self.burn_rate == 0
+    }
+}
+
 impl Data {
     pub fn new(
         authorized_principals: Vec<Principal>,

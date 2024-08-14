@@ -20,7 +20,7 @@ const SYNC_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
     debug!("Starting the governance sync job..");
-    run_now_then_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run)
+    run_now_then_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run);
 }
 
 pub fn run() {
