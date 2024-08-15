@@ -16,8 +16,8 @@ fn update_config_impl(args: UpdateConfigArgs, state: &mut RuntimeState) -> Updat
     if let Some(burn_rate) = args.burn_rate {
         state.data.burn_config.burn_rate = burn_rate;
     }
-    if let Some(min_icp_burn_amount) = args.min_icp_burn_amount {
-        state.data.burn_config.min_icp_burn_amount = min_icp_burn_amount;
+    if let Some(min_burn_amount) = args.min_burn_amount {
+        state.data.burn_config.min_burn_amount = min_burn_amount;
     }
     if let Some(burn_interval) = args.burn_interval_in_secs {
         state.data.burn_config.burn_interval = Duration::from_secs(burn_interval);

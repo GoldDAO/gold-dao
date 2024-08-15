@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::time::Duration;
 use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
@@ -7,9 +6,11 @@ use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
-use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo, TokenSymbol };
+use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
 use crate::swap_clients::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
 use crate::types::token_swaps::TokenSwaps;
+use canister_timer_jobs::TimerJobs;
+use crate::timer_job_types::TimerJob;
 
 canister_state!(RuntimeState);
 
@@ -31,7 +32,7 @@ impl RuntimeState {
     pub fn get_config(&self) -> GetConfigResponse {
         GetConfigResponse {
             burn_rate: self.data.burn_config.burn_rate,
-            min_icp_burn_amount: self.data.burn_config.min_icp_burn_amount,
+            min_icp_burn_amount: self.data.burn_config.min_burn_amount,
         }
     }
 
@@ -58,13 +59,14 @@ pub struct Data {
     pub swap_clients: SwapClinets,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
+    pub timer_jobs: TimerJobs<TimerJob>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BurnConfig {
     pub burn_address: CanisterId,
     pub burn_rate: u8,
-    pub min_icp_burn_amount: Tokens,
+    pub min_burn_amount: Tokens,
     pub burn_interval: Duration,
 }
 
@@ -83,12 +85,21 @@ impl Data {
         swap_interval_in_secs: u64,
         sns_governance_canister_id: Principal,
         burn_rate: u8,
-        min_icp_burn_amount: Tokens,
+        min_burn_amount: Tokens,
         burn_interval_in_secs: u64,
         this_canister_id: Principal
     ) -> Data {
         let mut swap_clients = SwapClinets::init(this_canister_id);
         // TODO: add other tokens support
+        for (id, token) in tokens.iter().enumerate() {
+            swap_clients.add_swap_client(SwapConfig {
+                // FIXME: this solution doesn't preserve previous swap_clients
+                swap_client_id: id as u128,
+                input_token: TokenInfo::icp(),
+                output_token: *token,
+                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
+            });
+        }
         swap_clients.add_swap_client(SwapConfig {
             swap_client_id: 0,
             input_token: TokenInfo::icp(),
@@ -104,10 +115,11 @@ impl Data {
             burn_config: BurnConfig {
                 burn_address: sns_governance_canister_id,
                 burn_rate,
-                min_icp_burn_amount,
+                min_burn_amount,
                 burn_interval: Duration::from_secs(burn_interval_in_secs),
             },
             token_swaps: TokenSwaps::default(),
+            timer_jobs: TimerJobs::default(),
         }
     }
 }

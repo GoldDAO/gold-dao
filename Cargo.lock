@@ -223,6 +223,7 @@ dependencies = [
  "canister_logger",
  "canister_state_macros",
  "canister_time",
+ "canister_timer_jobs",
  "canister_tracing_macros",
  "futures",
  "http_request",
@@ -400,6 +401,15 @@ dependencies = [
  "ic-cdk-timers 0.7.0",
  "ic0 0.21.1",
  "types",
+]
+
+[[package]]
+name = "canister_timer_jobs"
+version = "0.1.0"
+dependencies = [
+ "canister_time",
+ "ic-cdk-timers 0.7.0",
+ "serde",
 ]
 
 [[package]]

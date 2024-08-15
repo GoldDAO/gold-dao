@@ -5,7 +5,7 @@ use serde::{ Deserialize, Serialize };
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Args {
     pub burn_rate: Option<u8>,
-    pub min_icp_burn_amount: Option<Tokens>,
+    pub min_burn_amount: Option<Tokens>,
     pub burn_interval_in_secs: Option<u64>,
 }
 

@@ -1,5 +1,4 @@
 use candid::CandidType;
-use ic_ledger_types::{ BlockIndex, Subaccount };
 use serde::{ Deserialize, Serialize };
 use std::collections::HashMap;
 use types::TimestampMillis;

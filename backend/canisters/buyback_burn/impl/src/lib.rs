@@ -32,10 +32,12 @@ mod utils;
 pub mod lifecycle;
 mod memory;
 pub mod queries;
+
 mod state;
 pub mod types;
 pub mod swap_clients;
 pub mod updates;
+pub mod timer_job_types;
 
 use lifecycle::*;
 // use queries::*;
