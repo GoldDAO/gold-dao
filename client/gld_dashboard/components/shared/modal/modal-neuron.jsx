@@ -1,7 +1,7 @@
 import { Bounce, toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { copyContent, elapsedTime } from '../../../utils/functions';
+import { copyContent } from '../../../utils/functions';
 import { parseNumbers } from '../../../utils/parsers';
 
 const ModalNeuron = ({ name, image, neurons }) => {
@@ -31,7 +31,8 @@ const ModalNeuron = ({ name, image, neurons }) => {
         <div className="w-full flex justify-between items-center">
           <p className="text-2xs font-normal sm:text-sm text-black text-justify w-[60%]">
             The Gold DAO has {neurons.length} neurons of {name} with different times of Dissolve
-            Delay. Each Neuron has voting power in the {name} governance and earns rewards by voting on
+            Delay. Each Neuron has voting power in the
+            {name} governance and earns rewards by voting on
             proposals.
           </p>
           <div className="bg-white size-25 rounded-full flex justify-center items-center">
@@ -69,7 +70,7 @@ const ModalNeuron = ({ name, image, neurons }) => {
 
             {/* Dissolve Time */}
             <div className="p-2 text-2xs">
-              <h4>Dissolving in {neuron?.dissolveDelay?.toFixed(2)} {neuron?.dissolveDelay > 1 ? "years" : "year"}</h4>
+              <h4>Dissolving in {neuron?.dissolveDelay?.toFixed(2)} {neuron?.dissolveDelay > 1 ? 'years' : 'year'}</h4>
             </div>
           </div>
         ))}

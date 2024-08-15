@@ -5,7 +5,7 @@ import React from 'react';
 import { parseNumbers } from '../../utils/parsers';
 
 const DataCard = ({
-  title, amount, image, info, isPrice, className, setDataNeuron, disabled, disabledTip
+  title, amount, image, info, isPrice, className, setDataNeuron, disabled, disabledTip,
 }) => (
     <article
       className={`shadow-[0_0_12px_0_#00000026] border-[0.5px] border-DarkGrey grid card bg-SoftGrey rounded-[24px] sm:rounded-[36px] py-5 sm:py-10 px-6 mb-5 sm:mb-0 ${className}`}
@@ -38,12 +38,12 @@ const DataCard = ({
         </div>
       )}
       <section
-        className={`flex justify-between mb-4`}
+        className="flex justify-between mb-4"
       >
         <div className="flex gap-2 items-center">
           <p className="whitespace-nowrap text-[18px]">{title} Neuron</p>
           <div
-            className={`tooltip hidden sm:flex`}
+            className="tooltip hidden sm:flex"
             data-tip={info}
           >
             <button>
@@ -67,7 +67,7 @@ const DataCard = ({
           <Image alt="expand data" height={10} width={10} src="svg/expand.svg" />
         </button>
       </section>
-      <section className={`flex gap-2 items-center`}>
+      <section className="flex gap-2 items-center">
         <h1 className="sm:text-[32px] font-bold">
           {isPrice && '$'}
           {parseNumbers(amount)}

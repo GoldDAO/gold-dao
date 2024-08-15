@@ -23,15 +23,15 @@ export default function Neurons() {
       info: 'Total amount of OGY stake in a neuron owned by the Gold DAO. ',
     },
   ]);
-  const [neurons, setNeurons] = useState({OGY: [], ICP: []});
+  const [neurons, setNeurons] = useState({ OGY: [], ICP: [] });
 
   useEffect(() => {
     (async () => {
       const icpData = await icpNeurons();
       const ogyData = await ogyNeurons();
       const tmpData = data;
-      tmpData[0].amount = icpData.reduce((res, item) =>  res += item.stakedAmount, 0);
-      tmpData[1].amount = ogyData.reduce((res, item) =>  res += item.stakedAmount, 0);
+      tmpData[0].amount = icpData.reduce((res, item) => res + item.stakedAmount, 0);
+      tmpData[1].amount = ogyData.reduce((res, item) => res + item.stakedAmount, 0);
       setData(tmpData);
       setNeurons({
         ICP: icpData,
