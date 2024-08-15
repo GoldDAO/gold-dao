@@ -4,8 +4,7 @@ use std::collections::HashMap;
 use types::TimestampMillis;
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
-use crate::swap_clients::SwapConfig;
-use crate::types::token_swap_status::SwapStatus;
+use crate::types::SwapConfig;
 use ic_stable_structures::StableBTreeMap;
 use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::account::Account;
@@ -32,28 +31,16 @@ impl Default for TokenSwaps {
     }
 }
 
-// #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-// pub struct Args {
-//     pub swap_id: u128,
-//     // pub input_token: TokenInfo,
-//     // pub output_token: TokenInfo,
-//     // pub input_amount: u128,
-//     // pub exchange_args: ExchangeArgs,
-//     pub min_output_amount: u128,
-//     pub pin: Option<String>,
-// }
-
 impl TokenSwaps {
-    pub fn push_new(&mut self, args: SwapConfig, now: TimestampMillis) -> TokenSwap {
-        let token_swap = TokenSwap::new(now);
-        // FIXME: fix here the swap id
+    pub fn push_new(&mut self, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
+        let id = self.get_next_id();
+        let token_swap = TokenSwap::new(id, swap_config, now);
         self.upsert(token_swap.clone());
         token_swap
     }
 
     pub fn upsert(&mut self, swap: TokenSwap) {
-        // FIXME: fix here the swap id
-        self.swaps.insert(0, swap);
+        self.swaps.insert(swap.swap_id, swap);
     }
 
     pub fn get(&self, swap_id: u128) -> Option<&TokenSwap> {
@@ -62,6 +49,11 @@ impl TokenSwaps {
 
     pub fn iter(&self) -> impl Iterator<Item = &TokenSwap> {
         self.swaps.values()
+    }
+
+    pub fn get_next_id(&self) -> u128 {
+        let current_len: u128 = self.swaps.len().try_into().unwrap();
+        current_len + 1
     }
 
     pub fn get_swap_info(&self, swap_id: u128) -> Option<TokenSwap> {
@@ -87,6 +79,7 @@ impl TokenSwaps {
         }
     }
 
+    // TODO: add metrics
     // pub total_amount_swapped: u64,
     // pub number_of_completed_swaps: u64,
     // pub number_of_attempted_swaps: u64,
@@ -95,11 +88,10 @@ impl TokenSwaps {
     pub fn get_metrics(&self) {}
 }
 
-// #[derive(Serialize, Deserialize, Clone, Debug)]
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct TokenSwap {
-    // pub args: SwapConfig,
-    pub status: SwapStatus,
+    pub swap_id: u128,
+    pub swap_config: SwapConfig,
     pub started: TimestampMillis,
     pub deposit_account: SwapSubtask<Account>,
     pub transfer: SwapSubtask<u64>, // Block Index
@@ -110,8 +102,7 @@ pub struct TokenSwap {
     pub is_archived: bool,
 }
 
-use candid::Decode;
-use candid::Encode;
+use candid::{ Decode, Encode };
 use ic_stable_structures::storable::Bound;
 use std::borrow::Cow;
 const MAX_SWAP_INFO_BYTES_SIZE: u32 = 1000;
@@ -132,10 +123,10 @@ impl Storable for TokenSwap {
 type SwapSubtask<T = ()> = Option<Result<T, String>>;
 
 impl TokenSwap {
-    pub fn new(now: TimestampMillis) -> TokenSwap {
+    pub fn new(swap_id: u128, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
         TokenSwap {
-            // args,
-            status: SwapStatus::Init,
+            swap_id,
+            swap_config,
             started: now,
             deposit_account: None,
             transfer: None,
@@ -147,17 +138,3 @@ impl TokenSwap {
         }
     }
 }
-
-// impl From<TokenSwap> for TokenSwapStatus {
-//     fn from(value: TokenSwap) -> Self {
-//         TokenSwapStatus {
-//             started: value.started,
-//             deposit_account: value.deposit_account.map(|a| a.value.map(|_| ())),
-//             transfer: value.transfer.map(|t| t.value),
-//             notify_dex: value.notified_dex_at.map(|t| t.value.map(|_| ())),
-//             amount_swapped: value.amount_swapped.as_ref().map(|t| t.value.clone()),
-//             withdraw_from_dex: value.withdrawn_from_dex_at.map(|t| t.value),
-//             success: value.success.map(|t| t.value),
-//         }
-//     }
-// }

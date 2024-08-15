@@ -4,7 +4,7 @@ use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
 use candid::{ Principal, Nat };
 use canister_tracing_macros::trace;
-use crate::state::{ mutate_state, read_state };
+use crate::state::read_state;
 use crate::utils::{ retry_with_attempts, get_token_balance, RETRY_DELAY };
 
 const MAX_ATTEMPTS: u8 = 3;
@@ -14,7 +14,6 @@ pub fn start_job() {
     run_now_then_interval(burn_interval, run);
 }
 
-// TODO Add retry here
 pub fn run() {
     ic_cdk::spawn(run_async());
 }
@@ -53,12 +52,6 @@ pub async fn process_token_burn() -> Result<(), String> {
         {
             Ok(_) => {
                 info!("SUCCESS: {} GLDGov tokens burned from the buyback and burn canister.", amount_to_burn);
-                mutate_state(
-                    |s| {
-                        // FIXME: update the last burn timestamp or other state changes
-                        // s.data.last_burn_time = Some(current_time_ms());
-                    }
-                );
                 Ok(())
             }
             Err(e) => {

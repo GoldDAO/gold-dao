@@ -3,8 +3,8 @@ use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::swap_clients::SwapConfig;
-use crate::swap_clients::ExchangeConfig;
+use crate::types::SwapConfig;
+use crate::types::ExchangeConfig;
 
 #[async_trait]
 #[typetag::serde]
@@ -13,8 +13,7 @@ use crate::swap_clients::ExchangeConfig;
 impl SwapClient for ICPSwapClient {
     fn get_config(&self) -> SwapConfig {
         SwapConfig {
-            // FIXME: fix the id
-            swap_client_id: 0,
+            swap_client_id: self.client_id(),
             input_token: self.input_token(),
             output_token: self.output_token(),
             exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig {

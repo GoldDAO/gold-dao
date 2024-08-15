@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::swap_clients::SwapConfig;
+use crate::types::SwapConfig;
 
 #[async_trait]
 #[typetag::serde(tag = "type")]

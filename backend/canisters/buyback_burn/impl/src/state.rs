@@ -7,7 +7,7 @@ use ic_ledger_types::Tokens;
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
 use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
-use crate::swap_clients::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
+use crate::types::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
 use crate::types::token_swaps::TokenSwaps;
 use canister_timer_jobs::TimerJobs;
 use crate::timer_job_types::TimerJob;
@@ -86,26 +86,26 @@ impl Data {
         sns_governance_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
-        burn_interval_in_secs: u64,
-        this_canister_id: Principal
+        burn_interval_in_secs: u64
     ) -> Data {
-        let mut swap_clients = SwapClinets::init(this_canister_id);
+        let mut swap_clients = SwapClinets::init();
         // TODO: add other tokens support
-        for (id, token) in tokens.iter().enumerate() {
-            swap_clients.add_swap_client(SwapConfig {
-                // FIXME: this solution doesn't preserve previous swap_clients
-                swap_client_id: id as u128,
-                input_token: TokenInfo::icp(),
-                output_token: *token,
-                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
-            });
-        }
         swap_clients.add_swap_client(SwapConfig {
             swap_client_id: 0,
             input_token: TokenInfo::icp(),
             output_token: TokenInfo::gldgov(),
             exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
         });
+        // NOTE: here we add all other tokens except of
+        for (id, token) in tokens.iter().enumerate() {
+            swap_clients.add_swap_client(SwapConfig {
+                swap_client_id: (id as u128) + 1,
+                input_token: TokenInfo::icp(),
+                output_token: *token,
+                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
+            });
+        }
+
         Data {
             authorized_principals: authorized_principals.into_iter().collect(),
             gldgov_ledger_canister_id,

@@ -1,9 +1,9 @@
-use candid::{ CandidType, Principal };
+use candid::{ CandidType };
 use icpswap_client::ICPSwapClient;
 use serde::{ Deserialize, Serialize };
 use types::TokenInfo;
-use crate::swap_clients::icpswap::ICPSwapConfig;
-use crate::swap_clients::SwapClient;
+use crate::types::icpswap::ICPSwapConfig;
+use crate::types::SwapClient;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct SwapConfig {
@@ -25,7 +25,7 @@ impl Default for SwapConfig {
 }
 
 impl SwapConfig {
-    pub fn build_swap_client(&self, this_canister_id: Principal) -> Box<dyn SwapClient> {
+    pub fn build_swap_client(&self) -> Box<dyn SwapClient> {
         let input_token = self.input_token.clone();
         let output_token = self.output_token.clone();
 
@@ -38,7 +38,8 @@ impl SwapConfig {
                 };
                 Box::new(
                     ICPSwapClient::new(
-                        this_canister_id,
+                        self.swap_client_id,
+                        ic_cdk::api::id(),
                         icpswap.swap_canister_id,
                         token0,
                         token1,

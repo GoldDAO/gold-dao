@@ -9,6 +9,7 @@ use types::{ CanisterId, TokenInfo };
 // NOTE: we use one ICPSwapClient to swap concrete token pair
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ICPSwapClient {
+    client_id: u128,
     this_canister_id: CanisterId,
     swap_canister_id: CanisterId,
     token0: TokenInfo,
@@ -19,6 +20,7 @@ pub struct ICPSwapClient {
 
 impl ICPSwapClient {
     pub fn new(
+        client_id: u128,
         this_canister_id: CanisterId,
         swap_canister_id: CanisterId,
         token0: TokenInfo,
@@ -26,6 +28,7 @@ impl ICPSwapClient {
         zero_for_one: bool
     ) -> Self {
         ICPSwapClient {
+            client_id,
             this_canister_id,
             swap_canister_id,
             token0,
@@ -83,6 +86,10 @@ impl ICPSwapClient {
             ICPSwapResult::Ok(amount_out) => Ok(nat_to_u128(amount_out)),
             ICPSwapResult::Err(error) => Err(convert_error(error)),
         }
+    }
+
+    pub fn client_id(&self) -> u128 {
+        self.client_id
     }
 
     pub fn input_token(&self) -> TokenInfo {

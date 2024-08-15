@@ -4,8 +4,8 @@ use tracing::error;
 use canister_tracing_macros::trace;
 use utils::env::Environment;
 use crate::types::token_swaps::TokenSwap;
-use crate::state::{ mutate_state, read_state, RuntimeState };
-use crate::swap_clients::{ SwapClient, SwapConfig };
+use crate::state::{ mutate_state, read_state };
+use crate::types::SwapClient;
 use crate::utils::{
     calculate_percentage_of_amount,
     get_token_balance,
@@ -23,12 +23,6 @@ pub fn start_job() {
     run_now_then_interval(swap_interval, run);
 }
 
-pub fn prepare_swap(args: SwapConfig, state: &mut RuntimeState) -> TokenSwap {
-    let now = state.env.now();
-    // TODO: implement that swap_client_id is stored in TokenSwap. All the clients should be queried in loop and for each of them the token swap should be created
-    state.data.token_swaps.push_new(args, now)
-}
-
 pub fn run() {
     ic_cdk::spawn(run_async());
 }
@@ -39,7 +33,9 @@ async fn run_async() {
 
     for swap_client in swap_clients.iter() {
         let args = swap_client.get_config();
-        let token_swap = mutate_state(|state| prepare_swap(args, state));
+        let token_swap = mutate_state(|state|
+            state.data.token_swaps.push_new(args, state.env.now())
+        );
 
         if
             let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
@@ -74,9 +70,7 @@ pub(crate) async fn process_token_swap(
         match swap_client.deposit_account().await {
             Ok(a) => {
                 mutate_state(|state| {
-                    // let now = state.env.now();
                     token_swap.deposit_account = Some(Ok(a));
-                    // FIXME: fix here an id
                     state.data.token_swaps.upsert(token_swap.clone());
                 });
                 a
@@ -84,7 +78,6 @@ pub(crate) async fn process_token_swap(
             Err(error) => {
                 let msg = format!("{error:?}");
                 mutate_state(|state| {
-                    // let now = state.env.now();
                     token_swap.deposit_account = Some(Err(msg.clone()));
                     token_swap.success = Some(false);
                     state.data.token_swaps.upsert(token_swap);
@@ -98,7 +91,6 @@ pub(crate) async fn process_token_swap(
     // Deposit tokens to the deposit account
     if extract_result(&token_swap.transfer).is_none() {
         let now = read_state(|state| state.env.now());
-        // FIXME: check that here it would work with ICP
         let transfer_result = match
             icrc_ledger_canister_c2c_client::icrc1_transfer(
                 swap_config.input_token.ledger_id,
@@ -148,7 +140,6 @@ pub(crate) async fn process_token_swap(
             return Err(msg);
         } else {
             mutate_state(|state| {
-                // let now = state.env.now();
                 token_swap.notified_dex_at = Some(Ok(()));
                 state.data.token_swaps.upsert(token_swap.clone());
             });

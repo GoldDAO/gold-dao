@@ -45,7 +45,7 @@ pub async fn retry_with_attempts<F, Fut>(
 
 /// Calculates the burn amount based on the current balance and burn rate.
 /// Returns the calculated amount or zero if there's an issue.
-/// FIXME If the burn rate is incorrect -> cancel the job at all
+/// TODO If the burn rate is incorrect -> cancel the job at all
 pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u128 {
     let balance_u128: u128 = match amount_available.0.try_into() {
         Ok(val) => val,

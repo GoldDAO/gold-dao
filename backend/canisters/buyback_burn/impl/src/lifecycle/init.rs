@@ -22,8 +22,7 @@ fn init(args: InitArgs) {
         args.sns_governance_canister_id,
         args.burn_rate,
         args.min_icp_burn_amount,
-        args.burn_interval_in_secs,
-        env.canister_id()
+        args.burn_interval_in_secs
     );
 
     if args.test_mode {
