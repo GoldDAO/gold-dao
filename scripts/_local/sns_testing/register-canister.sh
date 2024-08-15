@@ -7,7 +7,7 @@ CANISTER_IDS="sns_canister_ids.json"
 CID="2f5ll-gqaaa-aaaak-qcfuq-cai"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
 

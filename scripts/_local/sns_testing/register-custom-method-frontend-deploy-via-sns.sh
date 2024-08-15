@@ -10,7 +10,7 @@ CID="mpece-iqaaa-aaaal-qizma-cai"
 METHOD_NAME="commit_proposed_batch"
 VALIDATE_METHOD_NAME="validate_commit_proposed_batch"
 
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
 

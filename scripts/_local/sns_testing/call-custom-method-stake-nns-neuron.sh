@@ -10,7 +10,7 @@ export BLOB="$(didc encode --format blob "()")"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
 

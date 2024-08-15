@@ -6,11 +6,11 @@ CANISTER_IDS="sns_canister_ids.json"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
-CID="j2neh-vqaaa-aaaal-aduxq-cai"
-METHOD_NAME="manage_reward_recipients"
-VALIDATE_METHOD_NAME="manage_reward_recipients_validate"
+CID="2f5ll-gqaaa-aaaak-qcfuq-cai"
+METHOD_NAME="set_reward_token_types"
+VALIDATE_METHOD_NAME="set_reward_token_types_validate"
 
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 [ -e message.json ] && rm message.json
 
@@ -19,12 +19,14 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Adding the manage_reward_recipients method of the icp_neuron canister to the SNS to be able to manage the reward recipients of the neurons' maturities. As described in proposal #5, the rewards of the neurons are split in 4 parts - 33% to GLDGov stakers, 33% to development team, 33% for listings and 1% for the Good DAO. This method allows to set these recipients.\";
+        summary=\"Register the method \`set_reward_token_types\` of the sns_rewards canister to the SNS.
+This method allows to define the tokens in which rewards are paid to stakers.
+\";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_002 : nat64);
-                name = \"Manage NNS neuron maturity recipients.\";
-                description = opt \"Proposal to manage the recipients of the disbursed maturity of the NNS neurons.\";
+                id = (1_005 : nat64);
+                name = \"Set reward token types.\";
+                description = opt \"Proposal to define the tokens in which rewards are paid to GLD neurons.\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
                         validator_canister_id = opt principal \"$CID\";
