@@ -10,6 +10,7 @@ import {
   truncateNeuronId,
   uint8ArrayToHexString,
 } from '../../../utils/functions';
+import { parseNumbers } from '../../../utils/parsers';
 import Modal from '../modal/modal';
 import ModalAdd from '../modal/modal-add';
 import ModalClaimAll from '../modal/modal-claim-all';
@@ -145,7 +146,7 @@ export default function RewardsNeurons({ setIcp, setGold }) {
                   <p className="text-xs sm:text-lg font-medium">
                     <span className="font-bold">
                       {item.cached_neuron_stake_e8s
-                        ? Number(item.cached_neuron_stake_e8s) / 10e7
+                        ? parseNumbers(Number(item.cached_neuron_stake_e8s) / 10e7)
                         : 0}
                     </span>{' '}
                     GLDGov

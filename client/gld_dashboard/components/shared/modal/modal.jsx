@@ -34,7 +34,6 @@ export default function Modal({
             <h2 className="font-bold text-dark text-[28px]">
               {title?.substring(0, 5) === 'chart' ? title?.substring(5) : title}
             </h2>
-
             <form method="dialog">
               <button className="bg-DarkGrey size-[26px] rounded-full flex justify-center items-center outline-none">
                 <Image
@@ -69,7 +68,6 @@ export default function Modal({
               && 'Total amount of GLDGov multiplied by the average price.'}
           </h3>
         </div>
-        <Navbar title={title} />
       </dialog>
     </>
   );
