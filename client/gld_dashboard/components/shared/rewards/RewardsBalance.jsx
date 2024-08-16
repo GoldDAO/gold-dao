@@ -70,7 +70,7 @@ export default function RewardsBalance({
           title="OGY"
           value={ogy.amount}
           svg="/png/origyn.png"
-          status={false}
+          status={true}
           setModalTitle={setModaltitle}
           setAmount={setAmount}
           loading={ogy.loading}
@@ -83,6 +83,7 @@ export default function RewardsBalance({
           amount={amount}
           setGold={setGold}
           setIcp={setIcp}
+          setOgy={setOgy}
           setAmount={setAmount}
         />
       </Modal>

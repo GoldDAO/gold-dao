@@ -20,7 +20,7 @@ const canisters = {
   archive: { canisterId: 'fgzua-6iaaa-aaaaq-aacgq-cai', idlFactory: idlArchive },
   ledger: { canisterId: isProd ? 'tyyy3-4aaaa-aaaaq-aab7a-cai' : 'irhm6-5yaaa-aaaap-ab24q-cai', idlFactory: idlLedger },
   root: { canisterId: isProd ? 'tw2vt-hqaaa-aaaaq-aab6a-cai' : 'i7fbw-giaaa-aaaap-ab25q-cai', idlFactory: idlRoot },
-  ogy: { canisterId: isProd ? 'jwcfb-hyaaa-aaaaj-aac4q-cai' : 'vmxlg-4qaaa-aaaag-ak7gq-cai', idlFactory: idlLedger },
+  ogy: { canisterId: isProd ? 'lkwrt-vyaaa-aaaaq-aadhq-cai' : 'j5naj-nqaaa-aaaal-ajc7q-cai', idlFactory: idlLedger },
   icp: { canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai', idlFactory: idlIcp },
   lighthouseApi: { canisterId: 'zfp4v-oyaaa-aaaar-qadqq-cai', idlFactory: idlLighthouse },
   icpNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpNeuron },

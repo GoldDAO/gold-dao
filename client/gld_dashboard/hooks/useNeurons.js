@@ -12,6 +12,7 @@ import useActor from './useActor';
 const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   const [snsRewards] = useActor('snsRewards');
   const [governance] = useActor('governance');
+  const [ogy] = useActor('ogy');
   const [ledger] = useActor('ledger');
   const [icp] = useActor('icp');
   const [loading, setLoading] = useState(false);
@@ -219,9 +220,9 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
           neuronPromises.push(promise);
         }
 
-        const responses = await Promise.all(neuronIds)
+        const responses = await Promise.all(neuronPromises);
         
-        await responses.forEach(async (status, i) => {
+        const data = await responses.forEach(async (status, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
           const neuronAge = Math.round(new Date().getTime() / 1000)
             - Number(status.result[0].Neuron.aging_since_timestamp_seconds);
@@ -243,6 +244,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
 
           let icpRewards;
           let ledgerRewards;
+          let ogyRewards;
           if (status.result[0].Neuron) {
             neurons[fixedNeuronIds] = {
               ...status.result[0].Neuron,
@@ -253,6 +255,10 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
               subaccount: [fixedNeuronIds],
             });
             ledgerRewards = await ledger.icrc1_balance_of({
+              owner: p(canisters.snsRewards.canisterId),
+              subaccount: [fixedNeuronIds],
+            });
+            ogyRewards = await ogy.icrc1_balance_of({
               owner: p(canisters.snsRewards.canisterId),
               subaccount: [fixedNeuronIds],
             });
@@ -275,6 +281,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ...neurons[fixedNeuronIds],
             icpRewards: Number(icpRewards),
             ledgerRewards: Number(ledgerRewards),
+            ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
             votingPower: dissolveDelay
               > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds)
@@ -282,6 +289,19 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             dissolveDelay,
             age: neuronAge,
           };
+          
+          return {
+            ...neurons[fixedNeuronIds],
+            icpRewards: Number(icpRewards),
+            ledgerRewards: Number(ledgerRewards),
+            ogyRewards: Number(ogyRewards),
+            dissolving: neuronState(dissolveState),
+            votingPower: dissolveDelay
+              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds)
+              ? votingPower : '-',
+            dissolveDelay,
+            age: neuronAge,
+          }
         });
         setLoading(false);
         return Object.values(neurons);

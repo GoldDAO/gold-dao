@@ -82,12 +82,12 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               className={`z-10 text-white w-full font-bold py-2 px-8 rounded-full sm:hidden flex gap-2 items-center justify-center text-sm ${item?.ogyRewards > 0 ? 'bg-black' : 'bg-black opacity-50 cursor-not-allowed'}`}
               disabled={true}
               onClick={() => {
-                // setClaimState({
-                //   name: item.id,
-                //   amount: item.ogyRewards,
-                //   claim: "OGY",
-                //   ...item,
-                // });
+                setClaimState({
+                  name: item.id,
+                  amount: item.ogyRewards,
+                  claim: "OGY",
+                  ...item,
+                });
                 document.getElementById('my_modal_confirm').showModal();
               }}
             >

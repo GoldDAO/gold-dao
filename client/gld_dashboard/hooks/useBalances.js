@@ -18,7 +18,6 @@ const useBalances = () => {
 
     try {
       const balance = await token.icrc1_balance_of({ owner: p(principal), subaccount: [] });
-
       return Number(balance);
     } catch (err) {
       console.log('get balance error');
