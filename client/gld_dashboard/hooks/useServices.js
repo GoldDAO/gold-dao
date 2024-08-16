@@ -54,7 +54,7 @@ const useServices = () => {
   const icpNeurons = async () => {
     try {
       const neurons = await icpNeuron.list_neurons();
-      console.log(neurons);
+
       const parsed = neurons?.neurons?.active?.map((n) => {
         const diffInDays = n?.dissolving
         ? (new Date(Number(n?.dissolve_delay) * 1000).getTime() - new Date().getTime() - 1) / (1000 * 60 * 60 * 24)
@@ -65,8 +65,8 @@ const useServices = () => {
           stakedAmount: Number(n?.staked_amount) / 10 ** 8,
           maturity: Number(n?.maturity),
           dissolveDelay: n?.dissolving
-            ? `${Math.floor(diffInDays / 365.3)} years ${diffInDays % 365.3 > 0 ? `${(diffInDays % 365.3).toFixed(0) - 1} days` : ""}`
-            : (diffInDays / 365.3).toFixed(0),
+            ? `Dissolving, unlocked in ${Math.floor(diffInDays / 365.3)} years ${diffInDays % 365.3 > 0 ? `${(diffInDays % 365.3).toFixed(0) - 1} days` : ""}`
+            : `Non-dissolving, locked for ${(diffInDays / 365.3).toFixed(0)} ${ (diffInDays / 365.3).toFixed(0) > 1? 'years' : 'year'}`,
           age: 3, // FIXME harcoded
           votingPower: 8376, // FIXME harcoded
         })
@@ -87,7 +87,11 @@ const useServices = () => {
         dissolving: n?.dissolving,
         stakedAmount: Number(n?.cached_neuron_stake_e8s) / 10 ** 8,
         maturity: Number(n?.maturity_e8s_equivalent),
-        dissolveDelay: Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24),
+        dissolveDelay: `
+          ${n?.dissolving ? "Dissolving, unlocked in " : "Non-dissolving, locked for "}
+          ${Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24)}
+          ${Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24) > 1 ? " years" : " year"}
+        `,
         age: Number(n?.aging_since_timestamp_seconds) / (365.25 * 60 * 60 * 24),
         votingPower: (Number(n?.cached_neuron_stake_e8s) * (1 + Number(n?.voting_power_percentage_multiplier) / 100)) / 10 ** 8,
       }));

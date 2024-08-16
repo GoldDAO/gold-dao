@@ -91,7 +91,7 @@ const ModalNeuron = ({ name, image, neurons }) => {
 
             {/* Dissolve Time */}
             <div className="p-2 text-2xs">
-              <h4>Dissolving in {neuron?.dissolveDelay} {!Number.isNaN(neuron?.dissolveDelay) && (neuron?.dissolveDelay > 1 ? 'years' : 'year')}</h4>
+              <h4>{neuron?.dissolveDelay}</h4>
             </div>
           </div>
         ))}
