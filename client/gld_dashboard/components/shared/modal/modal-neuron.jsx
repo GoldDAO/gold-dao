@@ -30,13 +30,14 @@ const ModalNeuron = ({ name, image, neurons }) => {
       <div className="flex justify-between w-full pt-10 mb-5">
         <div className="w-full flex justify-between items-center">
           {
-            name === "OGY" ?
-              <p className="text-2xs font-normal sm:text-sm text-black text-justify w-[60%]">
-                The Gold DAO has received a donation of 500 million OGY tokens from the ORIGYN Foundation.
+            name === 'OGY'
+              ? <p className="text-2xs font-normal sm:text-sm text-black text-justify w-[60%]">
+                The Gold DAO has received a donation of 500 million OGY tokens
+                from the ORIGYN Foundation.
                 These tokens are locked in a 5 year neuron and its rewards
                 are distributed to active Gold DAO neuron owners.
-              </p> :
-              <p className="text-2xs font-normal sm:text-sm text-black text-justify w-[60%]">
+              </p>
+              : <p className="text-2xs font-normal sm:text-sm text-black text-justify w-[60%]">
                 The Gold DAO has {neurons.length} neurons of {name} with different times of Dissolve
                 Delay. Each Neuron has voting power in the
                 {name} governance and earns rewards by voting on
@@ -90,7 +91,7 @@ const ModalNeuron = ({ name, image, neurons }) => {
 
             {/* Dissolve Time */}
             <div className="p-2 text-2xs">
-              <h4>Dissolving in {neuron?.dissolveDelay} {!isNaN(neuron?.dissolveDelay) && (neuron?.dissolveDelay > 1 ? 'years' : 'year')}</h4>
+              <h4>Dissolving in {neuron?.dissolveDelay} {!Number.isNaN(neuron?.dissolveDelay) && (neuron?.dissolveDelay > 1 ? 'years' : 'year')}</h4>
             </div>
           </div>
         ))}
