@@ -3,7 +3,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-nested-ternary */
 
-import { calculateVotingPower, hexStringToUint8Array, neuronState } from '../utils/functions';
+import { calculateVotingPower, hexStringToUint8Array, neuronState, calculateTimestamp } from '../utils/functions';
 import {
   convertDate,
   p,
@@ -54,15 +54,23 @@ const useServices = () => {
   const icpNeurons = async () => {
     try {
       const neurons = await icpNeuron.list_neurons();
-      const parsed = neurons?.neurons?.active?.map((n) => ({
-        id: Number(n?.id),
-        dissolving: n?.dissolving,
-        stakedAmount: Number(n?.staked_amount) / 10 ** 8,
-        maturity: Number(n?.maturity),
-        dissolveDelay: Number(n?.dissolve_delay) / (365.25 * 60 * 60 * 24),
-        age: 3, // FIXME harcoded
-        votingPower: 8376, // FIXME harcoded
-      }));
+      console.log(neurons);
+      const parsed = neurons?.neurons?.active?.map((n) => {
+        const diffInDays = n?.dissolving
+        ? (new Date(Number(n?.dissolve_delay) * 1000).getTime() - new Date().getTime() - 1) / (1000 * 60 * 60 * 24)
+        : Number(n?.dissolve_delay) / (60 * 60 * 24)
+        return ({
+          id: n?.id?.toString() || n?.id,
+          dissolving: n?.dissolving,
+          stakedAmount: Number(n?.staked_amount) / 10 ** 8,
+          maturity: Number(n?.maturity),
+          dissolveDelay: n?.dissolving
+            ? `${Math.floor(diffInDays / 365.3)} years ${diffInDays % 365.3 > 0 ? `${(diffInDays % 365.3).toFixed(0) - 1} days` : ""}`
+            : (diffInDays / 365.3).toFixed(0),
+          age: 3, // FIXME harcoded
+          votingPower: 8376, // FIXME harcoded
+        })
+      });
       return parsed;
     } catch (err) {
       console.log('icp neuron error:', err);
