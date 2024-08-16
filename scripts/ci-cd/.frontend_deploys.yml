@@ -33,6 +33,13 @@ $[[ inputs.src-folder ]] staging deploy:
     TARGET_NETWORK: staging
     IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
   needs: ["$[[ inputs.src-folder ]] staging build"]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      when: manual
+      allow_failure: true
   script:
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then

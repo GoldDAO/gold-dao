@@ -19,7 +19,7 @@ import ModalConfirm from '../modal/modal-confirm';
 import ModalDelete from '../modal/modal-delete';
 import useNeurons from '../../../hooks/useNeurons';
 
-export default function RewardsNeurons({ setIcp, setGold }) {
+export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
   const [claimState, setClaimState] = useState(null);
   const [disableClaimAll, setDisableClaimAll] = useState(true);
   const [neuronAmountsToClaim, setNeuronAmountsToClaim] = useState({});
@@ -43,13 +43,15 @@ export default function RewardsNeurons({ setIcp, setGold }) {
     const response = await getNeuronsByOwner();
     if (response) {
       setUserNeurons(response);
+
       const amountsToClaim = response.reduce(
         (acc, curr) => {
           acc.icpAmount += curr.icpRewards;
           acc.ledgerAmount += curr.ledgerRewards;
+          acc.ogyAmount += curr.ogyRewards;
           return acc;
         },
-        { icpAmount: 0, ledgerAmount: 0 },
+        { icpAmount: 0, ledgerAmount: 0, ogyAmount: 0 },
       );
       setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: response });
       if (!amountsToClaim.icpAmount && !amountsToClaim.ledgerAmount) {
@@ -198,15 +200,19 @@ export default function RewardsNeurons({ setIcp, setGold }) {
                   <button
                     onClick={() => {
                       document.getElementById('my_modal_confirm').showModal();
-                      // setClaimState({ name: item.id, amount: item.ogyRewards,
-                      // claim: "OGY", ...item });
+                      setClaimState({
+                        name: item.id,
+                        amount: item.ogyRewards,
+                        claim: 'OGY',
+                        ...item,
+                      });
                     }}
                     className={
                       'z-10 text-white min-w-[160px] max-w-[200px] font-bold py-2 px-8 rounded-full hidden sm:flex gap-2 items-center justify-center text-sm bg-black opacity-50 cursor-not-allowed'
                     }
                     disabled={true}
                   >
-                    Claim 0
+                    Claim {item.ogyRewards / 1e8 || 0}
                     <Image className="h-4 w-4" src="ogy.png" alt="origyn" width={13} height={13} />
                   </button>
                   <button
@@ -386,6 +392,7 @@ export default function RewardsNeurons({ setIcp, setGold }) {
           setNeuronModify={setNeuronModify}
           setGold={setGold}
           setIcp={setIcp}
+          setOgy={setOgy}
         />
       </Modal>
       <Modal title="Add Neuron" idModal="my_modal_add">

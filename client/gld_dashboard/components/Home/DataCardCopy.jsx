@@ -43,7 +43,7 @@ const DataCardCopy = ({
         </div>
       </section>
       <section className="flex gap-2 items-center -mb-2">
-        <h1 className="text-[28px] sm:text-[36px] font-bold">
+        <h1 className="text-[28px] sm:text-[36px] font-bold" style={{ wordBreak: 'break-word', lineHeight: 1.2 }}>
           {isPrice && '$'}
           {parseNumbers(amount)}
         </h1>
