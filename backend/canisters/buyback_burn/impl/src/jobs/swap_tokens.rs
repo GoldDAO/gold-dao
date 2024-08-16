@@ -59,7 +59,7 @@ pub(crate) async fn process_token_swap(
     let input_amount = calculate_percentage_of_amount(available_amount, burn_rate);
     let amount_to_dex = input_amount.saturating_sub(swap_config.input_token.fee.into());
 
-    // TODO: Should we use this parameter? We can try to also store the minimum ICP/GLDGov
+    // NOTE: Should we use this parameter? We can try to also store the minimum ICP/GLDGov
     // price and then calculate the min_output_amount
     let min_output_amount = 0;
 

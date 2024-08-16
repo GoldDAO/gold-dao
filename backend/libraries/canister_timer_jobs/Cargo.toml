@@ -9,3 +9,7 @@ edition = "2021"
 canister_time = { path = "../canister_time" }
 ic-cdk-timers = { workspace = true }
 serde = { workspace = true }
+types = { path = "../types" }
+utils = { path = "../utils" }
+tracing = { workspace = true }
+ic-cdk = { workspace = true }

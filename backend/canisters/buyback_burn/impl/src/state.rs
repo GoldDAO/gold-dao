@@ -59,7 +59,7 @@ pub struct Data {
     pub swap_clients: SwapClinets,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
-    pub timer_jobs: TimerJobs<TimerJob>,
+    // pub timer_jobs: TimerJobs<TimerJob, Data>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -119,7 +119,7 @@ impl Data {
                 burn_interval: Duration::from_secs(burn_interval_in_secs),
             },
             token_swaps: TokenSwaps::default(),
-            timer_jobs: TimerJobs::default(),
+            // timer_jobs: TimerJobs::default(),
         }
     }
 }

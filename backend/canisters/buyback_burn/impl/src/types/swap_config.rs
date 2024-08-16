@@ -1,4 +1,4 @@
-use candid::{ CandidType };
+use candid::CandidType;
 use icpswap_client::ICPSwapClient;
 use serde::{ Deserialize, Serialize };
 use types::TokenInfo;

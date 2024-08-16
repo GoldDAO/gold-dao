@@ -408,8 +408,12 @@ name = "canister_timer_jobs"
 version = "0.1.0"
 dependencies = [
  "canister_time",
+ "ic-cdk 0.13.2",
  "ic-cdk-timers 0.7.0",
  "serde",
+ "tracing",
+ "types",
+ "utils",
 ]
 
 [[package]]
