@@ -213,9 +213,16 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       const neuronsParameters = await nervousSystemParameters();
       if (neuronIds.length) {
         neuronIds = neuronIds.flat();
+        const neuronPromises = [];
         for (let i = 0; i < neuronIds.length; i += 1) {
+          const promise = governance.get_neuron({ neuron_id: [neuronIds[i]] });
+          neuronPromises.push(promise);
+        }
+
+        const responses = await Promise.all(neuronIds)
+        
+        await responses.forEach(async (status, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
-          const status = await governance.get_neuron({ neuron_id: [neuronIds[i]] });
           const neuronAge = Math.round(new Date().getTime() / 1000)
             - Number(status.result[0].Neuron.aging_since_timestamp_seconds);
           const dissolveState = status.result[0].Neuron.dissolve_state[0];
@@ -275,7 +282,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             dissolveDelay,
             age: neuronAge,
           };
-        }
+        });
         setLoading(false);
         return Object.values(neurons);
       }

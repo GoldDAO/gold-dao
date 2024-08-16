@@ -20,6 +20,7 @@ const useServices = () => {
   const [ledger] = useActor('ledger');
   const [root] = useActor('root');
   const [icpNeuron] = useActor('icpNeuron');
+  const [ogyNeuron] = useActor('ogyNeuron');
   const [governance] = useActor('governance');
   const [icp] = useActor('icp');
   const { setGldGovTreasury, setGldGovSupply } = useCharts();
@@ -61,6 +62,26 @@ const useServices = () => {
         dissolveDelay: Number(n?.dissolve_delay) / (365.25 * 60 * 60 * 24),
         age: 3, // FIXME harcoded
         votingPower: 8376, // FIXME harcoded
+      }));
+      return parsed;
+    } catch (err) {
+      console.log('icp neuron error:', err);
+      return [];
+    }
+  };
+
+  const ogyNeurons = async () => {
+    try {
+      const neurons = await ogyNeuron.list_ogy_neurons();
+      //Buffer.from(uint8).toString('hex')
+      const parsed = neurons?.neurons?.ogy_neurons?.map((n) => ({
+        id: Buffer.from(n?.id[0].id.buffer).toString('hex'),
+        dissolving: n?.dissolving,
+        stakedAmount: Number(n?.cached_neuron_stake_e8s) / 10 ** 8,
+        maturity: Number(n?.maturity_e8s_equivalent),
+        dissolveDelay: Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24),
+        age: Number(n?.aging_since_timestamp_seconds) / (365.25 * 60 * 60 * 24),
+        votingPower: (Number(n?.cached_neuron_stake_e8s) * (1 + Number(n?.voting_power_percentage_multiplier) / 100)) / 10 ** 8,
       }));
       return parsed;
     } catch (err) {
@@ -335,6 +356,7 @@ const useServices = () => {
     gldGovPrice,
     gldGovTotalSupply,
     icpNeurons,
+    ogyNeurons,
     goldNeurons,
     overviewData,
     gldGovTreasury,

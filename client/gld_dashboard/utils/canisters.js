@@ -1,6 +1,7 @@
 import { idlFactory as idlIcp } from './idls/icp';
 import { idlFactory as icpAllInfoNeuron } from './idls/icpAllInfoNeuron';
 import { idlFactory as icpNeuron } from './idls/icpNeuron';
+import { idlFactory as ogyNeurons } from './idls/ogyNeurons';
 import { idlFactory as icpSwap } from './idls/icpSwap';
 import { idlFactory as idlArchive } from './idls/archive';
 import { idlFactory as idlGovernance } from './idls/governance';
@@ -23,6 +24,7 @@ const canisters = {
   icp: { canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai', idlFactory: idlIcp },
   lighthouseApi: { canisterId: 'zfp4v-oyaaa-aaaar-qadqq-cai', idlFactory: idlLighthouse },
   icpNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpNeuron },
+  ogyNeuron: { canisterId: '54vkq-taaaa-aaaap-ahqra-cai', idlFactory: ogyNeurons },
   icpSwap: { canisterId: 'moe7a-tiaaa-aaaag-qclfq-cai', idlFactory: icpSwap },
   snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : '2f5ll-gqaaa-aaaak-qcfuq-cai', idlFactory: snsRewards },
   icpAllInfoNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpAllInfoNeuron },
