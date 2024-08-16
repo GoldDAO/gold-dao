@@ -24,7 +24,6 @@ const fees = {
   OGY: 0.0002,
 };
 
-
 export default function ModalTransfer({
   title,
   amount,

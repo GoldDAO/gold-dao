@@ -43,7 +43,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
     const response = await getNeuronsByOwner();
     if (response) {
       setUserNeurons(response);
-      
+
       const amountsToClaim = response.reduce(
         (acc, curr) => {
           acc.icpAmount += curr.icpRewards;
@@ -200,8 +200,12 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                   <button
                     onClick={() => {
                       document.getElementById('my_modal_confirm').showModal();
-                      setClaimState({ name: item.id, amount: item.ogyRewards,
-                      claim: "OGY", ...item });
+                      setClaimState({
+                        name: item.id,
+                        amount: item.ogyRewards,
+                        claim: 'OGY',
+                        ...item,
+                      });
                     }}
                     className={
                       'z-10 text-white min-w-[160px] max-w-[200px] font-bold py-2 px-8 rounded-full hidden sm:flex gap-2 items-center justify-center text-sm bg-black opacity-50 cursor-not-allowed'

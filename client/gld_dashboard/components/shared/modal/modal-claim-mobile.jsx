@@ -85,7 +85,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
                 setClaimState({
                   name: item.id,
                   amount: item.ogyRewards,
-                  claim: "OGY",
+                  claim: 'OGY',
                   ...item,
                 });
                 document.getElementById('my_modal_confirm').showModal();
