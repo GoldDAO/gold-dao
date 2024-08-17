@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { truncatePrincipal } from '../../../utils/functions';
 import useNeurons from '../../../hooks/useNeurons';
 import useSession from '../../../hooks/useSession';
 import useBalances from '../../../hooks/useBalances';
