@@ -131,6 +131,17 @@
         }
       }
     },
+    "ogy_ledger": {
+      "candid": "backend/external_canisters/icrc_ledger/api/can.did",
+      "remote": {
+        "id": {
+          "ic": "lkwrt-vyaaa-aaaaq-aadhq-cai",
+          "staging": "j5naj-nqaaa-aaaal-ajc7q-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": ""
+    },
     "gldt_ledger": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icrc1/ledger/ledger.did",
       "type": "custom",
