@@ -1751,7 +1751,7 @@ pub struct ListProposalsResponse {
 /// paginated fashion.
 /// Listing of all neurons can be accomplished using `limit` and `start_page_at`.
 /// To only list neurons associated with a given principal, use `of_principal`.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
 pub struct ListNeurons {
     /// Limit the number of Neurons returned in each page, from 1 to 100.
     /// If a value outside of this range is provided, 100 will be used.

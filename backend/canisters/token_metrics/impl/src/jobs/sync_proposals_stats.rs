@@ -36,6 +36,7 @@ pub async fn sync_proposals_metrics_data() {
 
     while continue_scanning {
         continue_scanning = false;
+        debug!("Syncing new proposal_metrics.");
 
         match sns_governance_canister_c2c_client::list_proposals(canister_id, &args).await {
             Ok(response) => {
@@ -80,7 +81,10 @@ pub async fn sync_proposals_metrics_data() {
                     number_of_scanned_proposals += 1;
                 }
 
-                if number_of_received_proposals == (args.limit as usize) {
+                if
+                    number_of_received_proposals == (args.limit as usize) &&
+                    args.before_proposal.is_some()
+                {
                     continue_scanning = true;
                 }
             }
@@ -91,13 +95,13 @@ pub async fn sync_proposals_metrics_data() {
         }
     }
 
-    info!("Successfully scanned {number_of_scanned_proposals} proposals.");
+    debug!("Successfully scanned {number_of_scanned_proposals} proposals.");
 
     mutate_state(|state| {
         state.data.sync_info.last_synced_number_of_proposals = number_of_scanned_proposals;
     });
 
-    info!("Voting metrics updated successfully.");
+    debug!("Voting metrics updated successfully.");
 }
 
 pub async fn recheck_ongoing_proposals() {
@@ -112,6 +116,7 @@ pub async fn recheck_ongoing_proposals() {
             include_status: Vec::new(),
             include_reward_status: Vec::new(),
         };
+        debug!("Syncing new recheck_ongoing_proposals.");
         match
             sns_governance_canister_c2c_client::list_proposals(governance_canister_id, &args).await
         {
@@ -262,6 +267,7 @@ mod tests {
     fn init_runtime_state() {
         let env = CanisterEnv::new(true);
         let data = Data::new(
+            vec![(CanisterId::anonymous(), 1)],
             CanisterId::anonymous(),
             CanisterId::anonymous(),
             CanisterId::anonymous(),

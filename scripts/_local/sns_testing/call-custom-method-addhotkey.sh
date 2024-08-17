@@ -22,7 +22,7 @@ export BLOB="$(didc encode --format blob "(record {
     neuron_id = ${NNS_NEURON_ID}:nat64
 })")"
 
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
