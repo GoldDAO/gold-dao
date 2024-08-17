@@ -222,7 +222,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
 
         const responses = await Promise.all(neuronPromises);
         
-        const data = await responses.forEach(async (status, i) => {
+        const neuronsData = responses.map(async (status, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
           const neuronAge = Math.round(new Date().getTime() / 1000)
             - Number(status.result[0].Neuron.aging_since_timestamp_seconds);
@@ -262,6 +262,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
               owner: p(canisters.snsRewards.canisterId),
               subaccount: [fixedNeuronIds],
             });
+            console.log(icpRewards, ledgerRewards, ogyRewards);
           } else {
             setLoading(false);
             toast.error('Something went wrong, please retry later.', {
@@ -303,6 +304,9 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             age: neuronAge,
           }
         });
+
+        await Promise.all(neuronsData);
+        
         setLoading(false);
         return Object.values(neurons);
       }
