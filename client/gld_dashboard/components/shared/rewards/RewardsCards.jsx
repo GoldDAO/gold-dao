@@ -36,13 +36,13 @@ export default function RewardsCards({
     var amount;
     if (title === 'ICP') {
       amount = await getBalance('icp');
-      setIcp({loading: false, amount});
+      setIcp({ loading: false, amount });
     } else if (title === 'OGY') {
       amount = await getBalance('ogy');
-      setOgy({loading: false, amount});
+      setOgy({ loading: false, amount });
     } else {
       amount = await getBalance('ledger');
-      setGold({loading: false, amount});
+      setGold({ loading: false, amount });
     }
 
     setAmount(amount);
