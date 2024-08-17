@@ -404,6 +404,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
           setNeuronModify={setNeuronModify}
           setGold={setGold}
           setIcp={setIcp}
+          setOgy={setOgy}
         />
       </Modal>
     </>

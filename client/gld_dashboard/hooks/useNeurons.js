@@ -337,6 +337,9 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       if (neuronsToClaim[i].ledgerRewards > 0) {
         rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'GLDGov'));
       }
+      if (neuronsToClaim[i].ogyRewards > 0) {
+        rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'OGY'));
+      }
     }
     const isNotFulfilled = (e) => e.status !== 'fulfilled';
 
