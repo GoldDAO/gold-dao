@@ -262,7 +262,6 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
               owner: p(canisters.snsRewards.canisterId),
               subaccount: [fixedNeuronIds],
             });
-            console.log(icpRewards, ledgerRewards, ogyRewards);
           } else {
             setLoading(false);
             toast.error('Something went wrong, please retry later.', {
