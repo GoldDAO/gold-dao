@@ -121,6 +121,16 @@
       "source": ["client/gldt_landing_page/out"],
       "type": "assets"
     },
+    "icp_ledger": {
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icp_ledger/ledger.did",
+      "type": "custom",
+      "wasm": "https://download.dfinity.systems/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
+    },
     "gldt_ledger": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icrc1/ledger/ledger.did",
       "type": "custom",
