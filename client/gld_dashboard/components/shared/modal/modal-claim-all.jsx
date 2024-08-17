@@ -37,7 +37,7 @@ export default function ModalClaimAll({
           <span className="font-bold"> {neuronAmountsToClaim.ledgerAmount / 1e8 || 0} GLDGov. </span>
         </p>
         <p className="text-center font-regular text-base sm:font-medium sm:text-lg">
-          The rewards will be sent to your account
+          The rewards will be sent to your account{' '}
           <span className="font-bold">{principal}</span>
         </p>
         <button
