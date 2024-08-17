@@ -33,7 +33,7 @@ export default function RewardsCards({
   const handleReloadClick = async () => {
     setLoading(true);
 
-    var amount;
+    let amount;
     if (title === 'ICP') {
       amount = await getBalance('icp');
       setIcp({ loading: false, amount });
