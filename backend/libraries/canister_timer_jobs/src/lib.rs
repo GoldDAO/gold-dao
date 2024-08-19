@@ -12,14 +12,14 @@ use crate::timer_manager::TimerManager;
 
 pub mod timer_manager;
 
-pub struct TimerJobs<R> {
-    jobs: BTreeMap<String, TimerManager<R>>,
+pub struct TimerJobs<J, R> where J: Fn() -> R, R: 'static {
+    jobs: BTreeMap<String, TimerManager<J, R>>,
 }
 
 type JobWrapper<J> = Rc<RefCell<Option<J>>>;
 
-impl<R> TimerJobs<R> {
-    pub fn iter(&self) -> impl Iterator<Item = &TimerManager<R>> {
+impl<J, R> TimerJobs<J, R> where J: Fn() -> R, R: 'static {
+    pub fn iter(&self) -> impl Iterator<Item = &TimerManager<J, R>> {
         self.jobs.values()
     }
 

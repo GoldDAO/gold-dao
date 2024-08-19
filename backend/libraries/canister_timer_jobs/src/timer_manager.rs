@@ -1,10 +1,19 @@
-use std::{ fmt::Debug, time::Duration };
+use std::time::Duration;
 use ic_cdk_timers::TimerId;
 use types::TimestampMillis;
 use crate::Environment;
+use std::any::type_name;
+use job_macros::job;
 
-pub struct TimerManager<R> {
-    job_function: fn() -> R,
+#[job(attempts = 3, interval = 60)]
+fn my_job() {
+    println!("This is the job function.");
+}
+
+// NOTE: https://nullderef.com/blog/rust-async-sync/#_what_ended_up_working_the_maybe_async_crate
+// NOTE: https://www.byronwasti.com/async-func-pointers/
+pub struct TimerManager<J, R> where J: Fn() -> R, R: 'static {
+    job_function: J,
     function_name: String, // Store name just in case
     timer_id: Option<TimerId>,
     interval: Duration,
@@ -13,27 +22,70 @@ pub struct TimerManager<R> {
     last_run: Option<TimestampMillis>,
 }
 
-impl<R> Debug for TimerManager<R> {
+impl<J, R> std::fmt::Debug for TimerManager<J, R> where J: Fn() -> R, R: 'static {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TimerManager")
-            .field("function_name", &self.function_name) // Include function name in debug output
+            .field("function_name", &self.function_name)
             .field("timer_id", &self.timer_id)
             .field("interval", &self.interval)
+            .field("max_attempts", &self.max_attempts)
+            .field("retry_delay_duration", &self.retry_delay_duration)
             .field("last_run", &self.last_run)
             .finish()
     }
 }
 
-use std::any::type_name;
+// Sync version
+impl<J> TimerManager<J, Result<(), String>>
+    where J: Fn() -> Result<(), String> + Clone + Sync + 'static
+{
+    pub fn start_timer_sync(&mut self, env: &dyn Environment) {
+        let interval = self.interval;
+        let job_function = self.job_function.clone();
+        let max_attempts = self.max_attempts;
+        let retry_delay_duration = self.retry_delay_duration;
 
-impl<R> TimerManager<R> {
+        self.timer_id = Some(
+            ic_cdk_timers::set_timer_interval(interval, move || {
+                run_sync(job_function.clone(), max_attempts, retry_delay_duration)
+            })
+        );
+
+        self.last_run = Some(env.now());
+    }
+}
+
+// Async version
+impl<J, R> TimerManager<J, R>
+    where
+        J: Fn() -> R + Clone + 'static + Sync + Send,
+        R: std::future::Future<Output = Result<(), String>>
+{
+    pub fn start_timer_async(&mut self, env: &dyn Environment) {
+        let interval = self.interval;
+        let job_function = self.job_function.clone();
+        let max_attempts = self.max_attempts;
+        let retry_delay_duration = self.retry_delay_duration;
+
+        self.timer_id = Some(
+            ic_cdk_timers::set_timer_interval(interval, move || {
+                run_async(job_function.clone(), max_attempts, retry_delay_duration)
+            })
+        );
+
+        self.last_run = Some(env.now());
+    }
+}
+
+impl<J, R> TimerManager<J, R> where J: Fn() -> R, R: 'static {
     pub fn new(
-        job_function: fn() -> R,
+        job_function: J,
         interval_secs: u64,
         max_attempts: Option<u32>,
         retry_delay_duration: Option<Duration>
     ) -> Self {
-        let function_name = type_name::<fn() -> R>().to_string();
+        let function_name = type_name::<J>().to_string();
+        // job_function.
         Self {
             job_function,
             function_name,
@@ -43,24 +95,6 @@ impl<R> TimerManager<R> {
             retry_delay_duration: retry_delay_duration.unwrap_or_default(),
             last_run: None,
         }
-    }
-
-    pub fn start_timer(&mut self, env: &dyn Environment) {
-        let interval = self.interval;
-        let job_function = self.job_function;
-        let max_attempts = self.max_attempts;
-        let retry_delay_duration = self.retry_delay_duration;
-
-        self.timer_id = Some(
-            ic_cdk_timers::set_timer_interval(
-                interval,
-                move || {
-                    // job_function.run(max_attempts, retry_delay_duration);
-                }
-            )
-        );
-
-        self.last_run = Some(env.now());
     }
 
     pub fn cancel_timer(&mut self) {
@@ -74,33 +108,72 @@ impl<R> TimerManager<R> {
     }
 }
 
-// Example function
-async fn example_action() -> Result<(), String> {
-    println!("Action executed");
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use utils::env::CanisterEnv;
 
+    // Example functions
+    async fn example_async_action() -> Result<(), String> {
+        println!("Async Action executed");
+        Ok(())
+    }
+
+    fn example_sync_action() -> Result<(), String> {
+        println!("Sync Action executed");
+        Ok(())
+    }
+
     #[test]
-    fn testing() {
+    fn test_sync_job() {
         let env = CanisterEnv::new(true);
-        let mut timer = TimerManager::new(example_action, 2, None, None);
-
-        // timer.start_timer(&env);
-
+        let mut timer = TimerManager::new(example_sync_action, 2, None, None);
+        // NOTE: this will not work outside of the canister, but allows to see if the compiler is ok with the code
+        timer.start_timer_sync(&env);
         println!("Timer: {:?}", timer);
+        timer.cancel_timer();
+    }
 
+    #[tokio::test]
+    async fn test_async_job() {
+        let env = CanisterEnv::new(true);
+        let mut timer = TimerManager::new(example_async_action, 2, None, None);
+        // NOTE: this will not work outside of the canister, but allows to see if the compiler is ok with the code
+        timer.start_timer_async(&env);
+        println!("Timer: {:?}", timer);
         timer.cancel_timer();
     }
 }
 
-// Helper function for retry logic with attempts
+pub async fn retry_with_attempts_sync<F>(max_attempts: u32, _delay_duration: Duration, mut f: F)
+    where F: FnMut() -> Result<(), String>
+{
+    for attempt in 1..=max_attempts {
+        match f() {
+            Ok(_) => {
+                break;
+            } // If successful, break out of the loop
+            Err(err) => {
+                error!("Attempt {}: Error - {:?}", attempt, err);
+                if attempt == max_attempts {
+                    error!(
+                        "Failed to execute the action after {} attempts: {:?}",
+                        max_attempts,
+                        err
+                    );
+                }
+            }
+        }
+    }
+}
+
+// NOTE: Helper function for retry logic with attempts
 use tracing::error;
-pub async fn retry_with_attempts<F, Fut>(max_attempts: u32, _delay_duration: Duration, mut f: F)
+pub async fn retry_with_attempts_async<F, Fut>(
+    max_attempts: u32,
+    _delay_duration: Duration,
+    mut f: F
+)
     where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
 {
     for attempt in 1..=max_attempts {
@@ -122,33 +195,32 @@ pub async fn retry_with_attempts<F, Fut>(max_attempts: u32, _delay_duration: Dur
     }
 }
 
-pub trait SyncJob {
-    fn run(self, max_attempts: u32, retry_delay_duration: Duration);
+// NOTE: RUN DIFFERENT TYPES
+fn run_sync<F>(func: F, max_attempts: u32, retry_delay_duration: Duration)
+    where F: Fn() -> Result<(), String>
+{
+    let _ = retry_with_attempts_sync(max_attempts, retry_delay_duration, func);
 }
 
-pub trait AsyncJob {
-    fn run(self, max_attempts: u32, retry_delay_duration: Duration);
-}
-
-// Implement SyncJob for functions
-impl<F> SyncJob for F where F: Fn() + 'static {
-    fn run(self, max_attempts: u32, retry_delay_duration: Duration) {
-        self();
-    }
-}
-
-impl<F, Fut> AsyncJob
-    for F
+pub fn run_async<F, Fut>(func: F, max_attempts: u32, retry_delay_duration: Duration)
     where F: Fn() -> Fut + 'static, Fut: std::future::Future<Output = Result<(), String>> + 'static
 {
-    fn run(self, max_attempts: u32, retry_delay_duration: Duration) {
-        // Clone `self` into the closure so that it is owned by the closure.
-        let f = self;
-
-        ic_cdk::spawn(async move {
-            let _ = retry_with_attempts(max_attempts, retry_delay_duration, || async {
-                f().await
-            }).await;
-        });
-    }
+    ic_cdk::spawn(async move {
+        let _ = retry_with_attempts_async(max_attempts, retry_delay_duration, func).await;
+    });
 }
+
+// #[test]
+// fn test() {
+//     // Example of synchronous function
+//     fn sync_function() {
+//         println!("Sync function executed");
+//     }
+
+//     // Example of asynchronous function
+//     async fn async_function() {
+//         println!("Async function executed");
+//     }
+
+//     ic_cdk::spawn(async_function());
+// }
