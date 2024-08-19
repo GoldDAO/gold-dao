@@ -32,20 +32,20 @@ pub fn job(args: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
-    // // Generate the output
-    // let fn_name = &input_fn.sig.ident;
-    // let expanded =
-    //     quote! {
-    //     // Original function
-    //     #input_fn
+    // Generate the output
+    let fn_name = &input_fn.sig.ident;
+    let expanded =
+        quote! {
+        // Original function
+        #input_fn
 
-    //     // Generated code (example: print values)
-    //     fn run_job() {
-    //         println!("Job function: {}", stringify!(#fn_name));
-    //         println!("Attempts: {}", #attempts);
-    //         println!("Interval: {}", #interval);
-    //     }
-    // };
+        // Generated code (example: print values)
+        fn run_job() {
+            println!("Job function: {}", stringify!(#fn_name));
+            println!("Attempts: {}", #attempts);
+            println!("Interval: {}", #interval);
+        }
+    };
 
     TokenStream::from(expanded)
 }
