@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
-
 show_help() {
   cat << EOF
 icp_neuron canister deployment script.
 Must be run from the repository's root folder, and with a running replica if for local deployment.
 'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
-The NETWORK argument should preferably be passed from the env variable that was previously defined
-by the pre-deploy script (using the dot notation, or inside a macro deploy script).
 
 The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
 
@@ -63,7 +59,7 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^i
     UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
   . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/parse_proposal_details.sh icp_neuron && \
+  . scripts/prepare_proposal_summary.sh icp_neuron && \
 #  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
   quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \

@@ -7,7 +7,7 @@ import useSession from '../../../hooks/useSession';
 import useBalances from '../../../hooks/useBalances';
 
 export default function ModalConfirm({
-  name, amount, claim, setNeuronModify, setGold, setIcp,
+  name, amount, claim, setNeuronModify, setGold, setIcp, setOgy,
 }) {
   const { principal } = useSession();
   const { getBalance } = useBalances();
@@ -27,6 +27,8 @@ export default function ModalConfirm({
     setIcp({ loading: false, amount: amountIcp });
     const newAmount = await getBalance('ledger');
     setGold({ loading: false, amount: newAmount });
+    const newOgy = await getBalance('ogy');
+    setOgy({ loading: false, amount: newOgy });
     document.getElementById('my_modal_confirm').close();
   };
   return (

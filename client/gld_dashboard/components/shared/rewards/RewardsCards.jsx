@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import useBalances from '../../../hooks/useBalances';
+import { parseNumbers } from '../../../utils/parsers';
 
 export default function RewardsCards({
   title,
@@ -57,7 +58,7 @@ export default function RewardsCards({
 
       <div className="flex p-6 items-center justify-between w-full relative h-[30%] sm:h-[50%]">
         <div className="text-[2rem]  sm:text-[3rem] font-bold flex gap-4 justify-center items-center">
-          {loading ? '...' : rewardValue?.toString()?.slice(0, 7)}
+          {loading ? '...' : parseNumbers(rewardValue.toFixed(2))}
           <Image
             width={8}
             height={8}

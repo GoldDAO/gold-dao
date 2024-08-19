@@ -10,6 +10,7 @@ candid = { workspace = true }
 canister_time = { path = "../canister_time" }
 icrc-ledger-types = { workspace = true }
 ic-cdk = { workspace = true }
+hex = { workspace = true }
 serde = { workspace = true }
 stable_memory = { path = "../stable_memory" }
 types = { path = "../types" }

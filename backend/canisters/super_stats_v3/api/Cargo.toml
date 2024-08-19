@@ -1,0 +1,25 @@
+[package]
+name = "super_stats_v3_api"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+ic-cdk = "0.12.0"
+ic-cdk-macros = "0.8.2"
+candid = { workspace = true }
+serde = "1.0.193"
+ic-cdk-timers = "0.6.0"
+ic-stable-memory = "0.4.4"
+ciborium = "0.2.1"
+scopeguard = "1.2.0"
+serde_bytes = "0.11.2"
+sha2 = "0.10"
+hex = "0.4.2"
+serde_cbor = "0.11"
+num-bigint = "0.4.4"
+num-traits = "0.2.17"
+#pocket-ic = "2.0.1"
+#icrc-ledger-types = { path = "../icrc_types" }
+
+

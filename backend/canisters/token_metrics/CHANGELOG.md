@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [unreleased]
+
+### [1.0.2] - 2024-08-13
+
+- Migrated the current version from the ogy repo which includes the comprehensive balance lists, supply data and governance related data
+
 ### [1.0.1] - 2024-06-26
 
 #### Added
@@ -17,5 +23,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 #### Added
 
 - first release /gold-nft-metrics endpoint for data about "total value locked", "gold_price" and "total_gold_grams"
-
-### [unreleased]

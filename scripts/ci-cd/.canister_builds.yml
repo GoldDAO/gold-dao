@@ -10,6 +10,7 @@ spec:
           "management",
           "sns_neuron_controller",
           "sns_rewards",
+          "super_stats_v3",
           "token_metrics"
         ]
 ---
@@ -40,16 +41,16 @@ $[[ inputs.src-folder ]] canister build:
 $[[ inputs.src-folder ]] integration-test build:
   stage: integration_testing
   rules:
-  # This will always run when any canister is released. Doesn't need to be this canister
-    - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z_]+-v\d+\.\d+\.\d+$/'
+    # This will always run when any canister is released. Doesn't need to be this canister
+    - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+$/'
       when: always
-  # This will run on merges to develop or MR from develop to master
+    # This will run on merges to develop or MR from develop to master
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock,md}"
         - "backend/external_canisters/**/*.{rs,toml,lock,md}"
         - "backend/canisters/**/*.{rs,toml,lock,md}"
-  # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
+    # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock,md}"
