@@ -109,7 +109,7 @@ pub async fn ogy_fetch_neuron_reward_balance(
     }
 }
 
-// NOTE: the following function calculates the general rewards as sum of all neurons rewards.
+// NOTE: the following function calculates the general rewards as sum of all neuron rewards.
 // If one of the rewards cannot be fetched, the general reward is calculated anyway, but it's
 // defined as RewardSumResult::Partial
 pub async fn ogy_calculate_available_rewards(
@@ -166,7 +166,6 @@ pub async fn ogy_calculate_available_rewards(
     }
 }
 
-// FIXME: handle an error like in calculate_available_rewards, use also Empty result
 pub async fn ogy_claim_rewards(
     neurons: &[Neuron],
     sns_rewards_canister_id: Principal,
@@ -184,7 +183,13 @@ pub async fn ogy_claim_rewards(
                     match ogy_sns_rewards_c2c_client::claim_reward(sns_rewards_canister_id, &args)
                         .await
                     {
-                        Ok(_) => Ok(()),
+                        Ok(response) => match response {
+                            ogy_sns_rewards_api_canister::claim_reward::Response::Ok(_) => Ok(()),
+                            error => Err(format!(
+                                "Error claiming reward for Neuron ID {}: {:?}",
+                                neuron_id, error
+                            )),
+                        },
                         Err(e) => Err(format!(
                             "Failed to claim rewards for Neuron ID {}: {:?}",
                             neuron_id, e

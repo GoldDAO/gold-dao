@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2024-08-20
+
+#### Description
+
+#### Fixed
+
+- **Error handling** : Enhancing error handling while claiming rewards.
+- **Job Scheduling** : Deleted unnecessary run function recursive call.
+
+#### Added
+
+- get_available_rewards query
+
 ### [1.0.2] - 2024-08-06
 
 #### Description
