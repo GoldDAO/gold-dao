@@ -34,7 +34,6 @@ async fn run_async() {
             "Failed to process neurons after {} attempts: {:?}",
             MAX_ATTEMPTS, err
         );
-        crate::jobs::process_neurons::run();
     }
 }
 
