@@ -21,7 +21,7 @@ const tokens = {
 const fees = {
   GLDGov: 0.001,
   ICP: 0.0001,
-  OGY: 0.0002,
+  OGY: 0.002,
 };
 
 export default function ModalTransfer({

@@ -54,7 +54,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         { icpAmount: 0, ledgerAmount: 0, ogyAmount: 0 },
       );
       setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: response });
-      if (!amountsToClaim.icpAmount && !amountsToClaim.ledgerAmount) {
+      if (!amountsToClaim.icpAmount && !amountsToClaim.ledgerAmount && !amountsToClaim.ogyAmount) {
         setDisableClaimAll(true);
       } else {
         setDisableClaimAll(false);
@@ -207,10 +207,8 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                         ...item,
                       });
                     }}
-                    className={
-                      'z-10 text-white min-w-[160px] max-w-[200px] font-bold py-2 px-8 rounded-full hidden sm:flex gap-2 items-center justify-center text-sm bg-black opacity-50 cursor-not-allowed'
-                    }
-                    disabled={true}
+                    className={`z-10 text-white min-w-[100px] max-w-[200px] font-bold py-2 px-8 rounded-full hidden sm:flex  gap-2 items-center justify-center text-sm ${item.ogyRewards > 0 ? 'bg-black' : 'bg-black opacity-50 cursor-not-allowed'}`}
+                    disabled={item.ogyRewards <= 0}
                   >
                     Claim {item.ogyRewards / 1e8 || 0}
                     <Image className="h-4 w-4" src="ogy.png" alt="origyn" width={13} height={13} />
@@ -247,19 +245,12 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                   <div className="text-[#D3B871] font-medium flex  items-center gap-2 text-sm">
                     {' '}
                     State
-                    <div
-                      className="cursor-pointer z-30"
-                    >
+                    <div className="cursor-pointer z-30">
                       <Tooltip
-                        content='The state of the neuron.'
+                        content="The state of the neuron."
                         classNames={{
-                          base: [
-                            'max-w-[400px]',
-                          ],
-                          content: [
-                            'py-2 px-4 shadow-xl',
-                            'text-white bg-black',
-                          ],
+                          base: ['max-w-[400px]'],
+                          content: ['py-2 px-4 shadow-xl', 'text-white bg-black'],
                         }}
                       >
                         <Image src={'/svg/info.svg'} alt="info" height={20} width={20} />
@@ -269,19 +260,12 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                   <div className="text-[#D3B871] font-medium flex  items-center gap-2 text-sm">
                     {' '}
                     Voting Power
-                    <div
-                      className="cursor-pointer z-30"
-                    >
+                    <div className="cursor-pointer z-30">
                       <Tooltip
-                        content='The voting power of the neuron.'
+                        content="The voting power of the neuron."
                         classNames={{
-                          base: [
-                            'max-w-[400px]',
-                          ],
-                          content: [
-                            'py-2 px-4 shadow-xl',
-                            'text-white bg-black',
-                          ],
+                          base: ['max-w-[400px]'],
+                          content: ['py-2 px-4 shadow-xl', 'text-white bg-black'],
                         }}
                       >
                         <Image src={'/svg/info.svg'} alt="info" height={20} width={20} />
@@ -297,7 +281,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                       onMouseLeave={() => setHovered({ disabled: false, index: null })}
                     >
                       <Tooltip
-                        content='The minimum time period over which the neuron owner locks up their staked
+                        content="The minimum time period over which the neuron owner locks up their staked
                         GLDGov tokens. This determines how long it will take to dissolve if the
                         neuron is placed into the Dissolving state. Once a neuron has been placed
                         into the Dissolving state, its dissolve delay falls over the passage of
@@ -305,15 +289,10 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                         zero. When it reaches zero and enters the Dissolved state, its owner can
                         perform a final disburse action to unlock the balance of GLDGov tokens. The
                         dissolve delay can be configured up to a maximum of 2 years, and must be 91
-                        days or greater for a neuron to be able to vote and earn voting rewards.'
+                        days or greater for a neuron to be able to vote and earn voting rewards."
                         classNames={{
-                          base: [
-                            'max-w-[400px]',
-                          ],
-                          content: [
-                            'py-2 px-4 shadow-xl',
-                            'text-white bg-black',
-                          ],
+                          base: ['max-w-[400px]'],
+                          content: ['py-2 px-4 shadow-xl', 'text-white bg-black'],
                         }}
                       >
                         <Image
@@ -323,7 +302,6 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                           height={20}
                           width={20}
                         />
-
                       </Tooltip>
                     </div>
                   </div>
@@ -335,19 +313,14 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                       onMouseLeave={() => setHovered({ disabled: false, index: null })}
                     >
                       <Tooltip
-                        content='The period of time that has elapsed since the neuron was created or last
+                        content="The period of time that has elapsed since the neuron was created or last
                         entered the Not Dissolving state. While dissolving, a neuron’s age is
                         considered zero. Increasing the stake of a neuron will decrease its age. For
                         example, if the stake is doubled, the age will be halved. Splitting a neuron
-                        creates a child neuron that inherits the age of its parent.'
+                        creates a child neuron that inherits the age of its parent."
                         classNames={{
-                          base: [
-                            'max-w-[400px]',
-                          ],
-                          content: [
-                            'py-2 px-4 shadow-xl',
-                            'text-white bg-black',
-                          ],
+                          base: ['max-w-[400px]'],
+                          content: ['py-2 px-4 shadow-xl', 'text-white bg-black'],
                         }}
                       >
                         <Image
@@ -404,6 +377,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
           setNeuronModify={setNeuronModify}
           setGold={setGold}
           setIcp={setIcp}
+          setOgy={setOgy}
         />
       </Modal>
     </>

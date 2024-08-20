@@ -14,6 +14,7 @@ export default function RewardsCards({
   status,
   setIcp,
   setGold,
+  setOgy,
 }) {
   let rewardValue = value;
   if (rewardValue !== 0) {
@@ -31,12 +32,19 @@ export default function RewardsCards({
 
   const handleReloadClick = async () => {
     setLoading(true);
-    const amount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
-    if (title === 'GLDGov') {
-      setGold({ loading: false, amount });
-    } else {
+
+    let amount;
+    if (title === 'ICP') {
+      amount = await getBalance('icp');
       setIcp({ loading: false, amount });
+    } else if (title === 'OGY') {
+      amount = await getBalance('ogy');
+      setOgy({ loading: false, amount });
+    } else {
+      amount = await getBalance('ledger');
+      setGold({ loading: false, amount });
     }
+
     setAmount(amount);
     setLoading(false);
   };
