@@ -1,6 +1,5 @@
 use crate::lifecycle::init_canister;
 use crate::memory::get_upgrades_memory;
-// use crate::migrations::types::state::RuntimeStateV0;
 use crate::state::RuntimeState;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;

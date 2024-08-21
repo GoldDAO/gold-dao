@@ -23,11 +23,15 @@ $[[ inputs.src-folder ]] staging deploy:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+      allow_failure: true
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
   needs:
-    ["$[[ inputs.src-folder ]] canister build", "integration tests"]
+    ["$[[ inputs.src-folder ]] staging build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -51,7 +55,7 @@ $[[ inputs.src-folder ]] production deploy:
     TARGET_NETWORK: ic
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
   needs:
-    ["$[[ inputs.src-folder ]] canister build", "integration tests"]
+    ["$[[ inputs.src-folder ]] production build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
