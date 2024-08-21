@@ -23,14 +23,12 @@ $[[ inputs.src-folder ]] staging deploy:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event" # deployment when merged to develop
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
-      needs:
-        ["$[[ inputs.src-folder ]] staging build", "integration tests"]
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # deployment when trigger manually on MR
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
-      needs:
-        ["$[[ inputs.src-folder ]] staging build"]
       allow_failure: true
+  needs:
+    ["$[[ inputs.src-folder ]] staging build", "integration tests"]
   variables:
     TARGET_NETWORK: staging
     PEM_FILE: "${PEM_FILE_STAGING}"
