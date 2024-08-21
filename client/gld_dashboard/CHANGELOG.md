@@ -8,18 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2024-08-21
+
+#### Fixed
+
+- **Lock periods and voting powers** : Fixed display of some voting power calculations and dissolve delays for neurons
+
+#### Added
+
+- **GLDGov OGY neuron** : added display for OGY neurons on the dashboard
+- **Use async loading for neurons** : connected beurons are loading asynchronously now
+- **OGY balance and rewards** : OGY token balance and rewards claiming enabled
+
 ### [1.0.2] - 2024-07-25
 
 #### Fixed
 
 - **Transfer modal**: fix the issue that when clicking on "Max" in the transfer modal, the e8s representation would be pasted. Now it takes the correct decimal value.
-- ** Lock periods and voting powers ** : Fixed displayed of some voting powers and desilve periods for Neurons
-
-#### Added
-
-- **GLDGov OGY Neuron** : added display for OGY Neurons on the dashboard
-- **Use Async loading for Neurons ** : connected Neurons are loading asynchronously now
-- ** OGY balance and rewards ** : OGY token balance and rewards claiming enabled
 
 ### [1.0.1] - 2024-07-23
 
