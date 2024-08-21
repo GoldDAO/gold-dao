@@ -12,11 +12,24 @@ import useBalances from '../../../hooks/useBalances';
 import useSession from '../../../hooks/useSession';
 import useTransfer from '../../../hooks/useTransfer';
 
+const tokens = {
+  GLDGov: 'ledger',
+  ICP: 'icp',
+  OGY: 'ogy',
+};
+
+const fees = {
+  GLDGov: 0.001,
+  ICP: 0.0001,
+  OGY: 0.002,
+};
+
 export default function ModalTransfer({
   title,
   amount,
   setGold,
   setIcp,
+  setOgy,
   setAmount,
 }) {
   const [copyState, setCopyState] = useState(false);
@@ -102,30 +115,31 @@ export default function ModalTransfer({
   };
 
   const { icrc1Transfer, loading } = useTransfer({
-    selectedToken: title === 'GLDGov' ? 'ledger' : 'icp',
+    selectedToken: tokens[title] || 'icp',
     amount: inputValue,
     to: toPrincipal,
   });
 
   const handleTransfer = async () => {
     await icrc1Transfer();
-    const newAmount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
+    const newAmount = await getBalance(tokens[title] || 'icp');
 
     if (title === 'GLDGov') setGold({ loading: false, amount: newAmount });
+    else if (title === 'OGY') setOgy({ loading: false, amount: newAmount });
     else setIcp({ loading: false, amount: newAmount });
     setInputValue('');
     setToPrincipal('');
     setAmount(newAmount);
   };
 
-  const disable = Number(inputValue) + ((title === 'GLDGov' ? 0.001 : 0.0001)) > decimalBalance
+  const disable = Number(inputValue) + (fees[title]) > decimalBalance
   || decimalBalance === 0
   || Number(inputValue) < 0.00000001
   || loading;
 
   const handleMaxButtonClick = () => {
     let rewardValue = amount;
-    rewardValue = rewardValue === 0 ? rewardValue : rewardValue - (title === 'GLDGov' ? 100000 : 10000);
+    rewardValue = rewardValue === 0 ? rewardValue : rewardValue - (fees[title] * 100000000);
 
     if (rewardValue !== 0) {
       rewardValue /= 10 ** 8;

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import useBalances from '../../../hooks/useBalances';
+import { parseNumbers } from '../../../utils/parsers';
 
 export default function RewardsCards({
   title,
@@ -13,6 +14,7 @@ export default function RewardsCards({
   status,
   setIcp,
   setGold,
+  setOgy,
 }) {
   let rewardValue = value;
   if (rewardValue !== 0) {
@@ -30,12 +32,19 @@ export default function RewardsCards({
 
   const handleReloadClick = async () => {
     setLoading(true);
-    const amount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
-    if (title === 'GLDGov') {
-      setGold({ loading: false, amount });
-    } else {
+
+    let amount;
+    if (title === 'ICP') {
+      amount = await getBalance('icp');
       setIcp({ loading: false, amount });
+    } else if (title === 'OGY') {
+      amount = await getBalance('ogy');
+      setOgy({ loading: false, amount });
+    } else {
+      amount = await getBalance('ledger');
+      setGold({ loading: false, amount });
     }
+
     setAmount(amount);
     setLoading(false);
   };
@@ -57,7 +66,7 @@ export default function RewardsCards({
 
       <div className="flex p-6 items-center justify-between w-full relative h-[30%] sm:h-[50%]">
         <div className="text-[2rem]  sm:text-[3rem] font-bold flex gap-4 justify-center items-center">
-          {loading ? '...' : rewardValue?.toString()?.slice(0, 7)}
+          {loading ? '...' : parseNumbers(rewardValue.toFixed(2))}
           <Image
             width={8}
             height={8}

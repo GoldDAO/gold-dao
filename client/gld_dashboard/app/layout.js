@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
       const mode = await getMaintenanceMode();
       setMaintenanceMode(mode);
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMaintenanceMode]);
 
   if (isMaintenanceMode) {
@@ -47,31 +47,33 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#c6c6c6" />
         <script async="" data-domain="dashboard.gold-dao.org" src="https://analytics.gold-dao.org/js/script.js"></script>
       </Head>
-      <Providers>
-        <body className={`${inter.className} flex h-screen bg-white text-black`}>
-          <Navbar />
-          <section className="w-full overflow-y-scroll flex flex-col justify-between ">
-            <div className="px-5 sm:px-0">
-              <Header />
-              {children}
-            </div>
-            <Footer />
-          </section>
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            transition="Bounce"
-          />
-        </body>
-      </Providers>
+      <body>
+        <Providers>
+          <div className={`${inter.className} flex h-screen bg-white text-black`}>
+            <Navbar />
+            <section className="w-full overflow-y-scroll flex flex-col justify-between ">
+              <div className="px-5 sm:px-0">
+                <Header />
+                {children}
+              </div>
+              <Footer />
+            </section>
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              transition="Bounce"
+            />
+          </div>
+        </Providers>
+      </body>
     </html>
   );
 }

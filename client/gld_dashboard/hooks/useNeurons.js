@@ -12,6 +12,7 @@ import useActor from './useActor';
 const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   const [snsRewards] = useActor('snsRewards');
   const [governance] = useActor('governance');
+  const [ogy] = useActor('ogy');
   const [ledger] = useActor('ledger');
   const [icp] = useActor('icp');
   const [loading, setLoading] = useState(false);
@@ -213,9 +214,16 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       const neuronsParameters = await nervousSystemParameters();
       if (neuronIds.length) {
         neuronIds = neuronIds.flat();
+        const neuronPromises = [];
         for (let i = 0; i < neuronIds.length; i += 1) {
+          const promise = governance.get_neuron({ neuron_id: [neuronIds[i]] });
+          neuronPromises.push(promise);
+        }
+
+        const responses = await Promise.all(neuronPromises);
+        
+        const neuronsData = responses.map(async (status, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
-          const status = await governance.get_neuron({ neuron_id: [neuronIds[i]] });
           const neuronAge = Math.round(new Date().getTime() / 1000)
             - Number(status.result[0].Neuron.aging_since_timestamp_seconds);
           const dissolveState = status.result[0].Neuron.dissolve_state[0];
@@ -236,6 +244,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
 
           let icpRewards;
           let ledgerRewards;
+          let ogyRewards;
           if (status.result[0].Neuron) {
             neurons[fixedNeuronIds] = {
               ...status.result[0].Neuron,
@@ -246,6 +255,10 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
               subaccount: [fixedNeuronIds],
             });
             ledgerRewards = await ledger.icrc1_balance_of({
+              owner: p(canisters.snsRewards.canisterId),
+              subaccount: [fixedNeuronIds],
+            });
+            ogyRewards = await ogy.icrc1_balance_of({
               owner: p(canisters.snsRewards.canisterId),
               subaccount: [fixedNeuronIds],
             });
@@ -268,14 +281,31 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ...neurons[fixedNeuronIds],
             icpRewards: Number(icpRewards),
             ledgerRewards: Number(ledgerRewards),
+            ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
             votingPower: dissolveDelay
-              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds)
+              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
           };
-        }
+          
+          return {
+            ...neurons[fixedNeuronIds],
+            icpRewards: Number(icpRewards),
+            ledgerRewards: Number(ledgerRewards),
+            ogyRewards: Number(ogyRewards),
+            dissolving: neuronState(dissolveState),
+            votingPower: dissolveDelay
+              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+              ? votingPower : '-',
+            dissolveDelay,
+            age: neuronAge,
+          }
+        });
+
+        await Promise.all(neuronsData);
+        
         setLoading(false);
         return Object.values(neurons);
       }
@@ -306,6 +336,9 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       }
       if (neuronsToClaim[i].ledgerRewards > 0) {
         rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'GLDGov'));
+      }
+      if (neuronsToClaim[i].ogyRewards > 0) {
+        rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'OGY'));
       }
     }
     const isNotFulfilled = (e) => e.status !== 'fulfilled';

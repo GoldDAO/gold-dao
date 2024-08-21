@@ -18,11 +18,6 @@ variables:
   resource_group: frontend staging deployment
   variables:
     PEM_FILE: "${PEM_FILE_STAGING}"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   before_script:
     - !reference [.import dfx identity, before_script]
     - !reference [.include didc, before_script]
@@ -32,6 +27,17 @@ $[[ inputs.src-folder ]] staging deploy:
   variables:
     TARGET_NETWORK: staging
     IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      when: manual
+      allow_failure: true
   needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
     - |
@@ -49,6 +55,11 @@ $[[ inputs.src-folder ]] preprod deploy:
   extends: .staging deploy template
   variables:
     TARGET_NETWORK: preprod
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
   needs: ["$[[ inputs.src-folder ]] preprod build"]
   script:
      - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]

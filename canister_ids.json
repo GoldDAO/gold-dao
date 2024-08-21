@@ -52,6 +52,9 @@
     "ic": "efv5g-kqaaa-aaaaq-aacaa-cai",
     "staging": "iwgkk-qaaaa-aaaap-ab24a-cai"
   },
+  "icp_ledger": {
+    "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
+  },
   "sns_ledger": {
     "ic": "tyyy3-4aaaa-aaaaq-aab7a-cai",
     "staging": "irhm6-5yaaa-aaaap-ab24q-cai"

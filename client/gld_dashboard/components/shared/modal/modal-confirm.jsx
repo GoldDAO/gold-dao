@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { truncatePrincipal } from '../../../utils/functions';
 import useNeurons from '../../../hooks/useNeurons';
 import useSession from '../../../hooks/useSession';
 import useBalances from '../../../hooks/useBalances';
 
 export default function ModalConfirm({
-  name, amount, claim, setNeuronModify, setGold, setIcp,
+  name, amount, claim, setNeuronModify, setGold, setIcp, setOgy,
 }) {
   const { principal } = useSession();
   const { getBalance } = useBalances();
@@ -27,6 +26,8 @@ export default function ModalConfirm({
     setIcp({ loading: false, amount: amountIcp });
     const newAmount = await getBalance('ledger');
     setGold({ loading: false, amount: newAmount });
+    const newOgy = await getBalance('ogy');
+    setOgy({ loading: false, amount: newOgy });
     document.getElementById('my_modal_confirm').close();
   };
   return (
@@ -40,7 +41,7 @@ export default function ModalConfirm({
         </p>
         <p className="text-center font-medium text-lg flex flex-col">
           The rewards will be sent to your account{' '}
-          <span className="font-bold">{truncatePrincipal(principal)}</span>
+          <span className="font-bold">{principal}</span>
         </p>
         <button
           className={`px-10 py-4 rounded-3xl bg-[#D3B871] text-white text-md font-bold flex items-center justify-center ${loading ? 'opacity-35 gap-2' : ''}`}
