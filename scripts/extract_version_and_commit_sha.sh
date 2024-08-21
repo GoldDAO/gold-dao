@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
 CANISTER_NAME=$1
+NETWORK=$2
 
-if [[ -n $CI_COMMIT_TAG ]]; then
-	VERSION="${CI_COMMIT_TAG#*-v}"
-	NAME="${CI_COMMIT_TAG%-v*}"
+if [[ -n $CI_COMMIT_TAG && $NETWORK == "ic" ]]; then
+
+	if [[ ! $CI_COMMIT_TAG =~ ^([a-zA-Z0-9_]+-v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+			echo "Error: commit tag $CI_COMMIT_TAG doesn't match expected format of xxx-v1.2.3" >&2
+			exit 1
+	fi
+
+	VERSION="${CI_COMMIT_TAG#*-v}" # converts test-v1.2.3 into 1.2.3
+	NAME="${CI_COMMIT_TAG%-v*}" # converts test-v1.2.3 into test
 
 	# Check if NAME matches CANISTER_NAME
 	# The script requires CANISTER_NAME to be defined for staging deployment and
@@ -24,6 +31,7 @@ else
 	COMMIT_SHA="$(git rev-parse --short HEAD)_local"
 fi
 
+echo "CANISTER: $CANISTER_NAME, VERSION: $VERSION, COMMIT_SHA: $COMMIT_SHA"
 
 export VERSION
 export COMMIT_SHA

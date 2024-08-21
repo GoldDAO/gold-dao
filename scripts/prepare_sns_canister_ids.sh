@@ -42,18 +42,7 @@ jq --arg choice $1 '{
   ledger_canister_id: .sns_ledger[$choice],
   root_canister_id: .sns_root[$choice],
   swap_canister_id: .sns_swap[$choice],
-  dapp_canister_id_list: [
-    .gld_dashboard[$choice],
-    .gldt_swap[$choice],
-    .gldt_explorer[$choice],
-    .gldt_ledger[$choice],
-    .gldt_landing_page[$choice],
-    .gldt_ledger_indexer[$choice],
-    .gldt_swap_app[$choice],
-    .icp_neuron[$choice],
-    .token_metrics[$choice],
-    .sns_rewards[$choice]
-  ]
+  dapp_canister_id_list: []
 }' $INPUT_FILE > $OUTPUT_FILE
 
 echo "SNS canister ids file generation complete based on $1. Output saved to $OUTPUT_FILE."

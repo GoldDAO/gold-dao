@@ -1,67 +1,27 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
-
-show_help() {
-  cat << EOF
-super_stats_v3 canister deployment script.
-Must be run from the repository's root folder, and with a running replica if for local deployment.
-'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
-The NETWORK argument should preferably be passed from the env variable that was previously defined
-by the pre-deploy script (using the dot notation, or inside a macro deploy script).
-
-The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
-
-Usage:
-  scripts/deploy-super_stats_v3.sh [options] <NETWORK>
-
-Options:
-  -h, --help        Show this message and exit
-EOF
-}
-
-
-
-if [[ $# -gt 0 ]]; then
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
-    case $1 in
-      -h | --help )
-        show_help
-        exit
-        ;;
-    esac;
-    shift;
-  done
-  if [[ "$1" == '--' ]]; then shift; fi
-else
-  echo "Error: missing <NETWORK> argument"
-  exit 1
-fi
-
 NETWORK=$1
-MODE="reinstall"
+DEPLOYMENT_VIA="direct"
 
-if [[ ! $NETWORK =~ ^(local|staging|ic)$ ]]; then
-  echo "Error: unknown network for deployment"
+if [[ $NETWORK =~ ^(local|staging)$ ]]; then
+  TESTMODE=true
+  ADMIN=$(dfx identity get-principal)
+elif [[ $NETWORK =~ ^(ic)$ ]]; then
+  TESTMODE=false
+  ADMIN=$(dfx identity get-principal)
+else
+  echo "Error: unknown network for deployment. Found $NETWORK."
   exit 2
 fi
 
-if [[ $NETWORK =~ ^(local|staging)$ ]]; then
-  TESTMODE="true"
-else
-  TESTMODE="false"
-fi
-ADMIN=$(dfx identity get-principal)
-ARGUMENTS='(record {
-  test_mode = '$TESTMODE';
-  admin = "'"$ADMIN"'";
-  } )'
+ARGUMENTS="(record {
+  test_mode = $TESTMODE;
+  admin = \"$ADMIN\"
+})"
 
+. ./scripts/deploy_backend_canister.sh super_stats_v3 $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA
 
-echo $ADMIN
-echo $ARGUMENTS
-
-dfx deploy super_stats_v3 --network $NETWORK --argument "$ARGUMENTS" --mode $MODE -y
+MODE=""
 
 if [ "$MODE" = "reinstall" ]; then
   TOKEN_METRICS_CANISTER_ID=$(dfx canister id token_metrics --network $NETWORK)
