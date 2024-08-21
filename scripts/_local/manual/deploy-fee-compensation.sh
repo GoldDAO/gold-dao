@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# . scripts/build-canister gldt_fee_compensation &&
-# . scripts/generate-did gldt_fee_compensation &&
+# . scripts/build_canister gldt_fee_compensation &&
+# . scripts/generate_did gldt_fee_compensation &&
 dfx deploy gldt_fee_compensation --network staging --argument '(opt record {
   fallback_timer_interval_secs=3600;
   execution_delay_secs=20;

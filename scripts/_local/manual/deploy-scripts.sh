@@ -111,5 +111,5 @@ dfx canister call --network staging gldt_ledger icrc1_balance_of '(record { owne
 #
 # 1. Generate .did file for gldt_core canister
 #   Since gldt_core is written in rust, the .did file needs to be generated manually.
-#   run the script `./scripts/generate-did.sh` to generate the .did file and
+#   run the script `./scripts/generate_did.sh` to generate the .did file and
 #   automatically create the js and ts bindings.

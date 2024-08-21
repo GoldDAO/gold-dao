@@ -6,7 +6,7 @@ Canister build and did generation script.
 Must be run from the repository's root folder.
 
 Usage:
-  scripts/build-canister.sh [options] <CANISTER>
+  scripts/build_canister.sh [options] <CANISTER>
 
 Options:
   -h, --help        Show this message and exit
