@@ -86,6 +86,7 @@ $[[ inputs.src-folder ]] production deploy:
       when: manual
   before_script:
     - !reference [.import dfx identity, before_script]
+    - !reference [.include didc, before_script]
   script:
     - |
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then

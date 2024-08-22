@@ -6,7 +6,7 @@ Generate the candid file and declarations for the mentioned wasm canister.
 Must be run from the repository's root folder.
 
 Usage:
-  scripts/generate-did [options] <wasm>
+  scripts/generate_did [options] <wasm>
 
 Options:
   -h, --help        Show this message and exit
