@@ -6,7 +6,7 @@ CHANGELOG_FILE=CHANGELOG.md
 
 CANISTER_NAME="$1"
 VERSION=$2 # needs to be in format 1.2.3
-CANISTER_TYPE=$3
+CANISTER_TYPE=$3 # needs to be "backend" or "frontend"
 
 if [[ -z $CANISTER_NAME ]]; then
     echo "Error: CANISTER_NAME is not defined." >&2
@@ -14,7 +14,7 @@ if [[ -z $CANISTER_NAME ]]; then
 fi
 
 if [[ $VERSION =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-	./scripts/parse_changelog.sh $CANISTER_NAME $VERSION
+	./scripts/parse_changelog.sh $CANISTER_NAME $VERSION $CANISTER_TYPE
 	exit_status=$? # Capture the exit status of the last command
 
 	if [[ $exit_status -eq 1 ]]; then
@@ -76,4 +76,4 @@ echo "
 ******************************************
 "
 
-return
+exit 0
