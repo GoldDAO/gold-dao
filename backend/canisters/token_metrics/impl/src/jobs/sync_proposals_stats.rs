@@ -1,4 +1,4 @@
-use canister_time::{ run_now_then_interval, timestamp_seconds };
+use canister_time::{ run_now_then_interval };
 use sns_governance_canister::types::{ get_proposal_response, ProposalData, ProposalId };
 use token_metrics_api::token_data::VotingHistoryCalculations;
 use std::time::Duration;

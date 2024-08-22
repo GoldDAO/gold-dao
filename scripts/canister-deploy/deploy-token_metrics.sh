@@ -28,7 +28,7 @@ ARGUMENTS="(record {
   sns_governance_canister_id = principal \"$SNS_GOVERNANCE\";
   sns_rewards_canister_id = principal \"$SNS_REWARDS\";
   super_stats_canister_id = principal \"$SUPER_STATS\";
-  treasury_account = \"$ORIGYN_TREASURY_ACCOUNT\";
+  treasury_account = \"$GOLD_TREASURY_ACCOUNT\";
   foundation_accounts = vec {
     \"$GOLD_TREASURY_ACCOUNT\"
   }
