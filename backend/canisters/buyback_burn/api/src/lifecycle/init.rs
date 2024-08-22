@@ -1,11 +1,12 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
-use types::{ CanisterId, TokenInfo };
+use candid::{CandidType, Principal};
 use ic_ledger_types::Tokens;
+use serde::{Deserialize, Serialize};
+use types::{CanisterId, TokenInfo};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
+    pub commit_hash: String,
     pub authorized_principals: Vec<Principal>,
     pub gldgov_ledger_canister_id: CanisterId,
     pub tokens: Vec<TokenInfo>,

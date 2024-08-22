@@ -1,16 +1,15 @@
-use std::time::Duration;
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use crate::types::token_swaps::TokenSwaps;
+use crate::types::{icpswap::ICPSwapConfig, ExchangeConfig, SwapClinets, SwapConfig};
 use buyback_burn_canister::get_config::Response as GetConfigResponse;
+use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
-use utils::env::{ CanisterEnv, Environment };
+use serde::{Deserialize, Serialize};
+use std::time::Duration;
+use types::BuildVersion;
+use types::{CanisterId, Cycles, TimestampMillis, TokenInfo};
+use utils::env::{CanisterEnv, Environment};
 use utils::memory::MemorySize;
-use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
-use crate::types::{ ExchangeConfig, SwapClinets, SwapConfig, icpswap::ICPSwapConfig };
-use crate::types::token_swaps::TokenSwaps;
-use canister_timer_jobs::TimerJobs;
-use crate::timer_job_types::TimerJob;
 
 canister_state!(RuntimeState);
 
@@ -86,7 +85,7 @@ impl Data {
         sns_governance_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
-        burn_interval_in_secs: u64
+        burn_interval_in_secs: u64,
     ) -> Data {
         let mut swap_clients = SwapClinets::init();
         // TODO: add other tokens support
@@ -136,6 +135,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }
