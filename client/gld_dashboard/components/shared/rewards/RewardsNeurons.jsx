@@ -363,6 +363,8 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         <ModalConfirm
           {...claimState}
           setNeuronModify={setNeuronModify}
+          setClaimState={setClaimState}
+          claimItam={claimState}
           setGold={setGold}
           setIcp={setIcp}
           setOgy={setOgy}
