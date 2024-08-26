@@ -1,16 +1,11 @@
-// use crate::types::neuron_manager::NeuronRewardsManager;
-// use candid::CandidType;
-// use ic_cdk::query;
-// use crate::state::{read_state, NeuronList};
+use crate::guards::caller_is_governance_principal;
+use crate::state::read_state;
+use crate::types::neuron_manager::NeuronRewardsManager;
+use candid::Nat;
+use ic_cdk::query;
 
-// #[derive(CandidType)]
-// pub struct ListNeuronsResponse {
-//     neurons: NeuronList,
-// }
-
-// #[query]
-// fn list_ogy_neurons() -> ListNeuronsResponse {
-//     read_state(|s| ListNeuronsResponse {
-//         neurons: s.data.neuron_managers.ogy.get_available_rewards().await,
-//     })
-// }
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+async fn current_available_rewards() -> Nat {
+    let ogy_neuron_manager = read_state(|s| s.data.neuron_managers.ogy.clone());
+    ogy_neuron_manager.get_available_rewards().await
+}

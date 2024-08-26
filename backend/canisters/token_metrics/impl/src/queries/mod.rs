@@ -11,6 +11,7 @@ pub mod get_proposals_metrics;
 pub mod get_voting_participation_history;
 pub mod get_voting_power_ratio_history;
 pub mod get_active_users_count;
+pub mod transform_http_response;
 
 pub use get_holders::*;
 pub use get_all_neuron_owners::*;

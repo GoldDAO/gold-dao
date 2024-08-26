@@ -30,8 +30,10 @@ async fn run_async() {
             fetch_and_process_neurons(&mut ogy_neuron_manager).await
         }).await
     {
-        error!("Failed to process neurons after {} attempts: {:?}", MAX_ATTEMPTS, err);
-        crate::jobs::process_neurons::run();
+        error!(
+            "Failed to process neurons after {} attempts: {:?}",
+            MAX_ATTEMPTS, err
+        );
     }
 }
 

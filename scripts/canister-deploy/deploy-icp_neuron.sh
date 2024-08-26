@@ -1,72 +1,19 @@
 #!/usr/bin/env bash
 
-show_help() {
-  cat << EOF
-icp_neuron canister deployment script.
-Must be run from the repository's root folder, and with a running replica if for local deployment.
-'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
+NETWORK=$1
+DEPLOYMENT_VIA="proposal"
 
-The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
-
-Usage:
-  scripts/deploy-icp-neuron.sh [options] <NETWORK>
-
-Options:
-  -h, --help        Show this message and exit
-  -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
-EOF
-}
-
-# TODO: add a --identity option ?? (See dfx deploy --identity)
-if [[ $# -gt 0 ]]; then
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
-    case $1 in
-      -h | --help )
-        show_help
-        exit
-        ;;
-      -r | --reinstall )
-        REINSTALL="--mode reinstall"
-        ;;
-    esac;
-    shift;
-  done
-  if [[ "$1" == '--' ]]; then shift; fi
+if [[ $NETWORK =~ ^(local|staging)$ ]]; then
+  TESTMODE=true
+elif [[ $NETWORK =~ ^(ic)$ ]]; then
+  TESTMODE=false
 else
-  echo "Error: missing <NETWORK> argument"
-  exit 1
-fi
-
-if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
-  echo "Error: unknown network for deployment"
+  echo "Error: unknown network for deployment. Found $NETWORK."
   exit 2
 fi
 
-if [[ $1 =~ ^(local|staging)$ ]]; then
-  TESTMODE="true"
-else
-  TESTMODE="false"
-fi
+ARGUMENTS="(record {
+  test_mode = $TESTMODE;
+})"
 
-if [[ $1 == "local" ]]; then
-  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^icp_neuron-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
-  if [[ $1 == "ic" ]]; then
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
-    UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
-  else
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
-    UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
-  fi
-  . scripts/prepare_sns_canister_ids.sh $1 && \
-  . scripts/prepare_proposal_summary.sh icp_neuron && \
-#  dfx deploy icp_neuron --network $1 ${REINSTALL} --argument '(opt record {test_mode = '$TESTMODE' })' --by-proposal -y && \
-  quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
-    --pem-file $PEM_FILE \
-    --canister-upgrade-arg '(opt record {test_mode = '$TESTMODE' })' \
-    --target-canister-id $(cat canister_ids.json | jq -r .icp_neuron.$1) \
-    --wasm-path backend/canisters/icp_neuron/target/wasm32-unknown-unknown/release/icp_neuron_canister.wasm.gz \
-    --title "Upgrade icp_neuron to ${UPGRADEVERSION}" \
-    --url ${DETAILS_URL} --summary-path proposal.md | quill send --yes -
-fi
-return
+. ./scripts/deploy_backend_canister.sh icp_neuron $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA

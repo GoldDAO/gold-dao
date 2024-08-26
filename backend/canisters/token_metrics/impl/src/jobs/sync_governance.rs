@@ -62,11 +62,12 @@ pub async fn sync_neurons_data() {
     while continue_scanning {
         continue_scanning = false;
 
+        debug!("Scanning neurons with args {args:?}");
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
                 // info!("{:?}", response);
                 // Mutate the state to update the principal with governance data
-                info!("Iterating neurons");
+                debug!("Iterating neurons");
                 response.neurons.iter().for_each(|neuron| {
                     update_principal_neuron_mapping(
                         &mut temp_principal_with_neurons,

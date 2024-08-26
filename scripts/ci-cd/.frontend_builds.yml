@@ -29,25 +29,10 @@ spec:
       - client/$[[ inputs.src-folder ]]/out
     expire_in: 6 months
 
-
-$[[ inputs.src-folder ]] testing build:
-  extends: .short-artifact-template
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
-      changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
-  variables:
-    ENV: "local" # local | staging | preprod | prod
-  environment:
-    name: $[[ inputs.src-folder ]] frontend
-    deployment_tier: development
-    action: prepare
-
 $[[ inputs.src-folder ]] staging build:
   extends: .short-artifact-template
   rules:
-    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop"
+    - if: ($CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop") || ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop")
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"

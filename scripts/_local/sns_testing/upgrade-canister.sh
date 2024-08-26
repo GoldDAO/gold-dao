@@ -12,7 +12,7 @@ dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
 [ -e message.json ] && rm message.json
 
-./scripts/sns_testing/prepare_scripts.sh staging
+./scripts/_local/sns_testing/prepare_scripts.sh staging
 
 quill sns \
     --canister-ids-file $CANISTER_IDS \
