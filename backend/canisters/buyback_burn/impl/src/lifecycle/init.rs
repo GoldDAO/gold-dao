@@ -26,7 +26,6 @@ fn init(args: Args) {
                 init_args.gldgov_ledger_canister_id,
                 init_args.swap_interval_in_secs,
                 init_args.icp_swap_canister_id,
-                init_args.sns_governance_canister_id,
                 init_args.burn_rate,
                 init_args.min_icp_burn_amount,
                 init_args.burn_interval_in_secs,
@@ -45,7 +44,9 @@ fn init(args: Args) {
             info!("Init complete.")
         }
         Args::Upgrade(_) => {
-            panic!("Cannot initialize the canister with an Upgrade argument. Please provide an Init argument.");
+            panic!(
+                "Cannot initialize the canister with an Upgrade argument. Please provide an Init argument."
+            );
         }
     }
 }

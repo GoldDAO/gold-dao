@@ -66,16 +66,23 @@ pub struct Data {
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct BurnConfig {
-    pub burn_address: CanisterId,
     pub burn_rate: u8,
     pub min_burn_amount: Tokens,
     pub burn_interval: Duration,
 }
 
 impl BurnConfig {
-    fn validate_burn_rate(&self) -> bool {
-        // the burn rate should be between 1 and 100
-        self.burn_rate > 100 || self.burn_rate == 0
+    fn new(burn_rate: u8, min_burn_amount: Tokens, burn_interval: Duration) -> Self {
+        BurnConfig {
+            // Check if the burn rate is valid. Otherwise set 0
+            burn_rate: if burn_rate > 100 || burn_rate == 0 {
+                burn_rate
+            } else {
+                0
+            },
+            min_burn_amount,
+            burn_interval,
+        }
     }
 }
 
@@ -86,7 +93,6 @@ impl Data {
         gldgov_ledger_canister_id: CanisterId,
         swap_interval_in_secs: u64,
         icp_swap_canister_id: Principal,
-        sns_governance_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
         burn_interval_in_secs: u64,
@@ -113,16 +119,13 @@ impl Data {
             authorized_principals: authorized_principals.into_iter().collect(),
             gldgov_ledger_canister_id,
             swap_interval: Duration::from_secs(swap_interval_in_secs),
-            // icpswap_client: ,
             swap_clients,
             burn_config: BurnConfig {
-                burn_address: sns_governance_canister_id,
                 burn_rate,
                 min_burn_amount,
                 burn_interval: Duration::from_secs(burn_interval_in_secs),
             },
             token_swaps: TokenSwaps::default(),
-            // timer_jobs: TimerJobs::default(),
         }
     }
 }

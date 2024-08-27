@@ -12,7 +12,6 @@ pub struct InitArgs {
     pub tokens: Vec<TokenInfo>,
     pub swap_interval_in_secs: u64,
     pub icp_swap_canister_id: Principal,
-    pub sns_governance_canister_id: CanisterId,
     pub burn_rate: u8,
     // NOTE: this value can be used to also define threshold for other tokens by taking the converted price
     pub min_icp_burn_amount: Tokens,

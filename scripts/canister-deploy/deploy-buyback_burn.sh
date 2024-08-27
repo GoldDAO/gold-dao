@@ -70,16 +70,13 @@ ARGS='(
       principal "'"$AUTHORIZED_PRINCIPAL"'";
     };
     gldgov_ledger_canister_id = principal "'"$GLDGOV_LEDGER_CANISTER_ID"'";
-
     tokens = vec {};
-
-    sns_governance_canister_id = principal "'"$SNS_GOVERNANCE_CANISTER_ID"'";
-
     burn_rate = '"$BURN_RATE"' : nat64;
     min_icp_burn_amount = '"$MIN_ICP_BURN_AMOUNT"' : nat64;
     burn_interval_in_secs = record { e8s = '"$BURN_INTERVAL_IN_SECS"' : nat64 };
   },
 )'
+
 
 echo "Deployment arguments: \n" $ARGS
 
@@ -89,6 +86,4 @@ elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^c
 
   # This is for direct deployment via CICD identity
   dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
-
-
 fi

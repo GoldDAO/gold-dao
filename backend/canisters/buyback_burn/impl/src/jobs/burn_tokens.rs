@@ -35,6 +35,18 @@ pub async fn process_token_burn() -> Result<(), String> {
     // Retrieve the burn configuration and ledger canister ID from the state
     let burn_config = read_state(|s| s.data.burn_config.clone());
     let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_ledger_canister_id);
+    let minting_account =
+        match icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id)
+            .await
+        {
+            Ok(account) => account,
+            Err(e) => {
+                return Err(format!(
+                    "Failed to get minting account (in order to burn tokens): {:?}",
+                    e
+                ))
+            }
+        };
 
     // Fetch the canister's GLDGov token balance
     let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
@@ -47,7 +59,7 @@ pub async fn process_token_burn() -> Result<(), String> {
         // Attempt to burn the calculated amount of tokens
         match burn_tokens(
             gldgov_ledger_canister_id,
-            burn_config.burn_address.into(),
+            minting_account,
             amount_to_burn.clone(),
         )
         .await
