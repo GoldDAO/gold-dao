@@ -1,10 +1,10 @@
 use super::swap_client::SwapClient;
+use crate::types::ExchangeConfig;
+use crate::types::SwapConfig;
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::types::SwapConfig;
-use crate::types::ExchangeConfig;
 
 #[async_trait]
 #[typetag::serde]
@@ -44,15 +44,24 @@ impl SwapClient for ICPSwapClient {
     }
 }
 
-use types::CanisterId;
-use serde::{ Deserialize, Serialize };
 use candid::CandidType;
 use candid::Principal;
+use serde::{Deserialize, Serialize};
+use types::CanisterId;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct ICPSwapConfig {
     pub swap_canister_id: CanisterId,
     pub zero_for_one: bool,
+}
+
+impl ICPSwapConfig {
+    pub fn new(swap_canister_id: Principal) -> Self {
+        Self {
+            swap_canister_id,
+            zero_for_one: true,
+        }
+    }
 }
 
 impl Default for ICPSwapConfig {

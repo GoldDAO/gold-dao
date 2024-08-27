@@ -1,5 +1,5 @@
 use crate::types::token_swaps::TokenSwaps;
-use crate::types::{icpswap::ICPSwapConfig, ExchangeConfig, SwapClinets, SwapConfig};
+use crate::types::{icpswap::ICPSwapConfig, ExchangeConfig, SwapClients, SwapConfig};
 use buyback_burn_canister::get_config::Response as GetConfigResponse;
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
@@ -35,19 +35,22 @@ impl RuntimeState {
         }
     }
 
-    // pub fn metrics(&self) -> Metrics {
-    //     Metrics {
-    //         canister_info: CanisterInfo {
-    //             test_mode: self.env.is_test_mode(),
-    //             now: self.env.now(),
-    //             memory_used: MemorySize::used(),
-    //             cycles_balance: self.env.cycles_balance(),
-    //         },
-    //         authorized_principals: self.data.authorized_principals.iter().copied().collect(),
-    //         sns_governance_canister: self.data.proposal_config.sns_governance_canister,
-    //         min_burn_amount: self.data.proposal_config.min_burn_amount,
-    //     }
-    // }
+    pub fn metrics(&self) -> Metrics {
+        Metrics {
+            canister_info: CanisterInfo {
+                test_mode: self.env.is_test_mode(),
+                now: self.env.now(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
+                memory_used: MemorySize::used(),
+                cycles_balance: self.env.cycles_balance(),
+            },
+            authorized_principals: self.data.authorized_principals.iter().copied().collect(),
+            gldgov_ledger_canister_id: self.data.gldgov_ledger_canister_id,
+            burn_config: self.data.burn_config.clone(),
+            // TODO: add more metrics
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -55,13 +58,13 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub gldgov_ledger_canister_id: CanisterId,
     pub swap_interval: Duration,
-    pub swap_clients: SwapClinets,
+    pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
     // pub timer_jobs: TimerJobs<TimerJob, Data>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct BurnConfig {
     pub burn_address: CanisterId,
     pub burn_rate: u8,
@@ -82,18 +85,19 @@ impl Data {
         tokens: Vec<TokenInfo>,
         gldgov_ledger_canister_id: CanisterId,
         swap_interval_in_secs: u64,
+        icp_swap_canister_id: Principal,
         sns_governance_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
         burn_interval_in_secs: u64,
     ) -> Data {
-        let mut swap_clients = SwapClinets::init();
+        let mut swap_clients = SwapClients::init();
         // TODO: add other tokens support
         swap_clients.add_swap_client(SwapConfig {
             swap_client_id: 0,
             input_token: TokenInfo::icp(),
             output_token: TokenInfo::gldgov(),
-            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
+            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
         });
         // NOTE: here we add all other tokens except of
         for (id, token) in tokens.iter().enumerate() {
@@ -101,7 +105,7 @@ impl Data {
                 swap_client_id: (id as u128) + 1,
                 input_token: TokenInfo::icp(),
                 output_token: *token,
-                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::default()),
+                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
             });
         }
 
@@ -127,8 +131,8 @@ impl Data {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
-    pub sns_governance_canister: CanisterId,
-    pub min_burn_amount: u128,
+    pub gldgov_ledger_canister_id: CanisterId,
+    pub burn_config: BurnConfig,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]

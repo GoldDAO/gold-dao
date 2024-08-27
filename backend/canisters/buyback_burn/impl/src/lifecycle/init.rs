@@ -25,6 +25,7 @@ fn init(args: Args) {
                 init_args.tokens,
                 init_args.gldgov_ledger_canister_id,
                 init_args.swap_interval_in_secs,
+                init_args.icp_swap_canister_id,
                 init_args.sns_governance_canister_id,
                 init_args.burn_rate,
                 init_args.min_icp_burn_amount,
