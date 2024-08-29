@@ -18,3 +18,5 @@ tracing = { workspace = true }
 serializer = { path = '../../../libraries/serializer' }
 canister_logger = { path = '../../../libraries/canister_logger' }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
+icrc-ledger-types = { workspace = true }
+ic-stable-structures = { workspace = true }

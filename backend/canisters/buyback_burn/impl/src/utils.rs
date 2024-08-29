@@ -1,32 +1,60 @@
+use buyback_burn_canister::swap_config::SwapConfig;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
-use tracing::{debug, error};
+use tracing::{ debug, error };
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
+use icpswap_client::ICPSwapClient;
+use buyback_burn_canister::swap_config::ExchangeConfig;
+use crate::types::SwapClient;
+pub fn build_swap_client(config: SwapConfig) -> Box<dyn SwapClient> {
+    let input_token = config.input_token;
+    let output_token = config.output_token;
+
+    match config.exchange_config {
+        ExchangeConfig::ICPSwap(icpswap) => {
+            let (token0, token1) = if icpswap.zero_for_one {
+                (input_token, output_token)
+            } else {
+                (output_token, input_token)
+            };
+            Box::new(
+                ICPSwapClient::new(
+                    config.swap_client_id,
+                    ic_cdk::api::id(),
+                    icpswap.swap_canister_id,
+                    token0,
+                    token1,
+                    icpswap.zero_for_one
+                )
+            )
+        }
+    }
+}
+
 pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
-    icrc_ledger_canister_c2c_client::icrc1_balance_of(
-        ledger_id,
-        &(Account {
-            owner: ic_cdk::api::id(),
-            subaccount: None,
-        }),
-    )
-    .await
-    .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
+    icrc_ledger_canister_c2c_client
+        ::icrc1_balance_of(
+            ledger_id,
+            &(Account {
+                owner: ic_cdk::api::id(),
+                subaccount: None,
+            })
+        ).await
+        .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
 }
 
 // TODO: think on how to add delay here
 pub async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
     _delay_duration: Duration,
-    mut f: F,
-) -> Result<(), String>
-where
-    F: FnMut() -> Fut,
-    Fut: std::future::Future<Output = Result<(), String>>,
+    mut f: F
+)
+    -> Result<(), String>
+    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
 {
     for attempt in 1..=max_attempts {
         match f().await {
@@ -95,10 +123,7 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
     };
 
     if burn_rate == 0 || burn_rate > 100 {
-        error!(
-            "Invalid burn rate: {}. It must be between 1 and 100.",
-            burn_rate
-        );
+        error!("Invalid burn rate: {}. It must be between 1 and 100.", burn_rate);
         return 0;
     }
 
@@ -107,7 +132,9 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
 
     debug!(
         "Calculated burn amount: {} tokens ({}% of {} e8s).",
-        amount_to_burn, burn_rate, balance_u128
+        amount_to_burn,
+        burn_rate,
+        balance_u128
     );
 
     amount_to_burn

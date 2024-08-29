@@ -1,10 +1,9 @@
 use super::swap_client::SwapClient;
-use crate::types::ExchangeConfig;
-use crate::types::SwapConfig;
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
+use crate::types::*;
 
 #[async_trait]
 #[typetag::serde]
@@ -41,34 +40,5 @@ impl SwapClient for ICPSwapClient {
 
     async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128> {
         self.withdraw(successful_swap, amount).await
-    }
-}
-
-use candid::CandidType;
-use candid::Principal;
-use serde::{Deserialize, Serialize};
-use types::CanisterId;
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub struct ICPSwapConfig {
-    pub swap_canister_id: CanisterId,
-    pub zero_for_one: bool,
-}
-
-impl ICPSwapConfig {
-    pub fn new(swap_canister_id: Principal) -> Self {
-        Self {
-            swap_canister_id,
-            zero_for_one: true,
-        }
-    }
-}
-
-impl Default for ICPSwapConfig {
-    fn default() -> Self {
-        Self {
-            swap_canister_id: Principal::from_text("7eikv-2iaaa-aaaag-qdgwa-cai").unwrap(),
-            zero_for_one: true,
-        }
     }
 }

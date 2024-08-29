@@ -1,5 +1,4 @@
 use crate::state::{ mutate_state, read_state };
-use crate::types::token_swaps::TokenSwap;
 use crate::types::SwapClient;
 use crate::utils::{
     calculate_percentage_of_amount,
@@ -13,6 +12,7 @@ use futures::future::join_all;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
 use utils::env::Environment;
+use crate::types::TokenSwap;
 
 use canister_time::NANOS_PER_MILLISECOND;
 const MAX_ATTEMPTS: u8 = 3;

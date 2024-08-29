@@ -259,6 +259,8 @@ dependencies = [
  "ic-cdk 0.13.2",
  "ic-cdk-macros 0.13.2",
  "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types",
  "serde",
  "serializer",
  "sns_governance_canister",

@@ -1,14 +1,12 @@
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
-use crate::types::SwapConfig;
-use candid::CandidType;
 use ic_stable_structures::StableBTreeMap;
-use ic_stable_structures::Storable;
-use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use std::collections::HashMap;
 use tracing::error;
 use types::TimestampMillis;
+use crate::types::*;
+use buyback_burn_canister::get_active_swaps::{ Response };
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
@@ -79,6 +77,10 @@ impl TokenSwaps {
         }
     }
 
+    pub fn get_active_swaps(&self) -> Response {
+        self.swaps.clone()
+    }
+
     // TODO: add metrics
     // pub total_amount_burned: u64,
     // pub total_amount_swapped: u64,
@@ -87,55 +89,4 @@ impl TokenSwaps {
     // pub number_of_failed_swaps: u64,
     // pub user_swaps: HashMap<Principal, UserSwap>,
     pub fn get_metrics(&self) {}
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub struct TokenSwap {
-    pub swap_id: u128,
-    pub swap_config: SwapConfig,
-    pub started: TimestampMillis,
-    pub deposit_account: SwapSubtask<Account>,
-    pub transfer: SwapSubtask<u64>, // Block Index
-    pub notified_dex_at: SwapSubtask,
-    pub amount_swapped: SwapSubtask<Result<u128, String>>,
-    pub withdrawn_from_dex_at: SwapSubtask<u128>,
-    pub success: Option<bool>,
-    pub is_archived: bool,
-}
-
-use candid::{Decode, Encode};
-use ic_stable_structures::storable::Bound;
-use std::borrow::Cow;
-const MAX_SWAP_INFO_BYTES_SIZE: u32 = 1000;
-
-impl Storable for TokenSwap {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
-    }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_SWAP_INFO_BYTES_SIZE,
-        is_fixed_size: false,
-    };
-}
-
-type SwapSubtask<T = ()> = Option<Result<T, String>>;
-
-impl TokenSwap {
-    pub fn new(swap_id: u128, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
-        TokenSwap {
-            swap_id,
-            swap_config,
-            started: now,
-            deposit_account: None,
-            transfer: None,
-            notified_dex_at: None,
-            amount_swapped: None,
-            withdrawn_from_dex_at: None,
-            success: None,
-            is_archived: false,
-        }
-    }
 }

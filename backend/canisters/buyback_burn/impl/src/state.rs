@@ -1,15 +1,18 @@
 use crate::types::token_swaps::TokenSwaps;
-use crate::types::{icpswap::ICPSwapConfig, ExchangeConfig, SwapClients, SwapConfig};
 use buyback_burn_canister::get_config::Response as GetConfigResponse;
-use candid::{CandidType, Principal};
+use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use std::time::Duration;
 use types::BuildVersion;
-use types::{CanisterId, Cycles, TimestampMillis, TokenInfo};
-use utils::env::{CanisterEnv, Environment};
+use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
+use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
+use crate::types::SwapClients;
+use buyback_burn_canister::swap_config::SwapConfig;
+use buyback_burn_canister::swap_config::ExchangeConfig;
+use buyback_burn_canister::icpswap::ICPSwapConfig;
 
 canister_state!(RuntimeState);
 
@@ -96,7 +99,7 @@ impl Data {
         icp_swap_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
-        burn_interval_in_secs: u64,
+        burn_interval_in_secs: u64
     ) -> Self {
         let mut swap_clients = SwapClients::init();
         // TODO: add other tokens support

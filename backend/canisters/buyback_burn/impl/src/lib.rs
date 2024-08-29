@@ -37,7 +37,7 @@ pub mod types;
 pub mod updates;
 
 use lifecycle::*;
-// use queries::*;
+use queries::*;
 // use updates::*;
 
 export_candid!();
