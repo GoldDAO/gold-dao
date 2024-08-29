@@ -4,6 +4,6 @@ pub use buyback_burn_canister::get_active_swaps::Response as GetActiveSwapsRespo
 use crate::state::read_state;
 
 #[query]
-fn get_active_swaps(args: GetActiveSwapsArgs) -> GetActiveSwapsResponse {
+fn get_active_swaps() -> GetActiveSwapsResponse {
     read_state(|state| state.data.token_swaps.get_active_swaps())
 }

@@ -1,4 +1,4 @@
-use super::{ SwapClient };
+use super::SwapClient;
 use serde::{ Deserialize, Serialize };
 use crate::utils::build_swap_client;
 use crate::types::*;

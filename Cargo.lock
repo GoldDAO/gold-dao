@@ -254,8 +254,6 @@ name = "buyback_burn_canister"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "candid_gen",
- "canister_logger",
  "ic-cdk 0.13.2",
  "ic-cdk-macros 0.13.2",
  "ic-ledger-types",
@@ -263,7 +261,6 @@ dependencies = [
  "icrc-ledger-types",
  "serde",
  "serializer",
- "sns_governance_canister",
  "stable_memory",
  "tracing",
  "types",
