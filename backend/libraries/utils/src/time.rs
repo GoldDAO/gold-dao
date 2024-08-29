@@ -1,13 +1,13 @@
 use canister_time::timestamp_nanos;
 
 pub fn get_current_day() -> u64 {
-    return timestamp_nanos() / 86400 / 1_000_000_000;
+    timestamp_nanos() / 86400 / 1_000_000_000
 }
 
 pub fn fill_missing_days<T: Clone>(
     mut history: Vec<(u64, T)>,
     days: u64,
-    default_data: T
+    default_data: T,
 ) -> Vec<(u64, T)> {
     history.sort_by_key(|&(day, _)| day);
 
@@ -42,7 +42,7 @@ mod tests {
             (get_current_day() - 3, 200),
             (get_current_day() - 2, 300),
             (get_current_day() - 1, 400),
-            (get_current_day(), 500)
+            (get_current_day(), 500),
         ];
         let filled = fill_missing_days(history, 5, 0);
         let expected = vec![
@@ -51,7 +51,7 @@ mod tests {
             (get_current_day() - 3, 200),
             (get_current_day() - 2, 300),
             (get_current_day() - 1, 400),
-            (get_current_day(), 500)
+            (get_current_day(), 500),
         ];
         assert_eq!(filled, expected);
     }
@@ -61,7 +61,7 @@ mod tests {
         let history = vec![
             (get_current_day() - 4, 100),
             (get_current_day() - 2, 200),
-            (get_current_day(), 300)
+            (get_current_day(), 300),
         ];
         let filled = fill_missing_days(history, 5, 0);
         let expected = vec![
@@ -70,7 +70,7 @@ mod tests {
             (get_current_day() - 3, 100),
             (get_current_day() - 2, 200),
             (get_current_day() - 1, 200),
-            (get_current_day(), 300)
+            (get_current_day(), 300),
         ];
         assert_eq!(filled, expected);
     }
@@ -85,7 +85,7 @@ mod tests {
             (get_current_day() - 3, 0),
             (get_current_day() - 2, 0),
             (get_current_day() - 1, 0),
-            (get_current_day(), 0)
+            (get_current_day(), 0),
         ];
         assert_eq!(filled, expected);
     }
@@ -100,7 +100,7 @@ mod tests {
             (get_current_day() - 3, 0),
             (get_current_day() - 2, 200),
             (get_current_day() - 1, 300),
-            (get_current_day(), 300)
+            (get_current_day(), 300),
         ];
         assert_eq!(filled, expected);
     }
@@ -115,7 +115,7 @@ mod tests {
             (get_current_day() - 3, 300),
             (get_current_day() - 2, 300),
             (get_current_day() - 1, 300),
-            (get_current_day(), 300)
+            (get_current_day(), 300),
         ];
         assert_eq!(filled, expected);
     }

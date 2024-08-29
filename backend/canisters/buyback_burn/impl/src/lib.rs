@@ -23,7 +23,6 @@
 use ic_cdk::export_candid;
 
 use crate::state::take_state;
-use crate::state::Data;
 use crate::state::RuntimeState;
 
 mod guards;

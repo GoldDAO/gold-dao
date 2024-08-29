@@ -15,8 +15,8 @@ pub struct SwapConfig {
 
 impl SwapConfig {
     pub fn build_swap_client(&self) -> Box<dyn SwapClient> {
-        let input_token = self.input_token.clone();
-        let output_token = self.output_token.clone();
+        let input_token = self.input_token;
+        let output_token = self.output_token;
 
         match &self.exchange_config {
             ExchangeConfig::ICPSwap(icpswap) => {

@@ -101,7 +101,7 @@ async fn burn_tokens(
         // NOTE: There should be no fees for burnings
         fee: None,
         created_at_time: None,
-        amount: amount,
+        amount,
         memo: None,
     };
 

@@ -45,7 +45,7 @@ impl RuntimeState {
                 memory_used: MemorySize::used(),
                 cycles_balance: self.env.cycles_balance(),
             },
-            authorized_principals: self.data.authorized_principals.iter().copied().collect(),
+            authorized_principals: self.data.authorized_principals.to_vec(),
             gldgov_ledger_canister_id: self.data.gldgov_ledger_canister_id,
             burn_config: self.data.burn_config.clone(),
             // TODO: add more metrics
@@ -72,7 +72,7 @@ pub struct BurnConfig {
 }
 
 impl BurnConfig {
-    fn new(burn_rate: u8, min_burn_amount: Tokens, burn_interval: Duration) -> Self {
+    fn new(burn_rate: u8, min_burn_amount: Tokens, burn_interval_in_secs: u64) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
             burn_rate: if burn_rate > 100 || burn_rate == 0 {
@@ -81,12 +81,13 @@ impl BurnConfig {
                 0
             },
             min_burn_amount,
-            burn_interval,
+            burn_interval: Duration::from_secs(burn_interval_in_secs),
         }
     }
 }
 
 impl Data {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         authorized_principals: Vec<Principal>,
         tokens: Vec<TokenInfo>,
@@ -96,7 +97,7 @@ impl Data {
         burn_rate: u8,
         min_burn_amount: Tokens,
         burn_interval_in_secs: u64,
-    ) -> Data {
+    ) -> Self {
         let mut swap_clients = SwapClients::init();
         // TODO: add other tokens support
         swap_clients.add_swap_client(SwapConfig {
@@ -115,16 +116,12 @@ impl Data {
             });
         }
 
-        Data {
+        Self {
             authorized_principals: authorized_principals.into_iter().collect(),
             gldgov_ledger_canister_id,
             swap_interval: Duration::from_secs(swap_interval_in_secs),
             swap_clients,
-            burn_config: BurnConfig {
-                burn_rate,
-                min_burn_amount,
-                burn_interval: Duration::from_secs(burn_interval_in_secs),
-            },
+            burn_config: BurnConfig::new(burn_rate, min_burn_amount, burn_interval_in_secs),
             token_swaps: TokenSwaps::default(),
         }
     }

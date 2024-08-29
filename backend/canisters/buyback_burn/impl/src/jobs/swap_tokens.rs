@@ -39,17 +39,15 @@ async fn run_async() {
 
             async move {
                 retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
-                    process_token_swap(swap_client, token_swap.clone()).await
+                    process_token_swap(swap_client.as_ref(), token_swap.clone()).await
                 })
                 .await
             }
         })
         .collect();
 
-    // Wait for all futures to complete
     let results = join_all(futures).await;
 
-    // Collect and handle errors
     let mut error_messages = Vec::new();
     for result in results {
         if let Err(e) = result {
@@ -60,7 +58,6 @@ async fn run_async() {
     if error_messages.is_empty() {
         info!("Successfully processed all token swaps");
     } else {
-        // Log errors if any
         error!(
             "Failed to process some token swaps:\n{}",
             error_messages.join("\n")
@@ -69,7 +66,7 @@ async fn run_async() {
 }
 
 pub(crate) async fn process_token_swap(
-    swap_client: &Box<dyn SwapClient>,
+    swap_client: &dyn SwapClient,
     mut token_swap: TokenSwap,
 ) -> Result<(), String> {
     let swap_config = swap_client.get_config();
