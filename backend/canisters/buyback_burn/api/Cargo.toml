@@ -11,11 +11,6 @@ candid = { workspace = true }
 ic-ledger-types = { workspace = true }
 serde = { workspace = true }
 types = { path = "../../../libraries/types" }
-ic-cdk = { workspace = true }
-ic-cdk-macros = { workspace = true }
-stable_memory = { path = '../../../libraries/stable_memory' }
-tracing = { workspace = true }
-serializer = { path = '../../../libraries/serializer' }
 # canister_logger = { path = '../../../libraries/canister_logger' }
 # sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 icrc-ledger-types = { workspace = true }
