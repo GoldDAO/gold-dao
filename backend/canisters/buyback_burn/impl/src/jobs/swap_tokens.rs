@@ -1,14 +1,17 @@
-use crate::state::{mutate_state, read_state};
+use crate::state::{ mutate_state, read_state };
 use crate::types::token_swaps::TokenSwap;
 use crate::types::SwapClient;
 use crate::utils::{
-    calculate_percentage_of_amount, get_token_balance, retry_with_attempts, RETRY_DELAY,
+    calculate_percentage_of_amount,
+    get_token_balance,
+    retry_with_attempts,
+    RETRY_DELAY,
 };
 use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{error, info};
+use tracing::{ error, info };
 use utils::env::Environment;
 
 use canister_time::NANOS_PER_MILLISECOND;
@@ -28,20 +31,22 @@ pub fn run() {
 #[trace]
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
+    let mut token_swap_ids = Vec::new();
 
     // TODO: check that everything here is correct
     let futures: Vec<_> = swap_clients
         .iter()
         .map(|swap_client| {
             let args = swap_client.get_config();
-            let token_swap =
-                mutate_state(|state| state.data.token_swaps.push_new(args, state.env.now()));
+            let token_swap = mutate_state(|state|
+                state.data.token_swaps.push_new(args, state.env.now())
+            );
+            token_swap_ids.push(token_swap.swap_id);
 
             async move {
                 retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
                     process_token_swap(swap_client.as_ref(), token_swap.clone()).await
-                })
-                .await
+                }).await
             }
         })
         .collect();
@@ -57,17 +62,17 @@ async fn run_async() {
 
     if error_messages.is_empty() {
         info!("Successfully processed all token swaps");
+        for token_swap_id in token_swap_ids {
+            let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
+        }
     } else {
-        error!(
-            "Failed to process some token swaps:\n{}",
-            error_messages.join("\n")
-        );
+        error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
     }
 }
 
 pub(crate) async fn process_token_swap(
     swap_client: &dyn SwapClient,
-    mut token_swap: TokenSwap,
+    mut token_swap: TokenSwap
 ) -> Result<(), String> {
     let swap_config = swap_client.get_config();
 
@@ -109,18 +114,18 @@ pub(crate) async fn process_token_swap(
     // Deposit tokens to the deposit account
     if extract_result(&token_swap.transfer).is_none() {
         let now = read_state(|state| state.env.now());
-        let transfer_result = match icrc_ledger_canister_c2c_client::icrc1_transfer(
-            swap_config.input_token.ledger_id,
-            &(TransferArg {
-                from_subaccount: None,
-                to: account,
-                fee: Some(swap_config.input_token.fee.into()),
-                created_at_time: Some(now * NANOS_PER_MILLISECOND),
-                memo: Some(MEMO_SWAP.to_vec().into()),
-                amount: amount_to_dex.into(),
-            }),
-        )
-        .await
+        let transfer_result = match
+            icrc_ledger_canister_c2c_client::icrc1_transfer(
+                swap_config.input_token.ledger_id,
+                &(TransferArg {
+                    from_subaccount: None,
+                    to: account,
+                    fee: Some(swap_config.input_token.fee.into()),
+                    created_at_time: Some(now * NANOS_PER_MILLISECOND),
+                    memo: Some(MEMO_SWAP.to_vec().into()),
+                    amount: amount_to_dex.into(),
+                })
+            ).await
         {
             Ok(Ok(index)) => Ok(index),
             Ok(Err(error)) => Err(format!("{error:?}")),
@@ -168,12 +173,11 @@ pub(crate) async fn process_token_swap(
     let swap_result = if let Some(a) = extract_result(&token_swap.amount_swapped).cloned() {
         a
     } else {
-        match swap_client
-            .swap(
+        match
+            swap_client.swap(
                 amount_to_dex.saturating_sub(swap_config.input_token.fee.into()),
-                min_output_amount,
-            )
-            .await
+                min_output_amount
+            ).await
         {
             Ok(a) => {
                 mutate_state(|state| {
@@ -195,15 +199,9 @@ pub(crate) async fn process_token_swap(
     };
 
     let (successful_swap, amount_out) = if let Ok(amount_swapped) = swap_result {
-        (
-            true,
-            amount_swapped.saturating_sub(swap_config.output_token.fee.into()),
-        )
+        (true, amount_swapped.saturating_sub(swap_config.output_token.fee.into()))
     } else {
-        (
-            false,
-            amount_to_dex.saturating_sub(swap_config.input_token.fee.into()),
-        )
+        (false, amount_to_dex.saturating_sub(swap_config.input_token.fee.into()))
     };
 
     // Withdraw tokens from the DEX
