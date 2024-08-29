@@ -6,8 +6,9 @@ use crate::utils::{
 };
 use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
+use futures::future::join_all;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::error;
+use tracing::{error, info};
 use utils::env::Environment;
 
 use canister_time::NANOS_PER_MILLISECOND;
@@ -28,21 +29,42 @@ pub fn run() {
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
 
-    for swap_client in swap_clients.iter() {
-        let args = swap_client.get_config();
-        let token_swap =
-            mutate_state(|state| state.data.token_swaps.push_new(args, state.env.now()));
+    // TODO: check that everything here is correct
+    let futures: Vec<_> = swap_clients
+        .iter()
+        .map(|swap_client| {
+            let args = swap_client.get_config();
+            let token_swap =
+                mutate_state(|state| state.data.token_swaps.push_new(args, state.env.now()));
 
-        if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
-            process_token_swap(swap_client, token_swap.clone()).await
+            async move {
+                retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
+                    process_token_swap(swap_client, token_swap.clone()).await
+                })
+                .await
+            }
         })
-        .await
-        {
-            error!(
-                "Failed to swap tokens after {} attempts: {:?}",
-                MAX_ATTEMPTS, err
-            );
+        .collect();
+
+    // Wait for all futures to complete
+    let results = join_all(futures).await;
+
+    // Collect and handle errors
+    let mut error_messages = Vec::new();
+    for result in results {
+        if let Err(e) = result {
+            error_messages.push(e);
         }
+    }
+
+    if error_messages.is_empty() {
+        info!("Successfully processed all token swaps");
+    } else {
+        // Log errors if any
+        error!(
+            "Failed to process some token swaps:\n{}",
+            error_messages.join("\n")
+        );
     }
 }
 

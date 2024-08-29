@@ -21,7 +21,10 @@ lazy_static! {
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
-    read_file_from_relative_bin(&format!("../canisters/{canister_name}/target/wasm32-unknown-unknown/release/{canister_name}_canister.wasm.gz")).unwrap()
+    match read_file_from_relative_bin(&format!("../canisters/{canister_name}/target/wasm32-unknown-unknown/release/{canister_name}_canister.wasm.gz")) {
+        Ok(wasm) => wasm,
+        Err(err) => {println!("Failed to read {canister_name} wasm: {err}. Run \"./scripts/build_canister.sh {canister_name}\""); panic!()},
+    }
 }
 
 fn get_canister_wasm(canister_name: &str) -> CanisterWasm {

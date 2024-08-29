@@ -23,6 +23,9 @@ type Args = record {
   command : Command;
   neuron_id : blob;
 };
+type Args_1 = record { amount : nat64 };
+type Args_2 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type By = variant {
   MemoAndController : MemoAndController;
   NeuronId : record {};
@@ -90,6 +93,7 @@ type InitArgs = record {
   ogy_sns_rewards_canister_id : principal;
   authorized_principals : vec principal;
   sns_rewards_canister_id : principal;
+  commit_hash : text;
   ogy_sns_governance_canister_id : principal;
 };
 type ListNeuronsResponse = record { neurons : NeuronList };
@@ -188,6 +192,7 @@ type TransferSnsTreasuryFunds = record {
   memo : opt nat64;
   amount_e8s : nat64;
 };
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
 type UpgradeSnsControlledCanister = record {
   new_canister_wasm : blob;
   mode : opt int32;
@@ -200,8 +205,8 @@ type VotingRewardsParameters = record {
   reward_rate_transition_duration_seconds : opt nat64;
   round_duration_seconds : opt nat64;
 };
-service : (InitArgs) -> {
+service : (Args_2) -> {
   list_ogy_neurons : () -> (ListNeuronsResponse) query;
   manage_sns_neuron : (Args) -> (Response);
-  stake_sns_neuron : () -> (Response_1);
+  stake_ogy_neuron : (Args_1) -> (Response_1);
 }

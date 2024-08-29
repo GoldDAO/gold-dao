@@ -8,6 +8,8 @@ use candid::encode_one;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
+use cycles_manager_api_canister::init::InitArgs;
+use cycles_manager_api_canister::Args;
 use ic_ledger_types::AccountIdentifier;
 use ic_ledger_types::Subaccount;
 use ic_ledger_types::Tokens;
@@ -150,7 +152,7 @@ impl CyclesManagerTestEnvBuilder {
         pic.tick();
 
         // Define initialization arguments for cycles manager canister
-        let cycles_manager_init_args = cycles_manager_api_canister::init::InitArgs {
+        let cycles_manager_init_args = Args::Init(InitArgs {
             test_mode: true,
             commit_hash: "integration_testing".to_string(),
             authorized_principals: vec![self.controller],
@@ -161,7 +163,7 @@ impl CyclesManagerTestEnvBuilder {
             icp_burn_amount: self.icp_burn_amount,
             icp_ledger_canister: icp_ledger_canister_id,
             cycles_minting_canister: cycles_minting_canister_id,
-        };
+        });
 
         let cycles_manager_id: Principal = setup_cycle_manager_canister(
             &mut pic,
