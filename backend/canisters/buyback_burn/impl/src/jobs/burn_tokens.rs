@@ -81,7 +81,6 @@ pub async fn process_token_burn() -> Result<(), String> {
             }
         }
     } else {
-        // Log an error if the amount to burn is below the threshold
         let error_message = format!(
             "ERROR: Calculated burn amount {} is below the minimum threshold of {}.",
             amount_to_burn, min_burn_amount

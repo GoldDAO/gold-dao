@@ -1913,6 +1913,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "serde",
+ "types",
 ]
 
 [[package]]

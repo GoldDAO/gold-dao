@@ -1,14 +1,14 @@
-use candid::CandidType;
-use serde::{ Deserialize, Serialize };
-use std::collections::HashMap;
-use types::TimestampMillis;
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
 use crate::types::SwapConfig;
+use candid::CandidType;
 use ic_stable_structures::StableBTreeMap;
 use ic_stable_structures::Storable;
 use icrc_ledger_types::icrc1::account::Account;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::error;
+use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
@@ -80,6 +80,7 @@ impl TokenSwaps {
     }
 
     // TODO: add metrics
+    // pub total_amount_burned: u64,
     // pub total_amount_swapped: u64,
     // pub number_of_completed_swaps: u64,
     // pub number_of_attempted_swaps: u64,
@@ -102,7 +103,7 @@ pub struct TokenSwap {
     pub is_archived: bool,
 }
 
-use candid::{ Decode, Encode };
+use candid::{Decode, Encode};
 use ic_stable_structures::storable::Bound;
 use std::borrow::Cow;
 const MAX_SWAP_INFO_BYTES_SIZE: u32 = 1000;

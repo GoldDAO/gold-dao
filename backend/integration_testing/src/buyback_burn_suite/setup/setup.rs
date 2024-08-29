@@ -152,7 +152,6 @@ impl SNCTestEnvBuilder {
 
         let snc_init_args = sns_neuron_controller_api_canister::init::InitArgs {
             test_mode: true,
-            commit_hash: "integration_testing".to_string(),
             authorized_principals: vec![self.sns_governance_id],
             sns_rewards_canister_id: self.gld_rewards_canister_id,
             ogy_sns_governance_canister_id: self.sns_governance_id,
