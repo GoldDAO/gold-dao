@@ -40,4 +40,3 @@ icpswap_client = { path = "../../../libraries/icpswap_client" }
 async-trait = { workspace = true }
 http_request = { path = '../../../libraries/http_request' }
 typetag = { workspace = true }
-canister_timer_jobs = { path = "../../../libraries/canister_timer_jobs" }
