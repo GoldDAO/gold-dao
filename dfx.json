@@ -284,6 +284,28 @@
       "type": "custom",
       "wasm": "backend/canisters/sns_neuron_controller/target/wasm32-unknown-unknown/release/sns_neuron_controller_canister.wasm.gz"
     },
+    "buyback_burn": {
+      "build": [
+        "./scripts/build-canister.sh buyback_burn"
+      ],
+      "candid": "backend/canisters/buyback_burn/api/can.did",
+      "declarations": {
+        "bindings": [
+          "js",
+          "did"
+        ],
+        "env_override": null,
+        "output": "backend/canisters/buyback_burn/api/declarations"
+      },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
+      "type": "custom",
+      "wasm": "backend/canisters/buyback_burn/target/wasm32-unknown-unknown/release/buyback_burn_canister.wasm.gz"
+    },
+
     "sns_root": {
       "build": "",
       "candid": "backend/external_canisters/sns_root/api/can.did",

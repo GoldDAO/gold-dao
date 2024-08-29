@@ -61,29 +61,50 @@ fi
 export BURN_RATE=33
 export MIN_ICP_BURN_AMOUNT=30_000_000_000
 # 6 hours
-export BURN_INTERVAL_IN_SECS=21_600 
+export BURN_INTERVAL_IN_SECS=21_600
+export SWAP_INTERVAL_IN_SECS=21_600
+
+# FIXME 
+export COMMIT_HASH=hello
+
+# # Init args
+# ARGS='(
+#   variant {
+#     Init = record {
+#       test_mode = '"$TESTMODE"';
+#       commit_hash = "'"$COMMIT_HASH"'";
+#       authorized_principals = vec {
+#         principal "'"$AUTHORIZED_PRINCIPAL"'";
+#       };
+#       gldgov_ledger_canister_id = principal "'"$GLDGOV_LEDGER_CANISTER_ID"'";
+#       tokens = vec {};
+#       sns_governance_canister_id = principal "'"$SNS_GOVERNANCE_CANISTER_ID"'";
+#       burn_rate = '"$BURN_RATE"' : nat8;
+#       min_icp_burn_amount = record { e8s = '"$MIN_ICP_BURN_AMOUNT"' : nat64 };
+#       burn_interval_in_secs = '"$BURN_INTERVAL_IN_SECS"' : nat64;
+#       swap_interval_in_secs = '"$SWAP_INTERVAL_IN_SECS"' : nat64;
+#     }
+#   }
+# )'
 
 ARGS='(
-  record {
-    test_mode = '"$TESTMODE"';
-    authorized_principals = vec {
-      principal "'"$AUTHORIZED_PRINCIPAL"'";
-    };
-    gldgov_ledger_canister_id = principal "'"$GLDGOV_LEDGER_CANISTER_ID"'";
-    tokens = vec {};
-    burn_rate = '"$BURN_RATE"' : nat64;
-    min_icp_burn_amount = '"$MIN_ICP_BURN_AMOUNT"' : nat64;
-    burn_interval_in_secs = record { e8s = '"$BURN_INTERVAL_IN_SECS"' : nat64 };
-  },
-)'
-
+  variant {
+    Upgrade = record {
+      wasm_version = record {
+        major = 0 : nat32;
+        minor = 0 : nat32;
+        patch = 1 : nat32;
+      };
+      commit_hash = "'"$COMMIT_HASH"'";
+    }
+})'
 
 echo "Deployment arguments: \n" $ARGS
 
 if [[ $1 == "local" ]]; then
-  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
-elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^cycles_manager-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+  dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
+elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^buyback_burn-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
 
   # This is for direct deployment via CICD identity
-  dfx deploy cycles_manager --network $1 ${REINSTALL} --argument "$ARGS" -y
+  dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
 fi
