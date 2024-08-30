@@ -1,7 +1,7 @@
 FROM rust:slim-bookworm@sha256:de22cea71b620c7fdc61e8c1bf3f048d0ffbafe062ca9d7b32aed6a7d59109a4
 
 # Default value, will be overwritten at runtime if `-e CANISTER_NAME=$CANISTER_NAME` is set
-ENV CANISTER_NAME=gldt_core
+ENV CANISTER_NAME=gldt_swap
 
 RUN apt update > /dev/null && \
     apt install -y wget build-essential pkg-config libssl-dev > /dev/null
