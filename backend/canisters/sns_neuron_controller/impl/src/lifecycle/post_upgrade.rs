@@ -4,20 +4,31 @@ use crate::state::RuntimeState;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
+pub use sns_neuron_controller_api_canister::Args;
 use stable_memory::get_reader;
 use tracing::info;
 
 #[post_upgrade]
 #[trace]
-fn post_upgrade() {
+fn post_upgrade(args: Args) {
+    match args {
+        Args::Init(_) =>
+            panic!(
+                "Cannot upgrade the canister with an Init argument. Please provide an Upgrade argument."
+            ),
+        Args::Upgrade(upgrade_args) => {
     let memory = get_upgrades_memory();
     let reader = get_reader(&memory);
 
-    let (runtime_state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) =
+    let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) =
         serializer::deserialize(reader).unwrap();
 
-    canister_logger::init_with_logs(runtime_state.env.is_test_mode(), logs, traces);
-    init_canister(runtime_state);
+        state.env.set_version(upgrade_args.wasm_version);
+        state.env.set_commit_hash(upgrade_args.commit_hash);
 
-    info!("Post upgrade complete.")
+    canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
+    init_canister(state);
+
+    info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");}
+}
 }

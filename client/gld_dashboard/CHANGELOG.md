@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.4] - 2024-08-23
+
+#### Fixed
+
+- **Claiming only OGY** : Fixed disabled claim when only OGY available
+
 ### [1.0.3] - 2024-08-21
 
 #### Fixed

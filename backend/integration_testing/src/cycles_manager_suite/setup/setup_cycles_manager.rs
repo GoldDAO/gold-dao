@@ -8,7 +8,7 @@ pub fn setup_cycle_manager_canister(
     pic: &mut PocketIc,
     controller: Principal,
     icp_ledger_canister_id: Principal,
-    init_args: cycles_manager_api_canister::init::InitArgs,
+    args: cycles_manager_api_canister::Args,
 ) -> Principal {
     let sns_subnet = pic.topology().get_sns().unwrap();
     let cycles_manager_canister =
@@ -37,7 +37,7 @@ pub fn setup_cycle_manager_canister(
     pic.install_canister(
         cycles_manager_canister,
         cycles_manager_wasm,
-        encode_one(init_args).unwrap(),
+        encode_one(args).unwrap(),
         Some(controller.clone()),
     );
 

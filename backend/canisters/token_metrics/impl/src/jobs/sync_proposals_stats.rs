@@ -1,18 +1,21 @@
-use canister_time::{ run_now_then_interval, timestamp_seconds };
-use sns_governance_canister::types::{ get_proposal_response, ProposalData, ProposalId };
-use token_metrics_api::token_data::VotingHistoryCalculations;
+use canister_time::run_now_then_interval;
+use sns_governance_canister::types::{get_proposal_response, ProposalData, ProposalId};
 use std::time::Duration;
-use tracing::{ debug, error, info };
+use token_metrics_api::token_data::VotingHistoryCalculations;
+use tracing::{debug, error, info};
 use types::Milliseconds;
 
-use crate::{ state::{ mutate_state, read_state, RuntimeState }, utils::is_proposal_closed };
+use crate::{
+    state::{mutate_state, read_state, RuntimeState},
+    utils::is_proposal_closed,
+};
 
 // every 5 minutes
 const SYNC_PROPOSALS_STATS_INTERVAL: Milliseconds = 5 * 60 * 1_000;
 
 pub fn start_job() {
     debug!("Starting the proposals metrics sync job..");
-    run_now_then_interval(Duration::from_millis(SYNC_PROPOSALS_STATS_INTERVAL), run)
+    run_now_then_interval(Duration::from_millis(SYNC_PROPOSALS_STATS_INTERVAL), run);
 }
 
 pub fn run() {
@@ -48,9 +51,8 @@ pub async fn sync_proposals_metrics_data() {
                 match response.proposals.first() {
                     Some(first_proposal_in_batch) => {
                         let first_id = first_proposal_in_batch.id.unwrap_or(ProposalId { id: 0 });
-                        let last_synced_id = last_synced_proposal_id.unwrap_or(ProposalId {
-                            id: 0,
-                        });
+                        let last_synced_id =
+                            last_synced_proposal_id.unwrap_or(ProposalId { id: 0 });
                         if first_id.id > last_synced_id.id {
                             mutate_state(|state| {
                                 state.data.sync_info.last_synced_proposal_id = Some(first_id);
@@ -81,9 +83,8 @@ pub async fn sync_proposals_metrics_data() {
                     number_of_scanned_proposals += 1;
                 }
 
-                if
-                    number_of_received_proposals == (args.limit as usize) &&
-                    args.before_proposal.is_some()
+                if number_of_received_proposals == (args.limit as usize)
+                    && args.before_proposal.is_some()
                 {
                     continue_scanning = true;
                 }
@@ -110,15 +111,17 @@ pub async fn recheck_ongoing_proposals() {
 
     for proposal_id in ongoing_proposals {
         let args = sns_governance_canister::list_proposals::Args {
-            before_proposal: Some(ProposalId { id: proposal_id.id + 1 }),
+            before_proposal: Some(ProposalId {
+                id: proposal_id.id + 1,
+            }),
             limit: 1,
             exclude_type: Vec::new(),
             include_status: Vec::new(),
             include_reward_status: Vec::new(),
         };
         debug!("Syncing new recheck_ongoing_proposals.");
-        match
-            sns_governance_canister_c2c_client::list_proposals(governance_canister_id, &args).await
+        match sns_governance_canister_c2c_client::list_proposals(governance_canister_id, &args)
+            .await
         {
             Ok(response) => {
                 let returned_proposal = response.proposals.first();
@@ -128,10 +131,9 @@ pub async fn recheck_ongoing_proposals() {
                             mutate_state(|state| {
                                 let ongoing_proposals = &mut state.data.sync_info.ongoing_proposals;
                                 if let Some(this_proposal_id) = proposal.id {
-                                    if
-                                        let Some(pos) = ongoing_proposals
-                                            .iter()
-                                            .position(|id| id == &this_proposal_id)
+                                    if let Some(pos) = ongoing_proposals
+                                        .iter()
+                                        .position(|id| id == &this_proposal_id)
                                     {
                                         ongoing_proposals.remove(pos);
                                     }
@@ -195,11 +197,10 @@ pub fn update_proposals_metrics(state: &mut RuntimeState, proposal: &ProposalDat
                 metrics_calculations.valid_tally_count += 1;
 
                 // Update the average voting participation
-                metrics.average_voting_participation = (((
-                    metrics_calculations.cumulative_voting_participation as f64
-                ) /
-                    (metrics_calculations.valid_tally_count as f64)) *
-                    100.0) as u64;
+                metrics.average_voting_participation =
+                    (((metrics_calculations.cumulative_voting_participation as f64)
+                        / (metrics_calculations.valid_tally_count as f64))
+                        * 100.0) as u64;
 
                 // Update the average voting power
                 metrics.average_voting_power =
@@ -230,11 +231,10 @@ fn update_voting_history(state: &mut RuntimeState, proposal: &ProposalData, part
             valid_tally_count: 1,
         });
 
-    let new_voting_history_value = (((
-        updated_voting_calculations.cumulative_voting_participation as f64
-    ) /
-        (updated_voting_calculations.valid_tally_count as f64)) *
-        100.0) as u64;
+    let new_voting_history_value = (((updated_voting_calculations.cumulative_voting_participation
+        as f64)
+        / (updated_voting_calculations.valid_tally_count as f64))
+        * 100.0) as u64;
 
     voting_history
         .entry(day_of_proposal)
@@ -249,23 +249,19 @@ mod tests {
 
     use canister_time::timestamp_seconds;
     use sns_governance_canister::types::{
-        neuron::DissolveState,
-        Neuron,
-        NeuronId,
-        ProposalData,
-        ProposalId,
-        Tally,
+        neuron::DissolveState, Neuron, NeuronId, ProposalData, ProposalId, Tally,
     };
-    use types::{ CanisterId, NeuronInfo };
+    use types::BuildVersion;
+    use types::{CanisterId, NeuronInfo};
     use utils::env::CanisterEnv;
 
     use crate::{
         jobs::sync_proposals_stats::analyze_proposal,
-        state::{ init_state, mutate_state, read_state, Data, RuntimeState },
+        state::{init_state, mutate_state, read_state, Data, RuntimeState},
     };
 
     fn init_runtime_state() {
-        let env = CanisterEnv::new(true);
+        let env = CanisterEnv::new(true, BuildVersion::min(), "aaaa1".to_string());
         let data = Data::new(
             vec![(CanisterId::anonymous(), 1)],
             CanisterId::anonymous(),
@@ -273,7 +269,7 @@ mod tests {
             CanisterId::anonymous(),
             CanisterId::anonymous(),
             "aaaa-aa.00..1".to_string(),
-            Vec::new()
+            Vec::new(),
         );
         init_state(RuntimeState::new(env.clone(), data));
     }
@@ -286,9 +282,7 @@ mod tests {
 
         // Proposal 1
         let mut proposal_1 = ProposalData::default();
-        proposal_1.id = Some(ProposalId {
-            id: 1,
-        });
+        proposal_1.id = Some(ProposalId { id: 1 });
         proposal_1.proposal_creation_timestamp_seconds = 86_400;
         proposal_1.decided_timestamp_seconds = 86_400;
         proposal_1.latest_tally = Some(Tally {
@@ -303,9 +297,8 @@ mod tests {
         });
 
         let proposals_metrics = read_state(|state| state.data.porposals_metrics.clone());
-        let voting_participation_history = read_state(|state|
-            state.data.voting_participation_history.clone()
-        );
+        let voting_participation_history =
+            read_state(|state| state.data.voting_participation_history.clone());
 
         assert_eq!(proposals_metrics.total_proposals, 1);
         assert_eq!(proposals_metrics.total_voting_power, 50);
@@ -316,9 +309,7 @@ mod tests {
 
         // Proposal 2
         let mut proposal_2 = ProposalData::default();
-        proposal_2.id = Some(ProposalId {
-            id: 2,
-        });
+        proposal_2.id = Some(ProposalId { id: 2 });
         proposal_2.proposal_creation_timestamp_seconds = 2 * 86_400;
         proposal_2.decided_timestamp_seconds = 2 * 86_400;
         proposal_2.latest_tally = Some(Tally {
@@ -333,9 +324,8 @@ mod tests {
         });
 
         let proposals_metrics = read_state(|state| state.data.porposals_metrics.clone());
-        let voting_participation_history = read_state(|state|
-            state.data.voting_participation_history.clone()
-        );
+        let voting_participation_history =
+            read_state(|state| state.data.voting_participation_history.clone());
 
         assert_eq!(proposals_metrics.total_proposals, 2);
         assert_eq!(proposals_metrics.total_voting_power, 60);
@@ -349,9 +339,7 @@ mod tests {
 
         // Proposal 3
         let mut proposal_3 = ProposalData::default();
-        proposal_3.id = Some(ProposalId {
-            id: 3,
-        });
+        proposal_3.id = Some(ProposalId { id: 3 });
         proposal_3.proposal_creation_timestamp_seconds = 3 * 86_400;
         proposal_3.decided_timestamp_seconds = 3 * 86_400;
         proposal_3.latest_tally = Some(Tally {
@@ -366,9 +354,8 @@ mod tests {
         });
 
         let proposals_metrics = read_state(|state| state.data.porposals_metrics.clone());
-        let voting_participation_history = read_state(|state|
-            state.data.voting_participation_history.clone()
-        );
+        let voting_participation_history =
+            read_state(|state| state.data.voting_participation_history.clone());
 
         assert_eq!(proposals_metrics.total_proposals, 3);
         assert_eq!(proposals_metrics.total_voting_power, 100);
@@ -382,9 +369,7 @@ mod tests {
 
         // Proposal 4 - still open
         let mut proposal_4 = ProposalData::default();
-        proposal_4.id = Some(ProposalId {
-            id: 4,
-        });
+        proposal_4.id = Some(ProposalId { id: 4 });
         proposal_4.proposal_creation_timestamp_seconds = 4 * 86_400;
         proposal_4.decided_timestamp_seconds = 0;
         proposal_4.latest_tally = Some(Tally {
@@ -397,14 +382,7 @@ mod tests {
         analyze_proposal(&proposal_4);
 
         let ongoing_proposals = read_state(|state| state.data.sync_info.ongoing_proposals.clone());
-        assert_eq!(
-            ongoing_proposals.contains(
-                &(ProposalId {
-                    id: 4,
-                })
-            ),
-            true
-        );
+        assert_eq!(ongoing_proposals.contains(&(ProposalId { id: 4 })), true);
         let proposals_metrics = read_state(|state| state.data.porposals_metrics.clone());
 
         assert_eq!(proposals_metrics.total_proposals, 4);
@@ -432,9 +410,7 @@ mod tests {
 
         // Proposal 5 - same day as proposal 4
         let mut proposal_5 = ProposalData::default();
-        proposal_5.id = Some(ProposalId {
-            id: 5,
-        });
+        proposal_5.id = Some(ProposalId { id: 5 });
         proposal_5.proposal_creation_timestamp_seconds = 4 * 86_400;
         proposal_5.decided_timestamp_seconds = 4 * 86_400;
         proposal_5.latest_tally = Some(Tally {
@@ -446,9 +422,8 @@ mod tests {
         mutate_state(|state| {
             update_proposals_metrics(state, &proposal_5);
         });
-        let voting_participation_history = read_state(|state|
-            state.data.voting_participation_history.clone()
-        );
+        let voting_participation_history =
+            read_state(|state| state.data.voting_participation_history.clone());
         // For day 4: avg between proposal 4 and proposal 5
         // = ((90 + 10) / 150 + (60 + 20) / 150) / 2 = 0.6
         assert_eq!(voting_participation_history.get(&4), Some(&6000u64));

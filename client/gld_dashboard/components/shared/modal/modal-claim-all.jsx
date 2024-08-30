@@ -52,7 +52,9 @@ export default function ModalClaimAll({
           className={`px-10 py-4 rounded-full bg-[#D3B871] text-white text-md font-bold flex items-center justify-center h-10 w-full sm:w-fit sm:h-fit ${(!neuronAmountsToClaim.icpAmount && !neuronAmountsToClaim.ledgerAmount) || loading ? 'opacity-35 cursor-not-allowed' : ''}`}
           onClick={handleConfirmClaimAll}
           disabled={
-            (!neuronAmountsToClaim.icpAmount && !neuronAmountsToClaim.ledgerAmount) || loading
+            (!neuronAmountsToClaim.icpAmount
+              && !neuronAmountsToClaim.ledgerAmount
+              && !neuronAmountsToClaim.ogyAmount) || loading
           }
         >
           {loading && <span className="loading loading-spinner mr-2"></span>}

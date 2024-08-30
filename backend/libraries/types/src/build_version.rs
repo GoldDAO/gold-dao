@@ -1,21 +1,9 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
-use std::fmt::{ Display, Formatter };
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-#[derive(
-    CandidType,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    Default,
-    Ord,
-    PartialOrd,
-    Eq,
-    PartialEq
-)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Copy, Debug, Default, Ord, PartialOrd, Eq, PartialEq)]
 pub struct BuildVersion {
     pub major: u32,
     pub minor: u32,
