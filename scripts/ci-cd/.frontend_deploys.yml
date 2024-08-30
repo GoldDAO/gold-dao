@@ -2,10 +2,10 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options: ['gldt_landing_page', 'gld_dashboard', 'gldt_swap_app']
+      options: ["gldt_landing_page", "gld_dashboard", "gldt_swap_app"]
     sns-controlled:
       description: Whether or not the canister is SNS controlled
-      options: ['true', 'false']
+      options: ["true", "false"]
 ---
 variables:
   DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
@@ -16,7 +16,7 @@ variables:
   stage: deploy
   resource_group: frontend staging deployment
   variables:
-    PEM_FILE: '${PEM_FILE_STAGING}'
+    PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
     - !reference [.import dfx identity, before_script]
     - !reference [.include didc, before_script]
@@ -29,22 +29,23 @@ $[[ inputs.src-folder ]] staging deploy:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
-        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
-        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       when: manual
       allow_failure: true
-  needs: ['$[[ inputs.src-folder ]] staging build']
+  needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
-    - |
-      if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
-        . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
-      else
-        dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
-      fi
+    # - |
+    #   if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
+    #     . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
+    #   else
+    #     dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
+    #   fi
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
@@ -57,9 +58,9 @@ $[[ inputs.src-folder ]] preprod deploy:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
-        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
-        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
-  needs: ['$[[ inputs.src-folder ]] preprod build']
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+  needs: ["$[[ inputs.src-folder ]] preprod build"]
   script:
     - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
   environment:
@@ -73,15 +74,15 @@ $[[ inputs.src-folder ]] production deploy:
   stage: deploy
   resource_group: frontend production deployment
   variables:
-    PEM_FILE: '${PEM_FILE_PRODUCTION}'
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
     IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
     TARGET_NETWORK: ic
-  needs: ['$[[ inputs.src-folder ]] production build']
+  needs: ["$[[ inputs.src-folder ]] production build"]
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
       changes:
-        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
-        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
       when: manual
   before_script:
     - !reference [.import dfx identity, before_script]
