@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite --mode dev",
     "dev:preprod": "vite --mode preprod",
-    "build": "tsc -b && vite build",
+    "build": "",
+    "build:staging": "npm run lint && tsc && vite build --mode staging",
+    "build:preprod": "npm run lint && tsc && vite build --mode preprod",
+    "build:production": "npm run lint && tsc && vite build --mode production",
+    "deploy:staging": "npm run build:staging && dfx deploy gldt_swap_app --network=staging",
+    "deploy:preprod": "npm run build:preprod && dfx deploy gldt_swap_app --network=preprod",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
