@@ -230,6 +230,8 @@ dependencies = [
  "ic-ledger-types",
  "ic-stable-structures",
  "icpswap_client",
+ "icpswap_factory_canister",
+ "icpswap_factory_canister_c2c_client",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
@@ -1496,6 +1498,25 @@ dependencies = [
  "icpswap_swap_pool_canister_c2c_client",
  "icrc-ledger-types",
  "serde",
+ "types",
+]
+
+[[package]]
+name = "icpswap_factory_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "serde",
+]
+
+[[package]]
+name = "icpswap_factory_canister_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "canister_client",
+ "ic-cdk 0.13.2",
+ "icpswap_factory_canister",
  "types",
 ]
 

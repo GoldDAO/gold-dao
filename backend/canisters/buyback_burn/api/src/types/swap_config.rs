@@ -11,6 +11,22 @@ pub struct SwapConfig {
     pub exchange_config: ExchangeConfig,
 }
 
+impl SwapConfig {
+    pub fn new(
+        swap_client_id: u128,
+        input_token: TokenInfo,
+        output_token: TokenInfo,
+        exchange_config: ExchangeConfig
+    ) -> Self {
+        SwapConfig {
+            swap_client_id,
+            input_token,
+            output_token,
+            exchange_config,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum ExchangeConfig {
     ICPSwap(ICPSwapConfig),

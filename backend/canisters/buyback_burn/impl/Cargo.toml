@@ -32,3 +32,5 @@ icpswap_client = { path = "../../../libraries/icpswap_client" }
 async-trait = { workspace = true }
 http_request = { path = '../../../libraries/http_request' }
 typetag = { workspace = true }
+icpswap_factory_canister = { path = "../../../external_canisters/icpswap_factory/api" }
+icpswap_factory_canister_c2c_client = { path = "../../../external_canisters/icpswap_factory/c2c_client" }
