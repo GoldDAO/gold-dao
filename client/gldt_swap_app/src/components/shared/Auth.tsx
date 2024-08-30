@@ -3,12 +3,12 @@ import { Button, Dialog, LoaderSpin } from "@components/ui";
 
 const Auth = () => {
   const {
-    state,
+    status,
     isConnected,
     handleOpenWalletList,
     handleSelectWallet,
     handleDisconnectWallet,
-    walletState,
+    walletStatus,
     handleCloseWalletList,
     walletList,
   } = useWallet();
@@ -20,7 +20,7 @@ const Auth = () => {
         <Button onClick={handleDisconnectWallet}>Disconnect</Button>
       )}
       <Dialog
-        show={state == walletState.OpenWalletList}
+        show={status == walletStatus.OpenWalletList}
         handleClose={handleCloseWalletList}
       >
         <div className="pt-6 pb-12 px-12">
@@ -49,7 +49,7 @@ const Auth = () => {
         </div>
       </Dialog>
       <Dialog
-        show={state == walletState.Connecting}
+        show={status == walletStatus.Connecting}
         handleClose={handleCloseWalletList}
       >
         <div className="pt-6 pb-12 px-4 text-center">
