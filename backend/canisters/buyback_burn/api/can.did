@@ -1,8 +1,54 @@
-type InitArgs = record {
-  sns_root_canister : opt principal;
-  min_cycles_balance : nat64;
-  authorized_principals : vec principal;
-  canisters : vec principal;
-  max_top_up_amount : nat64;
+type Account = record { owner : principal; subaccount : opt blob };
+type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type ExchangeConfig = variant { ICPSwap : ICPSwapConfig };
+type ICPSwapConfig = record {
+  zero_for_one : bool;
+  swap_canister_id : principal;
 };
-service : (InitArgs) -> {}
+type InitArgs = record {
+  min_icp_burn_amount : Tokens;
+  test_mode : bool;
+  gldgov_ledger_canister_id : principal;
+  icp_swap_canister_id : principal;
+  burn_rate : nat8;
+  authorized_principals : vec principal;
+  tokens : vec TokenInfo;
+  swap_interval_in_secs : nat64;
+  commit_hash : text;
+  burn_interval_in_secs : nat64;
+};
+type Result = variant { Ok : Account; Err : text };
+type Result_1 = variant { Ok; Err : text };
+type Result_2 = variant { Ok : nat; Err : text };
+type Result_3 = variant { Ok : Result_2; Err : text };
+type Result_4 = variant { Ok : nat64; Err : text };
+type SwapConfig = record {
+  swap_client_id : nat;
+  input_token : TokenInfo;
+  exchange_config : ExchangeConfig;
+  output_token : TokenInfo;
+};
+type TokenInfo = record {
+  fee : nat64;
+  decimals : nat64;
+  ledger_id : principal;
+};
+type TokenSwap = record {
+  started : nat64;
+  deposit_account : opt Result;
+  swap_id : nat;
+  swap_config : SwapConfig;
+  is_archived : bool;
+  notified_dex_at : opt Result_1;
+  withdrawn_from_dex_at : opt Result_2;
+  amount_swapped : opt Result_3;
+  success : opt bool;
+  transfer : opt Result_4;
+};
+type Tokens = record { e8s : nat64 };
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+service : (Args) -> {
+  get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
+  get_swap : (nat) -> (opt TokenSwap) query;
+}

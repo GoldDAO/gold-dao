@@ -122,11 +122,6 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
         }
     };
 
-    if burn_rate == 0 || burn_rate > 100 {
-        error!("Invalid burn rate: {}. It must be between 1 and 100.", burn_rate);
-        return 0;
-    }
-
     // TODO: think of the sequence here
     let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
 
@@ -162,6 +157,16 @@ mod tests {
 
         let burn_amount = calculate_percentage_of_amount(amount_available, burn_rate);
         assert_eq!(burn_amount, 0u128);
+    }
+
+    #[test]
+    fn test_calculate_percentage() {
+        let amount_available = Nat::from(50000000u128);
+        let burn_rate = 33;
+
+        let burn_amount = calculate_percentage_of_amount(amount_available, burn_rate);
+        println!("Burn amount: {}", burn_amount);
+        // assert_eq!(burn_amount, 0u128);
     }
 
     #[test]

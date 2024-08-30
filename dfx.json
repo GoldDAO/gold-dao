@@ -285,9 +285,7 @@
       "wasm": "backend/canisters/sns_neuron_controller/target/wasm32-unknown-unknown/release/sns_neuron_controller_canister.wasm.gz"
     },
     "buyback_burn": {
-      "build": [
-        "./scripts/build-canister.sh buyback_burn"
-      ],
+      "build": ["./scripts/build_canister.sh buyback_burn"],
       "candid": "backend/canisters/buyback_burn/api/can.did",
       "declarations": {
         "bindings": [

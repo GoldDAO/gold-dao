@@ -14,6 +14,7 @@ fn update_config(args: UpdateConfigArgs) -> UpdateConfigResponse {
 
 fn update_config_impl(args: UpdateConfigArgs, state: &mut RuntimeState) -> UpdateConfigResponse {
     if let Some(burn_rate) = args.burn_rate {
+        // FIXME: add verification
         state.data.burn_config.burn_rate = burn_rate;
     }
     if let Some(min_burn_amount) = args.min_burn_amount {

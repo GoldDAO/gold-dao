@@ -13,6 +13,7 @@ use crate::types::SwapClients;
 use buyback_burn_canister::swap_config::SwapConfig;
 use buyback_burn_canister::swap_config::ExchangeConfig;
 use buyback_burn_canister::icpswap::ICPSwapConfig;
+use tracing::error;
 
 canister_state!(RuntimeState);
 
@@ -78,10 +79,11 @@ impl BurnConfig {
     fn new(burn_rate: u8, min_burn_amount: Tokens, burn_interval_in_secs: u64) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
-            burn_rate: if burn_rate > 100 || burn_rate == 0 {
-                burn_rate
-            } else {
+            burn_rate: if burn_rate > 100 {
+                error!("Burn rate must be between 0 and 100");
                 0
+            } else {
+                burn_rate
             },
             min_burn_amount,
             burn_interval: Duration::from_secs(burn_interval_in_secs),

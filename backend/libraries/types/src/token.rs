@@ -1,12 +1,10 @@
-use std::{borrow::Cow, fmt::Display};
+use std::{ borrow::Cow, fmt::Display };
 
-use candid::{CandidType, Decode, Encode, Principal};
-use ic_stable_structures::{storable::Bound, Storable};
-use serde::{Deserialize, Serialize};
+use candid::{ CandidType, Decode, Encode, Principal };
+use ic_stable_structures::{ storable::Bound, Storable };
+use serde::{ Deserialize, Serialize };
 
-#[derive(
-    Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord,
-)]
+#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct TokenSymbol(String);
 
 #[derive(Debug)]
@@ -70,7 +68,7 @@ impl TokenInfo {
             // token: "ICP",
             ledger_id: Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap(),
             decimals: 8,
-            fee: 100_000,
+            fee: 10_000,
         }
     }
 }

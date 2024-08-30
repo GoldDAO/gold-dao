@@ -79,8 +79,14 @@ pub(crate) async fn process_token_swap(
     let burn_rate = read_state(|s| s.data.burn_config.burn_rate);
 
     let available_amount = get_token_balance(swap_config.input_token.ledger_id).await?;
+
+    // FIXME: add here minimum amount to swap
     let input_amount = calculate_percentage_of_amount(available_amount, burn_rate);
     let amount_to_dex = input_amount.saturating_sub(swap_config.input_token.fee.into());
+
+    if amount_to_dex == 0 {
+        return Err("Insufficient balance to swap".to_string());
+    }
 
     // NOTE: Should we use this parameter? We can try to also store the minimum ICP/GLDGov
     // price and then calculate the min_output_amount
