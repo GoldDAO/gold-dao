@@ -9,7 +9,7 @@ import { usePagination } from "@utils/table/useTable";
 import TxList from "./List";
 
 const PastTransactions = () => {
-  const [pagination] = usePagination({ pageIndex: 0, pageSize: 5 });
+  const [pagination] = usePagination({ pageIndex: 0, pageSize: 10 });
 
   return (
     <div>
