@@ -9,8 +9,7 @@ import { useWallet, getActor } from "@amerej/artemis-react";
 
 import { canisters } from "@providers/Auth";
 
-import { SwapInfo } from "@canisters/gldt_swap/interfaces";
-import { SwapData } from "./interfaces";
+import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
 
 interface GetOneSwapByIdParams {

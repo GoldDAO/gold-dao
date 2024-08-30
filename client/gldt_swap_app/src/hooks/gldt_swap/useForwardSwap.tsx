@@ -11,7 +11,10 @@ import {
   GLDT_FORWARD_SWAP_FEE,
 } from "@constants";
 import { Result_3 } from "@canisters/gldt_swap/interfaces";
-import { MarketTransferRequest, MarketTransferResult } from "@hooks/gld_nft";
+import {
+  MarketTransferRequest,
+  MarketTransferResult,
+} from "@canisters/gld_nft/interfaces";
 
 type TransferBatchNft = {
   canister: string;
