@@ -43,7 +43,7 @@ const Default = () => {
           </div>
           <div className="flex justify-self-end items-center">
             <Link
-              to={GLDT_SWAP_APP_FRONT_URL}
+              to="/swap"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center"
