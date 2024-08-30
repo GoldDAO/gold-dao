@@ -119,14 +119,12 @@
       "wasm": "https://download.dfinity.systems/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/canisters/ic-icrc1-index-ng.wasm.gz"
     },
     "gldt_swap_app": {
-      "build": ["npm run postinstall", "npm run build:back", "npm run build:gldt_swap_app"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "frontend": {},
-      "source": ["client/gldt_swap_app/out"],
+      "source": ["client/gldt_swap_app/dist"],
       "type": "assets"
     },
     "icp_neuron": {
