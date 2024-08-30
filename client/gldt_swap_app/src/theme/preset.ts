@@ -9,7 +9,9 @@ export const colors = {
   border: "rgb(var(--color-border))",
   gold: "rgb(var(--color-gold))",
   accent: "rgb(var(--color-accent))",
-  charcoal: "rgb(var(--color-charcoal))"
+  charcoal: "rgb(var(--color-charcoal))",
+  jade: "rgb(var(--color-jade))",
+  "dark-orange": "rgb(var(--color-dark-orange))"
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

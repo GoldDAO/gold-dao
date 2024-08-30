@@ -10,7 +10,7 @@ const Badge = ({
 }) => {
   return (
     <div
-      className={`rounded-full font-semibold w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
+      className={`rounded-full w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </div>
@@ -21,16 +21,16 @@ const BadgeStatusTx = ({ status }: { status: string }) => {
   switch (status) {
     case "Success":
       return (
-        <Badge className="bg-emerald-500/10">
-          <CheckCircleIcon className="h-6 w-6 text-emerald-500" />
-          <div className="text-emerald-500">Success</div>
+        <Badge className="bg-jade/10">
+          <CheckCircleIcon className="h-6 w-6 text-jade" />
+          <div className="text-jade font-semibold text-xs">Success</div>
         </Badge>
       );
     case "Failed":
       return (
-        <Badge className="bg-red-500/10">
-          <XCircleIcon className="h-6 w-6 text-red-500" />
-          <div className="text-red-500">Failed</div>
+        <Badge className="bg-dark-orange/10">
+          <XCircleIcon className="h-6 w-6 text-dark-orange" />
+          <div className="text-dark-orange font-semibold text-xs">Failed</div>
         </Badge>
       );
     default:

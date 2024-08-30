@@ -5,8 +5,8 @@ import TotalWeightNfts from "@components/account/TotalWeightNfts";
 import TokenBalance from "@components/account/token-balance/TokenBalance";
 import YourNfts from "@components/account/your-nfts/YourNfts";
 
-import OngoingTransactions from "@components/transactions/ongoing/Ongoing";
-import PastTransactions from "@components/transactions/past/Past";
+import OngoingTransactions from "@components/transactions/list/ongoing/Ongoing";
+import PastTransactions from "@components/transactions/list/past/Past";
 
 const Account = () => {
   return (
