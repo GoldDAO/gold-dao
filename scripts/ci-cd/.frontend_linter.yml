@@ -2,8 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder. Must be located in the /client/ folder
-      options:
-        ["gldt_swap_app", "gldt_landing_page", "gldt_explorer", "gld_dashboard"]
+      options: ['gldt_swap_app', 'gldt_landing_page', 'gld_dashboard']
 ---
 # Front-end (NextJS) linter job template
 
@@ -12,14 +11,14 @@ $[[ inputs.src-folder ]] linter:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
+        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
+        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
   extends: .node template
   script:
     - npm run lint:$[[ inputs.src-folder ]]

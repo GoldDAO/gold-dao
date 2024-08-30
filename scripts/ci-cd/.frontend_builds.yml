@@ -2,7 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options: ["gldt_landing_page", "gldt_explorer", "gld_dashboard", "gldt_swap_app"]
+      options: ['gldt_landing_page', 'gld_dashboard', 'gldt_swap_app']
 ---
 # Frontend builds
 
@@ -16,7 +16,7 @@ spec:
 .short-artifact-template:
   extends: .build template
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_BUILD_${ENV}"
+    name: '${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_BUILD_${ENV}'
     paths:
       - client/$[[ inputs.src-folder ]]/out
     expire_in: 1 day
@@ -24,7 +24,7 @@ spec:
 .long-artifact-template:
   extends: .build template
   artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_BUILD_${ENV}"
+    name: '${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-$[[ inputs.src-folder ]]_BUILD_${ENV}'
     paths:
       - client/$[[ inputs.src-folder ]]/out
     expire_in: 6 months
@@ -34,10 +34,10 @@ $[[ inputs.src-folder ]] staging build:
   rules:
     - if: ($CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop") || ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop")
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
+        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
   variables:
-    ENV: "staging" # local | staging | preprod | prod
+    ENV: 'staging' # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
@@ -48,26 +48,24 @@ $[[ inputs.src-folder ]] preprod build:
   rules:
     - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
+        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
   variables:
-    ENV: "preprod" # local | staging | preprod | prod
+    ENV: 'preprod' # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: testing
     action: prepare
-
-
 
 $[[ inputs.src-folder ]] production build:
   extends: .long-artifact-template
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
       changes:
-        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
-        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - 'client/$[[ inputs.src-folder ]]/*.{js,json}'
+        - 'client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}'
   variables:
-    ENV: "prod" # local | staging | preprod | prod
+    ENV: 'prod' # local | staging | preprod | prod
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: production
