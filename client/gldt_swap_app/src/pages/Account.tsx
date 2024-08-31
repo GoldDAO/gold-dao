@@ -11,7 +11,7 @@ import PastTransactions from "@components/transactions/list/past/Past";
 const Account = () => {
   return (
     <div className="container mx-auto mt-4 sm:mt-8">
-      <div className="mb-4">
+      <div className="mb-8">
         <div className="text-4xl font-semibold text-gold">My Account</div>
         <div className="text-4xl">Overview</div>
       </div>

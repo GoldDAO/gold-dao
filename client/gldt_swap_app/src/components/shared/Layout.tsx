@@ -39,12 +39,16 @@ const Layout = () => {
   );
 
   return (
-    <div className="bg-cover-img bg-cover bg-fixed bg-background min-h-screen pb-12">
+    <div className="flex flex-col bg-cover-img bg-cover bg-fixed bg-background min-h-screen pb-12">
       {isSwap ? <NavbarSwap /> : <NavbarHome />}
       <div className="flex-grow px-4 sm:px-6">
         {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
       </div>
-      <ScrollRestoration getKey={getKey} />
+      {/* <ScrollRestoration
+        getKey={(location, matches) => {
+          return location.pathname;
+        }}
+      /> */}
     </div>
   );
 };

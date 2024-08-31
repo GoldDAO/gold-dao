@@ -24,6 +24,8 @@ export const getSwapData = (swap: SwapInfo) => {
     | (typeof swapStatus.Reverse)[keyof typeof swapStatus.Reverse];
   let send_value;
   let receive_value;
+  let gldt_value;
+  let nft_value;
 
   if ("Forward" in swap) {
     type = "forward";
@@ -35,6 +37,8 @@ export const getSwapData = (swap: SwapInfo) => {
       ];
     receive_value = Number(tx.tokens_to_mint.value) / 10 ** 8;
     send_value = receive_value / GLDT_VALUE_1G_NFT;
+    gldt_value = receive_value
+    nft_value = send_value
   } else {
     type = "reverse";
     label = "Reverse";
@@ -45,6 +49,8 @@ export const getSwapData = (swap: SwapInfo) => {
       ];
     send_value = Number(tx.tokens_to_receive.value) / 10 ** 8;
     receive_value = send_value / GLDT_VALUE_1G_NFT;
+    gldt_value = send_value
+    nft_value = receive_value
   }
 
   const created_at = getDateUTC(Number(tx?.created_at), {
@@ -61,6 +67,8 @@ export const getSwapData = (swap: SwapInfo) => {
     nft_id_string,
     send_value,
     receive_value,
+    gldt_value,
+    nft_value,
     status,
     nft_id,
     index,

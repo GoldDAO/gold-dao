@@ -7,6 +7,8 @@ export interface SwapData {
   nft_id_string: string;
   send_value: number;
   receive_value: number;
+  gldt_value: number;
+  nft_value: number;
   status: { value: string; label: string };
   nft_id: string;
   index: string;

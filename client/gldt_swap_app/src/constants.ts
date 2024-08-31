@@ -15,6 +15,8 @@ export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
 
+export const API_OGY_BASE_URL="https://api.origyn.com"
+
 export const GLDT_TX_FEE = 10000000000;
 export const GLDT_FORWARD_SWAP_FEE = 10000000;
 export const GLDT_REVERSE_SWAP_FEE = 100000000;
