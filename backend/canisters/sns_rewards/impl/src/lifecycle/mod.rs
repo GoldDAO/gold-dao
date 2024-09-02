@@ -7,6 +7,6 @@ pub use init::*;
 use crate::state::{ init_state, RuntimeState };
 
 pub fn init_canister(runtime_state: RuntimeState) {
-    crate::jobs::start();
     init_state(runtime_state);
+    crate::jobs::start();
 }
