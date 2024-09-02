@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Transition, TransitionChild, Dialog } from "@headlessui/react";
 import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { Button } from "@components/ui";
-import { GLDT_SWAP_APP_FRONT_URL } from "@constants";
 
 const Default = () => {
   const [showMenu, setShowMenu] = useState(false);
