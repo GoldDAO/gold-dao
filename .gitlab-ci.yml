@@ -15,7 +15,7 @@ default:
       - unknown_failure
 
 cache:
-  - key: 'dfx-$CI_COMMIT_REF_SLUG'
+  - key: "dfx-$CI_COMMIT_REF_SLUG"
     paths:
       - .dfx
 
@@ -36,6 +36,9 @@ include:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_landing_page
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
+      src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gldt_swap_app
@@ -100,6 +103,9 @@ include:
       src-folder: gldt_landing_page
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
+      src-folder: gld_landing_page
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
       src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -133,11 +139,11 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gld_dashboard
-      sns-controlled: 'true'
+      sns-controlled: "true"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gldt_swap_app
-      sns-controlled: 'true'
+      sns-controlled: "true"
 
 ################################################################################
 # Cache preparation
@@ -147,7 +153,7 @@ node cache:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - './frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}'
+        - "./frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
@@ -165,14 +171,14 @@ rust lint:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - 'Cargo.{lock,toml}'
-        - 'backend/**/*.{rs,toml,lock,md}'
+        - "Cargo.{lock,toml}"
+        - "backend/**/*.{rs,toml,lock,md}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - 'Cargo.{lock,toml}'
-        - 'backend/**/*.{rs,toml,lock,md}'
+        - "Cargo.{lock,toml}"
+        - "backend/**/*.{rs,toml,lock,md}"
   extends: .rust template
   script:
     - cargo clippy
