@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useCallback } from "react";
-import type { Location, useMatches } from "react-router-dom";
+// import { useCallback } from "react";
+// import type { Location, useMatches } from "react-router-dom";
 import {
-  ScrollRestoration,
+  // ScrollRestoration,
   Outlet,
   useNavigation,
   useLocation,
@@ -27,16 +27,16 @@ const Layout = () => {
   const location = useLocation();
   const isSwap = location.pathname.match(/\/swap/) ? true : false;
 
-  const getKey = useCallback(
-    (location: Location, matches: ReturnType<typeof useMatches>) => {
-      const match = matches.find((m) => m.handle?.scrollMode);
-      if (match?.handle?.scrollMode === "pathname") {
-        return location.pathname;
-      }
-      return location.key;
-    },
-    []
-  );
+  // const getKey = useCallback(
+  //   (location: Location, matches: ReturnType<typeof useMatches>) => {
+  //     const match = matches.find((m) => m.handle?.scrollMode);
+  //     if (match?.handle?.scrollMode === "pathname") {
+  //       return location.pathname;
+  //     }
+  //     return location.key;
+  //   },
+  //   []
+  // );
 
   return (
     <div className="flex flex-col bg-cover-img bg-cover bg-fixed bg-background min-h-screen pb-12">
