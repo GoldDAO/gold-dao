@@ -21,15 +21,15 @@ const Header = () => {
   ];
 
   return (
-    <header className="flex relative z-50 justify-between w-full items-center border bg-white/10 border-[#FAF9F826] rounded-full m-4 p-1 text-sm max-w-screen-xl bg-clip-padding backdrop-filter backdrop-blur-2xl text-main">
-      <div className="flex flex-row flex-wrap items-center gap-2 pl-1">
+    <header className="flex relative z-50 justify-between w-full items-center border bg-white/20 border-[#FAF9F826] rounded-full m-4 p-1 text-sm max-w-screen-xl bg-clip-padding backdrop-filter backdrop-blur-lg text-main">
+      <div className="flex flex-row flex-wrap items-center gap-2 pl-4">
         <Image
           src="/static/icons/GoldDAO.svg"
           alt="Bity"
           width={28}
           height={28}
         />
-        <h1 className="text-2xl font-bold ">{t("title")}</h1>
+        <h1 className="text-xl font-bold ">{t("title")}</h1>
       </div>
 
       <button className="md:hidden z-20">
