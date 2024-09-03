@@ -29,7 +29,7 @@ const Hero = () => {
   const { t } = useTranslation("hero");
 
   return (
-    <>
+    <div className="h-[90vh] 4xl:h-screen w-full flex flex-col items-center justify-center">
       <video
         autoPlay
         loop
@@ -38,7 +38,7 @@ const Hero = () => {
         className="absolute inset-0 w-full h-full object-cover"
         src="/videos/Gold_DAO_bg_video.mp4"
       />
-      <div className="relative text-center top-6 md:top-36 w-full 3xl:top-44 xl:w-3/4 3xl:w-1/2 4xl:top-36">
+      <div className="relative text-center ">
         <h1
           className="text-[60px] md:text-[82px] font-inter font-bold text-white leading-[90px] text-shadow-lg"
           style={{
@@ -72,7 +72,7 @@ const Hero = () => {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

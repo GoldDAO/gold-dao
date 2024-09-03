@@ -6,6 +6,11 @@
   @apply bg-black text-white p-2 px-4 rounded-full hover:opacity-80 transition-all duration-500 ease-in-out;
 }
 
+.main-button-disabled {
+  @apply bg-[#E8E6E1] text-black p-2 px-4 rounded-full font-semibold;
+}
+
+
 .secondary-button {
   @apply bg-secondary text-black p-2 px-4 rounded-full hover:opacity-80 transition-all duration-500 ease-in-out;
 }
