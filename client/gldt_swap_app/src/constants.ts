@@ -17,7 +17,7 @@ export const API_OGY_BASE_URL="https://api.origyn.com"
 
 export const GLDT_TX_FEE = 1000000;
 export const GLDT_DECIMAL = 100000000;
-export const GLDT_REVERSE_SWAP_DECIMAL = 100000000;
+export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
 
 if (!(APP_MODE === "production")) {

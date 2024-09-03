@@ -1,10 +1,9 @@
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 import {
   Listbox,
   ListboxButton,
   ListboxOptions,
   ListboxOption,
-  Transition,
 } from "@headlessui/react";
 import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
@@ -45,44 +44,41 @@ const Select = ({
               <ChevronUpDownIcon className="h-5 w-5" aria-hidden="true" />
             </span>
           </ListboxButton>
-          <Transition
-            as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+
+          <ListboxOptions
+            anchor="bottom"
+            className="absolute mt-1 max-h-60 w-auto overflow-auto rounded-xl bg-surface py-1 text-base border border-border focus:outline-none sm:text-sm origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
           >
-            <ListboxOptions className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-surface py-1 text-base border border-border focus:outline-none sm:text-sm">
-              {options.map((option) => (
-                <ListboxOption
-                  key={option.value}
-                  className={({ focus }) =>
-                    `relative cursor-pointer select-none py-2 px-4 ${
-                      focus ? "bg-accent/10 text-accent" : ""
-                    }`
-                  }
-                  value={option.value}
-                >
-                  {({ selected }) => (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <img src={option.icon} className="w-4 h-4 mr-2" />
-                        <div
-                          className={`truncate mr-3 ${
-                            selected ? "font-semibold" : "font-normal"
-                          }`}
-                        >
-                          {option.value}
-                        </div>
-                      </div>
-                      <div className="bg-surface-2 rounded-sm px-2">
-                        {option.label}
+            {options.map((option) => (
+              <ListboxOption
+                key={option.value}
+                className={({ focus }) =>
+                  `relative cursor-pointer select-none py-2 px-4 ${
+                    focus ? "bg-accent/10 text-accent" : ""
+                  }`
+                }
+                value={option.value}
+              >
+                {({ selected }) => (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <img src={option.icon} className="w-4 h-4 mr-2" />
+                      <div
+                        className={`truncate mr-3 ${
+                          selected ? "font-semibold" : "font-normal"
+                        }`}
+                      >
+                        {option.value}
                       </div>
                     </div>
-                  )}
-                </ListboxOption>
-              ))}
-            </ListboxOptions>
-          </Transition>
+                    <div className="bg-surface-2 rounded-sm px-2">
+                      {option.label}
+                    </div>
+                  </div>
+                )}
+              </ListboxOption>
+            ))}
+          </ListboxOptions>
         </div>
       </Listbox>
     </div>

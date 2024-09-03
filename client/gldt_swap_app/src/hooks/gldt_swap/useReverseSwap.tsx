@@ -4,8 +4,9 @@ import { getActor } from "@amerej/artemis-react";
 
 import {
   SWAP_CANISTER_ID,
-  GLDT_REVERSE_SWAP_DECIMAL,
+  REVERSE_GLDT_TX_FEE,
   GLDT_DECIMAL,
+  GLDT_VALUE_1G_NFT,
 } from "@constants";
 
 import { Result_4, Args_2 } from "@canisters/gldt_swap/interfaces";
@@ -68,7 +69,9 @@ export const useReverseSwap = () => {
   const icrc2_approve_args = selected.flatMap((nft) =>
     nft.tokenIds.map((tokenId) => {
       return {
-        amount: BigInt(nft.value * GLDT_DECIMAL + GLDT_REVERSE_SWAP_DECIMAL),
+        amount: BigInt(
+          nft.value * GLDT_VALUE_1G_NFT * GLDT_DECIMAL + REVERSE_GLDT_TX_FEE
+        ),
         fee: [],
         memo: [],
         expected_allowance: [],
