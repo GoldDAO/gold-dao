@@ -5,7 +5,8 @@
   "workspaces": [
     "client/gldt_swap_app",
     "client/gldt_landing_page",
-    "client/gld_dashboard"
+    "client/gld_dashboard",
+    "client/gld_landing_page"
   ],
   "license": "AGPL-3.0-only",
   "version": "0.0.0",
