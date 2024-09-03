@@ -29,7 +29,7 @@ const Hero = () => {
   const { t } = useTranslation("hero");
 
   return (
-    <div className="h-[90vh] 4xl:h-screen w-full flex flex-col items-center justify-center">
+    <div className="h-[90vh] 4xl:h-screen w-full flex flex-col items-center justify-center px-2 md:px-10 ">
       <video
         autoPlay
         loop

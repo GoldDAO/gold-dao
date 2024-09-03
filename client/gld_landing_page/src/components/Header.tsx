@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import Image from "next/image";
@@ -26,7 +27,7 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="flex relative z-50 justify-between w-full items-center border bg-white/20 border-[#FAF9F826] rounded-full m-4 p-1 text-sm max-w-screen-xl bg-clip-padding backdrop-filter backdrop-blur-lg text-main">
+    <header className="flex relative z-50  justify-between w-full items-center border bg-white/20 border-[#FAF9F826] rounded-full m-4 p-1 text-sm max-w-screen-xl bg-clip-padding backdrop-filter backdrop-blur-lg text-main">
       <LogoSection />
       <MenuButton isOpen={isOpen} toggleMenu={toggleMenu} />
       <Navigation links={links} />

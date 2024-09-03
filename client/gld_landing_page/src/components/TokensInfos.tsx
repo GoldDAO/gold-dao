@@ -6,7 +6,7 @@ const TokensInfos: React.FC = () => {
   const { t } = useTranslation("tokens");
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px]">
+    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 md:px-10 ">
       <p className="text-[30px] font-inter font-normal leading-[36px] text-center lg:w-3/4 3xl:w-1/2 my-[96px]">
         {t("description")}
       </p>

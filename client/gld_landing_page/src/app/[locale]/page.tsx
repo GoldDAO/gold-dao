@@ -5,7 +5,7 @@ import TokensInfos from "@/components/TokensInfos";
 import WhyInfos from "@/components/WhyInfos";
 export default async function Home() {
   return (
-    <main className="flex flex-col items-center px-2 md:px-10 ">
+    <main className="flex flex-col items-center">
       <Header />
       <Hero />
       <TokensInfos />
