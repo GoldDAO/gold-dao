@@ -1,0 +1,11 @@
+{
+  "title": "Gold DAO",
+  "links": {
+    "gldt": "GLDT",
+    "gld_swap": "GLD SWAP",
+    "gld_nft": "GLD NFT"
+  },
+  "buttons": {
+    "dashboard": "Dashboard"
+  }
+}
