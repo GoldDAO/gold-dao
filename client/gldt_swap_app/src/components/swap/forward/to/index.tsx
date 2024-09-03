@@ -3,8 +3,8 @@ import { useNft } from "@context/index";
 import Card from "@components/shared/card/Base";
 
 const ForwardSwapTo = () => {
-  const { getSelectedTotalGLDTNFTs } = useNft();
-  const totalGLDTtoSwap = getSelectedTotalGLDTNFTs();
+  const { getSelectedTotalGLDT } = useNft();
+  const totalGLDTtoSwap = getSelectedTotalGLDT();
 
   return (
     <div
