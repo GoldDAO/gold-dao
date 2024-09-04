@@ -63,16 +63,10 @@ include:
       src-folder: management
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
-      src-folder: cycles_manager
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
       src-folder: sns_neuron_controller
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: cycles_manager
   # - local: scripts/ci-cd/.canister_builds.yml
   #   inputs:
   #     src-folder: gldt_swap
@@ -105,9 +99,6 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Backend deployments
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: cycles_manager
   # - local: scripts/ci-cd/.canister_deploys.yml
   #   inputs:
   #     src-folder: gldt_swap

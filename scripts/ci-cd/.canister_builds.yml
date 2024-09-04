@@ -4,7 +4,6 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
-          'cycles_manager',
           'gldt_swap',
           'icp_neuron',
           'management',
