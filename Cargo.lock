@@ -343,7 +343,7 @@ version = "0.1.0"
 dependencies = [
  "ic-cdk 0.16.0",
  "ic-cdk-timers 0.7.0",
- "ic0 0.21.1",
+ "ic0 0.23.0",
  "types",
 ]
 
@@ -3090,8 +3090,8 @@ dependencies = [
  "ciborium",
  "hex",
  "ic-cdk 0.16.0",
- "ic-cdk-macros 0.8.4",
- "ic-cdk-timers 0.6.0",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers 0.7.0",
  "ic-stable-memory",
  "num-bigint",
  "num-traits",
