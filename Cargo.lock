@@ -498,62 +498,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cycles_manager"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "canister_logger",
- "canister_state_macros",
- "canister_time",
- "canister_tracing_macros",
- "cycles_manager_api_canister",
- "cycles_minting_canister",
- "cycles_minting_canister_c2c_client",
- "futures",
- "http_request",
- "ic-cdk 0.16.0",
- "ic-cdk-macros 0.13.2",
- "ic-ledger-types",
- "ic-stable-structures",
- "icp_ledger_canister_c2c_client",
- "serde",
- "serializer",
- "sns_root_canister",
- "sns_root_canister_c2c_client",
- "stable_memory",
- "tracing",
- "types",
- "utils",
-]
-
-[[package]]
-name = "cycles_manager_api_canister"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "ic-ledger-types",
- "serde",
- "types",
-]
-
-[[package]]
-name = "cycles_minting_canister"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "candid_gen",
- "serde",
-]
-
-[[package]]
-name = "cycles_minting_canister_c2c_client"
-version = "0.1.0"
-dependencies = [
- "canister_client",
- "cycles_minting_canister",
-]
-
-[[package]]
 name = "darling"
 version = "0.20.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1493,7 +1437,6 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "canister_time",
- "cycles_manager_api_canister",
  "hex",
  "ic-ledger-types",
  "icrc-ledger-types",
@@ -2848,24 +2791,6 @@ dependencies = [
  "serde",
  "sns_governance_canister",
  "types",
-]
-
-[[package]]
-name = "sns_root_canister"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "candid_gen",
- "serde",
- "types",
-]
-
-[[package]]
-name = "sns_root_canister_c2c_client"
-version = "0.1.0"
-dependencies = [
- "canister_client",
- "sns_root_canister",
 ]
 
 [[package]]
