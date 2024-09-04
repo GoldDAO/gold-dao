@@ -321,6 +321,11 @@ dependencies = [
 [[package]]
 name = "canister_client_macros"
 version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "ic-cdk 0.16.0",
+ "types",
+]
 
 [[package]]
 name = "canister_logger"
@@ -342,7 +347,7 @@ name = "canister_time"
 version = "0.1.0"
 dependencies = [
  "ic-cdk 0.16.0",
- "ic-cdk-timers 0.7.0",
+ "ic-cdk-timers",
  "ic0 0.23.0",
  "types",
 ]
@@ -382,33 +387,6 @@ dependencies = [
  "num-traits",
  "serde",
  "windows-targets",
-]
-
-[[package]]
-name = "ciborium"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42e69ffd6f0917f5c029256a24d0161db17cea3997d185db0d35926308770f0e"
-dependencies = [
- "ciborium-io",
- "ciborium-ll",
- "serde",
-]
-
-[[package]]
-name = "ciborium-io"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05afea1e0a06c9be33d539b876f1ce3692f4afea2cb41f740e7743225ed1c757"
-
-[[package]]
-name = "ciborium-ll"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57663b653d948a338bfb3eeba9bb2fd5fcfaecb9e199e87e1eda4d9e8b240fd9"
-dependencies = [
- "ciborium-io",
- "half 2.4.1",
 ]
 
 [[package]]
@@ -571,11 +549,8 @@ dependencies = [
 name = "cycles_minting_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
  "cycles_minting_canister",
- "ic-cdk 0.16.0",
- "types",
 ]
 
 [[package]]
@@ -967,16 +942,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
 
 [[package]]
-name = "half"
-version = "2.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6dd08c532ae367adf81c312a4580bc67f1d0fe8bc9c460520283f4c0ff277888"
-dependencies = [
- "cfg-if",
- "crunchy",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1172,19 +1137,6 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e908da565d9e304e83732500069ebb959e3d2cad80f894889ea37207112c7a0"
-dependencies = [
- "candid 0.10.10",
- "ic-cdk-macros 0.8.4",
- "ic0 0.21.1",
- "serde",
- "serde_bytes",
-]
-
-[[package]]
-name = "ic-cdk"
 version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b1da6a25b045f9da3c9459c0cb2b0700ac368ee16382975a17185a23b9c18ab"
@@ -1225,20 +1177,6 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk-macros"
-version = "0.8.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5a618e4020cea88e933d8d2f8c7f86d570ec06213506a80d4f2c520a9bba512"
-dependencies = [
- "candid 0.10.10",
- "proc-macro2",
- "quote",
- "serde",
- "serde_tokenstream 0.1.7",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "ic-cdk-macros"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a45800053d80a6df839a71aaea5797e723188c0b992618208ca3b941350c7355"
@@ -1263,20 +1201,6 @@ dependencies = [
  "serde",
  "serde_tokenstream 0.2.2",
  "syn 2.0.76",
-]
-
-[[package]]
-name = "ic-cdk-timers"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c43b9706fef3ad10c4192a14801d16bd9539068239f0f06f257857441364329"
-dependencies = [
- "futures",
- "ic-cdk 0.12.2",
- "ic0 0.21.1",
- "serde",
- "serde_bytes",
- "slotmap",
 ]
 
 [[package]]
@@ -1417,11 +1341,8 @@ dependencies = [
 name = "icp_ledger_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "icp_ledger_canister",
- "types",
 ]
 
 [[package]]
@@ -1438,7 +1359,7 @@ dependencies = [
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
+ "ic-cdk-timers",
  "ic-stable-structures",
  "ic-transport-types",
  "icrc-ledger-types",
@@ -1840,11 +1761,8 @@ dependencies = [
 name = "nns_governance_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "nns_governance_canister",
- "types",
 ]
 
 [[package]]
@@ -1928,41 +1846,17 @@ name = "ogy_sns_rewards_api_canister"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "candid_gen",
- "canister_logger",
- "canister_state_macros",
- "canister_time",
- "canister_tracing_macros",
- "futures",
- "http_request",
- "ic-cdk 0.16.0",
- "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
- "ic-ledger-types",
- "ic-stable-structures",
- "icrc-ledger-types",
- "icrc_ledger_canister_c2c_client",
- "num-bigint",
  "serde",
- "serde_json",
- "serializer",
  "sns_governance_canister",
- "sns_governance_canister_c2c_client",
- "stable_memory",
- "tracing",
  "types",
- "utils",
 ]
 
 [[package]]
 name = "ogy_sns_rewards_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "ogy_sns_rewards_api_canister",
- "types",
 ]
 
 [[package]]
@@ -2623,7 +2517,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bef2ebfde456fb76bbcf9f59315333decc4fda0b2b44b420243c11e0f5ec1f5"
 dependencies = [
- "half 1.8.3",
+ "half",
  "serde",
 ]
 
@@ -2835,33 +2729,9 @@ dependencies = [
 name = "sns_governance_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
  "ic-cdk 0.16.0",
  "sns_governance_canister",
- "types",
-]
-
-[[package]]
-name = "sns_ledger_canister"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "candid_gen",
- "canister_time",
- "icrc-ledger-types",
- "serde",
- "types",
-]
-
-[[package]]
-name = "sns_ledger_canister_c2c_client"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "canister_client",
- "ic-cdk 0.16.0",
- "sns_ledger_canister",
  "types",
 ]
 
@@ -2876,31 +2746,20 @@ dependencies = [
  "canister_time",
  "canister_tracing_macros",
  "futures",
- "getrandom 0.2.15",
- "hex",
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
- "ic-ledger-types",
  "ic-stable-structures",
- "ic-transport-types",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
- "k256",
  "ledger_utils",
  "ogy_sns_rewards_api_canister",
  "ogy_sns_rewards_c2c_client",
  "serde",
- "serde_bytes",
- "serde_cbor",
  "serde_json",
- "serde_with",
  "serializer",
- "sha256",
  "sns_governance_canister",
  "sns_governance_canister_c2c_client",
- "sns_ledger_canister_c2c_client",
  "sns_neuron_controller_api_canister",
  "stable_memory",
  "tracing",
@@ -2914,9 +2773,6 @@ name = "sns_neuron_controller_api_canister"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "ic-cdk 0.16.0",
- "ic-cdk-macros 0.13.2",
- "ic-ledger-types",
  "serde",
  "sns_governance_canister",
  "types",
@@ -2935,7 +2791,7 @@ dependencies = [
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
+ "ic-cdk-timers",
  "ic-stable-structures",
  "ic0 0.23.0",
  "icrc-ledger-types",
@@ -2981,11 +2837,8 @@ dependencies = [
 name = "sns_root_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "sns_root_canister",
- "types",
 ]
 
 [[package]]
@@ -3087,19 +2940,13 @@ name = "super_stats_v3"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "ciborium",
  "hex",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
+ "ic-cdk-timers",
  "ic-stable-memory",
- "num-bigint",
  "num-traits",
- "scopeguard",
  "serde",
- "serde_bytes",
- "serde_cbor",
- "sha2",
  "super_stats_v3_api",
  "utils",
 ]
@@ -3109,33 +2956,19 @@ name = "super_stats_v3_api"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "ciborium",
  "hex",
- "ic-cdk 0.12.2",
- "ic-cdk-macros 0.8.4",
- "ic-cdk-timers 0.6.0",
+ "ic-cdk 0.16.0",
  "ic-stable-memory",
- "num-bigint",
- "num-traits",
- "scopeguard",
  "serde",
  "serde_bytes",
- "serde_cbor",
- "sha2",
 ]
 
 [[package]]
 name = "super_stats_v3_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
- "ic-stable-memory",
- "num-bigint",
- "serde",
  "super_stats_v3_api",
- "types",
 ]
 
 [[package]]
@@ -3300,15 +3133,10 @@ dependencies = [
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
- "ic-ledger-types",
  "ic-stable-structures",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
- "ledger_utils",
- "num-bigint",
  "serde",
- "serde_bytes",
  "serde_json",
  "serializer",
  "sns_governance_canister",
@@ -3328,30 +3156,10 @@ name = "token_metrics_api"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "canister_logger",
- "canister_state_macros",
- "canister_time",
- "canister_tracing_macros",
- "futures",
- "http_request",
- "ic-cdk 0.16.0",
- "ic-cdk-macros 0.13.2",
- "ic-cdk-timers 0.7.0",
  "ic-ledger-types",
- "ic-stable-structures",
  "icrc-ledger-types",
- "icrc_ledger_canister_c2c_client",
- "ledger_utils",
- "num-bigint",
  "serde",
- "serde_bytes",
- "serializer",
- "sns_governance_canister",
- "sns_governance_canister_c2c_client",
- "stable_memory",
  "super_stats_v3_api",
- "super_stats_v3_c2c_client",
- "tracing",
  "types",
  "utils",
 ]

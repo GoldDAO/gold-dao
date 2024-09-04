@@ -17,14 +17,8 @@ ic-cdk-macros = { workspace = true }
 candid = { workspace = true }
 serde = { workspace = true }
 ic-cdk-timers = { workspace = true }
-serde_bytes = { workspace = true }
-serde_cbor = { workspace = true }
 ic-stable-memory = "0.4.4"
-ciborium = "0.2.1"
-scopeguard = "1.2.0"
-sha2 = "0.10"
 hex = "0.4.2"
-num-bigint = "0.4.4"
 num-traits = "0.2.17"
 super_stats_v3_api = { path = "../api" }
 utils = { path = '../../../libraries/utils' }
