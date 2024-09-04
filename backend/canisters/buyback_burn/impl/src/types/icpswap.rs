@@ -4,6 +4,7 @@ use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
 use crate::types::*;
+use types::CanisterId;
 
 #[async_trait]
 #[typetag::serde]
@@ -16,10 +17,14 @@ impl SwapClient for ICPSwapClient {
             input_token: self.input_token(),
             output_token: self.output_token(),
             exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig {
-                swap_canister_id: self.swap_canister_id(),
+                swap_canister_id: Some(self.swap_canister_id()),
                 zero_for_one: self.zero_for_one(),
             }),
         }
+    }
+
+    fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId) {
+        self.set_swap_canister_id(swap_canister_id);
     }
 
     fn clone_box(&self) -> Box<dyn SwapClient> {

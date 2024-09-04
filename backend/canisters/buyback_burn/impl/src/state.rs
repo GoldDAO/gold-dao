@@ -61,11 +61,11 @@ impl RuntimeState {
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub gldgov_ledger_canister_id: CanisterId,
+    pub icp_swap_canister_id: Principal,
     pub swap_interval: Duration,
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
-    // pub timer_jobs: TimerJobs<TimerJob, Data>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
@@ -106,20 +106,11 @@ impl Data {
         let mut swap_clients = SwapClients::init();
 
         // TODO: add other tokens support
-        swap_clients.add_swap_client(SwapConfig {
-            swap_client_id: 0,
-            input_token: TokenInfo::icp(),
-            output_token: TokenInfo::gldgov(),
-            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
-        });
+        swap_clients.add_swap_client(0, TokenInfo::icp(), TokenInfo::gldgov());
+
         // NOTE: here we add all other tokens except of
         for (id, token) in tokens.iter().enumerate() {
-            swap_clients.add_swap_client(SwapConfig {
-                swap_client_id: (id as u128) + 1,
-                input_token: TokenInfo::icp(),
-                output_token: *token,
-                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
-            });
+            swap_clients.add_swap_client((id as u128) + 1, TokenInfo::icp(), *token);
         }
 
         Self {
@@ -127,6 +118,7 @@ impl Data {
             gldgov_ledger_canister_id,
             swap_interval: Duration::from_secs(swap_interval_in_secs),
             swap_clients,
+            icp_swap_canister_id,
             burn_config: BurnConfig::new(burn_rate, min_burn_amount, burn_interval_in_secs),
             token_swaps: TokenSwaps::default(),
         }
@@ -150,70 +142,3 @@ pub struct CanisterInfo {
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }
-
-// #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-// pub struct SwapConfig {
-//     pub swap_client_id: u128,
-//     pub input_token: TokenInfo,
-//     pub output_token: TokenInfo,
-//     pub exchange_config: ExchangeConfig,
-// }
-
-// impl SwapConfig {
-//     pub async fn new(
-//         swap_client_id: u128,
-//         input_token: TokenInfo,
-//         output_token: TokenInfo,
-//         exchange_config: ExchangeConfig
-//     ) -> Self {
-//         // Fetch token standards asynchronously
-//         let input_token_standard = icrc_ledger_canister_c2c_client::icrc1_supported_standards(
-//             input_token.ledger_id
-//         ).await;
-//         let output_token_standard = icrc_ledger_canister_c2c_client::icrc1_supported_standards(
-//             output_token.ledger_id
-//         ).await;
-
-//         // Extract the first standard or handle errors if fetching fails
-//         let input_standard = match input_token_standard {
-//             Ok(standards) => standards.first().unwrap().name.cloned(),
-//             Err(e) => {
-//                 error!("Failed to fetch input token standard: {:?}", e);
-//                 None
-//             }
-//         };
-
-//         let output_standard = match output_token_standard {
-//             Ok(standards) => standards.first().unwrap().name.cloned(),
-//             Err(e) => {
-//                 error!("Failed to fetch output token standard: {:?}", e);
-//                 None
-//             }
-//         };
-
-//         let args = icpswap_factory_canister::get_pool::Args {
-//             token0: icpswap_factory_canister::get_pool::Token {
-//                 address: input_token.ledger_id.to_string(),
-//                 standard: input_standard.unwrap(),
-//             },
-//             token1: icpswap_factory_canister::get_pool::Token {
-//                 address: output_token.ledger_id.to_string(),
-//                 standard: output_standard.unwrap(),
-//             },
-//             // NOTE: it's always 3000: https://github.com/ICPSwap-Labs/docs/blob/main/01.SwapFactory/01.Searching_a_Pool.md
-//             fee: (3000).into(),
-//         };
-
-//         let icpswap_swap_pool_id = icpswap_factory_canister_c2c_client::get_pool(
-//             icpswap_swap_pool_id,
-//             &args
-//         ).await;
-
-//         SwapConfig {
-//             swap_client_id,
-//             input_token,
-//             output_token,
-//             exchange_config,
-//         }
-//     }
-// }

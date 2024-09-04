@@ -10,18 +10,18 @@ use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ error, info };
+use tracing::{ debug, error, info };
 use utils::env::Environment;
 use crate::types::TokenSwap;
 
 use canister_time::NANOS_PER_MILLISECOND;
-const MAX_ATTEMPTS: u8 = 3;
+const MAX_ATTEMPTS: u8 = 1;
 
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    let swap_interval = read_state(|s| s.data.swap_interval);
-    run_now_then_interval(swap_interval, run);
+    // let swap_interval = read_state(|s| s.data.swap_interval);
+    // run_now_then_interval(swap_interval, run);
 }
 
 pub fn run() {
@@ -82,7 +82,9 @@ pub(crate) async fn process_token_swap(
 
     // FIXME: add here minimum amount to swap
     let input_amount = calculate_percentage_of_amount(available_amount, burn_rate);
+    debug!("input_amount: {}", input_amount);
     let amount_to_dex = input_amount.saturating_sub(swap_config.input_token.fee.into());
+    debug!("amount_to_dex: {}", amount_to_dex);
 
     if amount_to_dex == 0 {
         return Err("Insufficient balance to swap".to_string());

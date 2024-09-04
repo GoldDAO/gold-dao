@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use tracing::error;
 use types::TimestampMillis;
 use crate::types::*;
-use buyback_burn_canister::get_active_swaps:: Response ;
+use buyback_burn_canister::get_active_swaps::Response;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
@@ -50,8 +50,9 @@ impl TokenSwaps {
     }
 
     pub fn get_next_id(&self) -> u128 {
-        let current_len: u128 = self.swaps.len().try_into().unwrap();
-        current_len + 1
+        let swaps_len: u128 = self.swaps.len().try_into().unwrap();
+        let history_len: u128 = self.history.len().try_into().unwrap();
+        swaps_len + history_len + 1
     }
 
     pub fn get_swap_info(&self, swap_id: u128) -> Option<TokenSwap> {
@@ -88,5 +89,17 @@ impl TokenSwaps {
     // pub number_of_attempted_swaps: u64,
     // pub number_of_failed_swaps: u64,
     // pub user_swaps: HashMap<Principal, UserSwap>,
-    pub fn get_metrics(&self) {}
+    pub fn get_metrics(&self) -> TokenSwapsMetrics {
+        TokenSwapsMetrics {
+            active_swaps: self.swaps.clone(),
+            active_swaps_len: self.swaps.len() as u64,
+            history_len: self.history.len() as u64,
+        }
+    }
+}
+
+pub struct TokenSwapsMetrics {
+    active_swaps: HashMap<u128, TokenSwap>,
+    active_swaps_len: u64,
+    history_len: u64,
 }

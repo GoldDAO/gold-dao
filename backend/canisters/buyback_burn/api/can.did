@@ -4,7 +4,7 @@ type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ExchangeConfig = variant { ICPSwap : ICPSwapConfig };
 type ICPSwapConfig = record {
   zero_for_one : bool;
-  swap_canister_id : principal;
+  swap_canister_id : opt principal;
 };
 type InitArgs = record {
   min_icp_burn_amount : Tokens;

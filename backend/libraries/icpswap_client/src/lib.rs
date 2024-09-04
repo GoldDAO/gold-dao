@@ -108,6 +108,10 @@ impl ICPSwapClient {
         self.swap_canister_id
     }
 
+    pub fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId) {
+        self.swap_canister_id = swap_canister_id;
+    }
+
     pub fn zero_for_one(&self) -> bool {
         self.zero_for_one
     }
