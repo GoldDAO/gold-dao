@@ -12,7 +12,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-ic-cdk = "0.12.0"
+ic-cdk = { workspace = true }
 ic-cdk-macros = "0.8.2"
 candid = "0.10.1"
 serde = "1.0.193"
@@ -30,4 +30,3 @@ super_stats_v3_api = { path = "../api" }
 #pocket-ic = "2.0.1"
 #icrc-ledger-types = { path = "../icrc_types" }
 utils = { path = '../../../libraries/utils' }
-
