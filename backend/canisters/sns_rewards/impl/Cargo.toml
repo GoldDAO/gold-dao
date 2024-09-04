@@ -36,4 +36,4 @@ tracing = { workspace = true }
 futures = { workspace = true }
 sns_rewards_api_canister = { path = "../api" }
 time = { workspace = true }
-ic0 = "0.23.0"
+ic0 = { workspace = true }
