@@ -24,17 +24,14 @@ const WhyInfos: React.FC = () => {
       </div>
 
       {/* Section Features */}
-      <div className="w-full flex flex-col md:flex-row mb-8 border-b border-secondary">
+      <div className="w-full flex flex-col md:flex-row border-b border-secondary">
         {["decentralized", "ownership", "crossChain", "audited"].map((feature, index) => (
-          <>
             <div
-              key={feature}
-              className="font-sans text-2xl font-semibold leading-[32px] text-secondary bg-black md:w-1/4 text-center py-2"
+            key={feature}
+              className="font-sans text-2xl font-semibold leading-[32px] text-secondary bg-black md:w-1/4 text-center content-center py-2"
             >
               {t(`features.${feature}`)}
             </div>
-            {index < 3 && <div className="border-b md:border-r w-[1px] border-secondary"></div>}
-          </>
         ))}
       </div>
     </>

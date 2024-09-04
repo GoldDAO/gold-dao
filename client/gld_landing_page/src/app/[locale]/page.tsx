@@ -1,4 +1,5 @@
 
+import GoldDAOChart from "@/components/GoldDAOChart";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TokensInfos from "@/components/TokensInfos";
@@ -10,6 +11,7 @@ export default async function Home() {
       <Hero />
       <TokensInfos />
       <WhyInfos />
+      <GoldDAOChart />
     </main>
   );
 }
