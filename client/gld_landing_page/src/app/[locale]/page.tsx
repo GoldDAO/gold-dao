@@ -1,5 +1,6 @@
 
 import GoldDAOChart from "@/components/GoldDAOChart";
+import Governance from "@/components/Governance";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Partners from "@/components/Partners";
@@ -16,6 +17,7 @@ export default async function Home() {
       <GoldDAOChart />
       <TokensCards />
       <Partners />
+      <Governance />
     </main>
   );
 }
