@@ -12,7 +12,7 @@ const WhitePaper = () => {
       }}
       className="flex flex-col items-center justify-center w-full px-2 bg-cover bg-center md:px-10 bg-white py-24 border-y border-secondary">
       <p className="text-6xl font-bold text-secondary ">{t("title")}</p>
-      <p className="text-[#161819] text-[60px] font-normal leading-[60px] ">
+      <p className="text-[#161819] text-[60px] text-center font-normal leading-[60px] ">
         {t("description")}
       </p>
       <button className="main-button mt-6">{t("button")}</button>

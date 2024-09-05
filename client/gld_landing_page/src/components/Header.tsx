@@ -27,7 +27,7 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="flex relative z-50  justify-between w-full items-center border bg-white/20 border-[#FAF9F826] rounded-full m-4 p-1 text-sm max-w-screen-xl bg-clip-padding backdrop-filter backdrop-blur-lg text-main">
+    <header className="flex z-50 fixed justify-between items-center border bg-white/20 border-[#FAF9F826] rounded-full my-4 p-1 text-sm 4xl:max-w-screen-xl w-[calc(100%-60px)] mx-auto bg-clip-padding backdrop-filter backdrop-blur-lg text-main">
       <LogoSection />
       <MenuButton isOpen={isOpen} toggleMenu={toggleMenu} />
       <Navigation links={links} />

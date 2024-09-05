@@ -7,7 +7,7 @@ const TokensInfos: React.FC = () => {
   const { t } = useTranslation("tokens");
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 md:px-10 ">
+    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
       <p className="text-[30px] font-inter font-normal leading-[36px] text-center lg:w-3/4 3xl:w-1/2 my-[96px]">
         {t("description")}
       </p>
@@ -36,7 +36,7 @@ const Card: React.FC<CardProps> = ({
   const { t } = useTranslation("tokens");
 
   return (
-    <div className="max-w-sm overflow-hidden shadow-lg bg-white rounded-[20px]">
+    <div className="w-[calc(100%-45px)] justify-self-center overflow-hidden shadow-lg bg-white rounded-[20px]">
       <div className="px-3 p-2">
         <div className="p-4 space-y-8">
           <div className="flex flex-row items-center align-middle space-x-4 mt-6">
@@ -112,7 +112,7 @@ const CardGrid: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 3xl:gap-[20px]">
       {cards.map((card, index) => (
         <Card key={index} {...card} />
       ))}
