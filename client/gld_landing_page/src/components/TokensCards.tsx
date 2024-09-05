@@ -21,7 +21,7 @@ const TokensCards = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-[14rem] px-2 xl:w-3/4 pt-[96px] mb-[96px]">
+    <div className="flex flex-col items-center justify-center gap-[14rem] px-2 xl:w-3/4 pt-[96px] mb-[96px] bg-[#FBF8F1]">
       {cards && cards.map((card, index) => (
         <div
           key={index}
@@ -49,8 +49,7 @@ const TokensCards = () => {
               src={card.imageSrc}
               alt={card.title}
               layout="fill"
-              objectFit="cover"
-              className="rounded-b-[20px] md:rounded-r-[20px] md:rounded-b-none"
+              className="rounded-b-[20px] md:rounded-r-[20px] md:rounded-b-none object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
