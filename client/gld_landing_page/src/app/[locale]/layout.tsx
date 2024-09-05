@@ -6,7 +6,7 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const i18nNamespaces = ["header", "hero", "tokens", "why","goldDaoChart"];
+const i18nNamespaces = ["header", "hero", "tokens", "why","goldDaoChart", "cards"];
 
 export const metadata: Metadata = {
   title: "The GOLD DAO Website",

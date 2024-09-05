@@ -2,6 +2,7 @@
 import GoldDAOChart from "@/components/GoldDAOChart";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import TokensCards from "@/components/TokensCards";
 import TokensInfos from "@/components/TokensInfos";
 import WhyInfos from "@/components/WhyInfos";
 export default async function Home() {
@@ -12,6 +13,7 @@ export default async function Home() {
       <TokensInfos />
       <WhyInfos />
       <GoldDAOChart />
+      <TokensCards />
     </main>
   );
 }

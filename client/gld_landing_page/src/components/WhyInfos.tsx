@@ -24,15 +24,17 @@ const WhyInfos: React.FC = () => {
       </div>
 
       {/* Section Features */}
-      <div className="w-full flex flex-col md:flex-row border-b border-secondary">
-        {["decentralized", "ownership", "crossChain", "audited"].map((feature, index) => (
+      <div className="w-full flex flex-col md:flex-row border-b  border-secondary">
+        {["decentralized", "ownership", "crossChain", "audited"].map((feature, index) => {
+          const isLast = index === ["decentralized", "ownership", "crossChain", "audited"].length - 1;
+          return (
             <div
             key={feature}
-              className="font-sans text-2xl font-semibold leading-[32px] text-secondary bg-black md:w-1/4 text-center content-center py-2"
+              className={`${!isLast && 'border-r border-secondary'} font-sans text-2xl font-semibold   leading-[32px] text-secondary bg-black md:w-1/4 text-center content-center py-2`}
             >
               {t(`features.${feature}`)}
             </div>
-        ))}
+        )})}
       </div>
     </>
   );
