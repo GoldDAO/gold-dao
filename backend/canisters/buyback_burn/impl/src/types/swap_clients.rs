@@ -20,12 +20,11 @@ impl SwapClients {
 
     pub fn add_swap_client(
         &mut self,
-        swap_client_id: u128,
         input_token: TokenInfo,
         output_token: TokenInfo,
         icp_swap_canister_id: Principal
-        // swap_config: SwapConfig
     ) {
+        let swap_client_id = self.get_next_id();
         let exchange_config = ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id));
         self.swap_clients.push(
             build_swap_client(SwapConfig {
@@ -35,7 +34,12 @@ impl SwapClients {
                 exchange_config,
             })
         );
-        info!("Added swap client {:?}", swap_client_id);
+        info!("Added swap client {}", swap_client_id);
+    }
+
+    pub fn get_next_id(&self) -> u128 {
+        let swap_client_len: u128 = self.swap_clients.len().try_into().unwrap();
+        swap_client_len + 1
     }
 
     pub fn iter(&self) -> std::slice::Iter<'_, Box<dyn SwapClient>> {

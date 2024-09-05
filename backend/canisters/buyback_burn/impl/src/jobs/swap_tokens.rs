@@ -228,7 +228,6 @@ pub(crate) async fn process_token_swap(
                 token_swap.success = Some(successful_swap);
                 state.data.token_swaps.upsert(token_swap);
             });
-            info!("Successful withdraw: {}", successful_swap);
         }
     }
 

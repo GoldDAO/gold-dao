@@ -1,7 +1,7 @@
 use candid::{ CandidType, Principal };
 use ic_ledger_types::Tokens;
 use serde::{ Deserialize, Serialize };
-use types::{ TokenInfo };
+use types::TokenInfo;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
@@ -18,7 +18,7 @@ pub struct InitArgs {
     pub burn_interval_in_secs: u64,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
 pub struct TokenAndPool {
     pub token: TokenInfo,
     pub swap_pool_id: Principal,

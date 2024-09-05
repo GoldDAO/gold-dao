@@ -103,14 +103,8 @@ impl Data {
     ) -> Self {
         let mut swap_clients = SwapClients::init();
 
-        // NOTE: here we add all other tokens except of ICP
-        for (id, token) in tokens.iter().enumerate() {
-            swap_clients.add_swap_client(
-                id as u128,
-                token.token,
-                gldgov_token_info,
-                token.swap_pool_id
-            );
+        for token in tokens.iter() {
+            swap_clients.add_swap_client(token.token, gldgov_token_info, token.swap_pool_id);
         }
 
         Self {
