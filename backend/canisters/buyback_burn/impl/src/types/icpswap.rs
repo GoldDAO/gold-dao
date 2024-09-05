@@ -17,7 +17,7 @@ impl SwapClient for ICPSwapClient {
             input_token: self.input_token(),
             output_token: self.output_token(),
             exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig {
-                swap_canister_id: Some(self.swap_canister_id()),
+                swap_canister_id: self.swap_canister_id(),
                 zero_for_one: self.zero_for_one(),
             }),
         }

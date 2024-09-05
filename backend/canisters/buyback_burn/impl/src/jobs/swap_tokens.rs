@@ -20,8 +20,8 @@ const MAX_ATTEMPTS: u8 = 1;
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    // let swap_interval = read_state(|s| s.data.swap_interval);
-    // run_now_then_interval(swap_interval, run);
+    let swap_interval = read_state(|s| s.data.swap_interval);
+    run_now_then_interval(swap_interval, run);
 }
 
 pub fn run() {
@@ -228,6 +228,7 @@ pub(crate) async fn process_token_swap(
                 token_swap.success = Some(successful_swap);
                 state.data.token_swaps.upsert(token_swap);
             });
+            info!("Successful withdraw: {}", successful_swap);
         }
     }
 

@@ -5,19 +5,15 @@ use types::CanisterId;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct ICPSwapConfig {
-    pub swap_canister_id: Option<CanisterId>,
+    pub swap_canister_id: CanisterId,
     pub zero_for_one: bool,
 }
 
 impl ICPSwapConfig {
-    pub fn new() -> Self {
+    pub fn new(swap_canister_id: Principal) -> Self {
         Self {
-            swap_canister_id: None,
+            swap_canister_id,
             zero_for_one: true,
         }
-    }
-
-    pub fn set_swap_canister_id(&mut self, swap_canister_id: Principal) {
-        self.swap_canister_id = Some(swap_canister_id);
     }
 }

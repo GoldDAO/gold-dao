@@ -1,18 +1,16 @@
 use crate::types::token_swaps::TokenSwaps;
 use buyback_burn_canister::get_config::Response as GetConfigResponse;
+use buyback_burn_canister::init::TokenAndPool;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
 use serde::{ Deserialize, Serialize };
 use std::time::Duration;
 use types::BuildVersion;
-use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
+use types::{ Cycles, TimestampMillis, TokenInfo };
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
 use crate::types::SwapClients;
-use buyback_burn_canister::swap_config::SwapConfig;
-use buyback_burn_canister::swap_config::ExchangeConfig;
-use buyback_burn_canister::icpswap::ICPSwapConfig;
 use tracing::error;
 
 canister_state!(RuntimeState);
@@ -50,7 +48,7 @@ impl RuntimeState {
                 cycles_balance: self.env.cycles_balance(),
             },
             authorized_principals: self.data.authorized_principals.to_vec(),
-            gldgov_ledger_canister_id: self.data.gldgov_ledger_canister_id,
+            gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             // TODO: add more metrics
         }
@@ -60,7 +58,7 @@ impl RuntimeState {
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
-    pub gldgov_ledger_canister_id: CanisterId,
+    pub gldgov_token_info: TokenInfo,
     pub icp_swap_canister_id: Principal,
     pub swap_interval: Duration,
     pub swap_clients: SwapClients,
@@ -95,8 +93,8 @@ impl Data {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         authorized_principals: Vec<Principal>,
-        tokens: Vec<TokenInfo>,
-        gldgov_ledger_canister_id: CanisterId,
+        tokens: Vec<TokenAndPool>,
+        gldgov_token_info: TokenInfo,
         swap_interval_in_secs: u64,
         icp_swap_canister_id: Principal,
         burn_rate: u8,
@@ -105,17 +103,19 @@ impl Data {
     ) -> Self {
         let mut swap_clients = SwapClients::init();
 
-        // TODO: add other tokens support
-        swap_clients.add_swap_client(0, TokenInfo::icp(), TokenInfo::gldgov());
-
-        // NOTE: here we add all other tokens except of
+        // NOTE: here we add all other tokens except of ICP
         for (id, token) in tokens.iter().enumerate() {
-            swap_clients.add_swap_client((id as u128) + 1, TokenInfo::icp(), *token);
+            swap_clients.add_swap_client(
+                id as u128,
+                token.token,
+                gldgov_token_info,
+                token.swap_pool_id
+            );
         }
 
         Self {
             authorized_principals: authorized_principals.into_iter().collect(),
-            gldgov_ledger_canister_id,
+            gldgov_token_info,
             swap_interval: Duration::from_secs(swap_interval_in_secs),
             swap_clients,
             icp_swap_canister_id,
@@ -129,7 +129,7 @@ impl Data {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
-    pub gldgov_ledger_canister_id: CanisterId,
+    pub gldgov_token_info: TokenInfo,
     pub burn_config: BurnConfig,
 }
 

@@ -4,16 +4,16 @@ type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ExchangeConfig = variant { ICPSwap : ICPSwapConfig };
 type ICPSwapConfig = record {
   zero_for_one : bool;
-  swap_canister_id : opt principal;
+  swap_canister_id : principal;
 };
 type InitArgs = record {
   min_icp_burn_amount : Tokens;
   test_mode : bool;
-  gldgov_ledger_canister_id : principal;
   icp_swap_canister_id : principal;
   burn_rate : nat8;
+  gldgov_token_info : TokenInfo;
   authorized_principals : vec principal;
-  tokens : vec TokenInfo;
+  tokens : vec TokenAndPool;
   swap_interval_in_secs : nat64;
   commit_hash : text;
   burn_interval_in_secs : nat64;
@@ -29,6 +29,7 @@ type SwapConfig = record {
   exchange_config : ExchangeConfig;
   output_token : TokenInfo;
 };
+type TokenAndPool = record { token : TokenInfo; swap_pool_id : principal };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;

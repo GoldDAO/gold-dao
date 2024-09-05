@@ -32,7 +32,7 @@ async fn run_async() {
 pub async fn process_token_burn() -> Result<(), String> {
     // Retrieve the burn configuration and ledger canister ID from the state
     let burn_config = read_state(|s| s.data.burn_config.clone());
-    let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_ledger_canister_id);
+    let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_token_info.ledger_id);
     let minting_account = match
         icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
     {
