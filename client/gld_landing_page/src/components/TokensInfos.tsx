@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
 
 const TokensInfos: React.FC = () => {
   const { t } = useTranslation("tokens");
@@ -39,7 +40,7 @@ const Card: React.FC<CardProps> = ({
       <div className="px-3 p-2">
         <div className="p-4 space-y-8">
           <div className="flex flex-row items-center align-middle space-x-4 mt-6">
-            <img src={logoSrc} alt={title} className="w-[40px] h-[40px]" />
+            <Image src={logoSrc} alt={title} className="w-[40px] h-[40px]" width={40} height={40} />
             <div className="font-semibold text-[36px]">{title}</div>
           </div>
           <p className="text-gray-700 text-base h-[72px]">{description}</p>
@@ -61,10 +62,12 @@ const Card: React.FC<CardProps> = ({
             )}
           </div>
         </div>
-        <img
+        <Image
           className="w-full min-h-[215px] object-cover rounded-[20px] mt-8"
           src={imageSrc}
           alt={title}
+          width={40}
+          height={40}
         />
       </div>
     </div>

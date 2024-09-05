@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
 interface InfoCardProps {
   iconSrc: string;
   iconAlt: string;
@@ -11,9 +12,11 @@ interface InfoCardProps {
 const InfoCard = ({ iconSrc, iconAlt, text, value }: InfoCardProps) => (
   <div className="flex h-10 px-4 pl-2 justify-center items-center rounded-3xl border gap-[8px] border-[#D3B872] bg-white">
     {iconSrc && (
-      <img
+      <Image
         src={iconSrc}
         alt={iconAlt}
+        width={24}
+        height={24}
         className="w-[24px] h-[24px] flex-shrink-0"
       />
     )}
