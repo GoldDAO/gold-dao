@@ -11,10 +11,10 @@ const GoldDAOChart = () => {
       style={{
         backgroundImage: "url('/static/backgrounds/bar_texture_full.svg')",
       }}
-      className="relative w-full h-full flex flex-col items-center justify-center bg-cover bg-center pb-[10rem]"
+      className="relative w-full h-full flex flex-col items-center justify-center bg-cover bg-center pb-[10rem] "
     >
       <div className="text-3xl font-bold py-24">{t("ecosystemTitle")}</div>
-      <div className="border border-[#E8E6E1] w-[90%] md:w-3/4 rounded-xl p-2 md:p-4 items-center justify-center bg-white md:max-h-[538px] xl:h-[450px] 2xl:h-[500px] 3xl:h-[538px]">
+      <div className="border border-[#E8E6E1] w-[90%] md:w-full rounded-xl xl:w-3/4 p-2 md:p-4 items-center 4xl:max-w-screen-2xl justify-center bg-white md:max-h-[538px] xl:h-[450px] 2xl:h-[500px] 3xl:h-[538px]">
         <Image
           src="/static/illustrations/GoldDAO-Ecosystem.svg"
           alt={t("ecosystemAlt")}
@@ -25,7 +25,7 @@ const GoldDAOChart = () => {
         <Image
           src="/static/illustrations/GoldDAO-chart-mobile.svg"
           alt={t("ecosystemAlt")}
-          width={500}
+          width={480}
           height={1200}
           className="mx-auto self-center pt-4 block md:hidden"
         />

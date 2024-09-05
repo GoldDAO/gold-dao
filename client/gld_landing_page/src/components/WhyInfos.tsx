@@ -30,7 +30,7 @@ const WhyInfos: React.FC = () => {
           return (
             <div
             key={feature}
-              className={`${!isLast && 'border-r border-secondary'} font-sans text-2xl font-semibold   leading-[32px] text-secondary bg-black md:w-1/4 text-center content-center py-2`}
+              className={`${!isLast && 'md:border-r border-secondary'} border-b md:border-b-0 border-secondaryfont-sans text-2xl font-semibold   leading-[32px] text-secondary bg-black md:w-1/4 text-center content-center py-2`}
             >
               {t(`features.${feature}`)}
             </div>

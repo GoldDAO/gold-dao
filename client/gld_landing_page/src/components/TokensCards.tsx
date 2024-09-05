@@ -21,7 +21,7 @@ const TokensCards = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-[14rem] px-2 xl:w-3/4 pt-[96px] mb-[96px] bg-[#FBF8F1]">
+    <div className="flex flex-col items-center justify-center gap-[14rem] px-2 w-[calc(100%-45px)] pt-[96px] 4xl:max-w-screen-2xl mb-[96px] bg-[#FBF8F1]">
       {cards && cards.map((card, index) => (
         <div
           key={index}
