@@ -8,7 +8,7 @@ const Success = () => {
 
   const handleOnClickGoToTxView = () => {
     handleClose;
-    navigate("/swap/account");
+    navigate("/swap/account#active-swaps");
   };
 
   return (
