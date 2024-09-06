@@ -29,3 +29,25 @@
 	top: 0;
 	padding-top: calc(var(--index) * var(--cardTopPadding));
 }
+
+@keyframes pulse {
+	0% {
+	  opacity: 1;
+	}
+	50% {
+	  opacity: 0.5;
+	}
+	100% {
+	  opacity: 1;
+	}
+  }
+  
+  .loading-skeleton {
+	background: linear-gradient(-90deg, #D3B872 0%, #fff 50%, #D3B872 100%);
+	background-size: 200% 100%;
+	animation: pulse 1.5s infinite;
+	border-radius: 2px;
+	width: 65px; 
+	height: 16px;
+  }
+  

@@ -1,8 +1,11 @@
+/* eslint-disable react/jsx-no-undef */
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import initTranslations from "../i18n";
-import TranslationsProvider from "@/components/TranslationsProvider";
+import TranslationsProvider from "@/providers/TranslationsProvider";
+import i18nConfig from '../../../i18nConfig';
 import "./globals.css";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +27,9 @@ export const metadata: Metadata = {
   description:
     "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
 };
-
+export function generateStaticParams() {
+  return i18nConfig.locales.map(locale => ({ locale}))
+} 
 export default async function RootLayout({
   children,
   locale,
@@ -39,8 +44,10 @@ export default async function RootLayout({
       resources={resources}
       locale={locale}
       namespaces={i18nNamespaces}>
-      <html lang="en">
-        <body className={`${inter.className} bg-[#FAF9F8]`}>{children}</body>
+      <html lang={locale}>
+        <body className={`${inter.className} bg-[#FAF9F8]`}>
+          <ReactQueryProvider>{children}</ReactQueryProvider>
+        </body>
       </html>
     </TranslationsProvider>
   );
