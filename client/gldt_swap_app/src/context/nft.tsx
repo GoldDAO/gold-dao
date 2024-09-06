@@ -13,6 +13,8 @@ import {
   GLD_NFT_100G_CANISTER_ID,
   GLD_NFT_1000G_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
+  REVERSE_GLDT_TX_FEE,
+  GLDT_DECIMAL
 } from "@constants";
 
 export type TokenId = {
@@ -187,7 +189,7 @@ const useNftProviderValue = () => {
   const canBuyNft = (collectionIndex: CollectionIndex, user_balance: number): boolean => {
     const totalGLDTtoSwap = getSelectedTotalGLDT();
     const singlePrice = state.nfts[collectionIndex].value * 100;
-    const remaining =  user_balance - totalGLDTtoSwap - singlePrice;
+    const remaining =  ((user_balance - totalGLDTtoSwap) - singlePrice) - (REVERSE_GLDT_TX_FEE / GLDT_DECIMAL);
     return remaining > 0;
   }
 
