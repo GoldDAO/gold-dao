@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import initTranslations from "../i18n";
 import TranslationsProvider from "@/providers/TranslationsProvider";
-import i18nConfig from '../../../i18nConfig';
+import i18nConfig from "../../../i18nConfig";
 import "./globals.css";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
@@ -25,26 +25,26 @@ const i18nNamespaces = [
 export const metadata: Metadata = {
   title: "The GOLD DAO Website",
   description:
-    "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
+    "Gold DAO is a decentralized community dedicated to revolutionizing the way gold is owned and utilised. Join the DAO in harnessing the power of blockchain technology to create a more transparent and accessible gold market.",
 };
 export function generateStaticParams() {
-  return i18nConfig.locales.map(locale => ({ locale}))
-} 
+  return i18nConfig.locales.map((locale) => ({ locale }));
+}
 export default async function RootLayout({
   children,
-  locale,
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  locale: string;
+  params: { locale: string }; 
 }>) {
-  const { resources } = await initTranslations(locale, i18nNamespaces);
+  const { resources } = await initTranslations(params.locale, i18nNamespaces);
 
   return (
     <TranslationsProvider
       resources={resources}
-      locale={locale}
+      locale={params.locale}
       namespaces={i18nNamespaces}>
-      <html lang={locale}>
+      <html lang={params.locale}>
         <body className={`${inter.className} bg-[#FAF9F8]`}>
           <ReactQueryProvider>{children}</ReactQueryProvider>
         </body>
