@@ -8,6 +8,7 @@ export const colors = {
   },
   border: "rgb(var(--color-border))",
   gold: "rgb(var(--color-gold))",
+  accent: "rgb(var(--color-accent))",
   charcoal: "rgb(var(--color-charcoal))"
 };
 
@@ -34,7 +35,7 @@ export default {
         sans: ["Inter", "Montserrat", "system-ui", "sans-serif"],
       },
       backgroundImage: {
-        'cover-img': "url('src/assets/bg-cover.png')",
+        'cover-img': "url('/src/assets/bg-cover.png')",
       }
     },
   },

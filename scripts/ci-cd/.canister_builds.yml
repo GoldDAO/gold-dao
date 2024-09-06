@@ -4,14 +4,13 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
-          "cycles_manager",
-          "gldt_core",
-          "icp_neuron",
-          "management",
-          "sns_neuron_controller",
-          "sns_rewards",
-          "super_stats_v3",
-          "token_metrics"
+          'gldt_swap',
+          'icp_neuron',
+          'management',
+          'sns_neuron_controller',
+          'sns_rewards',
+          'super_stats_v3',
+          'token_metrics',
         ]
 ---
 # Rust canisters builds
@@ -23,7 +22,7 @@ $[[ inputs.src-folder ]] canister build:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
     - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
   extends: .rust template
   script:
@@ -32,7 +31,7 @@ $[[ inputs.src-folder ]] canister build:
     - scripts/build_canister.sh --checksum $[[ inputs.src-folder ]]
     - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
   artifacts:
-    name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
+    name: '${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm'
     paths:
       - backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release
       - backend/canisters/$[[ inputs.src-folder ]]/api/can.did
@@ -47,22 +46,22 @@ $[[ inputs.src-folder ]] integration-test build:
     # This will run on merges to develop or MR from develop to master
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
-        - "backend/canisters/**/*.{rs,toml,lock,md}"
+        - 'backend/libraries/**/*.{rs,toml,lock,md}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md}'
     # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
-        - "backend/canisters/**/*.{rs,toml,lock,md}"
-      needs: ["integration tests trigger"]
+        - 'backend/libraries/**/*.{rs,toml,lock,md}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md}'
+      needs: ['integration tests trigger']
   extends: .rust template
   script:
     - scripts/build_canister.sh -it $[[ inputs.src-folder ]]
     - scripts/generate_did.sh $[[ inputs.src-folder ]]
   artifacts:
-    name: "$[[ inputs.src-folder ]]-${CI_COMMIT_SHORT_SHA}-wasm-INT_TEST_BUILD"
+    name: '$[[ inputs.src-folder ]]-${CI_COMMIT_SHORT_SHA}-wasm-INT_TEST_BUILD'
     paths:
       - backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release
     expire_in: 1 day
