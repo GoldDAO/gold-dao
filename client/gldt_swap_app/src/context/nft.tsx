@@ -184,6 +184,13 @@ const useNftProviderValue = () => {
     });
   };
 
+  const canBuyNft = (collectionIndex: CollectionIndex, user_balance: number): boolean => {
+    const totalGLDTtoSwap = getSelectedTotalGLDT();
+    const singlePrice = state.nfts[collectionIndex].value * 100;
+    const remaining =  user_balance - totalGLDTtoSwap - singlePrice;
+    return remaining > 0;
+  }
+
   const selectNft = (collectionIndex: CollectionIndex): void => {
     const i = collectionIndex;
     setState((prevState) => {
@@ -308,6 +315,7 @@ const useNftProviderValue = () => {
       getSelectedTotalGram,
       getSelectedTotalGLDT,
       resetState,
+      canBuyNft
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state]
