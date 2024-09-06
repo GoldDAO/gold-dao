@@ -13,8 +13,6 @@ import { canisters } from "@providers/Auth";
 import { SwapInfo, Result_1, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
 
-import { useGetUserHistoricCountSwap } from "@hooks/gldt_swap";
-
 interface GetUserHistoricSwapParams {
   page: number;
   principal: string;
@@ -23,23 +21,26 @@ interface GetUserHistoricSwapParams {
 
 interface UseGetUserHistoricSwapParams
   extends Partial<GetUserHistoricSwapParams>,
-    Omit<UseQueryOptions<Result_1>, "queryKey" | "queryFn"> {}
+    Omit<UseQueryOptions<[Result_1, number]>, "queryKey" | "queryFn"> {}
 
 const get_historic_swaps_by_user = async ({
   page,
   principal,
   limit,
-}: GetUserHistoricSwapParams) => {
+}: GetUserHistoricSwapParams): Promise<[Result_1, number]> => {
   const { canisterId, idlFactory } = canisters["gldt_swap"];
   const actor = await getActor(canisterId, idlFactory, {
     isAnon: false,
   });
-  const result = (await actor.get_historic_swaps_by_user({
+  const result_history = (await actor.get_historic_swaps_by_user({
     page: page,
     user: Principal.fromText(principal),
     limit: limit,
   })) as Result_1;
-  return result;
+  const result_count = (await actor.get_history_total([
+    Principal.fromText(principal),
+  ])) as bigint;
+  return [result_history, Number(result_count)];
 };
 
 export const useGetUserHistoricSwap = ({
@@ -55,9 +56,10 @@ export const useGetUserHistoricSwap = ({
   } | null>(null);
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const historic = useQuery({
+  const history = useQuery({
     queryKey: [
       "USER_FETCH_TRANSACTIONS_HISTORY",
       page,
@@ -75,62 +77,42 @@ export const useGetUserHistoricSwap = ({
     ...queryParams,
   });
 
-  const historic_count = useGetUserHistoricCountSwap({
-    enabled: !!historic.isSuccess,
-  });
-
   useEffect(() => {
-    if (historic.isLoading || historic_count.isLoading) {
-      setIsInitializing(true);
+    if (history.isSuccess) {
       setIsError(false);
-    }
-  }, [historic.isLoading, historic_count.isLoading]);
-
-  useEffect(() => {
-    if (historic.isError || historic_count.isError) {
-      setIsInitializing(false);
-    }
-  }, [historic.isError, historic_count.isError]);
-
-  useEffect(() => {
-    if (
-      historic.isSuccess &&
-      historic.data &&
-      historic_count.isSuccess &&
-      historic_count.data
-    ) {
-      if ("Err" in historic.data) {
-        setError(Object.keys(historic.data.Err)[0]);
-        setIsInitializing(false);
-        setIsError(true);
-        setError("Error while fetching history swap.");
-      }
-      if ("Ok" in historic.data) {
-        const rows = (
-          historic.data.Ok as Array<[[bigint, bigint], SwapInfo]>
-        ).map((r) => getSwapData(r[1]));
-        setData({
-          rows,
-          pageCount: Math.ceil(historic_count.data / limit),
-          rowCount: historic_count.data,
+      setError("");
+      setIsLoading(true);
+      setIsSuccess(false);
+      const initData = async () => {
+        await new Promise<void>((resolve) => {
+          if ("Err" in history.data[0]) {
+            // setError(Object.keys(historic.data.Err)[0]);
+            setIsError(true);
+            setError("Error while fetching history swap.");
+          } else {
+            const rows = (
+              history.data[0].Ok as Array<[[bigint, bigint], SwapInfo]>
+            ).map((r) => getSwapData(r[1]));
+            setData({
+              rows,
+              pageCount: Math.ceil(history.data[1] / limit),
+              rowCount: history.data[1],
+            });
+            setIsSuccess(true);
+          }
+          resolve();
+          setIsLoading(false);
         });
-        setIsInitializing(false);
-      }
+      };
+      initData();
     }
-  }, [
-    historic.isSuccess,
-    historic.data,
-    historic_count.isSuccess,
-    historic_count.data,
-    limit,
-  ]);
+  }, [history.data, history.isSuccess, limit]);
 
   return {
-    isSuccess:
-      historic.isSuccess && historic_count.isSuccess && !isInitializing,
+    isSuccess,
     data,
-    isError: historic.isError || isError,
-    error: historic.error || error,
-    isLoading: isInitializing,
+    isError: history.isError || isError,
+    error: history.error || error,
+    isLoading: history.isLoading || isLoading,
   };
 };

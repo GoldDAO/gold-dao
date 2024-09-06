@@ -10,10 +10,9 @@ import Success from "./Success";
 import Error from "./Error";
 
 const Proceed = () => {
-  const { getSelectedTotalGLDTNFTs, getSelectedTotalNFTs, resetState } =
-    useNft();
-  const totalGLDNFTtoSwap = getSelectedTotalNFTs();
-  const totalGLDTtoSwap = getSelectedTotalGLDTNFTs();
+  const { getSelectedTotalGLDT, getSelectedTotalGram, resetState } = useNft();
+  const totalGLDNFTtoSwap = getSelectedTotalGram();
+  const totalGLDTtoSwap = getSelectedTotalGLDT();
   const queryClient = useQueryClient();
   const {
     state: reverseSwapProceedState,

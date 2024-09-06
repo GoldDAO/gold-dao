@@ -12,6 +12,7 @@ import { SwapAppProvider } from "@context/index";
 
 import Account from "@pages/Account";
 import TransactionDetails from "@pages/TransactionDetails";
+import TransactionHistoryList from "@pages/TransactionHistoryList";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
               {
                 path: "transactions",
                 children: [
+                  {
+                    index: true,
+                    element: <TransactionHistoryList />,
+                  },
                   {
                     path: ":nft_id",
                     element: <TransactionDetails />,

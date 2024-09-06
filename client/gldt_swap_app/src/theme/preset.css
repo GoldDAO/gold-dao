@@ -14,6 +14,8 @@
     --color-gold: 204 160 86;
     --color-accent: 204 160 86;
     --color-charcoal: 34 37 38;
+    --color-jade: 80 190 143;
+    --color-dark-orange: 190 89 80;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -25,6 +27,8 @@
       --color-gold: 204 160 86;
       --color-accent: 204 160 86;
       --color-charcoal: 34 37 38;
+      --color-jade: 80 190 143;
+      --color-dark-orange: 190 89 80;
     }
   }
 }

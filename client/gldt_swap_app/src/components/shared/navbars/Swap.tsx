@@ -1,16 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useWallet } from "@amerej/artemis-react";
 import { UserIcon } from "@heroicons/react/20/solid";
+
 import Auth from "@components/shared/Auth";
+import AccountOverview from "@components/account/overview/AccountOverview";
 import { Tile, Skeleton } from "@components/ui";
 
 const Swap = () => {
+  const [showAccountOverview, setShowAccountOverview] = useState(false);
   const { isConnected, principalId } = useWallet();
-  const navigate = useNavigate();
 
-  const handleNavigateAccountPage = () => {
-    navigate("/swap/account");
-  };
+  const handleOnClickShowAccountOverview = (show: boolean) =>
+    setShowAccountOverview(show);
 
   return (
     <>
@@ -30,7 +32,7 @@ const Swap = () => {
               <button className="flex items-center bg-surface rounded-full py-1 px-1">
                 <div
                   className="flex items-center"
-                  onClick={handleNavigateAccountPage}
+                  onClick={() => handleOnClickShowAccountOverview(true)}
                 >
                   <Tile className="rounded-full h-8 w-8 bg-background">
                     <UserIcon className="p-1 text-white" />
@@ -61,6 +63,10 @@ const Swap = () => {
           </div>
         </div>
       </nav>
+      <AccountOverview
+        show={showAccountOverview}
+        handleClose={() => handleOnClickShowAccountOverview(false)}
+      />
     </>
   );
 };

@@ -16,7 +16,7 @@ const CardNFT = ({
       <div className="border border-border bg-surface-2 p-6 rounded-xl">
         <div className="flex justify-center sm:justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="bg-gold text-white rounded-lg px-2 font-semibold">
+            <div className="bg-gold text-white rounded-md px-2 font-semibold">
               {countNFT}
             </div>
             <img className="flex-none h-16" src={`/gold-bars/${1}g.png`} />

@@ -4,6 +4,7 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { useNft, useForwardSwapProceed } from "@context/index";
 
 import { Dialog, Button } from "@components/ui";
+import TransactionDetails from "../TransactionDetails";
 
 import Pending from "./Pending";
 import Success from "./Success";
@@ -11,12 +12,14 @@ import Error from "./Error";
 
 const Proceed = () => {
   const {
-    getSelectedTotalGLDTNFTs,
-    getSelectedTotalNFTs,
+    getSelectedTotalGLDT,
+    getSelectedTotalGram,
+    getCollectionSelectedNFTs,
     resetState: resetSwapState,
   } = useNft();
-  const totalGLDNFTtoSwap = getSelectedTotalNFTs();
-  const totalGLDTtoSwap = getSelectedTotalGLDTNFTs();
+  const totalGram = getSelectedTotalGram();
+  const totalGLDT = getSelectedTotalGLDT();
+  const selectedNfts = getCollectionSelectedNFTs();
   const queryClient = useQueryClient();
   const {
     state: forwardSwapProceedState,
@@ -60,12 +63,14 @@ const Proceed = () => {
     });
   };
 
+  console.log(selectedNfts);
+
   return (
     <>
       <Button
         onClick={handleShow}
         className={`rounded-xl w-full py-3`}
-        disabled={!totalGLDTtoSwap}
+        disabled={!totalGLDT}
       >
         Proceed to Swap
       </Button>
@@ -78,9 +83,7 @@ const Proceed = () => {
           {isIdle && (
             <>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
-                <div className="font-semibold">
-                  {totalGLDNFTtoSwap}g of gold
-                </div>
+                <div className="font-semibold">{totalGram}g of gold</div>
 
                 <div className="w-full flex justify-center items-center py-4">
                   <div className="relative w-full">
@@ -96,16 +99,11 @@ const Proceed = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* <div className="relative h-[1px] bg-border w-full">
-                  <div className="absolute">
-                    <button className="bg-content text-background rounded-full p-2 cursor-default">
-                      <ArrowDownIcon height={16} width={16} />
-                    </button>
-                  </div>
-                </div> */}
-                <div className="font-semibold">{totalGLDTtoSwap} GLDT</div>
+                <div className="font-semibold">{totalGLDT} GLDT</div>
               </div>
+
+              <TransactionDetails className="w-full  mt-8" />
+
               <div className="text-center mt-8">
                 <Button onClick={handleOnClick}>Convert</Button>
               </div>

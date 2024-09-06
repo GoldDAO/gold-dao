@@ -20,7 +20,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/20/solid";
-import { Select } from "@components/ui";
+import SelectPagination from "@components/ui/table/SelectPagination";
 
 interface ReactTableProps<T extends object> {
   data: T[];
@@ -226,7 +226,7 @@ const Table = <T extends object>({
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center">
               <span>Lines per page</span>
-              <Select
+              <SelectPagination
                 options={linesPerPageOptions}
                 value={table.getState().pagination.pageSize}
                 handleOnChange={(value) => handleOnChangePageSize(value)}

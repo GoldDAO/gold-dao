@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, XCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const Badge = ({
   children,
@@ -10,7 +10,7 @@ const Badge = ({
 }) => {
   return (
     <div
-      className={`rounded-full font-semibold w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
+      className={`rounded-full w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </div>
@@ -18,19 +18,35 @@ const Badge = ({
 };
 
 const BadgeStatusTx = ({ status }: { status: string }) => {
+  console.log("we herer", status)
   switch (status) {
     case "Success":
       return (
-        <Badge className="bg-emerald-500/10">
-          <CheckCircleIcon className="h-6 w-6 text-emerald-500" />
-          <div className="text-emerald-500">Success</div>
+        <Badge className="bg-jade/10">
+          <CheckCircleIcon className="h-6 w-6 text-jade" />
+          <div className="text-jade font-semibold text-xs">Success</div>
         </Badge>
       );
     case "Failed":
       return (
-        <Badge className="bg-red-500/10">
-          <XCircleIcon className="h-6 w-6 text-red-500" />
-          <div className="text-red-500">Failed</div>
+        <Badge className="bg-dark-orange/10">
+          <XCircleIcon className="h-6 w-6 text-dark-orange" />
+          <div className="text-dark-orange font-semibold text-xs">Failed</div>
+        </Badge>
+      );
+    case "Opening Sale":
+    case "Minting": 
+    case "Swapping NFT":
+    case "Burning Fees":
+    case "Refunding":
+    case "Transfering NFT":
+    case "Transfering Fee":
+    case "Escrow Request":
+    case "Burning":
+      return (
+        <Badge className="bg-gold/10">
+          <ArrowPathIcon className="h-6 w-6 text-gold" />
+          <div className="text-gold font-semibold text-xs">{status}...</div>
         </Badge>
       );
     default:

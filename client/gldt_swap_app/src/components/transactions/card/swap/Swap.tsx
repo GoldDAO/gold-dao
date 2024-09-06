@@ -15,7 +15,12 @@ const Swap = () => {
         <>
           <div className="mb-4 font-semibold">{data.label}</div>
           <div className="sm:flex justify-between items-center sm:w-full grid grid-cols-1 gap-6">
-            <NftWeight className="flex-1" nftWeight={data.nft_value} />
+            {data.type === "forward" && (
+              <NftWeight className="flex-1" nftWeight={data.send_value} />
+            )}
+            {data.type === "reverse" && (
+              <GldtAmount className="flex-1" gldtAmount={data.send_value} />
+            )}
             <div className="bg-content mx-auto sm:mx-0 text-background rounded-full p-2">
               <ArrowRightIcon
                 className="rotate-90 sm:rotate-0"
@@ -23,7 +28,12 @@ const Swap = () => {
                 width={32}
               />
             </div>
-            <GldtAmount className="flex-1" gldtAmount={data.gldt_value} />
+            {data.type === "forward" && (
+              <GldtAmount className="flex-1" gldtAmount={data.receive_value} />
+            )}
+            {data.type === "reverse" && (
+              <NftWeight className="flex-1" nftWeight={data.receive_value} />
+            )}
           </div>
         </>
       )}

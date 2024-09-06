@@ -21,7 +21,9 @@ const PastTransactions = () => {
             </div>
           </DisclosureButton>
           <DisclosurePanel className="bg-surface p-4 text-sm/5 border-t border-border rounded-b-xl">
+          <div id="active-swaps">
             <TxList />
+            </div>
           </DisclosurePanel>
         </Disclosure>
       </div>
