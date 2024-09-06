@@ -9,6 +9,9 @@
     "scripts": {
         "develop": "next dev",
         "build": "next build",
+        "build:staging": "next build",
+        "build:preprod": "next build",
+        "build:production": "next build",
         "lint": "next lint",
         "postinstall": "echo 'landing page has been installed'"
     },
