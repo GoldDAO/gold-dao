@@ -63,7 +63,6 @@ export const useGetUserActiveSwaps = ({
 
   useEffect(() => {
     if (active_swaps.isSuccess && active_swaps.data) {
-      console.log(active_swaps.data);
       const rows = active_swaps.data.map((r) => getSwapData(r[1]));
       setData({
         rows,

@@ -104,11 +104,7 @@ export const useGetUserNftsMetrics = () => {
                   accumulator + currentValue.countNFT,
                 0
               ),
-              totalCountGLDT: (_data as NFTMetric[]).reduce(
-                (accumulator, currentValue) =>
-                  accumulator + currentValue.countGLDT,
-                0
-              ),
+              totalCountGLDT: 0, // todo: ask freddie for route
               totalCountWeight: (_data as NFTMetric[]).reduce(
                 (accumulator, currentValue) =>
                   accumulator + currentValue?.countWeight,
