@@ -8,6 +8,7 @@ const TokensInfos: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
+    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
       <p className="text-[30px] font-inter font-normal leading-[36px] text-center lg:w-3/4 3xl:w-1/2 my-[96px]">
         {t("description")}
       </p>
