@@ -144,6 +144,10 @@ include:
     inputs:
       src-folder: gldt_swap_app
       sns-controlled: "true"
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: gld_landing_page
+      sns-controlled: "true"
 
 ################################################################################
 # Cache preparation
