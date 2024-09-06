@@ -31,7 +31,7 @@ const Account = () => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-4">
         <TotalCountNfts className="w-full" />
         <TotalWeightNfts className="w-full" />
-        <TotalSwappedGLDT className="w-full" />
+        <TotalSwappedGLDT className="w-full blur-sm" />
       </div>
 
       <TokenBalance className="mb-4" />
