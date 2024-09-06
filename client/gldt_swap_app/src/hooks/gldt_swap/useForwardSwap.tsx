@@ -8,10 +8,14 @@ import {
   GLDT_LEDGER_CANISTER_ID,
   SWAP_CANISTER_ID,
   GLDT_TX_FEE,
-  GLDT_FORWARD_SWAP_FEE,
+  GLDT_VALUE_1G_NFT,
+  GLDT_DECIMAL,
 } from "@constants";
 import { Result_3 } from "@canisters/gldt_swap/interfaces";
-import { MarketTransferRequest, MarketTransferResult } from "@hooks/gld_nft";
+import {
+  MarketTransferRequest,
+  MarketTransferResult,
+} from "@canisters/gld_nft/interfaces";
 
 type TransferBatchNft = {
   canister: string;
@@ -59,7 +63,7 @@ export const useForwardSwap = () => {
     tokenId: string,
     nft: NftCollection
   ): MarketTransferRequest => {
-    const TOKEN_FEE = BigInt(GLDT_FORWARD_SWAP_FEE);
+    const TOKEN_FEE = BigInt(GLDT_TX_FEE);
     const TOKEN_DECIMALS = 8n;
     const TOKEN_SYMBOL = "GLDT";
     const ENDING_TIMEOUT = 180000000000n; // 3 minutes
@@ -83,7 +87,11 @@ export const useForwardSwap = () => {
                   },
                 },
               },
-              { buy_now: BigInt(nft.value * GLDT_TX_FEE + 20000000) }, // Todo fetch it from get_swap for each tx (tokens_to_mint -> value_with_fee)
+              {
+                buy_now: BigInt(
+                  nft.value * GLDT_VALUE_1G_NFT * GLDT_DECIMAL + 2 * GLDT_TX_FEE
+                ),
+              }, // Todo fetch it from get_swap for each tx (tokens_to_mint -> value_with_fee)
               { notify: [Principal.fromText(SWAP_CANISTER_ID)] },
               { fee_schema: "com.origyn.royalties.fixed" },
               { allow_list: [Principal.fromText(SWAP_CANISTER_ID)] },

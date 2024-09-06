@@ -21,7 +21,6 @@ integration tests:
         - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
         - 'backend/canisters/**/*.{rs,toml,lock,md}'
   needs: [
-      'cycles_manager integration-test build',
       # 'gldt_swap integration-test build',
       'icp_neuron integration-test build',
       'management integration-test build',

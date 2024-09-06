@@ -7,8 +7,8 @@ import Card from "@components/shared/card/Base";
 
 const ReverseSwapFrom = () => {
   // const { principalId } = useWallet();
-  const { getSelectedTotalGLDTNFTs } = useNft();
-  const totalGLDTtoSwap = getSelectedTotalGLDTNFTs();
+  const { getSelectedTotalGLDT } = useNft();
+  const totalGLDTtoSwap = getSelectedTotalGLDT();
   // const balance = useIcrc1BalanceOf({ owner: principalId as string });
 
   return (

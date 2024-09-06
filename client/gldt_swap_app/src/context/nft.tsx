@@ -13,6 +13,8 @@ import {
   GLD_NFT_100G_CANISTER_ID,
   GLD_NFT_1000G_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
+  REVERSE_GLDT_TX_FEE,
+  GLDT_DECIMAL
 } from "@constants";
 
 export type TokenId = {
@@ -45,7 +47,8 @@ export interface NftCollection {
   canisterId: string;
   canister: string;
   totalSelected: number;
-  totalSelectedInGLDT: number;
+  totalSelectedGram: number;
+  totalSelectedGLDT: number;
 }
 
 export interface NftState {
@@ -66,7 +69,8 @@ const initialState: NftState = {
       canisterId: GLD_NFT_1G_CANISTER_ID,
       canister: "gld_nft_1g",
       totalSelected: 0,
-      totalSelectedInGLDT: 0,
+      totalSelectedGram: 0,
+      totalSelectedGLDT: 0,
     },
     {
       name: "10g",
@@ -77,7 +81,8 @@ const initialState: NftState = {
       canisterId: GLD_NFT_10G_CANISTER_ID,
       canister: "gld_nft_10g",
       totalSelected: 0,
-      totalSelectedInGLDT: 0,
+      totalSelectedGram: 0,
+      totalSelectedGLDT: 0,
     },
     {
       name: "100g",
@@ -88,7 +93,8 @@ const initialState: NftState = {
       canisterId: GLD_NFT_100G_CANISTER_ID,
       canister: "gld_nft_100g",
       totalSelected: 0,
-      totalSelectedInGLDT: 0,
+      totalSelectedGram: 0,
+      totalSelectedGLDT: 0,
     },
     {
       name: "1000g",
@@ -99,7 +105,8 @@ const initialState: NftState = {
       canisterId: GLD_NFT_1000G_CANISTER_ID,
       canister: "gld_nft_1000g",
       totalSelected: 0,
-      totalSelectedInGLDT: 0,
+      totalSelectedGram: 0,
+      totalSelectedGLDT: 0,
     },
   ],
   isLoadingInit: true,
@@ -179,6 +186,13 @@ const useNftProviderValue = () => {
     });
   };
 
+  const canBuyNft = (collectionIndex: CollectionIndex, user_balance: number): boolean => {
+    const totalGLDTtoSwap = getSelectedTotalGLDT();
+    const singlePrice = state.nfts[collectionIndex].value * 100;
+    const remaining =  ((user_balance - totalGLDTtoSwap) - singlePrice) - (REVERSE_GLDT_TX_FEE / GLDT_DECIMAL);
+    return remaining > 0;
+  }
+
   const selectNft = (collectionIndex: CollectionIndex): void => {
     const i = collectionIndex;
     setState((prevState) => {
@@ -196,10 +210,10 @@ const useNftProviderValue = () => {
         newNfts[i] = {
           ...newNfts[i],
           tokenIds: newTokenIds,
-          totalSelected: newNfts[i].totalSelected + newNfts[i].value,
-          totalSelectedInGLDT:
-            newNfts[i].totalSelectedInGLDT +
-            newNfts[i].value * GLDT_VALUE_1G_NFT,
+          totalSelected: newNfts[i].totalSelected + 1,
+          totalSelectedGram: newNfts[i].totalSelectedGram + newNfts[i].value,
+          totalSelectedGLDT:
+            newNfts[i].totalSelectedGLDT + newNfts[i].value * GLDT_VALUE_1G_NFT,
         };
       }
 
@@ -227,10 +241,10 @@ const useNftProviderValue = () => {
         newNfts[i] = {
           ...newNfts[i],
           tokenIds: newTokenIds,
-          totalSelected: newNfts[i].totalSelected - newNfts[i].value,
-          totalSelectedInGLDT:
-            newNfts[i].totalSelectedInGLDT -
-            newNfts[i].value * GLDT_VALUE_1G_NFT,
+          totalSelected: newNfts[i].totalSelected - 1,
+          totalSelectedGram: newNfts[i].totalSelectedGram - newNfts[i].value,
+          totalSelectedGLDT:
+            newNfts[i].totalSelectedGLDT - newNfts[i].value * GLDT_VALUE_1G_NFT,
         };
       }
 
@@ -261,19 +275,26 @@ const useNftProviderValue = () => {
     const indexId = state.nfts[i].tokenIds.findIndex(
       (e: TokenId) => e.selected === true
     );
-    return state.nfts[indexId].totalSelectedInGLDT;
+    return state.nfts[indexId].totalSelectedGLDT;
   };
 
-  const getSelectedTotalNFTs = () => {
+  const getSelectedTotal = () => {
     return state.nfts.reduce(
       (acc, nft: NftCollection) => acc + nft.totalSelected,
       0
     );
   };
 
-  const getSelectedTotalGLDTNFTs = () => {
+  const getSelectedTotalGram = () => {
     return state.nfts.reduce(
-      (acc, nft: NftCollection) => acc + nft.totalSelectedInGLDT,
+      (acc, nft: NftCollection) => acc + nft.totalSelectedGram,
+      0
+    );
+  };
+
+  const getSelectedTotalGLDT = () => {
+    return state.nfts.reduce(
+      (acc, nft: NftCollection) => acc + nft.totalSelectedGLDT,
       0
     );
   };
@@ -292,9 +313,11 @@ const useNftProviderValue = () => {
       getCountNfts,
       getCollectionSelectedNFTs,
       getSelectedCollectionGLDTNFTs,
-      getSelectedTotalNFTs,
-      getSelectedTotalGLDTNFTs,
+      getSelectedTotal,
+      getSelectedTotalGram,
+      getSelectedTotalGLDT,
       resetState,
+      canBuyNft
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state]

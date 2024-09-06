@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2024-09-04
+
+- Updated Rust CDK dependencies to the latest versions to improve compatibility and performance.
+
 ### [1.0.2] - 2024-08-13
 
 - Migrated the current version from the ogy repo which includes the comprehensive balance lists, supply data and governance related data

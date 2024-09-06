@@ -130,18 +130,12 @@
       "wasm": "https://download.dfinity.systems/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/canisters/ic-icrc1-index-ng.wasm.gz"
     },
     "gldt_swap_app": {
-      "build": [
-        "npm run postinstall",
-        "npm run build:back",
-        "npm run build:gldt_swap_app"
-      ],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "frontend": {},
-      "source": ["client/gldt_swap_app/out"],
+      "source": ["client/gldt_swap_app/dist"],
       "type": "assets"
     },
     "icp_neuron": {
@@ -232,22 +226,6 @@
       },
       "type": "custom",
       "wasm": "backend/canisters/management/target/wasm32-unknown-unknown/release/management_canister.wasm.gz"
-    },
-    "cycles_manager": {
-      "build": ["./scripts/build_canister.sh cycles_manager"],
-      "candid": "backend/canisters/cycles_manager/api/can.did",
-      "declarations": {
-        "bindings": ["js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/cycles_manager/api/declarations"
-      },
-      "metadata": [
-        {
-          "name": "candid:service"
-        }
-      ],
-      "type": "custom",
-      "wasm": "backend/canisters/cycles_manager/target/wasm32-unknown-unknown/release/cycles_manager_canister.wasm.gz"
     },
     "sns_neuron_controller": {
       "build": ["./scripts/build_canister.sh sns_neuron_controller"],

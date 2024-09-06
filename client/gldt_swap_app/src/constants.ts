@@ -1,6 +1,4 @@
 export const APP_MODE = import.meta.env.MODE;
-export const GLDT_SWAP_APP_FRONT_URL = import.meta.env
-  .VITE_GLDT_SWAP_APP_FRONT_URL;
 export const GLD_NFT_1G_CANISTER_ID = import.meta.env
   .VITE_GLD_NFT_1G_CANISTER_ID;
 export const GLD_NFT_10G_CANISTER_ID = import.meta.env
@@ -15,19 +13,15 @@ export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
 
-export const GLDT_TX_FEE = 10000000000;
-export const GLDT_FORWARD_SWAP_FEE = 10000000;
-export const GLDT_REVERSE_SWAP_FEE = 100000000;
+export const API_OGY_BASE_URL="https://api.origyn.com"
+
+export const GLDT_TX_FEE = 1000000;
+export const GLDT_DECIMAL = 100000000;
+export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
-
-  if (!GLDT_SWAP_APP_FRONT_URL)
-    console.log(
-      "No GLDT_SWAP_APP_FRONT_URL environment variable. Set GLDT_SWAP_APP_FRONT_URL environment variable."
-    );
-  else console.log(`GLDT_SWAP_APP_FRONT_URL=${GLDT_SWAP_APP_FRONT_URL}`);
 
   if (!GLD_NFT_1G_CANISTER_ID)
     console.log(
