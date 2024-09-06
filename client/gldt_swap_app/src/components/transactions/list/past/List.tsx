@@ -8,6 +8,9 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import { Table, LoaderSpin } from "@components/ui";
 import TransactionStatus from "@components/transactions/badge/TransactionStatus";
 
+import ColInfoGLDT from "../ColInfoGLDT";
+import ColInfoNFT from "../ColInfoNFT";
+
 import { TableProps } from "@utils/table/useTable";
 
 import { useGetUserHistoricSwap } from "@hooks/gldt_swap";
@@ -20,7 +23,7 @@ const List = ({
   sorting,
   setSorting,
 }: TableProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
 
   const columns = useMemo<ColumnDef<SwapData>[]>(
     () => [
@@ -45,32 +48,34 @@ const List = ({
         },
       },
       {
-        cell: ({ row }) => (
-          <div className="font-semibold">
-            {" "}
+        cell: ({ row, getValue }) => (
+          <div className="flex justify-center">
             {row.original.type === "forward" && (
-              <div>{row.original.gldt_value} GLDT</div>
+              <ColInfoNFT>{getValue()}</ColInfoNFT>
             )}
             {row.original.type === "reverse" && (
-              <div>{row.original.nft_value}g of GOLD</div>
+              <ColInfoGLDT>{getValue()}</ColInfoGLDT>
             )}
           </div>
         ),
-        header: "Swapping",
+        header: "Sending",
+        accessorKey: "send_value",
+        id: "send_value",
       },
       {
-        cell: ({ row }) => (
-          <div className="font-semibold">
-            {" "}
+        cell: ({ row, getValue }) => (
+          <div className="flex justify-center">
             {row.original.type === "forward" && (
-              <div>{row.original.nft_value}G of GOLD</div>
+              <ColInfoGLDT>{getValue()}</ColInfoGLDT>
             )}
             {row.original.type === "reverse" && (
-              <div>{row.original.gldt_value} GLDT</div>
+              <ColInfoNFT>{getValue()}</ColInfoNFT>
             )}
           </div>
         ),
         header: "Receiving",
+        accessorKey: "receive_value",
+        id: "receive_value",
       },
       {
         accessorKey: "status",

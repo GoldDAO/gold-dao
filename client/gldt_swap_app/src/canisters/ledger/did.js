@@ -65,7 +65,6 @@ export const idlFactory = ({ IDL }) => {
     token_name: IDL.Text,
     feature_flags: IDL.Opt(FeatureFlags),
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const LedgerArgument = IDL.Variant({
     Upgrade: IDL.Opt(UpgradeArgs),
     Init: InitArgs,

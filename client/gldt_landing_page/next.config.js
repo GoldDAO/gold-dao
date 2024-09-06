@@ -48,6 +48,7 @@ const YUMI_KYC_CANISTER_ID = process.env.NETWORK
     : ''; //GeneratedLocalCanisterIds.yumi_kyc[canisterKey];
 
 const nextConfig = {
+    distDir: 'dist',
     output: 'export',
     transpilePackages: ['@connect2ic/react', '@connect2ic/core'],
     assetPrefix: '',
