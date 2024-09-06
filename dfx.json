@@ -73,7 +73,7 @@
         "env_override": null,
         "output": null
       },
-      "source": ["client/gld_dashboard/out"],
+      "source": ["client/gld_dashboard/dist"],
       "type": "assets"
     },
     "gldt_landing_page": {
@@ -84,7 +84,7 @@
         "output": null
       },
       "frontend": {},
-      "source": ["client/gldt_landing_page/out"],
+      "source": ["client/gldt_landing_page/dist"],
       "type": "assets"
     },
     "icp_ledger": {
