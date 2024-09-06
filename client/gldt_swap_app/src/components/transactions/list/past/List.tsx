@@ -23,7 +23,7 @@ const List = ({
   sorting,
   setSorting,
 }: TableProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
 
   const columns = useMemo<ColumnDef<SwapData>[]>(
     () => [

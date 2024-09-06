@@ -1,3 +1,4 @@
+import { useWallet } from "@amerej/artemis-react";
 import TotalCountNfts from "@components/account/TotalCountNfts";
 import TotalSwappedGLDT from "@components/account/TotalSwappedGLDT";
 import TotalWeightNfts from "@components/account/TotalWeightNfts";
@@ -7,8 +8,19 @@ import YourNfts from "@components/account/your-nfts/YourNfts";
 
 import OngoingTransactions from "@components/transactions/list/ongoing/Ongoing";
 import PastTransactions from "@components/transactions/list/past/Past";
+import { useState, useEffect } from "react";
 
 const Account = () => {
+
+  const [ready, setReady] = useState(false);
+  const { principalId } = useWallet()
+
+  useEffect(() => {
+    if (principalId !== undefined) {
+      setReady(true);
+    }
+  }, [principalId]);
+
   return (
     <div className="container mx-auto mt-4 sm:mt-8">
       <div className="mb-8">
@@ -34,7 +46,8 @@ const Account = () => {
           <OngoingTransactions />
         </div>
         <div className="mt-6">
-          <PastTransactions />
+          { ready && (<PastTransactions />)}
+          
         </div>
       </div>
     </div>

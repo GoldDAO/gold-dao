@@ -11,6 +11,7 @@ import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 import { useUserBalanceOGY } from "@hooks/ogy_ledger";
 import { useBalanceOGYUSD } from "@hooks/ogy_api";
 import { useUserBalanceGLDT } from "@hooks/gldt_ledger";
+import LogoutButton from "@components/shared/button/LogoutButton";
 
 const AccountOverview = ({
   show,
@@ -66,7 +67,8 @@ const AccountOverview = ({
               >
                 <div className="bg-background px-4 sm:px-8 py-5 sm:max-w-[480px] max-w-80">
                   <div className="flex justify-end">
-                    auth button
+                    <LogoutButton/>
+                    {/* auth button */}
                     {/* <AuthButton /> */}
                   </div>
                   <div className="mt-12 flex items-center bg-surface rounded-full py-1 px-1">

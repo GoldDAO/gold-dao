@@ -28,6 +28,7 @@ export const getSwapData = (swap: SwapInfo) => {
   let nft_value;
 
   if ("Forward" in swap) {
+    // console.log(swap.Forward.status)
     type = "forward";
     label = "Forward";
     tx = swap.Forward;
@@ -85,7 +86,7 @@ export const swapStatus = {
     MintRequest: { value: "MintRequest", label: "Minting" },
     MintFailed: { value: "MintFailed", label: "Mint Failed" },
     BidFail: { value: "BidFail", label: "Bid Fail" },
-    BidRequest: { value: "BidRequest", label: "Bid Request" },
+    BidRequest: { value: "BidRequest", label: "Swapping NFT" },
     BurnFeesRequest: { value: "BurnFeesRequest", label: "Burning Fees" },
     BurnFeesFailed: { value: "BurnFeesFailed", label: "Burn Fees Failed" },
     Complete: { value: "Complete", label: "Success" },

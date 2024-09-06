@@ -14,18 +14,18 @@ import {
   ApproveArgs,
   Result_2,
   AllowanceArgs,
-  Result_1,
+  // Result_1,
 } from "@canisters/ledger/interfaces";
 
 import { canisters } from "@providers/Auth";
 import { useNft } from "@context/index";
 
-const icrc2_allowance = async (arg: AllowanceArgs): Promise<Result_1> => {
-  const { canisterId, idlFactory } = canisters["gldt_ledger"];
-  const actor = await getActor(canisterId, idlFactory, { isAnon: false });
-  const result = await actor.icrc2_allowance(arg);
-  return result as Result_1;
-};
+// const icrc2_allowance = async (arg: AllowanceArgs): Promise<Result_1> => {
+//   const { canisterId, idlFactory } = canisters["gldt_ledger"];
+//   const actor = await getActor(canisterId, idlFactory, { isAnon: false });
+//   const result = await actor.icrc2_allowance(arg);
+//   return result as Result_1;
+// };
 
 const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
   const { canisterId, idlFactory } = canisters["gldt_ledger"];
@@ -46,6 +46,8 @@ const swap_tokens_for_nft = async (token: Args_2): Promise<Result_4> => {
 
 export const useReverseSwap = () => {
   const { principalId } = useWallet();
+  const { walletList, walletSelected } = useWallet();
+
   const { getCollectionSelectedNFTs } = useNft();
   const selected = getCollectionSelectedNFTs();
 
@@ -96,22 +98,19 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
+      console.log(walletSelected)
+      
+      if (walletSelected === "bitfinity") {
+        const bitfinity_adapter = walletList.find((adaptor) => adaptor.id === "bitfinity");
+        bitfinity_adapter?.adapter.batchTransactions(icrc2_approve_args.map(async (arg) => await icrc2_approve(arg)))
+      } else {
+        await Promise.allSettled(icrc2_approve_args.map(async (arg) => await icrc2_approve(arg)))
+      }
+
       const swapTasks = icrc2_allowance_args.map(
         async (allowanceArg, index) => {
           try {
-            const allowanceResult = await icrc2_allowance(allowanceArg);
-            if ("Err" in allowanceResult) {
-              console.error("Error icrc2_allowance:", allowanceResult.Err);
-              return;
-            }
-
-            const approveArg = icrc2_approve_args[index];
-            const approveResult = await icrc2_approve(approveArg);
-            if ("Err" in approveResult) {
-              console.error("Error icrc2_approve:", approveResult.Err);
-              return;
-            }
-
+         
             const swapData = swap_tokens_for_nft_data[index];
             const swapResult = await swap_tokens_for_nft(swapData);
             if ("Err" in swapResult) {
@@ -125,7 +124,7 @@ export const useReverseSwap = () => {
           }
         }
       );
-      await Promise.all(swapTasks);
+      await Promise.allSettled(swapTasks);
     },
   });
 };
