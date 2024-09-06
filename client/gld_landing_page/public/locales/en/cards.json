@@ -25,7 +25,7 @@
       "title": "GLDT & GLD Swap",
       "tag": "Token",
       "description": "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
-      "imageSrc": "/static/illustrations/Gold-Swap.svg",
+      "videoSrc": "/videos/Gold_swap_video.mp4",
       "points": [
         "Cross-Chain Utility: Ensures liquidity across multiple blockchain ecosystems, enhancing its appeal to a broader investor base.",
         "Collateral Efficiency: Offers a robust collateral framework for DeFi."
