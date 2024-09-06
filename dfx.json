@@ -95,7 +95,7 @@
         "output": null
       },
       "frontend": {},
-      "source": ["client/gld_landing_page/out"],
+      "source": ["client/gld_landing_page/dist"],
       "type": "assets"
     },
     "icp_ledger": {
