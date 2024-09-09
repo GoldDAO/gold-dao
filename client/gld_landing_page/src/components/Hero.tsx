@@ -65,7 +65,7 @@ const Hero = () => {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        src="/videos/Gold_DAO_bg_video.mp4"
+        src="/videos/Gold_DAO_bg.mp4"
       />
       <div className="relative text-center ">
         <h1
