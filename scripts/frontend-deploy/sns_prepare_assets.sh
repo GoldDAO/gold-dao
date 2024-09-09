@@ -48,5 +48,3 @@ Finished preparing assets. Uploaded in batch $BATCH_ID with evidence $EVIDENCE
 
 **********************************************************************
 "
-
-return

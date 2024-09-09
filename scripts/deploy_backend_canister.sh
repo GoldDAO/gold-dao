@@ -68,5 +68,3 @@ else
   echo "Error: invalid deployment mode. Needs to be 'direct' or 'proposal'."
   exit 2
 fi
-
-return
