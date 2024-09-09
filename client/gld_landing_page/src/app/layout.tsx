@@ -6,7 +6,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../../i18n";
 import "./globals.css";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
-
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +17,6 @@ export default function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }>) {
-
   return (
     <I18nextProvider i18n={i18n}>
       <html lang={"en"}>

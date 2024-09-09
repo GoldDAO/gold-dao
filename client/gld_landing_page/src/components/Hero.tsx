@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
+import { useState, useRef } from "react";
 
 interface InfoCardProps {
   iconSrc: string;
@@ -63,9 +64,11 @@ const Hero = () => {
         autoPlay
         loop
         muted
+        preload="auto"
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
         src="/videos/Gold_DAO_bg.mp4"
+        poster="/backgrounds/bg_video.svg"
       />
       <div className="relative text-center ">
         <h1
