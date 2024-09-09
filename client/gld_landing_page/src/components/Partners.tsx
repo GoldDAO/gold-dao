@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 const Partners = () => {
   const { t } = useTranslation("partners");
   const partners = [

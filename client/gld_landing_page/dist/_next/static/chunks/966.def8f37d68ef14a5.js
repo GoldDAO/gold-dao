@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[966],{9966:function(e,l,t){t.r(l);var s=t(7437),c=t(8125);l.default=()=>{let{t:e}=(0,c.$G)("footer");return(0,s.jsx)("div",{className:"flex flex-col w-full bg-black py-2 px-16 h-[50px] justify-center",children:(0,s.jsx)("p",{className:"text-xs font-normal text-white ",children:e("from")})})}}}]);

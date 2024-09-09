@@ -1,0 +1,11 @@
+{
+  "titleBold": "Why",
+  "titleRegular": "the Gold DAO exists?",
+  "description": "One of the primary concerns in the gold market is the practice of selling more ‘paper gold’ - such as futures, options, and ETFs - than the actual physical gold that exists. The Gold DAO now emerges as the solution to this problem, eliminating the need for intermediaries and empowering investors with direct ownership of physical gold via GLD NFTs. This includes the ability for GLD NFT holders to increase the liquidity of their GLD NFTs by swapping these for GLDT tokens. The core vision of the Gold DAO project is to make physical gold easily accessible and liquid. Historically, physical gold has been a medium of exchange but still faces transportability issues. The Gold DAO addresses this shortcoming by transforming physical gold into digital form that can be exchanged like cash.",
+  "features": {
+    "decentralized": "Fully decentralized",
+    "ownership": "Real ownership",
+    "crossChain": "Cross-chain",
+    "audited": "Fully audited"
+  }
+}

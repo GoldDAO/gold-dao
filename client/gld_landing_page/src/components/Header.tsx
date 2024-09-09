@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from 'react-i18next';
 import MenuIcon from "../../public/static/icons/MenuIcon";
 import XIcon from "../../public/static/icons/XIcon";
 
@@ -37,17 +37,18 @@ const Header: React.FC = () => {
   );
 };
 
-const LogoSection: React.FC = () => (
-  <div className="flex flex-row flex-wrap items-center gap-2 pl-4">
+const LogoSection: React.FC = () => {
+  const { t } = useTranslation("header");
+  return (  <div className="flex flex-row flex-wrap items-center gap-2 pl-4">
     <Image
       src="/static/icons/GoldDAO.svg"
       alt="Gold DAO"
       width={28}
       height={28}
     />
-    <h1 className="text-xl font-bold">{useTranslation("header").t("title")}</h1>
-  </div>
-);
+    <h1 className="text-xl font-bold">{t("title")}</h1>
+  </div>)
+}
 
 interface MenuButtonProps {
   isOpen: boolean;
