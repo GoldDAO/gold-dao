@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface Card {
   title: string;
@@ -15,11 +15,50 @@ interface Card {
 const TokensCards = () => {
   const { t } = useTranslation("cards");
 
-  const cards: Card[] = t("cards", { returnObjects: true }) as Card[];
-
-  if (!cards) {
-    return null;
-  }
+  // const cards: Card[] = t("cards", { returnObjects: true }) as Card[];
+  const cards =  [
+    {
+      "title": "GLDGov",
+      "tag": "Governance",
+      "description": "The project is governed by the GLDGov token - the Gold Governance token. This token is issued upon the launch of the project’s Service Nervous System (SNS), granting participating users governance rights, such as:",
+      "imageSrc": "/static/illustrations/Gold-gov-big.svg",
+      "points": [
+        "Proposing and making decisions about the direction of the Gold DAO",
+        "Governing any upgrades to the system’s canisters",
+        "Receiving staking rewards as a result of participation in governance"
+      ]
+    },
+    {
+      "title": "GLD NFT",
+      "tag": "NFT",
+      "description": "Direct ownership of physical gold stored in Swiss vaults, facilitating tangible investment and redeemability.",
+      "imageSrc": "/static/illustrations/Gold-NFT.svg",
+      "points": [
+        "Expert Insight: Each NFT is backed by a specific physical gold asset, with a serial number and purity details transparently and immutably recorded on the blockchain",
+        "Redeemability Factor: Holders can redeem digital gold for physical gold and vice versa, seamlessly bridging the worlds of both digital and tangible assets"
+      ]
+    },
+    {
+      "title": "GLDT & GLD Swap",
+      "tag": "Token",
+      "description": "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
+      "videoSrc": "/videos/Gold_swap_video.mp4",
+      "points": [
+        "Cross-Chain Utility: Ensures liquidity across multiple blockchain ecosystems, enhancing its appeal to a broader investor base.",
+        "Collateral Efficiency: Offers a robust collateral framework for DeFi."
+      ]
+    },
+    {
+      "title": "USDG",
+      "tag": "Stablecoin",
+      "description": "A stablecoin backed by GLDT, providing a reliable alternative to fiat-backed stablecoins.",
+      "imageSrc": "/static/illustrations/Gold-USDG-big.svg",
+      "points": [
+        "Inflation Resistance: The value of USDG’s collateral, i.e. GLDT, is unaffected by erosion caused by inflation.",
+        "Financial Stability: The liquidity risk is lowered due to the price stability of GLDT."
+      ]
+    }
+  ]
 
   return (
     <div className="flex flex-col items-center justify-center gap-[24rem] md:gap-[14rem] px-2 w-[calc(100%-45px)] pt-[96px] 4xl:max-w-screen-2xl mb-[96px] bg-[#FBF8F1]">

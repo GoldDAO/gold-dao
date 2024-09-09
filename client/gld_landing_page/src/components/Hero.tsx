@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
