@@ -1,7 +1,6 @@
 use super::swap_client::SwapClient;
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
-use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
 use crate::types::*;
 use types::CanisterId;

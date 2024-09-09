@@ -8,6 +8,7 @@ use tracing::info;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SwapClients {
+    // FIXME: serde
     pub swap_clients: Vec<Box<dyn SwapClient>>,
 }
 

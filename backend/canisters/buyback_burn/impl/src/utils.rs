@@ -4,10 +4,10 @@ use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ debug, error };
+use crate::types::ICPSwapClient;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
-use icpswap_client::ICPSwapClient;
 use buyback_burn_canister::swap_config::ExchangeConfig;
 use crate::types::SwapClient;
 pub fn build_swap_client(config: SwapConfig) -> Box<dyn SwapClient> {
