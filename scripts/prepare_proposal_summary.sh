@@ -75,5 +75,3 @@ cat $PROPOSAL_SUMMARY_FILE
 echo "
 ******************************************
 "
-
-return
