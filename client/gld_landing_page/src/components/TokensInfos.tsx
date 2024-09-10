@@ -8,10 +8,12 @@ const TokensInfos: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
-      <p className="text-[30px] font-inter font-normal leading-[36px] text-center lg:w-3/4 3xl:w-1/2 my-[96px]">
+      <p className="text-[30px] font-inter font-light leading-[36px] text-center px-5 md:px-0 lg:max-w-4xl my-[96px] text-[#000000CC]">
         {t("description")}
       </p>
-      <CardGrid />
+      <div className="lg:max-w-7xl 2xl:max-w-[91rem] 3xl:max-w-[90rem]">
+        <CardGrid />
+      </div>
     </div>
   );
 };
@@ -36,19 +38,24 @@ const Card: React.FC<CardProps> = ({
   const { t } = useTranslation("tokens");
 
   return (
-    <div className="w-[calc(100%-45px)] justify-self-center overflow-hidden shadow-lg bg-white rounded-[20px]">
+    <div className=" justify-self-center overflow-hidden shadow-lg bg-white rounded-[20px]">
       <div className="px-3 p-2">
         <div className="p-4 space-y-8">
           <div className="flex flex-row items-center align-middle space-x-4 mt-6">
-            <Image src={logoSrc} alt={title} className="w-[40px] h-[40px]" width={40} height={40} />
+            <Image
+              src={logoSrc}
+              alt={title}
+              className="w-[40px] h-[40px]"
+              width={40}
+              height={40}
+            />
             <div className="font-semibold text-[36px]">{title}</div>
           </div>
           <p className="text-gray-700 text-base h-[72px]">{description}</p>
           <div className="flex flex-col space-y-6">
             <a
               href={learnMoreLink}
-              className="text-[#000000A3] underline underline-offset-[3px] hover:text-secondary duration-300 ease-in-out"
-            >
+              className="text-[#000000A3] underline underline-offset-[3px] hover:text-secondary duration-300 ease-in-out">
               {t("learn_more")}
             </a>
             {buyLink ? (
@@ -112,7 +119,7 @@ const CardGrid: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-[40px] md:gap-0 md:grid-cols-2 xl:grid-cols-4 2xl:gap-[40px]">
+    <div className="grid grid-cols-1 gap-[40px] md:gap-0 md:grid-cols-2 xl:grid-cols-4 xl:gap-[20px]">
       {cards.map((card, index) => (
         <Card key={index} {...card} />
       ))}

@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
-import { useState, useRef } from "react";
 
 interface InfoCardProps {
   iconSrc: string;
@@ -21,7 +20,7 @@ const InfoCard = ({
   value,
   loading,
 }: InfoCardProps) => (
-  <div className="flex h-10 px-4 pl-2 justify-center items-center rounded-3xl border gap-[8px] border-[#D3B872] bg-white">
+  <div className="flex h-10 px-4 pl-2 min-w-full md:min-w-0 justify-center items-center rounded-3xl border gap-[8px] mx-2 border-[#D3B872] bg-white">
     {iconSrc && (
       <Image
         src={iconSrc}
@@ -59,20 +58,20 @@ const Hero = () => {
     : null;
 
   return (
-    <div className="h-screen  4xl:h-screen w-full flex flex-col items-center justify-center px-2 md:px-10 ">
+    <div className="h-[85vh] md:h-[75vh] w-full flex flex-col items-center justify-center px-2 md:px-10 ">
       <video
         autoPlay
         loop
         muted
         preload="auto"
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover"
         src="/videos/Gold_DAO_bg.mp4"
         poster="/backgrounds/bg_video.svg"
       />
-      <div className="relative text-center ">
+      <div className="relative text-center">
         <h1
-          className="text-[60px] md:text-[82px] font-inter font-bold text-white leading-[90px] text-shadow-lg"
+          className="text-[53px] md:text-[82px] font-inter font-bold text-white leading-[90px] text-shadow-lg md:max-w-2xl mx-auto"
           style={{
             textShadow:
               "0px 10px 15px rgba(0, 0, 0, 0.10), 0px 4px 6px rgba(0, 0, 0, 0.05)",
@@ -80,7 +79,7 @@ const Hero = () => {
           {t("title")}
         </h1>
         <p
-          className="text-[40px] md:text-[82px] font-inter font-light leading-[90px] text-[rgba(0,0,0,0.80)]"
+          className="text-[40px] md:text-[82px] font-inter font-light leading-[90px] text-[rgba(0,0,0,0.80)]  w-3/4 md:w-full mx-auto  md:max-w-2xl"
           style={{
             textShadow:
               "0px 10px 15px rgba(0, 0, 0, 0.10), 0px 4px 6px rgba(0, 0, 0, 0.05)",

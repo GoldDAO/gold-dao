@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .main-button {
-  @apply bg-black text-white p-2 px-4 rounded-full hover:opacity-80 transition-all duration-500 ease-in-out;
+  @apply flex justify-center items-center gap-2 px-5 py-2.5 rounded-[100px] bg-black text-white hover:opacity-80 transition-all duration-500 ease-in-out;
 }
 
 .main-button-disabled {
