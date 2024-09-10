@@ -49,7 +49,7 @@ export default function ModalClaimAll({
           The rewards will be sent to your account <span className="font-bold">{principal}</span>
         </p>
         <button
-          className={`px-10 py-4 rounded-full bg-[#D3B871] text-white text-md font-bold flex items-center justify-center h-10 w-full sm:w-fit sm:h-fit ${(!neuronAmountsToClaim.icpAmount && !neuronAmountsToClaim.ledgerAmount) || loading ? 'opacity-35 cursor-not-allowed' : ''}`}
+          className={`px-10 py-4 rounded-full bg-[#D3B871] text-white text-md font-bold flex items-center justify-center h-10 w-full sm:w-fit sm:h-fit ${(!neuronAmountsToClaim.icpAmount && !neuronAmountsToClaim.ledgerAmount && !neuronAmountsToClaim.ogyAmount) || loading ? 'opacity-35 cursor-not-allowed' : ''}`}
           onClick={handleConfirmClaimAll}
           disabled={
             (!neuronAmountsToClaim.icpAmount

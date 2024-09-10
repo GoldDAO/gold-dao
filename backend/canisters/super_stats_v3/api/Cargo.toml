@@ -5,11 +5,9 @@ edition = "2021"
 
 
 [dependencies]
-ic-cdk = "0.12.0"
+ic-cdk = { workspace = true }
 candid = { workspace = true }
-serde = "1.0.193"
+serde = { workspace = true }
+serde_bytes = { workspace = true }
 ic-stable-memory = "0.4.4"
-serde_bytes = "0.11.2"
 hex = "0.4.2"
-#pocket-ic = "2.0.1"
-#icrc-ledger-types = { path = "../icrc_types" }

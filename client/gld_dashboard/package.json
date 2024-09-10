@@ -5,6 +5,9 @@
   "scripts": {
     "develop": "ENV=local next dev",
     "build": "next build",
+    "build:staging": "next build",
+    "build:preprod": "next build",
+    "build:production": "next build",
     "start": "next start",
     "lint": "next lint"
   },

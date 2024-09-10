@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useCallback } from "react";
-import type { Location, useMatches } from "react-router-dom";
+// import { useCallback } from "react";
+// import type { Location, useMatches } from "react-router-dom";
 import {
-  ScrollRestoration,
+  // ScrollRestoration,
   Outlet,
   useNavigation,
   useLocation,
@@ -27,24 +27,28 @@ const Layout = () => {
   const location = useLocation();
   const isSwap = location.pathname.match(/\/swap/) ? true : false;
 
-  const getKey = useCallback(
-    (location: Location, matches: ReturnType<typeof useMatches>) => {
-      const match = matches.find((m) => m.handle?.scrollMode);
-      if (match?.handle?.scrollMode === "pathname") {
-        return location.pathname;
-      }
-      return location.key;
-    },
-    []
-  );
+  // const getKey = useCallback(
+  //   (location: Location, matches: ReturnType<typeof useMatches>) => {
+  //     const match = matches.find((m) => m.handle?.scrollMode);
+  //     if (match?.handle?.scrollMode === "pathname") {
+  //       return location.pathname;
+  //     }
+  //     return location.key;
+  //   },
+  //   []
+  // );
 
   return (
-    <div className="bg-cover-img bg-cover bg-repeat bg-background flex flex-col h-screen">
+    <div className="flex flex-col bg-cover-img bg-cover bg-fixed bg-background min-h-screen pb-12">
       {isSwap ? <NavbarSwap /> : <NavbarHome />}
-      <div className="flex-grow">
+      <div className="flex-grow px-4 sm:px-6">
         {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
       </div>
-      <ScrollRestoration getKey={getKey} />
+      {/* <ScrollRestoration
+        getKey={(location, matches) => {
+          return location.pathname;
+        }}
+      /> */}
     </div>
   );
 };

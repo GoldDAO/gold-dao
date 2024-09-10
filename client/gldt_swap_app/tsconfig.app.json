@@ -28,15 +28,16 @@
     /* Paths */
     "baseUrl": "src",
     "paths": {
+      "@store/*": ["store/*"],
+      "@context/*": ["context/*"],
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
       "@components/*": ["components/*"],
-      "@shared/*": ["shared/*"],
-      "@helpers/*": ["helpers/*"],
-      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"],
       "@providers/*": ["providers/*"],
       "@constants": ["constants.ts"],
-      "@theme/*": ["theme/*"]
+      "@theme/*": ["theme/*"],
+      "@canisters/*": ["canisters/*"]
     }
   },
   "include": ["src"],
