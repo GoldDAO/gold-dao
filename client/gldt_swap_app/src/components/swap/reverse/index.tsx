@@ -10,6 +10,7 @@ import Backdrop from "@components/shared/Backdrop";
 import ReverseSwapFrom from "./from";
 import ReverseSwapTo from "./to";
 import ReverseSwapProceed from "./proceed";
+import TransactionDetails from "./TransactionDetails";
 
 const Reverse = () => {
   const { isConnected } = useWallet();
@@ -23,6 +24,7 @@ const Reverse = () => {
         </FromCard>
         <ArrowDown />
         <ReverseSwapTo />
+        <TransactionDetails className="w-full  mt-8" />
       </div>
       <div className="mt-6">
         {!isConnected && <ConnectWallet />}

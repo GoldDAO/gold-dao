@@ -28,6 +28,7 @@ const BadgeStatusTx = ({ status }: { status: string }) => {
         </Badge>
       );
     case "Failed":
+    case "Bid Fail":
       return (
         <Badge className="bg-dark-orange/10">
           <XCircleIcon className="h-6 w-6 text-dark-orange" />

@@ -193,34 +193,41 @@ const useNftProviderValue = () => {
     return remaining > 0;
   }
 
+  // selects a random NFT
   const selectNft = (collectionIndex: CollectionIndex): void => {
-    const i = collectionIndex;
     setState((prevState) => {
       const newNfts = [...prevState.nfts];
-      const indexId = newNfts[i].tokenIds.findIndex(
-        (e: TokenId) => e.selected === false
-      );
+      const collectionMeta = newNfts[collectionIndex];
+      const collection = newNfts[collectionIndex].tokenIds;
+      const collectionLength = collection.length;
 
-      if (indexId !== -1) {
-        const newTokenIds = [...newNfts[i].tokenIds];
-        newTokenIds[indexId] = {
-          ...newTokenIds[indexId],
-          selected: true,
-        };
-        newNfts[i] = {
-          ...newNfts[i],
-          tokenIds: newTokenIds,
-          totalSelected: newNfts[i].totalSelected + 1,
-          totalSelectedGram: newNfts[i].totalSelectedGram + newNfts[i].value,
-          totalSelectedGLDT:
-            newNfts[i].totalSelectedGLDT + newNfts[i].value * GLDT_VALUE_1G_NFT,
-        };
+      let randomIndex = getRandomNumber(collectionLength - 1);
+      if(collectionMeta.totalSelected === collectionLength){
+        return {
+          ...prevState
+        }
       }
+      while (collection.find((token, index) => { return index === randomIndex && token.selected === true}) ) {
+        randomIndex = getRandomNumber(collectionLength - 1);
+      }
+      collection[randomIndex] = {
+        ...collection[randomIndex],
+        selected: true,
+      };
+      newNfts[collectionIndex] = {
+        ...newNfts[collectionIndex],
+        tokenIds: collection,
+        totalSelected: newNfts[collectionIndex].totalSelected + 1,
+        totalSelectedGram: newNfts[collectionIndex].totalSelectedGram + newNfts[collectionIndex].value,
+        totalSelectedGLDT:
+          newNfts[collectionIndex].totalSelectedGLDT + newNfts[collectionIndex].value * GLDT_VALUE_1G_NFT,
+      };
 
-      return {
+      const newState = {
         ...prevState,
         nfts: newNfts,
       };
+      return newState
     });
   };
 
@@ -332,3 +339,8 @@ export const NftProvider = ({ children }: { children: ReactNode }) => {
     <NftContext.Provider value={contextValue}>{children}</NftContext.Provider>
   );
 };
+
+
+function getRandomNumber(n: number): number {
+  return Math.floor(Math.random() * (n + 1));
+}
