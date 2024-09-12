@@ -10,11 +10,13 @@ import {
   OGY_LEDGER_CANISTER_ID,
   GLDT_LEDGER_CANISTER_ID,
   SWAP_CANISTER_ID,
+  ICP_SWAP_CANISTER_ID,
 } from "@constants";
 
 import { idlFactory as gld_nft_idl } from "@canisters/gld_nft/did";
 import { idlFactory as gldt_swap_idl } from "@canisters/gldt_swap/did";
 import { idlFactory as ledger_idl } from "@canisters/ledger/did";
+import { idlFactory as icp_swap_idl } from "@canisters/icp_swap/did";
 
 interface Canisters {
   [canisterName: string]: {
@@ -53,6 +55,10 @@ export const canisters: Canisters = {
     canisterId: OGY_LEDGER_CANISTER_ID,
     idlFactory: ledger_idl,
   },
+  icp_swap: {
+    canisterId: ICP_SWAP_CANISTER_ID,
+    idlFactory: icp_swap_idl
+  }
 };
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {

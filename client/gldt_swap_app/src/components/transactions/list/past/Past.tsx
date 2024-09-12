@@ -8,6 +8,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { usePagination } from "@utils/table/useTable";
 import TxList from "./List";
+import { useGetUserHistoricCountSwap } from "@hooks/gldt_swap";
 
 const PastTransactions = () => {
   const navigate = useNavigate();
@@ -17,14 +18,16 @@ const PastTransactions = () => {
     navigate("/swap/account/transactions");
   };
 
+  const count = useGetUserHistoricCountSwap({refetchInterval: 2000});
+
   return (
     <div>
       <div className="w-full divide-y divide-white/5 border border-border rounded-xl">
         <Disclosure as="div" defaultOpen={true}>
           <div className="flex items-center justify-between bg-surface-2 px-6 py-4 rounded-xl group-data-[open]:rounded-b-none">
             <div className="flex items-center gap-4">
-              <div className="font-medium group-data-[hover]:text-content/80">
-                Past transactions
+              <div className="font-medium group-data-[hover]:text-content/80 align-center flex">
+              <span className="mr-2">Past transactions</span> <span className="bg-gold pl-2 pr-2 text-xs py-1 rounded-md text-center">{count.data}</span>
               </div>
               <button onClick={handleShowAllTxs}>Show all</button>
             </div>

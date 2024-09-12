@@ -13,13 +13,19 @@ import {
 import Loading from "./Loading";
 import Empty from "./Empty";
 import Error from "./Error";
-import { useUserBalanceGLDT } from "@hooks/gldt_ledger";
+import { useLedgerUserBalance } from "@hooks/ledger";
 
 const ReverseSwapTo = () => {
-  const { getCountNfts, selectNft, unselectNft, state: nftState, canBuyNft } = useNft();
+  const {
+    getCountNfts,
+    selectNft,
+    unselectNft,
+    state: nftState,
+    canBuyNft,
+  } = useNft();
   const { isConnected } = useWallet();
   const count = getCountNfts();
-  const { data: balanceGLDT } = useUserBalanceGLDT();
+  const { data: balanceGLDT } = useLedgerUserBalance({ ledger: "GLDT" });
 
   const { isLoading, isSuccess, isError, error } = useGetAvailableGLDNFT();
 
@@ -28,7 +34,7 @@ const ReverseSwapTo = () => {
       unselectNft(collectionIndex);
     } else if (type === "+") {
       if (canBuyNft(collectionIndex, balanceGLDT?.number || 0))
-      selectNft(collectionIndex);
+        selectNft(collectionIndex);
     }
   };
 

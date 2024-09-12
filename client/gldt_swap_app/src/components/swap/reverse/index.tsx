@@ -12,8 +12,12 @@ import ReverseSwapTo from "./to";
 import ReverseSwapProceed from "./proceed";
 import TransactionDetails from "./TransactionDetails";
 
+import { useNft } from "@context/index";
+
 const Reverse = () => {
   const { isConnected } = useWallet();
+  const { getSelectedTotal } = useNft();
+  const hasSelectedNfts = !!getSelectedTotal();
 
   return (
     <>
@@ -24,7 +28,7 @@ const Reverse = () => {
         </FromCard>
         <ArrowDown />
         <ReverseSwapTo />
-        <TransactionDetails className="w-full  mt-8" />
+        {hasSelectedNfts && <TransactionDetails className="w-full  mt-8" />}
       </div>
       <div className="mt-6">
         {!isConnected && <ConnectWallet />}

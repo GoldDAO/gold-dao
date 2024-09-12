@@ -14,12 +14,12 @@ const Proceed = () => {
   const {
     getSelectedTotalGLDT,
     getSelectedTotalGram,
-    getCollectionSelectedNFTs,
+    // getCollectionSelectedNFTs,
     resetState: resetSwapState,
   } = useNft();
   const totalGram = getSelectedTotalGram();
   const totalGLDT = getSelectedTotalGLDT();
-  const selectedNfts = getCollectionSelectedNFTs();
+  // const selectedNfts = getCollectionSelectedNFTs();
   const queryClient = useQueryClient();
   const {
     state: forwardSwapProceedState,
@@ -62,8 +62,6 @@ const Proceed = () => {
       },
     });
   };
-
-  console.log(selectedNfts);
 
   return (
     <>

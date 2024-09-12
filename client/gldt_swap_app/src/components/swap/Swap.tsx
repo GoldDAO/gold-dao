@@ -9,7 +9,7 @@ const Swap = () => {
   const { state: swapState } = useSwap();
 
   return (
-    <>
+    <div className="mt-8">
       {swapState.mode === Mode.FORWARD && (
         <NftProvider>
           <ForwardSwap />
@@ -20,7 +20,7 @@ const Swap = () => {
           <ReverseSwap />
         </NftProvider>
       )}
-    </>
+    </div>
   );
 };
 
