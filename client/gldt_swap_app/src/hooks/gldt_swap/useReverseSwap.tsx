@@ -98,7 +98,6 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      console.log(walletSelected)
       
       if (walletSelected === "bitfinity") {
         const bitfinity_adapter = walletList.find((adaptor) => adaptor.id === "bitfinity");
@@ -110,15 +109,12 @@ export const useReverseSwap = () => {
       const swapTasks = icrc2_allowance_args.map(
         async (allowanceArg, index) => {
           try {
-         
             const swapData = swap_tokens_for_nft_data[index];
             const swapResult = await swap_tokens_for_nft(swapData);
             if ("Err" in swapResult) {
               console.error("Error swap_tokens_for_nft:", swapResult.Err);
               return;
             }
-
-            console.log("Success swap:", swapData);
           } catch (error) {
             console.error("Error swap:", error);
           }

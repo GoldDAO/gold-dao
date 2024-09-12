@@ -28,12 +28,12 @@ const List = ({
   const columns = useMemo<ColumnDef<SwapData>[]>(
     () => [
       {
-        accessorKey: "label",
-        id: "label",
+        accessorKey: "index",
+        id: "index",
         cell: ({ getValue }) => (
           <div className="font-semibold">{getValue()}</div>
         ),
-        header: "Type",
+        header: "Index ID",
         meta: {
           className: "text-left",
         },
