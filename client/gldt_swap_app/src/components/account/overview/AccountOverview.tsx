@@ -8,10 +8,10 @@ import { Button, Tile, Tooltip, Skeleton } from "@components/ui";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 // import AuthButton from "@components/auth/Auth";
 
-import { useUserBalanceOGY } from "@hooks/ogy_ledger";
+import { useLedgerUserBalance } from "@hooks/ledger";
 import { useBalanceOGYUSD } from "@hooks/ogy_api";
-import { useUserBalanceGLDT } from "@hooks/gldt_ledger";
 import LogoutButton from "@components/shared/button/LogoutButton";
+import { useGetGLDTPrice } from "@hooks/icpSwap/useGetGLDTPrice";
 
 const AccountOverview = ({
   show,
@@ -23,12 +23,15 @@ const AccountOverview = ({
   const navigate = useNavigate();
   const { principalId } = useWallet();
 
-  const { data: balanceOGY } = useUserBalanceOGY();
+  const { data: balanceOGY } = useLedgerUserBalance({ ledger: "OGY" });
   const { data: balanceOGYUSD } = useBalanceOGYUSD({
     balance: balanceOGY?.number,
   });
+
+  const {GLDTPrice} = useGetGLDTPrice();
+
   const { data: balanceGLDT, isSuccess: isSuccessBalanceGLDT } =
-    useUserBalanceGLDT();
+    useLedgerUserBalance({ ledger: "GLDT" });
 
   const handleClickAccount = () => {
     navigate("swap/account");
@@ -67,7 +70,7 @@ const AccountOverview = ({
               >
                 <div className="bg-background px-4 sm:px-8 py-5 sm:max-w-[480px] max-w-80">
                   <div className="flex justify-end">
-                    <LogoutButton/>
+                    <LogoutButton />
                     {/* auth button */}
                     {/* <AuthButton /> */}
                   </div>
@@ -126,7 +129,7 @@ const AccountOverview = ({
                             )}
                           </div>
                           <div className="flex justify-center text-sm">
-                            <div className="text-content/60">todo $</div>
+                            <div className="text-content/60">{balanceGLDT && (balanceGLDT?.number * GLDTPrice).toFixed(2)} $</div>
                           </div>
                         </>
 

@@ -48,8 +48,11 @@ const TransactionDetails = ({ className }: { className: string }) => {
               <div>Total number of NFTs received</div>
               <div>{totalNFTs} GLD NFT</div>
             </div>
-            {selectedNfts.map(({ value, totalSelected }) => (
-              <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
+            {selectedNfts.map(({ value, totalSelected }, index) => (
+              <div
+                key={index}
+                className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60"
+              >
                 <div>{value}g GLD NFT</div>
                 <div>{totalSelected}x</div>
               </div>

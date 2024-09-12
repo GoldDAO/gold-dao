@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
@@ -65,6 +64,7 @@ export interface InitArgs {
   'gldt_ledger_id' : Principal,
 }
 export type LockError = { 'NftAlreadyLocked' : Array<bigint> } |
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   { 'UnexpectedError' : {} } |
   { 'NftNotLocked' : null };
 export type MintError = { 'UnexpectedError' : ImpossibleErrorReason } |

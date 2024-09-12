@@ -2247,6 +2247,7 @@ export const idlFactory = ({ IDL }) => {
   });
   return Nft_Canister;
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const init = ({ IDL }) => {
   return [];
 };

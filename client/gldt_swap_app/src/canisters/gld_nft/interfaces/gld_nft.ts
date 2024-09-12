@@ -2096,6 +2096,7 @@ export interface definite_canister_settings {
   'memory_allocation' : bigint,
   'compute_allocation' : bigint,
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface _SERVICE extends Nft_Canister {}
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

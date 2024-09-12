@@ -3,7 +3,7 @@ import { Card } from "@components/ui";
 import { useSwapApp, View } from "@context/index";
 
 import { SwapProvider } from "@context/swap/swap";
-import { TransferProvider } from "@context/transfer";
+import { TransferProvider } from "@context/transfer/index";
 
 import ToggleBtnSwapTransfer from "@components/shared/ToggleBtnSwapTransfer";
 import Backdrop from "@components/shared/Backdrop";

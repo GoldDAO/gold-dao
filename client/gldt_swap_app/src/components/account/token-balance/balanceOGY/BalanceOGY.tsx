@@ -1,9 +1,14 @@
 import { LoaderSpin } from "@components/ui";
 
-import { useUserBalanceOGY } from "@hooks/ogy_ledger";
+import { useLedgerUserBalance } from "@hooks/ledger";
 
 const BalanceOGY = ({ className }: { className?: string }) => {
-  const { data: balance, isSuccess, isError, isLoading } = useUserBalanceOGY();
+  const {
+    data: balance,
+    isSuccess,
+    isError,
+    isLoading,
+  } = useLedgerUserBalance({ ledger: "OGY" });
   return (
     <div className={`${className}`}>
       <div className="border border-border rounded-xl bg-surface p-6">

@@ -7,7 +7,7 @@ const Success = () => {
   const { handleClose } = useReverseSwapProceed();
 
   const handleOnClickGoToTxView = () => {
-    handleClose;
+    handleClose();
     navigate("/swap/account#active-swaps");
   };
 
