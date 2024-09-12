@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 
 import NavbarHome from "./navbars/Home";
-import NavbarSwap from "./navbars/Swap";
+import NavbarSwap from "./navbars/swap/NavbarSwap";
 
 const NavigationProgress = () => {
   return (
