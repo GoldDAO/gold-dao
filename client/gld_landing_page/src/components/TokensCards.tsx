@@ -18,7 +18,7 @@ const TokensCards = () => {
   const cards: Card[] = t("cards", { returnObjects: true }) as Card[];
 
   return (
-    <div className="flex flex-col items-center justify-center gap-[24rem] md:gap-[14rem] px-2 w-[calc(100%-45px)] pt-[96px] 3xl:max-w-[90rem] mb-[96px] bg-[#FBF8F1]">
+    <section className="flex flex-col items-center justify-center gap-[24rem] md:gap-[14rem] px-2 w-[calc(100%-45px)] pt-[96px] 3xl:max-w-[90rem] mb-[96px] bg-[#FBF8F1]">
       {cards &&
         cards.map((card, index) => (
           <div
@@ -71,7 +71,7 @@ const TokensCards = () => {
             </div>
           </div>
         ))}
-    </div>
+    </section>
   );
 };
 

@@ -21,27 +21,24 @@ const Header: React.FC = () => {
   };
 
   const links: Link[] = [
-    { name: t("links.gldt"), href: "#" },
-    { name: t("links.gld_swap"), href: "#" },
-    { name: t("links.gld_nft"), href: "#" },
+    { name: t("links.gldt"), href: "https://gldt.org/" },
+    { name: t("links.gld_swap"), href: "http://app.gldt.org/" },
+    { name: t("links.gld_nft"), href: "https://gldt.org/" },
   ];
 
-  const menuRef = useRef<HTMLDivElement>(null); // Référence pour le menu
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Effet pour détecter les clics à l'extérieur du menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false); // Ferme le menu si on clique en dehors
+        setIsOpen(false);
       }
     };
 
-    // Ajoute un écouteur d'événements lors du montage
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-    // Nettoie l'écouteur lors du démontage
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -115,9 +112,12 @@ const Navigation: React.FC<NavigationProps> = ({ links }) => (
 );
 
 const DashboardButton: React.FC = () => (
-  <button className="main-button text-white font-semibold text-[16px] leading-[24px] md:block hidden">
+  <a
+    href="https://dashboard.gold-dao.org/"
+    target="_blank"
+    className="main-button text-white font-semibold text-[16px] leading-[24px] md:block hidden">
     {useTranslation("header").t("buttons.dashboard")}
-  </button>
+  </a>
 );
 
 interface MobileMenuProps {
@@ -144,14 +144,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           <a
             key={link.name}
             href={link.href}
+            target="_blank"
             onClick={toggleMenu}
             className="w-full text-center py-2 text-white font-medium border-b border-gray-200">
             {link.name}
           </a>
         ))}
-        <button className="secondary-button font-semibold w-full mt-4">
+        <a href="https://dashboard.gold-dao.org/" target="_blank" className="secondary-button text-center font-semibold w-full mt-4">
           {useTranslation("header").t("buttons.dashboard")}
-        </button>
+        </a>
       </nav>
     </div>
   );

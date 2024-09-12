@@ -7,7 +7,7 @@ const GoldDAOChart = () => {
   const { t } = useTranslation("goldDaoChart");
 
   return (
-    <div
+    <section
       style={{
         backgroundImage: "url('/static/backgrounds/bar_texture_full.svg')",
       }}
@@ -60,7 +60,7 @@ const GoldDAOChart = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

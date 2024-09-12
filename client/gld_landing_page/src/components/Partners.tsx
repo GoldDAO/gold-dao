@@ -37,7 +37,7 @@ const Partners = () => {
     },
   ];
   return (
-    <div className="flex flex-col items-center justify-center gap-8 w-full py-16  mt-16 mb-[96px] px-2 md:px-10 bg-white border border-y-secondary ">
+    <section className="flex flex-col items-center justify-center gap-8 w-full py-16  mt-16 mb-[96px] px-2 md:px-10 bg-white border border-y-secondary ">
       <p className="text-[rgba(0,0,0,0.64)] text-center font-inter text-[16px] font-bold leading-[32px] tracking-[2.56px] uppercase">
         {t("title")}
       </p>
@@ -59,7 +59,7 @@ const Partners = () => {
           </a>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

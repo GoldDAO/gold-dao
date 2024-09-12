@@ -1,12 +1,12 @@
 "use client";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const WhitePaper = () => {
   const { t } = useTranslation("whitepaper");
 
   return (
-    <div
+    <section
       style={{
         backgroundImage: "url('/static/backgrounds/bar_texture_full_3.svg')",
       }}
@@ -15,8 +15,13 @@ const WhitePaper = () => {
       <p className="text-[#161819] text-[60px] text-center font-normal leading-[60px] ">
         {t("description")}
       </p>
-      <button className="main-button mt-6">{t("button")}</button>
-    </div>
+      <a
+        href="https://docs.gold-dao.org/v/gold-dao-whitepaper"
+        target="_blank"
+        className="main-button mt-6">
+        {t("button")}
+      </a>
+    </section>
   );
 };
 

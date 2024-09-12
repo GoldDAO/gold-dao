@@ -7,14 +7,14 @@ const TokensInfos: React.FC = () => {
   const { t } = useTranslation("tokens");
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
+    <section className="flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl">
       <p className="text-[30px] font-inter font-light leading-[36px] text-center px-5 md:px-0 lg:max-w-4xl my-[96px] text-[#000000CC]">
         {t("description")}
       </p>
       <div className="lg:max-w-7xl 2xl:max-w-[91rem] 3xl:max-w-[90rem]">
         <CardGrid />
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -53,19 +53,27 @@ const Card: React.FC<CardProps> = ({
           </div>
           <p className="text-gray-700 text-base h-[72px]">{description}</p>
           <div className="flex flex-col space-y-6">
-            <a
-              href={learnMoreLink}
-              className="text-[#000000A3] underline underline-offset-[3px] hover:text-secondary duration-300 ease-in-out">
-              {t("learn_more")}
-            </a>
+            {learnMoreLink ? (
+              <a
+                href={learnMoreLink}
+                target="_blank"
+                className="text-[#000000A3] underline underline-offset-[3px] hover:text-secondary duration-300 ease-in-out">
+                {t("learn_more")}
+              </a>
+            ) : (
+              <p className="text-[#000000A3] underline underline-offset-[3px]">
+                {t("learn_more")}
+              </p>
+            )}
+
             {buyLink ? (
-              <a href={buyLink} className="main-button w-fit">
+              <a href={buyLink} target="_blank" className="main-button w-fit">
                 {t("buy")} {title}
               </a>
             ) : (
-              <a href={learnMoreLink} className="main-button-disabled w-fit">
+              <button className="main-button-disabled w-fit cursor-default">
                 {t("coming_soon")}
-              </a>
+              </button>
             )}
           </div>
         </div>
@@ -89,31 +97,31 @@ const CardGrid: React.FC = () => {
       logoSrc: "/static/icons/Gold-Gov.svg",
       title: t("tokens.gldgov.title"),
       description: t("tokens.gldgov.description"),
-      learnMoreLink: "#",
-      buyLink: "#",
+      learnMoreLink: "https://docs.gold-dao.org/",
+      buyLink: "https://info.icpswap.com/swap/token/details/tyyy3-4aaaa-aaaaq-aab7a-cai",
       imageSrc: "/static/illustrations/Gold-Gov.svg",
     },
     {
       logoSrc: "/static/icons/gold-light-neutral-1g.svg",
       title: t("tokens.gld_nft.title"),
       description: t("tokens.gld_nft.description"),
-      learnMoreLink: "#",
-      buyLink: "#",
+      learnMoreLink: "https://yumi.io/gold/about",
+      buyLink: "https://yumi.io/gold",
       imageSrc: "/static/illustrations/gold-light-nft.svg",
     },
     {
       logoSrc: "/static/icons/Gold-Marketcap.svg",
       title: t("tokens.gldt.title"),
       description: t("tokens.gldt.description"),
-      learnMoreLink: "#",
-      buyLink: "#",
+      learnMoreLink: "https://gldt.org/",
+      buyLink: "https://gldt.org/",
       imageSrc: "/static/illustrations/Gold-GLDT.svg",
     },
     {
       logoSrc: "/static/icons/Gold-USDG.svg",
       title: t("tokens.usdg.title"),
       description: t("tokens.usdg.description"),
-      learnMoreLink: "#",
+      learnMoreLink: "",
       imageSrc: "/static/illustrations/Gold-USDG.svg",
     },
   ];

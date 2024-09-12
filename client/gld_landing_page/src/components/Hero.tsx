@@ -20,7 +20,7 @@ const InfoCard = ({
   value,
   loading,
 }: InfoCardProps) => (
-  <div className="flex h-10 px-4 pl-2 min-w-full md:min-w-0 justify-center items-center rounded-3xl border gap-[8px] mx-2 border-[#D3B872] bg-white">
+  <section className="flex h-10 px-4 pl-2 min-w-full md:min-w-0 justify-center items-center rounded-3xl border gap-[8px] mx-2 border-[#D3B872] bg-white">
     {iconSrc && (
       <Image
         src={iconSrc}
@@ -39,7 +39,7 @@ const InfoCard = ({
     ) : (
       <span className="font-bold">{value}</span>
     )}
-  </div>
+  </section>
 );
 
 const Hero = () => {

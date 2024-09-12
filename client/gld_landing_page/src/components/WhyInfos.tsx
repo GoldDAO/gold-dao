@@ -6,7 +6,7 @@ const WhyInfos: React.FC = () => {
   const { t } = useTranslation("why");
 
   return (
-    <div className="bg-white">
+    <section className="bg-white">
       {/* Section Title and Description */}
       <div className="flex flex-col md:flex-row w-full border-y border-secondary">
         <div className="md:w-1/2 py-16 md:py-0 md:mt-16 border-b md:border-0 border-secondary">
@@ -44,7 +44,7 @@ const WhyInfos: React.FC = () => {
           }
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
