@@ -15,7 +15,7 @@ const TransactionHistoryList = () => {
         <div className="text-4xl">History</div>
       </div>
 
-      <div className="mt-8 mb-16">
+      <div className="border border-border rounded-xl bg-surface p-4 mt-8 mb-16">
         <PastTransactions
           pagination={pagination}
           setPagination={setPagination}

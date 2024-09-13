@@ -43,6 +43,7 @@ export const useGetUserActiveSwaps = ({
   const { isConnected, principalId } = useWallet();
   const [data, setData] = useState<{ rows: SwapData[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState("");
 
   const active_swaps = useQuery({
     queryKey: ["USER_FETCH_ACTIVE_SWAP", principalId] as QueryKey,
@@ -58,24 +59,30 @@ export const useGetUserActiveSwaps = ({
   useEffect(() => {
     if (active_swaps.isLoading) {
       setIsInitializing(true);
-    }
-  }, [active_swaps.isLoading]);
-
-  useEffect(() => {
-    if (active_swaps.isSuccess && active_swaps.data) {
+    } else if (active_swaps.isSuccess) {
       const rows = active_swaps.data.map((r) => getSwapData(r[1]));
       setData({
         rows,
       });
       setIsInitializing(false);
+    } else if (active_swaps.isError) {
+      console.log(active_swaps.error);
+      setError("Error while fetching active swaps :(.");
+      setIsInitializing(false);
     }
-  }, [active_swaps.isSuccess, active_swaps.data]);
+  }, [
+    active_swaps.isLoading,
+    active_swaps.isSuccess,
+    active_swaps.isError,
+    active_swaps.data,
+    active_swaps.error,
+  ]);
 
   return {
-    isSuccess: active_swaps.isSuccess && !isInitializing,
     data,
+    isSuccess: active_swaps.isSuccess && !isInitializing,
     isError: active_swaps.isError,
-    error: active_swaps.error,
+    error,
     isLoading: isInitializing,
   };
 };

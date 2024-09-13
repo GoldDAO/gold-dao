@@ -1,6 +1,7 @@
 import { LoaderSpin } from "@components/ui";
 
 import { useLedgerUserBalance } from "@hooks/ledger";
+import { useBalanceOGYUSD } from "@hooks/ogy_api";
 
 const BalanceOGY = ({ className }: { className?: string }) => {
   const {
@@ -9,6 +10,10 @@ const BalanceOGY = ({ className }: { className?: string }) => {
     isError,
     isLoading,
   } = useLedgerUserBalance({ ledger: "OGY" });
+  const { data: balanceOGYUSD } = useBalanceOGYUSD({
+    balance: balance?.number,
+  });
+
   return (
     <div className={`${className}`}>
       <div className="border border-border rounded-xl bg-surface p-6">
@@ -19,7 +24,7 @@ const BalanceOGY = ({ className }: { className?: string }) => {
               <div className="font-semibold text-2xl">{balance.string}</div>
               <div className="font-semibold text-2xl">OGY</div>
             </div>
-            <div className="font-light text-content/60">= $</div>
+            <div className="font-light text-content/60">={balanceOGYUSD} $</div>
           </div>
         )}
         {(isLoading || isError) && (

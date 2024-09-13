@@ -54,10 +54,10 @@ export const useGetUserHistoricSwap = ({
     pageCount: number;
     rowCount: number;
   } | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const history = useQuery({
     queryKey: [
@@ -78,41 +78,48 @@ export const useGetUserHistoricSwap = ({
   });
 
   useEffect(() => {
-    if (history.isSuccess) {
+    if (history.isLoading) {
+      setIsSuccess(false);
       setIsError(false);
       setError("");
-      setIsLoading(true);
-      setIsSuccess(false);
-      const initData = async () => {
-        await new Promise<void>((resolve) => {
-          if ("Err" in history.data[0]) {
-            // setError(Object.keys(historic.data.Err)[0]);
-            setIsError(true);
-            setError("Error while fetching history swap.");
-          } else {
-            const rows = (
-              history.data[0].Ok as Array<[[bigint, bigint], SwapInfo]>
-            ).map((r) => getSwapData(r[1]));
-            setData({
-              rows,
-              pageCount: Math.ceil(history.data[1] / limit),
-              rowCount: history.data[1],
-            });
-            setIsSuccess(true);
-          }
-          resolve();
-          setIsLoading(false);
+      setIsInitializing(true);
+    } else if (history.isSuccess) {
+      if ("Err" in history.data[0]) {
+        console.log(history.data[0].Err);
+        setIsError(true);
+        setError("Error while fetching swap history :(.");
+      } else {
+        const rows = (
+          history.data[0].Ok as Array<[[bigint, bigint], SwapInfo]>
+        ).map((r) => getSwapData(r[1]));
+        setData({
+          rows,
+          pageCount: Math.ceil(history.data[1] / limit),
+          rowCount: history.data[1],
         });
-      };
-      initData();
+        setIsSuccess(true);
+      }
+      setIsInitializing(false);
+    } else if (history.isError) {
+      console.log(history.error);
+      setIsError(true);
+      setError("Error while fetching swap history 2 :(.");
+      setIsInitializing(false);
     }
-  }, [history.data, history.isSuccess, limit]);
+  }, [
+    history.data,
+    history.error,
+    history.isError,
+    history.isLoading,
+    history.isSuccess,
+    limit,
+  ]);
 
   return {
-    isSuccess,
+    isSuccess: isSuccess && !isInitializing,
     data,
-    isError: history.isError || isError,
-    error: history.error || error,
-    isLoading: history.isLoading || isLoading,
+    isError,
+    error,
+    isLoading: isInitializing,
   };
 };
