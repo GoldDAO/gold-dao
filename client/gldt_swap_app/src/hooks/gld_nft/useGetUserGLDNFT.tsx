@@ -12,6 +12,7 @@ export const useGetUserGLDNFT = () => {
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const active_swaps = useGetUserActiveSwaps();
 
@@ -80,13 +81,14 @@ export const useGetUserGLDNFT = () => {
   const isSuccess = userNFTs.every((result) => result.isSuccess);
   const isLoading = userNFTs.some((result) => result.isLoading);
   const isFetching = userNFTs.some((result) => result.isFetching);
-  const isError = userNFTs.some((result) => result.isError);
+  const _isError = userNFTs.some((result) => result.isError);
   const _error = userNFTs.map((result) => result.error).filter(Boolean)[0];
   const data = userNFTs.map((result) => result.data);
 
   useEffect(() => {
     if (isLoading || isFetching) {
       setIsInitializing(true);
+      setIsError(false);
     } else if (isSuccess && isInitializing) {
       // ? Filter nft's currently being swapped
       const nftIdStrings =
@@ -108,13 +110,23 @@ export const useGetUserGLDNFT = () => {
       };
       updateNfts();
       setIsInitializing(false);
-    } else if (isError) {
-      console.log(_error);
+    } else if (_isError || active_swaps.isError) {
+      console.log(_error ?? active_swaps.isError);
+      setIsError(true);
       setError("Error while fetching your NFTs :(.");
       setIsInitializing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, isSuccess, isLoading, isFetching, isError, _error, isInitializing]);
+  }, [
+    data,
+    isSuccess,
+    isLoading,
+    isFetching,
+    isError,
+    _error,
+    isInitializing,
+    active_swaps.isError,
+  ]);
 
   return {
     data,
