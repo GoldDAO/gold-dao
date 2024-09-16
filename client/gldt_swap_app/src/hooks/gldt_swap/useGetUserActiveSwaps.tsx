@@ -16,12 +16,10 @@ import { getSwapData } from "./utils/index";
 interface GetUserActiveSwapsParams {
   principal: string;
 }
-interface UseGetUserActiveSwapsParams
-  extends Partial<GetUserActiveSwapsParams>,
-    Omit<
-      UseQueryOptions<Array<[[bigint, bigint], SwapInfo]>>,
-      "queryKey" | "queryFn"
-    > {}
+type UseGetUserActiveSwapsParams = Omit<
+  UseQueryOptions<Array<[[bigint, bigint], SwapInfo]>>,
+  "queryKey" | "queryFn"
+>;
 
 const get_active_swaps_by_user = async ({
   principal,
@@ -39,14 +37,14 @@ const get_active_swaps_by_user = async ({
 
 export const useGetUserActiveSwaps = ({
   ...queryParams
-}: UseGetUserActiveSwapsParams) => {
+}: UseGetUserActiveSwapsParams = {}) => {
   const { isConnected, principalId } = useWallet();
   const [data, setData] = useState<{ rows: SwapData[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
 
   const active_swaps = useQuery({
-    queryKey: ["USER_FETCH_ACTIVE_SWAP", principalId] as QueryKey,
+    queryKey: ["USER_FETCH_ACTIVE_SWAPS", principalId] as QueryKey,
     queryFn: () =>
       get_active_swaps_by_user({
         principal: principalId as string,

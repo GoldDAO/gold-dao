@@ -54,6 +54,9 @@ const Proceed = () => {
         queryClient.invalidateQueries({
           queryKey: ["GET_USER_GLD_NFT_1000G"],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
+        });
         resetSwapState();
       },
       onError: (err) => {

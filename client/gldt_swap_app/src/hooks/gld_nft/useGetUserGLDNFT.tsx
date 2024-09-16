@@ -5,12 +5,15 @@ import { useWallet, getActor } from "@amerej/artemis-react";
 
 import { TokenId, Nft, useNft } from "@context/index";
 import { canisters } from "@providers/Auth";
+import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetUserGLDNFT = () => {
   const { principalId, isConnected } = useWallet();
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
+
+  const active_swaps = useGetUserActiveSwaps();
 
   const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
     const { canisterId, idlFactory } = canisters[canisterName];
@@ -49,7 +52,7 @@ export const useGetUserGLDNFT = () => {
         queryKey: ["GET_USER_GLD_NFT_1G"],
         queryFn: () => getUserNFTByCanister("gld_nft_1g"),
         placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
+        enabled: !!isConnected && !!principalId && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,
       },
       // {
@@ -85,9 +88,21 @@ export const useGetUserGLDNFT = () => {
     if (isLoading || isFetching) {
       setIsInitializing(true);
     } else if (isSuccess && isInitializing) {
+      // ? Filter nft's currently being swapped
+      const nftIdStrings =
+        active_swaps.data?.rows.map((row) => row.nft_id_string) ?? [];
+      const filteredData = data.map((obj) => {
+        return {
+          ...obj,
+          tokenIds:
+            obj?.tokenIds.filter(
+              (token) => !nftIdStrings.includes(token.id_string)
+            ) ?? [],
+        };
+      });
       const updateNfts = async () => {
         await new Promise<void>((resolve) => {
-          setNfts(data as Nft[]);
+          setNfts(filteredData as Nft[]);
           resolve();
         });
       };
