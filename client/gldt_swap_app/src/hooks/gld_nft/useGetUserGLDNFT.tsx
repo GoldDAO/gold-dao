@@ -9,7 +9,6 @@ import { canisters } from "@providers/Auth";
 export const useGetUserGLDNFT = () => {
   const { principalId, isConnected } = useWallet();
   const { setNfts } = useNft();
-  const [isLoadingInit, setIsLoadingInit] = useState(true);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
 
