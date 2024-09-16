@@ -1,26 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 import { useWallet, getActor } from "@amerej/artemis-react";
-import _isEqual from "lodash/isEqual";
 
 import { TokenId, Nft, useNft } from "@context/index";
 import { canisters } from "@providers/Auth";
 import { SWAP_CANISTER_ID } from "@constants";
 import { bigintTo32ByteArray } from "@utils/index";
 
-const usePrevious = (value: Nft[]) => {
-  const ref = useRef<Nft[]>();
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
-};
-
 export const useGetAvailableGLDNFT = () => {
   const { principalId, isConnected } = useWallet();
   const { setNfts } = useNft();
-  const [isLoadingInit, setIsLoadingInit] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState("");
 
   const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
     const { canisterId, idlFactory } = canisters[canisterName];
@@ -36,8 +28,6 @@ export const useGetAvailableGLDNFT = () => {
       []
     )) as Array<bigint>;
 
-    // console.log(token_ids_bigint);
-
     const tokenIds = await Promise.all(
       token_ids_bigint.map(async (tokenId: bigint): Promise<TokenId> => {
         const result = (await actor.get_nat_as_token_id_origyn(
@@ -51,8 +41,6 @@ export const useGetAvailableGLDNFT = () => {
         };
       })
     );
-
-    // console.log(tokenIds);
     return {
       tokenIds,
     };
@@ -67,13 +55,13 @@ export const useGetAvailableGLDNFT = () => {
         enabled: !!isConnected && !!principalId,
         refetchOnWindowFocus: false,
       },
-      {
-        queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-        queryFn: () => getUserNFTByCanister("gld_nft_10g"),
-        placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
-        refetchOnWindowFocus: false,
-      },
+      // {
+      //   queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
+      //   queryFn: () => getUserNFTByCanister("gld_nft_10g"),
+      //   placeholderData: keepPreviousData,
+      //   enabled: !!isConnected && !!principalId,
+      //   refetchOnWindowFocus: false,
+      // },
       // {
       //   queryKey: ["GET_USER_GLD_NFT_100G"],
       //   queryFn: () => getUserNFTByCanister("gld_nft_100g"),
@@ -93,32 +81,34 @@ export const useGetAvailableGLDNFT = () => {
   const isLoading = availableNFTs.some((result) => result.isLoading);
   const isFetching = availableNFTs.some((result) => result.isFetching);
   const isError = availableNFTs.some((result) => result.isError);
-  const error = availableNFTs.map((result) => result.error).filter(Boolean)[0];
+  const _error = availableNFTs.map((result) => result.error).filter(Boolean)[0];
   const data = availableNFTs.map((result) => result.data);
-  const prevData = usePrevious(data as Nft[]);
-  // const refetchAll = useCallback(() => {
-  //   availableNFTs.forEach((result) => result.refetch());
-  // }, [availableNFTs]);
 
   useEffect(() => {
     if (isLoading || isFetching) {
-      setIsLoadingInit(true);
-    }
-  }, [isLoading, isFetching]);
-
-  useEffect(() => {
-    if (isSuccess && data && !_isEqual(data, prevData) && isLoadingInit) {
-      setNfts(data as Nft[]);
-      setIsLoadingInit(false);
+      setIsInitializing(true);
+    } else if (isSuccess && isInitializing) {
+      const updateNfts = async () => {
+        await new Promise<void>((resolve) => {
+          setNfts(data as Nft[]);
+          resolve();
+        });
+      };
+      updateNfts();
+      setIsInitializing(false);
+    } else if (isError) {
+      console.log(_error);
+      setError("Error while fetching available NFTs :(.");
+      setIsInitializing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, isSuccess, isConnected, prevData, isLoadingInit]);
+  }, [data, isSuccess, isLoading, isFetching, isError, _error, isInitializing]);
 
   return {
     data,
-    isSuccess,
+    isSuccess: isSuccess && !isInitializing,
     isError,
-    isLoading: isLoading || isFetching || isLoadingInit,
+    isLoading: isInitializing,
     error,
   };
 };

@@ -10,6 +10,8 @@ export const useGetUserGLDNFT = () => {
   const { principalId, isConnected } = useWallet();
   const { setNfts } = useNft();
   const [isLoadingInit, setIsLoadingInit] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState("");
 
   const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
     const { canisterId, idlFactory } = canisters[canisterName];
@@ -51,13 +53,13 @@ export const useGetUserGLDNFT = () => {
         enabled: !!isConnected && !!principalId,
         refetchOnWindowFocus: false,
       },
-      {
-        queryKey: ["GET_USER_GLD_NFT_10G"],
-        queryFn: () => getUserNFTByCanister("gld_nft_10g"),
-        placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
-        refetchOnWindowFocus: false,
-      },
+      // {
+      //   queryKey: ["GET_USER_GLD_NFT_10G"],
+      //   queryFn: () => getUserNFTByCanister("gld_nft_10g"),
+      //   placeholderData: keepPreviousData,
+      //   enabled: !!isConnected && !!principalId,
+      //   refetchOnWindowFocus: false,
+      // },
       // {
       //   queryKey: ["GET_USER_GLD_NFT_100G"],
       //   queryFn: () => getUserNFTByCanister("gld_nft_100g"),
@@ -77,34 +79,34 @@ export const useGetUserGLDNFT = () => {
   const isLoading = userNFTs.some((result) => result.isLoading);
   const isFetching = userNFTs.some((result) => result.isFetching);
   const isError = userNFTs.some((result) => result.isError);
-  const error = userNFTs.map((result) => result.error).filter(Boolean)[0];
+  const _error = userNFTs.map((result) => result.error).filter(Boolean)[0];
   const data = userNFTs.map((result) => result.data);
 
   useEffect(() => {
     if (isLoading || isFetching) {
-      setIsLoadingInit(true);
-    }
-  }, [isLoading, isFetching]);
-
-  useEffect(() => {
-    const updateNfts = async () => {
-      if (isSuccess && data && isLoadingInit) {
+      setIsInitializing(true);
+    } else if (isSuccess && isInitializing) {
+      const updateNfts = async () => {
         await new Promise<void>((resolve) => {
           setNfts(data as Nft[]);
           resolve();
         });
-        setIsLoadingInit(false);
-      }
-    };
-
-    updateNfts();
-  }, [data, isSuccess, isLoadingInit, setNfts]);
+      };
+      updateNfts();
+      setIsInitializing(false);
+    } else if (isError) {
+      console.log(_error);
+      setError("Error while fetching your NFTs :(.");
+      setIsInitializing(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, isSuccess, isLoading, isFetching, isError, _error, isInitializing]);
 
   return {
     data,
-    isSuccess,
+    isSuccess: isSuccess && !isInitializing,
     isError,
-    isLoading: isLoadingInit,
+    isLoading: isInitializing,
     error,
   };
 };
