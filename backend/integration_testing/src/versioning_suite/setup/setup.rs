@@ -6,7 +6,7 @@ use pocket_ic::{ PocketIc, PocketIcBuilder };
 use ic_ledger_types::Tokens;
 use types::TokenInfo;
 use candid::encode_one;
-
+use types::BuildVersion;
 use types::CanisterId;
 
 const INIT_CYCLES_BALANCE: u128 = 1_000 * 1_000_000_000_000;
@@ -23,17 +23,22 @@ macro_rules! create_and_install_canister {
     };
 }
 
-use crate::versioning_suite::tests::test_process_neurons::UpgradeArgs;
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum Args<T> {
-    Init(T),
-    Upgrade(UpgradeArgs),
-}
-
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     test_mode: bool,
     commit_hash: String,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub enum Args {
+    Init(InitArgs),
+    Upgrade(UpgradeArgs),
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub struct UpgradeArgs {
+    pub wasm_version: BuildVersion,
+    pub commit_hash: String,
 }
 
 pub struct SNCTestEnv {
@@ -49,28 +54,12 @@ pub struct SNCTestEnv {
 }
 pub struct SNCTestEnvBuilder {
     controller: Principal,
-    buyback_burn_canister_id: CanisterId,
-    icp_neuron_canister_id: CanisterId,
-    management_canister_id: CanisterId,
-    sns_neuron_controller_canister_id: CanisterId,
-    sns_rewards_canister_id: CanisterId,
-    super_stats_v3_canister_id: CanisterId,
-    token_metrics_canister_id: CanisterId,
 }
 
 impl Default for SNCTestEnvBuilder {
     fn default() -> Self {
         Self {
             controller: random_principal(),
-            buyback_burn_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
-            icp_neuron_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 2]),
-            management_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 3]),
-            sns_neuron_controller_canister_id: Principal::from_slice(
-                &[4, 0, 0, 0, 0, 0, 0, 0, 0, 4]
-            ),
-            sns_rewards_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 5]),
-            super_stats_v3_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 6]),
-            token_metrics_canister_id: Principal::from_slice(&[4, 0, 0, 0, 0, 0, 0, 0, 0, 7]),
         }
     }
 }
@@ -248,50 +237,6 @@ impl SNCTestEnvBuilder {
             token_metrics_init_args
         );
         println!("token_metrics_canister_id was installed");
-
-        // // Install all the canisters
-        // pic.install_canister(
-        //     buyback_burn_canister_id,
-        //     wasms::BUYBACK_BURN.clone(),
-        //     encode_one(buyback_burn_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     icp_neuron_canister_id,
-        //     wasms::ICP_NEURON.clone(),
-        //     encode_one(icp_neuron_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     management_canister_id,
-        //     wasms::MANAGEMENT.clone(),
-        //     encode_one(management_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     sns_neuron_controller_canister_id,
-        //     wasms::SNS_NEURON_CONTROLLER.clone(),
-        //     encode_one(snc_init_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     sns_rewards_canister_id,
-        //     wasms::REWARDS.clone(),
-        //     encode_one(sns_rewards_init_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     super_stats_v3_canister_id,
-        //     wasms::SUPER_STATS.clone(),
-        //     encode_one(super_stats_init_args).unwrap(),
-        //     Some(controller.clone())
-        // );
-        // pic.install_canister(
-        //     token_metrics_canister_id,
-        //     wasms::TOKEN_METRICS.clone(),
-        //     encode_one(token_metrics_init_args).unwrap(),
-        //     Some(controller.clone())
-        // );
 
         SNCTestEnv {
             controller: self.controller,
