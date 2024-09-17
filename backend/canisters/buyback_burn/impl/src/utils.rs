@@ -1,4 +1,4 @@
-use buyback_burn_canister::swap_config::SwapConfig;
+use buyback_burn_api::swap_config::SwapConfig;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
@@ -8,7 +8,7 @@ use crate::types::ICPSwapClient;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
-use buyback_burn_canister::swap_config::ExchangeConfig;
+use buyback_burn_api::swap_config::ExchangeConfig;
 use crate::types::SwapClient;
 pub fn build_swap_client(config: SwapConfig) -> Box<dyn SwapClient> {
     let input_token = config.input_token;

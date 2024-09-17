@@ -17,6 +17,10 @@ lazy_static! {
     pub static ref SNS_NEURON_CONTROLLER: CanisterWasm =
         get_canister_wasm_from_bin("sns_neuron_controller");
     pub static ref BUYBACK_BURN: CanisterWasm = get_canister_wasm_from_bin("buyback_burn");
+    pub static ref ICP_NEURON: CanisterWasm = get_canister_wasm_from_bin("icp_neuron");
+    pub static ref MANAGEMENT: CanisterWasm = get_canister_wasm_from_bin("management");
+    pub static ref SUPER_STATS: CanisterWasm = get_canister_wasm_from_bin("super_stats_v3");
+    pub static ref TOKEN_METRICS: CanisterWasm = get_canister_wasm_from_bin("token_metrics");
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
@@ -30,7 +34,7 @@ fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
         Ok(wasm) => wasm,
         Err(err) => {
             println!(
-                "Failed to read {canister_name} wasm: {err}. Run \"./scripts/build_canister.sh {canister_name}\""
+                "Failed to read {canister_name} wasm: {err}. \n\x1b[31mRun \"./scripts/build_canister.sh {canister_name}\"\x1b[0m"
             );
             panic!()
         }

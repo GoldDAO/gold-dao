@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{ mutate_state, RuntimeState };
-pub use buyback_burn_canister::add_swap_client::Args as AddSwapClientArgs;
-pub use buyback_burn_canister::add_swap_client::Response as AddSwapClientResponse;
+pub use buyback_burn_api::add_swap_client::Args as AddSwapClientArgs;
+pub use buyback_burn_api::add_swap_client::Response as AddSwapClientResponse;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::update;
 

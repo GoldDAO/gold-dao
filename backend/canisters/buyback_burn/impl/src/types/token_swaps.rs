@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use tracing::error;
 use types::TimestampMillis;
 use crate::types::*;
-use buyback_burn_canister::get_active_swaps::Response;
+use buyback_burn_api::get_active_swaps::Response;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {

@@ -1,6 +1,6 @@
 use crate::types::token_swaps::TokenSwaps;
-use buyback_burn_canister::get_config::Response as GetConfigResponse;
-use buyback_burn_canister::init::TokenAndPool;
+use buyback_burn_api::get_config::Response as GetConfigResponse;
+use buyback_burn_api::init::TokenAndPool;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;

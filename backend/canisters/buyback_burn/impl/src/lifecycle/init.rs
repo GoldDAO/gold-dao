@@ -1,6 +1,6 @@
 use crate::lifecycle::init_canister;
 use crate::state::{ Data, RuntimeState };
-pub use buyback_burn_canister::Args;
+pub use buyback_burn_api::Args;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use tracing::info;

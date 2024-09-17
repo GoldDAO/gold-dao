@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{ mutate_state, RuntimeState };
-pub use buyback_burn_canister::update_config::Args as UpdateConfigArgs;
-pub use buyback_burn_canister::update_config::Response as UpdateConfigResponse;
+pub use buyback_burn_api::update_config::Args as UpdateConfigArgs;
+pub use buyback_burn_api::update_config::Response as UpdateConfigResponse;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::update;
 use std::time::Duration;

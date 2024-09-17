@@ -217,7 +217,7 @@ name = "buyback_burn"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "buyback_burn_canister",
+ "buyback_burn_api",
  "candid 0.10.10",
  "canister_logger",
  "canister_state_macros",
@@ -244,7 +244,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "buyback_burn_canister"
+name = "buyback_burn_api"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
@@ -1530,6 +1530,7 @@ dependencies = [
 name = "integration_testing"
 version = "0.1.0"
 dependencies = [
+ "buyback_burn_api",
  "candid 0.10.10",
  "canister_time",
  "hex",
@@ -1537,6 +1538,7 @@ dependencies = [
  "icrc-ledger-types",
  "icrc_ledger_canister",
  "lazy_static",
+ "management_api_canister",
  "pocket-ic",
  "rand",
  "serde",
@@ -1544,6 +1546,8 @@ dependencies = [
  "sns_governance_canister",
  "sns_neuron_controller_api_canister",
  "sns_rewards_api_canister",
+ "super_stats_v3_api",
+ "token_metrics_api",
  "types",
  "utils",
 ]

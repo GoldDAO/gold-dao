@@ -1,7 +1,7 @@
 use crate::lifecycle::init_canister;
 use crate::memory::get_upgrades_memory;
 use crate::state::RuntimeState;
-pub use buyback_burn_canister::Args;
+pub use buyback_burn_api::Args;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
