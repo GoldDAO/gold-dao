@@ -14,7 +14,7 @@ use crate::{
         rewards::{ add_neuron_ownership, claim_reward, remove_neuron_ownership },
     },
     sns_rewards_suite::setup::{ default_test_setup, test_setup_with_no_neuron_hotkeys },
-    utils::tick_n_blocks,
+    utils::{ random_principal, tick_n_blocks },
 };
 
 fn is_claim_reward_fail(value: &ClaimRewardResponse) -> bool {
@@ -217,7 +217,7 @@ fn test_neuron_with_no_hotkey() {
     let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
-    let random_principal = Principal::anonymous();
+    // let random_principal = Principal::anonymous();
     let neuron_1 = test_env.neuron_data.get(&0usize).unwrap().clone(); // has no hotkey
     let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
     assert!(neuron_1.permissions.get(1) == None); // should be no hotkey on this neuron
@@ -228,31 +228,31 @@ fn test_neuron_with_no_hotkey() {
     };
 
     // ********************************
-    // 1. Add neuron owner as user_1 - SHOULD FAIL ( NO hotkeys on neuron for any user )
+    // 1. Add neuron owner as user_1 - SHOULD FAIL ( random principal not owner of neuron )
     // ********************************
 
     let res = add_neuron_ownership(
         &mut test_env.pic,
-        random_principal,
+        random_principal(),
         rewards_canister_id,
         &neuron_id_1.clone()
     );
-    assert_eq!(res, AddNeuronOwnerShipResponse::NeuronHotKeyAbsent);
+    assert_eq!(res, AddNeuronOwnerShipResponse::NeuronHotKeyInvalid);
 
     // ********************************
-    // 1. remove owner as user_1 - SHOULD FAIL ( No hotkeys on neuron for any user )
+    // 1. remove owner as user_1 - SHOULD FAIL ( random principal not owner of neuron )
     // ********************************
 
     let res = remove_neuron_ownership(
         &mut test_env.pic,
-        random_principal,
+        random_principal(),
         rewards_canister_id,
         &neuron_id_1.clone()
     );
-    assert_eq!(res, RemoveNeuronOwnershipResponse::NeuronHotKeyAbsent);
+    assert_eq!(res, RemoveNeuronOwnershipResponse::NeuronHotKeyInvalid);
 
     // ********************************
-    // 1. Claim reward as user 1 - SHOULD FAIL ( no hotkeys on neuron for any user )
+    // 1. Claim reward as user 1 - SHOULD FAIL ( random principal not owner of neuron )
     // ********************************
     // add some rewards to claim just incase.
     transfer(
@@ -266,14 +266,27 @@ fn test_neuron_with_no_hotkey() {
 
     let res = claim_reward(
         &mut test_env.pic,
-        random_principal,
+        random_principal(),
         rewards_canister_id,
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
         })
     );
-    assert_eq!(res, ClaimRewardResponse::NeuronHotKeyAbsent);
+
+    // ********************************
+    // 4. Claim reward as neuron_1 owner principal - SHOULD PASS ( as it does own the neuron and is a hotkey )
+    // ********************************
+    let res = claim_reward(
+        &mut test_env.pic,
+        neuron_1.permissions.get(0).unwrap().principal.unwrap(),
+        rewards_canister_id,
+        &(ClaimRewardArgs {
+            neuron_id: neuron_id_1.clone(),
+            token: "ICP".to_string(),
+        })
+    );
+    assert_eq!(res, ClaimRewardResponse::Ok(true));
 }
 
 #[test]
