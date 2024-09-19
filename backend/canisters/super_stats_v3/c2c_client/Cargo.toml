@@ -6,6 +6,3 @@ edition = "2021"
 [dependencies]
 canister_client = { path = "../../../libraries/canister_client" }
 super_stats_v3_api = { path = "../api" }
-types = { path = "../../../libraries/types" }
-ic-cdk = { workspace = true }
-candid = { workspace = true }

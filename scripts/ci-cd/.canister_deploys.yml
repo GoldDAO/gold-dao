@@ -4,14 +4,13 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
-          "cycles_manager",
-          "gldt_core",
-          "icp_neuron",
-          "management",
-          "sns_neuron_controller",
-          "sns_rewards",
-          "super_stats_v3",
-          "token_metrics"
+          'gldt_swap',
+          'icp_neuron',
+          'management',
+          'sns_neuron_controller',
+          'sns_rewards',
+          'super_stats_v3',
+          'token_metrics',
         ]
 ---
 # Rust canisters deployments
@@ -47,9 +46,9 @@ $[[ inputs.src-folder ]] production deploy:
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
       changes:
-        - "backend/libraries/**/*.{rs,toml,lock,md}"
-        - "backend/external_canisters/**/*.{rs,toml,lock,md}"
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - 'backend/libraries/**/*.{rs,toml,lock,md}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
       when: manual
   variables:
     TARGET_NETWORK: ic

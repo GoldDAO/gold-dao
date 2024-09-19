@@ -5,8 +5,14 @@ import useNeurons from '../../../hooks/useNeurons';
 import useSession from '../../../hooks/useSession';
 import useBalances from '../../../hooks/useBalances';
 
+const amounts = {
+  OGY: 'ogyRewards',
+  ICP: 'icpRewards',
+  GLDGov: 'ledgerRewards',
+};
+
 export default function ModalConfirm({
-  name, amount, claim, setNeuronModify, setGold, setIcp, setOgy,
+  name, amount, claim, setNeuronModify, setGold, setIcp, setOgy, setClaimState, claimItam,
 }) {
   const { principal } = useSession();
   const { getBalance } = useBalances();
@@ -29,7 +35,11 @@ export default function ModalConfirm({
     const newOgy = await getBalance('ogy');
     setOgy({ loading: false, amount: newOgy });
     document.getElementById('my_modal_confirm').close();
+    if (claimItam) {
+      setClaimState({ ...claimItam, [amounts[claim]]: 0 });
+    }
   };
+
   return (
     <>
       <div className=" flex-col mt-6 width-[90%] h-60 flex justify-around items-center">

@@ -12,7 +12,10 @@
     --color-surface-2: 250 249 248;
     --color-border: 232 230 225;
     --color-gold: 204 160 86;
+    --color-accent: 204 160 86;
     --color-charcoal: 34 37 38;
+    --color-jade: 80 190 143;
+    --color-dark-orange: 190 89 80;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -22,7 +25,10 @@
       --color-surface-2: 40 40 40;
       --color-border: 46 46 46;
       --color-gold: 204 160 86;
+      --color-accent: 204 160 86;
       --color-charcoal: 34 37 38;
+      --color-jade: 80 190 143;
+      --color-dark-orange: 190 89 80;
     }
   }
 }

@@ -10,7 +10,7 @@ See the [official website](https://gldt.org/) for more informations about the pr
 
 All the backend canisters are included in the folder [`backend/canisters`](backend/canisters/). This includes
 
-- [`gldt_core (WIP)`](backend/canisters/gldt_core/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
+- [`gldt_swap (WIP)`](backend/canisters/gldt_swap/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
 - [`icp_neuron`](backend/canisters/icp_neuron/): The canister that controls the ICP neurons of the Gold DAO.
 - [`sns_rewards (WIP)`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
 
@@ -26,11 +26,11 @@ The frontend canisters of the project are included in the folder [`client`](clie
 
 ### Clone this repository
 
-  ```sh
-  git clone git@github.com:GoldDAO/gldt-swap.git
-  ```
+```sh
+git clone git@github.com:GoldDAO/gldt-swap.git
+```
 
-  (Or from the DAOlink internal Gitlab url, from which this Github repo is automatically mirrored)
+(Or from the DAOlink internal Gitlab url, from which this Github repo is automatically mirrored)
 
 ### Install the dependencies
 
@@ -51,13 +51,13 @@ npm start
 
 > **⚠️ Some resources (fonts, images...) will return errors (`400`) if accessed from `http://127.0.0.1:<REPLICA_PORT>/?canisterId=<FRONTEND_CANISTER_ID>`**. Instead, use the following url to access the locally deployed dapp: `http://<FRONTEND_CANISTER_ID>.localhost:<REPLICA_PORT>/`.
 
-To redeploy your latest changes on `gldt_core`, `gldt_fee_compensation`, or on the frontend:
+To redeploy your latest changes on `gldt_swap`, or on the frontend:
 
 ```sh
 npm run deploy
 ```
 
-If you need to test a redeploy operation for a canister (`gldt_core`, `gldt_fee_compensation` or `gldt_ledger`), you can use one of those scripts:
+If you need to test a redeploy operation for a canister (`gldt_swap` or `gldt_ledger`), you can use one of those scripts:
 
 ```sh
 scripts/deploy-gldt-core.sh --help
@@ -77,7 +77,6 @@ To launch a **front-end only** development server, with [HMR](https://webpack.js
 ```sh
 npm run dev:gldt_swap_app # For the GLDT swap application frontend
 npm run dev:gldt_landing_page # For the GLDT main landing page
-npm run dev:gldt_explorer # For the GLDT explorer frontend
 ```
 
 The frontend development server will be available at `http://localhost:3000`.
@@ -122,7 +121,7 @@ export CANISTER_NAME=<THE_CANISTER_NAME>
 e.g.
 
 ```sh
-export CANISTER_NAME=gldt_core
+export CANISTER_NAME=gldt_swap
 ```
 
 Build the canister

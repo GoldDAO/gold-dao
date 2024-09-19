@@ -12,6 +12,7 @@ use core::init_and_upgrade::*;
 
 export_candid!();
 
+#[cfg(test)]
 mod tests {
     use super_stats_v3_api::{
         account_tree::AccountTree,

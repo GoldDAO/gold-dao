@@ -1,18 +1,15 @@
-import { useWalletInit } from "@amerej/artemis-react";
-
 import "./App.css";
+import { Tooltip } from "@components/ui";
+import Auth from "@components/shared/Auth";
+
 import RouterProvider from "@providers/Router.tsx";
 
 function App() {
-  useWalletInit({
-    host: "https://identity.ic0.app",
-    derivationOrigin: "",
-    whitelist: [],
-    canisters: {},
-  });
   return (
     <>
       <RouterProvider />
+      <Tooltip id="tooltip" />
+      <Auth />
     </>
   );
 }
