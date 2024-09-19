@@ -223,23 +223,6 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                   >
                     Claim
                   </button>
-                  <button className="z-10 flex items-center justify-between w-1/6">
-                    <div className="sm:hidden">
-                      {loading && DoubleArrowRefresh}
-                      {neuronError[item.id] && RedCross}
-                    </div>
-                    <Image
-                      src="svg/trash.svg"
-                      alt="trash"
-                      height={20}
-                      width={20}
-                      className="ml-2"
-                      onClick={() => {
-                        setSelectedNeuronId(item.id);
-                        document.getElementById('my_modal_delete').showModal();
-                      }}
-                    />
-                  </button>
                 </section>
                 <section className="collapse-content w-[95%] grid grid-cols-4 grid-rows-2 px-2 sm:px-8">
                   <div className="text-[#D3B871] font-medium flex  items-center gap-2 text-sm">

@@ -28,7 +28,8 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "components/shared/modal/modal.jsx"
+    "components/shared/modal/modal.jsx",
+    "dist/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
