@@ -2,7 +2,7 @@ import { Bounce, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Tooltip } from '@nextui-org/react';
-import { CopyIcon, DoubleArrowRefresh, RedCross } from '../../../utils/svgs';
+import { CopyIcon } from '../../../utils/svgs';
 import {
   copyContent,
   elapsedTime,
@@ -24,7 +24,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
   const [disableClaimAll, setDisableClaimAll] = useState(true);
   const [neuronAmountsToClaim, setNeuronAmountsToClaim] = useState({});
   const [reloadPrincipal, setReloadPrincipal] = useState(false);
-  const [selectedNeuronId, setSelectedNeuronId] = useState(false);
+  const [selectedNeuronId] = useState(false);
   const [userNeurons, setUserNeurons] = useState([]);
   const [neuronModify, setNeuronModify] = useState([]);
   const [hovered, setHovered] = useState({ disabled: false });
@@ -34,7 +34,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
     setHovered({ ...hovered, disabled, index });
   };
 
-  const { getNeuronsByOwner, loading, neuronError } = useNeurons({
+  const { getNeuronsByOwner, loading } = useNeurons({
     neuronId: '',
     token: '',
   });
