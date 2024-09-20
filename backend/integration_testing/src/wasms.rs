@@ -16,14 +16,28 @@ lazy_static! {
     // Wasms in particular canister folder
     pub static ref REWARDS: CanisterWasm = get_canister_wasm_from_bin("sns_rewards");
     pub static ref CYCLES_MANAGER: CanisterWasm = get_canister_wasm_from_bin("cycles_manager");
-    pub static ref SNS_NEURON_CONTROLLER: CanisterWasm = get_canister_wasm_from_bin("sns_neuron_controller");
+    pub static ref GLDT_SWAP: CanisterWasm = get_canister_wasm_from_bin("gldt_swap");
+    pub static ref ORIGYN_NFT: CanisterWasm = get_canister_wasm_gz("origyn_nft_reference");
+    pub static ref SNS_NEURON_CONTROLLER: CanisterWasm =
+        get_canister_wasm_from_bin("sns_neuron_controller");
     pub static ref BUYBACK_BURN: CanisterWasm = get_canister_wasm_from_bin("buyback_burn");
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
-    match read_file_from_relative_bin(&format!("../canisters/{canister_name}/target/wasm32-unknown-unknown/release/{canister_name}_canister.wasm.gz")) {
+    match
+        read_file_from_relative_bin(
+            &format!(
+                "../canisters/{canister_name}/target/wasm32-unknown-unknown/release/{canister_name}_canister.wasm.gz"
+            )
+        )
+    {
         Ok(wasm) => wasm,
-        Err(err) => {println!("Failed to read {canister_name} wasm: {err}. Run \"./scripts/build_canister.sh {canister_name}\""); panic!()},
+        Err(err) => {
+            println!(
+                "Failed to read {canister_name} wasm: {err}. Run \"./scripts/build_canister.sh {canister_name}\""
+            );
+            panic!()
+        }
     }
 }
 

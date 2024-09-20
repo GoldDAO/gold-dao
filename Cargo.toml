@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "backend/canisters/buyback_burn/impl",
+  "backend/canisters/buyback_burn/api",
   "backend/canisters/gldt_swap/common",
   "backend/canisters/gldt_swap/impl",
   "backend/canisters/gldt_swap/api",
