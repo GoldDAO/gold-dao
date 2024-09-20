@@ -1,4 +1,4 @@
-import { useWallet } from "@amerej/artemis-react";
+import { useAuth } from "@context/auth";
 import TotalCountNfts from "@components/account/TotalCountNfts";
 import TotalSwappedGLDT from "@components/account/TotalSwappedGLDT";
 import TotalWeightNfts from "@components/account/TotalWeightNfts";
@@ -8,17 +8,12 @@ import YourNfts from "@components/account/your-nfts/YourNfts";
 
 import OngoingTransactions from "@components/transactions/list/ongoing/Ongoing";
 import PastTransactions from "@components/transactions/list/past/Past";
-import { useState, useEffect } from "react";
+
+// todo better handle isConnected state
 
 const Account = () => {
-  const [ready, setReady] = useState(false);
-  const { principalId } = useWallet();
-
-  useEffect(() => {
-    if (principalId !== undefined) {
-      setReady(true);
-    }
-  }, [principalId]);
+  const { state: authState } = useAuth();
+  const { isConnected } = authState;
 
   return (
     <div className="container mx-auto mt-4 sm:mt-8">
@@ -42,7 +37,7 @@ const Account = () => {
         <div className="mt-6">
           <OngoingTransactions />
         </div>
-        <div className="mt-6">{ready && <PastTransactions />}</div>
+        <div className="mt-6">{isConnected && <PastTransactions />}</div>
       </div>
     </div>
   );

@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { getActor } from "@amerej/artemis-react";
-import { canisters } from "@providers/Auth";
 import { GetPoolsForTokenResponse } from "@canisters/icp_swap/interfaces";
 
+import { useAuth } from "@context/auth";
+
 export const useGetGLDTPrice = () => {
+  const { getActor } = useAuth();
   const [GLDTPrice, setGLDTPrice] = useState(0);
-  const { canisterId, idlFactory } = canisters["icp_swap"];
 
   const gldGovPrice = async () => {
-    const icpSwap = await getActor(canisterId, idlFactory, {
-      isAnon: true,
-    });
+    const actor = getActor("icp_swap");
     try {
       const gldt_ledger_id = "tyyy3-4aaaa-aaaaq-aab7a-cai"; // todo set to GLDT_LEDGER_CANISTER_ID when icp swap has pair . using gldgov for now
-      const pools = (await icpSwap.getPoolsForToken(gldt_ledger_id)) as Awaited<
+      const pools = (await actor.getPoolsForToken(gldt_ledger_id)) as Awaited<
         GetPoolsForTokenResponse[]
       >;
 

@@ -6,7 +6,6 @@ import {
   useEffect,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-// import { useWallet } from "@amerej/artemis-react";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export enum View {
@@ -40,7 +39,6 @@ export const useSwapApp = () => {
 };
 
 export const SwapAppProvider = ({ children }: { children: ReactNode }) => {
-  //   const { principalId, accountId } = useWallet();
   const [state, setState] = useState<SwapAppState>(initialState);
   const [searchParams, setSearchParams] = useSearchParams();
   const viewSearchParams = Number(searchParams.get("view"));
@@ -70,8 +68,6 @@ export const SwapAppProvider = ({ children }: { children: ReactNode }) => {
       value={{
         state,
         setView,
-        // principalId,
-        // accountId,
       }}
     >
       {children}

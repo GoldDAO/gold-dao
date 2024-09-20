@@ -1,7 +1,7 @@
 import "./App.css";
 import { Tooltip } from "@components/ui";
-import Auth from "@components/shared/Auth";
 
+import ConnectingDialog from "@components/auth/ConnectingDialog";
 import RouterProvider from "@providers/Router.tsx";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <>
       <RouterProvider />
       <Tooltip id="tooltip" />
-      <Auth />
+      <ConnectingDialog />
     </>
   );
 }

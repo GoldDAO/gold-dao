@@ -7,6 +7,7 @@ use types::CanisterWasm;
 lazy_static! {
     // Wasms in wasms folder
     pub static ref IC_ICRC1_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
+    pub static ref IC_ICRC2_LEDGER: CanisterWasm = get_canister_wasm_gz("icrc_ledger");
     pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
     pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm("sns_root");
     pub static ref ICP_LEDGER: CanisterWasm = get_canister_wasm("ledger");
@@ -28,6 +29,10 @@ fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
 
 fn get_canister_wasm(canister_name: &str) -> CanisterWasm {
     read_file_from_local_bin(&format!("{canister_name}_canister.wasm"))
+}
+
+fn get_canister_wasm_gz(canister_name: &str) -> CanisterWasm {
+    read_file_from_local_bin(&format!("{canister_name}_canister.wasm.gz"))
 }
 
 fn read_file_from_local_bin(file_name: &str) -> Vec<u8> {

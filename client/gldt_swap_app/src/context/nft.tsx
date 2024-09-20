@@ -5,6 +5,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useEffect,
 } from "react";
 
 import {
@@ -14,8 +15,10 @@ import {
   GLD_NFT_1000G_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
   REVERSE_GLDT_TX_FEE,
-  GLDT_DECIMAL
+  GLDT_DECIMAL,
 } from "@constants";
+
+import { useAuth } from "@context/auth";
 
 export type TokenId = {
   id_string: string;
@@ -127,6 +130,8 @@ export const useNft = () => {
 
 const useNftProviderValue = () => {
   const [state, setState] = useState<NftState>(initialState);
+  const { state: authState } = useAuth();
+  const { isConnected } = authState;
 
   const setNfts = useCallback((nfts: Nft[]): void => {
     setState((prevState) => {
@@ -186,12 +191,19 @@ const useNftProviderValue = () => {
     });
   };
 
-  const canBuyNft = (collectionIndex: CollectionIndex, user_balance: number): boolean => {
+  const canBuyNft = (
+    collectionIndex: CollectionIndex,
+    user_balance: number
+  ): boolean => {
     const totalGLDTtoSwap = getSelectedTotalGLDT();
     const singlePrice = state.nfts[collectionIndex].value * 100;
-    const remaining =  ((user_balance - totalGLDTtoSwap) - singlePrice) - (REVERSE_GLDT_TX_FEE / GLDT_DECIMAL);
+    const remaining =
+      user_balance -
+      totalGLDTtoSwap -
+      singlePrice -
+      REVERSE_GLDT_TX_FEE / GLDT_DECIMAL;
     return remaining > 0;
-  }
+  };
 
   // selects a random NFT
   const selectNft = (collectionIndex: CollectionIndex): void => {
@@ -202,12 +214,16 @@ const useNftProviderValue = () => {
       const collectionLength = collection.length;
 
       let randomIndex = getRandomNumber(collectionLength - 1);
-      if(collectionMeta.totalSelected === collectionLength){
+      if (collectionMeta.totalSelected === collectionLength) {
         return {
-          ...prevState
-        }
+          ...prevState,
+        };
       }
-      while (collection.find((token, index) => { return index === randomIndex && token.selected === true}) ) {
+      while (
+        collection.find((token, index) => {
+          return index === randomIndex && token.selected === true;
+        })
+      ) {
         randomIndex = getRandomNumber(collectionLength - 1);
       }
       collection[randomIndex] = {
@@ -218,16 +234,19 @@ const useNftProviderValue = () => {
         ...newNfts[collectionIndex],
         tokenIds: collection,
         totalSelected: newNfts[collectionIndex].totalSelected + 1,
-        totalSelectedGram: newNfts[collectionIndex].totalSelectedGram + newNfts[collectionIndex].value,
+        totalSelectedGram:
+          newNfts[collectionIndex].totalSelectedGram +
+          newNfts[collectionIndex].value,
         totalSelectedGLDT:
-          newNfts[collectionIndex].totalSelectedGLDT + newNfts[collectionIndex].value * GLDT_VALUE_1G_NFT,
+          newNfts[collectionIndex].totalSelectedGLDT +
+          newNfts[collectionIndex].value * GLDT_VALUE_1G_NFT,
       };
 
       const newState = {
         ...prevState,
         nfts: newNfts,
       };
-      return newState
+      return newState;
     });
   };
 
@@ -310,6 +329,12 @@ const useNftProviderValue = () => {
     setState(initialState);
   };
 
+  useEffect(() => {
+    if (!isConnected) {
+      resetState();
+    }
+  }, [isConnected]);
+
   const value = useMemo(
     () => ({
       state,
@@ -324,7 +349,7 @@ const useNftProviderValue = () => {
       getSelectedTotalGram,
       getSelectedTotalGLDT,
       resetState,
-      canBuyNft
+      canBuyNft,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state]
@@ -339,7 +364,6 @@ export const NftProvider = ({ children }: { children: ReactNode }) => {
     <NftContext.Provider value={contextValue}>{children}</NftContext.Provider>
   );
 };
-
 
 function getRandomNumber(n: number): number {
   return Math.floor(Math.random() * (n + 1));

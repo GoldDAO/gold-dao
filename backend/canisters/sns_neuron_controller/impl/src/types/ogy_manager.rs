@@ -190,17 +190,27 @@ pub async fn ogy_claim_rewards(
                             &args
                         ).await
                     {
-                        Ok(response) => match response {
-                            ogy_sns_rewards_api_canister::claim_reward::Response::Ok(_) => Ok(()),
-                            error => Err(format!(
-                                "Error claiming reward for Neuron ID {}: {:?}",
-                                neuron_id, error
-                            )),
-                        },
-                        Err(e) => Err(format!(
-                            "Failed to claim rewards for Neuron ID {}: {:?}",
-                            neuron_id, e
-                        )),
+                        Ok(response) =>
+                            match response {
+                                ogy_sns_rewards_api_canister::claim_reward::Response::Ok(_) =>
+                                    Ok(()),
+                                error =>
+                                    Err(
+                                        format!(
+                                            "Error claiming reward for Neuron ID {}: {:?}",
+                                            neuron_id,
+                                            error
+                                        )
+                                    ),
+                            }
+                        Err(e) =>
+                            Err(
+                                format!(
+                                    "Failed to claim rewards for Neuron ID {}: {:?}",
+                                    neuron_id,
+                                    e
+                                )
+                            ),
                     }
                 }
             })
