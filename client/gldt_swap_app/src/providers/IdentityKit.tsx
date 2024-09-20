@@ -1,5 +1,12 @@
 import { ReactNode } from "react";
-import { Provider } from "@amerej/artemis-react";
+import {
+  IdentityKitAuthType,
+  NFIDW,
+  Plug,
+  InternetIdentity,
+  Stoic,
+} from "@nfid/identitykit";
+import { IdentityKitProvider } from "@nfid/identitykit/react";
 import { IDL } from "@dfinity/candid";
 
 import {
@@ -57,28 +64,39 @@ export const canisters: Canisters = {
   },
   icp_swap: {
     canisterId: ICP_SWAP_CANISTER_ID,
-    idlFactory: icp_swap_idl
-  }
+    idlFactory: icp_swap_idl,
+  },
 };
 
-const AuthProvider = ({ children }: { children: ReactNode }) => {
+const IKProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <Provider
-      host="https://identity.ic0.app"
-      derivationOrigin=""
-      whitelist={[
-        GLD_NFT_1G_CANISTER_ID,
-        GLD_NFT_10G_CANISTER_ID,
-        GLD_NFT_100G_CANISTER_ID,
-        GLD_NFT_1000G_CANISTER_ID,
-        SWAP_CANISTER_ID,
-        GLDT_LEDGER_CANISTER_ID,
-        OGY_LEDGER_CANISTER_ID,
-      ]}
+    <IdentityKitProvider
+      signers={[NFIDW, Plug, InternetIdentity, Stoic]}
+      authType={IdentityKitAuthType.DELEGATION}
+      signerClientOptions={{
+        targets: [
+          GLD_NFT_1G_CANISTER_ID,
+          GLD_NFT_10G_CANISTER_ID,
+          GLD_NFT_100G_CANISTER_ID,
+          GLD_NFT_1000G_CANISTER_ID,
+          OGY_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_CANISTER_ID,
+          SWAP_CANISTER_ID,
+        ],
+      }}
+      onConnectFailure={(e: Error) => {
+        console.log(e);
+      }}
+      onConnectSuccess={() => {
+        console.log("connected");
+      }}
+      onDisconnect={() => {
+        console.log("disconnected");
+      }}
     >
       {children}
-    </Provider>
+    </IdentityKitProvider>
   );
 };
 
-export default AuthProvider;
+export default IKProvider;

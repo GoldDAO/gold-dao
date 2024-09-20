@@ -1,6 +1,5 @@
 // import { useEffect, useRef, useState } from "react";
-import { useWallet } from "@amerej/artemis-react";
-
+import { useAuth } from "@context/auth";
 import { useNft } from "@context/index";
 import { useGetAvailableGLDNFT } from "@hooks/gld_nft";
 
@@ -23,7 +22,8 @@ const ReverseSwapTo = () => {
     state: nftState,
     canBuyNft,
   } = useNft();
-  const { isConnected } = useWallet();
+  const { state: authState } = useAuth();
+  const { isConnected } = authState;
   const count = getCountNfts();
   const { data: balanceGLDT } = useLedgerUserBalance({ ledger: "GLDT" });
 

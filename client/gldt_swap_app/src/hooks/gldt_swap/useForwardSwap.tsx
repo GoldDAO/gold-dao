@@ -2,8 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 import { NftCollection, useNft } from "@context/index";
-import { canisters } from "@providers/Auth";
-import { getActor } from "@amerej/artemis-react";
+
 import {
   GLDT_LEDGER_CANISTER_ID,
   SWAP_CANISTER_ID,
@@ -11,6 +10,9 @@ import {
   GLDT_VALUE_1G_NFT,
   GLDT_DECIMAL,
 } from "@constants";
+
+import { useAuth } from "@context/auth";
+
 import { Result_3 } from "@canisters/gldt_swap/interfaces";
 import {
   MarketTransferRequest,
@@ -22,30 +24,24 @@ type TransferBatchNft = {
   data: MarketTransferRequest[];
 };
 
-const market_transfer_batch_nft_origyn = async (
-  nfts: TransferBatchNft[]
-): Promise<PromiseSettledResult<[MarketTransferResult]>[]> => {
-  const promises = nfts.map(async (nft: TransferBatchNft) => {
-    const actor = await getActor(
-      canisters[nft.canister].canisterId,
-      canisters[nft.canister].idlFactory,
-      {
-        isAnon: false,
-      }
-    );
-    const marketTransferResults = await actor.market_transfer_batch_nft_origyn(
-      nft.data
-    );
-    return marketTransferResults as [MarketTransferResult];
-  });
-
-  const results = await Promise.allSettled(promises);
-  return results;
-};
-
 export const useForwardSwap = () => {
+  const { getActor } = useAuth();
   const { getCollectionSelectedNFTs } = useNft();
   const selected = getCollectionSelectedNFTs();
+
+  const market_transfer_batch_nft_origyn = async (
+    nfts: TransferBatchNft[]
+  ): Promise<PromiseSettledResult<[MarketTransferResult]>[]> => {
+    const promises = nfts.map(async (nft: TransferBatchNft) => {
+      const actor = getActor(nft.canister);
+      const marketTransferResults =
+        await actor.market_transfer_batch_nft_origyn(nft.data);
+      return marketTransferResults as [MarketTransferResult];
+    });
+
+    const results = await Promise.allSettled(promises);
+    return results;
+  };
 
   // * get selected token ids for swap_nft_for_tokens
   const data_swap_nft_for_tokens = selected.flatMap((nft) =>
@@ -53,7 +49,7 @@ export const useForwardSwap = () => {
       (tokenId) =>
         [tokenId.id_bigint, Principal.fromText(nft.canisterId)] as [
           bigint,
-          Principal,
+          Principal
         ]
     )
   );
@@ -91,7 +87,7 @@ export const useForwardSwap = () => {
                 buy_now: BigInt(
                   nft.value * GLDT_VALUE_1G_NFT * GLDT_DECIMAL + 2 * GLDT_TX_FEE
                 ),
-              }, // Todo fetch it from get_swap for each tx (tokens_to_mint -> value_with_fee)
+              }, // todo fetch it from get_swap for each tx (tokens_to_mint -> value_with_fee)
               { notify: [Principal.fromText(SWAP_CANISTER_ID)] },
               { fee_schema: "com.origyn.royalties.fixed" },
               { allow_list: [Principal.fromText(SWAP_CANISTER_ID)] },
@@ -124,13 +120,7 @@ export const useForwardSwap = () => {
   return useMutation({
     mutationKey: ["GLD_NFT_SWAP_GLDT"],
     mutationFn: async (): Promise<void> => {
-      const actorSwap = await getActor(
-        canisters["gldt_swap"].canisterId,
-        canisters["gldt_swap"].idlFactory,
-        {
-          isAnon: false,
-        }
-      );
+      const actorSwap = getActor("gldt_swap");
 
       // * add intent to swap
       // console.log(data_swap_nft_for_tokens);
@@ -154,100 +144,3 @@ export const useForwardSwap = () => {
     },
   });
 };
-
-// const getSwaps = async (actorSwap: ActorSubclass, swapIntents: Result_3[]) => {
-//   let allResultsReady = false;
-
-//   while (!allResultsReady) {
-//     const swapPromises = swapIntents.map(async (intent: Result_3) => {
-//       const swapResult = await actorSwap.get_swap(intent);
-//       return swapResult as [[bigint, bigint], SwapInfo];
-//     });
-//     const results = await Promise.allSettled(swapPromises);
-
-//     allResultsReady = results.every((result) => {
-//       if (result.status === "fulfilled") {
-//         const swapResult = result.value[0][1];
-//         console.log(swapResult);
-//         const status = swapResult?.Forward?.status;
-//         console.log(status);
-//         if (status && ("Init" in status || "Failed" in status)) {
-//           return true;
-//         }
-//       }
-//       return false;
-//     });
-
-//     if (!allResultsReady) {
-//       console.log("Not all swaps are ready, retrying...");
-//       await new Promise((resolve) => setTimeout(resolve, 5000));
-//     } else {
-//       console.log("All swaps are either Init or Failed.");
-//     }
-//   }
-//   console.log("All swap operations have completed.");
-// };
-
-// const getInitSwaps = async (
-//   actorSwap: ActorSubclass,
-//   swapIntents: Result_3[]
-// ): Promise<boolean> => {
-//   const checkSwaps = async (): Promise<boolean> => {
-//     const swapPromises = swapIntents.map(async (intent: Result_3) => {
-//       const swapResult = await actorSwap.get_swap(intent);
-//       return swapResult as [[[bigint, bigint], SwapInfo]];
-//     });
-
-//     const results = await Promise.allSettled(swapPromises);
-
-//     const status = results.map((result) => {
-//       if (result.status === "fulfilled") {
-//         const swapResult = result.value[0][1];
-//         if ("Forward" in swapResult) {
-//           const status = swapResult?.Forward?.status;
-//           return status;
-//         }
-//       }
-//       return { Null: null };
-//     });
-
-//     const allStatusFetched = status.every((s) => "Init" in s || "Failed" in s);
-
-//     if (!allStatusFetched) {
-//       await new Promise((resolve) => setTimeout(resolve, 1000));
-//       return await checkSwaps();
-//     } else {
-//       const statusInit = status.every((s) => "Init" in s);
-//       if (statusInit) {
-//         return true;
-//       } else {
-//         return false;
-//       }
-//     }
-//   };
-//   return await checkSwaps();
-// };
-
-// const addIntent2Swap = async (
-//   actorSwap: ActorSubclass,
-//   nfts: Result_3[]
-// ): Promise<PromiseSettledResult<SwapResult>[]> => {
-//   const refetch = async (): Promise<PromiseSettledResult<SwapResult>[]> => {
-//     const promises = nfts.map(async (nft: Result_3) => {
-//       const result = await actorSwap.get_swap(nft);
-//       return result as [[[bigint, bigint], SwapInfo]];
-//     });
-
-//     const results = await Promise.allSettled(promises);
-
-//     const fulfilled = results.every((result) => result.status === "fulfilled");
-
-//     if (!fulfilled) {
-//       await new Promise((resolve) => setTimeout(resolve, 1000));
-//       return await refetch();
-//     } else {
-//       return results;
-//     }
-//   };
-//   return await refetch();
-// };

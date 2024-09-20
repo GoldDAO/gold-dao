@@ -1,41 +1,38 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { canisters } from "@providers/Auth";
+import { useAuth } from "@context/auth";
 import { roundAndFormatLocale, divideBy1e8 } from "@utils/numbers";
-
-const icrc1_balance_of = async ({
-  owner,
-  ledger,
-}: {
-  owner: string;
-  ledger: string;
-}) => {
-  const { canisterId, idlFactory } = canisters[`${ledger}_ledger`];
-  const actor = await getActor(canisterId, idlFactory, {
-    isAnon: false,
-  });
-  const result = (await actor.icrc1_balance_of({
-    owner: Principal.fromText(owner),
-    subaccount: [],
-  })) as number;
-
-  const balance = divideBy1e8(result)
-  return {
-    e8s: result,
-    number: balance,
-    string: roundAndFormatLocale({ number: balance }),
-  };
-};
 
 export const useLedgerUserBalance = ({
   ledger = "OGY",
 }: {
   ledger: string;
 }) => {
-  const { isConnected, principalId } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected, principalId } = authState;
   const queryKeyName = `USER_FETCH_BALANCE_${ledger}`;
+
+  const icrc1_balance_of = async ({
+    owner,
+    ledger,
+  }: {
+    owner: string;
+    ledger: string;
+  }) => {
+    const actor = await getActor(`${ledger}_ledger`);
+    const result = (await actor.icrc1_balance_of({
+      owner: Principal.fromText(owner),
+      subaccount: [],
+    })) as number;
+
+    const balance = divideBy1e8(result);
+    return {
+      e8s: result,
+      number: balance,
+      string: roundAndFormatLocale({ number: balance }),
+    };
+  };
 
   return useQuery({
     queryKey: [queryKeyName, principalId],
