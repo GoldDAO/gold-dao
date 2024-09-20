@@ -2,7 +2,6 @@ pub mod set_reserve_transfer_amounts_validate;
 pub mod set_reward_token_types_validate;
 pub mod get_reward_token_types;
 pub mod get_reserve_transfer_amounts;
-pub mod get_neurons_by_owner;
 pub mod get_neuron_by_id;
 pub mod get_n_history;
 pub mod get_maturity_history_of_neuron;
