@@ -1,6 +1,7 @@
 use std::{ env, path::Path, time::SystemTime };
 use candid::{ Nat, Principal };
 use gldt_swap_common::{ gldt::{ GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE }, nft::NftCanisterConf };
+use gldt_swap_api_canister::lifecycle::Args as GldtSwapCanisterArgs;
 use gldt_swap_api_canister::init::InitArgs as GldtSwapCanisterInitArgs;
 use icrc_ledger_canister::init::{ InitArgs, LedgerArgument };
 use pocket_ic::{ PocketIc, PocketIcBuilder };
@@ -209,14 +210,16 @@ fn install_canisters(
         gldt_ledger_init_args
     );
 
-    let gldt_swap_init_args: GldtSwapCanisterInitArgs = GldtSwapCanisterInitArgs {
-        version: "0.0.1".to_string(),
-        test_mode: true,
-        gldt_ledger_id: gldt_ledger_canister_id.clone(),
-        gldnft_canisters: vec![(origyn_nft_canister_id, NftCanisterConf { grams: 1u16 })],
-        ogy_ledger_id: ogy_ledger_canister_id,
-        authorized_principals: vec![controller.clone()],
-    };
+    let gldt_swap_init_args: GldtSwapCanisterArgs = GldtSwapCanisterArgs::Init(
+        GldtSwapCanisterInitArgs {
+            commit_hash: "abcdefgh".to_string(),
+            test_mode: true,
+            gldt_ledger_id: gldt_ledger_canister_id.clone(),
+            gldnft_canisters: vec![(origyn_nft_canister_id, NftCanisterConf { grams: 1u16 })],
+            ogy_ledger_id: ogy_ledger_canister_id,
+            authorized_principals: vec![controller.clone()],
+        }
+    );
 
     pic.set_time(SystemTime::now());
 

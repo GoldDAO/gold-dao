@@ -70,8 +70,11 @@ mod tests {
     use gldt_swap_api_canister::{
         get_historic_swaps::{ Args as GetHistoricSwapsArgs, GetHistoricSwapsError },
         get_historic_swaps_by_user::Args as GetHistoricSwapsByUserArgs,
+        lifecycle::Args as GldtSwapCanisterArgs,
         init::InitArgs as GldtSwapCanisterInitArgs,
+        post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
     };
+    use types::BuildVersion;
 
     #[test]
     pub fn init_should_create_a_default_archive() {
@@ -336,19 +339,15 @@ mod tests {
                 archive.canister_id.clone(),
                 &()
             );
-            assert_eq!(version, "0.0.1".to_string());
+            assert_eq!(version, BuildVersion::new(0, 0, 1));
         }
 
         // upgrading should work fine
         let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
         let gldt_swap_init_args = Encode!(
-            &(GldtSwapCanisterInitArgs {
-                version: "0.0.2".to_string(), // init will set this to "0.0.1" in test setup
-                test_mode: true,
-                gldt_ledger_id: gldt_ledger.clone(),
-                gldnft_canisters: vec![(origyn_nft, NftCanisterConf { grams: 1u16 })],
-                ogy_ledger_id: ogy_ledger,
-                authorized_principals: vec![controller.clone()],
+            &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
+                wasm_version: BuildVersion::new(0, 0, 2),
+                commit_hash: "zyxwvut".to_string(),
             })
         ).unwrap();
         pic.upgrade_canister(
@@ -367,7 +366,7 @@ mod tests {
                 archive.canister_id.clone(),
                 &()
             );
-            assert_eq!(version, "0.0.2".to_string());
+            assert_eq!(version, BuildVersion::new(0, 0, 2));
         }
 
         // get a swap from both archive canisters
@@ -410,18 +409,14 @@ mod tests {
             archive_canister.canister_id.clone(),
             &()
         );
-        assert_eq!(version, "0.0.1".to_string());
+        assert_eq!(version, BuildVersion::new(0, 0, 1));
 
         // upgrading should work fine
         let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
         let gldt_swap_init_args = Encode!(
-            &(GldtSwapCanisterInitArgs {
-                version: "0.0.2".to_string(), // init will set this to "0.0.1" in test setup
-                test_mode: true,
-                gldt_ledger_id: gldt_ledger.clone(),
-                gldnft_canisters: vec![(origyn_nft, NftCanisterConf { grams: 1u16 })],
-                ogy_ledger_id: ogy_ledger,
-                authorized_principals: vec![controller.clone()],
+            &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
+                wasm_version: BuildVersion::new(0, 0, 2), // init will set this to "0.0.1" in test setup
+                commit_hash: "zyxwvt".to_string(),
             })
         ).unwrap();
         pic.upgrade_canister(
@@ -437,7 +432,7 @@ mod tests {
             archive_canister.canister_id.clone(),
             &()
         );
-        assert_eq!(version, "0.0.2".to_string());
+        assert_eq!(version, BuildVersion::new(0, 0, 2));
 
         // check controllers match
     }
