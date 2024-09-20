@@ -1,5 +1,10 @@
 [workspace]
 members = [
+  "backend/canisters/gldt_swap/common",
+  "backend/canisters/gldt_swap/impl",
+  "backend/canisters/gldt_swap/api",
+  "backend/canisters/gldt_swap/archive",
+  "backend/canisters/gldt_swap/api_archive",
   "backend/canisters/management/impl",
   "backend/canisters/management/api",
   "backend/canisters/sns_rewards/impl",
@@ -10,9 +15,11 @@ members = [
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
-  "backend/canisters/gldt_libs",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
+  "backend/external_canisters/origyn_nft_reference/api",
+  "backend/external_canisters/origyn_nft_reference/c2c_client",
+  "backend/external_canisters/gldt_swap_archive/c2c_client",
   "backend/libraries/candid_gen",
   "backend/libraries/canister_client",
   "backend/libraries/canister_client_macros",
@@ -33,7 +40,7 @@ lto = "thin"
 panic = "abort"
 
 [workspace.dependencies]
-candid = { version = "0.10.2" }
+candid = { version = "0.10.2", features = ["value"] }
 ciborium = "0.2.2"
 futures = "0.3.29"
 # Enable `custom` feature of k256's getrandom dependency. See icp_neuron/impl/src/ecdsa.rs for more details.
