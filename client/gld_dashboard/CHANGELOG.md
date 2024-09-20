@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.7] - 2024-09-20 
+
+### Fixed
+
+- **Bug fix : voting power** - voting power would not show in reward neurons list if the delay was exactly the same as the nns configured minimum delay amount.
+
+### Imrpovments
+
+- **Neuron Linking** - You no longer need to link a neuron by calling a canister endpoint. As long as a dashboard principal has been added to the neuron as a hotkey, it will automatically be shown in the user's reward neuron list.
+- **Deployment** - small change to deployment to only built into a dist folder if the node env is production. this allows us to develop locally.
+
 ### [1.0.6] - 2024-08-23
 
 #### Fixed
