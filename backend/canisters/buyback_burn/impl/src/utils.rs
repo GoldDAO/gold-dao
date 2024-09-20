@@ -73,44 +73,6 @@ pub async fn retry_with_attempts<F, Fut>(
     Ok(())
 }
 
-// pub async fn retry_with_attempts<F, Fut>(
-//     attempt: u8,
-//     max_attempts: u8,
-//     delay_duration: Duration,
-//     mut f: F,
-// ) -> Result<(), String>
-// where
-//     F: FnMut() -> Fut + 'static + Copy, // Add 'static + Copy for closure capturing
-//     Fut: std::future::Future<Output = Result<(), String>> + 'static,
-// {
-//     match f().await {
-//         Ok(_) => {
-//             return Ok(());
-//         }
-//         Err(err) => {
-//             ic_cdk::println!("Attempt {}: Error - {:?}", attempt, err);
-//             if attempt == max_attempts {
-//                 return Err(err);
-//             }
-
-//             // Schedule the next retry with delay
-
-//             ic_cdk_timers::set_timer(delay_duration, move || {
-//                 // Since we're inside a timer callback, we must spawn the next async call
-//                 ic_cdk::spawn(async move {
-//                     if let Err(err) =
-//                         retry_with_attempts(attempt + 1, max_attempts, delay_duration, f).await
-//                     {
-//                         ic_cdk::println!("Final attempt failed: {:?}", err);
-//                     }
-//                 });
-//             });
-//         }
-//     }
-
-//     Ok(())
-// }
-
 /// Calculates the burn amount based on the current balance and burn rate.
 /// Returns the calculated amount or zero if there's an issue.
 /// TODO If the burn rate is incorrect -> cancel the job at all
@@ -122,6 +84,11 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
             return 0;
         }
     };
+
+    if burn_rate > 100 {
+        error!("Burn rate couldn't be more that 100. Returning 0 as burn amount.");
+        return 0;
+    }
 
     // TODO: think of the sequence here
     let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
