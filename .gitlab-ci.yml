@@ -48,6 +48,9 @@ include:
   #     src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
+      src-folder: buyback_burn
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
       src-folder: icp_neuron
   # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
   #   inputs:
