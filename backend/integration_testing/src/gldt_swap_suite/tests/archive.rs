@@ -339,7 +339,7 @@ mod tests {
                 archive.canister_id.clone(),
                 &()
             );
-            assert_eq!(version, BuildVersion::new(0, 0, 1));
+            assert_eq!(version, BuildVersion::new(0, 0, 0));
         }
 
         // upgrading should work fine
@@ -409,13 +409,13 @@ mod tests {
             archive_canister.canister_id.clone(),
             &()
         );
-        assert_eq!(version, BuildVersion::new(0, 0, 1));
+        assert_eq!(version, BuildVersion::new(0, 0, 0));
 
         // upgrading should work fine
         let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
         let gldt_swap_init_args = Encode!(
             &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
-                wasm_version: BuildVersion::new(0, 0, 2), // init will set this to "0.0.1" in test setup
+                wasm_version: BuildVersion::new(0, 0, 2), // init will set this to "0.0.0" in test setup
                 commit_hash: "zyxwvt".to_string(),
             })
         ).unwrap();
