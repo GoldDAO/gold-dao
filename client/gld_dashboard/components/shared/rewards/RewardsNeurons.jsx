@@ -123,7 +123,6 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
           </article>
         ) : (
           userNeurons.map((item) => {
-            console.log(item);
             const dissolveState = item.dissolve_state[0];
             const { votingPower } = item;
             return (

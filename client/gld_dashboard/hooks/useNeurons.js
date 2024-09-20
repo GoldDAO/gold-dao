@@ -297,20 +297,19 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
             votingPower: dissolveDelay
-              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+              >= Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
           };
-
           return {
             ...neurons[fixedNeuronIds],
             icpRewards: Number(icpRewards),
             ledgerRewards: Number(ledgerRewards),
             ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
-            votingPower: dissolveDelay
-              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+            votingPower: dissolveDelay >= 
+              Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
