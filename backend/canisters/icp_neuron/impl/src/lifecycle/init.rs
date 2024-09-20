@@ -6,6 +6,7 @@ use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use serde::{ Deserialize, Serialize };
 use tracing::info;
+use types::BuildVersion;
 use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use utils::env::{ CanisterEnv, Environment };
 
