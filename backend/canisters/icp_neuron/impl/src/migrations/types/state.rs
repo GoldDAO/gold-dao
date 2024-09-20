@@ -1,11 +1,6 @@
 use serde::{ Deserialize, Serialize };
-use candid::Principal;
-use types::RewardsRecipientList;
-use utils::env::CanisterEnv;
 
-use crate::state::Neurons;
-
-use super::outstanding_payments::OutstandingPaymentsList;
+use crate::state::Data;
 
 #[derive(Serialize, Deserialize)]
 pub struct RuntimeStateV0 {
@@ -16,12 +11,12 @@ pub struct RuntimeStateV0 {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Data {
-    pub public_key: Vec<u8>,
-    pub authorized_principals: Vec<Principal>,
-    pub neurons: Neurons,
-    pub nns_governance_canister_id: Principal,
-    pub icp_ledger_canister_id: Principal,
-    pub rewards_recipients: RewardsRecipientList,
-    pub outstanding_payments: OutstandingPaymentsList,
+pub struct CanisterEnv {
+    test_mode: bool,
+}
+
+impl CanisterEnv {
+    pub fn is_test_mode(&self) -> bool {
+        self.test_mode
+    }
 }

@@ -16,19 +16,11 @@ if [[ -n $CI_COMMIT_TAG && $NETWORK == "ic" ]]; then
 
 	VERSION="${VERSION_STRING#*v}" # converts v1.2.3 into 1.2.3
 
-	# VERSION="${CI_COMMIT_TAG#*-v}" # converts test-v1.2.3 into 1.2.3
-	# NAME="${CI_COMMIT_TAG%-v*}" # converts test-v1.2.3 into test
-
 	VERSION_MAJOR=$(echo "$VERSION" | awk -F'.' '{print $1}')
 	VERSION_MINOR=$(echo "$VERSION" | awk -F'.' '{print $2}')
 	VERSION_PATCH=$(echo "$VERSION" | awk -F'.' '{print $3}')
 
-	# VERSION_MAJOR="${VERSION%.*.*}"
-	# VERSION_MINOR="${VERSION#*.}"
-	# VERSION_MINOR="${VERSION_MINOR%.*}"
-	# VERSION_PATCH="${VERSION#*.*.}"
-
-	WASM_VERSION="record { major: $VERSION_MAJOR; minor: $VERSION_MINOR; patch: $VERSION_PATCH };"
+	WASM_VERSION="record { major = $VERSION_MAJOR:nat32; minor = $VERSION_MINOR:nat32; patch = $VERSION_PATCH:nat32 }"
 
 	# Check if NAME matches CANISTER_NAME
 	# The script requires CANISTER_NAME to be defined for staging deployment and
@@ -37,11 +29,9 @@ if [[ -n $CI_COMMIT_TAG && $NETWORK == "ic" ]]; then
 			echo "Error: NAME extracted from CI_COMMIT_TAG ('$NAME') does not match CANISTER_NAME ('$CANISTER_NAME')." >&2
 			exit 1
 	fi
-
-	WASM_VERSION="record { major: $VERSION_MAJOR; minor: $VERSION_MINOR; patch: $VERSION_PATCH };"
 else
 	VERSION="_STAGINGTEST_"
-	WASM_VERSION="record { major: 0; minor: 0; patch: 0 };"
+	WASM_VERSION="record { major = 0:nat32; minor = 0:nat32; patch = 0:nat32 }"
 fi
 
 if [[ -n $CI_COMMIT_SHORT_SHA ]]; then
