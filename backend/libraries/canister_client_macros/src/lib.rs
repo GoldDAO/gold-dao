@@ -1,3 +1,7 @@
+pub extern crate types;
+pub extern crate candid;
+pub extern crate ic_cdk;
+
 #[macro_export]
 macro_rules! generate_update_call {
     ($method_name:ident) => {
@@ -64,25 +68,28 @@ macro_rules! generate_c2c_call {
     };
 }
 
-pub extern crate types;
-pub extern crate candid;
-pub extern crate ic_cdk;
-
 #[macro_export]
 macro_rules! generate_candid_c2c_call {
     ($method_name:ident) => {
-        ::canister_client::generate_candid_c2c_call!($method_name, $method_name);
+        generate_candid_c2c_call!($method_name, $method_name);
     };
     ($method_name:ident, $external_canister_method_name:ident) => {
-        pub async fn $method_name(
+        pub async fn $method_name<A>(
             canister_id: $crate::types::CanisterId,
-            args: &$method_name::Args,
-        ) -> $crate::ic_cdk::api::call::CallResult<$method_name::Response> {
+            args: A,
+        ) -> $crate::ic_cdk::api::call::CallResult<$method_name::Response>
+        where
+            A: std::borrow::Borrow<$method_name::Args>,
+        {
             let method_name = stringify!($external_canister_method_name);
 
-            canister_client::make_c2c_call(canister_id, method_name, args, $crate::candid::encode_one, |r| {
-                $crate::candid::decode_one(r)
-            })
+            ::canister_client::make_c2c_call(
+                canister_id,
+                method_name,
+                args.borrow(),
+                $crate::candid::encode_one,
+                |r| $crate::candid::decode_one(r),
+            )
             .await
         }
     };
