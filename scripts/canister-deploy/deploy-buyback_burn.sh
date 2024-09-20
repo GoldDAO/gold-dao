@@ -60,7 +60,7 @@ if [[ $MODE == "init" ]]; then
     variant {
       Init = record {
         test_mode = '"$TESTMODE"';
-        wasm_version = record {
+        version = record {
           major = '"$MAJOR"' : nat32;
           minor = '"$MINOR"' : nat32;
           patch = '"$PATCH"' : nat32;
@@ -98,7 +98,7 @@ elif [[ $MODE == "upgrade" ]]; then
   ARGUMENTS='(
     variant {
       Upgrade = record {
-        wasm_version = record {
+        version = record {
           major = '"$MAJOR"' : nat32;
           minor = '"$MINOR"' : nat32;
           patch = '"$PATCH"' : nat32;

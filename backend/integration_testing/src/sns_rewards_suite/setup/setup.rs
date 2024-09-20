@@ -96,7 +96,7 @@ impl RewardsTestEnv {
 
         let init_args = Args::Init(InitArgs {
             test_mode: true,
-            wasm_version: BuildVersion::min(),
+            version: BuildVersion::min(),
             commit_hash: "Test".to_string(),
             icp_ledger_canister_id,
             sns_ledger_canister_id,

@@ -12,7 +12,7 @@ fn test_version_upgrade() {
     let controller = test_env.controller.clone();
 
     let upgrade_args = Args::Upgrade(UpgradeArgs {
-        wasm_version: BuildVersion::min(),
+        version: BuildVersion::min(),
         commit_hash: "TestCommitHash2".to_string(),
     });
 

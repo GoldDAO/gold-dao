@@ -13,7 +13,7 @@ use utils::env::{ CanisterEnv, Environment };
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     test_mode: bool,
-    wasm_version: BuildVersion,
+    version: BuildVersion,
     commit_hash: String,
 }
 
@@ -26,7 +26,7 @@ fn init(args: Args) {
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
-                init_args.wasm_version,
+                init_args.version,
                 init_args.commit_hash
             );
             let mut data = Data::new();

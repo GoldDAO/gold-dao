@@ -5,7 +5,7 @@ use types::{ CanisterId, BuildVersion };
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
-    pub wasm_version: BuildVersion,
+    pub version: BuildVersion,
     pub commit_hash: String,
     pub sns_governance_canister_id: CanisterId,
     pub super_stats_canister_id: CanisterId,

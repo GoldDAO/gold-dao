@@ -7,14 +7,14 @@ use candid::CandidType;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use stable_memory::get_reader;
 use tracing::info;
 use types::BuildVersion;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct UpgradeArgs {
-    pub wasm_version: BuildVersion,
+    pub version: BuildVersion,
     pub commit_hash: String,
 }
 
@@ -34,7 +34,7 @@ fn post_upgrade(args: Args) {
                 ::deserialize(reader)
                 .unwrap();
 
-            state.env.set_version(upgrade_args.wasm_version);
+            state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             // uncomment these lines if you want to do an upgrade with migration
@@ -48,7 +48,7 @@ fn post_upgrade(args: Args) {
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
 
-            info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");
+            info!(version = %upgrade_args.version, "Post-upgrade complete");
         }
     }
 }

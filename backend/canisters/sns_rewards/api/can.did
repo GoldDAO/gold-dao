@@ -47,7 +47,7 @@ type TokenInfo = record {
   decimals : nat64;
   ledger_id : principal;
 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args_3) -> {
   add_neuron_ownership : (NeuronId) -> (Response);
   claim_reward : (Args) -> (Response_1);

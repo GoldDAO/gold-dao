@@ -5,7 +5,7 @@ use types::BuildVersion;
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
-    pub wasm_version: BuildVersion,
+    pub version: BuildVersion,
     pub commit_hash: String,
     pub authorized_principals: Vec<Principal>,
 }

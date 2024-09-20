@@ -5,7 +5,7 @@ use stable_memory::get_reader;
 pub use token_metrics_api::Args;
 use tracing::info;
 
-use crate::{memory::get_upgrades_memory, state::RuntimeState};
+use crate::{ memory::get_upgrades_memory, state::RuntimeState };
 
 use super::init_canister;
 
@@ -25,13 +25,13 @@ fn post_upgrade(args: Args) {
                 ::deserialize(reader)
                 .unwrap();
 
-            state.env.set_version(upgrade_args.wasm_version);
+            state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
 
-            info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");
+            info!(version = %upgrade_args.version, "Post-upgrade complete");
         }
     }
 }

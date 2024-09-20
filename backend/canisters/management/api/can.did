@@ -5,7 +5,7 @@ type InitArgs = record {
   authorized_principals : vec principal;
   commit_hash : text;
 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
   get_gld_dashboard_maintenance_mode : () -> (bool) query;
   update_gld_dashboard_maintenance_mode : (bool) -> (null);

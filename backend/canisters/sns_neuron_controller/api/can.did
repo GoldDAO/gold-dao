@@ -192,7 +192,7 @@ type TransferSnsTreasuryFunds = record {
   memo : opt nat64;
   amount_e8s : nat64;
 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 type UpgradeSnsControlledCanister = record {
   new_canister_wasm : blob;
   mode : opt int32;

@@ -37,7 +37,7 @@ fn init(args: Args) {
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
-                init_args.wasm_version,
+                init_args.version,
                 init_args.commit_hash
             );
             let data = Data::new(

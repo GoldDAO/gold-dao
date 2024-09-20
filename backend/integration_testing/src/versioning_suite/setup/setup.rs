@@ -37,7 +37,7 @@ pub enum Args {
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct UpgradeArgs {
-    pub wasm_version: BuildVersion,
+    pub version: BuildVersion,
     pub commit_hash: String,
 }
 
@@ -99,7 +99,7 @@ impl SNCTestEnvBuilder {
 
         let buyback_burn_args = buyback_burn_api::Args::Init(buyback_burn_api::init::InitArgs {
             test_mode,
-            wasm_version: BuildVersion::min(),
+            version: BuildVersion::min(),
             commit_hash: commit_hash.clone(),
             authorized_principals: authorized_principals.clone(),
             gldgov_token_info: TokenInfo {
@@ -123,7 +123,7 @@ impl SNCTestEnvBuilder {
         let management_args = management_api_canister::Args::Init(
             management_api_canister::init::InitArgs {
                 test_mode,
-                wasm_version: BuildVersion::min(),
+                version: BuildVersion::min(),
                 commit_hash: commit_hash.clone(),
                 authorized_principals: authorized_principals.clone(),
             }
@@ -132,7 +132,7 @@ impl SNCTestEnvBuilder {
         let snc_init_args = sns_neuron_controller_api_canister::Args::Init(
             sns_neuron_controller_api_canister::init::InitArgs {
                 test_mode,
-                wasm_version: BuildVersion::min(),
+                version: BuildVersion::min(),
                 commit_hash: commit_hash.clone(),
                 authorized_principals: authorized_principals.clone(),
                 sns_rewards_canister_id,
@@ -145,7 +145,7 @@ impl SNCTestEnvBuilder {
         let sns_rewards_init_args = sns_rewards_api_canister::Args::Init(
             sns_rewards_api_canister::init::InitArgs {
                 test_mode: true,
-                wasm_version: BuildVersion::min(),
+                version: BuildVersion::min(),
                 commit_hash: commit_hash.clone(),
                 icp_ledger_canister_id,
                 sns_ledger_canister_id,
@@ -162,7 +162,7 @@ impl SNCTestEnvBuilder {
         let token_metrics_init_args = token_metrics_api::Args::Init(
             token_metrics_api::init::InitArgs {
                 test_mode: true,
-                wasm_version: BuildVersion::min(),
+                version: BuildVersion::min(),
                 commit_hash: commit_hash.clone(),
                 sns_governance_canister_id,
                 super_stats_canister_id,
