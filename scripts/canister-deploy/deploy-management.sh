@@ -3,6 +3,8 @@
 NETWORK=$1
 DEPLOYMENT_VIA="direct"
 
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh management $NETWORK
+
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE=true
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae

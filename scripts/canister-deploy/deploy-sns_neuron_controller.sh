@@ -3,6 +3,8 @@
 NETWORK=$1
 DEPLOYMENT_VIA="direct"
 
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh sns_neuron_controller $NETWORK
+
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE=true
   SNS_REWARDS_CANISTER_ID=2f5ll-gqaaa-aaaak-qcfuq-cai

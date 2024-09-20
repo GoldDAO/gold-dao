@@ -3,6 +3,8 @@
 NETWORK=$1
 DEPLOYMENT_VIA="direct"
 
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh token_metrics $NETWORK
+
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE=true
   OGY_LEDGER=$(dfx canister id sns_ledger --network staging)

@@ -3,6 +3,8 @@
 NETWORK=$1
 DEPLOYMENT_VIA="proposal"
 
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh sns_rewards $NETWORK
+
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE=true
   ICP_LEDGER_CANISTER_ID=ete3q-rqaaa-aaaal-qdlva-cai

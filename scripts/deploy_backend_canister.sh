@@ -4,6 +4,8 @@ CANISTER=$1
 NETWORK=$2
 ARGUMENTS=$3
 DEPLOYMENT_VIA=$4
+VERSION=$5
+REINSTALL=$6
 
 
 echo -e "CANISTER: $CANISTER \nNETWORK: $NETWORK \nARGUMENTS: $ARGUMENTS \nDEPLOYMENT_VIA: $DEPLOYMENT_VIA \nTAG: $CI_COMMIT_TAG"
@@ -16,17 +18,26 @@ fi
 
 # if deployment is to production/ic, the CI_COMMIT_TAG needs to match the expected pattern
 if [[ $NETWORK == ic && ! $CI_COMMIT_TAG =~ ^($CANISTER-v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-  echo "Error: Enter valid commit tag to deploy to productio. Received $CI_COMMIT_TAG."
+  echo "Error: Enter valid commit tag to deploy to production. Received $CI_COMMIT_TAG."
   exit 2
 fi
 
-if [[ $DEPLOYMENT_VIA == "direct" ]]; then
+if [[ $DEPLOYMENT_VIA == "direct" || $REINSTALL ]]; then
 
-  echo "Deploying $CANISTER directly via dfx."
-
-  dfx deploy $CANISTER --network $NETWORK ${REINSTALL} --argument "$ARGUMENTS" -y
+  if [[ $REINSTALL == "reinstall" ]]; then
+    echo "Reinstalling $CANISTER directly via dfx."
+    dfx deploy $CANISTER --network $NETWORK --mode reinstall --argument "$ARGUMENTS" -y
+  else
+    echo "Upgrading $CANISTER directly via dfx."
+    dfx deploy $CANISTER --network $NETWORK --argument "$ARGUMENTS" -y
+  fi
 
 elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
+
+  if [[ $REINSTALL == "reinstall" ]]; then
+    echo "Error: Cannot reinstall canister which is controller by SNS. Aborting here."
+    exit 2
+  fi
 
   echo "Deploying $CANISTER via SNS proposal on $NETWORK."
 
@@ -38,12 +49,12 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
     UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
   fi
 
-  # Extract version info and commit sha from CICD pipeline variables
-  . scripts/extract_version_and_commit_sha.sh $CANISTER $NETWORK
-  if [ $? -ne 0 ]; then
-    echo "Error in extract_version_and_commit_sha.sh"
-    exit 1
-  fi
+  # # Extract version info and commit sha from CICD pipeline variables
+  # . scripts/extract_commit_tag_data_and_commit_sha.sh $CANISTER $NETWORK
+  # if [ $? -ne 0 ]; then
+  #   echo "Error in extract_commit_tag_data_and_commit_sha.sh"
+  #   exit 1
+  # fi
 
   # Prepare prososal summary
   . scripts/prepare_proposal_summary.sh $CANISTER $VERSION backend

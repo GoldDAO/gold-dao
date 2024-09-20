@@ -1,44 +1,7 @@
 #!/usr/bin/env bash
 
-## As argument, preferably pass $1 previously defined by calling the pre-deploy script with the dot notation.
 
-show_help() {
-  cat << EOF
-byuback_burn canister deployment script.
-Must be run from the repository's root folder, and with a running replica if for local deployment.
-'staging' and 'ic' networks can only be selected from a Gitlab CI/CD environment.
-The NETWORK argument should preferably be passed from the env variable that was previously defined
-by the pre-deploy script (using the dot notation, or inside a macro deploy script).
-
-The canister will always be reinstalled locally, and only upgraded in staging and production (ic).
-
-Usage:
-  scripts/deploy-cycles-manager.sh [options] <NETWORK>
-
-Options:
-  -h, --help        Show this message and exit
-  -r, --reinstall   Completely reinstall the canister, instead of simply upgrade it
-EOF
-}
-
-if [[ $# -gt 0 ]]; then
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
-    case $1 in
-      -h | --help )
-        show_help
-        exit
-        ;;
-      -r | --reinstall )
-        REINSTALL="--mode reinstall"
-        ;;
-    esac;
-    shift;
-  done
-  if [[ "$1" == '--' ]]; then shift; fi
-else
-  echo "Error: missing <NETWORK> argument"
-  exit 1
-fi
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
 
 if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
   echo "Error: unknown network for deployment"
@@ -70,7 +33,7 @@ export BURN_RATE=33
 export MIN_ICP_BURN_AMOUNT=30_000_000_000
 export ICP_SWAP_CANISTER_ID=7eikv-2iaaa-aaaag-qdgwa-cai
 
-# FIXME 
+# FIXME
 export COMMIT_HASH=hello
 
 # Init args

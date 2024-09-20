@@ -3,6 +3,8 @@
 NETWORK=$1
 DEPLOYMENT_VIA="direct"
 
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh super_stats_v3 $NETWORK
+
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE=true
   ADMIN=$(dfx identity get-principal)

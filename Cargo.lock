@@ -213,6 +213,49 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
+name = "buyback_burn"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "buyback_burn_canister",
+ "candid 0.10.10",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "http_request",
+ "ic-cdk 0.16.0",
+ "ic-cdk-macros 0.13.2",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icpswap_client",
+ "icpswap_factory_canister",
+ "icpswap_factory_canister_c2c_client",
+ "icrc-ledger-types",
+ "icrc_ledger_canister_c2c_client",
+ "serde",
+ "serializer",
+ "stable_memory",
+ "tracing",
+ "types",
+ "typetag",
+ "utils",
+]
+
+[[package]]
+name = "buyback_burn_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "serde",
+ "types",
+]
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1107,6 +1150,19 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9cff1a3c3db565e3384c9c9d6d676b0a3f89a0886f4f787294d9c946d844369f"
+dependencies = [
+ "candid 0.10.10",
+ "ic-cdk-macros 0.14.0",
+ "ic0 0.23.0",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "ic-cdk"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd8ecacd682fa05a985253592963306cb9799622d7b1cce4b1edb89c6ec85be1"
@@ -1162,6 +1218,20 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk-macros"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01dc6bc425ec048d6ac4137c7c0f2cfbd6f8b0be8efc568feae2b265f566117c"
+dependencies = [
+ "candid 0.10.10",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_tokenstream 0.2.2",
+ "syn 2.0.76",
+]
+
+[[package]]
+name = "ic-cdk-macros"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d4d857135deef20cc7ea8f3869a30cd9cfeb1392b3a81043790b2cd82adc3e0"
@@ -1209,7 +1279,7 @@ dependencies = [
  "candid 0.10.10",
  "crc32fast",
  "hex",
- "ic-cdk 0.13.5",
+ "ic-cdk 0.14.1",
  "serde",
  "serde_bytes",
  "sha2",
@@ -1357,7 +1427,7 @@ name = "icpswap_client"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "ic-cdk 0.13.2",
+ "ic-cdk 0.16.0",
  "ic-ledger-types",
  "icpswap_swap_pool_canister",
  "icpswap_swap_pool_canister_c2c_client",
@@ -1380,7 +1450,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.13.2",
+ "ic-cdk 0.16.0",
  "icpswap_factory_canister",
  "types",
 ]
@@ -1399,7 +1469,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.13.2",
+ "ic-cdk 0.16.0",
  "icpswap_swap_pool_canister",
  "types",
 ]
@@ -2752,6 +2822,7 @@ dependencies = [
 name = "sns_governance_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
+ "candid 0.10.10",
  "canister_client",
  "ic-cdk 0.16.0",
  "sns_governance_canister",
