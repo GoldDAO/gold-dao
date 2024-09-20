@@ -1,5 +1,6 @@
 use crate::lifecycle::init_canister;
 use crate::memory::get_upgrades_memory;
+use crate::migrations::types::state::RuntimeStateV0;
 use crate::state::RuntimeState;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
@@ -17,18 +18,29 @@ fn post_upgrade(args: Args) {
                 "Cannot upgrade the canister with an Init argument. Please provide an Upgrade argument."
             ),
         Args::Upgrade(upgrade_args) => {
-    let memory = get_upgrades_memory();
-    let reader = get_reader(&memory);
+            let memory = get_upgrades_memory();
+            let reader = get_reader(&memory);
 
-    let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) =
-        serializer::deserialize(reader).unwrap();
+            // uncomment these lines if you want to do a normal upgrade
+            // let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = serializer
+            //     ::deserialize(reader)
+            //     .unwrap();
 
-        state.env.set_version(upgrade_args.wasm_version);
-        state.env.set_commit_hash(upgrade_args.commit_hash);
+            // uncomment these lines if you want to do an upgrade with migration
+            let (runtime_state_v0, logs, traces): (
+                RuntimeStateV0,
+                Vec<LogEntry>,
+                Vec<LogEntry>,
+            ) = serializer::deserialize(reader).unwrap();
+            let mut state = RuntimeState::from(runtime_state_v0);
 
-    canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
-    init_canister(state);
+            state.env.set_version(upgrade_args.wasm_version);
+            state.env.set_commit_hash(upgrade_args.commit_hash);
 
-    info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");}
-}
+            canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
+            init_canister(state);
+
+            info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");
+        }
+    }
 }
