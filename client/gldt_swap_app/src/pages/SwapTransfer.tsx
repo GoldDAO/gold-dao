@@ -1,5 +1,5 @@
-import { useWallet } from "@amerej/artemis-react";
 import { Card } from "@components/ui";
+import { useAuth } from "@context/auth";
 import { useSwapApp, View } from "@context/index";
 
 import { SwapProvider } from "@context/swap/swap";
@@ -12,7 +12,8 @@ import Swap from "@components/swap/Swap";
 import Transfer from "@components/transfer/Transfer";
 
 const SwapTransfer = () => {
-  const { isConnected } = useWallet();
+  const { state: authState } = useAuth();
+  const { isConnected } = authState;
   const { state: swapAppState } = useSwapApp();
   const { view } = swapAppState;
 

@@ -6,9 +6,8 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { canisters } from "@providers/Auth";
+import { useAuth } from "@context/auth";
 
 interface GetUserHistoricSwapTotalParams {
   principal: string;
@@ -18,23 +17,23 @@ interface UseGetUserHistoricSwapParams
   extends Partial<GetUserHistoricSwapTotalParams>,
     Omit<UseQueryOptions<bigint>, "queryKey" | "queryFn"> {}
 
-const get_history_total = async ({
-  principal,
-}: GetUserHistoricSwapTotalParams): Promise<bigint> => {
-  const { canisterId, idlFactory } = canisters["gldt_swap"];
-  const actor = await getActor(canisterId, idlFactory, {
-    isAnon: false,
-  });
-  const result = await actor.get_history_total([Principal.fromText(principal)]);
-  return result as bigint;
-};
-
 export const useGetUserHistoricCountSwap = ({
   ...queryParams
 }: UseGetUserHistoricSwapParams) => {
-  const { isConnected, principalId } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected, principalId } = authState;
   const [data, setData] = useState<number | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+
+  const get_history_total = async ({
+    principal,
+  }: GetUserHistoricSwapTotalParams): Promise<bigint> => {
+    const actor = getActor("gldt_swap");
+    const result = await actor.get_history_total([
+      Principal.fromText(principal),
+    ]);
+    return result as bigint;
+  };
 
   const historic_count = useQuery({
     queryKey: [

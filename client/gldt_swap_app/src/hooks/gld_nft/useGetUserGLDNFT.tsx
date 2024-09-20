@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
+import { useAuth } from "@context/auth";
 import { TokenId, Nft, useNft } from "@context/index";
-import { canisters } from "@providers/Auth";
+
 import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetUserGLDNFT = () => {
-  const { principalId, isConnected } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected, principalId } = authState;
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -17,10 +18,7 @@ export const useGetUserGLDNFT = () => {
   const active_swaps = useGetUserActiveSwaps();
 
   const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
-    const { canisterId, idlFactory } = canisters[canisterName];
-    const actor = await getActor(canisterId, idlFactory, {
-      isAnon: false,
-    });
+    const actor = getActor(canisterName);
     const token_ids_bigint = (await actor.unlisted_tokens_of(
       {
         owner: Principal.fromText(principalId as string),

@@ -6,10 +6,8 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { canisters } from "@providers/Auth";
-
+import { useAuth } from "@context/auth";
 import { SwapInfo, Result_1, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
 
@@ -23,32 +21,13 @@ interface UseGetUserHistoricSwapParams
   extends Partial<GetUserHistoricSwapParams>,
     Omit<UseQueryOptions<[Result_1, number]>, "queryKey" | "queryFn"> {}
 
-const get_historic_swaps_by_user = async ({
-  page,
-  principal,
-  limit,
-}: GetUserHistoricSwapParams): Promise<[Result_1, number]> => {
-  const { canisterId, idlFactory } = canisters["gldt_swap"];
-  const actor = await getActor(canisterId, idlFactory, {
-    isAnon: false,
-  });
-  const result_history = (await actor.get_historic_swaps_by_user({
-    page: page,
-    user: Principal.fromText(principal),
-    limit: limit,
-  })) as Result_1;
-  const result_count = (await actor.get_history_total([
-    Principal.fromText(principal),
-  ])) as bigint;
-  return [result_history, Number(result_count)];
-};
-
 export const useGetUserHistoricSwap = ({
   page = 0,
   limit = 5,
   ...queryParams
 }: UseGetUserHistoricSwapParams) => {
-  const { isConnected, principalId } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected, principalId } = authState;
   const [data, setData] = useState<{
     rows: SwapData[];
     pageCount: number;
@@ -58,6 +37,23 @@ export const useGetUserHistoricSwap = ({
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const get_historic_swaps_by_user = async ({
+    page,
+    principal,
+    limit,
+  }: GetUserHistoricSwapParams): Promise<[Result_1, number]> => {
+    const actor = getActor("gldt_swap");
+    const result_history = (await actor.get_historic_swaps_by_user({
+      page: page,
+      user: Principal.fromText(principal),
+      limit: limit,
+    })) as Result_1;
+    const result_count = (await actor.get_history_total([
+      Principal.fromText(principal),
+    ])) as bigint;
+    return [result_history, Number(result_count)];
+  };
 
   const history = useQuery({
     queryKey: [
