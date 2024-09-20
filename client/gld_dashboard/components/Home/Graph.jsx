@@ -18,7 +18,7 @@ Interaction.modes.interpolate = Interpolate;
 export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
-  const { copyGldGovSupply, copyGldGovTreasury } = useCharts();
+  const { copyGldGovSupply, copyGldGovTreasury, stakersData } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
   useEffect(() => setInnerWidth(window.innerWidth), []);
@@ -37,7 +37,8 @@ export default function Graph({ name }) {
           });
           break;
         case 'Staked':
-          setData({ loading: false, data: data2, suggestedMax: 1200 });
+          if (stakersData?.loading) break;
+          setData({ loading: false, data: stakersData.data, suggestedMax: 1200 });
           break;
         case 'Liquid':
           setData({ loading: false, data: data3, suggestedMax: 1200 });
@@ -111,6 +112,8 @@ export default function Graph({ name }) {
     copyGldGovTreasury.data,
     copyGldGovTreasury?.loading,
     data.data?.length,
+    stakersData?.data,
+    stakersData?.data.length,
     name,
   ]);
 

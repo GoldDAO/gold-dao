@@ -7,6 +7,7 @@ export default create((set, get) => ({
   copyGldGovSupply: { loading: true, data: [] },
   gldGovTreasury: { loading: true, data: [] },
   copyGldGovTreasury: { loading: true, data: [] },
+  stakersData: { loading: true, data: [] },
   setSelectedDistance: (selectedDistance) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
@@ -29,6 +30,7 @@ export default create((set, get) => ({
     const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyGldGovSupply = filterDates(filtered);
+    console.log(copyGldGovSupply);
 
     return set({
       gldGovSupply: { loading: false, data },
@@ -43,6 +45,17 @@ export default create((set, get) => ({
     return set({
       gldGovTreasury: { loading: false, data },
       copyGldGovTreasury: { loading: false, data: copyGldGovTreasury },
+    });
+  },
+  setStakersMetrics: (data) => {
+    const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+    const mappedData = data.map(([daysSinceEpoch, value]) => ({
+      label: new Date(daysSinceEpoch * millisPerDay).toISOString().split('T')[0],
+      value,
+    }));
+    return set({
+      stakersData: { loading: false, data: mappedData },
     });
   },
 }));

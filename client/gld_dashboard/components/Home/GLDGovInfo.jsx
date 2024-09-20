@@ -16,6 +16,7 @@ export default function GLDGovInfo() {
   const [price, setPrice] = useState({ loading: true, amount: 0 });
   const [marketcap, setMarketcap] = useState({ loading: true, amount: 0 });
   const [infoModal, setInfoModal] = useState(null);
+
   // getters
   useEffect(() => {
     (async () => {

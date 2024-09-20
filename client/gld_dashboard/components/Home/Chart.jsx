@@ -26,7 +26,7 @@ const Chart = ({ name, amount }) => {
 
   return (
     <section className={' w-[67%]  p-5 relative hidden sm:block'}>
-      {name !== 'Treasury' && (
+      {/* {name !== 'Treasury' && (
         <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-20  z-50  rounded-r-[36px]">
           <div className="text-white text-4xl font-bold flex justify-center items-center gap-2">
             <p>Coming Soon</p>
@@ -38,7 +38,7 @@ const Chart = ({ name, amount }) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <div>
         <div className="flex justify-between">
           <div className="w-full flex justify-between border-b border-[#C6C6C6] pb-5">
