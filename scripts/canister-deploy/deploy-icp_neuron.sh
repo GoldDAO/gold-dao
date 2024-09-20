@@ -6,7 +6,6 @@ DEPLOYMENT_VIA="proposal"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh icp_neuron $NETWORK
 
-
 if [[ $REINSTALL == "reinstall" ]]; then
 
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
