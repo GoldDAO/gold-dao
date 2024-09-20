@@ -12,8 +12,12 @@ import ForwardSwapFrom from "./from";
 import ForwardSwapTo from "./to";
 import ForwardSwapProceed from "./proceed";
 
+import { useNft } from "@context/index";
+
 const Forward = () => {
   const { isConnected } = useWallet();
+  const { getSelectedTotal } = useNft();
+  const hasSelectedNfts = !!getSelectedTotal();
 
   return (
     <>
@@ -24,7 +28,7 @@ const Forward = () => {
         </FromCard>
         <ArrowDown />
         <ForwardSwapTo />
-        <TransactionDetails className="w-full  mt-8" />
+        {hasSelectedNfts && <TransactionDetails className="w-full  mt-8" />}
       </div>
       <div className="mt-6">
         {!isConnected && <ConnectWallet />}

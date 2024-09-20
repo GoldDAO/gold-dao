@@ -11,9 +11,8 @@ import PastTransactions from "@components/transactions/list/past/Past";
 import { useState, useEffect } from "react";
 
 const Account = () => {
-
   const [ready, setReady] = useState(false);
-  const { principalId } = useWallet()
+  const { principalId } = useWallet();
 
   useEffect(() => {
     if (principalId !== undefined) {
@@ -39,16 +38,11 @@ const Account = () => {
       <YourNfts className="mb-4" />
 
       <div className="bg-surface rounded-xl border border-border px-6 py-4">
-        <div>
-          <div className="font-semibold">My transactions</div>
-        </div>
+        <div>My transactions</div>
         <div className="mt-6">
           <OngoingTransactions />
         </div>
-        <div className="mt-6">
-          { ready && (<PastTransactions />)}
-          
-        </div>
+        <div className="mt-6">{ready && <PastTransactions />}</div>
       </div>
     </div>
   );

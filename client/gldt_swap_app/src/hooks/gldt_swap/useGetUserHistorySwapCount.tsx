@@ -53,21 +53,21 @@ export const useGetUserHistoricCountSwap = ({
   useEffect(() => {
     if (historic_count.isLoading) {
       setIsInitializing(true);
-    }
-  }, [historic_count.isLoading]);
-
-  useEffect(() => {
-    if (historic_count.isError) {
-      setIsInitializing(false);
-    }
-  }, [historic_count.isError]);
-
-  useEffect(() => {
-    if (historic_count.isSuccess && historic_count.data) {
+    } else if (historic_count.isSuccess) {
       setData(Number(historic_count?.data ?? 0));
       setIsInitializing(false);
+    } else if (historic_count.isError) {
+      setData(0);
+      console.log(historic_count.error);
+      setIsInitializing(false);
     }
-  }, [historic_count.isSuccess, historic_count.data, historic_count]);
+  }, [
+    historic_count?.data,
+    historic_count.error,
+    historic_count.isError,
+    historic_count.isLoading,
+    historic_count.isSuccess,
+  ]);
 
   return {
     isSuccess: historic_count.isSuccess && !isInitializing,

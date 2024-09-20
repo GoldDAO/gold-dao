@@ -1,13 +1,10 @@
 import { useWallet } from "@amerej/artemis-react";
-import { Button, Dialog, LoaderSpin } from "@components/ui";
+import { Dialog, LoaderSpin } from "@components/ui";
 
 const Auth = () => {
   const {
     status,
-    isConnected,
-    handleOpenWalletList,
     handleSelectWallet,
-    handleDisconnectWallet,
     walletStatus,
     handleCloseWalletList,
     walletList,
@@ -15,10 +12,6 @@ const Auth = () => {
 
   return (
     <>
-      {!isConnected && <Button onClick={handleOpenWalletList}>Connect</Button>}
-      {isConnected && (
-        <Button onClick={handleDisconnectWallet}>Disconnect</Button>
-      )}
       <Dialog
         show={status == walletStatus.OpenWalletList}
         handleClose={handleCloseWalletList}

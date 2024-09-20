@@ -5,8 +5,14 @@ import { useWallet, getActor } from "@amerej/artemis-react";
 import { canisters } from "@providers/Auth";
 import { roundAndFormatLocale, divideBy1e8 } from "@utils/numbers";
 
-const icrc1_balance_of = async ({ owner }: { owner: string }) => {
-  const { canisterId, idlFactory } = canisters["ogy_ledger"];
+const icrc1_balance_of = async ({
+  owner,
+  ledger,
+}: {
+  owner: string;
+  ledger: string;
+}) => {
+  const { canisterId, idlFactory } = canisters[`${ledger}_ledger`];
   const actor = await getActor(canisterId, idlFactory, {
     isAnon: false,
   });
@@ -15,7 +21,7 @@ const icrc1_balance_of = async ({ owner }: { owner: string }) => {
     subaccount: [],
   })) as number;
 
-  const balance = divideBy1e8(result);
+  const balance = divideBy1e8(result)
   return {
     e8s: result,
     number: balance,
@@ -23,12 +29,21 @@ const icrc1_balance_of = async ({ owner }: { owner: string }) => {
   };
 };
 
-export const useUserBalanceOGY = () => {
+export const useLedgerUserBalance = ({
+  ledger = "OGY",
+}: {
+  ledger: string;
+}) => {
   const { isConnected, principalId } = useWallet();
+  const queryKeyName = `USER_FETCH_BALANCE_${ledger}`;
 
   return useQuery({
-    queryKey: ["USER_FETCH_BALANCE_OGY", principalId],
-    queryFn: () => icrc1_balance_of({ owner: principalId as string }),
+    queryKey: [queryKeyName, principalId],
+    queryFn: () =>
+      icrc1_balance_of({
+        owner: principalId as string,
+        ledger: ledger.toLocaleLowerCase(),
+      }),
     placeholderData: keepPreviousData,
     enabled: !!isConnected && !!principalId,
   });

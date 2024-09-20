@@ -12,9 +12,11 @@ export const OGY_LEDGER_CANISTER_ID = import.meta.env
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
+export const ICP_SWAP_CANISTER_ID = import.meta.env.VITE_ICP_SWAP_CANISTER_ID;
 
 export const API_OGY_BASE_URL="https://api.origyn.com"
 
+export const OGY_TX_FEE=200000
 export const GLDT_TX_FEE = 1000000;
 export const GLDT_DECIMAL = 100000000;
 export const REVERSE_GLDT_TX_FEE = 100000000;
@@ -64,4 +66,12 @@ if (!(APP_MODE === "production")) {
       "No GLDT_LEDGER_CANISTER_ID environment variable. Set GLDT_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`GLDT_LEDGER_CANISTER_ID=${GLDT_LEDGER_CANISTER_ID}`);
+
+  if (!ICP_SWAP_CANISTER_ID)
+    console.log(
+      "No ICP_SWAP_CANISTER_ID environment variable. Set ICP_SWAP_CANISTER_ID environment variable."
+    );
+  else console.log(`ICP_SWAP_CANISTER_ID=${ICP_SWAP_CANISTER_ID}`);
+
+
 }

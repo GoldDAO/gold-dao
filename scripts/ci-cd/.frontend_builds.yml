@@ -18,6 +18,7 @@ $[[ inputs.src-folder ]] staging build:
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "staging"
+    ENV: "staging"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
     - ENV=$ENV VERSION=$VERSION_STRING npm run build:staging --workspace $[[ inputs.src-folder ]]
@@ -47,6 +48,7 @@ $[[ inputs.src-folder ]] preprod build:
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "preprod"
+    ENV: "preprod"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
     - ENV=$ENV VERSION=$VERSION_STRING npm run build:preprod --workspace $[[ inputs.src-folder ]]
@@ -77,6 +79,7 @@ $[[ inputs.src-folder ]] production build:
   variables:
     CANISTER_NAME: "$[[ inputs.src-folder ]]"
     NETWORK: "ic"
+    ENV: "prod"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
     - ENV=$ENV VERSION=$VERSION_STRING npm run build:production --workspace $[[ inputs.src-folder ]]
