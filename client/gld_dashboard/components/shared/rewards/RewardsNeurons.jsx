@@ -123,6 +123,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
           </article>
         ) : (
           userNeurons.map((item) => {
+            console.log(item);
             const dissolveState = item.dissolve_state[0];
             const { votingPower } = item;
             return (
@@ -354,7 +355,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         />
       </Modal>
       <Modal title="Add Neuron" idModal="my_modal_add">
-        <ModalAdd setNeuronModify={setNeuronModify} />
+        <ModalAdd setNeuronModify={setNeuronModify} neuronModify={neuronModify} />
       </Modal>
       <Modal title="Confirm claim" idModal="my_modal_claim_desk">
         <ModalClaimAll

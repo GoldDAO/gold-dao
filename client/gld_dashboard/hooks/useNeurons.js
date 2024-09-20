@@ -213,19 +213,29 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       setRequestSent(true);
       setLoading(true);
       const neurons = {};
+      let shouldGetMore = true;
+      let responses = [];
+      const limit = 100;
+      let startPageAt = [];
 
-      const responses = await governance.list_neurons({
-        of_principal: [Principal.fromText(principal)],
-        start_page_at: [],
-        limit: 100,
-      });
+      while (shouldGetMore) {
+        const res = await governance.list_neurons({
+          of_principal: [Principal.fromText(principal)],
+          start_page_at: startPageAt,
+          limit,
+        });
+        responses = responses.concat(res.neurons);
+        if (res.neurons.length < limit) {
+          shouldGetMore = false;
+        } else {
+          startPageAt = res.neurons[res.neurons.length - 1].id;
+        }
+      }
 
       const neuronsParameters = await nervousSystemParameters();
-      if (responses.neurons.length) {
-        console.log(responses.neurons);
-        const neuronIds = responses.neurons.map((neuron) => neuron.id[0]); // [0].id
-        console.log(neuronIds);
-        const neuronsData = responses.neurons.map(async (neuron, i) => {
+      if (responses.length) {
+        const neuronIds = responses.map((neuron) => neuron.id[0]); // [0].id
+        const neuronsData = responses.map(async (neuron, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
           const neuronAge = Math.round(new Date().getTime() / 1000)
             - Number(neuron.aging_since_timestamp_seconds);

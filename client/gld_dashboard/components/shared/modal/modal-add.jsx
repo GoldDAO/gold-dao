@@ -7,12 +7,12 @@ import { copyContent } from '../../../utils/functions';
 import useNeurons from '../../../hooks/useNeurons';
 import useSession from '../../../hooks/useSession';
 
-export default function ModalAdd({ setNeuronModify }) {
+export default function ModalAdd({ setNeuronModify, neuronModify }) {
   const [neuronIdToAdd, setNeuronIdToAdd] = useState('');
   const [copyState, setCopyState] = useState(false);
   const { principal } = useSession();
 
-  const { addNeuron, loading, requestSent } = useNeurons({
+  const { loading, requestSent } = useNeurons({
     neuronId: neuronIdToAdd,
     token: '',
     neuronsToClaim: [],
@@ -30,11 +30,9 @@ export default function ModalAdd({ setNeuronModify }) {
     }
   }, [copyState]);
 
-  const handleAddNeuron = async () => {
-    await addNeuron();
-
-    setNeuronModify((prev) => !prev);
+  const closeModal = async () => {
     document.getElementById('my_modal_add')?.close();
+    setNeuronModify(neuronModify + 1);
   };
 
   return (
@@ -42,7 +40,7 @@ export default function ModalAdd({ setNeuronModify }) {
       <div className="text-left font-normal text-lg w-full flex flex-wrap gap-[36px]">
         <p>
           To successfully add each neuron to the dashboard,
-          please complete the following two steps for every individual neuron:
+          please complete the following for every individual neuron:
         </p>
         <span className="flex flex-wrap">
           {'1. Add your principal'.split(' ').map((l, i) => (
@@ -104,28 +102,13 @@ export default function ModalAdd({ setNeuronModify }) {
           </div>
         )}
       </div>
-      <div className="mt-6 w-full flex flex-col justify-between items-center">
-        <p className="text-left w-full font-normal text-lg mb-2">
-          2. Enter your <span className="font-bold">Gold DAO neuron ID</span> here:
-        </p>
-        <label className="input input-bordered flex items-center gap-2 w-full rounded-md bg-white">
-          <input
-            type="text"
-            className="grow"
-            placeholder="Neuron ID"
-            value={neuronIdToAdd}
-            onChange={(e) => setNeuronIdToAdd(e.target.value.trim())}
-            disabled={loading}
-          />{' '}
-        </label>
-      </div>
+
       <button
         className={`px-10 mt-6 py-4 rounded-3xl bg-[#D3B871] text-white text-md font-bold flex items-center justify-center ${loading ? 'opacity-35 gap-2' : ''} disabled:opacity-35`}
-        onClick={handleAddNeuron}
-        disabled={loading || !neuronIdToAdd}
+        onClick={closeModal}
       >
         {loading && <span className="loading loading-spinner"></span>}
-        Confirm
+        Done
       </button>
     </div>
   );
