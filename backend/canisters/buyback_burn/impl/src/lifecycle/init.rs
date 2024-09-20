@@ -4,7 +4,6 @@ pub use buyback_burn_api::Args;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use tracing::info;
-use types::BuildVersion;
 use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use utils::env::{ CanisterEnv, Environment };
 
@@ -17,7 +16,7 @@ fn init(args: Args) {
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
-                BuildVersion::min(),
+                init_args.wasm_version,
                 init_args.commit_hash
             );
             let mut data = Data::new(

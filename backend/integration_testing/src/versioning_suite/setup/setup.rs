@@ -99,6 +99,7 @@ impl SNCTestEnvBuilder {
 
         let buyback_burn_args = buyback_burn_api::Args::Init(buyback_burn_api::init::InitArgs {
             test_mode,
+            wasm_version: BuildVersion::min(),
             commit_hash: commit_hash.clone(),
             authorized_principals: authorized_principals.clone(),
             gldgov_token_info: TokenInfo {

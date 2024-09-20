@@ -8,8 +8,8 @@ if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BURN_INTERVAL_IN_SECS=1_000_000  # 11 days
-  SWAP_INTERVAL_IN_SECS=21_600     # 6 hours
+  BURN_INTERVAL_IN_SECS=21_600
+  SWAP_INTERVAL_IN_SECS=21_600
 elif [[ $NETWORK =~ ^(ic)$ ]]; then
   TESTMODE="false"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
@@ -41,16 +41,30 @@ GLDGOV_TOKEN_INFO='record {
 
 # Validate mode and parse related arguments
 if [[ $MODE == "init" ]]; then
-  if [[ $# -ne 3 ]]; then
-    echo "Error: init mode requires <COMMIT_HASH>"
+  if [[ $# -ne 4 ]]; then
+    echo "Error: init mode requires <VERSION> and <COMMIT_HASH>"
     exit 1
   fi
-  COMMIT_HASH=$3
+  VERSION=$3
+  COMMIT_HASH=$4
+
+  # Extracting major, minor, and patch from the version
+  IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+  if [[ -z $MAJOR || -z $MINOR || -z $PATCH ]]; then
+    echo "Error: version format should be x.y.z"
+    exit 1
+  fi
   # Arguments for init mode
   ARGUMENTS='(
     variant {
       Init = record {
         test_mode = '"$TESTMODE"';
+        wasm_version = record {
+          major = '"$MAJOR"' : nat32;
+          minor = '"$MINOR"' : nat32;
+          patch = '"$PATCH"' : nat32;
+        };
         commit_hash = "'"$COMMIT_HASH"'";
         authorized_principals = vec {
           principal "'"$AUTHORIZED_PRINCIPAL"'";
@@ -73,14 +87,21 @@ elif [[ $MODE == "upgrade" ]]; then
   fi
   VERSION=$3
   COMMIT_HASH=$4
+    # Extracting major, minor, and patch from the version
+  IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+  if [[ -z $MAJOR || -z $MINOR || -z $PATCH ]]; then
+    echo "Error: version format should be x.y.z"
+    exit 1
+  fi
   # Arguments for upgrade mode
   ARGUMENTS='(
     variant {
       Upgrade = record {
         wasm_version = record {
-          major = '"$(echo $VERSION | cut -d. -f1)"' : nat32;
-          minor = '"$(echo $VERSION | cut -d. -f2)"' : nat32;
-          patch = '"$(echo $VERSION | cut -d. -f3)"' : nat32;
+          major = '"$MAJOR"' : nat32;
+          minor = '"$MINOR"' : nat32;
+          patch = '"$PATCH"' : nat32;
         };
         commit_hash = "'"$COMMIT_HASH"'";
       }

@@ -1,11 +1,10 @@
 use ic_cdk_macros::init;
 pub use sns_rewards_api_canister::Args;
 use tracing::info;
-use types::BuildVersion;
-use types::{TokenInfo, TokenSymbol};
+use types::{ TokenInfo, TokenSymbol };
 use utils::env::CanisterEnv;
 
-use crate::state::{Data, RuntimeState};
+use crate::state::{ Data, RuntimeState };
 
 use super::init_canister;
 
@@ -17,8 +16,8 @@ fn init(args: Args) {
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
-                BuildVersion::min(),
-                init_args.commit_hash,
+                init_args.wasm_version,
+                init_args.commit_hash
             );
             let mut data = Data::default();
 
@@ -29,34 +28,25 @@ fn init(args: Args) {
                 let gldgov_ledger_canister_id = init_args.sns_ledger_canister_id;
 
                 if let Ok(token) = TokenSymbol::parse("ICP") {
-                    data.tokens.insert(
-                        token,
-                        TokenInfo {
-                            ledger_id: icp_ledger_canister_id,
-                            fee: 10_000u64,
-                            decimals: 8u64,
-                        },
-                    );
+                    data.tokens.insert(token, TokenInfo {
+                        ledger_id: icp_ledger_canister_id,
+                        fee: 10_000u64,
+                        decimals: 8u64,
+                    });
                 }
                 if let Ok(token) = TokenSymbol::parse("OGY") {
-                    data.tokens.insert(
-                        token,
-                        TokenInfo {
-                            ledger_id: ogy_ledger_canister_id,
-                            fee: 200_000u64,
-                            decimals: 8u64,
-                        },
-                    );
+                    data.tokens.insert(token, TokenInfo {
+                        ledger_id: ogy_ledger_canister_id,
+                        fee: 200_000u64,
+                        decimals: 8u64,
+                    });
                 }
                 if let Ok(token) = TokenSymbol::parse("GLDGov") {
-                    data.tokens.insert(
-                        token.clone(),
-                        TokenInfo {
-                            ledger_id: gldgov_ledger_canister_id,
-                            fee: 100_000u64,
-                            decimals: 8u64,
-                        },
-                    );
+                    data.tokens.insert(token.clone(), TokenInfo {
+                        ledger_id: gldgov_ledger_canister_id,
+                        fee: 100_000u64,
+                        decimals: 8u64,
+                    });
                 }
 
                 data.authorized_principals = vec![init_args.sns_gov_canister_id];

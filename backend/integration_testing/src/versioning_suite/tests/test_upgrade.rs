@@ -1,6 +1,7 @@
 use crate::wasms;
 use candid::encode_one;
 use types::BuildVersion;
+use crate::utils::tick_n_blocks;
 
 use crate::versioning_suite::setup::default_test_setup;
 use crate::versioning_suite::setup::setup::*;
