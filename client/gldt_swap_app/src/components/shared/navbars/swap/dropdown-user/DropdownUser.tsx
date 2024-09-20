@@ -7,12 +7,15 @@ import {
   ArrowPathIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/16/solid";
-import { useWallet } from "@amerej/artemis-react";
+
+import { useAuth } from "@context/auth";
+
 import { Tile } from "@components/ui";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
 const DropdownUser = () => {
-  const { handleDisconnectWallet, principalId } = useWallet();
+  const { state: authState, disconnect } = useAuth();
+  const { principalId } = authState;
 
   return (
     <div className="text-center">
@@ -55,7 +58,7 @@ const DropdownUser = () => {
                       >
                         {principalId}
                       </div>
-                      <CopyToClipboard value={principalId as string} />
+                      <CopyToClipboard value={principalId} />
                     </div>
                   </div>
                 </div>
@@ -95,7 +98,7 @@ const DropdownUser = () => {
 
               <MenuItem>
                 <div
-                  onClick={handleDisconnectWallet}
+                  onClick={disconnect}
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10 cursor-pointer"
                 >
                   <ArrowUpTrayIcon className="size-4" />

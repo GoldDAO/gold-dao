@@ -1,5 +1,4 @@
-// import { useEffect, useRef, useState } from "react";
-import { useWallet } from "@amerej/artemis-react";
+import { useAuth } from "@context/auth";
 
 import { useNft } from "@context/nft";
 import { useGetUserGLDNFT } from "@hooks/gld_nft";
@@ -16,7 +15,8 @@ import Error from "./Error";
 
 const ForwardSwapFrom = () => {
   const { getCountNfts, selectNft, unselectNft, state: nftState } = useNft();
-  const { isConnected } = useWallet();
+  const { state: authState } = useAuth();
+  const { isConnected } = authState;
   const count = getCountNfts();
 
   const { isLoading, isSuccess, isError, error } = useGetUserGLDNFT();
@@ -50,7 +50,7 @@ const ForwardSwapFrom = () => {
           );
         })}
       {isConnected && isLoading && <Loading />}
-      {isConnected && nftState.isEmpty && <Empty />}
+      {isConnected && !isLoading && nftState.isEmpty && <Empty />}
       {isConnected && isError && <Error error={error} />}
       {isConnected &&
         isSuccess &&

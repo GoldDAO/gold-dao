@@ -1,17 +1,35 @@
 import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { TokenId, Nft, useNft } from "@context/index";
-import { canisters } from "@providers/Auth";
 import { SWAP_CANISTER_ID } from "@constants";
+
+import { useAuth } from "@context/auth";
+import { TokenId, Nft, useNft } from "@context/index";
+
 import { bigintTo32ByteArray } from "@utils/index";
 
 import { useGetActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetAvailableGLDNFT = () => {
-  const { isConnected } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected } = authState;
+  // const { canisterId: canisterId10g, idlFactory: idlFactory10g } =
+  //   canisters["gld_nft_10g"];
+  // const { canisterId: canisterId100g, idlFactory: idlFactory100g } =
+  //   canisters["gld_nft_100g"];
+  // const { canisterId: canisterId1000g, idlFactory: idlFactory1000g } =
+  //   canisters["gld_nft_1000g"];
+
+  // const actor10g = useActor(canisterId10g, idlFactory10g, {
+  //   authenticated: false,
+  // });
+  // const actor100g = useActor(canisterId100g, idlFactory100g, {
+  //   authenticated: false,
+  // });
+  // const actor1000g = useActor(canisterId1000g, idlFactory1000g, {
+  //   authenticated: false,
+  // });
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -19,11 +37,8 @@ export const useGetAvailableGLDNFT = () => {
 
   const active_swaps = useGetActiveSwaps();
 
-  const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
-    const { canisterId, idlFactory } = canisters[canisterName];
-    const actor = await getActor(canisterId, idlFactory, {
-      isAnon: false,
-    });
+  const getNFTByCanister = async (canisterName: string): Promise<Nft> => {
+    const actor = getActor(canisterName);
     const token_ids_bigint = (await actor.icrc7_tokens_of(
       {
         owner: Principal.fromText(SWAP_CANISTER_ID as string),
@@ -55,7 +70,7 @@ export const useGetAvailableGLDNFT = () => {
     queries: [
       {
         queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
-        queryFn: () => getUserNFTByCanister("gld_nft_1g"),
+        queryFn: () => getNFTByCanister("gld_nft_1g"),
         placeholderData: keepPreviousData,
         enabled: !!isConnected && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,

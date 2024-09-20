@@ -1,0 +1,102 @@
+import { ReactNode } from "react";
+import {
+  IdentityKitAuthType,
+  NFIDW,
+  Plug,
+  InternetIdentity,
+  Stoic,
+} from "@nfid/identitykit";
+import { IdentityKitProvider } from "@nfid/identitykit/react";
+import { IDL } from "@dfinity/candid";
+
+import {
+  GLD_NFT_1G_CANISTER_ID,
+  GLD_NFT_10G_CANISTER_ID,
+  GLD_NFT_100G_CANISTER_ID,
+  GLD_NFT_1000G_CANISTER_ID,
+  OGY_LEDGER_CANISTER_ID,
+  GLDT_LEDGER_CANISTER_ID,
+  SWAP_CANISTER_ID,
+  ICP_SWAP_CANISTER_ID,
+} from "@constants";
+
+import { idlFactory as gld_nft_idl } from "@canisters/gld_nft/did";
+import { idlFactory as gldt_swap_idl } from "@canisters/gldt_swap/did";
+import { idlFactory as ledger_idl } from "@canisters/ledger/did";
+import { idlFactory as icp_swap_idl } from "@canisters/icp_swap/did";
+
+interface Canisters {
+  [canisterName: string]: {
+    canisterId: string;
+    idlFactory: IDL.InterfaceFactory;
+  };
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const canisters: Canisters = {
+  gld_nft_1g: {
+    canisterId: GLD_NFT_1G_CANISTER_ID,
+    idlFactory: gld_nft_idl,
+  },
+  gld_nft_10g: {
+    canisterId: GLD_NFT_10G_CANISTER_ID,
+    idlFactory: gld_nft_idl,
+  },
+  gld_nft_100g: {
+    canisterId: GLD_NFT_100G_CANISTER_ID,
+    idlFactory: gld_nft_idl,
+  },
+  gld_nft_1000g: {
+    canisterId: GLD_NFT_1000G_CANISTER_ID,
+    idlFactory: gld_nft_idl,
+  },
+  gldt_swap: {
+    canisterId: SWAP_CANISTER_ID,
+    idlFactory: gldt_swap_idl,
+  },
+  gldt_ledger: {
+    canisterId: GLDT_LEDGER_CANISTER_ID,
+    idlFactory: ledger_idl,
+  },
+  ogy_ledger: {
+    canisterId: OGY_LEDGER_CANISTER_ID,
+    idlFactory: ledger_idl,
+  },
+  icp_swap: {
+    canisterId: ICP_SWAP_CANISTER_ID,
+    idlFactory: icp_swap_idl,
+  },
+};
+
+const IKProvider = ({ children }: { children: ReactNode }) => {
+  return (
+    <IdentityKitProvider
+      signers={[NFIDW, Plug, InternetIdentity, Stoic]}
+      authType={IdentityKitAuthType.DELEGATION}
+      signerClientOptions={{
+        targets: [
+          GLD_NFT_1G_CANISTER_ID,
+          GLD_NFT_10G_CANISTER_ID,
+          GLD_NFT_100G_CANISTER_ID,
+          GLD_NFT_1000G_CANISTER_ID,
+          OGY_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_CANISTER_ID,
+          SWAP_CANISTER_ID,
+        ],
+      }}
+      onConnectFailure={(e: Error) => {
+        console.log(e);
+      }}
+      onConnectSuccess={() => {
+        console.log("connected");
+      }}
+      onDisconnect={() => {
+        console.log("disconnected");
+      }}
+    >
+      {children}
+    </IdentityKitProvider>
+  );
+};
+
+export default IKProvider;

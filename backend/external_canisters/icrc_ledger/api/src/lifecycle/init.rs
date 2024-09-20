@@ -13,6 +13,7 @@ pub struct InitArgs {
     pub metadata: Vec<(String, MetadataValue)>,
     pub initial_balances: Vec<(Account, NumTokens)>,
     pub archive_options: ArchiveOptions,
+    pub fee_collector_account: Option<Account>,
 }
 
 #[derive(CandidType)]

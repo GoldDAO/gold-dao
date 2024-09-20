@@ -45,4 +45,5 @@ if [[ $dryrun -eq 1 ]]; then
   candid-extractor "backend/canisters/$1/target/wasm32-unknown-unknown/release/${1}.wasm"
 else
   candid-extractor "backend/canisters/$1/target/wasm32-unknown-unknown/release/${1}.wasm" > $did_path/can.did
+
 fi

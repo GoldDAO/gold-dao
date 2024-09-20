@@ -43,9 +43,6 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Unit tests
-  # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-  #   inputs:
-  #     src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: icp_neuron
@@ -64,12 +61,12 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_neuron_controller
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_swap
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
-  # - local: scripts/ci-cd/.canister_builds.yml
-  #   inputs:
-  #     src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: management
@@ -88,6 +85,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: token_metrics
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_swap
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -99,9 +99,9 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Backend deployments
-  # - local: scripts/ci-cd/.canister_deploys.yml
-  #   inputs:
-  #     src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: management

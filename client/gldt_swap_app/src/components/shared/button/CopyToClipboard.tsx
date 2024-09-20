@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { CopyToClipboard as ReactCopyToClipboard } from "react-copy-to-clipboard";
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
-const CopyToClipboard = ({ value }: { value: string }) => {
+const CopyToClipboard = ({ value = "" }: { value: string | undefined }) => {
   const [valueCopied] = useState(value);
   const [, setCopied] = useState(false);
 
