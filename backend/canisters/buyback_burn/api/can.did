@@ -9,6 +9,7 @@ type ICPSwapConfig = record {
 type InitArgs = record {
   min_icp_burn_amount : Tokens;
   test_mode : bool;
+  wasm_version : BuildVersion;
   icp_swap_canister_id : principal;
   burn_rate : nat8;
   gldgov_token_info : TokenInfo;

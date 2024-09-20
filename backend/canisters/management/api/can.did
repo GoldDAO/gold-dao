@@ -1,8 +1,12 @@
+type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
   test_mode : bool;
   authorized_principals : vec principal;
+  commit_hash : text;
 };
-service : (InitArgs) -> {
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+service : (Args) -> {
   get_gld_dashboard_maintenance_mode : () -> (bool) query;
   update_gld_dashboard_maintenance_mode : (bool) -> (null);
 }

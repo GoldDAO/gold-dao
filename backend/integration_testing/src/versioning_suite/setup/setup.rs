@@ -123,6 +123,7 @@ impl SNCTestEnvBuilder {
         let management_args = management_api_canister::Args::Init(
             management_api_canister::init::InitArgs {
                 test_mode,
+                wasm_version: BuildVersion::min(),
                 commit_hash: commit_hash.clone(),
                 authorized_principals: authorized_principals.clone(),
             }

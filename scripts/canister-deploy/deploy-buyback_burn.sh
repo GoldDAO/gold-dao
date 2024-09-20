@@ -6,7 +6,7 @@ DEPLOYMENT_VIA="direct"
 
 if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
-  GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
+  GLDGOV_LEDGER_CANISTER_ID=tyyy3aaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
   BURN_INTERVAL_IN_SECS=21_600
   SWAP_INTERVAL_IN_SECS=21_600
