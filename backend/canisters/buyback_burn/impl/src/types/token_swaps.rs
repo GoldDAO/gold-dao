@@ -72,7 +72,7 @@ impl TokenSwaps {
                 Ok(())
             }
             None => {
-                error!("Failed to archive {swap_id} because it doesn't exist in swap heap memory");
+                error!("Failed to archive {swap_id}. Swap not found");
                 Err(())
             }
         }
