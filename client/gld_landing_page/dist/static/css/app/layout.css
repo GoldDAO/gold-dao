@@ -1086,6 +1086,12 @@ video {
 .underline-offset-\[3px\] {
   text-underline-offset: 3px;
 }
+.opacity-0 {
+  opacity: 0;
+}
+.opacity-100 {
+  opacity: 1;
+}
 .shadow-\[0px_5px_30px_0px_rgba\(135\2c 88\2c 29\2c 0\.10\)\] {
   --tw-shadow: 0px 5px 30px 0px rgba(135,88,29,0.10);
   --tw-shadow-colored: 0px 5px 30px 0px var(--tw-shadow-color);
@@ -1112,6 +1118,11 @@ video {
 }
 .transition-all {
   transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.transition-opacity {
+  transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }

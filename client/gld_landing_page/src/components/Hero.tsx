@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
+import { useEffect, useState } from "react";
 
 interface InfoCardProps {
   iconSrc: string;
@@ -43,6 +45,7 @@ const InfoCard = ({
 );
 
 const Hero = () => {
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const { data, isLoading, error } = useQuery<TokenMetrics>({
     queryKey: ["tokenMetrics"],
     queryFn: fetchTokenMetrics,
@@ -57,15 +60,42 @@ const Hero = () => {
     ? Math.ceil(parseFloat(data!.tvl)).toLocaleString("en-US")
     : null;
 
+  useEffect(() => {
+    const videoElement = document.getElementById(
+      "hero-video"
+    ) as HTMLVideoElement;
+    if (videoElement) {
+      videoElement.addEventListener("canplaythrough", () => {
+        setVideoLoaded(true);
+      });
+    }
+
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener("canplaythrough", () => {
+          setVideoLoaded(true);
+        });
+      }
+    };
+  }, []);
+
   return (
     <div className="h-[85vh] md:h-[75vh] w-full flex flex-col items-center justify-center px-2 md:px-10 ">
+      {!videoLoaded && (
+        <img
+          src="/static/backgrounds/hero_bg_video.webp"
+          alt="Poster"
+          className="absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover"
+        />
+      )}
       <video
+        id="hero-video"
         autoPlay
         loop
         muted
         preload="auto"
         playsInline
-        className="absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover"
+        className={`absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover`}
         src="/videos/Gold_DAO_bg.mp4"
         poster="/backgrounds/bg_video.svg"
       />
