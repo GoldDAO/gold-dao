@@ -12,7 +12,7 @@ const TotalWeightNfts = ({ className }: { className?: string }) => {
         </div>
         {isSuccess && (
           <div className="flex items-center justify-center sm:justify-start gap-4">
-            <img className="flex-none h-8" src={`/gold-bars/${1}g.png`} />
+            <img className="flex-none h-8" src={`/gold-bars/${1}g.svg`} />
             <div className="font-semibold text-4xl">
               {data?.totalCountWeight ?? 0}g
             </div>

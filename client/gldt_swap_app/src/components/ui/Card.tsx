@@ -10,7 +10,7 @@ const Card = ({
 }) => {
   return (
     <div
-      className={`relative bg-surface border border-border p-6 rounded-xl ${className}`}
+      className={`relative bg-surface border border-border p-4 md:p-6 rounded-xl ${className}`}
       {...restProps}
     >
       {children}

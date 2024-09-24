@@ -12,13 +12,18 @@ const Swap = () => {
 
   return (
     <>
-      <nav className="sticky top-0 px-6 py-5 z-40 bg-background">
+      <nav className="sticky top-0 px-4 sm:px-6 py-5 z-40 bg-background">
         <div className="grid grid-cols-2 items-center h-10">
           <div className="flex-shrink-0">
             <Link to="/swap" className="flex items-center space-x-2">
-              <img src="/vite.svg" alt="GLDT Logo" />
+              <img
+                src="/gldt_logo.svg"
+                alt="GLDT Logo"
+                width={32}
+                height={32}
+              />
               <span className="self-center text-xl font-semibold whitespace-nowrap hidden sm:block">
-                GLDT Swap App
+                GLDT Swap
               </span>
             </Link>
           </div>
