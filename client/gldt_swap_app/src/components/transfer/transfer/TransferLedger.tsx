@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { FieldValues, useWatch } from "react-hook-form";
 import { divideBy1e8 } from "@utils/numbers";
 import { Button, LoaderSpin } from "@components/ui";
 import { useTransferProceedLedger } from "@context/transfer/proceed-ledger";
 
-import FieldPrincipalId from "../form/field/ledger/To";
+import FieldTo from "../form/field/ledger/To";
 import FieldAmount from "../form/field/ledger/Amount";
 import Balance from "../balance/Balance";
 
@@ -20,7 +19,6 @@ const TransferLedger = () => {
     control,
     formState: { errors, isValid },
   } = form;
-  const [txFee] = useState(divideBy1e8(fee));
 
   const onSubmit = (data: FieldValues) => {
     handleSubmitForm(data as { amount: string; to: string });
@@ -58,14 +56,14 @@ const TransferLedger = () => {
         <>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mt-4 p-4 border border-border rounded-xl">
-              <FieldPrincipalId className="" />
+              <FieldTo />
             </div>
             <div className="mt-4 p-4 border border-border rounded-xl">
               <FieldAmount balance={balance.data} transactionFee={fee} />
             </div>
 
-            <div className="flex justify-between items-center mt-8 mx-2">
-              <div className="inline-flex justify-start items-center text-content/60 text-sm rounded-lg">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-8 mx-2">
+              <div className="inline-flex justify-start items-center text-content/60 text-sm rounded-lg mb-2 sm:mb-0">
                 <div>Fee: </div>
                 <div className="flex items-center">
                   <img
@@ -74,7 +72,7 @@ const TransferLedger = () => {
                     alt={`${ledger} Logo`}
                   />
                   <span>
-                    {txFee} {ledger}
+                    {divideBy1e8(fee)} {ledger}
                   </span>
                 </div>
               </div>

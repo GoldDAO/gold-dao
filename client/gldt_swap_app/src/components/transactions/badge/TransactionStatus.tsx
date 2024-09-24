@@ -14,7 +14,7 @@ const Badge = ({
 }) => {
   return (
     <div
-      className={`rounded-full w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
+      className={`rounded-full px-4 py-1 text-sm flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </div>

@@ -21,7 +21,7 @@ const Default = () => {
         <div className="grid grid-cols-2 xl:grid-cols-3 items-center h-10">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/vite.svg" alt="GLDT Logo" />
+              <img src="/gldt_logo.svg" alt="GLDT Logo" />
               <span className="self-center text-xl font-semibold whitespace-nowrap hidden sm:block">
                 GLDT
               </span>
@@ -103,7 +103,7 @@ const Default = () => {
                       <div className="flex flex-col items-center px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         <div className="flex items-center justify-between w-full mb-4">
                           <Link to="/" className="flex items-center pr-4">
-                            <img src="/vite.svg" alt="OGY Dashboard Logo" />
+                            <img src="/ogy_logo.svg" alt="OGY Logo" />
                             <span className="self-center text-xl font-semibold whitespace-nowrap">
                               GLDT
                             </span>

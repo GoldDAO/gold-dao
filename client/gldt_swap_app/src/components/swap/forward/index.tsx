@@ -23,13 +23,15 @@ const Forward = () => {
   return (
     <>
       <div className="relative">
-        {!isConnected && <Backdrop />}
+        {!isConnected && (
+          <Backdrop isClickable={true} handleOnClick={connect} />
+        )}
         <FromCard>
           <ForwardSwapFrom />
         </FromCard>
         <ArrowDown />
         <ForwardSwapTo />
-        {hasSelectedNfts && <TransactionDetails className="w-full  mt-8" />}
+        {hasSelectedNfts && <TransactionDetails className="w-full mt-8" />}
       </div>
       <div className="mt-6">
         {!isConnected && (

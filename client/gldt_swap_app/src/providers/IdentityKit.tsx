@@ -4,7 +4,6 @@ import {
   NFIDW,
   Plug,
   InternetIdentity,
-  Stoic,
 } from "@nfid/identitykit";
 import { IdentityKitProvider } from "@nfid/identitykit/react";
 import { IDL } from "@dfinity/candid";
@@ -71,7 +70,7 @@ export const canisters: Canisters = {
 const IKProvider = ({ children }: { children: ReactNode }) => {
   return (
     <IdentityKitProvider
-      signers={[NFIDW, Plug, InternetIdentity, Stoic]}
+      signers={[NFIDW, Plug, InternetIdentity]}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
         targets: [
@@ -87,12 +86,12 @@ const IKProvider = ({ children }: { children: ReactNode }) => {
       onConnectFailure={(e: Error) => {
         console.log(e);
       }}
-      onConnectSuccess={() => {
-        console.log("connected");
-      }}
-      onDisconnect={() => {
-        console.log("disconnected");
-      }}
+      // onConnectSuccess={() => {
+      //   console.log("connected");
+      // }}
+      // onDisconnect={() => {
+      //   console.log("disconnected");
+      // }}
     >
       {children}
     </IdentityKitProvider>
