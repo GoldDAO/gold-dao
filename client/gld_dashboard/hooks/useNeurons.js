@@ -308,8 +308,8 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ledgerRewards: Number(ledgerRewards),
             ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
-            votingPower: dissolveDelay >= 
-              Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+            votingPower: dissolveDelay
+              >= Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
