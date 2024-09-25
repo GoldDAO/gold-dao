@@ -45,7 +45,7 @@ if [[ $DEPLOYMENT_VIA == "direct" ]]; then
 elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
 
   if [[ $REINSTALL == "reinstall" ]]; then
-    echo "Error: Cannot reinstall canister which is controller by SNS. Aborting here."
+    echo "Error: Cannot reinstall canister which is controlled by SNS. Aborting here."
     exit 2
   fi
 
@@ -81,6 +81,7 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
   quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
     --canister-upgrade-arg "$ARGUMENTS" \
+    --mode upgrade \
     --target-canister-id $(cat canister_ids.json | jq -r .$CANISTER.$NETWORK) \
     --wasm-path backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
     --title "Upgrade $CANISTER to version $VERSION" \
