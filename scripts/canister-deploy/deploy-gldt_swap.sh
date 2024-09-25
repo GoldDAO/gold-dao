@@ -25,25 +25,25 @@ if [[ $REINSTALL == "reinstall" ]]; then
     record {
       0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1g)\";
       1 = record {
-        grams = 1;
+        grams = 1:nat16;
       };
     };
     record {
       0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_10g)\";
       1 = record {
-        grams = 10;
+        grams = 10:nat16;
       };
     };
     record {
       0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_100g)\";
       1 = record {
-        grams = 100;
+        grams = 100:nat16;
       };
     };
     record {
       0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1000g)\";
       1 = record {
-        grams = 1000;
+        grams = 1000:nat16;
       };
     };
   }"
