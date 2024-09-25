@@ -10,10 +10,12 @@ import ModalChartMobile from '../shared/modal/modal-chart-mobile';
 import { data1 } from '../../utils/datas';
 import { parseNumbers } from '../../utils/parsers';
 import useServices from '../../hooks/useServices';
+import useCharts from '../../hooks/useCharts';
 
 export default function Graphs() {
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
+  const { stakersData } = useCharts();
   const [amount, setAmount] = useState();
   const [infoModal, setInfoModal] = useState(null);
 
@@ -30,9 +32,13 @@ export default function Graphs() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await gldGovTreasury();
-
-        setAmount(result);
+        if (selectedTab === 'Treasury') {
+          const result = await gldGovTreasury();
+          setAmount(result);
+        }
+        if (selectedTab === 'Staked') {
+          setAmount(stakersData.data[stakersData.data.length - 1].value);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -7,6 +7,7 @@ import { calculateTimestamp } from '../../utils/functions';
 import useCharts from '../../hooks/useCharts';
 
 const Chart = ({ name, amount }) => {
+  console.log('bro', amount)
   const { setSelectedDistance } = useCharts();
   const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '3M', t: 86400 * 31 * 3 });
 
@@ -68,7 +69,7 @@ const Chart = ({ name, amount }) => {
         </div>
         <div className="pt-5">
           <h1 className="flex flex-row mb-5 text-4xl font-bold">
-            {name !== 'Treasury' ? 'N/A' : amount || '0.0'}
+            {amount}
             {name !== 'Treasury' ? null : (
               <Image width={25} height={25} src="svg/g-logo.svg" className="ml-2" alt="gold dao" />
             )}
