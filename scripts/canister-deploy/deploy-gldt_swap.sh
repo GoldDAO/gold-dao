@@ -66,4 +66,4 @@ fi
 
 echo $ARGUMENTS
 
-# . ./scripts/deploy_backend_canister.sh gldt_swap $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
+. ./scripts/deploy_backend_canister.sh gldt_swap $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
