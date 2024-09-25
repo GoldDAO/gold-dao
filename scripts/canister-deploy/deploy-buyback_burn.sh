@@ -22,7 +22,7 @@ else
 fi
 
 BURN_RATE=33
-MIN_ICP_BURN_AMOUNT=30_000_000_000
+MIN_BURN_AMOUNT=30_000_000_000
 ICP_SWAP_CANISTER_ID=7eikv-2iaaa-aaaag-qdgwa-cai
 GLDGOV_ICP_POOL='record {
   token = record {
@@ -73,7 +73,7 @@ if [[ $MODE == "init" ]]; then
         gldgov_token_info = '"$GLDGOV_TOKEN_INFO"';
         tokens = vec {'"$GLDGOV_ICP_POOL"'};
         burn_rate = '"$BURN_RATE"' : nat8;
-        min_icp_burn_amount = record { e8s = '"$MIN_ICP_BURN_AMOUNT"' : nat64 };
+        min_burn_amount = record { e8s = '"$MIN_BURN_AMOUNT"' : nat64 };
         burn_interval_in_secs = '"$BURN_INTERVAL_IN_SECS"' : nat64;
         swap_interval_in_secs = '"$SWAP_INTERVAL_IN_SECS"' : nat64;
       }

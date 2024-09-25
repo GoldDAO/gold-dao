@@ -7,7 +7,7 @@ type ICPSwapConfig = record {
   swap_canister_id : principal;
 };
 type InitArgs = record {
-  min_icp_burn_amount : Tokens;
+  min_burn_amount : Tokens;
   test_mode : bool;
   version : BuildVersion;
   icp_swap_canister_id : principal;

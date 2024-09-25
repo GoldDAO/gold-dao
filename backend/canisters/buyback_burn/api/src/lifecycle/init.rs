@@ -15,8 +15,7 @@ pub struct InitArgs {
     pub swap_interval_in_secs: u64,
     pub icp_swap_canister_id: Principal,
     pub burn_rate: u8,
-    // NOTE: this value can be used to also define threshold for other tokens by taking the converted price
-    pub min_icp_burn_amount: Tokens,
+    pub min_burn_amount: Tokens,
     pub burn_interval_in_secs: u64,
 }
 

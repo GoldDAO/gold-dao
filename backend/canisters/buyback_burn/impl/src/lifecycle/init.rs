@@ -26,7 +26,7 @@ fn init(args: Args) {
                 init_args.swap_interval_in_secs,
                 init_args.icp_swap_canister_id,
                 init_args.burn_rate,
-                init_args.min_icp_burn_amount,
+                init_args.min_burn_amount,
                 init_args.burn_interval_in_secs
             );
 

@@ -22,7 +22,11 @@ pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC
 
 pub fn start_job() {
     let swap_interval = read_state(|s| s.data.swap_interval);
-    run_now_then_interval(swap_interval, run);
+    if read_state(|s| s.data.burn_config.validate_burn_rate()) {
+        run_now_then_interval(swap_interval, run);
+    } else {
+        error!("Burn rate is invalid. The job wouldn't start");
+    }
 }
 
 pub fn run() {
@@ -92,25 +96,45 @@ pub(crate) async fn process_token_swap(
     swap_client: &dyn SwapClient,
     mut token_swap: TokenSwap
 ) -> Result<(), String> {
+    let burn_config = read_state(|s| s.data.burn_config.clone());
     let swap_config = swap_client.get_config();
 
-    let burn_rate = read_state(|s| s.data.burn_config.burn_rate);
-
+    let min_output_amount = 0;
     let available_amount = get_token_balance(swap_config.input_token.ledger_id).await?;
 
-    // FIXME: add here minimum amount to swap
-    let input_amount = calculate_percentage_of_amount(available_amount, burn_rate);
+    let input_amount = calculate_percentage_of_amount(available_amount, burn_config.burn_rate);
     debug!("input_amount: {}", input_amount);
     let amount_to_dex = input_amount.saturating_sub(swap_config.input_token.fee.into());
     debug!("amount_to_dex: {}", amount_to_dex);
 
-    if amount_to_dex == 0 {
+    // Get the quote to decide whether swap or not
+    let quote = match
+        swap_client.get_quote(
+            amount_to_dex.saturating_sub(swap_config.input_token.fee.into()),
+            min_output_amount
+        ).await
+    {
+        Ok(quote) => {
+            match quote {
+                Ok(q) => q,
+                Err(error) => {
+                    let msg = format!("{error:?}");
+                    error!("Failed to get the quote: {}", msg.as_str());
+                    return Err(msg);
+                }
+            }
+        }
+        Err(error) => {
+            let msg = format!("{error:?}");
+            error!("Failed to get the quote: {}", msg.as_str());
+            return Err(msg);
+        }
+    };
+
+    // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
+    if quote < burn_config.get_min_after_swap_amount() + (swap_config.output_token.fee as u128) {
         return Err("Insufficient balance to swap".to_string());
     }
-
-    // NOTE: Should we use this parameter? We can try to also store the minimum ICP/GLDGov
-    // price and then calculate the min_output_amount
-    let min_output_amount = 0;
 
     // Get the deposit account
     let account = if let Some(a) = extract_result(&token_swap.deposit_account) {

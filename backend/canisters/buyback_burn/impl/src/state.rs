@@ -33,7 +33,7 @@ impl RuntimeState {
     pub fn get_config(&self) -> GetConfigResponse {
         GetConfigResponse {
             burn_rate: self.data.burn_config.burn_rate,
-            min_icp_burn_amount: self.data.burn_config.min_burn_amount,
+            min_burn_amount: self.data.burn_config.min_burn_amount,
         }
     }
 
@@ -87,6 +87,16 @@ impl BurnConfig {
             burn_interval: Duration::from_secs(burn_interval_in_secs),
         }
     }
+
+    pub fn validate_burn_rate(&self) -> bool {
+        self.burn_rate > 0 && self.burn_rate <= 100
+    }
+
+    // Get the 100% of the min_burn_amount to know what the balance should be after swap (to have enough funds)
+    pub fn get_min_after_swap_amount(&self) -> u128 {
+        let min_burn_amount = self.min_burn_amount.e8s() as u128;
+        (min_burn_amount * 100) / (self.burn_rate as u128)
+    }
 }
 
 impl Data {
@@ -135,4 +145,34 @@ pub struct CanisterInfo {
     pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validate_burn_rate() {
+        let valid_burn_config = BurnConfig::new(50, Tokens::from_e8s(100), 3600);
+        let invalid_burn_config_zero = BurnConfig::new(0, Tokens::from_e8s(100), 3600);
+        let invalid_burn_config_above_100 = BurnConfig::new(150, Tokens::from_e8s(100), 3600);
+
+        assert!(valid_burn_config.validate_burn_rate());
+        assert!(!invalid_burn_config_zero.validate_burn_rate());
+        assert!(!invalid_burn_config_above_100.validate_burn_rate());
+    }
+
+    #[test]
+    fn test_get_after_swap_amount() {
+        let burn_config = BurnConfig::new(50, Tokens::from_e8s(100), 3600);
+        assert_eq!(burn_config.get_min_after_swap_amount(), 200);
+
+        let burn_config = BurnConfig::new(90, Tokens::from_e8s(900), 3600); // 90% burn
+        assert_eq!(burn_config.get_min_after_swap_amount(), 1000);
+
+        let burn_config = BurnConfig::new(1, Tokens::from_e8s(1), 3600);
+        assert_eq!(burn_config.get_min_after_swap_amount(), 100);
+
+        let burn_config = BurnConfig::new(33, Tokens::from_e8s(100), 3600);
+        assert_eq!(burn_config.get_min_after_swap_amount(), 303);
+    }
 }

@@ -30,6 +30,14 @@ impl SwapClient for ICPSwapClient {
         Box::new(self.clone())
     }
 
+    async fn get_quote(
+        &self,
+        amount: u128,
+        min_amount_out: u128
+    ) -> CallResult<Result<u128, String>> {
+        self.get_quote(amount, min_amount_out).await
+    }
+
     async fn deposit_account(&self) -> CallResult<Account> {
         Ok(self.deposit_account_internal())
     }
