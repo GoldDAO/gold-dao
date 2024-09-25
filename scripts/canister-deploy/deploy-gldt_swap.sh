@@ -11,9 +11,49 @@ if [[ $REINSTALL == "reinstall" ]]; then
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
     TESTMODE=true
     AUTHORIZED_PRINCIPALS="vec { principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\"; principal \"$(dfx canister id --network $NETWORK sns_governance)\" }"
+    GLD_NFT_CANISTERS="vec {
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1g)\";
+        1 = record {
+          grams = 1:nat16;
+        };
+      };
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_10g)\";
+        1 = record {
+          grams = 10:nat16;
+        };
+      };
+    }"
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     AUTHORIZED_PRINCIPALS="vec { principal \"$(dfx canister id --network $NETWORK sns_governance)\" }"
     TESTMODE=false
+    GLD_NFT_CANISTERS="vec {
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1g)\";
+        1 = record {
+          grams = 1:nat16;
+        };
+      };
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_10g)\";
+        1 = record {
+          grams = 10:nat16;
+        };
+      };
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_100g)\";
+        1 = record {
+          grams = 100:nat16;
+        };
+      };
+      record {
+        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1000g)\";
+        1 = record {
+          grams = 1000:nat16;
+        };
+      };
+    }"
   else
     echo "Error: unknown network for deployment. Found $NETWORK."
     exit 2
@@ -21,32 +61,6 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
   GLDT_LEDGER_CANISTER_ID="$(dfx canister id --network $NETWORK gldt_ledger)"
   OGY_LEDGER_CANISTER_ID="$(dfx canister id --network $NETWORK ogy_ledger)"
-  GLD_NFT_CANISTERS="vec {
-    record {
-      0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1g)\";
-      1 = record {
-        grams = 1:nat16;
-      };
-    };
-    record {
-      0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_10g)\";
-      1 = record {
-        grams = 10:nat16;
-      };
-    };
-    record {
-      0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_100g)\";
-      1 = record {
-        grams = 100:nat16;
-      };
-    };
-    record {
-      0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1000g)\";
-      1 = record {
-        grams = 1000:nat16;
-      };
-    };
-  }"
 
   ARGUMENTS="(variant { Init = record {
     test_mode = $TESTMODE;
