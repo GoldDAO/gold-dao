@@ -53,3 +53,22 @@ pub struct TokenInfo {
     pub fee: u64,
     pub decimals: u64,
 }
+
+impl TokenInfo {
+    pub fn gldgov() -> Self {
+        Self {
+            // token: "GLDGov",
+            ledger_id: Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai").unwrap(),
+            decimals: 8,
+            fee: 100_000,
+        }
+    }
+    pub fn icp() -> Self {
+        Self {
+            // token: "ICP",
+            ledger_id: Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap(),
+            decimals: 8,
+            fee: 10_000,
+        }
+    }
+}

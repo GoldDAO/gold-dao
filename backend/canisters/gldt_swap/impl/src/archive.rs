@@ -1,6 +1,7 @@
 use candid::{ Encode, Nat, Principal };
 use gldt_swap_common::archive::ArchiveCanister;
-use gldt_swap_api_archive::init_archive::InitArgArchive;
+use gldt_swap_api_archive::lifecycle::Args as ArgsArchive;
+use gldt_swap_api_archive::{ init::InitArgs, post_upgrade::UpgradeArgs };
 use gldt_swap_archive_c2c_client::get_archive_size;
 use ic_cdk::api::management_canister::main::{
     canister_status,
@@ -93,15 +94,15 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     };
     let mut current_auth_prins = read_state(|s| s.data.authorized_principals.clone());
     let test_mode = read_state(|s| s.env.is_test_mode());
-    let version = read_state(|s| s.data.version.clone());
+    let commit_hash = read_state(|s| s.env.commit_hash().to_string());
     current_auth_prins.push(this_canister_id);
 
     let init_args = match
         Encode!(
-            &(InitArgArchive {
-                version: version,
+            &ArgsArchive::Init(InitArgs {
+                commit_hash,
                 authorized_principals: current_auth_prins,
-                test_mode: test_mode,
+                test_mode,
             })
         )
     {
@@ -140,18 +141,17 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
 
 pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
     let archive_canisters = read_state(|s| s.data.swaps.get_archive_canisters());
-    let version = read_state(|s| s.data.version.clone());
-    let test_mode = read_state(|s| s.env.is_test_mode());
+    let commit_hash = read_state(|s| s.env.commit_hash().to_string());
+    let wasm_version = read_state(|s| s.env.version());
     let mut current_auth_prins = read_state(|s| s.data.authorized_principals.clone());
     let this_canister_id = read_state(|s| s.env.canister_id());
     current_auth_prins.push(this_canister_id);
 
     let init_args = match
         Encode!(
-            &(InitArgArchive {
-                authorized_principals: current_auth_prins,
-                test_mode: test_mode,
-                version: version,
+            &ArgsArchive::Upgrade(UpgradeArgs {
+                commit_hash,
+                wasm_version,
             })
         )
     {

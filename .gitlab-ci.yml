@@ -114,9 +114,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: sns_rewards
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: super_stats_v3
+  # - local: scripts/ci-cd/.canister_deploys.yml
+  #   inputs:
+  #     src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: token_metrics

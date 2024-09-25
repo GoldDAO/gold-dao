@@ -1,7 +1,7 @@
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::TimestampMillis;
+use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 canister_state!(RuntimeState);
@@ -25,6 +25,8 @@ impl RuntimeState {
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             gld_dashbaord_maintenance_mode: self.data.gld_dashbaord_maintenance_mode,
             authorized_principals: self.data.authorized_principals.clone(),
@@ -48,6 +50,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }

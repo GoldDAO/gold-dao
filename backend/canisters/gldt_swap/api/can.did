@@ -26,11 +26,13 @@ type ArchiveDownReason = variant {
 type Args = record { page : nat64; limit : nat64 };
 type Args_1 = record { page : nat64; user : principal; limit : nat64 };
 type Args_2 = record { nft_id : nat; nft_canister_id : principal };
+type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BidFailError = variant {
   UnexpectedError : text;
   CallError : text;
   TransferFailed : text;
 };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type BurnError = variant { CallError : text };
 type EscrowError = variant {
   ApproveError : ApproveError;
@@ -63,9 +65,9 @@ type InitArgs = record {
   test_mode : bool;
   ogy_ledger_id : principal;
   authorized_principals : vec principal;
-  version : text;
   gldnft_canisters : vec record { principal; NftCanisterConf };
   gldt_ledger_id : principal;
+  commit_hash : text;
 };
 type LockError = variant {
   NftAlreadyLocked : vec nat;
@@ -264,7 +266,8 @@ type TransferFromError = variant {
   TooOld;
   InsufficientFunds : record { balance : nat };
 };
-service : (InitArgs) -> {
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+service : (Args_3) -> {
   get_active_swap_ids_by_user : (opt principal) -> (
       vec record { nat; nat },
     ) query;

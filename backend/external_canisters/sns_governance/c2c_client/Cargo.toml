@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 canister_client = { path = "../../../libraries/canister_client" }
-ic-cdk = { workspace = true }
 sns_governance_canister = { path = "../api" }
 types = { path = "../../../libraries/types" }
+ic-cdk = { workspace = true }
+candid = { workspace = true }

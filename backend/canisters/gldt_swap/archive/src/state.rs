@@ -1,7 +1,7 @@
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::TimestampMillis;
+use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 use crate::model::archive::Archive;
@@ -22,12 +22,13 @@ impl RuntimeState {
     }
     pub fn metrics(&self) -> Metrics {
         Metrics {
-            version: self.data.version.clone(),
             canister_info: CanisterInfo {
                 now: self.env.now(),
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
         }
     }
@@ -40,7 +41,6 @@ impl RuntimeState {
 
 #[derive(CandidType, Serialize)]
 pub struct Metrics {
-    pub version: String,
     pub canister_info: CanisterInfo,
 }
 
@@ -48,13 +48,14 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    pub version: String,
     pub archive: Archive,
     pub authorized_principals: Vec<Principal>,
 }
@@ -62,7 +63,6 @@ pub struct Data {
 impl Default for Data {
     fn default() -> Self {
         Self {
-            version: String::default(),
             archive: Archive::default(),
             authorized_principals: vec![],
         }
