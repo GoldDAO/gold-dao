@@ -227,6 +227,7 @@ dependencies = [
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
  "icpswap_client",

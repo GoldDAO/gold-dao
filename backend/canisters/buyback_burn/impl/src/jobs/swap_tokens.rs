@@ -6,6 +6,7 @@ use crate::utils::{
     retry_with_attempts,
     RETRY_DELAY,
 };
+use utils::rand::generate_random_delay;
 use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
 use futures::future::join_all;
@@ -25,7 +26,21 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::spawn(run_async_with_rand_delay());
+}
+
+#[trace]
+async fn run_async_with_rand_delay() {
+    let swap_interval = read_state(|s| s.data.swap_interval);
+
+    match generate_random_delay(swap_interval).await {
+        Ok(random_delay) => {
+            ic_cdk_timers::set_timer_interval(random_delay, || ic_cdk::spawn(run_async()));
+        }
+        Err(e) => {
+            error!("Failed to generate random delay: {}", e);
+        }
+    }
 }
 
 #[trace]
@@ -65,6 +80,9 @@ async fn run_async() {
         for token_swap_id in token_swap_ids {
             let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
         }
+
+        // NOTE: added burning tokens
+        crate::jobs::burn_tokens::run();
     } else {
         error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
     }

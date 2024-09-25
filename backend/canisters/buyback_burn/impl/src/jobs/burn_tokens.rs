@@ -1,18 +1,12 @@
 use crate::state::read_state;
 use crate::utils::{ get_token_balance, retry_with_attempts, RETRY_DELAY };
 use candid::{ Nat, Principal };
-use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
 
 const MAX_ATTEMPTS: u8 = 3;
-
-pub fn start_job() {
-    let burn_interval = read_state(|s| s.data.burn_config.burn_interval);
-    run_now_then_interval(burn_interval, run);
-}
 
 pub fn run() {
     ic_cdk::spawn(run_async());

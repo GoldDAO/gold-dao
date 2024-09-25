@@ -1,4 +1,5 @@
 use ic_cdk::api::management_canister::main::raw_rand;
+use std::time::Duration;
 
 pub async fn generate_rand_nonce() -> Result<u64, String> {
     generate_rand_byte_array().await.map(|b| u64::from_be_bytes(b))
@@ -16,4 +17,12 @@ pub async fn generate_rand_byte_array() -> Result<[u8; 8], String> {
         }
         Err(err) => Err(format!("Random bytes generation error: {:?}", err)),
     }
+}
+
+pub async fn generate_random_delay(max_interval: Duration) -> Result<Duration, String> {
+    let random_nonce = generate_rand_nonce().await?;
+
+    let random_delay_nanos = random_nonce % (max_interval.as_nanos() as u64);
+
+    Ok(Duration::from_nanos(random_delay_nanos))
 }
