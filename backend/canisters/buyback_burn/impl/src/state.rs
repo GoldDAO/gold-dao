@@ -11,6 +11,7 @@ use types::{ Cycles, TimestampMillis, TokenInfo };
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
 use crate::types::SwapClients;
+use crate::types::token_swaps::TokenSwapsMetrics;
 use tracing::error;
 
 canister_state!(RuntimeState);
@@ -50,6 +51,7 @@ impl RuntimeState {
             authorized_principals: self.data.authorized_principals.to_vec(),
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
+            token_swaps_metrics: self.data.token_swaps.get_metrics(),
             // TODO: add more metrics
         }
     }
@@ -135,6 +137,7 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub gldgov_token_info: TokenInfo,
     pub burn_config: BurnConfig,
+    pub token_swaps_metrics: TokenSwapsMetrics,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]

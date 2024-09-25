@@ -21,10 +21,6 @@ pub trait SwapClient {
     async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128>;
 }
 
-//  pub async fn quote(&self, arg0: SwapArgs) -> Result<(Result_,)> {
-// ic_cdk::call(self.0, "quote", (arg0,)).await
-//   }
-
 impl Clone for Box<dyn SwapClient> {
     fn clone(&self) -> Box<dyn SwapClient> {
         self.clone_box()

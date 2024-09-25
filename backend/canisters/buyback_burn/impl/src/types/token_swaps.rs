@@ -7,6 +7,7 @@ use tracing::error;
 use types::TimestampMillis;
 use crate::types::*;
 use buyback_burn_api::get_active_swaps::Response;
+use candid::CandidType;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
@@ -82,7 +83,7 @@ impl TokenSwaps {
         self.swaps.clone()
     }
 
-    // TODO: add metrics
+    // TODO: add more metrics
     // pub total_amount_burned: u64,
     // pub total_amount_swapped: u64,
     // pub number_of_completed_swaps: u64,
@@ -98,6 +99,7 @@ impl TokenSwaps {
     }
 }
 
+#[derive(CandidType, Serialize)]
 pub struct TokenSwapsMetrics {
     active_swaps: HashMap<u128, TokenSwap>,
     active_swaps_len: u64,
