@@ -2,9 +2,9 @@ import { Token, useTransfer } from "@context/index";
 import { Select } from "@components/ui";
 
 const TOKEN_TYPE_OPTIONS = [
-  { value: "GLDT", icon: "vite.svg", label: "ICRC-1" },
-  { value: "GLD NFT", icon: "vite.svg", label: "NFT" },
-  { value: "OGY", icon: "vite.svg", label: "ICRC-1" },
+  { value: "GLDT", icon: "gldt_logo.svg", label: "ICRC-1" },
+  { value: "GLD NFT", icon: "gold-bars/1g.svg", label: "NFT" },
+  { value: "OGY", icon: "ogy_logo.svg", label: "ICRC-1" },
 ];
 
 const TokenType = ({ className }: { className: string }) => {

@@ -12,9 +12,14 @@ const CopyToClipboard = ({ value = "" }: { value: string | undefined }) => {
     toast.success("That's copied!");
   }, []);
 
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <ReactCopyToClipboard onCopy={onCopy} text={valueCopied}>
-      <button className="p-1">
+      <button onClick={(e) => handleClick(e)} className="p-1">
         <ClipboardDocumentIcon className="h-4 w-4" />
       </button>
     </ReactCopyToClipboard>

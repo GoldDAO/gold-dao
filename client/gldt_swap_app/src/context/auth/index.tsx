@@ -9,7 +9,7 @@ import {
 import { IDL } from "@dfinity/candid";
 import { IdentityKitDelegationType } from "@nfid/identitykit";
 import { useIdentityKit } from "@nfid/identitykit/react";
-import { Actor, HttpAgent } from "@dfinity/agent";
+import { Actor, ActorSubclass, HttpAgent } from "@dfinity/agent";
 
 import {
   GLD_NFT_1G_CANISTER_ID,
@@ -158,18 +158,17 @@ const useAuthProviderValue = () => {
       | "ogy_ledger"
       | "icp_swap",
     options: { authenticated: boolean } = { authenticated: true }
-  ) => {
+  ): ActorSubclass => {
     const { canisterId, idlFactory } = CANISTERS[canisterName];
 
     const nonTargetActor =
       identity &&
       delegationType === IdentityKitDelegationType.ANONYMOUS &&
-      authenticatedNonTargetAgent
-        ? Actor.createActor(idlFactory, {
-            agent: authenticatedNonTargetAgent,
-            canisterId,
-          })
-        : undefined;
+      authenticatedNonTargetAgent &&
+      Actor.createActor(idlFactory, {
+        agent: authenticatedNonTargetAgent,
+        canisterId,
+      });
 
     const nonTargetUnauthenticatedActor =
       unauthenticatedAgent &&
@@ -181,7 +180,7 @@ const useAuthProviderValue = () => {
     const actor = options.authenticated
       ? nonTargetActor
       : nonTargetUnauthenticatedActor;
-    return actor;
+    return actor as ActorSubclass;
   };
 
   const disconnect = () => {

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
   ChevronDownIcon,
@@ -16,6 +16,12 @@ import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 const DropdownUser = () => {
   const { state: authState, disconnect } = useAuth();
   const { principalId } = authState;
+  const navigate = useNavigate();
+
+  const handleDisconnect = () => {
+    disconnect();
+    navigate("/swap");
+  };
 
   return (
     <div className="text-center">
@@ -98,7 +104,7 @@ const DropdownUser = () => {
 
               <MenuItem>
                 <div
-                  onClick={disconnect}
+                  onClick={handleDisconnect}
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10 cursor-pointer"
                 >
                   <ArrowUpTrayIcon className="size-4" />
