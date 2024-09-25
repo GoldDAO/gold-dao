@@ -35,7 +35,7 @@ async fn run_async_with_rand_delay() {
 
     match generate_random_delay(swap_interval).await {
         Ok(random_delay) => {
-            ic_cdk_timers::set_timer_interval(random_delay, || ic_cdk::spawn(run_async()));
+            ic_cdk_timers::set_timer(random_delay, || ic_cdk::spawn(run_async()));
         }
         Err(e) => {
             error!("Failed to generate random delay: {}", e);
