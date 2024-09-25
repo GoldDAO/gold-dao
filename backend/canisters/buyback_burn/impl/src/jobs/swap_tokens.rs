@@ -21,9 +21,9 @@ const MAX_ATTEMPTS: u8 = 1;
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    let swap_interval = read_state(|s| s.data.swap_interval);
+    let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);
     if read_state(|s| s.data.burn_config.validate_burn_rate()) {
-        run_now_then_interval(swap_interval, run);
+        run_now_then_interval(buyback_burn_interval, run);
     } else {
         error!("Burn rate is invalid. The job wouldn't start");
     }
@@ -35,9 +35,9 @@ pub fn run() {
 
 #[trace]
 async fn run_async_with_rand_delay() {
-    let swap_interval = read_state(|s| s.data.swap_interval);
+    let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);
 
-    match generate_random_delay(swap_interval).await {
+    match generate_random_delay(buyback_burn_interval).await {
         Ok(random_delay) => {
             ic_cdk_timers::set_timer(random_delay, || ic_cdk::spawn(run_async()));
         }

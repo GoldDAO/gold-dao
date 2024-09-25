@@ -108,11 +108,10 @@ impl SNCTestEnvBuilder {
                 decimals: 8,
             },
             tokens: vec![],
-            swap_interval_in_secs: 1000,
+            buyback_burn_interval_in_secs: 1000,
             icp_swap_canister_id,
             burn_rate: 33,
             min_burn_amount: Tokens::from_e8s(100000),
-            burn_interval_in_secs: 1000,
         });
 
         let icp_neuron_args = Args::Init(InitArgs {

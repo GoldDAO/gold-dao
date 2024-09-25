@@ -8,14 +8,12 @@ if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3aaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BURN_INTERVAL_IN_SECS=21_600
-  SWAP_INTERVAL_IN_SECS=21_600
+  BUYBACK_BURN_INTERVAL_IN_SECS=21_600
 elif [[ $NETWORK =~ ^(ic)$ ]]; then
   TESTMODE="false"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BURN_INTERVAL_IN_SECS=21_600
-  SWAP_INTERVAL_IN_SECS=21_600
+  BUYBACK_BURN_INTERVAL_IN_SECS=21_600
 else
   echo "Error: unknown network for deployment. Found $NETWORK."
   exit 2
@@ -74,8 +72,7 @@ if [[ $MODE == "init" ]]; then
         tokens = vec {'"$GLDGOV_ICP_POOL"'};
         burn_rate = '"$BURN_RATE"' : nat8;
         min_burn_amount = record { e8s = '"$MIN_BURN_AMOUNT"' : nat64 };
-        burn_interval_in_secs = '"$BURN_INTERVAL_IN_SECS"' : nat64;
-        swap_interval_in_secs = '"$SWAP_INTERVAL_IN_SECS"' : nat64;
+        buyback_burn_interval_in_secs = '"$BUYBACK_BURN_INTERVAL_IN_SECS"' : nat64;
       }
     }
   )'

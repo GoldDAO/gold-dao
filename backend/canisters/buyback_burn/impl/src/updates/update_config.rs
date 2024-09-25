@@ -23,8 +23,8 @@ fn update_config_impl(args: UpdateConfigArgs, state: &mut RuntimeState) -> Updat
     if let Some(min_burn_amount) = args.min_burn_amount {
         state.data.burn_config.min_burn_amount = min_burn_amount;
     }
-    if let Some(burn_interval) = args.burn_interval_in_secs {
-        state.data.burn_config.burn_interval = Duration::from_secs(burn_interval);
+    if let Some(buyback_burn_interval_in_secs) = args.buyback_burn_interval_in_secs {
+        state.data.buyback_burn_interval = Duration::from_secs(buyback_burn_interval_in_secs);
     }
 
     UpdateConfigResponse::Success
