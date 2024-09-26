@@ -1,11 +1,10 @@
 use buyback_burn_api::swap_config::SwapConfig;
-use candid::error;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ debug, error };
-use crate::types::ICPSwapClient;
+pub use crate::types::ICPSwapClient;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
