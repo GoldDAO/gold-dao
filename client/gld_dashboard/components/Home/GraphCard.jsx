@@ -11,7 +11,6 @@ import { data1 } from '../../utils/datas';
 import { parseNumbers } from '../../utils/parsers';
 import useServices from '../../hooks/useServices';
 import useCharts from '../../hooks/useCharts';
-import { treasuryData } from '../../services/icpApi';
 
 export default function Graphs() {
   const [burnAmount, setBurnedAmount] = useState();
@@ -25,7 +24,7 @@ export default function Graphs() {
     stakersData, holdersData, burnData, gldGovSupply, setLiquidChartData, liquidData,
   } = useCharts();
   const [amount, setAmount] = useState();
-  const [infoModal, setInfoModal] = useState(null);
+  const [, setInfoModal] = useState(null);
 
   const tabs = ['Treasury', 'Staked', 'Liquid', 'Burned', 'Holders'];
 
@@ -95,7 +94,10 @@ export default function Graphs() {
     };
 
     fetchData();
-  }, [selectedTab, stakersData?.data, stakersData.loading, stakersData?.data.length, burnData?.data.length, burnData.loading, liquidData?.data.length, liquidData.loading, holdersData?.data.length, holdersData.loading]);
+  }, [selectedTab, stakersData?.data, stakersData.loading,
+    stakersData?.data.length, burnData?.data.length, burnData.loading,
+    liquidData?.data.length, liquidData.loading,
+    holdersData?.data.length, holdersData.loading]);
 
   const displayAmount = parseNumbers(amount);
 
