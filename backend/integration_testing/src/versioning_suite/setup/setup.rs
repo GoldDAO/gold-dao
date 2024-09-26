@@ -26,6 +26,7 @@ macro_rules! create_and_install_canister {
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     test_mode: bool,
+    version: BuildVersion,
     commit_hash: String,
 }
 
@@ -116,6 +117,7 @@ impl SNCTestEnvBuilder {
 
         let icp_neuron_args = Args::Init(InitArgs {
             test_mode,
+            version: BuildVersion::min(),
             commit_hash: commit_hash.clone(),
         });
 
@@ -192,6 +194,8 @@ impl SNCTestEnvBuilder {
             encode_one(buyback_burn_args).unwrap(),
             Some(controller.clone())
         );
+
+        println!("buyback_burn_canister was installed");
 
         let icp_neuron_canister_id = create_and_install_canister!(
             pic,

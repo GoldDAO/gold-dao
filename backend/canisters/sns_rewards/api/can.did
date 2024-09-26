@@ -6,6 +6,7 @@ type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
   sns_gov_canister_id : principal;
   test_mode : bool;
+  version : BuildVersion;
   ogy_ledger_canister_id : principal;
   icp_ledger_canister_id : principal;
   sns_ledger_canister_id : principal;

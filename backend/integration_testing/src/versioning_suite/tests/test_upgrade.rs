@@ -26,6 +26,8 @@ fn test_version_upgrade() {
         )
         .unwrap();
 
+    println!("buyback_burn_canister upgraded");
+
     test_env.pic
         .upgrade_canister(
             test_env.icp_neuron_canister_id,
@@ -34,6 +36,7 @@ fn test_version_upgrade() {
             Some(controller.clone())
         )
         .unwrap();
+    
     test_env.pic
         .upgrade_canister(
             test_env.management_canister_id,
