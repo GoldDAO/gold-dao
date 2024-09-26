@@ -1,6 +1,5 @@
 use super::SwapClient;
 use serde::{ Deserialize, Serialize };
-use crate::utils::build_swap_client;
 use crate::types::*;
 use types::TokenInfo;
 use candid::Principal;
@@ -8,7 +7,7 @@ use tracing::info;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SwapClients {
-    pub swap_clients: Vec<Box<dyn SwapClient>>,
+    pub swap_clients: Vec<SwapClientEnum>,
 }
 
 impl SwapClients {
@@ -27,7 +26,7 @@ impl SwapClients {
         let swap_client_id = self.get_next_id();
         let exchange_config = ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id));
         self.swap_clients.push(
-            build_swap_client(SwapConfig {
+            SwapClientEnum::build_swap_client(SwapConfig {
                 swap_client_id,
                 input_token,
                 output_token,
@@ -42,7 +41,7 @@ impl SwapClients {
         swap_client_len + 1
     }
 
-    pub fn iter(&self) -> std::slice::Iter<'_, Box<dyn SwapClient>> {
+    pub fn iter(&self) -> std::slice::Iter<'_, SwapClientEnum> {
         self.swap_clients.iter()
     }
 }

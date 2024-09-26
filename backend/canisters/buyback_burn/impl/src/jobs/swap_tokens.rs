@@ -68,7 +68,7 @@ async fn run_async() {
                 retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
                     let value = token_swap.clone();
                     let value2 = swap_client_clone.clone();
-                    async move { process_token_swap(value2.as_ref(), value).await }
+                    async move { process_token_swap(&value2, value).await }
                 }).await
             }
         })

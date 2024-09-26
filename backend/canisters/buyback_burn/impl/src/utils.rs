@@ -10,31 +10,6 @@ pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
 use buyback_burn_api::swap_config::ExchangeConfig;
 use crate::types::SwapClient;
-pub fn build_swap_client(config: SwapConfig) -> Box<dyn SwapClient> {
-    let input_token = config.input_token;
-    let output_token = config.output_token;
-
-    match config.exchange_config {
-        ExchangeConfig::ICPSwap(icpswap) => {
-            let (token0, token1) = if icpswap.zero_for_one {
-                (input_token, output_token)
-            } else {
-                (output_token, input_token)
-            };
-
-            Box::new(
-                ICPSwapClient::new(
-                    config.swap_client_id,
-                    ic_cdk::api::id(),
-                    icpswap.swap_canister_id,
-                    token0,
-                    token1,
-                    icpswap.zero_for_one
-                )
-            )
-        }
-    }
-}
 
 pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
     icrc_ledger_canister_c2c_client

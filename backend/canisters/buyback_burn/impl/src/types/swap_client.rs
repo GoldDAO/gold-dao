@@ -3,9 +3,13 @@ use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
 use crate::types::SwapConfig;
 use types::CanisterId;
+use enum_dispatch::enum_dispatch;
+use crate::types::ICPSwapClient;
+use serde::{ Deserialize, Serialize };
+use crate::types::ExchangeConfig;
 
 #[async_trait]
-#[typetag::serde(tag = "type")]
+#[enum_dispatch(SwapClientEnum)]
 pub trait SwapClient {
     fn get_config(&self) -> SwapConfig;
     fn clone_box(&self) -> Box<dyn SwapClient>;
@@ -24,5 +28,39 @@ pub trait SwapClient {
 impl Clone for Box<dyn SwapClient> {
     fn clone(&self) -> Box<dyn SwapClient> {
         self.clone_box()
+    }
+}
+
+#[enum_dispatch]
+#[derive(Serialize, Deserialize, Clone)]
+pub enum SwapClientEnum {
+    ICPSwapClient(ICPSwapClient),
+}
+
+impl SwapClientEnum {
+    pub fn build_swap_client(config: SwapConfig) -> Self {
+        let input_token = config.input_token;
+        let output_token = config.output_token;
+
+        match config.exchange_config {
+            ExchangeConfig::ICPSwap(icpswap) => {
+                let (token0, token1) = if icpswap.zero_for_one {
+                    (input_token, output_token)
+                } else {
+                    (output_token, input_token)
+                };
+
+                SwapClientEnum::ICPSwapClient(
+                    ICPSwapClient::new(
+                        config.swap_client_id,
+                        ic_cdk::api::id(),
+                        icpswap.swap_canister_id,
+                        token0,
+                        token1,
+                        icpswap.zero_for_one
+                    )
+                )
+            }
+        }
     }
 }

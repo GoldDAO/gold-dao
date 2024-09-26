@@ -6,7 +6,6 @@ use crate::types::*;
 use types::CanisterId;
 
 #[async_trait]
-#[typetag::serde]
 // TODO: when async traits would be stable, rewrite without async_trait usage:
 // https://blog.rust-lang.org/2023/12/21/async-fn-rpit-in-traits.html
 impl SwapClient for ICPSwapClient {

@@ -82,4 +82,5 @@ time = { version = "0.3.36", features = [
 ] }
 pocket-ic = "3.1.0"
 async-trait = "0.1.81"
-typetag = "0.2.16"
+enum_dispatch = "0.3.13"
+typetag = "0.2.18"

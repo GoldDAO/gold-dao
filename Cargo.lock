@@ -206,6 +206,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "enum_dispatch",
  "futures",
  "http_request",
  "ic-cdk 0.16.0",
@@ -224,7 +225,6 @@ dependencies = [
  "stable_memory",
  "tracing",
  "types",
- "typetag",
  "utils",
 ]
 
@@ -662,6 +662,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d248bdd43ce613d87415282f69b9bb99d947d290b10962dd6c56233312c2ad5"
 dependencies = [
  "log",
+]
+
+[[package]]
+name = "enum_dispatch"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.77",
 ]
 
 [[package]]
