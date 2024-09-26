@@ -5,6 +5,7 @@ use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
+use anyhow::Result;
 
 const MAX_ATTEMPTS: u8 = 1;
 
@@ -25,26 +26,24 @@ async fn run_async() {
 }
 
 pub async fn process_token_burn() -> Result<(), String> {
-    // Retrieve the burn configuration and ledger canister ID from the state
     let burn_config = read_state(|s| s.data.burn_config.clone());
     let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_token_info.ledger_id);
-    let minting_account = match
-        icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
-    {
-        Ok(account) => account,
-        Err(e) => {
-            return Err(format!("Failed to get minting account (in order to burn tokens): {:?}", e));
-        }
-    };
 
-    // Fetch the canister's GLDGov token balance
     let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
-
-    // Minimum burn amount in ICP tokens (converted from e8s)
     let min_burn_amount: u128 = burn_config.min_burn_amount.e8s().into();
 
-    // Check if the amount to burn is above the minimum threshold
     if amount_to_burn < min_burn_amount {
+        let minting_account = match
+            icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
+        {
+            Ok(account) => account,
+            Err(e) => {
+                return Err(
+                    format!("Failed to get minting account (in order to burn tokens): {:?}", e)
+                );
+            }
+        };
+
         // Attempt to burn the calculated amount of tokens
         match burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn.clone()).await {
             Ok(_) => {

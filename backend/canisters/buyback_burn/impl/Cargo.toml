@@ -38,3 +38,4 @@ icpswap_factory_canister = { path = "../../../external_canisters/icpswap_factory
 icpswap_factory_canister_c2c_client = { path = "../../../external_canisters/icpswap_factory/c2c_client" }
 icpswap_swap_pool_canister = { path = "../../../external_canisters/icpswap_swap_pool/api" }
 icpswap_swap_pool_canister_c2c_client = { path = "../../../external_canisters/icpswap_swap_pool/c2c_client" }
+anyhow = { workspace = true }

@@ -110,10 +110,10 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
-    pub memory_used: MemorySize,
-    pub cycles_balance_in_tc: f64,
     pub version: BuildVersion,
     pub commit_hash: String,
+    pub memory_used: MemorySize,
+    pub cycles_balance_in_tc: f64,
 }
 
 #[derive(Serialize, Deserialize)]
