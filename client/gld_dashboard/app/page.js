@@ -9,6 +9,7 @@ import Neurons from '../components/Home/Neurons';
 import StakingReturn from '../components/Home/StakingReturn';
 import TradeOn from '../components/Home/TradeOn';
 import useTokenMetrics from '../hooks/useTokenMetrics';
+import useSuperStats from '../hooks/useSuperStats';
 
 export const viewport = {
   themeColor: '#c6c6c6',
@@ -17,6 +18,7 @@ export const viewport = {
 export default function Home() {
   // edit navigation bar color
   const { getStakedAmount } = useTokenMetrics();
+  const { getHoldersData } = useSuperStats();
 
   useEffect(() => {
     let metaTag = document.querySelector('meta[name="theme-color"]');
@@ -34,6 +36,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       await getStakedAmount();
+      await getHoldersData();
     })();
   }, []);
 

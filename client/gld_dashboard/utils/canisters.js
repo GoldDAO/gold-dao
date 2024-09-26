@@ -9,7 +9,9 @@ import { idlFactory as idlLedger } from './idls/ledger';
 import { idlFactory as idlLighthouse } from './idls/lighthouseApi';
 import { idlFactory as idlRoot } from './idls/root';
 import { idlFactory as snsRewards } from './idls/snsRewards';
-import { idlFactory as idlManagement, idlFactory as idltokenMetrics } from './idls/tokenMetrics';
+import { idlFactory as idlManagement } from './idls/management';
+import { idlFactory as idltokenMetrics } from './idls/tokenMetrics';
+import { idlFactory as superStats } from './idls/superStats';
 
 // eslint-disable-next-line import/prefer-default-export
 
@@ -30,6 +32,7 @@ const canisters = {
   icpAllInfoNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpAllInfoNeuron },
   management: { canisterId: isProd ? 'g5je6-yaaaa-aaaap-ahkza-cai' : 't5uzw-sqaaa-aaaan-qmoaq-cai', idlFactory: idlManagement },
   tokenMetrics: { canisterId: 'teiwz-pqaaa-aaaap-ag7hq-cai', idlFactory: idltokenMetrics },
+  superStats: { canisterId: 'hgbea-2aaaa-aaaal-qjo4q-cai', idlFactory: superStats },
 };
 
 export default canisters;

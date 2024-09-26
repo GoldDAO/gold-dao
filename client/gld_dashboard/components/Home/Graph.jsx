@@ -18,7 +18,9 @@ Interaction.modes.interpolate = Interpolate;
 export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
-  const { copyGldGovSupply, copyGldGovTreasury, copyStakersData } = useCharts();
+  const {
+    copyGldGovSupply, copyGldGovTreasury, copyStakersData, copyHoldersData,
+  } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
   useEffect(() => setInnerWidth(window.innerWidth), []);
@@ -47,7 +49,8 @@ export default function Graph({ name }) {
           setData({ loading: false, data: data4, suggestedMax: 1200 });
           break;
         case 'Holders':
-          setData({ loading: false, data: data5, suggestedMax: 1200 });
+          if (copyHoldersData?.loading) break;
+          setData({ loading: false, data: copyHoldersData.data, suggestedMax: 1000000 });
           break;
         case 'Total GLDGov Supply':
           if (copyGldGovSupply?.loading) break;
@@ -114,6 +117,8 @@ export default function Graph({ name }) {
     data.data?.length,
     copyStakersData?.data,
     copyStakersData?.data.length,
+    copyHoldersData?.data,
+    copyHoldersData?.data.length,
     name,
   ]);
 
