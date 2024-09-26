@@ -17,6 +17,7 @@ fn post_upgrade(args: Args) {
                 "Cannot upgrade the canister with an Init argument. Please provide an Upgrade argument."
             ),
         Args::Upgrade(upgrade_args) => {
+            info!("Post-upgrade starting with args: {:?}", upgrade_args);
             let memory = get_upgrades_memory();
             let reader = get_reader(&memory);
 

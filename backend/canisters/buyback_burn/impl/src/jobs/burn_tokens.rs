@@ -9,6 +9,7 @@ use tracing::{ error, info };
 const MAX_ATTEMPTS: u8 = 1;
 
 pub fn run() {
+    error!("The job started");
     ic_cdk::spawn(run_async());
 }
 

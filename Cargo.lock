@@ -213,9 +213,10 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "icpswap_client",
  "icpswap_factory_canister",
  "icpswap_factory_canister_c2c_client",
+ "icpswap_swap_pool_canister",
+ "icpswap_swap_pool_canister_c2c_client",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
@@ -1541,20 +1542,6 @@ dependencies = [
  "tracing",
  "types",
  "utils",
-]
-
-[[package]]
-name = "icpswap_client"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "ic-cdk 0.16.0",
- "ic-ledger-types",
- "icpswap_swap_pool_canister",
- "icpswap_swap_pool_canister_c2c_client",
- "icrc-ledger-types",
- "serde",
- "types",
 ]
 
 [[package]]
