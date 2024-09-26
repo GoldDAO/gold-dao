@@ -11,8 +11,14 @@ import { data1 } from '../../utils/datas';
 import { parseNumbers } from '../../utils/parsers';
 import useServices from '../../hooks/useServices';
 import useCharts from '../../hooks/useCharts';
+import { treasuryData } from '../../services/icpApi';
 
 export default function Graphs() {
+  const [burnAmount, setBurnedAmount] = useState();
+  const [liquidAmount, setLiquidAmount] = useState();
+  const [holdersAmount, setHoldersAmount] = useState();
+  const [treasuryAmount, setTreasuryAmount] = useState();
+  const [stakedAmount, setStakedAmount] = useState();
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
   const {
@@ -51,12 +57,30 @@ export default function Graphs() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (liquidData?.data.length){
+        setLiquidAmount(liquidData.data[liquidData.data.length - 1].value)
+      }
+      if(burnData?.data.length) {
+      setBurnedAmount(burnData.data[burnData.data.length - 1].value)
+
+      }
+      if(holdersData?.data.length) {
+      setHoldersAmount(holdersData.data[holdersData.data.length - 1].value)
+
+      }
+      if(stakersData?.data.length) {
+      setStakedAmount(stakersData.data[stakersData.data.length - 1].value)
+
+      }
+
       try {
         if (selectedTab === 'Treasury') {
           const result = await gldGovTreasury();
+          setTreasuryAmount(result);
+          setInfoModal(result);
           setAmount(result);
         }
-        if (selectedTab === 'Staked') {
+        if (selectedTab === 'Staked' && !stakersData?.loading) {
           setAmount(stakersData.data[stakersData.data.length - 1].value);
         }
         if (selectedTab === 'Holders') {
@@ -74,7 +98,7 @@ export default function Graphs() {
     };
 
     fetchData();
-  }, [selectedTab]);
+  }, [selectedTab, stakersData?.data, stakersData.loading, stakersData?.data.length, burnData?.data.length, burnData.loading,liquidData?.data.length, liquidData.loading,holdersData?.data.length, holdersData.loading,]);
 
   const displayAmount = parseNumbers(amount);
 
@@ -114,17 +138,67 @@ export default function Graphs() {
                 />
               </div>
               <div className="flex justify-end min-w-[120px] sm:hidden items-center gap-1">
-                <h5 className="font-bold text-xs">
-                  {tab !== 'Treasury' ? 'N/A' : parseNumbers(amount)}
-                </h5>
-                <GLDGovIcon />
+                {tab === 'Treasury' && (
+                    <  >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(treasuryAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                  )
+                }
+                  
+                {tab === 'Liquid' && (
+                    <  >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(liquidAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                  )
+                }
+                  
+                  
+                {tab === 'Burned' && (
+                    <  >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(burnAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                  )
+                }
+                  
+                  
+                {tab === 'Holders' && (
+                    <  >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(holdersAmount)}
+                      </h5>
+                    </>
+                  )
+                }
+                  
+                  
+                {tab === 'Staked' && (
+                    <  >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(stakedAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                  )
+                }
+                  
+                
+               
               </div>
             </span>
           ))}
         </div>
         <Chart name={selectedTab} amount={displayAmount} />
       </article>
-      <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={infoModal?.amount}>
+      <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={amount}>
         <ModalChartMobile name={selectedTab} />
       </Modal>
     </>

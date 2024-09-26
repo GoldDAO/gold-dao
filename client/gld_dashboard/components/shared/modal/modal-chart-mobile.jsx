@@ -28,23 +28,6 @@ export default function ModalChartMobile({ name }) {
   return (
     <div className="">
       <div className="w-full h-fit flex justify-evenly rounded-[36px] border-[0.5px] mt-20">
-        {name !== 'Treasury' && name !== 'Total GLDGov Supply' && (
-          <div className="absolute top-0 w-full h-full flex justify-center items-center bg-black bg-opacity-20 z-50 rounded-t-[24px]">
-            <div className="text-white text-4xl font-bold flex justify-center items-center gap-2">
-              <p>Coming Soon</p>
-              <div
-                className="tooltip "
-                data-tip={"Good news! We're working on this. Coming your way soon."}
-              >
-                <Image src={'svg/infoWhite.svg'} alt="f" height={30} width={30} />
-              </div>
-              <form method="dialog" className="absolute top-10 right-7">
-                <button className="bg-transparent h-[24px] w-[26px] rounded-full flex justify-center items-center p-2 outline-none">
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
 
         <div className="w-full h-fit  flex  border-b-[0.5px]  border-t-[0.5px]">
           {dates.map((date) => (
