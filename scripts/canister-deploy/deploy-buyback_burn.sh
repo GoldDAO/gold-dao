@@ -49,7 +49,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
 else
   ARGUMENTS="(variant { Upgrade = record {
-    wasm_version = $WASM_VERSION;
+    version = $VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 fi
@@ -115,7 +115,7 @@ fi
 # # ARGS='(
 # #   variant {
 # #     Upgrade = record {
-# #       wasm_version = record {
+# #       version = record {
 # #         major = 0 : nat32;
 # #         minor = 0 : nat32;
 # #         patch = 1 : nat32;

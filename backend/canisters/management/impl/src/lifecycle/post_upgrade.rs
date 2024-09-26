@@ -38,13 +38,13 @@ fn post_upgrade(args: Args) {
             ) = serializer::deserialize(reader).unwrap();
             let mut state = RuntimeState::from(runtime_state_v0);
 
-            state.env.set_version(upgrade_args.wasm_version);
+            state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
 
-            info!(version = %upgrade_args.wasm_version, "Post-upgrade complete");
+            info!(version = %upgrade_args.version, "Post-upgrade complete");
         }
     }
 }
