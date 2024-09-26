@@ -6,7 +6,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
 
-const MAX_ATTEMPTS: u8 = 3;
+const MAX_ATTEMPTS: u8 = 1;
 
 pub fn run() {
     ic_cdk::spawn(run_async());

@@ -52,7 +52,6 @@ impl RuntimeState {
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
-            // TODO: add more metrics
         }
     }
 }

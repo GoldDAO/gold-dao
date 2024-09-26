@@ -92,6 +92,7 @@ type InitArgs = record {
   ogy_sns_ledger_canister_id : principal;
   ogy_sns_rewards_canister_id : principal;
   authorized_principals : vec principal;
+  version : BuildVersion;
   sns_rewards_canister_id : principal;
   commit_hash : text;
   ogy_sns_governance_canister_id : principal;

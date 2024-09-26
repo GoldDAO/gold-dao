@@ -53,18 +53,22 @@ async fn run_async() {
     let mut token_swap_ids = Vec::new();
 
     // TODO: check that everything here is correct
+    // FIXME: get rid of all the clones
     let futures: Vec<_> = swap_clients
         .iter()
         .map(|swap_client| {
-            let args = swap_client.get_config();
+            let swap_client_clone = swap_client.clone();
+            let args = swap_client_clone.get_config();
             let token_swap = mutate_state(|state|
                 state.data.token_swaps.push_new(args, state.env.now())
             );
             token_swap_ids.push(token_swap.swap_id);
 
             async move {
-                retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
-                    process_token_swap(swap_client.as_ref(), token_swap.clone()).await
+                retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
+                    let value = token_swap.clone();
+                    let value2 = swap_client_clone.clone();
+                    async move { process_token_swap(value2.as_ref(), value).await }
                 }).await
             }
         })

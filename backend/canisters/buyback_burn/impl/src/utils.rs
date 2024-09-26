@@ -1,4 +1,5 @@
 use buyback_burn_api::swap_config::SwapConfig;
+use candid::error;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
@@ -48,28 +49,35 @@ pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
         .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
 }
 
-// TODO: think on how to add delay here
 pub async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
     _delay_duration: Duration,
-    mut f: F
+    f: F
 )
     -> Result<(), String>
-    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
+    where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Result<(), String>>
 {
-    for attempt in 1..=max_attempts {
-        match f().await {
-            Ok(_) => {
-                return Ok(());
-            }
-            Err(err) => {
-                error!("Attempt {}: Error - {:?}", attempt, err);
-                if attempt == max_attempts {
-                    return Err(err);
-                }
-            }
-        }
+    // Run code with delay
+    fn recursive<
+        F: FnMut() -> Fut + 'static,
+        Fut: std::future::Future<Output = Result<(), String>>
+    >(mut f: F, attempt: u8, max_attempts: u8) {
+        ic_cdk_timers::set_timer(Duration::ZERO, move || {
+            ic_cdk::spawn(async move {
+                if let Ok(_) = f().await {
+                } else {
+                    if attempt < max_attempts {
+                        recursive(f, attempt + 1, max_attempts);
+                    } else {
+                        error!("Failed to execute the action after {} attempts", max_attempts);
+                    }
+                };
+            });
+        });
     }
+
+    let _ = recursive(f, 0, max_attempts);
+
     Ok(())
 }
 

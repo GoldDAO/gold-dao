@@ -7,9 +7,9 @@ type ICPSwapConfig = record {
   swap_canister_id : principal;
 };
 type InitArgs = record {
-  min_burn_amount : Tokens;
+  min_icp_burn_amount : Tokens;
   test_mode : bool;
-  version : BuildVersion;
+  wasm_version : BuildVersion;
   icp_swap_canister_id : principal;
   burn_rate : nat8;
   gldgov_token_info : TokenInfo;
@@ -49,7 +49,7 @@ type TokenSwap = record {
   transfer : opt Result_4;
 };
 type Tokens = record { e8s : nat64 };
-type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
 service : (Args) -> {
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;

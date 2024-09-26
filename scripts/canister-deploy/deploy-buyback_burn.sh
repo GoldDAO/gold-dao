@@ -54,7 +54,7 @@ if [[ $MODE == "init" ]]; then
     exit 1
   fi
   # Arguments for init mode
-  ARGUMENTS='(
+  ARGUMENTS="(
     variant {
       Init = record {
         test_mode = '"$TESTMODE"';
@@ -63,19 +63,19 @@ if [[ $MODE == "init" ]]; then
           minor = '"$MINOR"' : nat32;
           patch = '"$PATCH"' : nat32;
         };
-        commit_hash = "'"$COMMIT_HASH"'";
+        commit_hash = \"$COMMIT_HASH\";
         authorized_principals = vec {
-          principal "'"$AUTHORIZED_PRINCIPAL"'";
+          principal \"$AUTHORIZED_PRINCIPAL\";
         };
-        icp_swap_canister_id = principal "'"$ICP_SWAP_CANISTER_ID"'";
-        gldgov_token_info = '"$GLDGOV_TOKEN_INFO"';
-        tokens = vec {'"$GLDGOV_ICP_POOL"'};
-        burn_rate = '"$BURN_RATE"' : nat8;
-        min_burn_amount = record { e8s = '"$MIN_BURN_AMOUNT"' : nat64 };
-        buyback_burn_interval_in_secs = '"$BUYBACK_BURN_INTERVAL_IN_SECS"' : nat64;
+        icp_swap_canister_id = principal \"$ICP_SWAP_CANISTER_ID\";
+        gldgov_token_info = $GLDGOV_TOKEN_INFO;
+        tokens = vec {$GLDGOV_ICP_POOL};
+        burn_rate = $BURN_RATE : nat8;
+        min_burn_amount = record { e8s = $MIN_BURN_AMOUNT : nat64 };
+        buyback_burn_interval_in_secs = $BUYBACK_BURN_INTERVAL_IN_SECS : nat64;
       }
     }
-  )'
+  )"
 
 elif [[ $MODE == "upgrade" ]]; then
   if [[ $# -ne 4 ]]; then
@@ -92,7 +92,7 @@ elif [[ $MODE == "upgrade" ]]; then
     exit 1
   fi
   # Arguments for upgrade mode
-  ARGUMENTS='(
+  ARGUMENTS="(
     variant {
       Upgrade = record {
         version = record {
@@ -100,10 +100,10 @@ elif [[ $MODE == "upgrade" ]]; then
           minor = '"$MINOR"' : nat32;
           patch = '"$PATCH"' : nat32;
         };
-        commit_hash = "'"$COMMIT_HASH"'";
+        commit_hash = \"$COMMIT_HASH\";
       }
     }
-  )'
+  )"
 else
   echo "Error: mode must be either 'init' or 'upgrade'"
   exit 1

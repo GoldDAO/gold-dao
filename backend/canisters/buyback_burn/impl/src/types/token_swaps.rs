@@ -83,13 +83,6 @@ impl TokenSwaps {
         self.swaps.clone()
     }
 
-    // TODO: add more metrics
-    // pub total_amount_burned: u64,
-    // pub total_amount_swapped: u64,
-    // pub number_of_completed_swaps: u64,
-    // pub number_of_attempted_swaps: u64,
-    // pub number_of_failed_swaps: u64,
-    // pub user_swaps: HashMap<Principal, UserSwap>,
     pub fn get_metrics(&self) -> TokenSwapsMetrics {
         TokenSwapsMetrics {
             active_swaps: self.swaps.clone(),

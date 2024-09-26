@@ -22,15 +22,38 @@ else
   exit 2
 fi
 
-ARGUMENTS="(record {
-  test_mode = $TESTMODE;
-  authorized_principals = vec {
-    principal \"$AUTHORIZED_PRINCIPAL\";
-  };
-  sns_rewards_canister_id = principal \"$SNS_REWARDS_CANISTER_ID\";
-  ogy_sns_governance_canister_id = principal \"$OGY_SNS_GOVERNANCE_CANISTER_ID\";
-  ogy_sns_ledger_canister_id = principal \"$OGY_SNS_LEDGER_CANISTER_ID\";
-  ogy_sns_rewards_canister_id = principal \"$OGY_SNS_REWARDS_CANISTER_ID\";
-})"
+# ARGUMENTS="(
+#   variant {
+#     Init = record {
+#       test_mode = $TESTMODE;
+#       version = record {
+#         major = 0 : nat32;
+#         minor = 0 : nat32;
+#         patch = 0 : nat32;
+#       };
+#       commit_hash = \"$COMMIT_HASH\";
+#       authorized_principals = vec {
+#         principal \"$AUTHORIZED_PRINCIPAL\";
+#       };
+#       sns_rewards_canister_id = principal \"$SNS_REWARDS_CANISTER_ID\";
+#       ogy_sns_governance_canister_id = principal \"$OGY_SNS_GOVERNANCE_CANISTER_ID\";
+#       ogy_sns_ledger_canister_id = principal \"$OGY_SNS_LEDGER_CANISTER_ID\";
+#       ogy_sns_rewards_canister_id = principal \"$OGY_SNS_REWARDS_CANISTER_ID\";
+#     }
+#   }
+# )"
+
+  ARGUMENTS="(
+    variant {
+      Upgrade = record {
+        version = record {
+          major = 1 : nat32;
+          minor = 0 : nat32;
+          patch = 0 : nat32;
+        };
+        commit_hash = \"$COMMIT_HASH\";
+      }
+    }
+  )"
 
 . ./scripts/deploy_backend_canister.sh sns_neuron_controller $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA
