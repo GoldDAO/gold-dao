@@ -51,24 +51,24 @@ async fn run_async_with_rand_delay() {
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
     let mut token_swap_ids = Vec::new();
-
-    // TODO: check that everything here is correct
-    // FIXME: get rid of all the clones
+    // TODO: check that everything here is correct and get rid of clones
     let futures: Vec<_> = swap_clients
         .iter()
         .map(|swap_client| {
-            let swap_client_clone = swap_client.clone();
-            let args = swap_client_clone.get_config();
+            let args = swap_client.get_config();
             let token_swap = mutate_state(|state|
                 state.data.token_swaps.push_new(args, state.env.now())
             );
             token_swap_ids.push(token_swap.swap_id);
 
+            let swap_client = swap_client.clone(); // Clone only if required in async block
+            let token_swap = token_swap.clone();
+
             async move {
                 retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                    let value = token_swap.clone();
-                    let value2 = swap_client_clone.clone();
-                    async move { process_token_swap(&value2, value).await }
+                    let swap_client = swap_client.clone();
+                    let token_swap = token_swap.clone();
+                    async move { process_token_swap(&swap_client, token_swap).await }
                 }).await
             }
         })
@@ -76,12 +76,7 @@ async fn run_async() {
 
     let results = join_all(futures).await;
 
-    let mut error_messages = Vec::new();
-    for result in results {
-        if let Err(e) = result {
-            error_messages.push(e);
-        }
-    }
+    let error_messages: Vec<String> = results.into_iter().filter_map(Result::err).collect();
 
     if error_messages.is_empty() {
         info!("Successfully processed all token swaps");
@@ -89,7 +84,6 @@ async fn run_async() {
             let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
         }
 
-        // NOTE: added burning tokens
         crate::jobs::burn_tokens::run();
     } else {
         error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));

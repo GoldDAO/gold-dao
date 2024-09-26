@@ -17,7 +17,6 @@ pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
         ).await
         .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
 }
-
 pub async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
     _delay_duration: Duration,
@@ -26,18 +25,17 @@ pub async fn retry_with_attempts<F, Fut>(
     -> Result<(), String>
     where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Result<(), String>>
 {
-    // Run code with delay
-    fn recursive<
-        F: FnMut() -> Fut + 'static,
-        Fut: std::future::Future<Output = Result<(), String>>
-    >(mut f: F, attempt: u8, max_attempts: u8) {
+    fn recursive<F, Fut>(mut f: F, attempt: u8, max_attempts: u8)
+        where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Result<(), String>>
+    {
         ic_cdk_timers::set_timer(Duration::ZERO, move || {
             ic_cdk::spawn(async move {
-                if f().await.is_ok() {
-                } else if attempt < max_attempts {
-                    recursive(f, attempt + 1, max_attempts);
-                } else {
-                    error!("Failed to execute the action after {} attempts", max_attempts);
+                match f().await {
+                    Ok(_) => (),
+                    Err(_) if attempt < max_attempts => recursive(f, attempt + 1, max_attempts),
+                    Err(_) => {
+                        error!("Failed to execute action after {} attempts", max_attempts);
+                    }
                 }
             });
         });
