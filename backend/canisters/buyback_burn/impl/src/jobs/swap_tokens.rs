@@ -56,14 +56,15 @@ async fn run_async() {
 
     // TODO: check that everything here is correct and get rid of clones
     let futures: Vec<_> = swap_clients_iter
-        .map(move |swap_client| {
+        .map(|swap_client| {
             let args = swap_client.get_config();
             let token_swap = mutate_state(|state|
                 state.data.token_swaps.push_new(args, state.env.now())
             );
+
             token_swap_ids.push(token_swap.swap_id);
 
-            async move {
+            async {
                 retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
                     let swap_client = swap_client.clone();
                     let token_swap = token_swap.clone();
@@ -77,16 +78,16 @@ async fn run_async() {
 
     let error_messages: Vec<String> = results.into_iter().filter_map(Result::err).collect();
 
-    // if error_messages.is_empty() {
-    //     info!("Successfully processed all token swaps");
-    //     for token_swap_id in token_swap_ids {
-    //         let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
-    //     }
+    if error_messages.is_empty() {
+        info!("Successfully processed all token swaps");
+        for token_swap_id in token_swap_ids {
+            let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
+        }
 
-    //     crate::jobs::burn_tokens::run();
-    // } else {
-    //     error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
-    // }
+        crate::jobs::burn_tokens::run();
+    } else {
+        error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
+    }
 }
 
 pub(crate) async fn process_token_swap(
