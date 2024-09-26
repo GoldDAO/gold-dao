@@ -17,7 +17,7 @@ export default function Graph({ name }) {
   const chartRef = useRef(null);
   const {
     copyGldGovSupply, copyGldGovTreasury,
-    copyStakersData, copyHoldersData, copyBurnData, gldGovSupply, stakersData, copyLiquidData
+    copyStakersData, copyHoldersData, copyBurnData, gldGovSupply, stakersData, copyLiquidData,
   } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 

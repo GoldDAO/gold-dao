@@ -22,7 +22,7 @@ export default function Graphs() {
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
   const {
-    stakersData, holdersData, burnData, gldGovSupply, setLiquidChartData, liquidData
+    stakersData, holdersData, burnData, gldGovSupply, setLiquidChartData, liquidData,
   } = useCharts();
   const [amount, setAmount] = useState();
   const [infoModal, setInfoModal] = useState(null);
@@ -57,20 +57,17 @@ export default function Graphs() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (liquidData?.data.length){
-        setLiquidAmount(liquidData.data[liquidData.data.length - 1].value)
+      if (liquidData?.data.length) {
+        setLiquidAmount(liquidData.data[liquidData.data.length - 1].value);
       }
-      if(burnData?.data.length) {
-      setBurnedAmount(burnData.data[burnData.data.length - 1].value)
-
+      if (burnData?.data.length) {
+        setBurnedAmount(burnData.data[burnData.data.length - 1].value);
       }
-      if(holdersData?.data.length) {
-      setHoldersAmount(holdersData.data[holdersData.data.length - 1].value)
-
+      if (holdersData?.data.length) {
+        setHoldersAmount(holdersData.data[holdersData.data.length - 1].value);
       }
-      if(stakersData?.data.length) {
-      setStakedAmount(stakersData.data[stakersData.data.length - 1].value)
-
+      if (stakersData?.data.length) {
+        setStakedAmount(stakersData.data[stakersData.data.length - 1].value);
       }
 
       try {
@@ -90,7 +87,7 @@ export default function Graphs() {
           setAmount(burnData.data[burnData.data.length - 1].value);
         }
         if (selectedTab === 'Liquid') {
-          setAmount(liquidData.data[liquidData.data.length - 1].value)
+          setAmount(liquidData.data[liquidData.data.length - 1].value);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -98,7 +95,7 @@ export default function Graphs() {
     };
 
     fetchData();
-  }, [selectedTab, stakersData?.data, stakersData.loading, stakersData?.data.length, burnData?.data.length, burnData.loading,liquidData?.data.length, liquidData.loading,holdersData?.data.length, holdersData.loading,]);
+  }, [selectedTab, stakersData?.data, stakersData.loading, stakersData?.data.length, burnData?.data.length, burnData.loading, liquidData?.data.length, liquidData.loading, holdersData?.data.length, holdersData.loading]);
 
   const displayAmount = parseNumbers(amount);
 
@@ -139,59 +136,54 @@ export default function Graphs() {
               </div>
               <div className="flex justify-end min-w-[120px] sm:hidden items-center gap-1">
                 {tab === 'Treasury' && (
-                    <  >
+                    < >
                       <h5 className="font-bold text-xs">
                        {parseNumbers(treasuryAmount)}
                       </h5>
                       <GLDGovIcon />
                     </>
-                  )
+                )
                 }
-                  
+
                 {tab === 'Liquid' && (
-                    <  >
+                    < >
                       <h5 className="font-bold text-xs">
                        {parseNumbers(liquidAmount)}
                       </h5>
                       <GLDGovIcon />
                     </>
-                  )
+                )
                 }
-                  
-                  
+
                 {tab === 'Burned' && (
-                    <  >
+                    < >
                       <h5 className="font-bold text-xs">
                        {parseNumbers(burnAmount)}
                       </h5>
                       <GLDGovIcon />
                     </>
-                  )
+                )
                 }
-                  
-                  
+
                 {tab === 'Holders' && (
-                    <  >
+                    < >
                       <h5 className="font-bold text-xs">
                        {parseNumbers(holdersAmount)}
                       </h5>
                     </>
-                  )
+                )
                 }
-                  
-                  
+
                 {tab === 'Staked' && (
-                    <  >
+                    < >
                       <h5 className="font-bold text-xs">
                        {parseNumbers(stakedAmount)}
                       </h5>
                       <GLDGovIcon />
                     </>
-                  )
+                )
                 }
-                  
-                
-               
+
               </div>
             </span>
           ))}
