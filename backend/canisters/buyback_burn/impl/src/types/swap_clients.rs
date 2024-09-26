@@ -1,4 +1,3 @@
-use super::SwapClient;
 use serde::{ Deserialize, Serialize };
 use crate::types::*;
 use types::TokenInfo;

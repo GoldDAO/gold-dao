@@ -73,7 +73,7 @@ pub fn validate_principal_dot_account(input: &str) -> Option<String> {
     match string_to_account(input.to_string()) {
         Ok(account) => Some(account.to_principal_dot_account()),
         Err(_) => {
-            match Account::from_str(&input.to_string()) {
+            match Account::from_str(input) {
                 Ok(account) => Some(account.to_principal_dot_account()),
                 Err(err) => {
                     println!("{err:?}");

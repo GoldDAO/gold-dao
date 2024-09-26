@@ -1,15 +1,10 @@
-use buyback_burn_api::swap_config::SwapConfig;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ debug, error };
-pub use crate::types::ICPSwapClient;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
-
-use buyback_burn_api::swap_config::ExchangeConfig;
-use crate::types::SwapClient;
 
 pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
     icrc_ledger_canister_c2c_client
@@ -38,19 +33,17 @@ pub async fn retry_with_attempts<F, Fut>(
     >(mut f: F, attempt: u8, max_attempts: u8) {
         ic_cdk_timers::set_timer(Duration::ZERO, move || {
             ic_cdk::spawn(async move {
-                if let Ok(_) = f().await {
+                if f().await.is_ok() {
+                } else if attempt < max_attempts {
+                    recursive(f, attempt + 1, max_attempts);
                 } else {
-                    if attempt < max_attempts {
-                        recursive(f, attempt + 1, max_attempts);
-                    } else {
-                        error!("Failed to execute the action after {} attempts", max_attempts);
-                    }
-                };
+                    error!("Failed to execute the action after {} attempts", max_attempts);
+                }
             });
         });
     }
 
-    let _ = recursive(f, 0, max_attempts);
+    recursive(f, 0, max_attempts);
 
     Ok(())
 }

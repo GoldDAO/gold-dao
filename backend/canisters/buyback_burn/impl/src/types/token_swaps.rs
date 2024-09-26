@@ -52,7 +52,7 @@ impl TokenSwaps {
 
     pub fn get_next_id(&self) -> u128 {
         let swaps_len: u128 = self.swaps.len().try_into().unwrap();
-        let history_len: u128 = self.history.len().try_into().unwrap();
+        let history_len: u128 = self.history.len().into();
         swaps_len + history_len + 1
     }
 
@@ -62,7 +62,7 @@ impl TokenSwaps {
         swap_info_incomplete.or(swap_info_completed)
     }
 
-    pub fn archive_swap(&mut self, swap_id: u128) -> Result<(), ()> {
+    pub fn archive_swap(&mut self, swap_id: u128) -> Result<(), String> {
         let swap_info = self.swaps.get(&swap_id);
         match swap_info {
             Some(swap) => {
@@ -74,7 +74,7 @@ impl TokenSwaps {
             }
             None => {
                 error!("Failed to archive {swap_id}. Swap not found");
-                Err(())
+                Err(format!("Failed to archive {}. Swap not found", swap_id))
             }
         }
     }
@@ -87,7 +87,7 @@ impl TokenSwaps {
         TokenSwapsMetrics {
             active_swaps: self.swaps.clone(),
             active_swaps_len: self.swaps.len() as u64,
-            history_len: self.history.len() as u64,
+            history_len: self.history.len(),
         }
     }
 }
