@@ -14,12 +14,12 @@ const Proceed = () => {
   const {
     getSelectedTotalGLDT,
     getSelectedTotalGram,
-    getCollectionSelectedNFTs,
+    // getCollectionSelectedNFTs,
     resetState: resetSwapState,
   } = useNft();
   const totalGram = getSelectedTotalGram();
   const totalGLDT = getSelectedTotalGLDT();
-  const selectedNfts = getCollectionSelectedNFTs();
+  // const selectedNfts = getCollectionSelectedNFTs();
   const queryClient = useQueryClient();
   const {
     state: forwardSwapProceedState,
@@ -54,6 +54,9 @@ const Proceed = () => {
         queryClient.invalidateQueries({
           queryKey: ["GET_USER_GLD_NFT_1000G"],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
+        });
         resetSwapState();
       },
       onError: (err) => {
@@ -62,8 +65,6 @@ const Proceed = () => {
       },
     });
   };
-
-  console.log(selectedNfts);
 
   return (
     <>

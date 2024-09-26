@@ -1,4 +1,4 @@
-interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {}
+type ButtonProps = React.ComponentPropsWithoutRef<"button">;
 
 const Button = ({
   className,

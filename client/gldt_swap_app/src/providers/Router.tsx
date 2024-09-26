@@ -1,6 +1,7 @@
 import {
   createBrowserRouter,
   RouterProvider as ReactRouterProvider,
+  Navigate,
 } from "react-router-dom";
 
 import Layout from "@components/shared/Layout";
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <div>HOME</div>,
+        element: <Navigate to="/swap" replace />,
       },
       {
         path: "swap",

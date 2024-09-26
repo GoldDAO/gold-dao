@@ -1,5 +1,9 @@
 import { ReactNode } from "react";
-import { CheckCircleIcon, XCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
 
 const Badge = ({
   children,
@@ -10,7 +14,7 @@ const Badge = ({
 }) => {
   return (
     <div
-      className={`rounded-full w-[120px] py-1 text-sm flex items-center justify-center gap-2 ${className}`}
+      className={`rounded-full px-4 py-1 text-sm flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </div>
@@ -18,7 +22,6 @@ const Badge = ({
 };
 
 const BadgeStatusTx = ({ status }: { status: string }) => {
-  console.log("we herer", status)
   switch (status) {
     case "Success":
       return (
@@ -36,7 +39,7 @@ const BadgeStatusTx = ({ status }: { status: string }) => {
         </Badge>
       );
     case "Opening Sale":
-    case "Minting": 
+    case "Minting":
     case "Swapping NFT":
     case "Burning Fees":
     case "Refunding":
@@ -51,7 +54,7 @@ const BadgeStatusTx = ({ status }: { status: string }) => {
         </Badge>
       );
     default:
-      null;
+      return null;
   }
 };
 

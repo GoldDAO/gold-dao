@@ -1,4 +1,4 @@
-use crate::ecdsa::{ get_key_id, get_public_key };
+use crate::ecdsa::{get_key_id, get_public_key};
 use crate::state::mutate_state;
 use std::time::Duration;
 
@@ -6,7 +6,7 @@ pub mod init;
 pub mod post_upgrade;
 pub mod pre_upgrade;
 
-use crate::state::{ init_state, RuntimeState };
+use crate::state::{init_state, RuntimeState};
 
 pub fn init_canister(runtime_state: RuntimeState) {
     if runtime_state.data.public_key.is_empty() {
@@ -29,4 +29,16 @@ fn init_public_key() {
             });
         }
     }
+}
+
+use candid::CandidType;
+use serde::{Deserialize, Serialize};
+
+use crate::InitArgs;
+use crate::UpgradeArgs;
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub enum Args {
+    Init(InitArgs),
+    Upgrade(UpgradeArgs),
 }

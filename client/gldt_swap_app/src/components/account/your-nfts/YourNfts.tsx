@@ -16,10 +16,10 @@ const CardNFT = ({
       <div className="border border-border bg-surface-2 p-6 rounded-xl">
         <div className="flex justify-center sm:justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="bg-gold text-white rounded-md px-2 font-semibold">
+            <div className="bg-gold text-white text-sm rounded-md px-2 py-1 font-semibold">
               {countNFT}
             </div>
-            <img className="flex-none h-16" src={`/gold-bars/${1}g.png`} />
+            <img className="flex-none h-14" src={`/gold-bars/${1}g.svg`} />
             <div className="font-semibold text-2xl">{valueNFT}g</div>
           </div>
           {/* <div></div> */}

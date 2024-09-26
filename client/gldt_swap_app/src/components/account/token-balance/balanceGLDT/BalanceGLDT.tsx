@@ -1,9 +1,16 @@
 import { LoaderSpin } from "@components/ui";
+import { useGetGLDTPrice } from "@hooks/icpSwap/useGetGLDTPrice";
 
-import { useUserBalanceGLDT } from "@hooks/gldt_ledger";
+import { useLedgerUserBalance } from "@hooks/ledger";
 
 const BalanceGLDT = ({ className }: { className?: string }) => {
-  const { data: balance, isSuccess, isError, isLoading } = useUserBalanceGLDT();
+  const {
+    data: balance,
+    isSuccess,
+    isError,
+    isLoading,
+  } = useLedgerUserBalance({ ledger: "GLDT" });
+  const { GLDTPrice } = useGetGLDTPrice();
   return (
     <div className={`${className}`}>
       <div className="border border-border rounded-xl bg-surface p-6">
@@ -14,7 +21,7 @@ const BalanceGLDT = ({ className }: { className?: string }) => {
               <div className="font-semibold text-2xl">{balance.string}</div>
               <div className="font-semibold text-2xl">GLDT</div>
             </div>
-            <div className="font-light text-content/60">= $</div>
+            <div className="font-light text-content/60">={balance && (balance?.number * GLDTPrice).toFixed(2)} $</div>
           </div>
         )}
         {(isLoading || isError) && (

@@ -1,8 +1,8 @@
-use crate::state::{mutate_state, read_state};
+use crate::state::{ mutate_state, read_state };
 use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::NeuronRewardsManager;
 use crate::types::OgyManager;
-use canister_time::{run_now_then_interval, DAY_IN_MS};
+use canister_time::{ run_now_then_interval, DAY_IN_MS };
 use canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
@@ -24,11 +24,11 @@ pub fn run() {
 
 #[trace]
 async fn run_async() {
-    if let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
-        let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
-        fetch_and_process_neurons(&mut ogy_neuron_manager).await
-    })
-    .await
+    if
+        let Err(err) = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, || async {
+            let mut ogy_neuron_manager = read_state(|state| state.data.neuron_managers.ogy.clone());
+            fetch_and_process_neurons(&mut ogy_neuron_manager).await
+        }).await
     {
         error!(
             "Failed to process neurons after {} attempts: {:?}",
@@ -38,17 +38,15 @@ async fn run_async() {
 }
 
 async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Result<(), String> {
-    ogy_neuron_manager
-        .fetch_and_sync_neurons()
-        .await
-        .map_err(|err| {
-            error!("Error fetching and syncing neurons: {:?}", err);
-            err.to_string()
-        })?;
+    ogy_neuron_manager.fetch_and_sync_neurons().await.map_err(|err| {
+        error!("Error fetching and syncing neurons: {:?}", err);
+        err.to_string()
+    })?;
 
     let available_rewards = ogy_neuron_manager.get_available_rewards().await;
-    if available_rewards >= CLAIM_REWARDS_THRESHOLD
-        && ogy_neuron_manager.claim_rewards().await.is_not_failed()
+    if
+        available_rewards >= CLAIM_REWARDS_THRESHOLD &&
+        ogy_neuron_manager.claim_rewards().await.is_not_failed()
     {
         let _ = ogy_neuron_manager.distribute_rewards().await;
     }
@@ -65,15 +63,16 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
 async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
     _delay_duration: Duration,
-    mut f: F,
-) -> Result<(), String>
-where
-    F: FnMut() -> Fut,
-    Fut: std::future::Future<Output = Result<(), String>>,
+    mut f: F
+)
+    -> Result<(), String>
+    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
 {
     for attempt in 1..=max_attempts {
         match f().await {
-            Ok(_) => return Ok(()),
+            Ok(_) => {
+                return Ok(());
+            }
             Err(err) => {
                 error!("Attempt {}: Error - {:?}", attempt, err);
                 if attempt == max_attempts {

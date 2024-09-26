@@ -1,9 +1,8 @@
 import { PropsWithChildren } from "react";
 
-interface IBadge
-  extends PropsWithChildren<{
-    className?: string;
-  }> {}
+type IBadge = PropsWithChildren<{
+  className?: string;
+}>;
 
 const Badge = ({ children, className, ...restProps }: IBadge) => {
   return (

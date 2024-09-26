@@ -52,7 +52,7 @@ export const getDateUTC = (
   //   dateTime = DateTime.fromMillis(Number(date) / 1000000, { zone: "utc" });
   else if (options?.fromISO)
     dateTime = DateTime.fromISO(date.toString(), { zone: "utc" });
-  const result = dateTime.toFormat("yyyy-LL-dd, hh:mm:ss z");
+  const result = dateTime.toFormat("yyyy-LL-dd, hh:mm:ss a z");
   return result;
 };
 

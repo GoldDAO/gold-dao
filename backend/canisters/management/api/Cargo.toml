@@ -10,3 +10,4 @@ inttest = []
 [dependencies]
 candid = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+types = { path = "../../../libraries/types" }

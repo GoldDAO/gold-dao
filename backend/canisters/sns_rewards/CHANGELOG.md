@@ -8,18 +8,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2024-09-25
+
+#### New
+
+- **State**: Include versioning and commit info in state.
+
 ### [1.0.2] - 2024-09-04
 
 #### Changed
+
 - **Dependencies**: Updated Rust CDK dependencies to the latest versions to improve compatibility and performance.
 
 ### [1.0.1] - 2024-07-16
 
 #### Description
+
 This includes fixes and improvements
 
 #### Added
-- **Consistent distribution times across upgrades** : Upgrading a canister would mean a distribution timer would get reset and so this could result in an almost 2 week delay depending on the time of the upgrade. This new feature allows the distribution to always start at a specific time of UTC 14 - 16. 
+
+- **Consistent distribution times across upgrades** : Upgrading a canister would mean a distribution timer would get reset and so this could result in an almost 2 week delay depending on the time of the upgrade. This new feature allows the distribution to always start at a specific time of UTC 14 - 16.
 - sns_rewards canister ugprade via SNS proposal
 
 #### Fixed

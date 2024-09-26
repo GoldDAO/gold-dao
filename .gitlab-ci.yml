@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.19.0@sha256:a7889ff2b3bc1e9d4106ba659383ffe2dd293b93c390d847d5300e6f19001cd4
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.22.0@sha256:11730bea35bb5b41aaec9c600a6b7ac837188d21d8d9ce97f781a7b74ad1fd01
   tags:
     - docker
   interruptible: true
@@ -15,7 +15,7 @@ default:
       - unknown_failure
 
 cache:
-  - key: 'dfx-$CI_COMMIT_REF_SLUG'
+  - key: "dfx-$CI_COMMIT_REF_SLUG"
     paths:
       - .dfx
 
@@ -43,9 +43,6 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Unit tests
-  # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-  #   inputs:
-  #     src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: icp_neuron
@@ -64,12 +61,12 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_neuron_controller
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_swap
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
-  # - local: scripts/ci-cd/.canister_builds.yml
-  #   inputs:
-  #     src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: management
@@ -88,6 +85,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: token_metrics
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_swap
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -99,9 +99,9 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Backend deployments
-  # - local: scripts/ci-cd/.canister_deploys.yml
-  #   inputs:
-  #     src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: management
@@ -114,9 +114,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: sns_rewards
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: super_stats_v3
+  # - local: scripts/ci-cd/.canister_deploys.yml
+  #   inputs:
+  #     src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: token_metrics
@@ -124,11 +124,11 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gld_dashboard
-      sns-controlled: 'true'
+      sns-controlled: "true"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gldt_swap_app
-      sns-controlled: 'true'
+      sns-controlled: "true"
 
 ################################################################################
 # Cache preparation
@@ -138,7 +138,7 @@ node cache:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - './frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}'
+        - "./frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}"
   extends: .node template
   script:
     - npm pkg get name description author license workspaces engines
@@ -156,14 +156,14 @@ rust lint:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - 'Cargo.{lock,toml}'
-        - 'backend/**/*.{rs,toml,lock,md}'
+        - "Cargo.{lock,toml}"
+        - "backend/**/*.{rs,toml,lock,md}"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - 'Cargo.{lock,toml}'
-        - 'backend/**/*.{rs,toml,lock,md}'
+        - "Cargo.{lock,toml}"
+        - "backend/**/*.{rs,toml,lock,md}"
   extends: .rust template
   script:
     - cargo clippy

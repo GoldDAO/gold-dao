@@ -58,6 +58,8 @@ if [[ $WASMONLY == 1 ]]; then
   echo "" > $BASE_CANISTER_PATH/$1/api/can.did
 fi
 
+./scripts/canister_prebuilds.sh $1 $BASE_CANISTER_PATH $INTTEST
+
 cargo build --target wasm32-unknown-unknown --target-dir $BASE_CANISTER_PATH/$1/target --release --locked $INTTEST -p $1
 
 if [[ -v $WASMONLY ]]; then
@@ -70,6 +72,7 @@ else
 	gzip -v -t $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz &&
 	echo "$1 successfully built, optimized and compressed"
 fi
+
 
 if [[ -v $EVIDENCE ]]; then
   SUM=$(sha256sum $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm)

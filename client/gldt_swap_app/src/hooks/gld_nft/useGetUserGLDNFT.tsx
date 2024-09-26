@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
+import { useAuth } from "@context/auth";
 import { TokenId, Nft, useNft } from "@context/index";
-import { canisters } from "@providers/Auth";
+
+import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetUserGLDNFT = () => {
-  const { principalId, isConnected } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected, principalId } = authState;
   const { setNfts } = useNft();
-  const [isLoadingInit, setIsLoadingInit] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  const active_swaps = useGetUserActiveSwaps();
 
   const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
-    const { canisterId, idlFactory } = canisters[canisterName];
-    const actor = await getActor(canisterId, idlFactory, {
-      isAnon: false,
-    });
+    const actor = getActor(canisterName);
     const token_ids_bigint = (await actor.unlisted_tokens_of(
       {
         owner: Principal.fromText(principalId as string),
@@ -48,16 +51,16 @@ export const useGetUserGLDNFT = () => {
         queryKey: ["GET_USER_GLD_NFT_1G"],
         queryFn: () => getUserNFTByCanister("gld_nft_1g"),
         placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
+        enabled: !!isConnected && !!principalId && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,
       },
-      {
-        queryKey: ["GET_USER_GLD_NFT_10G"],
-        queryFn: () => getUserNFTByCanister("gld_nft_10g"),
-        placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
-        refetchOnWindowFocus: false,
-      },
+      // {
+      //   queryKey: ["GET_USER_GLD_NFT_10G"],
+      //   queryFn: () => getUserNFTByCanister("gld_nft_10g"),
+      //   placeholderData: keepPreviousData,
+      //   enabled: !!isConnected && !!principalId,
+      //   refetchOnWindowFocus: false,
+      // },
       // {
       //   queryKey: ["GET_USER_GLD_NFT_100G"],
       //   queryFn: () => getUserNFTByCanister("gld_nft_100g"),
@@ -76,35 +79,58 @@ export const useGetUserGLDNFT = () => {
   const isSuccess = userNFTs.every((result) => result.isSuccess);
   const isLoading = userNFTs.some((result) => result.isLoading);
   const isFetching = userNFTs.some((result) => result.isFetching);
-  const isError = userNFTs.some((result) => result.isError);
-  const error = userNFTs.map((result) => result.error).filter(Boolean)[0];
+  const _isError = userNFTs.some((result) => result.isError);
+  const _error = userNFTs.map((result) => result.error).filter(Boolean)[0];
   const data = userNFTs.map((result) => result.data);
 
   useEffect(() => {
     if (isLoading || isFetching) {
-      setIsLoadingInit(true);
-    }
-  }, [isLoading, isFetching]);
-
-  useEffect(() => {
-    const updateNfts = async () => {
-      if (isSuccess && data && isLoadingInit) {
+      setIsInitializing(true);
+      setIsError(false);
+    } else if (isSuccess && isInitializing) {
+      // ? Filter nft's currently being swapped
+      const nftIdStrings =
+        active_swaps.data?.rows.map((row) => row.nft_id_string) ?? [];
+      const filteredData = data.map((obj) => {
+        return {
+          ...obj,
+          tokenIds:
+            obj?.tokenIds.filter(
+              (token) => !nftIdStrings.includes(token.id_string)
+            ) ?? [],
+        };
+      });
+      const updateNfts = async () => {
         await new Promise<void>((resolve) => {
-          setNfts(data as Nft[]);
+          setNfts(filteredData as Nft[]);
           resolve();
         });
-        setIsLoadingInit(false);
-      }
-    };
-
-    updateNfts();
-  }, [data, isSuccess, isLoadingInit, setNfts]);
+      };
+      updateNfts();
+      setIsInitializing(false);
+    } else if (_isError || active_swaps.isError) {
+      console.log(_error ?? active_swaps.isError);
+      setIsError(true);
+      setError("Error while fetching your NFTs :(.");
+      setIsInitializing(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    data,
+    isSuccess,
+    isLoading,
+    isFetching,
+    isError,
+    _error,
+    isInitializing,
+    active_swaps.isError,
+  ]);
 
   return {
     data,
-    isSuccess,
+    isSuccess: isSuccess && !isInitializing,
     isError,
-    isLoading: isLoadingInit,
+    isLoading: isInitializing,
     error,
   };
 };

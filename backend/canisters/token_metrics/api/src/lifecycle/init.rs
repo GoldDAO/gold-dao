@@ -1,10 +1,11 @@
 use candid::CandidType;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use types::CanisterId;
 
-#[derive(Deserialize, CandidType)]
+#[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
+    pub commit_hash: String,
     pub sns_governance_canister_id: CanisterId,
     pub super_stats_canister_id: CanisterId,
     pub ogy_new_ledger_canister_id: CanisterId,

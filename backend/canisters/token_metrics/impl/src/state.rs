@@ -1,20 +1,24 @@
-use candid::{CandidType, Principal};
+use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::{NeuronId, ProposalId};
+use serde::{ Deserialize, Serialize };
+use sns_governance_canister::types::{ NeuronId, ProposalId };
 use std::collections::BTreeMap;
 use super_stats_v3_api::account_tree::HistoryData;
 use token_metrics_api::token_data::{
-    ActiveUsers, DailyVotingMetrics, GovernanceStats, LockedNeuronsAmount, PrincipalBalance,
-    ProposalsMetrics, ProposalsMetricsCalculations, TokenSupplyData, VotingHistoryCalculations,
+    ActiveUsers,
+    DailyVotingMetrics,
+    GovernanceStats,
+    LockedNeuronsAmount,
+    PrincipalBalance,
+    ProposalsMetrics,
+    ProposalsMetricsCalculations,
+    TokenSupplyData,
+    VotingHistoryCalculations,
     WalletOverview,
 };
-use types::{CanisterId, TimestampMillis};
-use utils::{
-    env::{CanisterEnv, Environment},
-    memory::MemorySize,
-};
+use types::{ BuildVersion, CanisterId, TimestampMillis };
+use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 canister_state!(RuntimeState);
 
@@ -37,6 +41,8 @@ impl RuntimeState {
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             sync_info: self.data.sync_info.clone(),
             number_of_owners: self.data.principal_neurons.len(),
@@ -67,6 +73,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }
@@ -156,7 +164,7 @@ impl Data {
         super_stats_canister_id: CanisterId,
         sns_rewards_canister_id: CanisterId,
         treasury_account: String,
-        foundation_accounts: Vec<String>,
+        foundation_accounts: Vec<String>
     ) -> Self {
         Self {
             gold_price: 0.0,
@@ -193,12 +201,11 @@ impl Data {
     pub fn update_foundation_accounts_data(&mut self) {
         let mut temp_foundation_accounts_data: Vec<(String, WalletOverview)> = Vec::new();
         for (account, wallet_overview) in &self.wallets_list {
-            if self
-                .foundation_accounts
-                .contains(&account.to_principal_dot_account())
-            {
-                temp_foundation_accounts_data
-                    .push((account.to_principal_dot_account(), wallet_overview.clone()));
+            if self.foundation_accounts.contains(&account.to_principal_dot_account()) {
+                temp_foundation_accounts_data.push((
+                    account.to_principal_dot_account(),
+                    wallet_overview.clone(),
+                ));
             }
         }
         self.foundation_accounts_data = temp_foundation_accounts_data;
@@ -212,10 +219,11 @@ impl PrincipalDotAccountFormat for Account {
     fn to_principal_dot_account(&self) -> String {
         match &self.subaccount {
             Some(subaccount) => format!("{}.{}", self.owner, hex::encode(subaccount)),
-            None => format!(
-                "{}.0000000000000000000000000000000000000000000000000000000000000000",
-                self.owner.to_string()
-            ),
+            None =>
+                format!(
+                    "{}.0000000000000000000000000000000000000000000000000000000000000000",
+                    self.owner.to_string()
+                ),
         }
     }
 }

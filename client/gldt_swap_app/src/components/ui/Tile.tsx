@@ -1,9 +1,8 @@
 import { PropsWithChildren } from "react";
 
-interface TileProps
-  extends PropsWithChildren<{
-    className?: string;
-  }> {}
+type TileProps = PropsWithChildren<{
+  className?: string;
+}>;
 
 const Tile = ({ className, children, ...restProps }: TileProps) => {
   return (

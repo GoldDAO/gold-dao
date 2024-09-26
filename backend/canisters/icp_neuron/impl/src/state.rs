@@ -7,7 +7,7 @@ use nns_governance_canister::types::Neuron;
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
-use types::{ CanisterId, TimestampMillis, RewardsRecipientList };
+use types::{ BuildVersion, CanisterId, RewardsRecipientList, TimestampMillis };
 use utils::{
     consts::{ ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID },
     env::{ CanisterEnv, Environment },
@@ -42,6 +42,8 @@ impl RuntimeState {
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             public_key: hex::encode(&self.data.public_key),
             public_key_der: hex::encode(&self.data.get_public_key_der().unwrap_or_default()),
@@ -114,6 +116,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }
