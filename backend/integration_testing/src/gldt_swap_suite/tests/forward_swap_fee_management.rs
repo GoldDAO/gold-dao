@@ -211,9 +211,10 @@ mod tests {
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 1);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
-        tick_n_blocks(pic, 1);
-
-        let res = balance_of(pic, ogy_ledger, account);
-        assert!(res > starting_ogy_balance);
+        tick_n_blocks(pic, 10);
+        let current_balance = balance_of(pic, ogy_ledger, account);
+        println!("current_balance {current_balance:?}");
+        println!("starting ogy {starting_ogy_balance:?}");
+        assert!(current_balance > starting_ogy_balance);
     }
 }
