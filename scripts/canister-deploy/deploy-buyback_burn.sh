@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# How to call the script:
+
+# 1. For init:
+# /Users/victoria/buyback_burn/gldt-swap/scripts/canister-deploy/deploy-buyback_burn
+# .sh' local init 1.0.0 commit_hash1
+
+# 2. For update:
+# /Users/victoria/buyback_burn/gldt-swap/scripts/canister-deploy/deploy-buyback_burn
+# .sh' local update 1.0.1 commit_hash2
+
 NETWORK=$1
 MODE=$2
 DEPLOYMENT_VIA="direct"
@@ -8,12 +18,12 @@ if [[ $NETWORK =~ ^(local|staging)$ ]]; then
   TESTMODE="true"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3aaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BUYBACK_BURN_INTERVAL_IN_SECS=21_600
+  BUYBACK_BURN_INTERVAL_IN_SECS=300
 elif [[ $NETWORK =~ ^(ic)$ ]]; then
   TESTMODE="false"
   GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
   AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BUYBACK_BURN_INTERVAL_IN_SECS=21_600
+  BUYBACK_BURN_INTERVAL_IN_SECS=86400
 else
   echo "Error: unknown network for deployment. Found $NETWORK."
   exit 2
@@ -57,11 +67,11 @@ if [[ $MODE == "init" ]]; then
   ARGUMENTS="(
     variant {
       Init = record {
-        test_mode = '"$TESTMODE"';
+        test_mode = $TESTMODE;
         version = record {
-          major = '"$MAJOR"' : nat32;
-          minor = '"$MINOR"' : nat32;
-          patch = '"$PATCH"' : nat32;
+          major = $MAJOR : nat32;
+          minor = $MINOR : nat32;
+          patch = $PATCH : nat32;
         };
         commit_hash = \"$COMMIT_HASH\";
         authorized_principals = vec {
@@ -96,9 +106,9 @@ elif [[ $MODE == "upgrade" ]]; then
     variant {
       Upgrade = record {
         version = record {
-          major = '"$MAJOR"' : nat32;
-          minor = '"$MINOR"' : nat32;
-          patch = '"$PATCH"' : nat32;
+          major = $MAJOR : nat32;
+          minor = $MINOR : nat32;
+          patch = $PATCH : nat32;
         };
         commit_hash = \"$COMMIT_HASH\";
       }
