@@ -15,11 +15,13 @@ type Args = record {
   limit : nat64;
   start : nat;
 };
+type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BidFailError = variant {
   UnexpectedError : text;
   CallError : text;
   TransferFailed : text;
 };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type BurnError = variant { CallError : text };
 type EscrowError = variant {
   ApproveError : ApproveError;
@@ -37,10 +39,10 @@ type ImpossibleErrorReason = variant {
   NFTResponseInvalid;
   PrincipalNotFound;
 };
-type InitArgArchive = record {
+type InitArgs = record {
   test_mode : bool;
   authorized_principals : vec principal;
-  version : text;
+  commit_hash : text;
 };
 type LockError = variant {
   NftAlreadyLocked : vec nat;
@@ -182,7 +184,8 @@ type TransferFromError = variant {
   TooOld;
   InsufficientFunds : record { balance : nat };
 };
-service : (InitArgArchive) -> {
+type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+service : (Args_1) -> {
   archive_swap : (record { record { nat; nat }; SwapInfo }) -> (null);
   archive_swaps : (vec record { record { nat; nat }; SwapInfo }) -> (null);
   get_archive_size : (null) -> (nat64) query;
@@ -196,5 +199,5 @@ service : (InitArgArchive) -> {
   get_swap_indexes_for_user : (principal) -> (
       opt vec record { nat; nat },
     ) query;
-  get_version : (null) -> (text) query;
+  get_version : (null) -> (BuildVersion) query;
 }

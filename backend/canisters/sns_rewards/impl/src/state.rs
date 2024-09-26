@@ -4,7 +4,7 @@ use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
-use types::{ NeuronInfo, TimestampMillis };
+use types::{ BuildVersion, NeuronInfo, TimestampMillis };
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },
@@ -37,6 +37,8 @@ impl RuntimeState {
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             sns_governance_canister: self.data.sns_governance_canister,
             number_of_neurons: self.data.neuron_maturity.len(),
@@ -100,6 +102,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }

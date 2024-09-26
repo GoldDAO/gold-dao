@@ -21,7 +21,7 @@ const PastTransactions = () => {
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="font-semibold">Ongoing transactions</div>
+          <div className="font-semibold">Ongoing</div>
           <div className="bg-gold px-2 text-xs font-semibold text-white py-1 rounded-md text-center">
             {active_swap?.data?.rows.length ?? 0}
           </div>

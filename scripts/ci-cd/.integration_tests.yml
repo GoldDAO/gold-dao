@@ -43,6 +43,6 @@ integration tests:
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic
-    - ulimit -n 202400
-    - ulimit -f 2024000
+    - ulimit -n 809600
+    - ulimit -f 8096000
     - cargo test -p integration_testing

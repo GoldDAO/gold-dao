@@ -7,5 +7,5 @@ use crate::state::read_state;
 
 #[query]
 async fn get_version(_: GetVersionArg) -> GetVersionResponse {
-    read_state(|s| s.data.version.clone())
+    read_state(|s| s.env.version())
 }

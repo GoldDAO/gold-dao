@@ -50,14 +50,14 @@ const Amount = ({
   };
 
   return (
-    <div className={className}>
+    <div className={`${className} text-center sm:text-left`}>
       <label htmlFor="amount" className="text-gold text-sm font-semibold mb-2">
         Amount
       </label>
       <div className="relative">
         <Input
           className="px-4 py-3 mt-2 mb-1 bg-surface-2 border border-border rounded-lg w-full text-center"
-          placeholder={`0 ${ledger}`}
+          placeholder={`100 ${ledger}`}
           id="amount"
           type="text"
           {...register("amount", {

@@ -3,7 +3,7 @@ use ic_cdk::export_candid;
 mod utils;
 mod guards;
 mod jobs;
-mod lifecycle;
+pub mod lifecycle;
 pub mod model;
 pub mod queries;
 pub mod state;

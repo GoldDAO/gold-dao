@@ -7,7 +7,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
 use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
-use types::TimestampMillis;
+use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
 use crate::model::swaps::Swaps;
@@ -30,12 +30,13 @@ impl RuntimeState {
     }
     pub fn metrics(&self) -> Metrics {
         Metrics {
-            version: self.data.version.clone(),
             canister_info: CanisterInfo {
                 now: self.env.now(),
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             total_active_swaps: self.get_number_active_swaps(),
             total_historic_swaps: format!("{:?}", self.get_total_historic_swaps()),
@@ -94,7 +95,6 @@ impl RuntimeState {
 
 #[derive(CandidType, Serialize)]
 pub struct Metrics {
-    pub version: String,
     pub canister_info: CanisterInfo,
     pub total_active_swaps: usize,
     pub total_historic_swaps: String,
@@ -112,6 +112,8 @@ pub struct CanisterInfo {
     pub test_mode: bool,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
+    pub version: BuildVersion,
+    pub commit_hash: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -125,7 +127,6 @@ pub struct Data {
     pub is_remove_stale_swaps_cron_running: bool,
     pub is_archive_cron_running: bool,
     pub max_canister_archive_threshold: Nat,
-    pub version: String,
     pub should_upgrade_archives: bool,
     pub ogy_balance: Nat,
     pub archive_status: ArchiveStatus,
@@ -144,7 +145,6 @@ impl Default for Data {
             is_remove_stale_swaps_cron_running: false,
             is_archive_cron_running: false,
             max_canister_archive_threshold: Nat::from(370 * 1024 * 1024 * (1024 as u128)), // 370GB
-            version: String::default(),
             should_upgrade_archives: false,
             ogy_balance: Nat::from(0u64),
             archive_status: ArchiveStatus::Initializing,

@@ -41,6 +41,10 @@ fn test_process_neurons_happy_path() {
     assert!(neuron.permissions.get(1).unwrap().principal == Some(sns_neuron_controller_id)); // double check the data correct (sns_neuron_controller_id's hotkey is on the first neuron's permissions list)
 
     // ********************************
+    // 1. add ownership (the rewards are distributed to the neuron owner). It's important to do this before topping up the neuron rewards, because otherwise the rewards would not be sent
+    // ********************************
+
+    // ********************************
     // 2. simulate distribution - add reward to neuron
     // ********************************
 

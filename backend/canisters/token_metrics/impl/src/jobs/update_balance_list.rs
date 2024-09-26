@@ -19,7 +19,7 @@ const UPDATE_LEDGER_BALANCE_LIST: Milliseconds = 15 * 60 * 1_000;
 
 pub fn start_job() {
     info!("Starting the update ledger balance list job...");
-    run_now_then_interval(Duration::from_millis(UPDATE_LEDGER_BALANCE_LIST), run)
+    run_now_then_interval(Duration::from_millis(UPDATE_LEDGER_BALANCE_LIST), run);
 }
 
 pub fn run() {

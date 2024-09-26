@@ -4,6 +4,7 @@ mod guards;
 mod jobs;
 mod lifecycle;
 mod memory;
+mod migrations;
 pub mod model;
 pub mod queries;
 pub mod state;

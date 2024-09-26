@@ -3,7 +3,7 @@ import { LoaderSpin } from "@components/ui";
 const Loading = () => {
   return (
     <div className="border border-border py-8 px-4 flex flex-col justify-center items-center rounded-xl">
-      <div className="mb-6 font-semibold">Fetching available NFT's...</div>
+      <div className="mb-6 font-semibold">Fetching available NFTs...</div>
       <div>
         <LoaderSpin />
       </div>

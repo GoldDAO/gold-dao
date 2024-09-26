@@ -12,8 +12,10 @@ const Transfer = () => {
 
   return (
     <div className="mt-8">
-      <div className="flex justify-between items-center p-4 border border-border rounded-xl">
-        <div className="text-gold font-semibold text-sm">Type of transfer</div>
+      <div className="flex flex-col sm:flex-row justify-between items-center p-4 border border-border rounded-xl">
+        <div className="text-gold font-semibold text-sm mb-2 sm:mb-0 ">
+          Type of transfer
+        </div>
         <SelectTokenType className="" />
       </div>
       {token === Token.GLDT && (

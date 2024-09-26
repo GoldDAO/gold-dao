@@ -14,22 +14,6 @@ import { useGetActiveSwaps } from "@hooks/gldt_swap";
 export const useGetAvailableGLDNFT = () => {
   const { state: authState, getActor } = useAuth();
   const { isConnected } = authState;
-  // const { canisterId: canisterId10g, idlFactory: idlFactory10g } =
-  //   canisters["gld_nft_10g"];
-  // const { canisterId: canisterId100g, idlFactory: idlFactory100g } =
-  //   canisters["gld_nft_100g"];
-  // const { canisterId: canisterId1000g, idlFactory: idlFactory1000g } =
-  //   canisters["gld_nft_1000g"];
-
-  // const actor10g = useActor(canisterId10g, idlFactory10g, {
-  //   authenticated: false,
-  // });
-  // const actor100g = useActor(canisterId100g, idlFactory100g, {
-  //   authenticated: false,
-  // });
-  // const actor1000g = useActor(canisterId1000g, idlFactory1000g, {
-  //   authenticated: false,
-  // });
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -77,20 +61,20 @@ export const useGetAvailableGLDNFT = () => {
       },
       // {
       //   queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_10g"),
+      //   queryFn: () => getNFTByCanister("gld_nft_10g"),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected,
       //   refetchOnWindowFocus: false,
       // },
       // {
       //   queryKey: ["GET_USER_GLD_NFT_100G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_100g"),
+      //   queryFn: () => getNFTByCanister("gld_nft_100g"),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected,
       // },
       // {
       //   queryKey: ["GET_USER_GLD_NFT_1000G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_1000g"),
+      //   queryFn: () => getNFTByCanister("gld_nft_1000g"),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected,
       // },

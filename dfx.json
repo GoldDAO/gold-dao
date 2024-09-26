@@ -1,5 +1,5 @@
 {
-  "dfx": "0.19.0",
+  "dfx": "0.22.0",
   "__0": "GLDT.org static website with swap canisters",
   "canisters": {
     "gldnft_backend_1000g": {
@@ -67,18 +67,13 @@
       "wasm": "backend/external_canisters/gld_nft/origyn_nft_reference.wasm.gz"
     },
     "gldt_explorer": {
-      "build": [
-        "npm run postinstall",
-        "npm run build:gldt_explorer"
-      ],
+      "build": ["npm run postinstall", "npm run build:gldt_explorer"],
       "declarations": {
         "bindings": [],
         "env_override": null,
         "output": null
       },
-      "source": [
-        "client/gldt_explorer/out"
-      ],
+      "source": ["client/gldt_explorer/out"],
       "type": "assets"
     },
     "gld_dashboard": {
@@ -221,16 +216,10 @@
       "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
     },
     "gldt_swap": {
-      "build": [
-        "./scripts/build-canister.sh gldt_swap"
-      ],
+      "build": ["./scripts/build-canister.sh gldt_swap"],
       "candid": "backend/canisters/gldt_swap/api/can.did",
       "declarations": {
-        "bindings": [
-          "ts",
-          "js",
-          "did"
-        ],
+        "bindings": ["ts", "js", "did"],
         "env_override": null,
         "output": "backend/canisters/gldt_swap/api/declarations"
       },
@@ -264,6 +253,23 @@
       "type": "custom",
       "wasm": "backend/canisters/sns_neuron_controller/target/wasm32-unknown-unknown/release/sns_neuron_controller_canister.wasm.gz"
     },
+    "buyback_burn": {
+      "build": ["./scripts/build_canister.sh buyback_burn"],
+      "candid": "backend/canisters/buyback_burn/api/can.did",
+      "declarations": {
+        "bindings": ["js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/buyback_burn/api/declarations"
+      },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
+      "type": "custom",
+      "wasm": "backend/canisters/buyback_burn/target/wasm32-unknown-unknown/release/buyback_burn_canister.wasm.gz"
+    },
+
     "sns_root": {
       "build": "",
       "candid": "backend/external_canisters/sns_root/api/can.did",

@@ -27,7 +27,7 @@ const PastTransactions = () => {
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="font-semibold">Past transactions</div>
+          <div className="font-semibold">Past</div>
           <div className="bg-gold px-2 text-xs text-white font-semibold py-1 rounded-md text-center">
             {count.data}
           </div>

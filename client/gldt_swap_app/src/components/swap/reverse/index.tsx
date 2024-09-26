@@ -23,7 +23,9 @@ const Reverse = () => {
   return (
     <>
       <div className="relative">
-        {!isConnected && <Backdrop />}
+        {!isConnected && (
+          <Backdrop isClickable={true} handleOnClick={connect} />
+        )}
         <FromCard>
           <ReverseSwapFrom />
         </FromCard>

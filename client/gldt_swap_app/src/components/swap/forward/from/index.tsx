@@ -3,7 +3,6 @@ import { useAuth } from "@context/auth";
 import { useNft } from "@context/nft";
 import { useGetUserGLDNFT } from "@hooks/gld_nft";
 
-import Card from "@components/shared/card/Base";
 import {
   Count as SelectNFTCount,
   Title as SelectNFTTitle,
@@ -31,24 +30,18 @@ const ForwardSwapFrom = () => {
 
   return (
     <>
-      {!isConnected &&
-        nftState.nfts.map((d, index) => {
-          return (
-            <Card key={d.name} className="mb-2 last:mb-0">
-              <div
-                className="flex justify-center items-center md:gap-12 gap-4"
-                key={d.name}
-              >
-                <SelectNFTTitle collectionName={d.name} />
-                <SelectNFTCount
-                  collectionIndex={index}
-                  count={0}
-                  handleOnChangeCount={() => {}}
-                />
-              </div>
-            </Card>
-          );
-        })}
+      {!isConnected && (
+        <div className="flex justify-center items-center border border-border blur-[3px] bg-surface-2 py-3 px-4 rounded-xl mb-2 last:mb-0 sm:gap-12 gap-4">
+          <div className="flex justify-between w-[260px]">
+            <SelectNFTTitle collectionName="1g" />
+            <SelectNFTCount
+              collectionIndex={0}
+              count={0}
+              handleOnChangeCount={() => {}}
+            />
+          </div>
+        </div>
+      )}
       {isConnected && isLoading && <Loading />}
       {isConnected && !isLoading && nftState.isEmpty && <Empty />}
       {isConnected && isError && <Error error={error} />}
@@ -58,11 +51,11 @@ const ForwardSwapFrom = () => {
         nftState.nfts.map((d, index) => {
           return (
             !d.isEmpty && (
-              <Card key={d.name} className="mb-2 last:mb-0">
-                <div
-                  className="flex justify-center items-center md:gap-12 gap-4"
-                  key={d.name}
-                >
+              <div
+                key={d.name}
+                className="flex justify-center items-center border border-border bg-surface-2 py-3 px-1 sm:px-4 rounded-xl mb-2 last:mb-0 sm:gap-12 gap-4"
+              >
+                <div className="flex items-center justify-between w-[260px]">
                   <SelectNFTTitle collectionName={d.name} />
                   <SelectNFTCount
                     collectionIndex={index}
@@ -73,7 +66,7 @@ const ForwardSwapFrom = () => {
                     {count[index].selected} / {count[index].total}
                   </div>
                 </div>
-              </Card>
+              </div>
             )
           );
         })}
