@@ -15,7 +15,7 @@ import useCharts from '../../hooks/useCharts';
 export default function Graphs() {
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
-  const { stakersData, holdersData } = useCharts();
+  const { stakersData, holdersData, burnData } = useCharts();
   const [amount, setAmount] = useState();
   const [infoModal, setInfoModal] = useState(null);
 
@@ -40,6 +40,9 @@ export default function Graphs() {
         }
         if (selectedTab === 'Holders') {
           setAmount(holdersData.data[holdersData.data.length - 1].value);
+        }
+        if (selectedTab === 'Burned') {
+          setAmount(burnData.data[burnData.data.length - 1].value);
         }
       } catch (error) {
         console.error('Error fetching data:', error);

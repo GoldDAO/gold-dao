@@ -10,6 +10,8 @@ import StakingReturn from '../components/Home/StakingReturn';
 import TradeOn from '../components/Home/TradeOn';
 import useTokenMetrics from '../hooks/useTokenMetrics';
 import useSuperStats from '../hooks/useSuperStats';
+import { fetchBurnData } from '../services/icpApi';
+import useCharts from '../hooks/useCharts';
 
 export const viewport = {
   themeColor: '#c6c6c6',
@@ -19,6 +21,8 @@ export default function Home() {
   // edit navigation bar color
   const { getStakedAmount } = useTokenMetrics();
   const { getHoldersData } = useSuperStats();
+  const { setBurnData } = useCharts();
+  fetchBurnData();
 
   useEffect(() => {
     let metaTag = document.querySelector('meta[name="theme-color"]');
@@ -37,6 +41,7 @@ export default function Home() {
     (async () => {
       await getStakedAmount();
       await getHoldersData();
+      setBurnData(await fetchBurnData());
     })();
   }, []);
 

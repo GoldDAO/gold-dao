@@ -1,8 +1,9 @@
 import { parseTimestamp } from '../utils/parsers';
 
-const URI = 'https://icrc-api.internetcomputer.org/api/v1/ledgers/tyyy3-4aaaa-aaaaq-aab7a-cai/accounts/tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8';
+const BASE_URI = 'https://icrc-api.internetcomputer.org/api/v1/ledgers/tyyy3-4aaaa-aaaaq-aab7a-cai';
+const URI = `${BASE_URI}/accounts/tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8`;
 
-const URI_SUPPLY = 'https://icrc-api.internetcomputer.org/api/v1/ledgers/tyyy3-4aaaa-aaaaq-aab7a-cai/total-supply';
+const URI_SUPPLY = `${BASE_URI}}/total-supply`;
 
 export const treasuryData = async () => {
   try {
@@ -29,6 +30,19 @@ export const supplyData = async () => {
     return data;
   } catch (err) {
     console.log('totalSupply data error:', err);
+    return [];
+  }
+};
+
+export const fetchBurnData = async () => {
+  try {
+    const url = `${BASE_URI}/total-burned-per-day?start=${1702470290}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    return data.data;
+  } catch (e) {
+    console.log(e);
     return [];
   }
 };

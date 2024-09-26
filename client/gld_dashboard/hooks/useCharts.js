@@ -11,6 +11,8 @@ export default create((set, get) => ({
   copyStakersData: { loading: true, data: [] },
   holdersData: { loading: true, data: [] },
   copyHoldersData: { loading: true, data: [] },
+  burnData: { loading: false, data: [] },
+  copBurnData: { loading: false, data: [] },
   setSelectedDistance: (selectedDistance) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
@@ -29,11 +31,23 @@ export default create((set, get) => ({
 
     const copyStakersData = filterDates(filteredStakersData);
 
+    const filteredHoldersData = get().holdersData.data.filter(
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
+    );
+    const copyHoldersData = filterDates(filteredHoldersData);
+
+    const filteredBurnData = get().burnData.data.filter(
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
+    );
+    const copyBurnData = filterDates(filteredBurnData);
+
     return set({
       selectedDistance,
       copyGldGovSupply: { loading: false, data: copyGldGovSupply },
       copyGldGovTreasury: { loading: false, data: copyGldGovTreasury },
       copyStakersData: { loading: false, data: copyStakersData },
+      copyHoldersData: { loading: false, data: copyHoldersData },
+      copyBurnData: { loading: false, data: copyBurnData },
     });
   },
   setGldGovSupply: (data) => {
@@ -63,7 +77,6 @@ export default create((set, get) => ({
       label: new Date(Number(daysSinceEpoch) * millisPerDay).toISOString().split('T')[0],
       value: Number(value.balance) / 1e8,
     }));
-
     const filtered = mappedData.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyStakersData = filterDates(filtered);
     return set({
@@ -72,28 +85,53 @@ export default create((set, get) => ({
     });
   },
   setHoldersData: (data) => {
-    // end_time
-    // total_unique_accounts
-    // total_unique_principals
     const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
-    const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
     const mappedData = data.map(
       ({
         end_time: endTime,
         total_unique_accounts: totalAccs,
         total_unique_principals: totalPrins,
       }) => ({
-        label: new Date(Number(endTime) * millisPerDay).toISOString().split('T')[0],
+        label: new Date(Number(endTime) / 1000000).toISOString().split('T')[0],
         value: Number(totalAccs) + Number(totalPrins),
       }),
     );
     const filtered = mappedData.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyHoldersData = filterDates(filtered);
-    console.log(copyHoldersData);
 
     return set({
       holdersData: { loading: false, data: mappedData },
       copyHoldersData: { loading: false, data: copyHoldersData },
+    });
+  },
+  setBurnData: (data) => {
+    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const transformedData = data.map((subarr) => ({
+      value: (Number(subarr[1])) / 1e8,
+      label: new Date(Number(subarr[0]) * 1000).toISOString().split('T')[0],
+    }));
+
+    const cumulativeData = transformedData.reduce(
+      (
+        accumulator,
+        current,
+        index,
+      ) => {
+        const previousValue = index === 0 ? 0 : accumulator[index - 1].value;
+        const cumulativeValue = previousValue + current.value;
+        accumulator.push({ label: current.label, value: cumulativeValue });
+        return accumulator;
+      },
+      [],
+    );
+    const filtered = cumulativeData.filter(
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
+    );
+    const copyBurnData = filterDates(filtered);
+
+    return set({
+      burnData: { loading: false, data: cumulativeData },
+      copyBurnData: { loading: false, data: copyBurnData },
     });
   },
 }));

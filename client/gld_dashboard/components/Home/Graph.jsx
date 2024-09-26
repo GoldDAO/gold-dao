@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Line } from 'react-chartjs-2';
 import {
-  data3, data4, data5,
+  data3,
 } from '../../utils/datas';
 import useCharts from '../../hooks/useCharts';
 
@@ -19,7 +19,7 @@ export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
   const {
-    copyGldGovSupply, copyGldGovTreasury, copyStakersData, copyHoldersData,
+    copyGldGovSupply, copyGldGovTreasury, copyStakersData, copyHoldersData, copyBurnData,
   } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
@@ -46,11 +46,12 @@ export default function Graph({ name }) {
           setData({ loading: false, data: data3, suggestedMax: 1200 });
           break;
         case 'Burned':
-          setData({ loading: false, data: data4, suggestedMax: 1200 });
+          if (copyBurnData?.loading) break;
+          setData({ loading: false, data: copyBurnData.data });
           break;
         case 'Holders':
           if (copyHoldersData?.loading) break;
-          setData({ loading: false, data: copyHoldersData.data, suggestedMax: 1000000 });
+          setData({ loading: false, data: copyHoldersData.data, suggestedMax: 100000 });
           break;
         case 'Total GLDGov Supply':
           if (copyGldGovSupply?.loading) break;
@@ -117,8 +118,13 @@ export default function Graph({ name }) {
     data.data?.length,
     copyStakersData?.data,
     copyStakersData?.data.length,
+    copyStakersData?.loading,
     copyHoldersData?.data,
     copyHoldersData?.data.length,
+    copyHoldersData?.loading,
+    copyBurnData?.loading,
+    copyBurnData?.data,
+    copyBurnData?.data.length,
     name,
   ]);
 
