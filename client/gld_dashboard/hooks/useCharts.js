@@ -12,7 +12,9 @@ export default create((set, get) => ({
   holdersData: { loading: true, data: [] },
   copyHoldersData: { loading: true, data: [] },
   burnData: { loading: false, data: [] },
-  copBurnData: { loading: false, data: [] },
+  copyBurnData: { loading: false, data: [] },
+  liquidData: { loading: false, data: []},
+  copyLiquidData: { loading: false, data: []},
   setSelectedDistance: (selectedDistance) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
@@ -41,6 +43,11 @@ export default create((set, get) => ({
     );
     const copyBurnData = filterDates(filteredBurnData);
 
+    const filteredLiquidData = get().liquidData.data.filter(
+      ({ label }) => new Date(label) >= new Date(distance * 1000),
+    );
+    const copyLiquidData = filterDates(filteredLiquidData);
+
     return set({
       selectedDistance,
       copyGldGovSupply: { loading: false, data: copyGldGovSupply },
@@ -48,6 +55,7 @@ export default create((set, get) => ({
       copyStakersData: { loading: false, data: copyStakersData },
       copyHoldersData: { loading: false, data: copyHoldersData },
       copyBurnData: { loading: false, data: copyBurnData },
+      copyLiquidData: {loading: false, data: copyLiquidData},
     });
   },
   setGldGovSupply: (data) => {
@@ -134,4 +142,13 @@ export default create((set, get) => ({
       copyBurnData: { loading: false, data: copyBurnData },
     });
   },
+  setLiquidChartData: (data) => {
+    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
+    const copyLiquidData = filterDates(filtered);
+    return set({
+      liquidData: { loading: false, data: data },
+      copyLiquidData: { loading: false, data: copyLiquidData },
+    });
+  }
 }));

@@ -3,7 +3,7 @@ import { parseTimestamp } from '../utils/parsers';
 const BASE_URI = 'https://icrc-api.internetcomputer.org/api/v1/ledgers/tyyy3-4aaaa-aaaaq-aab7a-cai';
 const URI = `${BASE_URI}/accounts/tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8`;
 
-const URI_SUPPLY = `${BASE_URI}}/total-supply`;
+const URI_SUPPLY = `${BASE_URI}/total-supply`;
 
 export const treasuryData = async () => {
   try {

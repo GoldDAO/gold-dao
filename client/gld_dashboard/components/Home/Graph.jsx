@@ -7,9 +7,6 @@ import { CrosshairPlugin, Interpolate } from 'chartjs-plugin-crosshair';
 import { useEffect, useRef, useState } from 'react';
 
 import { Line } from 'react-chartjs-2';
-import {
-  data3,
-} from '../../utils/datas';
 import useCharts from '../../hooks/useCharts';
 
 Chart.register(CrosshairPlugin);
@@ -19,7 +16,8 @@ export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
   const {
-    copyGldGovSupply, copyGldGovTreasury, copyStakersData, copyHoldersData, copyBurnData,
+    copyGldGovSupply, copyGldGovTreasury,
+    copyStakersData, copyHoldersData, copyBurnData, gldGovSupply, stakersData, copyLiquidData
   } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
@@ -43,7 +41,11 @@ export default function Graph({ name }) {
           setData({ loading: false, data: copyStakersData.data, suggestedMax: 800000000 });
           break;
         case 'Liquid':
-          setData({ loading: false, data: data3, suggestedMax: 1200 });
+          if (stakersData?.loading || gldGovSupply?.loading) break;
+          setData({
+            loading: false,
+            data: copyLiquidData.data,
+          });
           break;
         case 'Burned':
           if (copyBurnData?.loading) break;
@@ -111,6 +113,8 @@ export default function Graph({ name }) {
       }
     })();
   }, [
+    gldGovSupply?.loading,
+    gldGovSupply?.data,
     copyGldGovSupply.data,
     copyGldGovSupply?.loading,
     copyGldGovTreasury.data,

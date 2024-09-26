@@ -15,7 +15,9 @@ import useCharts from '../../hooks/useCharts';
 export default function Graphs() {
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
-  const { stakersData, holdersData, burnData } = useCharts();
+  const {
+    stakersData, holdersData, burnData, gldGovSupply, setLiquidChartData, liquidData
+  } = useCharts();
   const [amount, setAmount] = useState();
   const [infoModal, setInfoModal] = useState(null);
 
@@ -27,6 +29,25 @@ export default function Graphs() {
     getSupplyChart();
     getTreasuryChart();
   }, [selectedTab]);
+
+  const deriveLiquidData = (gldgovSupply, staked) => {
+    const liquid = gldgovSupply.map(({ label: supplyLabel, value }) => {
+      const stakedValue = staked.find(
+        ({ label: stakedLabel }) => stakedLabel === supplyLabel,
+      );
+      return {
+        label: supplyLabel,
+        value: value - (stakedValue?.value ?? 0),
+      };
+    });
+
+    setLiquidChartData(liquid);
+  };
+
+  useEffect(() => {
+    deriveLiquidData(gldGovSupply.data, stakersData.data);
+  }, [stakersData?.data, stakersData?.data.length, stakersData.loading,
+    gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +64,9 @@ export default function Graphs() {
         }
         if (selectedTab === 'Burned') {
           setAmount(burnData.data[burnData.data.length - 1].value);
+        }
+        if (selectedTab === 'Liquid') {
+          setAmount(liquidData.data[liquidData.data.length - 1].value)
         }
       } catch (error) {
         console.error('Error fetching data:', error);
