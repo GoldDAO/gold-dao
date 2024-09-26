@@ -1,22 +1,15 @@
 use crate::state::{ mutate_state, read_state };
-use crate::types::SwapClient;
-use crate::utils::{
-    calculate_percentage_of_amount,
-    get_token_balance,
-    retry_with_attempts,
-    RETRY_DELAY,
-};
-use futures::future::join_all;
-use crate::types::SwapClientEnum;
+use crate::utils::{ calculate_percentage_of_amount, get_token_balance, RETRY_DELAY };
+use crate::types::{ SwapClientEnum, TokenSwap, SwapClient };
 use utils::rand::generate_random_delay;
 use canister_time::run_now_then_interval;
 use canister_tracing_macros::trace;
-use tracing::info;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ debug, error };
+use tracing::{ debug, info, error };
+use anyhow::{ Result, anyhow };
 use utils::env::Environment;
-use crate::types::TokenSwap;
-use anyhow::Result;
+use utils::retry_async::retry_with_attempts;
+use futures::future::join_all;
 
 use canister_time::NANOS_PER_MILLISECOND;
 const MAX_ATTEMPTS: u8 = 1;
@@ -77,7 +70,7 @@ async fn run_async() {
 
     let results = join_all(futures).await;
 
-    let error_messages: Vec<String> = results.into_iter().filter_map(Result::err).collect();
+    let error_messages: Vec<anyhow::Error> = results.into_iter().filter_map(Result::err).collect();
 
     if error_messages.is_empty() {
         info!("Successfully processed all token swaps");
@@ -87,14 +80,14 @@ async fn run_async() {
 
         crate::jobs::burn_tokens::run();
     } else {
-        error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
+        error!("Failed to process some token swaps:\n{:?}", error_messages);
     }
 }
 
 pub(crate) async fn process_token_swap(
     swap_client: SwapClientEnum,
     mut token_swap: TokenSwap
-) -> Result<(), String> {
+) -> Result<()> {
     let burn_config = read_state(|s| s.data.burn_config.clone());
     let swap_config = swap_client.get_config();
 
@@ -119,20 +112,20 @@ pub(crate) async fn process_token_swap(
                 Err(error) => {
                     let msg = format!("{error:?}");
                     error!("Failed to get the quote: {}", msg.as_str());
-                    return Err(msg);
+                    return Err(anyhow!(msg));
                 }
             }
         }
         Err(error) => {
             let msg = format!("{error:?}");
             error!("Failed to get the quote: {}", msg.as_str());
-            return Err(msg);
+            return Err(anyhow!(msg));
         }
     };
 
     // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
     if quote < burn_config.get_min_after_swap_amount() + (swap_config.output_token.fee as u128) {
-        return Err("Insufficient balance to swap".to_string());
+        return Err(anyhow!("Insufficient balance to swap"));
     }
 
     // Get the deposit account
@@ -155,7 +148,7 @@ pub(crate) async fn process_token_swap(
                     state.data.token_swaps.upsert(token_swap);
                 });
                 error!("Failed to deposit tokens while swap: {}", msg.as_str());
-                return Err(msg);
+                return Err(anyhow!(msg));
             }
         }
     };
@@ -195,7 +188,7 @@ pub(crate) async fn process_token_swap(
                     state.data.token_swaps.upsert(token_swap);
                 });
                 error!("Failed to transfer tokens: {}", msg.as_str());
-                return Err(msg);
+                return Err(anyhow!(msg));
             }
         }
     }
@@ -209,7 +202,7 @@ pub(crate) async fn process_token_swap(
                 state.data.token_swaps.upsert(token_swap.clone());
             });
             error!("Failed to deposit tokens: {}", msg.as_str());
-            return Err(msg);
+            return Err(anyhow!(msg));
         } else {
             mutate_state(|state| {
                 token_swap.notified_dex_at = Some(Ok(()));
@@ -242,7 +235,7 @@ pub(crate) async fn process_token_swap(
                     state.data.token_swaps.upsert(token_swap.clone());
                 });
                 error!("Failed to swap tokens: {}", msg.as_str());
-                return Err(msg);
+                return Err(anyhow!(msg));
             }
         }
     };
@@ -262,7 +255,7 @@ pub(crate) async fn process_token_swap(
                 state.data.token_swaps.upsert(token_swap.clone());
             });
             error!("Failed to withdraw tokens: {}", msg.as_str());
-            return Err(msg);
+            return Err(anyhow!(msg));
         } else {
             mutate_state(|state| {
                 token_swap.withdrawn_from_dex_at = Some(Ok(amount_out));
@@ -275,7 +268,7 @@ pub(crate) async fn process_token_swap(
     if successful_swap {
         Ok(())
     } else {
-        Err("The swap failed".to_string())
+        Err(anyhow!("The swap failed"))
     }
 }
 

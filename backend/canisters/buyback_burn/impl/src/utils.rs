@@ -1,12 +1,12 @@
-use candid::Nat;
-use candid::Principal;
+use candid::{ Principal, Nat };
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
 use tracing::{ debug, error };
+use anyhow::{ Result, anyhow };
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
-pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
+pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat> {
     icrc_ledger_canister_c2c_client
         ::icrc1_balance_of(
             ledger_id,
@@ -15,37 +15,7 @@ pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
                 subaccount: None,
             })
         ).await
-        .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
-}
-
-pub async fn retry_with_attempts<F, Fut, T>(
-    max_attempts: u8,
-    delay_duration: Duration,
-    f: F
-)
-    -> Result<(), String>
-    where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Result<T, String>>
-{
-    fn recursive<F, Fut, T>(mut f: F, attempt: u8, max_attempts: u8, delay_duration: Duration)
-        where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Result<T, String>>
-    {
-        ic_cdk_timers::set_timer(delay_duration, move || {
-            ic_cdk::spawn(async move {
-                match f().await {
-                    Ok(_) => (),
-                    Err(_) if attempt < max_attempts =>
-                        recursive(f, attempt + 1, max_attempts, delay_duration),
-                    Err(_) => {
-                        error!("Failed to execute action after {} attempts", max_attempts);
-                    }
-                }
-            });
-        });
-    }
-
-    recursive(f, 0, max_attempts, delay_duration);
-
-    Ok(())
+        .map_err(|e| anyhow!("Failed to fetch token balance: {:?}", e))
 }
 
 /// Calculates the burn amount based on the current balance and burn rate.

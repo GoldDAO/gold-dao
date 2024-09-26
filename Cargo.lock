@@ -2975,6 +2975,7 @@ dependencies = [
 name = "sns_neuron_controller"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "candid 0.10.10",
  "canister_logger",
@@ -3677,10 +3678,12 @@ dependencies = [
 name = "utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "candid 0.10.10",
  "canister_time",
  "hex",
  "ic-cdk 0.16.0",
+ "ic-cdk-timers",
  "icrc-ledger-types",
  "serde",
  "stable_memory",

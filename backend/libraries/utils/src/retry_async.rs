@@ -1,4 +1,40 @@
 use std::future::Future;
+use std::time::Duration;
+use anyhow::Result;
+use tracing::error;
+
+pub async fn retry_with_attempts<F, Fut, T, Out>(
+    max_attempts: u8,
+    delay_duration: Duration,
+    f: F
+)
+    -> Result<()>
+    where F: FnMut() -> Fut + 'static, Fut: std::future::Future<Output = Out>, Out: Into<Result<T>>
+{
+    fn recursive<F, Fut, T, Out>(mut f: F, attempt: u8, max_attempts: u8, delay_duration: Duration)
+        where
+            F: FnMut() -> Fut + 'static,
+            Fut: std::future::Future<Output = Out>,
+            Out: Into<Result<T>>
+    {
+        ic_cdk_timers::set_timer(delay_duration, move || {
+            ic_cdk::spawn(async move {
+                match f().await.into() {
+                    Ok(_) => (),
+                    Err(_) if attempt < max_attempts =>
+                        recursive(f, attempt + 1, max_attempts, delay_duration),
+                    Err(_) => {
+                        error!("Failed to execute action after {} attempts", max_attempts);
+                    }
+                }
+            });
+        });
+    }
+
+    recursive(f, 0, max_attempts, delay_duration);
+
+    Ok(())
+}
 
 pub async fn retry_async<F, Fut, T, E>(mut operation: F, retries: usize) -> Result<T, E>
     where F: FnMut() -> Fut, Fut: Future<Output = Result<T, E>>

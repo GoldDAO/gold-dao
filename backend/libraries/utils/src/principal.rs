@@ -18,6 +18,7 @@ impl PrincipalDotAccountFormat for Account {
         }
     }
 }
+
 pub fn string_to_account(input: String) -> Result<Account, String> {
     if let Some(index) = input.find('.') {
         let (principal_str, subaccount_str) = input.split_at(index);
