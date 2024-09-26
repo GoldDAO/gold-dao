@@ -1,122 +1,150 @@
 #!/usr/bin/env bash
 
-# How to call the script:
-
-# 1. For init:
-# /Users/victoria/buyback_burn/gldt-swap/scripts/canister-deploy/deploy-buyback_burn
-# .sh' local init 1.0.0 commit_hash1
-
-# 2. For update:
-# /Users/victoria/buyback_burn/gldt-swap/scripts/canister-deploy/deploy-buyback_burn
-# .sh' local update 1.0.1 commit_hash2
-
 NETWORK=$1
-MODE=$2
+
 DEPLOYMENT_VIA="direct"
 
-if [[ $NETWORK =~ ^(local|staging)$ ]]; then
-  TESTMODE="true"
-  GLDGOV_LEDGER_CANISTER_ID=tyyy3aaa-aaaaq-aab7a-cai
-  AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BUYBACK_BURN_INTERVAL_IN_SECS=300
-elif [[ $NETWORK =~ ^(ic)$ ]]; then
-  TESTMODE="false"
-  GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
-  AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-  BUYBACK_BURN_INTERVAL_IN_SECS=86400
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
+
+if [[ $REINSTALL == "reinstall" ]]; then
+
+  if [[ $NETWORK =~ ^(local|staging)$ ]]; then
+    TESTMODE=true
+    GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network ic sns_ledger)
+    AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
+    # 11 days
+    BURN_INTERVAL_IN_SECS=$((11*24*3600))
+    # 6 hours
+    SWAP_INTERVAL_IN_SECS=$((6*3600))
+  elif [[ $NETWORK =~ ^(ic)$ ]]; then
+    TESTMODE=false
+    GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network $NETWORK sns_ledger)
+    AUTHORIZED_PRINCIPAL=$(dfx canister id --network $NETWORK sns_governance)
+    # 6 hours
+    BURN_INTERVAL_IN_SECS=$((6*3600))
+    SWAP_INTERVAL_IN_SECS=$((6*3600))
+  else
+    echo "Error: unknown network for deployment. Found $NETWORK."
+    exit 2
+  fi
+
+  export BURN_RATE=33
+  export MIN_ICP_BURN_AMOUNT=30_000_000_000
+  export ICP_SWAP_CANISTER_ID="7eikv-2iaaa-aaaag-qdgwa-cai"
+
+  ARGUMENTS="(variant { Init = record {
+    test_mode = $TESTMODE;
+    commit_hash = \"$COMMIT_SHA\";
+    authorized_principals = vec {
+      principal \"$AUTHORIZED_PRINCIPAL\";
+    };
+    icp_swap_canister_id = principal \"$ICP_SWAP_CANISTER_ID\";
+    gldgov_ledger_canister_id = principal \"$GLDGOV_LEDGER_CANISTER_ID\";
+    tokens = vec {};
+    burn_rate = $BURN_RATE : nat8;
+    min_icp_burn_amount = record { e8s = $MIN_ICP_BURN_AMOUNT : nat64 };
+    burn_interval_in_secs = $BURN_INTERVAL_IN_SECS : nat64;
+    swap_interval_in_secs = $SWAP_INTERVAL_IN_SECS : nat64;
+  }})"
+
 else
-  echo "Error: unknown network for deployment. Found $NETWORK."
-  exit 2
+  ARGUMENTS="(variant { Upgrade = record {
+    wasm_version = $WASM_VERSION;
+    commit_hash = \"$COMMIT_SHA\";
+  }})"
 fi
 
-BURN_RATE=33
-MIN_BURN_AMOUNT=30_000_000_000
-ICP_SWAP_CANISTER_ID=7eikv-2iaaa-aaaag-qdgwa-cai
-GLDGOV_ICP_POOL='record {
-  token = record {
-    fee = 10_000 : nat64;
-    decimals = 8 : nat64;
-    ledger_id = principal "ryjl3-tyaaa-aaaaa-aaaba-cai";
-  };
-  swap_pool_id = principal "k46ek-4qaaa-aaaag-qcyzq-cai";
-};'
+. ./scripts/deploy_backend_canister.sh buyback_burn $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
 
-GLDGOV_TOKEN_INFO='record {
-    fee = 100_000 : nat64;
-    decimals = 8 : nat64;
-    ledger_id = principal "tyyy3-4aaaa-aaaaq-aab7a-cai";
-}'
 
-# Validate mode and parse related arguments
-if [[ $MODE == "init" ]]; then
-  if [[ $# -ne 4 ]]; then
-    echo "Error: init mode requires <VERSION> and <COMMIT_HASH>"
-    exit 1
-  fi
-  VERSION=$3
-  COMMIT_HASH=$4
+# . ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
 
-  # Extracting major, minor, and patch from the version
-  IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+# if [[ ! $1 =~ ^(local|staging|ic)$ ]]; then
+#   echo "Error: unknown network for deployment"
+#   exit 2
+# fi
 
-  if [[ -z $MAJOR || -z $MINOR || -z $PATCH ]]; then
-    echo "Error: version format should be x.y.z"
-    exit 1
-  fi
-  # Arguments for init mode
-  ARGUMENTS="(
-    variant {
-      Init = record {
-        test_mode = $TESTMODE;
-        version = record {
-          major = $MAJOR : nat32;
-          minor = $MINOR : nat32;
-          patch = $PATCH : nat32;
-        };
-        commit_hash = \"$COMMIT_HASH\";
-        authorized_principals = vec {
-          principal \"$AUTHORIZED_PRINCIPAL\";
-        };
-        icp_swap_canister_id = principal \"$ICP_SWAP_CANISTER_ID\";
-        gldgov_token_info = $GLDGOV_TOKEN_INFO;
-        tokens = vec {$GLDGOV_ICP_POOL};
-        burn_rate = $BURN_RATE : nat8;
-        min_burn_amount = record { e8s = $MIN_BURN_AMOUNT : nat64 };
-        buyback_burn_interval_in_secs = $BUYBACK_BURN_INTERVAL_IN_SECS : nat64;
-      }
-    }
-  )"
 
-elif [[ $MODE == "upgrade" ]]; then
-  if [[ $# -ne 4 ]]; then
-    echo "Error: upgrade mode requires <VERSION> and <COMMIT_HASH>"
-    exit 1
-  fi
-  VERSION=$3
-  COMMIT_HASH=$4
-    # Extracting major, minor, and patch from the version
-  IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+# if [[ $1 =~ ^(local|staging)$ ]]; then
+# TESTMODE="true"
+# # GLDGOV_LEDGER_CANISTER_ID=irhm6-5yaaa-aaaap-ab24q-cai
+# GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
+# # SNS_GOVERNANCE_CANISTER_ID=j3ioe-7iaaa-aaaap-ab23q-cai
+# AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
+# # 11 days
+# BURN_INTERVAL_IN_SECS=1_000_000
+# # 6 hours
+# SWAP_INTERVAL_IN_SECS=21_600
+# else
+# TESTMODE="false"
+# GLDGOV_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
+# # SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
+# AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
+# # 6 hours
+# BURN_INTERVAL_IN_SECS=21_600
+# SWAP_INTERVAL_IN_SECS=21_600
+# fi
 
-  if [[ -z $MAJOR || -z $MINOR || -z $PATCH ]]; then
-    echo "Error: version format should be x.y.z"
-    exit 1
-  fi
-  # Arguments for upgrade mode
-  ARGUMENTS="(
-    variant {
-      Upgrade = record {
-        version = record {
-          major = $MAJOR : nat32;
-          minor = $MINOR : nat32;
-          patch = $PATCH : nat32;
-        };
-        commit_hash = \"$COMMIT_HASH\";
-      }
-    }
-  )"
-else
-  echo "Error: mode must be either 'init' or 'upgrade'"
-  exit 1
-fi
+# export BURN_RATE=33
+# export MIN_ICP_BURN_AMOUNT=30_000_000_000
+# export ICP_SWAP_CANISTER_ID=7eikv-2iaaa-aaaag-qdgwa-cai
 
-. ./scripts/deploy_backend_canister.sh buyback_burn $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA
+# # FIXME
+# export COMMIT_HASH=hello
+
+# # Init args
+# ARGS='(
+#   variant {
+#     Init = record {
+#       test_mode = '"$TESTMODE"';
+#       commit_hash = "'"$COMMIT_HASH"'";
+#       authorized_principals = vec {
+#         principal "'"$AUTHORIZED_PRINCIPAL"'";
+#       };
+#       icp_swap_canister_id = principal "'"$ICP_SWAP_CANISTER_ID"'";
+#       gldgov_ledger_canister_id = principal "'"$GLDGOV_LEDGER_CANISTER_ID"'";
+#       tokens = vec {};
+#       burn_rate = '"$BURN_RATE"' : nat8;
+#       min_icp_burn_amount = record { e8s = '"$MIN_ICP_BURN_AMOUNT"' : nat64 };
+#       burn_interval_in_secs = '"$BURN_INTERVAL_IN_SECS"' : nat64;
+#       swap_interval_in_secs = '"$SWAP_INTERVAL_IN_SECS"' : nat64;
+#     }
+#   }
+# )'
+
+# # ARGS='(
+# #   variant {
+# #     Upgrade = record {
+# #       wasm_version = record {
+# #         major = 0 : nat32;
+# #         minor = 0 : nat32;
+# #         patch = 1 : nat32;
+# #       };
+# #       commit_hash = "'"$COMMIT_HASH"'";
+# #     }
+# # })'
+
+# echo "Deployment arguments: \n" $ARGS
+
+# # Deployment Logic
+# if [[ $1 == "local" ]]; then
+#   # Deploy to local environment
+#   dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
+# elif [[ $1 == "staging" ]]; then
+#   # Deploy to staging environment - works both manually and from CI/CD
+#   if [[ -n "$CI_COMMIT_REF_NAME" ]]; then
+#     # This block runs in CI/CD
+#     echo "Deploying to staging from CI/CD on branch: $CI_COMMIT_REF_NAME"
+#     dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
+#   else
+#     # This block runs when deploying manually
+#     echo "Deploying to staging manually"
+#     dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
+#   fi
+# elif [[ $CI_COMMIT_REF_NAME == "develop" || ( $1 == "ic" && $CI_COMMIT_TAG =~ ^buyback_burn-v{1}[[:digit:]]{1,2}.[[:digit:]]{1,2}.[[:digit:]]{1,3}$ ) ]]; then
+#   # Deploy to production (ic) environment if tag matches the pattern
+#   dfx deploy buyback_burn --network $1 ${REINSTALL} --argument "$ARGS" -y
+# else
+#   echo "Error: Invalid deployment context or missing environment variables."
+#   exit 4
+# fi

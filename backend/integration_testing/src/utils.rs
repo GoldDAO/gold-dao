@@ -2,6 +2,7 @@ use candid::Principal;
 use canister_time::DAY_IN_MS;
 use pocket_ic::PocketIc;
 use rand::{ RngCore, thread_rng };
+use types::Cycles;
 use types::TimestampMillis;
 use lazy_static::lazy_static;
 
@@ -20,6 +21,7 @@ pub fn tick_n_blocks(pic: &PocketIc, times: u32) {
         pic.tick();
     }
 }
+pub const T: Cycles = 1_000_000_000_000;
 
 pub fn is_interval_more_than_7_days(
     previous_time: TimestampMillis,

@@ -20,20 +20,20 @@ const To = ({ className }: { className?: string }) => {
     }
   };
   return (
-    <div className={className}>
+    <div className={`${className} text-center sm:text-left`}>
       <label htmlFor="to" className="text-gold text-sm font-semibold mb-2">
-        Principal ID
+        To
       </label>
       <Input
         className="px-4 py-3 mt-2 mb-1 bg-surface-2 border border-border rounded-lg w-full text-center"
         id="to"
-        placeholder="0x-000-000-000"
+        placeholder="6uad6-fqaaa-aaaam-abovq-cai"
         type="text"
         {...register("to", {
-          required: "Principal ID is required.",
+          required: "Recipient address is required.",
           validate: {
             isValidRecipientAddress: (v) =>
-              isValidRecipientAddress(v) || "Invalid Principal ID.",
+              isValidRecipientAddress(v) || "Invalid recipient address.",
           },
         })}
         // ? fix form set errors when amount is setted via max button

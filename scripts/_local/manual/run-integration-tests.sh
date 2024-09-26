@@ -1,0 +1,1 @@
+./scripts/_local/manual/integration-test.sh gldt_swap

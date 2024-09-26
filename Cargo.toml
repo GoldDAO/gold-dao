@@ -2,6 +2,11 @@
 members = [
   "backend/canisters/buyback_burn/impl",
   "backend/canisters/buyback_burn/api",
+  "backend/canisters/gldt_swap/common",
+  "backend/canisters/gldt_swap/impl",
+  "backend/canisters/gldt_swap/api",
+  "backend/canisters/gldt_swap/archive",
+  "backend/canisters/gldt_swap/api_archive",
   "backend/canisters/management/impl",
   "backend/canisters/management/api",
   "backend/canisters/sns_rewards/impl",
@@ -12,9 +17,11 @@ members = [
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
-  "backend/canisters/gldt_libs",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
+  "backend/external_canisters/origyn_nft_reference/api",
+  "backend/external_canisters/origyn_nft_reference/c2c_client",
+  "backend/external_canisters/gldt_swap_archive/c2c_client",
   "backend/libraries/candid_gen",
   "backend/libraries/canister_client",
   "backend/libraries/canister_client_macros",
@@ -27,7 +34,8 @@ members = [
   "backend/libraries/stable_memory",
   "backend/libraries/types",
   "backend/libraries/utils",
-  "backend/integration_testing"]
+  "backend/integration_testing",
+]
 resolver = "2"
 
 [profile.release]
@@ -35,7 +43,7 @@ lto = "thin"
 panic = "abort"
 
 [workspace.dependencies]
-candid = { version = "0.10.2" }
+candid = { version = "0.10.2", features = ["value"] }
 ciborium = "0.2.2"
 futures = "0.3.29"
 # Enable `custom` feature of k256's getrandom dependency. See icp_neuron/impl/src/ecdsa.rs for more details.
@@ -66,7 +74,12 @@ tracing = "0.1.40"
 tracing-attributes = "0.1.27"
 tracing-subscriber = "0.3.18"
 num-bigint = "0.4.4"
-time = { version = "0.3.36", features = ["macros", "serde", "parsing", "formatting"]}
+time = { version = "0.3.36", features = [
+  "macros",
+  "serde",
+  "parsing",
+  "formatting",
+] }
 pocket-ic = "3.1.0"
 async-trait = "0.1.81"
 typetag = "0.2.16"

@@ -5,9 +5,8 @@ import {
   QueryKey,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { canisters } from "@providers/Auth";
+import { useAuth } from "@context/auth";
 
 import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
@@ -17,24 +16,23 @@ type UseGetActiveSwapsParams = Omit<
   "queryKey" | "queryFn"
 >;
 
-const get_active_swaps = async () => {
-  const { canisterId, idlFactory } = canisters["gldt_swap"];
-  const actor = await getActor(canisterId, idlFactory, {
-    isAnon: false,
-  });
-  const result = (await actor.get_active_swaps(null)) as Array<
-    [[bigint, bigint], SwapInfo]
-  >;
-  return result;
-};
-
 export const useGetActiveSwaps = ({
   ...queryParams
 }: UseGetActiveSwapsParams = {}) => {
-  const { isConnected } = useWallet();
+  const { state: authState, getActor } = useAuth();
+  const { isConnected } = authState;
+
   const [data, setData] = useState<{ rows: SwapData[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
+
+  const get_active_swaps = async () => {
+    const actor = getActor("gldt_swap");
+    const result = (await actor.get_active_swaps(null)) as Array<
+      [[bigint, bigint], SwapInfo]
+    >;
+    return result;
+  };
 
   const active_swaps = useQuery({
     queryKey: ["FETCH_ACTIVE_SWAPS"] as QueryKey,

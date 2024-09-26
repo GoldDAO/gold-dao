@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.4] - 2024-09-25
+
+#### New
+
+- **State**: Include versioning and commit info in state.
+
 ### [1.0.3] - 2024-09-04
 
 - Updated Rust CDK dependencies to the latest versions to improve compatibility and performance.

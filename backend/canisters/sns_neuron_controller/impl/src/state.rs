@@ -6,9 +6,8 @@ use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use serde::{ Deserialize, Serialize };
 use sns_governance_canister::types::Neuron;
-use types::CanisterId;
 use types::BuildVersion;
-use types::Cycles;
+use types::CanisterId;
 use types::TimestampMillis;
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
@@ -34,7 +33,9 @@ impl RuntimeState {
                 commit_hash: self.env.commit_hash().to_string(),
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
-                cycles_balance: self.env.cycles_balance(),
+                cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
 
             authorized_principals: self.data.authorized_principals.clone(),
@@ -64,7 +65,7 @@ pub struct CanisterInfo {
     pub version: BuildVersion,
     pub commit_hash: String,
     pub memory_used: MemorySize,
-    pub cycles_balance: Cycles,
+    pub cycles_balance_in_tc: f64,
 }
 
 #[derive(Serialize, Deserialize)]

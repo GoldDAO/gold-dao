@@ -55,6 +55,9 @@ pub const GOLD_1000G_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 1, 128, 10, 88, 1, 1]
 );
 
+pub const E8S_PER_OGY: u64 = 100_000_000;
+pub const E8S_FEE_OGY: u64 = 200_000;
+
 #[cfg(test)]
 mod tests {
     use super::*;
