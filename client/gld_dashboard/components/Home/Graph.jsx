@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Line } from 'react-chartjs-2';
 import {
-  data2, data3, data4, data5,
+  data3, data4, data5,
 } from '../../utils/datas';
 import useCharts from '../../hooks/useCharts';
 
@@ -18,7 +18,7 @@ Interaction.modes.interpolate = Interpolate;
 export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
-  const { copyGldGovSupply, copyGldGovTreasury } = useCharts();
+  const { copyGldGovSupply, copyGldGovTreasury, copyStakersData } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
   useEffect(() => setInnerWidth(window.innerWidth), []);
@@ -37,7 +37,8 @@ export default function Graph({ name }) {
           });
           break;
         case 'Staked':
-          setData({ loading: false, data: data2, suggestedMax: 1200 });
+          if (copyStakersData?.loading) break;
+          setData({ loading: false, data: copyStakersData.data, suggestedMax: 800000000 });
           break;
         case 'Liquid':
           setData({ loading: false, data: data3, suggestedMax: 1200 });
@@ -111,6 +112,8 @@ export default function Graph({ name }) {
     copyGldGovTreasury.data,
     copyGldGovTreasury?.loading,
     data.data?.length,
+    copyStakersData?.data,
+    copyStakersData?.data.length,
     name,
   ]);
 

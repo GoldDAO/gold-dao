@@ -7,6 +7,7 @@ import { calculateTimestamp } from '../../utils/functions';
 import useCharts from '../../hooks/useCharts';
 
 const Chart = ({ name, amount }) => {
+  console.log('bro', amount)
   const { setSelectedDistance } = useCharts();
   const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '3M', t: 86400 * 31 * 3 });
 
@@ -26,7 +27,7 @@ const Chart = ({ name, amount }) => {
 
   return (
     <section className={' w-[67%]  p-5 relative hidden sm:block'}>
-      {name !== 'Treasury' && (
+      {/* {name !== 'Treasury' && (
         <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-20  z-50  rounded-r-[36px]">
           <div className="text-white text-4xl font-bold flex justify-center items-center gap-2">
             <p>Coming Soon</p>
@@ -38,7 +39,7 @@ const Chart = ({ name, amount }) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <div>
         <div className="flex justify-between">
           <div className="w-full flex justify-between border-b border-[#C6C6C6] pb-5">
@@ -68,7 +69,7 @@ const Chart = ({ name, amount }) => {
         </div>
         <div className="pt-5">
           <h1 className="flex flex-row mb-5 text-4xl font-bold">
-            {name !== 'Treasury' ? 'N/A' : amount || '0.0'}
+            {amount}
             {name !== 'Treasury' ? null : (
               <Image width={25} height={25} src="svg/g-logo.svg" className="ml-2" alt="gold dao" />
             )}
