@@ -43,4 +43,8 @@ impl SwapClients {
     pub fn iter(&self) -> std::slice::Iter<'_, SwapClientEnum> {
         self.swap_clients.iter()
     }
+
+    pub fn into_iter(&self) -> std::vec::IntoIter<swap_client::SwapClientEnum> {
+        self.swap_clients.clone().into_iter()
+    }
 }
