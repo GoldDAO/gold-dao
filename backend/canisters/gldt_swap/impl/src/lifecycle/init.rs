@@ -18,7 +18,7 @@ fn init(args: Args) {
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
-                BuildVersion::min(),
+                init_args.version,
                 init_args.commit_hash
             );
             let mut data = Data::default();

@@ -2,10 +2,12 @@ use candid::{ CandidType, Principal };
 use serde::{ Deserialize, Serialize };
 
 use gldt_swap_common::nft::NftCanisterConf;
+use types::BuildVersion;
 
 #[derive(Deserialize, Serialize, CandidType, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
+    pub version: BuildVersion,
     pub commit_hash: String,
     pub gldt_ledger_id: Principal,
     pub gldnft_canisters: Vec<(Principal, NftCanisterConf)>,
