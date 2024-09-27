@@ -7,16 +7,16 @@ type ICPSwapConfig = record {
   swap_canister_id : principal;
 };
 type InitArgs = record {
-  min_icp_burn_amount : Tokens;
   test_mode : bool;
-  gldgov_ledger_canister_id : principal;
   icp_swap_canister_id : principal;
   burn_rate : nat8;
+  buyback_burn_interval_in_secs : nat64;
+  gldgov_token_info : TokenInfo;
   authorized_principals : vec principal;
-  tokens : vec TokenInfo;
-  swap_interval_in_secs : nat64;
+  version : BuildVersion;
+  tokens : vec TokenAndPool;
+  min_burn_amount : Tokens;
   commit_hash : text;
-  burn_interval_in_secs : nat64;
 };
 type Result = variant { Ok : Account; Err : text };
 type Result_1 = variant { Ok; Err : text };
@@ -29,6 +29,7 @@ type SwapConfig = record {
   exchange_config : ExchangeConfig;
   output_token : TokenInfo;
 };
+type TokenAndPool = record { token : TokenInfo; swap_pool_id : principal };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
@@ -47,7 +48,7 @@ type TokenSwap = record {
   transfer : opt Result_4;
 };
 type Tokens = record { e8s : nat64 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;

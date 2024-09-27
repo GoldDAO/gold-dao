@@ -4,6 +4,7 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
+          'buyback_burn',
           'gldt_swap',
           'icp_neuron',
           'management',
@@ -45,7 +46,7 @@ $[[ inputs.src-folder ]] production deploy:
   stage: deploy
   resource_group: backend canister production deployment
   rules:
-    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
       changes:
         - 'backend/libraries/**/*.{rs,toml,lock,md}'
         - 'backend/external_canisters/**/*.{rs,toml,lock,md}'

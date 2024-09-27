@@ -184,7 +184,7 @@ type TransferFromError = variant {
   TooOld;
   InsufficientFunds : record { balance : nat };
 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args_1) -> {
   archive_swap : (record { record { nat; nat }; SwapInfo }) -> (null);
   archive_swaps : (vec record { record { nat; nat }; SwapInfo }) -> (null);

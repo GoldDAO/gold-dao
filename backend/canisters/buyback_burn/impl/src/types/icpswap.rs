@@ -1,12 +1,11 @@
 use super::swap_client::SwapClient;
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
-use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
 use crate::types::*;
+use types::CanisterId;
 
 #[async_trait]
-#[typetag::serde]
 // TODO: when async traits would be stable, rewrite without async_trait usage:
 // https://blog.rust-lang.org/2023/12/21/async-fn-rpit-in-traits.html
 impl SwapClient for ICPSwapClient {
@@ -22,8 +21,20 @@ impl SwapClient for ICPSwapClient {
         }
     }
 
+    fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId) {
+        self.set_swap_canister_id(swap_canister_id);
+    }
+
     fn clone_box(&self) -> Box<dyn SwapClient> {
         Box::new(self.clone())
+    }
+
+    async fn get_quote(
+        &self,
+        amount: u128,
+        min_amount_out: u128
+    ) -> CallResult<Result<u128, String>> {
+        self.get_quote(amount, min_amount_out).await
     }
 
     async fn deposit_account(&self) -> CallResult<Account> {
