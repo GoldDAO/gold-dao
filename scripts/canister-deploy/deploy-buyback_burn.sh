@@ -5,9 +5,6 @@ DEPLOYMENT_VIA="direct"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
 
-VERSION="1.2.3"
-IFS='.' read -r MAJOR MINOR PATCH <<<"$VERSION"
-
 if [[ $REINSTALL == "reinstall" ]]; then
 
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
@@ -50,11 +47,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
   ARGUMENTS="(variant { Init = record {
         test_mode = $TESTMODE;
-        version = record {
-          major = $MAJOR : nat32;
-          minor = $MINOR : nat32;
-          patch = $PATCH : nat32;
-        };
+        version = $BUILD_VERSION;
         commit_hash = \"$COMMIT_HASH\";
         authorized_principals = vec {
           principal \"$AUTHORIZED_PRINCIPAL\";
@@ -71,11 +64,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
 else
   ARGUMENTS="(variant { Upgrade = record {
-    version = record {
-          major = $MAJOR : nat32;
-          minor = $MINOR : nat32;
-          patch = $PATCH : nat32;
-        };
+    version = $BUILD_VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 fi

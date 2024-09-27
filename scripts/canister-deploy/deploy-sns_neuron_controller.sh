@@ -29,6 +29,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
   ARGUMENTS="(variant { Init = record {
     test_mode = $TESTMODE;
     commit_hash = \"$COMMIT_SHA\";
+    version = $BUILD_VERSION;
     authorized_principals = vec {
       principal \"$AUTHORIZED_PRINCIPAL\";
     };
@@ -40,7 +41,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
 else
   ARGUMENTS="(variant { Upgrade = record {
-    version = $VERSION;
+    version = $BUILD_VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 fi
