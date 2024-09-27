@@ -38,7 +38,7 @@ export default function Graph({ name }) {
           break;
         case 'Staked':
           if (copyStakersData?.loading) break;
-          setData({ loading: false, data: copyStakersData.data, suggestedMax: 800000000 });
+          setData({ loading: false, data: copyStakersData.data });
           break;
         case 'Liquid':
           if (stakersData?.loading || gldGovSupply?.loading) break;
