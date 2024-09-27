@@ -29,6 +29,10 @@ pub fn run() {
     ic_cdk::spawn(run_async_with_rand_delay());
 }
 
+pub fn run_now() {
+    ic_cdk::spawn(run_async());
+}
+
 #[trace]
 async fn run_async_with_rand_delay() {
     let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);

@@ -11,14 +11,14 @@ if [[ $REINSTALL == "reinstall" ]]; then
     TESTMODE=true
     GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network ic sns_ledger)
     AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-    # 24 hours
+    # 6 hours
     BUYBACK_BURN_INTERVAL_IN_SECS=$((6 * 3600))
 
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
     GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network $NETWORK sns_ledger)
     AUTHORIZED_PRINCIPAL=$(dfx canister id --network $NETWORK sns_governance)
-    # 24 hours
+    # 6 hours
     BUYBACK_BURN_INTERVAL_IN_SECS=$((6 * 3600))
 
   else
