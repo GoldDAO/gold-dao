@@ -20,7 +20,9 @@ export const viewport = {
 export default function Home() {
   // edit navigation bar color
   const { getStakedAmount } = useTokenMetrics();
-  const { getHoldersData } = useSuperStats();
+  const {
+    getHoldersData, getRewardPool, getReservePool, getSNSFundCanister,
+  } = useSuperStats();
   const { setBurnData } = useCharts();
   fetchBurnData();
 
@@ -41,6 +43,9 @@ export default function Home() {
     (async () => {
       await getStakedAmount();
       await getHoldersData();
+      await getRewardPool();
+      await getReservePool();
+      await getSNSFundCanister();
       setBurnData(await fetchBurnData());
     })();
   }, []);

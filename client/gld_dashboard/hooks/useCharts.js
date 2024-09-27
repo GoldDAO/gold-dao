@@ -11,10 +11,16 @@ export default create((set, get) => ({
   copyStakersData: { loading: true, data: [] },
   holdersData: { loading: true, data: [] },
   copyHoldersData: { loading: true, data: [] },
-  burnData: { loading: false, data: [] },
-  copyBurnData: { loading: false, data: [] },
-  liquidData: { loading: false, data: []},
-  copyLiquidData: { loading: false, data: []},
+  burnData: { loading: true, data: [] },
+  copyBurnData: { loading: true, data: [] },
+  liquidData: { loading: true, data: [] },
+  copyLiquidData: { loading: true, data: [] },
+  rewardPoolData: { loading: true, data: [] },
+  copyRewardPoolData: { loading: true, data: [] },
+  reservePoolData: { loading: true, data: [] },
+  copyReservePoolData: { loading: true, data: [] },
+  snsFundData: { loading: true, data: [] },
+  copySNSFundData: { loading: true, data: [] },
   setSelectedDistance: (selectedDistance) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
@@ -55,7 +61,7 @@ export default create((set, get) => ({
       copyStakersData: { loading: false, data: copyStakersData },
       copyHoldersData: { loading: false, data: copyHoldersData },
       copyBurnData: { loading: false, data: copyBurnData },
-      copyLiquidData: {loading: false, data: copyLiquidData},
+      copyLiquidData: { loading: false, data: copyLiquidData },
     });
   },
   setGldGovSupply: (data) => {
@@ -72,7 +78,6 @@ export default create((set, get) => ({
     const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyGldGovTreasury = filterDates(filtered);
-
     return set({
       gldGovTreasury: { loading: false, data },
       copyGldGovTreasury: { loading: false, data: copyGldGovTreasury },
@@ -147,8 +152,56 @@ export default create((set, get) => ({
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyLiquidData = filterDates(filtered);
     return set({
-      liquidData: { loading: false, data: data },
+      liquidData: { loading: false, data },
       copyLiquidData: { loading: false, data: copyLiquidData },
     });
-  }
+  },
+  setRewardPoolData: (data) => {
+    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+    const mappedData = data.map(([daysSinceEpoch, value]) => ({
+      label: new Date(Number(daysSinceEpoch) * millisPerDay).toISOString().split('T')[0],
+      value: Number(value.balance) / 1e8,
+    }));
+
+    const filtered = mappedData.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
+    const copyRewardPoolData = filterDates(filtered);
+    return set({
+      rewardPoolData: { loading: false, data: mappedData },
+      copyRewardPoolData: { loading: false, data: copyRewardPoolData },
+    });
+  },
+  setReservePoolData: (data) => {
+    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+    const mappedData = data.map(([daysSinceEpoch, value]) => ({
+      label: new Date(Number(daysSinceEpoch) * millisPerDay).toISOString().split('T')[0],
+      value: Number(value.balance) / 1e8,
+    }));
+
+    const filtered = mappedData.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
+    const copyReservePoolData = filterDates(filtered);
+    return set({
+      reservePoolData: { loading: false, data: mappedData },
+      copyReservePoolData: { loading: false, data: copyReservePoolData },
+    });
+  },
+  setSNSFundCanister: (data) => {
+    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+    const mappedData = data.map(([daysSinceEpoch, value]) => ({
+      label: new Date(Number(daysSinceEpoch) * millisPerDay).toISOString().split('T')[0],
+      value: Number(value.balance) / 1e8,
+    }));
+
+    const filtered = mappedData.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
+    const copySNSFundData = filterDates(filtered);
+    return set({
+      snsFundData: { loading: false, data: mappedData },
+      copySNSFundData: { loading: false, data: copySNSFundData },
+    });
+  },
 }));

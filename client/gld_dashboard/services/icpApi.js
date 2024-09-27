@@ -25,7 +25,7 @@ export const supplyData = async () => {
     const totalSupply = await res.json();
     const data = totalSupply.data?.map((t) => ({
       label: parseTimestamp(t[0]),
-      value: t[1] / 10e7,
+      value: t[1] / 1e8,
     }));
     return data;
   } catch (err) {

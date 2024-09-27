@@ -21,7 +21,9 @@ export default function Graphs() {
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
   const {
-    stakersData, holdersData, burnData, gldGovSupply, setLiquidChartData, liquidData,
+    stakersData, holdersData, burnData, gldGovSupply,
+    setLiquidChartData, liquidData, rewardPoolData,
+    reservePoolData, gldGovTreasury: gldGovTreasuryData, snsFundData,
   } = useCharts();
   const [amount, setAmount] = useState();
   const [, setInfoModal] = useState(null);
@@ -35,24 +37,63 @@ export default function Graphs() {
     getTreasuryChart();
   }, [selectedTab]);
 
-  const deriveLiquidData = (gldgovSupply, staked) => {
+  const deriveLiquidData = (
+    gldgovSupply,
+    staked,
+    rewardPool,
+    reservePool,
+    treasuryData,
+    snsFund,
+  ) => {
     const liquid = gldgovSupply.map(({ label: supplyLabel, value }) => {
       const stakedValue = staked.find(
-        ({ label: stakedLabel }) => stakedLabel === supplyLabel,
+        ({ label }) => label === supplyLabel,
       );
+      const rewardPoolValue = rewardPool.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const reservePoolValue = reservePool.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const treasuryValue = treasuryData.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const snsFundValue = snsFund.find(
+        ({ label }) => label === supplyLabel,
+      );
+
       return {
         label: supplyLabel,
-        value: value - (stakedValue?.value ?? 0),
+        value: (((value - (stakedValue?.value ?? 0))
+        - (rewardPoolValue?.value ?? 0))
+        - (reservePoolValue?.value ?? 0))
+        - (treasuryValue?.value ?? 0)
+        - (snsFundValue?.value ?? 0),
       };
     });
-
     setLiquidChartData(liquid);
   };
 
   useEffect(() => {
-    deriveLiquidData(gldGovSupply.data, stakersData.data);
+    if (gldGovSupply?.data.length && stakersData?.data.length
+      && rewardPoolData?.data.length && reservePoolData?.data.length
+      && gldGovTreasuryData?.data.length && snsFundData?.data.length) {
+      deriveLiquidData(
+        gldGovSupply.data,
+        stakersData.data,
+        rewardPoolData.data,
+        reservePoolData.data,
+        gldGovTreasuryData.data,
+        snsFundData.data,
+      );
+    }
   }, [stakersData?.data, stakersData?.data.length, stakersData.loading,
-    gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading]);
+    gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading,
+    rewardPoolData.loading, rewardPoolData?.data, rewardPoolData?.data.length,
+    reservePoolData.loading, reservePoolData?.data, reservePoolData?.data.length,
+    gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
+    snsFundData.loading, snsFundData?.data, snsFundData?.data.length,
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,7 +127,9 @@ export default function Graphs() {
           setAmount(burnData.data[burnData.data.length - 1].value);
         }
         if (selectedTab === 'Liquid') {
-          setAmount(liquidData.data[liquidData.data.length - 1].value);
+          if (!liquidData.loading && liquidData?.data.length) {
+            setAmount(liquidData.data[liquidData.data.length - 1].value);
+          }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -96,8 +139,13 @@ export default function Graphs() {
     fetchData();
   }, [selectedTab, stakersData?.data, stakersData.loading,
     stakersData?.data.length, burnData?.data.length, burnData.loading,
-    liquidData?.data.length, liquidData.loading,
-    holdersData?.data.length, holdersData.loading]);
+    liquidData?.data.length, liquidData.loading, liquidData?.data,
+    holdersData?.data.length, holdersData.loading,
+    rewardPoolData?.data.length, rewardPoolData.loading,
+    reservePoolData?.data.length, reservePoolData.loading,
+    gldGovSupply?.data.length,
+
+  ]);
 
   const displayAmount = parseNumbers(amount);
 
