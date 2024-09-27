@@ -41,12 +41,16 @@ export default function Home() {
   // getters
   useEffect(() => {
     (async () => {
-      await getStakedAmount();
-      await getHoldersData();
-      await getRewardPool();
-      await getReservePool();
-      await getSNSFundCanister();
-      setBurnData(await fetchBurnData());
+      const [burnData] = await Promise.allSettled([
+        fetchBurnData(),
+        getStakedAmount(),
+        getHoldersData(),
+        getRewardPool(),
+        getReservePool(),
+        getSNSFundCanister(),
+      ]);
+
+      setBurnData(burnData.value ?? []);
     })();
   }, []);
 

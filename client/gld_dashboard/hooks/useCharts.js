@@ -101,11 +101,11 @@ export default create((set, get) => ({
     const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
     const mappedData = data.map(
       ({
-        end_time: endTime,
+        start_time: startTime,
         total_unique_accounts: totalAccs,
         total_unique_principals: totalPrins,
       }) => ({
-        label: new Date(Number(endTime) / 1000000).toISOString().split('T')[0],
+        label: new Date(Number(startTime) / 1000000).toISOString().split('T')[0],
         value: Number(totalAccs) + Number(totalPrins),
       }),
     );

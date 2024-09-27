@@ -7,7 +7,7 @@ const URI_SUPPLY = `${BASE_URI}/total-supply`;
 
 export const treasuryData = async () => {
   try {
-    const uri = `${URI}/balance-history?start=${1698846951}&step=${86400}`;
+    const uri = `${URI}/balance-history?start=${1702339200}&step=${86400}`;
     const res = await fetch(uri);
     const treasury = await res.json();
     const data = treasury.data?.map((t) => ({ label: t.day, value: t.balance / 10e7 }));
@@ -20,7 +20,7 @@ export const treasuryData = async () => {
 
 export const supplyData = async () => {
   try {
-    const url = `${URI_SUPPLY}/?start=${1698846951}&step=${86400}`;
+    const url = `${URI_SUPPLY}/?start=${1702339200}&step=${86400}`;
     const res = await fetch(url);
     const totalSupply = await res.json();
     const data = totalSupply.data?.map((t) => ({
@@ -36,7 +36,7 @@ export const supplyData = async () => {
 
 export const fetchBurnData = async () => {
   try {
-    const url = `${BASE_URI}/total-burned-per-day?start=${1698846951}`;
+    const url = `${BASE_URI}/total-burned-per-day?start=${1702252800}`;
     const res = await fetch(url);
     const data = await res.json();
 

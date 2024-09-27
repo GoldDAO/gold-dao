@@ -2,7 +2,7 @@ import useActor from './useActor';
 import useCharts from './useCharts';
 
 // Define the specific date
-const startDate = new Date('2023-11-13'); // minus 1 month
+const startDate = new Date('2023-12-11'); // minus 1 month
 const today = new Date();
 const timeDifference = today - startDate;
 const projectStartDateDiffDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
