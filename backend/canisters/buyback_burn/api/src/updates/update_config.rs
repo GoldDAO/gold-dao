@@ -6,10 +6,11 @@ use serde::{ Deserialize, Serialize };
 pub struct Args {
     pub burn_rate: Option<u8>,
     pub min_burn_amount: Option<Tokens>,
-    pub burn_interval_in_secs: Option<u64>,
+    pub buyback_burn_interval_in_secs: Option<u64>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub enum Response {
     Success,
+    InvalidBurnRate,
 }

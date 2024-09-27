@@ -45,6 +45,9 @@ include:
   # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
+      src-folder: buyback_burn
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
       src-folder: icp_neuron
   # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
   #   inputs:
@@ -67,6 +70,9 @@ include:
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: buyback_burn
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: management
@@ -102,6 +108,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: buyback_burn
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: management

@@ -346,7 +346,7 @@ mod tests {
         let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
         let gldt_swap_init_args = Encode!(
             &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
-                wasm_version: BuildVersion::new(0, 0, 2),
+                version: BuildVersion::new(0, 0, 2),
                 commit_hash: "zyxwvut".to_string(),
             })
         ).unwrap();
@@ -415,7 +415,7 @@ mod tests {
         let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
         let gldt_swap_init_args = Encode!(
             &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
-                wasm_version: BuildVersion::new(0, 0, 2), // init will set this to "0.0.0" in test setup
+                version: BuildVersion::new(0, 0, 2), // init will set this to "0.0.0" in test setup
                 commit_hash: "zyxwvt".to_string(),
             })
         ).unwrap();

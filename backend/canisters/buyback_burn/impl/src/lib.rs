@@ -1,5 +1,11 @@
 /*!
-# TODO: add canister description
+# Buyback adn burn canister
+
+The canister is designed to support a deflationary tokenomics model by recieving
+ICP tokens from various sources and selling them on a decentralized exchange (DEX).
+The obtained GOLDGov tokens are then sent to a minting address to be burned,
+thereby reducing the token supply over time.
+
 
 ## Copyright
 © 2023  [DAO.LINK Sàrl], [Switzerland]

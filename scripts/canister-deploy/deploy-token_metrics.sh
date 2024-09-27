@@ -29,6 +29,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
   ARGUMENTS="(variant { Init = record {
     test_mode = $TESTMODE;
     commit_hash = \"$COMMIT_SHA\";
+    version = $BUILD_VERSION;
     ogy_new_ledger_canister_id = principal \"$OGY_LEDGER\";
     sns_governance_canister_id = principal \"$SNS_GOVERNANCE\";
     sns_rewards_canister_id = principal \"$SNS_REWARDS\";
@@ -41,7 +42,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
 else
   ARGUMENTS="(variant { Upgrade = record {
-    wasm_version = $WASM_VERSION;
+    version = $BUILD_VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 fi

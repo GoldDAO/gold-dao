@@ -142,7 +142,7 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
 pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
     let archive_canisters = read_state(|s| s.data.swaps.get_archive_canisters());
     let commit_hash = read_state(|s| s.env.commit_hash().to_string());
-    let wasm_version = read_state(|s| s.env.version());
+    let version = read_state(|s| s.env.version());
     let mut current_auth_prins = read_state(|s| s.data.authorized_principals.clone());
     let this_canister_id = read_state(|s| s.env.canister_id());
     current_auth_prins.push(this_canister_id);
@@ -151,7 +151,7 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
         Encode!(
             &ArgsArchive::Upgrade(UpgradeArgs {
                 commit_hash,
-                wasm_version,
+                version,
             })
         )
     {

@@ -4,6 +4,7 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
+          'buyback_burn',
           'gldt_swap',
           'icp_neuron',
           'management',

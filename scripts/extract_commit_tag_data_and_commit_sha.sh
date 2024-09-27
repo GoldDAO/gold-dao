@@ -20,7 +20,7 @@ if [[ -n $CI_COMMIT_TAG && $NETWORK == "ic" ]]; then
 	VERSION_MINOR=$(echo "$VERSION" | awk -F'.' '{print $2}')
 	VERSION_PATCH=$(echo "$VERSION" | awk -F'.' '{print $3}')
 
-	WASM_VERSION="record { major = $VERSION_MAJOR:nat32; minor = $VERSION_MINOR:nat32; patch = $VERSION_PATCH:nat32 }"
+	BUILD_VERSION="record { major = $VERSION_MAJOR:nat32; minor = $VERSION_MINOR:nat32; patch = $VERSION_PATCH:nat32 }"
 
 	# Check if NAME matches CANISTER_NAME
 	# The script requires CANISTER_NAME to be defined for staging deployment and
@@ -31,7 +31,7 @@ if [[ -n $CI_COMMIT_TAG && $NETWORK == "ic" ]]; then
 	fi
 else
 	VERSION="_STAGINGTEST_"
-	WASM_VERSION="record { major = 0:nat32; minor = 0:nat32; patch = 0:nat32 }"
+	BUILD_VERSION="record { major = 0:nat32; minor = 0:nat32; patch = 0:nat32 }"
 fi
 
 if [[ -n $CI_COMMIT_SHORT_SHA ]]; then
@@ -40,9 +40,9 @@ else
 	COMMIT_SHA="$(git rev-parse --short HEAD)_local"
 fi
 
-echo "CANISTER: $CANISTER_NAME, VERSION: $VERSION, COMMIT_SHA: $COMMIT_SHA, WASM_VERSION: $WASM_VERSION, $REINSTALL"
+echo "CANISTER: $CANISTER_NAME, VERSION: $VERSION, COMMIT_SHA: $COMMIT_SHA, BUILD_VERSION: $BUILD_VERSION, $REINSTALL"
 
 export VERSION
 export COMMIT_SHA
-export WASM_VERSION
+export BUILD_VERSION
 export REINSTALL

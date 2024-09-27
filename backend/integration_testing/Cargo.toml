@@ -30,3 +30,8 @@ stable_memory = { path = '../libraries/stable_memory' }
 tracing = { workspace = true }
 serde_bytes = { workspace = true }
 sns_neuron_controller_api_canister = { path = "../canisters/sns_neuron_controller/api" }
+
+buyback_burn_api = { path = "../canisters/buyback_burn/api" }
+management_api_canister = { path = "../canisters/management/api" }
+super_stats_v3_api = { path = "../canisters/super_stats_v3/api" }
+token_metrics_api = { path = "../canisters/token_metrics/api" }

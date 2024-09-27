@@ -1,18 +1,17 @@
 use crate::types::token_swaps::TokenSwaps;
-use buyback_burn_canister::get_config::Response as GetConfigResponse;
+use buyback_burn_api::get_config::Response as GetConfigResponse;
+use buyback_burn_api::init::TokenAndPool;
 use candid::{ CandidType, Principal };
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
 use serde::{ Deserialize, Serialize };
 use std::time::Duration;
 use types::BuildVersion;
-use types::{ CanisterId, Cycles, TimestampMillis, TokenInfo };
+use types::{ Cycles, TimestampMillis, TokenInfo };
 use utils::env::{ CanisterEnv, Environment };
 use utils::memory::MemorySize;
 use crate::types::SwapClients;
-use buyback_burn_canister::swap_config::SwapConfig;
-use buyback_burn_canister::swap_config::ExchangeConfig;
-use buyback_burn_canister::icpswap::ICPSwapConfig;
+use crate::types::token_swaps::TokenSwapsMetrics;
 use tracing::error;
 
 canister_state!(RuntimeState);
@@ -35,7 +34,7 @@ impl RuntimeState {
     pub fn get_config(&self) -> GetConfigResponse {
         GetConfigResponse {
             burn_rate: self.data.burn_config.burn_rate,
-            min_icp_burn_amount: self.data.burn_config.min_burn_amount,
+            min_burn_amount: self.data.burn_config.min_burn_amount,
         }
     }
 
@@ -50,9 +49,9 @@ impl RuntimeState {
                 cycles_balance: self.env.cycles_balance(),
             },
             authorized_principals: self.data.authorized_principals.to_vec(),
-            gldgov_ledger_canister_id: self.data.gldgov_ledger_canister_id,
+            gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
-            // TODO: add more metrics
+            token_swaps_metrics: self.data.token_swaps.get_metrics(),
         }
     }
 }
@@ -60,23 +59,22 @@ impl RuntimeState {
 #[derive(Serialize, Deserialize)]
 pub struct Data {
     pub authorized_principals: Vec<Principal>,
-    pub gldgov_ledger_canister_id: CanisterId,
-    pub swap_interval: Duration,
+    pub gldgov_token_info: TokenInfo,
+    pub icp_swap_canister_id: Principal,
+    pub buyback_burn_interval: Duration,
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
-    // pub timer_jobs: TimerJobs<TimerJob, Data>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct BurnConfig {
     pub burn_rate: u8,
     pub min_burn_amount: Tokens,
-    pub burn_interval: Duration,
 }
 
 impl BurnConfig {
-    fn new(burn_rate: u8, min_burn_amount: Tokens, burn_interval_in_secs: u64) -> Self {
+    fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
             burn_rate: if burn_rate > 100 {
@@ -86,8 +84,17 @@ impl BurnConfig {
                 burn_rate
             },
             min_burn_amount,
-            burn_interval: Duration::from_secs(burn_interval_in_secs),
         }
+    }
+
+    pub fn validate_burn_rate(&self) -> bool {
+        self.burn_rate > 0 && self.burn_rate <= 100
+    }
+
+    // Get the 100% of the min_burn_amount to know what the balance should be after swap (to have enough funds)
+    pub fn get_min_after_swap_amount(&self) -> u128 {
+        let min_burn_amount = self.min_burn_amount.e8s() as u128;
+        (min_burn_amount * 100) / (self.burn_rate as u128)
     }
 }
 
@@ -95,39 +102,26 @@ impl Data {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         authorized_principals: Vec<Principal>,
-        tokens: Vec<TokenInfo>,
-        gldgov_ledger_canister_id: CanisterId,
-        swap_interval_in_secs: u64,
+        tokens: Vec<TokenAndPool>,
+        gldgov_token_info: TokenInfo,
+        buyback_burn_interval_in_secs: u64,
         icp_swap_canister_id: Principal,
         burn_rate: u8,
-        min_burn_amount: Tokens,
-        burn_interval_in_secs: u64
+        min_burn_amount: Tokens
     ) -> Self {
         let mut swap_clients = SwapClients::init();
 
-        // TODO: add other tokens support
-        swap_clients.add_swap_client(SwapConfig {
-            swap_client_id: 0,
-            input_token: TokenInfo::icp(),
-            output_token: TokenInfo::gldgov(),
-            exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
-        });
-        // NOTE: here we add all other tokens except of
-        for (id, token) in tokens.iter().enumerate() {
-            swap_clients.add_swap_client(SwapConfig {
-                swap_client_id: (id as u128) + 1,
-                input_token: TokenInfo::icp(),
-                output_token: *token,
-                exchange_config: ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id)),
-            });
+        for token in tokens.iter() {
+            swap_clients.add_swap_client(token.token, gldgov_token_info, token.swap_pool_id);
         }
 
         Self {
             authorized_principals: authorized_principals.into_iter().collect(),
-            gldgov_ledger_canister_id,
-            swap_interval: Duration::from_secs(swap_interval_in_secs),
+            gldgov_token_info,
+            buyback_burn_interval: Duration::from_secs(buyback_burn_interval_in_secs),
             swap_clients,
-            burn_config: BurnConfig::new(burn_rate, min_burn_amount, burn_interval_in_secs),
+            icp_swap_canister_id,
+            burn_config: BurnConfig::new(burn_rate, min_burn_amount),
             token_swaps: TokenSwaps::default(),
         }
     }
@@ -137,8 +131,9 @@ impl Data {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
-    pub gldgov_ledger_canister_id: CanisterId,
+    pub gldgov_token_info: TokenInfo,
     pub burn_config: BurnConfig,
+    pub token_swaps_metrics: TokenSwapsMetrics,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -150,70 +145,33 @@ pub struct CanisterInfo {
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-// #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-// pub struct SwapConfig {
-//     pub swap_client_id: u128,
-//     pub input_token: TokenInfo,
-//     pub output_token: TokenInfo,
-//     pub exchange_config: ExchangeConfig,
-// }
+    #[test]
+    fn test_validate_burn_rate() {
+        let valid_burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
+        let invalid_burn_config_zero = BurnConfig::new(0, Tokens::from_e8s(100));
+        let invalid_burn_config_above_100 = BurnConfig::new(150, Tokens::from_e8s(100));
 
-// impl SwapConfig {
-//     pub async fn new(
-//         swap_client_id: u128,
-//         input_token: TokenInfo,
-//         output_token: TokenInfo,
-//         exchange_config: ExchangeConfig
-//     ) -> Self {
-//         // Fetch token standards asynchronously
-//         let input_token_standard = icrc_ledger_canister_c2c_client::icrc1_supported_standards(
-//             input_token.ledger_id
-//         ).await;
-//         let output_token_standard = icrc_ledger_canister_c2c_client::icrc1_supported_standards(
-//             output_token.ledger_id
-//         ).await;
+        assert!(valid_burn_config.validate_burn_rate());
+        assert!(!invalid_burn_config_zero.validate_burn_rate());
+        assert!(!invalid_burn_config_above_100.validate_burn_rate());
+    }
 
-//         // Extract the first standard or handle errors if fetching fails
-//         let input_standard = match input_token_standard {
-//             Ok(standards) => standards.first().unwrap().name.cloned(),
-//             Err(e) => {
-//                 error!("Failed to fetch input token standard: {:?}", e);
-//                 None
-//             }
-//         };
+    #[test]
+    fn test_get_after_swap_amount() {
+        let burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
+        assert_eq!(burn_config.get_min_after_swap_amount(), 200);
 
-//         let output_standard = match output_token_standard {
-//             Ok(standards) => standards.first().unwrap().name.cloned(),
-//             Err(e) => {
-//                 error!("Failed to fetch output token standard: {:?}", e);
-//                 None
-//             }
-//         };
+        let burn_config = BurnConfig::new(90, Tokens::from_e8s(900));
+        assert_eq!(burn_config.get_min_after_swap_amount(), 1000);
 
-//         let args = icpswap_factory_canister::get_pool::Args {
-//             token0: icpswap_factory_canister::get_pool::Token {
-//                 address: input_token.ledger_id.to_string(),
-//                 standard: input_standard.unwrap(),
-//             },
-//             token1: icpswap_factory_canister::get_pool::Token {
-//                 address: output_token.ledger_id.to_string(),
-//                 standard: output_standard.unwrap(),
-//             },
-//             // NOTE: it's always 3000: https://github.com/ICPSwap-Labs/docs/blob/main/01.SwapFactory/01.Searching_a_Pool.md
-//             fee: (3000).into(),
-//         };
+        let burn_config = BurnConfig::new(1, Tokens::from_e8s(1));
+        assert_eq!(burn_config.get_min_after_swap_amount(), 100);
 
-//         let icpswap_swap_pool_id = icpswap_factory_canister_c2c_client::get_pool(
-//             icpswap_swap_pool_id,
-//             &args
-//         ).await;
-
-//         SwapConfig {
-//             swap_client_id,
-//             input_token,
-//             output_token,
-//             exchange_config,
-//         }
-//     }
-// }
+        let burn_config = BurnConfig::new(33, Tokens::from_e8s(100));
+        assert_eq!(burn_config.get_min_after_swap_amount(), 303);
+    }
+}

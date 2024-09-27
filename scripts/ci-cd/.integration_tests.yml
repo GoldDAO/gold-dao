@@ -22,6 +22,7 @@ integration tests:
         - 'backend/canisters/**/*.{rs,toml,lock,md}'
   needs: [
       # 'gldt_swap integration-test build',
+      'buyback_burn integration-test build',
       'icp_neuron integration-test build',
       'management integration-test build',
       'sns_neuron_controller integration-test build',

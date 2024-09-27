@@ -6,7 +6,8 @@ use std::collections::HashMap;
 use tracing::error;
 use types::TimestampMillis;
 use crate::types::*;
-use buyback_burn_canister::get_active_swaps:: Response ;
+use buyback_burn_api::get_active_swaps::Response;
+use candid::CandidType;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
@@ -50,8 +51,9 @@ impl TokenSwaps {
     }
 
     pub fn get_next_id(&self) -> u128 {
-        let current_len: u128 = self.swaps.len().try_into().unwrap();
-        current_len + 1
+        let swaps_len: u128 = self.swaps.len().try_into().unwrap();
+        let history_len: u128 = self.history.len().into();
+        swaps_len + history_len + 1
     }
 
     pub fn get_swap_info(&self, swap_id: u128) -> Option<TokenSwap> {
@@ -60,7 +62,7 @@ impl TokenSwaps {
         swap_info_incomplete.or(swap_info_completed)
     }
 
-    pub fn archive_swap(&mut self, swap_id: u128) -> Result<(), ()> {
+    pub fn archive_swap(&mut self, swap_id: u128) -> Result<(), String> {
         let swap_info = self.swaps.get(&swap_id);
         match swap_info {
             Some(swap) => {
@@ -71,8 +73,8 @@ impl TokenSwaps {
                 Ok(())
             }
             None => {
-                error!("Failed to archive {swap_id} because it doesn't exist in swap heap memory");
-                Err(())
+                error!("Failed to archive {swap_id}. Swap not found");
+                Err(format!("Failed to archive {}. Swap not found", swap_id))
             }
         }
     }
@@ -81,12 +83,18 @@ impl TokenSwaps {
         self.swaps.clone()
     }
 
-    // TODO: add metrics
-    // pub total_amount_burned: u64,
-    // pub total_amount_swapped: u64,
-    // pub number_of_completed_swaps: u64,
-    // pub number_of_attempted_swaps: u64,
-    // pub number_of_failed_swaps: u64,
-    // pub user_swaps: HashMap<Principal, UserSwap>,
-    pub fn get_metrics(&self) {}
+    pub fn get_metrics(&self) -> TokenSwapsMetrics {
+        TokenSwapsMetrics {
+            active_swaps: self.swaps.clone(),
+            active_swaps_len: self.swaps.len() as u64,
+            history_len: self.history.len(),
+        }
+    }
+}
+
+#[derive(CandidType, Serialize)]
+pub struct TokenSwapsMetrics {
+    active_swaps: HashMap<u128, TokenSwap>,
+    active_swaps_len: u64,
+    history_len: u64,
 }

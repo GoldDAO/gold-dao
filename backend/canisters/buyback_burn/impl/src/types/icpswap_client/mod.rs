@@ -44,6 +44,23 @@ impl ICPSwapClient {
         }
     }
 
+    pub async fn get_quote(
+        &self,
+        amount: u128,
+        min_amount_out: u128
+    ) -> CallResult<Result<u128, String>> {
+        let args = icpswap_swap_pool_canister::swap::Args {
+            operator: self.this_canister_id,
+            amount_in: amount.to_string(),
+            zero_for_one: self.zero_for_one,
+            amount_out_minimum: min_amount_out.to_string(),
+        };
+        match icpswap_swap_pool_canister_c2c_client::quote(self.swap_canister_id, &args).await? {
+            ICPSwapResult::Ok(amount_out) => Ok(Ok(nat_to_u128(amount_out))),
+            ICPSwapResult::Err(error) => Ok(Err(format!("{error:?}"))),
+        }
+    }
+
     // NOTE: ICPSwap API - https://dashboard.internetcomputer.org/canister/7eikv-2iaaa-aaaag-qdgwa-cai
     pub async fn deposit(&self, amount: u128) -> CallResult<u128> {
         let token = self.input_token();
@@ -83,7 +100,7 @@ impl ICPSwapClient {
             fee: token.fee.into(),
         };
         match icpswap_swap_pool_canister_c2c_client::withdraw(self.swap_canister_id, &args).await? {
-            ICPSwapResult::Ok(amount_out) => Ok(nat_to_u128(amount_out)),
+            ICPSwapResult::Ok(amount_out) => { Ok(nat_to_u128(amount_out)) }
             ICPSwapResult::Err(error) => Err(convert_error(error)),
         }
     }
@@ -106,6 +123,10 @@ impl ICPSwapClient {
 
     pub fn swap_canister_id(&self) -> CanisterId {
         self.swap_canister_id
+    }
+
+    pub fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId) {
+        self.swap_canister_id = swap_canister_id;
     }
 
     pub fn zero_for_one(&self) -> bool {

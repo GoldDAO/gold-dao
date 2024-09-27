@@ -9,11 +9,11 @@ use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
-use pocket_ic::{PocketIc, PocketIcBuilder};
+use pocket_ic::{ PocketIc, PocketIcBuilder };
 use sns_governance_canister::types::Neuron;
 use sns_neuron_controller_api_canister::Args;
 use std::collections::HashMap;
-
+use types::BuildVersion;
 use types::CanisterId;
 
 #[derive(CandidType, Deserialize, Debug)]
@@ -39,19 +39,10 @@ impl Debug for SNCTestEnv {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("SNCTestEnv")
             .field("controller", &self.controller.to_text())
-            .field(
-                "sns_neuron_controller_id",
-                &self.sns_neuron_controller_id.to_text(),
-            )
+            .field("sns_neuron_controller_id", &self.sns_neuron_controller_id.to_text())
             .field("sns_governance_id", &self.sns_governance_id.to_text())
-            .field(
-                "ogy_rewards_canister_id",
-                &self.ogy_rewards_canister_id.to_text(),
-            )
-            .field(
-                "gld_rewards_canister_id",
-                &self.gld_rewards_canister_id.to_text(),
-            )
+            .field("ogy_rewards_canister_id", &self.ogy_rewards_canister_id.to_text())
+            .field("gld_rewards_canister_id", &self.gld_rewards_canister_id.to_text())
             .finish()
     }
 }
@@ -97,7 +88,7 @@ impl SNCTestEnvBuilder {
         mut self,
         symbol: &str,
         initial_balances: &mut Vec<(Account, Nat)>,
-        transaction_fee: Nat,
+        transaction_fee: Nat
     ) -> Self {
         self.token_symbols.push(symbol.to_string());
         self.initial_ledger_accounts.append(initial_balances);
@@ -106,20 +97,29 @@ impl SNCTestEnvBuilder {
     }
 
     pub fn build(&mut self) -> SNCTestEnv {
-        let mut pic = PocketIcBuilder::new()
-            .with_sns_subnet()
-            .with_application_subnet()
-            .build();
+        let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
 
         let sns_subnet = pic.topology().get_sns().unwrap();
-        self.ogy_rewards_canister_id =
-            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
-        self.sns_governance_id =
-            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
-        self.sns_neuron_controller_id =
-            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
-        self.gld_rewards_canister_id =
-            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+        self.ogy_rewards_canister_id = pic.create_canister_on_subnet(
+            Some(self.controller.clone()),
+            None,
+            sns_subnet
+        );
+        self.sns_governance_id = pic.create_canister_on_subnet(
+            Some(self.controller.clone()),
+            None,
+            sns_subnet
+        );
+        self.sns_neuron_controller_id = pic.create_canister_on_subnet(
+            Some(self.controller.clone()),
+            None,
+            sns_subnet
+        );
+        self.gld_rewards_canister_id = pic.create_canister_on_subnet(
+            Some(self.controller.clone()),
+            None,
+            sns_subnet
+        );
 
         // NOTE: Neuron Permissions should be granted to the controller
         let (neuron_data, _) = generate_neuron_data(0, 1, 1, &vec![self.sns_neuron_controller_id]);
@@ -127,14 +127,14 @@ impl SNCTestEnvBuilder {
             &mut pic,
             self.sns_governance_id,
             &neuron_data,
-            &self.controller,
+            &self.controller
         );
         let token_ledgers = setup_ledgers(
             &pic,
             sns_gov_canister_id.clone(),
             self.token_symbols.clone(),
             self.initial_ledger_accounts.clone(),
-            self.ledger_fees.clone(),
+            self.ledger_fees.clone()
         );
 
         let ogy_sns_rewards_canister_id = setup_rewards_canister(
@@ -142,17 +142,20 @@ impl SNCTestEnvBuilder {
             self.ogy_rewards_canister_id,
             &token_ledgers,
             sns_gov_canister_id,
-            &self.controller,
+            &self.controller
         );
 
         // let token_ledger_ids: Vec<Principal> =
         //     token_ledgers.iter().map(|(_, id)| id.clone()).collect();
 
-        let ogy_sns_ledger_canister_id =
-            token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
+        let ogy_sns_ledger_canister_id = token_ledgers
+            .get("ogy_ledger_canister_id")
+            .unwrap()
+            .clone();
 
         let snc_init_args = Args::Init(sns_neuron_controller_api_canister::init::InitArgs {
             test_mode: true,
+            version: BuildVersion::min(),
             commit_hash: "integration_testing".to_string(),
             authorized_principals: vec![self.sns_governance_id],
             sns_rewards_canister_id: self.gld_rewards_canister_id,
@@ -165,7 +168,7 @@ impl SNCTestEnvBuilder {
             &mut pic,
             self.sns_neuron_controller_id,
             snc_init_args,
-            self.controller,
+            self.controller
         );
 
         SNCTestEnv {
