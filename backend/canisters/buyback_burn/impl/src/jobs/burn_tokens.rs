@@ -5,7 +5,6 @@ use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
-use anyhow::Result;
 
 const MAX_ATTEMPTS: u8 = 1;
 
