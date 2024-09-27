@@ -8,8 +8,6 @@ use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
 use utils::env::Environment;
-use utils::retry_async::retry_with_attempts;
-use anyhow::{ Result, anyhow };
 
 const PROCESS_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS; // 1 day
 const MAX_ATTEMPTS: u8 = 3;
@@ -32,14 +30,17 @@ async fn run_async() {
             fetch_and_process_neurons(&mut ogy_neuron_manager).await
         }).await
     {
-        error!("Failed to process neurons after {} attempts: {:?}", MAX_ATTEMPTS, err);
+        error!(
+            "Failed to process neurons after {} attempts: {:?}",
+            MAX_ATTEMPTS, err
+        );
     }
 }
 
-async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Result<()> {
+async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Result<(), String> {
     ogy_neuron_manager.fetch_and_sync_neurons().await.map_err(|err| {
         error!("Error fetching and syncing neurons: {:?}", err);
-        anyhow!(err)
+        err.to_string()
     })?;
 
     let available_rewards = ogy_neuron_manager.get_available_rewards().await;
@@ -55,5 +56,30 @@ async fn fetch_and_process_neurons(ogy_neuron_manager: &mut OgyManager) -> Resul
         s.data.neuron_managers.now = s.env.now();
     });
 
+    Ok(())
+}
+
+// TODO: think on how to add delay here
+async fn retry_with_attempts<F, Fut>(
+    max_attempts: u8,
+    _delay_duration: Duration,
+    mut f: F
+)
+    -> Result<(), String>
+    where F: FnMut() -> Fut, Fut: std::future::Future<Output = Result<(), String>>
+{
+    for attempt in 1..=max_attempts {
+        match f().await {
+            Ok(_) => {
+                return Ok(());
+            }
+            Err(err) => {
+                error!("Attempt {}: Error - {:?}", attempt, err);
+                if attempt == max_attempts {
+                    return Err(err);
+                }
+            }
+        }
+    }
     Ok(())
 }
