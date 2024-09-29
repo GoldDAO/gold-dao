@@ -1,10 +1,11 @@
 use crate::state::read_state;
-use crate::utils::{ get_token_balance, retry_with_attempts, RETRY_DELAY };
+use crate::utils::{ get_token_balance, RETRY_DELAY };
 use candid::{ Nat, Principal };
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ error, info };
+use crate::utils::retry_with_attempts;
 
 const MAX_ATTEMPTS: u8 = 1;
 
@@ -43,15 +44,11 @@ pub async fn process_token_burn() -> Result<(), String> {
             }
         };
 
-        // Attempt to burn the calculated amount of tokens
         match burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn.clone()).await {
-            Ok(_) => {
-                info!("SUCCESS: {} GLDGov tokens burned from the buyback and burn canister.", amount_to_burn);
-                Ok(())
-            }
+            Ok(_) => { Ok(()) }
             Err(e) => {
                 let error_message = format!(
-                    "ERROR: Failed to burn GLDGov tokens from the buyback and burn canister: {:?}",
+                    "Failed to burn GLDGov tokens from the buyback and burn canister: {:?}",
                     e
                 );
                 error!("{}", error_message);
@@ -60,7 +57,7 @@ pub async fn process_token_burn() -> Result<(), String> {
         }
     } else {
         let error_message = format!(
-            "ERROR: Calculated burn amount {} is below the minimum threshold of {}.",
+            "Calculated burn amount {} is below the minimum threshold of {}.",
             amount_to_burn,
             min_burn_amount
         );

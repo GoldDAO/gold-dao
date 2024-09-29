@@ -1,10 +1,10 @@
 use serde::{ Deserialize, Serialize };
 use crate::types::*;
 use types::TokenInfo;
-use candid::Principal;
+use candid::{ Principal, CandidType };
 use tracing::info;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct SwapClients {
     pub swap_clients: Vec<SwapClientEnum>,
 }

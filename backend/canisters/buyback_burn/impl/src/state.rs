@@ -52,6 +52,9 @@ impl RuntimeState {
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
+            buyback_burn_interval_in_secs: self.data.buyback_burn_interval.as_secs(),
+            icp_swap_canister_id: self.data.icp_swap_canister_id,
+            swap_clients: self.data.swap_clients.clone(),
         }
     }
 }
@@ -132,8 +135,11 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub gldgov_token_info: TokenInfo,
+    pub buyback_burn_interval_in_secs: u64,
+    pub icp_swap_canister_id: Principal,
     pub burn_config: BurnConfig,
     pub token_swaps_metrics: TokenSwapsMetrics,
+    pub swap_clients: SwapClients,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -145,6 +151,7 @@ pub struct CanisterInfo {
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,11 +1,6 @@
 use crate::state::{ mutate_state, read_state };
 use crate::types::SwapClient;
-use crate::utils::{
-    calculate_percentage_of_amount,
-    get_token_balance,
-    retry_with_attempts,
-    RETRY_DELAY,
-};
+use crate::utils::{ calculate_percentage_of_amount, get_token_balance, RETRY_DELAY };
 use futures::future::join_all;
 use crate::types::SwapClientEnum;
 use utils::rand::generate_random_delay;
@@ -16,6 +11,7 @@ use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{ debug, error };
 use utils::env::Environment;
 use crate::types::TokenSwap;
+use crate::utils::retry_with_attempts;
 
 use canister_time::NANOS_PER_MILLISECOND;
 const MAX_ATTEMPTS: u8 = 1;
@@ -55,11 +51,11 @@ async fn run_async_with_rand_delay() {
 
 #[trace]
 async fn run_async() {
-    let swap_clients_iter = read_state(|state| state.data.swap_clients.into_iter());
+    let swap_clients = read_state(|state| state.data.swap_clients.clone());
     let mut token_swap_ids = Vec::new();
 
-    // TODO: check that everything here is correct and get rid of clones
-    let futures: Vec<_> = swap_clients_iter
+    let futures: Vec<_> = swap_clients
+        .iter()
         .map(|swap_client| {
             let args = swap_client.get_config();
             let token_swap = mutate_state(|state|
@@ -68,13 +64,11 @@ async fn run_async() {
 
             token_swap_ids.push(token_swap.swap_id);
 
-            async {
-                retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                    let swap_client = swap_client.clone();
-                    let token_swap = token_swap.clone();
-                    async move { process_token_swap(swap_client, token_swap).await }
-                }).await
-            }
+            retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
+                let swap_client = swap_client.clone();
+                let token_swap = token_swap.clone();
+                process_token_swap(swap_client, token_swap)
+            })
         })
         .collect();
 
@@ -88,7 +82,8 @@ async fn run_async() {
             let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
         }
 
-        crate::jobs::burn_tokens::run();
+        // TODO: uncomment
+        // crate::jobs::burn_tokens::run();
     } else {
         error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
     }
@@ -135,6 +130,7 @@ pub(crate) async fn process_token_swap(
 
     // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
     if quote < burn_config.get_min_after_swap_amount() + (swap_config.output_token.fee as u128) {
+        error!("Insufficient balance to swap: {:?}", quote);
         return Err("Insufficient balance to swap".to_string());
     }
 
@@ -180,8 +176,14 @@ pub(crate) async fn process_token_swap(
             ).await
         {
             Ok(Ok(index)) => Ok(index),
-            Ok(Err(error)) => Err(format!("{error:?}")),
-            Err(error) => Err(format!("{error:?}")),
+            Ok(Err(error)) => {
+                error!("Failed to deposit tokens to deposit account: {:?}", error);
+                Err(format!("{error:?}"))
+            }
+            Err(error) => {
+                error!("Failed to deposit tokens to deposit account: {:?}", error);
+                Err(format!("{error:?}"))
+            }
         };
 
         match transfer_result {
