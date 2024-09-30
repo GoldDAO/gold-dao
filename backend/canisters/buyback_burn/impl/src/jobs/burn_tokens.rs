@@ -36,7 +36,14 @@ pub async fn process_token_burn() -> Result<(), String> {
         let minting_account = match
             icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
         {
-            Ok(account) => account,
+            Ok(account) => {
+                match account {
+                    Some(a) => a,
+                    None => {
+                        return Err("Minting account is None".to_string());
+                    }
+                }
+            }
             Err(e) => {
                 return Err(
                     format!("Failed to get minting account (in order to burn tokens): {:?}", e)
