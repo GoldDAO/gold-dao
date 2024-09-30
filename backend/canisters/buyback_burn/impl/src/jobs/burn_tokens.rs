@@ -4,7 +4,7 @@ use candid::{ Nat, Principal };
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ error, info };
+use tracing::{ error };
 use crate::utils::retry_with_attempts;
 
 const MAX_ATTEMPTS: u8 = 1;
