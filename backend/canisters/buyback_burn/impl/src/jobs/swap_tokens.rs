@@ -82,8 +82,7 @@ async fn run_async() {
             let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
         }
 
-        // TODO: uncomment
-        // crate::jobs::burn_tokens::run();
+        crate::jobs::burn_tokens::run();
     } else {
         error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
     }
