@@ -6,21 +6,18 @@ import ModalChart from '../shared/modal/modal-chart';
 import { calculateTimestamp } from '../../utils/functions';
 import useCharts from '../../hooks/useCharts';
 
-const Chart = ({ name, amount }) => {
-  const { setSelectedDistance } = useCharts();
-  const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '3M', t: 86400 * 31 * 3 });
+const Chart = ({
+  name,
+  amount,
+}) => {
+  const { setSelectedDistance, selectedDistance } = useCharts();
+  
 
   const dates = [
-    // { name: "1J", timestamp: calculateTimestamp(86400 * 2) },
     { name: '1 WEEK', timestamp: calculateTimestamp(86400 * 7) },
     { name: '1 MONTH', timestamp: calculateTimestamp(86400 * 31) },
     { name: '3 MONTHS', timestamp: calculateTimestamp(86400 * 31 * 3) },
-    // { name: "6M", timestamp: calculateTimestamp(86400 * 31 * 6) },
-    // { name: "AAJ", timestamp: calculateTimestamp() },
     { name: '1 YEAR', timestamp: calculateTimestamp(86400 * 365) },
-    // { name: "2A", timestamp: calculateTimestamp(86400 * 365 * 2) },
-    // { name: "5A", timestamp: calculateTimestamp(86400 * 365 * 5) },
-    // { name: "10A", timestamp: calculateTimestamp(86400 * 365 * 10) },
     { name: 'ALL', timestamp: calculateTimestamp('ALL') },
   ];
 
@@ -66,18 +63,17 @@ const Chart = ({ name, amount }) => {
         {dates.map((date) => (
           <button
             className={`
-              text-center text-xs w-full ${selectedTimestamp.date === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
+              text-center text-xs w-full ${selectedDistance.name === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
             key={date.name}
             onClick={() => {
-              setSelectedTimestamp({ date: date.name, t: date.timestamp });
-              setSelectedDistance(date.timestamp);
+              setSelectedDistance({name: date.name, timestamp: date.timestamp});
             }}
           >
             {date.name}
           </button>
         ))}
       </div>
-      <Graph name={name} timestamp={selectedTimestamp.t} />
+      <Graph name={name} timestamp={selectedDistance} />
       <Modal title={`chart ${name}`} idModal="chartmodalG">
         <ModalChart name={name} />
       </Modal>

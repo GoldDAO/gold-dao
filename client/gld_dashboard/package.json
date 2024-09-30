@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "develop": "ENV=local next dev",
+    "develop": "ENV=preprod next dev",
     "build": "next build",
     "build:staging": "next build",
     "build:preprod": "next build",

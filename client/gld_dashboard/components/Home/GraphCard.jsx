@@ -27,6 +27,7 @@ export default function Graphs() {
   } = useCharts();
   const [amount, setAmount] = useState();
   const [, setInfoModal] = useState(null);
+  const { selectedDistance } = useCharts();
 
   const tabs = ['Treasury', 'Staked', 'Liquid', 'Burned', 'Holders'];
 
@@ -93,6 +94,7 @@ export default function Graphs() {
     reservePoolData.loading, reservePoolData?.data, reservePoolData?.data.length,
     gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
     snsFundData.loading, snsFundData?.data, snsFundData?.data.length,
+    selectedDistance
   ]);
 
   useEffect(() => {
@@ -139,12 +141,14 @@ export default function Graphs() {
     fetchData();
   }, [selectedTab, stakersData?.data, stakersData.loading,
     stakersData?.data.length, burnData?.data.length, burnData.loading,
+    burnData?.data,
     liquidData?.data.length, liquidData.loading, liquidData?.data,
     holdersData?.data.length, holdersData.loading,
+    holdersData?.data,
     rewardPoolData?.data.length, rewardPoolData.loading,
     reservePoolData?.data.length, reservePoolData.loading,
     gldGovSupply?.data.length,
-
+    selectedDistance,
   ]);
 
   const displayAmount = parseNumbers(amount);
@@ -238,7 +242,9 @@ export default function Graphs() {
             </span>
           ))}
         </div>
-        <Chart name={selectedTab} amount={displayAmount} />
+        <Chart name={selectedTab}
+        amount={displayAmount}
+         />
       </article>
       <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={amount}>
         <ModalChartMobile name={selectedTab} />

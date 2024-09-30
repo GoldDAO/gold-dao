@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { currentTimestamp, filterDates } from '../utils/functions';
+import { currentTimestamp, filterDates, calculateTimestamp } from '../utils/functions';
 
 export default create((set, get) => ({
-  selectedDistance: 86400 * 31 * 6,
+  selectedDistance: { name: '3 MONTHS', timestamp: calculateTimestamp(86400 * 31 * 3) },
   gldGovSupply: { loading: true, data: [] },
   copyGldGovSupply: { loading: true, data: [] },
   gldGovTreasury: { loading: true, data: [] },
@@ -21,7 +21,7 @@ export default create((set, get) => ({
   copyReservePoolData: { loading: true, data: [] },
   snsFundData: { loading: true, data: [] },
   copySNSFundData: { loading: true, data: [] },
-  setSelectedDistance: (selectedDistance) => {
+  setSelectedDistance: ({ name, timestamp: selectedDistance }) => {
     const distance = currentTimestamp() - selectedDistance;
     const filteredSupply = get().gldGovSupply.data.filter(
       ({ label }) => new Date(label) >= new Date(distance * 1000),
@@ -55,7 +55,7 @@ export default create((set, get) => ({
     const copyLiquidData = filterDates(filteredLiquidData);
 
     return set({
-      selectedDistance,
+      selectedDistance: { name, timestamp: selectedDistance },
       copyGldGovSupply: { loading: false, data: copyGldGovSupply },
       copyGldGovTreasury: { loading: false, data: copyGldGovTreasury },
       copyStakersData: { loading: false, data: copyStakersData },

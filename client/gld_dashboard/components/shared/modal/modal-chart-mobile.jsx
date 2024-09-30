@@ -7,8 +7,7 @@ import Graph from '../../Home/Graph';
 import useCharts from '../../../hooks/useCharts';
 
 export default function ModalChartMobile({ name }) {
-  const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '1M', t: 86400 * 31 });
-  const { setSelectedDistance } = useCharts();
+  const { setSelectedDistance, selectedDistance } = useCharts();
 
   const dates = [
     // { name: "1J", timestamp: calculateTimestamp(86400 * 2) },
@@ -32,11 +31,10 @@ export default function ModalChartMobile({ name }) {
           {dates.map((date) => (
             <button
               className={`
-              text-center text-xs w-full ${selectedTimestamp.date === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
+              text-center text-xs w-full ${selectedDistance.name === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
               key={date.name}
               onClick={() => {
-                setSelectedTimestamp({ date: date.name, t: date.timestamp });
-                setSelectedDistance(date.timestamp);
+                setSelectedDistance({name: date.name, timestamp: date.timestamp});
               }}
             >
               {date.name}
@@ -45,7 +43,7 @@ export default function ModalChartMobile({ name }) {
         </div>
       </div>
       <section className="mb-6">
-        <Graph key="mobile-graph" name={name} timestamp={verifyTimestamp(selectedTimestamp.t)} />
+        <Graph key="mobile-graph" name={name} timestamp={selectedDistance} />
       </section>
       <span className="text-base text-[#C6C6C6]">Total amount of GLDGov tokens minted.</span>
     </div>
