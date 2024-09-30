@@ -13,6 +13,9 @@
     "export": "next export"
   },
   "dependencies": {
+    "@dfinity/agent": "^2.1.2",
+    "@dfinity/candid": "^2.1.2",
+    "@dfinity/principal": "^2.1.2",
     "@tanstack/query-core": "^5.54.1",
     "@tanstack/react-query": "^5.55.0",
     "autoprefixer": "^10.4.20",

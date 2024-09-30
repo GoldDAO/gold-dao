@@ -11,6 +11,10 @@
       "static/chunks/_app-pages-browser_node_modules_tanstack_query-devtools_build_DevtoolsPanelComponent_YCAYD3IW_js.js"
     ]
   },
+  "..\\node_modules\\@dfinity\\agent\\lib\\esm\\agent\\http\\index.js -> ../../canisterStatus": {
+    "id": "..\\node_modules\\@dfinity\\agent\\lib\\esm\\agent\\http\\index.js -> ../../canisterStatus",
+    "files": []
+  },
   "components\\ClientSidePage.tsx -> @/components/Footer": {
     "id": "components\\ClientSidePage.tsx -> @/components/Footer",
     "files": [

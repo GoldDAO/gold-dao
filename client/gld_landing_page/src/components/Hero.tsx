@@ -4,8 +4,8 @@
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
 import { useEffect, useRef, useState } from "react";
+import { useTokenMetrics } from "@/hooks/useTokenMetrics";
 
 interface InfoCardProps {
   iconSrc: string;
@@ -50,19 +50,14 @@ const Hero = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const { data, isLoading, error } = useQuery<TokenMetrics>({
-    queryKey: ["tokenMetrics"],
-    queryFn: fetchTokenMetrics,
-  });
+  const { data, isLoading, error } = useTokenMetrics();
+
+  console.log(data);
 
   const { t } = useTranslation("hero");
 
-  const totalGoldLockedKg = data
-    ? (parseFloat(data!.total_gold_grams) / 1000).toFixed(2)
-    : null; // Convert grams to kg
-  const marketCapUSD = data
-    ? Math.ceil(parseFloat(data!.tvl)).toLocaleString("en-US")
-    : null;
+  const totalGoldLockedKg = data ? data.total_gold_kg.toFixed(2) : null;
+  const marketCapUSD = data ? `${data.tvl.toLocaleString('en-US')}` : null;
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -71,9 +66,7 @@ const Hero = () => {
     if (videoElement && canvasElement) {
       const ctx = canvasElement.getContext("2d");
 
-      // Lorsque la vidéo a assez de données pour commencer à jouer
       videoElement.addEventListener("loadeddata", () => {
-        // Dessine l'image vidéo sur le canvas
         if (ctx) {
           canvasElement.width = videoElement.videoWidth;
           canvasElement.height = videoElement.videoHeight;
@@ -87,10 +80,9 @@ const Hero = () => {
         }
       });
 
-      // Remplace le canvas par la vidéo une fois que la vidéo peut être jouée
       videoElement.addEventListener("canplaythrough", () => {
         setVideoLoaded(true);
-        setCanvasVisible(false); // Cache le canvas une fois que la vidéo est prête
+        setCanvasVisible(false);
       });
     }
   }, []);
