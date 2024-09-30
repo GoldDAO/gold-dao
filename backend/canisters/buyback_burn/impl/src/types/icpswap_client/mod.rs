@@ -1,4 +1,4 @@
-use candid::Nat;
+use candid::{ Nat, CandidType };
 use ic_cdk::api::call::{ CallResult, RejectionCode };
 use ic_ledger_types::Subaccount;
 use icpswap_swap_pool_canister::{ ICPSwapError, ICPSwapResult };
@@ -7,14 +7,13 @@ use serde::{ Deserialize, Serialize };
 use types::{ CanisterId, TokenInfo };
 
 // NOTE: we use one ICPSwapClient to swap concrete token pair
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct ICPSwapClient {
     client_id: u128,
     this_canister_id: CanisterId,
     swap_canister_id: CanisterId,
     token0: TokenInfo,
     token1: TokenInfo,
-    // TODO: zero_for_one means which token is sold. There could be another neat solution
     zero_for_one: bool,
 }
 
