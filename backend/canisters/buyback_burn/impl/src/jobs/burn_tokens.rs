@@ -4,7 +4,7 @@ use candid::{ Nat, Principal };
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ error };
+use tracing::error;
 use crate::utils::retry_with_attempts;
 
 const MAX_ATTEMPTS: u8 = 1;
@@ -32,7 +32,7 @@ pub async fn process_token_burn() -> Result<(), String> {
     let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
     let min_burn_amount: u128 = burn_config.min_burn_amount.e8s().into();
 
-    if amount_to_burn < min_burn_amount {
+    if amount_to_burn > min_burn_amount {
         let minting_account = match
             icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
         {
