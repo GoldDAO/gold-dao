@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenMetrics, TokenMetrics } from "../lib/fetchTokenMetrics";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface InfoCardProps {
   iconSrc: string;
@@ -46,6 +46,10 @@ const InfoCard = ({
 
 const Hero = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [canvasVisible, setCanvasVisible] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
   const { data, isLoading, error } = useQuery<TokenMetrics>({
     queryKey: ["tokenMetrics"],
     queryFn: fetchTokenMetrics,
@@ -61,43 +65,53 @@ const Hero = () => {
     : null;
 
   useEffect(() => {
-    const videoElement = document.getElementById(
-      "hero-video"
-    ) as HTMLVideoElement;
-    if (videoElement) {
+    const videoElement = videoRef.current;
+    const canvasElement = canvasRef.current;
+
+    if (videoElement && canvasElement) {
+      const ctx = canvasElement.getContext("2d");
+
+      // Lorsque la vidéo a assez de données pour commencer à jouer
+      videoElement.addEventListener("loadeddata", () => {
+        // Dessine l'image vidéo sur le canvas
+        if (ctx) {
+          canvasElement.width = videoElement.videoWidth;
+          canvasElement.height = videoElement.videoHeight;
+          ctx.drawImage(
+            videoElement,
+            0,
+            0,
+            videoElement.videoWidth,
+            videoElement.videoHeight
+          );
+        }
+      });
+
+      // Remplace le canvas par la vidéo une fois que la vidéo peut être jouée
       videoElement.addEventListener("canplaythrough", () => {
         setVideoLoaded(true);
+        setCanvasVisible(false); // Cache le canvas une fois que la vidéo est prête
       });
     }
-
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener("canplaythrough", () => {
-          setVideoLoaded(true);
-        });
-      }
-    };
   }, []);
 
   return (
     <div className="h-[85vh] md:h-[75vh] w-full flex flex-col items-center justify-center px-2 md:px-10 ">
-      {!videoLoaded && (
-        <img
-          src="/static/backgrounds/hero_bg_video.webp"
-          alt="Poster"
+      {canvasVisible && (
+        <canvas
+          ref={canvasRef}
           className="absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover"
         />
       )}
       <video
-        id="hero-video"
+        ref={videoRef}
         autoPlay
         loop
         muted
         preload="auto"
         playsInline
-        className={`absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover`}
+        className={`absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover transition-opacity duration-500`}
         src="/videos/Gold_DAO_bg.mp4"
-        poster="/backgrounds/bg_video.svg"
       />
       <div className="relative text-center">
         <h1
