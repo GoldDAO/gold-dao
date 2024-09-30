@@ -88,13 +88,14 @@ export default function Graphs() {
         snsFundData.data,
       );
     }
-  }, [stakersData?.data, stakersData?.data.length, stakersData.loading,
+  }, [
+    stakersData?.data, stakersData?.data.length, stakersData.loading,
     gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading,
     rewardPoolData.loading, rewardPoolData?.data, rewardPoolData?.data.length,
     reservePoolData.loading, reservePoolData?.data, reservePoolData?.data.length,
     gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
     snsFundData.loading, snsFundData?.data, snsFundData?.data.length,
-    selectedDistance
+
   ]);
 
   useEffect(() => {
@@ -139,16 +140,15 @@ export default function Graphs() {
     };
 
     fetchData();
-  }, [selectedTab, stakersData?.data, stakersData.loading,
+  }, [
+    selectedTab, stakersData?.data, stakersData.loading,
     stakersData?.data.length, burnData?.data.length, burnData.loading,
-    burnData?.data,
     liquidData?.data.length, liquidData.loading, liquidData?.data,
     holdersData?.data.length, holdersData.loading,
-    holdersData?.data,
     rewardPoolData?.data.length, rewardPoolData.loading,
     reservePoolData?.data.length, reservePoolData.loading,
     gldGovSupply?.data.length,
-    selectedDistance,
+
   ]);
 
   const displayAmount = parseNumbers(amount);

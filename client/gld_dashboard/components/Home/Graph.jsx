@@ -61,18 +61,7 @@ export default function Graph({ name, timestamp }) {
         setData({ loading: false, data: [], suggestedMax: 1200 });
         break;
     }
-  }, [
-    copyStakersData?.data, copyStakersData.loading,
-    copyBurnData?.data, copyBurnData.loading,
-    copyGldGovTreasury?.data, copyGldGovTreasury.loading,
-    copyLiquidData?.data, copyLiquidData.loading,
-    copyHoldersData?.data, copyHoldersData.loading,
-    copyRewardPoolData?.data, copyRewardPoolData.loading,
-    copyReservePoolData?.data, copyReservePoolData.loading,
-    copyGldGovSupply?.data, copyGldGovSupply.loading,
-  ]);
 
-  useEffect(() => {
     const chart = chartRef.current;
     const monthsCount = data.data?.length;
     if (chart && monthsCount > 0) {
@@ -111,7 +100,33 @@ export default function Graph({ name, timestamp }) {
       }
     }
     chart.update();
-  }, [data.data.length, data.data, data.loading]);
+  }, [
+    copyStakersData?.data, copyStakersData.loading,
+    copyBurnData?.data, copyBurnData.loading,
+    copyGldGovTreasury?.data, copyGldGovTreasury.loading,
+    copyLiquidData?.data, copyLiquidData.loading,
+    copyHoldersData?.data, copyHoldersData.loading,
+    copyRewardPoolData?.data, copyRewardPoolData.loading,
+    copyReservePoolData?.data, copyReservePoolData.loading,
+    copyGldGovSupply?.data, copyGldGovSupply.loading,
+    copyGldGovSupply.data,
+    copyGldGovSupply?.loading,
+    copyGldGovTreasury.data,
+    copyGldGovTreasury?.loading,
+    data.data?.length,
+    copyStakersData?.data,
+    copyStakersData?.data.length,
+    copyStakersData?.loading,
+    copyHoldersData?.data,
+    copyHoldersData?.data.length,
+    copyHoldersData?.loading,
+    copyBurnData?.loading,
+    copyBurnData?.data,
+    copyBurnData?.data.length,
+    name,
+
+  ]);
+
 
   return (
     <div className="mt-[30px]  h-[250px]">

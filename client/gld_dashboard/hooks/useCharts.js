@@ -53,6 +53,7 @@ export default create((set, get) => ({
       ({ label }) => new Date(label) >= new Date(distance * 1000),
     );
     const copyLiquidData = filterDates(filteredLiquidData);
+    console.log(copyLiquidData);
 
     return set({
       selectedDistance: { name, timestamp: selectedDistance },
