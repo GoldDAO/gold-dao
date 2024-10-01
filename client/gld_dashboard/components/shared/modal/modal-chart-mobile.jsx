@@ -44,7 +44,11 @@ export default function ModalChartMobile({ name }) {
       <section className="mb-6">
         <Graph key="mobile-graph" name={name} timestamp={selectedDistance} />
       </section>
-      <span className="text-base text-[#C6C6C6]">Total amount of GLDGov tokens minted.</span>
+      {/* <span className="text-base text-[#C6C6C6]">
+        {
+          name === 'Treasury' && 'Total amount of GLDGov tokens minted.'
+        }
+      </span> */}
     </div>
   );
 }
