@@ -1,5 +1,4 @@
 use candid::CandidType;
-use crate::swap_config::SwapConfig;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
 use ic_stable_structures::Storable;
@@ -8,7 +7,7 @@ use types::TimestampMillis;
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct TokenSwap {
     pub swap_id: u128,
-    pub swap_config: SwapConfig,
+    pub swap_client_id: u128,
     pub started: TimestampMillis,
     pub deposit_account: SwapSubtask<Account>,
     pub transfer: SwapSubtask<u64>, // Block Index
@@ -40,10 +39,10 @@ impl Storable for TokenSwap {
 type SwapSubtask<T = ()> = Option<Result<T, String>>;
 
 impl TokenSwap {
-    pub fn new(swap_id: u128, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
+    pub fn new(swap_id: u128, swap_client_id: u128, now: TimestampMillis) -> TokenSwap {
         TokenSwap {
             swap_id,
-            swap_config,
+            swap_client_id,
             started: now,
             deposit_account: None,
             transfer: None,

@@ -60,13 +60,6 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
 
     let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
 
-    debug!(
-        "Calculated burn amount: {} tokens ({}% of {} e8s).",
-        amount_to_burn,
-        burn_rate,
-        balance_u128
-    );
-
     amount_to_burn
 }
 
