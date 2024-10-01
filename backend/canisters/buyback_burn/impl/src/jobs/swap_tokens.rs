@@ -97,7 +97,6 @@ pub(crate) async fn process_token_swap(
     mut token_swap: TokenSwap,
     should_update_amount: bool
 ) -> Result<(), String> {
-    let burn_config = read_state(|s| s.data.burn_config.clone());
     let swap_config = swap_client.get_config();
 
     let min_output_amount = 0;
@@ -139,10 +138,17 @@ pub(crate) async fn process_token_swap(
         }
     };
 
-    // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
-    if quote < burn_config.get_min_after_swap_amount() + (swap_config.output_token.fee as u128) {
-        error!("Insufficient balance to swap: {:?}", quote);
-        return Err("Insufficient balance to swap".to_string());
+    // // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
+    let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
+    if quote < min_burn_amount + (swap_config.output_token.fee as u128) {
+        let msg = format!("Insufficient balance to swap: {:?}", quote);
+        mutate_state(|state| {
+            token_swap.deposit_account = Some(Err(msg.clone()));
+            token_swap.success = Some(false);
+            state.data.token_swaps.upsert(token_swap);
+        });
+        error!(msg);
+        return Err(msg);
     }
 
     // Get the deposit account
