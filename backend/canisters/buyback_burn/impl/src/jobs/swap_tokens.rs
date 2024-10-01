@@ -54,27 +54,66 @@ async fn run_async_with_rand_delay() {
 #[trace]
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
+    let should_update_burn_amount = should_update_amount();
 
-    let mut token_swap_ids = Vec::new();
-    let should_update_amount = should_update_amount();
+    let mut futures: Vec<_> = vec![];
 
-    let futures: Vec<_> = swap_clients
-        .iter()
-        .map(|swap_client| {
-            let args = swap_client.get_config();
-            let token_swap = mutate_state(|state|
-                state.data.token_swaps.push_new(args, state.env.now())
-            );
+    for swap_client in swap_clients.iter() {
+        let swap_client = swap_client.clone();
+        let args = swap_client.get_config();
 
-            token_swap_ids.push(token_swap.swap_id);
+        // If the week had passed -> recalculate the amounts to be burned
+        if should_update_burn_amount {
+            let burn_amount_per_interval = burn_amount_per_interval(
+                args.input_token
+            ).await.unwrap();
+            mutate_state(|state| {
+                state.data.burn_amounts.insert(args.swap_client_id, burn_amount_per_interval);
+            });
+        }
 
-            retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                let swap_client = swap_client.clone();
-                let token_swap = token_swap.clone();
-                process_token_swap(swap_client, token_swap, should_update_amount)
-            })
-        })
-        .collect();
+        // Check that the balance is enough to initiate the swap
+        let amount_to_dex = read_state(|s| *s.data.burn_amounts.get(&args.swap_client_id).unwrap());
+
+        let quote = match
+            swap_client.get_quote(
+                amount_to_dex.saturating_sub(args.input_token.fee.into()),
+                0
+            ).await
+        {
+            Ok(quote) => {
+                match quote {
+                    Ok(q) => q,
+                    Err(error) => {
+                        let msg = format!("{error:?}");
+                        error!("Failed to get the quote: {}", msg.as_str());
+                        0
+                    }
+                }
+            }
+            Err(error) => {
+                let msg = format!("{error:?}");
+                error!("Failed to get the quote: {}", msg.as_str());
+                0
+            }
+        };
+
+        // Check if the balance is sufficient before creating the swap
+        let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
+        if quote > min_burn_amount + (args.output_token.fee as u128) {
+            let token_swap = mutate_state(|state| {
+                state.data.token_swaps.push_new(args.clone(), state.env.now())
+            });
+
+            let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
+                process_token_swap(swap_client.clone(), token_swap.clone())
+            });
+
+            futures.push(future);
+        } else {
+            error!("Insufficient balance for swap: {:?}", quote);
+        }
+    }
 
     let results = join_all(futures).await;
 
@@ -82,11 +121,6 @@ async fn run_async() {
 
     if error_messages.is_empty() {
         info!("Successfully processed all token swaps");
-        for token_swap_id in token_swap_ids {
-            let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
-        }
-
-        crate::jobs::burn_tokens::run();
     } else {
         error!("Failed to process some token swaps:\n{}", error_messages.join("\n"));
     }
@@ -94,20 +128,11 @@ async fn run_async() {
 
 pub(crate) async fn process_token_swap(
     swap_client: SwapClientEnum,
-    mut token_swap: TokenSwap,
-    should_update_amount: bool
+    mut token_swap: TokenSwap
 ) -> Result<(), String> {
     let swap_config = swap_client.get_config();
 
     let min_output_amount = 0;
-
-    // Recalculate amount
-    if should_update_amount {
-        let burn_amount_per_interval = burn_amount_per_interval(swap_config.input_token).await?;
-        mutate_state(|state| {
-            state.data.burn_amounts.insert(swap_config.swap_client_id, burn_amount_per_interval)
-        });
-    }
 
     // NOTE: should be always found
     let amount_to_dex = read_state(
