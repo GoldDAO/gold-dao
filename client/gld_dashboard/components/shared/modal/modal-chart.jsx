@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { calculateTimestamp, verifyTimestamp } from '../../../utils/functions';
+import { calculateTimestamp } from '../../../utils/functions';
 
 import Graph from '../../Home/Graph';
 import useCharts from '../../../hooks/useCharts';
 
-export default function ModalChart({ name }) {
+export default function ModalChart({ chartName }) {
   const { setSelectedDistance, selectedDistance } = useCharts();
 
   const dates = [
@@ -34,7 +33,7 @@ export default function ModalChart({ name }) {
           text-center text-xs w-full ${selectedDistance.name === name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
             key={`${name}-${index}`}
             onClick={() => {
-              setSelectedDistance({name: name, timestamp: timestamp});
+              setSelectedDistance({ name, timestamp });
             }}
           >
             {name}
@@ -43,7 +42,7 @@ export default function ModalChart({ name }) {
       </div>
       <div className="h-20"></div>
 
-      <Graph name={name} timestamp={selectedDistance} />
+      <Graph name={chartName} timestamp={selectedDistance} />
     </>
   );
 }

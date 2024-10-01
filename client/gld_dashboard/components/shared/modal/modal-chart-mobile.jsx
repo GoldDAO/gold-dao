@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { calculateTimestamp, verifyTimestamp } from '../../../utils/functions';
+import { calculateTimestamp } from '../../../utils/functions';
 
 import Graph from '../../Home/Graph';
 import useCharts from '../../../hooks/useCharts';
@@ -34,7 +33,7 @@ export default function ModalChartMobile({ name }) {
               text-center text-xs w-full ${selectedDistance.name === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
               key={date.name}
               onClick={() => {
-                setSelectedDistance({name: date.name, timestamp: date.timestamp});
+                setSelectedDistance({ name: date.name, timestamp: date.timestamp });
               }}
             >
               {date.name}
