@@ -134,15 +134,6 @@ impl Data {
             burn_amounts: BTreeMap::new(),
         }
     }
-
-    // // NOTE: added this, should be checked in case of errors
-    // pub fn get_burn_amount(&self, swap_client_id: u128) -> Option<u128> {
-    //     self. burn_amounts.insert(key, value)
-    //     self.burn_amounts
-    //         .iter()
-    //         .find(|burn_amount| burn_amount.0 == swap_client_id)
-    //         .map(|burn_amount| burn_amount.1)
-    // }
 }
 
 #[derive(CandidType, Serialize)]
