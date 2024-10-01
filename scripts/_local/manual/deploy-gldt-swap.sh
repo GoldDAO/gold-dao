@@ -5,13 +5,18 @@
 ### FOR STAGING
 ###############
 
-./scripts/build-canister.sh gldt_swap &&
-./scripts/generate-did.sh gldt_swap &&
-./scripts/build-canister.sh gldt_swap &&
+./scripts/build_canister.sh gldt_swap &&
+./scripts/generate_did.sh gldt_swap &&
+./scripts/build_canister.sh gldt_swap &&
 # dfx deploy --network staging sns_rewards --argument '(record {test_mode = true})' --mode reinstall
-dfx deploy --network staging gldt_swap --argument "(record {
+dfx deploy --network staging gldt_swap --argument "(variant { Init = record {
     test_mode = true;
-    version = \"0.0.1\";
+    version = record {
+     major = 0:nat32;
+     minor = 0:nat32;
+     patch = 0:nat32;
+    };
+    commit_hash = \"stagingcommit\";
     gldt_ledger_id = principal \"6uad6-fqaaa-aaaam-abovq-cai\";
     gldnft_canisters = vec {
       record {
@@ -30,10 +35,10 @@ dfx deploy --network staging gldt_swap --argument "(record {
        0 = principal \"hvanv-3iaaa-aaaap-qkfwq-cai\";
        1 = record {
          grams = 100;
-       }
-      }
+       };
+      };
     };
     ogy_ledger_id = principal \"j5naj-nqaaa-aaaal-ajc7q-cai\";
     authorized_principals = vec { principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\" };
-})" --mode reinstall
+}})" --mode reinstall
 
