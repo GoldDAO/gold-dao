@@ -13,6 +13,7 @@ use utils::memory::MemorySize;
 use crate::types::SwapClients;
 use crate::types::token_swaps::TokenSwapsMetrics;
 use tracing::error;
+use std::collections::BTreeMap;
 
 canister_state!(RuntimeState);
 
@@ -68,6 +69,9 @@ pub struct Data {
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
+    pub last_burn_amount_update: Option<TimestampMillis>,
+    // swap_clinet_id, burn_amount
+    pub burn_amounts: BTreeMap<u128, u128>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
@@ -126,8 +130,19 @@ impl Data {
             icp_swap_canister_id,
             burn_config: BurnConfig::new(burn_rate, min_burn_amount),
             token_swaps: TokenSwaps::default(),
+            last_burn_amount_update: None,
+            burn_amounts: BTreeMap::new(),
         }
     }
+
+    // // NOTE: added this, should be checked in case of errors
+    // pub fn get_burn_amount(&self, swap_client_id: u128) -> Option<u128> {
+    //     self. burn_amounts.insert(key, value)
+    //     self.burn_amounts
+    //         .iter()
+    //         .find(|burn_amount| burn_amount.0 == swap_client_id)
+    //         .map(|burn_amount| burn_amount.1)
+    // }
 }
 
 #[derive(CandidType, Serialize)]
