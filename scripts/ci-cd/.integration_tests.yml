@@ -6,6 +6,7 @@ integration tests trigger:
         - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
       when: manual
   script:
     - echo "Running integration tests"
@@ -20,8 +21,8 @@ integration tests:
         - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
   needs: [
-      # 'gldt_swap integration-test build',
       'buyback_burn integration-test build',
       'icp_neuron integration-test build',
       'management integration-test build',

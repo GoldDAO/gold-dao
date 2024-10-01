@@ -71,12 +71,14 @@ $[[ inputs.src-folder ]] integration-test build:
         - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
     # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
         - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
         - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
       needs: ['integration tests trigger']
   extends: .rust template
   script:
