@@ -19,6 +19,14 @@ const Chart = ({
     { name: 'ALL', timestamp: calculateTimestamp('ALL') },
   ];
 
+  const toolTips = {
+    Treasury: 'GLDGov tokens which are at the disposition of the Gold DAO SNS DAO, allocated by the Gold DAO decentralization swap.',
+    Staked: 'GLDGov tokens which are staked in the SNS as Gold DAO neurons.',
+    Liquid: 'GLDGov tokens that are publicly available and not locked. I.e. tokens which are not staked, held by the team or allocated for reward distribution.',
+    Burned: 'GLDGov tokens that have been burned and are permanently taken out of existence.',
+    Holders: 'The number of unique accounts that hold GLDGov tokens.',
+  };
+
   return (
     <section className={' w-[67%]  p-5 relative hidden sm:block'}>
       <div>
@@ -31,7 +39,7 @@ const Chart = ({
               <div
                 className="tooltip "
                 data-tip={
-                  'GLDGov tokens which are at the disposition of the Gold DAO SNS DAO, allocated by the Gold DAO decentralization swap.'
+                  toolTips[name]
                 }
               >
                 <Image src="svg/info.svg" alt="" height={25} width={25} />
