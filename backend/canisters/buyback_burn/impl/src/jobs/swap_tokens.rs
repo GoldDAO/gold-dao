@@ -70,6 +70,7 @@ async fn run_async() {
             ).await.unwrap();
             mutate_state(|state| {
                 state.data.burn_amounts.insert(args.swap_client_id, burn_amount_per_interval);
+                state.data.last_burn_amount_update = Some(ic_cdk::api::time());
             });
         }
 
@@ -79,6 +80,7 @@ async fn run_async() {
         let quote = match
             swap_client.get_quote(
                 amount_to_dex.saturating_sub(args.input_token.fee.into()),
+                // NOTE: min expected output
                 0
             ).await
         {
@@ -88,6 +90,7 @@ async fn run_async() {
                     Err(error) => {
                         let msg = format!("{error:?}");
                         error!("Failed to get the quote: {}", msg.as_str());
+                        // The swap won't be created due to next comparison
                         0
                     }
                 }
@@ -95,6 +98,7 @@ async fn run_async() {
             Err(error) => {
                 let msg = format!("{error:?}");
                 error!("Failed to get the quote: {}", msg.as_str());
+                // The swap won't be created due to next comparison
                 0
             }
         };
@@ -340,8 +344,8 @@ fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
 pub fn should_update_amount() -> bool {
     let last_burn_amount_update_opt = read_state(|s| s.data.last_burn_amount_update);
     if let Some(last_burn_amount_update) = last_burn_amount_update_opt {
-        ic_cdk::api::time() + WEEK_IN_MS * NANOS_PER_MILLISECOND >
-            last_burn_amount_update * NANOS_PER_MILLISECOND
+        ic_cdk::api::time() >
+            last_burn_amount_update * NANOS_PER_MILLISECOND + WEEK_IN_MS * NANOS_PER_MILLISECOND
     } else {
         true
     }

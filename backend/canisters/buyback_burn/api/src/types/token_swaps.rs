@@ -1,5 +1,4 @@
 use candid::CandidType;
-use crate::swap_config::SwapConfig;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
 use ic_stable_structures::Storable;
