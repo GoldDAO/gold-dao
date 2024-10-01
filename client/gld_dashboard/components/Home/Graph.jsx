@@ -12,7 +12,7 @@ import useCharts from '../../hooks/useCharts';
 Chart.register(CrosshairPlugin);
 Interaction.modes.interpolate = Interpolate;
 
-export default function Graph({ name, timestamp }) {
+export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
   const {
@@ -57,7 +57,6 @@ export default function Graph({ name, timestamp }) {
         setData({ loading: false, data: copyHoldersData.data, suggestedMax: 100000 });
         break;
       default:
-        // console.log("default");
         setData({ loading: false, data: [], suggestedMax: 1200 });
         break;
     }
@@ -126,7 +125,6 @@ export default function Graph({ name, timestamp }) {
     name,
 
   ]);
-
 
   return (
     <div className="mt-[30px]  h-[250px]">

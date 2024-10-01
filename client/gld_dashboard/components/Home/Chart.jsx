@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useState } from 'react';
 import Graph from './Graph';
 import Modal from '../shared/modal/modal';
 import ModalChart from '../shared/modal/modal-chart';
@@ -11,7 +10,6 @@ const Chart = ({
   amount,
 }) => {
   const { setSelectedDistance, selectedDistance } = useCharts();
-  
 
   const dates = [
     { name: '1 WEEK', timestamp: calculateTimestamp(86400 * 7) },
@@ -66,7 +64,7 @@ const Chart = ({
               text-center text-xs w-full ${selectedDistance.name === date.name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
             key={date.name}
             onClick={() => {
-              setSelectedDistance({name: date.name, timestamp: date.timestamp});
+              setSelectedDistance({ name: date.name, timestamp: date.timestamp });
             }}
           >
             {date.name}

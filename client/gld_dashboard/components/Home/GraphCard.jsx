@@ -27,7 +27,6 @@ export default function Graphs() {
   } = useCharts();
   const [amount, setAmount] = useState();
   const [, setInfoModal] = useState(null);
-  const { selectedDistance } = useCharts();
 
   const tabs = ['Treasury', 'Staked', 'Liquid', 'Burned', 'Holders'];
 
