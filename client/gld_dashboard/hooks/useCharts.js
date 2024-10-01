@@ -53,7 +53,7 @@ export default create((set, get) => ({
       ({ label }) => new Date(label) >= new Date(distance * 1000),
     );
     const copyLiquidData = filterDates(filteredLiquidData);
-    console.log(copyLiquidData);
+    console.log('copy liquid data ( chart ) ', copyLiquidData);
 
     return set({
       selectedDistance: { name, timestamp: selectedDistance },
@@ -66,7 +66,7 @@ export default create((set, get) => ({
     });
   },
   setGldGovSupply: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyGldGovSupply = filterDates(filtered);
 
@@ -76,7 +76,7 @@ export default create((set, get) => ({
     });
   },
   setGldGovTreasury: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyGldGovTreasury = filterDates(filtered);
     return set({
@@ -85,7 +85,7 @@ export default create((set, get) => ({
     });
   },
   setStakersMetrics: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
     const mappedData = data.map(([daysSinceEpoch, value]) => ({
       label: new Date(Number(daysSinceEpoch) * millisPerDay).toISOString().split('T')[0],
@@ -99,7 +99,7 @@ export default create((set, get) => ({
     });
   },
   setHoldersData: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const mappedData = data.map(
       ({
         start_time: startTime,
@@ -119,7 +119,7 @@ export default create((set, get) => ({
     });
   },
   setBurnData: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const transformedData = data.map((subarr) => ({
       value: (Number(subarr[1])) / 1e8,
       label: new Date(Number(subarr[0]) * 1000).toISOString().split('T')[0],
@@ -149,7 +149,7 @@ export default create((set, get) => ({
     });
   },
   setLiquidChartData: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const filtered = data.filter(({ label }) => new Date(label) >= new Date(distance * 1000));
     const copyLiquidData = filterDates(filtered);
     return set({
@@ -158,7 +158,7 @@ export default create((set, get) => ({
     });
   },
   setRewardPoolData: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
     const mappedData = data.map(([daysSinceEpoch, value]) => ({
@@ -174,7 +174,7 @@ export default create((set, get) => ({
     });
   },
   setReservePoolData: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
     const mappedData = data.map(([daysSinceEpoch, value]) => ({
@@ -190,7 +190,7 @@ export default create((set, get) => ({
     });
   },
   setSNSFundCanister: (data) => {
-    const distance = currentTimestamp() - 86400 * 31 * 6; // 6 months in seconds;
+    const distance = currentTimestamp() - get().selectedDistance.timestamp;
     const millisPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
     const mappedData = data.map(([daysSinceEpoch, value]) => ({

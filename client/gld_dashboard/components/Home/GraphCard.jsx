@@ -72,6 +72,7 @@ export default function Graphs() {
         - (snsFundValue?.value ?? 0),
       };
     });
+    console.log('liquid', liquid);
     setLiquidChartData(liquid);
   };
 
