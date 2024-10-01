@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
-### [1.0.3] - 2024-09-19
+### [1.0.3] - 2024-10-01
 
 #### Changed
 - let any principal in permission list claim rewards to enable actual owners of neurons to also claim rewards
