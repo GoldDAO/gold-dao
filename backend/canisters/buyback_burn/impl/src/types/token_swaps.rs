@@ -33,7 +33,7 @@ impl Default for TokenSwaps {
 impl TokenSwaps {
     pub fn push_new(&mut self, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
         let id = self.get_next_id();
-        let token_swap = TokenSwap::new(id, swap_config, now);
+        let token_swap = TokenSwap::new(id, swap_config.swap_client_id, now);
         self.upsert(token_swap.clone());
         token_swap
     }

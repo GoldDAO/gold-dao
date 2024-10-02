@@ -10,7 +10,6 @@ use crate::utils::retry_with_attempts;
 const MAX_ATTEMPTS: u8 = 1;
 
 pub fn run() {
-    error!("The job started");
     ic_cdk::spawn(run_async());
 }
 
