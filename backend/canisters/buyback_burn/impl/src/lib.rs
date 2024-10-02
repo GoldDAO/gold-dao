@@ -44,6 +44,6 @@ pub mod updates;
 
 use lifecycle::*;
 use queries::*;
-// use updates::*;
+use updates::*;
 
 export_candid!();

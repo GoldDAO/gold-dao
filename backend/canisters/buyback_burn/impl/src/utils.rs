@@ -2,7 +2,7 @@ use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
-use tracing::{ debug, error };
+use tracing::error;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
 
