@@ -3,8 +3,14 @@ use crate::state::{ mutate_state, RuntimeState };
 pub use buyback_burn_api::update_config::Args as UpdateConfigArgs;
 pub use buyback_burn_api::update_config::Response as UpdateConfigResponse;
 use canister_tracing_macros::trace;
-use ic_cdk_macros::update;
+use ic_cdk_macros::{ update, query };
 use std::time::Duration;
+
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn update_config_validate(args: UpdateConfigArgs) -> Result<String, String> {
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+}
 
 #[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]

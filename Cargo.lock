@@ -221,6 +221,7 @@ dependencies = [
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
+ "serde_json",
  "serializer",
  "stable_memory",
  "tracing",

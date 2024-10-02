@@ -3,7 +3,13 @@ use crate::state::{ mutate_state, RuntimeState };
 pub use buyback_burn_api::add_swap_client::Args as AddSwapClientArgs;
 pub use buyback_burn_api::add_swap_client::Response as AddSwapClientResponse;
 use canister_tracing_macros::trace;
-use ic_cdk_macros::update;
+use ic_cdk_macros::{ update, query };
+
+#[query(guard = "caller_is_governance_principal", hidden = true)]
+#[trace]
+async fn add_swap_clients_validate(args: AddSwapClientArgs) -> Result<String, String> {
+    serde_json::to_string_pretty(&args).map_err(|_| "invalid payload".to_string())
+}
 
 #[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
