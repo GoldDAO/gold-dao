@@ -11,4 +11,3 @@ canister_client = { path = "../../../libraries/canister_client" }
 ic-cdk = { workspace = true }
 icrc_ledger_canister = { path = "../api" }
 types = { path = "../../../libraries/types" }
-icrc-ledger-types = { workspace = true }

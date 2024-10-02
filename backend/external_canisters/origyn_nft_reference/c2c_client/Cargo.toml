@@ -8,6 +8,4 @@ edition = "2021"
 [dependencies]
 candid = { workspace = true }
 canister_client = { path = "../../../libraries/canister_client" }
-ic-cdk = { workspace = true }
 origyn_nft_reference = { path = "../api" }
-types = { path = "../../../libraries/types" }
