@@ -9,17 +9,15 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
     TESTMODE=true
-    GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network ic sns_ledger)
     AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
-    # 6 hours
-    BUYBACK_BURN_INTERVAL_IN_SECS=$((6 * 3600))
+    # 4 hours
+    BUYBACK_BURN_INTERVAL_IN_SECS=$((4 * 3600))
 
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
-    GLDGOV_LEDGER_CANISTER_ID=$(dfx canister id --network $NETWORK sns_ledger)
     AUTHORIZED_PRINCIPAL=$(dfx canister id --network $NETWORK sns_governance)
-    # 6 hours
-    BUYBACK_BURN_INTERVAL_IN_SECS=$((6 * 3600))
+    # 4 hours
+    BUYBACK_BURN_INTERVAL_IN_SECS=$((4 * 3600))
 
   else
     echo "Error: unknown network for deployment. Found $NETWORK."
@@ -30,6 +28,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
   MIN_BURN_AMOUNT=30_000_000_000
   ICP_SWAP_CANISTER_ID="7eikv-2iaaa-aaaag-qdgwa-cai"
 
+  # ICP token data + GOLDGov/ICP swap pool
   GLDGOV_ICP_POOL='record {
       token = record {
           fee = 10_000 : nat64;
@@ -39,6 +38,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
       swap_pool_id = principal "k46ek-4qaaa-aaaag-qcyzq-cai";
   };'
 
+  # Production canister is used for both staging and production
   GLDGOV_TOKEN_INFO='record {
       fee = 100_000 : nat64;
       decimals = 8 : nat64;

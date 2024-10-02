@@ -40,4 +40,3 @@ utils = { path = "../../../libraries/utils" }
 async-trait = { workspace = true }
 typetag = { workspace = true }
 futures = { workspace = true }
-anyhow = { workspace = true }

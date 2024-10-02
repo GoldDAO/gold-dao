@@ -4,14 +4,12 @@ use candid::{ Nat, Principal };
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ error, info };
-use anyhow::{ Result, anyhow };
-use utils::retry_async::retry_with_attempts;
+use tracing::error;
+use crate::utils::retry_with_attempts;
 
 const MAX_ATTEMPTS: u8 = 1;
 
 pub fn run() {
-    error!("The job started");
     ic_cdk::spawn(run_async());
 }
 
@@ -26,29 +24,37 @@ async fn run_async() {
     }
 }
 
-pub async fn process_token_burn() -> Result<()> {
+pub async fn process_token_burn() -> Result<(), String> {
     let burn_config = read_state(|s| s.data.burn_config.clone());
     let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_token_info.ledger_id);
 
     let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
     let min_burn_amount: u128 = burn_config.min_burn_amount.e8s().into();
 
-    if amount_to_burn < min_burn_amount {
-        let minting_account = icrc_ledger_canister_c2c_client
-            ::icrc1_minting_account(gldgov_ledger_canister_id).await
-            .map_err(|(code, message)|
-                anyhow!("Error calling icrc1_minting_account: {:?} - {}", code, message)
-            )?;
-
-        // Attempt to burn the calculated amount of tokens
-        match burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn.clone()).await {
-            Ok(_) => {
-                info!("SUCCESS: {} GLDGov tokens burned from the buyback and burn canister.", amount_to_burn);
-                Ok(())
+    if amount_to_burn > min_burn_amount {
+        let minting_account = match
+            icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
+        {
+            Ok(account) => {
+                match account {
+                    Some(a) => a,
+                    None => {
+                        return Err("Minting account is None".to_string());
+                    }
+                }
             }
             Err(e) => {
-                let error_message = anyhow!(
-                    "ERROR: Failed to burn GLDGov tokens from the buyback and burn canister: {:?}",
+                return Err(
+                    format!("Failed to get minting account (in order to burn tokens): {:?}", e)
+                );
+            }
+        };
+
+        match burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn.clone()).await {
+            Ok(_) => { Ok(()) }
+            Err(e) => {
+                let error_message = format!(
+                    "Failed to burn GLDGov tokens from the buyback and burn canister: {:?}",
                     e
                 );
                 error!("{}", error_message);
@@ -56,8 +62,8 @@ pub async fn process_token_burn() -> Result<()> {
             }
         }
     } else {
-        let error_message = anyhow!(
-            "ERROR: Calculated burn amount {} is below the minimum threshold of {}.",
+        let error_message = format!(
+            "Calculated burn amount {} is below the minimum threshold of {}.",
             amount_to_burn,
             min_burn_amount
         );

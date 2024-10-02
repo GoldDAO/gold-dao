@@ -7,10 +7,12 @@ use enum_dispatch::enum_dispatch;
 use crate::types::ICPSwapClient;
 use serde::{ Deserialize, Serialize };
 use crate::types::ExchangeConfig;
+use candid::CandidType;
 
 #[async_trait]
 #[enum_dispatch(SwapClientEnum)]
 pub trait SwapClient {
+    fn get_swap_client_id(&self) -> u128;
     fn get_config(&self) -> SwapConfig;
     fn clone_box(&self) -> Box<dyn SwapClient>;
     fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId);
@@ -32,7 +34,7 @@ impl Clone for Box<dyn SwapClient> {
 }
 
 #[enum_dispatch]
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone)]
 pub enum SwapClientEnum {
     ICPSwapClient(ICPSwapClient),
 }

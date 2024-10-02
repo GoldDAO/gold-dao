@@ -9,6 +9,10 @@ use types::CanisterId;
 // TODO: when async traits would be stable, rewrite without async_trait usage:
 // https://blog.rust-lang.org/2023/12/21/async-fn-rpit-in-traits.html
 impl SwapClient for ICPSwapClient {
+    fn get_swap_client_id(&self) -> u128 {
+        self.client_id()
+    }
+
     fn get_config(&self) -> SwapConfig {
         SwapConfig {
             swap_client_id: self.client_id(),

@@ -1,11 +1,6 @@
 type Account = record { owner : principal; subaccount : opt blob };
 type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
-type ExchangeConfig = variant { ICPSwap : ICPSwapConfig };
-type ICPSwapConfig = record {
-  zero_for_one : bool;
-  swap_canister_id : principal;
-};
 type InitArgs = record {
   test_mode : bool;
   icp_swap_canister_id : principal;
@@ -23,12 +18,6 @@ type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
 type Result_3 = variant { Ok : Result_2; Err : text };
 type Result_4 = variant { Ok : nat64; Err : text };
-type SwapConfig = record {
-  swap_client_id : nat;
-  input_token : TokenInfo;
-  exchange_config : ExchangeConfig;
-  output_token : TokenInfo;
-};
 type TokenAndPool = record { token : TokenInfo; swap_pool_id : principal };
 type TokenInfo = record {
   fee : nat64;
@@ -38,8 +27,8 @@ type TokenInfo = record {
 type TokenSwap = record {
   started : nat64;
   deposit_account : opt Result;
+  swap_client_id : nat;
   swap_id : nat;
-  swap_config : SwapConfig;
   is_archived : bool;
   notified_dex_at : opt Result_1;
   withdrawn_from_dex_at : opt Result_2;

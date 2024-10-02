@@ -13,6 +13,7 @@ use utils::memory::MemorySize;
 use crate::types::SwapClients;
 use crate::types::token_swaps::TokenSwapsMetrics;
 use tracing::error;
+use std::collections::BTreeMap;
 
 canister_state!(RuntimeState);
 
@@ -52,6 +53,9 @@ impl RuntimeState {
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
+            buyback_burn_interval_in_secs: self.data.buyback_burn_interval.as_secs(),
+            icp_swap_canister_id: self.data.icp_swap_canister_id,
+            swap_clients: self.data.swap_clients.clone(),
         }
     }
 }
@@ -65,6 +69,9 @@ pub struct Data {
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
+    pub last_burn_amount_update: Option<TimestampMillis>,
+    // swap_clinet_id, burn_amount
+    pub burn_amounts: BTreeMap<u128, u128>,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
@@ -123,6 +130,8 @@ impl Data {
             icp_swap_canister_id,
             burn_config: BurnConfig::new(burn_rate, min_burn_amount),
             token_swaps: TokenSwaps::default(),
+            last_burn_amount_update: None,
+            burn_amounts: BTreeMap::new(),
         }
     }
 }
@@ -132,8 +141,11 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub gldgov_token_info: TokenInfo,
+    pub buyback_burn_interval_in_secs: u64,
+    pub icp_swap_canister_id: Principal,
     pub burn_config: BurnConfig,
     pub token_swaps_metrics: TokenSwapsMetrics,
+    pub swap_clients: SwapClients,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -145,6 +157,7 @@ pub struct CanisterInfo {
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
