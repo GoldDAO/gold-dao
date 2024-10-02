@@ -52,49 +52,47 @@ const Hero = () => {
 
   const { data, isLoading, error } = useTokenMetrics();
 
-  console.log(data);
-
   const { t } = useTranslation("hero");
 
   const totalGoldLockedKg = data ? data.total_gold_kg.toFixed(2) : null;
-  const marketCapUSD = data ? `${data.tvl.toLocaleString('en-US')}` : null;
+  const marketCapUSD = data ? `${data.tvl.toLocaleString("en-US")}` : null;
 
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    const canvasElement = canvasRef.current;
+  // useEffect(() => {
+  //   const videoElement = videoRef.current;
+  //   const canvasElement = canvasRef.current;
 
-    if (videoElement && canvasElement) {
-      const ctx = canvasElement.getContext("2d");
+  //   if (videoElement && canvasElement) {
+  //     const ctx = canvasElement.getContext("2d");
 
-      videoElement.addEventListener("loadeddata", () => {
-        if (ctx) {
-          canvasElement.width = videoElement.videoWidth;
-          canvasElement.height = videoElement.videoHeight;
-          ctx.drawImage(
-            videoElement,
-            0,
-            0,
-            videoElement.videoWidth,
-            videoElement.videoHeight
-          );
-        }
-      });
+  //     videoElement.addEventListener("loadeddata", () => {
+  //       if (ctx) {
+  //         canvasElement.width = videoElement.videoWidth;
+  //         canvasElement.height = videoElement.videoHeight;
+  //         ctx.drawImage(
+  //           videoElement,
+  //           0,
+  //           0,
+  //           videoElement.videoWidth,
+  //           videoElement.videoHeight
+  //         );
+  //       }
+  //     });
 
-      videoElement.addEventListener("canplaythrough", () => {
-        setVideoLoaded(true);
-        setCanvasVisible(false);
-      });
-    }
-  }, []);
+  //     videoElement.addEventListener("canplaythrough", () => {
+  //       setVideoLoaded(true);
+  //       setCanvasVisible(false);
+  //     });
+  //   }
+  // }, []);
 
   return (
     <div className="h-[85vh] md:h-[75vh] w-full flex flex-col items-center justify-center px-2 md:px-10 ">
-      {canvasVisible && (
+      {/* {canvasVisible && (
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover"
         />
-      )}
+      )} */}
       <video
         ref={videoRef}
         autoPlay
@@ -103,7 +101,7 @@ const Hero = () => {
         preload="auto"
         playsInline
         className={`absolute inset-0 w-full h-[85vh] md:h-3/4 object-cover transition-opacity duration-500`}
-        src="/videos/Gold_DAO_bg.mp4"
+        src="https://daolink-gold-dao-website-medias.sos-ch-gva-2.exo.io/Gold_DAO_bg_video.mp4"
       />
       <div className="relative text-center">
         <h1
