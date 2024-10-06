@@ -786,7 +786,7 @@ export interface FeeDepositResponse {
   'transaction' : TransactionRecord,
 }
 export interface FeeDepositWithdrawDescription {
-  'status' : { 'locked' : { 'sale_id' : string } } |
+  'status' : { 'locked' : { 'token_id' : string, 'sale_id' : string } } |
     { 'unlocked' : null },
   'token' : TokenSpec__1,
   'withdraw_to' : Account__1,

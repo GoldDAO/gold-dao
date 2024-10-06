@@ -3,7 +3,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
   ChevronDownIcon,
   UserIcon,
-  UsersIcon,
+  ArrowsRightLeftIcon,
   ArrowPathIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/16/solid";
@@ -95,7 +95,7 @@ const DropdownUser = () => {
                   to="swap?view=1"
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
                 >
-                  <UsersIcon className="size-4" />
+                  <ArrowsRightLeftIcon className="size-4" />
                   Transfer
                 </Link>
               </MenuItem>

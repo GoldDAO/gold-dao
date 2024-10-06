@@ -18,6 +18,7 @@ export const Count = ({
       <button
         onClick={() => handleOnChangeCount(i, "-")}
         className="flex items-center bg-surface-2 p-1 rounded-md"
+        type="button"
       >
         <MinusIcon className="h-4 w-4" />
       </button>
@@ -27,6 +28,7 @@ export const Count = ({
       <button
         onClick={() => handleOnChangeCount(i, "+")}
         className="flex items-center bg-surface-2 p-1 rounded-md"
+        type="button"
       >
         <PlusIcon className="h-4 w-4" />
       </button>

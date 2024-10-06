@@ -84,10 +84,9 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      const log = await Promise.allSettled(
+      await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
-      console.log(log);
       // if (walletSelected === "bitfinity") {
       //   const bitfinity_adapter = walletList.find(
       //     (adaptor) => adaptor.id === "bitfinity"
