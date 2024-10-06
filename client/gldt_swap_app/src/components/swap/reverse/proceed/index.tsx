@@ -21,7 +21,7 @@ const Proceed = () => {
     reverseSwap,
     setCanCloseDialog,
   } = useReverseSwapProceed();
-  const { show, canCloseDialog } = reverseSwapProceedState;
+  const { show, canCloseDialog, canReverseSwap } = reverseSwapProceedState;
   const {
     mutate: mutateSwapGLDNFT,
     isSuccess,
@@ -61,7 +61,7 @@ const Proceed = () => {
       <Button
         onClick={handleShow}
         className={`rounded-xl w-full py-3`}
-        disabled={!totalGLDTtoSwap}
+        disabled={!canReverseSwap}
       >
         Preview Swap
       </Button>
@@ -90,14 +90,6 @@ const Proceed = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* <div className="relative h-[1px] bg-border w-full">
-                  <div className="absolute">
-                    <button className="bg-content text-background rounded-full p-2 cursor-default">
-                      <ArrowDownIcon height={16} width={16} />
-                    </button>
-                  </div>
-                </div> */}
                 <div className="font-semibold">
                   {totalGLDNFTtoSwap}g of gold
                 </div>
