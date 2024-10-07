@@ -61,11 +61,6 @@ export default function Graphs() {
       const snsFundValue = snsFund.find(
         ({ label }) => label === supplyLabel,
       );
-      console.log('stakedValue', stakedValue);
-      console.log('rwardPoolValue', rewardPoolValue);
-      console.log('reservePoolValue', reservePoolValue);
-      console.log('treasuryValue', treasuryValue);
-      console.log('snsFundValue', snsFundValue);
       if (!stakedValue || !rewardPoolValue
         || !reservePoolValue || !treasuryValue || !snsFundValue) {
         return null;
