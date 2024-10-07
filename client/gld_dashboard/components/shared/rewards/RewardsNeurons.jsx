@@ -47,13 +47,13 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         const hasStakedAmount = (neuron.cached_neuron_stake_e8s
           + neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent) > 0;
         const isDissolving = neuron.dissolving === 'Dissolving';
-        // const hasNoRewards = (neuron.icpRewards === 0
-        //   || neuron.ledgerRewards === 0 || neuron.ogyRewards === 0);
+        const hasRewards = (neuron.icpRewards > 0
+          || neuron.ledgerRewards > 0 || neuron.ogyRewards > 0);
 
-        if (hasStakedAmount && isDissolving) {
-          return true;
+        if (hasStakedAmount && isDissolving && !hasRewards) {
+          return false;
         }
-        return false;
+        return true;
       });
 
       setUserNeurons(neuronsToShow);
