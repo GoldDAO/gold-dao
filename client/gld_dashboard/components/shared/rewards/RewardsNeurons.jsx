@@ -50,6 +50,10 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         const hasRewards = (neuron.icpRewards > 0
           || neuron.ledgerRewards > 0 || neuron.ogyRewards > 0);
 
+        if (hasRewards) {
+          return true;
+        }
+
         if (hasStakedAmount && isDissolving && !hasRewards) {
           return false;
         }
