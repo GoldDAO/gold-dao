@@ -43,7 +43,7 @@ const LoginButton = () => {
     console.log(process.env.ENV);
     try {
       // start the login process and wait for it to finish
-      const useDerivationOrigin = process.env.ENV === 'local' || process.env.ENV === 'staging' || process.env.ENV === 'preprod';
+      const useDerivationOrigin = process.env.ENV === 'local' || process.env.ENV === 'staging';
       await authClient.login({
         identityProvider: 'https://identity.ic0.app',
         derivationOrigin: useDerivationOrigin ? null : 'https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io',
