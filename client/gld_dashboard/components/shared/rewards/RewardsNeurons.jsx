@@ -42,7 +42,21 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
   const getNeurons = async () => {
     const response = await getNeuronsByOwner();
     if (response) {
-      setUserNeurons(response);
+      console.log(response);
+      const neuronsToShow = response.filter((neuron) => {
+        const hasStakedAmount = (neuron.cached_neuron_stake_e8s
+          + neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent) > 0;
+        const isDissolving = neuron.dissolving === 'Dissolving';
+        // const hasNoRewards = (neuron.icpRewards === 0
+        //   || neuron.ledgerRewards === 0 || neuron.ogyRewards === 0);
+
+        if (hasStakedAmount && isDissolving) {
+          return true;
+        }
+        return false;
+      });
+
+      setUserNeurons(neuronsToShow);
 
       const amountsToClaim = response.reduce(
         (acc, curr) => {
