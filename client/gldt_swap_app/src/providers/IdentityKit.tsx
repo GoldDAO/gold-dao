@@ -33,6 +33,10 @@ const IKProvider = ({
       signerClientOptions={{
         targets: targets ?? [],
         derivationOrigin: "https://oj7ri-2qaaa-aaaap-abrzq-cai.icp0.io",
+        maxTimeToLive: 604800000000000n, // ? one week
+        idleOptions: {
+          disableIdle: false,
+        },
       }}
       onConnectFailure={(e: Error) => {
         window.location.reload();
