@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Bounce, toast } from 'react-toastify';
 import { copyContent } from '../../../utils/functions';
 import useNeurons from '../../../hooks/useNeurons';
 import useSession from '../../../hooks/useSession';
@@ -24,6 +25,17 @@ export default function ModalAdd({ setNeuronModify, neuronModify }) {
 
   useEffect(() => {
     if (copyState) {
+      toast.success('Copied', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+        transition: Bounce,
+      });
       setTimeout(() => {
         setCopyState(false);
       }, 2000);
@@ -39,68 +51,26 @@ export default function ModalAdd({ setNeuronModify, neuronModify }) {
     <div className="flex-col mt-6 mb-32 overflow-y-auto sm:mb-0 flex justify-around items-center">
       <div className="text-left font-normal text-lg w-full flex flex-wrap gap-[36px]">
         <p>
-          To successfully add each neuron to the dashboard,
-          please complete the following for every individual neuron:
-        </p>
-        <span className="flex flex-wrap">
-          {'1. Add your principal'.split(' ').map((l, i) => (
-            <span className="mr-1" key={i * 999}>
-              {l}
-            </span>
-          ))}
-          {principal.split('').map((l, i) => (
-            <span className="font-bold" key={i * 22}>
-              {l}
-            </span>
-          ))}
+        To successfully connect each neuron to the dashboard, you need to
+        add your principal  <span className="font-bold inline">
+          {principal}
           <Image
             src={'/svg/copy-button.svg'}
             alt="copy"
-            className="mx-2 cursor-pointer"
+            className="ml-2 cursor-pointer inline"
             height={15}
             width={15}
             onClick={() => copyContent(principal, setCopyState)}
           />
-          <span className="mr-1">as</span>
-          <span className="font-bold mr-1">a</span>
-          <span className="font-bold mr-1">HotKey</span>
-          <span className="mr-1">to</span>
-          <span className="mr-1">your</span>
-          <span className="font-bold mr-1">Gold</span>
-          <span className="font-bold mr-1">DAO</span>
-          <span className="font-bold mr-1">neuron</span>
-          <span className="mr-1">which</span>
-          <span className="mr-1">you</span>
-          <span className="mr-1">wish</span>
-          <span className="mr-1">to</span>
-          <span className="mr-1">include</span>
-          <span className="mr-1">in</span>
-          <span className="mr-1">this</span>
-          <span className="mr-1">dashbaord.</span>
-          <span className="mr-1">To</span>
-          <span className="mr-1">do</span>
-          <span className="mr-1">this,</span>
-          <span className="mr-1">Open</span>
-          <span className="mr-1">your</span>
-          <Link
+          </span> as a hotkey to your Gold DAO neuron. To do so, open the <Link
             href={'https://nns.ic0.app/neurons/?u=tw2vt-hqaaa-aaaaq-aab6a-cai'}
             target="_blank"
             rel="noreferrer noopener"
-            className="underline mr-1"
+            className="underline "
           >
-            NNS app
-          </Link>
-          <span className="mr-1">and</span>
-          <span className="mr-1">click</span>
-          <span className="mr-1">into</span>
-          <span className="mr-1">each</span>
-          <span className="mr-1">Neuron.</span>
-        </span>
-        {copyState && (
-          <div className="text-green-600">
-            <p>copied</p>
-          </div>
-        )}
+            NNS dApp
+          </Link>, click into each neuron and add your principal as a hotkey.
+        </p>
       </div>
 
       <button
