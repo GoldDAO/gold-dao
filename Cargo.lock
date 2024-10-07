@@ -214,13 +214,12 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "icpswap_factory_canister",
- "icpswap_factory_canister_c2c_client",
  "icpswap_swap_pool_canister",
  "icpswap_swap_pool_canister_c2c_client",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
+ "serde_json",
  "serializer",
  "stable_memory",
  "tracing",
@@ -845,8 +844,6 @@ name = "gldt_swap"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "candid_gen",
- "canister_client",
  "canister_logger",
  "canister_state_macros",
  "canister_time",
@@ -859,8 +856,6 @@ dependencies = [
  "http_request",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
- "ic-cdk-timers",
- "ic-ledger-types",
  "ic-stable-structures",
  "ic0 0.23.0",
  "icrc-ledger-types",
@@ -870,7 +865,6 @@ dependencies = [
  "origyn_nft_reference_c2c_client",
  "serde",
  "serde_bytes",
- "serde_json",
  "serializer",
  "stable_memory",
  "tracing",
@@ -985,12 +979,9 @@ dependencies = [
 name = "gldt_swap_archive_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
  "gldt_swap_api_archive",
  "gldt_swap_common",
- "ic-cdk 0.16.0",
- "types",
 ]
 
 [[package]]
@@ -1557,25 +1548,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "icpswap_factory_canister"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "serde",
-]
-
-[[package]]
-name = "icpswap_factory_canister_c2c_client"
-version = "0.1.0"
-dependencies = [
- "candid 0.10.10",
- "canister_client",
- "ic-cdk 0.16.0",
- "icpswap_factory_canister",
- "types",
-]
-
-[[package]]
 name = "icpswap_swap_pool_canister"
 version = "0.1.0"
 dependencies = [
@@ -1587,11 +1559,8 @@ dependencies = [
 name = "icpswap_swap_pool_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "icpswap_swap_pool_canister",
- "types",
 ]
 
 [[package]]
@@ -1631,7 +1600,6 @@ dependencies = [
  "candid 0.10.10",
  "canister_client",
  "ic-cdk 0.16.0",
- "icrc-ledger-types",
  "icrc_ledger_canister",
  "types",
 ]
@@ -1688,7 +1656,6 @@ dependencies = [
  "ic-ledger-types",
  "icrc-ledger-types",
  "icrc_ledger_canister",
- "icrc_ledger_canister_c2c_client",
  "lazy_static",
  "management_api_canister",
  "origyn_nft_reference",
@@ -1698,13 +1665,10 @@ dependencies = [
  "serde_bytes",
  "sha2",
  "sns_governance_canister",
- "sns_governance_canister_c2c_client",
  "sns_neuron_controller_api_canister",
  "sns_rewards_api_canister",
- "stable_memory",
  "super_stats_v3_api",
  "token_metrics_api",
- "tracing",
  "types",
  "utils",
 ]
@@ -2103,9 +2067,7 @@ name = "origyn_nft_reference"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
- "candid_gen",
  "ic-cdk 0.15.1",
- "icrc-ledger-types",
  "serde",
  "serde_bytes",
 ]
@@ -2116,9 +2078,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "canister_client",
- "ic-cdk 0.16.0",
  "origyn_nft_reference",
- "types",
 ]
 
 [[package]]
@@ -2963,7 +2923,6 @@ dependencies = [
 name = "sns_governance_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
- "candid 0.10.10",
  "canister_client",
  "ic-cdk 0.16.0",
  "sns_governance_canister",

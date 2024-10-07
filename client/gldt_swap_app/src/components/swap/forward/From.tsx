@@ -6,11 +6,11 @@ import { useGetUserGLDNFT } from "@hooks/gld_nft";
 import {
   Count as SelectNFTCount,
   Title as SelectNFTTitle,
-} from "@components/shared/select-nfts";
+} from "@components/shared/nft-select";
 
-import Loading from "./Loading";
-import Empty from "./Empty";
-import Error from "./Error";
+import Loading from "@components/shared/user-nft/Loading";
+import Empty from "@components/shared/user-nft/Empty";
+import Error from "@components/shared/user-nft/Error";
 
 const ForwardSwapFrom = () => {
   const { getCountNfts, selectNft, unselectNft, state: nftState } = useNft();

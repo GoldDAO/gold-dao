@@ -1,6 +1,7 @@
 import { Mode, useSwap } from "@context/index";
 
 import { NftProvider } from "@context/index";
+import { ReverseSwapProceedProvider } from "@context/index";
 
 import ForwardSwap from "@components/swap/forward/";
 import ReverseSwap from "@components/swap/reverse";
@@ -17,7 +18,9 @@ const Swap = () => {
       )}
       {swapState.mode === Mode.REVERSE && (
         <NftProvider>
-          <ReverseSwap />
+          <ReverseSwapProceedProvider>
+            <ReverseSwap />
+          </ReverseSwapProceedProvider>
         </NftProvider>
       )}
     </div>

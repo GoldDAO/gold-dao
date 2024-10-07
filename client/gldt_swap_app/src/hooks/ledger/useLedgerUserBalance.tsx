@@ -20,7 +20,7 @@ export const useLedgerUserBalance = ({
     owner: string;
     ledger: string;
   }) => {
-    const actor = await getActor(`${ledger}_ledger`);
+    const actor = getActor(`${ledger}_ledger`);
     const result = (await actor.icrc1_balance_of({
       owner: Principal.fromText(owner),
       subaccount: [],

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@components/ui";
 
 const Empty = () => {
@@ -7,7 +8,13 @@ const Empty = () => {
         You currently don't own any GLD NFT!
       </div>
       <div>
-        <Button>Buy GLD NFT</Button>
+        <Link
+          to="https://www.youtube.com/watch?v=pxw-5qfJ1dk"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button>Buy GLD NFT</Button>
+        </Link>
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import {
   useContext,
   ReactNode,
   useState,
-  useCallback,
   useMemo,
   useEffect,
 } from "react";
@@ -14,8 +13,6 @@ import {
   GLD_NFT_100G_CANISTER_ID,
   GLD_NFT_1000G_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
-  REVERSE_GLDT_TX_FEE,
-  GLDT_DECIMAL,
 } from "@constants";
 
 import { useAuth } from "@context/auth";
@@ -29,6 +26,7 @@ export type TokenId = {
 
 export interface Nft {
   tokenIds: TokenId[];
+  collectionIndex: CollectionIndex;
 }
 
 export type CollectionName = "1g" | "10g" | "100g" | "1000g";
@@ -133,31 +131,39 @@ const useNftProviderValue = () => {
   const { state: authState } = useAuth();
   const { isConnected } = authState;
 
-  const setNfts = useCallback((nfts: Nft[]): void => {
-    setState((prevState) => {
-      const newNfts = nfts.map((nft, index) => {
-        const newIds = nft.tokenIds.map((tokenId) => ({
-          id_string: tokenId.id_string,
-          id_bigint: tokenId.id_bigint,
-          id_byte_array: tokenId?.id_byte_array ?? [],
-          selected: false,
-        }));
+  const setNfts = async (nfts: Nft[]): Promise<void> => {
+    const result = await new Promise<void>((resolve) => {
+      setState((prevState) => {
+        const updatedNfts = prevState.nfts.map((prevNft) => {
+          const matchingNft = nfts.find(
+            (nft) => nft.collectionIndex === prevNft.index
+          );
+          if (matchingNft) {
+            const tokenIds = matchingNft.tokenIds.map((tokenId) => ({
+              id_string: tokenId.id_string,
+              id_bigint: tokenId.id_bigint,
+              id_byte_array: tokenId?.id_byte_array ?? [],
+              selected: false,
+            }));
+            return {
+              ...prevNft,
+              tokenIds,
+              isEmpty: !tokenIds.length,
+            };
+          }
+          return prevNft;
+        });
+        const isEmpty = updatedNfts.every((nft) => nft.isEmpty);
         return {
-          ...prevState.nfts[index],
-          tokenIds: newIds,
-          isEmpty: !newIds.length,
+          ...prevState,
+          nfts: updatedNfts,
+          isEmpty,
         };
       });
-
-      const isEmpty = nfts.every((nft) => !nft.tokenIds.length);
-
-      return {
-        ...prevState,
-        nfts: newNfts,
-        isEmpty,
-      };
+      resolve();
     });
-  }, []);
+    return result;
+  };
 
   const getNftById = ({
     collectionIndex: i,
@@ -189,20 +195,6 @@ const useNftProviderValue = () => {
         nfts: newNfts,
       };
     });
-  };
-
-  const canBuyNft = (
-    collectionIndex: CollectionIndex,
-    user_balance: number
-  ): boolean => {
-    const totalGLDTtoSwap = getSelectedTotalGLDT();
-    const singlePrice = state.nfts[collectionIndex].value * 100;
-    const remaining =
-      user_balance -
-      totalGLDTtoSwap -
-      singlePrice -
-      REVERSE_GLDT_TX_FEE / GLDT_DECIMAL;
-    return remaining > 0;
   };
 
   // selects a random NFT
@@ -288,12 +280,31 @@ const useNftProviderValue = () => {
     }));
   };
 
+  const getCountSelectedNfts = () => {
+    const count = getCountNfts();
+    const sum = count.reduce((acc, cur) => acc + cur.selected, 0);
+    return sum;
+  };
+
   const getCollectionSelectedNFTs = () => {
     const selected = state.nfts.map((nft: NftCollection) => ({
       ...nft,
       tokenIds: nft.tokenIds.filter((e: TokenId) => e.selected === true),
     }));
     return selected.filter((c) => c.tokenIds.length !== 0);
+  };
+
+  const getOneRandomNftId = () => {
+    const selected = state.nfts
+      .map((nft: NftCollection) => ({
+        ...nft,
+        tokenIds: nft.tokenIds.filter((e: TokenId) => e.selected === true),
+      }))
+      .find((c) => c.tokenIds.length !== 0);
+
+    return selected?.tokenIds[0]
+      ? { canister: selected.canister, tokenId: selected?.tokenIds[0] }
+      : null;
   };
 
   const getSelectedCollectionGLDTNFTs = (collectionIndex: CollectionIndex) => {
@@ -349,7 +360,8 @@ const useNftProviderValue = () => {
       getSelectedTotalGram,
       getSelectedTotalGLDT,
       resetState,
-      canBuyNft,
+      getCountSelectedNfts,
+      getOneRandomNftId,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state]

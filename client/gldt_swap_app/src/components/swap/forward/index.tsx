@@ -8,8 +8,8 @@ import FromCard from "@components/swap/card/From";
 import Backdrop from "@components/shared/Backdrop";
 import TransactionDetails from "./TransactionDetails";
 
-import ForwardSwapFrom from "./from";
-import ForwardSwapTo from "./to";
+import ForwardSwapFrom from "./From";
+import ForwardSwapTo from "./To";
 import ForwardSwapProceed from "./proceed";
 
 import { useNft } from "@context/index";
