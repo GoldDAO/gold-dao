@@ -13,7 +13,6 @@ pub enum SwapNftForTokensErrors {
     ContainsDuplicates(String),
     ServiceDown(ServiceDownReason),
     Limit(String),
-    ImpossibleError(String),
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]

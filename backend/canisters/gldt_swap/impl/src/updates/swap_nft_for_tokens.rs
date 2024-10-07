@@ -12,6 +12,7 @@ use crate::{
     service_status::check_service_status,
     state::read_state,
     swap::swap_builder::SwapBuilder,
+    utils::trace,
 };
 pub use gldt_swap_api_canister::swap_nft_for_tokens::{
     Args as SwapNftForTokensArgs,
@@ -91,35 +92,39 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
     }
 
     if invalid_nft_ids.len() > 0 {
+        trace("///// returning here 1");
         return Err(SwapNftForTokensErrors::NftValidationErrors((valid_nft_ids, invalid_nft_ids)));
-    }
-
-    for swap in &swaps_to_insert {
-        if let SwapInfo::Forward(details) = swap {
-            match swap.insert_swap().await {
-                Ok(swap_id) => {
-                    swap_ids_to_return.push(swap_id);
-                }
-                Err(_) => {
-                    // we shouldn't get here because we already check for locked nfts in the forward().init()
-                    debug!(
-                        "FAILED to insert a swap with NFT id {:?}. This NFT is already locked. this should've already been checked in the validation",
-                        details.nft_id
-                    );
-                    return Err(
-                        SwapNftForTokensErrors::ImpossibleError(
-                            format!(
-                                "Failed to insert a swap with NFT id {:?}. Impossible error since we already check if the nft is in active swaps",
-                                details.nft_id
-                            )
-                        )
-                    );
+    } else {
+        let mut insert_errors: Vec<(NftID, Vec<NftInvalidError>)> = vec![];
+        let mut valid_nfts: Vec<NftID> = vec![];
+        for swap in &swaps_to_insert {
+            if let SwapInfo::Forward(details) = swap {
+                match swap.insert_swap().await {
+                    Ok(swap_id) => {
+                        swap_ids_to_return.push(swap_id.clone());
+                        valid_nfts.push(swap_id.0);
+                    }
+                    Err(_) => {
+                        // we shouldn't get here because we already check for locked nfts in the forward().init()
+                        debug!(
+                            "FAILED to insert a swap with NFT id {:?}. This NFT is already locked. this should've already been checked in the validation",
+                            details.nft_id.clone()
+                        );
+                        insert_errors.push((
+                            swap.get_nft_id(),
+                            vec![NftInvalidError::AlreadyLocked],
+                        ));
+                    }
                 }
             }
         }
+        if insert_errors.len() > 0 {
+            trace("///// returning here 2");
+            return Err(SwapNftForTokensErrors::NftValidationErrors((valid_nfts, insert_errors)));
+        } else {
+            return Ok(swap_ids_to_return);
+        }
     }
-
-    Ok(swap_ids_to_return)
 }
 
 fn contains_duplicates(args: &SwapNftForTokensArgs) -> bool {

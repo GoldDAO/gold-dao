@@ -1,6 +1,6 @@
 {
   "gldt_swap": {
-    "ic": "m5bu4-7qaaa-aaaap-abrxq-cai",
+    "ic": "6f6ua-hqaaa-aaaar-qairq-cai",
     "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
   },
   "gld_dashboard": {
@@ -13,7 +13,7 @@
     "staging": "maz3v-6aaaa-aaaak-qcgpq-cai"
   },
   "gldt_ledger": {
-    "ic": "oh54a-baaaa-aaaap-abryq-cai",
+    "ic": "6c7su-kiaaa-aaaar-qaira-cai",
     "staging": "6uad6-fqaaa-aaaam-abovq-cai"
   },
   "gldt_ledger_indexer": {

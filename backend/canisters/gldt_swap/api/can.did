@@ -65,6 +65,7 @@ type InitArgs = record {
   test_mode : bool;
   ogy_ledger_id : principal;
   authorized_principals : vec principal;
+  version : BuildVersion;
   gldnft_canisters : vec record { principal; NftCanisterConf };
   gldt_ledger_id : principal;
   commit_hash : text;
@@ -196,7 +197,6 @@ type SwapInfo = variant {
 };
 type SwapNftForTokensErrors = variant {
   Limit : text;
-  ImpossibleError : text;
   ContainsDuplicates : text;
   NftValidationErrors : record {
     vec nat;
