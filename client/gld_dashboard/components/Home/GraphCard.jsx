@@ -61,6 +61,15 @@ export default function Graphs() {
       const snsFundValue = snsFund.find(
         ({ label }) => label === supplyLabel,
       );
+      console.log('stakedValue', stakedValue);
+      console.log('rwardPoolValue', rewardPoolValue);
+      console.log('reservePoolValue', reservePoolValue);
+      console.log('treasuryValue', treasuryValue);
+      console.log('snsFundValue', snsFundValue);
+      if (!stakedValue || !rewardPoolValue
+        || !reservePoolValue || !treasuryValue || !snsFundValue) {
+        return null;
+      }
 
       return {
         label: supplyLabel,
@@ -71,7 +80,10 @@ export default function Graphs() {
         - (snsFundValue?.value ?? 0),
       };
     });
-    setLiquidChartData(liquid);
+
+    const liquidCompleteDays = liquid.filter((el) => el !== null);
+
+    setLiquidChartData(liquidCompleteDays);
   };
 
   useEffect(() => {
