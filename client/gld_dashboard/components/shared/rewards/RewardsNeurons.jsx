@@ -50,19 +50,23 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         const hasRewards = (neuron.icpRewards > 0
           || neuron.ledgerRewards > 0 || neuron.ogyRewards > 0);
 
+        console.log('hasStakedAmount', hasStakedAmount);
+        console.log('isDissolving', isDissolving);
+        console.log('hasRewards', hasRewards);
         if (hasRewards) {
           return true;
         }
 
-        if (hasStakedAmount && isDissolving && !hasRewards) {
+        if (!hasStakedAmount || !isDissolving) {
           return false;
         }
         return true;
       });
+      console.log('NEURONS TO SHOW', neuronsToShow);
 
       setUserNeurons(neuronsToShow);
 
-      const amountsToClaim = response.reduce(
+      const amountsToClaim = neuronsToShow.reduce(
         (acc, curr) => {
           acc.icpAmount += curr.icpRewards;
           acc.ledgerAmount += curr.ledgerRewards;
@@ -71,7 +75,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         },
         { icpAmount: 0, ledgerAmount: 0, ogyAmount: 0 },
       );
-      setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: response });
+      setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: neuronsToShow });
       if (!amountsToClaim.icpAmount && !amountsToClaim.ledgerAmount && !amountsToClaim.ogyAmount) {
         setDisableClaimAll(true);
       } else {
