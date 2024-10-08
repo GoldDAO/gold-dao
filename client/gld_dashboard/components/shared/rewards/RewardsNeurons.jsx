@@ -46,21 +46,14 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
       const neuronsToShow = response.filter((neuron) => {
         const hasStakedAmount = (neuron.cached_neuron_stake_e8s
           + neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent) > 0;
-        const isDissolving = neuron.dissolving === 'Dissolving';
         const hasRewards = (neuron.icpRewards > 0
           || neuron.ledgerRewards > 0 || neuron.ogyRewards > 0);
 
-        console.log('hasStakedAmount', hasStakedAmount);
-        console.log('isDissolving', isDissolving);
-        console.log('hasRewards', hasRewards);
-        if (hasRewards) {
+        if (hasRewards || hasStakedAmount) {
           return true;
         }
 
-        if (!hasStakedAmount || !isDissolving) {
-          return false;
-        }
-        return true;
+        return false;
       });
       console.log('NEURONS TO SHOW', neuronsToShow);
 
