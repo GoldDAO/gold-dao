@@ -85,6 +85,7 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
+    use gldt_swap_api_canister::swap_nft_for_tokens::NftInvalidError;
     use gldt_swap_common::{
         gldt::GLDT_LEDGER_FEE_ACCOUNT,
         swap::{
@@ -1286,5 +1287,145 @@ mod tests {
         assert_eq!(post_swap_total_supply, pre_swap_total_supply - Nat::from(2 * GLDT_TX_FEE));
 
         // check the burn fees got burnt
+    }
+
+    #[test]
+    pub fn forward_swap_returns_lock_error_if_the_same_nft_is_already_being_swapped() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
+            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+        } = env;
+        tick_n_blocks(pic, 2);
+
+        let pre_swap_gldt_supply = icrc1_total_supply(
+            pic,
+            Principal::anonymous(),
+            gldt_ledger,
+            &()
+        );
+
+        // 1. setup nft and verify owner
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            nft_owner.clone(),
+            "1".to_string()
+        );
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string()
+        );
+
+        let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+        );
+        match res {
+            Ok(ids) => {
+                swap_id = ids[0].clone();
+            }
+            Err(e) => {
+                println!("/// intent to swap errors : {e:?}");
+            }
+        }
+
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+        );
+        match res {
+            Ok(ids) => {
+                swap_id = ids[0].clone();
+            }
+            Err(e) => {
+                match e {
+                    gldt_swap_api_canister::swap_nft_for_tokens::SwapNftForTokensErrors::NftValidationErrors(
+                        validation_error,
+                    ) => {
+                        println!("{validation_error:?}");
+
+                        assert_eq!(validation_error.1[0].0.0, token_id_as_nat);
+                        assert_eq!(validation_error.1[0].1[0], NftInvalidError::AlreadyLocked);
+                    }
+                    _ => {
+                        println!("/// fail expected already locked error but got : {e:?}");
+                        assert_eq!(true, false);
+                    }
+                }
+            }
+        }
+
+        // // verify swap got inserted with init state
+        // let res = get_swap(pic, Principal::anonymous(), gldt_swap, &swap_id).unwrap();
+        // if let SwapInfo::Forward(details) = res.1 {
+        //     assert_eq!(details.status, SwapStatusForward::Init);
+        // }
+        // // 2. start the forward swap
+        // let market_args = MarketTransferRequest {
+        //     token_id: "1".to_string(),
+        //     sales_config: SalesConfig {
+        //         broker_id: None,
+        //         pricing: PricingConfigShared::Ask(
+        //             Some(
+        //                 vec![
+        //                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+        //                     AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+        //                     AskFeature::Notify(vec![gldt_swap]),
+        //                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+        //                     AskFeature::AllowList(vec![gldt_swap])
+        //                 ]
+        //             )
+        //         ),
+        //         escrow_receipt: None,
+        //     },
+        // };
+        // market_transfer_nft_origyn(pic, origyn_nft.clone(), nft_owner, market_args);
+        // tick_n_blocks(pic, 100);
+        // // check swap completed
+        // let res = get_swap(pic, Principal::anonymous(), gldt_swap, &swap_id).unwrap();
+        // if let SwapInfo::Forward(details) = res.1 {
+        //     assert_eq!(details.status, SwapStatusForward::Complete);
+        // }
+
+        // // check the total supply increased
+        // let post_sale_total_supply = icrc1_total_supply(
+        //     pic,
+        //     Principal::anonymous(),
+        //     gldt_ledger,
+        //     &()
+        // );
+        // let expected_supply = pre_swap_gldt_supply + Nat::from(10_000_000_000u64); // mint incurs fee && nft escrow has to transfer to user ( x 2 transactions )
+        // assert_eq!(post_sale_total_supply, expected_supply);
+
+        // // check user got their gldt tokens
+        // let user_balance = balance_of(pic, gldt_ledger, Account {
+        //     owner: nft_owner.clone(),
+        //     subaccount: None,
+        // });
+        // assert_eq!(user_balance, Nat::from(10_000_000_000u64));
+
+        // // ensure canister now owns nft
+        // let owner_of = icrc7_owner_of(
+        //     pic,
+        //     origyn_nft.clone(),
+        //     net_principal.clone(),
+        //     vec![token_id_as_nat.clone()]
+        // );
+        // assert_eq!(
+        //     owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
+        //     gldt_swap.to_string()
+        // );
     }
 }

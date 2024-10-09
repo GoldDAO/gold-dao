@@ -3,9 +3,9 @@ import { divideBy1e8 } from "@utils/numbers";
 import { Button, LoaderSpin } from "@components/ui";
 import { useTransferProceedLedger } from "@context/transfer/proceed-ledger";
 
-import FieldTo from "../form/field/ledger/To";
-import FieldAmount from "../form/field/ledger/Amount";
-import Balance from "../balance/Balance";
+import FieldTo from "./form/To";
+import FieldAmount from "./form/Amount";
+import Balance from "../shared/balance/Balance";
 
 import ConfirmDialog from "./confirm-dialog";
 
