@@ -3,9 +3,10 @@ integration tests trigger:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
       when: manual
   script:
     - echo "Running integration tests"
@@ -17,11 +18,11 @@ integration tests:
       when: always
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
   needs: [
-      # 'gldt_swap integration-test build',
       'buyback_burn integration-test build',
       'icp_neuron integration-test build',
       'management integration-test build',

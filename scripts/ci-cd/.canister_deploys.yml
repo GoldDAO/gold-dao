@@ -23,10 +23,10 @@ $[[ inputs.src-folder ]] staging deploy:
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event" # deployment when merged to develop
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # deployment when trigger manually on MR
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       allow_failure: true
   needs:
     ["$[[ inputs.src-folder ]] staging build", "integration tests"]
@@ -48,9 +48,9 @@ $[[ inputs.src-folder ]] production deploy:
   rules:
     - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}'
       when: manual
   variables:
     TARGET_NETWORK: ic
