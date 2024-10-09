@@ -7,25 +7,9 @@ import {
   useMemo,
 } from "react";
 import { IDL } from "@dfinity/candid";
-import { IdentityKitDelegationType } from "@nfid/identitykit";
+// import { IdentityKitDelegationType } from "@nfid/identitykit";
 import { useIdentityKit } from "@nfid/identitykit/react";
-import { Actor, ActorSubclass, HttpAgent } from "@dfinity/agent";
-
-import {
-  GLD_NFT_1G_CANISTER_ID,
-  GLD_NFT_10G_CANISTER_ID,
-  GLD_NFT_100G_CANISTER_ID,
-  GLD_NFT_1000G_CANISTER_ID,
-  OGY_LEDGER_CANISTER_ID,
-  GLDT_LEDGER_CANISTER_ID,
-  SWAP_CANISTER_ID,
-  ICP_SWAP_CANISTER_ID,
-} from "@constants";
-
-import { idlFactory as gld_nft_idl } from "@canisters/gld_nft/did";
-import { idlFactory as gldt_swap_idl } from "@canisters/gldt_swap/did";
-import { idlFactory as ledger_idl } from "@canisters/ledger/did";
-import { idlFactory as icp_swap_idl } from "@canisters/icp_swap/did";
+import { Actor, ActorSubclass, HttpAgent, SignIdentity } from "@dfinity/agent";
 
 interface Canisters {
   [canisterName: string]: {
@@ -34,49 +18,15 @@ interface Canisters {
   };
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const CANISTERS: Canisters = {
-  gld_nft_1g: {
-    canisterId: GLD_NFT_1G_CANISTER_ID,
-    idlFactory: gld_nft_idl,
-  },
-  gld_nft_10g: {
-    canisterId: GLD_NFT_10G_CANISTER_ID,
-    idlFactory: gld_nft_idl,
-  },
-  gld_nft_100g: {
-    canisterId: GLD_NFT_100G_CANISTER_ID,
-    idlFactory: gld_nft_idl,
-  },
-  gld_nft_1000g: {
-    canisterId: GLD_NFT_1000G_CANISTER_ID,
-    idlFactory: gld_nft_idl,
-  },
-  gldt_swap: {
-    canisterId: SWAP_CANISTER_ID,
-    idlFactory: gldt_swap_idl,
-  },
-  gldt_ledger: {
-    canisterId: GLDT_LEDGER_CANISTER_ID,
-    idlFactory: ledger_idl,
-  },
-  ogy_ledger: {
-    canisterId: OGY_LEDGER_CANISTER_ID,
-    idlFactory: ledger_idl,
-  },
-  icp_swap: {
-    canisterId: ICP_SWAP_CANISTER_ID,
-    idlFactory: icp_swap_idl,
-  },
-};
-
 export interface AuthState {
+  isInitializing: boolean;
   isConnected: boolean;
   isConnecting: boolean;
   principalId: string;
 }
 
 const initialState: AuthState = {
+  isInitializing: true,
   isConnected: false,
   isConnecting: false,
   principalId: "",
@@ -95,7 +45,7 @@ export const useAuth = () => {
   return context;
 };
 
-const useAuthProviderValue = () => {
+const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
   const [state, setState] = useState<AuthState>(initialState);
   const connected = localStorage.getItem("connected") || "";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<
@@ -110,7 +60,41 @@ const useAuthProviderValue = () => {
     connect,
     disconnect: disconnectIK,
     delegationType,
+    isInitializing,
+    isUserConnecting,
   } = useIdentityKit();
+  // console.log(user);
+  // console.log(identity);
+  // console.log(agent);
+  // console.log(authenticatedNonTargetAgent);
+
+  useEffect(() => {
+    if (!isInitializing && !user && connected !== "1") {
+      setState((prevState) => ({
+        ...prevState,
+        isInitializing: false,
+      }));
+    }
+  }, [connected, isInitializing, user]);
+
+  useEffect(() => {
+    if (!isInitializing && !!user && connected === "1") {
+      setState((prevState) => ({
+        ...prevState,
+        isConnecting: true,
+      }));
+    }
+  }, [connected, isInitializing, user]);
+
+  useEffect(() => {
+    if (isUserConnecting || (!!user && connected === "1")) {
+      setState((prevState) => ({
+        ...prevState,
+        isConnecting: true,
+        isInitializing,
+      }));
+    }
+  }, [isUserConnecting, user, connected, isInitializing]);
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then(
@@ -118,36 +102,34 @@ const useAuthProviderValue = () => {
     );
   }, []);
 
+  // ? remove this condition for plug delegationType === IdentityKitDelegationType.ANONYMOUS
   useEffect(() => {
-    if (identity && delegationType === IdentityKitDelegationType.ANONYMOUS) {
+    if (user && agent && identity) {
       HttpAgent.create({ identity, host: "https://icp-api.io/" }).then(
         setAuthenticatedNonTargetAgent
       );
     }
-  }, [identity, delegationType]);
+  }, [identity, delegationType, user, agent]);
 
   useEffect(() => {
-    if (user && authenticatedNonTargetAgent && agent) {
+    if (user && authenticatedNonTargetAgent) {
       setState((prevState) => ({
         ...prevState,
         principalId: user.principal.toText(),
         isConnected: true,
         isConnecting: false,
       }));
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        principalId: "",
+        isConnected: false,
+      }));
     }
   }, [user, authenticatedNonTargetAgent, agent]);
 
-  useEffect(() => {
-    if (!!user && connected !== undefined && connected === "1") {
-      setState((prevState) => ({
-        ...prevState,
-        isConnecting: true,
-      }));
-    }
-  }, [user, connected]);
-
   const getActor = (
-    canisterName:
+    canister:
       | string
       | "gld_nft_1g"
       | "gld_nft_10g"
@@ -156,36 +138,39 @@ const useAuthProviderValue = () => {
       | "gldt_swap"
       | "gldt_ledger"
       | "ogy_ledger"
-      | "icp_swap",
-    options: { authenticated: boolean } = { authenticated: true }
+      | "icp_swap"
   ): ActorSubclass => {
-    const { canisterId, idlFactory } = CANISTERS[canisterName];
+    const { canisterId, idlFactory } = canisters[canister];
 
-    const nonTargetActor =
-      identity &&
-      delegationType === IdentityKitDelegationType.ANONYMOUS &&
-      authenticatedNonTargetAgent &&
-      Actor.createActor(idlFactory, {
-        agent: authenticatedNonTargetAgent,
-        canisterId,
-      });
+    const actor = authenticatedNonTargetAgent
+      ? Actor.createActor(idlFactory, {
+          agent: authenticatedNonTargetAgent,
+          canisterId,
+        })
+      : Actor.createActor(idlFactory, {
+          agent: unauthenticatedAgent,
+          canisterId: canisterId,
+        });
 
-    const nonTargetUnauthenticatedActor =
-      unauthenticatedAgent &&
-      Actor.createActor(idlFactory, {
-        agent: unauthenticatedAgent,
-        canisterId: canisterId,
-      });
-
-    const actor = options.authenticated
-      ? nonTargetActor
-      : nonTargetUnauthenticatedActor;
     return actor as ActorSubclass;
   };
 
+  useEffect(() => {
+    if (state.isConnected && !(identity instanceof SignIdentity)) {
+      console.log("Lost SignIdentity");
+      disconnect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identity, state.isConnected]);
+
   const disconnect = () => {
     disconnectIK();
-    setState(initialState);
+    setState({
+      isInitializing: false,
+      isConnected: false,
+      isConnecting: false,
+      principalId: "",
+    });
   };
 
   const value = useMemo(
@@ -196,13 +181,19 @@ const useAuthProviderValue = () => {
       getActor,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state]
+    [state, identity]
   );
   return value;
 };
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const contextValue = useAuthProviderValue();
+export const AuthProvider = ({
+  children,
+  canisters,
+}: {
+  children: ReactNode;
+  canisters: Canisters;
+}) => {
+  const contextValue = useAuthProviderValue({ canisters });
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

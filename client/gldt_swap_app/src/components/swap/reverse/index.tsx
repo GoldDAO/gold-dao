@@ -1,5 +1,5 @@
 import { useAuth } from "@context/auth";
-import { ReverseSwapProceedProvider } from "@context/index";
+import { useReverseSwapProceed } from "@context/index";
 
 import { Button } from "@components/ui";
 
@@ -11,14 +11,13 @@ import ReverseSwapFrom from "./from";
 import ReverseSwapTo from "./to";
 import ReverseSwapProceed from "./proceed";
 import TransactionDetails from "./TransactionDetails";
-
-import { useNft } from "@context/index";
+import InsufficientFundsGLDT from "./insufficient-gldt-disclaimer";
 
 const Reverse = () => {
   const { state: authState, connect } = useAuth();
   const { isConnected } = authState;
-  const { getSelectedTotal } = useNft();
-  const hasSelectedNfts = !!getSelectedTotal();
+  const { state: reverseSwapProceedState } = useReverseSwapProceed();
+  const { canReverseSwap, isInsufficientGLDTFunds } = reverseSwapProceedState;
 
   return (
     <>
@@ -27,11 +26,15 @@ const Reverse = () => {
           <Backdrop isClickable={true} handleOnClick={connect} />
         )}
         <FromCard>
-          <ReverseSwapFrom />
+          {isInsufficientGLDTFunds ? (
+            <InsufficientFundsGLDT className="mt-6" />
+          ) : (
+            <ReverseSwapFrom />
+          )}
         </FromCard>
         <ArrowDown />
         <ReverseSwapTo />
-        {hasSelectedNfts && <TransactionDetails className="w-full  mt-8" />}
+        {canReverseSwap && <TransactionDetails className="w-full  mt-8" />}
       </div>
       <div className="mt-6">
         {!isConnected && (
@@ -39,11 +42,7 @@ const Reverse = () => {
             Connect a wallet
           </Button>
         )}
-        {isConnected && (
-          <ReverseSwapProceedProvider>
-            <ReverseSwapProceed />
-          </ReverseSwapProceedProvider>
-        )}
+        {isConnected && <ReverseSwapProceed />}
       </div>
     </>
   );
