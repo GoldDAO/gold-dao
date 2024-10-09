@@ -158,8 +158,9 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
   useEffect(() => {
     if (state.isConnected && !(identity instanceof SignIdentity)) {
       console.log("Lost SignIdentity");
-      // disconnect();
+      disconnect();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [identity, state.isConnected]);
 
   const disconnect = () => {
