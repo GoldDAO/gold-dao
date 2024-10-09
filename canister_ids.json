@@ -1,12 +1,12 @@
 {
-  "gldt_swap": {
-    "ic": "m5bu4-7qaaa-aaaap-abrxq-cai",
-    "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
+  "buyback_burn": {
+    "ic": "atslz-hiaaa-aaaam-acq6q-cai",
+    "staging": "y4bmn-taaaa-aaaak-qillq-cai"
   },
   "gld_dashboard": {
     "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
-    "staging": "mpece-iqaaa-aaaal-qizma-cai",
-    "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai"
+    "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai",
+    "staging": "mpece-iqaaa-aaaal-qizma-cai"
   },
   "gldt_landing_page": {
     "ic": "bojx2-iaaaa-aaaag-ab3jq-cai",
@@ -20,9 +20,16 @@
     "ic": "oo6x4-xiaaa-aaaap-abrza-cai",
     "staging": "wusb2-uiaaa-aaaao-a2lca-cai"
   },
+  "gldt_swap": {
+    "ic": "m5bu4-7qaaa-aaaap-abrxq-cai",
+    "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
+  },
   "gldt_swap_app": {
     "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
     "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
+  },
+  "icp_ledger": {
+    "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
   },
   "icp_neuron": {
     "ic": "j4jiq-sqaaa-aaaap-ab23a-cai",
@@ -32,10 +39,6 @@
     "ic": "g5je6-yaaaa-aaaap-ahkza-cai",
     "staging": "t5uzw-sqaaa-aaaan-qmoaq-cai"
   },
-  "buyback_burn": {
-    "ic": "atslz-hiaaa-aaaam-acq6q-cai",
-    "staging": "y4bmn-taaaa-aaaak-qillq-cai"
-  },
   "sns_governance": {
     "ic": "tr3th-kiaaa-aaaaq-aab6q-cai",
     "staging": "j3ioe-7iaaa-aaaap-ab23q-cai"
@@ -44,16 +47,17 @@
     "ic": "efv5g-kqaaa-aaaaq-aacaa-cai",
     "staging": "iwgkk-qaaaa-aaaap-ab24a-cai"
   },
-  "icp_ledger": {
-    "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
-  },
   "sns_ledger": {
     "ic": "tyyy3-4aaaa-aaaaq-aab7a-cai",
     "staging": "irhm6-5yaaa-aaaap-ab24q-cai"
   },
+  "sns_neuron_controller": {
+    "ic": "54vkq-taaaa-aaaap-ahqra-cai",
+    "staging": "s2ryu-oyaaa-aaaap-qhq2q-cai"
+  },
   "sns_rewards": {
     "ic": "iyehc-lqaaa-aaaap-ab25a-cai",
-    "staging": "2f5ll-gqaaa-aaaak-qcfuq-cai"
+    "staging": "rbv23-fqaaa-aaaam-qbfma-cai"
   },
   "sns_root": {
     "ic": "tw2vt-hqaaa-aaaaq-aab6a-cai",
@@ -63,16 +67,12 @@
     "ic": "t7z6p-ryaaa-aaaaq-aab7q-cai",
     "staging": "ikcq3-haaaa-aaaap-ab26a-cai"
   },
-  "sns_neuron_controller": {
-    "ic": "54vkq-taaaa-aaaap-ahqra-cai",
-    "staging": "s2ryu-oyaaa-aaaap-qhq2q-cai"
+  "super_stats_v3": {
+    "ic": "hgbea-2aaaa-aaaal-qjo4q-cai",
+    "staging": "j7n5o-wyaaa-aaaap-qhskq-cai"
   },
   "token_metrics": {
     "ic": "teiwz-pqaaa-aaaap-ag7hq-cai",
     "staging": "yfjcz-3iaaa-aaaap-accjq-cai"
-  },
-  "super_stats_v3": {
-    "ic": "hgbea-2aaaa-aaaal-qjo4q-cai",
-    "staging": "j7n5o-wyaaa-aaaap-qhskq-cai"
   }
 }

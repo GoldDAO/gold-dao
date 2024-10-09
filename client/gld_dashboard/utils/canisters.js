@@ -28,7 +28,7 @@ const canisters = {
   icpNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpNeuron },
   ogyNeuron: { canisterId: '54vkq-taaaa-aaaap-ahqra-cai', idlFactory: ogyNeurons },
   icpSwap: { canisterId: 'moe7a-tiaaa-aaaag-qclfq-cai', idlFactory: icpSwap },
-  snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : '2f5ll-gqaaa-aaaak-qcfuq-cai', idlFactory: snsRewards },
+  snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : 'rbv23-fqaaa-aaaam-qbfma-cai', idlFactory: snsRewards },
   icpAllInfoNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpAllInfoNeuron },
   management: { canisterId: isProd ? 'g5je6-yaaaa-aaaap-ahkza-cai' : 't5uzw-sqaaa-aaaan-qmoaq-cai', idlFactory: idlManagement },
   tokenMetrics: { canisterId: 'teiwz-pqaaa-aaaap-ag7hq-cai', idlFactory: idltokenMetrics },

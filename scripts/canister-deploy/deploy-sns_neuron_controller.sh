@@ -9,7 +9,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
     TESTMODE=true
-    SNS_REWARDS_CANISTER_ID=2f5ll-gqaaa-aaaak-qcfuq-cai
+    SNS_REWARDS_CANISTER_ID=rbv23-fqaaa-aaaam-qbfma-cai
     OGY_SNS_GOVERNANCE_CANISTER_ID=jtpnb-waaaa-aaaal-ajc6q-cai
     OGY_SNS_LEDGER_CANISTER_ID=j5naj-nqaaa-aaaal-ajc7q-cai
     OGY_SNS_REWARDS_CANISTER_ID=fpmqz-aaaaa-aaaag-qjvua-cai
