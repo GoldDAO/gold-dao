@@ -10,6 +10,8 @@ import { idlFactory as idlLighthouse } from './idls/lighthouseApi';
 import { idlFactory as idlRoot } from './idls/root';
 import { idlFactory as snsRewards } from './idls/snsRewards';
 import { idlFactory as idlManagement } from './idls/management';
+import { idlFactory as idltokenMetrics } from './idls/tokenMetrics';
+import { idlFactory as superStats } from './idls/superStats';
 
 // eslint-disable-next-line import/prefer-default-export
 
@@ -21,14 +23,16 @@ const canisters = {
   ledger: { canisterId: isProd ? 'tyyy3-4aaaa-aaaaq-aab7a-cai' : 'irhm6-5yaaa-aaaap-ab24q-cai', idlFactory: idlLedger },
   root: { canisterId: isProd ? 'tw2vt-hqaaa-aaaaq-aab6a-cai' : 'i7fbw-giaaa-aaaap-ab25q-cai', idlFactory: idlRoot },
   ogy: { canisterId: isProd ? 'lkwrt-vyaaa-aaaaq-aadhq-cai' : 'j5naj-nqaaa-aaaal-ajc7q-cai', idlFactory: idlLedger },
-  icp: { canisterId: isProd ? 'ryjl3-tyaaa-aaaaa-aaaba-cai': 'ete3q-rqaaa-aaaal-qdlva-cai', idlFactory: idlIcp },
+  icp: { canisterId: isProd ? 'ryjl3-tyaaa-aaaaa-aaaba-cai' : 'ete3q-rqaaa-aaaal-qdlva-cai', idlFactory: idlIcp },
   lighthouseApi: { canisterId: 'zfp4v-oyaaa-aaaar-qadqq-cai', idlFactory: idlLighthouse },
   icpNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpNeuron },
   ogyNeuron: { canisterId: '54vkq-taaaa-aaaap-ahqra-cai', idlFactory: ogyNeurons },
   icpSwap: { canisterId: 'moe7a-tiaaa-aaaag-qclfq-cai', idlFactory: icpSwap },
-  snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : '2f5ll-gqaaa-aaaak-qcfuq-cai', idlFactory: snsRewards },
+  snsRewards: { canisterId: isProd ? 'iyehc-lqaaa-aaaap-ab25a-cai' : 'rbv23-fqaaa-aaaam-qbfma-cai', idlFactory: snsRewards },
   icpAllInfoNeuron: { canisterId: isProd ? 'j4jiq-sqaaa-aaaap-ab23a-cai' : 'j2neh-vqaaa-aaaal-aduxq-cai', idlFactory: icpAllInfoNeuron },
   management: { canisterId: isProd ? 'g5je6-yaaaa-aaaap-ahkza-cai' : 't5uzw-sqaaa-aaaan-qmoaq-cai', idlFactory: idlManagement },
+  tokenMetrics: { canisterId: 'teiwz-pqaaa-aaaap-ag7hq-cai', idlFactory: idltokenMetrics },
+  superStats: { canisterId: 'hgbea-2aaaa-aaaal-qjo4q-cai', idlFactory: superStats },
 };
 
 export default canisters;

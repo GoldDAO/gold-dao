@@ -1,5 +1,5 @@
 import { Card } from "@components/ui";
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { useSwapApp, View } from "@context/index";
 
 import { SwapProvider } from "@context/swap/swap";
@@ -12,8 +12,7 @@ import Swap from "@components/swap/Swap";
 import Transfer from "@components/transfer/Transfer";
 
 const SwapTransfer = () => {
-  const { state: authState, connect } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected, connect } = useAuth();
   const { state: swapAppState } = useSwapApp();
   const { view } = swapAppState;
 

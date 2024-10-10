@@ -204,10 +204,14 @@ impl SwapBuilder<SwapDetailForward> {
                 swap_details.created_at = time;
                 swap_details.tokens_to_mint = tokens_to_mint;
                 swap_details.escrow_sub_account = [0u8; 32];
-                swap_details.gldt_receiver = Account { owner: user_principal, subaccount: None };
+                swap_details.gldt_receiver = Account {
+                    owner: user_principal,
+                    subaccount: None,
+                };
             }
             _ => {}
         }
+
         if errors.len() > 0 {
             Err((new_swap, errors))
         } else {

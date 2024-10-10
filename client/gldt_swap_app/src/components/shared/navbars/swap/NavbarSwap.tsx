@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { Button } from "@components/ui";
 import DropdownBalance from "./dropdown-balance/DropdownBalance";
 import DropdownUser from "./dropdown-user/DropdownUser";
 
 const Swap = () => {
-  const { state: authState, connect } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected, connect } = useAuth();
 
   return (
     <>

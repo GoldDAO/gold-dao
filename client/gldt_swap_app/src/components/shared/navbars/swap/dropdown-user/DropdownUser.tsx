@@ -3,19 +3,18 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
   ChevronDownIcon,
   UserIcon,
-  UsersIcon,
+  ArrowsRightLeftIcon,
   ArrowPathIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/16/solid";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { Tile } from "@components/ui";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
 const DropdownUser = () => {
-  const { state: authState, disconnect } = useAuth();
-  const { principalId } = authState;
+  const { principalId, disconnect } = useAuth();
   const navigate = useNavigate();
 
   const handleDisconnect = () => {
@@ -95,7 +94,7 @@ const DropdownUser = () => {
                   to="swap?view=1"
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
                 >
-                  <UsersIcon className="size-4" />
+                  <ArrowsRightLeftIcon className="size-4" />
                   Transfer
                 </Link>
               </MenuItem>

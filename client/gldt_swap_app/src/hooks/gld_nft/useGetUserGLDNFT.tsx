@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
-import { TokenId, Nft, useNft } from "@context/index";
+import { useAuth } from "@auth/index";
+import { TokenId, Nft, useNft, CollectionIndex } from "@context/index";
+
+import { bigintTo32ByteArray } from "@utils/index";
 
 import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetUserGLDNFT = () => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -17,8 +18,11 @@ export const useGetUserGLDNFT = () => {
 
   const active_swaps = useGetUserActiveSwaps();
 
-  const getUserNFTByCanister = async (canisterName: string): Promise<Nft> => {
-    const actor = getActor(canisterName);
+  const getUserNFTByCanister = async (
+    canisterName: string,
+    collectionIndex: CollectionIndex
+  ): Promise<Nft> => {
+    const actor = createActor(canisterName);
     const token_ids_bigint = (await actor.unlisted_tokens_of(
       {
         owner: Principal.fromText(principalId as string),
@@ -36,40 +40,46 @@ export const useGetUserGLDNFT = () => {
         return {
           id_string: result,
           id_bigint: tokenId,
+          id_byte_array: bigintTo32ByteArray(tokenId),
         };
       })
     );
 
     return {
       tokenIds,
+      collectionIndex,
     };
   };
 
   const userNFTs = useQueries({
     queries: [
       {
-        queryKey: ["GET_USER_GLD_NFT_1G"],
-        queryFn: () => getUserNFTByCanister("gld_nft_1g"),
+        queryKey: ["USER_GET_GLD_NFT_1G"],
+        queryFn: () =>
+          getUserNFTByCanister("gld_nft_1g", CollectionIndex.GLD_NFT_1G),
         placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId && !!active_swaps.isSuccess,
+        enabled: !!isConnected && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,
       },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_10G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_10g"),
+      //   queryKey: ["USER_GET_GLD_NFT_10G"],
+      //   queryFn: () =>
+      //     getUserNFTByCanister("gld_nft_10g", CollectionIndex.GLD_NFT_10G),
       //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!principalId,
+      //   enabled: !!isConnected && !!active_swaps.isSuccess,
       //   refetchOnWindowFocus: false,
       // },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_100G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_100g"),
+      //   queryKey: ["USER_GET_GLD_NFT_100G"],
+      //   queryFn: () =>
+      //     getUserNFTByCanister("gld_nft_100g", CollectionIndex.GLD_NFT_100G),
       //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!principalId,
+      //   enabled: !!isConnected && !!active_swaps.isSuccess,
+      //   refetchOnWindowFocus: false,
       // },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_1000G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_1000g"),
+      //   queryKey: ["USER_GET_GLD_NFT_1000G"],
+      //   queryFn: () => getUserNFTByCanister("gld_nft_1000g", CollectionIndex.GLD_NFT_1000G),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected && !!principalId,
       // },
@@ -87,29 +97,25 @@ export const useGetUserGLDNFT = () => {
     if (isLoading || isFetching) {
       setIsInitializing(true);
       setIsError(false);
-    } else if (isSuccess && isInitializing) {
+    } else if (isSuccess && active_swaps.isSuccess && isInitializing) {
       // ? Filter nft's currently being swapped
-      const nftIdStrings =
+      const unavailableNfts =
         active_swaps.data?.rows.map((row) => row.nft_id_string) ?? [];
-      const filteredData = data.map((obj) => {
+      const availableNfts = data.map((obj) => {
         return {
           ...obj,
           tokenIds:
             obj?.tokenIds.filter(
-              (token) => !nftIdStrings.includes(token.id_string)
+              (token) => !unavailableNfts.includes(token.id_string)
             ) ?? [],
         };
       });
-      const updateNfts = async () => {
-        await new Promise<void>((resolve) => {
-          setNfts(filteredData as Nft[]);
-          resolve();
-        });
-      };
-      updateNfts();
+      (async function () {
+        await setNfts(availableNfts as Nft[]);
+      })();
       setIsInitializing(false);
     } else if (_isError || active_swaps.isError) {
-      console.log(_error ?? active_swaps.isError);
+      if (_error) console.log(_error);
       setIsError(true);
       setError("Error while fetching your NFTs :(.");
       setIsInitializing(false);

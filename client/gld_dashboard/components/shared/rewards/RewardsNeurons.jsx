@@ -2,7 +2,7 @@ import { Bounce, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Tooltip } from '@nextui-org/react';
-import { CopyIcon, DoubleArrowRefresh, RedCross } from '../../../utils/svgs';
+import { CopyIcon } from '../../../utils/svgs';
 import {
   copyContent,
   elapsedTime,
@@ -24,7 +24,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
   const [disableClaimAll, setDisableClaimAll] = useState(true);
   const [neuronAmountsToClaim, setNeuronAmountsToClaim] = useState({});
   const [reloadPrincipal, setReloadPrincipal] = useState(false);
-  const [selectedNeuronId, setSelectedNeuronId] = useState(false);
+  const [selectedNeuronId] = useState(false);
   const [userNeurons, setUserNeurons] = useState([]);
   const [neuronModify, setNeuronModify] = useState([]);
   const [hovered, setHovered] = useState({ disabled: false });
@@ -34,7 +34,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
     setHovered({ ...hovered, disabled, index });
   };
 
-  const { getNeuronsByOwner, loading, neuronError } = useNeurons({
+  const { getNeuronsByOwner, loading } = useNeurons({
     neuronId: '',
     token: '',
   });
@@ -42,9 +42,24 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
   const getNeurons = async () => {
     const response = await getNeuronsByOwner();
     if (response) {
-      setUserNeurons(response);
+      console.log(response);
+      const neuronsToShow = response.filter((neuron) => {
+        const hasStakedAmount = (neuron.cached_neuron_stake_e8s
+          + neuron.maturity_e8s_equivalent + neuron.staked_maturity_e8s_equivalent) > 0;
+        const hasRewards = (neuron.icpRewards > 0
+          || neuron.ledgerRewards > 0 || neuron.ogyRewards > 0);
 
-      const amountsToClaim = response.reduce(
+        if (hasRewards || hasStakedAmount) {
+          return true;
+        }
+
+        return false;
+      });
+      console.log('NEURONS TO SHOW', neuronsToShow);
+
+      setUserNeurons(neuronsToShow);
+
+      const amountsToClaim = neuronsToShow.reduce(
         (acc, curr) => {
           acc.icpAmount += curr.icpRewards;
           acc.ledgerAmount += curr.ledgerRewards;
@@ -53,7 +68,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         },
         { icpAmount: 0, ledgerAmount: 0, ogyAmount: 0 },
       );
-      setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: response });
+      setNeuronAmountsToClaim({ ...amountsToClaim, userNeurons: neuronsToShow });
       if (!amountsToClaim.icpAmount && !amountsToClaim.ledgerAmount && !amountsToClaim.ogyAmount) {
         setDisableClaimAll(true);
       } else {
@@ -223,23 +238,6 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                   >
                     Claim
                   </button>
-                  <button className="z-10 flex items-center justify-between w-1/6">
-                    <div className="sm:hidden">
-                      {loading && DoubleArrowRefresh}
-                      {neuronError[item.id] && RedCross}
-                    </div>
-                    <Image
-                      src="svg/trash.svg"
-                      alt="trash"
-                      height={20}
-                      width={20}
-                      className="ml-2"
-                      onClick={() => {
-                        setSelectedNeuronId(item.id);
-                        document.getElementById('my_modal_delete').showModal();
-                      }}
-                    />
-                  </button>
                 </section>
                 <section className="collapse-content w-[95%] grid grid-cols-4 grid-rows-2 px-2 sm:px-8">
                   <div className="text-[#D3B871] font-medium flex  items-center gap-2 text-sm">
@@ -371,7 +369,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
         />
       </Modal>
       <Modal title="Add Neuron" idModal="my_modal_add">
-        <ModalAdd setNeuronModify={setNeuronModify} />
+        <ModalAdd setNeuronModify={setNeuronModify} neuronModify={neuronModify} />
       </Modal>
       <Modal title="Confirm claim" idModal="my_modal_claim_desk">
         <ModalClaimAll

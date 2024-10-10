@@ -1,4 +1,4 @@
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import TotalCountNfts from "@components/account/TotalCountNfts";
 import TotalSwappedGLDT from "@components/account/TotalSwappedGLDT";
 import TotalWeightNfts from "@components/account/TotalWeightNfts";
@@ -12,8 +12,7 @@ import PastTransactions from "@components/transactions/list/past/Past";
 // todo better handle isConnected state
 
 const Account = () => {
-  const { state: authState } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected } = useAuth();
 
   return (
     <div className="container mx-auto mt-4 sm:mt-8">

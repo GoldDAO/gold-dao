@@ -7,9 +7,6 @@ import { CrosshairPlugin, Interpolate } from 'chartjs-plugin-crosshair';
 import { useEffect, useRef, useState } from 'react';
 
 import { Line } from 'react-chartjs-2';
-import {
-  data2, data3, data4, data5,
-} from '../../utils/datas';
 import useCharts from '../../hooks/useCharts';
 
 Chart.register(CrosshairPlugin);
@@ -18,100 +15,115 @@ Interaction.modes.interpolate = Interpolate;
 export default function Graph({ name }) {
   const [data, setData] = useState({ loading: true, data: [], suggestedMax: 800000000 });
   const chartRef = useRef(null);
-  const { copyGldGovSupply, copyGldGovTreasury } = useCharts();
+  const {
+    copyGldGovSupply, copyGldGovTreasury,
+    copyStakersData, copyHoldersData, copyBurnData,
+    copyLiquidData, copyRewardPoolData, copyReservePoolData,
+  } = useCharts();
   const [innerWidth, setInnerWidth] = useState(700);
 
   useEffect(() => setInnerWidth(window.innerWidth), []);
 
   useEffect(() => {
-    (async () => {
-      switch (name) {
-        case 'Treasury':
-          if (copyGldGovTreasury?.loading) break;
-          // await getTreasuryChart();
-          // const data = await treasuryData({ timestamp });
-          setData({
-            loading: false,
-            data: copyGldGovTreasury.data,
-            suggestedMax: 800000000,
-          });
-          break;
-        case 'Staked':
-          setData({ loading: false, data: data2, suggestedMax: 1200 });
-          break;
-        case 'Liquid':
-          setData({ loading: false, data: data3, suggestedMax: 1200 });
-          break;
-        case 'Burned':
-          setData({ loading: false, data: data4, suggestedMax: 1200 });
-          break;
-        case 'Holders':
-          setData({ loading: false, data: data5, suggestedMax: 1200 });
-          break;
-        case 'Total GLDGov Supply':
-          if (copyGldGovSupply?.loading) break;
+    switch (name) {
+      case 'Treasury':
+        if (copyGldGovTreasury?.loading
+          && copyGldGovTreasury?.data && copyGldGovTreasury?.data.length) break;
+        setData({
+          loading: false,
+          data: copyGldGovTreasury.data,
+          suggestedMax: 800000000,
+        });
+        break;
+      case 'Staked':
+        if (copyStakersData?.loading
+          && copyStakersData?.data && copyStakersData?.data.length) break;
+        setData({ loading: false, data: copyStakersData.data });
+        break;
+      case 'Liquid':
+        if (copyLiquidData?.loading && copyLiquidData?.data && copyLiquidData?.data.length) break;
+        setData({
+          loading: false,
+          data: copyLiquidData.data,
+        });
+        break;
+      case 'Burned':
+        if (copyBurnData?.loading && copyBurnData?.data && copyBurnData?.data.length) break;
+        setData({ loading: false, data: copyBurnData.data });
+        break;
+      case 'Holders':
+        if (copyHoldersData?.loading
+          && copyHoldersData?.data && copyHoldersData?.data.length) break;
+        setData({ loading: false, data: copyHoldersData.data, suggestedMax: 100000 });
+        break;
+      default:
+        setData({ loading: false, data: [], suggestedMax: 1200 });
+        break;
+    }
 
-          // await getSupplyChart();
-          // await supplyData({ timestamp });
-          setData({
-            loading: false,
-            data: copyGldGovSupply.data, // ,
-            suggestedMax: 1000010000,
-            suggestedMin: 999905000,
-          });
-          break;
-        default:
-          // console.log("default");
-          setData({ loading: false, data: [], suggestedMax: 1200 });
-          break;
+    const chart = chartRef.current;
+    const monthsCount = data.data?.length;
+    if (chart && monthsCount > 0) {
+      const xAxis = chart.scales.x;
+      if (xAxis) {
+        xAxis.options.gridLines = {
+          display: true,
+          drawBorder: false,
+          drawOnChartArea: false,
+          color: '#ccc',
+          lineWidth: 1,
+          tickLength: 0,
+          borderDash: [5, 5],
+          z: 0,
+
+          drawTicks(context) {
+            const { ticks } = xAxis;
+            const tickStep = Math.floor(ticks.length / 4);
+            for (let i = 0; i < ticks.length; i += tickStep) {
+              const xPos = xAxis.getPixelForTick(i);
+              context.save();
+              context.beginPath();
+              context.moveTo(xPos, 0);
+              context.lineTo(xPos, chart.height);
+              context.strokeStyle = this.color;
+              context.lineWidth = this.lineWidth;
+              context.setLineDash(this.borderDash);
+              context.stroke();
+              context.restore();
+            }
+          },
+        };
+        xAxis.options.ticks = {
+          display: false,
+        };
       }
-
-      const chart = chartRef.current;
-      const monthsCount = data.data?.length;
-      if (chart && monthsCount > 0) {
-        const xAxis = chart.scales.x;
-        if (xAxis) {
-          xAxis.options.gridLines = {
-            display: true,
-            drawBorder: false,
-            drawOnChartArea: false,
-            color: '#ccc',
-            lineWidth: 1,
-            tickLength: 0,
-            borderDash: [5, 5],
-            z: 0,
-
-            drawTicks(context) {
-              const { ticks } = xAxis;
-              const tickStep = Math.floor(ticks.length / 4);
-              for (let i = 0; i < ticks.length; i += tickStep) {
-                const xPos = xAxis.getPixelForTick(i);
-                context.save();
-                context.beginPath();
-                context.moveTo(xPos, 0);
-                context.lineTo(xPos, chart.height);
-                context.strokeStyle = this.color;
-                context.lineWidth = this.lineWidth;
-                context.setLineDash(this.borderDash);
-                context.stroke();
-                context.restore();
-              }
-            },
-          };
-          xAxis.options.ticks = {
-            display: false,
-          };
-          chart.update();
-        }
-      }
-    })();
+    }
+    chart.update();
   }, [
+    copyStakersData?.data, copyStakersData.loading,
+    copyBurnData?.data, copyBurnData.loading,
+    copyGldGovTreasury?.data, copyGldGovTreasury.loading,
+    copyLiquidData?.data, copyLiquidData.loading,
+    copyHoldersData?.data, copyHoldersData.loading,
+    copyRewardPoolData?.data, copyRewardPoolData.loading,
+    copyReservePoolData?.data, copyReservePoolData.loading,
+    copyGldGovSupply?.data, copyGldGovSupply.loading,
     copyGldGovSupply.data,
     copyGldGovSupply?.loading,
     copyGldGovTreasury.data,
     copyGldGovTreasury?.loading,
     data.data?.length,
+    copyStakersData?.data,
+    copyStakersData?.data.length,
+    copyStakersData?.loading,
+    copyHoldersData?.data,
+    copyHoldersData?.data.length,
+    copyHoldersData?.loading,
+    copyBurnData?.loading,
+    copyBurnData?.data,
+    copyBurnData?.data.length,
     name,
+
   ]);
 
   return (

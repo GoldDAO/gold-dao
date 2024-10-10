@@ -1,7 +1,7 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { roundAndFormatLocale, divideBy1e8 } from "@utils/numbers";
 
 export const useLedgerUserBalance = ({
@@ -9,8 +9,7 @@ export const useLedgerUserBalance = ({
 }: {
   ledger: string;
 }) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const queryKeyName = `USER_FETCH_BALANCE_${ledger}`;
 
   const icrc1_balance_of = async ({
@@ -20,7 +19,7 @@ export const useLedgerUserBalance = ({
     owner: string;
     ledger: string;
   }) => {
-    const actor = await getActor(`${ledger}_ledger`);
+    const actor = createActor(`${ledger}_ledger`);
     const result = (await actor.icrc1_balance_of({
       owner: Principal.fromText(owner),
       subaccount: [],

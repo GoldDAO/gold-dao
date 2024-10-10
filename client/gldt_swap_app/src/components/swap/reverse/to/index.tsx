@@ -1,30 +1,20 @@
-// import { useEffect, useRef, useState } from "react";
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { useNft } from "@context/index";
 import { useGetAvailableGLDNFT } from "@hooks/gld_nft";
 
 import {
   Count as SelectNFTCount,
   Title as SelectNFTTitle,
-} from "@components/shared/select-nfts";
+} from "@components/shared/nft-select";
 
 import Loading from "./Loading";
 import Empty from "./Empty";
 import Error from "./Error";
-import { useLedgerUserBalance } from "@hooks/ledger";
 
 const ReverseSwapTo = () => {
-  const {
-    getCountNfts,
-    selectNft,
-    unselectNft,
-    state: nftState,
-    canBuyNft,
-  } = useNft();
-  const { state: authState } = useAuth();
-  const { isConnected } = authState;
+  const { getCountNfts, selectNft, unselectNft, state: nftState } = useNft();
+  const { isConnected } = useAuth();
   const count = getCountNfts();
-  const { data: balanceGLDT } = useLedgerUserBalance({ ledger: "GLDT" });
 
   const { isLoading, isSuccess, isError, error } = useGetAvailableGLDNFT();
 
@@ -32,8 +22,7 @@ const ReverseSwapTo = () => {
     if (type === "-") {
       unselectNft(collectionIndex);
     } else if (type === "+") {
-      if (canBuyNft(collectionIndex, balanceGLDT?.number || 0))
-        selectNft(collectionIndex);
+      selectNft(collectionIndex);
     }
   };
 

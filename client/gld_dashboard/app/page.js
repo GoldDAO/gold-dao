@@ -8,6 +8,10 @@ import GraphCard from '../components/Home/GraphCard';
 import Neurons from '../components/Home/Neurons';
 import StakingReturn from '../components/Home/StakingReturn';
 import TradeOn from '../components/Home/TradeOn';
+import useTokenMetrics from '../hooks/useTokenMetrics';
+import useSuperStats from '../hooks/useSuperStats';
+import { fetchBurnData } from '../services/icpApi';
+import useCharts from '../hooks/useCharts';
 
 export const viewport = {
   themeColor: '#c6c6c6',
@@ -15,6 +19,13 @@ export const viewport = {
 
 export default function Home() {
   // edit navigation bar color
+  const { getStakedAmount } = useTokenMetrics();
+  const {
+    getHoldersData, getRewardPool, getReservePool, getSNSFundCanister,
+  } = useSuperStats();
+  const { setBurnData } = useCharts();
+  fetchBurnData();
+
   useEffect(() => {
     let metaTag = document.querySelector('meta[name="theme-color"]');
 
@@ -25,6 +36,22 @@ export default function Home() {
     }
 
     metaTag.setAttribute('content', '#c6c6c6');
+  }, []);
+
+  // getters
+  useEffect(() => {
+    (async () => {
+      const [burnData] = await Promise.allSettled([
+        fetchBurnData(),
+        getStakedAmount(),
+        getHoldersData(),
+        getRewardPool(),
+        getReservePool(),
+        getSNSFundCanister(),
+      ]);
+
+      setBurnData(burnData.value ?? []);
+    })();
   }, []);
 
   return (
