@@ -14,8 +14,11 @@ const Success = () => {
   return (
     <div className="text-center">
       <div className="flex flex-col justify-center items-center rounded-xl">
-        <video autoPlay={true} loop={true} poster="/images/GLDNFT2GLDT.png">
-          <source src="/GLDNFT2GLDT.mp4" type="video/mp4" />
+        <video autoPlay={true} loop={true}>
+          <source
+            src="https://daolink-gold-dao-website-medias.sos-ch-gva-2.exo.io/GLDNFT2GLDT.webm#t=2.106585"
+            type="video/webm"
+          />
           Your browser does not support the video tag.
         </video>
         <div className="mb-6 font-semibold text-gold">

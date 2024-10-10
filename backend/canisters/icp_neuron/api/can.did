@@ -96,7 +96,7 @@ type Spawn = record {
 type Split = record { amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
 type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
   list_neurons : () -> (ListNeuronsResponse) query;
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);

@@ -4,6 +4,7 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
+          'buyback_burn',
           'gldt_swap',
           'icp_neuron',
           'management',
@@ -33,7 +34,7 @@ $[[ inputs.src-folder ]] staging build:
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
@@ -48,7 +49,7 @@ $[[ inputs.src-folder ]] staging build:
 $[[ inputs.src-folder ]] production build:
   extends: .canister build template
   rules:
-   - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+   - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
   artifacts:
     name: '${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm'
     paths:
@@ -57,46 +58,26 @@ $[[ inputs.src-folder ]] production build:
     expire_in: 6 months
 
 
-# $[[ inputs.src-folder ]] canister build:
-#   stage: build
-#   rules:
-#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-#       when: never
-#     - if: $CI_COMMIT_REF_NAME == "develop"
-#       changes:
-#         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
-#     - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
-#   extends: .rust template
-#   script:
-#     - scripts/build_canister.sh --wasmonly $[[ inputs.src-folder ]]
-#     - scripts/generate_did.sh $[[ inputs.src-folder ]]
-#     - scripts/build_canister.sh --checksum $[[ inputs.src-folder ]]
-#     - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
-#   artifacts:
-#     name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm"
-#     paths:
-#       - backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release
-#       - backend/canisters/$[[ inputs.src-folder ]]/api/can.did
-#     expire_in: 6 months
-
 $[[ inputs.src-folder ]] integration-test build:
   stage: integration_testing
   rules:
     # This will always run when any canister is released. Doesn't need to be this canister
-    - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+(-reinstall)?$/'
       when: always
     # This will run on merges to develop or MR from develop to master
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
     # This will run on any MR except for MR coming from develop (e.g. MR develop to master). The latter is covered above and will always run Int-tests
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
       needs: ['integration tests trigger']
   extends: .rust template
   script:

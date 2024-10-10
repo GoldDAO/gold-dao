@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { GLDT_TX_FEE, OGY_TX_FEE } from "@constants";
 
@@ -15,7 +15,7 @@ const getFeeByLedger = (ledger: string): bigint => {
 };
 
 export const useLedgerTransfer = ({ ledger = "OGY" }: { ledger: string }) => {
-  const { getActor } = useAuth();
+  const { createActor } = useAuth();
   const icrc1_transfer = async ({
     ledger,
     amount,
@@ -25,7 +25,7 @@ export const useLedgerTransfer = ({ ledger = "OGY" }: { ledger: string }) => {
     amount: bigint;
     to: string;
   }) => {
-    const actor = getActor(`${ledger}_ledger`);
+    const actor = createActor(`${ledger}_ledger`);
 
     const decodedAccount = decodeIcrcAccount(to);
     const owner = decodedAccount.owner;

@@ -19,12 +19,13 @@ if [[ $REINSTALL == "reinstall" ]]; then
 
   ARGUMENTS="(variant { Init = record {
     test_mode = $TESTMODE;
+    version = $BUILD_VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 
 else
   ARGUMENTS="(variant { Upgrade = record {
-    wasm_version = $WASM_VERSION;
+    version = $BUILD_VERSION;
     commit_hash = \"$COMMIT_SHA\";
   }})"
 fi

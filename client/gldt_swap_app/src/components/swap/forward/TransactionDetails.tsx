@@ -6,7 +6,6 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { useNft } from "@context/index";
-import { GLDT_VALUE_1G_NFT } from "@constants";
 
 const TransactionDetails = ({ className }: { className: string }) => {
   const {
@@ -38,10 +37,6 @@ const TransactionDetails = ({ className }: { className: string }) => {
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
               <div className="">Swapped amount</div>
               <div>{totalGLDT} GLDT</div>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
-              <div className="">Conversion fee</div>
-              <div>{totalNFTs * GLDT_VALUE_1G_NFT} GLDT</div>
             </div>
             <div className="border border-border"></div>
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60 font-semibold">

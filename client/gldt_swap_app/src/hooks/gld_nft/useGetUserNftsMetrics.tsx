@@ -4,7 +4,7 @@ import { Principal } from "@dfinity/principal";
 
 import { GLDT_VALUE_1G_NFT } from "@constants";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 interface NFTMetric {
   countNFT: number;
@@ -21,8 +21,7 @@ interface NFTMetrics {
 }
 
 export const useGetUserNftsMetrics = () => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<NFTMetrics | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -30,7 +29,7 @@ export const useGetUserNftsMetrics = () => {
     canisterName: string,
     valueNFT: number
   ): Promise<NFTMetric> => {
-    const actor = getActor(canisterName);
+    const actor = createActor(canisterName);
     const result = (await actor.count_unlisted_tokens_of({
       owner: Principal.fromText(principalId as string),
       subaccount: [],
@@ -48,30 +47,31 @@ export const useGetUserNftsMetrics = () => {
   const userNFTs = useQueries({
     queries: [
       {
-        queryKey: ["GET_USER_GLD_NFT_1G_COUNT"],
+        queryKey: ["USER_GET_GLD_NFT_1G_COUNT"],
         queryFn: () => getUserNFTCountByCanister("gld_nft_1g", 1),
         placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!principalId,
+        enabled: !!isConnected,
         refetchOnWindowFocus: false,
       },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_10G_COUNT"],
+      //   queryKey: ["USER_GET_GLD_NFT_10G_COUNT"],
       //   queryFn: () => getUserNFTCountByCanister("gld_nft_10g", 10),
       //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!principalId,
+      //   enabled: !!isConnected,
+      //   refetchOnWindowFocus: false,
+      // },
+      // {
+      //   queryKey: ["USER_GET_GLD_NFT_100G_COUNT"],
+      //   queryFn: () => getUserNFTCountByCanister("gld_nft_100g", 100),
+      //   placeholderData: keepPreviousData,
+      //   enabled: !!isConnected,
       //   refetchOnWindowFocus: false,
       // },
       //   {
-      //     queryKey: ["GET_USER_GLD_NFT_100G_COUNT"],
-      //     queryFn: () => getUserNFTCountByCanister("gld_nft_100g", 100),
-      //     placeholderData: keepPreviousData,
-      //     enabled: !!isConnected && !!principalId,
-      //   },
-      //   {
-      //     queryKey: ["GET_USER_GLD_NFT_1000G_COUNT"],
+      //     queryKey: ["USER_GET_GLD_NFT_1000G_COUNT"],
       //     queryFn: () => getUserNFTCountByCanister("gld_nft_1000g", 1000),
       //     placeholderData: keepPreviousData,
-      //     enabled: !!isConnected && !!principalId,
+      //     enabled: !!isConnected,
       //   },
     ],
   });

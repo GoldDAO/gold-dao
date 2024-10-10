@@ -7,20 +7,24 @@ edition = "2021"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[features]
+inttest = []
+
 [dependencies]
 candid = { workspace = true }
 canister_logger = { path = "../../../libraries/canister_logger" }
 canister_state_macros = { path = "../../../libraries/canister_state_macros" }
 canister_tracing_macros = { path = "../../../libraries/canister_tracing_macros" }
 canister_time = { path = "../../../libraries/canister_time" }
-buyback_burn_canister = { path = "../api" }
+buyback_burn_api = { path = "../api" }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
+ic-cdk-timers = { workspace = true }
 ic-ledger-types = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
-#rand = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
 serializer = { path = "../../../libraries/serializer" }
 stable_memory = { path = "../../../libraries/stable_memory" }
 tracing = { workspace = true }
@@ -28,9 +32,8 @@ types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 futures = { workspace = true }
 icrc-ledger-types = { workspace = true }
-icpswap_client = { path = "../../../libraries/icpswap_client" }
 async-trait = { workspace = true }
 http_request = { path = '../../../libraries/http_request' }
-typetag = { workspace = true }
-icpswap_factory_canister = { path = "../../../external_canisters/icpswap_factory/api" }
-icpswap_factory_canister_c2c_client = { path = "../../../external_canisters/icpswap_factory/c2c_client" }
+enum_dispatch = { workspace = true }
+icpswap_swap_pool_canister = { path = "../../../external_canisters/icpswap_swap_pool/api" }
+icpswap_swap_pool_canister_c2c_client = { path = "../../../external_canisters/icpswap_swap_pool/c2c_client" }

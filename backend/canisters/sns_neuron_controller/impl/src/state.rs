@@ -29,11 +29,11 @@ impl RuntimeState {
         Metrics {
             canister_info: CanisterInfo {
                 now: self.env.now(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
-                version: self.env.version(),
-                commit_hash: self.env.commit_hash().to_string(),
             },
 
             authorized_principals: self.data.authorized_principals.clone(),

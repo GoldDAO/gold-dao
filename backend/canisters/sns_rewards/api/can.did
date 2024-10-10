@@ -6,6 +6,7 @@ type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
   sns_gov_canister_id : principal;
   test_mode : bool;
+  version : BuildVersion;
   ogy_ledger_canister_id : principal;
   icp_ledger_canister_id : principal;
   sns_ledger_canister_id : principal;
@@ -30,7 +31,7 @@ type TokenInfo = record {
   decimals : nat64;
   ledger_id : principal;
 };
-type UpgradeArgs = record { wasm_version : BuildVersion; commit_hash : text };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args_3) -> {
   claim_reward : (Args) -> (Response_1);
   get_neurons_by_owner : (opt principal) -> (opt vec NeuronId) query;

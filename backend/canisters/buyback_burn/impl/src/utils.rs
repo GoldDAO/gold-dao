@@ -1,39 +1,10 @@
-use buyback_burn_canister::swap_config::SwapConfig;
 use candid::Nat;
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
-use tracing::{ debug, error };
+use tracing::error;
 
 pub const RETRY_DELAY: Duration = Duration::from_secs(5 * 60); // each 5 minutes
-
-use icpswap_client::ICPSwapClient;
-use buyback_burn_canister::swap_config::ExchangeConfig;
-use crate::types::SwapClient;
-pub fn build_swap_client(config: SwapConfig) -> Box<dyn SwapClient> {
-    let input_token = config.input_token;
-    let output_token = config.output_token;
-
-    match config.exchange_config {
-        ExchangeConfig::ICPSwap(icpswap) => {
-            let (token0, token1) = if icpswap.zero_for_one {
-                (input_token, output_token)
-            } else {
-                (output_token, input_token)
-            };
-            Box::new(
-                ICPSwapClient::new(
-                    config.swap_client_id,
-                    ic_cdk::api::id(),
-                    icpswap.swap_canister_id,
-                    token0,
-                    token1,
-                    icpswap.zero_for_one
-                )
-            )
-        }
-    }
-}
 
 pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
     icrc_ledger_canister_c2c_client
@@ -47,7 +18,6 @@ pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
         .map_err(|e| format!("Failed to fetch token balance: {:?}", e))
 }
 
-// TODO: think on how to add delay here
 pub async fn retry_with_attempts<F, Fut>(
     max_attempts: u8,
     _delay_duration: Duration,
@@ -72,47 +42,8 @@ pub async fn retry_with_attempts<F, Fut>(
     Ok(())
 }
 
-// pub async fn retry_with_attempts<F, Fut>(
-//     attempt: u8,
-//     max_attempts: u8,
-//     delay_duration: Duration,
-//     mut f: F,
-// ) -> Result<(), String>
-// where
-//     F: FnMut() -> Fut + 'static + Copy, // Add 'static + Copy for closure capturing
-//     Fut: std::future::Future<Output = Result<(), String>> + 'static,
-// {
-//     match f().await {
-//         Ok(_) => {
-//             return Ok(());
-//         }
-//         Err(err) => {
-//             ic_cdk::println!("Attempt {}: Error - {:?}", attempt, err);
-//             if attempt == max_attempts {
-//                 return Err(err);
-//             }
-
-//             // Schedule the next retry with delay
-
-//             ic_cdk_timers::set_timer(delay_duration, move || {
-//                 // Since we're inside a timer callback, we must spawn the next async call
-//                 ic_cdk::spawn(async move {
-//                     if let Err(err) =
-//                         retry_with_attempts(attempt + 1, max_attempts, delay_duration, f).await
-//                     {
-//                         ic_cdk::println!("Final attempt failed: {:?}", err);
-//                     }
-//                 });
-//             });
-//         }
-//     }
-
-//     Ok(())
-// }
-
 /// Calculates the burn amount based on the current balance and burn rate.
 /// Returns the calculated amount or zero if there's an issue.
-/// TODO If the burn rate is incorrect -> cancel the job at all
 pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u128 {
     let balance_u128: u128 = match amount_available.0.try_into() {
         Ok(val) => val,
@@ -122,15 +53,12 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
         }
     };
 
-    // TODO: think of the sequence here
-    let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
+    if burn_rate > 100 {
+        error!("Burn rate couldn't be more that 100. Returning 0 as burn amount.");
+        return 0;
+    }
 
-    debug!(
-        "Calculated burn amount: {} tokens ({}% of {} e8s).",
-        amount_to_burn,
-        burn_rate,
-        balance_u128
-    );
+    let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
 
     amount_to_burn
 }

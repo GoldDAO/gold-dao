@@ -7,7 +7,7 @@ import {
   GLDT_VALUE_1G_NFT,
 } from "@constants";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { Result_4, Args_2 } from "@canisters/gldt_swap/interfaces";
 import {
@@ -19,20 +19,19 @@ import {
 import { useNft } from "@context/index";
 
 export const useReverseSwap = () => {
-  const { state, getActor } = useAuth();
-  const { principalId } = state;
+  const { principalId, createActor } = useAuth();
 
   const { getCollectionSelectedNFTs } = useNft();
   const selected = getCollectionSelectedNFTs();
 
   const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
-    const actor = getActor("gldt_ledger");
+    const actor = createActor("gldt_ledger");
     const result = await actor.icrc2_approve(arg);
     return result as Result_2;
   };
 
   const swap_tokens_for_nft = async (token: Args_2): Promise<Result_4> => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result = await actor.swap_tokens_for_nft(token);
     return result as Result_4;
   };
@@ -84,10 +83,9 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      const log = await Promise.allSettled(
+      await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
-      console.log(log);
       // if (walletSelected === "bitfinity") {
       //   const bitfinity_adapter = walletList.find(
       //     (adaptor) => adaptor.id === "bitfinity"

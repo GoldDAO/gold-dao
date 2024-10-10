@@ -8,7 +8,7 @@ use pocket_ic::{ PocketIc, PocketIcBuilder };
 use utils::consts::E8S_FEE_OGY;
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::ManageStorageRequestConfigureStorage;
-use types::CanisterId;
+use types::{ BuildVersion, CanisterId };
 
 // use ic_icrc1_ledger::{ ArchiveOptions, InitArgs as LedgerInitArgs, LedgerArgument };
 use icrc_ledger_types::icrc3::archive::{ GetArchivesArgs, GetArchivesResult };
@@ -213,6 +213,7 @@ fn install_canisters(
     let gldt_swap_init_args: GldtSwapCanisterArgs = GldtSwapCanisterArgs::Init(
         GldtSwapCanisterInitArgs {
             commit_hash: "abcdefgh".to_string(),
+            version: BuildVersion::min(),
             test_mode: true,
             gldt_ledger_id: gldt_ledger_canister_id.clone(),
             gldnft_canisters: vec![(origyn_nft_canister_id, NftCanisterConf { grams: 1u16 })],

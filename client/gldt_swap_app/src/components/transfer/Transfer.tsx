@@ -1,10 +1,11 @@
-// import { useEffect } from "react";
-
 import { useTransfer, Token } from "@context/transfer";
 import { TransferProceedLedgerProvider } from "@context/transfer/proceed-ledger";
+import { TransferProceedNftProvider } from "@context/transfer/proceed-nft";
+import { NftProvider } from "@context/index";
 
-import SelectTokenType from "./select/TokenType";
-import TransferLedger from "./transfer/TransferLedger";
+import SelectToken from "./shared/select/Token";
+import TransferLedger from "./ledger/Ledger";
+import TransferNft from "./nft/Nft";
 
 const Transfer = () => {
   const { state: transferState } = useTransfer();
@@ -16,7 +17,7 @@ const Transfer = () => {
         <div className="text-gold font-semibold text-sm mb-2 sm:mb-0 ">
           Type of transfer
         </div>
-        <SelectTokenType className="" />
+        <SelectToken />
       </div>
       {token === Token.GLDT && (
         <TransferProceedLedgerProvider ledger="GLDT">
@@ -27,6 +28,13 @@ const Transfer = () => {
         <TransferProceedLedgerProvider ledger="OGY">
           <TransferLedger />
         </TransferProceedLedgerProvider>
+      )}
+      {token === Token.GLD_NFT && (
+        <NftProvider>
+          <TransferProceedNftProvider>
+            <TransferNft />
+          </TransferProceedNftProvider>
+        </NftProvider>
       )}
     </div>
   );

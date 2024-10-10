@@ -13,7 +13,7 @@
     "staging": "maz3v-6aaaa-aaaak-qcgpq-cai"
   },
   "gldt_ledger": {
-    "ic": "oh54a-baaaa-aaaap-abryq-cai",
+    "ic": "6c7su-kiaaa-aaaar-qaira-cai",
     "staging": "6uad6-fqaaa-aaaam-abovq-cai"
   },
   "gldt_ledger_indexer": {
@@ -26,7 +26,7 @@
   },
   "gldt_swap_app": {
     "ic": "oj7ri-2qaaa-aaaap-abrzq-cai",
-    "staging": "ebrqv-vaaaa-aaaal-qb6zq-cai"
+    "staging": "qfyvj-4qaaa-aaaam-qbfka-cai"
   },
   "icp_ledger": {
     "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
