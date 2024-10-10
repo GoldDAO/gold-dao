@@ -1,5 +1,10 @@
 type Account = record { owner : principal; subaccount : opt blob };
-type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args = record {
+  burn_rate : opt nat8;
+  buyback_burn_interval_in_secs : opt nat64;
+  min_burn_amount : opt Tokens;
+};
+type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
   test_mode : bool;
@@ -13,6 +18,7 @@ type InitArgs = record {
   min_burn_amount : Tokens;
   commit_hash : text;
 };
+type Response = variant { Success; InvalidBurnRate };
 type Result = variant { Ok : Account; Err : text };
 type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
@@ -38,7 +44,8 @@ type TokenSwap = record {
 };
 type Tokens = record { e8s : nat64 };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
-service : (Args) -> {
+service : (Args_1) -> {
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;
+  update_config : (Args) -> (Response);
 }

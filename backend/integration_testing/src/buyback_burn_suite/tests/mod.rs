@@ -1,1 +1,1 @@
-pub mod test_process_neurons;
+pub mod test_burn_amount_recalculation;

@@ -81,7 +81,7 @@ pub struct BurnConfig {
 }
 
 impl BurnConfig {
-    fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
+    pub fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
             burn_rate: if burn_rate > 100 {
