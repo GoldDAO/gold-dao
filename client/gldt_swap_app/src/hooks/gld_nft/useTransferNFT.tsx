@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
 import { OGY_TX_FEE } from "@constants";
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { TransferArgs, TransferResult } from "@canisters/gld_nft/interfaces";
 import { ApproveArgs, Result_2 } from "@canisters/ledger/interfaces";
@@ -10,10 +10,10 @@ import { ApproveArgs, Result_2 } from "@canisters/ledger/interfaces";
 import { NftCollection } from "@context/index";
 
 export const useTransferNFT = () => {
-  const { getActor } = useAuth();
+  const { createActor } = useAuth();
 
   const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
-    const actor = getActor("ogy_ledger");
+    const actor = createActor("ogy_ledger");
     const result = await actor.icrc2_approve(arg);
     return result as Result_2;
   };
@@ -23,7 +23,7 @@ export const useTransferNFT = () => {
     tokenIds: TransferArgs[];
   }): Promise<TransferResult> => {
     const { canister, tokenIds } = arg;
-    const actor = getActor(canister);
+    const actor = createActor(canister);
     const result = await actor.icrc7_transfer(tokenIds);
     return result as TransferResult;
   };

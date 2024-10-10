@@ -99,16 +99,16 @@ const useTransferProceedNftProviderValue = () => {
             queryKey: [`USER_FETCH_BALANCE_OGY`],
           });
           queryClient.invalidateQueries({
-            queryKey: [`GET_USER_GLD_NFT_1G`],
+            queryKey: [`USER_GET_GLD_NFT_1G`],
           });
           queryClient.invalidateQueries({
-            queryKey: [`GET_USER_GLD_NFT_10G`],
+            queryKey: [`USER_GET_GLD_NFT_10G`],
           });
           queryClient.invalidateQueries({
-            queryKey: [`GET_USER_GLD_NFT_100G`],
+            queryKey: [`USER_GET_GLD_NFT_100G`],
           });
           queryClient.invalidateQueries({
-            queryKey: [`GET_USER_GLD_NFT_1000G`],
+            queryKey: [`USER_GET_GLD_NFT_1000G`],
           });
         },
       }

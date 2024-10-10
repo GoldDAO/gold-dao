@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { GetPoolsForTokenResponse } from "@canisters/icp_swap/interfaces";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 export const useGetGLDTPrice = () => {
-  const { getActor } = useAuth();
+  const { createActor } = useAuth();
   const [GLDTPrice, setGLDTPrice] = useState(0);
 
   const gldGovPrice = async () => {
-    const actor = getActor("icp_swap");
+    const actor = createActor("icp_swap");
     try {
       const gldt_ledger_id = "tyyy3-4aaaa-aaaaq-aab7a-cai"; // todo set to GLDT_LEDGER_CANISTER_ID when icp swap has pair . using gldgov for now
       const pools = (await actor.getPoolsForToken(gldt_ledger_id)) as Awaited<

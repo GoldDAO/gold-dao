@@ -6,7 +6,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
@@ -28,14 +28,13 @@ export const useGetOneSwapById = ({
   index,
   ...queryParams
 }: UseGetOneSwapByIdParams) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<SwapData | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const get_swap = async ({ nft_id, index }: GetOneSwapByIdParams) => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result = (await actor.get_swap([BigInt(nft_id), BigInt(index)])) as
       | []
       | [[[bigint, bigint], SwapInfo]];

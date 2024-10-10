@@ -4,9 +4,10 @@ import { Toaster } from "react-hot-toast";
 
 import "@nfid/identitykit/react/styles.css";
 
-import IdentityKitProvider from "@providers/IdentityKit";
 import { colors as themeColors } from "@theme/preset";
 import App from "./App";
+
+import { AuthProvider } from "./auth";
 
 import {
   GLD_NFT_1G_CANISTER_ID,
@@ -47,15 +48,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     />
 
     <QueryClientProvider client={queryClient}>
-      <IdentityKitProvider
+      <AuthProvider
+        // derivationOrigin="https://oj7ri-2qaaa-aaaap-abrzq-cai.icp0.io"
         targets={[
           GLD_NFT_1G_CANISTER_ID,
           GLD_NFT_10G_CANISTER_ID,
           GLD_NFT_100G_CANISTER_ID,
           GLD_NFT_1000G_CANISTER_ID,
+          SWAP_CANISTER_ID,
           OGY_LEDGER_CANISTER_ID,
           GLDT_LEDGER_CANISTER_ID,
-          SWAP_CANISTER_ID,
           ICP_SWAP_CANISTER_ID,
         ]}
         canisters={{
@@ -94,7 +96,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         }}
       >
         <App />
-      </IdentityKitProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </>
 );

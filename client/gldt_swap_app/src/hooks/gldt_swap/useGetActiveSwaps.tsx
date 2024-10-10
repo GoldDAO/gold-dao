@@ -6,7 +6,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
@@ -19,15 +19,14 @@ type UseGetActiveSwapsParams = Omit<
 export const useGetActiveSwaps = ({
   ...queryParams
 }: UseGetActiveSwapsParams = {}) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected, createActor } = useAuth();
 
   const [data, setData] = useState<{ rows: SwapData[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
 
   const get_active_swaps = async () => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result = (await actor.get_active_swaps(null)) as Array<
       [[bigint, bigint], SwapInfo]
     >;

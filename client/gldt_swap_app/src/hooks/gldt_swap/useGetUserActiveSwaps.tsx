@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
 
@@ -22,8 +22,7 @@ type UseGetUserActiveSwapsParams = Omit<
 export const useGetUserActiveSwaps = ({
   ...queryParams
 }: UseGetUserActiveSwapsParams = {}) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<{ rows: SwapData[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -31,7 +30,7 @@ export const useGetUserActiveSwaps = ({
   const get_active_swaps_by_user = async ({
     principal,
   }: GetUserActiveSwapsParams) => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result = (await actor.get_active_swaps_by_user([
       Principal.fromText(principal),
     ])) as Array<[[bigint, bigint], SwapInfo]>;

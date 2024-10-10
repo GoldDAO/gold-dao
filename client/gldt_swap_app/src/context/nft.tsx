@@ -15,7 +15,7 @@ import {
   GLDT_VALUE_1G_NFT,
 } from "@constants";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 export type TokenId = {
   id_string: string;
@@ -128,8 +128,7 @@ export const useNft = () => {
 
 const useNftProviderValue = () => {
   const [state, setState] = useState<NftState>(initialState);
-  const { state: authState } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected } = useAuth();
 
   const setNfts = async (nfts: Nft[]): Promise<void> => {
     const result = await new Promise<void>((resolve) => {

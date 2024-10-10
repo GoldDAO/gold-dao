@@ -10,6 +10,7 @@ import { IDL } from "@dfinity/candid";
 // import { IdentityKitDelegationType } from "@nfid/identitykit";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { Actor, ActorSubclass, HttpAgent, SignIdentity } from "@dfinity/agent";
+import { DelegationIdentity } from "@dfinity/identity";
 
 interface Canisters {
   [canisterName: string]: {
@@ -55,46 +56,11 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
     useState<HttpAgent | undefined>();
   const {
     user,
-    agent,
     identity,
     connect,
     disconnect: disconnectIK,
-    delegationType,
     isInitializing,
-    isUserConnecting,
   } = useIdentityKit();
-  // console.log(user);
-  // console.log(identity);
-  // console.log(agent);
-  // console.log(authenticatedNonTargetAgent);
-
-  useEffect(() => {
-    if (!isInitializing && !user && connected !== "1") {
-      setState((prevState) => ({
-        ...prevState,
-        isInitializing: false,
-      }));
-    }
-  }, [connected, isInitializing, user]);
-
-  useEffect(() => {
-    if (!isInitializing && !!user && connected === "1") {
-      setState((prevState) => ({
-        ...prevState,
-        isConnecting: true,
-      }));
-    }
-  }, [connected, isInitializing, user]);
-
-  useEffect(() => {
-    if (isUserConnecting || (!!user && connected === "1")) {
-      setState((prevState) => ({
-        ...prevState,
-        isConnecting: true,
-        isInitializing,
-      }));
-    }
-  }, [isUserConnecting, user, connected, isInitializing]);
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then(
@@ -102,31 +68,69 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
     );
   }, []);
 
-  // ? remove this condition for plug delegationType === IdentityKitDelegationType.ANONYMOUS
   useEffect(() => {
-    if (user && agent && identity) {
-      HttpAgent.create({ identity, host: "https://icp-api.io/" }).then(
-        setAuthenticatedNonTargetAgent
-      );
+    if (!isInitializing && !user && !connected) {
+      setState((prevState) => ({
+        ...prevState,
+        isConnecting: false,
+      }));
     }
-  }, [identity, delegationType, user, agent]);
+  }, [connected, isInitializing, user]);
 
   useEffect(() => {
-    if (user && authenticatedNonTargetAgent) {
+    if (!isInitializing && !user && connected === "1") {
+      setState((prevState) => ({
+        ...prevState,
+        isConnecting: true,
+      }));
+    }
+  }, [connected, isInitializing, user]);
+
+  useEffect(() => {
+    // ? removed condition for plug delegationType === IdentityKitDelegationType.ANONYMOUS
+    if (user && identity instanceof SignIdentity) {
+      (async function () {
+        await HttpAgent.create({ identity, host: "https://icp-api.io/" }).then(
+          setAuthenticatedNonTargetAgent
+        );
+      })();
+    }
+  }, [identity, user]);
+
+  useEffect(() => {
+    if (
+      user &&
+      authenticatedNonTargetAgent &&
+      authenticatedNonTargetAgent?.config?.identity instanceof
+        DelegationIdentity
+    ) {
       setState((prevState) => ({
         ...prevState,
         principalId: user.principal.toText(),
         isConnected: true,
         isConnecting: false,
       }));
-    } else {
+    }
+  }, [user, authenticatedNonTargetAgent]);
+
+  useEffect(() => {
+    if (
+      state.isConnected &&
+      !(
+        identity instanceof SignIdentity &&
+        authenticatedNonTargetAgent?.config?.identity instanceof
+          DelegationIdentity
+      )
+    ) {
+      console.log("Lost Delegation Identity");
       setState((prevState) => ({
         ...prevState,
-        principalId: "",
         isConnected: false,
       }));
+      disconnect();
     }
-  }, [user, authenticatedNonTargetAgent, agent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identity, authenticatedNonTargetAgent, state.isConnected]);
 
   const getActor = (
     canister:
@@ -155,14 +159,6 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
     return actor as ActorSubclass;
   };
 
-  useEffect(() => {
-    if (state.isConnected && !(identity instanceof SignIdentity)) {
-      console.log("Lost SignIdentity");
-      disconnect();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity, state.isConnected]);
-
   const disconnect = () => {
     disconnectIK();
     setState({
@@ -173,6 +169,11 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
     });
   };
 
+  // console.log(user);
+  // console.log(identity);
+  // console.log(agent);
+  // console.log(authenticatedNonTargetAgent);
+
   const value = useMemo(
     () => ({
       state,
@@ -181,7 +182,7 @@ const useAuthProviderValue = ({ canisters }: { canisters: Canisters }) => {
       getActor,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, identity]
+    [state, identity, isInitializing]
   );
   return value;
 };
