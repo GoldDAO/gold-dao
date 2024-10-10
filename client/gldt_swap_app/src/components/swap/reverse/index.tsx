@@ -1,4 +1,4 @@
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { useReverseSwapProceed } from "@context/index";
 
 import { Button } from "@components/ui";
@@ -14,8 +14,7 @@ import TransactionDetails from "./TransactionDetails";
 import InsufficientFundsGLDT from "./insufficient-gldt-disclaimer";
 
 const Reverse = () => {
-  const { state: authState, connect } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected, connect } = useAuth();
   const { state: reverseSwapProceedState } = useReverseSwapProceed();
   const { canReverseSwap, isInsufficientGLDTFunds } = reverseSwapProceedState;
 

@@ -1,5 +1,4 @@
-import { useAuth } from "@context/auth";
-
+import { useAuth } from "@auth/index";
 import { useNft } from "@context/nft";
 import { useGetUserGLDNFT } from "@hooks/gld_nft";
 
@@ -14,8 +13,7 @@ import Error from "@components/shared/user-nft/Error";
 
 const ForwardSwapFrom = () => {
   const { getCountNfts, selectNft, unselectNft, state: nftState } = useNft();
-  const { state: authState } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected } = useAuth();
   const count = getCountNfts();
 
   const { isLoading, isSuccess, isError, error } = useGetUserGLDNFT();

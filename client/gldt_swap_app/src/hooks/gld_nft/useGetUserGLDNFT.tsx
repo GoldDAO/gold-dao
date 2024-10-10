@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQueries, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { TokenId, Nft, useNft, CollectionIndex } from "@context/index";
 
 import { bigintTo32ByteArray } from "@utils/index";
@@ -10,8 +10,7 @@ import { bigintTo32ByteArray } from "@utils/index";
 import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
 export const useGetUserGLDNFT = () => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const { setNfts } = useNft();
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState("");
@@ -23,7 +22,7 @@ export const useGetUserGLDNFT = () => {
     canisterName: string,
     collectionIndex: CollectionIndex
   ): Promise<Nft> => {
-    const actor = getActor(canisterName);
+    const actor = createActor(canisterName);
     const token_ids_bigint = (await actor.unlisted_tokens_of(
       {
         owner: Principal.fromText(principalId as string),
@@ -55,7 +54,7 @@ export const useGetUserGLDNFT = () => {
   const userNFTs = useQueries({
     queries: [
       {
-        queryKey: ["GET_USER_GLD_NFT_1G"],
+        queryKey: ["USER_GET_GLD_NFT_1G"],
         queryFn: () =>
           getUserNFTByCanister("gld_nft_1g", CollectionIndex.GLD_NFT_1G),
         placeholderData: keepPreviousData,
@@ -63,23 +62,23 @@ export const useGetUserGLDNFT = () => {
         refetchOnWindowFocus: false,
       },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_10G"],
+      //   queryKey: ["USER_GET_GLD_NFT_10G"],
       //   queryFn: () =>
       //     getUserNFTByCanister("gld_nft_10g", CollectionIndex.GLD_NFT_10G),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected && !!active_swaps.isSuccess,
       //   refetchOnWindowFocus: false,
       // },
-      {
-        queryKey: ["GET_USER_GLD_NFT_100G"],
-        queryFn: () =>
-          getUserNFTByCanister("gld_nft_100g", CollectionIndex.GLD_NFT_100G),
-        placeholderData: keepPreviousData,
-        enabled: !!isConnected && !!active_swaps.isSuccess,
-        refetchOnWindowFocus: false,
-      },
       // {
-      //   queryKey: ["GET_USER_GLD_NFT_1000G"],
+      //   queryKey: ["USER_GET_GLD_NFT_100G"],
+      //   queryFn: () =>
+      //     getUserNFTByCanister("gld_nft_100g", CollectionIndex.GLD_NFT_100G),
+      //   placeholderData: keepPreviousData,
+      //   enabled: !!isConnected && !!active_swaps.isSuccess,
+      //   refetchOnWindowFocus: false,
+      // },
+      // {
+      //   queryKey: ["USER_GET_GLD_NFT_1000G"],
       //   queryFn: () => getUserNFTByCanister("gld_nft_1000g", CollectionIndex.GLD_NFT_1000G),
       //   placeholderData: keepPreviousData,
       //   enabled: !!isConnected && !!principalId,

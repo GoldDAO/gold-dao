@@ -1,4 +1,4 @@
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { useNft } from "@context/index";
 import { useGetAvailableGLDNFT } from "@hooks/gld_nft";
 
@@ -13,8 +13,7 @@ import Error from "./Error";
 
 const ReverseSwapTo = () => {
   const { getCountNfts, selectNft, unselectNft, state: nftState } = useNft();
-  const { state: authState } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected } = useAuth();
   const count = getCountNfts();
 
   const { isLoading, isSuccess, isError, error } = useGetAvailableGLDNFT();

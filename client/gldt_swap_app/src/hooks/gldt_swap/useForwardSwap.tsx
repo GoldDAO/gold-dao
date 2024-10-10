@@ -11,7 +11,7 @@ import {
   GLDT_DECIMAL,
 } from "@constants";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { Result_3 } from "@canisters/gldt_swap/interfaces";
 import {
@@ -25,7 +25,7 @@ type TransferBatchNft = {
 };
 
 export const useForwardSwap = () => {
-  const { getActor } = useAuth();
+  const { createActor } = useAuth();
   const { getCollectionSelectedNFTs } = useNft();
   const selected = getCollectionSelectedNFTs();
 
@@ -33,7 +33,7 @@ export const useForwardSwap = () => {
     nfts: TransferBatchNft[]
   ): Promise<PromiseSettledResult<[MarketTransferResult]>[]> => {
     const promises = nfts.map(async (nft: TransferBatchNft) => {
-      const actor = getActor(nft.canister);
+      const actor = createActor(nft.canister);
       const marketTransferResults =
         await actor.market_transfer_batch_nft_origyn(nft.data);
       return marketTransferResults as [MarketTransferResult];
@@ -49,7 +49,7 @@ export const useForwardSwap = () => {
       (tokenId) =>
         [tokenId.id_bigint, Principal.fromText(nft.canisterId)] as [
           bigint,
-          Principal
+          Principal,
         ]
     )
   );
@@ -120,7 +120,7 @@ export const useForwardSwap = () => {
   return useMutation({
     mutationKey: ["GLD_NFT_SWAP_GLDT"],
     mutationFn: async (): Promise<void> => {
-      const actorSwap = getActor("gldt_swap");
+      const actorSwap = createActor("gldt_swap");
 
       // * add intent to swap
       // console.log(data_swap_nft_for_tokens);
