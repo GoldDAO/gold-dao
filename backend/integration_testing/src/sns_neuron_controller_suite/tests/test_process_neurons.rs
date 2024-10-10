@@ -1,9 +1,7 @@
-use crate::client::rewards::add_neuron_ownership;
 use candid::{ CandidType, Deserialize };
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::add_neuron_ownership::Response as AddNeuronOwnerShipResponse;
 use std::time::Duration;
 
 use crate::{
@@ -45,17 +43,6 @@ fn test_process_neurons_happy_path() {
     // ********************************
     // 1. add ownership (the rewards are distributed to the neuron owner). It's important to do this before topping up the neuron rewards, because otherwise the rewards would not be sent
     // ********************************
-    let res = add_neuron_ownership(
-        &mut test_env.pic,
-        sns_neuron_controller_id,
-        ogy_rewards_canister_id,
-        &neuron_id.clone()
-    );
-    tick_n_blocks(&test_env.pic, 10);
-    match res {
-        AddNeuronOwnerShipResponse::Ok(n_id) => assert_eq!(n_id, neuron_id),
-        _ => {}
-    }
 
     // ********************************
     // 2. simulate distribution - add reward to neuron

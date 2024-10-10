@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  output: "export",
+  output: 'export',
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "*",
+        protocol: 'https',
+        hostname: '*',
       },
     ],
     unoptimized: true,
@@ -15,7 +15,7 @@ const nextConfig = {
     ENV: process.env.ENV,
     VERSION: process.env.VERSION,
   },
-  distDir: "dist",
+  distDir: process.env.NODE_ENV === 'production' ? 'dist' : '.next',
 };
 
 module.exports = nextConfig;

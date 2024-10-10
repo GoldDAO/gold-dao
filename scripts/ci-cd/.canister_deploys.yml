@@ -28,6 +28,7 @@ $[[ inputs.src-folder ]] staging deploy:
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       allow_failure: true
+      when: manual
   needs:
     ["$[[ inputs.src-folder ]] staging build", "integration tests"]
   variables:

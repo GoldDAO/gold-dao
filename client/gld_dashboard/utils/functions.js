@@ -14,11 +14,10 @@ export const calculateTimestamp = (timestamp) => {
     const milisecondsDistance = (now - firstDay) / 1000;
     distanceTimestamp = Math.floor(milisecondsDistance);
   } else if (timestamp === 'ALL') {
-    distanceTimestamp = new Date(2000, 0, 1) / 1000;
+    distanceTimestamp = new Date('2023-12-11').getTime() / 1000;
   } else {
     distanceTimestamp = timestamp;
   }
-
   return distanceTimestamp;
 };
 
