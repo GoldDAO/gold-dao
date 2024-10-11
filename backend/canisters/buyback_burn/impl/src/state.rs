@@ -53,6 +53,7 @@ impl RuntimeState {
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
+            last_burn_amount_update: self.data.last_burn_amount_update,
             buyback_burn_interval_in_secs: self.data.buyback_burn_interval.as_secs(),
             icp_swap_canister_id: self.data.icp_swap_canister_id,
             swap_clients: self.data.swap_clients.clone(),
@@ -81,7 +82,7 @@ pub struct BurnConfig {
 }
 
 impl BurnConfig {
-    fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
+    pub fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
             burn_rate: if burn_rate > 100 {
@@ -145,6 +146,7 @@ pub struct Metrics {
     pub icp_swap_canister_id: Principal,
     pub burn_config: BurnConfig,
     pub token_swaps_metrics: TokenSwapsMetrics,
+    pub last_burn_amount_update: Option<TimestampMillis>,
     pub swap_clients: SwapClients,
 }
 

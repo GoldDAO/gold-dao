@@ -1,17 +1,11 @@
-use crate::types::neuron_manager::NeuronConfig;
-use crate::types::neuron_manager::NeuronManager;
-use crate::types::neuron_manager::NeuronRewardsManager;
-use crate::types::neuron_manager::Neurons;
-use crate::utils::ClaimRewardResult;
-use crate::utils::RewardSumResult;
+use crate::types::neuron_manager::{ Neurons, NeuronConfig, NeuronManager, NeuronRewardsManager };
+use crate::utils::{ ClaimRewardResult, RewardSumResult };
 use async_trait::async_trait;
-use candid::Nat;
-use candid::Principal;
+use candid::{ Nat, Principal };
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::Neuron;
-use sns_governance_canister::types::NeuronId;
+use sns_governance_canister::types::{ Neuron, NeuronId };
 use tracing::{ error, info };
 use types::CanisterId;
 

@@ -65,6 +65,8 @@ async fn run_async() {
 
         // If the week had passed -> recalculate the amounts to be burned
         if should_update_burn_amount {
+            info!("Recalculating burn amounts");
+
             let burn_amount_per_interval = burn_amount_per_interval(
                 args.input_token
             ).await.unwrap();
@@ -344,8 +346,7 @@ fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
 pub fn should_update_amount() -> bool {
     let last_burn_amount_update_opt = read_state(|s| s.data.last_burn_amount_update);
     if let Some(last_burn_amount_update) = last_burn_amount_update_opt {
-        ic_cdk::api::time() >
-            last_burn_amount_update * NANOS_PER_MILLISECOND + WEEK_IN_MS * NANOS_PER_MILLISECOND
+        ic_cdk::api::time() > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND
     } else {
         true
     }
@@ -365,5 +366,26 @@ pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, St
         Ok(amount_per_interval)
     } else {
         Err("Failed to get token balance".to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_should_update_burn_amount() {
+        let last_burn_amount_update = 1727879360726 * NANOS_PER_MILLISECOND; // Wed Oct 02 2024 16:29:20 GMT in nanoseconds
+        let current_time = 1728572230564 * NANOS_PER_MILLISECOND; // Thu Oct 10 2024 16:57:10 GMT in nanoseconds
+
+        assert!(current_time > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND);
+    }
+
+    #[test]
+    fn test_should_not_update_burn_amount() {
+        let last_burn_amount_update = 1727879360726 * NANOS_PER_MILLISECOND; // Wed Oct 02 2024 16:29:20 GMT in nanoseconds
+        let current_time = 1727991596250 * NANOS_PER_MILLISECOND; // 	Thu Oct 03 2024 21:39:56 GMT in nanoseconds
+
+        assert!(!current_time > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND);
     }
 }

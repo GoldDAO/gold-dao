@@ -2,6 +2,7 @@
 
 mod client;
 pub mod sns_neuron_controller_suite;
+pub mod buyback_burn_suite;
 pub mod sns_rewards_suite;
 pub mod gldt_swap_suite;
 pub mod versioning_suite;
