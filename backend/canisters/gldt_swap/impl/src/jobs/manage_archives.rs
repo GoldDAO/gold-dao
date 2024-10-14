@@ -12,17 +12,13 @@ use crate::{
     update_archive_canisters,
 };
 use candid::Nat;
-use canister_time::{ run_now_then_interval, DAY_IN_MS };
 use gldt_swap_common::{ archive::ArchiveCanister, swap::{ ArchiveDownReason, ArchiveStatus } };
 use ic_cdk::trap;
 use tracing::{ debug, info };
-use std::time::Duration;
-use types::Milliseconds;
-
-const ARCHIVE_INTERVAL: Milliseconds = DAY_IN_MS * 365 * 100; // 1000 years
+use canister_time::run_once;
 
 pub fn start_job() {
-    run_now_then_interval(Duration::from_millis(ARCHIVE_INTERVAL), spawn_transfer_job);
+    run_once(spawn_transfer_job);
 }
 
 pub fn spawn_transfer_job() {

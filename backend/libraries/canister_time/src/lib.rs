@@ -57,3 +57,7 @@ pub fn run_now_then_interval(interval: Duration, func: fn()) -> TimerId {
 pub fn run_interval(interval: Duration, func: fn()) {
     ic_cdk_timers::set_timer_interval(interval, func);
 }
+
+pub fn run_once(func: fn()) {
+    ic_cdk_timers::set_timer(Duration::ZERO, func);
+}
