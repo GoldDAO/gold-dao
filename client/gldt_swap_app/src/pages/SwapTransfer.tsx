@@ -11,7 +11,7 @@ import Backdrop from "@components/shared/Backdrop";
 import Swap from "@components/swap/Swap";
 import Transfer from "@components/transfer/Transfer";
 
-const SwapTransfer = () => {
+export const SwapTransfer = () => {
   const { isConnected, connect } = useAuth();
   const { state: swapAppState } = useSwapApp();
   const { view } = swapAppState;
@@ -40,5 +40,3 @@ const SwapTransfer = () => {
     </div>
   );
 };
-
-export default SwapTransfer;

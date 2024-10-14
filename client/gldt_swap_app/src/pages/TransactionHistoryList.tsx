@@ -3,7 +3,7 @@ import { usePagination } from "@utils/table/useTable";
 import GoBack from "@components/shared/button/GoBack";
 import PastTransactions from "@components/transactions/list/past/List";
 
-const TransactionHistoryList = () => {
+export const TransactionHistoryList = () => {
   const [pagination, setPagination] = usePagination({
     pageSize: 20,
     pageIndex: 0,
@@ -25,5 +25,3 @@ const TransactionHistoryList = () => {
     </div>
   );
 };
-
-export default TransactionHistoryList;

@@ -7,7 +7,7 @@ import DetailsHeader from "@components/transactions/header/Details";
 import SwapCard from "@components/transactions/card/swap/Swap";
 import DetailsCard from "@components/transactions/card/Details";
 
-const Details = () => {
+export const TransactionDetails = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
 
@@ -25,5 +25,3 @@ const Details = () => {
     </TransactionDetailsProvider>
   );
 };
-
-export default Details;

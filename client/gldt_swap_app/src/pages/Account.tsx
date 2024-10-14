@@ -11,7 +11,7 @@ import PastTransactions from "@components/transactions/list/past/Past";
 
 // todo better handle isConnected state
 
-const Account = () => {
+export const Account = () => {
   const { isConnected } = useAuth();
 
   return (
@@ -41,5 +41,3 @@ const Account = () => {
     </div>
   );
 };
-
-export default Account;

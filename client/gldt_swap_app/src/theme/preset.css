@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --color-background: 232 230 225;
+    --color-background: 250 249 248;
     --color-content: 34 37 38;
     --color-surface-1: 255 255 255;
     --color-surface-2: 250 249 248;
@@ -19,7 +19,7 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --color-background: 23 23 23;
+      --color-background: 40 40 40;
       --color-content: 255 255 255;
       --color-surface-1: 32 32 32;
       --color-surface-2: 40 40 40;
