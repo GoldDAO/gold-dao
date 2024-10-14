@@ -54,7 +54,6 @@ async fn run_async_with_rand_delay() {
 #[trace]
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
-    let should_update_burn_amount = should_update_amount();
 
     let mut token_swap_ids = Vec::new();
     let mut futures = Vec::new();
@@ -63,21 +62,7 @@ async fn run_async() {
         let swap_client = swap_client.clone();
         let args = swap_client.get_config();
 
-        // If the week had passed -> recalculate the amounts to be burned
-        if should_update_burn_amount {
-            info!("Recalculating burn amounts");
-
-            let burn_amount_per_interval = burn_amount_per_interval(
-                args.input_token
-            ).await.unwrap();
-            mutate_state(|state| {
-                state.data.burn_amounts.insert(args.swap_client_id, burn_amount_per_interval);
-                state.data.last_burn_amount_update = Some(ic_cdk::api::time());
-            });
-        }
-
-        // Check that the balance is enough to initiate the swap
-        let amount_to_dex = read_state(|s| *s.data.burn_amounts.get(&args.swap_client_id).unwrap());
+        let amount_to_dex = burn_amount_per_interval(args.input_token).await.unwrap();
 
         let quote = match
             swap_client.get_quote(
@@ -114,7 +99,7 @@ async fn run_async() {
 
             token_swap_ids.push(token_swap.swap_id);
             let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                process_token_swap(swap_client.clone(), token_swap.clone())
+                process_token_swap(swap_client.clone(), token_swap.clone(), amount_to_dex)
             });
 
             futures.push(future);
@@ -141,16 +126,12 @@ async fn run_async() {
 
 pub(crate) async fn process_token_swap(
     swap_client: SwapClientEnum,
-    mut token_swap: TokenSwap
+    mut token_swap: TokenSwap,
+    amount_to_dex: u128
 ) -> Result<(), String> {
     let swap_config = swap_client.get_config();
 
     let min_output_amount = 0;
-
-    // NOTE: should be always found
-    let amount_to_dex = read_state(
-        |s| *s.data.burn_amounts.get(&swap_config.swap_client_id).unwrap()
-    );
 
     // Get the quote to decide whether swap or not
     let quote = match
@@ -343,15 +324,6 @@ fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
     subtask.as_ref().and_then(|t| t.as_ref().ok())
 }
 
-pub fn should_update_amount() -> bool {
-    let last_burn_amount_update_opt = read_state(|s| s.data.last_burn_amount_update);
-    if let Some(last_burn_amount_update) = last_burn_amount_update_opt {
-        ic_cdk::api::time() > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND
-    } else {
-        true
-    }
-}
-
 pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, String> {
     if let Ok(available_amount) = get_token_balance(input_token.ledger_id).await {
         let burn_rate = read_state(|s| s.data.burn_config.burn_rate);
@@ -366,26 +338,5 @@ pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, St
         Ok(amount_per_interval)
     } else {
         Err("Failed to get token balance".to_string())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_should_update_burn_amount() {
-        let last_burn_amount_update = 1727879360726 * NANOS_PER_MILLISECOND; // Wed Oct 02 2024 16:29:20 GMT in nanoseconds
-        let current_time = 1728572230564 * NANOS_PER_MILLISECOND; // Thu Oct 10 2024 16:57:10 GMT in nanoseconds
-
-        assert!(current_time > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND);
-    }
-
-    #[test]
-    fn test_should_not_update_burn_amount() {
-        let last_burn_amount_update = 1727879360726 * NANOS_PER_MILLISECOND; // Wed Oct 02 2024 16:29:20 GMT in nanoseconds
-        let current_time = 1727991596250 * NANOS_PER_MILLISECOND; // 	Thu Oct 03 2024 21:39:56 GMT in nanoseconds
-
-        assert!(!current_time > last_burn_amount_update + WEEK_IN_MS * NANOS_PER_MILLISECOND);
     }
 }
