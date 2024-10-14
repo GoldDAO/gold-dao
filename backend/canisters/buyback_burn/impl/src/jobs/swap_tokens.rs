@@ -1,20 +1,19 @@
 use crate::state::{ mutate_state, read_state };
-use crate::types::SwapClient;
-use crate::utils::{ calculate_percentage_of_amount, get_token_balance, RETRY_DELAY };
-use futures::future::join_all;
-use crate::types::SwapClientEnum;
+use crate::types::{ TokenSwap, SwapClient, SwapClientEnum };
+use crate::utils::{
+    retry_with_attempts,
+    calculate_percentage_of_amount,
+    get_token_balance,
+    RETRY_DELAY,
+};
 use utils::rand::generate_random_delay;
-use canister_time::run_now_then_interval;
-use canister_tracing_macros::trace;
-use tracing::info;
-use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ debug, error };
 use utils::env::Environment;
-use crate::types::TokenSwap;
-use crate::utils::retry_with_attempts;
+use futures::future::join_all;
+use canister_time::{ run_now_then_interval, NANOS_PER_MILLISECOND, WEEK_IN_MS };
+use canister_tracing_macros::trace;
+use icrc_ledger_types::icrc1::transfer::TransferArg;
+use tracing::{ debug, info, error };
 use types::TokenInfo;
-
-use canister_time::{ NANOS_PER_MILLISECOND, WEEK_IN_MS };
 
 const MAX_ATTEMPTS: u8 = 1;
 
@@ -59,52 +58,13 @@ async fn run_async() {
     let mut futures = Vec::new();
 
     for swap_client in swap_clients.iter() {
-        let swap_client = swap_client.clone();
-        let args = swap_client.get_config();
-
-        let amount_to_dex = burn_amount_per_interval(args.input_token).await.unwrap();
-
-        let quote = match
-            swap_client.get_quote(
-                amount_to_dex.saturating_sub(args.input_token.fee.into()),
-                // NOTE: min expected output
-                0
+        if
+            let Some((future, token_swap_id)) = create_token_swap_if_possible(
+                swap_client.clone()
             ).await
         {
-            Ok(quote) => {
-                match quote {
-                    Ok(q) => q,
-                    Err(error) => {
-                        let msg = format!("{error:?}");
-                        error!("Failed to get the quote: {}", msg.as_str());
-                        // The swap won't be created due to next comparison
-                        0
-                    }
-                }
-            }
-            Err(error) => {
-                let msg = format!("{error:?}");
-                error!("Failed to get the quote: {}", msg.as_str());
-                // The swap won't be created due to next comparison
-                0
-            }
-        };
-
-        // Check if the balance is sufficient before creating the swap
-        let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
-        if quote > min_burn_amount + (args.output_token.fee as u128) {
-            let token_swap = mutate_state(|state| {
-                state.data.token_swaps.push_new(args.clone(), state.env.now())
-            });
-
-            token_swap_ids.push(token_swap.swap_id);
-            let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                process_token_swap(swap_client.clone(), token_swap.clone(), amount_to_dex)
-            });
-
             futures.push(future);
-        } else {
-            error!("Insufficient balance for swap: {:?}", quote);
+            token_swap_ids.push(token_swap_id);
         }
     }
 
@@ -124,7 +84,7 @@ async fn run_async() {
     }
 }
 
-async fn create_swap_if_possible(
+async fn create_token_swap_if_possible(
     swap_client: SwapClientEnum
 ) -> Option<(impl std::future::Future<Output = Result<(), String>>, u128)> {
     let args = swap_client.get_config();
@@ -201,7 +161,7 @@ pub(crate) async fn process_token_swap(
         }
     };
 
-    // // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
+    // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
     let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
     if quote < min_burn_amount + (swap_config.output_token.fee as u128) {
         let msg = format!("Insufficient balance to swap: {:?}", quote);
