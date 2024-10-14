@@ -109,7 +109,11 @@ async fn create_token_swap_if_possible(
         });
         Some((future, swap_id))
     } else {
-        error!("Insufficient balance for swap: {:?}", quote);
+        error!(
+            "Insufficient balance for swap: {:?}, min balance: {:?}",
+            quote,
+            min_burn_amount + (args.output_token.fee as u128)
+        );
         None
     }
 }
@@ -117,12 +121,8 @@ async fn create_token_swap_if_possible(
 async fn get_swap_quote(swap_client: &SwapClientEnum, amount_to_dex: u128, fee: u64) -> u128 {
     match swap_client.get_quote(amount_to_dex.saturating_sub(fee.into()), 0).await {
         Ok(Ok(quote)) => quote,
-        Ok(Err(e)) => {
-            error!("Failed to get the quote: {:?}", e);
-            0
-        }
-        Err(e) => {
-            error!("Failed to get the quote: {:?}", e);
+        _ => {
+            error!("Failed to get the quote");
             0
         }
     }

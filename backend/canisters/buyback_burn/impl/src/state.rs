@@ -68,7 +68,6 @@ pub struct Data {
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
-    // swap_clinet_id, burn_amount
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
