@@ -31,45 +31,18 @@ pub async fn process_token_burn() -> Result<(), String> {
     let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
     let min_burn_amount: u128 = burn_config.min_burn_amount.e8s().into();
 
-    if amount_to_burn > min_burn_amount {
-        let minting_account = match
-            icrc_ledger_canister_c2c_client::icrc1_minting_account(gldgov_ledger_canister_id).await
-        {
-            Ok(account) => {
-                match account {
-                    Some(a) => a,
-                    None => {
-                        return Err("Minting account is None".to_string());
-                    }
-                }
-            }
-            Err(e) => {
-                return Err(
-                    format!("Failed to get minting account (in order to burn tokens): {:?}", e)
-                );
-            }
-        };
-
-        match burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn.clone()).await {
-            Ok(_) => { Ok(()) }
-            Err(e) => {
-                let error_message = format!(
-                    "Failed to burn GLDGov tokens from the buyback and burn canister: {:?}",
-                    e
-                );
-                error!("{}", error_message);
-                Err(error_message)
-            }
-        }
-    } else {
+    if amount_to_burn <= min_burn_amount {
         let error_message = format!(
             "Calculated burn amount {} is below the minimum threshold of {}.",
             amount_to_burn,
             min_burn_amount
         );
         error!("{}", error_message);
-        Err(error_message)
+        return Err(error_message);
     }
+
+    let minting_account = get_minting_account(gldgov_ledger_canister_id).await?;
+    burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn).await
 }
 
 async fn burn_tokens(
@@ -80,8 +53,7 @@ async fn burn_tokens(
     let args = TransferArg {
         from_subaccount: None,
         to: burn_address,
-        // NOTE: There should be no fees for burnings
-        fee: None,
+        fee: None, // NOTE: There is no fee for burnings
         created_at_time: None,
         amount,
         memo: None,
@@ -91,5 +63,13 @@ async fn burn_tokens(
         Ok(Ok(_)) => Ok(()),
         Ok(Err(transfer_error)) => Err(format!("Failed to transfer tokens: {:?}", transfer_error)),
         Err(e) => Err(format!("Failed to send transfer request: {:?}", e)),
+    }
+}
+
+async fn get_minting_account(ledger_id: Principal) -> Result<Account, String> {
+    match icrc_ledger_canister_c2c_client::icrc1_minting_account(ledger_id).await {
+        Ok(Some(account)) => Ok(account),
+        Ok(None) => Err("Minting account is None".to_string()),
+        Err(e) => Err(format!("Failed to get minting account (in order to burn tokens): {:?}", e)),
     }
 }

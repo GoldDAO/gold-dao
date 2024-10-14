@@ -28,9 +28,6 @@ fn post_upgrade(args: Args) {
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
-            // NOTE: each time the canister is upgraded - the burn amount is recalculated
-            state.data.last_burn_amount_update = None;
-
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
 
