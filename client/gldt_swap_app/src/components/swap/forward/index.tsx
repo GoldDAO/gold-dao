@@ -1,4 +1,4 @@
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { ForwardSwapProceedProvider } from "@context/index";
 
 import { Button } from "@components/ui";
@@ -15,8 +15,7 @@ import ForwardSwapProceed from "./proceed";
 import { useNft } from "@context/index";
 
 const Forward = () => {
-  const { state: authState, connect } = useAuth();
-  const { isConnected } = authState;
+  const { isConnected, connect } = useAuth();
   const { getSelectedTotal } = useNft();
   const hasSelectedNfts = !!getSelectedTotal();
 

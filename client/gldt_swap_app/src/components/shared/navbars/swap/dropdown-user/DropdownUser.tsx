@@ -8,14 +8,13 @@ import {
   ArrowUpTrayIcon,
 } from "@heroicons/react/16/solid";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 import { Tile } from "@components/ui";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
 const DropdownUser = () => {
-  const { state: authState, disconnect } = useAuth();
-  const { principalId } = authState;
+  const { principalId, disconnect } = useAuth();
   const navigate = useNavigate();
 
   const handleDisconnect = () => {

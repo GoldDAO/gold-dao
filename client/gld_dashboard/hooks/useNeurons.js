@@ -2,12 +2,14 @@
 /* eslint-disable no-await-in-loop */
 import { Bounce, toast } from 'react-toastify';
 import { useState } from 'react';
+import { Principal } from '@dfinity/principal';
 import { calculateVotingPower, neuronState, uint8ArrayToHexString } from '../utils/functions';
 import mapResponseErrorCodeToFriendlyError from '../utils/errorMap';
 
 import canisters from '../utils/canisters';
 import { p } from '../utils/parsers';
 import useActor from './useActor';
+import useSession from './useSession';
 
 const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   const [snsRewards] = useActor('snsRewards');
@@ -18,6 +20,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
   const [loading, setLoading] = useState(false);
   const [neuronError, setNeuronError] = useState({});
   const [requestSent, setRequestSent] = useState(false);
+  const { principal } = useSession();
 
   function hexStringToUint8Array(hexString) {
     const bytes = [];
@@ -210,27 +213,37 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
       setRequestSent(true);
       setLoading(true);
       const neurons = {};
-      let neuronIds = await snsRewards.get_neurons_by_owner([]);
-      const neuronsParameters = await nervousSystemParameters();
-      if (neuronIds.length) {
-        neuronIds = neuronIds.flat();
-        const neuronPromises = [];
-        for (let i = 0; i < neuronIds.length; i += 1) {
-          const promise = governance.get_neuron({ neuron_id: [neuronIds[i]] });
-          neuronPromises.push(promise);
-        }
+      let shouldGetMore = true;
+      let responses = [];
+      const limit = 100;
+      let startPageAt = [];
 
-        const responses = await Promise.all(neuronPromises);
-        
-        const neuronsData = responses.map(async (status, i) => {
+      while (shouldGetMore) {
+        const res = await governance.list_neurons({
+          of_principal: [Principal.fromText(principal)],
+          start_page_at: startPageAt,
+          limit,
+        });
+        responses = responses.concat(res.neurons);
+        if (res.neurons.length < limit) {
+          shouldGetMore = false;
+        } else {
+          startPageAt = res.neurons[res.neurons.length - 1].id;
+        }
+      }
+
+      const neuronsParameters = await nervousSystemParameters();
+      if (responses.length) {
+        const neuronIds = responses.map((neuron) => neuron.id[0]); // [0].id
+        const neuronsData = responses.map(async (neuron, i) => {
           const fixedNeuronIds = Array.from(neuronIds[i].id);
           const neuronAge = Math.round(new Date().getTime() / 1000)
-            - Number(status.result[0].Neuron.aging_since_timestamp_seconds);
-          const dissolveState = status.result[0].Neuron.dissolve_state[0];
+            - Number(neuron.aging_since_timestamp_seconds);
+          const dissolveState = neuron.dissolve_state[0];
           const { votingPower, dissolveDelay } = calculateVotingPower({
-            cachedNeuronStakeE8s: Number(status.result[0].Neuron.cached_neuron_stake_e8s),
+            cachedNeuronStakeE8s: Number(neuron.cached_neuron_stake_e8s),
             stakedMaturiryE8sEquivalent: Number(
-              status.result[0].Neuron.staked_maturity_e8s_equivalent[0] || 0,
+              neuron.staked_maturity_e8s_equivalent[0] || 0,
             ),
             age: neuronAge,
             maxNeuronAgeForAgeBonus: Number(neuronsParameters.max_neuron_age_for_age_bonus[0]),
@@ -245,10 +258,10 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
           let icpRewards;
           let ledgerRewards;
           let ogyRewards;
-          if (status.result[0].Neuron) {
+          if (neuron) {
             neurons[fixedNeuronIds] = {
-              ...status.result[0].Neuron,
-              id: status.result[0].Neuron.id[0].id,
+              ...neuron,
+              id: neuron.id[0].id,
             };
             icpRewards = await icp.icrc1_balance_of({
               owner: p(canisters.snsRewards.canisterId),
@@ -284,12 +297,11 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
             votingPower: dissolveDelay
-              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+              >= Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
           };
-          
           return {
             ...neurons[fixedNeuronIds],
             icpRewards: Number(icpRewards),
@@ -297,15 +309,15 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
             ogyRewards: Number(ogyRewards),
             dissolving: neuronState(dissolveState),
             votingPower: dissolveDelay
-              > Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
+              >= Number(neuronsParameters.neuron_minimum_dissolve_delay_to_vote_seconds[0])
               ? votingPower : '-',
             dissolveDelay,
             age: neuronAge,
-          }
+          };
         });
 
         await Promise.all(neuronsData);
-        
+
         setLoading(false);
         return Object.values(neurons);
       }

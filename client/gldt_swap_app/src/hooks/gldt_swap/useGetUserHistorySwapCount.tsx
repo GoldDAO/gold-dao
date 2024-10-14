@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 
 interface GetUserHistoricSwapTotalParams {
   principal: string;
@@ -20,15 +20,14 @@ interface UseGetUserHistoricSwapParams
 export const useGetUserHistoricCountSwap = ({
   ...queryParams
 }: UseGetUserHistoricSwapParams) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<number | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   const get_history_total = async ({
     principal,
   }: GetUserHistoricSwapTotalParams): Promise<bigint> => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result = await actor.get_history_total([
       Principal.fromText(principal),
     ]);

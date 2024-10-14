@@ -1,9 +1,8 @@
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { Dialog, LoaderSpin } from "@components/ui";
 
 const ConnectingDialog = () => {
-  const { state: authState } = useAuth();
-  const { isConnecting } = authState;
+  const { isConnecting } = useAuth();
 
   return (
     <>

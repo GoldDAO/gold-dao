@@ -40,10 +40,10 @@ if [[ ! $NETWORK =~ ^(staging|ic)$ ]]; then
 fi
 
 # Extract version info and commit sha from CICD pipeline variables
-. ./scripts/extract_version_and_commit_sha.sh $CANISTER_NAME $NETWORK
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh $CANISTER_NAME $NETWORK
 
 if [ $? -ne 0 ]; then
-  echo "Error in extract_version_and_commit_sha.sh"
+  echo "Error in extract_commit_tag_data_and_commit_sha.sh"
   exit 1
 fi
 

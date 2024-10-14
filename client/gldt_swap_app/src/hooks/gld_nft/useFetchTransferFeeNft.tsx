@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { divideBy1e8 } from "@utils/numbers";
 
 export const useFetchTransferFeeNft = ({
@@ -10,8 +10,7 @@ export const useFetchTransferFeeNft = ({
   nftId: bigint | undefined;
   canister: string;
 }) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
 
   const icrc7_transfer_fee = async ({
     nftId,
@@ -20,7 +19,7 @@ export const useFetchTransferFeeNft = ({
     nftId: bigint | undefined;
     canister: string;
   }): Promise<number | undefined> => {
-    const actor = getActor(canister);
+    const actor = createActor(canister);
     const result = (await actor.icrc7_transfer_fee(
       BigInt(nftId as bigint)
     )) as [bigint];

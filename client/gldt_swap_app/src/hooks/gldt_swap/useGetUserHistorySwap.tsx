@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { useAuth } from "@context/auth";
+import { useAuth } from "@auth/index";
 import { SwapInfo, Result_1, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
 
@@ -26,8 +26,7 @@ export const useGetUserHistoricSwap = ({
   limit = 5,
   ...queryParams
 }: UseGetUserHistoricSwapParams) => {
-  const { state: authState, getActor } = useAuth();
-  const { isConnected, principalId } = authState;
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<{
     rows: SwapData[];
     pageCount: number;
@@ -43,7 +42,7 @@ export const useGetUserHistoricSwap = ({
     principal,
     limit,
   }: GetUserHistoricSwapParams): Promise<[Result_1, number]> => {
-    const actor = getActor("gldt_swap");
+    const actor = createActor("gldt_swap");
     const result_history = (await actor.get_historic_swaps_by_user({
       page: page,
       user: Principal.fromText(principal),

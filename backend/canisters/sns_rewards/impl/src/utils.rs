@@ -164,15 +164,9 @@ pub fn authenticate_by_hotkey(
     neuron_data: &Neuron,
     caller: &Principal
 ) -> AuthenticateByHotkeyResponse {
-    // first is always the nns owner principal so if less than or equal to 1 then no hotkeys have been added.
-    if neuron_data.permissions.len() <= 1 {
-        return AuthenticateByHotkeyResponse::NeuronHotKeyAbsent;
-    }
-
     // Check if any of the permission principals contain an entry that matches the caller principal
     let matching_caller_hotkey = neuron_data.permissions
         .iter()
-        .skip(1)
         .filter(|permission| permission.principal.as_ref() == Some(caller))
         .count();
 
@@ -251,7 +245,28 @@ mod tests {
     }
 
     #[test]
-    fn test_authenticate_by_hotkey_with_no_hotkeys() {
+    fn test_authenticate_by_hotkey_with_no_hotkey_but_valid_caller() {
+        let neuron_id = NeuronId::new(
+            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
+        ).unwrap();
+
+        let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        neuron.permissions.push(NeuronPermission {
+            principal: Some(caller.clone()),
+            permission_type: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+        });
+
+        let result = authenticate_by_hotkey(&neuron, &caller);
+
+        assert_eq!(result, AuthenticateByHotkeyResponse::Ok(true));
+    }
+
+    #[test]
+    fn test_authenticate_by_hotkey_with_no_hotkeys_invalid_caller() {
         let neuron_id = NeuronId::new(
             "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
         ).unwrap();
@@ -269,7 +284,7 @@ mod tests {
 
         let result = authenticate_by_hotkey(&neuron, &caller);
 
-        assert_eq!(result, AuthenticateByHotkeyResponse::NeuronHotKeyAbsent)
+        assert_eq!(result, AuthenticateByHotkeyResponse::NeuronHotKeyInvalid)
     }
 
     #[test]

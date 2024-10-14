@@ -216,7 +216,7 @@
       "wasm": "backend/canisters/sns_rewards/target/wasm32-unknown-unknown/release/sns_rewards_canister.wasm.gz"
     },
     "gldt_swap": {
-      "build": ["./scripts/build-canister.sh gldt_swap"],
+      "build": ["./scripts/build_canister.sh gldt_swap"],
       "candid": "backend/canisters/gldt_swap/api/can.did",
       "declarations": {
         "bindings": ["ts", "js", "did"],

@@ -12,11 +12,7 @@ use utils::{
 };
 
 use crate::{
-    model::{
-        maturity_history::MaturityHistory,
-        neuron_owners::NeuronOwnership,
-        payment_processor::PaymentProcessor,
-    },
+    model::{ maturity_history::MaturityHistory, payment_processor::PaymentProcessor },
     utils::TimeInterval,
 };
 
@@ -129,8 +125,6 @@ pub struct Data {
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
-    /// owners of neurons
-    pub neuron_owners: NeuronOwnership,
     /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
     /// valid tokens and their associated ledger data
@@ -162,7 +156,6 @@ impl Default for Data {
             neuron_maturity: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            neuron_owners: NeuronOwnership::default(),
             payment_processor: PaymentProcessor::default(),
             tokens: HashMap::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
