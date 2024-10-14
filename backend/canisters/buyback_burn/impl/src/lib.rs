@@ -37,7 +37,7 @@ mod lifecycle;
 mod memory;
 mod queries;
 mod utils;
-mod migrations;
+// mod migrations;
 
 mod state;
 pub mod types;
