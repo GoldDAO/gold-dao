@@ -1,20 +1,19 @@
 use crate::state::{ mutate_state, read_state };
-use crate::types::SwapClient;
-use crate::utils::{ calculate_percentage_of_amount, get_token_balance, RETRY_DELAY };
-use futures::future::join_all;
-use crate::types::SwapClientEnum;
+use crate::types::{ TokenSwap, SwapClient, SwapClientEnum };
+use crate::utils::{
+    retry_with_attempts,
+    calculate_percentage_of_amount,
+    get_token_balance,
+    RETRY_DELAY,
+};
 use utils::rand::generate_random_delay;
-use canister_time::run_now_then_interval;
-use canister_tracing_macros::trace;
-use tracing::info;
-use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::{ debug, error };
 use utils::env::Environment;
-use crate::types::TokenSwap;
-use crate::utils::retry_with_attempts;
+use futures::future::join_all;
+use canister_time::{ run_now_then_interval, NANOS_PER_MILLISECOND, WEEK_IN_MS };
+use canister_tracing_macros::trace;
+use icrc_ledger_types::icrc1::transfer::TransferArg;
+use tracing::{ debug, info, error };
 use types::TokenInfo;
-
-use canister_time::{ NANOS_PER_MILLISECOND, WEEK_IN_MS };
 
 const MAX_ATTEMPTS: u8 = 1;
 
@@ -54,70 +53,18 @@ async fn run_async_with_rand_delay() {
 #[trace]
 async fn run_async() {
     let swap_clients = read_state(|state| state.data.swap_clients.clone());
-    let should_update_burn_amount = should_update_amount();
 
     let mut token_swap_ids = Vec::new();
     let mut futures = Vec::new();
 
     for swap_client in swap_clients.iter() {
-        let swap_client = swap_client.clone();
-        let args = swap_client.get_config();
-
-        // If the week had passed -> recalculate the amounts to be burned
-        if should_update_burn_amount {
-            let burn_amount_per_interval = burn_amount_per_interval(
-                args.input_token
-            ).await.unwrap();
-            mutate_state(|state| {
-                state.data.burn_amounts.insert(args.swap_client_id, burn_amount_per_interval);
-                state.data.last_burn_amount_update = Some(ic_cdk::api::time());
-            });
-        }
-
-        // Check that the balance is enough to initiate the swap
-        let amount_to_dex = read_state(|s| *s.data.burn_amounts.get(&args.swap_client_id).unwrap());
-
-        let quote = match
-            swap_client.get_quote(
-                amount_to_dex.saturating_sub(args.input_token.fee.into()),
-                // NOTE: min expected output
-                0
+        if
+            let Some((future, token_swap_id)) = create_token_swap_if_possible(
+                swap_client.clone()
             ).await
         {
-            Ok(quote) => {
-                match quote {
-                    Ok(q) => q,
-                    Err(error) => {
-                        let msg = format!("{error:?}");
-                        error!("Failed to get the quote: {}", msg.as_str());
-                        // The swap won't be created due to next comparison
-                        0
-                    }
-                }
-            }
-            Err(error) => {
-                let msg = format!("{error:?}");
-                error!("Failed to get the quote: {}", msg.as_str());
-                // The swap won't be created due to next comparison
-                0
-            }
-        };
-
-        // Check if the balance is sufficient before creating the swap
-        let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
-        if quote > min_burn_amount + (args.output_token.fee as u128) {
-            let token_swap = mutate_state(|state| {
-                state.data.token_swaps.push_new(args.clone(), state.env.now())
-            });
-
-            token_swap_ids.push(token_swap.swap_id);
-            let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
-                process_token_swap(swap_client.clone(), token_swap.clone())
-            });
-
             futures.push(future);
-        } else {
-            error!("Insufficient balance for swap: {:?}", quote);
+            token_swap_ids.push(token_swap_id);
         }
     }
 
@@ -137,18 +84,58 @@ async fn run_async() {
     }
 }
 
+async fn create_token_swap_if_possible(
+    swap_client: SwapClientEnum
+) -> Option<(impl std::future::Future<Output = Result<(), String>>, u128)> {
+    let args = swap_client.get_config();
+    let amount_to_dex = match burn_amount_per_interval(args.input_token).await {
+        Ok(amount) => amount,
+        Err(e) => {
+            error!("Error calculating burn amount: {}", e);
+            return None;
+        }
+    };
+
+    let quote = get_swap_quote(&swap_client, amount_to_dex, args.input_token.fee).await;
+    let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
+
+    if quote > min_burn_amount + (args.output_token.fee as u128) {
+        let token_swap = mutate_state(|state|
+            state.data.token_swaps.push_new(args.clone(), state.env.now())
+        );
+        let swap_id = token_swap.swap_id;
+        let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
+            process_token_swap(swap_client.clone(), token_swap.clone(), amount_to_dex)
+        });
+        Some((future, swap_id))
+    } else {
+        error!(
+            "Insufficient balance for swap: {:?}, min balance: {:?}",
+            quote,
+            min_burn_amount + (args.output_token.fee as u128)
+        );
+        None
+    }
+}
+
+async fn get_swap_quote(swap_client: &SwapClientEnum, amount_to_dex: u128, fee: u64) -> u128 {
+    match swap_client.get_quote(amount_to_dex.saturating_sub(fee.into()), 0).await {
+        Ok(Ok(quote)) => quote,
+        _ => {
+            error!("Failed to get the quote");
+            0
+        }
+    }
+}
+
 pub(crate) async fn process_token_swap(
     swap_client: SwapClientEnum,
-    mut token_swap: TokenSwap
+    mut token_swap: TokenSwap,
+    amount_to_dex: u128
 ) -> Result<(), String> {
     let swap_config = swap_client.get_config();
 
     let min_output_amount = 0;
-
-    // NOTE: should be always found
-    let amount_to_dex = read_state(
-        |s| *s.data.burn_amounts.get(&swap_config.swap_client_id).unwrap()
-    );
 
     // Get the quote to decide whether swap or not
     let quote = match
@@ -174,7 +161,7 @@ pub(crate) async fn process_token_swap(
         }
     };
 
-    // // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
+    // NOTE: check if it makes sense to make swap (especially if there would be enough balance after the swap)
     let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
     if quote < min_burn_amount + (swap_config.output_token.fee as u128) {
         let msg = format!("Insufficient balance to swap: {:?}", quote);
@@ -339,16 +326,6 @@ pub(crate) async fn process_token_swap(
 
 fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
     subtask.as_ref().and_then(|t| t.as_ref().ok())
-}
-
-pub fn should_update_amount() -> bool {
-    let last_burn_amount_update_opt = read_state(|s| s.data.last_burn_amount_update);
-    if let Some(last_burn_amount_update) = last_burn_amount_update_opt {
-        ic_cdk::api::time() >
-            last_burn_amount_update * NANOS_PER_MILLISECOND + WEEK_IN_MS * NANOS_PER_MILLISECOND
-    } else {
-        true
-    }
 }
 
 pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, String> {

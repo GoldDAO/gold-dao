@@ -38,7 +38,7 @@ fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
         Ok(wasm) => wasm,
         Err(err) => {
             println!(
-                "Failed to read {canister_name} wasm: {err}. Run \"./scripts/build_canister.sh {canister_name}\""
+                "Failed to read {canister_name} wasm: {err}. \n\x1b[31mRun \"./scripts/build_canister.sh {canister_name}\"\x1b[0m"
             );
             panic!()
         }
