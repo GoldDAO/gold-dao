@@ -6,6 +6,7 @@ pub mod swap_nft_for_tokens;
 pub mod remove_intent_to_swap;
 pub mod get_service_status;
 pub mod set_base_ogy_swap_fee;
+pub mod get_history_total;
 
 pub use notify_sale_nft_origyn::*;
 pub use swap_tokens_for_nft::*;
@@ -15,3 +16,4 @@ pub use swap_nft_for_tokens::*;
 pub use remove_intent_to_swap::*;
 pub use get_service_status::*;
 pub use set_base_ogy_swap_fee::*;
+pub use get_history_total::*;

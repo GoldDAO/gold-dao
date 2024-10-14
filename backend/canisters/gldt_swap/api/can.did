@@ -280,7 +280,7 @@ service : (Args_3) -> {
   get_archive_canisters : (null) -> (vec ArchiveCanister) query;
   get_historic_swaps : (Args) -> (Result) composite_query;
   get_historic_swaps_by_user : (Args_1) -> (Result_1) composite_query;
-  get_history_total : (opt principal) -> (nat) composite_query;
+  get_history_total : (opt principal) -> (nat);
   get_swap : (record { nat; nat }) -> (
       opt record { record { nat; nat }; SwapInfo },
     ) composite_query;

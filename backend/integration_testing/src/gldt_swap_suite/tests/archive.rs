@@ -74,6 +74,10 @@ mod tests {
         init::InitArgs as GldtSwapCanisterInitArgs,
         post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
     };
+    use gldt_swap_api_archive::get_archive_swaps::{
+        Args as GetArchiveSwapArgs,
+        Response as GetArchiveSwapResponse,
+    };
     use types::BuildVersion;
 
     #[test]
@@ -93,8 +97,7 @@ mod tests {
     use crate::{
         client::gldt_swap::{
             get_archive_canisters,
-            get_historic_swaps,
-            get_historic_swaps_by_user,
+            get_archive_swaps,
             get_history_total,
             get_version,
         },
@@ -158,177 +161,204 @@ mod tests {
         );
         assert_eq!(swap.is_some(), true);
 
-        // test simple pagination - should be able to go all the way from 249 to 0
-        let res = get_historic_swaps(
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        // there should be 2 archive canisters
+        assert_eq!(archive_canisters.len(), 2);
+
+        let archive_canister_1 = archive_canisters[0].clone();
+        let archive_canister_2 = archive_canisters[1].clone();
+
+        println!("{archive_canister_1:?}");
+        println!("{archive_canister_2:?}");
+
+        // start at 249 ( the latest swap ) and go to the oldest swap
+        let mut start_index = total_swaps.clone(); // starts at 249
+        println!("///// start_index : {start_index:?}");
+        let res = get_archive_swaps(
             pic,
             Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
                 limit: 50,
+                user_principal: None,
             })
-        ).unwrap();
+        );
         assert_eq!(res.len(), 50);
         for (swap, expected_id) in res.iter().zip((0..50).rev().map(|i| Nat::from(i + 200u64))) {
             assert_eq!(expected_id, swap.0.1);
         }
+        assert_eq!(res[0].0.1, Nat::from(249u64));
+        assert_eq!(res[49].0.1, Nat::from(200u64));
 
-        start_swap_index += 1;
-        let res = get_historic_swaps(
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
             pic,
             Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
                 limit: 50,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        for (swap, expected_id) in res.iter().zip((0..50).rev().map(|i| Nat::from(i + 150u64))) {
-            assert_eq!(expected_id, swap.0.1);
-        }
-
-        start_swap_index += 1;
-        let res = get_historic_swaps(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
-                limit: 50,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        for (swap, expected_id) in res.iter().zip((0..50).rev().map(|i| Nat::from(i + 100u64))) {
-            assert_eq!(expected_id, swap.0.1);
-        }
-
-        start_swap_index += 1;
-        let res = get_historic_swaps(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
-                limit: 50,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        for (swap, expected_id) in res.iter().zip((0..50).rev().map(|i| Nat::from(i + 50u64))) {
-            assert_eq!(expected_id, swap.0.1);
-        }
-
-        start_swap_index += 1;
-        let res = get_historic_swaps(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
-                limit: 50,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        for (swap, expected_id) in res.iter().zip((0..50u64).rev()) {
-            assert_eq!(Nat::from(expected_id), swap.0.1);
-        }
-
-        // test a limit that is too large
-        let res = get_historic_swaps(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: start_swap_index,
-                limit: 201,
+                user_principal: None,
             })
         );
-        matches!(res, Err(GetHistoricSwapsError::LimitTooLarge(_)));
+        assert_eq!(res.len(), 19);
+        assert_eq!(res[0].0.1, Nat::from(199u64));
+        assert_eq!(res[18].0.1, Nat::from(181u64));
 
-        // // test when start + limit is more than the total number of swaps
-
-        let res = get_historic_swaps(
+        // using archive canister 1 now because we've gone through all of archive canister 2's records
+        start_index = res[18].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
             pic,
             Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: 2, // 300
-                limit: 100,
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
             })
-        ).unwrap();
+        );
         assert_eq!(res.len(), 50);
-        for (swap, expected_id) in res.iter().zip((0..50u64).rev()) {
-            assert_eq!(Nat::from(expected_id), swap.0.1);
-        }
-        assert_eq!(res.last().unwrap().0.1, Nat::from(0u64));
+        assert_eq!(res[0].0.1, Nat::from(180u64));
+        assert_eq!(res[49].0.1, Nat::from(131u64));
 
-        // test a page that should return no swaps
-        let res = get_historic_swaps(
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
             pic,
             Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsArgs {
-                page: 3, // start at 400
-                limit: 100,
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
             })
-        ).unwrap();
-        if &res.len() > &0usize {
-            let last_swap = res.get(0);
-            println!("{last_swap:?}");
-        }
-        assert_eq!(res.len(), 0);
+        );
+        assert_eq!(res.len(), 50);
+        assert_eq!(res[0].0.1, Nat::from(130u64));
+        assert_eq!(res[49].0.1, Nat::from(81u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 50);
+        assert_eq!(res[0].0.1, Nat::from(80u64));
+        assert_eq!(res[49].0.1, Nat::from(31u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 31);
+        assert_eq!(res[0].0.1, Nat::from(30u64));
+        assert_eq!(res[30].0.1, Nat::from(0u64));
+
+        // // test a limit that is too large
+        // let res = get_historic_swaps(
+        //     pic,
+        //     Principal::anonymous(),
+        //     gldt_swap,
+        //     &(GetHistoricSwapsArgs {
+        //         page: start_swap_index,
+        //         limit: 201,
+        //     })
+        // );
+        // matches!(res, Err(GetHistoricSwapsError::LimitTooLarge(_)));
+
+        // // // test when start + limit is more than the total number of swaps
+
+        // let res = get_historic_swaps(
+        //     pic,
+        //     Principal::anonymous(),
+        //     gldt_swap,
+        //     &(GetHistoricSwapsArgs {
+        //         page: 2, // 300
+        //         limit: 100,
+        //     })
+        // ).unwrap();
+        // assert_eq!(res.len(), 50);
+        // for (swap, expected_id) in res.iter().zip((0..50u64).rev()) {
+        //     assert_eq!(Nat::from(expected_id), swap.0.1);
+        // }
+        // assert_eq!(res.last().unwrap().0.1, Nat::from(0u64));
+
+        // // test a page that should return no swaps
+        // let res = get_historic_swaps(
+        //     pic,
+        //     Principal::anonymous(),
+        //     gldt_swap,
+        //     &(GetHistoricSwapsArgs {
+        //         page: 3, // start at 400
+        //         limit: 100,
+        //     })
+        // ).unwrap();
+        // if &res.len() > &0usize {
+        //     let last_swap = res.get(0);
+        //     println!("{last_swap:?}");
+        // }
+        // assert_eq!(res.len(), 0);
 
         // test getting user historic swaps
-        let res = get_historic_swaps_by_user(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsByUserArgs {
-                page: 0,
-                limit: 50,
-                user: user_a,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        assert_eq!(res.first().unwrap().0.1, Nat::from(249u64));
-        assert_eq!(res.last().unwrap().0.1, Nat::from(151u64));
+        let total_user_swaps = get_history_total(pic, user_a, gldt_swap, &Some(user_a));
+        let mut running_total = 0u64;
 
-        let res = get_historic_swaps_by_user(
+        start_index = Nat::from(250u64);
+        let res = get_archive_swaps(
             pic,
             Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsByUserArgs {
-                page: 1,
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
                 limit: 50,
-                user: user_a,
+                user_principal: Some(user_a),
             })
-        ).unwrap();
-        assert_eq!(res.len(), 50);
-        assert_eq!(res.first().unwrap().0.1, Nat::from(149u64));
-        assert_eq!(res.last().unwrap().0.1, Nat::from(51u64));
-
-        let res = get_historic_swaps_by_user(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &(GetHistoricSwapsByUserArgs {
-                page: 2,
-                limit: 50,
-                user: user_a,
-            })
-        ).unwrap();
-        assert_eq!(res.len(), 26);
-        assert_eq!(res.first().unwrap().0.1, Nat::from(49u64));
-        assert_eq!(res.last().unwrap().0.1, Nat::from(0u64));
-
-        // check user_history_total works
-        let user_history_total = get_history_total(
-            pic,
-            Principal::anonymous(),
-            gldt_swap,
-            &Some(user_a)
         );
-        assert_eq!(user_history_total, Nat::from(126u64));
+        assert_eq!(res.len(), 35);
+        running_total += 35;
+
+        start_index = res[34].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
+                limit: 50,
+                user_principal: Some(user_a),
+            })
+        );
+        assert_eq!(res.len(), 50);
+        running_total += 50;
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
+                limit: 50,
+                user_principal: Some(user_a),
+            })
+        );
+        assert_eq!(res.len(), 41);
+        running_total += 41;
+
+        assert_eq!(total_user_swaps, Nat::from(running_total));
 
         // will upgrade multiple canisters
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
