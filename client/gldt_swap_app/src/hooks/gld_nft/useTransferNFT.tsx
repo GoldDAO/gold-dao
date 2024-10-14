@@ -41,21 +41,22 @@ export const useTransferNFT = () => {
     }): Promise<void> => {
       const icrc2_approve_args = nfts.flatMap((nft) => {
         console.log(`approve_args canisterID: ${nft.canisterId}`);
-        return nft.tokenIds.map(() => {
-          return {
-            amount: BigInt(fee * 10 ** 8 + OGY_TX_FEE),
-            fee: [],
-            memo: [],
-            expected_allowance: [],
-            created_at_time: [],
-            expires_at: [],
-            spender: {
-              owner: Principal.fromText(nft.canisterId),
-              subaccount: [],
-            },
-            from_subaccount: [],
-          };
-        });
+        const amount = BigInt(
+          nft.tokenIds.length * (fee * 10 ** 8 + OGY_TX_FEE)
+        );
+        return {
+          amount,
+          fee: [],
+          memo: [],
+          expected_allowance: [],
+          created_at_time: [],
+          expires_at: [],
+          spender: {
+            owner: Principal.fromText(nft.canisterId),
+            subaccount: [],
+          },
+          from_subaccount: [],
+        };
       }) as ApproveArgs[];
 
       console.log("approve_args:");
@@ -63,6 +64,16 @@ export const useTransferNFT = () => {
       const approve = await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
+
+      const approveErrors = approve.filter(
+        (result) => result.status === "rejected"
+      );
+      if (approveErrors.length > 0) {
+        console.error(approveErrors);
+        throw new Error(
+          "Transfer error! One or more approve transactions failed."
+        );
+      }
       console.log("approve result:");
       console.log(approve);
 
@@ -91,6 +102,15 @@ export const useTransferNFT = () => {
       const transfer = await Promise.allSettled(
         icrc7_transfer_args.map(async (arg) => await icrc7_transfer(arg))
       );
+      const transferErrors = transfer.filter(
+        (result) => result.status === "rejected"
+      );
+      if (transferErrors.length > 0) {
+        console.error(transferErrors);
+        throw new Error(
+          "Transfer error! One or more transfer transactions failed"
+        );
+      }
       console.log("transfer result:");
       console.log(transfer);
     },

@@ -61,8 +61,12 @@ const useTransferProceedNftProviderValue = () => {
   const handleShowDialogConfirm = () => setShow(true);
   const handleCloseDialogConfirm = () => setShow(false);
   const mutation = useTransferNFT();
-  const { getCollectionSelectedNFTs, getOneRandomNftId, getCountSelectedNfts } =
-    useNft();
+  const {
+    getCollectionSelectedNFTs,
+    getOneRandomNftId,
+    getCountSelectedNfts,
+    resetState: resetStateNft,
+  } = useNft();
   const randomNftId = getOneRandomNftId(); // ? useful for the one call to transfer_fee
   const countSelectedNfts = getCountSelectedNfts();
 
@@ -92,30 +96,47 @@ const useTransferProceedNftProviderValue = () => {
         to: state.to,
         nfts,
         fee: state.fee,
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_BALANCE_OGY`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [`USER_GET_GLD_NFT_1G`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [`USER_GET_GLD_NFT_10G`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [`USER_GET_GLD_NFT_100G`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [`USER_GET_GLD_NFT_1000G`],
-          });
-        },
       }
+      // {
+      //   onSuccess: () => {
+      //     resetStateNft();
+      //     queryClient.invalidateQueries({
+      //       queryKey: [`USER_FETCH_BALANCE_OGY`],
+      //     });
+      //     queryClient.invalidateQueries({
+      //       queryKey: [`USER_GET_GLD_NFT_1G`],
+      //     });
+      //     queryClient.invalidateQueries({
+      //       queryKey: [`USER_GET_GLD_NFT_10G`],
+      //     });
+      //     queryClient.invalidateQueries({
+      //       queryKey: [`USER_GET_GLD_NFT_100G`],
+      //     });
+      //     queryClient.invalidateQueries({
+      //       queryKey: [`USER_GET_GLD_NFT_1000G`],
+      //     });
+      //   },
+      // }
     );
   };
 
   const handleReset = (): void => {
+    resetStateNft();
+    queryClient.invalidateQueries({
+      queryKey: [`USER_FETCH_BALANCE_OGY`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`USER_GET_GLD_NFT_1G`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`USER_GET_GLD_NFT_10G`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`USER_GET_GLD_NFT_100G`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`USER_GET_GLD_NFT_1000G`],
+    });
     setState(initialState);
     form.reset();
     mutation.reset();
