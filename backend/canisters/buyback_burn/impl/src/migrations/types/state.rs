@@ -1,12 +1,13 @@
 use serde::{ Deserialize, Serialize };
 use crate::state::BurnConfig;
-
 use crate::types::token_swaps::TokenSwaps;
 use candid::Principal;
 use std::time::Duration;
 use types::TokenInfo;
 use utils::env::CanisterEnv;
 use crate::types::SwapClients;
+use std::collections::BTreeMap;
+use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize)]
 pub struct RuntimeStateV0 {
@@ -25,4 +26,7 @@ pub struct Data {
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
+    pub last_burn_amount_update: Option<TimestampMillis>,
+    // swap_clinet_id, burn_amount
+    pub burn_amounts: BTreeMap<u128, u128>,
 }
