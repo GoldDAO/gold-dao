@@ -124,6 +124,50 @@ async fn run_async() {
     }
 }
 
+async fn create_swap_if_possible(
+    swap_client: SwapClientEnum
+) -> Option<(impl std::future::Future<Output = Result<(), String>>, u128)> {
+    let args = swap_client.get_config();
+    let amount_to_dex = match burn_amount_per_interval(args.input_token).await {
+        Ok(amount) => amount,
+        Err(e) => {
+            error!("Error calculating burn amount: {}", e);
+            return None;
+        }
+    };
+
+    let quote = get_swap_quote(&swap_client, amount_to_dex, args.input_token.fee).await;
+    let min_burn_amount = read_state(|s| s.data.burn_config.min_burn_amount.e8s()) as u128;
+
+    if quote > min_burn_amount + (args.output_token.fee as u128) {
+        let token_swap = mutate_state(|state|
+            state.data.token_swaps.push_new(args.clone(), state.env.now())
+        );
+        let swap_id = token_swap.swap_id;
+        let future = retry_with_attempts(MAX_ATTEMPTS, RETRY_DELAY, move || {
+            process_token_swap(swap_client.clone(), token_swap.clone(), amount_to_dex)
+        });
+        Some((future, swap_id))
+    } else {
+        error!("Insufficient balance for swap: {:?}", quote);
+        None
+    }
+}
+
+async fn get_swap_quote(swap_client: &SwapClientEnum, amount_to_dex: u128, fee: u64) -> u128 {
+    match swap_client.get_quote(amount_to_dex.saturating_sub(fee.into()), 0).await {
+        Ok(Ok(quote)) => quote,
+        Ok(Err(e)) => {
+            error!("Failed to get the quote: {:?}", e);
+            0
+        }
+        Err(e) => {
+            error!("Failed to get the quote: {:?}", e);
+            0
+        }
+    }
+}
+
 pub(crate) async fn process_token_swap(
     swap_client: SwapClientEnum,
     mut token_swap: TokenSwap,
