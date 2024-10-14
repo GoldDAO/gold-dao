@@ -33,10 +33,11 @@ use crate::state::RuntimeState;
 
 mod guards;
 mod jobs;
-pub mod lifecycle;
+mod lifecycle;
 mod memory;
-pub mod queries;
+mod queries;
 mod utils;
+mod migrations;
 
 mod state;
 pub mod types;
