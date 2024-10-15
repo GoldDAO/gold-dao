@@ -63,14 +63,14 @@ export const useGetAvailableGLDNFT = () => {
         enabled: !!isConnected && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,
       },
-      // {
-      //   queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-      //   queryFn: () =>
-      //     getNFTByCanister("gld_nft_10g", CollectionIndex.GLD_NFT_10G),
-      //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!active_swaps.isSuccess,
-      //   refetchOnWindowFocus: false,
-      // },
+      {
+        queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
+        queryFn: () =>
+          getNFTByCanister("gld_nft_10g", CollectionIndex.GLD_NFT_10G),
+        placeholderData: keepPreviousData,
+        enabled: !!isConnected && !!active_swaps.isSuccess,
+        refetchOnWindowFocus: false,
+      },
       // {
       //   queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
       //   queryFn: () =>
