@@ -4,7 +4,7 @@ export const LandingPage = () => {
   return (
     <>
       <div className="bg-surface-2 bg-cover-img bg-cover bg-fixed">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4">
           <NavbarHome />
         </div>
         <section className="p-16">
@@ -28,18 +28,30 @@ export const LandingPage = () => {
           </div>
         </section>
       </div>
-      <div className="container mx-auto mt-4 sm:mt-8">
-        <section className="p-16">
-          <div>A token backed 100% in perpetuity by physical gold</div>
-          <div>
-            GLDT is a fractionable token backed by physical goldv. Users can buy
-            gold certificates (referred to as GLD NFTs) via the Yumi
-            marketplace. These certificates can then be exchanged for GLDT
-            tokens using the swap app. For example, a GLD NFT representing 1
-            gram of gold can be swapped for 100 GLDT tokens. Essentially, each
-            GLDT represents a fractional share of actual physical gold, making
-            it far more liquid. This enables the trading of gold outside the
-            traditional banking system.
+      <div className="container mx-auto">
+        <section className="border-y border-gold/60">
+          <div className="grid grid-cols-1 xl:grid-cols-2">
+            <div className="flex justify-center px-4 xl:px-24 pt-16 pb-0 xl:py-24 text-center xl:text-left xl:border-r border-gold/60">
+              <div className="text-xl">
+                A token backed 100% in perpetuity by{" "}
+                <span className="font-semibold">physical gold</span>
+              </div>
+            </div>
+            <div className="flex justify-center px-4 xl:px-24 pt-8 pb-16 xl:py-24 text-center xl:text-left">
+              <div className="">
+                GLDT is a fractionable token backed by physical goldv. <br />
+                Users can buy gold certificates (referred to as GLD NFTs) via
+                the Yumi marketplace. These certificates can then be exchanged
+                for GLDT tokens using the swap app. <br />
+                For example, a GLD NFT representing 1 gram of gold can be
+                swapped for 100 GLDT tokens.
+                <br />
+                Essentially, each GLDT represents a fractional share of actual
+                physical gold, making it far more liquid. <br />
+                This enables the trading of gold outside the traditional banking
+                system.
+              </div>
+            </div>
           </div>
         </section>
         <section className="p-16">
@@ -64,19 +76,33 @@ export const LandingPage = () => {
             the whitepaper.
           </div>
         </section>
-        <section className="p-16">
-          <div>
-            <div>Determining the price of GLDT</div>
-            <div>
-              The price of GLDT is directly correlated with the spot price of
-              physical gold. The market determines the price of gold, which is
-              then used to calculate the value of GLDT. It's important to note
-              that every 100 GLDT equals 1 gram of gold. This system operates
-              24/7, accessible all around the world with lowest fees.
+        <section className="border-y border-gold/60">
+          <div className="grid grid-cols-1 xl:grid-cols-2">
+            <div className="flex flex-col justify-center px-4 xl:px-24 pt-16 pb-0 xl:py-24 text-center xl:text-left xl:border-r border-gold/60">
+              <div className="text-2xl">
+                Determining the{" "}
+                <span className="font-semibold">price of GLDT</span>
+              </div>
+              <div className="mt-8">
+                The price of GLDT is directly correlated with the spot price of
+                physical gold.
+                <br />
+                The market determines the price of gold, which is then used to
+                calculate the value of GLDT.
+                <br />
+                It's important to note that every 100 GLDT equals 1 gram of
+                gold.
+                <br />
+                This system operates 24/7, accessible all around the world with
+                lowest fees.
+              </div>
+            </div>
+            <div className="flex justify-center px-4 xl:px-24 pt-8 pb-16 xl:py-24 text-center xl:text-left bg-surface-2 bg-cover-img bg-cover">
+              <img className="flex-none" src={`/swap_landing_page.svg`} />
             </div>
           </div>
-          <div>Image</div>
         </section>
+
         <section className="p-16">
           <div>
             <div>Get started</div>

@@ -21,7 +21,7 @@ const Proceed = () => {
     reverseSwap,
     setCanCloseDialog,
   } = useReverseSwapProceed();
-  const { show, canCloseDialog, canReverseSwap } = reverseSwapProceedState;
+  const { show, canReverseSwap } = reverseSwapProceedState;
   const {
     mutate: mutateSwapGLDNFT,
     isSuccess,
@@ -31,7 +31,6 @@ const Proceed = () => {
   } = reverseSwap;
 
   const handleOnClick = () => {
-    setCanCloseDialog(false);
     mutateSwapGLDNFT(undefined, {
       onSuccess: () => {
         setCanCloseDialog(true);
@@ -49,10 +48,6 @@ const Proceed = () => {
         });
         resetState();
       },
-      onError: (err) => {
-        console.log(err);
-        setCanCloseDialog(true);
-      },
     });
   };
 
@@ -65,11 +60,7 @@ const Proceed = () => {
       >
         Preview Swap
       </Button>
-      <Dialog
-        show={show}
-        handleClose={handleClose}
-        enableClose={canCloseDialog}
-      >
+      <Dialog show={show} handleClose={handleClose} enableClose={isIdle}>
         <div className="px-6 pt-6 pb-12">
           {isIdle && (
             <>

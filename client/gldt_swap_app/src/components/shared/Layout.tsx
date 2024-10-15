@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Outlet, useNavigation, useLocation } from "react-router-dom";
 import NavbarSwap from "./navbars/swap/NavbarSwap";
 
@@ -17,10 +16,10 @@ const Layout = () => {
   const location = useLocation();
   const isSwap = location.pathname.match(/\/swap/) ? true : false;
 
-  useEffect(() => {
-    if (isSwap) document.body.classList.add("bg-background");
-    else document.body.classList.remove("bg-surface-1");
-  }, [isSwap]);
+  // useEffect(() => {
+  //   if (isSwap) document.body.classList.add("bg-background");
+  //   else document.body.classList.remove("bg-surface-1");
+  // }, [isSwap]);
 
   return isSwap ? (
     <div className="flex flex-col min-h-screen pb-12 bg-cover-img bg-cover bg-fixed bg-background">

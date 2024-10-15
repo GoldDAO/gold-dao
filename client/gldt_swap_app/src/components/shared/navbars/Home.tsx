@@ -7,9 +7,9 @@ import { Button } from "@components/ui";
 const Default = () => {
   const [showMenu, setShowMenu] = useState(false);
 
-  const navItems = [
+  const navItems: { title: string; url: string }[] = [
     // { title: "Explorer", url: "/" },
-    { title: "Explorer", url: "/explorer" },
+    // { title: "Explorer", url: "/explorer" },
     // { title: "Proposals", url: "/proposals" },
   ];
 
@@ -17,7 +17,7 @@ const Default = () => {
 
   return (
     <>
-      <nav className="sticky top-0 px-6 py-5 z-40">
+      <nav className="sticky top-0 py-5 z-40">
         <div className="grid grid-cols-2 xl:grid-cols-3 items-center h-10">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">

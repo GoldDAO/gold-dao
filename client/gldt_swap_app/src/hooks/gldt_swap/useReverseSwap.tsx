@@ -83,21 +83,27 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      await Promise.allSettled(
+      console.log("approve_args:");
+      console.log(icrc2_approve_args);
+      const approve = await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
-      // if (walletSelected === "bitfinity") {
-      //   const bitfinity_adapter = walletList.find(
-      //     (adaptor) => adaptor.id === "bitfinity"
-      //   );
-      //   bitfinity_adapter?.adapter.batchTransactions(
-      //     icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
-      //   );
-      // } else {
-      //   await Promise.allSettled(
-      //     icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
-      //   );
-      // }
+
+      console.log("approve result:");
+      console.log(approve);
+
+      const approveErrors = approve.filter(
+        (result) => result.status === "rejected"
+      );
+      if (approveErrors.length > 0) {
+        console.error(approveErrors);
+        throw new Error(
+          "Reverse swap error! One or more approve transactions failed."
+        );
+      }
+
+      console.log("icrc2_allowance_args:");
+      console.log(icrc2_allowance_args);
 
       const swapTasks = icrc2_allowance_args.map(async (_, index) => {
         try {
@@ -111,7 +117,18 @@ export const useReverseSwap = () => {
           console.error("Error swap:", error);
         }
       });
-      await Promise.allSettled(swapTasks);
+      const swap = await Promise.allSettled(swapTasks);
+
+      console.log("swap result:");
+      console.log(swap);
+
+      const swapErrors = swap.filter((result) => result.status === "rejected");
+      if (swapErrors.length > 0) {
+        console.error(approveErrors);
+        throw new Error(
+          "Reverse swap error! One or more swap transactions failed."
+        );
+      }
     },
   });
 };

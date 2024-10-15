@@ -1,17 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export const idlFactory = ({ IDL }) => {
   const SwapStatusReverse = IDL.Rec();
+  const BuildVersion = IDL.Record({
+    major: IDL.Nat32,
+    minor: IDL.Nat32,
+    patch: IDL.Nat32,
+  });
+  const UpgradeArgs = IDL.Record({
+    version: BuildVersion,
+    commit_hash: IDL.Text,
+  });
   const NftCanisterConf = IDL.Record({ grams: IDL.Nat16 });
   const InitArgs = IDL.Record({
     test_mode: IDL.Bool,
     ogy_ledger_id: IDL.Principal,
     authorized_principals: IDL.Vec(IDL.Principal),
-    version: IDL.Text,
+    version: BuildVersion,
     gldnft_canisters: IDL.Vec(IDL.Tuple(IDL.Principal, NftCanisterConf)),
     gldt_ledger_id: IDL.Principal,
+    commit_hash: IDL.Text,
   });
+  const Args_3 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
   const BidFailError = IDL.Variant({
     UnexpectedError: IDL.Text,
+    CallError: IDL.Text,
     TransferFailed: IDL.Text,
   });
   const ImpossibleErrorReason = IDL.Variant({
@@ -148,24 +159,14 @@ export const idlFactory = ({ IDL }) => {
     NotOwnedBySwapCanister: IDL.Null,
   });
   const BurnError = IDL.Variant({ CallError: IDL.Text });
-  const TransferError_1 = IDL.Variant({
-    GenericError: IDL.Record({
-      message: IDL.Text,
-      error_code: IDL.Nat,
-    }),
-    Duplicate: IDL.Record({ duplicate_of: IDL.Nat }),
-    NonExistingTokenId: IDL.Null,
-    Unauthorized: IDL.Null,
-    CreatedInFuture: IDL.Record({ ledger_time: IDL.Nat64 }),
-    TooOld: IDL.Null,
-  });
   const NftTransferError = IDL.Variant({
+    FailedToGetOgyFeeAllowance: IDL.Text,
     ApprovalError: ApproveError,
     ApprovalCallError: IDL.Text,
     InvalidFee: IDL.Text,
     UnexpectedError: ImpossibleErrorReason,
     CallError: IDL.Text,
-    TransferFailed: TransferError_1,
+    TransferFailed: IDL.Text,
   });
   const SwapErrorReverse = IDL.Variant({
     FeeTransferFailed: FeeTransferError,
@@ -272,7 +273,6 @@ export const idlFactory = ({ IDL }) => {
   });
   const SwapNftForTokensErrors = IDL.Variant({
     Limit: IDL.Text,
-    ImpossibleError: IDL.Text,
     ContainsDuplicates: IDL.Text,
     NftValidationErrors: IDL.Tuple(
       IDL.Vec(IDL.Nat),
@@ -327,21 +327,13 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Vec(ArchiveCanister)],
       ["query"]
     ),
-    get_historic_swaps: IDL.Func([Args], [Result], ["composite_query"]),
-    get_historic_swaps_by_user: IDL.Func(
-      [Args_1],
-      [Result_1],
-      ["composite_query"]
-    ),
-    get_history_total: IDL.Func(
-      [IDL.Opt(IDL.Principal)],
-      [IDL.Nat],
-      ["composite_query"]
-    ),
+    get_historic_swaps: IDL.Func([Args], [Result], []),
+    get_historic_swaps_by_user: IDL.Func([Args_1], [Result_1], []),
+    get_history_total: IDL.Func([IDL.Opt(IDL.Principal)], [IDL.Nat], []),
     get_swap: IDL.Func(
       [IDL.Tuple(IDL.Nat, IDL.Nat)],
       [IDL.Opt(IDL.Tuple(IDL.Tuple(IDL.Nat, IDL.Nat), SwapInfo))],
-      ["composite_query"]
+      []
     ),
     remove_intent_to_swap: IDL.Func(
       [IDL.Tuple(IDL.Nat, IDL.Nat)],
@@ -357,14 +349,25 @@ export const idlFactory = ({ IDL }) => {
   });
 };
 export const init = ({ IDL }) => {
+  const BuildVersion = IDL.Record({
+    major: IDL.Nat32,
+    minor: IDL.Nat32,
+    patch: IDL.Nat32,
+  });
+  const UpgradeArgs = IDL.Record({
+    version: BuildVersion,
+    commit_hash: IDL.Text,
+  });
   const NftCanisterConf = IDL.Record({ grams: IDL.Nat16 });
   const InitArgs = IDL.Record({
     test_mode: IDL.Bool,
     ogy_ledger_id: IDL.Principal,
     authorized_principals: IDL.Vec(IDL.Principal),
-    version: IDL.Text,
+    version: BuildVersion,
     gldnft_canisters: IDL.Vec(IDL.Tuple(IDL.Principal, NftCanisterConf)),
     gldt_ledger_id: IDL.Principal,
+    commit_hash: IDL.Text,
   });
-  return [InitArgs];
+  const Args_3 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  return [Args_3];
 };
