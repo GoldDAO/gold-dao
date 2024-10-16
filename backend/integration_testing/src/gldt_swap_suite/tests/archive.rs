@@ -74,6 +74,10 @@ mod tests {
         init::InitArgs as GldtSwapCanisterInitArgs,
         post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
     };
+    use gldt_swap_api_archive::get_archive_swaps::{
+        Args as GetArchiveSwapArgs,
+        Response as GetArchiveSwapResponse,
+    };
     use types::BuildVersion;
 
     #[test]
@@ -93,6 +97,7 @@ mod tests {
     use crate::{
         client::gldt_swap::{
             get_archive_canisters,
+            get_archive_swaps,
             get_historic_swaps,
             get_historic_swaps_by_user,
             get_history_total,
@@ -104,6 +109,274 @@ mod tests {
     use super::*;
     #[test]
     pub fn archive_features_work_correctly() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids: CanisterIds { origyn_nft, gldt_swap, gldt_ledger, ogy_ledger, .. },
+            principal_ids: PrincipalIds { controller, .. },
+        } = env;
+        tick_n_blocks(pic, 2); // need to wait for cron job to finish creating the archive
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(archive_canisters.len(), 1);
+
+        // In test mode there is a threshhold of approximately 10MB before a new archive canister is created.
+        let (user_a, _) = insert_bulk_fake_swaps(pic, 250, controller, gldt_swap);
+
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(archive_canisters.len(), 2);
+        let ArchiveCanister { start_index: second_archive_start_index, .. } = archive_canisters
+            .last()
+            .unwrap();
+        println!("archive canister 2 index : {second_archive_start_index:?}");
+        println!("archive canisters : {archive_canisters:?}");
+        let total_swaps: Nat = get_history_total(pic, Principal::anonymous(), gldt_swap, &None);
+        assert_eq!(total_swaps, Nat::from(250u64));
+        let mut start_swap_index = 0usize;
+
+        // test all individual swaps are locatable first with no duplicates or extra swaps
+        for i in 0..250u64 {
+            let res = get_swap(
+                pic,
+                Principal::anonymous(),
+                gldt_swap,
+                &SwapId(NftID(Nat::from(i)), Nat::from(i))
+            ).unwrap();
+            assert_eq!(res.0.1, Nat::from(i));
+        }
+        let res = get_swap(
+            pic,
+            Principal::anonymous(),
+            gldt_swap,
+            &SwapId(NftID(Nat::from(250u64)), Nat::from(250u64))
+        );
+        assert_eq!(res.is_none(), true);
+
+        // the starting index should be retrievable
+        let swap = get_swap(
+            pic,
+            Principal::anonymous(),
+            gldt_swap,
+            &SwapId(
+                NftID(second_archive_start_index.clone()),
+                Nat::from(second_archive_start_index.clone())
+            )
+        );
+        assert_eq!(swap.is_some(), true);
+
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        // there should be 2 archive canisters
+        assert_eq!(archive_canisters.len(), 2);
+
+        let archive_canister_1 = archive_canisters[0].clone();
+        let archive_canister_2 = archive_canisters[1].clone();
+
+        println!("{archive_canister_1:?}");
+        println!("{archive_canister_2:?}");
+
+        // start at 249 ( the latest swap ) and go to the oldest swap
+        let mut start_index = total_swaps.clone(); // starts at 249
+        println!("///// start_index : {start_index:?}");
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 50);
+        for (swap, expected_id) in res.iter().zip((0..50).rev().map(|i| Nat::from(i + 200u64))) {
+            assert_eq!(expected_id, swap.0.1);
+        }
+        assert_eq!(res[0].0.1, Nat::from(249u64));
+        assert_eq!(res[49].0.1, Nat::from(200u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 19);
+        assert_eq!(res[0].0.1, Nat::from(199u64));
+        assert_eq!(res[18].0.1, Nat::from(181u64));
+
+        // using archive canister 1 now because we've gone through all of archive canister 2's records
+        start_index = res[18].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 50);
+        assert_eq!(res[0].0.1, Nat::from(180u64));
+        assert_eq!(res[49].0.1, Nat::from(131u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 50);
+        assert_eq!(res[0].0.1, Nat::from(130u64));
+        assert_eq!(res[49].0.1, Nat::from(81u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 50);
+        assert_eq!(res[0].0.1, Nat::from(80u64));
+        assert_eq!(res[49].0.1, Nat::from(31u64));
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index.clone(),
+                limit: 50,
+                user_principal: None,
+            })
+        );
+        assert_eq!(res.len(), 31);
+        assert_eq!(res[0].0.1, Nat::from(30u64));
+        assert_eq!(res[30].0.1, Nat::from(0u64));
+
+        // test getting user historic swaps
+        let total_user_swaps = get_history_total(pic, user_a, gldt_swap, &Some(user_a));
+        let mut running_total = 0u64;
+
+        start_index = Nat::from(250u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_2.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
+                limit: 50,
+                user_principal: Some(user_a),
+            })
+        );
+        assert_eq!(res.len(), 35);
+        running_total += 35;
+
+        start_index = res[34].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
+                limit: 50,
+                user_principal: Some(user_a),
+            })
+        );
+        assert_eq!(res.len(), 50);
+        running_total += 50;
+
+        start_index = res[49].0.1.clone() - Nat::from(1u64);
+        let res = get_archive_swaps(
+            pic,
+            Principal::anonymous(),
+            archive_canister_1.canister_id,
+            &(GetArchiveSwapArgs {
+                start: start_index,
+                limit: 50,
+                user_principal: Some(user_a),
+            })
+        );
+        assert_eq!(res.len(), 41);
+        running_total += 41;
+
+        assert_eq!(total_user_swaps, Nat::from(running_total));
+
+        // will upgrade multiple canisters
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        for archive in archive_canisters {
+            let version = get_version(
+                pic,
+                Principal::anonymous(),
+                archive.canister_id.clone(),
+                &()
+            );
+            assert_eq!(version, BuildVersion::new(0, 0, 0));
+        }
+
+        // upgrading should work fine
+        let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
+        let gldt_swap_init_args = Encode!(
+            &GldtSwapCanisterArgs::Upgrade(GldtSwapCanisterUpgradeArgs {
+                version: BuildVersion::new(0, 0, 2),
+                commit_hash: "zyxwvut".to_string(),
+            })
+        ).unwrap();
+        pic.upgrade_canister(
+            gldt_swap,
+            gldt_swap_canister_wasm,
+            gldt_swap_init_args,
+            Some(controller)
+        ).unwrap();
+        tick_n_blocks(pic, 20);
+
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        for archive in archive_canisters {
+            let version = get_version(
+                pic,
+                Principal::anonymous(),
+                archive.canister_id.clone(),
+                &()
+            );
+            assert_eq!(version, BuildVersion::new(0, 0, 2));
+        }
+
+        // get a swap from both archive canisters
+        get_swap(
+            pic,
+            Principal::anonymous(),
+            gldt_swap,
+            &SwapId(NftID(Nat::from(50u64)), Nat::from(50u64))
+        ).unwrap();
+
+        get_swap(
+            pic,
+            Principal::anonymous(),
+            gldt_swap,
+            &SwapId(NftID(Nat::from(210u64)), Nat::from(210u64))
+        ).unwrap();
+
+        let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(archive_canisters.len(), 2);
+    }
+
+    #[test]
+    pub fn get_historic_swaps_works_correctly() {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,

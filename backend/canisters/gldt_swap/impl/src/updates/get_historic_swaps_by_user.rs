@@ -9,11 +9,11 @@ use gldt_swap_common::{ archive::ArchiveCanister, swap::{ SwapId, SwapInfo } };
 
 use gldt_swap_api_canister::get_historic_swaps_by_user::GetHistoricSwapsByUserError;
 use gldt_swap_archive_c2c_client::get_swap_bulk;
-use ic_cdk::query;
+use ic_cdk::update;
 
 use crate::utils::get_all_user_swap_ids;
 
-#[query(composite = true)]
+#[update]
 async fn get_historic_swaps_by_user(
     args: GetHistoricSwapsByUserArgs
 ) -> GetHistoricSwapsByUserResponse {

@@ -10,23 +10,12 @@ type ApproveError = variant {
   Expired : record { ledger_time : nat64 };
   InsufficientFunds : record { balance : nat };
 };
-type ArchiveCanister = record {
-  canister_id : principal;
-  end_index : opt nat;
-  start_index : nat;
+type Args = record {
+  user_principal : opt principal;
+  limit : nat64;
+  start : nat;
 };
-type ArchiveDownReason = variant {
-  UpgradingArchivesFailed : text;
-  NoArchiveCanisters : text;
-  Upgrading;
-  InitializingFirstArchiveFailed : text;
-  ActiveSwapCapacityFull;
-  LowOrigynToken : text;
-};
-type Args = record { page : nat64; limit : nat64 };
-type Args_1 = record { page : nat64; user : principal; limit : nat64 };
-type Args_2 = record { nft_id : nat; nft_canister_id : principal };
-type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BidFailError = variant {
   UnexpectedError : text;
   CallError : text;
@@ -44,17 +33,6 @@ type FeeTransferError = variant {
   TransferError : TransferError;
   CallError : text;
 };
-type GetHistoricSwapsByUserError = variant {
-  LimitTooLarge : text;
-  LimitTooSmall : text;
-  QueryCanisterError : text;
-};
-type GetHistoricSwapsError = variant { LimitTooLarge : text };
-type GetNftMetaDetailErrorReason = variant {
-  CantFindNFT : text;
-  NoMetaDetails;
-  UnexpectedError : text;
-};
 type GldtNumTokens = record { value_with_fee : nat; value : nat };
 type ImpossibleErrorReason = variant {
   AmountNotFound;
@@ -63,11 +41,7 @@ type ImpossibleErrorReason = variant {
 };
 type InitArgs = record {
   test_mode : bool;
-  ogy_ledger_id : principal;
   authorized_principals : vec principal;
-  version : BuildVersion;
-  gldnft_canisters : vec record { principal; NftCanisterConf };
-  gldt_ledger_id : principal;
   commit_hash : text;
 };
 type LockError = variant {
@@ -78,15 +52,6 @@ type LockError = variant {
 type MintError = variant {
   UnexpectedError : ImpossibleErrorReason;
   TransferFailed : TransferFailReason;
-};
-type NftCanisterConf = record { grams : nat16 };
-type NftInvalidError = variant {
-  InvalidNftOwner : text;
-  AlreadyLocked;
-  CantGetOrigynID : text;
-  InvalidNFTCollectionPrincipal;
-  InvalidTokenAmount;
-  CantGetNatIdOfNft;
 };
 type NftTransferError = variant {
   FailedToGetOgyFeeAllowance : text;
@@ -122,35 +87,6 @@ type NotificationError = variant {
   AllowListDoesNotContainCorrectPrincipal;
 };
 type RefundError = variant { CallError : text; TransferFailed : TransferError };
-type RemoveIntentToSwapError = variant {
-  InvalidSwapType : text;
-  InvalidUser;
-  SwapNotFound;
-  InProgress;
-};
-type Result = variant {
-  Ok : vec record { record { nat; nat }; SwapInfo };
-  Err : GetHistoricSwapsError;
-};
-type Result_1 = variant {
-  Ok : vec record { record { nat; nat }; SwapInfo };
-  Err : GetHistoricSwapsByUserError;
-};
-type Result_2 = variant { Ok; Err : RemoveIntentToSwapError };
-type Result_3 = variant {
-  Ok : vec record { nat; nat };
-  Err : SwapNftForTokensErrors;
-};
-type Result_4 = variant {
-  Ok : record { nat; nat };
-  Err : SwapTokensForNftRequestErrors;
-};
-type ServiceDownReason = variant {
-  ArchiveRelated : ArchiveDownReason;
-  Initializing;
-  ActiveSwapCapacityFull;
-  LowOrigynToken : text;
-};
 type SwapDetailForward = record {
   nft_id : nat;
   status : SwapStatusForward;
@@ -195,15 +131,6 @@ type SwapInfo = variant {
   Forward : SwapDetailForward;
   Reverse : SwapDetailReverse;
 };
-type SwapNftForTokensErrors = variant {
-  Limit : text;
-  ContainsDuplicates : text;
-  NftValidationErrors : record {
-    vec nat;
-    vec record { nat; vec NftInvalidError };
-  };
-  ServiceDown : ServiceDownReason;
-};
 type SwapStatusForward = variant {
   Failed : SwapErrorForward;
   Init;
@@ -230,15 +157,6 @@ type SwapStatusReverse = variant {
   FeeTransferRequest;
   RefundFailed : RefundError;
   EscrowRequest;
-};
-type SwapTokensForNftRequestErrors = variant {
-  GetNftMetaDetailError : GetNftMetaDetailErrorReason;
-  CantForgeSwapId;
-  NftLocked : LockError;
-  NftValidationErrors : vec NftValidationError;
-  NotOwnedBySwapCanister;
-  ServiceDown : ServiceDownReason;
-  SwapCreationError;
 };
 type TransferError = variant {
   GenericError : record { message : text; error_code : nat };
@@ -267,24 +185,19 @@ type TransferFromError = variant {
   InsufficientFunds : record { balance : nat };
 };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
-service : (Args_3) -> {
-  get_active_swap_ids_by_user : (opt principal) -> (
-      vec record { nat; nat },
-    ) query;
-  get_active_swaps : (null) -> (
-      vec record { record { nat; nat }; SwapInfo },
-    ) query;
-  get_active_swaps_by_user : (opt principal) -> (
-      vec record { record { nat; nat }; SwapInfo },
-    ) query;
-  get_archive_canisters : (null) -> (vec ArchiveCanister) query;
-  get_historic_swaps : (Args) -> (Result);
-  get_historic_swaps_by_user : (Args_1) -> (Result_1);
-  get_history_total : (opt principal) -> (nat);
-  get_swap : (record { nat; nat }) -> (
+service : (Args_1) -> {
+  archive_swap : (record { record { nat; nat }; SwapInfo }) -> (null);
+  archive_swaps : (vec record { record { nat; nat }; SwapInfo }) -> (null);
+  get_archive_size : (null) -> (nat64) query;
+  get_archive_swap : (record { nat; nat }) -> (
       opt record { record { nat; nat }; SwapInfo },
-    );
-  remove_intent_to_swap : (record { nat; nat }) -> (Result_2);
-  swap_nft_for_tokens : (vec record { nat; principal }) -> (Result_3);
-  swap_tokens_for_nft : (Args_2) -> (Result_4);
+    ) query;
+  get_archive_swaps : (Args) -> (
+      vec record { record { nat; nat }; SwapInfo },
+    ) query;
+  get_swap_bulk : (vec record { nat; nat }) -> (vec SwapInfo) query;
+  get_swap_indexes_for_user : (principal) -> (
+      opt vec record { nat; nat },
+    ) query;
+  get_version : (null) -> (BuildVersion) query;
 }
