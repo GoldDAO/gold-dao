@@ -147,7 +147,7 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gld_landing_page
-      sns-controlled: "true"
+      sns-controlled: "false"
 
 ################################################################################
 # Cache preparation
