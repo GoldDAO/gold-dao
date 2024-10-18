@@ -1,6 +1,6 @@
 use candid::Nat;
 use gldt_swap_common::{
-    gldt::{ OGYTokenSpec, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE },
+    gldt::{ OGYTokenSpec, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE, MEMO_GLDT_SWAP },
     swap::{
         BurnError,
         EscrowError,
@@ -18,7 +18,11 @@ use gldt_swap_common::{
 };
 use icrc_ledger_canister::icrc1_balance_of;
 use icrc_ledger_canister_c2c_client::{ icrc1_balance_of, icrc2_transfer_from };
-use icrc_ledger_types::{ icrc1::account::Account, icrc2::transfer_from::TransferFromArgs };
+use icrc_ledger_types::{
+    icrc1::{ account::Account, transfer::Memo },
+    icrc2::transfer_from::TransferFromArgs,
+};
+use icrc_ledger_types::icrc1::{ transfer::{ Memo as MemoIcrc } };
 use origyn_nft_reference::origyn_nft_reference_canister::{
     Account as OrigynAccount,
     EscrowReceipt,
@@ -29,9 +33,10 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
     SalesConfig,
 };
 use origyn_nft_reference_c2c_client::market_transfer_nft_origyn;
+use serde_bytes::ByteBuf;
 use tracing::{ debug, error, info };
 use utils::{ env::Environment, retry_async::retry_async };
-use crate::{ swap::swap_info::SwapInfoTrait, utils::trace };
+use crate::{ state::mutate_state, swap::swap_info::SwapInfoTrait, utils::trace };
 
 use crate::{ state::read_state, utils::transfer_token };
 
@@ -62,6 +67,7 @@ pub async fn transfer_to_escrow(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::EscrowRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
     let amount =
@@ -170,7 +176,7 @@ pub async fn transfer_nft(swap_id: &SwapId) {
         );
         return ();
     }
-
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::NftTransferRequestInProgress));
     let ogy_ledger_id = read_state(|s| s.data.ogy_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
 
@@ -286,6 +292,7 @@ pub async fn burn_gldt(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::BurnRequestInProgress));
 
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
@@ -300,7 +307,8 @@ pub async fn burn_gldt(swap_id: &SwapId) {
                         subaccount: None,
                     },
                     gldt_ledger_id,
-                    swap_details.tokens_to_receive.get().clone() // we still have 0.8 left in the pot
+                    swap_details.tokens_to_receive.get().clone(), // we still have 0.8 left in the pot
+                    Some(MemoIcrc(ByteBuf::from(swap.get_swap_id().1.0.to_bytes_le())))
                 ),
             3
         ).await
@@ -355,6 +363,7 @@ pub async fn transfer_fees(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::FeeTransferRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
 
@@ -368,7 +377,8 @@ pub async fn transfer_fees(swap_id: &SwapId) {
                         subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
                     },
                     gldt_ledger_id,
-                    swap_details.swap_fee.clone() - Nat::from(GLDT_TX_FEE * 3) // at this point, there is .8 in swap lefts left
+                    swap_details.swap_fee.clone() - Nat::from(GLDT_TX_FEE * 3),
+                    Some(MEMO_GLDT_SWAP.to_vec().into()) // at this point, there is .8 in swap lefts left
                 ),
             3
         ).await
@@ -427,6 +437,7 @@ pub async fn refund(swap_id: &SwapId) {
             return ();
         }
     };
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::RefundRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
 
     match
@@ -442,7 +453,8 @@ pub async fn refund(swap_id: &SwapId) {
                     swap_details.tokens_to_receive.get().clone() +
                         swap_details.swap_fee.clone() -
                         swap_details.transfer_fees.clone() -
-                        GLDT_TX_FEE
+                        GLDT_TX_FEE,
+                    Some(MEMO_GLDT_SWAP.to_vec().into())
                 ),
             3
         ).await
@@ -466,6 +478,48 @@ pub async fn refund(swap_id: &SwapId) {
             debug!("REVERSE SWAP :: burn :: Swap Id {swap_id:?} :: error =  {msg:?}");
         }
     }
+}
+
+pub fn enable_recovery_mode(swap_id: &SwapId) {
+    let (swap, swap_details) = if
+        let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
+    {
+        if let SwapInfo::Reverse(details) = swap_info.clone() {
+            (swap_info, details)
+        } else {
+            debug!(
+                "REVERSE SWAP :: enable_recovery_mode :: {:?} has no forward swap details",
+                swap_id
+            );
+            return ();
+        }
+    } else {
+        debug!("REVERSE SWAP :: enable_recovery_mode :: {:?} - can't find swap", swap_id);
+        return ();
+    };
+
+    swap.set_recovery_mode(true);
+}
+
+pub fn disable_recovery_mode(swap_id: &SwapId) {
+    let (swap, swap_details) = if
+        let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
+    {
+        if let SwapInfo::Reverse(details) = swap_info.clone() {
+            (swap_info, details)
+        } else {
+            debug!(
+                "REVERSE SWAP :: disable_recovery_mode :: {:?} has no forward swap details",
+                swap_id
+            );
+            return ();
+        }
+    } else {
+        debug!("REVERSE SWAP :: disable_recovery_mode :: {:?} - can't find swap", swap_id);
+        return ();
+    };
+
+    swap.set_recovery_mode(false);
 }
 
 fn valid_for_refund(current_swap_details: &SwapDetailReverse) -> Result<&SwapStatusReverse, ()> {

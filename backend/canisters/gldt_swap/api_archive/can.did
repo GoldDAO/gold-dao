@@ -110,6 +110,7 @@ type SwapDetailReverse = record {
   nft_canister : principal;
   index : nat;
   transfer_fees : nat;
+  in_recovery_mode : bool;
 };
 type SwapErrorForward = variant {
   BidFailed : BidFailError;
@@ -133,25 +134,34 @@ type SwapInfo = variant {
 };
 type SwapStatusForward = variant {
   Failed : SwapErrorForward;
+  BidInProgress;
   Init;
   MintRequest;
   Complete;
   BidFail : BidFailError;
   BidRequest;
   NotificationFailed : NotificationError;
+  MintInProgress;
+  BurnFeesInProgress;
   BurnFeesRequest;
+  ExpiringInProgress;
   BurnFeesFailed : MintError;
   MintFailed : MintError;
 };
 type SwapStatusReverse = variant {
+  NftTransferRequestInProgress;
   FeeTransferFailed : FeeTransferError;
   Failed : SwapErrorReverse;
   EscrowFailed : EscrowError;
   Init;
+  BurnRequestInProgress;
+  EscrowRequestInProgress;
   Complete;
   BurnFailed : BurnError;
+  RefundRequestInProgress;
   RefundRequest;
   NftTransferRequest;
+  FeeTransferRequestInProgress;
   NftTransferFailed : NftTransferError;
   BurnRequest;
   FeeTransferRequest;

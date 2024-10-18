@@ -3,7 +3,7 @@ use std::array::TryFromSliceError;
 use candid::{ Nat, Principal };
 use canister_time::timestamp_nanos;
 use gldt_swap_common::{
-    gldt::{ GldtNumTokens, GldtTokenSpec, GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE },
+    gldt::{ GldtNumTokens, GldtTokenSpec, GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE, MEMO_GLDT_SWAP },
     swap::{
         BidFailError,
         BurnFeesError,
@@ -18,6 +18,7 @@ use gldt_swap_common::{
         TransferFailReason,
     },
 };
+use ic_stable_structures::Storable;
 use origyn_nft_reference::origyn_nft_reference_canister::{
     Account as NftSellerAccount,
     AskFeature,
@@ -375,6 +376,9 @@ pub async fn forward_swap_perform_mint_to_escrow(swap_id: &SwapId) {
         );
         return ();
     }
+
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::MintInProgress));
+
     let gldt_canister_id = read_state(|s| s.data.gldt_ledger_id);
 
     let args = TransferArg {
@@ -457,6 +461,8 @@ pub async fn forward_swap_perform_bid_on_nft(
         );
         return ();
     }
+
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::BidInProgress));
     let nft_id = swap_id.0.clone();
     let nft_canister_id = swap_details.nft_canister;
     let gldt_ledger_canister_id = read_state(|s| s.data.gldt_ledger_id);
@@ -590,7 +596,7 @@ pub async fn forward_swap_perform_burn_fees(swap_id: &SwapId) {
         );
         return ();
     }
-
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
     match
@@ -603,7 +609,8 @@ pub async fn forward_swap_perform_burn_fees(swap_id: &SwapId) {
                         subaccount: None,
                     },
                     gldt_ledger_id,
-                    Nat::from(GLDT_TX_FEE * 2)
+                    Nat::from(GLDT_TX_FEE * 2),
+                    Some(MemoIcrc(ByteBuf::from(swap.get_swap_id().1.0.to_bytes_le())))
                 ),
             3
         ).await

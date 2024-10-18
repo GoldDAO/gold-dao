@@ -503,6 +503,8 @@ mod tests {
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(details.status, SwapStatusForward::Init);
         }
+        pic.advance_time(Duration::from_nanos(5000));
+        tick_n_blocks(pic, 1);
         // 2. start the forward swap
         let market_args = MarketTransferRequest {
             token_id: "1".to_string(),
@@ -522,6 +524,8 @@ mod tests {
                 escrow_receipt: None,
             },
         };
+        pic.advance_time(Duration::from_millis(1000));
+        tick_n_blocks(pic, 1);
         market_transfer_nft_origyn(pic, origyn_nft.clone(), nft_owner, market_args);
         let market_args = MarketTransferRequest {
             token_id: "2".to_string(),
@@ -541,6 +545,8 @@ mod tests {
                 escrow_receipt: None,
             },
         };
+        pic.advance_time(Duration::from_millis(10000));
+        tick_n_blocks(pic, 1);
         market_transfer_nft_origyn(pic, origyn_nft.clone(), nft_owner, market_args);
         let market_args = MarketTransferRequest {
             token_id: "3".to_string(),

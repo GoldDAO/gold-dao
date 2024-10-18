@@ -243,12 +243,16 @@ pub enum SwapStatusForward {
     Init,
     NotificationFailed(NotificationError),
     MintRequest,
+    MintInProgress,
     MintFailed(MintError),
     BidRequest,
+    BidInProgress,
     BidFail(BidFailError),
     BurnFeesRequest,
+    BurnFeesInProgress,
     BurnFeesFailed(BurnFeesError),
     Complete,
+    ExpiringInProgress,
     Failed(SwapErrorForward),
 }
 
@@ -311,6 +315,7 @@ pub struct SwapDetailReverse {
     pub swap_fee: Nat,
     pub transfer_fees: Nat,
     pub user: Principal,
+    pub in_recovery_mode: bool,
 }
 
 impl Default for SwapDetailReverse {
@@ -326,6 +331,7 @@ impl Default for SwapDetailReverse {
             swap_fee: Nat::from(100_000_000u64),
             user: Principal::anonymous(),
             transfer_fees: Nat::from(GLDT_TX_FEE * 2),
+            in_recovery_mode: false,
         }
     }
 }
@@ -334,14 +340,19 @@ impl Default for SwapDetailReverse {
 pub enum SwapStatusReverse {
     Init,
     EscrowRequest,
+    EscrowRequestInProgress,
     EscrowFailed(EscrowError),
     NftTransferRequest,
+    NftTransferRequestInProgress,
     NftTransferFailed(NftTransferError),
     RefundRequest,
+    RefundRequestInProgress,
     RefundFailed(RefundError),
     BurnRequest,
+    BurnRequestInProgress,
     BurnFailed(BurnError),
     FeeTransferRequest,
+    FeeTransferRequestInProgress,
     FeeTransferFailed(FeeTransferError),
     Complete,
     Failed(SwapErrorReverse),

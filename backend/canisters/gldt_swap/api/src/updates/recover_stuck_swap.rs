@@ -12,4 +12,5 @@ pub enum RecoverSwapError {
     NoSwapDetails,
     SwapIsNotStuck,
     CantRecoverForwardSwaps,
+    InProgress,
 }
