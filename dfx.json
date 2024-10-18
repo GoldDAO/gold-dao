@@ -97,6 +97,17 @@
       "source": ["client/gldt_landing_page/dist"],
       "type": "assets"
     },
+    "gld_landing_page": {
+      "build": ["npm run postinstall", "npm run build:gld_landing_page"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {},
+      "source": ["client/gld_landing_page/dist"],
+      "type": "assets"
+    },
     "icp_ledger": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icp_ledger/ledger.did",
       "type": "custom",
@@ -225,6 +236,17 @@
       },
       "type": "custom",
       "wasm": "backend/canisters/gldt_swap/target/wasm32-unknown-unknown/release/gldt_swap_canister.wasm.gz"
+    },
+    "gldt_swap_archive": {
+      "build": [""],
+      "candid": "backend/canisters/gldt_swap/api_archive/can.did",
+      "declarations": {
+        "bindings": ["ts", "js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_swap/api_archive/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/gldt_swap_archive/target/wasm32-unknown-unknown/release/gldt_swap_archive_canister.wasm.gz"
     },
     "management": {
       "build": ["./scripts/build_canister.sh management"],

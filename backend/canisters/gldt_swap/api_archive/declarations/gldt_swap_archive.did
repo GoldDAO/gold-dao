@@ -1,0 +1,203 @@
+type Account = record { owner : principal; subaccount : opt blob };
+type ApproveError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  AllowanceChanged : record { current_allowance : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  Expired : record { ledger_time : nat64 };
+  InsufficientFunds : record { balance : nat };
+};
+type Args = record {
+  user_principal : opt principal;
+  limit : nat64;
+  start : nat;
+};
+type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BidFailError = variant {
+  UnexpectedError : text;
+  CallError : text;
+  TransferFailed : text;
+};
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type BurnError = variant { CallError : text };
+type EscrowError = variant {
+  ApproveError : ApproveError;
+  UnexpectedError : ImpossibleErrorReason;
+  TransferFailed : TransferFailReason;
+  RequestFailed : text;
+};
+type FeeTransferError = variant {
+  TransferError : TransferError;
+  CallError : text;
+};
+type GldtNumTokens = record { value_with_fee : nat; value : nat };
+type ImpossibleErrorReason = variant {
+  AmountNotFound;
+  NFTResponseInvalid;
+  PrincipalNotFound;
+};
+type InitArgs = record {
+  test_mode : bool;
+  authorized_principals : vec principal;
+  commit_hash : text;
+};
+type LockError = variant {
+  NftAlreadyLocked : vec nat;
+  UnexpectedError : record {};
+  NftNotLocked;
+};
+type MintError = variant {
+  UnexpectedError : ImpossibleErrorReason;
+  TransferFailed : TransferFailReason;
+};
+type NftTransferError = variant {
+  FailedToGetOgyFeeAllowance : text;
+  ApprovalError : ApproveError;
+  ApprovalCallError : text;
+  InvalidFee : text;
+  UnexpectedError : ImpossibleErrorReason;
+  CallError : text;
+  TransferFailed : text;
+};
+type NftValidationError = variant {
+  WeightParseError;
+  CanisterInvalid;
+  CantGetOrigynID : text;
+  CantVerifySwapCanisterOwnsNft;
+  InvalidGldtTokensFromWeight;
+  InvalidNftWeight;
+  NotOwnedBySwapCanister;
+};
+type NotificationError = variant {
+  InvalidSaleSubaccount;
+  InvalidTokenSpec;
+  TimeoutInvalid : text;
+  InvalidEscrowSubaccount : text;
+  TooManyPrincipalsInAllowList;
+  OrigynStringIdDoesNotMatch : text;
+  SellerIsNotPrincipalOrAccount : text;
+  SellerAndReceiverDoesNotMatch : text;
+  InvalidCustomAskFeature;
+  InvalidTokenAmount;
+  InvalidPricingConfig;
+  CollectionDoesNotMatch : text;
+  AllowListDoesNotContainCorrectPrincipal;
+};
+type RefundError = variant { CallError : text; TransferFailed : TransferError };
+type SwapDetailForward = record {
+  nft_id : nat;
+  status : SwapStatusForward;
+  escrow_sub_account : blob;
+  nft_id_string : text;
+  created_at : nat64;
+  gldt_receiver : Account;
+  tokens_to_mint : GldtNumTokens;
+  nft_canister : principal;
+  index : nat;
+  sale_id : text;
+};
+type SwapDetailReverse = record {
+  nft_id : nat;
+  status : SwapStatusReverse;
+  tokens_to_receive : GldtNumTokens;
+  nft_id_string : text;
+  user : principal;
+  created_at : nat64;
+  swap_fee : nat;
+  nft_canister : principal;
+  index : nat;
+  transfer_fees : nat;
+};
+type SwapErrorForward = variant {
+  BidFailed : BidFailError;
+  UnexpectedError : ImpossibleErrorReason;
+  NotificationFailed : NotificationError;
+  MintFailed : MintError;
+  Expired;
+};
+type SwapErrorReverse = variant {
+  FeeTransferFailed : FeeTransferError;
+  EscrowFailed : EscrowError;
+  LockFailed : LockError;
+  Refunded : SwapStatusReverse;
+  NftValidationFailed : vec NftValidationError;
+  BurnFailed : BurnError;
+  NftTransferFailed : NftTransferError;
+};
+type SwapInfo = variant {
+  Forward : SwapDetailForward;
+  Reverse : SwapDetailReverse;
+};
+type SwapStatusForward = variant {
+  Failed : SwapErrorForward;
+  Init;
+  MintRequest;
+  Complete;
+  BidFail : BidFailError;
+  BidRequest;
+  NotificationFailed : NotificationError;
+  BurnFeesRequest;
+  BurnFeesFailed : MintError;
+  MintFailed : MintError;
+};
+type SwapStatusReverse = variant {
+  FeeTransferFailed : FeeTransferError;
+  Failed : SwapErrorReverse;
+  EscrowFailed : EscrowError;
+  Init;
+  Complete;
+  BurnFailed : BurnError;
+  RefundRequest;
+  NftTransferRequest;
+  NftTransferFailed : NftTransferError;
+  BurnRequest;
+  FeeTransferRequest;
+  RefundFailed : RefundError;
+  EscrowRequest;
+};
+type TransferError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  BadBurn : record { min_burn_amount : nat };
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  InsufficientFunds : record { balance : nat };
+};
+type TransferFailReason = variant {
+  TransferError : TransferError;
+  TransferFromError : TransferFromError;
+  CallError : text;
+};
+type TransferFromError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  InsufficientAllowance : record { allowance : nat };
+  BadBurn : record { min_burn_amount : nat };
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  InsufficientFunds : record { balance : nat };
+};
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
+service : (Args_1) -> {
+  archive_swap : (record { record { nat; nat }; SwapInfo }) -> (null);
+  archive_swaps : (vec record { record { nat; nat }; SwapInfo }) -> (null);
+  get_archive_size : (null) -> (nat64) query;
+  get_archive_swap : (record { nat; nat }) -> (
+      opt record { record { nat; nat }; SwapInfo },
+    ) query;
+  get_archive_swaps : (Args) -> (
+      vec record { record { nat; nat }; SwapInfo },
+    ) query;
+  get_swap_bulk : (vec record { nat; nat }) -> (vec SwapInfo) query;
+  get_swap_indexes_for_user : (principal) -> (
+      opt vec record { nat; nat },
+    ) query;
+  get_version : (null) -> (BuildVersion) query;
+}

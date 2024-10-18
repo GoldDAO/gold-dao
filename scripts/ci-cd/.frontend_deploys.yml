@@ -2,7 +2,13 @@ spec:
   inputs:
     src-folder:
       description: The NextJS project folder name. Must be located in the /client/ folder
-      options: ["gldt_landing_page", "gld_dashboard", "gldt_swap_app"]
+      options:
+        [
+          "gldt_landing_page",
+          "gld_dashboard",
+          "gldt_swap_app",
+          "gld_landing_page",
+        ]
     sns-controlled:
       description: Whether or not the canister is SNS controlled
       options: ["true", "false"]

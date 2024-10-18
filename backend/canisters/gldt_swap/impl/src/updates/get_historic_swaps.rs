@@ -6,11 +6,11 @@ pub use gldt_swap_api_canister::get_historic_swaps::{
 use gldt_swap_api_canister::get_historic_swaps::GetHistoricSwapsError;
 use gldt_swap_api_archive::get_archive_swaps::Args as GetArchiveSwapsArg;
 use gldt_swap_archive_c2c_client::get_archive_swaps;
-use ic_cdk::query;
+use ic_cdk::update;
 
 use crate::state::read_state;
 
-#[query(composite = true)]
+#[update]
 async fn get_historic_swaps(args: GetHistoricSwapsArgs) -> GetHistoricSwapsResponse {
     let limit = args.limit.clone();
     let max_limit = 200usize;

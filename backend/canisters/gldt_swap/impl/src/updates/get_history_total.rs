@@ -3,12 +3,12 @@ pub use gldt_swap_api_canister::get_history_total::{
     Args as GetHistoryTotalArgs,
     Response as GetHistoryTotalResponse,
 };
-use ic_cdk::query;
+use ic_cdk::update;
 use tracing::debug;
 
 use crate::{ state::read_state, utils::get_all_user_swap_ids };
 
-#[query(composite = true)]
+#[update]
 async fn get_history_total(user: GetHistoryTotalArgs) -> GetHistoryTotalResponse {
     match user {
         Some(principal) => {

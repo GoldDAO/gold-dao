@@ -7,7 +7,7 @@ use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
-use crate::migrations::types::state::RuntimeStateV0;
+// use crate::migrations::types::state::RuntimeStateV0;
 
 #[post_upgrade]
 #[trace]
@@ -22,18 +22,18 @@ fn post_upgrade(args: Args) {
             let memory = get_upgrades_memory();
             let reader = get_reader(&memory);
 
-            // uncomment these lines if you want to do a normal upgrade
-            // let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = serializer
-            //     ::deserialize(reader)
-            //     .unwrap();
+            // NOTE: uncomment these lines if you want to do a normal upgrade
+            let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = serializer
+                ::deserialize(reader)
+                .unwrap();
 
-            // uncomment these lines if you want to do an upgrade with migration
-            let (runtime_state_v0, logs, traces): (
-                RuntimeStateV0,
-                Vec<LogEntry>,
-                Vec<LogEntry>,
-            ) = serializer::deserialize(reader).unwrap();
-            let mut state = RuntimeState::from(runtime_state_v0);
+            // NOTE: uncomment these lines if you want to do an upgrade with migration
+            // let (runtime_state_v0, logs, traces): (
+            //     RuntimeStateV0,
+            //     Vec<LogEntry>,
+            //     Vec<LogEntry>,
+            // ) = serializer::deserialize(reader).unwrap();
+            // let mut state = RuntimeState::from(runtime_state_v0);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);

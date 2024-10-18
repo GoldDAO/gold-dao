@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.main-button {
+  @apply flex justify-center items-center gap-2 px-5 py-2.5 rounded-[100px] bg-black text-white hover:opacity-80 transition-all duration-500 ease-in-out;
+}
+
+.main-button-disabled {
+  @apply bg-[#E8E6E1] text-black p-2 px-4 rounded-full font-semibold;
+}
+
+.secondary-button {
+  @apply bg-secondary text-black p-2 px-4 rounded-full hover:opacity-80 transition-all duration-500 ease-in-out;
+}
+
+#card1 {
+  --index: 1;
+}
+#card2 {
+  --index: 2;
+}
+#card3 {
+  --index: 3;
+}
+.card {
+  position: sticky;
+  top: 16px;
+  padding-top: calc(var(--index) * var(--cardTopPadding));
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-skeleton {
+  background: linear-gradient(-90deg, #d3b872 0%, #fff 50%, #d3b872 100%);
+  background-size: 200% 100%;
+  animation: pulse 1.5s infinite;
+  border-radius: 2px;
+  width: 65px;
+  height: 16px;
+}

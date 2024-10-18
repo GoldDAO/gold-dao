@@ -278,12 +278,12 @@ service : (Args_3) -> {
       vec record { record { nat; nat }; SwapInfo },
     ) query;
   get_archive_canisters : (null) -> (vec ArchiveCanister) query;
-  get_historic_swaps : (Args) -> (Result) composite_query;
-  get_historic_swaps_by_user : (Args_1) -> (Result_1) composite_query;
-  get_history_total : (opt principal) -> (nat) composite_query;
+  get_historic_swaps : (Args) -> (Result);
+  get_historic_swaps_by_user : (Args_1) -> (Result_1);
+  get_history_total : (opt principal) -> (nat);
   get_swap : (record { nat; nat }) -> (
       opt record { record { nat; nat }; SwapInfo },
-    ) composite_query;
+    );
   remove_intent_to_swap : (record { nat; nat }) -> (Result_2);
   swap_nft_for_tokens : (vec record { nat; principal }) -> (Result_3);
   swap_tokens_for_nft : (Args_2) -> (Result_4);
