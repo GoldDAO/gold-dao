@@ -97,6 +97,17 @@
       "source": ["client/gldt_landing_page/dist"],
       "type": "assets"
     },
+    "gld_landing_page": {
+      "build": ["npm run postinstall", "npm run build:gld_landing_page"],
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "frontend": {},
+      "source": ["client/gld_landing_page/dist"],
+      "type": "assets"
+    },
     "icp_ledger": {
       "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icp_ledger/ledger.did",
       "type": "custom",

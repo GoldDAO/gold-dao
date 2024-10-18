@@ -38,6 +38,9 @@ include:
       src-folder: gldt_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
+      src-folder: gld_landing_page
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
       src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
@@ -100,6 +103,9 @@ include:
       src-folder: gldt_landing_page
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
+      src-folder: gld_landing_page
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
       src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -138,6 +144,10 @@ include:
     inputs:
       src-folder: gldt_swap_app
       sns-controlled: "true"
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: gld_landing_page
+      sns-controlled: "false"
 
 ################################################################################
 # Cache preparation
