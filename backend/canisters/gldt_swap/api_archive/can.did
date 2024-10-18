@@ -144,7 +144,6 @@ type SwapStatusForward = variant {
   MintInProgress;
   BurnFeesInProgress;
   BurnFeesRequest;
-  ExpiringInProgress;
   BurnFeesFailed : MintError;
   MintFailed : MintError;
 };

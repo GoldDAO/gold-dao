@@ -252,7 +252,6 @@ pub enum SwapStatusForward {
     BurnFeesInProgress,
     BurnFeesFailed(BurnFeesError),
     Complete,
-    ExpiringInProgress,
     Failed(SwapErrorForward),
 }
 

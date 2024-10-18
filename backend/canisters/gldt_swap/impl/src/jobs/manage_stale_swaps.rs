@@ -56,6 +56,21 @@ async fn handle_remove_stale_swap() {
     let expired_swaps: Vec<_> = swaps
         .into_iter()
         .filter(|(_, swap_info)| swap_info.is_stuck())
+        .filter(|(_, swap_info)| {
+            match swap_info {
+                SwapInfo::Forward(swap_detail_forward) => {
+                    match swap_detail_forward.status {
+                        | SwapStatusForward::MintInProgress
+                        | SwapStatusForward::BidInProgress
+                        | SwapStatusForward::BurnFeesInProgress => {
+                            false
+                        }
+                        _ => true,
+                    }
+                }
+                SwapInfo::Reverse(swap_detail_reverse) => false,
+            }
+        })
         .collect();
     for batch in expired_swaps.chunks(10) {
         // **************************************
