@@ -52,7 +52,7 @@ export default function Modal({
                 || title?.substring(5) === ' GLDGov Price'
                 || title?.substring(5) === ' GLDGov Marketcap'
                 ? parseNumbers(amount)
-                : 'N/A'}
+                : parseNumbers(amount)}
               <Image width={25} height={25} src="svg/g-logo.svg" className="ml-2" alt="gold dao" />
             </h1>
           ) : (

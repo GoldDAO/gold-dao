@@ -1,0 +1,14 @@
+[package]
+name = "gldt_swap_archive_c2c_client"
+version = "0.1.0"
+edition = "2021"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+canister_client = { path = "../../../libraries/canister_client" }
+gldt_swap_api_archive = { path = "../../../canisters/gldt_swap/api_archive" }
+gldt_swap_common = { path = "../../../canisters/gldt_swap/common" }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

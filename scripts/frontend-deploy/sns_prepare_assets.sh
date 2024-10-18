@@ -14,6 +14,8 @@ Preparing assets for $CANISTER_NAME on $NETWORK
 "
 
 
+# dfx canister call --network $NETWORK $CANISTER_NAME delete_batch '(record { batch_id = 5 : nat })'
+
 if [[ "$(uname -s)" == "Darwin" ]]; then
   echo "Deploying from local systen."
   ENV=$NETWORK VERSION="local-deploy" dfx deploy --network $NETWORK --by-proposal $CANISTER_NAME 2>&1 | tee $LOG_FILE
@@ -48,5 +50,3 @@ Finished preparing assets. Uploaded in batch $BATCH_ID with evidence $EVIDENCE
 
 **********************************************************************
 "
-
-return

@@ -49,6 +49,7 @@ export default function Footer() {
         },
         { text: 'Medium', link: 'https://medium.com/@GoldDAO', icon: 'svg/medium.svg' },
         { text: 'Telegram', link: 'https://t.me/TheGoldDAO', icon: 'svg/telegram.svg' },
+        { text: 'OpenChat', link: 'https://oc.app/community/qi5v6-wiaaa-aaaar-axvia-cai/?ref=g5b5b-zaaaa-aaaar-bdivq-cai', icon: 'svg/openchat.svg' },
       ],
     },
   ];

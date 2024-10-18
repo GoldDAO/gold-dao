@@ -4,6 +4,7 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options:
         [
+          'buyback_burn',
           'gldt_swap',
           'icp_neuron',
           'management',
@@ -11,6 +12,7 @@ spec:
           'sns_rewards',
           'super_stats_v3',
           'token_metrics',
+          'gldt_swap',
         ]
 ---
 # Rust canisters deployments
@@ -19,13 +21,19 @@ $[[ inputs.src-folder ]] staging deploy:
   stage: deploy
   resource_group: backend canister staging deployment
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event" # deployment when merged to develop
       changes:
-        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # deployment when trigger manually on MR
+      changes:
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
+      allow_failure: true
+      when: manual
+  needs:
+    ["$[[ inputs.src-folder ]] staging build", "integration tests"]
   variables:
     TARGET_NETWORK: staging
-    PEM_FILE: '${PEM_FILE_STAGING}'
-  needs: ['$[[ inputs.src-folder ]] canister build', 'integration tests']
+    PEM_FILE: "${PEM_FILE_STAGING}"
   before_script:
     - !reference [.import dfx identity, before_script]
   script:
@@ -39,16 +47,17 @@ $[[ inputs.src-folder ]] production deploy:
   stage: deploy
   resource_group: backend canister production deployment
   rules:
-    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+$/'
+    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}'
       when: manual
   variables:
     TARGET_NETWORK: ic
-    PEM_FILE: '${PEM_FILE_PRODUCTION}'
-  needs: ['$[[ inputs.src-folder ]] canister build', 'integration tests']
+    PEM_FILE: "${PEM_FILE_PRODUCTION}"
+  needs:
+    ["$[[ inputs.src-folder ]] production build", "integration tests"]
   before_script:
     - !reference [.import dfx identity, before_script]
   script:

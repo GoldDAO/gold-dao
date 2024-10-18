@@ -60,6 +60,7 @@ pub fn generate_ledger_canister_init_args(
     LedgerArgument::Init(InitArgs {
         minting_account: Account::from(controller),
         initial_balances: initial_ledger_accounts,
+        fee_collector_account: None,
         transfer_fee: fee.clone(),
         token_name: token.into(),
         token_symbol: token.into(),

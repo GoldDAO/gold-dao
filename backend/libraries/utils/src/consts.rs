@@ -1,5 +1,4 @@
 use candid::Principal;
-use icrc_ledger_types::icrc1::account::Account;
 use types::CanisterId;
 
 pub const E8S_PER_ICP: u64 = 100_000_000;
@@ -55,6 +54,9 @@ pub const GOLD_100G_CANISTER_ID: CanisterId = Principal::from_slice(
 pub const GOLD_1000G_CANISTER_ID: CanisterId = Principal::from_slice(
     &[0, 0, 0, 0, 1, 128, 10, 88, 1, 1]
 );
+
+pub const E8S_PER_OGY: u64 = 100_000_000;
+pub const E8S_FEE_OGY: u64 = 200_000;
 
 #[cfg(test)]
 mod tests {

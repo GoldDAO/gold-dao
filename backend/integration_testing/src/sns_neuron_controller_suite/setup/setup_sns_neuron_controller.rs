@@ -6,7 +6,7 @@ use pocket_ic::PocketIc;
 pub fn setup_sns_neuron_controller_canister(
     pic: &mut PocketIc,
     sns_neuron_controller_id: Principal,
-    init_args: sns_neuron_controller_api_canister::init::InitArgs,
+    args: sns_neuron_controller_api_canister::Args,
     controller: Principal,
 ) -> Principal {
     let sns_neuron_controller_wasm = SNS_NEURON_CONTROLLER.clone();
@@ -23,7 +23,7 @@ pub fn setup_sns_neuron_controller_canister(
     pic.install_canister(
         sns_neuron_controller_id,
         sns_neuron_controller_wasm,
-        encode_one(init_args).unwrap(),
+        encode_one(args).unwrap(),
         Some(controller.clone()),
     );
 

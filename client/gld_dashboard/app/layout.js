@@ -45,7 +45,7 @@ export default function RootLayout({ children }) {
         <meta name="keywords" content="RWA, DAO, WEB3, GOLD, BLOCKCHAIN" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#c6c6c6" />
-        <script async="" data-domain="dashboard.gold-dao.org" src="https://analytics.gold-dao.org/js/script.js"></script>
+        <script defer data-domain="dashboard.gold-dao.org" src="https://analytics.gold-dao.org/js/script.js"></script>
       </Head>
       <body>
         <Providers>

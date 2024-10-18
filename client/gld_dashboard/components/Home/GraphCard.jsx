@@ -10,12 +10,23 @@ import ModalChartMobile from '../shared/modal/modal-chart-mobile';
 import { data1 } from '../../utils/datas';
 import { parseNumbers } from '../../utils/parsers';
 import useServices from '../../hooks/useServices';
+import useCharts from '../../hooks/useCharts';
 
 export default function Graphs() {
+  const [burnAmount, setBurnedAmount] = useState();
+  const [liquidAmount, setLiquidAmount] = useState();
+  const [holdersAmount, setHoldersAmount] = useState();
+  const [treasuryAmount, setTreasuryAmount] = useState();
+  const [stakedAmount, setStakedAmount] = useState();
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
+  const {
+    stakersData, holdersData, burnData, gldGovSupply,
+    setLiquidChartData, liquidData, rewardPoolData,
+    reservePoolData, gldGovTreasury: gldGovTreasuryData, snsFundData,
+  } = useCharts();
   const [amount, setAmount] = useState();
-  const [infoModal, setInfoModal] = useState(null);
+  const [, setInfoModal] = useState(null);
 
   const tabs = ['Treasury', 'Staked', 'Liquid', 'Burned', 'Holders'];
 
@@ -24,22 +35,127 @@ export default function Graphs() {
   useEffect(() => {
     getSupplyChart();
     getTreasuryChart();
-    // setAmount(gldGovTreasury());
-  }, []);
+  }, [selectedTab]);
+
+  const deriveLiquidData = (
+    gldgovSupply,
+    staked,
+    rewardPool,
+    reservePool,
+    treasuryData,
+    snsFund,
+  ) => {
+    const liquid = gldgovSupply.map(({ label: supplyLabel, value }) => {
+      const stakedValue = staked.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const rewardPoolValue = rewardPool.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const reservePoolValue = reservePool.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const treasuryValue = treasuryData.find(
+        ({ label }) => label === supplyLabel,
+      );
+      const snsFundValue = snsFund.find(
+        ({ label }) => label === supplyLabel,
+      );
+      if (!stakedValue || !rewardPoolValue
+        || !reservePoolValue || !treasuryValue || !snsFundValue) {
+        return null;
+      }
+
+      return {
+        label: supplyLabel,
+        value: (((value - (stakedValue?.value ?? 0))
+        - (rewardPoolValue?.value ?? 0))
+        - (reservePoolValue?.value ?? 0))
+        - (treasuryValue?.value ?? 0)
+        - (snsFundValue?.value ?? 0),
+      };
+    });
+
+    const liquidCompleteDays = liquid.filter((el) => el !== null);
+
+    setLiquidChartData(liquidCompleteDays);
+  };
+
+  useEffect(() => {
+    if (gldGovSupply?.data.length && stakersData?.data.length
+      && rewardPoolData?.data.length && reservePoolData?.data.length
+      && gldGovTreasuryData?.data.length && snsFundData?.data.length) {
+      deriveLiquidData(
+        gldGovSupply.data,
+        stakersData.data,
+        rewardPoolData.data,
+        reservePoolData.data,
+        gldGovTreasuryData.data,
+        snsFundData.data,
+      );
+    }
+  }, [
+    stakersData?.data, stakersData?.data.length, stakersData.loading,
+    gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading,
+    rewardPoolData.loading, rewardPoolData?.data, rewardPoolData?.data.length,
+    reservePoolData.loading, reservePoolData?.data, reservePoolData?.data.length,
+    gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
+    snsFundData.loading, snsFundData?.data, snsFundData?.data.length,
+
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const result = await gldGovTreasury();
+      if (liquidData?.data.length) {
+        setLiquidAmount(liquidData.data[liquidData.data.length - 1].value);
+      }
+      if (burnData?.data.length) {
+        setBurnedAmount(burnData.data[burnData.data.length - 1].value);
+      }
+      if (holdersData?.data.length) {
+        setHoldersAmount(holdersData.data[holdersData.data.length - 1].value);
+      }
+      if (stakersData?.data.length) {
+        setStakedAmount(stakersData.data[stakersData.data.length - 1].value);
+      }
 
-        setAmount(result);
+      try {
+        if (selectedTab === 'Treasury') {
+          const result = await gldGovTreasury();
+          setTreasuryAmount(result);
+          setInfoModal(result);
+          setAmount(result);
+        }
+        if (selectedTab === 'Staked' && !stakersData?.loading) {
+          setAmount(stakersData.data[stakersData.data.length - 1].value);
+        }
+        if (selectedTab === 'Holders') {
+          setAmount(holdersData.data[holdersData.data.length - 1].value);
+        }
+        if (selectedTab === 'Burned') {
+          setAmount(burnData.data[burnData.data.length - 1].value);
+        }
+        if (selectedTab === 'Liquid') {
+          if (!liquidData.loading && liquidData?.data.length) {
+            setAmount(liquidData.data[liquidData.data.length - 1].value);
+          }
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, [gldGovTreasury]);
+  }, [
+    selectedTab, stakersData?.data, stakersData.loading,
+    stakersData?.data.length, burnData?.data.length, burnData.loading,
+    liquidData?.data.length, liquidData.loading, liquidData?.data,
+    holdersData?.data.length, holdersData.loading,
+    rewardPoolData?.data.length, rewardPoolData.loading,
+    reservePoolData?.data.length, reservePoolData.loading,
+    gldGovSupply?.data.length,
+
+  ]);
 
   const displayAmount = parseNumbers(amount);
 
@@ -79,17 +195,64 @@ export default function Graphs() {
                 />
               </div>
               <div className="flex justify-end min-w-[120px] sm:hidden items-center gap-1">
-                <h5 className="font-bold text-xs">
-                  {tab !== 'Treasury' ? 'N/A' : parseNumbers(amount)}
-                </h5>
-                <GLDGovIcon />
+                {tab === 'Treasury' && (
+                    < >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(treasuryAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                )
+                }
+
+                {tab === 'Liquid' && (
+                    < >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(liquidAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                )
+                }
+
+                {tab === 'Burned' && (
+                    < >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(burnAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                )
+                }
+
+                {tab === 'Holders' && (
+                    < >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(holdersAmount)}
+                      </h5>
+                    </>
+                )
+                }
+
+                {tab === 'Staked' && (
+                    < >
+                      <h5 className="font-bold text-xs">
+                       {parseNumbers(stakedAmount)}
+                      </h5>
+                      <GLDGovIcon />
+                    </>
+                )
+                }
+
               </div>
             </span>
           ))}
         </div>
-        <Chart name={selectedTab} amount={displayAmount} />
+        <Chart name={selectedTab}
+        amount={displayAmount}
+         />
       </article>
-      <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={infoModal?.amount}>
+      <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={amount}>
         <ModalChartMobile name={selectedTab} />
       </Modal>
     </>

@@ -1,14 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { calculateTimestamp, verifyTimestamp } from '../../../utils/functions';
+import { calculateTimestamp } from '../../../utils/functions';
 
 import Graph from '../../Home/Graph';
 import useCharts from '../../../hooks/useCharts';
 
-export default function ModalChart({ name }) {
-  const [selectedTimestamp, setSelectedTimestamp] = useState({ date: '1M', t: 86400 * 31 });
-  const { setSelectedDistance } = useCharts();
+export default function ModalChart({ chartName }) {
+  const { setSelectedDistance, selectedDistance } = useCharts();
 
   const dates = [
     // { name: "1J", timestamp: calculateTimestamp(86400 * 2) },
@@ -29,14 +27,13 @@ export default function ModalChart({ name }) {
       <div className="h-20"></div>
 
       <div className="w-full h-fit flex border-b-[0.5px] border-t-[0.5px]">
-        {dates.map(({ timestamp }, index) => (
+        {dates.map(({ name, timestamp }, index) => (
           <button
             className={`
-          text-center text-xs w-full ${selectedTimestamp.date === name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
+          text-center text-xs w-full ${selectedDistance.name === name ? 'bg-DarkGrey text-white font-bold' : ''} py-2`}
             key={`${name}-${index}`}
             onClick={() => {
-              setSelectedTimestamp({ date: name, t: timestamp });
-              setSelectedDistance(timestamp);
+              setSelectedDistance({ name, timestamp });
             }}
           >
             {name}
@@ -45,7 +42,7 @@ export default function ModalChart({ name }) {
       </div>
       <div className="h-20"></div>
 
-      <Graph name={name} timestamp={verifyTimestamp(selectedTimestamp.t)} />
+      <Graph name={chartName} timestamp={selectedDistance} />
     </>
   );
 }

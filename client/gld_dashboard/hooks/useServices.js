@@ -3,7 +3,9 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-nested-ternary */
 
-import { calculateVotingPower, hexStringToUint8Array, neuronState, calculateTimestamp } from '../utils/functions';
+import {
+  calculateVotingPower, hexStringToUint8Array, neuronState,
+} from '../utils/functions';
 import {
   convertDate,
   p,
@@ -57,19 +59,20 @@ const useServices = () => {
 
       const parsed = neurons?.neurons?.active?.map((n) => {
         const diffInDays = n?.dissolving
-        ? (new Date(Number(n?.dissolve_delay) * 1000).getTime() - new Date().getTime() - 1) / (1000 * 60 * 60 * 24)
-        : Number(n?.dissolve_delay) / (60 * 60 * 24)
+          ? (new Date(Number(n?.dissolve_delay) * 1000).getTime()
+           - new Date().getTime() - 1) / (1000 * 60 * 60 * 24)
+          : Number(n?.dissolve_delay) / (60 * 60 * 24);
         return ({
           id: n?.id?.toString() || n?.id,
           dissolving: n?.dissolving,
           stakedAmount: Number(n?.staked_amount) / 10 ** 8,
           maturity: Number(n?.maturity),
           dissolveDelay: n?.dissolving
-            ? `Dissolving, unlocked in ${Math.floor(diffInDays / 365.3)} years ${diffInDays % 365.3 > 0 ? `${(diffInDays % 365.3).toFixed(0) - 1} days` : ""}`
-            : `Non-dissolving, locked for ${(diffInDays / 365.3).toFixed(0)} ${ (diffInDays / 365.3).toFixed(0) > 1? 'years' : 'year'}`,
+            ? `Dissolving, unlocked in ${Math.floor(diffInDays / 365.3)} years ${diffInDays % 365.3 > 0 ? `${(diffInDays % 365.3).toFixed(0) - 1} days` : ''}`
+            : `Non-dissolving, locked for ${(diffInDays / 365.3).toFixed(0)} ${(diffInDays / 365.3).toFixed(0) > 1 ? 'years' : 'year'}`,
           age: 3, // FIXME harcoded
           votingPower: 8376, // FIXME harcoded
-        })
+        });
       });
       return parsed;
     } catch (err) {
@@ -81,19 +84,20 @@ const useServices = () => {
   const ogyNeurons = async () => {
     try {
       const neurons = await ogyNeuron.list_ogy_neurons();
-      //Buffer.from(uint8).toString('hex')
+      // Buffer.from(uint8).toString('hex')
       const parsed = neurons?.neurons?.ogy_neurons?.map((n) => ({
         id: Buffer.from(n?.id[0].id.buffer).toString('hex'),
         dissolving: n?.dissolving,
         stakedAmount: Number(n?.cached_neuron_stake_e8s) / 10 ** 8,
         maturity: Number(n?.maturity_e8s_equivalent),
         dissolveDelay: `
-          ${n?.dissolving ? "Dissolving, unlocked in " : "Non-dissolving, locked for "}
+          ${n?.dissolving ? 'Dissolving, unlocked in ' : 'Non-dissolving, locked for '}
           ${Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24)}
-          ${Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24) > 1 ? " years" : " year"}
+          ${Number(n?.dissolve_state[0].DissolveDelaySeconds) / (365.25 * 60 * 60 * 24) > 1 ? ' years' : ' year'}
         `,
         age: Number(n?.aging_since_timestamp_seconds) / (365.25 * 60 * 60 * 24),
-        votingPower: (Number(n?.cached_neuron_stake_e8s) * (1 + Number(n?.voting_power_percentage_multiplier) / 100)) / 10 ** 8,
+        votingPower: (Number(n?.cached_neuron_stake_e8s)
+        * (1 + Number(n?.voting_power_percentage_multiplier) / 100)) / 10 ** 8,
       }));
       return parsed;
     } catch (err) {

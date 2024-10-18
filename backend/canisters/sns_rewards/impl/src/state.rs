@@ -4,7 +4,7 @@ use sns_governance_canister::types::NeuronId;
 use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
-use types::{ NeuronInfo, TimestampMillis };
+use types::{ BuildVersion, NeuronInfo, TimestampMillis };
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{ CanisterEnv, Environment },
@@ -12,11 +12,7 @@ use utils::{
 };
 
 use crate::{
-    model::{
-        maturity_history::MaturityHistory,
-        neuron_owners::NeuronOwnership,
-        payment_processor::PaymentProcessor,
-    },
+    model::{ maturity_history::MaturityHistory, payment_processor::PaymentProcessor },
     utils::TimeInterval,
 };
 
@@ -41,6 +37,8 @@ impl RuntimeState {
                 test_mode: self.env.is_test_mode(),
                 memory_used: MemorySize::used(),
                 cycles_balance_in_tc: self.env.cycles_balance_in_tc(),
+                version: self.env.version(),
+                commit_hash: self.env.commit_hash().to_string(),
             },
             sns_governance_canister: self.data.sns_governance_canister,
             number_of_neurons: self.data.neuron_maturity.len(),
@@ -104,6 +102,8 @@ pub struct Metrics {
 pub struct CanisterInfo {
     pub now: TimestampMillis,
     pub test_mode: bool,
+    pub version: BuildVersion,
+    pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance_in_tc: f64,
 }
@@ -125,8 +125,6 @@ pub struct Data {
     pub sync_info: SyncInfo,
     /// The history of each neuron's maturity.
     pub maturity_history: MaturityHistory,
-    /// owners of neurons
-    pub neuron_owners: NeuronOwnership,
     /// Payment processor - responsible for queuing and processing rounds of payments
     pub payment_processor: PaymentProcessor,
     /// valid tokens and their associated ledger data
@@ -158,7 +156,6 @@ impl Default for Data {
             neuron_maturity: BTreeMap::new(),
             sync_info: SyncInfo::default(),
             maturity_history: MaturityHistory::default(),
-            neuron_owners: NeuronOwnership::default(),
             payment_processor: PaymentProcessor::default(),
             tokens: HashMap::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],

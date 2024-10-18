@@ -3,17 +3,11 @@ use std::collections::HashMap;
 use candid::{ encode_one, CandidType, Principal };
 use pocket_ic::PocketIc;
 use serde::Deserialize;
+use sns_rewards_api_canister::init::InitArgs;
+use sns_rewards_api_canister::Args;
+use types::BuildVersion;
 
 use crate::wasms;
-
-#[derive(Deserialize, CandidType)]
-pub struct Args {
-    pub test_mode: bool,
-    pub icp_ledger_canister_id: Principal,
-    pub sns_ledger_canister_id: Principal,
-    pub ogy_ledger_canister_id: Principal,
-    pub sns_gov_canister_id: Principal,
-}
 
 pub fn setup_rewards_canister(
     pic: &mut PocketIc,
@@ -50,13 +44,15 @@ pub fn setup_rewards_canister(
         .expect("couldn't find ledger with 'ogy_ledger_canister_id'")
         .clone();
 
-    let init_args = Args {
+    let init_args = Args::Init(InitArgs {
         test_mode: true,
+        version: BuildVersion::min(),
+        commit_hash: "Test".to_string(),
         icp_ledger_canister_id,
         sns_ledger_canister_id,
         ogy_ledger_canister_id,
         sns_gov_canister_id: sns_canister_id.clone(),
-    };
+    });
     pic.install_canister(
         rewards_canister,
         rewards_wasm,

@@ -28,12 +28,12 @@ const List = ({
   const columns = useMemo<ColumnDef<SwapData>[]>(
     () => [
       {
-        accessorKey: "label",
-        id: "label",
+        accessorKey: "index",
+        id: "index",
         cell: ({ getValue }) => (
           <div className="font-semibold">{getValue()}</div>
         ),
-        header: "Type",
+        header: "Index ID",
         meta: {
           className: "text-left",
         },
@@ -133,13 +133,17 @@ const List = ({
         active_swap.data &&
         active_swap.data.rows.length === 0 && <ListEmptyItem />}
       {active_swap.isLoading && (
-        <div className="flex items-center justify-center h-40">
-          <LoaderSpin size="xl" />
+        <div className="flex items-center justify-center p-8">
+          <LoaderSpin />
         </div>
       )}
       {active_swap.isError && (
-        <div className="flex items-center justify-center h-40 text-red-500 font-semibold">
-          <div>{active_swap.error?.message}</div>
+        <div className="flex justify-center">
+          <div className="p-8 border border-dark-orange bg-dark-orange/10 rounded-xl">
+            <div className="text-dark-orange font-semibold">
+              {active_swap.error}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -16,6 +16,7 @@ export default function GLDGovInfo() {
   const [price, setPrice] = useState({ loading: true, amount: 0 });
   const [marketcap, setMarketcap] = useState({ loading: true, amount: 0 });
   const [infoModal, setInfoModal] = useState(null);
+
   // getters
   useEffect(() => {
     (async () => {
@@ -39,7 +40,6 @@ export default function GLDGovInfo() {
   }, [totalSupply, price]);
 
   const allDataLoaded = !totalSupply.loading && !price.loading && !marketcap.loading;
-  console.log('Version: ', process.env.VERSION);
   return (
     <>
       <section className="grid grid-cols-1 lg:grid-cols-3 w-full gap-2">
