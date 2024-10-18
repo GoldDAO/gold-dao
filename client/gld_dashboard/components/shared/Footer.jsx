@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FooterGoldDaoIcon } from '../../utils/svgs';
 
 export default function Footer() {
   const footerInfo = [
@@ -61,10 +60,10 @@ export default function Footer() {
           <div className="w-[100%] sm:w-[40%] mb-10">
             <div className="flex items-center justify-start sm:px-2">
               <Link href={'/'} className='hidden sm:block'>
-                <FooterGoldDaoIcon w={188} h={60} />
+                <img src="svg/logo-full.svg" alt="" class="w-[188px]" />
               </Link>
               <Link href={'/'} className='sm:hidden'>
-                <FooterGoldDaoIcon w={149} h={47} />
+                <img src="svg/logo-full.svg" alt="" class="w-[149px]" />
               </Link>
             </div>
           </div>
