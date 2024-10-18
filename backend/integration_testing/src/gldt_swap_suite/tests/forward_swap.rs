@@ -85,7 +85,7 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use gldt_swap_api_canister::swap_nft_for_tokens::NftInvalidError;
+    use gldt_swap_api_canister::swap_nft_for_tokens::{ NftInvalidError, SwapNftForTokensErrors };
     use gldt_swap_common::{
         gldt::GLDT_LEDGER_FEE_ACCOUNT,
         swap::{
@@ -209,6 +209,40 @@ mod tests {
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
             gldt_swap.to_string()
         );
+    }
+
+    #[test]
+    pub fn swap_nft_for_tokens_should_fail_if_invalid_nft_canister_supplied() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
+            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+        } = env;
+        tick_n_blocks(pic, 2);
+
+        // 1. setup nft and verify owner
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string()
+        );
+
+        let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), Principal::anonymous())] // use annoymous principal
+        );
+        match res {
+            Ok(r) => { assert_eq!(true, false) }
+            Err(e) => {
+                matches!(e, SwapNftForTokensErrors::ContainsInvalidNftCanister(_));
+            }
+        }
     }
 
     #[test]

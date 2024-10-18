@@ -198,6 +198,7 @@ type SwapInfo = variant {
 type SwapNftForTokensErrors = variant {
   Limit : text;
   ContainsDuplicates : text;
+  ContainsInvalidNftCanister : text;
   NftValidationErrors : record {
     vec nat;
     vec record { nat; vec NftInvalidError };

@@ -11,6 +11,7 @@ pub type Response = Result<Vec<SwapId>, SwapNftForTokensErrors>;
 pub enum SwapNftForTokensErrors {
     NftValidationErrors((Vec<NftID>, Vec<(NftID, Vec<NftInvalidError>)>)),
     ContainsDuplicates(String),
+    ContainsInvalidNftCanister(String),
     ServiceDown(ServiceDownReason),
     Limit(String),
 }

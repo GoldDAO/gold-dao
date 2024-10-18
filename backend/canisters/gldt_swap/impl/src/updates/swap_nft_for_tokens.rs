@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use candid::Principal;
 use canister_time::timestamp_millis;
 use futures::future::join_all;
 use gldt_swap_common::{ nft::NftID, swap::{ ServiceStatus, SwapId, SwapInfo } };
@@ -58,6 +59,22 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
         return Err(
             SwapNftForTokensErrors::ContainsDuplicates(
                 format!("You can't supply the same NFT ID to be swapped twice!")
+            )
+        );
+    }
+
+    if !contains_valid_nft_canisters(&args) {
+        let nft_canisters: Vec<Principal> = read_state(|s|
+            s.data.gldnft_canisters
+                .iter()
+                .map(|(prin, ..)| prin.clone())
+                .collect()
+        );
+        return Err(
+            SwapNftForTokensErrors::ContainsInvalidNftCanister(
+                format!(
+                    "You may not specify an unknown GLD NFT canister. Check that all your intended swaps contain a valid NFT canister principal that match one of these: \n {nft_canisters:?}"
+                )
             )
         );
     }
@@ -137,4 +154,15 @@ fn contains_duplicates(args: &SwapNftForTokensArgs) -> bool {
     }
 
     false
+}
+
+fn contains_valid_nft_canisters(args: &SwapNftForTokensArgs) -> bool {
+    let nft_canisters: Vec<Principal> = read_state(|s|
+        s.data.gldnft_canisters
+            .iter()
+            .map(|(prin, ..)| prin.clone())
+            .collect()
+    );
+    // if any of the intended swaps don't match one of the weights return false
+    args.iter().all(|(_, nft_canister)| nft_canisters.contains(&nft_canister))
 }
