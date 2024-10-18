@@ -25,27 +25,10 @@ pub async fn notify_sale_nft_origyn_impl(args: SubscriberNotification) {
             // TODO
             // if the swap already has a sale_id that isn't equal to a blank string then its a duplicate notify_sale_nft_origyn request or a fraudulent one
 
-            if let SwapInfo::Forward(details) = &swap_info {
-                if details.status != SwapStatusForward::Init {
-                    let nft_string_id = &args.sale.token_id;
-                    let msg = format!(
-                        "FORWARD SWAP :: notification endpoint :: NFT ID string = {nft_string_id} :: msg = duplicate notification sent. swap is already in progress :: swap detials = {details:?}"
-                    );
-                    debug!(msg);
-                    return;
-                }
-
-                forward_swap_validate_notification(&swap_id, &args);
-                forward_swap_perform_mint_to_escrow(&swap_id).await;
-                forward_swap_perform_bid_on_nft(&swap_id, args).await;
-                forward_swap_perform_burn_fees(&swap_id).await;
-            } else {
-                let nft_string_id = &args.sale.token_id;
-                let msg = format!(
-                    "FORWARD SWAP :: notification endpoint :: NFT ID string = {nft_string_id} :: msg = swap was found but it is not a Forward swap"
-                );
-                debug!(msg);
-            }
+            forward_swap_validate_notification(&swap_id, &args);
+            forward_swap_perform_mint_to_escrow(&swap_id).await;
+            forward_swap_perform_bid_on_nft(&swap_id, args).await;
+            forward_swap_perform_burn_fees(&swap_id).await;
         }
         None => {
             let nft_string_id = &args.sale.token_id;
