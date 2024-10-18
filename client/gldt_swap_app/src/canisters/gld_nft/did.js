@@ -1208,7 +1208,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const FeeDepositWithdrawDescription = IDL.Record({
     status: IDL.Variant({
-      locked: IDL.Record({ sale_id: IDL.Text }),
+      locked: IDL.Record({ token_id: IDL.Text, sale_id: IDL.Text }),
       unlocked: IDL.Null,
     }),
     token: TokenSpec__1,
@@ -2247,6 +2247,7 @@ export const idlFactory = ({ IDL }) => {
   });
   return Nft_Canister;
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const init = ({ IDL }) => {
   return [];
 };

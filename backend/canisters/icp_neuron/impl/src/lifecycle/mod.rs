@@ -13,8 +13,8 @@ pub fn init_canister(runtime_state: RuntimeState) {
         ic_cdk_timers::set_timer(Duration::ZERO, init_public_key);
     }
 
-    crate::jobs::start();
     init_state(runtime_state);
+    crate::jobs::start();
 }
 
 fn init_public_key() {
@@ -29,4 +29,16 @@ fn init_public_key() {
             });
         }
     }
+}
+
+use candid::CandidType;
+use serde::{ Deserialize, Serialize };
+
+use crate::InitArgs;
+use crate::UpgradeArgs;
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub enum Args {
+    Init(InitArgs),
+    Upgrade(UpgradeArgs),
 }

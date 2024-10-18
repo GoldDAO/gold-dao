@@ -37,7 +37,8 @@
       "@providers/*": ["providers/*"],
       "@constants": ["constants.ts"],
       "@theme/*": ["theme/*"],
-      "@canisters/*": ["canisters/*"]
+      "@canisters/*": ["canisters/*"],
+      "@auth/*": ["auth/*"],
     }
   },
   "include": ["src"],

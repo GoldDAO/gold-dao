@@ -1,0 +1,8 @@
+scripts/build_canister.sh buyback_burn
+scripts/build_canister.sh gldt_swap
+scripts/build_canister.sh icp_neuron
+scripts/build_canister.sh management
+scripts/build_canister.sh sns_neuron_controller
+scripts/build_canister.sh sns_rewards
+scripts/build_canister.sh super_stats_v3
+scripts/build_canister.sh token_metrics

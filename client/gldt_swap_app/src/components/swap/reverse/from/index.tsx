@@ -2,14 +2,9 @@ import { useNft } from "@context/index";
 
 import Card from "@components/shared/card/Base";
 
-// import { useIcrc1BalanceOf } from "@hooks/gldt_ledger";
-// import { useWallet } from "@amerej/artemis-react";
-
 const ReverseSwapFrom = () => {
-  // const { principalId } = useWallet();
   const { getSelectedTotalGLDT } = useNft();
   const totalGLDTtoSwap = getSelectedTotalGLDT();
-  // const balance = useIcrc1BalanceOf({ owner: principalId as string });
 
   return (
     <div className="">

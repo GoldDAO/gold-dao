@@ -6,7 +6,7 @@ CANISTER_IDS="sns_canister_ids.json"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
-CID="2f5ll-gqaaa-aaaak-qcfuq-cai"
+CID="rbv23-fqaaa-aaaam-qbfma-cai"
 METHOD_NAME="set_reward_token_types"
 VALIDATE_METHOD_NAME="set_reward_token_types_validate"
 
@@ -24,7 +24,7 @@ This method allows to define the tokens in which rewards are paid to stakers.
 \";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_005 : nat64);
+                id = (1_006 : nat64);
                 name = \"Set reward token types.\";
                 description = opt \"Proposal to define the tokens in which rewards are paid to GLD neurons.\";
                 function_type = opt variant {

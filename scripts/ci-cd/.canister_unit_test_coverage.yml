@@ -4,12 +4,14 @@ spec:
       description: Name of the source folder, should be the same as the canister's cargo package name.
       options: [
           'gldt_swap',
+          'buyback_burn',
           'icp_neuron',
           'token_metrics',
           'sns_rewards',
           'sns_neuron_controller',
           'integration_testing',
           'management',
+          'gldt_swap',
           # "super_stats_v3",
         ]
 ---
@@ -20,9 +22,9 @@ $[[ inputs.src-folder ]] unit tests:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md}'
-        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}'
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - 'backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}'
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
   extends: .rust template

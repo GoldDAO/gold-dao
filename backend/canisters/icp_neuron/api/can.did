@@ -1,7 +1,9 @@
-type Account = record { owner : principal; subaccount : opt vec nat8 };
-type AccountIdentifier = record { hash : vec nat8 };
+type Account = record { owner : principal; subaccount : opt blob };
+type AccountIdentifier = record { hash : blob };
 type AddHotKey = record { new_hot_key : opt principal };
 type Amount = record { e8s : nat64 };
+type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type By = variant {
   NeuronIdOrSubaccount : record {};
   MemoAndController : MemoAndController;
@@ -44,7 +46,7 @@ type Follow = record { topic : int32; followees : vec NeuronId };
 type IncreaseDissolveDelay = record {
   additional_dissolve_delay_seconds : nat32;
 };
-type InitArgs = record { test_mode : bool };
+type InitArgs = record { test_mode : bool; commit_hash : text };
 type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageNnsNeuronRequest = record { command : Command; neuron_id : nat64 };
 type ManageNnsNeuronResponse = variant { Success : text; InternalError : text };
@@ -94,7 +96,8 @@ type Spawn = record {
 type Split = record { amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
 type StakeNnsNeuronResponse = variant { Success : nat64; InternalError : text };
-service : (opt InitArgs) -> {
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
+service : (Args) -> {
   list_neurons : () -> (ListNeuronsResponse) query;
   manage_nns_neuron : (ManageNnsNeuronRequest) -> (ManageNnsNeuronResponse);
   manage_reward_recipients : (ManageRewardRecipientsRequest) -> (

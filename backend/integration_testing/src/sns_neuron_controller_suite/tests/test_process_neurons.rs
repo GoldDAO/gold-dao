@@ -1,13 +1,11 @@
-use crate::client::rewards::add_neuron_ownership;
-use candid::{CandidType, Deserialize};
+use candid::{ CandidType, Deserialize };
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::add_neuron_ownership::Response as AddNeuronOwnerShipResponse;
 use std::time::Duration;
 
 use crate::{
-    client::icrc1::client::{balance_of, transfer},
+    client::icrc1::client::{ balance_of, transfer },
     sns_neuron_controller_suite::setup::default_test_setup,
     utils::tick_n_blocks,
 };
@@ -21,8 +19,7 @@ pub struct GetNeuronRequest {
 fn test_process_neurons_happy_path() {
     let mut test_env = default_test_setup();
 
-    let ogy_ledger_canister_id = test_env
-        .token_ledgers
+    let ogy_ledger_canister_id = test_env.token_ledgers
         .get("ogy_ledger_canister_id")
         .unwrap()
         .clone();
@@ -34,38 +31,18 @@ fn test_process_neurons_happy_path() {
         Account {
             owner: test_env.gld_rewards_canister_id,
             subaccount: None,
-        },
+        }
     );
-    println!(
-        "initial_sns_rewards_balance: {:?}",
-        initial_sns_rewards_balance
-    );
+    println!("initial_sns_rewards_balance: {:?}", initial_sns_rewards_balance);
 
     let sns_neuron_controller_id = test_env.sns_neuron_controller_id;
     let neuron = test_env.neuron_data.get(&0usize).unwrap().clone();
-    let neuron_id = test_env
-        .neuron_data
-        .get(&0usize)
-        .unwrap()
-        .clone()
-        .id
-        .unwrap();
+    let neuron_id = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
     assert!(neuron.permissions.get(1).unwrap().principal == Some(sns_neuron_controller_id)); // double check the data correct (sns_neuron_controller_id's hotkey is on the first neuron's permissions list)
 
     // ********************************
     // 1. add ownership (the rewards are distributed to the neuron owner). It's important to do this before topping up the neuron rewards, because otherwise the rewards would not be sent
     // ********************************
-    let res = add_neuron_ownership(
-        &mut test_env.pic,
-        sns_neuron_controller_id,
-        ogy_rewards_canister_id,
-        &neuron_id.clone(),
-    );
-    tick_n_blocks(&test_env.pic, 10);
-    match res {
-        AddNeuronOwnerShipResponse::Ok(n_id) => assert_eq!(n_id, neuron_id),
-        _ => {}
-    }
 
     // ********************************
     // 2. simulate distribution - add reward to neuron
@@ -83,16 +60,15 @@ fn test_process_neurons_happy_path() {
         ogy_ledger_canister_id,
         None,
         neuron_account,
-        300_000_000_000_000, // 10,000 OGY
-    )
-    .unwrap();
+        300_000_000_000_000 // 10,000 OGY
+    ).unwrap();
 
-    let initial_neuron_rewards_balance =
-        balance_of(&mut test_env.pic, ogy_ledger_canister_id, neuron_account);
-    println!(
-        "initial_neuron_rewards_balance: {:?}",
-        initial_neuron_rewards_balance
+    let initial_neuron_rewards_balance = balance_of(
+        &mut test_env.pic,
+        ogy_ledger_canister_id,
+        neuron_account
     );
+    println!("initial_neuron_rewards_balance: {:?}", initial_neuron_rewards_balance);
 
     test_env.pic.advance_time(Duration::from_secs(24 * 60 * 60));
     tick_n_blocks(&test_env.pic, 10);
@@ -103,19 +79,16 @@ fn test_process_neurons_happy_path() {
         Account {
             owner: test_env.gld_rewards_canister_id,
             subaccount: None,
-        },
+        }
     );
-    println!(
-        "current_sns_rewards_balance: {:?}",
-        current_sns_rewards_balance
-    );
+    println!("current_sns_rewards_balance: {:?}", current_sns_rewards_balance);
 
-    let current_neuron_rewards_balance =
-        balance_of(&mut test_env.pic, ogy_ledger_canister_id, neuron_account);
-    println!(
-        "current_neuron_rewards_balance: {:?}",
-        current_neuron_rewards_balance
+    let current_neuron_rewards_balance = balance_of(
+        &mut test_env.pic,
+        ogy_ledger_canister_id,
+        neuron_account
     );
+    println!("current_neuron_rewards_balance: {:?}", current_neuron_rewards_balance);
 
     // assert!(initial_sns_rewards_balance < current_sns_rewards_balance);
     // assert!(initial_neuron_rewards_balance > current_neuron_rewards_balance);

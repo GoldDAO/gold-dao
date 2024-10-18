@@ -5,9 +5,8 @@ import {
   QueryKey,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { useWallet, getActor } from "@amerej/artemis-react";
 
-import { canisters } from "@providers/Auth";
+import { useAuth } from "@auth/index";
 
 import { SwapInfo, SwapData } from "@canisters/gldt_swap/interfaces";
 import { getSwapData } from "./utils/index";
@@ -24,26 +23,23 @@ interface UseGetOneSwapByIdParams
       "queryKey" | "queryFn"
     > {}
 
-const get_swap = async ({ nft_id, index }: GetOneSwapByIdParams) => {
-  const { canisterId, idlFactory } = canisters["gldt_swap"];
-  const actor = await getActor(canisterId, idlFactory, {
-    isAnon: false,
-  });
-  const result = (await actor.get_swap([BigInt(nft_id), BigInt(index)])) as
-    | []
-    | [[[bigint, bigint], SwapInfo]];
-  return result;
-};
-
 export const useGetOneSwapById = ({
   nft_id,
   index,
   ...queryParams
 }: UseGetOneSwapByIdParams) => {
-  const { isConnected, principalId } = useWallet();
+  const { isConnected, principalId, createActor } = useAuth();
   const [data, setData] = useState<SwapData | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const get_swap = async ({ nft_id, index }: GetOneSwapByIdParams) => {
+    const actor = createActor("gldt_swap");
+    const result = (await actor.get_swap([BigInt(nft_id), BigInt(index)])) as
+      | []
+      | [[[bigint, bigint], SwapInfo]];
+    return result;
+  };
 
   const {
     data: response,

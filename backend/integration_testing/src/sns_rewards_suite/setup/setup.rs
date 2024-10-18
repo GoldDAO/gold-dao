@@ -4,6 +4,9 @@ use candid::{ encode_one, Nat, Principal };
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{ PocketIc, PocketIcBuilder };
 use sns_governance_canister::types::Neuron;
+use sns_rewards_api_canister::init::InitArgs;
+use sns_rewards_api_canister::Args;
+use types::BuildVersion;
 
 use crate::{
     client::icrc1::client::transfer,
@@ -15,7 +18,7 @@ use crate::{
     wasms,
 };
 
-use super::{ setup_rewards::{ setup_rewards_canister, Args }, setup_sns::reinstall_sns_with_data };
+use super::{ setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data };
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
@@ -91,13 +94,15 @@ impl RewardsTestEnv {
             .expect("couldn't find ledger with 'ogy_ledger_canister_id'")
             .clone();
 
-        let init_args = Args {
+        let init_args = Args::Init(InitArgs {
             test_mode: true,
+            version: BuildVersion::min(),
+            commit_hash: "Test".to_string(),
             icp_ledger_canister_id,
             sns_ledger_canister_id,
             ogy_ledger_canister_id,
             sns_gov_canister_id: self.sns_gov_canister_id.clone(),
-        };
+        });
         match
             self.pic.upgrade_canister(
                 self.rewards_canister_id,

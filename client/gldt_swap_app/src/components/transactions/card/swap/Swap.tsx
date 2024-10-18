@@ -10,7 +10,7 @@ const Swap = () => {
   const { isSuccess, data, isLoading, isError } = useTransactionDetails();
 
   return (
-    <div className="border border-border rounded-xl bg-surface p-4 sm:p-6">
+    <div className="border border-border rounded-xl bg-surface p-4 md:p-6">
       {isSuccess && data && (
         <>
           <div className="mb-4 font-semibold">{data.label}</div>

@@ -1,0 +1,290 @@
+type Account = record { owner : principal; subaccount : opt blob };
+type ApproveError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  AllowanceChanged : record { current_allowance : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  Expired : record { ledger_time : nat64 };
+  InsufficientFunds : record { balance : nat };
+};
+type ArchiveCanister = record {
+  canister_id : principal;
+  end_index : opt nat;
+  start_index : nat;
+};
+type ArchiveDownReason = variant {
+  UpgradingArchivesFailed : text;
+  NoArchiveCanisters : text;
+  Upgrading;
+  InitializingFirstArchiveFailed : text;
+  ActiveSwapCapacityFull;
+  LowOrigynToken : text;
+};
+type Args = record { page : nat64; limit : nat64 };
+type Args_1 = record { page : nat64; user : principal; limit : nat64 };
+type Args_2 = record { nft_id : nat; nft_canister_id : principal };
+type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BidFailError = variant {
+  UnexpectedError : text;
+  CallError : text;
+  TransferFailed : text;
+};
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type BurnError = variant { CallError : text };
+type EscrowError = variant {
+  ApproveError : ApproveError;
+  UnexpectedError : ImpossibleErrorReason;
+  TransferFailed : TransferFailReason;
+  RequestFailed : text;
+};
+type FeeTransferError = variant {
+  TransferError : TransferError;
+  CallError : text;
+};
+type GetHistoricSwapsByUserError = variant {
+  LimitTooLarge : text;
+  LimitTooSmall : text;
+  QueryCanisterError : text;
+};
+type GetHistoricSwapsError = variant { LimitTooLarge : text };
+type GetNftMetaDetailErrorReason = variant {
+  CantFindNFT : text;
+  NoMetaDetails;
+  UnexpectedError : text;
+};
+type GldtNumTokens = record { value_with_fee : nat; value : nat };
+type ImpossibleErrorReason = variant {
+  AmountNotFound;
+  NFTResponseInvalid;
+  PrincipalNotFound;
+};
+type InitArgs = record {
+  test_mode : bool;
+  ogy_ledger_id : principal;
+  authorized_principals : vec principal;
+  version : BuildVersion;
+  gldnft_canisters : vec record { principal; NftCanisterConf };
+  gldt_ledger_id : principal;
+  commit_hash : text;
+};
+type LockError = variant {
+  NftAlreadyLocked : vec nat;
+  UnexpectedError : record {};
+  NftNotLocked;
+};
+type MintError = variant {
+  UnexpectedError : ImpossibleErrorReason;
+  TransferFailed : TransferFailReason;
+};
+type NftCanisterConf = record { grams : nat16 };
+type NftInvalidError = variant {
+  InvalidNftOwner : text;
+  AlreadyLocked;
+  CantGetOrigynID : text;
+  InvalidNFTCollectionPrincipal;
+  InvalidTokenAmount;
+  CantGetNatIdOfNft;
+};
+type NftTransferError = variant {
+  FailedToGetOgyFeeAllowance : text;
+  ApprovalError : ApproveError;
+  ApprovalCallError : text;
+  InvalidFee : text;
+  UnexpectedError : ImpossibleErrorReason;
+  CallError : text;
+  TransferFailed : text;
+};
+type NftValidationError = variant {
+  WeightParseError;
+  CanisterInvalid;
+  CantGetOrigynID : text;
+  CantVerifySwapCanisterOwnsNft;
+  InvalidGldtTokensFromWeight;
+  InvalidNftWeight;
+  NotOwnedBySwapCanister;
+};
+type NotificationError = variant {
+  InvalidSaleSubaccount;
+  InvalidTokenSpec;
+  TimeoutInvalid : text;
+  InvalidEscrowSubaccount : text;
+  TooManyPrincipalsInAllowList;
+  OrigynStringIdDoesNotMatch : text;
+  SellerIsNotPrincipalOrAccount : text;
+  SellerAndReceiverDoesNotMatch : text;
+  InvalidCustomAskFeature;
+  InvalidTokenAmount;
+  InvalidPricingConfig;
+  CollectionDoesNotMatch : text;
+  AllowListDoesNotContainCorrectPrincipal;
+};
+type RefundError = variant { CallError : text; TransferFailed : TransferError };
+type RemoveIntentToSwapError = variant {
+  InvalidSwapType : text;
+  InvalidUser;
+  SwapNotFound;
+  InProgress;
+};
+type Result = variant {
+  Ok : vec record { record { nat; nat }; SwapInfo };
+  Err : GetHistoricSwapsError;
+};
+type Result_1 = variant {
+  Ok : vec record { record { nat; nat }; SwapInfo };
+  Err : GetHistoricSwapsByUserError;
+};
+type Result_2 = variant { Ok; Err : RemoveIntentToSwapError };
+type Result_3 = variant {
+  Ok : vec record { nat; nat };
+  Err : SwapNftForTokensErrors;
+};
+type Result_4 = variant {
+  Ok : record { nat; nat };
+  Err : SwapTokensForNftRequestErrors;
+};
+type ServiceDownReason = variant {
+  ArchiveRelated : ArchiveDownReason;
+  Initializing;
+  ActiveSwapCapacityFull;
+  LowOrigynToken : text;
+};
+type SwapDetailForward = record {
+  nft_id : nat;
+  status : SwapStatusForward;
+  escrow_sub_account : blob;
+  nft_id_string : text;
+  created_at : nat64;
+  gldt_receiver : Account;
+  tokens_to_mint : GldtNumTokens;
+  nft_canister : principal;
+  index : nat;
+  sale_id : text;
+};
+type SwapDetailReverse = record {
+  nft_id : nat;
+  status : SwapStatusReverse;
+  tokens_to_receive : GldtNumTokens;
+  nft_id_string : text;
+  user : principal;
+  created_at : nat64;
+  swap_fee : nat;
+  nft_canister : principal;
+  index : nat;
+  transfer_fees : nat;
+};
+type SwapErrorForward = variant {
+  BidFailed : BidFailError;
+  UnexpectedError : ImpossibleErrorReason;
+  NotificationFailed : NotificationError;
+  MintFailed : MintError;
+  Expired;
+};
+type SwapErrorReverse = variant {
+  FeeTransferFailed : FeeTransferError;
+  EscrowFailed : EscrowError;
+  LockFailed : LockError;
+  Refunded : SwapStatusReverse;
+  NftValidationFailed : vec NftValidationError;
+  BurnFailed : BurnError;
+  NftTransferFailed : NftTransferError;
+};
+type SwapInfo = variant {
+  Forward : SwapDetailForward;
+  Reverse : SwapDetailReverse;
+};
+type SwapNftForTokensErrors = variant {
+  Limit : text;
+  ContainsDuplicates : text;
+  NftValidationErrors : record {
+    vec nat;
+    vec record { nat; vec NftInvalidError };
+  };
+  ServiceDown : ServiceDownReason;
+};
+type SwapStatusForward = variant {
+  Failed : SwapErrorForward;
+  Init;
+  MintRequest;
+  Complete;
+  BidFail : BidFailError;
+  BidRequest;
+  NotificationFailed : NotificationError;
+  BurnFeesRequest;
+  BurnFeesFailed : MintError;
+  MintFailed : MintError;
+};
+type SwapStatusReverse = variant {
+  FeeTransferFailed : FeeTransferError;
+  Failed : SwapErrorReverse;
+  EscrowFailed : EscrowError;
+  Init;
+  Complete;
+  BurnFailed : BurnError;
+  RefundRequest;
+  NftTransferRequest;
+  NftTransferFailed : NftTransferError;
+  BurnRequest;
+  FeeTransferRequest;
+  RefundFailed : RefundError;
+  EscrowRequest;
+};
+type SwapTokensForNftRequestErrors = variant {
+  GetNftMetaDetailError : GetNftMetaDetailErrorReason;
+  CantForgeSwapId;
+  NftLocked : LockError;
+  NftValidationErrors : vec NftValidationError;
+  NotOwnedBySwapCanister;
+  ServiceDown : ServiceDownReason;
+  SwapCreationError;
+};
+type TransferError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  BadBurn : record { min_burn_amount : nat };
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  InsufficientFunds : record { balance : nat };
+};
+type TransferFailReason = variant {
+  TransferError : TransferError;
+  TransferFromError : TransferFromError;
+  CallError : text;
+};
+type TransferFromError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporarilyUnavailable;
+  InsufficientAllowance : record { allowance : nat };
+  BadBurn : record { min_burn_amount : nat };
+  Duplicate : record { duplicate_of : nat };
+  BadFee : record { expected_fee : nat };
+  CreatedInFuture : record { ledger_time : nat64 };
+  TooOld;
+  InsufficientFunds : record { balance : nat };
+};
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
+service : (Args_3) -> {
+  get_active_swap_ids_by_user : (opt principal) -> (
+      vec record { nat; nat },
+    ) query;
+  get_active_swaps : (null) -> (
+      vec record { record { nat; nat }; SwapInfo },
+    ) query;
+  get_active_swaps_by_user : (opt principal) -> (
+      vec record { record { nat; nat }; SwapInfo },
+    ) query;
+  get_archive_canisters : (null) -> (vec ArchiveCanister) query;
+  get_historic_swaps : (Args) -> (Result);
+  get_historic_swaps_by_user : (Args_1) -> (Result_1);
+  get_history_total : (opt principal) -> (nat);
+  get_swap : (record { nat; nat }) -> (
+      opt record { record { nat; nat }; SwapInfo },
+    );
+  remove_intent_to_swap : (record { nat; nat }) -> (Result_2);
+  swap_nft_for_tokens : (vec record { nat; principal }) -> (Result_3);
+  swap_tokens_for_nft : (Args_2) -> (Result_4);
+}
