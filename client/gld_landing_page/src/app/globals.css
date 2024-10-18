@@ -25,7 +25,7 @@
 }
 .card {
   position: sticky;
-  top: 0;
+  top: 16px;
   padding-top: calc(var(--index) * var(--cardTopPadding));
 }
 
