@@ -1146,7 +1146,7 @@ mod tests {
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
         tick_n_blocks(pic, 3);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 1));
-        tick_n_blocks(pic, 2);
+        tick_n_blocks(pic, 3);
 
         // 9. verify the sale is expired
         let sale_info_status = match
