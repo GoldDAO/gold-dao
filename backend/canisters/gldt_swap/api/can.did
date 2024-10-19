@@ -34,6 +34,7 @@ type BidFailError = variant {
 };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type BurnError = variant { CallError : text };
+type DepositRecoveryError = variant { CantRecover : text; CallError : text };
 type EscrowError = variant {
   ApproveError : ApproveError;
   UnexpectedError : ImpossibleErrorReason;
@@ -177,6 +178,7 @@ type SwapDetailReverse = record {
   in_recovery_mode : bool;
 };
 type SwapErrorForward = variant {
+  DepositRecoveryFailed : DepositRecoveryError;
   BidFailed : BidFailError;
   UnexpectedError : ImpossibleErrorReason;
   NotificationFailed : NotificationError;
@@ -207,10 +209,13 @@ type SwapNftForTokensErrors = variant {
   ServiceDown : ServiceDownReason;
 };
 type SwapStatusForward = variant {
+  DepositRecoveryFailed : record { SwapStatusForward; DepositRecoveryError };
   Failed : SwapErrorForward;
+  DepositRecoveryInProgress : SwapStatusForward;
   BidInProgress;
   Init;
   MintRequest;
+  DepositRecoveryRequest : SwapStatusForward;
   Complete;
   BidFail : BidFailError;
   BidRequest;
@@ -219,6 +224,7 @@ type SwapStatusForward = variant {
   BurnFeesInProgress;
   BurnFeesRequest;
   BurnFeesFailed : MintError;
+  NotificationInProgress;
   MintFailed : MintError;
 };
 type SwapStatusReverse = variant {

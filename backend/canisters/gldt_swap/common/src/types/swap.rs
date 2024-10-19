@@ -80,8 +80,53 @@ impl SwapInfo {
         }
     }
 
-    pub fn is_stuck(&self) -> bool {
+    pub fn is_swap_over_time_threshold(&self) -> bool {
         let now = timestamp_millis();
+        // match self {
+        //     // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
+        //     // because the nft canister will release funds and cancel sale after 1 minute
+        //     SwapInfo::Forward(details) => {
+        //         let threshold =
+        //             details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
+        //         let is_old = now > threshold;
+
+        //         let is_valid_stuck_status = matches!(
+        //             details.status,
+        //             SwapStatusForward::Init | NotificationFailed(NotificationError),
+        //             MintFailed(MintError),
+        //             BidRequest,
+        //             BidFail(BidFailError),
+        //             BurnFeesRequest,
+        //             BurnFeesFailed(BurnFeesError),
+        //             Complete,
+        //             Failed(SwapErrorForward),
+        //             SwapStatusForward::MintRequest |
+        //                 SwapStatusForward::MintFailed(_) |
+        //                 SwapStatusForward::BidRequest |
+        //                 SwapStatusForward::BidFail(_) |
+        //                 SwapStatusForward::BurnFeesFailed(_)
+        //         );
+
+        //         return is_valid_stuck_status && is_old;
+        //     }
+        //     SwapInfo::Reverse(details) => {
+        //         let threshold =
+        //             details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
+        //         let is_old = now > threshold;
+
+        //         let is_valid_stuck_status = matches!(
+        //             details.status,
+        //             SwapStatusReverse::Init |
+        //                 SwapStatusReverse::EscrowRequest |
+        //                 SwapStatusReverse::NftTransferRequest |
+        //                 SwapStatusReverse::BurnRequest |
+        //                 SwapStatusReverse::FeeTransferRequest |
+        //                 SwapStatusReverse::NftTransferFailed(_) |
+        //                 SwapStatusReverse::RefundRequest
+        //         );
+
+        //         return is_valid_stuck_status && is_old;
+        //     }
         match self {
             // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
             // because the nft canister will release funds and cancel sale after 1 minute
@@ -90,34 +135,42 @@ impl SwapInfo {
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
 
-                let is_valid_stuck_status = matches!(
-                    details.status,
-                    SwapStatusForward::Init |
-                        SwapStatusForward::MintRequest |
-                        SwapStatusForward::BidRequest |
-                        SwapStatusForward::BidFail(_) |
-                        SwapStatusForward::BurnFeesFailed(_)
-                );
+                // let is_valid_stuck_status = matches!(
+                //     details.status,
+                //     SwapStatusForward::Init | NotificationFailed(NotificationError),
+                //     MintFailed(MintError),
+                //     BidRequest,
+                //     BidFail(BidFailError),
+                //     BurnFeesRequest,
+                //     BurnFeesFailed(BurnFeesError),
+                //     Complete,
+                //     Failed(SwapErrorForward),
+                //     SwapStatusForward::MintRequest |
+                //         SwapStatusForward::MintFailed(_) |
+                //         SwapStatusForward::BidRequest |
+                //         SwapStatusForward::BidFail(_) |
+                //         SwapStatusForward::BurnFeesFailed(_)
+                // );
 
-                return is_valid_stuck_status && is_old;
+                return is_old;
             }
             SwapInfo::Reverse(details) => {
                 let threshold =
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
 
-                let is_valid_stuck_status = matches!(
-                    details.status,
-                    SwapStatusReverse::Init |
-                        SwapStatusReverse::EscrowRequest |
-                        SwapStatusReverse::NftTransferRequest |
-                        SwapStatusReverse::BurnRequest |
-                        SwapStatusReverse::FeeTransferRequest |
-                        SwapStatusReverse::NftTransferFailed(_) |
-                        SwapStatusReverse::RefundRequest
-                );
+                // let is_valid_stuck_status = matches!(
+                //     details.status,
+                //     SwapStatusReverse::Init |
+                //         SwapStatusReverse::EscrowRequest |
+                //         SwapStatusReverse::NftTransferRequest |
+                //         SwapStatusReverse::BurnRequest |
+                //         SwapStatusReverse::FeeTransferRequest |
+                //         SwapStatusReverse::NftTransferFailed(_) |
+                //         SwapStatusReverse::RefundRequest
+                // );
 
-                return is_valid_stuck_status && is_old;
+                return is_old;
             }
         }
     }
@@ -241,6 +294,7 @@ impl SwapDetailForward {
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum SwapStatusForward {
     Init,
+    NotificationInProgress,
     NotificationFailed(NotificationError),
     MintRequest,
     MintInProgress,
@@ -251,6 +305,9 @@ pub enum SwapStatusForward {
     BurnFeesRequest,
     BurnFeesInProgress,
     BurnFeesFailed(BurnFeesError),
+    DepositRecoveryRequest(Box<SwapStatusForward>),
+    DepositRecoveryInProgress(Box<SwapStatusForward>),
+    DepositRecoveryFailed(Box<SwapStatusForward>, DepositRecoveryError),
     Complete,
     Failed(SwapErrorForward),
 }
@@ -272,9 +329,24 @@ pub enum BidFailError {
     CallError(String),
     UnexpectedError(String),
 }
+#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+pub enum DepositRecoveryError {
+    CantRecover(String),
+    CallError(String),
+}
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum SwapErrorForward {
+    NotificationFailed(NotificationError),
+    MintFailed(MintError),
+    BidFailed(BidFailError),
+    UnexpectedError(ImpossibleErrorReason),
+    DepositRecoveryFailed(DepositRecoveryError),
+    Expired,
+}
+
+#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+pub enum SwapErrorForwardMainProcess {
     NotificationFailed(NotificationError),
     MintFailed(MintError),
     BidFailed(BidFailError),

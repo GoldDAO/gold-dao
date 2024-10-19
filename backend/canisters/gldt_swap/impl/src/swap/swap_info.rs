@@ -33,7 +33,6 @@ impl SwapInfoTrait for SwapInfo {
 
         if check_storage_and_create_archive().await.is_err() {
             return Err(());
-            // TODO - return error code here
         }
         let current_index = read_state(|s| s.data.swaps.get_current_swap_index());
         mutate_state(|s| s.data.swaps.increment_swap_index());

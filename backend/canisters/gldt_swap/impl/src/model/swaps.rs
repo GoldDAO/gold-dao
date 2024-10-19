@@ -89,7 +89,7 @@ impl Swaps {
     pub fn get_stuck_swaps(&self) -> Vec<(SwapId, SwapInfo)> {
         self.get_active_swaps()
             .into_iter()
-            .filter(|(_, swap_info)| { swap_info.is_stuck() })
+            .filter(|(_, swap_info)| { swap_info.is_swap_over_time_threshold() })
             .collect()
     }
 

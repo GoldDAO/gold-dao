@@ -1,4 +1,4 @@
-use gldt_swap_common::swap::SwapInfo;
+use gldt_swap_common::swap::{ SwapInfo, SwapStatusForward, SwapStatusReverse };
 use gldt_swap_api_canister::recover_stuck_swap::RecoverSwapError;
 
 pub use gldt_swap_api_canister::recover_stuck_swap::{
@@ -24,13 +24,26 @@ async fn recover_stuck_swap(swap_id: RecoverStuckSwapArgs) -> RecoverStuckSwapRe
 pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverStuckSwapResponse {
     if let Some(swap) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {
         // check if swap is stuck
-        if !swap.is_stuck() {
+        if !swap.is_swap_over_time_threshold() {
             return Err(RecoverSwapError::SwapIsNotStuck);
         }
         // process it again
         match swap {
             SwapInfo::Reverse(details) => {
                 if details.in_recovery_mode {
+                    return Err(RecoverSwapError::InProgress);
+                }
+
+                if
+                    matches!(
+                        details.status,
+                        SwapStatusReverse::BurnRequestInProgress |
+                            SwapStatusReverse::EscrowRequestInProgress |
+                            SwapStatusReverse::FeeTransferRequestInProgress |
+                            SwapStatusReverse::RefundRequestInProgress |
+                            SwapStatusReverse::NftTransferRequestInProgress
+                    )
+                {
                     return Err(RecoverSwapError::InProgress);
                 }
 
