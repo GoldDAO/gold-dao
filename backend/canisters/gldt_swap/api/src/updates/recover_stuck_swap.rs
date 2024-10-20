@@ -11,6 +11,6 @@ pub enum RecoverSwapError {
     NoSwapExists,
     NoSwapDetails,
     SwapIsNotStuck,
-    CantRecoverForwardSwaps,
+    InvalidForwardSwapType(String),
     InProgress,
 }

@@ -422,7 +422,6 @@ mod tests {
                 swap_fee: Nat::from(100_000_000u64),
                 transfer_fees: Nat::from(GLDT_TX_FEE * 2),
                 user: nft_owner,
-                in_recovery_mode: false,
             })
         ).unwrap();
 
@@ -576,7 +575,6 @@ mod tests {
                 swap_fee: Nat::from(100_000_000u64),
                 transfer_fees: Nat::from(GLDT_TX_FEE * 2),
                 user: nft_owner,
-                in_recovery_mode: false,
             })
         ).unwrap();
         tick_n_blocks(pic, 5);

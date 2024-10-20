@@ -1,4 +1,4 @@
-use gldt_swap_common::swap::{ SwapInfo, SwapStatusForward, SwapStatusReverse };
+use gldt_swap_common::swap::{ SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
 use gldt_swap_api_canister::recover_stuck_swap::RecoverSwapError;
 
 pub use gldt_swap_api_canister::recover_stuck_swap::{
@@ -10,7 +10,7 @@ pub use gldt_swap_common::nft::NftID;
 use crate::guards::caller_is_authorized;
 
 use crate::state::mutate_state;
-use crate::swap::reverse_swap::{ disable_recovery_mode, enable_recovery_mode };
+use crate::swap::forward_swap::forward_swap_perform_deposit_recovery;
 use crate::swap::swap_info::SwapInfoTrait;
 use crate::{
     state::read_state,
@@ -28,12 +28,8 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
             return Err(RecoverSwapError::SwapIsNotStuck);
         }
         // process it again
-        match swap {
+        match &swap {
             SwapInfo::Reverse(details) => {
-                if details.in_recovery_mode {
-                    return Err(RecoverSwapError::InProgress);
-                }
-
                 if
                     matches!(
                         details.status,
@@ -47,16 +43,46 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                     return Err(RecoverSwapError::InProgress);
                 }
 
-                enable_recovery_mode(&swap_id);
                 transfer_to_escrow(&swap_id).await;
                 transfer_nft(&swap_id).await;
                 burn_gldt(&swap_id).await;
                 transfer_fees(&swap_id).await;
                 refund(&swap_id).await;
-                disable_recovery_mode(&swap_id);
                 Ok(swap_id)
             }
-            _ => { Err(RecoverSwapError::CantRecoverForwardSwaps) }
+            SwapInfo::Forward(details) => {
+                if
+                    matches!(
+                        details.status,
+                        SwapStatusForward::DepositRecoveryRequest(_) |
+                            SwapStatusForward::DepositRecoveryFailed(_, _)
+                    )
+                {
+                    swap.update_status(
+                        SwapStatus::Forward(
+                            SwapStatusForward::DepositRecoveryRequest(
+                                Box::new(details.status.clone())
+                            )
+                        )
+                    );
+                    match forward_swap_perform_deposit_recovery(&swap.get_swap_id()).await {
+                        Ok(_) => {
+                            return Ok(swap_id);
+                        }
+                        Err(_) => {
+                            return Ok(swap_id);
+                        }
+                    }
+                } else {
+                    Err(
+                        RecoverSwapError::InvalidForwardSwapType(
+                            format!(
+                                "You may only recover a forward swap that is DepositRecoveryRequest or DepositRecoveryFailed. All others should be correctly handled and expired accordingly"
+                            )
+                        )
+                    )
+                }
+            }
         }
     } else {
         Err(RecoverSwapError::NoSwapExists) // no active swap with this id

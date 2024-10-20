@@ -141,10 +141,17 @@ fn classify_swaps(
 
 // Retry burn fees for failed forward swaps
 async fn retry_failed_burn_fees(swaps: Vec<SwapInfo>) {
-    for swap in swaps {
+    // for swap in swaps {
+    //     swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesRequest));
+    //     forward_swap_perform_burn_fees(&swap.get_swap_id()).await;
+    // }
+    let futures = swaps.into_iter().map(|swap| {
         swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesRequest));
-        forward_swap_perform_burn_fees(&swap.get_swap_id()).await;
-    }
+        let swap_id = swap.get_swap_id().clone(); // Clone the swap_id
+        async move { forward_swap_perform_burn_fees(&swap_id).await }
+    });
+
+    join_all(futures).await;
 }
 
 fn auto_expire_swaps(swaps: Vec<SwapInfo>) {
@@ -155,24 +162,41 @@ fn auto_expire_swaps(swaps: Vec<SwapInfo>) {
     }
 }
 async fn withdraw_expired_swap_deposits(swaps: Vec<SwapInfo>) {
-    let mut recognized_swaps = Vec::new(); // Store the successful ones
+    // for swap_info in swaps.into_iter() {
+    //     match &swap_info {
+    //         SwapInfo::Forward(swap_detail_forward) => {
+    //             swap_info.update_status(
+    //                 SwapStatus::Forward(
+    //                     SwapStatusForward::DepositRecoveryRequest(
+    //                         Box::new(swap_detail_forward.status.clone())
+    //                     )
+    //                 )
+    //             );
+    //             forward_swap_perform_deposit_recovery(&swap_info.get_swap_id());
+    //         }
+    //         _ => {}
+    //     }
+    // }
 
-    for swap_info in swaps.into_iter() {
-        match &swap_info {
-            SwapInfo::Forward(swap_detail_forward) => {
-                swap_info.update_status(
-                    SwapStatus::Forward(
-                        SwapStatusForward::DepositRecoveryRequest(
-                            Box::new(swap_detail_forward.status.clone())
+    let futures: Vec<_> = swaps
+        .iter()
+        .filter_map(|swap_info| {
+            match &swap_info {
+                SwapInfo::Forward(swap_detail_forward) => {
+                    swap_info.update_status(
+                        SwapStatus::Forward(
+                            SwapStatusForward::DepositRecoveryRequest(
+                                Box::new(swap_detail_forward.status.clone())
+                            )
                         )
-                    )
-                );
-                match forward_swap_perform_deposit_recovery(&swap_info.get_swap_id()).await {
-                    Ok(_) => recognized_swaps.push(swap_info),
-                    Err(_) => todo!(),
+                    );
+                    let id = swap_info.get_swap_id().clone();
+                    Some(async move { forward_swap_perform_deposit_recovery(&id).await })
                 }
+                _ => { None }
             }
-            _ => {}
-        }
-    }
+        })
+        .collect();
+
+    join_all(futures).await;
 }

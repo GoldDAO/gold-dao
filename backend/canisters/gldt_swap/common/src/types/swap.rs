@@ -386,7 +386,6 @@ pub struct SwapDetailReverse {
     pub swap_fee: Nat,
     pub transfer_fees: Nat,
     pub user: Principal,
-    pub in_recovery_mode: bool,
 }
 
 impl Default for SwapDetailReverse {
@@ -402,7 +401,6 @@ impl Default for SwapDetailReverse {
             swap_fee: Nat::from(100_000_000u64),
             user: Principal::anonymous(),
             transfer_fees: Nat::from(GLDT_TX_FEE * 2),
-            in_recovery_mode: false,
         }
     }
 }

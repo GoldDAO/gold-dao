@@ -111,7 +111,6 @@ type SwapDetailReverse = record {
   nft_canister : principal;
   index : nat;
   transfer_fees : nat;
-  in_recovery_mode : bool;
 };
 type SwapErrorForward = variant {
   DepositRecoveryFailed : DepositRecoveryError;

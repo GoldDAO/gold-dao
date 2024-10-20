@@ -480,48 +480,6 @@ pub async fn refund(swap_id: &SwapId) {
     }
 }
 
-pub fn enable_recovery_mode(swap_id: &SwapId) {
-    let (swap, swap_details) = if
-        let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
-    {
-        if let SwapInfo::Reverse(details) = swap_info.clone() {
-            (swap_info, details)
-        } else {
-            debug!(
-                "REVERSE SWAP :: enable_recovery_mode :: {:?} has no forward swap details",
-                swap_id
-            );
-            return ();
-        }
-    } else {
-        debug!("REVERSE SWAP :: enable_recovery_mode :: {:?} - can't find swap", swap_id);
-        return ();
-    };
-
-    swap.set_recovery_mode(true);
-}
-
-pub fn disable_recovery_mode(swap_id: &SwapId) {
-    let (swap, swap_details) = if
-        let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
-    {
-        if let SwapInfo::Reverse(details) = swap_info.clone() {
-            (swap_info, details)
-        } else {
-            debug!(
-                "REVERSE SWAP :: disable_recovery_mode :: {:?} has no forward swap details",
-                swap_id
-            );
-            return ();
-        }
-    } else {
-        debug!("REVERSE SWAP :: disable_recovery_mode :: {:?} - can't find swap", swap_id);
-        return ();
-    };
-
-    swap.set_recovery_mode(false);
-}
-
 fn valid_for_refund(current_swap_details: &SwapDetailReverse) -> Result<&SwapStatusReverse, ()> {
     let current_swap_status = &current_swap_details.status;
     if !matches!(current_swap_status, &SwapStatusReverse::NftTransferFailed(_)) {

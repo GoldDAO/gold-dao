@@ -14,7 +14,6 @@ use crate::{
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
     fn update_status(&self, status: SwapStatus) -> ();
-    fn set_recovery_mode(&self, new_state: bool) -> ();
     fn move_swap_to_history(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
 }
 
@@ -114,29 +113,6 @@ impl SwapInfoTrait for SwapInfo {
                 });
             }
         }
-    }
-
-    fn set_recovery_mode(&self, new_state: bool) {
-        let swap_id = self.get_swap_id();
-
-        mutate_state(|s| {
-            let mut swap = s.data.swaps.get_active_swap_mut(&swap_id);
-            match swap {
-                Some(swap) => {
-                    match swap {
-                        SwapInfo::Forward(_) => {}
-                        SwapInfo::Reverse(swap_detail_reverse) => {
-                            swap_detail_reverse.in_recovery_mode = new_state;
-                        }
-                    }
-                }
-                None => {
-                    debug!(
-                        "ERROR :: swap with id {swap_id:?} can't be toggled to recovery mode because the swap can't be found"
-                    );
-                }
-            }
-        });
     }
 
     async fn move_swap_to_history(&self) -> Result<SwapId, ()> {
