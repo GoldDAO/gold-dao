@@ -13,8 +13,6 @@ spec:
       description: Whether or not the canister is SNS controlled
       options: ["true", "false"]
 ---
-variables:
-  DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
 
 # STAGING AND PREPROD DEPLOYMENT
 
@@ -31,7 +29,7 @@ $[[ inputs.src-folder ]] staging deploy:
   extends: .staging deploy template
   variables:
     TARGET_NETWORK: staging
-    IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
+    DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
@@ -46,6 +44,7 @@ $[[ inputs.src-folder ]] staging deploy:
   needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
     - |
+      echo "Deploying via proposal: " $DEPLOY_VIA_SNS_PROPOSAL
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
         . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
       else
@@ -80,7 +79,7 @@ $[[ inputs.src-folder ]] production deploy:
   resource_group: frontend production deployment
   variables:
     PEM_FILE: "${PEM_FILE_PRODUCTION}"
-    IS_SNS_CONTROLLED: $[[ inputs.sns-controlled ]]
+    DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
     TARGET_NETWORK: ic
   needs: ["$[[ inputs.src-folder ]] production build"]
   rules:
@@ -94,6 +93,7 @@ $[[ inputs.src-folder ]] production deploy:
     - !reference [.include didc, before_script]
   script:
     - |
+      echo "Deploying via proposal: " $DEPLOY_VIA_SNS_PROPOSAL
       if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
         . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
       else
