@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Inter } from 'next/font/google';
 
 import Footer from '../shared/Footer';
-import { FooterGoldDaoIcon } from '../../utils/svgs';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,7 +30,7 @@ export default function MaintenanceLayout() {
           <body className={`${inter.className} flex h-screen bg-white text-black`}>
             <section className="w-full overflow-y-scroll flex flex-col justify-between ">
               <div className="flex py-16  justify-center text-center align-center items-center flex-col">
-                <FooterGoldDaoIcon w={188} h={60} />
+                <img src="svg/logo-full.svg" alt="" class="w-[188px]" />
                 <h2 class="font-bold">Site is under maintenance.</h2>
                 <p class="mt-3">We&apos;re just upgrading the site. We&apos;ll be back very soon.</p>
               </div>
