@@ -270,6 +270,15 @@ fn set_notification_error(swap_info: &SwapInfo, error: NotificationError) {
 fn validate_nft_escrow_subaccount(
     args: &SubscriberNotification
 ) -> Result<Subaccount, NotificationError> {
+    if args.escrow_info.account.sub_account.as_slice().len() != 32 {
+        return Err(
+            NotificationError::InvalidEscrowSubaccount(
+                format!(
+                    "Escrow sub accoun (escrow_info.account.sub_account) is not of the correct length. can't convert to a Subaccount type"
+                )
+            )
+        );
+    }
     let b: Result<[u8; 32], TryFromSliceError> = args.escrow_info.account.sub_account
         .as_slice()
         .try_into();

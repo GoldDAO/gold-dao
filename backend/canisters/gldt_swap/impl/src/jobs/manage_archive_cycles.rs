@@ -42,6 +42,9 @@ async fn handle_archive_canister_cycles() {
 
     // we dont have enough in this canister to reliably transfer to all archive canisters and preserve some cycles for the main swap canister
     if this_canister_cycle_balance < swap_canister_required_base {
+        debug!(
+            "CYCLE MANAGER :: Not enough total cycles to top up all potential archive canisters. required minimum : {swap_canister_required_base}. current cycle balance : {this_canister_cycle_balance}"
+        );
         return ();
     }
 
