@@ -41,6 +41,9 @@ async fn handle_archive_canister_cycles() {
     let swap_canister_required_base: Cycles =
         archive_canister_threshold * ((archive_canisters.len() as u64) + 1); // all archive canisters plus this canister
 
+    mutate_state(|s| {
+        s.data.required_cycle_balance = Nat::from(swap_canister_required_base);
+    });
     // we dont have enough in this canister to reliably transfer to all archive canisters and preserve some cycles for the main swap canister
     if this_canister_cycle_balance < swap_canister_required_base {
         debug!(
@@ -87,8 +90,4 @@ async fn handle_archive_canister_cycles() {
 
     // Await all tasks
     join_all(tasks).await;
-
-    mutate_state(|s| {
-        s.data.required_cycle_balance = Nat::from(swap_canister_required_base);
-    })
 }
