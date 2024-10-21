@@ -5,17 +5,17 @@
 
 use crate::state::{ mutate_state, read_state };
 use candid::Nat;
-use canister_time::{ run_interval, HOUR_IN_MS };
+use canister_time::{ run_interval, run_now_then_interval, HOUR_IN_MS, MINUTE_IN_MS };
 use futures::future::join_all;
 use utils::{ canister::{ deposit_cycles, get_cycles_balance }, env::Environment };
 use std::time::Duration;
 use tracing::{ debug, info };
 use types::{ Cycles, Milliseconds };
 
-const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = HOUR_IN_MS;
+const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = MINUTE_IN_MS * 10;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL), spawn_transfer_job);
+    run_now_then_interval(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL), spawn_transfer_job);
 }
 
 pub fn spawn_transfer_job() {
@@ -33,7 +33,7 @@ async fn handle_archive_canister_cycles() {
         10_000_000_000_000
     };
     let archive_canister_topup_amount: Cycles = if is_test_mode {
-        5_000_000_000
+        1_000_000_000_000
     } else {
         10_000_000_000_000
     };
