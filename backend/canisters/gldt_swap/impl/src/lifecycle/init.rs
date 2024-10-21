@@ -31,8 +31,16 @@ fn init(args: Args) {
             data.ogy_ledger_id = init_args.ogy_ledger_id;
             data.authorized_principals = init_args.authorized_principals;
 
+            // Check for the `inttest` feature - this allows integration tests in test_mode to test multiple archive canister creation by inserting relatively fewer swaps before triggering the threshold
+            #[cfg(feature = "inttest")]
             if init_args.test_mode {
                 data.max_canister_archive_threshold = Nat::from(18 * 1024 * (1024 as u128)); // 18MB
+            }
+
+            // on staging - set a slighly higher threshold
+            #[cfg(not(feature = "inttest"))]
+            if init_args.test_mode {
+                data.max_canister_archive_threshold = Nat::from(22 * 1024 * (1024 as u128)); // 22MB
             }
 
             let runtime_state = RuntimeState::new(env, data);
