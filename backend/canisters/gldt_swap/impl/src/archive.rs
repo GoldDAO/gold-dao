@@ -21,6 +21,7 @@ use tracing::debug;
 use utils::{ env::Environment, retry_async::retry_async };
 
 use crate::state::{ mutate_state, read_state };
+use crate::utils::trace;
 
 const ARCHIVE_WASM: &[u8] = include_bytes!("../../archive/wasm/gldt_swap_archive_canister.wasm.gz");
 
@@ -133,6 +134,9 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
     let max_canister_archive_threshold = read_state(|s|
         s.data.max_canister_archive_threshold.clone()
     );
+    let archive_id = archive.canister_id;
+
+    trace(&format!("TRACE :: archive: {archive_id:?}. archive size {res:?}"));
     match res {
         Ok(size) => { size >= max_canister_archive_threshold }
         Err(_) => { false }
