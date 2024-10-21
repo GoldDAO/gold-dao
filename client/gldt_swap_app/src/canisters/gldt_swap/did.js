@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const idlFactory = ({ IDL }) => {
+  const SwapStatusForward = IDL.Rec();
   const SwapStatusReverse = IDL.Rec();
   const BuildVersion = IDL.Record({
     major: IDL.Nat32,
@@ -20,6 +22,10 @@ export const idlFactory = ({ IDL }) => {
     commit_hash: IDL.Text,
   });
   const Args_3 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  const DepositRecoveryError = IDL.Variant({
+    CantRecover: IDL.Text,
+    CallError: IDL.Text,
+  });
   const BidFailError = IDL.Variant({
     UnexpectedError: IDL.Text,
     CallError: IDL.Text,
@@ -82,24 +88,34 @@ export const idlFactory = ({ IDL }) => {
     TransferFailed: TransferFailReason,
   });
   const SwapErrorForward = IDL.Variant({
+    DepositRecoveryFailed: DepositRecoveryError,
     BidFailed: BidFailError,
     UnexpectedError: ImpossibleErrorReason,
     NotificationFailed: NotificationError,
     MintFailed: MintError,
     Expired: IDL.Null,
   });
-  const SwapStatusForward = IDL.Variant({
-    Failed: SwapErrorForward,
-    Init: IDL.Null,
-    MintRequest: IDL.Null,
-    Complete: IDL.Null,
-    BidFail: BidFailError,
-    BidRequest: IDL.Null,
-    NotificationFailed: NotificationError,
-    BurnFeesRequest: IDL.Null,
-    BurnFeesFailed: MintError,
-    MintFailed: MintError,
-  });
+  SwapStatusForward.fill(
+    IDL.Variant({
+      DepositRecoveryFailed: IDL.Tuple(SwapStatusForward, DepositRecoveryError),
+      Failed: SwapErrorForward,
+      DepositRecoveryInProgress: SwapStatusForward,
+      BidInProgress: IDL.Null,
+      Init: IDL.Null,
+      MintRequest: IDL.Null,
+      DepositRecoveryRequest: SwapStatusForward,
+      Complete: IDL.Null,
+      BidFail: BidFailError,
+      BidRequest: IDL.Null,
+      NotificationFailed: NotificationError,
+      MintInProgress: IDL.Null,
+      BurnFeesInProgress: IDL.Null,
+      BurnFeesRequest: IDL.Null,
+      BurnFeesFailed: MintError,
+      NotificationInProgress: IDL.Null,
+      MintFailed: MintError,
+    })
+  );
   const Account = IDL.Record({
     owner: IDL.Principal,
     subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
@@ -183,14 +199,19 @@ export const idlFactory = ({ IDL }) => {
   });
   SwapStatusReverse.fill(
     IDL.Variant({
+      NftTransferRequestInProgress: IDL.Null,
       FeeTransferFailed: FeeTransferError,
       Failed: SwapErrorReverse,
       EscrowFailed: EscrowError,
       Init: IDL.Null,
+      BurnRequestInProgress: IDL.Null,
+      EscrowRequestInProgress: IDL.Null,
       Complete: IDL.Null,
       BurnFailed: BurnError,
+      RefundRequestInProgress: IDL.Null,
       RefundRequest: IDL.Null,
       NftTransferRequest: IDL.Null,
+      FeeTransferRequestInProgress: IDL.Null,
       NftTransferFailed: NftTransferError,
       BurnRequest: IDL.Null,
       FeeTransferRequest: IDL.Null,
@@ -274,6 +295,7 @@ export const idlFactory = ({ IDL }) => {
   const SwapNftForTokensErrors = IDL.Variant({
     Limit: IDL.Text,
     ContainsDuplicates: IDL.Text,
+    ContainsInvalidNftCanister: IDL.Text,
     NftValidationErrors: IDL.Tuple(
       IDL.Vec(IDL.Nat),
       IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Vec(NftInvalidError)))

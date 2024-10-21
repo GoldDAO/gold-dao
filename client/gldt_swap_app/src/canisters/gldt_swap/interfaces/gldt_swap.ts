@@ -47,6 +47,8 @@ export interface BuildVersion {
   'patch' : number,
 }
 export type BurnError = { 'CallError' : string };
+export type DepositRecoveryError = { 'CantRecover' : string } |
+  { 'CallError' : string };
 export type EscrowError = { 'ApproveError' : ApproveError } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'TransferFailed' : TransferFailReason } |
@@ -156,7 +158,10 @@ export interface SwapDetailReverse {
   'index' : bigint,
   'transfer_fees' : bigint,
 }
-export type SwapErrorForward = { 'BidFailed' : BidFailError } |
+export type SwapErrorForward = {
+    'DepositRecoveryFailed' : DepositRecoveryError
+  } |
+  { 'BidFailed' : BidFailError } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'NotificationFailed' : NotificationError } |
   { 'MintFailed' : MintError } |
@@ -172,6 +177,7 @@ export type SwapInfo = { 'Forward' : SwapDetailForward } |
   { 'Reverse' : SwapDetailReverse };
 export type SwapNftForTokensErrors = { 'Limit' : string } |
   { 'ContainsDuplicates' : string } |
+  { 'ContainsInvalidNftCanister' : string } |
   {
     'NftValidationErrors' : [
       Array<bigint>,
@@ -179,24 +185,38 @@ export type SwapNftForTokensErrors = { 'Limit' : string } |
     ]
   } |
   { 'ServiceDown' : ServiceDownReason };
-export type SwapStatusForward = { 'Failed' : SwapErrorForward } |
+export type SwapStatusForward = {
+    'DepositRecoveryFailed' : [SwapStatusForward, DepositRecoveryError]
+  } |
+  { 'Failed' : SwapErrorForward } |
+  { 'DepositRecoveryInProgress' : SwapStatusForward } |
+  { 'BidInProgress' : null } |
   { 'Init' : null } |
   { 'MintRequest' : null } |
+  { 'DepositRecoveryRequest' : SwapStatusForward } |
   { 'Complete' : null } |
   { 'BidFail' : BidFailError } |
   { 'BidRequest' : null } |
   { 'NotificationFailed' : NotificationError } |
+  { 'MintInProgress' : null } |
+  { 'BurnFeesInProgress' : null } |
   { 'BurnFeesRequest' : null } |
   { 'BurnFeesFailed' : MintError } |
+  { 'NotificationInProgress' : null } |
   { 'MintFailed' : MintError };
-export type SwapStatusReverse = { 'FeeTransferFailed' : FeeTransferError } |
+export type SwapStatusReverse = { 'NftTransferRequestInProgress' : null } |
+  { 'FeeTransferFailed' : FeeTransferError } |
   { 'Failed' : SwapErrorReverse } |
   { 'EscrowFailed' : EscrowError } |
   { 'Init' : null } |
+  { 'BurnRequestInProgress' : null } |
+  { 'EscrowRequestInProgress' : null } |
   { 'Complete' : null } |
   { 'BurnFailed' : BurnError } |
+  { 'RefundRequestInProgress' : null } |
   { 'RefundRequest' : null } |
   { 'NftTransferRequest' : null } |
+  { 'FeeTransferRequestInProgress' : null } |
   { 'NftTransferFailed' : NftTransferError } |
   { 'BurnRequest' : null } |
   { 'FeeTransferRequest' : null } |
