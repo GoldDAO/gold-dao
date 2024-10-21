@@ -155,6 +155,7 @@ type ServiceDownReason = variant {
   ActiveSwapCapacityFull;
   LowOrigynToken : text;
 };
+type ServiceStatus = variant { Up; Down : ServiceDownReason };
 type SwapDetailForward = record {
   nft_id : nat;
   status : SwapStatusForward;
@@ -299,6 +300,7 @@ service : (Args_3) -> {
   get_historic_swaps : (Args) -> (Result);
   get_historic_swaps_by_user : (Args_1) -> (Result_1);
   get_history_total : (opt principal) -> (nat);
+  get_service_status : (null) -> (ServiceStatus);
   get_swap : (record { nat; nat }) -> (
       opt record { record { nat; nat }; SwapInfo },
     );
