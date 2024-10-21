@@ -3,7 +3,8 @@
 
 */
 
-use crate::state::read_state;
+use crate::state::{ mutate_state, read_state };
+use candid::Nat;
 use canister_time::{ run_interval, HOUR_IN_MS };
 use futures::future::join_all;
 use utils::{ canister::{ deposit_cycles, get_cycles_balance }, env::Environment };
@@ -86,4 +87,8 @@ async fn handle_archive_canister_cycles() {
 
     // Await all tasks
     join_all(tasks).await;
+
+    mutate_state(|s| {
+        s.data.required_cycle_balance = Nat::from(swap_canister_required_base);
+    })
 }

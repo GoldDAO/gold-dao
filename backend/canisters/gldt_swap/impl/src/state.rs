@@ -46,6 +46,7 @@ impl RuntimeState {
             required_ogy_threshold: format!("{:?}", self.get_required_ogy_for_canister()),
             ogy_balance: format!("{:?}", self.data.ogy_balance.clone()),
             nft_fee_accounts: format_nft_canister_configs(self.data.gldnft_canisters.clone()),
+            required_cycle_balance: format!("{:?}", self.data.required_cycle_balance.clone()),
         }
     }
 
@@ -104,6 +105,7 @@ pub struct Metrics {
     pub required_ogy_threshold: String,
     pub ogy_balance: String,
     pub nft_fee_accounts: String,
+    pub required_cycle_balance: String,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -132,6 +134,7 @@ pub struct Data {
     pub archive_status: ArchiveStatus,
     pub service_status: ServiceStatus,
     pub base_ogy_swap_fee: Nat,
+    pub required_cycle_balance: Nat,
 }
 
 impl Default for Data {
@@ -150,6 +153,7 @@ impl Default for Data {
             archive_status: ArchiveStatus::Initializing,
             service_status: ServiceStatus::Down(ServiceDownReason::Initializing),
             base_ogy_swap_fee: Nat::from(1_000_000_000u64), // default of 10 OGY
+            required_cycle_balance: Nat::default(),
         }
     }
 }
