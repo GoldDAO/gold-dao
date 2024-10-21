@@ -136,7 +136,7 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
     );
     let archive_id = archive.canister_id;
 
-    trace(&format!("TRACE :: archive: {archive_id:?}. archive size {res:?}"));
+    debug!("ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}");
     match res {
         Ok(size) => { size >= max_canister_archive_threshold }
         Err(_) => { false }
