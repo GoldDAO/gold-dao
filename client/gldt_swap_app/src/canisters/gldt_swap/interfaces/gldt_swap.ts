@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
@@ -35,9 +36,19 @@ export interface Args_1 {
   'limit' : bigint,
 }
 export interface Args_2 { 'nft_id' : bigint, 'nft_canister_id' : Principal }
+export type Args_3 = { 'Upgrade' : UpgradeArgs } |
+  { 'Init' : InitArgs };
 export type BidFailError = { 'UnexpectedError' : string } |
+  { 'CallError' : string } |
   { 'TransferFailed' : string };
+export interface BuildVersion {
+  'major' : number,
+  'minor' : number,
+  'patch' : number,
+}
 export type BurnError = { 'CallError' : string };
+export type DepositRecoveryError = { 'CantRecover' : string } |
+  { 'CallError' : string };
 export type EscrowError = { 'ApproveError' : ApproveError } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'TransferFailed' : TransferFailReason } |
@@ -59,12 +70,12 @@ export interface InitArgs {
   'test_mode' : boolean,
   'ogy_ledger_id' : Principal,
   'authorized_principals' : Array<Principal>,
-  'version' : string,
+  'version' : BuildVersion,
   'gldnft_canisters' : Array<[Principal, NftCanisterConf]>,
   'gldt_ledger_id' : Principal,
+  'commit_hash' : string,
 }
 export type LockError = { 'NftAlreadyLocked' : Array<bigint> } |
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   { 'UnexpectedError' : {} } |
   { 'NftNotLocked' : null };
 export type MintError = { 'UnexpectedError' : ImpossibleErrorReason } |
@@ -76,12 +87,13 @@ export type NftInvalidError = { 'InvalidNftOwner' : string } |
   { 'InvalidNFTCollectionPrincipal' : null } |
   { 'InvalidTokenAmount' : null } |
   { 'CantGetNatIdOfNft' : null };
-export type NftTransferError = { 'ApprovalError' : ApproveError } |
+export type NftTransferError = { 'FailedToGetOgyFeeAllowance' : string } |
+  { 'ApprovalError' : ApproveError } |
   { 'ApprovalCallError' : string } |
   { 'InvalidFee' : string } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'CallError' : string } |
-  { 'TransferFailed' : TransferError_1 };
+  { 'TransferFailed' : string };
 export type NftValidationError = { 'WeightParseError' : null } |
   { 'CanisterInvalid' : null } |
   { 'CantGetOrigynID' : string } |
@@ -146,7 +158,10 @@ export interface SwapDetailReverse {
   'index' : bigint,
   'transfer_fees' : bigint,
 }
-export type SwapErrorForward = { 'BidFailed' : BidFailError } |
+export type SwapErrorForward = {
+    'DepositRecoveryFailed' : DepositRecoveryError
+  } |
+  { 'BidFailed' : BidFailError } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'NotificationFailed' : NotificationError } |
   { 'MintFailed' : MintError } |
@@ -161,8 +176,8 @@ export type SwapErrorReverse = { 'FeeTransferFailed' : FeeTransferError } |
 export type SwapInfo = { 'Forward' : SwapDetailForward } |
   { 'Reverse' : SwapDetailReverse };
 export type SwapNftForTokensErrors = { 'Limit' : string } |
-  { 'ImpossibleError' : string } |
   { 'ContainsDuplicates' : string } |
+  { 'ContainsInvalidNftCanister' : string } |
   {
     'NftValidationErrors' : [
       Array<bigint>,
@@ -170,24 +185,38 @@ export type SwapNftForTokensErrors = { 'Limit' : string } |
     ]
   } |
   { 'ServiceDown' : ServiceDownReason };
-export type SwapStatusForward = { 'Failed' : SwapErrorForward } |
+export type SwapStatusForward = {
+    'DepositRecoveryFailed' : [SwapStatusForward, DepositRecoveryError]
+  } |
+  { 'Failed' : SwapErrorForward } |
+  { 'DepositRecoveryInProgress' : SwapStatusForward } |
+  { 'BidInProgress' : null } |
   { 'Init' : null } |
   { 'MintRequest' : null } |
+  { 'DepositRecoveryRequest' : SwapStatusForward } |
   { 'Complete' : null } |
   { 'BidFail' : BidFailError } |
   { 'BidRequest' : null } |
   { 'NotificationFailed' : NotificationError } |
+  { 'MintInProgress' : null } |
+  { 'BurnFeesInProgress' : null } |
   { 'BurnFeesRequest' : null } |
   { 'BurnFeesFailed' : MintError } |
+  { 'NotificationInProgress' : null } |
   { 'MintFailed' : MintError };
-export type SwapStatusReverse = { 'FeeTransferFailed' : FeeTransferError } |
+export type SwapStatusReverse = { 'NftTransferRequestInProgress' : null } |
+  { 'FeeTransferFailed' : FeeTransferError } |
   { 'Failed' : SwapErrorReverse } |
   { 'EscrowFailed' : EscrowError } |
   { 'Init' : null } |
+  { 'BurnRequestInProgress' : null } |
+  { 'EscrowRequestInProgress' : null } |
   { 'Complete' : null } |
   { 'BurnFailed' : BurnError } |
+  { 'RefundRequestInProgress' : null } |
   { 'RefundRequest' : null } |
   { 'NftTransferRequest' : null } |
+  { 'FeeTransferRequestInProgress' : null } |
   { 'NftTransferFailed' : NftTransferError } |
   { 'BurnRequest' : null } |
   { 'FeeTransferRequest' : null } |
@@ -212,14 +241,6 @@ export type TransferError = {
   { 'CreatedInFuture' : { 'ledger_time' : bigint } } |
   { 'TooOld' : null } |
   { 'InsufficientFunds' : { 'balance' : bigint } };
-export type TransferError_1 = {
-    'GenericError' : { 'message' : string, 'error_code' : bigint }
-  } |
-  { 'Duplicate' : { 'duplicate_of' : bigint } } |
-  { 'NonExistingTokenId' : null } |
-  { 'Unauthorized' : null } |
-  { 'CreatedInFuture' : { 'ledger_time' : bigint } } |
-  { 'TooOld' : null };
 export type TransferFailReason = { 'TransferError' : TransferError } |
   { 'TransferFromError' : TransferFromError } |
   { 'CallError' : string };
@@ -234,6 +255,10 @@ export type TransferFromError = {
   { 'CreatedInFuture' : { 'ledger_time' : bigint } } |
   { 'TooOld' : null } |
   { 'InsufficientFunds' : { 'balance' : bigint } };
+export interface UpgradeArgs {
+  'version' : BuildVersion,
+  'commit_hash' : string,
+}
 export interface _SERVICE {
   'get_active_swap_ids_by_user' : ActorMethod<
     [[] | [Principal]],

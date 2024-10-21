@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Outlet, useNavigation, useLocation } from "react-router-dom";
-import NavbarSwap from "./navbars/swap/NavbarSwap";
+
+import NavbarSwap from "../navbars/swap/NavbarSwap";
 
 const NavigationProgress = () => {
   return (
@@ -11,30 +13,26 @@ const NavigationProgress = () => {
   );
 };
 
-const Layout = () => {
+const LayoutSwapApp = () => {
   const navigation = useNavigation();
   const location = useLocation();
   const isSwap = location.pathname.match(/\/swap/) ? true : false;
 
-  // useEffect(() => {
-  //   if (isSwap) document.body.classList.add("bg-background");
-  //   else document.body.classList.remove("bg-surface-1");
-  // }, [isSwap]);
+  useEffect(() => {
+    if (isSwap) document.body.classList.add("bg-background");
+    else document.body.classList.remove("bg-surface-1");
+  }, [isSwap]);
 
-  return isSwap ? (
-    <div className="flex flex-col min-h-screen pb-12 bg-cover-img bg-cover bg-fixed bg-background">
+  return (
+    <div
+      className={`flex flex-col min-h-screen pb-12 bg-cover-img bg-cover bg-fixed`}
+    >
       <NavbarSwap />
       <div className="flex-grow px-4 sm:px-6">
-        {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
-      </div>
-    </div>
-  ) : (
-    <div className={`flex flex-col min-h-screen`}>
-      <div className="flex-grow">
         {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
       </div>
     </div>
   );
 };
 
-export default Layout;
+export default LayoutSwapApp;

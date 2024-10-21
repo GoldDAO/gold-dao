@@ -15,7 +15,7 @@ const ConfirmDialog = () => {
       <Dialog
         show={show}
         handleClose={handleCloseDialogConfirm}
-        enableClose={isSuccess || isError || isIdle}
+        enableClose={isIdle}
       >
         <div className="px-12 py-8">
           {isIdle && show && <Confirm />}

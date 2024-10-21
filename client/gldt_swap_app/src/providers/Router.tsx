@@ -1,19 +1,21 @@
 import {
   createBrowserRouter,
   RouterProvider as ReactRouterProvider,
-  Navigate,
 } from "react-router-dom";
 
 import Layout from "@components/shared/Layout";
 import Protected from "@components/shared/routes/Protected";
 import NotFound from "@components/shared/routes/NotFound";
 
-import SwapTransfer from "@pages/SwapTransfer";
 import { SwapAppProvider } from "@context/index";
 
-import Account from "@pages/Account";
-import TransactionDetails from "@pages/TransactionDetails";
-import TransactionHistoryList from "@pages/TransactionHistoryList";
+import {
+  LandingPage,
+  SwapTransfer,
+  Account,
+  TransactionDetails,
+  TransactionHistoryList,
+} from "@pages/index";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +24,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/swap" replace />,
+        element: <LandingPage />,
       },
       {
         path: "swap",
