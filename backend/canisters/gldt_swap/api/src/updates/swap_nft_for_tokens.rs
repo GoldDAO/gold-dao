@@ -24,4 +24,5 @@ pub enum NftInvalidError {
     AlreadyLocked,
     CantGetOrigynID(String),
     InvalidNftOwner(String),
+    NftIdStringTooLong(String),
 }

@@ -150,6 +150,19 @@ impl SwapBuilder<SwapDetailForward> {
         };
     }
 
+    pub fn _verify_nft_id_string(&self, nft_id_string: &String) -> Result<bool, NftInvalidError> {
+        if nft_id_string.len() > 300 {
+            return Err(
+                NftInvalidError::NftIdStringTooLong(
+                    format!(
+                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+                    )
+                )
+            );
+        }
+        Ok(true)
+    }
+
     pub async fn init(
         self,
         nft_id: NftID,
@@ -187,6 +200,10 @@ impl SwapBuilder<SwapDetailForward> {
                 GldtNumTokens::invalid()
             }
         };
+
+        if let Err(e) = self._verify_nft_id_string(&nft_id_string) {
+            errors.push(e);
+        }
 
         trace(&format!("//////// {tokens_to_mint:?}"));
 
@@ -298,6 +315,22 @@ impl SwapBuilder<SwapDetailReverse> {
         }
     }
 
+    pub fn _verify_nft_id_string(
+        &self,
+        nft_id_string: &String
+    ) -> Result<bool, NftValidationError> {
+        if nft_id_string.len() > 300 {
+            return Err(
+                NftValidationError::NftIdStringTooLong(
+                    format!(
+                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+                    )
+                )
+            );
+        }
+        Ok(true)
+    }
+
     pub async fn init(
         self,
         init_args: &SwapTokensForNftArgs,
@@ -329,7 +362,15 @@ impl SwapBuilder<SwapDetailReverse> {
         let nft_id_string = match
             self._get_origyn_id_string(&init_args.nft_id, &init_args.nft_canister_id).await
         {
-            Ok(id) => id,
+            Ok(id) => {
+                match self._verify_nft_id_string(&id) {
+                    Ok(_) => id,
+                    Err(e) => {
+                        errors.push(e);
+                        "".to_string()
+                    }
+                }
+            }
             Err(e) => {
                 errors.push(e);
                 "".to_string()

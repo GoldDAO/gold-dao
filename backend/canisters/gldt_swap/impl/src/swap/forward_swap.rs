@@ -140,6 +140,11 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
         return ();
     }
 
+    if let Err(e) = validate_sale_id_length(&notification.sale.sale_id) {
+        set_notification_error(&swap, e);
+        return ();
+    }
+
     mutate_state(|s| {
         if let Some(SwapInfo::Forward(details)) = s.data.swaps.get_active_swap_mut(&swap_id) {
             details.update_escrow_account(escrow_sub_account);
@@ -251,6 +256,9 @@ fn set_notification_error(swap_info: &SwapInfo, error: NotificationError) {
         NotificationError::InvalidPricingConfig => {
             error_message.push_str("Pricing config is invalid");
         }
+        NotificationError::SaleIDStringTooLong(e) => {
+            error_message.push_str(&e.clone());
+        }
     }
 
     swap_info.update_status(
@@ -269,6 +277,18 @@ fn validate_nft_escrow_subaccount(
         Ok(x) => Ok(x),
         Err(e) => { Err(NotificationError::InvalidEscrowSubaccount(format!("{e}"))) }
     }
+}
+
+fn validate_sale_id_length(sale_id: &String) -> Result<bool, NotificationError> {
+    let len = sale_id.len();
+    if len > 250 {
+        return Err(
+            NotificationError::SaleIDStringTooLong(
+                format!("The length of the sale id may not pass 1000. it's current length is {len}")
+            )
+        );
+    }
+    Ok(true)
 }
 
 fn validate_sale_config(

@@ -369,6 +369,7 @@ pub enum NotificationError {
     InvalidCustomAskFeature,
     InvalidPricingConfig,
     TimeoutInvalid(String),
+    SaleIDStringTooLong(String),
 }
 // -----------------
 //     Reverse swap
@@ -467,6 +468,7 @@ pub enum NftValidationError {
     CantGetOrigynID(String),
     NotOwnedBySwapCanister,
     CantVerifySwapCanisterOwnsNft,
+    NftIdStringTooLong(String),
 }
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum NftTransferError {

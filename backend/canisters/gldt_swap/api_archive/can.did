@@ -64,6 +64,7 @@ type NftTransferError = variant {
   TransferFailed : text;
 };
 type NftValidationError = variant {
+  NftIdStringTooLong : text;
   WeightParseError;
   CanisterInvalid;
   CantGetOrigynID : text;
@@ -77,6 +78,7 @@ type NotificationError = variant {
   InvalidTokenSpec;
   TimeoutInvalid : text;
   InvalidEscrowSubaccount : text;
+  SaleIDStringTooLong : text;
   TooManyPrincipalsInAllowList;
   OrigynStringIdDoesNotMatch : text;
   SellerIsNotPrincipalOrAccount : text;
