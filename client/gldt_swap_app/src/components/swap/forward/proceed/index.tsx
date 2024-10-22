@@ -14,12 +14,10 @@ const Proceed = () => {
   const {
     getSelectedTotalGLDT,
     getSelectedTotalGram,
-    // getCollectionSelectedNFTs,
     resetState: resetSwapState,
   } = useNft();
   const totalGram = getSelectedTotalGram();
   const totalGLDT = getSelectedTotalGLDT();
-  // const selectedNfts = getCollectionSelectedNFTs();
   const queryClient = useQueryClient();
   const {
     state: forwardSwapProceedState,
@@ -83,6 +81,16 @@ const Proceed = () => {
         <div className="px-6 pt-6 pb-12">
           {isIdle && (
             <>
+              <div className="px-6 mb-8 text-center">
+                You are sending{" "}
+                <span className="font-semibold text-gold">
+                  {totalGram} GLD NFTs
+                </span>{" "}
+                and will receive{" "}
+                <span className="font-semibold text-gold">
+                  {totalGLDT}g GLDT.
+                </span>
+              </div>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
                 <div className="font-semibold">{totalGram}g of gold</div>
 
@@ -103,10 +111,10 @@ const Proceed = () => {
                 <div className="font-semibold">{totalGLDT} GLDT</div>
               </div>
 
-              <TransactionDetails className="w-full  mt-8" />
+              <TransactionDetails className="w-full mt-8" />
 
               <div className="text-center mt-8">
-                <Button onClick={handleOnClick}>Convert</Button>
+                <Button onClick={handleOnClick}>Confirm</Button>
               </div>
             </>
           )}
