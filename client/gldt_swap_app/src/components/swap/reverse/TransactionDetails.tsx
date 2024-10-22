@@ -7,7 +7,13 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { useNft } from "@context/index";
 
-const TransactionDetails = ({ className }: { className: string }) => {
+const TransactionDetails = ({
+  className = "",
+  defaultOpen = false,
+}: {
+  className?: string;
+  defaultOpen?: boolean;
+}) => {
   const {
     getSelectedTotal,
     getSelectedTotalGLDT,
@@ -21,7 +27,7 @@ const TransactionDetails = ({ className }: { className: string }) => {
 
   return (
     <div className={className}>
-      <Disclosure as="div" defaultOpen={false}>
+      <Disclosure as="div" defaultOpen={defaultOpen}>
         <div className="flex items-center justify-between px-2 rounded-xl group-data-[open]:rounded-b-none">
           <div className="flex items-center gap-4">
             <div className="font-medium group-data-[hover]:text-content/80">
