@@ -30,17 +30,29 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
         // process it again
         match &swap {
             SwapInfo::Reverse(details) => {
-                if
-                    matches!(
-                        details.status,
-                        SwapStatusReverse::BurnRequestInProgress |
-                            SwapStatusReverse::EscrowRequestInProgress |
-                            SwapStatusReverse::FeeTransferRequestInProgress |
-                            SwapStatusReverse::RefundRequestInProgress |
-                            SwapStatusReverse::NftTransferRequestInProgress
-                    )
-                {
-                    return Err(RecoverSwapError::InProgress);
+                match &details.status {
+                    SwapStatusReverse::EscrowRequestInProgress => {
+                        swap.update_status(SwapStatus::Reverse(SwapStatusReverse::EscrowRequest));
+                    }
+                    SwapStatusReverse::NftTransferRequestInProgress => {
+                        swap.update_status(
+                            SwapStatus::Reverse(SwapStatusReverse::NftTransferRequest)
+                        );
+                    }
+                    | SwapStatusReverse::RefundRequestInProgress
+                    | SwapStatusReverse::RefundFailed(_) => {
+                        swap.update_status(SwapStatus::Reverse(SwapStatusReverse::RefundRequest));
+                    }
+
+                    SwapStatusReverse::BurnRequestInProgress | SwapStatusReverse::BurnFailed(_) => {
+                        swap.update_status(SwapStatus::Reverse(SwapStatusReverse::BurnRequest));
+                    }
+                    SwapStatusReverse::FeeTransferRequestInProgress => {
+                        swap.update_status(
+                            SwapStatus::Reverse(SwapStatusReverse::FeeTransferRequest)
+                        );
+                    }
+                    _ => {}
                 }
 
                 transfer_to_escrow(&swap_id).await;
