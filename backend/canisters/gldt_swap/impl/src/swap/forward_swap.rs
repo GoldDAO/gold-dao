@@ -788,7 +788,7 @@ pub async fn forward_swap_perform_deposit_recovery(swap_id: &SwapId) -> Result<(
     match manage_sale_result {
         Ok(ManageSaleResult::Ok(_)) => {
             match &original_error {
-                SwapStatusForward::BidRequest | SwapStatusForward::Init => {
+                SwapStatusForward::BidRequest => {
                     let _ = &swap.update_status(
                         // we have the deposit back, a request must have timed out or the notification never came to the swap canister so there should be no error to propogate
                         SwapStatus::Forward(SwapStatusForward::Failed(SwapErrorForward::Expired))

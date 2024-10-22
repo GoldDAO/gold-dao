@@ -1,10 +1,3 @@
-/*!
-# Force fail stuck forward swaps 
-# due to the nature of how a forward swap works. we can't retry or recover swaps. The NFT canister will refund and cancel the sale after 1 minute
-## Interval : 5 minutes
-## forces, Init, Mint and Bid Requests to fail
-*/
-
 use crate::{
     state::{ mutate_state, read_state },
     swap::forward_swap::{ forward_swap_perform_burn_fees, forward_swap_perform_deposit_recovery },
@@ -77,7 +70,6 @@ fn filter_expired_swaps(swaps: Vec<(SwapId, SwapInfo)>) -> Vec<(SwapId, SwapInfo
                             SwapStatusForward::BidInProgress |
                             SwapStatusForward::BurnFeesInProgress |
                             SwapStatusForward::NotificationInProgress |
-                            SwapStatusForward::DepositRecoveryRequest(_) |
                             SwapStatusForward::DepositRecoveryInProgress(_)
                     )
                 }
@@ -125,9 +117,11 @@ fn classify_swaps(
                     SwapStatusForward::BidFail(_) | SwapStatusForward::BidRequest => {
                         swaps_to_recover_deposit.push(swap_info);
                     }
-                    SwapStatusForward::BurnFeesFailed(_) => {
+                    SwapStatusForward::BurnFeesFailed(_) | SwapStatusForward::BurnFeesRequest => {
                         swaps_to_retry_burn.push(swap_info);
                     }
+                    | SwapStatusForward::DepositRecoveryFailed(_, _)
+                    | SwapStatusForward::DepositRecoveryRequest(_) => {}
                     _ => {
                         swaps_to_auto_expire.push(swap_info);
                     }
@@ -141,10 +135,6 @@ fn classify_swaps(
 
 // Retry burn fees for failed forward swaps
 async fn retry_failed_burn_fees(swaps: Vec<SwapInfo>) {
-    // for swap in swaps {
-    //     swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesRequest));
-    //     forward_swap_perform_burn_fees(&swap.get_swap_id()).await;
-    // }
     let futures = swaps.into_iter().map(|swap| {
         swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesRequest));
         let swap_id = swap.get_swap_id().clone(); // Clone the swap_id
@@ -162,22 +152,6 @@ fn auto_expire_swaps(swaps: Vec<SwapInfo>) {
     }
 }
 async fn withdraw_expired_swap_deposits(swaps: Vec<SwapInfo>) {
-    // for swap_info in swaps.into_iter() {
-    //     match &swap_info {
-    //         SwapInfo::Forward(swap_detail_forward) => {
-    //             swap_info.update_status(
-    //                 SwapStatus::Forward(
-    //                     SwapStatusForward::DepositRecoveryRequest(
-    //                         Box::new(swap_detail_forward.status.clone())
-    //                     )
-    //                 )
-    //             );
-    //             forward_swap_perform_deposit_recovery(&swap_info.get_swap_id());
-    //         }
-    //         _ => {}
-    //     }
-    // }
-
     let futures: Vec<_> = swaps
         .iter()
         .filter_map(|swap_info| {

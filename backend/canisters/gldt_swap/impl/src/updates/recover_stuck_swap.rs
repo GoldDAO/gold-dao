@@ -53,18 +53,46 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
             SwapInfo::Forward(details) => {
                 if
                     matches!(
-                        details.status,
+                        &details.status,
                         SwapStatusForward::DepositRecoveryRequest(_) |
-                            SwapStatusForward::DepositRecoveryFailed(_, _)
+                            SwapStatusForward::DepositRecoveryFailed(_, _) |
+                            SwapStatusForward::DepositRecoveryInProgress(_)
                     )
                 {
-                    swap.update_status(
-                        SwapStatus::Forward(
-                            SwapStatusForward::DepositRecoveryRequest(
-                                Box::new(details.status.clone())
-                            )
-                        )
-                    );
+                    match &details.status {
+                        SwapStatusForward::DepositRecoveryRequest(swap_status_forward) => {
+                            swap.update_status(
+                                SwapStatus::Forward(
+                                    SwapStatusForward::DepositRecoveryRequest(
+                                        Box::new(details.status.clone())
+                                    )
+                                )
+                            );
+                        }
+                        SwapStatusForward::DepositRecoveryInProgress(swap_status_forward) => {
+                            swap.update_status(
+                                SwapStatus::Forward(
+                                    SwapStatusForward::DepositRecoveryRequest(
+                                        Box::new(details.status.clone())
+                                    )
+                                )
+                            );
+                        }
+                        SwapStatusForward::DepositRecoveryFailed(
+                            swap_status_forward,
+                            deposit_recovery_error,
+                        ) => {
+                            swap.update_status(
+                                SwapStatus::Forward(
+                                    SwapStatusForward::DepositRecoveryRequest(
+                                        swap_status_forward.clone()
+                                    )
+                                )
+                            );
+                        }
+                        _ => {}
+                    }
+
                     match forward_swap_perform_deposit_recovery(&swap.get_swap_id()).await {
                         Ok(_) => {
                             return Ok(swap_id);
@@ -77,7 +105,7 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                     Err(
                         RecoverSwapError::InvalidForwardSwapType(
                             format!(
-                                "You may only recover a forward swap that is DepositRecoveryRequest or DepositRecoveryFailed. All others should be correctly handled and expired accordingly"
+                                "You may only recover a forward swap that is DepositRecoveryRequest, DepositRecoveryFailed or DepositRecoveryInProgress. All others should be correctly handled and expired accordingly"
                             )
                         )
                     )
