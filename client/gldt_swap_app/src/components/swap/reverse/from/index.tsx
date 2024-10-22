@@ -3,7 +3,8 @@ import { useNft } from "@context/index";
 import Card from "@components/shared/card/Base";
 
 const ReverseSwapFrom = () => {
-  const { getSelectedTotalGLDT } = useNft();
+  const { getSelectedTotalGLDT, getSelectedTotal } = useNft();
+  const totalNFTs = getSelectedTotal();
   const totalGLDTtoSwap = getSelectedTotalGLDT();
 
   return (
@@ -11,7 +12,7 @@ const ReverseSwapFrom = () => {
       <Card>
         <div className="flex justify-center items-center">
           <div className="font-semibold text-content/40">
-            {totalGLDTtoSwap} GLDT
+            {totalGLDTtoSwap + totalNFTs} GLDT
           </div>
         </div>
       </Card>

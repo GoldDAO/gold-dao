@@ -22,9 +22,7 @@ const Forward = () => {
   return (
     <>
       <div className="relative">
-        {!isConnected && (
-          <Backdrop isClickable={true} handleOnClick={connect} />
-        )}
+        {!isConnected && <Backdrop onClick={connect} />}
         <FromCard>
           <ForwardSwapFrom />
         </FromCard>

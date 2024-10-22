@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
   useIdentityKit,
-  useTargetAuthenticatedAgent,
+  useAgent,
   // useNonTargetAuthenticatedAgent,
 } from "@nfid/identitykit/react";
 import { HttpAgent } from "@dfinity/agent";
@@ -31,7 +31,7 @@ const AuthProviderInit = ({
   const { user, isInitializing } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
-  const agent = useTargetAuthenticatedAgent();
+  const agent = useAgent();
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
