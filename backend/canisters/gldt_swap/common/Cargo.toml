@@ -5,7 +5,7 @@ description = "GLDT forward and reserve swap to GLD - api"
 edition = "2021"
 
 [features]
-default = [] 
+default = []  # Empty default features
 inttest = []
 
 [dependencies]
@@ -36,3 +36,4 @@ futures = { workspace = true }
 num-bigint = {workspace = true}
 candid_gen = { path = "../../../libraries/candid_gen" }
 serde_bytes = { workspace = true }
+ic0 = "0.23.0"

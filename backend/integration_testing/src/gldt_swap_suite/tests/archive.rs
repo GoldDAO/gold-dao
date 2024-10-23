@@ -123,6 +123,7 @@ mod tests {
         let (user_a, _) = insert_bulk_fake_swaps(pic, 250, controller, gldt_swap);
 
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+        println!("///////////////{archive_canisters:?}");
         assert_eq!(archive_canisters.len(), 2);
         let ArchiveCanister { start_index: second_archive_start_index, .. } = archive_canisters
             .last()
@@ -164,6 +165,7 @@ mod tests {
         assert_eq!(swap.is_some(), true);
 
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
+
         // there should be 2 archive canisters
         assert_eq!(archive_canisters.len(), 2);
 

@@ -15,10 +15,10 @@ use ic_ledger_types::{ AccountIdentifier, TransferError };
 use crate::{ gldt::{ GldtNumTokens, GLDT_TX_FEE }, nft::NftID };
 
 #[cfg(feature = "inttest")]
-const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
+pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
 
 #[cfg(not(feature = "inttest"))]
-const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
+pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
 
 const MAX_SWAP_TYPE_BYTES_SIZE: u32 = 100;
 const MAX_SWAP_ID_BYTES_SIZE: u32 = 100;
@@ -52,9 +52,16 @@ pub enum SwapInfo {
     Reverse(SwapDetailReverse),
 }
 
+pub fn trace(msg: &str) {
+    unsafe {
+        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
+    }
+}
+
 impl SwapInfo {
     pub fn new(swap_type: SwapType) -> Self {
         debug!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}");
+        trace(&format!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"));
         match swap_type {
             SwapType::Forward => Self::Forward(SwapDetailForward::default()),
             SwapType::Reverse => Self::Reverse(SwapDetailReverse::default()),

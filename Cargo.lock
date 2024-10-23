@@ -1010,6 +1010,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
+ "ic0 0.23.0",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "num-bigint",

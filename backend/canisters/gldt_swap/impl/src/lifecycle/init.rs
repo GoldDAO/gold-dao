@@ -1,6 +1,7 @@
 use candid::Nat;
+use gldt_swap_common::swap::trace;
 use ic_cdk_macros::init;
-use tracing::info;
+use tracing::{ debug, info };
 use types::BuildVersion;
 use utils::env::CanisterEnv;
 
@@ -31,16 +32,10 @@ fn init(args: Args) {
             data.ogy_ledger_id = init_args.ogy_ledger_id;
             data.authorized_principals = init_args.authorized_principals;
 
-            // Check for the `inttest` feature - this allows integration tests in test_mode to test multiple archive canister creation by inserting relatively fewer swaps before triggering the threshold
-            #[cfg(feature = "inttest")]
+            // on staging - set a slighly higher threshold - based on a swap size of 2000 we expect around 4000~ swaps per page size ( per 8mb )
             if init_args.test_mode {
-                data.max_canister_archive_threshold = Nat::from(18 * 1024 * (1024 as u128)); // 18MB
-            }
-
-            // on staging - set a slighly higher threshold
-            #[cfg(not(feature = "inttest"))]
-            if init_args.test_mode {
-                data.max_canister_archive_threshold = Nat::from(22 * 1024 * (1024 as u128)); // 22MB
+                debug!("INIT :: settingg max threshold to 18mb");
+                data.max_canister_archive_threshold = Nat::from(18 * 1024 * (1024 as u128)); // 18M
             }
 
             let runtime_state = RuntimeState::new(env, data);
