@@ -5,6 +5,7 @@ description = "GLDT forward and reserve swap to GLD - api"
 edition = "2021"
 
 [features]
+default = [] 
 inttest = []
 
 [dependencies]
