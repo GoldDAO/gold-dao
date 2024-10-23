@@ -17,7 +17,7 @@ use ic_cdk::api::management_canister::main::{
     InstallCodeArgument,
     LogVisibility,
 };
-use tracing::debug;
+use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 
 use crate::state::{ mutate_state, read_state };
@@ -34,6 +34,7 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
         )
     {
         if is_archive_canister_at_threshold(&current_archive).await {
+            info!("ARCHIVE :: at capacity :: creating new archive canister");
             let archive_principal = match create_archive_canister().await {
                 Ok(principal) => { principal }
                 Err(e) => {
@@ -136,7 +137,7 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
     );
     let archive_id = archive.canister_id;
 
-    debug!(
+    info!(
         "ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
     );
     match res {
