@@ -82,51 +82,7 @@ impl SwapInfo {
 
     pub fn is_swap_over_time_threshold(&self) -> bool {
         let now = timestamp_millis();
-        // match self {
-        //     // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
-        //     // because the nft canister will release funds and cancel sale after 1 minute
-        //     SwapInfo::Forward(details) => {
-        //         let threshold =
-        //             details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
-        //         let is_old = now > threshold;
 
-        //         let is_valid_stuck_status = matches!(
-        //             details.status,
-        //             SwapStatusForward::Init | NotificationFailed(NotificationError),
-        //             MintFailed(MintError),
-        //             BidRequest,
-        //             BidFail(BidFailError),
-        //             BurnFeesRequest,
-        //             BurnFeesFailed(BurnFeesError),
-        //             Complete,
-        //             Failed(SwapErrorForward),
-        //             SwapStatusForward::MintRequest |
-        //                 SwapStatusForward::MintFailed(_) |
-        //                 SwapStatusForward::BidRequest |
-        //                 SwapStatusForward::BidFail(_) |
-        //                 SwapStatusForward::BurnFeesFailed(_)
-        //         );
-
-        //         return is_valid_stuck_status && is_old;
-        //     }
-        //     SwapInfo::Reverse(details) => {
-        //         let threshold =
-        //             details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
-        //         let is_old = now > threshold;
-
-        //         let is_valid_stuck_status = matches!(
-        //             details.status,
-        //             SwapStatusReverse::Init |
-        //                 SwapStatusReverse::EscrowRequest |
-        //                 SwapStatusReverse::NftTransferRequest |
-        //                 SwapStatusReverse::BurnRequest |
-        //                 SwapStatusReverse::FeeTransferRequest |
-        //                 SwapStatusReverse::NftTransferFailed(_) |
-        //                 SwapStatusReverse::RefundRequest
-        //         );
-
-        //         return is_valid_stuck_status && is_old;
-        //     }
         match self {
             // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
             // because the nft canister will release funds and cancel sale after 1 minute
@@ -135,40 +91,12 @@ impl SwapInfo {
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
 
-                // let is_valid_stuck_status = matches!(
-                //     details.status,
-                //     SwapStatusForward::Init | NotificationFailed(NotificationError),
-                //     MintFailed(MintError),
-                //     BidRequest,
-                //     BidFail(BidFailError),
-                //     BurnFeesRequest,
-                //     BurnFeesFailed(BurnFeesError),
-                //     Complete,
-                //     Failed(SwapErrorForward),
-                //     SwapStatusForward::MintRequest |
-                //         SwapStatusForward::MintFailed(_) |
-                //         SwapStatusForward::BidRequest |
-                //         SwapStatusForward::BidFail(_) |
-                //         SwapStatusForward::BurnFeesFailed(_)
-                // );
-
                 return is_old;
             }
             SwapInfo::Reverse(details) => {
                 let threshold =
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
-
-                // let is_valid_stuck_status = matches!(
-                //     details.status,
-                //     SwapStatusReverse::Init |
-                //         SwapStatusReverse::EscrowRequest |
-                //         SwapStatusReverse::NftTransferRequest |
-                //         SwapStatusReverse::BurnRequest |
-                //         SwapStatusReverse::FeeTransferRequest |
-                //         SwapStatusReverse::NftTransferFailed(_) |
-                //         SwapStatusReverse::RefundRequest
-                // );
 
                 return is_old;
             }

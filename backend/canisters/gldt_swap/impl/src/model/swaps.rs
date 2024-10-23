@@ -290,4 +290,15 @@ mod tests {
             archive_canister_2.canister_id
         );
     }
+
+    // #[test]
+    // fn test_swap_size() {
+    //     let swap_key_size = mem::size_of::<SwapId>();
+    //     let swap_info_size = mem::size_of::<SwapInfo>();
+
+    //     let entry_size = swap_key_size + swap_info_size;
+    //     let total_size = entry_size * 1;
+    //     let swap_is_less_than_1000_bytes = 1000;
+    //     // assert!(total_size < swap_is_less_than_1000_bytes);
+    // }
 }
