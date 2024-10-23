@@ -58,7 +58,7 @@ if [[ $WASMONLY == 1 ]]; then
   echo "" > $BASE_CANISTER_PATH/$1/api/can.did
 fi
 
-./scripts/canister_prebuilds.sh $1 $BASE_CANISTER_PATH $INTTEST
+./scripts/canister_prebuilds.sh $1 $BASE_CANISTER_PATH "$INTTEST"
 
 cargo build --target wasm32-unknown-unknown --target-dir $BASE_CANISTER_PATH/$1/target --release --locked $INTTEST -p $1
 
