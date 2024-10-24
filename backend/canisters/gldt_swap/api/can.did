@@ -205,6 +205,7 @@ type SwapInfo = variant {
 type SwapNftForTokensErrors = variant {
   Limit : text;
   ContainsDuplicates : text;
+  CantBeAnoymous : text;
   ContainsInvalidNftCanister : text;
   NftValidationErrors : record {
     vec nat;
@@ -255,6 +256,7 @@ type SwapTokensForNftRequestErrors = variant {
   GetNftMetaDetailError : GetNftMetaDetailErrorReason;
   CantForgeSwapId;
   NftLocked : LockError;
+  CantBeAnoymous : text;
   NftValidationErrors : vec NftValidationError;
   NotOwnedBySwapCanister;
   ServiceDown : ServiceDownReason;

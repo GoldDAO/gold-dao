@@ -158,7 +158,7 @@ impl Default for Data {
             service_status: ServiceStatus::Down(ServiceDownReason::Initializing),
             base_ogy_swap_fee: Nat::from(1_000_000_000u64), // default of 10 OGY
             required_cycle_balance: Nat::default(),
-            archive_buffer: 100_000usize,
+            archive_buffer: 250_000usize,
         }
     }
 }

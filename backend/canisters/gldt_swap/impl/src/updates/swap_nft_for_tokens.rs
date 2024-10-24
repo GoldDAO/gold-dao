@@ -49,6 +49,7 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
     let mut swap_ids_to_return: Vec<SwapId> = vec![];
     let mut valid_nft_ids: Vec<NftID> = vec![];
     let mut invalid_nft_ids: Vec<(NftID, Vec<NftInvalidError>)> = vec![];
+    let caller = read_state(|s| s.env.caller());
 
     //  check there are no duplicates
     if args.is_empty() {
@@ -59,6 +60,14 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
         return Err(
             SwapNftForTokensErrors::ContainsDuplicates(
                 format!("You can't supply the same NFT ID to be swapped twice!")
+            )
+        );
+    }
+
+    if caller == Principal::anonymous() {
+        return Err(
+            SwapNftForTokensErrors::CantBeAnoymous(
+                format!("You can't use an annoymous principal to swap")
             )
         );
     }
