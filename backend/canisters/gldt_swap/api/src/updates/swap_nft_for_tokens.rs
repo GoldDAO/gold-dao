@@ -14,7 +14,7 @@ pub enum SwapNftForTokensErrors {
     ContainsInvalidNftCanister(String),
     ServiceDown(ServiceDownReason),
     Limit(String),
-    CantBeAnoymous(String),
+    CantBeAnonymous(String),
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]

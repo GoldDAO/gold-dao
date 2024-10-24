@@ -23,7 +23,7 @@ pub enum SwapTokensForNftRequestErrors {
     ServiceDown(ServiceDownReason),
     SwapCreationError,
     NotOwnedBySwapCanister,
-    CantBeAnoymous(String),
+    CantBeAnonymous(String),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, CandidType)]

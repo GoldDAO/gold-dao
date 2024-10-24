@@ -33,7 +33,7 @@ async fn swap_tokens_for_nft(args: SwapTokensForNftArgs) -> SwapTokensForNftResp
 
     if caller == Principal::anonymous() {
         return Err(
-            SwapTokensForNftRequestErrors::CantBeAnoymous(
+            SwapTokensForNftRequestErrors::CantBeAnonymous(
                 format!("You can't use an annoymous principal to swap")
             )
         );
