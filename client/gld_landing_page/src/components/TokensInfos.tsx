@@ -23,6 +23,8 @@ interface CardProps {
   title: string
   description: string
   learnMoreLink: string
+  learnMoreButton: string
+  button: string
   buyLink?: string
   imageSrc: string
 }
@@ -32,6 +34,8 @@ const Card: React.FC<CardProps> = ({
   title,
   description,
   learnMoreLink,
+  learnMoreButton,
+  button,
   buyLink,
   imageSrc
 }) => {
@@ -59,21 +63,21 @@ const Card: React.FC<CardProps> = ({
                 target='_blank'
                 className='text-[#000000A3] underline underline-offset-[3px] hover:text-secondary duration-300 ease-in-out'
               >
-                {t('learn_more')}
+                {learnMoreButton}
               </a>
             ) : (
               <p className='text-[#000000A3] underline underline-offset-[3px]'>
-                {t('learn_more')}
+                {learnMoreButton}
               </p>
             )}
 
             {buyLink ? (
               <a href={buyLink} target='_blank' className='main-button w-fit'>
-                {t('buy')} {title}
+                {button}
               </a>
             ) : (
               <button className='main-button-disabled w-fit cursor-default'>
-                {t('coming_soon')}
+                {button}
               </button>
             )}
           </div>
@@ -98,33 +102,43 @@ const CardGrid: React.FC = () => {
       logoSrc: '/static/icons/Gold-Gov.svg',
       title: t('tokens.gldgov.title'),
       description: t('tokens.gldgov.description'),
+      learnMoreButton: t('tokens.gldgov.learnMoreButton'),
       learnMoreLink: 'https://docs.gold-dao.org/',
       buyLink:
         'https://info.icpswap.com/swap/token/details/tyyy3-4aaaa-aaaaq-aab7a-cai',
-      imageSrc: '/static/illustrations/Gold-Gov.svg'
+      imageSrc: '/static/illustrations/Gold-Gov.svg',
+      button: t('tokens.gldgov.button')
     },
     {
       logoSrc: '/static/icons/Gold-NFT.svg',
       title: t('tokens.gld_nft.title'),
       description: t('tokens.gld_nft.description'),
-      learnMoreLink: 'https://yumi.io/gold/about',
-      buyLink: 'https://yumi.io/gold',
-      imageSrc: '/static/illustrations/gold-light-nft.svg'
+      learnMoreButton: t('tokens.gld_nft.learnMoreButton'),
+      learnMoreLink: 'https://gold.bity.com/en/about',
+      buyLink: 'https://gold.bity.com/',
+      imageSrc: '/static/illustrations/gold-light-nft.svg',
+      button: t('tokens.gld_nft.button')
     },
     {
       logoSrc: '/static/icons/Gold-GLDT.svg',
       title: t('tokens.gldt.title'),
       description: t('tokens.gldt.description'),
+      learnMoreButton: t('tokens.gldt.learnMoreButton'),
       learnMoreLink: 'https://gldt.org/',
-      buyLink: 'https://gldt.org/',
-      imageSrc: '/static/illustrations/Gold-GLDT.svg'
+      buyLink: '', // app.gldt.org/swap not available
+      imageSrc: '/static/illustrations/Gold-GLDT.svg',
+      button: t('tokens.gldt.button')
     },
     {
       logoSrc: '/static/icons/Gold-USDG.svg',
       title: t('tokens.usdg.title'),
       description: t('tokens.usdg.description'),
-      learnMoreLink: '',
-      imageSrc: '/static/illustrations/Gold-USDG.svg'
+      learnMoreButton: t('tokens.usdg.learnMoreButton'),
+      learnMoreLink:
+        'https://docs.gold-dao.org/gold-dao-whitepaper/the-ecosystem/products/usd-pegged-stablecoin-usdg',
+      buyLink: '',
+      imageSrc: '/static/illustrations/Gold-USDG.svg',
+      button: t('tokens.usdg.button')
     }
   ]
 
