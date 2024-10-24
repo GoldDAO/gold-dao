@@ -27,7 +27,6 @@ const ARCHIVE_WASM: &[u8] = include_bytes!("../../archive/wasm/gldt_swap_archive
 
 pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     // check if the capacity is
-    let current_swap_index = read_state(|s| s.data.swaps.get_current_swap_index());
     if
         let Some(current_archive) = read_state(|s|
             s.data.swaps.get_archive_canisters().last().cloned()
@@ -35,6 +34,7 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     {
         if is_archive_canister_at_threshold(&current_archive).await {
             info!("ARCHIVE :: at capacity :: creating new archive canister");
+            trace("///// Checking archive 3");
             let archive_principal = match create_archive_canister().await {
                 Ok(principal) => { principal }
                 Err(e) => {
@@ -42,11 +42,15 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
                     return Err(());
                 }
             };
+            let current_swap_index = read_state(|s| s.data.swaps.get_current_swap_index());
+            let archive_buffer = read_state(|s| s.data.archive_buffer);
+            let future_swap_index = current_swap_index + Nat::from(archive_buffer);
             mutate_state(|s|
                 s.data.swaps.set_new_archive_canister(ArchiveCanister {
                     canister_id: archive_principal,
-                    start_index: current_swap_index,
+                    start_index: future_swap_index,
                     end_index: None,
+                    active: false,
                 })
             );
             // new archive created
@@ -136,12 +140,16 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
         s.data.max_canister_archive_threshold.clone()
     );
     let archive_id = archive.canister_id;
-
+    trace(
+        &format!(
+            "///// Checking archive 4 : {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
+        )
+    );
     info!(
         "ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
     );
     match res {
-        Ok(size) => { size >= max_canister_archive_threshold }
+        Ok(size) => { (size as u128) >= max_canister_archive_threshold }
         Err(_) => { false }
     }
 }

@@ -7,3 +7,4 @@ pub mod remove_intent_to_swap;
 pub mod get_service_status;
 pub mod set_base_ogy_swap_fee;
 pub mod get_history_total;
+pub mod insert_fake_bulk_swaps;

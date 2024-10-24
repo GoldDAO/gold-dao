@@ -81,6 +81,10 @@ pub async fn get_all_user_swap_ids(
 
     let archives = read_state(|s| {
         let mut archives = s.data.swaps.get_archive_canisters().clone();
+        // archives = archives
+        //     .into_iter()
+        //     .filter(|archive| archive.active)
+        //     .collect();
         archives.sort_by_key(|canister| canister.start_index.clone());
         archives.reverse();
         archives

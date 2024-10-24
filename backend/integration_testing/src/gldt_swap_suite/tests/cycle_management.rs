@@ -3,6 +3,7 @@ use canister_time::HOUR_IN_MS;
 use gldt_swap_common::{ archive::ArchiveCanister, swap::SwapIndex };
 
 use crate::client::gldt_swap::get_archive_canisters;
+use crate::client::gldt_swap::insert_fake_bulk_swaps;
 use crate::client::gldt_swap::insert_fake_swap;
 use crate::gldt_swap_suite::{ init, CanisterIds, PrincipalIds, TestEnv };
 use crate::utils::tick_n_blocks;
@@ -21,7 +22,6 @@ fn insert_bulk_fake_swaps(
     controller: Principal,
     gldt_swap: Principal
 ) -> (Principal, Principal) {
-    let time_now = timestamp_millis() + (Duration::from_millis(WEEK_IN_MS).as_millis() as u64);
     let user_a = Principal::from_slice(
         &[
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
@@ -34,13 +34,12 @@ fn insert_bulk_fake_swaps(
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 2u8,
         ]
     );
+    let mut swaps: Vec<SwapInfo> = vec![];
     for i in 0..num_to_insert {
         let user = if i == 0 { user_a } else if i % 2 == 0 { user_b } else { user_a };
-        insert_fake_swap(
-            pic,
-            controller.clone(),
-            gldt_swap.clone(),
-            &SwapInfo::Forward(SwapDetailForward {
+        let time_now = timestamp_millis() + (Duration::from_millis(WEEK_IN_MS).as_millis() as u64);
+        swaps.push(
+            SwapInfo::Forward(SwapDetailForward {
                 index: SwapIndex::from(i),
                 nft_id: NftID(Nat::from(i)),
                 nft_id_string: i.to_string(),
@@ -52,15 +51,18 @@ fn insert_bulk_fake_swaps(
                 escrow_sub_account: [0u8; 32],
                 gldt_receiver: Account { owner: user, subaccount: None },
             })
-        ).unwrap();
-        pic.advance_time(Duration::from_millis(1000));
-        pic.tick();
+        );
     }
+    insert_fake_bulk_swaps(pic, controller.clone(), gldt_swap.clone(), &swaps).unwrap();
+    pic.advance_time(Duration::from_millis(1000));
+    pic.tick();
     (user_a, user_b)
 }
 
 #[cfg(test)]
 mod tests {
+    use canister_time::MINUTE_IN_MS;
+
     use super::*;
     #[test]
     pub fn gldt_swap_manages_archive_canister_cycles_happy_path() {
@@ -89,8 +91,14 @@ mod tests {
             "//// first archive cycle balance  : {first_archive_cycle_balance_before_swaps:?}"
         );
 
-        // In test mode there is a threshhold of approximately 18mb before a new canister is created.
-        let _ = insert_bulk_fake_swaps(pic, 250, controller, gldt_swap);
+        // In test mode there is a threshhold of approximately 32mb memory and a max swap size of 28500 ( this affects how many we can store before the btreemap is allocated more memory)
+        // 366 reprensts the amount of swaps needed to create 2 archive canisters.
+        let _ = insert_bulk_fake_swaps(pic, 366, controller, gldt_swap);
+        // let _ = insert_bulk_fake_swaps(pic, 1087, controller, gldt_swap);
+        tick_n_blocks(pic, 10);
+        pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
+        tick_n_blocks(pic, 10);
+        pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 10);
         println!("//// swaps inserted ");
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());

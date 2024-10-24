@@ -34,8 +34,9 @@ fn init(args: Args) {
 
             // on staging - set a slighly higher threshold - based on a swap size of 2000 we expect around 4000~ swaps per page size ( per 8mb )
             if init_args.test_mode {
-                debug!("INIT :: settingg max threshold to 18mb");
-                data.max_canister_archive_threshold = Nat::from(18 * 1024 * (1024 as u128)); // 18M
+                debug!("INIT :: settingg max threshold to 64mb");
+                data.max_canister_archive_threshold = 32 * 1024 * (1024 as u128); // 64M
+                data.archive_buffer = 100;
             }
 
             let runtime_state = RuntimeState::new(env, data);

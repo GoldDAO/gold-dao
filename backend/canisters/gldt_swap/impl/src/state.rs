@@ -128,13 +128,16 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub is_remove_stale_swaps_cron_running: bool,
     pub is_archive_cron_running: bool,
-    pub max_canister_archive_threshold: Nat,
+    pub is_init_archive_cron_running: bool,
+    pub max_canister_archive_threshold: u128,
     pub should_upgrade_archives: bool,
     pub ogy_balance: Nat,
     pub archive_status: ArchiveStatus,
     pub service_status: ServiceStatus,
     pub base_ogy_swap_fee: Nat,
     pub required_cycle_balance: Nat,
+    /// archive buffer is used during subsequent archive creation when current archives are full. new archive canisters are created before the current used archive is full. we give the new archive a start index of the current highest + this buffer to give current swaps room to still insert into the old archive
+    pub archive_buffer: usize,
 }
 
 impl Default for Data {
@@ -147,13 +150,15 @@ impl Default for Data {
             authorized_principals: vec![],
             is_remove_stale_swaps_cron_running: false,
             is_archive_cron_running: false,
-            max_canister_archive_threshold: Nat::from(370 * 1024 * 1024 * (1024 as u128)), // 370GB
+            is_init_archive_cron_running: false,
+            max_canister_archive_threshold: 300 * 1024 * 1024 * (1024 as u128), // 300GB
             should_upgrade_archives: false,
             ogy_balance: Nat::from(0u64),
             archive_status: ArchiveStatus::Initializing,
             service_status: ServiceStatus::Down(ServiceDownReason::Initializing),
             base_ogy_swap_fee: Nat::from(1_000_000_000u64), // default of 10 OGY
             required_cycle_balance: Nat::default(),
+            archive_buffer: 100_000usize,
         }
     }
 }

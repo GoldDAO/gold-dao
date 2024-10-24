@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::mem;
-use candid::{ Nat, Principal };
+use candid::{ arc, Nat, Principal };
 use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_common::{ nft::NftID, swap::{ SwapId, SwapInfo, SwapIndex } };
 use serde::{ Deserialize, Serialize };
@@ -200,6 +200,16 @@ impl Swaps {
         self.archive_canisters.push(archive_canister);
     }
 
+    pub fn set_archive_as_active(&mut self, start_index: &Nat) {
+        if
+            let Some(archive) = self.archive_canisters
+                .iter_mut()
+                .find(|archive| start_index == &archive.start_index)
+        {
+            archive.active = true;
+        }
+    }
+
     pub fn update_archive_canister_end_index(&mut self, end_index: Nat) {
         match self.archive_canisters.last_mut() {
             Some(archive) => {
@@ -250,18 +260,21 @@ mod tests {
             canister_id: archive_canister_1,
             start_index: Nat::from(0u64),
             end_index: None,
+            active: true,
         };
 
         let archive_canister_2 = ArchiveCanister {
             canister_id: archive_canister_2,
             start_index: Nat::from(100u64),
             end_index: None,
+            active: true,
         };
 
         let archive_canister_3 = ArchiveCanister {
             canister_id: archive_canister_3,
             start_index: Nat::from(200u64),
             end_index: None,
+            active: true,
         };
         // archive should be from 0u8 - 99
         mutate_state(|s| s.data.swaps.set_new_archive_canister(archive_canister_1.clone()));

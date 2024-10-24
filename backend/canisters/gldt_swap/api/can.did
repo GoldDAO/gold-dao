@@ -11,6 +11,7 @@ type ApproveError = variant {
   InsufficientFunds : record { balance : nat };
 };
 type ArchiveCanister = record {
+  active : bool;
   canister_id : principal;
   end_index : opt nat;
   start_index : nat;
