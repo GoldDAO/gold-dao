@@ -9,7 +9,8 @@
         "Proposing and making decisions about the direction of the Gold DAO",
         "Governing any upgrades to the system’s canisters",
         "Receiving staking rewards as a result of participation in governance"
-      ]
+      ],
+      "cardKey": "gldgov"
     },
     {
       "title": "GLD NFT",
@@ -19,17 +20,19 @@
       "points": [
         "Expert Insight: Each NFT is backed by a specific physical gold asset, with a serial number and purity details transparently and immutably recorded on the blockchain",
         "Redeemability Factor: Holders can redeem digital gold for physical gold and vice versa, seamlessly bridging the worlds of both digital and tangible assets"
-      ]
+      ],
+      "cardKey": "gld_nft"
     },
     {
-      "title": "GLDT & GLD Swap",
+      "title": "GLDT",
       "tag": "Token",
       "description": "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
       "videoSrc": "/videos/Gold_swap_video.mp4",
       "points": [
         "Cross-Chain Utility: Ensures liquidity across multiple blockchain ecosystems, enhancing its appeal to a broader investor base.",
         "Collateral Efficiency: Offers a robust collateral framework for DeFi."
-      ]
+      ],
+      "cardKey": "gldt"
     },
     {
       "title": "USDG",
@@ -39,7 +42,8 @@
       "points": [
         "Inflation Resistance: The value of USDG’s collateral, i.e. GLDT, is unaffected by erosion caused by inflation.",
         "Financial Stability: The liquidity risk is lowered due to the price stability of GLDT."
-      ]
+      ],
+      "cardKey": "usdg"
     }
   ]
 }

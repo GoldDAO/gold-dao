@@ -1,0 +1,15 @@
+{
+  "titleBold": "What is the Gold DAO?",
+  "description-1": "A secure, transparent and convenient solution to gold investment.",
+  "description-2": "Gold is a timeless and trusted asset, proven over time to preserve value and provide protection against inflation and economic uncertainty.",
+  "description-3": "In the modern gold market, the practice of overselling ‘paper gold’ – such as futures, options, and ETFs – has raised concerns about asset backing and long-term value. Gold DAO offers a secure, transparent solution by providing direct ownership of physical gold, backed by GLD NFTs and stored in secure Swiss vaults.",
+  "description-4": "Investors can trust that their assets are anchored in tangible gold, not speculative contracts. Additionally, GLD NFT holders have the option to convert their assets into GLDT tokens, increasing liquidity and flexibility.",
+  "description-5": "While gold has historically been a trusted store of value, owning physical gold often poses challenges in terms of transport, storage and liquidity. Gold DAO overcomes these limitations by digitising physical gold, allowing it to be exchanged as easily as cash.",
+  "description-6": "Start investing with Gold DAO today and experience the security of physical gold ownership with the convenience and liquidity of digital assets.",
+  "features": {
+    "decentralized": "Fully decentralized",
+    "ownership": "Real ownership",
+    "crossChain": "Cross-chain",
+    "audited": "Fully audited"
+  }
+}

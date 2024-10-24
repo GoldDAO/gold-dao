@@ -1,7 +1,9 @@
 'use client'
 
 import Image from 'next/image'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import LearnMoreModal from './LearnMoreModal'
 
 interface Card {
   title: string
@@ -10,9 +12,24 @@ interface Card {
   imageSrc?: string
   videoSrc?: string
   points: string[]
+  cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg'
 }
 
 const TokensCards = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedCardKey, setSelectedCardKey] = useState<
+    'gldgov' | 'gld_nft' | 'gldt' | 'usdg'
+  >('gldgov')
+
+  const openModal = (cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg') => {
+    setSelectedCardKey(cardKey)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
+
   const { t } = useTranslation('cards')
 
   const cards: Card[] = t('cards', { returnObjects: true }) as Card[]
@@ -44,7 +61,15 @@ const TokensCards = () => {
                   </span>
                 </div>
               ))}
+
+              <button
+                onClick={() => openModal(card.cardKey)}
+                className='main-button w-fit mt-4'
+              >
+                Learn More
+              </button>
             </div>
+
             {/* Image / Video Section */}
             <div className='relative w-full md:w-1/2 h-[780px] md:h-[612px] '>
               {card.videoSrc && (
@@ -75,6 +100,9 @@ const TokensCards = () => {
             </div>
           </div>
         ))}
+      {isModalOpen && (
+        <LearnMoreModal onClose={closeModal} cardKey={selectedCardKey} />
+      )}
     </section>
   )
 }
