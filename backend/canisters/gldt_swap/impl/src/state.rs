@@ -47,6 +47,9 @@ impl RuntimeState {
             ogy_balance: format!("{:?}", self.data.ogy_balance.clone()),
             nft_fee_accounts: format_nft_canister_configs(self.data.gldnft_canisters.clone()),
             required_cycle_balance: format!("{:?}", self.data.required_cycle_balance.clone()),
+            total_completed_forward_swaps: self.data.total_completed_forward_swaps,
+            total_completed_reverse_swaps: self.data.total_completed_reverse_swaps,
+            total_failed_swaps: self.data.total_failed_swaps,
         }
     }
 
@@ -106,6 +109,9 @@ pub struct Metrics {
     pub ogy_balance: String,
     pub nft_fee_accounts: String,
     pub required_cycle_balance: String,
+    pub total_completed_forward_swaps: u128,
+    pub total_completed_reverse_swaps: u128,
+    pub total_failed_swaps: u128,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -139,6 +145,9 @@ pub struct Data {
     /// archive buffer is used during subsequent archive creation when current archives are full. new archive canisters are created before the current used archive is full. we give the new archive a start index of the current highest + this buffer to give current swaps room to still insert into the old archive
     pub archive_buffer: usize,
     pub new_archive_error: Option<NewArchiveError>,
+    pub total_completed_forward_swaps: u128,
+    pub total_completed_reverse_swaps: u128,
+    pub total_failed_swaps: u128,
 }
 
 impl Default for Data {
@@ -161,6 +170,9 @@ impl Default for Data {
             required_cycle_balance: Nat::default(),
             archive_buffer: 250_000usize,
             new_archive_error: None,
+            total_completed_forward_swaps: 0,
+            total_completed_reverse_swaps: 0,
+            total_failed_swaps: 0,
         }
     }
 }

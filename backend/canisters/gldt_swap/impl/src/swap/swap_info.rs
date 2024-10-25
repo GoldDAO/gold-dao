@@ -100,6 +100,31 @@ impl SwapInfoTrait for SwapInfo {
                 SwapStatus::Reverse(SwapStatusReverse::Failed(_))
         );
 
+        if matches!(status, SwapStatus::Forward(SwapStatusForward::Complete)) {
+            // update total success forward swaps
+            mutate_state(|s| {
+                s.data.total_completed_forward_swaps += 1;
+            });
+        }
+
+        if matches!(status, SwapStatus::Reverse(SwapStatusReverse::Complete)) {
+            mutate_state(|s| {
+                s.data.total_completed_reverse_swaps += 1;
+            });
+        }
+
+        if
+            matches!(
+                status,
+                SwapStatus::Forward(SwapStatusForward::Failed(_)) |
+                    SwapStatus::Reverse(SwapStatusReverse::Failed(_))
+            )
+        {
+            mutate_state(|s| {
+                s.data.total_failed_swaps += 1;
+            });
+        }
+
         if should_move_to_history {
             if let Some(swap) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {
                 ic_cdk::spawn(async move {
