@@ -5,11 +5,7 @@ use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
 use tracing::{ debug, info };
 
-use crate::{
-    check_storage_and_create_archive,
-    state::{ mutate_state, read_state },
-    utils::{ get_historic_swap, trace },
-};
+use crate::{ state::{ mutate_state, read_state }, utils::{ get_historic_swap, trace } };
 
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;

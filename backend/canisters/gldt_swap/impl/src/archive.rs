@@ -1,8 +1,9 @@
-use candid::{ Encode, Nat, Principal };
+use candid::{ CandidType, Encode, Nat, Principal };
 use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_api_archive::lifecycle::Args as ArgsArchive;
 use gldt_swap_api_archive::{ init::InitArgs, post_upgrade::UpgradeArgs };
 use gldt_swap_archive_c2c_client::get_archive_size;
+use gldt_swap_common::swap::NewArchiveError;
 use ic_cdk::api::management_canister::main::{
     canister_status,
     create_canister,
@@ -17,6 +18,7 @@ use ic_cdk::api::management_canister::main::{
     InstallCodeArgument,
     LogVisibility,
 };
+use serde::{ Deserialize, Serialize };
 use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 
@@ -38,7 +40,10 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
             let archive_principal = match create_archive_canister().await {
                 Ok(principal) => { principal }
                 Err(e) => {
-                    debug!(e);
+                    debug!("{e:?}");
+                    mutate_state(|s| {
+                        s.data.new_archive_error = Some(e);
+                    });
                     return Err(());
                 }
             };
@@ -64,7 +69,7 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     Err(())
 }
 
-pub async fn create_archive_canister() -> Result<Principal, String> {
+pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     let this_canister_id = read_state(|s| s.env.canister_id());
     let mut controllers = get_canister_controllers(this_canister_id).await?;
     controllers.push(ic_cdk::api::id());
@@ -95,7 +100,7 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     {
         Ok(canister) => { canister.0.canister_id }
         Err(e) => {
-            return Err(format!("ERROR : failed to create a canister id with error - {e:?}"));
+            return Err(NewArchiveError::CreateCanisterError(format!("{e:?}")));
         }
     };
     let mut current_auth_prins = read_state(|s| s.data.authorized_principals.clone());
@@ -114,7 +119,7 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     {
         Ok(encoded_init_args) => encoded_init_args,
         Err(e) => {
-            return Err(format!("ERROR : failed to create init args with error - {e}"));
+            return Err(NewArchiveError::FailedToSerializeInitArgs(format!("{e}")));
         }
     };
 
@@ -127,9 +132,14 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     };
 
     match retry_async(|| install_code(install_args.clone()), 3).await {
-        Ok(_) => Ok(canister_id),
-        Err((code, msg)) => {
-            return Err(format!("ERROR : {code:?} - {msg}"));
+        Ok(_) => {
+            mutate_state(|s| {
+                s.data.new_archive_error = None;
+            });
+            Ok(canister_id)
+        }
+        Err(e) => {
+            return Err(NewArchiveError::InstallCodeError(format!("{e:?}")));
         }
     }
 }
@@ -256,9 +266,11 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
     }
 }
 
-async fn get_canister_controllers(canister_id: CanisterId) -> Result<Vec<Principal>, String> {
+async fn get_canister_controllers(
+    canister_id: CanisterId
+) -> Result<Vec<Principal>, NewArchiveError> {
     match retry_async(|| canister_status(CanisterIdRecord { canister_id }), 3).await {
         Ok(res) => Ok(res.0.settings.controllers),
-        Err(e) => { Err(format!("Failed to get canister status: {:?}", e)) }
+        Err(e) => { Err(NewArchiveError::CantFindControllers(format!("{e:?}"))) }
     }
 }

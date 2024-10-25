@@ -1,7 +1,7 @@
 use gldt_swap_common::{
     archive::format_archive_canisters,
     nft::NftCanisterConf,
-    swap::{ ArchiveStatus, ServiceDownReason, ServiceStatus },
+    swap::{ ArchiveStatus, NewArchiveError, ServiceDownReason, ServiceStatus },
 };
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
@@ -10,7 +10,7 @@ use canister_state_macros::canister_state;
 use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
 
-use crate::model::swaps::Swaps;
+use crate::{ model::swaps::Swaps };
 
 canister_state!(RuntimeState);
 
@@ -138,6 +138,7 @@ pub struct Data {
     pub required_cycle_balance: Nat,
     /// archive buffer is used during subsequent archive creation when current archives are full. new archive canisters are created before the current used archive is full. we give the new archive a start index of the current highest + this buffer to give current swaps room to still insert into the old archive
     pub archive_buffer: usize,
+    pub new_archive_error: Option<NewArchiveError>,
 }
 
 impl Default for Data {
@@ -159,6 +160,7 @@ impl Default for Data {
             base_ogy_swap_fee: Nat::from(1_000_000_000u64), // default of 10 OGY
             required_cycle_balance: Nat::default(),
             archive_buffer: 250_000usize,
+            new_archive_error: None,
         }
     }
 }

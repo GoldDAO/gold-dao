@@ -24,7 +24,7 @@ use canister_time::{ run_interval, run_once, SECOND_IN_MS };
 
 pub fn start_job() {
     run_once(spawn_archive_on_init);
-    run_interval(Duration::from_millis(SECOND_IN_MS * 20), spawn_manage_archives);
+    run_interval(Duration::from_millis(SECOND_IN_MS * 30), spawn_manage_archives);
 }
 
 pub fn spawn_archive_on_init() {
@@ -57,13 +57,11 @@ async fn archive_on_init() {
             Err(e) => {
                 mutate_state(|s| {
                     s.set_archive_status(
-                        ArchiveStatus::Down(
-                            ArchiveDownReason::InitializingFirstArchiveFailed(e.clone())
-                        )
+                        ArchiveStatus::Down(ArchiveDownReason::NewArchiveError(e.clone()))
                     );
                 });
 
-                trap(&e);
+                trap(&format!("{e:?}"));
             }
         }
         return;
@@ -109,9 +107,7 @@ pub async fn manage_archives() {
     mutate_state(|s| {
         s.data.is_archive_cron_running = true;
     });
-    trace("///// Checking archive 1");
     let _ = check_storage_and_create_archive().await;
-    trace("///// Checking archive 2");
     mutate_state(|s| {
         s.data.is_archive_cron_running = false;
     });

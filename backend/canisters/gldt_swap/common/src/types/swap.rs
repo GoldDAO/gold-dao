@@ -457,10 +457,18 @@ pub enum ArchiveStatus {
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ArchiveDownReason {
-    InitializingFirstArchiveFailed(String), //
+    NewArchiveError(NewArchiveError), //
     Upgrading, //
     UpgradingArchivesFailed(String), //
     ActiveSwapCapacityFull,
     NoArchiveCanisters(String), //
     LowOrigynToken(String),
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Ord, PartialOrd)]
+pub enum NewArchiveError {
+    FailedToSerializeInitArgs(String),
+    CreateCanisterError(String),
+    InstallCodeError(String),
+    CantFindControllers(String),
 }
