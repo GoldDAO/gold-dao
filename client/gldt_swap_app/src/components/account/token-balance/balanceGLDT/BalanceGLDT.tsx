@@ -1,7 +1,8 @@
 import { LoaderSpin } from "@components/ui";
 import { LogoGLDT } from "@components/shared/logos";
-import { useGetGLDTPrice } from "@hooks/icpSwap/useGetGLDTPrice";
+
 import { useLedgerUserBalance } from "@hooks/ledger";
+import { useBalanceGLDTUSD } from "@hooks/gold_api";
 
 const BalanceGLDT = ({ className }: { className?: string }) => {
   const {
@@ -10,7 +11,10 @@ const BalanceGLDT = ({ className }: { className?: string }) => {
     isError,
     isLoading,
   } = useLedgerUserBalance({ ledger: "GLDT" });
-  const { GLDTPrice } = useGetGLDTPrice();
+  const { data: balanceGLTDUSD } = useBalanceGLDTUSD({
+    balance: balance?.number,
+  });
+
   return (
     <div className={`${className}`}>
       <div className="border border-border rounded-xl bg-surface p-6">
@@ -21,9 +25,11 @@ const BalanceGLDT = ({ className }: { className?: string }) => {
               <div className="font-semibold text-2xl">{balance.string}</div>
               <div className="font-semibold text-2xl">GLDT</div>
             </div>
-            <div className="font-light text-content/60">
-              ={balance && (balance?.number * GLDTPrice).toFixed(2)} $
-            </div>
+            {balanceGLTDUSD && (
+              <div className="font-light text-content/60">
+                ={balanceGLTDUSD} $
+              </div>
+            )}
           </div>
         )}
         {(isLoading || isError) && (
