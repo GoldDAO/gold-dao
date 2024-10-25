@@ -1,6 +1,6 @@
 import { LoaderSpin } from "@components/ui";
+import { LogoGLDT } from "@components/shared/logos";
 import { useGetGLDTPrice } from "@hooks/icpSwap/useGetGLDTPrice";
-
 import { useLedgerUserBalance } from "@hooks/ledger";
 
 const BalanceGLDT = ({ className }: { className?: string }) => {
@@ -17,11 +17,13 @@ const BalanceGLDT = ({ className }: { className?: string }) => {
         {isSuccess && balance && (
           <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-4">
             <div className="flex items-center justify-center sm:justify-start gap-3">
-              <img className="flex-none h-8" src={`/gldt_logo.svg`} />
+              <LogoGLDT className="flex-none w-8 h-8" />
               <div className="font-semibold text-2xl">{balance.string}</div>
               <div className="font-semibold text-2xl">GLDT</div>
             </div>
-            <div className="font-light text-content/60">={balance && (balance?.number * GLDTPrice).toFixed(2)} $</div>
+            <div className="font-light text-content/60">
+              ={balance && (balance?.number * GLDTPrice).toFixed(2)} $
+            </div>
           </div>
         )}
         {(isLoading || isError) && (

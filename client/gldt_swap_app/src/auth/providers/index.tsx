@@ -12,7 +12,6 @@ import {
   IdentityKitProvider,
   useIdentityKit,
   useAgent,
-  // useNonTargetAuthenticatedAgent,
 } from "@nfid/identitykit/react";
 import { HttpAgent } from "@dfinity/agent";
 
@@ -114,7 +113,7 @@ export const AuthProvider = ({
         console.log(e);
       }}
       onConnectSuccess={() => {
-        console.log("connected");
+        // console.log("connected");
         queryClient.clear();
       }}
       onDisconnect={() => {
@@ -125,7 +124,7 @@ export const AuthProvider = ({
           isConnecting: false,
           agent: undefined,
         }));
-        console.log("disconnected");
+        // console.log("disconnected");
       }}
     >
       <AuthProviderInit canisters={canisters}>{children}</AuthProviderInit>

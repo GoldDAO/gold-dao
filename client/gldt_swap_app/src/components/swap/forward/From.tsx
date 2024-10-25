@@ -46,6 +46,7 @@ const ForwardSwapFrom = () => {
       {isConnected &&
         isSuccess &&
         !isLoading &&
+        !isError &&
         nftState.nfts.map((d, index) => {
           return (
             !d.isEmpty && (

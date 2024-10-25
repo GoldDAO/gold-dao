@@ -19,6 +19,7 @@ export type ApproveError = {
   { 'Expired' : { 'ledger_time' : bigint } } |
   { 'InsufficientFunds' : { 'balance' : bigint } };
 export interface ArchiveCanister {
+  'active' : boolean,
   'canister_id' : Principal,
   'end_index' : [] | [bigint],
   'start_index' : bigint,
@@ -26,8 +27,8 @@ export interface ArchiveCanister {
 export type ArchiveDownReason = { 'UpgradingArchivesFailed' : string } |
   { 'NoArchiveCanisters' : string } |
   { 'Upgrading' : null } |
-  { 'InitializingFirstArchiveFailed' : string } |
   { 'ActiveSwapCapacityFull' : null } |
+  { 'NewArchiveError' : NewArchiveError } |
   { 'LowOrigynToken' : string };
 export interface Args { 'page' : bigint, 'limit' : bigint }
 export interface Args_1 {
@@ -80,8 +81,13 @@ export type LockError = { 'NftAlreadyLocked' : Array<bigint> } |
   { 'NftNotLocked' : null };
 export type MintError = { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'TransferFailed' : TransferFailReason };
+export type NewArchiveError = { 'CreateCanisterError' : string } |
+  { 'CantFindControllers' : string } |
+  { 'FailedToSerializeInitArgs' : string } |
+  { 'InstallCodeError' : string };
 export interface NftCanisterConf { 'grams' : number }
 export type NftInvalidError = { 'InvalidNftOwner' : string } |
+  { 'NftIdStringTooLong' : string } |
   { 'AlreadyLocked' : null } |
   { 'CantGetOrigynID' : string } |
   { 'InvalidNFTCollectionPrincipal' : null } |
@@ -94,7 +100,8 @@ export type NftTransferError = { 'FailedToGetOgyFeeAllowance' : string } |
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'CallError' : string } |
   { 'TransferFailed' : string };
-export type NftValidationError = { 'WeightParseError' : null } |
+export type NftValidationError = { 'NftIdStringTooLong' : string } |
+  { 'WeightParseError' : null } |
   { 'CanisterInvalid' : null } |
   { 'CantGetOrigynID' : string } |
   { 'CantVerifySwapCanisterOwnsNft' : null } |
@@ -105,6 +112,7 @@ export type NotificationError = { 'InvalidSaleSubaccount' : null } |
   { 'InvalidTokenSpec' : null } |
   { 'TimeoutInvalid' : string } |
   { 'InvalidEscrowSubaccount' : string } |
+  { 'SaleIDStringTooLong' : string } |
   { 'TooManyPrincipalsInAllowList' : null } |
   { 'OrigynStringIdDoesNotMatch' : string } |
   { 'SellerIsNotPrincipalOrAccount' : string } |
@@ -134,6 +142,8 @@ export type ServiceDownReason = { 'ArchiveRelated' : ArchiveDownReason } |
   { 'Initializing' : null } |
   { 'ActiveSwapCapacityFull' : null } |
   { 'LowOrigynToken' : string };
+export type ServiceStatus = { 'Up' : null } |
+  { 'Down' : ServiceDownReason };
 export interface SwapDetailForward {
   'nft_id' : bigint,
   'status' : SwapStatusForward,
@@ -165,7 +175,7 @@ export type SwapErrorForward = {
   { 'UnexpectedError' : ImpossibleErrorReason } |
   { 'NotificationFailed' : NotificationError } |
   { 'MintFailed' : MintError } |
-  { 'Expired' : null };
+  { 'Expired' : SwapStatusForward };
 export type SwapErrorReverse = { 'FeeTransferFailed' : FeeTransferError } |
   { 'EscrowFailed' : EscrowError } |
   { 'LockFailed' : LockError } |
@@ -184,6 +194,7 @@ export type SwapNftForTokensErrors = { 'Limit' : string } |
       Array<[bigint, Array<NftInvalidError>]>,
     ]
   } |
+  { 'CantBeAnonymous' : string } |
   { 'ServiceDown' : ServiceDownReason };
 export type SwapStatusForward = {
     'DepositRecoveryFailed' : [SwapStatusForward, DepositRecoveryError]
@@ -228,6 +239,7 @@ export type SwapTokensForNftRequestErrors = {
   { 'CantForgeSwapId' : null } |
   { 'NftLocked' : LockError } |
   { 'NftValidationErrors' : Array<NftValidationError> } |
+  { 'CantBeAnonymous' : string } |
   { 'NotOwnedBySwapCanister' : null } |
   { 'ServiceDown' : ServiceDownReason } |
   { 'SwapCreationError' : null };
@@ -273,6 +285,7 @@ export interface _SERVICE {
   'get_historic_swaps' : ActorMethod<[Args], Result>,
   'get_historic_swaps_by_user' : ActorMethod<[Args_1], Result_1>,
   'get_history_total' : ActorMethod<[[] | [Principal]], bigint>,
+  'get_service_status' : ActorMethod<[null], ServiceStatus>,
   'get_swap' : ActorMethod<
     [[bigint, bigint]],
     [] | [[[bigint, bigint], SwapInfo]]
@@ -283,3 +296,4 @@ export interface _SERVICE {
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
+

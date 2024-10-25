@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 
+import { LogoGLDT } from "@components/shared/logos";
+
 const ColInfoGLDT = ({
   children,
   className,
@@ -10,7 +12,7 @@ const ColInfoGLDT = ({
   return (
     <div className={className}>
       <div className="flex items-center gap-2">
-        <img className="flex-none h-4" src={`/gldt_logo.svg`} />
+        <LogoGLDT className="flex-none w-4 h-4" />
         <div className="font-semibold">{children}</div>
         <div className="text-content/60 text-sm">GLDT</div>
       </div>

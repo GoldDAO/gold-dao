@@ -47,6 +47,7 @@ const ReverseSwapTo = () => {
       {isConnected &&
         isSuccess &&
         !isLoading &&
+        !isError &&
         nftState.nfts.map((d, index) => {
           return (
             !d.isEmpty && (

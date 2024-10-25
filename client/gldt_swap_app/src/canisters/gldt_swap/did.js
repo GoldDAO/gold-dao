@@ -40,6 +40,7 @@ export const idlFactory = ({ IDL }) => {
     InvalidTokenSpec: IDL.Null,
     TimeoutInvalid: IDL.Text,
     InvalidEscrowSubaccount: IDL.Text,
+    SaleIDStringTooLong: IDL.Text,
     TooManyPrincipalsInAllowList: IDL.Null,
     OrigynStringIdDoesNotMatch: IDL.Text,
     SellerIsNotPrincipalOrAccount: IDL.Text,
@@ -92,7 +93,7 @@ export const idlFactory = ({ IDL }) => {
     UnexpectedError: ImpossibleErrorReason,
     NotificationFailed: NotificationError,
     MintFailed: MintError,
-    Expired: IDL.Null,
+    Expired: SwapStatusForward,
   });
   SwapStatusForward.fill(
     IDL.Variant({
@@ -165,6 +166,7 @@ export const idlFactory = ({ IDL }) => {
     NftNotLocked: IDL.Null,
   });
   const NftValidationError = IDL.Variant({
+    NftIdStringTooLong: IDL.Text,
     WeightParseError: IDL.Null,
     CanisterInvalid: IDL.Null,
     CantGetOrigynID: IDL.Text,
@@ -235,6 +237,7 @@ export const idlFactory = ({ IDL }) => {
     Reverse: SwapDetailReverse,
   });
   const ArchiveCanister = IDL.Record({
+    active: IDL.Bool,
     canister_id: IDL.Principal,
     end_index: IDL.Opt(IDL.Nat),
     start_index: IDL.Nat,
@@ -259,6 +262,30 @@ export const idlFactory = ({ IDL }) => {
     Ok: IDL.Vec(IDL.Tuple(IDL.Tuple(IDL.Nat, IDL.Nat), SwapInfo)),
     Err: GetHistoricSwapsByUserError,
   });
+  const NewArchiveError = IDL.Variant({
+    CreateCanisterError: IDL.Text,
+    CantFindControllers: IDL.Text,
+    FailedToSerializeInitArgs: IDL.Text,
+    InstallCodeError: IDL.Text,
+  });
+  const ArchiveDownReason = IDL.Variant({
+    UpgradingArchivesFailed: IDL.Text,
+    NoArchiveCanisters: IDL.Text,
+    Upgrading: IDL.Null,
+    ActiveSwapCapacityFull: IDL.Null,
+    NewArchiveError: NewArchiveError,
+    LowOrigynToken: IDL.Text,
+  });
+  const ServiceDownReason = IDL.Variant({
+    ArchiveRelated: ArchiveDownReason,
+    Initializing: IDL.Null,
+    ActiveSwapCapacityFull: IDL.Null,
+    LowOrigynToken: IDL.Text,
+  });
+  const ServiceStatus = IDL.Variant({
+    Up: IDL.Null,
+    Down: ServiceDownReason,
+  });
   const RemoveIntentToSwapError = IDL.Variant({
     InvalidSwapType: IDL.Text,
     InvalidUser: IDL.Null,
@@ -271,25 +298,12 @@ export const idlFactory = ({ IDL }) => {
   });
   const NftInvalidError = IDL.Variant({
     InvalidNftOwner: IDL.Text,
+    NftIdStringTooLong: IDL.Text,
     AlreadyLocked: IDL.Null,
     CantGetOrigynID: IDL.Text,
     InvalidNFTCollectionPrincipal: IDL.Null,
     InvalidTokenAmount: IDL.Null,
     CantGetNatIdOfNft: IDL.Null,
-  });
-  const ArchiveDownReason = IDL.Variant({
-    UpgradingArchivesFailed: IDL.Text,
-    NoArchiveCanisters: IDL.Text,
-    Upgrading: IDL.Null,
-    InitializingFirstArchiveFailed: IDL.Text,
-    ActiveSwapCapacityFull: IDL.Null,
-    LowOrigynToken: IDL.Text,
-  });
-  const ServiceDownReason = IDL.Variant({
-    ArchiveRelated: ArchiveDownReason,
-    Initializing: IDL.Null,
-    ActiveSwapCapacityFull: IDL.Null,
-    LowOrigynToken: IDL.Text,
   });
   const SwapNftForTokensErrors = IDL.Variant({
     Limit: IDL.Text,
@@ -299,6 +313,7 @@ export const idlFactory = ({ IDL }) => {
       IDL.Vec(IDL.Nat),
       IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Vec(NftInvalidError)))
     ),
+    CantBeAnonymous: IDL.Text,
     ServiceDown: ServiceDownReason,
   });
   const Result_3 = IDL.Variant({
@@ -319,6 +334,7 @@ export const idlFactory = ({ IDL }) => {
     CantForgeSwapId: IDL.Null,
     NftLocked: LockError,
     NftValidationErrors: IDL.Vec(NftValidationError),
+    CantBeAnonymous: IDL.Text,
     NotOwnedBySwapCanister: IDL.Null,
     ServiceDown: ServiceDownReason,
     SwapCreationError: IDL.Null,
@@ -351,6 +367,7 @@ export const idlFactory = ({ IDL }) => {
     get_historic_swaps: IDL.Func([Args], [Result], []),
     get_historic_swaps_by_user: IDL.Func([Args_1], [Result_1], []),
     get_history_total: IDL.Func([IDL.Opt(IDL.Principal)], [IDL.Nat], []),
+    get_service_status: IDL.Func([IDL.Null], [ServiceStatus], []),
     get_swap: IDL.Func(
       [IDL.Tuple(IDL.Nat, IDL.Nat)],
       [IDL.Opt(IDL.Tuple(IDL.Tuple(IDL.Nat, IDL.Nat), SwapInfo))],

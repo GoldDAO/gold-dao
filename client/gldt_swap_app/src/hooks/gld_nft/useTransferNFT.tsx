@@ -40,7 +40,7 @@ export const useTransferNFT = () => {
       fee: number;
     }): Promise<void> => {
       const icrc2_approve_args = nfts.flatMap((nft) => {
-        console.log(`approve_args canisterID: ${nft.canisterId}`);
+        // console.log(`approve_args canisterID: ${nft.canisterId}`);
         const amount = BigInt(
           nft.tokenIds.length * (fee * 10 ** 8 + OGY_TX_FEE)
         );
@@ -59,8 +59,8 @@ export const useTransferNFT = () => {
         };
       }) as ApproveArgs[];
 
-      console.log("approve_args:");
-      console.log(icrc2_approve_args);
+      // console.log("approve_args:");
+      // console.log(icrc2_approve_args);
       const approve = await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
@@ -74,12 +74,12 @@ export const useTransferNFT = () => {
           "Transfer error! One or more approve transactions failed."
         );
       }
-      console.log("approve result:");
-      console.log(approve);
+      // console.log("approve result:");
+      // console.log(approve);
 
       const icrc7_transfer_args = nfts.map((nft) => {
         const tokenIds = nft.tokenIds.map((tokenId) => {
-          console.log(`transfer_args to address: ${to}`);
+          // console.log(`transfer_args to address: ${to}`);
           return {
             to: {
               owner: Principal.fromText(to),
@@ -97,8 +97,8 @@ export const useTransferNFT = () => {
         };
       });
 
-      console.log("transfer_args:");
-      console.log(icrc7_transfer_args);
+      // console.log("transfer_args:");
+      // console.log(icrc7_transfer_args);
       const transfer = await Promise.allSettled(
         icrc7_transfer_args.map(async (arg) => await icrc7_transfer(arg))
       );
@@ -111,8 +111,8 @@ export const useTransferNFT = () => {
           "Transfer error! One or more transfer transactions failed"
         );
       }
-      console.log("transfer result:");
-      console.log(transfer);
+      // console.log("transfer result:");
+      // console.log(transfer);
     },
   });
 };

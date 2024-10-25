@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 
 import "@nfid/identitykit/react/styles.css";
 
+import { APP_MODE } from "@constants";
 import { colors as themeColors } from "@theme/preset";
 import App from "./App";
 
@@ -49,7 +50,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
     <QueryClientProvider client={queryClient}>
       <AuthProvider
-        // derivationOrigin="https://oj7ri-2qaaa-aaaap-abrzq-cai.icp0.io"
+        derivationOrigin={
+          APP_MODE !== "dev"
+            ? "https://oj7ri-2qaaa-aaaap-abrzq-cai.icp0.io"
+            : undefined
+        }
         targets={[
           GLD_NFT_1G_CANISTER_ID,
           GLD_NFT_10G_CANISTER_ID,
