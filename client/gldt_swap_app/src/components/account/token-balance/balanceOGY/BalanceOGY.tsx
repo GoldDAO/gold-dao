@@ -24,7 +24,11 @@ const BalanceOGY = ({ className }: { className?: string }) => {
               <div className="font-semibold text-2xl">{balance.string}</div>
               <div className="font-semibold text-2xl">OGY</div>
             </div>
-            <div className="font-light text-content/60">={balanceOGYUSD} $</div>
+            {balanceOGYUSD && (
+              <div className="font-light text-content/60">
+                ={balanceOGYUSD} $
+              </div>
+            )}
           </div>
         )}
         {(isLoading || isError) && (

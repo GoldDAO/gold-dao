@@ -10,7 +10,7 @@ export const useGetGLDTPrice = () => {
   const gldGovPrice = async () => {
     const actor = createActor("icp_swap");
     try {
-      const gldt_ledger_id = "tyyy3-4aaaa-aaaaq-aab7a-cai"; // todo set to GLDT_LEDGER_CANISTER_ID when icp swap has pair . using gldgov for now
+      const gldt_ledger_id = "tyyy3-4aaaa-aaaaq-aab7a-cai"; // ! todo set to GLDT_LEDGER_CANISTER_ID when icp swap has pair . using gldgov for now
       const pools = (await actor.getPoolsForToken(gldt_ledger_id)) as Awaited<
         GetPoolsForTokenResponse[]
       >;
