@@ -8,9 +8,10 @@ const TokensInfos: React.FC = () => {
 
   return (
     <section className='flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 4xl:max-w-screen-3xl'>
-      <p className='text-[30px] font-inter font-light leading-[36px] text-center px-5 md:px-0 lg:max-w-4xl my-[96px] text-[#000000CC]'>
-        {t('description')}
-      </p>
+      <div className='my-[96px]  font-inter leading-[36px] text-center px-5 md:px-0 md:max-w-2xl lg:max-w-6xl  text-[#000000CC]'>
+        <p className='font-semibold text-[30px]'>{t('subtitle')}</p>
+        <p className='font-light pt-4 text-[25px]'>{t('description')}</p>
+      </div>
       <div className='lg:max-w-7xl xl:max-w-[1289px] 2xl:max-w-[91rem] 3xl:max-w-[90rem]'>
         <CardGrid />
       </div>

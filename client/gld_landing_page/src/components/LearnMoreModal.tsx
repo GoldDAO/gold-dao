@@ -1,20 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import Image from 'next/image'
+import {
+  disableBodyScroll,
+  enableBodyScroll,
+  clearAllBodyScrollLocks
+} from 'body-scroll-lock'
 
 interface LearnMoreModalProps {
   onClose: () => void
-  cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg'
+  cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg' | ''
 }
 
 const LearnMoreModal = ({ onClose, cardKey }: LearnMoreModalProps) => {
   const { t } = useTranslation('learnMoreModal')
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden'
+    const modalElement = modalRef.current
+    if (modalElement) {
+      disableBodyScroll(modalElement)
+    }
+
     return () => {
-      document.body.style.overflow = 'auto'
+      if (modalElement) {
+        enableBodyScroll(modalElement)
+      }
+      clearAllBodyScrollLocks()
     }
   }, [])
 
@@ -89,9 +101,10 @@ const LearnMoreModal = ({ onClose, cardKey }: LearnMoreModalProps) => {
           <a
             href={t(`${cardKey}.learnMoreLink`)}
             target='_blank'
+            rel='noopener noreferrer'
             className='main-button w-fit'
           >
-            Learn more
+            {t(`${cardKey}.button`)}
           </a>
         )}
         {!hasLink && (

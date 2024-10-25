@@ -13,7 +13,8 @@
       "Earn rewards: Stakers of GLDGov tokens receive staking rewards and financially benefit from the project’s success, as a portion of the revenue flows back into the DAO."
     ],
     "bottomDescription": "Experience industry-leading security and full transparency through Gold DAO’s decentralised governance, where your decisions help shape a secure, trusted system for all participants.",
-    "learnMoreLink": "https://docs.gold-dao.org/"
+    "learnMoreLink": "https://docs.gold-dao.org/",
+    "button": "Visit Knowledge hub"
   },
   "gld_nft": {
     "title": "GLD NFT",
@@ -27,7 +28,8 @@
       "Seamless redeemability: GLD NFT holders enjoy the flexibility of redeeming their digital gold for physical gold – or vice versa – bridging the gap between the digital and physical asset worlds with ease."
     ],
     "bottomDescription": "Own gold securely with GLD NFTs and enjoy the peace of mind of physical gold ownership with the convenience of a digital asset.",
-    "learnMoreLink": "https://yumi.io/gold/about"
+    "learnMoreLink": "https://gold.bity.com",
+    "button": "Buy GLD NFT"
   },
   "gldt": {
     "title": "GLDT",
@@ -42,7 +44,8 @@
       "DeFi collateral: GLDT offers a highly efficient and stable collateral solution for DeFi platforms, backed by physical gold. This creates a strong foundation for decentralised financial transactions, offering investors security and stability."
     ],
     "bottomDescription": "GLDT provides the security of gold ownership with the flexibility to use it as easily as digital currency for everyday transactions.",
-    "learnMoreLink": "https://gldt.org/"
+    "learnMoreLink": "https://gldt.org/",
+    "button": "Visit GLDT website"
   },
   "usdg": {
     "title": "USDG",
@@ -55,6 +58,7 @@
       "Full transparency: USDG is backed by GLDT tokens, and those tokens are further backed by GLD NFTs, providing direct ownership of physical gold.",
       "Financial stability: The inherent price stability of GLDT makes USDG an ideal asset for DeFi applications (such as lending, borrowing, trading and/or staking). It allows for lower collateralisation ratios compared to other assets, making USDG both stable and capital efficient."
     ],
-    "bottomDescription": "Count on USDG for financial stability, backed by the strength of gold and conveniently usable across both decentralised and traditional finance."
+    "bottomDescription": "Count on USDG for financial stability, backed by the strength of gold and conveniently usable across both decentralised and traditional finance.",
+    "button": ""
   }
 }

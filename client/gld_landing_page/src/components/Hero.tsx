@@ -46,12 +46,12 @@ const InfoCard = ({
 
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const { data, isLoading, error } = useTokenMetrics()
+  // const { data, isLoading, error } = useTokenMetrics()
 
   const { t } = useTranslation('hero')
 
-  const totalGoldLockedKg = data ? data.total_gold_kg.toFixed(2) : null
-  const marketCapUSD = data ? `${data.tvl.toLocaleString('en-US')}` : null
+  // const totalGoldLockedKg = data ? data.total_gold_kg.toFixed(2) : null
+  // const marketCapUSD = data ? `${data.tvl.toLocaleString('en-US')}` : null
 
   return (
     <div className='h-[100vh] md:h-[75vh] w-full flex flex-col items-center justify-center px-2 md:px-10 '>
@@ -76,7 +76,7 @@ const Hero = () => {
           {t('title')}
         </h1>
         <p
-          className='text-[40px] md:text-[82px] font-inter font-light leading-[90px] text-[rgba(0,0,0,0.80)]  w-3/4 md:w-full mx-auto  md:max-w-2xl'
+          className='text-[40px] md:text-[46px] font-inter font-light leading-[90px] text-[rgba(0,0,0,0.80)]  w-full mx-auto  md:max-w-6xl'
           style={{
             textShadow:
               '0px 10px 15px rgba(0, 0, 0, 0.10), 0px 4px 6px rgba(0, 0, 0, 0.05)'
