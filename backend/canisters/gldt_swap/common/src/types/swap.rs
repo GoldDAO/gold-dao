@@ -279,16 +279,7 @@ pub enum SwapErrorForward {
     BidFailed(BidFailError),
     UnexpectedError(ImpossibleErrorReason),
     DepositRecoveryFailed(DepositRecoveryError),
-    Expired,
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapErrorForwardMainProcess {
-    NotificationFailed(NotificationError),
-    MintFailed(MintError),
-    BidFailed(BidFailError),
-    UnexpectedError(ImpossibleErrorReason),
-    Expired,
+    Expired(Box<SwapStatusForward>),
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]

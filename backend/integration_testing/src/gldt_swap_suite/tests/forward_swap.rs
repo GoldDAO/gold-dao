@@ -93,6 +93,7 @@ mod tests {
             ImpossibleErrorReason,
             MintError,
             NotificationError,
+            SwapStatus,
             TransferFailReason,
             STALE_SWAP_TIME_THRESHOLD_MINUTES,
         },
@@ -1059,7 +1060,12 @@ mod tests {
             &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
         ).unwrap();
         if let SwapInfo::Forward(details) = res.1 {
-            assert_eq!(details.status, SwapStatusForward::Failed(SwapErrorForward::Expired));
+            assert_eq!(
+                details.status,
+                SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(Box::new(SwapStatusForward::BidRequest))
+                )
+            );
         }
         // 11. verify the nft canister sent back the tokens to the swap canister ( burned them ) and so the supply of gldt is the same as when we started
         let post_fail_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
@@ -1473,7 +1479,12 @@ mod tests {
             &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
-            assert_eq!(details.status, SwapStatusForward::Failed(SwapErrorForward::Expired));
+            assert_eq!(
+                details.status,
+                SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(Box::new(SwapStatusForward::Init))
+                )
+            );
         }
         // check the burn fees got burnt
     }
@@ -1610,7 +1621,18 @@ mod tests {
             &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
-            assert_eq!(details.status, SwapStatusForward::Failed(SwapErrorForward::Expired));
+            assert_eq!(
+                details.status,
+                SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(
+                        Box::new(
+                            SwapStatusForward::NotificationFailed(
+                                NotificationError::InvalidTokenAmount
+                            )
+                        )
+                    )
+                )
+            );
         }
         // check the burn fees got burnt
     }
@@ -1677,7 +1699,12 @@ mod tests {
             &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
-            assert_eq!(details.status, SwapStatusForward::Failed(SwapErrorForward::Expired));
+            assert_eq!(
+                details.status,
+                SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(Box::new(SwapStatusForward::MintRequest))
+                )
+            );
         }
         // check the burn fees got burnt
     }
@@ -1813,7 +1840,18 @@ mod tests {
             &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
-            assert_eq!(details.status, SwapStatusForward::Failed(SwapErrorForward::Expired));
+            assert_eq!(
+                details.status,
+                SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(
+                        Box::new(
+                            SwapStatusForward::MintFailed(
+                                MintError::UnexpectedError(ImpossibleErrorReason::AmountNotFound)
+                            )
+                        )
+                    )
+                )
+            );
         }
         // check the burn fees got burnt
     }

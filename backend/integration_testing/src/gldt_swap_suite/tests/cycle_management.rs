@@ -1,5 +1,6 @@
 use std::time::Duration;
 use canister_time::HOUR_IN_MS;
+use gldt_swap_common::swap::SwapStatus;
 use gldt_swap_common::{ archive::ArchiveCanister, swap::SwapIndex };
 
 use crate::client::gldt_swap::get_archive_canisters;
@@ -44,7 +45,9 @@ fn insert_bulk_fake_swaps(
                 nft_id: NftID(Nat::from(i)),
                 nft_id_string: i.to_string(),
                 nft_canister: Principal::anonymous(),
-                status: SwapStatusForward::Failed(SwapErrorForward::Expired),
+                status: SwapStatusForward::Failed(
+                    SwapErrorForward::Expired(Box::new(SwapStatusForward::BidRequest))
+                ),
                 sale_id: String::from(""),
                 created_at: time_now,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),

@@ -791,7 +791,11 @@ pub async fn forward_swap_perform_deposit_recovery(swap_id: &SwapId) -> Result<(
                 SwapStatusForward::BidRequest => {
                     let _ = &swap.update_status(
                         // we have the deposit back, a request must have timed out or the notification never came to the swap canister so there should be no error to propogate
-                        SwapStatus::Forward(SwapStatusForward::Failed(SwapErrorForward::Expired))
+                        SwapStatus::Forward(
+                            SwapStatusForward::Failed(
+                                SwapErrorForward::Expired(Box::new(original_error))
+                            )
+                        )
                     );
                     return Ok(());
                 }

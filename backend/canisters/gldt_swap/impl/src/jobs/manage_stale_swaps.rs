@@ -146,9 +146,18 @@ async fn retry_failed_burn_fees(swaps: Vec<SwapInfo>) {
 
 fn auto_expire_swaps(swaps: Vec<SwapInfo>) {
     for swap in swaps {
-        swap.update_status(
-            SwapStatus::Forward(SwapStatusForward::Failed(SwapErrorForward::Expired))
-        );
+        match swap.get_status() {
+            SwapStatus::Forward(current_forward_status) => {
+                swap.update_status(
+                    SwapStatus::Forward(
+                        SwapStatusForward::Failed(
+                            SwapErrorForward::Expired(Box::new(current_forward_status))
+                        )
+                    )
+                );
+            }
+            _ => {}
+        }
     }
 }
 async fn withdraw_expired_swap_deposits(swaps: Vec<SwapInfo>) {

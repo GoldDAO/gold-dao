@@ -110,6 +110,8 @@ fn insert_bulk_fake_swaps(env: &mut TestEnv, num_to_insert: usize) {
 
 #[cfg(test)]
 mod tests {
+    use gldt_swap_common::swap::SwapStatus;
+
     use super::*;
 
     #[test]
@@ -172,7 +174,9 @@ mod tests {
                 } else {
                     assert_eq!(
                         detail_forward.status,
-                        SwapStatusForward::Failed(SwapErrorForward::Expired)
+                        SwapStatusForward::Failed(
+                            SwapErrorForward::Expired(Box::new(SwapStatusForward::Init))
+                        )
                     );
                 }
             }
