@@ -12,9 +12,9 @@ const Select = ({
   value,
   handleOnChange,
   className,
-  // placeholder,
-}: {
-  options: Array<{ value: string | number; icon: string; label: string }>;
+}: // placeholder,
+{
+  options: Array<{ value: string | number; icon: ReactNode; label: string }>;
   value: string | number;
   handleOnChange: (v: string | number) => void;
   className?: string;
@@ -22,7 +22,7 @@ const Select = ({
 }) => {
   const displayValue = options.find((e) => e.value === value) as {
     value: string | number;
-    icon: string;
+    icon: ReactNode;
     label: string;
   };
 
@@ -33,7 +33,7 @@ const Select = ({
           <ListboxButton className="relative w-full cursor-pointer rounded-full bg-surface py-2 pl-4 pr-11 text-left border border-border focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <img src={displayValue.icon} className="w-4 h-4 mr-2" />
+                <div className="mr-2">{displayValue.icon}</div>
                 <div className={`truncate mr-3`}>{displayValue.value}</div>
               </div>
               <div className="bg-surface-2 rounded-sm px-2">
@@ -62,7 +62,7 @@ const Select = ({
                 {({ selected }) => (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <img src={option.icon} className="w-4 h-4 mr-2" />
+                      <div className="mr-2">{option.icon}</div>
                       <div
                         className={`truncate mr-3 ${
                           selected ? "font-semibold" : "font-normal"

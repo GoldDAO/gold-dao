@@ -83,14 +83,14 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      console.log("approve_args:");
-      console.log(icrc2_approve_args);
+      // console.log("approve_args:");
+      // console.log(icrc2_approve_args);
       const approve = await Promise.allSettled(
         icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
       );
 
-      console.log("approve result:");
-      console.log(approve);
+      // console.log("approve result:");
+      // console.log(approve);
 
       const approveErrors = approve.filter(
         (result) => result.status === "rejected"
@@ -102,8 +102,8 @@ export const useReverseSwap = () => {
         );
       }
 
-      console.log("icrc2_allowance_args:");
-      console.log(icrc2_allowance_args);
+      // console.log("icrc2_allowance_args:");
+      // console.log(icrc2_allowance_args);
 
       const swapTasks = icrc2_allowance_args.map(async (_, index) => {
         try {
@@ -119,8 +119,8 @@ export const useReverseSwap = () => {
       });
       const swap = await Promise.allSettled(swapTasks);
 
-      console.log("swap result:");
-      console.log(swap);
+      // console.log("swap result:");
+      // console.log(swap);
 
       const swapErrors = swap.filter((result) => result.status === "rejected");
       if (swapErrors.length > 0) {

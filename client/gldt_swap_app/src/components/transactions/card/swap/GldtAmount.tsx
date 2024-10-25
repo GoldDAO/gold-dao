@@ -1,3 +1,5 @@
+import { LogoGLDT } from "@components/shared/logos";
+
 const GldtAmount = ({
   gldtAmount,
   className,
@@ -12,7 +14,7 @@ const GldtAmount = ({
           GLDT amount
         </div>
         <div className="flex items-center justify-center sm:justify-start gap-2">
-          <img className="flex-none h-8" src={`/gldt_logo.svg`} />
+          <LogoGLDT className="flex-none w-8 h-8" />
           <div className="font-semibold text-4xl">{gldtAmount}</div>
           <div className="font-semibold text-xl">GLDT</div>
         </div>

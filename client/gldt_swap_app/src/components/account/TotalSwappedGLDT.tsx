@@ -1,5 +1,6 @@
 import { useGetUserNftsMetrics } from "@hooks/gld_nft";
 import { LoaderSpin } from "@components/ui";
+import { LogoGLDT } from "@components/shared/logos";
 
 const TotalSwappedGLDT = ({ className }: { className?: string }) => {
   const { data, isSuccess, isLoading, isError } = useGetUserNftsMetrics();
@@ -12,7 +13,7 @@ const TotalSwappedGLDT = ({ className }: { className?: string }) => {
         </div>
         {isSuccess && (
           <div className="flex items-center justify-center sm:justify-start gap-2">
-            <img className="flex-none h-8" src={`/gldt_logo.svg`} />
+            <LogoGLDT className="flex-none w-8 h-8" />
             <div className="font-semibold text-4xl">
               {data?.totalCountGLDT ?? 0}
             </div>

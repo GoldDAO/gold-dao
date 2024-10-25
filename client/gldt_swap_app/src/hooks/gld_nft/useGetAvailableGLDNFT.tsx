@@ -120,7 +120,7 @@ export const useGetAvailableGLDNFT = () => {
     } else if (_isError || active_swaps.isError) {
       if (_error) console.log(_error);
       setIsError(true);
-      setError("Error while fetching available NFTs :(.");
+      setError("Error while fetching available GLD NFTs.");
       setIsInitializing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
