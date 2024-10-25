@@ -7,7 +7,6 @@ const WhatInfos: React.FC = () => {
 
   return (
     <section className='bg-white'>
-      {/* Section Title and Description */}
       <div className='flex flex-col md:flex-row w-full border-y border-secondary'>
         <div className='md:w-1/2 py-16 md:py-0 md:mt-16 border-b md:border-0 border-secondary'>
           <p className='text-[30px] text-center'>
@@ -37,7 +36,6 @@ const WhatInfos: React.FC = () => {
         </div>
       </div>
 
-      {/* Section Features */}
       <div className='w-full flex flex-col md:flex-row border-b  border-secondary'>
         {['decentralized', 'ownership', 'crossChain', 'audited'].map(
           (feature, index) => {

@@ -1,19 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   disableBodyScroll,
   enableBodyScroll,
   clearAllBodyScrollLocks
 } from 'body-scroll-lock'
+import { TFunction } from 'i18next'
 
 interface LearnMoreModalProps {
   onClose: () => void
   cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg' | ''
+  t: TFunction
 }
 
-const LearnMoreModal = ({ onClose, cardKey }: LearnMoreModalProps) => {
-  const { t } = useTranslation('learnMoreModal')
+const LearnMoreModal = ({ onClose, cardKey, t }: LearnMoreModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const LearnMoreModal = ({ onClose, cardKey }: LearnMoreModalProps) => {
       }
       clearAllBodyScrollLocks()
     }
-  }, [])
+  }, [cardKey, t])
 
   const handleOutsideClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -47,7 +47,7 @@ const LearnMoreModal = ({ onClose, cardKey }: LearnMoreModalProps) => {
       className='fixed inset-0 flex items-center justify-center bg-[#212425] bg-opacity-70 z-50'
       onClick={handleOutsideClick}
     >
-      <div className='bg-white rounded-2xl px-6 py-6 md:px-20 md:pb-20 md:pt-10 w-[95%] lg:w-3/4 2xl:w-3/4 3xl:w-1/2 4xl:w-1/3 shadow-lg relative space-y-4 max-h-[95vh] overflow-y-auto'>
+      <div className='bg-white rounded-2xl px-6 py-6 md:px-20 md:pb-20 xl:pb-10 2xl:pb-20 md:pt-10 w-[95%] lg:w-3/4 2xl:w-3/4 3xl:w-1/2 4xl:w-1/3 shadow-lg relative space-y-4 max-h-[95vh] overflow-y-auto'>
         <button
           className='absolute top-4 right-4 text-gray-400 text-2xl hover:text-gray-600'
           onClick={onClose}

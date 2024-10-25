@@ -4,17 +4,11 @@
 const Secure = () => {
   return (
     <section className='flex flex-col items-center justify-center gap-4 w-full mb-[96px] px-2 md:px-10 bg-[#FAF9F8]'>
-      {/* Titre */}
       <p className='font-bold text-3xl text-center'>
         Secure, audited, and regulated
       </p>
-
-      {/* Contenu */}
       <div className='space-y-4 text-center w-full md:w-1/2 2xl:w-[51%] 3xl:w-1/2 py-8 text-[#000000CC]'>
-        {/* Sous-titre */}
         <p className='font-bold'>Peace of mind for your investment</p>
-
-        {/* Description 1 avec lien */}
         <p>
           To ensure maximum safety, security and transparency, Gold DAO’s gold
           assets are audited every four months by KPMG, which issues an
@@ -30,8 +24,6 @@ const Secure = () => {
           </a>
           .
         </p>
-
-        {/* Description 2 avec lien */}
         <p>
           All gold assets are sourced from{' '}
           <a
