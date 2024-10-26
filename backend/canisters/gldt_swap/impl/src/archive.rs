@@ -71,17 +71,28 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
 
 pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     let this_canister_id = read_state(|s| s.env.canister_id());
+    let test_mode = read_state(|s| s.env.is_test_mode());
     let mut controllers = get_canister_controllers(this_canister_id).await?;
     controllers.push(ic_cdk::api::id());
 
-    let initial_cycles = 2_000_000_000_000u64; // 2 Trillion cycles
+    let initial_cycles = if test_mode {
+        2_000_000_000_000u64 // 2 Trillion cycles
+    } else {
+        10_000_000_000_000u64 // 2 Trillion cycles
+    };
+
+    let reserved_cycles = if test_mode {
+        2_000_000_000_000u64 // 2 Trillion cycles
+    } else {
+        4_000_000_000_000u64 // 2 Trillion cycles
+    };
     // Define the initial settings for the new canister
     let settings = CanisterSettings {
         controllers: Some(controllers), // Ensure the current canister is a controller
         compute_allocation: None,
         memory_allocation: None,
         freezing_threshold: None,
-        reserved_cycles_limit: Some(Nat::from(initial_cycles)),
+        reserved_cycles_limit: Some(Nat::from(reserved_cycles)),
         log_visibility: Some(LogVisibility::Public),
         wasm_memory_limit: None, // use default of 3GB
     };
