@@ -5,7 +5,10 @@ use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
 use tracing::{ debug, info };
 
-use crate::{ state::{ mutate_state, read_state }, utils::{ get_historic_swap, trace } };
+use crate::{
+    state::{ mutate_state, read_state },
+    utils::{ commit_changes, get_historic_swap, trace },
+};
 
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
@@ -124,6 +127,10 @@ impl SwapInfoTrait for SwapInfo {
                 s.data.total_failed_swaps += 1;
             });
         }
+
+        ic_cdk::spawn(async move {
+            commit_changes().await;
+        });
 
         if should_move_to_history {
             if let Some(swap) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {

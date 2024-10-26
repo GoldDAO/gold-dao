@@ -296,6 +296,7 @@ type TransferFromError = variant {
 };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args_3) -> {
+  commit : () -> ();
   get_active_swap_ids_by_user : (opt principal) -> (
       vec record { nat; nat },
     ) query;

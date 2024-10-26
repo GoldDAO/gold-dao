@@ -51,7 +51,7 @@ use icrc_ledger_types::icrc1::{
 };
 use serde_bytes::ByteBuf;
 use icrc_ledger_canister_c2c_client::icrc1_transfer;
-use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
+use crate::{ state::{ mutate_state, read_state }, utils::{ commit_changes, transfer_token } };
 use crate::swap::swap_info::SwapInfoTrait;
 
 pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &SubscriberNotification) {
