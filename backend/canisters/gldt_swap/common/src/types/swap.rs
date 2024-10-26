@@ -397,6 +397,8 @@ pub enum NftValidationError {
     NotOwnedBySwapCanister,
     CantVerifySwapCanisterOwnsNft,
     NftIdStringTooLong(String),
+    UserDoesNotHaveTheRequiredGLDT(String),
+    CantValidateUserBalanceOfGLDT(String),
 }
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum NftTransferError {

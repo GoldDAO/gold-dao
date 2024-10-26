@@ -99,7 +99,7 @@ mod tests {
         },
     };
 
-    use crate::client::gldt_swap::recover_stuck_swap;
+    use crate::client::{ gldt_swap::recover_stuck_swap, icrc1_icrc2_token::icrc1_balance_of };
 
     use super::*;
     #[test]
@@ -212,6 +212,50 @@ mod tests {
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
             gldt_swap.to_string()
         );
+    }
+
+    #[test]
+    pub fn forward_swap_should_fail_if_user_doesnt_own_the_nft() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
+            principal_ids: PrincipalIds { net_principal, originator, nft_owner, controller },
+        } = env;
+        tick_n_blocks(pic, 2);
+
+        let pre_swap_gldt_supply = icrc1_total_supply(
+            pic,
+            Principal::anonymous(),
+            gldt_ledger,
+            &()
+        );
+
+        // 1. setup nft and verify owner
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            nft_owner.clone(),
+            "1".to_string()
+        );
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string()
+        );
+
+        let res = swap_nft_for_tokens(
+            pic,
+            controller, // controlelr doesn't own the nft
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+        );
+
+        matches!(res, Err(SwapNftForTokensErrors::NftValidationErrors((_, _))));
     }
 
     #[test]

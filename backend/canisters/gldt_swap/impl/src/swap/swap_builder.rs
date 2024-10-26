@@ -21,6 +21,8 @@ use gldt_swap_api_canister::{
 };
 
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
+use icrc_ledger_canister::icrc1_balance_of;
+use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::Account3;
 use origyn_nft_reference_c2c_client::{
@@ -331,6 +333,36 @@ impl SwapBuilder<SwapDetailReverse> {
         Ok(true)
     }
 
+    pub async fn _user_has_tokens_for_swap(
+        &self,
+        user_principal: &Principal,
+        amount_required: &Nat
+    ) -> Result<bool, NftValidationError> {
+        let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
+        let args = icrc1_balance_of::Args {
+            owner: user_principal.clone(),
+            subaccount: None,
+        };
+        match icrc1_balance_of(gldt_ledger_id, args).await {
+            Ok(user_balance) => {
+                if &user_balance >= amount_required {
+                    Ok(true)
+                } else {
+                    Err(
+                        NftValidationError::UserDoesNotHaveTheRequiredGLDT(
+                            format!(
+                                "User with principal : {user_principal} does not have the required GLDT to perform this swap. user balance is {user_balance}"
+                            )
+                        )
+                    )
+                }
+            }
+            Err(e) => { Err(NftValidationError::CantValidateUserBalanceOfGLDT(format!("{e:?}"))) }
+        }
+
+        // UserDoesNotHaveTheRequiredGLDT
+    }
+
     pub async fn init(
         self,
         init_args: &SwapTokensForNftArgs,
@@ -352,6 +384,12 @@ impl SwapBuilder<SwapDetailReverse> {
                 GldtNumTokens::invalid()
             }
         };
+
+        let _ = self
+            ._user_has_tokens_for_swap(&user_principal, &tokens_to_receive.get_with_fee()).await
+            .map_err(|e| {
+                errors.push(e);
+            });
 
         let _ = self
             ._is_owned_by_canister(&init_args.nft_id, &init_args.nft_canister_id).await

@@ -109,6 +109,8 @@ type NftTransferError = variant {
 type NftValidationError = variant {
   NftIdStringTooLong : text;
   WeightParseError;
+  CantValidateUserBalanceOfGLDT : text;
+  UserDoesNotHaveTheRequiredGLDT : text;
   CanisterInvalid;
   CantGetOrigynID : text;
   CantVerifySwapCanisterOwnsNft;
