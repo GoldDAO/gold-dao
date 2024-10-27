@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::mem;
-use candid::{ arc, Nat, Principal };
+use candid::{ Nat, Principal };
 use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_common::{ nft::NftID, swap::{ SwapId, SwapInfo, SwapIndex } };
 use serde::{ Deserialize, Serialize };

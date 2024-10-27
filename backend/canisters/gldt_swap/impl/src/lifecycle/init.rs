@@ -1,8 +1,5 @@
-use candid::Nat;
-use gldt_swap_common::swap::trace;
 use ic_cdk_macros::init;
-use tracing::{ debug, info };
-use types::BuildVersion;
+use tracing::info;
 use utils::env::CanisterEnv;
 
 pub use gldt_swap_api_canister::Args;
@@ -16,6 +13,10 @@ fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
             canister_logger::init(init_args.test_mode);
+
+            if init_args.test_mode {
+                info!("INIT :: in test mode");
+            }
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
@@ -34,7 +35,7 @@ fn init(args: Args) {
 
             // on staging - set a slighly higher threshold - based on a swap size of 2000 we expect around 4000~ swaps per page size ( per 8mb )
             if init_args.test_mode {
-                debug!("INIT :: settingg max threshold to 64mb");
+                info!("INIT :: settingg max threshold to 64mb");
                 data.max_canister_archive_threshold = 32 * 1024 * (1024 as u128); // 64M
                 data.archive_buffer = 100;
             }

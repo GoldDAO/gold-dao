@@ -8,3 +8,6 @@ pub mod get_service_status;
 pub mod set_base_ogy_swap_fee;
 pub mod get_history_total;
 pub mod insert_fake_bulk_swaps;
+pub mod get_swap;
+pub mod get_historic_swaps;
+pub mod get_historic_swaps_by_user;

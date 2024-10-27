@@ -32,7 +32,7 @@ use origyn_nft_reference_c2c_client::{
 };
 use types::TimestampMillis;
 use utils::{ env::Environment, retry_async::retry_async };
-use crate::{ state::{ read_state, FeeAccount }, utils::trace };
+use crate::state::{ read_state, FeeAccount };
 
 #[derive(Clone)]
 pub struct SwapBuilder<T> {
@@ -206,8 +206,6 @@ impl SwapBuilder<SwapDetailForward> {
         if let Err(e) = self._verify_nft_id_string(&nft_id_string) {
             errors.push(e);
         }
-
-        trace(&format!("//////// {tokens_to_mint:?}"));
 
         let is_locked = read_state(|s| s.data.swaps.get_active_swap_by_string_id(&nft_id_string));
         if is_locked.is_some() {

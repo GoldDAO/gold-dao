@@ -5,10 +5,7 @@ use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
 use tracing::{ debug, info };
 
-use crate::{
-    state::{ mutate_state, read_state },
-    utils::{ commit_changes, get_historic_swap, trace },
-};
+use crate::{ state::{ mutate_state, read_state }, utils::{ commit_changes, get_historic_swap } };
 
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
@@ -157,7 +154,6 @@ impl SwapInfoTrait for SwapInfo {
                 "ERROR : can't insert swap with SwapId : {swap_id:?}. it already exists in history"
             );
             debug!(message);
-            trace(&message);
             return Err(());
         }
 

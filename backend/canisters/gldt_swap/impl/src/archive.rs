@@ -1,4 +1,4 @@
-use candid::{ CandidType, Encode, Nat, Principal };
+use candid::{ Encode, Nat, Principal };
 use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_api_archive::lifecycle::Args as ArgsArchive;
 use gldt_swap_api_archive::{ init::InitArgs, post_upgrade::UpgradeArgs };
@@ -18,7 +18,6 @@ use ic_cdk::api::management_canister::main::{
     InstallCodeArgument,
     LogVisibility,
 };
-use serde::{ Deserialize, Serialize };
 use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 

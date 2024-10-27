@@ -1,11 +1,3 @@
-/*!
-
-- gets fee deposit accounts for each nft canister - sale_info_nft_origyn(#fee_deposit_info
-- transfers ogy to deposit accounts if they are low - query balance and topup
-
-
-*/
-
 use crate::{ state::{ mutate_state, read_state, FeeAccount }, utils::trace };
 use candid::{ Nat, Principal };
 use canister_time::{ run_now_then_interval, MINUTE_IN_MS };

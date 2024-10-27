@@ -13,7 +13,6 @@ use crate::{
     service_status::check_service_status,
     state::read_state,
     swap::swap_builder::SwapBuilder,
-    utils::trace,
 };
 pub use gldt_swap_api_canister::swap_nft_for_tokens::{
     Args as SwapNftForTokensArgs,
@@ -118,7 +117,6 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
     }
 
     if invalid_nft_ids.len() > 0 {
-        trace("///// returning here 1");
         return Err(SwapNftForTokensErrors::NftValidationErrors((valid_nft_ids, invalid_nft_ids)));
     } else {
         let mut insert_errors: Vec<(NftID, Vec<NftInvalidError>)> = vec![];
@@ -145,7 +143,6 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
             }
         }
         if insert_errors.len() > 0 {
-            trace("///// returning here 2");
             return Err(SwapNftForTokensErrors::NftValidationErrors((valid_nfts, insert_errors)));
         } else {
             return Ok(swap_ids_to_return);

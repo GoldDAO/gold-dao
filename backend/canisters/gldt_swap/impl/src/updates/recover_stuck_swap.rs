@@ -9,7 +9,6 @@ use ic_cdk::update;
 pub use gldt_swap_common::nft::NftID;
 use crate::guards::caller_is_authorized;
 
-use crate::state::mutate_state;
 use crate::swap::forward_swap::forward_swap_perform_deposit_recovery;
 use crate::swap::swap_info::SwapInfoTrait;
 use crate::{
@@ -72,7 +71,7 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                     )
                 {
                     match &details.status {
-                        SwapStatusForward::DepositRecoveryRequest(swap_status_forward) => {
+                        SwapStatusForward::DepositRecoveryRequest(_) => {
                             swap.update_status(
                                 SwapStatus::Forward(
                                     SwapStatusForward::DepositRecoveryRequest(
@@ -81,7 +80,7 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                                 )
                             );
                         }
-                        SwapStatusForward::DepositRecoveryInProgress(swap_status_forward) => {
+                        SwapStatusForward::DepositRecoveryInProgress(_) => {
                             swap.update_status(
                                 SwapStatus::Forward(
                                     SwapStatusForward::DepositRecoveryRequest(
@@ -90,10 +89,7 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                                 )
                             );
                         }
-                        SwapStatusForward::DepositRecoveryFailed(
-                            swap_status_forward,
-                            deposit_recovery_error,
-                        ) => {
+                        SwapStatusForward::DepositRecoveryFailed(swap_status_forward, _) => {
                             swap.update_status(
                                 SwapStatus::Forward(
                                     SwapStatusForward::DepositRecoveryRequest(

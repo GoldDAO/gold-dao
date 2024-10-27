@@ -12,7 +12,6 @@ pub use gldt_swap_api_canister::insert_fake_swap::{
 };
 use crate::guards::caller_is_authorized;
 use crate::swap::swap_info::SwapInfoTrait;
-use gldt_swap_common::swap::MAX_SWAP_INFO_BYTES_SIZE;
 
 #[cfg(feature = "inttest")]
 #[update(hidden = true, guard = "caller_is_authorized")]
@@ -23,7 +22,6 @@ async fn insert_fake_swap(swap: InsertFakeSwapArgs) -> InsertFakeSwapResponse {
 async fn insert_fake_swap_impl(swap: InsertFakeSwapArgs) -> InsertFakeSwapResponse {
     // valid and create new swaps - error swaps are saved too
     let mut new_swap = swap.clone();
-    trace(&format!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"));
 
     match &mut new_swap {
         SwapInfo::Forward(swap_details) => {

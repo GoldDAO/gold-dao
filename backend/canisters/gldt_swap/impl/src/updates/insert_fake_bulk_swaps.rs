@@ -12,7 +12,6 @@ pub use gldt_swap_api_canister::insert_fake_bulk_swaps::{
 };
 use crate::guards::caller_is_authorized;
 use crate::swap::swap_info::SwapInfoTrait;
-use gldt_swap_common::swap::MAX_SWAP_INFO_BYTES_SIZE;
 
 #[cfg(feature = "inttest")]
 #[update(hidden = true, guard = "caller_is_authorized")]

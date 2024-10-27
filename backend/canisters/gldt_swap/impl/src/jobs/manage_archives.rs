@@ -1,10 +1,3 @@
-/*!
-# Runs once when
-- init 
-- upgrading
-
-*/
-
 use std::time::Duration;
 
 use crate::{
@@ -14,10 +7,7 @@ use crate::{
     update_archive_canisters,
 };
 use candid::Nat;
-use gldt_swap_common::{
-    archive::ArchiveCanister,
-    swap::{ trace, ArchiveDownReason, ArchiveStatus },
-};
+use gldt_swap_common::{ archive::ArchiveCanister, swap::{ ArchiveDownReason, ArchiveStatus } };
 use ic_cdk::trap;
 use tracing::{ debug, info };
 use canister_time::{ run_interval, run_once, SECOND_IN_MS };
@@ -101,9 +91,6 @@ pub fn spawn_manage_archives() {
 }
 
 pub async fn manage_archives() {
-    // get the latest archive,
-    // check it is 3/4 of capacity
-    // if it is, create a new one, with inactive status
     mutate_state(|s| {
         s.data.is_archive_cron_running = true;
     });

@@ -4,7 +4,7 @@ use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::{ timestamp_millis, MINUTE_IN_MS };
 use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Deserialize, Serialize };
-use tracing::{ debug, trace };
+use tracing::debug;
 use types::TimestampMillis;
 use icrc_ledger_types::{
     icrc1::{ account::{ Account, Subaccount }, transfer::TransferError as TransferErrorIcrc },

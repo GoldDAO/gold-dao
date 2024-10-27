@@ -1,13 +1,11 @@
 use crate::{
     state::{ mutate_state, read_state },
     swap::forward_swap::{ forward_swap_perform_burn_fees, forward_swap_perform_deposit_recovery },
-    utils::{ is_nft_in_sale_state, trace },
+    utils::is_nft_in_sale_state,
 };
 use canister_time::{ run_interval, MINUTE_IN_MS };
 use futures::{ future::{ join_all, BoxFuture }, FutureExt };
-use gldt_swap_common::{
-    swap::{ SwapErrorForward, SwapId, SwapInfo, SwapStatus, SwapStatusForward },
-};
+use gldt_swap_common::swap::{ SwapErrorForward, SwapId, SwapInfo, SwapStatus, SwapStatusForward };
 use std::time::Duration;
 use types::Milliseconds;
 use crate::swap::swap_info::SwapInfoTrait;

@@ -3,7 +3,7 @@ use std::{ array::TryFromSliceError, ops::Deref };
 use candid::{ Nat, Principal };
 use canister_time::timestamp_nanos;
 use gldt_swap_common::{
-    gldt::{ GldtNumTokens, GldtTokenSpec, GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE, MEMO_GLDT_SWAP },
+    gldt::{ GldtNumTokens, GldtTokenSpec, GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE },
     swap::{
         BidFailError,
         BurnFeesError,
@@ -19,7 +19,6 @@ use gldt_swap_common::{
         TransferFailReason,
     },
 };
-use ic_stable_structures::Storable;
 use origyn_nft_reference::origyn_nft_reference_canister::{
     Account as NftSellerAccount,
     AskFeature,
@@ -42,7 +41,7 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
 };
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
 use origyn_nft_reference_c2c_client::sale_nft_origyn;
-use origyn_nft_reference::origyn_nft_reference_canister::{ Account as OrigynAccount };
+use origyn_nft_reference::origyn_nft_reference_canister::Account as OrigynAccount;
 use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 use icrc_ledger_types::icrc1::{
@@ -51,7 +50,7 @@ use icrc_ledger_types::icrc1::{
 };
 use serde_bytes::ByteBuf;
 use icrc_ledger_canister_c2c_client::icrc1_transfer;
-use crate::{ state::{ mutate_state, read_state }, utils::{ commit_changes, transfer_token } };
+use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
 use crate::swap::swap_info::SwapInfoTrait;
 
 pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &SubscriberNotification) {
@@ -468,7 +467,6 @@ pub async fn forward_swap_perform_bid_on_nft(
     swap_id: &SwapId,
     notification: SubscriberNotification
 ) {
-    info!("FORWARD SWAP :: forward_swap_perform_bid_on_nft :: entered ");
     let (swap, swap_details) = if
         let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
     {

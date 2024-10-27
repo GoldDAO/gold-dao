@@ -1,15 +1,10 @@
-/*!
-# tarnsfers GLDT swap fees that have accumulated in the fee sub account GLDT_FEE_ACCOUNT to x every 12 hours
-
-*/
-
 use crate::state::{ mutate_state, read_state };
 use candid::Nat;
-use canister_time::{ run_interval, run_now_then_interval, HOUR_IN_MS, MINUTE_IN_MS };
+use canister_time::{ run_now_then_interval, MINUTE_IN_MS };
 use futures::future::join_all;
 use utils::{ canister::{ deposit_cycles, get_cycles_balance }, env::Environment };
 use std::time::Duration;
-use tracing::{ debug, info };
+use tracing::info;
 use types::{ Cycles, Milliseconds };
 
 const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = MINUTE_IN_MS * 10;
@@ -46,8 +41,8 @@ async fn handle_archive_canister_cycles() {
     });
     // we dont have enough in this canister to reliably transfer to all archive canisters and preserve some cycles for the main swap canister
     if this_canister_cycle_balance < swap_canister_required_base {
-        debug!(
-            "CYCLE MANAGER :: Not enough total cycles to top up all potential archive canisters. required minimum : {swap_canister_required_base}. current cycle balance : {this_canister_cycle_balance}"
+        info!(
+            "CYCLE MANAGER :: WARNING :: Not enough total cycles to top up all potential archive canisters. required minimum : {swap_canister_required_base}. current cycle balance : {this_canister_cycle_balance}"
         );
         return ();
     }
@@ -67,20 +62,21 @@ async fn handle_archive_canister_cycles() {
                                 ).await
                             {
                                 Ok(_) => {
-                                    info!("SUCCESS : deposited cycles");
+                                    info!(
+                                        "CYCLE MANAGER :: deposited cycles for archive {archive_canister_id:?}"
+                                    );
                                 }
                                 Err(e) => {
-                                    debug!(
-                                        "ERROR : Failed to top up archive canister : {archive_canister_id}. with error : {e:?}"
+                                    info!(
+                                        "CYCLE MANAGER :: ERROR :: Failed to top up archive canister : {archive_canister_id}. with error : {e:?}"
                                     );
                                 }
                             }
                         }
                     }
                     Err(e) => {
-                        // trace(&format!("ERROR : archive {archive_canister_id} : has error {e:?}"));
-                        debug!(
-                            "ERROR : Failed to get balance of archive canister : {archive_canister_id}. with error : {e}"
+                        info!(
+                            "CYCLE MANAGER :: ERROR :: Failed to get balance of archive canister : {archive_canister_id}. with error : {e}"
                         );
                     }
                 }

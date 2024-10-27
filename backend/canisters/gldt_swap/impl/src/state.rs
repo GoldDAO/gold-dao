@@ -9,8 +9,7 @@ use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
-
-use crate::{ model::swaps::Swaps };
+use crate::model::swaps::Swaps;
 
 canister_state!(RuntimeState);
 

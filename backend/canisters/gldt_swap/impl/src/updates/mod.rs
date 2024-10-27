@@ -26,4 +26,3 @@ pub use get_swap::*;
 pub use get_historic_swaps::*;
 pub use get_historic_swaps_by_user::*;
 pub use insert_fake_bulk_swaps::*;
-pub use commit::*;
