@@ -12,7 +12,6 @@ spec:
           'sns_rewards',
           'super_stats_v3',
           'token_metrics',
-          'gldt_swap',
         ]
 ---
 # Rust canisters builds
@@ -37,7 +36,7 @@ $[[ inputs.src-folder ]] staging build:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       allow_failure: true
   artifacts:
     name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-STAGING"

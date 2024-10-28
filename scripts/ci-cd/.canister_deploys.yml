@@ -12,7 +12,6 @@ spec:
           'sns_rewards',
           'super_stats_v3',
           'token_metrics',
-          'gldt_swap',
         ]
 ---
 # Rust canisters deployments
