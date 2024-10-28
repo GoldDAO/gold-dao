@@ -35,9 +35,6 @@ include:
   # Frontend linters:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
-      src-folder: gldt_landing_page
-  - local: scripts/ci-cd/.frontend_linter.yml
-    inputs:
       src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
