@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useTranslation } from 'react-i18next'
@@ -83,12 +84,10 @@ const Card: React.FC<CardProps> = ({
             )}
           </div>
         </div>
-        <Image
-          className='w-full min-h-[215px] object-cover rounded-[20px] mt-8'
+        <img
+          className='min-h-[215px] object-cover rounded-[20px] mt-8'
           src={imageSrc}
           alt={title}
-          width={40}
-          height={40}
         />
       </div>
     </div>
@@ -107,7 +106,7 @@ const CardGrid: React.FC = () => {
       learnMoreLink: 'https://docs.gold-dao.org/',
       buyLink:
         'https://info.icpswap.com/swap/token/details/tyyy3-4aaaa-aaaaq-aab7a-cai',
-      imageSrc: '/static/illustrations/Gold-Gov.svg',
+      imageSrc: '/static/illustrations/Gold-Gov.png',
       button: t('tokens.gldgov.button')
     },
     {
@@ -117,7 +116,7 @@ const CardGrid: React.FC = () => {
       learnMoreButton: t('tokens.gld_nft.learnMoreButton'),
       learnMoreLink: 'https://gold.bity.com/en/about',
       buyLink: 'https://gold.bity.com/',
-      imageSrc: '/static/illustrations/gold-light-nft.svg',
+      imageSrc: '/static/illustrations/Gold-NFT.png',
       button: t('tokens.gld_nft.button')
     },
     {
@@ -127,7 +126,7 @@ const CardGrid: React.FC = () => {
       learnMoreButton: t('tokens.gldt.learnMoreButton'),
       learnMoreLink: 'https://gldt.org/',
       buyLink: '', // app.gldt.org/swap not available
-      imageSrc: '/static/illustrations/Gold-GLDT.svg',
+      imageSrc: '/static/illustrations/Gold-GLDT.png',
       button: t('tokens.gldt.button')
     },
     {
@@ -138,7 +137,7 @@ const CardGrid: React.FC = () => {
       learnMoreLink:
         'https://docs.gold-dao.org/gold-dao-whitepaper/the-ecosystem/products/usd-pegged-stablecoin-usdg',
       buyLink: '',
-      imageSrc: '/static/illustrations/Gold-USDG.svg',
+      imageSrc: '/static/illustrations/Gold-USDG.png',
       button: t('tokens.usdg.button')
     }
   ]
