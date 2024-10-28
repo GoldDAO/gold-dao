@@ -21,9 +21,8 @@ const Header: React.FC = () => {
   }
 
   const links: Link[] = [
-    { name: t('links.gldt'), href: 'https://gldt.org/' },
-    { name: t('links.gld_swap'), href: 'https://gldt.org/' },
-    { name: t('links.gld_nft'), href: 'https://gldt.org/' }
+    { name: t('links.gld_nft'), href: 'https://gold.bity.com' },
+    { name: t('links.gldt'), href: 'https://gldt.org' }
   ]
 
   const menuRef = useRef<HTMLDivElement>(null)
