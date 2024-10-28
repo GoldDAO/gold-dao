@@ -86,17 +86,6 @@
       "source": ["client/gld_dashboard/dist"],
       "type": "assets"
     },
-    "gldt_landing_page": {
-      "build": ["npm run postinstall", "npm run build:gldt_landing_page"],
-      "declarations": {
-        "bindings": [],
-        "env_override": null,
-        "output": null
-      },
-      "frontend": {},
-      "source": ["client/gldt_landing_page/dist"],
-      "type": "assets"
-    },
     "gld_landing_page": {
       "build": ["npm run postinstall", "npm run build:gld_landing_page"],
       "declarations": {

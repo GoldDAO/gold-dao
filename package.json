@@ -4,7 +4,6 @@
   "author": "GoldDAO",
   "workspaces": [
     "client/gldt_swap_app",
-    "client/gldt_landing_page",
     "client/gld_dashboard",
     "client/gld_landing_page"
   ],
@@ -13,13 +12,11 @@
   "private": true,
   "scripts": {
     "dev:gldt_swap_app": "npm run --workspace gldt_swap_app develop",
-    "dev:gldt_landing_page": "npm run --workspace gldt_landing_page develop",
     "dev:gld_landing_page": "npm run --workspace gld_landing_page develop",
     "dev:gld_dashboard": "npm run --workspace gld_dashboard develop",
     "build": "npm run build:backdid && npm run build:back && npm run build:frontends",
-    "build:frontends": "npm run build:gldt_swap_app && npm run build:gldt_landing_page && npm run build:gld_dashboard",
+    "build:frontends": "npm run build:gldt_swap_app && npm run build:gld_dashboard",
     "build:gldt_swap_app": "npm run --workspace gldt_swap_app build",
-    "build:gldt_landing_page": "npm run --workspace gldt_landing_page build",
     "build:gld_landing_page": "npm run --workspace gld_landing_page build",
     "build:gld_dashboard": "npm run --workspace gld_dashboard build",
     "build:back": "scripts/build_canister.sh gldt_swap && scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
@@ -28,9 +25,8 @@
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
     "lint": "npm run lint:back && npm run lint:frontends",
     "lint:back": "cargo clippy",
-    "lint:frontends": "npm run lint:gldt_swap_app && npm run lint:gldt_landing_page && npm run lint:gld_landing_page && npm run lint:gld_dashboard",
+    "lint:frontends": "npm run lint:gldt_swap_app && npm run lint:gld_landing_page && npm run lint:gld_dashboard",
     "lint:gldt_swap_app": "npm run --workspace gldt_swap_app lint",
-    "lint:gldt_landing_page": "npm run --workspace gldt_landing_page lint",
     "lint:gld_landing_page": "npm run --workspace gld_landing_page lint",
     "lint:gld_dashboard": "npm run --workspace gld_dashboard lint",
     "deploy:gld_dashboard:staging": "ENV=staging dfx deploy gld_dashboard --network=staging --mode reinstall",

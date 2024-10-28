@@ -3,6 +3,7 @@ import NavbarHome from "@components/shared/navbars/Home";
 import { Button, Skeleton } from "@components/ui";
 import { FrequentlyAskedQuestions } from "@components/landing-page";
 import { useGLDTMarketcapUSD } from "@hooks/gold_api";
+import { useGLDNFTLocked } from "@hooks/gld_nft/useGLDNFTLocked";
 
 const Logo = ({ name, alt = "" }: { name: string; alt?: string }) => {
   return (
@@ -24,12 +25,10 @@ export const LandingPage = () => {
     { name: "BITY", alt: "BITY brand logo" },
   ];
 
-  const {
-    data: GLDTMarketcap,
-    isSuccess: isSuccessGLDTMarketcap,
-    // isLoading: isLoadingGLDTMarketcap,
-    // isError: isErrorGLDTMarketcap,
-  } = useGLDTMarketcapUSD();
+  const { data: GLDTMarketcap, isSuccess: isSuccessGLDTMarketcap } =
+    useGLDTMarketcapUSD();
+
+  const { data: NFTLocked, isSuccess: isSuccessNFTLocked } = useGLDNFTLocked();
 
   return (
     <>
@@ -55,14 +54,23 @@ export const LandingPage = () => {
                   The future of owning physical gold
                 </div>
                 <div className="mt-4 mb-8 sm:my-8">
-                  <Button className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg">
+                  <Button
+                    className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg"
+                    disabled
+                  >
                     Start swapping
                   </Button>
                 </div>
                 <div className="flex flex-col xl:flex-row gap-4">
-                  <div className="border border-gold/60 rounded-full px-8 py-2">
+                  <div className="flex flex-col items-center border border-gold/60 rounded-full px-8 py-2">
                     <div className="text-sm">Total Gold locked in kg</div>
-                    <div className="font-semibold">7000.7 kg</div>
+                    <div className="font-semibold">
+                      {isSuccessNFTLocked ? (
+                        <div>{NFTLocked} Kg</div>
+                      ) : (
+                        <Skeleton className="w-32" />
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-col items-center border border-gold/60 rounded-full px-8 py-2">
                     <div className="text-sm">GLDT marketcap in USD</div>
@@ -181,7 +189,7 @@ export const LandingPage = () => {
               GLD NFTs today on BITY Gold.
             </div>
             <Link
-              to="https://gold.bity.com"
+              to="https://gold.bity.com/"
               target="_blank"
               rel="noopener noreferrer"
             >

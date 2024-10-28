@@ -76,7 +76,6 @@ To launch a **front-end only** development server, with [HMR](https://webpack.js
 
 ```sh
 npm run dev:gldt_swap_app # For the GLDT swap application frontend
-npm run dev:gldt_landing_page # For the GLDT main landing page
 ```
 
 The frontend development server will be available at `http://localhost:3000`.
