@@ -15,6 +15,7 @@ import {
   Account,
   TransactionDetails,
   TransactionHistoryList,
+  Faqs,
 } from "@pages/index";
 
 const router = createBrowserRouter([
@@ -63,11 +64,11 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "explorer",
+        path: "faqs",
         children: [
           {
             index: true,
-            element: <div>EXPLORER</div>,
+            element: <Faqs />,
           },
         ],
       },

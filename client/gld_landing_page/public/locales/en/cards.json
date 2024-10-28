@@ -2,44 +2,35 @@
   "cards": [
     {
       "title": "GLDGov",
+      "subtitle": "Decentralised governance with industry-leading security and transparency.",
       "tag": "Governance",
-      "description": "The project is governed by the GLDGov token - the Gold Governance token. This token is issued upon the launch of the project’s Service Nervous System (SNS), granting participating users governance rights, such as:",
+      "description": "Gold DAO operates as a Decentralised Autonomous Organisation (DAO), powered by the ORIGYN Protocol and running on the Internet Computer (ICP). This cutting-edge infrastructure ensures fully decentralised governance, secure, transparent and tamper-proof transactions, with all operations conducted 100% on-chain.",
       "imageSrc": "/static/illustrations/Gold-gov-big.svg",
-      "points": [
-        "Proposing and making decisions about the direction of the Gold DAO",
-        "Governing any upgrades to the system’s canisters",
-        "Receiving staking rewards as a result of participation in governance"
-      ]
+      "cardKey": "gldgov"
     },
     {
       "title": "GLD NFT",
+      "subtitle": "Direct ownership of physical gold.",
       "tag": "NFT",
-      "description": "Direct ownership of physical gold stored in Swiss vaults, facilitating tangible investment and redeemability.",
+      "description": "The GLD NFT represents direct ownership of physical gold stored in secure Swiss vaults, offering investors a tangible, redeemable asset backed by the highest standards of transparency and security.",
       "imageSrc": "/static/illustrations/Gold-NFT.svg",
-      "points": [
-        "Expert Insight: Each NFT is backed by a specific physical gold asset, with a serial number and purity details transparently and immutably recorded on the blockchain",
-        "Redeemability Factor: Holders can redeem digital gold for physical gold and vice versa, seamlessly bridging the worlds of both digital and tangible assets"
-      ]
+      "cardKey": "gld_nft"
     },
     {
-      "title": "GLDT & GLD Swap",
+      "title": "GLDT",
+      "subtitle": "Gold with Utility.",
       "tag": "Token",
-      "description": "A fungible cross-chain token that can act as a medium of exchange. GLDTs fractionalize gold ownership and serve as stable collateral for DeFi.",
+      "description": "The GLDT token is a digital asset that combines the stability of gold with the liquidity of digital currency. With GDLT, you can store your wealth in gold while using it for everyday purchases – whether its buying coffee or making larger transactions – seamlessly bridging the gap between gold and digital payments.",
       "videoSrc": "/videos/Gold_swap_video.mp4",
-      "points": [
-        "Cross-Chain Utility: Ensures liquidity across multiple blockchain ecosystems, enhancing its appeal to a broader investor base.",
-        "Collateral Efficiency: Offers a robust collateral framework for DeFi."
-      ]
+      "cardKey": "gldt"
     },
     {
       "title": "USDG",
+      "subtitle": "A stablecoin backed by gold .",
       "tag": "Stablecoin",
-      "description": "A stablecoin backed by GLDT, providing a reliable alternative to fiat-backed stablecoins.",
+      "description": "USDG is a stablecoin pegged to the US dollar, offering the stability of USD while being supported by the security of gold. Unlike traditional fiat-backed stablecoins, USDG is backed by GLDT, which is itself tied to physical gold through GLD NFTs. These NFTs represent direct ownership of gold stored securely in Swiss vaults, ensuring a fully transparent and verifiable backing for every USDG issued.",
       "imageSrc": "/static/illustrations/Gold-USDG-big.svg",
-      "points": [
-        "Inflation Resistance: The value of USDG’s collateral, i.e. GLDT, is unaffected by erosion caused by inflation.",
-        "Financial Stability: The liquidity risk is lowered due to the price stability of GLDT."
-      ]
+      "cardKey": "usdg"
     }
   ]
 }

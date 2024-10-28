@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import { useAtom } from "jotai";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { Actor, ActorSubclass, Agent } from "@dfinity/agent";
@@ -5,9 +6,15 @@ import { Actor, ActorSubclass, Agent } from "@dfinity/agent";
 import { stateAtom } from "../atoms";
 
 export const useAuth = () => {
-  const { connect, disconnect: disconnectIK } = useIdentityKit();
+  const { connect: connectIK, disconnect: disconnectIK } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
+
+  const connect: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    connectIK();
+  };
 
   const disconnect = () => {
     setState((prevState) => ({

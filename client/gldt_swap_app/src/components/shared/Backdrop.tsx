@@ -1,18 +1,9 @@
-const Backdrop = ({
-  handleOnClick = () => null,
-  isClickable = false,
-}: {
-  handleOnClick?: () => null | void;
-  isClickable?: boolean;
-}) => {
-  return (
-    <div
-      onClick={handleOnClick}
-      className={`absolute h-full w-full z-50 ${
-        isClickable ? "cursor-pointer" : ""
-      }`}
-    />
-  );
+import { ButtonHTMLAttributes } from "react";
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+
+const Backdrop = ({ ...restprops }: ButtonProps) => {
+  return <button className={`absolute h-full w-full z-50`} {...restprops} />;
 };
 
 export default Backdrop;

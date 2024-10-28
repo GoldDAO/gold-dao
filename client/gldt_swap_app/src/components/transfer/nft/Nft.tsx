@@ -106,17 +106,6 @@ const TransferNft = () => {
                   <span>{totalTransferFee.string} OGY</span>
                 </div>
               </div>
-              {/* <div className="inline-flex justify-start items-center text-content/60 text-sm rounded-lg">
-                <div>Amount received: </div>
-                <div className="flex items-center">
-                  <img
-                    className="mx-2 h-4 w-4"
-                    src={`/${ledger.toLocaleLowerCase()}_logo.svg`}
-                    alt={`${ledger} Logo`}
-                  />
-                  <Amount />
-                </div>
-              </div> */}
             </div>
             {isInsufficientOGYFunds && <BuyOGYDisclaimer className="mt-6" />}
             <Button

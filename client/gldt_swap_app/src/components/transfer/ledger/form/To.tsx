@@ -27,7 +27,7 @@ const To = ({ className }: { className?: string }) => {
       <Input
         className="px-4 py-3 mt-2 mb-1 bg-surface-2 border border-border rounded-lg w-full text-center"
         id="to"
-        placeholder="6uad6-fqaaa-aaaam-abovq-cai"
+        placeholder="00000-00000-00000-00000-000"
         type="text"
         {...register("to", {
           required: "Recipient address is required.",

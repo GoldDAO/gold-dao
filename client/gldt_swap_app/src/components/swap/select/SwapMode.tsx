@@ -1,9 +1,16 @@
 import { Mode, useSwap } from "@context/index";
 import { Select } from "@components/ui";
+import { LogoGLDT } from "@components/shared/logos";
 
 const SWAP_MODE_OPTIONS = [
-  { value: "GLD NFT", icon: "gold-bars/1g.svg", label: "NFT" },
-  { value: "GLDT", icon: "gldt_logo.svg", label: "ICRC-1" },
+  {
+    value: "GLD NFT",
+    icon: (
+      <img src="gold-bars/1g.svg" className="w-4 h-4" alt="Gold bar logo" />
+    ),
+    label: "NFT",
+  },
+  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-1" },
 ];
 
 const SelectSwapMode = () => {

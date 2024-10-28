@@ -1,10 +1,21 @@
 import { Token as TokenType, useTransfer } from "@context/index";
 import { Select } from "@components/ui";
+import { LogoGLDT } from "@components/shared/logos";
 
 const TOKEN_OPTIONS = [
-  { value: "GLDT", icon: "gldt_logo.svg", label: "ICRC-1" },
-  { value: "GLD NFT", icon: "gold-bars/1g.svg", label: "NFT" },
-  { value: "OGY", icon: "ogy_logo.svg", label: "ICRC-1" },
+  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-1" },
+  {
+    value: "GLD NFT",
+    icon: (
+      <img src="gold-bars/1g.svg" className="w-4 h-4" alt="Gold bar logo" />
+    ),
+    label: "NFT",
+  },
+  {
+    value: "OGY",
+    icon: <img src="ogy_logo.svg" className="w-4 h-4" alt="Origyn logo" />,
+    label: "ICRC-1",
+  },
 ];
 
 const Token = ({ className }: { className?: string }) => {

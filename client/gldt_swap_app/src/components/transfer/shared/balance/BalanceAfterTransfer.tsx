@@ -1,3 +1,5 @@
+import { roundAndFormatLocale } from "@utils/numbers";
+
 const BalanceAfterTransfer = ({
   ledger,
   balance,
@@ -15,7 +17,7 @@ const BalanceAfterTransfer = ({
           alt={`${ledger} Logo`}
         />
         <span>
-          {balance} {ledger}
+          {roundAndFormatLocale({ number: balance })} {ledger}
         </span>
       </div>
     </div>

@@ -20,9 +20,7 @@ export const SwapTransfer = () => {
     <div className="flex justify-center items-center mt-4 sm:mt-8">
       <Card className="w-full sm:w-[600px] p-2 md:p-6 border border-border">
         <div className="relative flex justify-center mb-6">
-          {!isConnected && (
-            <Backdrop isClickable={true} handleOnClick={connect} />
-          )}
+          {!isConnected && <Backdrop onClick={connect} />}
           <ToggleBtnSwapTransfer />
         </div>
         <div>

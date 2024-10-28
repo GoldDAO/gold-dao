@@ -15,6 +15,9 @@ export const GLDT_LEDGER_CANISTER_ID = import.meta.env
 export const ICP_SWAP_CANISTER_ID = import.meta.env.VITE_ICP_SWAP_CANISTER_ID;
 
 export const API_OGY_BASE_URL="https://api.origyn.com"
+export const GOLD_API_BASE_URL="https://www.goldapi.io/api"
+export const GOLD_API_API_KEY = "goldapi-57rn8fsm2pahlrj-io" // !replace with official one
+
 
 export const OGY_TX_FEE=200000
 export const GLDT_TX_FEE = 1000000;

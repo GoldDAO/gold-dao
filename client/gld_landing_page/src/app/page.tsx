@@ -7,31 +7,31 @@ export async function generateStaticParams () {
 }
 
 export const metadata: Metadata = {
-  title: 'The GOLD DAO Website',
+  title: 'The Gold DAO Website',
   description:
-    'Gold DAO is a decentralized community dedicated to revolutionizing the way gold is owned and utilised. Join the DAO in harnessing the power of blockchain technology to create a more transparent and accessible gold market.',
+    'Gold is a timeless and trusted asset. Gold DAO enables you to directly own and trade physical gold, using cutting-edge blockchain technology for unrivalled transparency, security, and ease.',
   openGraph: {
     type: 'website',
     url: 'https://www.gold-dao.org/',
-    title: 'The GOLD DAO Website',
+    title: 'The Gold DAO Website',
     description:
-      'Gold DAO is a decentralized community dedicated to revolutionizing the way gold is owned and utilised. Join the DAO in harnessing the power of blockchain technology to create a more transparent and accessible gold market.',
+      'Gold is a timeless and trusted asset. Gold DAO enables you to directly own and trade physical gold, using cutting-edge blockchain technology for unrivalled transparency, security, and ease.',
     images: [
       {
-        url: '/static/illustrations/gold_dao.png',
+        url: 'https://www.gold-dao.org/static/illustrations/gold_dao.png',
         width: 800,
         height: 600,
-        alt: 'The GOLD DAO Website'
+        alt: 'The Gold DAO Website'
       }
     ]
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'The GOLD DAO Website',
+    title: 'The Gold DAO Website',
     description:
-      'Gold DAO is a decentralized community dedicated to revolutionizing the way gold is owned and utilised. Join the DAO in harnessing the power of blockchain technology to create a more transparent and accessible gold market.',
-    images: ['/static/illustrations/gold_dao.png']
+      'Gold is a timeless and trusted asset. Gold DAO enables you to directly own and trade physical gold, using cutting-edge blockchain technology for unrivalled transparency, security, and ease.',
+    images: ['https://www.gold-dao.org/static/illustrations/gold_dao.png']
   }
 }
 

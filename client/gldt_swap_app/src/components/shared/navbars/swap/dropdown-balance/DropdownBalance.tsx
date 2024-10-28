@@ -4,6 +4,7 @@ import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useLedgerUserBalance } from "@hooks/ledger";
 
 import { Skeleton } from "@components/ui";
+import { LogoGLDT } from "@components/shared/logos";
 
 const DropdownBalance = () => {
   const { data: balanceOGY, isSuccess: isSuccessBalanceOGY } =
@@ -26,7 +27,7 @@ const DropdownBalance = () => {
               <>
                 <MenuButton className="inline-flex items-center gap-2 rounded-lg bg-surface py-1.5 px-3 text-sm/6 font-semibold">
                   <div className="max-w-48 flex items-center gap-2">
-                    <img className="flex-none h-6" src={`/gldt_logo.svg`} />
+                    <LogoGLDT className="flex-none w-6 h-6" />
                     <div className="truncate hidden sm:block">
                       <div className="truncate font-semibold text-sm">
                         {balanceGLDT.string} GLDT
@@ -35,18 +36,6 @@ const DropdownBalance = () => {
                   </div>
                   <ChevronDownIcon className="size-4 fill-content/60" />
                 </MenuButton>
-                {/* <MenuButton className="inline-flex items-center gap-2 rounded-lg bg-surface py-1.5 px-3 text-sm/6 font-semibold">
-                  <div className="max-w-48 flex items-center gap-2 px-2">
-                    <img className="flex-none h-6" src={`/gldt_logo.svg`} />
-                    <div className="font-semibold text-sm">
-                      {balanceGLDT.string}
-                    </div>
-                    <div className="font-semibold text-sm hidden md:block">
-                      GLDT
-                    </div>
-                  </div>
-                  <ChevronDownIcon className="size-4 fill-content/60" />
-                </MenuButton> */}
 
                 <MenuItems
                   transition
@@ -56,7 +45,7 @@ const DropdownBalance = () => {
                   {isSuccessBalanceGLDT && balanceGLDT && (
                     <MenuItem>
                       <div className="flex items-center gap-2 pl-2 py-2">
-                        <img className="flex-none h-5" src={`/gldt_logo.svg`} />
+                        <LogoGLDT className="flex-none w-5 h-5" />
                         <div className="font-semibold text-sm">
                           {balanceGLDT.string}
                         </div>

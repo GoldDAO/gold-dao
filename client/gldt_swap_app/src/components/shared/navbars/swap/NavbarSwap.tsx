@@ -5,6 +5,7 @@ import { useAuth } from "@auth/index";
 import { Button } from "@components/ui";
 import DropdownBalance from "./dropdown-balance/DropdownBalance";
 import DropdownUser from "./dropdown-user/DropdownUser";
+import { LogoGLDT } from "@components/shared/logos";
 
 const Swap = () => {
   const { isConnected, connect } = useAuth();
@@ -15,12 +16,7 @@ const Swap = () => {
         <div className="grid grid-cols-2 items-center h-10">
           <div className="flex-shrink-0">
             <Link to="/swap" className="flex items-center space-x-2">
-              <img
-                src="/gldt_logo.svg"
-                alt="GLDT Logo"
-                width={32}
-                height={32}
-              />
+              <LogoGLDT />
               <span className="self-center text-xl font-semibold whitespace-nowrap hidden sm:block">
                 GLDT Swap
               </span>

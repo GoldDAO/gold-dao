@@ -21,9 +21,7 @@ const Reverse = () => {
   return (
     <>
       <div className="relative">
-        {!isConnected && (
-          <Backdrop isClickable={true} handleOnClick={connect} />
-        )}
+        {!isConnected && <Backdrop onClick={connect} />}
         <FromCard>
           {isInsufficientGLDTFunds ? (
             <InsufficientFundsGLDT className="mt-6" />

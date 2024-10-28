@@ -49,7 +49,7 @@ export const useForwardSwap = () => {
       (tokenId) =>
         [tokenId.id_bigint, Principal.fromText(nft.canisterId)] as [
           bigint,
-          Principal,
+          Principal
         ]
     )
   );
@@ -127,19 +127,30 @@ export const useForwardSwap = () => {
       const swap_nft_for_tokens_results = (await actorSwap.swap_nft_for_tokens(
         data_swap_nft_for_tokens
       )) as Result_3;
-      console.log(swap_nft_for_tokens_results);
+      // console.log(swap_nft_for_tokens_results);
 
       if ("Err" in swap_nft_for_tokens_results) {
-        const error = Object.keys(swap_nft_for_tokens_results.Err)[0];
-        throw new Error(error);
+        const err = Object.keys(swap_nft_for_tokens_results.Err)[0];
+        console.log(err);
+        throw new Error(
+          "Error when swapping GLD NFTs! Swap GLD NTFs for tokens failed."
+        );
       }
 
       // * initiate swap
       if (swap_nft_for_tokens_results.Ok) {
         // console.log(data_swap_market_transfer_batch_nft_origyn);
-        await market_transfer_batch_nft_origyn(
-          data_swap_market_transfer_batch_nft_origyn as TransferBatchNft[]
-        );
+        const market_transfer_batch_nft_origyn_results =
+          await market_transfer_batch_nft_origyn(
+            data_swap_market_transfer_batch_nft_origyn as TransferBatchNft[]
+          );
+        if ("err" in market_transfer_batch_nft_origyn_results) {
+          const err = market_transfer_batch_nft_origyn_results.err;
+          console.log(err);
+          throw new Error(
+            "Error when swapping GLD NFTs! Swap market transfer failed."
+          );
+        }
       }
     },
   });

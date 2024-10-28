@@ -11,10 +11,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
   useIdentityKit,
-  useTargetAuthenticatedAgent,
-  // useNonTargetAuthenticatedAgent,
+  useAgent,
 } from "@nfid/identitykit/react";
 import { HttpAgent } from "@dfinity/agent";
+import { isMobile } from "react-device-detect";
 
 import { stateAtom } from "../atoms";
 import { Canisters } from "../interfaces";
@@ -31,7 +31,7 @@ const AuthProviderInit = ({
   const { user, isInitializing } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
-  const agent = useTargetAuthenticatedAgent();
+  const agent = useAgent();
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
@@ -99,7 +99,7 @@ export const AuthProvider = ({
 
   return (
     <IdentityKitProvider
-      signers={signers}
+      signers={isMobile ? [NFIDW, InternetIdentity] : signers}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
         targets,
@@ -114,7 +114,7 @@ export const AuthProvider = ({
         console.log(e);
       }}
       onConnectSuccess={() => {
-        console.log("connected");
+        // console.log("connected");
         queryClient.clear();
       }}
       onDisconnect={() => {
@@ -125,7 +125,7 @@ export const AuthProvider = ({
           isConnecting: false,
           agent: undefined,
         }));
-        console.log("disconnected");
+        // console.log("disconnected");
       }}
     >
       <AuthProviderInit canisters={canisters}>{children}</AuthProviderInit>
