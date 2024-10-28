@@ -9,6 +9,7 @@ pub struct ArchiveCanister {
     pub canister_id: Principal,
     pub start_index: Nat,
     pub end_index: Option<Nat>,
+    pub active: bool,
 }
 
 impl Display for ArchiveCanister {
@@ -44,11 +45,13 @@ mod tests {
                 start_index: Nat::from(0u64),
                 canister_id: Principal::anonymous(),
                 end_index: Some(Nat::from(99u64)),
+                active: true,
             },
             ArchiveCanister {
                 start_index: Nat::from(100u64),
                 canister_id: Principal::anonymous(),
                 end_index: None,
+                active: true,
             }
         ];
 

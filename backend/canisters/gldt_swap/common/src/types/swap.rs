@@ -4,6 +4,7 @@ use candid::{ CandidType, Decode, Encode, Nat, Principal };
 use canister_time::{ timestamp_millis, MINUTE_IN_MS };
 use ic_stable_structures::{ storable::Bound, Storable };
 use serde::{ Deserialize, Serialize };
+use tracing::debug;
 use types::TimestampMillis;
 use icrc_ledger_types::{
     icrc1::{ account::{ Account, Subaccount }, transfer::TransferError as TransferErrorIcrc },
@@ -14,10 +15,10 @@ use ic_ledger_types::{ AccountIdentifier, TransferError };
 use crate::{ gldt::{ GldtNumTokens, GLDT_TX_FEE }, nft::NftID };
 
 #[cfg(feature = "inttest")]
-const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
+pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
 
 #[cfg(not(feature = "inttest"))]
-const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
+pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
 
 const MAX_SWAP_TYPE_BYTES_SIZE: u32 = 100;
 const MAX_SWAP_ID_BYTES_SIZE: u32 = 100;
@@ -51,8 +52,16 @@ pub enum SwapInfo {
     Reverse(SwapDetailReverse),
 }
 
+pub fn trace(msg: &str) {
+    unsafe {
+        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
+    }
+}
+
 impl SwapInfo {
     pub fn new(swap_type: SwapType) -> Self {
+        debug!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}");
+        trace(&format!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"));
         match swap_type {
             SwapType::Forward => Self::Forward(SwapDetailForward::default()),
             SwapType::Reverse => Self::Reverse(SwapDetailReverse::default()),
@@ -80,8 +89,9 @@ impl SwapInfo {
         }
     }
 
-    pub fn is_stuck(&self) -> bool {
+    pub fn is_swap_over_time_threshold(&self) -> bool {
         let now = timestamp_millis();
+
         match self {
             // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
             // because the nft canister will release funds and cancel sale after 1 minute
@@ -90,34 +100,14 @@ impl SwapInfo {
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
 
-                let is_valid_stuck_status = matches!(
-                    details.status,
-                    SwapStatusForward::Init |
-                        SwapStatusForward::MintRequest |
-                        SwapStatusForward::BidRequest |
-                        SwapStatusForward::BidFail(_) |
-                        SwapStatusForward::BurnFeesFailed(_)
-                );
-
-                return is_valid_stuck_status && is_old;
+                return is_old;
             }
             SwapInfo::Reverse(details) => {
                 let threshold =
                     details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
                 let is_old = now > threshold;
 
-                let is_valid_stuck_status = matches!(
-                    details.status,
-                    SwapStatusReverse::Init |
-                        SwapStatusReverse::EscrowRequest |
-                        SwapStatusReverse::NftTransferRequest |
-                        SwapStatusReverse::BurnRequest |
-                        SwapStatusReverse::FeeTransferRequest |
-                        SwapStatusReverse::NftTransferFailed(_) |
-                        SwapStatusReverse::RefundRequest
-                );
-
-                return is_valid_stuck_status && is_old;
+                return is_old;
             }
         }
     }
@@ -241,13 +231,20 @@ impl SwapDetailForward {
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum SwapStatusForward {
     Init,
+    NotificationInProgress,
     NotificationFailed(NotificationError),
     MintRequest,
+    MintInProgress,
     MintFailed(MintError),
     BidRequest,
+    BidInProgress,
     BidFail(BidFailError),
     BurnFeesRequest,
+    BurnFeesInProgress,
     BurnFeesFailed(BurnFeesError),
+    DepositRecoveryRequest(Box<SwapStatusForward>),
+    DepositRecoveryInProgress(Box<SwapStatusForward>),
+    DepositRecoveryFailed(Box<SwapStatusForward>, DepositRecoveryError),
     Complete,
     Failed(SwapErrorForward),
 }
@@ -269,6 +266,11 @@ pub enum BidFailError {
     CallError(String),
     UnexpectedError(String),
 }
+#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+pub enum DepositRecoveryError {
+    CantRecover(String),
+    CallError(String),
+}
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum SwapErrorForward {
@@ -276,7 +278,8 @@ pub enum SwapErrorForward {
     MintFailed(MintError),
     BidFailed(BidFailError),
     UnexpectedError(ImpossibleErrorReason),
-    Expired,
+    DepositRecoveryFailed(DepositRecoveryError),
+    Expired(Box<SwapStatusForward>),
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]
@@ -294,6 +297,7 @@ pub enum NotificationError {
     InvalidCustomAskFeature,
     InvalidPricingConfig,
     TimeoutInvalid(String),
+    SaleIDStringTooLong(String),
 }
 // -----------------
 //     Reverse swap
@@ -334,14 +338,19 @@ impl Default for SwapDetailReverse {
 pub enum SwapStatusReverse {
     Init,
     EscrowRequest,
+    EscrowRequestInProgress,
     EscrowFailed(EscrowError),
     NftTransferRequest,
+    NftTransferRequestInProgress,
     NftTransferFailed(NftTransferError),
     RefundRequest,
+    RefundRequestInProgress,
     RefundFailed(RefundError),
     BurnRequest,
+    BurnRequestInProgress,
     BurnFailed(BurnError),
     FeeTransferRequest,
+    FeeTransferRequestInProgress,
     FeeTransferFailed(FeeTransferError),
     Complete,
     Failed(SwapErrorReverse),
@@ -387,6 +396,9 @@ pub enum NftValidationError {
     CantGetOrigynID(String),
     NotOwnedBySwapCanister,
     CantVerifySwapCanisterOwnsNft,
+    NftIdStringTooLong(String),
+    UserDoesNotHaveTheRequiredGLDT(String),
+    CantValidateUserBalanceOfGLDT(String),
 }
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum NftTransferError {
@@ -438,10 +450,18 @@ pub enum ArchiveStatus {
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ArchiveDownReason {
-    InitializingFirstArchiveFailed(String), //
+    NewArchiveError(NewArchiveError), //
     Upgrading, //
     UpgradingArchivesFailed(String), //
     ActiveSwapCapacityFull,
     NoArchiveCanisters(String), //
     LowOrigynToken(String),
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Ord, PartialOrd)]
+pub enum NewArchiveError {
+    FailedToSerializeInitArgs(String),
+    CreateCanisterError(String),
+    InstallCodeError(String),
+    CantFindControllers(String),
 }

@@ -9,7 +9,8 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [features]
-inttest = []
+default = []  # Empty default features
+inttest = ["gldt_swap_common/inttest",  "gldt_swap_api_archive/inttest"]
 
 [dependencies]
 candid = { workspace = true }
@@ -35,8 +36,8 @@ types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
 futures = { workspace = true }
-gldt_swap_api_archive = { path = "../api_archive", features = ["inttest"] }
-gldt_swap_common = { path = "../common", features = ["inttest"] }
+gldt_swap_api_archive = { path = "../api_archive", features = []}
+gldt_swap_common = { path = "../common", features = []}
 candid_gen = { path = "../../../libraries/candid_gen" }
 origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api'}
 origyn_nft_reference_c2c_client = { path = '../../../external_canisters/origyn_nft_reference/c2c_client'}

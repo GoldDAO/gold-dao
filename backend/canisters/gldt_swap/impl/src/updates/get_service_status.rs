@@ -6,7 +6,7 @@ use ic_cdk::update;
 
 use crate::service_status::check_service_status;
 
-#[update(hidden = true)]
+#[update]
 async fn get_service_status(_: GetServiceStatusArgs) -> GetServiceStatusResponse {
     check_service_status().await
 }

@@ -1,3 +1,4 @@
+use candid::Principal;
 use gldt_swap_common::swap::{ LockError, ServiceStatus, SwapStatus, SwapStatusReverse };
 use gldt_swap_api_canister::swap_tokens_for_nft::SwapTokensForNftRequestErrors;
 pub use gldt_swap_api_canister::swap_tokens_for_nft::{
@@ -29,6 +30,14 @@ async fn swap_tokens_for_nft(args: SwapTokensForNftArgs) -> SwapTokensForNftResp
     // 1. check if an active swap with the nft id already exists
     let caller = read_state(|s| s.env.caller());
     let nft_id = args.nft_id.clone();
+
+    if caller == Principal::anonymous() {
+        return Err(
+            SwapTokensForNftRequestErrors::CantBeAnonymous(
+                format!("You can't use an annoymous principal to swap")
+            )
+        );
+    }
 
     // 4. build a new swap - error early
     let new_swap = match SwapBuilder::reverse().init(&args, &caller).await {

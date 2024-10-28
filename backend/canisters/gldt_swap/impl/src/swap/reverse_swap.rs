@@ -1,6 +1,6 @@
 use candid::Nat;
 use gldt_swap_common::{
-    gldt::{ OGYTokenSpec, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE },
+    gldt::{ OGYTokenSpec, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE, MEMO_GLDT_SWAP },
     swap::{
         BurnError,
         EscrowError,
@@ -16,9 +16,9 @@ use gldt_swap_common::{
         TransferFailReason,
     },
 };
-use icrc_ledger_canister::icrc1_balance_of;
-use icrc_ledger_canister_c2c_client::{ icrc1_balance_of, icrc2_transfer_from };
+use icrc_ledger_canister_c2c_client::icrc2_transfer_from;
 use icrc_ledger_types::{ icrc1::account::Account, icrc2::transfer_from::TransferFromArgs };
+use icrc_ledger_types::icrc1::transfer::Memo as MemoIcrc;
 use origyn_nft_reference::origyn_nft_reference_canister::{
     Account as OrigynAccount,
     EscrowReceipt,
@@ -29,6 +29,7 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
     SalesConfig,
 };
 use origyn_nft_reference_c2c_client::market_transfer_nft_origyn;
+use serde_bytes::ByteBuf;
 use tracing::{ debug, error, info };
 use utils::{ env::Environment, retry_async::retry_async };
 use crate::{ swap::swap_info::SwapInfoTrait, utils::trace };
@@ -62,6 +63,7 @@ pub async fn transfer_to_escrow(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::EscrowRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
     let amount =
@@ -69,7 +71,6 @@ pub async fn transfer_to_escrow(swap_id: &SwapId) {
         swap_details.swap_fee.clone() -
         GLDT_TX_FEE * 2;
 
-    trace(&format!("/// amount requested {amount:?}"));
     // we request 100.8 from the user // why does the icrc2 take 2x fee? weird ( maybe one for approval and one for transfer from )
     match
         retry_async(
@@ -90,19 +91,6 @@ pub async fn transfer_to_escrow(swap_id: &SwapId) {
         ).await
     {
         Ok(transfer_response) => {
-            match
-                icrc1_balance_of(gldt_ledger_id, icrc1_balance_of::Args {
-                    owner: this_canister_id,
-                    subaccount: Some(swap_details.nft_id.clone().into()),
-                }).await
-            {
-                Ok(bal) => {
-                    trace(&format!("//// balance after transfer from : {bal:?}"));
-                }
-                Err(_) => {
-                    trace("//// something went wrong getting user balance");
-                } // .8
-            }
             match transfer_response {
                 icrc_ledger_canister::icrc2_transfer_from::Response::Ok(_) => {
                     swap.update_status(SwapStatus::Reverse(SwapStatusReverse::NftTransferRequest));
@@ -170,7 +158,7 @@ pub async fn transfer_nft(swap_id: &SwapId) {
         );
         return ();
     }
-
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::NftTransferRequestInProgress));
     let ogy_ledger_id = read_state(|s| s.data.ogy_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
 
@@ -286,6 +274,7 @@ pub async fn burn_gldt(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::BurnRequestInProgress));
 
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
@@ -300,24 +289,14 @@ pub async fn burn_gldt(swap_id: &SwapId) {
                         subaccount: None,
                     },
                     gldt_ledger_id,
-                    swap_details.tokens_to_receive.get().clone() // we still have 0.8 left in the pot
+                    swap_details.tokens_to_receive.get().clone(), // we still have 0.8 left in the pot
+                    Some(MemoIcrc(ByteBuf::from(swap.get_swap_id().1.0.to_bytes_le())))
                 ),
             3
         ).await
     {
         Ok(_) => {
             swap.update_status(SwapStatus::Reverse(SwapStatusReverse::FeeTransferRequest));
-            debug!("REVERSE SWAP :: burn :: Swap Id {swap_id:?} :: success");
-
-            match
-                icrc1_balance_of(gldt_ledger_id, icrc1_balance_of::Args {
-                    owner: this_canister_id,
-                    subaccount: Some(swap_details.nft_id.clone().into()),
-                }).await
-            {
-                Ok(bal) => { trace(&format!("//// balance after burn : {bal:?}")) }
-                Err(_) => { trace("//// something went wrong getting user balance") } // .8
-            }
         }
         Err(error_message) => {
             swap.update_status(
@@ -355,6 +334,7 @@ pub async fn transfer_fees(swap_id: &SwapId) {
         );
         return ();
     }
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::FeeTransferRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
 
@@ -368,7 +348,8 @@ pub async fn transfer_fees(swap_id: &SwapId) {
                         subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
                     },
                     gldt_ledger_id,
-                    swap_details.swap_fee.clone() - Nat::from(GLDT_TX_FEE * 3) // at this point, there is .8 in swap lefts left
+                    swap_details.swap_fee.clone() - Nat::from(GLDT_TX_FEE * 3),
+                    Some(MEMO_GLDT_SWAP.to_vec().into()) // at this point, there is .8 in swap lefts left
                 ),
             3
         ).await
@@ -376,15 +357,6 @@ pub async fn transfer_fees(swap_id: &SwapId) {
         Ok(_) => {
             swap.update_status(SwapStatus::Reverse(SwapStatusReverse::Complete));
             debug!("REVERSE SWAP :: fee transfer :: Swap Id {swap_id:?} :: success");
-            match
-                icrc1_balance_of(gldt_ledger_id, icrc1_balance_of::Args {
-                    owner: this_canister_id,
-                    subaccount: Some(swap_details.nft_id.clone().into()),
-                }).await
-            {
-                Ok(bal) => { trace(&format!("//// balance after transferring fees : {bal:?}")) }
-                Err(_) => { trace("//// something went wrong getting user balance") } // .8
-            }
         }
         Err(error_message) => {
             swap.update_status(
@@ -427,6 +399,7 @@ pub async fn refund(swap_id: &SwapId) {
             return ();
         }
     };
+    swap.update_status(SwapStatus::Reverse(SwapStatusReverse::RefundRequestInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
 
     match
@@ -442,7 +415,8 @@ pub async fn refund(swap_id: &SwapId) {
                     swap_details.tokens_to_receive.get().clone() +
                         swap_details.swap_fee.clone() -
                         swap_details.transfer_fees.clone() -
-                        GLDT_TX_FEE
+                        GLDT_TX_FEE,
+                    Some(MEMO_GLDT_SWAP.to_vec().into())
                 ),
             3
         ).await

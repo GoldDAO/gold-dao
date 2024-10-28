@@ -1,16 +1,18 @@
 use candid::{ Nat, Principal };
+use canister_time::timestamp_nanos;
 use futures::future::join_all;
 use gldt_swap_api_canister::get_historic_swaps_by_user::GetHistoricSwapsByUserError;
 use gldt_swap_common::{ archive::ArchiveCanister, swap::{ SwapId, SwapInfo } };
 use gldt_swap_archive_c2c_client::{ get_archive_swap, get_swap_indexes_for_user };
 
-use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
+use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::{ Memo, TransferArg } };
 use origyn_nft_reference::origyn_nft_reference_canister::{
     AuctionStateSharedStatus,
     NftInfoResult,
     SaleStatusSharedSaleType,
 };
 use origyn_nft_reference_c2c_client::nft_origyn;
+use utils::env::Environment;
 
 use crate::state::read_state;
 
@@ -18,7 +20,8 @@ pub async fn transfer_token(
     from_sub_account: Subaccount,
     to_account: Account,
     ledger_id: Principal,
-    amount: Nat
+    amount: Nat,
+    memo: Option<Memo>
 ) -> Result<(), String> {
     match
         icrc_ledger_canister_c2c_client::icrc1_transfer(
@@ -27,9 +30,9 @@ pub async fn transfer_token(
                 from_subaccount: Some(from_sub_account),
                 to: to_account,
                 fee: None,
-                created_at_time: None,
+                created_at_time: Some(timestamp_nanos()),
                 amount: amount,
-                memo: None,
+                memo: memo,
             })
         ).await
     {
@@ -132,4 +135,9 @@ pub async fn get_historic_swap(swap_id: &SwapId) -> Option<SwapInfo> {
         }
         Err(_) => None,
     }
+}
+
+pub async fn commit_changes() {
+    let this_canister_id = read_state(|s| s.env.canister_id());
+    let _ = ic_cdk::call::<(), ()>(this_canister_id, "commit", ()).await;
 }

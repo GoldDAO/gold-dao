@@ -1,12 +1,7 @@
-/*!
-# Runs once when
-- init 
-- upgrading
-- the timer is almost irrelevent since a bool flag is_archive_cron_running is never reset except for in post_upgrade.rs
-
-*/
+use std::time::Duration;
 
 use crate::{
+    check_storage_and_create_archive,
     create_archive_canister,
     state::{ mutate_state, read_state },
     update_archive_canisters,
@@ -15,21 +10,22 @@ use candid::Nat;
 use gldt_swap_common::{ archive::ArchiveCanister, swap::{ ArchiveDownReason, ArchiveStatus } };
 use ic_cdk::trap;
 use tracing::{ debug, info };
-use canister_time::run_once;
+use canister_time::{ run_interval, run_once, SECOND_IN_MS };
 
 pub fn start_job() {
-    run_once(spawn_transfer_job);
+    run_once(spawn_archive_on_init);
+    run_interval(Duration::from_millis(SECOND_IN_MS * 30), spawn_manage_archives);
 }
 
-pub fn spawn_transfer_job() {
-    let is_running = read_state(|s| s.data.is_archive_cron_running);
+pub fn spawn_archive_on_init() {
+    let is_running = read_state(|s| s.data.is_init_archive_cron_running);
     if is_running {
         return;
     }
-    ic_cdk::spawn(manage_archives())
+    ic_cdk::spawn(archive_on_init())
 }
 
-async fn manage_archives() {
+async fn archive_on_init() {
     mutate_state(|s| {
         s.data.should_upgrade_archives = true;
     });
@@ -42,6 +38,7 @@ async fn manage_archives() {
                         canister_id: principal,
                         start_index: Nat::from(0u64),
                         end_index: None,
+                        active: true,
                     });
                     s.set_archive_status(ArchiveStatus::Up)
                 });
@@ -50,13 +47,11 @@ async fn manage_archives() {
             Err(e) => {
                 mutate_state(|s| {
                     s.set_archive_status(
-                        ArchiveStatus::Down(
-                            ArchiveDownReason::InitializingFirstArchiveFailed(e.clone())
-                        )
+                        ArchiveStatus::Down(ArchiveDownReason::NewArchiveError(e.clone()))
                     );
                 });
 
-                trap(&e);
+                trap(&format!("{e:?}"));
             }
         }
         return;
@@ -85,4 +80,22 @@ async fn manage_archives() {
             s.data.should_upgrade_archives = false;
         });
     }
+}
+
+pub fn spawn_manage_archives() {
+    let is_running = read_state(|s| s.data.is_archive_cron_running);
+    if is_running {
+        return;
+    }
+    ic_cdk::spawn(manage_archives())
+}
+
+pub async fn manage_archives() {
+    mutate_state(|s| {
+        s.data.is_archive_cron_running = true;
+    });
+    let _ = check_storage_and_create_archive().await;
+    mutate_state(|s| {
+        s.data.is_archive_cron_running = false;
+    });
 }

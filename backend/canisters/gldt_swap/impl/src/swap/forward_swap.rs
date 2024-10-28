@@ -1,4 +1,4 @@
-use std::array::TryFromSliceError;
+use std::{ array::TryFromSliceError, ops::Deref };
 
 use candid::{ Nat, Principal };
 use canister_time::timestamp_nanos;
@@ -7,6 +7,7 @@ use gldt_swap_common::{
     swap::{
         BidFailError,
         BurnFeesError,
+        DepositRecoveryError,
         MintError,
         NotificationError,
         SwapDetailForward,
@@ -24,8 +25,10 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
     BidFeature,
     BidRequest,
     BidResponseTxnType,
+    DepositDetail,
     EndingType,
     EscrowRecord,
+    EscrowRequest,
     IcTokenSpec,
     ManageSaleRequest,
     ManageSaleResponse,
@@ -33,9 +36,12 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
     PricingConfigShared,
     SaleStatusSharedSaleType,
     TokenSpec,
+    WithdrawDescription,
+    WithdrawRequest,
 };
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
 use origyn_nft_reference_c2c_client::sale_nft_origyn;
+use origyn_nft_reference::origyn_nft_reference_canister::Account as OrigynAccount;
 use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 use icrc_ledger_types::icrc1::{
@@ -58,14 +64,14 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
                 "FORWARD SWAP :: forward_swap_validate_notification :: {:?} has no forward swap details",
                 swap_id
             );
-            return ();
+            return;
         }
     } else {
         debug!(
             "FORWARD SWAP :: forward_swap_validate_notification :: {:?} - can't find swap",
             swap_id
         );
-        return ();
+        return;
     };
 
     if let Err(_) = valid_init_state(&swap_details) {
@@ -75,13 +81,14 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
             swap_details.status,
             SwapStatusForward::Init
         );
-        return ();
+        return;
     }
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::NotificationInProgress));
 
     if swap_details.nft_id_string != notification.sale.token_id {
         let swap_nft_id_string = swap_details.nft_id_string;
         let noti_nft_id = notification.sale.token_id.clone();
-        validate_error(
+        set_notification_error(
             &swap,
             NotificationError::OrigynStringIdDoesNotMatch(
                 format!(
@@ -89,13 +96,13 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
                 )
             )
         );
-        return ();
+        return;
     }
 
     if swap_details.nft_canister != notification.collection {
         let swap_coll = swap_details.nft_canister;
         let noti_coll = notification.collection;
-        validate_error(
+        set_notification_error(
             &swap,
             NotificationError::CollectionDoesNotMatch(
                 format!(
@@ -103,18 +110,18 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
                 )
             )
         );
-        return ();
+        return;
     }
 
     if let Err(e) = is_valid_seller(notification.seller.clone(), swap_details.gldt_receiver.owner) {
-        validate_error(&swap, e);
+        set_notification_error(&swap, e);
         return; // Return early if there is an error
     }
 
     let escrow_sub_account: Subaccount = match validate_nft_escrow_subaccount(&notification) {
         Ok(sub_account) => sub_account,
         Err(e) => {
-            validate_error(&swap, e);
+            set_notification_error(&swap, e);
             return ();
         }
     };
@@ -122,13 +129,18 @@ pub fn forward_swap_validate_notification(swap_id: &SwapId, notification: &Subsc
     let (token, config) = match verify_token_spec(&notification) {
         Ok(toke_and_config) => toke_and_config,
         Err(e) => {
-            validate_error(&swap, e);
+            set_notification_error(&swap, e);
             return ();
         }
     };
 
     if let Err(e) = validate_sale_config(&config, &swap_details.tokens_to_mint, &token) {
-        validate_error(&swap, e);
+        set_notification_error(&swap, e);
+        return ();
+    }
+
+    if let Err(e) = validate_sale_id_length(&notification.sale.sale_id) {
+        set_notification_error(&swap, e);
         return ();
     }
 
@@ -195,7 +207,7 @@ fn is_valid_seller(
     }
 }
 
-fn validate_error(swap_info: &SwapInfo, error: NotificationError) {
+fn set_notification_error(swap_info: &SwapInfo, error: NotificationError) {
     let swap_id = &swap_info.get_swap_id();
     let mut error_message = format!(
         "FORWARD SWAP :: notification validation  :: SwapID = {swap_id:?} :: "
@@ -243,6 +255,9 @@ fn validate_error(swap_info: &SwapInfo, error: NotificationError) {
         NotificationError::InvalidPricingConfig => {
             error_message.push_str("Pricing config is invalid");
         }
+        NotificationError::SaleIDStringTooLong(e) => {
+            error_message.push_str(&e.clone());
+        }
     }
 
     swap_info.update_status(
@@ -254,6 +269,15 @@ fn validate_error(swap_info: &SwapInfo, error: NotificationError) {
 fn validate_nft_escrow_subaccount(
     args: &SubscriberNotification
 ) -> Result<Subaccount, NotificationError> {
+    if args.escrow_info.account.sub_account.as_slice().len() != 32 {
+        return Err(
+            NotificationError::InvalidEscrowSubaccount(
+                format!(
+                    "Escrow sub accoun (escrow_info.account.sub_account) is not of the correct length. can't convert to a Subaccount type"
+                )
+            )
+        );
+    }
     let b: Result<[u8; 32], TryFromSliceError> = args.escrow_info.account.sub_account
         .as_slice()
         .try_into();
@@ -261,6 +285,18 @@ fn validate_nft_escrow_subaccount(
         Ok(x) => Ok(x),
         Err(e) => { Err(NotificationError::InvalidEscrowSubaccount(format!("{e}"))) }
     }
+}
+
+fn validate_sale_id_length(sale_id: &String) -> Result<bool, NotificationError> {
+    let len = sale_id.len();
+    if len > 250 {
+        return Err(
+            NotificationError::SaleIDStringTooLong(
+                format!("The length of the sale id may not pass 1000. it's current length is {len}")
+            )
+        );
+    }
+    Ok(true)
 }
 
 fn validate_sale_config(
@@ -375,6 +411,9 @@ pub async fn forward_swap_perform_mint_to_escrow(swap_id: &SwapId) {
         );
         return ();
     }
+
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::MintInProgress));
+
     let gldt_canister_id = read_state(|s| s.data.gldt_ledger_id);
 
     let args = TransferArg {
@@ -428,7 +467,6 @@ pub async fn forward_swap_perform_bid_on_nft(
     swap_id: &SwapId,
     notification: SubscriberNotification
 ) {
-    info!("FORWARD SWAP :: forward_swap_perform_bid_on_nft :: entered ");
     let (swap, swap_details) = if
         let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
     {
@@ -457,6 +495,8 @@ pub async fn forward_swap_perform_bid_on_nft(
         );
         return ();
     }
+
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::BidInProgress));
     let nft_id = swap_id.0.clone();
     let nft_canister_id = swap_details.nft_canister;
     let gldt_ledger_canister_id = read_state(|s| s.data.gldt_ledger_id);
@@ -590,7 +630,7 @@ pub async fn forward_swap_perform_burn_fees(swap_id: &SwapId) {
         );
         return ();
     }
-
+    swap.update_status(SwapStatus::Forward(SwapStatusForward::BurnFeesInProgress));
     let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
     let this_canister_id = read_state(|s| s.env.canister_id());
     match
@@ -603,7 +643,8 @@ pub async fn forward_swap_perform_burn_fees(swap_id: &SwapId) {
                         subaccount: None,
                     },
                     gldt_ledger_id,
-                    Nat::from(GLDT_TX_FEE * 2)
+                    Nat::from(GLDT_TX_FEE * 2),
+                    Some(MemoIcrc(ByteBuf::from(swap.get_swap_id().1.0.to_bytes_le())))
                 ),
             3
         ).await
@@ -624,6 +665,197 @@ pub async fn forward_swap_perform_burn_fees(swap_id: &SwapId) {
     }
 
     return ();
+}
+
+pub async fn forward_swap_perform_deposit_recovery(swap_id: &SwapId) -> Result<(), ()> {
+    let (swap, swap_details) = if
+        let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(swap_id).cloned())
+    {
+        if let SwapInfo::Forward(details) = swap_info.clone() {
+            (swap_info, details)
+        } else {
+            debug!(
+                "FORWARD SWAP :: forward_swap_perform_deposit_recovery :: {:?} has no forward swap details",
+                swap_id
+            );
+            return Err(());
+        }
+    } else {
+        debug!(
+            "FORWARD SWAP :: forward_swap_perform_deposit_recovery :: {:?} - can't find swap",
+            swap_id
+        );
+        return Err(());
+    };
+
+    let original_error = match swap_details.status {
+        SwapStatusForward::DepositRecoveryRequest(swap_status_forward) => {
+            swap_status_forward.deref().clone()
+        }
+        _ => {
+            debug!(
+                "FORWARD SWAP :: forward_swap_perform_deposit_recovery :: {:?} has the status {:?}",
+                swap_id,
+                swap_details.status
+            );
+            return Err(());
+        }
+    };
+    swap.update_status(
+        SwapStatus::Forward(
+            SwapStatusForward::DepositRecoveryInProgress(Box::new(original_error.clone()))
+        )
+    );
+    let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
+    let this_canister_id = read_state(|s| s.env.canister_id());
+
+    let args = ManageSaleRequest::RecognizeEscrow(EscrowRequest {
+        token_id: swap_details.nft_id_string.clone(),
+        deposit: DepositDetail {
+            token: GldtTokenSpec::new(gldt_ledger_id).get_token_spec(),
+            trx_id: None,
+            seller: OrigynAccount::Account {
+                owner: swap_details.gldt_receiver.owner,
+                sub_account: None,
+            },
+            buyer: OrigynAccount::Account {
+                owner: this_canister_id,
+                sub_account: None,
+            },
+            amount: swap_details.tokens_to_mint.get_with_fee().clone(),
+            sale_id: Some(swap_details.sale_id.clone()),
+        },
+        lock_to_date: None,
+    });
+
+    let valid_deposit = match sale_nft_origyn(swap_details.nft_canister, args).await {
+        Ok(_deposit_result) => {
+            match _deposit_result {
+                ManageSaleResult::Ok(_) => {
+                    true // deposit recognized
+                }
+                ManageSaleResult::Err(origyn_error) => {
+                    swap.update_status(
+                        SwapStatus::Forward(
+                            SwapStatusForward::DepositRecoveryFailed(
+                                Box::new(original_error.clone()),
+                                DepositRecoveryError::CantRecover(format!("{origyn_error:?}"))
+                            )
+                        )
+                    );
+                    false
+                }
+            }
+        }
+        Err(e) => {
+            swap.update_status(
+                SwapStatus::Forward(
+                    SwapStatusForward::DepositRecoveryFailed(
+                        Box::new(original_error.clone()),
+                        DepositRecoveryError::CallError(format!("{e:?}"))
+                    )
+                )
+            );
+            false
+        }
+    };
+
+    if !valid_deposit {
+        return Err(());
+    }
+
+    let args = ManageSaleRequest::Withdraw(
+        WithdrawRequest::Escrow(WithdrawDescription {
+            token: GldtTokenSpec::new(gldt_ledger_id).get_token_spec_with_no_fee(),
+            token_id: swap_details.nft_id_string.clone(),
+            seller: OrigynAccount::Account {
+                owner: swap_details.gldt_receiver.owner,
+                sub_account: None,
+            },
+            withdraw_to: OrigynAccount::Principal_(this_canister_id),
+            buyer: OrigynAccount::Account {
+                owner: this_canister_id,
+                sub_account: None,
+            },
+            amount: swap_details.tokens_to_mint.get_with_fee(),
+        })
+    );
+
+    let manage_sale_result = sale_nft_origyn(swap_details.nft_canister, args).await;
+
+    match manage_sale_result {
+        Ok(ManageSaleResult::Ok(_)) => {
+            match &original_error {
+                SwapStatusForward::BidRequest => {
+                    let _ = &swap.update_status(
+                        // we have the deposit back, a request must have timed out or the notification never came to the swap canister so there should be no error to propogate
+                        SwapStatus::Forward(
+                            SwapStatusForward::Failed(
+                                SwapErrorForward::Expired(Box::new(original_error))
+                            )
+                        )
+                    );
+                    return Ok(());
+                }
+                SwapStatusForward::BidFail(e) => {
+                    // fail it like normal
+                    let _ = &swap.update_status(
+                        SwapStatus::Forward(
+                            SwapStatusForward::Failed(SwapErrorForward::BidFailed(e.clone()))
+                        )
+                    );
+                    return Ok(());
+                }
+
+                other_status => {
+                    let swap_id = swap.get_swap_id();
+                    swap.update_status(
+                        SwapStatus::Forward(
+                            SwapStatusForward::DepositRecoveryFailed(
+                                Box::new(original_error.clone()),
+                                DepositRecoveryError::CantRecover(
+                                    format!(
+                                        "SwapId : {swap_id:?} Tried to recover a swap deposit that wasn't previously a BidRequest or BidFail. Current status : {other_status:?}"
+                                    )
+                                )
+                            )
+                        )
+                    );
+                    return Err(());
+                }
+            }
+        }
+        Ok(ManageSaleResult::Err(e)) => {
+            let swap_id = swap.get_swap_id();
+            debug!(
+                "STALE SWAP JOB : Swap ID :: {swap_id:?} - Failed to withdraw forward swap deposit: {e:?}"
+            );
+            swap.update_status(
+                SwapStatus::Forward(
+                    SwapStatusForward::DepositRecoveryFailed(
+                        Box::new(original_error.clone()),
+                        DepositRecoveryError::CantRecover(format!("{e:?}"))
+                    )
+                )
+            );
+            return Err(());
+        }
+        Err(e) => {
+            let swap_id = swap.get_swap_id();
+            debug!(
+                "STALE SWAP JOB : Swap ID :: {swap_id:?} - Failed to withdraw forward swap deposit: {e:?}"
+            );
+            swap.update_status(
+                SwapStatus::Forward(
+                    SwapStatusForward::DepositRecoveryFailed(
+                        Box::new(original_error.clone()),
+                        DepositRecoveryError::CallError(format!("{e:?}"))
+                    )
+                )
+            );
+            return Err(());
+        }
+    }
 }
 
 fn valid_for_mint(current_swap_details: &SwapDetailForward) -> Result<(), ()> {
