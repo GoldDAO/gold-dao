@@ -4,7 +4,6 @@ spec:
       description: The frontend project folder name. Must be located in the /client/ folder
       options:
         [
-          "gldt_landing_page",
           "gld_dashboard",
           "gldt_swap_app",
           "gld_landing_page",

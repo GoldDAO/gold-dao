@@ -97,9 +97,6 @@ include:
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
-      src-folder: gldt_landing_page
-  - local: scripts/ci-cd/.frontend_builds.yml
-    inputs:
       src-folder: gld_landing_page
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:

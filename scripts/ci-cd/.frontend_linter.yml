@@ -5,7 +5,6 @@ spec:
       options:
         [
           "gldt_swap_app",
-          "gldt_landing_page",
           "gld_dashboard",
           "gld_landing_page",
         ]
