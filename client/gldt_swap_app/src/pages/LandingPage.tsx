@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import NavbarHome from "@components/shared/navbars/Home";
-import { Button } from "@components/ui";
+import { Button, Skeleton } from "@components/ui";
 import { FrequentlyAskedQuestions } from "@components/landing-page";
+import { useGLDTMarketcapUSD } from "@hooks/gold_api";
 
 const Logo = ({ name, alt = "" }: { name: string; alt?: string }) => {
   return (
@@ -22,6 +23,14 @@ export const LandingPage = () => {
     { name: "ICP", alt: "ICP brand logo" },
     { name: "BITY", alt: "BITY brand logo" },
   ];
+
+  const {
+    data: GLDTMarketcap,
+    isSuccess: isSuccessGLDTMarketcap,
+    // isLoading: isLoadingGLDTMarketcap,
+    // isError: isErrorGLDTMarketcap,
+  } = useGLDTMarketcapUSD();
+
   return (
     <>
       <div className="bg-surface-2 bg-cover-img bg-cover bg-fixed">
@@ -55,9 +64,15 @@ export const LandingPage = () => {
                     <div className="text-sm">Total Gold locked in kg</div>
                     <div className="font-semibold">7000.7 kg</div>
                   </div>
-                  <div className="border border-gold/60 rounded-full px-8 py-2">
+                  <div className="flex flex-col items-center border border-gold/60 rounded-full px-8 py-2">
                     <div className="text-sm">GLDT marketcap in USD</div>
-                    <div className="font-semibold">567,344,456.098 $</div>
+                    <div className="font-semibold">
+                      {isSuccessGLDTMarketcap ? (
+                        <div>{GLDTMarketcap} $</div>
+                      ) : (
+                        <Skeleton className="w-32" />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
