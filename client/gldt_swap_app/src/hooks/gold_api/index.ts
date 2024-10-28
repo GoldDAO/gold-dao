@@ -21,7 +21,8 @@ export const fetchGoldPrice1G = async () => {
         };
       };
     } = data;
-    return Object.values(rates)[0]["USDXAU"];
+    return Object.values(rates)[0]["USDXAU"] / 31.103;
   };
 
 export * from "./useBalanceGLDTUSD"
+export * from "./useGLDTMarketcapUSD"
