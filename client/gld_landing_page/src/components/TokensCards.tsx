@@ -47,7 +47,7 @@ const TokensCards = () => {
         cards.map((card, index) => (
           <div
             key={index}
-            className='card shadow-lg bg-white rounded-[20px] flex flex-col md:flex-row items-center max-h-[700px] md:max-h-[612px] w-full'
+            className='card shadow-lg bg-white rounded-[20px] flex flex-col md:flex-row items-center h-[90vh] max-h-[90vh] md:max-h-[612px] w-full'
           >
             <div className='flex flex-col md:w-1/2 p-8 md:py-16 md:px-8 xl:px-16 2xl:px-32'>
               <div className='bg-[#F7EED7] text-[#B89143] hidden md:inline rounded-full w-fit px-4 py-1 mb-4'>
@@ -72,30 +72,25 @@ const TokensCards = () => {
               </button>
             </div>
 
-            <div className='relative w-full md:w-1/2 h-[780px] md:h-[612px] '>
+            <div className='flex-1 relative w-full md:w-1/2 h-full flex items-stretch overflow-hidden rounded-b-[20px] md:rounded-r-[20px] md:rounded-br-[20px] md:rounded-bl-[0px]'>
               {card.videoSrc && (
-                <div className=''>
-                  <video
-                    src={card.videoSrc}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className='rounded-b-[20px] md:rounded-r-[20px] md:rounded-b-none object-cover w-full h-full absolute'
-                    controlsList='nodownload'
-                  />
-                </div>
+                <video
+                  src={card.videoSrc}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className='rounded-b-[20px] md:rounded-r-[20px] md:rounded-b-none object-cover w-full h-full'
+                  controlsList='nodownload'
+                />
               )}
-
               {card.imageSrc && (
-                <div className='w-full h-full'>
-                  <img
-                    src={card.imageSrc}
-                    alt={card.title}
-                    className='rounded-b-[20px] md:rounded-r-[20px] w-full h-full md:rounded-b-none object-cover'
-                    sizes='(max-width: 768px) 100vw, 50vw'
-                  />
-                </div>
+                <img
+                  src={card.imageSrc}
+                  alt={card.title}
+                  className='object-cover w-full h-full'
+                  sizes='(max-width: 768px) 100vw, 50vw'
+                />
               )}
             </div>
           </div>
