@@ -27,7 +27,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
       record {
        0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_100g)\";
        1 = record {
-         grams = 100;
+         grams = 100:nat16;
        };
       };
       record {
