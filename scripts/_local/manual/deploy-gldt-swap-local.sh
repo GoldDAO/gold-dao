@@ -10,8 +10,13 @@
 ./scripts/build-canister.sh gldt_swap &&
 # dfx deploy --network staging sns_rewards --argument '(record {test_mode = true})' --mode reinstall
 dfx deploy gldt_swap --argument "(record {
-    test_mode = true;
-    version = \"0.0.1\";
+   test_mode = true;
+    version = record {
+     major = 0:nat32;
+     minor = 0:nat32;
+     patch = 0:nat32;
+    };
+    commit_hash = \"stagingcommit\";
     gldt_ledger_id = principal \"6uad6-fqaaa-aaaam-abovq-cai\";
     gldnft_canisters = vec {
       record {
@@ -25,6 +30,18 @@ dfx deploy gldt_swap --argument "(record {
         1 = record {
           grams = 10;
         };
+      };
+      record {
+       0 = principal \"hvanv-3iaaa-aaaap-qkfwq-cai\";
+       1 = record {
+         grams = 100;
+       };
+      };
+      record {
+       0 = principal \"vnpd6-iqaaa-aaaao-qbelq-cai\";
+       1 = record {
+         grams = 1000;
+       };
       };
     };
     ogy_ledger_id = principal \"j5naj-nqaaa-aaaal-ajc7q-cai\";
