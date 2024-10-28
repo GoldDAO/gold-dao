@@ -106,7 +106,7 @@ const CardGrid: React.FC = () => {
       learnMoreLink: 'https://docs.gold-dao.org/',
       buyLink:
         'https://info.icpswap.com/swap/token/details/tyyy3-4aaaa-aaaaq-aab7a-cai',
-      imageSrc: '/static/illustrations/Gold-Gov.png',
+      imageSrc: '/static/illustrations/Gold-gov.png',
       button: t('tokens.gldgov.button')
     },
     {
