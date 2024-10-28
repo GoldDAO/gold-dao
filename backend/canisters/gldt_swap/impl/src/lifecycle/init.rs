@@ -15,7 +15,7 @@ fn init(args: Args) {
             canister_logger::init(init_args.test_mode);
 
             if init_args.test_mode {
-                info!("INIT :: in test mode");
+                info!("INIT :: in test mode.");
             }
 
             let env = CanisterEnv::new(

@@ -60,19 +60,20 @@ export const useGetUserNftsMetrics = () => {
         enabled: !!isConnected,
         refetchOnWindowFocus: false,
       },
-      // {
-      //   queryKey: ["USER_GET_GLD_NFT_100G_COUNT"],
-      //   queryFn: () => getUserNFTCountByCanister("gld_nft_100g", 100),
-      //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected,
-      //   refetchOnWindowFocus: false,
-      // },
-      //   {
-      //     queryKey: ["USER_GET_GLD_NFT_1000G_COUNT"],
-      //     queryFn: () => getUserNFTCountByCanister("gld_nft_1000g", 1000),
-      //     placeholderData: keepPreviousData,
-      //     enabled: !!isConnected,
-      //   },
+      {
+        queryKey: ["USER_GET_GLD_NFT_100G_COUNT"],
+        queryFn: () => getUserNFTCountByCanister("gld_nft_100g", 100),
+        placeholderData: keepPreviousData,
+        enabled: !!isConnected,
+        refetchOnWindowFocus: false,
+      },
+      {
+        queryKey: ["USER_GET_GLD_NFT_1000G_COUNT"],
+        queryFn: () => getUserNFTCountByCanister("gld_nft_1000g", 1000),
+        placeholderData: keepPreviousData,
+        enabled: !!isConnected,
+        refetchOnWindowFocus: false,
+      },
     ],
   });
 
