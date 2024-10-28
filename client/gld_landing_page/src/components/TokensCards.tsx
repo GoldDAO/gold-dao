@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* TokensCards.tsx */
 'use client'
 
@@ -87,13 +88,11 @@ const TokensCards = () => {
               )}
 
               {card.imageSrc && (
-                <div className=''>
-                  <Image
+                <div className='w-full h-full'>
+                  <img
                     src={card.imageSrc}
                     alt={card.title}
-                    width={600} // Ajuster les dimensions selon besoin
-                    height={400} // Ajuster les dimensions selon besoin
-                    className='rounded-b-[20px] md:rounded-r-[20px] md:rounded-b-none object-cover'
+                    className='rounded-b-[20px] md:rounded-r-[20px] w-full h-full md:rounded-b-none object-cover'
                     sizes='(max-width: 768px) 100vw, 50vw'
                   />
                 </div>

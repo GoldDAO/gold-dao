@@ -67,7 +67,7 @@ const Hero = () => {
       />
       <div className='relative text-center'>
         <h1
-          className='text-[53px] md:text-[82px] font-inter font-bold text-white leading-[90px] text-shadow-lg md:max-w-2xl mx-auto'
+          className='text-5xl leading-[48px] md:text-[82px] font-inter font-bold text-white md:leading-[90px] text-shadow-lg md:max-w-2xl mx-auto'
           style={{
             textShadow:
               '0px 10px 15px rgba(0, 0, 0, 0.10), 0px 4px 6px rgba(0, 0, 0, 0.05)'
@@ -76,7 +76,7 @@ const Hero = () => {
           {t('title')}
         </h1>
         <p
-          className='text-[40px] md:text-[46px] font-inter font-light leading-[90px] text-[rgba(0,0,0,0.80)]  w-full mx-auto  md:max-w-6xl'
+          className='text-4xl font-medium leading-10 md:text-6xl font-inter md:leading-[60px] text-[rgba(0,0,0,0.80)]  w-full mx-auto  md:max-w-5xl'
           style={{
             textShadow:
               '0px 10px 15px rgba(0, 0, 0, 0.10), 0px 4px 6px rgba(0, 0, 0, 0.05)'
