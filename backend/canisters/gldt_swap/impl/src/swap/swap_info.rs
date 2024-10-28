@@ -5,11 +5,7 @@ use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
 use tracing::{ debug, info };
 
-use crate::{
-    check_storage_and_create_archive,
-    state::{ mutate_state, read_state },
-    utils::{ get_historic_swap, trace },
-};
+use crate::{ state::{ mutate_state, read_state }, utils::{ commit_changes, get_historic_swap } };
 
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
@@ -30,12 +26,9 @@ impl SwapInfoTrait for SwapInfo {
             return Err(());
         }
 
-        if check_storage_and_create_archive().await.is_err() {
-            return Err(());
-            // TODO - return error code here
-        }
         let current_index = read_state(|s| s.data.swaps.get_current_swap_index());
         mutate_state(|s| s.data.swaps.increment_swap_index());
+        mutate_state(|s| s.data.swaps.set_archive_as_active(&current_index));
 
         // use the latest index
         let mut new_swap = self.clone();
@@ -107,6 +100,35 @@ impl SwapInfoTrait for SwapInfo {
                 SwapStatus::Reverse(SwapStatusReverse::Failed(_))
         );
 
+        if matches!(status, SwapStatus::Forward(SwapStatusForward::Complete)) {
+            // update total success forward swaps
+            mutate_state(|s| {
+                s.data.total_completed_forward_swaps += 1;
+            });
+        }
+
+        if matches!(status, SwapStatus::Reverse(SwapStatusReverse::Complete)) {
+            mutate_state(|s| {
+                s.data.total_completed_reverse_swaps += 1;
+            });
+        }
+
+        if
+            matches!(
+                status,
+                SwapStatus::Forward(SwapStatusForward::Failed(_)) |
+                    SwapStatus::Reverse(SwapStatusReverse::Failed(_))
+            )
+        {
+            mutate_state(|s| {
+                s.data.total_failed_swaps += 1;
+            });
+        }
+
+        ic_cdk::spawn(async move {
+            commit_changes().await;
+        });
+
         if should_move_to_history {
             if let Some(swap) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {
                 ic_cdk::spawn(async move {
@@ -132,7 +154,6 @@ impl SwapInfoTrait for SwapInfo {
                 "ERROR : can't insert swap with SwapId : {swap_id:?}. it already exists in history"
             );
             debug!(message);
-            trace(&message);
             return Err(());
         }
 

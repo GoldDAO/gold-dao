@@ -69,20 +69,21 @@ export const useGetUserGLDNFT = () => {
         enabled: !!isConnected && !!active_swaps.isSuccess,
         refetchOnWindowFocus: false,
       },
-      // {
-      //   queryKey: ["USER_GET_GLD_NFT_100G"],
-      //   queryFn: () =>
-      //     getUserNFTByCanister("gld_nft_100g", CollectionIndex.GLD_NFT_100G),
-      //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!active_swaps.isSuccess,
-      //   refetchOnWindowFocus: false,
-      // },
-      // {
-      //   queryKey: ["USER_GET_GLD_NFT_1000G"],
-      //   queryFn: () => getUserNFTByCanister("gld_nft_1000g", CollectionIndex.GLD_NFT_1000G),
-      //   placeholderData: keepPreviousData,
-      //   enabled: !!isConnected && !!principalId,
-      // },
+      {
+        queryKey: ["USER_GET_GLD_NFT_100G"],
+        queryFn: () =>
+          getUserNFTByCanister("gld_nft_100g", CollectionIndex.GLD_NFT_100G),
+        placeholderData: keepPreviousData,
+        enabled: !!isConnected && !!active_swaps.isSuccess,
+        refetchOnWindowFocus: false,
+      },
+      {
+        queryKey: ["USER_GET_GLD_NFT_1000G"],
+        queryFn: () =>
+          getUserNFTByCanister("gld_nft_1000g", CollectionIndex.GLD_NFT_1000G),
+        placeholderData: keepPreviousData,
+        enabled: !!isConnected && !!principalId,
+      },
     ],
   });
 

@@ -10,6 +10,8 @@ pub mod get_history_total;
 pub mod get_swap;
 pub mod get_historic_swaps;
 pub mod get_historic_swaps_by_user;
+pub mod insert_fake_bulk_swaps;
+pub mod commit;
 
 pub use notify_sale_nft_origyn::*;
 pub use swap_tokens_for_nft::*;
@@ -23,3 +25,4 @@ pub use get_history_total::*;
 pub use get_swap::*;
 pub use get_historic_swaps::*;
 pub use get_historic_swaps_by_user::*;
+pub use insert_fake_bulk_swaps::*;

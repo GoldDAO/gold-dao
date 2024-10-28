@@ -12,7 +12,7 @@
       "remote": {
         "id": {
           "ic": "7i7jl-6qaaa-aaaam-abjma-cai",
-          "staging": "7i7jl-6qaaa-aaaam-abjma-cai"
+          "staging": "vnpd6-iqaaa-aaaao-qbelq-cai"
         }
       },
       "type": "custom",
@@ -28,7 +28,7 @@
       "remote": {
         "id": {
           "ic": "zhfjc-liaaa-aaaal-acgja-cai",
-          "staging": "zhfjc-liaaa-aaaal-acgja-cai"
+          "staging": "hvanv-3iaaa-aaaap-qkfwq-cai"
         }
       },
       "type": "custom",
@@ -130,14 +130,14 @@
       "wasm": ""
     },
     "gldt_ledger": {
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/rs/ledger_suite/icrc1/ledger/ledger.did",
       "type": "custom",
-      "wasm": "https://download.dfinity.systems/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/canisters/ic-icrc1-ledger.wasm.gz"
+      "wasm": "https://download.dfinity.systems/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/canisters/ic-icrc1-ledger.wasm.gz"
     },
     "gldt_ledger_indexer": {
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/rs/rosetta-api/icrc1/index-ng/index-ng.did",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/rs/ledger_suite/icrc1/index-ng/index-ng.did",
       "type": "custom",
-      "wasm": "https://download.dfinity.systems/ic/94fd38099f0e63950eb5d5673b7b9d23780ace2d/canisters/ic-icrc1-index-ng.wasm.gz"
+      "wasm": "https://download.dfinity.systems/ic/75dd48c38f296fc907c269263f96633fa8a29d0e/canisters/ic-icrc1-index-ng.wasm.gz"
     },
     "gldt_swap_app": {
       "declarations": {

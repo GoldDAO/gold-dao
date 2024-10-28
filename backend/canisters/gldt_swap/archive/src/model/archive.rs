@@ -73,7 +73,7 @@ impl Archive {
     }
 
     pub fn add_swap_index_for_user(&mut self, user: Principal, swap_index: SwapId) {
-        let mut indexes = self.user_swap_id_map.get(&user).unwrap_or(VecNat::default());
+        let mut indexes = self.user_swap_id_map.get(&user).unwrap_or_default();
         indexes.0.push(swap_index);
         self.user_swap_id_map.insert(user, indexes);
     }

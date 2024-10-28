@@ -4,7 +4,7 @@
 #![allow(unused_mut)] // Ignore warnings for unused mutable variables
 #![allow(unused_macros)]
 
-use gldt_swap_common::swap::{ SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
+use gldt_swap_common::swap::{ trace, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
 use ic_cdk::update;
 pub use gldt_swap_api_canister::insert_fake_swap::{
     Args as InsertFakeSwapArgs,

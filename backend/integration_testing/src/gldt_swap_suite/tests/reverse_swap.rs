@@ -73,8 +73,10 @@ mod tests {
     use gldt_swap_api_canister::swap_tokens_for_nft::SwapTokensForNftRequestErrors;
     use gldt_swap_common::{
         gldt::GLDT_LEDGER_FEE_ACCOUNT,
-        swap::{ ServiceDownReason, STALE_SWAP_TIME_THRESHOLD_MINUTES },
+        swap::{ NftValidationError, ServiceDownReason, STALE_SWAP_TIME_THRESHOLD_MINUTES },
     };
+
+    use crate::client::icrc1_icrc2_token::icrc1_balance_of;
 
     use super::*;
     #[test]
@@ -254,6 +256,56 @@ mod tests {
             subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
         });
         assert_eq!(balance, Nat::from(2_000_000u64));
+    }
+
+    #[test]
+    pub fn reverse_swap_should_fail_if_user_has_incorrect_gldt_balance() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
+            principal_ids: PrincipalIds { net_principal, originator, nft_owner, controller, .. },
+        } = env;
+        tick_n_blocks(pic, 10);
+        // 1. setup nft and verify owner
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            gldt_swap.clone(),
+            "1".to_string()
+        );
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string()
+        );
+        let nft_id = NftID(token_id_as_nat.clone());
+
+        let owner_of = icrc7_owner_of(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            vec![token_id_as_nat.clone()]
+        );
+        assert_eq!(
+            owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
+            gldt_swap.to_string()
+        );
+
+        let res = swap_tokens_for_nft(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &(Args {
+                nft_id: nft_id.clone(),
+                nft_canister_id: origyn_nft,
+            })
+        );
+        matches!(res, Err(SwapTokensForNftRequestErrors::NftValidationErrors(_)));
     }
 
     // #[test]

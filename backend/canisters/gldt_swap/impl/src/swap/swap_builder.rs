@@ -21,6 +21,8 @@ use gldt_swap_api_canister::{
 };
 
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
+use icrc_ledger_canister::icrc1_balance_of;
+use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::Account3;
 use origyn_nft_reference_c2c_client::{
@@ -30,7 +32,7 @@ use origyn_nft_reference_c2c_client::{
 };
 use types::TimestampMillis;
 use utils::{ env::Environment, retry_async::retry_async };
-use crate::{ state::{ read_state, FeeAccount }, utils::trace };
+use crate::state::{ read_state, FeeAccount };
 
 #[derive(Clone)]
 pub struct SwapBuilder<T> {
@@ -150,6 +152,19 @@ impl SwapBuilder<SwapDetailForward> {
         };
     }
 
+    pub fn _verify_nft_id_string(&self, nft_id_string: &String) -> Result<bool, NftInvalidError> {
+        if nft_id_string.len() > 300 {
+            return Err(
+                NftInvalidError::NftIdStringTooLong(
+                    format!(
+                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+                    )
+                )
+            );
+        }
+        Ok(true)
+    }
+
     pub async fn init(
         self,
         nft_id: NftID,
@@ -188,7 +203,9 @@ impl SwapBuilder<SwapDetailForward> {
             }
         };
 
-        trace(&format!("//////// {tokens_to_mint:?}"));
+        if let Err(e) = self._verify_nft_id_string(&nft_id_string) {
+            errors.push(e);
+        }
 
         let is_locked = read_state(|s| s.data.swaps.get_active_swap_by_string_id(&nft_id_string));
         if is_locked.is_some() {
@@ -298,6 +315,52 @@ impl SwapBuilder<SwapDetailReverse> {
         }
     }
 
+    pub fn _verify_nft_id_string(
+        &self,
+        nft_id_string: &String
+    ) -> Result<bool, NftValidationError> {
+        if nft_id_string.len() > 300 {
+            return Err(
+                NftValidationError::NftIdStringTooLong(
+                    format!(
+                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+                    )
+                )
+            );
+        }
+        Ok(true)
+    }
+
+    pub async fn _user_has_tokens_for_swap(
+        &self,
+        user_principal: &Principal,
+        amount_required: &Nat
+    ) -> Result<bool, NftValidationError> {
+        let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
+        let args = icrc1_balance_of::Args {
+            owner: user_principal.clone(),
+            subaccount: None,
+        };
+        match icrc1_balance_of(gldt_ledger_id, args).await {
+            Ok(user_balance) => {
+                if &user_balance >= amount_required {
+                    Ok(true)
+                } else {
+                    Err(
+                        NftValidationError::UserDoesNotHaveTheRequiredGLDT(
+                            format!(
+                                "User with principal : {user_principal} does not have the required GLDT to perform this swap. user balance is {user_balance}"
+                            )
+                        )
+                    )
+                }
+            }
+            Err(e) => { Err(NftValidationError::CantValidateUserBalanceOfGLDT(format!("{e:?}"))) }
+        }
+
+        // UserDoesNotHaveTheRequiredGLDT
+    }
+
     pub async fn init(
         self,
         init_args: &SwapTokensForNftArgs,
@@ -321,6 +384,12 @@ impl SwapBuilder<SwapDetailReverse> {
         };
 
         let _ = self
+            ._user_has_tokens_for_swap(&user_principal, &tokens_to_receive.get_with_fee()).await
+            .map_err(|e| {
+                errors.push(e);
+            });
+
+        let _ = self
             ._is_owned_by_canister(&init_args.nft_id, &init_args.nft_canister_id).await
             .map_err(|e| {
                 errors.push(e);
@@ -329,7 +398,15 @@ impl SwapBuilder<SwapDetailReverse> {
         let nft_id_string = match
             self._get_origyn_id_string(&init_args.nft_id, &init_args.nft_canister_id).await
         {
-            Ok(id) => id,
+            Ok(id) => {
+                match self._verify_nft_id_string(&id) {
+                    Ok(_) => id,
+                    Err(e) => {
+                        errors.push(e);
+                        "".to_string()
+                    }
+                }
+            }
             Err(e) => {
                 errors.push(e);
                 "".to_string()

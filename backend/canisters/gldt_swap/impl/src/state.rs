@@ -1,7 +1,7 @@
 use gldt_swap_common::{
     archive::format_archive_canisters,
     nft::NftCanisterConf,
-    swap::{ ArchiveStatus, ServiceDownReason, ServiceStatus },
+    swap::{ ArchiveStatus, NewArchiveError, ServiceDownReason, ServiceStatus },
 };
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{ Deserialize, Serialize };
@@ -9,7 +9,6 @@ use candid::{ CandidType, Nat, Principal };
 use canister_state_macros::canister_state;
 use types::{ BuildVersion, TimestampMillis };
 use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
-
 use crate::model::swaps::Swaps;
 
 canister_state!(RuntimeState);
@@ -46,6 +45,10 @@ impl RuntimeState {
             required_ogy_threshold: format!("{:?}", self.get_required_ogy_for_canister()),
             ogy_balance: format!("{:?}", self.data.ogy_balance.clone()),
             nft_fee_accounts: format_nft_canister_configs(self.data.gldnft_canisters.clone()),
+            required_cycle_balance: format!("{:?}", self.data.required_cycle_balance.clone()),
+            total_completed_forward_swaps: self.data.total_completed_forward_swaps,
+            total_completed_reverse_swaps: self.data.total_completed_reverse_swaps,
+            total_failed_swaps: self.data.total_failed_swaps,
         }
     }
 
@@ -104,6 +107,10 @@ pub struct Metrics {
     pub required_ogy_threshold: String,
     pub ogy_balance: String,
     pub nft_fee_accounts: String,
+    pub required_cycle_balance: String,
+    pub total_completed_forward_swaps: u128,
+    pub total_completed_reverse_swaps: u128,
+    pub total_failed_swaps: u128,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -126,12 +133,20 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub is_remove_stale_swaps_cron_running: bool,
     pub is_archive_cron_running: bool,
-    pub max_canister_archive_threshold: Nat,
+    pub is_init_archive_cron_running: bool,
+    pub max_canister_archive_threshold: u128,
     pub should_upgrade_archives: bool,
     pub ogy_balance: Nat,
     pub archive_status: ArchiveStatus,
     pub service_status: ServiceStatus,
     pub base_ogy_swap_fee: Nat,
+    pub required_cycle_balance: Nat,
+    /// archive buffer is used during subsequent archive creation when current archives are full. new archive canisters are created before the current used archive is full. we give the new archive a start index of the current highest + this buffer to give current swaps room to still insert into the old archive
+    pub archive_buffer: usize,
+    pub new_archive_error: Option<NewArchiveError>,
+    pub total_completed_forward_swaps: u128,
+    pub total_completed_reverse_swaps: u128,
+    pub total_failed_swaps: u128,
 }
 
 impl Default for Data {
@@ -144,12 +159,19 @@ impl Default for Data {
             authorized_principals: vec![],
             is_remove_stale_swaps_cron_running: false,
             is_archive_cron_running: false,
-            max_canister_archive_threshold: Nat::from(370 * 1024 * 1024 * (1024 as u128)), // 370GB
+            is_init_archive_cron_running: false,
+            max_canister_archive_threshold: 300 * 1024 * 1024 * (1024 as u128), // 300GB
             should_upgrade_archives: false,
             ogy_balance: Nat::from(0u64),
             archive_status: ArchiveStatus::Initializing,
             service_status: ServiceStatus::Down(ServiceDownReason::Initializing),
             base_ogy_swap_fee: Nat::from(1_000_000_000u64), // default of 10 OGY
+            required_cycle_balance: Nat::default(),
+            archive_buffer: 250_000usize,
+            new_archive_error: None,
+            total_completed_forward_swaps: 0,
+            total_completed_reverse_swaps: 0,
+            total_failed_swaps: 0,
         }
     }
 }

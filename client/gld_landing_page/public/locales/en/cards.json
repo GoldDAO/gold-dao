@@ -5,7 +5,7 @@
       "subtitle": "Decentralised governance with industry-leading security and transparency.",
       "tag": "Governance",
       "description": "Gold DAO operates as a Decentralised Autonomous Organisation (DAO), powered by the ORIGYN Protocol and running on the Internet Computer (ICP). This cutting-edge infrastructure ensures fully decentralised governance, secure, transparent and tamper-proof transactions, with all operations conducted 100% on-chain.",
-      "imageSrc": "/static/illustrations/Gold-gov-big.svg",
+      "imageSrc": "/static/illustrations/Gold-gov-big.png",
       "cardKey": "gldgov"
     },
     {
@@ -13,7 +13,7 @@
       "subtitle": "Direct ownership of physical gold.",
       "tag": "NFT",
       "description": "The GLD NFT represents direct ownership of physical gold stored in secure Swiss vaults, offering investors a tangible, redeemable asset backed by the highest standards of transparency and security.",
-      "imageSrc": "/static/illustrations/Gold-NFT.svg",
+      "imageSrc": "/static/illustrations/Gold-NFT.png",
       "cardKey": "gld_nft"
     },
     {
@@ -29,7 +29,7 @@
       "subtitle": "A stablecoin backed by gold .",
       "tag": "Stablecoin",
       "description": "USDG is a stablecoin pegged to the US dollar, offering the stability of USD while being supported by the security of gold. Unlike traditional fiat-backed stablecoins, USDG is backed by GLDT, which is itself tied to physical gold through GLD NFTs. These NFTs represent direct ownership of gold stored securely in Swiss vaults, ensuring a fully transparent and verifiable backing for every USDG issued.",
-      "imageSrc": "/static/illustrations/Gold-USDG-big.svg",
+      "imageSrc": "/static/illustrations/Gold-USDG-big.png",
       "cardKey": "usdg"
     }
   ]

@@ -3,6 +3,7 @@ use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_api_archive::lifecycle::Args as ArgsArchive;
 use gldt_swap_api_archive::{ init::InitArgs, post_upgrade::UpgradeArgs };
 use gldt_swap_archive_c2c_client::get_archive_size;
+use gldt_swap_common::swap::NewArchiveError;
 use ic_cdk::api::management_canister::main::{
     canister_status,
     create_canister,
@@ -17,34 +18,43 @@ use ic_cdk::api::management_canister::main::{
     InstallCodeArgument,
     LogVisibility,
 };
-use tracing::debug;
+use tracing::{ debug, info };
 use utils::{ env::Environment, retry_async::retry_async };
 
 use crate::state::{ mutate_state, read_state };
+use crate::utils::trace;
 
 const ARCHIVE_WASM: &[u8] = include_bytes!("../../archive/wasm/gldt_swap_archive_canister.wasm.gz");
 
 pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     // check if the capacity is
-    let current_swap_index = read_state(|s| s.data.swaps.get_current_swap_index());
     if
         let Some(current_archive) = read_state(|s|
             s.data.swaps.get_archive_canisters().last().cloned()
         )
     {
         if is_archive_canister_at_threshold(&current_archive).await {
+            info!("ARCHIVE :: at capacity :: creating new archive canister");
+            trace("///// Checking archive 3");
             let archive_principal = match create_archive_canister().await {
                 Ok(principal) => { principal }
                 Err(e) => {
-                    debug!(e);
+                    debug!("{e:?}");
+                    mutate_state(|s| {
+                        s.data.new_archive_error = Some(e);
+                    });
                     return Err(());
                 }
             };
+            let current_swap_index = read_state(|s| s.data.swaps.get_current_swap_index());
+            let archive_buffer = read_state(|s| s.data.archive_buffer);
+            let future_swap_index = current_swap_index + Nat::from(archive_buffer);
             mutate_state(|s|
                 s.data.swaps.set_new_archive_canister(ArchiveCanister {
                     canister_id: archive_principal,
-                    start_index: current_swap_index,
+                    start_index: future_swap_index,
                     end_index: None,
+                    active: false,
                 })
             );
             // new archive created
@@ -58,19 +68,30 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     Err(())
 }
 
-pub async fn create_archive_canister() -> Result<Principal, String> {
+pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     let this_canister_id = read_state(|s| s.env.canister_id());
+    let test_mode = read_state(|s| s.env.is_test_mode());
     let mut controllers = get_canister_controllers(this_canister_id).await?;
     controllers.push(ic_cdk::api::id());
 
-    let initial_cycles = 2_000_000_000_000u64; // 2 Trillion cycles
+    let initial_cycles = if test_mode {
+        2_000_000_000_000u64 // 2 Trillion cycles
+    } else {
+        10_000_000_000_000u64 // 2 Trillion cycles
+    };
+
+    let reserved_cycles = if test_mode {
+        2_000_000_000_000u64 // 2 Trillion cycles
+    } else {
+        4_000_000_000_000u64 // 2 Trillion cycles
+    };
     // Define the initial settings for the new canister
     let settings = CanisterSettings {
         controllers: Some(controllers), // Ensure the current canister is a controller
         compute_allocation: None,
         memory_allocation: None,
         freezing_threshold: None,
-        reserved_cycles_limit: Some(Nat::from(initial_cycles)),
+        reserved_cycles_limit: Some(Nat::from(reserved_cycles)),
         log_visibility: Some(LogVisibility::Public),
         wasm_memory_limit: None, // use default of 3GB
     };
@@ -89,7 +110,7 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     {
         Ok(canister) => { canister.0.canister_id }
         Err(e) => {
-            return Err(format!("ERROR : failed to create a canister id with error - {e:?}"));
+            return Err(NewArchiveError::CreateCanisterError(format!("{e:?}")));
         }
     };
     let mut current_auth_prins = read_state(|s| s.data.authorized_principals.clone());
@@ -108,7 +129,7 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     {
         Ok(encoded_init_args) => encoded_init_args,
         Err(e) => {
-            return Err(format!("ERROR : failed to create init args with error - {e}"));
+            return Err(NewArchiveError::FailedToSerializeInitArgs(format!("{e}")));
         }
     };
 
@@ -121,9 +142,14 @@ pub async fn create_archive_canister() -> Result<Principal, String> {
     };
 
     match retry_async(|| install_code(install_args.clone()), 3).await {
-        Ok(_) => Ok(canister_id),
-        Err((code, msg)) => {
-            return Err(format!("ERROR : {code:?} - {msg}"));
+        Ok(_) => {
+            mutate_state(|s| {
+                s.data.new_archive_error = None;
+            });
+            Ok(canister_id)
+        }
+        Err(e) => {
+            return Err(NewArchiveError::InstallCodeError(format!("{e:?}")));
         }
     }
 }
@@ -133,8 +159,17 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
     let max_canister_archive_threshold = read_state(|s|
         s.data.max_canister_archive_threshold.clone()
     );
+    let archive_id = archive.canister_id;
+    trace(
+        &format!(
+            "///// Checking archive 4 : {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
+        )
+    );
+    info!(
+        "ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
+    );
     match res {
-        Ok(size) => { size >= max_canister_archive_threshold }
+        Ok(size) => { (size as u128) >= max_canister_archive_threshold }
         Err(_) => { false }
     }
 }
@@ -241,9 +276,11 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
     }
 }
 
-async fn get_canister_controllers(canister_id: CanisterId) -> Result<Vec<Principal>, String> {
+async fn get_canister_controllers(
+    canister_id: CanisterId
+) -> Result<Vec<Principal>, NewArchiveError> {
     match retry_async(|| canister_status(CanisterIdRecord { canister_id }), 3).await {
         Ok(res) => Ok(res.0.settings.controllers),
-        Err(e) => { Err(format!("Failed to get canister status: {:?}", e)) }
+        Err(e) => { Err(NewArchiveError::CantFindControllers(format!("{e:?}"))) }
     }
 }

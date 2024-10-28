@@ -11,8 +11,10 @@ pub type Response = Result<Vec<SwapId>, SwapNftForTokensErrors>;
 pub enum SwapNftForTokensErrors {
     NftValidationErrors((Vec<NftID>, Vec<(NftID, Vec<NftInvalidError>)>)),
     ContainsDuplicates(String),
+    ContainsInvalidNftCanister(String),
     ServiceDown(ServiceDownReason),
     Limit(String),
+    CantBeAnonymous(String),
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]
@@ -23,4 +25,5 @@ pub enum NftInvalidError {
     AlreadyLocked,
     CantGetOrigynID(String),
     InvalidNftOwner(String),
+    NftIdStringTooLong(String),
 }

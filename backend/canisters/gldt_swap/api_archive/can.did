@@ -23,6 +23,7 @@ type BidFailError = variant {
 };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type BurnError = variant { CallError : text };
+type DepositRecoveryError = variant { CantRecover : text; CallError : text };
 type EscrowError = variant {
   ApproveError : ApproveError;
   UnexpectedError : ImpossibleErrorReason;
@@ -63,6 +64,7 @@ type NftTransferError = variant {
   TransferFailed : text;
 };
 type NftValidationError = variant {
+  NftIdStringTooLong : text;
   WeightParseError;
   CanisterInvalid;
   CantGetOrigynID : text;
@@ -76,6 +78,7 @@ type NotificationError = variant {
   InvalidTokenSpec;
   TimeoutInvalid : text;
   InvalidEscrowSubaccount : text;
+  SaleIDStringTooLong : text;
   TooManyPrincipalsInAllowList;
   OrigynStringIdDoesNotMatch : text;
   SellerIsNotPrincipalOrAccount : text;
@@ -112,6 +115,7 @@ type SwapDetailReverse = record {
   transfer_fees : nat;
 };
 type SwapErrorForward = variant {
+  DepositRecoveryFailed : DepositRecoveryError;
   BidFailed : BidFailError;
   UnexpectedError : ImpossibleErrorReason;
   NotificationFailed : NotificationError;
@@ -132,26 +136,38 @@ type SwapInfo = variant {
   Reverse : SwapDetailReverse;
 };
 type SwapStatusForward = variant {
+  DepositRecoveryFailed : record { SwapStatusForward; DepositRecoveryError };
   Failed : SwapErrorForward;
+  DepositRecoveryInProgress : SwapStatusForward;
+  BidInProgress;
   Init;
   MintRequest;
+  DepositRecoveryRequest : SwapStatusForward;
   Complete;
   BidFail : BidFailError;
   BidRequest;
   NotificationFailed : NotificationError;
+  MintInProgress;
+  BurnFeesInProgress;
   BurnFeesRequest;
   BurnFeesFailed : MintError;
+  NotificationInProgress;
   MintFailed : MintError;
 };
 type SwapStatusReverse = variant {
+  NftTransferRequestInProgress;
   FeeTransferFailed : FeeTransferError;
   Failed : SwapErrorReverse;
   EscrowFailed : EscrowError;
   Init;
+  BurnRequestInProgress;
+  EscrowRequestInProgress;
   Complete;
   BurnFailed : BurnError;
+  RefundRequestInProgress;
   RefundRequest;
   NftTransferRequest;
+  FeeTransferRequestInProgress;
   NftTransferFailed : NftTransferError;
   BurnRequest;
   FeeTransferRequest;

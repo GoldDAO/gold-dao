@@ -89,7 +89,7 @@ impl Swaps {
     pub fn get_stuck_swaps(&self) -> Vec<(SwapId, SwapInfo)> {
         self.get_active_swaps()
             .into_iter()
-            .filter(|(_, swap_info)| { swap_info.is_stuck() })
+            .filter(|(_, swap_info)| { swap_info.is_swap_over_time_threshold() })
             .collect()
     }
 
@@ -200,6 +200,16 @@ impl Swaps {
         self.archive_canisters.push(archive_canister);
     }
 
+    pub fn set_archive_as_active(&mut self, start_index: &Nat) {
+        if
+            let Some(archive) = self.archive_canisters
+                .iter_mut()
+                .find(|archive| start_index == &archive.start_index)
+        {
+            archive.active = true;
+        }
+    }
+
     pub fn update_archive_canister_end_index(&mut self, end_index: Nat) {
         match self.archive_canisters.last_mut() {
             Some(archive) => {
@@ -250,18 +260,21 @@ mod tests {
             canister_id: archive_canister_1,
             start_index: Nat::from(0u64),
             end_index: None,
+            active: true,
         };
 
         let archive_canister_2 = ArchiveCanister {
             canister_id: archive_canister_2,
             start_index: Nat::from(100u64),
             end_index: None,
+            active: true,
         };
 
         let archive_canister_3 = ArchiveCanister {
             canister_id: archive_canister_3,
             start_index: Nat::from(200u64),
             end_index: None,
+            active: true,
         };
         // archive should be from 0u8 - 99
         mutate_state(|s| s.data.swaps.set_new_archive_canister(archive_canister_1.clone()));
@@ -290,4 +303,15 @@ mod tests {
             archive_canister_2.canister_id
         );
     }
+
+    // #[test]
+    // fn test_swap_size() {
+    //     let swap_key_size = mem::size_of::<SwapId>();
+    //     let swap_info_size = mem::size_of::<SwapInfo>();
+
+    //     let entry_size = swap_key_size + swap_info_size;
+    //     let total_size = entry_size * 1;
+    //     let swap_is_less_than_1000_bytes = 1000;
+    //     // assert!(total_size < swap_is_less_than_1000_bytes);
+    // }
 }
