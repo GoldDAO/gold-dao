@@ -10,6 +10,7 @@ To get started with the GLD Landing Page, follow these steps:
 
 ````bash
 git clone git@gitlab.bochslerfinance.com:gldt/gldt-swap.git
+````
 
 2. Navigate to the `client/gld_landing_page` directory:
 
