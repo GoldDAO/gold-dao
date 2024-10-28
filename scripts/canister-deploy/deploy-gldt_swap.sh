@@ -30,6 +30,12 @@ if [[ $REINSTALL == "reinstall" ]]; then
          grams = 100;
        };
       };
+      record {
+       0 = principal \"$(dfx canister id --network $NETWORK gldnft_backend_1000g)\";
+       1 = record {
+          grams = 1000:nat16;
+       };
+      };
     }"
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     AUTHORIZED_PRINCIPALS="vec { principal \"$(dfx canister id --network $NETWORK sns_governance)\" }"

@@ -37,6 +37,12 @@ dfx deploy --network staging gldt_swap --argument "(variant { Init = record {
          grams = 100;
        };
       };
+      record {
+       0 = principal \"vnpd6-iqaaa-aaaao-qbelq-cai\";
+       1 = record {
+         grams = 1000;
+       };
+      };
     };
     ogy_ledger_id = principal \"j5naj-nqaaa-aaaal-ajc7q-cai\";
     authorized_principals = vec { principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\" };
