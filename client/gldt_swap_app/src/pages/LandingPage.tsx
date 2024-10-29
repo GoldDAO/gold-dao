@@ -100,9 +100,18 @@ export const LandingPage = () => {
             <div className="flex justify-center px-8 xl:px-24 pt-8 pb-16 xl:py-24 text-center xl:text-left">
               <div className="">
                 GLDT is a fractionable token backed by physical gold. <br />
-                Users can buy gold certificates (referred to as GLD NFTs) via
-                the Yumi marketplace. These certificates can then be exchanged
-                for GLDT tokens using the swap app. <br />
+                Users can buy gold certificates (referred to as GLD NFTs) via{" "}
+                <Link
+                  to="https://gold.bity.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold/80"
+                >
+                  gold.bity.com
+                </Link>
+                <br />
+                These certificates can then be exchanged for GLDT tokens using
+                the swap app. <br />
                 For example, a GLD NFT representing 1 gram of gold can be
                 swapped for 100 GLDT tokens.
                 <br />
