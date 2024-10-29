@@ -19,7 +19,9 @@ const Confirm = () => {
   return (
     <>
       <div className="flex flex-col items-center gap-6 border border-gold/20 bg-gold/5 p-6 rounded-xl mb-6">
-        <div className="font-semibold text-2xl">{amount} OGY</div>
+        <div className="font-semibold text-2xl">
+          {amount} {ledger}
+        </div>
 
         <div className="w-full flex justify-center items-center py-4">
           <div className="relative w-full">

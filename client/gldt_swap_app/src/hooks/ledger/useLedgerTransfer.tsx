@@ -6,8 +6,9 @@ import { useAuth } from "@auth/index";
 import { GLDT_TX_FEE, OGY_TX_FEE } from "@constants";
 
 const getFeeByLedger = (ledger: string): bigint => {
-  switch (ledger) {
-    case "GLDT":
+  const _ledger = ledger.toLocaleLowerCase();
+  switch (_ledger) {
+    case "gldt":
       return BigInt(GLDT_TX_FEE);
     default:
       return BigInt(OGY_TX_FEE);
