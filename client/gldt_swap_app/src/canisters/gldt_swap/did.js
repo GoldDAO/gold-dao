@@ -168,6 +168,8 @@ export const idlFactory = ({ IDL }) => {
   const NftValidationError = IDL.Variant({
     NftIdStringTooLong: IDL.Text,
     WeightParseError: IDL.Null,
+    CantValidateUserBalanceOfGLDT: IDL.Text,
+    UserDoesNotHaveTheRequiredGLDT: IDL.Text,
     CanisterInvalid: IDL.Null,
     CantGetOrigynID: IDL.Text,
     CantVerifySwapCanisterOwnsNft: IDL.Null,
@@ -344,6 +346,7 @@ export const idlFactory = ({ IDL }) => {
     Err: SwapTokensForNftRequestErrors,
   });
   return IDL.Service({
+    commit: IDL.Func([], [], []),
     get_active_swap_ids_by_user: IDL.Func(
       [IDL.Opt(IDL.Principal)],
       [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Nat))],
