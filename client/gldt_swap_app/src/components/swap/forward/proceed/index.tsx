@@ -88,7 +88,7 @@ const Proceed = () => {
                 </span>{" "}
                 and will receive{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDT}g GLDT.
+                  {totalGLDT} GLDT.
                 </span>
               </div>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
