@@ -8,6 +8,7 @@ import Protected from "@components/shared/routes/Protected";
 import NotFound from "@components/shared/routes/NotFound";
 
 import { SwapAppProvider } from "@context/index";
+import { TransactionDetailsProvider } from "@context/index";
 
 import {
   LandingPage,
@@ -55,7 +56,11 @@ const router = createBrowserRouter([
                   },
                   {
                     path: ":nft_id",
-                    element: <TransactionDetails />,
+                    element: (
+                      <TransactionDetailsProvider>
+                        <TransactionDetails />
+                      </TransactionDetailsProvider>
+                    ),
                   },
                 ],
               },
