@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   IdentityKitAuthType,
   NFIDW,
@@ -28,9 +28,12 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  const { user, isInitializing } = useIdentityKit();
+  const { user } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
+  const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<
+    HttpAgent | undefined
+  >();
   const agent = useAgent();
 
   useEffect(() => {
@@ -39,6 +42,7 @@ const AuthProviderInit = ({
         ...prevState,
         agent: res,
       }));
+      setUnauthenticatedAgent(res);
     });
     setState((prevState) => ({
       ...prevState,
@@ -48,14 +52,25 @@ const AuthProviderInit = ({
   }, []);
 
   useEffect(() => {
-    if (!isInitializing && connected === "1") {
+    if (connected === "1" && (!user || !agent)) {
       setState((prevState) => ({
         ...prevState,
         isConnecting: true,
       }));
+
+      const timer = setTimeout(() => {
+        if (!user || !agent) {
+          localStorage.clear();
+          setState((prevState) => ({
+            ...prevState,
+            isConnecting: false,
+          }));
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, isInitializing]);
+  }, [connected, user, agent]);
 
   useEffect(() => {
     if (user && agent) {
@@ -71,6 +86,7 @@ const AuthProviderInit = ({
         ...prevState,
         principalId: "",
         isConnected: false,
+        agent: unauthenticatedAgent,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
