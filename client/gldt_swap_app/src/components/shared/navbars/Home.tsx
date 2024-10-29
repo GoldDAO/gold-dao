@@ -11,7 +11,7 @@ const Default = () => {
   const active = location.pathname;
 
   const navItems: { title: string; url: string }[] = [
-    { title: "About GLDT", url: "/" },
+    { title: "Home", url: "/" },
     { title: "FAQ", url: "/faqs" },
   ];
 

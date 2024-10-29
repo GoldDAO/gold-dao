@@ -1,7 +1,6 @@
 import "./App.css";
 import { Tooltip } from "@components/ui";
 
-import ConnectingDialog from "@components/auth/ConnectingDialog";
 import RouterProvider from "@providers/Router.tsx";
 
 function App() {
@@ -9,7 +8,6 @@ function App() {
     <>
       <RouterProvider />
       <Tooltip id="tooltip" />
-      <ConnectingDialog />
     </>
   );
 }

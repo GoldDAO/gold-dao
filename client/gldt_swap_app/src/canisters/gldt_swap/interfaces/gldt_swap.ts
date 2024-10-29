@@ -102,6 +102,8 @@ export type NftTransferError = { 'FailedToGetOgyFeeAllowance' : string } |
   { 'TransferFailed' : string };
 export type NftValidationError = { 'NftIdStringTooLong' : string } |
   { 'WeightParseError' : null } |
+  { 'CantValidateUserBalanceOfGLDT' : string } |
+  { 'UserDoesNotHaveTheRequiredGLDT' : string } |
   { 'CanisterInvalid' : null } |
   { 'CantGetOrigynID' : string } |
   { 'CantVerifySwapCanisterOwnsNft' : null } |
@@ -272,6 +274,7 @@ export interface UpgradeArgs {
   'commit_hash' : string,
 }
 export interface _SERVICE {
+  'commit' : ActorMethod<[], undefined>,
   'get_active_swap_ids_by_user' : ActorMethod<
     [[] | [Principal]],
     Array<[bigint, bigint]>
@@ -296,4 +299,3 @@ export interface _SERVICE {
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
-
