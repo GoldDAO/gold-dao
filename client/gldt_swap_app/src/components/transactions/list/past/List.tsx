@@ -106,7 +106,7 @@ const List = ({
   );
 
   const history_swap = useGetUserHistoricSwap({
-    refetchInterval: 1000,
+    refetchInterval: 5000,
     limit: pagination?.pageSize as number,
     page: pagination.pageIndex as number,
   });

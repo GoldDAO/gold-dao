@@ -16,7 +16,7 @@ const PastTransactions = () => {
     navigate("/swap/account/transactions");
   };
 
-  const count = useGetUserHistoricCountSwap({ refetchInterval: 1000 });
+  const count = useGetUserHistoricCountSwap({ refetchInterval: 5000 });
 
   return (
     <div className="w-full">

@@ -106,7 +106,7 @@ const List = ({
   );
 
   const active_swap = useGetUserActiveSwaps({
-    refetchInterval: 1000,
+    refetchInterval: 5000,
   });
 
   const handleClickView = (cell) => {

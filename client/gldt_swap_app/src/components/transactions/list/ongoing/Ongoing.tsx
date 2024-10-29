@@ -9,7 +9,7 @@ const PastTransactions = () => {
   const [open, setOpen] = useState(true);
 
   const active_swap = useGetUserActiveSwaps({
-    refetchInterval: 1000,
+    refetchInterval: 5000,
   });
 
   return (
