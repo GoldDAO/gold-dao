@@ -12,7 +12,7 @@ const TotalCountNfts = ({ className }: { className?: string }) => {
         </div>
         {isSuccess && (
           <div className="flex items-center justify-center sm:justify-start gap-4">
-            <img className="flex-none h-8" src={`/gold-bars/${1}g.svg`} />
+            <img className="flex-none h-8" src={`/nft_logo.svg`} />
             <div className="font-semibold text-4xl">
               {data?.totalCountNFT ?? 0}
             </div>

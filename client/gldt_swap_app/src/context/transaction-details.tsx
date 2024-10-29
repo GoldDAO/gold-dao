@@ -1,4 +1,5 @@
 import { createContext, useContext, ReactNode, useMemo } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useGetOneSwapById } from "@hooks/gldt_swap";
 
 const TransactionDetailsContext = createContext<ReturnType<
@@ -37,14 +38,15 @@ const useTransactionDetailsProviderValue = (nft_id: string, index: string) => {
 
 export const TransactionDetailsProvider = ({
   children,
-  nft_id,
-  index,
 }: {
   children: ReactNode;
-  nft_id: string;
-  index: string;
 }) => {
-  const contextValue = useTransactionDetailsProviderValue(nft_id, index);
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  const contextValue = useTransactionDetailsProviderValue(
+    params.nft_id as string,
+    searchParams.get("index") as string
+  );
 
   return (
     <TransactionDetailsContext.Provider value={contextValue}>

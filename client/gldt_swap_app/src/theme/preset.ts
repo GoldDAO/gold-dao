@@ -38,7 +38,16 @@ export default {
       },
       backgroundImage: {
         'cover-img': "url('/src/assets/bg-cover.png')",
-      }
+      },
+      animation: {
+        beat: 'beat 1s ease-in-out infinite',
+      },
+      keyframes: {
+        beat: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.3)' },
+        },
+      },
     },
   },
   plugins: [

@@ -106,8 +106,8 @@ const Default = () => {
                     <div className="flex flex-col items-center px-2 pt-2 pb-3 space-y-1 sm:px-3">
                       <div className="flex items-center justify-between w-full mb-4">
                         <Link to="/" className="flex items-center pr-4">
-                          <img src="/ogy_logo.svg" alt="OGY Logo" />
-                          <span className="self-center text-xl font-semibold whitespace-nowrap">
+                          <LogoGLDT />
+                          <span className="self-center text-xl font-semibold whitespace-nowrap ml-2">
                             GLDT
                           </span>
                         </Link>

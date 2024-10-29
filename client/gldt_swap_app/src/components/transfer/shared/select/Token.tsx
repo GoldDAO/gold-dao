@@ -6,14 +6,12 @@ const TOKEN_OPTIONS = [
   { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-1" },
   {
     value: "GLD NFT",
-    icon: (
-      <img src="gold-bars/1g.svg" className="w-4 h-4" alt="Gold bar logo" />
-    ),
+    icon: <img src="/nft_logo.svg" className="w-4 h-4" alt="Gold bar logo" />,
     label: "NFT",
   },
   {
     value: "OGY",
-    icon: <img src="ogy_logo.svg" className="w-4 h-4" alt="Origyn logo" />,
+    icon: <img src="/ogy_logo.svg" className="w-4 h-4" alt="Origyn logo" />,
     label: "ICRC-1",
   },
 ];
