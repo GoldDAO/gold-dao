@@ -90,7 +90,7 @@ const AuthProviderInit = ({
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, agent, state.canisters]);
+  }, [user, agent, state.canisters, unauthenticatedAgent]);
 
   return children;
 };
