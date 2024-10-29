@@ -37,23 +37,30 @@ const Proceed = () => {
     isIdle,
   } = reverseSwap;
 
+  const reset = () => {
+    resetState();
+    queryClient.invalidateQueries({
+      queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["GET_AVAILABLE_GLD_NFT_1000G"],
+    });
+    setCanCloseDialog(true);
+  };
+
   const handleOnClick = () => {
     mutateSwapGLDNFT(undefined, {
       onSuccess: () => {
-        setCanCloseDialog(true);
-        queryClient.invalidateQueries({
-          queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["GET_AVAILABLE_GLD_NFT_1000G"],
-        });
-        resetState();
+        reset();
+      },
+      onError: () => {
+        reset();
       },
     });
   };
