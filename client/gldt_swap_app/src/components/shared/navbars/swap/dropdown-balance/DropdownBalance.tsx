@@ -40,7 +40,7 @@ const DropdownBalance = () => {
                 <MenuItems
                   transition
                   anchor="bottom end"
-                  className="w-48 sm:w-[var(--button-width)] z-50 border border-border origin-top-right rounded-xl bg-surface p-1 mt-1 text-sm/6 transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+                  className="max-w-fit z-50 border border-border origin-top-right rounded-xl bg-surface py-1 pl-1 pr-3 mt-1 text-sm/6 transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
                 >
                   {isSuccessBalanceGLDT && balanceGLDT && (
                     <MenuItem>
@@ -49,9 +49,7 @@ const DropdownBalance = () => {
                         <div className="font-semibold text-sm">
                           {balanceGLDT.string}
                         </div>
-                        <div className="font-semibold text-sm hidden sm:block">
-                          GLDT
-                        </div>
+                        <div className="font-semibold text-sm">GLDT</div>
                       </div>
                     </MenuItem>
                   )}
@@ -62,9 +60,7 @@ const DropdownBalance = () => {
                         <div className="font-semibold text-sm">
                           {balanceOGY.string}
                         </div>
-                        <div className="font-semibold text-sm hidden sm:block">
-                          OGY
-                        </div>
+                        <div className="font-semibold text-sm">OGY</div>
                       </div>
                     </MenuItem>
                   )}
