@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.2] - 2024-10-30
+
+#### Description
+
+Update texts, images and add popups on the website.
+
 ### [1.0.1] - 2024-10-28
 
 #### Description
