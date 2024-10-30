@@ -52,7 +52,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <AuthProvider
         derivationOrigin={
           APP_MODE !== "dev"
-            ? "https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io"
+            ? "https://oj7ri-2qaaa-aaaap-abrzq-cai.icp0.io"
             : undefined
         }
         targets={[
