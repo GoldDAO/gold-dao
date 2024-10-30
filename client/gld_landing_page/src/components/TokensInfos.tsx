@@ -125,7 +125,7 @@ const CardGrid: React.FC = () => {
       description: t('tokens.gldt.description'),
       learnMoreButton: t('tokens.gldt.learnMoreButton'),
       learnMoreLink: 'https://gldt.org/',
-      buyLink: '', // app.gldt.org/swap not available
+      buyLink: 'https://gldt.org/swap',
       imageSrc: '/static/illustrations/Gold-GLDT.png',
       button: t('tokens.gldt.button')
     },
