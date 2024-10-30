@@ -51,7 +51,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider
         derivationOrigin={
-          APP_MODE !== "dev"
+          ["preprod", "production"].includes(APP_MODE)
             ? "https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io"
             : undefined
         }
