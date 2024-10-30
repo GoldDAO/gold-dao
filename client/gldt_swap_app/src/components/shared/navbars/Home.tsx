@@ -50,7 +50,7 @@ const Default = () => {
             rel="noopener noreferrer"
             className="flex items-center"
           >
-            <Button className="bg-content rounded-full py-1 px-1" disabled>
+            <Button className="bg-content rounded-full py-1 px-1">
               Swap app
             </Button>
           </Link>
