@@ -12,7 +12,8 @@ const instance = axios.create({
 
 export const fetchGoldPrice1G = async () => {
   const dateOfTheDay = DateTime.now().toFormat('yyyy-MM-dd')
-    const { data } = await instance.get(`/rates/XAUUSD?start_date=${dateOfTheDay}&end_date=${dateOfTheDay}`);
+  const dateOfYesterday = DateTime.now().minus({ days: 1 }).toFormat('yyyy-MM-dd');
+    const { data } = await instance.get(`/rates/XAUUSD?start_date=${dateOfYesterday}&end_date=${dateOfTheDay}`);
     const { rates }: {
       rates: {
         [date: string]: {
