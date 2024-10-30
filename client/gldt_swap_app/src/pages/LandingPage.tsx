@@ -66,7 +66,7 @@ export const LandingPage = () => {
                     <div className="text-sm">Total Gold locked in kg</div>
                     <div className="font-semibold">
                       {isSuccessNFTLocked ? (
-                        <div>{NFTLocked} Kg</div>
+                        <div>{NFTLocked} kg</div>
                       ) : (
                         <Skeleton className="w-32" />
                       )}
