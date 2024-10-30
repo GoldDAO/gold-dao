@@ -9,7 +9,7 @@ const NftWeight = ({
     <div className={`${className}`}>
       <div className="border border-border rounded-xl bg-surface p-4">
         <div className="mb-2 font-light text-content/60 text-center sm:text-left">
-          Total of NFTs weight
+          Total weight of NFTs owned
         </div>
         <div className="flex items-center justify-center sm:justify-start gap-4">
           <img className="flex-none h-8" src={`/gold-bars/${nftWeight}g.svg`} />

@@ -75,7 +75,7 @@ const Proceed = () => {
         className={`rounded-xl w-full py-3`}
         disabled={!totalGLDT}
       >
-        Proceed to Swap
+        Proceed to swap
       </Button>
       <Dialog
         show={show}

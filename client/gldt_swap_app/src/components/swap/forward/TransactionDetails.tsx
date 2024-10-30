@@ -31,7 +31,7 @@ const TransactionDetails = ({
         <div className="flex items-center justify-between px-2 rounded-xl group-data-[open]:rounded-b-none">
           <div className="flex items-center gap-4">
             <div className="font-medium group-data-[hover]:text-content/80">
-              Transactions details
+              Transaction details
             </div>
           </div>
           <DisclosureButton className="group">
