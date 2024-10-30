@@ -51,7 +51,7 @@ export const FrequentlyAskedQuestions = ({
           GLDT stands for “Gold Token”, being a fungible token backed by GLD
           NFTs. GLD NFTs are NFTs that represent irrefutable ownership of
           physical gold bars. 1 GLDT represents exactly 0.01g of gold, and GLD
-          NFTs can be swapped at a ratio of 1g for 100 GLDTs."
+          NFTs can be swapped at a ratio of 1g for 100 GLDTs.
         </div>
       ),
     },
