@@ -54,12 +54,16 @@ export const LandingPage = () => {
                   The future of owning physical gold
                 </div>
                 <div className="mt-4 mb-8 sm:my-8">
-                  <Button
-                    className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg"
-                    disabled
+                  <Link
+                    to="/swap"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
                   >
-                    Start swapping
-                  </Button>
+                    <Button className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg">
+                      Start swapping
+                    </Button>
+                  </Link>
                 </div>
                 <div className="flex flex-col xl:flex-row gap-4">
                   <div className="flex flex-col items-center border border-gold/60 rounded-full px-8 py-2">
