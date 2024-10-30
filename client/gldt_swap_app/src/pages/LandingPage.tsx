@@ -66,7 +66,7 @@ export const LandingPage = () => {
                     <div className="text-sm">Total Gold locked in kg</div>
                     <div className="font-semibold">
                       {isSuccessNFTLocked ? (
-                        <div>{NFTLocked} Kg</div>
+                        <div>{NFTLocked} kg</div>
                       ) : (
                         <Skeleton className="w-32" />
                       )}
@@ -99,26 +99,11 @@ export const LandingPage = () => {
             </div>
             <div className="flex justify-center px-8 xl:px-24 pt-8 pb-16 xl:py-24 text-center xl:text-left">
               <div className="">
-                GLDT is a fractionable token backed by physical gold. <br />
-                Users can buy gold certificates (referred to as GLD NFTs) via{" "}
-                <Link
-                  to="https://gold.bity.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gold/80"
-                >
-                  gold.bity.com
-                </Link>
-                <br />
-                These certificates can then be exchanged for GLDT tokens using
-                the swap app. <br />
-                For example, a GLD NFT representing 1 gram of gold can be
-                swapped for 100 GLDT tokens.
-                <br />
-                Essentially, each GLDT represents a fractional share of actual
-                physical gold, making it far more liquid. <br />
-                This enables the trading of gold outside the traditional banking
-                system.
+                The GLDT token is a digital asset that combines the stability of
+                gold with the liquidity of digital currency. With GDLT, you can
+                store your wealth in gold while using it for everyday purchases
+                – whether its buying coffee or making larger transactions –
+                seamlessly bridging the gap between gold and digital payments.
               </div>
             </div>
           </div>

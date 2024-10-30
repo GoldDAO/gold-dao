@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.0.2] - 2024-10-30
+
+#### Description
+
+This version mostly improve wordings on landing page and frequently asked questions page, also improve authentication.
+
+#### Changed
+
+- Wording landing page and FAQ's.
+
+#### Fix
+
+- start_date on price-history.api.bity that ensure it correctly fetch gold price of the current day.
+- remove derivationOrigin for staging canister.
+- isInitializing state for useIdentityKit.
+
 ### [1.0.1] - 2024-10-29
 
 #### Description
@@ -27,7 +43,6 @@ This version improve global UI of app, also improve authentication and fix small
 - Wording on landing page.
 - Transfer fee and amount sended on Ledger transfer.
 - Correctly reset state swap on errors.
-
 
 ### [1.0.0] - 2024-10-28
 

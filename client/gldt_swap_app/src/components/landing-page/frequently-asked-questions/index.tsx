@@ -49,12 +49,9 @@ export const FrequentlyAskedQuestions = ({
       a: (
         <div>
           GLDT stands for “Gold Token”, being a fungible token backed by GLD
-          NFTs.
-          <br />
-          GLD NFTs are NFTs that represent irrefutable ownership of physical
-          gold bars.
-          <br />1 GLDT represents exactly 0.01g of gold, and GLD NFTs can be
-          swapped at a ratio of 1g for 100 GLDTs.",
+          NFTs. GLD NFTs are NFTs that represent irrefutable ownership of
+          physical gold bars. 1 GLDT represents exactly 0.01g of gold, and GLD
+          NFTs can be swapped at a ratio of 1g for 100 GLDTs.
         </div>
       ),
     },
@@ -62,9 +59,8 @@ export const FrequentlyAskedQuestions = ({
       q: <Question>How are GLDT minted?</Question>,
       a: (
         <div>
-          GLDT are minted when someone swaps a GLD NFT for GLDT.
-          <br />
-          The swapping ratio is 1g of GLD NFT for 100 GLDT.
+          GLDT are minted when someone swaps a GLD NFT for GLDT. The swapping
+          ratio is 1g of GLD NFT for 100 GLDT.
         </div>
       ),
     },
@@ -72,8 +68,16 @@ export const FrequentlyAskedQuestions = ({
       q: <Question>Who can participate in the swap?</Question>,
       a: (
         <div>
-          Everybody who owns GLD NFT. See here for details of purchasing GLD
-          NFTs.
+          Everybody who owns GLD NFT. See{" "}
+          <Link
+            to="https://gold.bity.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold/80"
+          >
+            gold.bity.com
+          </Link>{" "}
+          for details of purchasing GLD NFTs.
         </div>
       ),
     },
@@ -81,13 +85,12 @@ export const FrequentlyAskedQuestions = ({
       q: <Question>How does the swap work?</Question>,
       a: (
         <div>
-          You must own at least one GLD NFT and connect to the swap app.
-          <br />
-          Then you will be able to select the GLD NFT which you want to swap to
-          GLDT.
-          <br />
-          After validating the transaction, the GLD NFT will be swapped against
-          GLDT that you will see in your balance/wallet.
+          You must own at least one GLD NFT and connect to the swap app. Then
+          you will be able to select the number of GLD NFT which you want to
+          swap to GLDT. After validating the transaction, the GLD NFT will be
+          locked in the swap canister and GLDT are effectively minted on the
+          spot to your account. There will always be a ratio of 100GLDT to 1g
+          GLD NFT owned by the swap canister.
         </div>
       ),
     },
@@ -95,10 +98,9 @@ export const FrequentlyAskedQuestions = ({
       q: <Question>How is the GLDT price determined?</Question>,
       a: (
         <div>
-          1g of gold = 100 GLDT. Or 1 GLDT = 0.01g of gold.
-          <br />
-          E.g.: You have 5g of GLD NFTs. You can swap these at a ratio of 1g to
-          100GLDT. So when swapping 5g of GLD NFT, you will receive 500 GLDT.
+          1g of gold = 100 GLDT. Or 1 GLDT = 0.01g of gold. E.g.: You have 5g of
+          GLD NFTs. You can swap these at a ratio of 1g to 100GLDT. So when
+          swapping 5g of GLD NFT, you will receive 500 GLDT.
         </div>
       ),
     },
@@ -106,50 +108,21 @@ export const FrequentlyAskedQuestions = ({
       q: <Question>How and when will I know if my swap is final?</Question>,
       a: (
         <div>
-          Once the transaction is completed, you can find GLDT in your wallet
-          balance.
+          You can follow along your transaction in your Account section. Once
+          the transaction is completed, you will find your newly minted GLDT in
+          your wallet balance.
         </div>
       ),
     },
     {
-      q: <Question>What are the commissions for swapping GLDT?</Question>,
+      q: <Question>What are the fees for swapping GLDT?</Question>,
       a: (
         <div>
-          Commissions are paid to Originator- BAS (0.4%), Authenticator- BAS
-          (0.1%), ORIGYN (0.5%) and are a total of 1%.
-          <br />
-          These fees are integrated inside the GLD NFT. The swap fees are
-          refunded for the first 100 million GLDT.
-          <br />
-          In addition to the swap fees, there is an inherent transaction fee of
-          0.0001 GLDT to avoid spamming of the network.
-        </div>
-      ),
-    },
-    {
-      q: <Question>What are the commissions on trading?</Question>,
-      a: (
-        <div>
-          There are no fees on trading. However, some exchanges can apply their
-          own exchange fees.
-        </div>
-      ),
-    },
-    {
-      q: (
-        <Question>
-          How and when can I swap back my GLDT?
-          <br />
-          Can I sell my GLDT on another platform?
-        </Question>
-      ),
-      a: (
-        <div>
-          You can swap your GLDT back to GLD NFT on the platform soon. This is
-          currently under development.
-          <br />
-          You may also visit any exchange that supports GLDT and trade it for
-          other cryptocurrencies.
+          There are no fees for swapping GLD NFT to GLDT. For reverse swapping
+          from GLDT to GLD NFT, a fee of 1 GLDT is charged for every GLD NFT
+          that is unlocked from the swap canister. For example, if 500 GLDT are
+          swapped to 5x 1g GLD NFT, 5x 1 GLDT fee are applied. If 1000 GLDT are
+          swapped to 1x 10g GLD NFT, 1x 1 GLDT will be applied.
         </div>
       ),
     },
@@ -164,7 +137,7 @@ export const FrequentlyAskedQuestions = ({
             rel="noopener noreferrer"
             className="text-gold/80"
           >
-            bity.gold.com
+            gold.bity.com
           </Link>{" "}
           to learn more about GLD NFTs, which back GLDTs.
         </div>

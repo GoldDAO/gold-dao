@@ -28,7 +28,7 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  const { user } = useIdentityKit();
+  const { user, isInitializing } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<
@@ -52,7 +52,7 @@ const AuthProviderInit = ({
   }, []);
 
   useEffect(() => {
-    if (connected === "1" && (!user || !agent)) {
+    if (!isInitializing && connected === "1" && (!user || !agent)) {
       setState((prevState) => ({
         ...prevState,
         isConnecting: true,
@@ -70,7 +70,7 @@ const AuthProviderInit = ({
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, user, agent]);
+  }, [connected, user, agent, isInitializing]);
 
   useEffect(() => {
     if (user && agent) {

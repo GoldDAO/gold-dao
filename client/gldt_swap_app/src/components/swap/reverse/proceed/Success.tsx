@@ -23,7 +23,7 @@ const Success = () => {
         </video>
         <div className="mb-6 font-semibold text-gold">
           <div className="text-xl font-semibold mb-4">
-            You successfully initiate swap!
+            Great, you've successfully initiated a swap!
           </div>
           <div className="text-sm">
             You can see the advancement in your transactions history.
