@@ -36,14 +36,16 @@ export const LandingPage = () => {
         <NavbarHome />
         <section className="container mx-auto px-4 mt-8 xl:mt-0">
           <div className="grid grid-cols-1 xl:grid-cols-2 justify-center items-center">
-            <div className="flex justify-center px-4 xl:px-8 pb-16 xl:py-32 text-center xl:text-left order-last xl:order-first max-w-[800px]">
-              <video autoPlay loop muted preload="auto" playsInline>
-                <source
-                  src="https://daolink-gold-dao-website-medias.sos-ch-gva-2.exo.io/GLDNFT2GLDT.webm#t=2.106585"
-                  type="video/webm"
-                />
-                Your browser does not support the video tag.
-              </video>
+            <div className="flex justify-center px-4 xl:px-8 pb-16 xl:py-32 order-last xl:order-first">
+              <div className="max-w-[800px]">
+                <video autoPlay loop muted preload="auto" playsInline>
+                  <source
+                    src="https://daolink-gold-dao-website-medias.sos-ch-gva-2.exo.io/GLDNFT2GLDT.webm#t=2.106585"
+                    type="video/webm"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
             </div>
             <div className="flex justify-center px-4 xl:px-8 py-4 xl:py-24 text-center xl:text-left">
               <div>
@@ -54,12 +56,7 @@ export const LandingPage = () => {
                   The future of owning physical gold
                 </div>
                 <div className="mt-4 mb-8 sm:my-8">
-                  <Link
-                    to="/swap"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center"
-                  >
+                  <Link to="/swap" target="_blank" rel="noopener noreferrer">
                     <Button className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg">
                       Start swapping
                     </Button>
