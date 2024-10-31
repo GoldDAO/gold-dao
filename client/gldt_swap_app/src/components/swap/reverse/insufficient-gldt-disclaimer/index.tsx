@@ -1,16 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@components/ui";
 
 import { useReverseSwapProceed } from "@context/index";
 
 const InsufficientGLDTDisclaimer = ({ className }: { className?: string }) => {
-  const navigate = useNavigate();
   const { state } = useReverseSwapProceed();
   const { totalSwapGLDT, balanceGLDT, countSelectedNfts } = state;
-
-  const handleClickGetGLDT = () => {
-    navigate("/swap?view=0&mode=0");
-  };
+  const linkIcpSwapPairICPGLDT =
+    "https://app.icpswap.com/swap?input=ryjl3-tyaaa-aaaaa-aaaba-cai&output=6c7su-kiaaa-aaaar-qaira-cai";
 
   return (
     <div className={className}>
@@ -30,7 +27,13 @@ const InsufficientGLDTDisclaimer = ({ className }: { className?: string }) => {
           </div>
         </div>
         <div>
-          <Button onClick={handleClickGetGLDT}>Get GLDT</Button>
+          <Link
+            to={linkIcpSwapPairICPGLDT}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button>Get GLDT</Button>
+          </Link>
         </div>
       </div>
     </div>
