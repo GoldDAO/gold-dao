@@ -116,7 +116,7 @@ const TransferNft = () => {
               Transfer
             </Button>
             <div className="flex justify-center mt-6">
-              <Balance ledger="OGY" balance={balanceOGY.data.number} />
+              <Balance ledger="OGY" balance={balanceOGY.data.string} />
             </div>
           </form>
           <ConfirmDialog />

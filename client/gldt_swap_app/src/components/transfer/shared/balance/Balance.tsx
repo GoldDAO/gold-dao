@@ -1,4 +1,4 @@
-const Balance = ({ ledger, balance }: { ledger: string; balance: number }) => {
+const Balance = ({ ledger, balance }: { ledger: string; balance: string }) => {
   return (
     <div className="inline-flex justify-start items-center px-2 py-1 bg-surface-2 text-content/60 text-xs rounded-lg">
       <div>Your balance: </div>

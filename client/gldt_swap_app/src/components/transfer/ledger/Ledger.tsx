@@ -1,5 +1,5 @@
 import { FieldValues, useWatch } from "react-hook-form";
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
 import { Button, LoaderSpin } from "@components/ui";
 import { useTransferProceedLedger } from "@context/transfer/proceed-ledger";
 
@@ -36,7 +36,9 @@ const TransferLedger = () => {
     if (isNaN(nAmount) || nAmount === 0 || errors?.amount) {
       return <div>0 {ledger}</div>;
     } else {
-      const result = divideBy1e8(nAmount * 100000000 - fee);
+      const result = roundAndFormatLocale({
+        number: divideBy1e8(nAmount * 100000000 - fee),
+      });
       return (
         <div>
           {result} {ledger}
@@ -98,7 +100,7 @@ const TransferLedger = () => {
             </Button>
 
             <div className="flex justify-center mt-6">
-              <Balance ledger={ledger} balance={balance.data.number} />
+              <Balance ledger={ledger} balance={balance.data.string} />
             </div>
           </form>
           <ConfirmDialog />

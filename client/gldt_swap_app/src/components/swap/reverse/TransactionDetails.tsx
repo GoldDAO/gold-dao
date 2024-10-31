@@ -15,14 +15,17 @@ const TransactionDetails = ({
   defaultOpen?: boolean;
 }) => {
   const {
-    getSelectedTotal,
+    getSelectedTotalNFTs,
     getSelectedTotalGLDT,
+    getSelectedTotalGLDTWithFees,
     getSelectedTotalGram,
     getCollectionSelectedNFTs,
   } = useNft();
-  const totalNFTs = getSelectedTotal();
+  const totalNFTs = getSelectedTotalNFTs();
   const totalGram = getSelectedTotalGram();
   const totalGLDT = getSelectedTotalGLDT();
+  const totalGLDTWithFees = getSelectedTotalGLDTWithFees();
+
   const selectedNfts = getCollectionSelectedNFTs();
 
   return (
@@ -42,7 +45,7 @@ const TransactionDetails = ({
           <div className="flex flex-col gap-4 border border-border bg-surface-2 p-6 rounded-xl">
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
               <div>Total number of NFTs to swap</div>
-              <div>{totalNFTs} GLD NFT</div>
+              <div>{totalNFTs.string} GLD NFT</div>
             </div>
             {selectedNfts.map(({ value, totalSelected }, index) => (
               <div
@@ -55,22 +58,22 @@ const TransactionDetails = ({
             ))}
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
               <div>Total grams of gold</div>
-              <div>{totalGram}g</div>
+              <div>{totalGram.string}g</div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
               <div>Conversion fee</div>
-              <div>{totalNFTs} GLDT</div>
+              <div>{totalNFTs.string} GLDT</div>
             </div>
 
             <div className="border border-border"></div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60 font-semibold">
               <div>Total number of GLDT changed</div>
-              <div>{totalGLDT} GLDT</div>
+              <div>{totalGLDT.string} GLDT</div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between font-semibold">
               <div>Total</div>
-              <div>{totalGLDT + totalNFTs} GLDT</div>
+              <div>{totalGLDTWithFees.string} GLDT</div>
             </div>
           </div>
         </DisclosurePanel>

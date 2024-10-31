@@ -7,14 +7,10 @@ import {
   useEffect,
 } from "react";
 
-import { REVERSE_GLDT_TX_FEE } from "@constants";
-
 import { useNft } from "@context/nft";
 
 import { useReverseSwap } from "@hooks/gldt_swap";
 import { useLedgerUserBalance } from "@hooks/ledger";
-
-import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
 
 const ReverseSwapProceedContext = createContext<ReturnType<
   typeof useReverseSwapProceedProviderValue
@@ -51,9 +47,9 @@ const useReverseSwapProceedProviderValue = () => {
   });
   const reverseSwap = useReverseSwap();
   const { data: balanceGLDT } = useLedgerUserBalance({ ledger: "GLDT" });
-  const { getCountSelectedNfts, getSelectedTotalGLDT } = useNft();
+  const { getCountSelectedNfts, getSelectedTotalGLDTWithFees } = useNft();
 
-  const amountSelectedGLDT = getSelectedTotalGLDT();
+  const amountSelectedGLDTWithFees = getSelectedTotalGLDTWithFees();
   const countSelectedNfts = getCountSelectedNfts();
 
   const handleShow = (): void => {
@@ -82,16 +78,13 @@ const useReverseSwapProceedProviderValue = () => {
 
   useEffect(() => {
     if (balanceGLDT) {
-      const fee = divideBy1e8(REVERSE_GLDT_TX_FEE) * countSelectedNfts;
       setState((prevState) => ({
         ...prevState,
-        totalSwapGLDT: roundAndFormatLocale({
-          number: amountSelectedGLDT + fee,
-        }),
+        totalSwapGLDT: amountSelectedGLDTWithFees.string,
         balanceGLDT: balanceGLDT.string,
         countSelectedNfts,
       }));
-      if (amountSelectedGLDT + fee > balanceGLDT.number) {
+      if (amountSelectedGLDTWithFees.number > balanceGLDT.number) {
         setState((prevState) => ({
           ...prevState,
           isInsufficientGLDTFunds: true,
@@ -103,7 +96,12 @@ const useReverseSwapProceedProviderValue = () => {
         }));
       }
     }
-  }, [amountSelectedGLDT, countSelectedNfts, balanceGLDT]);
+  }, [
+    amountSelectedGLDTWithFees.number,
+    amountSelectedGLDTWithFees.string,
+    countSelectedNfts,
+    balanceGLDT,
+  ]);
 
   useEffect(() => {
     if (countSelectedNfts && !state.isInsufficientGLDTFunds) {

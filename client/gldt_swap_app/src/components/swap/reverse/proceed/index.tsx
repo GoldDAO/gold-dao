@@ -12,14 +12,17 @@ import Error from "./Error";
 
 const Proceed = () => {
   const {
-    getSelectedTotal,
+    getSelectedTotalNFTs,
     getSelectedTotalGLDT,
+    getSelectedTotalGLDTWithFees,
     getSelectedTotalGram,
     resetState,
   } = useNft();
-  const totalNFTs = getSelectedTotal();
-  const totalGLDNFTtoSwap = getSelectedTotalGram();
-  const totalGLDTtoSwap = getSelectedTotalGLDT();
+  const totalNFTs = getSelectedTotalNFTs();
+  const totalGram = getSelectedTotalGram();
+  const totalGLDT = getSelectedTotalGLDT();
+  const totalGLDTWithFees = getSelectedTotalGLDTWithFees();
+
   const queryClient = useQueryClient();
   const {
     state: reverseSwapProceedState,
@@ -81,25 +84,25 @@ const Proceed = () => {
               <div className="px-6 mb-8 text-center">
                 You are sending{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDTtoSwap + totalNFTs} GLDT
+                  {totalGLDTWithFees.string} GLDT
                 </span>{" "}
                 and will receive{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDNFTtoSwap}g GLD NFTs
+                  {totalGram.string}g GLD NFTs
                 </span>
                 . <br />
                 <span className="font-semibold text-gold">
-                  {totalGLDTtoSwap} GLDT
+                  {totalGLDT.number} GLDT
                 </span>{" "}
                 will be burned and{" "}
                 <span className="font-semibold text-gold">
-                  {totalNFTs} GLDT
+                  {totalNFTs.string} GLDT
                 </span>{" "}
                 fee are charged.
               </div>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
                 <div className="font-semibold">
-                  {totalGLDTtoSwap + totalNFTs} GLDT
+                  {totalGLDTWithFees.string} GLDT
                 </div>
 
                 <div className="w-full flex justify-center items-center py-4">
@@ -116,9 +119,7 @@ const Proceed = () => {
                     </div>
                   </div>
                 </div>
-                <div className="font-semibold">
-                  {totalGLDNFTtoSwap}g of gold
-                </div>
+                <div className="font-semibold">{totalGram.string}g of gold</div>
               </div>
 
               <TransactionDetails className="w-full mt-8" />
