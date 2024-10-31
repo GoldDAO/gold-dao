@@ -169,7 +169,7 @@ const useTransferProceedNftProviderValue = () => {
         ...prevState,
         totalTransferFee: {
           number: tFee,
-          string: roundAndFormatLocale({ number: tFee, decimals: 0 }),
+          string: roundAndFormatLocale({ number: tFee }),
         },
         balanceAfterTransfer: state.balance ? state.balance - tFee : 0,
       }));

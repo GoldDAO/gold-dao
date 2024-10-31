@@ -60,7 +60,9 @@ const Details = ({ data }: { data: SwapData }) => {
           </div>
 
           <div className="flex justify-between items-center py-4">
-            <div className="font-semibold text-content/60">Swapped amount</div>
+            <div className="font-semibold text-content/60">
+              Amount to be minted
+            </div>
             <div className="font-semibold text-content/60">
               {data.gldt_value} GLDT
             </div>

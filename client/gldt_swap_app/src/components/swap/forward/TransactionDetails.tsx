@@ -15,12 +15,12 @@ const TransactionDetails = ({
   defaultOpen?: boolean;
 }) => {
   const {
-    getSelectedTotal,
+    getSelectedTotalNFTs,
     getSelectedTotalGLDT,
     getSelectedTotalGram,
     getCollectionSelectedNFTs,
   } = useNft();
-  const totalNFTs = getSelectedTotal();
+  const totalNFTs = getSelectedTotalNFTs();
   const totalGram = getSelectedTotalGram();
   const totalGLDT = getSelectedTotalGLDT();
   const selectedNfts = getCollectionSelectedNFTs();
@@ -41,13 +41,13 @@ const TransactionDetails = ({
         <DisclosurePanel className="bg-surface text-sm/5 mt-4">
           <div className="flex flex-col gap-4 border border-border bg-surface-2 p-6 rounded-xl">
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
-              <div className="">Swapped amount</div>
-              <div>{totalGLDT} GLDT</div>
+              <div className="">Amount to be minted</div>
+              <div>{totalGLDT.string} GLDT</div>
             </div>
             <div className="border border-border"></div>
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60 font-semibold">
-              <div>Total number of NFTs received</div>
-              <div>{totalNFTs} GLD NFT</div>
+              <div>Total number of NFTs to be swapped</div>
+              <div>{totalNFTs.string} GLD NFT</div>
             </div>
             {selectedNfts.map(({ value, totalSelected }, index) => (
               <div
@@ -60,11 +60,11 @@ const TransactionDetails = ({
             ))}
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60 font-semibold">
               <div>Total grams of gold</div>
-              <div>{totalGram}g</div>
+              <div>{totalGram.string}g</div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between font-semibold">
               <div>Total</div>
-              <div>{totalGLDT} GLDT</div>
+              <div>{totalGLDT.string} GLDT</div>
             </div>
           </div>
         </DisclosurePanel>

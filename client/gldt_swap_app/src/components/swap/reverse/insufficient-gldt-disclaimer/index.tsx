@@ -17,7 +17,7 @@ const InsufficientGLDTDisclaimer = ({ className }: { className?: string }) => {
       <div className="border border-orange-500 bg-orange-500/5 py-8 px-4 flex flex-col justify-center items-center rounded-xl text-center">
         <div className="mb-6 text-orange-500">
           <div className="font-semibold mb-2">
-            You don't have enough GLDT to process
+            You don't have enough GLDT to process.
           </div>
           <div>
             To reverse swap the{" "}
@@ -26,7 +26,7 @@ const InsufficientGLDTDisclaimer = ({ className }: { className?: string }) => {
             <span className="font-semibold">{totalSwapGLDT} GLDT</span>.
             <br />
             Your current balance is{" "}
-            <span className="font-semibold">{balanceGLDT} GLDT</span>
+            <span className="font-semibold">{balanceGLDT} GLDT.</span>
           </div>
         </div>
         <div>

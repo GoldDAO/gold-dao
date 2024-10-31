@@ -10,25 +10,27 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 import { OGY_TX_FEE, GLDT_TX_FEE } from "@constants";
-import { divideBy1e8, numberToE8s } from "@utils/numbers";
+import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
 import { useLedgerTransfer, useLedgerUserBalance } from "@hooks/ledger/index";
 
 export interface TransferProceedLedgerState {
   ledger: string;
   to: string;
-  amount: string;
-  balance: number | null;
-  balanceE8s: number | null;
-  balanceAfterTransfer: number | null;
   fee: number;
+  balanceAfterTransfer: {
+    string: string;
+    number: number;
+  } | null;
+  amount: {
+    string: string;
+    bigint: bigint;
+  } | null;
 }
 
 const initialState: TransferProceedLedgerState = {
   ledger: "GLDT",
   to: "",
-  amount: "",
-  balance: null,
-  balanceE8s: null,
+  amount: null,
   balanceAfterTransfer: null,
   fee: 0,
 };
@@ -69,36 +71,45 @@ const useTransferProceedLedgerProviderValue = ({
   });
 
   const handleSubmitForm = (data: { amount: string; to: string }) => {
-    const _amount = Number(data.amount) * 100000000 - getFeeByLedger(ledger);
+    const _amount = Number(data.amount) * 1e8 - getFeeByLedger(ledger);
+    const balanceAfterTransfer =
+      balance.isSuccess && balance.data
+        ? divideBy1e8(
+            BigInt(balance.data.e8s) -
+              BigInt(_amount) -
+              BigInt(getFeeByLedger(ledger))
+          )
+        : 0;
     setState((prevState) => ({
       ...prevState,
-      amount: divideBy1e8(_amount).toString(),
+      amount: {
+        string: roundAndFormatLocale({ number: divideBy1e8(_amount) }),
+        bigint: BigInt(_amount * 1e8),
+      },
       to: data.to,
-      balanceAfterTransfer:
-        state.balanceE8s !== null
-          ? divideBy1e8(
-              BigInt(state.balanceE8s) -
-                BigInt(_amount) -
-                BigInt(getFeeByLedger(ledger))
-            )
-          : 0,
+      balanceAfterTransfer: {
+        number: balanceAfterTransfer,
+        string: roundAndFormatLocale({ number: balanceAfterTransfer }),
+      },
     }));
   };
 
   const handleTransfer = () => {
-    mutation.mutate(
-      {
-        amount: numberToE8s(state.amount),
-        to: state.to,
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_BALANCE_${ledger}`],
-          });
+    if (state.amount) {
+      mutation.mutate(
+        {
+          amount: state.amount.bigint,
+          to: state.to,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: [`USER_FETCH_BALANCE_${ledger}`],
+            });
+          },
+        }
+      );
+    }
   };
 
   const handleReset = (): void => {
@@ -123,16 +134,6 @@ const useTransferProceedLedgerProviderValue = ({
       fee: getFeeByLedger(ledger),
     }));
   }, [ledger]);
-
-  useEffect(() => {
-    if (balance.isSuccess && balance.data) {
-      setState((prevState) => ({
-        ...prevState,
-        balance: balance.data.number,
-        balanceE8s: balance.data.e8s,
-      }));
-    }
-  }, [balance.isSuccess, balance.data]);
 
   const value = useMemo(
     () => ({
