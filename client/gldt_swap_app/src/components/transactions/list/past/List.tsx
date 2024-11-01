@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { EyeIcon } from "@heroicons/react/24/outline";
+
 // import CopyToClipboard from "@components/buttons/CopyToClipboard";
 import { Table, LoaderSpin } from "@components/ui";
 import TransactionStatus from "@components/transactions/badge/TransactionStatus";
@@ -106,7 +107,6 @@ const List = ({
   );
 
   const history_swap = useGetUserHistoricSwap({
-    refetchInterval: 5000,
     limit: pagination?.pageSize as number,
     page: pagination.pageIndex as number,
   });

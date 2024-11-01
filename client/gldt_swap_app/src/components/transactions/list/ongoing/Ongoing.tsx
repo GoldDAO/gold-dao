@@ -5,11 +5,11 @@ import clsx from "clsx";
 import TxList from "./List";
 import { useGetUserActiveSwaps } from "@hooks/gldt_swap";
 
-const PastTransactions = () => {
+const OnGoingTransactions = () => {
   const [open, setOpen] = useState(true);
 
   const active_swap = useGetUserActiveSwaps({
-    refetchInterval: 5000,
+    refetchInterval: 3000,
   });
 
   return (
@@ -47,4 +47,4 @@ const PastTransactions = () => {
   );
 };
 
-export default PastTransactions;
+export default OnGoingTransactions;

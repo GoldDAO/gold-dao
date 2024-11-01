@@ -38,19 +38,10 @@ const Proceed = () => {
   const reset = (): void => {
     resetSwapState();
     queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_1G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_10G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_100G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_1000G"],
-    });
-    queryClient.invalidateQueries({
       queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["USER_FETCH_NFTS"],
     });
     setCanCloseDialog(true);
   };
@@ -62,7 +53,7 @@ const Proceed = () => {
         reset();
       },
       onError: (err) => {
-        console.log(err);
+        console.error(err);
         reset();
       },
     });

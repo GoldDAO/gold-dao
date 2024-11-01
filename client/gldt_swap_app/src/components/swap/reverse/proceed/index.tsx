@@ -31,7 +31,7 @@ const Proceed = () => {
     reverseSwap,
     setCanCloseDialog,
   } = useReverseSwapProceed();
-  const { show, canReverseSwap } = reverseSwapProceedState;
+  const { show, canReverseSwap, canCloseDialog } = reverseSwapProceedState;
   const {
     mutate: mutateSwapGLDNFT,
     isSuccess,
@@ -43,26 +43,22 @@ const Proceed = () => {
   const reset = () => {
     resetState();
     queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
+      queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
     });
     queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_1000G"],
+      queryKey: ["FETCH_AVAILABLE_NFTS"],
     });
     setCanCloseDialog(true);
   };
 
   const handleOnClick = () => {
+    setCanCloseDialog(false);
     mutateSwapGLDNFT(undefined, {
       onSuccess: () => {
         reset();
       },
-      onError: () => {
+      onError: (err) => {
+        console.error(err);
         reset();
       },
     });
@@ -77,7 +73,11 @@ const Proceed = () => {
       >
         Preview Swap
       </Button>
-      <Dialog show={show} handleClose={handleClose} enableClose={isIdle}>
+      <Dialog
+        show={show}
+        handleClose={handleClose}
+        enableClose={canCloseDialog}
+      >
         <div className="px-6 pt-6 pb-12">
           {isIdle && (
             <>

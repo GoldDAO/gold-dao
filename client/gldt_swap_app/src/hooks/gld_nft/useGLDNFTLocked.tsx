@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useQueries, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
 import { SWAP_CANISTER_ID } from "@constants";
@@ -8,99 +7,72 @@ import { useAuth } from "@auth/index";
 
 export const useGLDNFTLocked = () => {
   const { createActor } = useAuth();
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [data, setData] = useState<number | undefined>(undefined);
-  const [error, setError] = useState("");
-  const [isError, setIsError] = useState(false);
 
-  const getNFTByCanister = async (
-    canisterName: string,
-    nftValue: number
-  ): Promise<number> => {
-    const actor = createActor(canisterName);
-    const result = (await actor.icrc7_balance_of([
-      {
-        owner: Principal.fromText(SWAP_CANISTER_ID as string),
-        subaccount: [],
-      },
-    ])) as Array<bigint>;
+  const nfts = [
+    { canister: "gld_nft_1g", value: 1 },
+    { canister: "gld_nft_10g", value: 10 },
+    { canister: "gld_nft_100g", value: 100 },
+    {
+      canister: "gld_nft_1000g",
+      value: 1000,
+    },
+  ];
 
-    const data = Number(result[0]) * nftValue;
+  const test = useQuery({
+    queryKey: ["FETCH_AVAILABLE_NFTS"],
+    queryFn: async (): Promise<number> => {
+      const results = await Promise.allSettled(
+        nfts.map(async ({ canister, value }) => {
+          const actor = createActor(canister);
+          const result = (await actor.icrc7_balance_of([
+            {
+              owner: Principal.fromText(SWAP_CANISTER_ID as string),
+              subaccount: [],
+            },
+          ])) as Array<bigint>;
 
-    return data;
-  };
+          const data = Number(result[0]) * value;
 
-  const availableNFTs = useQueries({
-    queries: [
-      {
-        queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
-        queryFn: () => getNFTByCanister("gld_nft_1g", 1),
-        placeholderData: keepPreviousData,
-        enabled: true,
-      },
-      {
-        queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-        queryFn: () => getNFTByCanister("gld_nft_10g", 10),
-        placeholderData: keepPreviousData,
-        enabled: true,
-      },
-      {
-        queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
-        queryFn: () => getNFTByCanister("gld_nft_100g", 100),
-        enabled: true,
-        placeholderData: keepPreviousData,
-      },
-      {
-        queryKey: ["GET_AVAILABLE_GLD_NFT_1000G"],
-        queryFn: () => getNFTByCanister("gld_nft_1000g", 1000),
-        enabled: true,
-        placeholderData: keepPreviousData,
-      },
-    ],
-  });
+          return data;
+        })
+      );
 
-  const isSuccess = availableNFTs.every((result) => result.isSuccess);
-  const isLoading = availableNFTs.some((result) => result.isLoading);
-  const isFetching = availableNFTs.some((result) => result.isFetching);
-  const _isError = availableNFTs.some((result) => result.isError);
-  const _error = availableNFTs.map((result) => result.error).filter(Boolean)[0];
-  const _data = availableNFTs.map((result) => result.data);
+      const rejectedResults = results.filter(
+        (result): result is PromiseRejectedResult =>
+          result.status === "rejected"
+      );
+      if (rejectedResults.length > 0) {
+        console.error(
+          "Some requests to GLD NFTs canisters failed:",
+          rejectedResults.map((r) => r.reason)
+        );
+        throw new Error("Error while fetching GLD NFTs total locked.");
+      }
 
-  useEffect(() => {
-    if (isLoading || isFetching) {
-      setIsError(false);
-      setIsInitializing(true);
-    } else if (isSuccess && isInitializing && _data) {
-      setData(
-        _data.reduce(
+      const fulfilledResults = results
+        .filter(
+          (result): result is PromiseFulfilledResult<number> =>
+            result.status === "fulfilled"
+        )
+        .map((result) => result.value);
+
+      return (
+        fulfilledResults.reduce(
           (accumulator: number, currentValue) =>
             accumulator + (currentValue ?? 0),
           0
         ) / 1000
       );
-      setIsInitializing(false);
-    } else if (_isError) {
-      if (_error) console.log(_error);
-      setIsError(true);
-      setError("Error while fetching locked GLD NFTs.");
-      setIsInitializing(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    _data,
-    isSuccess,
-    isLoading,
-    isFetching,
-    isError,
-    _error,
-    isInitializing,
-  ]);
+    },
+    enabled: true,
+    placeholderData: keepPreviousData,
+  });
 
   return {
-    data,
-    isSuccess: isSuccess && !isInitializing,
-    isError,
-    isLoading: isInitializing,
-    error,
+    data: test.data,
+    isSuccess: test.isSuccess,
+    isLoading: test.isLoading || test.isPending,
+    isError: test.isError,
+    error: test.error?.message ?? "",
   };
 };

@@ -39,6 +39,7 @@
       "@theme/*": ["theme/*"],
       "@canisters/*": ["canisters/*"],
       "@auth/*": ["auth/*"],
+      "@atoms/*": ["atoms/*"],
     }
   },
   "include": ["src"],
