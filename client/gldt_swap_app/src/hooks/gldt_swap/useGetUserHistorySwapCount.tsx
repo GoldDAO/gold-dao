@@ -4,6 +4,7 @@ import {
   UseQueryOptions,
   QueryKey,
   keepPreviousData,
+  useQueryClient,
 } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
@@ -20,7 +21,11 @@ interface UseGetUserHistoricSwapParams
 export const useGetUserHistoricCountSwap = ({
   ...queryParams
 }: UseGetUserHistoricSwapParams) => {
+  const queryClient = useQueryClient();
   const { isConnected, principalId, createActor } = useAuth();
+  const [counterTransactions, setCounterTransactions] = useState<
+    number | undefined
+  >(undefined);
   const [data, setData] = useState<number | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -52,7 +57,11 @@ export const useGetUserHistoricCountSwap = ({
     if (historic_count.isLoading) {
       setIsInitializing(true);
     } else if (historic_count.isSuccess) {
-      setData(Number(historic_count?.data ?? 0));
+      const count = Number(historic_count?.data ?? 0);
+      setData(count);
+      if (counterTransactions === undefined) {
+        setCounterTransactions(count);
+      }
       setIsInitializing(false);
     } else if (historic_count.isError) {
       setData(0);
@@ -65,7 +74,36 @@ export const useGetUserHistoricCountSwap = ({
     historic_count.isError,
     historic_count.isLoading,
     historic_count.isSuccess,
+    counterTransactions,
   ]);
+
+  useEffect(() => {
+    if (
+      historic_count.isSuccess &&
+      data &&
+      counterTransactions !== undefined &&
+      counterTransactions !== data
+    ) {
+      queryClient.refetchQueries({
+        queryKey: ["USER_FETCH_BALANCE_GLDT"],
+        type: "active",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["USER_FETCH_BALANCE_OGY"],
+        type: "active",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["USER_FETCH_NFTS_METRICS"],
+        type: "active",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["USER_FETCH_TRANSACTIONS_HISTORY"],
+        type: "active",
+      });
+      setCounterTransactions(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counterTransactions, data, historic_count.isSuccess]);
 
   return {
     isSuccess: historic_count.isSuccess && !isInitializing,

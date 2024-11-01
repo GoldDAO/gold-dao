@@ -70,6 +70,8 @@ const TransferNft = () => {
               {!isLoadingUserNft && nftState.isEmpty && <Empty />}
               {isErrorUserNft && <Error error={errorUserNft} />}
               {isSuccessUserNft &&
+                !isLoadingUserNft &&
+                !isErrorUserNft &&
                 nftState.nfts.map((d, index) => {
                   return (
                     !d.isEmpty && (

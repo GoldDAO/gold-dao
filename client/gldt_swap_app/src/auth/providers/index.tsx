@@ -18,6 +18,7 @@ import { isMobile } from "react-device-detect";
 
 import { stateAtom } from "../atoms";
 import { Canisters } from "../interfaces";
+import { LoaderSpin } from "@components/ui";
 
 const AuthProviderInit = ({
   canisters,
@@ -92,7 +93,15 @@ const AuthProviderInit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, agent, state.canisters, unauthenticatedAgent]);
 
-  return children;
+  if (!Object.keys(state.canisters).length || !state.agent) {
+    return (
+      <div className="flex h-screen">
+        <div className="m-auto">
+          <LoaderSpin />
+        </div>
+      </div>
+    );
+  } else return children;
 };
 
 export const AuthProvider = ({

@@ -82,7 +82,7 @@ export const useGetUserHistoricSwap = ({
       if ("Err" in history.data[0]) {
         console.log(history.data[0].Err);
         setIsError(true);
-        setError("Error while fetching swap history :(.");
+        setError("Error while fetching swap history.");
       } else {
         const rows = (
           history.data[0].Ok as Array<[[bigint, bigint], SwapInfo]>
@@ -98,7 +98,7 @@ export const useGetUserHistoricSwap = ({
     } else if (history.isError) {
       console.log(history.error);
       setIsError(true);
-      setError("Error while fetching swap history 2 :(.");
+      setError("Error while fetching swap history.");
       setIsInitializing(false);
     }
   }, [
@@ -116,5 +116,6 @@ export const useGetUserHistoricSwap = ({
     isError,
     error,
     isLoading: isInitializing,
+    refetch: history.refetch,
   };
 };

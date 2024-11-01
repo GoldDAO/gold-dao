@@ -50,27 +50,25 @@ const ReverseSwapTo = () => {
         !isError &&
         nftState.nfts.map((d, index) => {
           return (
-            !d.isEmpty && (
+            <div
+              key={d.name}
+              className="flex justify-center items-center border border-border bg-surface-2 py-3 px-1 sm:px-4 rounded-xl mb-2 last:mb-0 sm:gap-12 gap-4"
+            >
               <div
+                className="flex justify-center items-center sm:gap-12 gap-4"
                 key={d.name}
-                className="flex justify-center items-center border border-border bg-surface-2 py-3 px-1 sm:px-4 rounded-xl mb-2 last:mb-0 sm:gap-12 gap-4"
               >
-                <div
-                  className="flex justify-center items-center sm:gap-12 gap-4"
-                  key={d.name}
-                >
-                  <SelectNFTTitle collectionName={d.name} />
-                  <SelectNFTCount
-                    collectionIndex={index}
-                    count={count[index].selected}
-                    handleOnChangeCount={handleOnChangeCount}
-                  />
-                  <div className="text-content/60 text-sm">
-                    {count[index].selected} / {count[index].total}
-                  </div>
+                <SelectNFTTitle collectionName={d.name} />
+                <SelectNFTCount
+                  collectionIndex={index}
+                  count={count[index].selected}
+                  handleOnChangeCount={handleOnChangeCount}
+                />
+                <div className="text-content/60 text-sm">
+                  {count[index].selected} / {count[index].total}
                 </div>
               </div>
-            )
+            </div>
           );
         })}
     </div>
