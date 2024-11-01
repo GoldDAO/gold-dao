@@ -44,7 +44,7 @@ const TransactionDetails = ({
         <DisclosurePanel className="bg-surface text-sm/5 mt-4">
           <div className="flex flex-col gap-4 border border-border bg-surface-2 p-6 rounded-xl">
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60">
-              <div>Total number of NFTs to swap</div>
+              <div>Total number of NFTs to receive</div>
               <div>{totalNFTs.string} GLD NFT</div>
             </div>
             {selectedNfts.map(({ value, totalSelected }, index) => (
@@ -68,7 +68,7 @@ const TransactionDetails = ({
             <div className="border border-border"></div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-content/60 font-semibold">
-              <div>Total number of GLDT changed</div>
+              <div>Total number of GLDT burned</div>
               <div>{totalGLDT.string} GLDT</div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between font-semibold">
