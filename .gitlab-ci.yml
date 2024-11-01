@@ -104,6 +104,9 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: usdg
   # Backend deployments
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
