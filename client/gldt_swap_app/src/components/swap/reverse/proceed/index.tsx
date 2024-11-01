@@ -12,14 +12,17 @@ import Error from "./Error";
 
 const Proceed = () => {
   const {
-    getSelectedTotal,
+    getSelectedTotalNFTs,
     getSelectedTotalGLDT,
+    getSelectedTotalGLDTWithFees,
     getSelectedTotalGram,
     resetState,
   } = useNft();
-  const totalNFTs = getSelectedTotal();
-  const totalGLDNFTtoSwap = getSelectedTotalGram();
-  const totalGLDTtoSwap = getSelectedTotalGLDT();
+  const totalNFTs = getSelectedTotalNFTs();
+  const totalGram = getSelectedTotalGram();
+  const totalGLDT = getSelectedTotalGLDT();
+  const totalGLDTWithFees = getSelectedTotalGLDTWithFees();
+
   const queryClient = useQueryClient();
   const {
     state: reverseSwapProceedState,
@@ -28,7 +31,7 @@ const Proceed = () => {
     reverseSwap,
     setCanCloseDialog,
   } = useReverseSwapProceed();
-  const { show, canReverseSwap } = reverseSwapProceedState;
+  const { show, canReverseSwap, canCloseDialog } = reverseSwapProceedState;
   const {
     mutate: mutateSwapGLDNFT,
     isSuccess,
@@ -40,26 +43,22 @@ const Proceed = () => {
   const reset = () => {
     resetState();
     queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_1G"],
+      queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
     });
     queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_10G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_100G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["GET_AVAILABLE_GLD_NFT_1000G"],
+      queryKey: ["FETCH_AVAILABLE_NFTS"],
     });
     setCanCloseDialog(true);
   };
 
   const handleOnClick = () => {
+    setCanCloseDialog(false);
     mutateSwapGLDNFT(undefined, {
       onSuccess: () => {
         reset();
       },
-      onError: () => {
+      onError: (err) => {
+        console.error(err);
         reset();
       },
     });
@@ -74,32 +73,36 @@ const Proceed = () => {
       >
         Preview Swap
       </Button>
-      <Dialog show={show} handleClose={handleClose} enableClose={isIdle}>
+      <Dialog
+        show={show}
+        handleClose={handleClose}
+        enableClose={canCloseDialog}
+      >
         <div className="px-6 pt-6 pb-12">
           {isIdle && (
             <>
               <div className="px-6 mb-8 text-center">
                 You are sending{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDTtoSwap + totalNFTs} GLDT
+                  {totalGLDTWithFees.string} GLDT
                 </span>{" "}
                 and will receive{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDNFTtoSwap}g GLD NFTs
+                  {totalGram.string}g GLD NFTs
                 </span>
                 . <br />
                 <span className="font-semibold text-gold">
-                  {totalGLDTtoSwap} GLDT
+                  {totalGLDT.number} GLDT
                 </span>{" "}
                 will be burned and{" "}
                 <span className="font-semibold text-gold">
-                  {totalNFTs} GLDT
+                  {totalNFTs.string} GLDT
                 </span>{" "}
                 fee are charged.
               </div>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
                 <div className="font-semibold">
-                  {totalGLDTtoSwap + totalNFTs} GLDT
+                  {totalGLDTWithFees.string} GLDT
                 </div>
 
                 <div className="w-full flex justify-center items-center py-4">
@@ -116,9 +119,7 @@ const Proceed = () => {
                     </div>
                   </div>
                 </div>
-                <div className="font-semibold">
-                  {totalGLDNFTtoSwap}g of gold
-                </div>
+                <div className="font-semibold">{totalGram.string}g of gold</div>
               </div>
 
               <TransactionDetails className="w-full mt-8" />

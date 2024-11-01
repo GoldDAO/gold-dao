@@ -8,7 +8,7 @@ const SWAP_MODE_OPTIONS = [
     icon: <img src="/nft_logo.svg" className="w-4 h-4" alt="Gold bar logo" />,
     label: "NFT",
   },
-  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-1" },
+  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-2" },
 ];
 
 const SelectSwapMode = () => {

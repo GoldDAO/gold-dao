@@ -10,7 +10,9 @@ const BalanceGLDT = ({ className }: { className?: string }) => {
     isSuccess,
     isError,
     isLoading,
-  } = useLedgerUserBalance({ ledger: "GLDT" });
+  } = useLedgerUserBalance({
+    ledger: "GLDT",
+  });
   const { data: balanceGLTDUSD } = useBalanceGLDTUSD({
     balance: balance?.number,
   });

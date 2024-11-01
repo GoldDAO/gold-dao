@@ -1,11 +1,9 @@
-import { roundAndFormatLocale } from "@utils/numbers";
-
 const BalanceAfterTransfer = ({
   ledger,
   balance,
 }: {
   ledger: string;
-  balance: number;
+  balance: string;
 }) => {
   return (
     <div className="flex items-center justify-between border border-border bg-surface-2 p-4 rounded-xl">
@@ -17,7 +15,7 @@ const BalanceAfterTransfer = ({
           alt={`${ledger} Logo`}
         />
         <span>
-          {roundAndFormatLocale({ number: balance })} {ledger}
+          {balance} {ledger}
         </span>
       </div>
     </div>

@@ -70,6 +70,8 @@ const TransferNft = () => {
               {!isLoadingUserNft && nftState.isEmpty && <Empty />}
               {isErrorUserNft && <Error error={errorUserNft} />}
               {isSuccessUserNft &&
+                !isLoadingUserNft &&
+                !isErrorUserNft &&
                 nftState.nfts.map((d, index) => {
                   return (
                     !d.isEmpty && (
@@ -116,7 +118,7 @@ const TransferNft = () => {
               Transfer
             </Button>
             <div className="flex justify-center mt-6">
-              <Balance ledger="OGY" balance={balanceOGY.data.number} />
+              <Balance ledger="OGY" balance={balanceOGY.data.string} />
             </div>
           </form>
           <ConfirmDialog />

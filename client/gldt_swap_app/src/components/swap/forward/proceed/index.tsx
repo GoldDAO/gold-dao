@@ -38,19 +38,10 @@ const Proceed = () => {
   const reset = (): void => {
     resetSwapState();
     queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_1G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_10G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_100G"],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["USER_GET_GLD_NFT_1000G"],
-    });
-    queryClient.invalidateQueries({
       queryKey: ["USER_FETCH_ACTIVE_SWAPS"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["USER_FETCH_NFTS"],
     });
     setCanCloseDialog(true);
   };
@@ -62,7 +53,7 @@ const Proceed = () => {
         reset();
       },
       onError: (err) => {
-        console.log(err);
+        console.error(err);
         reset();
       },
     });
@@ -88,15 +79,15 @@ const Proceed = () => {
               <div className="px-6 mb-8 text-center">
                 You are sending{" "}
                 <span className="font-semibold text-gold">
-                  {totalGram} GLD NFTs
+                  {totalGram.string} GLD NFTs
                 </span>{" "}
                 and will receive{" "}
                 <span className="font-semibold text-gold">
-                  {totalGLDT} GLDT.
+                  {totalGLDT.string} GLDT.
                 </span>
               </div>
               <div className="flex flex-col items-center gap-6 border border-border bg-surface-2 p-6 rounded-xl">
-                <div className="font-semibold">{totalGram}g of gold</div>
+                <div className="font-semibold">{totalGram.string}g of gold</div>
 
                 <div className="w-full flex justify-center items-center py-4">
                   <div className="relative w-full">
@@ -112,7 +103,7 @@ const Proceed = () => {
                     </div>
                   </div>
                 </div>
-                <div className="font-semibold">{totalGLDT} GLDT</div>
+                <div className="font-semibold">{totalGLDT.string} GLDT</div>
               </div>
 
               <TransactionDetails className="w-full mt-8" />

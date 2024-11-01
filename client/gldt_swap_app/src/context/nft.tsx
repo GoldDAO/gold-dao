@@ -13,9 +13,11 @@ import {
   GLD_NFT_100G_CANISTER_ID,
   GLD_NFT_1000G_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
+  REVERSE_GLDT_TX_FEE,
 } from "@constants";
 
 import { useAuth } from "@auth/index";
+import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
 
 export type TokenId = {
   id_string: string;
@@ -314,25 +316,48 @@ const useNftProviderValue = () => {
     return state.nfts[indexId].totalSelectedGLDT;
   };
 
-  const getSelectedTotal = () => {
-    return state.nfts.reduce(
+  const getSelectedTotalNFTs = () => {
+    const sum = state.nfts.reduce(
       (acc, nft: NftCollection) => acc + nft.totalSelected,
       0
     );
+    return {
+      number: sum,
+      string: roundAndFormatLocale({ number: sum }),
+    };
   };
 
   const getSelectedTotalGram = () => {
-    return state.nfts.reduce(
+    const sum = state.nfts.reduce(
       (acc, nft: NftCollection) => acc + nft.totalSelectedGram,
       0
     );
+    return {
+      number: sum,
+      string: roundAndFormatLocale({ number: sum }),
+    };
   };
 
   const getSelectedTotalGLDT = () => {
-    return state.nfts.reduce(
+    const sum = state.nfts.reduce(
       (acc, nft: NftCollection) => acc + nft.totalSelectedGLDT,
       0
     );
+    return {
+      number: sum,
+      string: roundAndFormatLocale({ number: sum }),
+    };
+  };
+
+  const getSelectedTotalGLDTWithFees = () => {
+    const totalGLDT = getSelectedTotalGLDT().number;
+    const totalNFTs = getSelectedTotalNFTs().number;
+    const fees = divideBy1e8(REVERSE_GLDT_TX_FEE) * totalNFTs;
+    const sum = totalGLDT + fees;
+    return {
+      number: sum,
+      string: roundAndFormatLocale({ number: sum }),
+    };
   };
 
   const resetState = (): void => {
@@ -355,9 +380,10 @@ const useNftProviderValue = () => {
       getCountNfts,
       getCollectionSelectedNFTs,
       getSelectedCollectionGLDTNFTs,
-      getSelectedTotal,
+      getSelectedTotalNFTs,
       getSelectedTotalGram,
       getSelectedTotalGLDT,
+      getSelectedTotalGLDTWithFees,
       resetState,
       getCountSelectedNfts,
       getOneRandomNftId,

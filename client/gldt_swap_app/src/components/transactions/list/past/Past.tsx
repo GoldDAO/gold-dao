@@ -16,7 +16,9 @@ const PastTransactions = () => {
     navigate("/swap/account/transactions");
   };
 
-  const count = useGetUserHistoricCountSwap({ refetchInterval: 5000 });
+  const count = useGetUserHistoricCountSwap({
+    refetchInterval: 3000,
+  });
 
   return (
     <div className="w-full">
@@ -29,7 +31,7 @@ const PastTransactions = () => {
         <div className="flex items-center gap-2">
           <div className="font-semibold">Past</div>
           <div className="bg-gold px-2 text-xs text-white font-semibold py-1 rounded-md text-center">
-            {count.data}
+            {count.isSuccess ? count.data : 0}
           </div>
           <div className="flex justify-center items-center shrink-0 rounded-md text-gold border border-gold bg-surface-2 hover:px-4 ml-4 px-3 transition-all duration-500">
             <button onClick={handleShowAllTxs} className="font-semibold">

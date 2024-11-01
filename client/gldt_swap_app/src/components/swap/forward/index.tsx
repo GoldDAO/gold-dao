@@ -16,8 +16,8 @@ import { useNft } from "@context/index";
 
 const Forward = () => {
   const { isConnected, connect } = useAuth();
-  const { getSelectedTotal } = useNft();
-  const hasSelectedNfts = !!getSelectedTotal();
+  const { getSelectedTotalNFTs } = useNft();
+  const hasSelectedNfts = !!getSelectedTotalNFTs().number;
 
   return (
     <>

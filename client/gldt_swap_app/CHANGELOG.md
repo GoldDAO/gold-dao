@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.0.3] - 2024-11-01
+
+#### Description
+
+This update fixes a few bugs and adds some minor improvements to the user interface.
+
+#### Added
+
+- Update displayed data on account page on success transactions.
+
+#### Changed
+
+- Notation for numbers > 1000 improving readability.
+
+#### Fix
+
+- Responsive issue on landing page.
+
+
 ### [1.0.2] - 2024-10-30
 
 #### Description

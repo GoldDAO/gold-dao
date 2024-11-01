@@ -91,33 +91,11 @@ const useTransferProceedNftProviderValue = () => {
 
   const handleTransfer = () => {
     const nfts = getCollectionSelectedNFTs();
-    mutation.mutate(
-      {
-        to: state.to,
-        nfts,
-        fee: state.fee,
-      }
-      // {
-      //   onSuccess: () => {
-      //     resetStateNft();
-      //     queryClient.invalidateQueries({
-      //       queryKey: [`USER_FETCH_BALANCE_OGY`],
-      //     });
-      //     queryClient.invalidateQueries({
-      //       queryKey: [`USER_GET_GLD_NFT_1G`],
-      //     });
-      //     queryClient.invalidateQueries({
-      //       queryKey: [`USER_GET_GLD_NFT_10G`],
-      //     });
-      //     queryClient.invalidateQueries({
-      //       queryKey: [`USER_GET_GLD_NFT_100G`],
-      //     });
-      //     queryClient.invalidateQueries({
-      //       queryKey: [`USER_GET_GLD_NFT_1000G`],
-      //     });
-      //   },
-      // }
-    );
+    mutation.mutate({
+      to: state.to,
+      nfts,
+      fee: state.fee,
+    });
   };
 
   const handleReset = (): void => {
@@ -126,16 +104,7 @@ const useTransferProceedNftProviderValue = () => {
       queryKey: [`USER_FETCH_BALANCE_OGY`],
     });
     queryClient.invalidateQueries({
-      queryKey: [`USER_GET_GLD_NFT_1G`],
-    });
-    queryClient.invalidateQueries({
-      queryKey: [`USER_GET_GLD_NFT_10G`],
-    });
-    queryClient.invalidateQueries({
-      queryKey: [`USER_GET_GLD_NFT_100G`],
-    });
-    queryClient.invalidateQueries({
-      queryKey: [`USER_GET_GLD_NFT_1000G`],
+      queryKey: [`USER_FETCH_NFTS`],
     });
     setState(initialState);
     form.reset();
@@ -169,7 +138,7 @@ const useTransferProceedNftProviderValue = () => {
         ...prevState,
         totalTransferFee: {
           number: tFee,
-          string: roundAndFormatLocale({ number: tFee, decimals: 0 }),
+          string: roundAndFormatLocale({ number: tFee }),
         },
         balanceAfterTransfer: state.balance ? state.balance - tFee : 0,
       }));

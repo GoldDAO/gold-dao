@@ -1,6 +1,6 @@
 import { useAuth } from "@auth/index";
 import TotalCountNfts from "@components/account/TotalCountNfts";
-import TotalSwappedGLDT from "@components/account/TotalSwappedGLDT";
+// import TotalSwappedGLDT from "@components/account/TotalSwappedGLDT";
 import TotalWeightNfts from "@components/account/TotalWeightNfts";
 
 import TokenBalance from "@components/account/token-balance/TokenBalance";
@@ -24,7 +24,7 @@ export const Account = () => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-4">
         <TotalCountNfts className="w-full" />
         <TotalWeightNfts className="w-full" />
-        <TotalSwappedGLDT className="w-full blur-sm" />
+        {/* <TotalSwappedGLDT className="w-full blur-sm" /> */}
       </div>
 
       <TokenBalance className="mb-4" />

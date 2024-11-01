@@ -9,7 +9,9 @@ const BalanceOGY = ({ className }: { className?: string }) => {
     isSuccess,
     isError,
     isLoading,
-  } = useLedgerUserBalance({ ledger: "OGY" });
+  } = useLedgerUserBalance({
+    ledger: "OGY",
+  });
   const { data: balanceOGYUSD } = useBalanceOGYUSD({
     balance: balance?.number,
   });

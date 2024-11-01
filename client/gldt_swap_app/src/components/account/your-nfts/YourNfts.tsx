@@ -36,7 +36,7 @@ const YourNfts = ({ className }: { className?: string }) => {
     <div className={className}>
       <div className="border border-border bg-surface-1 p-6 rounded-xl">
         <div className="flex justify-between items-center mb-2">
-          <div className="mb-4">Your NFTs</div>
+          <div className="mb-4">My NFTs</div>
           <div></div>
         </div>
         {isSuccess && (

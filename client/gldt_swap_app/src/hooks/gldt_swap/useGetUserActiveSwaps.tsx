@@ -59,7 +59,7 @@ export const useGetUserActiveSwaps = ({
       });
       setIsInitializing(false);
     } else if (active_swaps.isError) {
-      console.log(active_swaps.error);
+      console.error(active_swaps.error);
       setError("Error while fetching active swaps :(.");
       setIsInitializing(false);
     }

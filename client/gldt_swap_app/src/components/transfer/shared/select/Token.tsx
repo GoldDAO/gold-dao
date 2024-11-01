@@ -3,7 +3,7 @@ import { Select } from "@components/ui";
 import { LogoGLDT } from "@components/shared/logos";
 
 const TOKEN_OPTIONS = [
-  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-1" },
+  { value: "GLDT", icon: <LogoGLDT className="w-4 h-4" />, label: "ICRC-2" },
   {
     value: "GLD NFT",
     icon: <img src="/nft_logo.svg" className="w-4 h-4" alt="Gold bar logo" />,
@@ -12,7 +12,7 @@ const TOKEN_OPTIONS = [
   {
     value: "OGY",
     icon: <img src="/ogy_logo.svg" className="w-4 h-4" alt="Origyn logo" />,
-    label: "ICRC-1",
+    label: "ICRC-2",
   },
 ];
 

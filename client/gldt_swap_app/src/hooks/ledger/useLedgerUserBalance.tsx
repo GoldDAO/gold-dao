@@ -6,8 +6,10 @@ import { roundAndFormatLocale, divideBy1e8 } from "@utils/numbers";
 
 export const useLedgerUserBalance = ({
   ledger = "OGY",
+  refetchInterval = false,
 }: {
   ledger: string;
+  refetchInterval?: number | false;
 }) => {
   const { isConnected, principalId, createActor } = useAuth();
   const queryKeyName = `USER_FETCH_BALANCE_${ledger}`;
@@ -42,5 +44,6 @@ export const useLedgerUserBalance = ({
       }),
     placeholderData: keepPreviousData,
     enabled: !!isConnected && !!principalId,
+    refetchInterval: refetchInterval,
   });
 };
