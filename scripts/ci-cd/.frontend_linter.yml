@@ -7,6 +7,7 @@ spec:
           "gldt_swap_app",
           "gld_dashboard",
           "gld_landing_page",
+          "usdg"
         ]
 ---
 # Front-end (NextJS) linter job template
