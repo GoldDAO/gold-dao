@@ -41,6 +41,9 @@ include:
       src-folder: gldt_swap_app
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
+      src-folder: usdg
+  - local: scripts/ci-cd/.frontend_linter.yml
+    inputs:
       src-folder: gld_dashboard
   # Unit tests
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
@@ -140,6 +143,10 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gldt_swap_app
+      sns-controlled: "false"
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: usdg
       sns-controlled: "false"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
