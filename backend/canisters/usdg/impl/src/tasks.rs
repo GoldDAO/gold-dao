@@ -3,6 +3,9 @@ use std::cell::{Cell, RefCell};
 use std::collections::{BTreeMap, BTreeSet};
 use std::time::Duration;
 
+// The task queue logic has been borrowed from:
+// https://github.com/dfinity/ic/blob/master/rs/bitcoin/ckbtc/minter/
+
 thread_local! {
     static TASKS: RefCell<TaskQueue> = RefCell::default();
     static LAST_GLOBAL_TIMER: Cell<u64> = Cell::default();
