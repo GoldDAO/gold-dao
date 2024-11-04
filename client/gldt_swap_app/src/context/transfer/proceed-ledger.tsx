@@ -71,20 +71,17 @@ const useTransferProceedLedgerProviderValue = ({
   });
 
   const handleSubmitForm = (data: { amount: string; to: string }) => {
-    const _amount = Number(data.amount) * 1e8 - getFeeByLedger(ledger);
+    const _amount = Math.floor(Number(data.amount) * 1e8);
     const balanceAfterTransfer =
       balance.isSuccess && balance.data
-        ? divideBy1e8(
-            BigInt(balance.data.e8s) -
-              BigInt(_amount) -
-              BigInt(getFeeByLedger(ledger))
-          )
+        ? divideBy1e8(BigInt(balance.data.e8s) - BigInt(_amount))
         : 0;
+
     setState((prevState) => ({
       ...prevState,
       amount: {
         string: roundAndFormatLocale({ number: divideBy1e8(_amount) }),
-        bigint: BigInt(_amount * 1e8),
+        bigint: BigInt(_amount),
       },
       to: data.to,
       balanceAfterTransfer: {

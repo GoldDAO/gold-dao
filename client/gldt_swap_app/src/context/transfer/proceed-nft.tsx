@@ -71,6 +71,7 @@ const useTransferProceedNftProviderValue = () => {
   const countSelectedNfts = getCountSelectedNfts();
 
   const balanceOGY = useLedgerUserBalance({ ledger: "OGY" });
+
   const fetchTransferFee = useFetchTransferFeeNft({
     nftId: randomNftId?.tokenId?.id_bigint,
     canister: randomNftId?.canister as string,
@@ -105,6 +106,9 @@ const useTransferProceedNftProviderValue = () => {
     });
     queryClient.invalidateQueries({
       queryKey: [`USER_FETCH_NFTS`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`FETCH_NFT_TRANSFER_FEE`],
     });
     setState(initialState);
     form.reset();
@@ -165,7 +169,6 @@ const useTransferProceedNftProviderValue = () => {
   }, [balanceOGY.isSuccess, balanceOGY.data]);
 
   useEffect(() => {
-    // ? testing + 29999.998
     if (state.balance && state.totalTransferFee.number > state.balance) {
       setState((prevState) => ({
         ...prevState,
