@@ -1,0 +1,15 @@
+[package]
+name = "usdg_canister"
+version = "0.1.0"
+description = "USDG protocol"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+default = []  # Empty default features
+inttest = []
+
+[dependencies]

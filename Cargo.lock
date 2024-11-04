@@ -3684,6 +3684,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "usdg_api_canister"
+version = "0.1.0"
+
+[[package]]
+name = "usdg_canister"
+version = "0.1.0"
+
+[[package]]
 name = "utils"
 version = "0.1.0"
 dependencies = [
