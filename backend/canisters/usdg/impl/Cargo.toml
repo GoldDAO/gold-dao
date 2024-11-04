@@ -1,0 +1,11 @@
+[package]
+name = "usdg_canister"
+version = "0.1.0"
+description = "USDG - api"
+edition = "2021"
+
+[features]
+default = []  # Empty default features
+inttest = []
+
+[dependencies]
