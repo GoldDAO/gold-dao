@@ -7,6 +7,7 @@ spec:
           "gld_dashboard",
           "gldt_swap_app",
           "gld_landing_page",
+          "usdg"
         ]
 ---
 # Frontend builds

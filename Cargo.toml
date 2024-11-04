@@ -17,6 +17,8 @@ members = [
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
+  "backend/canisters/usdg/impl",
+  "backend/canisters/usdg/api",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
   "backend/external_canisters/origyn_nft_reference/api",

@@ -45,12 +45,14 @@ export const useLedgerTransfer = ({ ledger = "OGY" }: { ledger: string }) => {
     return result;
   };
 
+  // todo ? handle error on success
   return useMutation({
-    mutationFn: async ({ amount, to }: { amount: bigint; to: string }) =>
-      icrc1_transfer({
+    mutationFn: async ({ amount, to }: { amount: bigint; to: string }) => {
+      return icrc1_transfer({
         amount,
         to,
         ledger: ledger.toLocaleLowerCase(),
-      }),
+      });
+    },
   });
 };

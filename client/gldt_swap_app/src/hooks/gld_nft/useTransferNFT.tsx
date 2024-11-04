@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Principal } from "@dfinity/principal";
 
-import { OGY_TX_FEE } from "@constants";
 import { useAuth } from "@auth/index";
 
 import { TransferArgs, TransferResult } from "@canisters/gld_nft/interfaces";
@@ -40,10 +39,7 @@ export const useTransferNFT = () => {
       fee: number;
     }): Promise<void> => {
       const icrc2_approve_args = nfts.flatMap((nft) => {
-        // console.log(`approve_args canisterID: ${nft.canisterId}`);
-        const amount = BigInt(
-          nft.tokenIds.length * (fee * 10 ** 8 + OGY_TX_FEE)
-        );
+        const amount = BigInt(nft.tokenIds.length * Math.floor(fee * 10 ** 8));
         return {
           amount,
           fee: [],

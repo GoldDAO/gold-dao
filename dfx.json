@@ -137,6 +137,15 @@
       "source": ["client/gldt_swap_app/dist"],
       "type": "assets"
     },
+    "usdg": {
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "source": ["client/usdg/dist"],
+      "type": "assets"
+    },
     "icp_neuron": {
       "build": ["./scripts/build_canister.sh icp_neuron"],
       "candid": "backend/canisters/icp_neuron/api/can.did",

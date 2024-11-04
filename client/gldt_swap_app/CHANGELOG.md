@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.0.4] - 2024-11-04
+
+#### Description
+
+This update fixes ledger's transfer issues.
+
+#### Fix
+
+- Ledger transfer issues (incorrect amount/fees calculation).
+
 ### [1.0.3] - 2024-11-01
 
 #### Description
