@@ -1,7 +1,7 @@
 // This is an experimental feature to generate Rust binding from Candid.
 // You may want to manually adjust some of the types.
 #![allow(dead_code, unused_imports)]
-use candid::{ self, CandidType, Deserialize, Principal };
+use candid::{self, CandidType, Deserialize, Principal};
 use ic_cdk::api::call::CallResult as Result;
 use serde::Serialize;
 
@@ -41,7 +41,8 @@ pub enum CandyShared {
     Option(Option<Box<CandyShared>>),
     Floats(Vec<f64>),
     Float(f64),
-    #[serde(rename = "Principal")] Principal_(Principal),
+    #[serde(rename = "Principal")]
+    Principal_(Principal),
     Array(Vec<Box<CandyShared>>),
     Class(Vec<PropertyShared>),
 }
@@ -82,14 +83,19 @@ pub struct IcTokenSpec {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum TokenSpec {
-    #[serde(rename = "ic")] Ic(IcTokenSpec),
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
+    #[serde(rename = "ic")]
+    Ic(IcTokenSpec),
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum TransactionId {
-    #[serde(rename = "nat")] Nat(candid::Nat),
-    #[serde(rename = "text")] Text(String),
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
+    #[serde(rename = "nat")]
+    Nat(candid::Nat),
+    #[serde(rename = "text")]
+    Text(String),
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct TransactionRecordTxnTypeMintSaleInner {
@@ -104,8 +110,10 @@ pub struct WaitForQuietType {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum MinIncreaseType {
-    #[serde(rename = "amount")] Amount(candid::Nat),
-    #[serde(rename = "percentage")] Percentage(f64),
+    #[serde(rename = "amount")]
+    Amount(candid::Nat),
+    #[serde(rename = "percentage")]
+    Percentage(f64),
 }
 pub type FeeName = String;
 pub type FeeAccountsParams = Vec<FeeName>;
@@ -119,14 +127,19 @@ pub struct NiftySettlementType {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum DutchParamsTimeUnit {
-    #[serde(rename = "day")] Day(candid::Nat),
-    #[serde(rename = "hour")] Hour(candid::Nat),
-    #[serde(rename = "minute")] Minute(candid::Nat),
+    #[serde(rename = "day")]
+    Day(candid::Nat),
+    #[serde(rename = "hour")]
+    Hour(candid::Nat),
+    #[serde(rename = "minute")]
+    Minute(candid::Nat),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum DutchParamsDecayType {
-    #[serde(rename = "flat")] Flat(candid::Nat),
-    #[serde(rename = "percent")] Percent(f64),
+    #[serde(rename = "flat")]
+    Flat(candid::Nat),
+    #[serde(rename = "percent")]
+    Percent(f64),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct DutchParams {
@@ -135,41 +148,62 @@ pub struct DutchParams {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum EndingType {
-    #[serde(rename = "date")] Date(candid::Int),
-    #[serde(rename = "timeout")] Timeout(candid::Nat),
+    #[serde(rename = "date")]
+    Date(candid::Int),
+    #[serde(rename = "timeout")]
+    Timeout(candid::Nat),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum AskFeature {
-    #[serde(rename = "kyc")] Kyc(Principal),
-    #[serde(rename = "start_price")] StartPrice(candid::Nat),
-    #[serde(rename = "token")] Token(TokenSpec),
-    #[serde(rename = "fee_schema")] FeeSchema(String),
-    #[serde(rename = "notify")] Notify(Vec<Principal>),
-    #[serde(rename = "wait_for_quiet")] WaitForQuiet(WaitForQuietType),
-    #[serde(rename = "reserve")] Reserve(candid::Nat),
-    #[serde(rename = "start_date")] StartDate(candid::Int),
-    #[serde(rename = "min_increase")] MinIncrease(MinIncreaseType),
-    #[serde(rename = "allow_list")] AllowList(Vec<Principal>),
-    #[serde(rename = "buy_now")] BuyNow(candid::Nat),
-    #[serde(rename = "fee_accounts")] FeeAccounts(FeeAccountsParams),
-    #[serde(rename = "nifty_settlement")] NiftySettlement(NiftySettlementType),
+    #[serde(rename = "kyc")]
+    Kyc(Principal),
+    #[serde(rename = "start_price")]
+    StartPrice(candid::Nat),
+    #[serde(rename = "token")]
+    Token(TokenSpec),
+    #[serde(rename = "fee_schema")]
+    FeeSchema(String),
+    #[serde(rename = "notify")]
+    Notify(Vec<Principal>),
+    #[serde(rename = "wait_for_quiet")]
+    WaitForQuiet(WaitForQuietType),
+    #[serde(rename = "reserve")]
+    Reserve(candid::Nat),
+    #[serde(rename = "start_date")]
+    StartDate(candid::Int),
+    #[serde(rename = "min_increase")]
+    MinIncrease(MinIncreaseType),
+    #[serde(rename = "allow_list")]
+    AllowList(Vec<Principal>),
+    #[serde(rename = "buy_now")]
+    BuyNow(candid::Nat),
+    #[serde(rename = "fee_accounts")]
+    FeeAccounts(FeeAccountsParams),
+    #[serde(rename = "nifty_settlement")]
+    NiftySettlement(NiftySettlementType),
     #[serde(rename = "atomic")]
     Atomic,
-    #[serde(rename = "dutch")] Dutch(DutchParams),
-    #[serde(rename = "ending")] Ending(EndingType),
+    #[serde(rename = "dutch")]
+    Dutch(DutchParams),
+    #[serde(rename = "ending")]
+    Ending(EndingType),
 }
 pub type AskFeatureArray = Vec<AskFeature>;
 pub type AskConfigShared = Option<AskFeatureArray>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum InstantFeature {
-    #[serde(rename = "fee_schema")] FeeSchema(String),
-    #[serde(rename = "fee_accounts")] FeeAccounts(FeeAccountsParams),
+    #[serde(rename = "fee_schema")]
+    FeeSchema(String),
+    #[serde(rename = "fee_accounts")]
+    FeeAccounts(FeeAccountsParams),
 }
 pub type InstantConfigShared = Option<Vec<InstantFeature>>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum AuctionConfigEnding {
-    #[serde(rename = "date")] Date(candid::Int),
-    #[serde(rename = "wait_for_quiet")] WaitForQuiet {
+    #[serde(rename = "date")]
+    Date(candid::Int),
+    #[serde(rename = "wait_for_quiet")]
+    WaitForQuiet {
         max: candid::Nat,
         date: candid::Int,
         fade: f64,
@@ -189,14 +223,19 @@ pub struct AuctionConfig {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum PricingConfigShared {
-    #[serde(rename = "ask")] Ask(AskConfigShared),
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "instant")] Instant(InstantConfigShared),
-    #[serde(rename = "auction")] Auction(AuctionConfig),
+    #[serde(rename = "ask")]
+    Ask(AskConfigShared),
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "instant")]
+    Instant(InstantConfigShared),
+    #[serde(rename = "auction")]
+    Auction(AuctionConfig),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum TransactionRecordTxnType {
-    #[serde(rename = "escrow_deposit")] EscrowDeposit {
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionId,
@@ -205,17 +244,20 @@ pub enum TransactionRecordTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "fee_deposit")] FeeDeposit {
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_network_updated")] CanisterNetworkUpdated {
+    #[serde(rename = "canister_network_updated")]
+    CanisterNetworkUpdated {
         network: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "escrow_withdraw")] EscrowWithdraw {
+    #[serde(rename = "escrow_withdraw")]
+    EscrowWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -225,28 +267,33 @@ pub enum TransactionRecordTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_managers_updated")] CanisterManagersUpdated {
+    #[serde(rename = "canister_managers_updated")]
+    CanisterManagersUpdated {
         managers: Vec<Principal>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "auction_bid")] AuctionBid {
+    #[serde(rename = "auction_bid")]
+    AuctionBid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
-    #[serde(rename = "burn")] Burn {
+    #[serde(rename = "burn")]
+    Burn {
         from: Option<Account>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "data")] Data {
+    #[serde(rename = "data")]
+    Data {
         hash: Option<serde_bytes::ByteBuf>,
         extensible: Box<CandyShared>,
         data_dapp: Option<String>,
         data_path: Option<String>,
     },
-    #[serde(rename = "sale_ended")] SaleEnded {
+    #[serde(rename = "sale_ended")]
+    SaleEnded {
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,
@@ -254,13 +301,15 @@ pub enum TransactionRecordTxnType {
         amount: candid::Nat,
         sale_id: Option<String>,
     },
-    #[serde(rename = "mint")] Mint {
+    #[serde(rename = "mint")]
+    Mint {
         to: Account,
         from: Account,
         sale: Option<TransactionRecordTxnTypeMintSaleInner>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "royalty_paid")] RoyaltyPaid {
+    #[serde(rename = "royalty_paid")]
+    RoyaltyPaid {
         tag: String,
         token: TokenSpec,
         seller: Account,
@@ -270,8 +319,10 @@ pub enum TransactionRecordTxnType {
         receiver: Account,
         sale_id: Option<String>,
     },
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "fee_deposit_withdraw")] FeeDepositWithdraw {
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "fee_deposit_withdraw")]
+    FeeDepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -279,21 +330,25 @@ pub enum TransactionRecordTxnType {
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "owner_transfer")] OwnerTransfer {
+    #[serde(rename = "owner_transfer")]
+    OwnerTransfer {
         to: Account,
         from: Account,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_opened")] SaleOpened {
+    #[serde(rename = "sale_opened")]
+    SaleOpened {
         pricing: PricingConfigShared,
         extensible: Box<CandyShared>,
         sale_id: String,
     },
-    #[serde(rename = "canister_owner_updated")] CanisterOwnerUpdated {
+    #[serde(rename = "canister_owner_updated")]
+    CanisterOwnerUpdated {
         owner: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_withdraw")] SaleWithdraw {
+    #[serde(rename = "sale_withdraw")]
+    SaleWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -303,7 +358,8 @@ pub enum TransactionRecordTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "deposit_withdraw")] DepositWithdraw {
+    #[serde(rename = "deposit_withdraw")]
+    DepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -340,9 +396,12 @@ pub enum AuctionStateSharedStatus {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum BidFeature {
-    #[serde(rename = "fee_schema")] FeeSchema(String),
-    #[serde(rename = "broker")] Broker(Account),
-    #[serde(rename = "fee_accounts")] FeeAccounts(FeeAccountsParams),
+    #[serde(rename = "fee_schema")]
+    FeeSchema(String),
+    #[serde(rename = "broker")]
+    Broker(Account),
+    #[serde(rename = "fee_accounts")]
+    FeeAccounts(FeeAccountsParams),
 }
 pub type BidConfigShared = Option<Vec<BidFeature>>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
@@ -371,7 +430,8 @@ pub struct AuctionStateShared {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum SaleStatusSharedSaleType {
-    #[serde(rename = "auction")] Auction(AuctionStateShared),
+    #[serde(rename = "auction")]
+    Auction(AuctionStateShared),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct SaleStatusShared {
@@ -406,14 +466,18 @@ pub struct NftBackupChunk {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum NftCanisterBackUpRet {
-    #[serde(rename = "eof")] Eof(NftBackupChunk),
-    #[serde(rename = "data")] Data(NftBackupChunk),
+    #[serde(rename = "eof")]
+    Eof(NftBackupChunk),
+    #[serde(rename = "data")]
+    Data(NftBackupChunk),
 }
 pub type ExtTokenIdentifier = String;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtUser {
-    #[serde(rename = "principal")] Principal_(Principal),
-    #[serde(rename = "address")] Address(String),
+    #[serde(rename = "principal")]
+    Principal_(Principal),
+    #[serde(rename = "address")]
+    Address(String),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct ExtBalanceRequest {
@@ -428,8 +492,10 @@ pub enum ExtCommonError {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtBalanceResult {
-    #[serde(rename = "ok")] Ok(ExtBalance),
-    #[serde(rename = "err")] Err(ExtCommonError),
+    #[serde(rename = "ok")]
+    Ok(ExtBalance),
+    #[serde(rename = "err")]
+    Err(ExtCommonError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct StakeRecord {
@@ -558,19 +624,25 @@ pub struct OrigynError {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum BalanceResult {
-    #[serde(rename = "ok")] Ok(BalanceResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(BalanceResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 pub type ExtAccountIdentifier = String;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtBearerResult {
-    #[serde(rename = "ok")] Ok(ExtAccountIdentifier),
-    #[serde(rename = "err")] Err(ExtCommonError),
+    #[serde(rename = "ok")]
+    Ok(ExtAccountIdentifier),
+    #[serde(rename = "err")]
+    Err(ExtCommonError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum BearerResult {
-    #[serde(rename = "ok")] Ok(Account),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(Account),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 pub type CanisterId = Principal;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
@@ -609,11 +681,13 @@ pub struct ChunkRequest {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ChunkContent {
-    #[serde(rename = "remote")] Remote {
+    #[serde(rename = "remote")]
+    Remote {
         args: ChunkRequest,
         canister: Principal,
     },
-    #[serde(rename = "chunk")] Chunk {
+    #[serde(rename = "chunk")]
+    Chunk {
         total_chunks: candid::Nat,
         content: serde_bytes::ByteBuf,
         storage_allocation: AllocationRecordStable,
@@ -622,8 +696,10 @@ pub enum ChunkContent {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ChunkResult {
-    #[serde(rename = "ok")] Ok(ChunkContent),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(ChunkContent),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct CollectionInfo {
@@ -649,8 +725,10 @@ pub struct CollectionInfo {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum CollectionResult {
-    #[serde(rename = "ok")] Ok(CollectionInfo),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(CollectionInfo),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageCollectionCommand {
@@ -665,8 +743,10 @@ pub enum ManageCollectionCommand {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum OrigynBoolResult {
-    #[serde(rename = "ok")] Ok(bool),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(bool),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum NftError {
@@ -717,7 +797,8 @@ pub enum VecItem1 {
     Int16Content(i16),
     BlobContent(serde_bytes::ByteBuf),
     NestedContent(Box<Vec<GenericValue>>),
-    #[serde(rename = "Principal")] Principal_(Principal),
+    #[serde(rename = "Principal")]
+    Principal_(Principal),
     TextContent(String),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
@@ -736,7 +817,8 @@ pub enum GenericValue {
     Int16Content(i16),
     BlobContent(serde_bytes::ByteBuf),
     NestedContent(Box<Vec<GenericValue>>),
-    #[serde(rename = "Principal")] Principal_(Principal),
+    #[serde(rename = "Principal")]
+    Principal_(Principal),
     TextContent(String),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
@@ -812,8 +894,10 @@ pub struct GetLatestLogMessagesParameters {
 pub enum CanisterLogRequest {
     #[serde(rename = "getMessagesInfo")]
     GetMessagesInfo,
-    #[serde(rename = "getMessages")] GetMessages(GetLogMessagesParameters),
-    #[serde(rename = "getLatestMessages")] GetLatestMessages(GetLatestLogMessagesParameters),
+    #[serde(rename = "getMessages")]
+    GetMessages(GetLogMessagesParameters),
+    #[serde(rename = "getLatestMessages")]
+    GetLatestMessages(GetLatestLogMessagesParameters),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum CanisterLogFeature {
@@ -852,7 +936,8 @@ pub enum Data {
     Option(Option<Box<CandyShared>>),
     Floats(Vec<f64>),
     Float(f64),
-    #[serde(rename = "Principal")] Principal_(Principal),
+    #[serde(rename = "Principal")]
+    Principal_(Principal),
     Array(Vec<Box<CandyShared>>),
     Class(Vec<PropertyShared>),
 }
@@ -871,8 +956,10 @@ pub struct CanisterLogMessages {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum CanisterLogResponse {
-    #[serde(rename = "messagesInfo")] MessagesInfo(CanisterLogMessagesInfo),
-    #[serde(rename = "messages")] Messages(CanisterLogMessages),
+    #[serde(rename = "messagesInfo")]
+    MessagesInfo(CanisterLogMessagesInfo),
+    #[serde(rename = "messages")]
+    Messages(CanisterLogMessages),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum MetricsGranularity {
@@ -917,8 +1004,10 @@ pub struct DailyMetricsData {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum CanisterMetricsData {
-    #[serde(rename = "hourly")] Hourly(Vec<HourlyMetricsData>),
-    #[serde(rename = "daily")] Daily(Vec<DailyMetricsData>),
+    #[serde(rename = "hourly")]
+    Hourly(Vec<HourlyMetricsData>),
+    #[serde(rename = "daily")]
+    Daily(Vec<DailyMetricsData>),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct CanisterMetrics {
@@ -926,8 +1015,10 @@ pub struct CanisterMetrics {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum OrigynTextResult {
-    #[serde(rename = "ok")] Ok(String),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(String),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct Tip {
@@ -937,27 +1028,35 @@ pub struct Tip {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum GovernanceRequest {
-    #[serde(rename = "update_system_var")] UpdateSystemVar {
+    #[serde(rename = "update_system_var")]
+    UpdateSystemVar {
         key: String,
         val: Box<CandyShared>,
         token_id: String,
     },
-    #[serde(rename = "clear_shared_wallets")] ClearSharedWallets(String),
+    #[serde(rename = "clear_shared_wallets")]
+    ClearSharedWallets(String),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum GovernanceResponse {
-    #[serde(rename = "update_system_var")] UpdateSystemVar(bool),
-    #[serde(rename = "clear_shared_wallets")] ClearSharedWallets(bool),
+    #[serde(rename = "update_system_var")]
+    UpdateSystemVar(bool),
+    #[serde(rename = "clear_shared_wallets")]
+    ClearSharedWallets(bool),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum GovernanceResult {
-    #[serde(rename = "ok")] Ok(GovernanceResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(GovernanceResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum HistoryResult {
-    #[serde(rename = "ok")] Ok(Vec<TransactionRecord>),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(Vec<TransactionRecord>),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct HeaderField(pub String, pub String);
@@ -1129,25 +1228,37 @@ pub struct TransferResultItem {
 pub type TransferResult = Vec<Option<TransferResultItem>>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageStorageRequestConfigureStorage {
-    #[serde(rename = "stableBtree")] StableBtree(Option<candid::Nat>),
-    #[serde(rename = "heap")] Heap(Option<candid::Nat>),
+    #[serde(rename = "stableBtree")]
+    StableBtree(Option<candid::Nat>),
+    #[serde(rename = "heap")]
+    Heap(Option<candid::Nat>),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageStorageRequest {
-    #[serde(rename = "add_storage_canisters")] AddStorageCanisters(
-        Vec<(Principal, candid::Nat, (candid::Nat, candid::Nat, candid::Nat))>,
+    #[serde(rename = "add_storage_canisters")]
+    AddStorageCanisters(
+        Vec<(
+            Principal,
+            candid::Nat,
+            (candid::Nat, candid::Nat, candid::Nat),
+        )>,
     ),
-    #[serde(rename = "configure_storage")] ConfigureStorage(ManageStorageRequestConfigureStorage),
+    #[serde(rename = "configure_storage")]
+    ConfigureStorage(ManageStorageRequestConfigureStorage),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageStorageResponse {
-    #[serde(rename = "add_storage_canisters")] AddStorageCanisters(candid::Nat, candid::Nat),
-    #[serde(rename = "configure_storage")] ConfigureStorage(candid::Nat, candid::Nat),
+    #[serde(rename = "add_storage_canisters")]
+    AddStorageCanisters(candid::Nat, candid::Nat),
+    #[serde(rename = "configure_storage")]
+    ConfigureStorage(candid::Nat, candid::Nat),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageStorageResult {
-    #[serde(rename = "ok")] Ok(ManageStorageResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(ManageStorageResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct SalesConfig {
@@ -1167,7 +1278,8 @@ pub struct MarketTransferRequestReponseTxnTypeMintSaleInner {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum MarketTransferRequestReponseTxnType {
-    #[serde(rename = "escrow_deposit")] EscrowDeposit {
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionId,
@@ -1176,17 +1288,20 @@ pub enum MarketTransferRequestReponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "fee_deposit")] FeeDeposit {
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_network_updated")] CanisterNetworkUpdated {
+    #[serde(rename = "canister_network_updated")]
+    CanisterNetworkUpdated {
         network: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "escrow_withdraw")] EscrowWithdraw {
+    #[serde(rename = "escrow_withdraw")]
+    EscrowWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1196,28 +1311,33 @@ pub enum MarketTransferRequestReponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_managers_updated")] CanisterManagersUpdated {
+    #[serde(rename = "canister_managers_updated")]
+    CanisterManagersUpdated {
         managers: Vec<Principal>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "auction_bid")] AuctionBid {
+    #[serde(rename = "auction_bid")]
+    AuctionBid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
-    #[serde(rename = "burn")] Burn {
+    #[serde(rename = "burn")]
+    Burn {
         from: Option<Account>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "data")] Data {
+    #[serde(rename = "data")]
+    Data {
         hash: Option<serde_bytes::ByteBuf>,
         extensible: Box<CandyShared>,
         data_dapp: Option<String>,
         data_path: Option<String>,
     },
-    #[serde(rename = "sale_ended")] SaleEnded {
+    #[serde(rename = "sale_ended")]
+    SaleEnded {
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,
@@ -1225,13 +1345,15 @@ pub enum MarketTransferRequestReponseTxnType {
         amount: candid::Nat,
         sale_id: Option<String>,
     },
-    #[serde(rename = "mint")] Mint {
+    #[serde(rename = "mint")]
+    Mint {
         to: Account,
         from: Account,
         sale: Option<MarketTransferRequestReponseTxnTypeMintSaleInner>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "royalty_paid")] RoyaltyPaid {
+    #[serde(rename = "royalty_paid")]
+    RoyaltyPaid {
         tag: String,
         token: TokenSpec,
         seller: Account,
@@ -1241,8 +1363,10 @@ pub enum MarketTransferRequestReponseTxnType {
         receiver: Account,
         sale_id: Option<String>,
     },
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "fee_deposit_withdraw")] FeeDepositWithdraw {
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "fee_deposit_withdraw")]
+    FeeDepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1250,21 +1374,25 @@ pub enum MarketTransferRequestReponseTxnType {
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "owner_transfer")] OwnerTransfer {
+    #[serde(rename = "owner_transfer")]
+    OwnerTransfer {
         to: Account,
         from: Account,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_opened")] SaleOpened {
+    #[serde(rename = "sale_opened")]
+    SaleOpened {
         pricing: PricingConfigShared,
         extensible: Box<CandyShared>,
         sale_id: String,
     },
-    #[serde(rename = "canister_owner_updated")] CanisterOwnerUpdated {
+    #[serde(rename = "canister_owner_updated")]
+    CanisterOwnerUpdated {
         owner: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_withdraw")] SaleWithdraw {
+    #[serde(rename = "sale_withdraw")]
+    SaleWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1274,7 +1402,8 @@ pub enum MarketTransferRequestReponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "deposit_withdraw")] DepositWithdraw {
+    #[serde(rename = "deposit_withdraw")]
+    DepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1292,25 +1421,31 @@ pub struct MarketTransferRequestReponse {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum MarketTransferResult {
-    #[serde(rename = "ok")] Ok(MarketTransferRequestReponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(MarketTransferRequestReponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtMetadata {
-    #[serde(rename = "fungible")] Fungible {
+    #[serde(rename = "fungible")]
+    Fungible {
         decimals: u8,
         metadata: Option<serde_bytes::ByteBuf>,
         name: String,
         symbol: String,
     },
-    #[serde(rename = "nonfungible")] Nonfungible {
+    #[serde(rename = "nonfungible")]
+    Nonfungible {
         metadata: Option<serde_bytes::ByteBuf>,
     },
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtMetadataResult {
-    #[serde(rename = "ok")] Ok(ExtMetadata),
-    #[serde(rename = "err")] Err(ExtCommonError),
+    #[serde(rename = "ok")]
+    Ok(ExtMetadata),
+    #[serde(rename = "err")]
+    Err(ExtCommonError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct NftInfoStable {
@@ -1319,15 +1454,21 @@ pub struct NftInfoStable {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum NftInfoResult {
-    #[serde(rename = "ok")] Ok(NftInfoStable),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(NftInfoStable),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum Account {
-    #[serde(rename = "account_id")] AccountId(String),
-    #[serde(rename = "principal")] Principal_(Principal),
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "account")] Account {
+    #[serde(rename = "account_id")]
+    AccountId(String),
+    #[serde(rename = "principal")]
+    Principal_(Principal),
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "account")]
+    Account {
         owner: Principal,
         sub_account: Option<serde_bytes::ByteBuf>,
     },
@@ -1377,9 +1518,8 @@ pub struct RejectDescription {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum FeeDepositWithdrawDescriptionStatus {
-    #[serde(rename = "locked")] Locked {
-        sale_id: String,
-    },
+    #[serde(rename = "locked")]
+    Locked { sale_id: String },
     #[serde(rename = "unlocked")]
     Unlocked,
 }
@@ -1409,11 +1549,16 @@ pub struct DepositWithdrawDescription {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum WithdrawRequest {
-    #[serde(rename = "reject")] Reject(RejectDescription),
-    #[serde(rename = "fee_deposit")] FeeDeposit(FeeDepositWithdrawDescription),
-    #[serde(rename = "sale")] Sale(WithdrawDescription),
-    #[serde(rename = "deposit")] Deposit(DepositWithdrawDescription),
-    #[serde(rename = "escrow")] Escrow(WithdrawDescription),
+    #[serde(rename = "reject")]
+    Reject(RejectDescription),
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit(FeeDepositWithdrawDescription),
+    #[serde(rename = "sale")]
+    Sale(WithdrawDescription),
+    #[serde(rename = "deposit")]
+    Deposit(DepositWithdrawDescription),
+    #[serde(rename = "escrow")]
+    Escrow(WithdrawDescription),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum TokenSpecFilterFilterType {
@@ -1453,11 +1598,13 @@ pub struct AskSubscribeRequestSubscribeFilterInner {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum AskSubscribeRequest {
-    #[serde(rename = "subscribe")] Subscribe {
+    #[serde(rename = "subscribe")]
+    Subscribe {
         stake: (Principal, candid::Nat),
         filter: Option<AskSubscribeRequestSubscribeFilterInner>,
     },
-    #[serde(rename = "unsubscribe")] Unsubscribe(Principal, candid::Nat),
+    #[serde(rename = "unsubscribe")]
+    Unsubscribe(Principal, candid::Nat),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct DistributeSaleRequest {
@@ -1465,16 +1612,26 @@ pub struct DistributeSaleRequest {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageSaleRequest {
-    #[serde(rename = "bid")] Bid(BidRequest),
-    #[serde(rename = "escrow_deposit")] EscrowDeposit(EscrowRequest),
-    #[serde(rename = "fee_deposit")] FeeDeposit(FeeDepositRequest),
-    #[serde(rename = "recognize_escrow")] RecognizeEscrow(EscrowRequest),
-    #[serde(rename = "withdraw")] Withdraw(WithdrawRequest),
-    #[serde(rename = "ask_subscribe")] AskSubscribe(AskSubscribeRequest),
-    #[serde(rename = "end_sale")] EndSale(String),
-    #[serde(rename = "refresh_offers")] RefreshOffers(Option<Account>),
-    #[serde(rename = "distribute_sale")] DistributeSale(DistributeSaleRequest),
-    #[serde(rename = "open_sale")] OpenSale(String),
+    #[serde(rename = "bid")]
+    Bid(BidRequest),
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit(EscrowRequest),
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit(FeeDepositRequest),
+    #[serde(rename = "recognize_escrow")]
+    RecognizeEscrow(EscrowRequest),
+    #[serde(rename = "withdraw")]
+    Withdraw(WithdrawRequest),
+    #[serde(rename = "ask_subscribe")]
+    AskSubscribe(AskSubscribeRequest),
+    #[serde(rename = "end_sale")]
+    EndSale(String),
+    #[serde(rename = "refresh_offers")]
+    RefreshOffers(Option<Account>),
+    #[serde(rename = "distribute_sale")]
+    DistributeSale(DistributeSaleRequest),
+    #[serde(rename = "open_sale")]
+    OpenSale(String),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct BidResponseTxnTypeMintSaleInner {
@@ -1483,7 +1640,8 @@ pub struct BidResponseTxnTypeMintSaleInner {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum BidResponseTxnType {
-    #[serde(rename = "escrow_deposit")] EscrowDeposit {
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionId,
@@ -1492,17 +1650,20 @@ pub enum BidResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "fee_deposit")] FeeDeposit {
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_network_updated")] CanisterNetworkUpdated {
+    #[serde(rename = "canister_network_updated")]
+    CanisterNetworkUpdated {
         network: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "escrow_withdraw")] EscrowWithdraw {
+    #[serde(rename = "escrow_withdraw")]
+    EscrowWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1512,28 +1673,33 @@ pub enum BidResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_managers_updated")] CanisterManagersUpdated {
+    #[serde(rename = "canister_managers_updated")]
+    CanisterManagersUpdated {
         managers: Vec<Principal>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "auction_bid")] AuctionBid {
+    #[serde(rename = "auction_bid")]
+    AuctionBid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
-    #[serde(rename = "burn")] Burn {
+    #[serde(rename = "burn")]
+    Burn {
         from: Option<Account>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "data")] Data {
+    #[serde(rename = "data")]
+    Data {
         hash: Option<serde_bytes::ByteBuf>,
         extensible: Box<CandyShared>,
         data_dapp: Option<String>,
         data_path: Option<String>,
     },
-    #[serde(rename = "sale_ended")] SaleEnded {
+    #[serde(rename = "sale_ended")]
+    SaleEnded {
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,
@@ -1541,13 +1707,15 @@ pub enum BidResponseTxnType {
         amount: candid::Nat,
         sale_id: Option<String>,
     },
-    #[serde(rename = "mint")] Mint {
+    #[serde(rename = "mint")]
+    Mint {
         to: Account,
         from: Account,
         sale: Option<BidResponseTxnTypeMintSaleInner>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "royalty_paid")] RoyaltyPaid {
+    #[serde(rename = "royalty_paid")]
+    RoyaltyPaid {
         tag: String,
         token: TokenSpec,
         seller: Account,
@@ -1557,8 +1725,10 @@ pub enum BidResponseTxnType {
         receiver: Account,
         sale_id: Option<String>,
     },
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "fee_deposit_withdraw")] FeeDepositWithdraw {
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "fee_deposit_withdraw")]
+    FeeDepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1566,21 +1736,25 @@ pub enum BidResponseTxnType {
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "owner_transfer")] OwnerTransfer {
+    #[serde(rename = "owner_transfer")]
+    OwnerTransfer {
         to: Account,
         from: Account,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_opened")] SaleOpened {
+    #[serde(rename = "sale_opened")]
+    SaleOpened {
         pricing: PricingConfigShared,
         extensible: Box<CandyShared>,
         sale_id: String,
     },
-    #[serde(rename = "canister_owner_updated")] CanisterOwnerUpdated {
+    #[serde(rename = "canister_owner_updated")]
+    CanisterOwnerUpdated {
         owner: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_withdraw")] SaleWithdraw {
+    #[serde(rename = "sale_withdraw")]
+    SaleWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1590,7 +1764,8 @@ pub enum BidResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "deposit_withdraw")] DepositWithdraw {
+    #[serde(rename = "deposit_withdraw")]
+    DepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1630,7 +1805,8 @@ pub struct WithdrawResponseTxnTypeMintSaleInner {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum WithdrawResponseTxnType {
-    #[serde(rename = "escrow_deposit")] EscrowDeposit {
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionId,
@@ -1639,17 +1815,20 @@ pub enum WithdrawResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "fee_deposit")] FeeDeposit {
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_network_updated")] CanisterNetworkUpdated {
+    #[serde(rename = "canister_network_updated")]
+    CanisterNetworkUpdated {
         network: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "escrow_withdraw")] EscrowWithdraw {
+    #[serde(rename = "escrow_withdraw")]
+    EscrowWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1659,28 +1838,33 @@ pub enum WithdrawResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_managers_updated")] CanisterManagersUpdated {
+    #[serde(rename = "canister_managers_updated")]
+    CanisterManagersUpdated {
         managers: Vec<Principal>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "auction_bid")] AuctionBid {
+    #[serde(rename = "auction_bid")]
+    AuctionBid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
-    #[serde(rename = "burn")] Burn {
+    #[serde(rename = "burn")]
+    Burn {
         from: Option<Account>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "data")] Data {
+    #[serde(rename = "data")]
+    Data {
         hash: Option<serde_bytes::ByteBuf>,
         extensible: Box<CandyShared>,
         data_dapp: Option<String>,
         data_path: Option<String>,
     },
-    #[serde(rename = "sale_ended")] SaleEnded {
+    #[serde(rename = "sale_ended")]
+    SaleEnded {
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,
@@ -1688,13 +1872,15 @@ pub enum WithdrawResponseTxnType {
         amount: candid::Nat,
         sale_id: Option<String>,
     },
-    #[serde(rename = "mint")] Mint {
+    #[serde(rename = "mint")]
+    Mint {
         to: Account,
         from: Account,
         sale: Option<WithdrawResponseTxnTypeMintSaleInner>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "royalty_paid")] RoyaltyPaid {
+    #[serde(rename = "royalty_paid")]
+    RoyaltyPaid {
         tag: String,
         token: TokenSpec,
         seller: Account,
@@ -1704,8 +1890,10 @@ pub enum WithdrawResponseTxnType {
         receiver: Account,
         sale_id: Option<String>,
     },
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "fee_deposit_withdraw")] FeeDepositWithdraw {
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "fee_deposit_withdraw")]
+    FeeDepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1713,21 +1901,25 @@ pub enum WithdrawResponseTxnType {
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "owner_transfer")] OwnerTransfer {
+    #[serde(rename = "owner_transfer")]
+    OwnerTransfer {
         to: Account,
         from: Account,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_opened")] SaleOpened {
+    #[serde(rename = "sale_opened")]
+    SaleOpened {
         pricing: PricingConfigShared,
         extensible: Box<CandyShared>,
         sale_id: String,
     },
-    #[serde(rename = "canister_owner_updated")] CanisterOwnerUpdated {
+    #[serde(rename = "canister_owner_updated")]
+    CanisterOwnerUpdated {
         owner: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_withdraw")] SaleWithdraw {
+    #[serde(rename = "sale_withdraw")]
+    SaleWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1737,7 +1929,8 @@ pub enum WithdrawResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "deposit_withdraw")] DepositWithdraw {
+    #[serde(rename = "deposit_withdraw")]
+    DepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1761,7 +1954,8 @@ pub struct EndSaleResponseTxnTypeMintSaleInner {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum EndSaleResponseTxnType {
-    #[serde(rename = "escrow_deposit")] EscrowDeposit {
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit {
         token: TokenSpec,
         token_id: String,
         trx_id: TransactionId,
@@ -1770,17 +1964,20 @@ pub enum EndSaleResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "fee_deposit")] FeeDeposit {
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_network_updated")] CanisterNetworkUpdated {
+    #[serde(rename = "canister_network_updated")]
+    CanisterNetworkUpdated {
         network: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "escrow_withdraw")] EscrowWithdraw {
+    #[serde(rename = "escrow_withdraw")]
+    EscrowWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1790,28 +1987,33 @@ pub enum EndSaleResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "canister_managers_updated")] CanisterManagersUpdated {
+    #[serde(rename = "canister_managers_updated")]
+    CanisterManagersUpdated {
         managers: Vec<Principal>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "auction_bid")] AuctionBid {
+    #[serde(rename = "auction_bid")]
+    AuctionBid {
         token: TokenSpec,
         extensible: Box<CandyShared>,
         buyer: Account,
         amount: candid::Nat,
         sale_id: String,
     },
-    #[serde(rename = "burn")] Burn {
+    #[serde(rename = "burn")]
+    Burn {
         from: Option<Account>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "data")] Data {
+    #[serde(rename = "data")]
+    Data {
         hash: Option<serde_bytes::ByteBuf>,
         extensible: Box<CandyShared>,
         data_dapp: Option<String>,
         data_path: Option<String>,
     },
-    #[serde(rename = "sale_ended")] SaleEnded {
+    #[serde(rename = "sale_ended")]
+    SaleEnded {
         token: TokenSpec,
         seller: Account,
         extensible: Box<CandyShared>,
@@ -1819,13 +2021,15 @@ pub enum EndSaleResponseTxnType {
         amount: candid::Nat,
         sale_id: Option<String>,
     },
-    #[serde(rename = "mint")] Mint {
+    #[serde(rename = "mint")]
+    Mint {
         to: Account,
         from: Account,
         sale: Option<EndSaleResponseTxnTypeMintSaleInner>,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "royalty_paid")] RoyaltyPaid {
+    #[serde(rename = "royalty_paid")]
+    RoyaltyPaid {
         tag: String,
         token: TokenSpec,
         seller: Account,
@@ -1835,8 +2039,10 @@ pub enum EndSaleResponseTxnType {
         receiver: Account,
         sale_id: Option<String>,
     },
-    #[serde(rename = "extensible")] Extensible(Box<CandyShared>),
-    #[serde(rename = "fee_deposit_withdraw")] FeeDepositWithdraw {
+    #[serde(rename = "extensible")]
+    Extensible(Box<CandyShared>),
+    #[serde(rename = "fee_deposit_withdraw")]
+    FeeDepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1844,21 +2050,25 @@ pub enum EndSaleResponseTxnType {
         account: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "owner_transfer")] OwnerTransfer {
+    #[serde(rename = "owner_transfer")]
+    OwnerTransfer {
         to: Account,
         from: Account,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_opened")] SaleOpened {
+    #[serde(rename = "sale_opened")]
+    SaleOpened {
         pricing: PricingConfigShared,
         extensible: Box<CandyShared>,
         sale_id: String,
     },
-    #[serde(rename = "canister_owner_updated")] CanisterOwnerUpdated {
+    #[serde(rename = "canister_owner_updated")]
+    CanisterOwnerUpdated {
         owner: Principal,
         extensible: Box<CandyShared>,
     },
-    #[serde(rename = "sale_withdraw")] SaleWithdraw {
+    #[serde(rename = "sale_withdraw")]
+    SaleWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         token_id: String,
@@ -1868,7 +2078,8 @@ pub enum EndSaleResponseTxnType {
         buyer: Account,
         amount: candid::Nat,
     },
-    #[serde(rename = "deposit_withdraw")] DepositWithdraw {
+    #[serde(rename = "deposit_withdraw")]
+    DepositWithdraw {
         fee: candid::Nat,
         token: TokenSpec,
         trx_id: TransactionId,
@@ -1886,36 +2097,56 @@ pub struct EndSaleResponse {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum Result_ {
-    #[serde(rename = "ok")] Ok(Box<ManageSaleResponse>),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(Box<ManageSaleResponse>),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 pub type DistributeSaleResponse = Vec<Result_>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageSaleResponse {
-    #[serde(rename = "bid")] Bid(BidResponse),
-    #[serde(rename = "escrow_deposit")] EscrowDeposit(EscrowResponse),
-    #[serde(rename = "fee_deposit")] FeeDeposit(FeeDepositResponse),
-    #[serde(rename = "recognize_escrow")] RecognizeEscrow(RecognizeEscrowResponse),
-    #[serde(rename = "withdraw")] Withdraw(WithdrawResponse),
-    #[serde(rename = "ask_subscribe")] AskSubscribe(AskSubscribeResponse),
-    #[serde(rename = "end_sale")] EndSale(EndSaleResponse),
-    #[serde(rename = "refresh_offers")] RefreshOffers(Vec<EscrowRecord>),
-    #[serde(rename = "distribute_sale")] DistributeSale(DistributeSaleResponse),
-    #[serde(rename = "open_sale")] OpenSale(bool),
+    #[serde(rename = "bid")]
+    Bid(BidResponse),
+    #[serde(rename = "escrow_deposit")]
+    EscrowDeposit(EscrowResponse),
+    #[serde(rename = "fee_deposit")]
+    FeeDeposit(FeeDepositResponse),
+    #[serde(rename = "recognize_escrow")]
+    RecognizeEscrow(RecognizeEscrowResponse),
+    #[serde(rename = "withdraw")]
+    Withdraw(WithdrawResponse),
+    #[serde(rename = "ask_subscribe")]
+    AskSubscribe(AskSubscribeResponse),
+    #[serde(rename = "end_sale")]
+    EndSale(EndSaleResponse),
+    #[serde(rename = "refresh_offers")]
+    RefreshOffers(Vec<EscrowRecord>),
+    #[serde(rename = "distribute_sale")]
+    DistributeSale(DistributeSaleResponse),
+    #[serde(rename = "open_sale")]
+    OpenSale(bool),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ManageSaleResult {
-    #[serde(rename = "ok")] Ok(Box<ManageSaleResponse>),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(Box<ManageSaleResponse>),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum SaleInfoRequest {
-    #[serde(rename = "status")] Status(String),
-    #[serde(rename = "fee_deposit_info")] FeeDepositInfo(Option<Account>),
-    #[serde(rename = "active")] Active(Option<(candid::Nat, candid::Nat)>),
-    #[serde(rename = "deposit_info")] DepositInfo(Option<Account>),
-    #[serde(rename = "history")] History(Option<(candid::Nat, candid::Nat)>),
-    #[serde(rename = "escrow_info")] EscrowInfo(EscrowReceipt),
+    #[serde(rename = "status")]
+    Status(String),
+    #[serde(rename = "fee_deposit_info")]
+    FeeDepositInfo(Option<Account>),
+    #[serde(rename = "active")]
+    Active(Option<(candid::Nat, candid::Nat)>),
+    #[serde(rename = "deposit_info")]
+    DepositInfo(Option<Account>),
+    #[serde(rename = "history")]
+    History(Option<(candid::Nat, candid::Nat)>),
+    #[serde(rename = "escrow_info")]
+    EscrowInfo(EscrowReceipt),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct SubAccountInfoAccount {
@@ -1931,25 +2162,33 @@ pub struct SubAccountInfo {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum SaleInfoResponse {
-    #[serde(rename = "status")] Status(Option<SaleStatusShared>),
-    #[serde(rename = "fee_deposit_info")] FeeDepositInfo(SubAccountInfo),
-    #[serde(rename = "active")] Active {
+    #[serde(rename = "status")]
+    Status(Option<SaleStatusShared>),
+    #[serde(rename = "fee_deposit_info")]
+    FeeDepositInfo(SubAccountInfo),
+    #[serde(rename = "active")]
+    Active {
         eof: bool,
         records: Vec<(String, Option<SaleStatusShared>)>,
         count: candid::Nat,
     },
-    #[serde(rename = "deposit_info")] DepositInfo(SubAccountInfo),
-    #[serde(rename = "history")] History {
+    #[serde(rename = "deposit_info")]
+    DepositInfo(SubAccountInfo),
+    #[serde(rename = "history")]
+    History {
         eof: bool,
         records: Vec<Option<SaleStatusShared>>,
         count: candid::Nat,
     },
-    #[serde(rename = "escrow_info")] EscrowInfo(SubAccountInfo),
+    #[serde(rename = "escrow_info")]
+    EscrowInfo(SubAccountInfo),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum SaleInfoResult {
-    #[serde(rename = "ok")] Ok(SaleInfoResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(SaleInfoResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct ShareWalletRequest {
@@ -1964,8 +2203,10 @@ pub struct OwnerTransferResponse {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum OwnerUpdateResult {
-    #[serde(rename = "ok")] Ok(OwnerTransferResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(OwnerTransferResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct NftCanisterStageBatchNftOrigynArgItem {
@@ -1985,8 +2226,10 @@ pub struct StageLibraryResponse {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum StageLibraryResult {
-    #[serde(rename = "ok")] Ok(StageLibraryResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(StageLibraryResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct NftCanisterStageNftOrigynArg {
@@ -2011,8 +2254,10 @@ pub struct StorageMetrics {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum StorageMetricsResult {
-    #[serde(rename = "ok")] Ok(StorageMetrics),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(StorageMetrics),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct ExtTokensResponse1Inner {
@@ -2028,8 +2273,10 @@ pub struct ExtTokensResponse(
 );
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtTokensResult {
-    #[serde(rename = "ok")] Ok(Vec<ExtTokensResponse>),
-    #[serde(rename = "err")] Err(ExtCommonError),
+    #[serde(rename = "ok")]
+    Ok(Vec<ExtTokensResponse>),
+    #[serde(rename = "err")]
+    Err(ExtCommonError),
 }
 pub type ExtMemo = serde_bytes::ByteBuf;
 pub type ExtSubAccount = serde_bytes::ByteBuf;
@@ -2054,8 +2301,10 @@ pub enum ExtTransferResponseErr {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum ExtTransferResponse {
-    #[serde(rename = "ok")] Ok(ExtBalance),
-    #[serde(rename = "err")] Err(ExtTransferResponseErr),
+    #[serde(rename = "ok")]
+    Ok(ExtBalance),
+    #[serde(rename = "err")]
+    Err(ExtTransferResponseErr),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum UpdateModeShared {
@@ -2075,12 +2324,14 @@ pub struct UpdateRequestShared {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum NftUpdateRequest {
-    #[serde(rename = "update")] Update {
+    #[serde(rename = "update")]
+    Update {
         token_id: String,
         update: UpdateRequestShared,
         app_id: String,
     },
-    #[serde(rename = "replace")] Replace {
+    #[serde(rename = "replace")]
+    Replace {
         token_id: String,
         data: Box<CandyShared>,
     },
@@ -2088,8 +2339,10 @@ pub enum NftUpdateRequest {
 pub type NftUpdateResponse = bool;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum NftUpdateResult {
-    #[serde(rename = "ok")] Ok(NftUpdateResponse),
-    #[serde(rename = "err")] Err(OrigynError),
+    #[serde(rename = "ok")]
+    Ok(NftUpdateResponse),
+    #[serde(rename = "err")]
+    Err(OrigynError),
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum IndexType {
@@ -2099,14 +2352,22 @@ pub enum IndexType {
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub enum UpdateSetting {
-    #[serde(rename = "maxRecordsToArchive")] MaxRecordsToArchive(candid::Nat),
-    #[serde(rename = "archiveIndexType")] ArchiveIndexType(IndexType),
-    #[serde(rename = "maxArchivePages")] MaxArchivePages(candid::Nat),
-    #[serde(rename = "settleToRecords")] SettleToRecords(candid::Nat),
-    #[serde(rename = "archiveCycles")] ArchiveCycles(candid::Nat),
-    #[serde(rename = "maxActiveRecords")] MaxActiveRecords(candid::Nat),
-    #[serde(rename = "maxRecordsInArchiveInstance")] MaxRecordsInArchiveInstance(candid::Nat),
-    #[serde(rename = "archiveControllers")] ArchiveControllers(Option<Option<Vec<Principal>>>),
+    #[serde(rename = "maxRecordsToArchive")]
+    MaxRecordsToArchive(candid::Nat),
+    #[serde(rename = "archiveIndexType")]
+    ArchiveIndexType(IndexType),
+    #[serde(rename = "maxArchivePages")]
+    MaxArchivePages(candid::Nat),
+    #[serde(rename = "settleToRecords")]
+    SettleToRecords(candid::Nat),
+    #[serde(rename = "archiveCycles")]
+    ArchiveCycles(candid::Nat),
+    #[serde(rename = "maxActiveRecords")]
+    MaxActiveRecords(candid::Nat),
+    #[serde(rename = "maxRecordsInArchiveInstance")]
+    MaxRecordsInArchiveInstance(candid::Nat),
+    #[serde(rename = "archiveControllers")]
+    ArchiveControllers(Option<Option<Vec<Principal>>>),
 }
 candid::define_service!(pub NftCanister : {
   "__advance_time" : candid::func!((candid::Int) -> (candid::Int));
@@ -2410,7 +2671,7 @@ impl Service {
     }
     pub async fn balance_of_batch_nft_origyn(
         &self,
-        arg0: Vec<Account>
+        arg0: Vec<Account>,
     ) -> Result<(Vec<BalanceResult>,)> {
         ic_cdk::call(self.0, "balance_of_batch_nft_origyn", (arg0,)).await
     }
@@ -2419,7 +2680,7 @@ impl Service {
     }
     pub async fn balance_of_secure_batch_nft_origyn(
         &self,
-        arg0: Vec<Account>
+        arg0: Vec<Account>,
     ) -> Result<(Vec<BalanceResult>,)> {
         ic_cdk::call(self.0, "balance_of_secure_batch_nft_origyn", (arg0,)).await
     }
@@ -2437,7 +2698,7 @@ impl Service {
     }
     pub async fn bearer_batch_secure_nft_origyn(
         &self,
-        arg0: Vec<String>
+        arg0: Vec<String>,
     ) -> Result<(Vec<BearerResult>,)> {
         ic_cdk::call(self.0, "bearer_batch_secure_nft_origyn", (arg0,)).await
     }
@@ -2449,7 +2710,7 @@ impl Service {
     }
     pub async fn canister_status(
         &self,
-        arg0: NftCanisterCanisterStatusArg
+        arg0: NftCanisterCanisterStatusArg,
     ) -> Result<(CanisterStatus,)> {
         ic_cdk::call(self.0, "canister_status", (arg0,)).await
     }
@@ -2464,25 +2725,25 @@ impl Service {
     }
     pub async fn collection_nft_origyn(
         &self,
-        arg0: Option<Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>>
+        arg0: Option<Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>>,
     ) -> Result<(CollectionResult,)> {
         ic_cdk::call(self.0, "collection_nft_origyn", (arg0,)).await
     }
     pub async fn collection_secure_nft_origyn(
         &self,
-        arg0: Option<Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>>
+        arg0: Option<Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>>,
     ) -> Result<(CollectionResult,)> {
         ic_cdk::call(self.0, "collection_secure_nft_origyn", (arg0,)).await
     }
     pub async fn collection_update_batch_nft_origyn(
         &self,
-        arg0: Vec<ManageCollectionCommand>
+        arg0: Vec<ManageCollectionCommand>,
     ) -> Result<(Vec<OrigynBoolResult>,)> {
         ic_cdk::call(self.0, "collection_update_batch_nft_origyn", (arg0,)).await
     }
     pub async fn collection_update_nft_origyn(
         &self,
-        arg0: ManageCollectionCommand
+        arg0: ManageCollectionCommand,
     ) -> Result<(OrigynBoolResult,)> {
         ic_cdk::call(self.0, "collection_update_nft_origyn", (arg0,)).await
     }
@@ -2498,7 +2759,7 @@ impl Service {
     pub async fn dip_721_is_approved_for_all(
         &self,
         arg0: Principal,
-        arg1: Principal
+        arg1: Principal,
     ) -> Result<(Dip721BoolResult,)> {
         ic_cdk::call(self.0, "dip721_is_approved_for_all", (arg0, arg1)).await
     }
@@ -2513,13 +2774,13 @@ impl Service {
     }
     pub async fn dip_721_operator_token_identifiers(
         &self,
-        arg0: Principal
+        arg0: Principal,
     ) -> Result<(Dip721TokensListMetadata,)> {
         ic_cdk::call(self.0, "dip721_operator_token_identifiers", (arg0,)).await
     }
     pub async fn dip_721_operator_token_metadata(
         &self,
-        arg0: Principal
+        arg0: Principal,
     ) -> Result<(Dip721TokensMetadata,)> {
         ic_cdk::call(self.0, "dip721_operator_token_metadata", (arg0,)).await
     }
@@ -2528,13 +2789,13 @@ impl Service {
     }
     pub async fn dip_721_owner_token_identifiers(
         &self,
-        arg0: Principal
+        arg0: Principal,
     ) -> Result<(Dip721TokensListMetadata,)> {
         ic_cdk::call(self.0, "dip721_owner_token_identifiers", (arg0,)).await
     }
     pub async fn dip_721_owner_token_metadata(
         &self,
-        arg0: Principal
+        arg0: Principal,
     ) -> Result<(Dip721TokensMetadata,)> {
         ic_cdk::call(self.0, "dip721_owner_token_metadata", (arg0,)).await
     }
@@ -2549,7 +2810,7 @@ impl Service {
     }
     pub async fn dip_721_token_metadata(
         &self,
-        arg0: candid::Nat
+        arg0: candid::Nat,
     ) -> Result<(Dip721TokenMetadata,)> {
         ic_cdk::call(self.0, "dip721_token_metadata", (arg0,)).await
     }
@@ -2562,7 +2823,7 @@ impl Service {
     pub async fn dip_721_transfer(
         &self,
         arg0: Principal,
-        arg1: candid::Nat
+        arg1: candid::Nat,
     ) -> Result<(Dip721NatResult,)> {
         ic_cdk::call(self.0, "dip721_transfer", (arg0, arg1)).await
     }
@@ -2570,19 +2831,19 @@ impl Service {
         &self,
         arg0: Principal,
         arg1: Principal,
-        arg2: candid::Nat
+        arg2: candid::Nat,
     ) -> Result<(Dip721NatResult,)> {
         ic_cdk::call(self.0, "dip721_transfer_from", (arg0, arg1, arg2)).await
     }
     pub async fn get_canister_log(
         &self,
-        arg0: Option<CanisterLogRequest>
+        arg0: Option<CanisterLogRequest>,
     ) -> Result<(Option<CanisterLogResponse>,)> {
         ic_cdk::call(self.0, "getCanisterLog", (arg0,)).await
     }
     pub async fn get_canister_metrics(
         &self,
-        arg0: GetMetricsParameters
+        arg0: GetMetricsParameters,
     ) -> Result<(Option<CanisterMetrics>,)> {
         ic_cdk::call(self.0, "getCanisterMetrics", (arg0,)).await
     }
@@ -2606,25 +2867,25 @@ impl Service {
     }
     pub async fn governance_batch_nft_origyn(
         &self,
-        arg0: Vec<GovernanceRequest>
+        arg0: Vec<GovernanceRequest>,
     ) -> Result<(Vec<GovernanceResult>,)> {
         ic_cdk::call(self.0, "governance_batch_nft_origyn", (arg0,)).await
     }
     pub async fn governance_nft_origyn(
         &self,
-        arg0: GovernanceRequest
+        arg0: GovernanceRequest,
     ) -> Result<(GovernanceResult,)> {
         ic_cdk::call(self.0, "governance_nft_origyn", (arg0,)).await
     }
     pub async fn history_batch_nft_origyn(
         &self,
-        arg0: Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>
+        arg0: Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>,
     ) -> Result<(Vec<HistoryResult>,)> {
         ic_cdk::call(self.0, "history_batch_nft_origyn", (arg0,)).await
     }
     pub async fn history_batch_secure_nft_origyn(
         &self,
-        arg0: Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>
+        arg0: Vec<(String, Option<candid::Nat>, Option<candid::Nat>)>,
     ) -> Result<(Vec<HistoryResult>,)> {
         ic_cdk::call(self.0, "history_batch_secure_nft_origyn", (arg0,)).await
     }
@@ -2632,7 +2893,7 @@ impl Service {
         &self,
         arg0: String,
         arg1: Option<candid::Nat>,
-        arg2: Option<candid::Nat>
+        arg2: Option<candid::Nat>,
     ) -> Result<(HistoryResult,)> {
         ic_cdk::call(self.0, "history_nft_origyn", (arg0, arg1, arg2)).await
     }
@@ -2640,7 +2901,7 @@ impl Service {
         &self,
         arg0: String,
         arg1: Option<candid::Nat>,
-        arg2: Option<candid::Nat>
+        arg2: Option<candid::Nat>,
     ) -> Result<(HistoryResult,)> {
         ic_cdk::call(self.0, "history_secure_nft_origyn", (arg0, arg1, arg2)).await
     }
@@ -2652,7 +2913,7 @@ impl Service {
     }
     pub async fn http_request_streaming_callback(
         &self,
-        arg0: StreamingCallbackToken
+        arg0: StreamingCallbackToken,
     ) -> Result<(StreamingCallbackResponse,)> {
         ic_cdk::call(self.0, "http_request_streaming_callback", (arg0,)).await
     }
@@ -2661,7 +2922,7 @@ impl Service {
     }
     pub async fn icrc_3_get_blocks(
         &self,
-        arg0: Vec<TransactionRange>
+        arg0: Vec<TransactionRange>,
     ) -> Result<(GetTransactionsResult,)> {
         ic_cdk::call(self.0, "icrc3_get_blocks", (arg0,)).await
     }
@@ -2693,7 +2954,7 @@ impl Service {
         ic_cdk::call(self.0, "icrc7_logo", ()).await
     }
     pub async fn icrc_7_max_approvals_per_token_or_collection(
-        &self
+        &self,
     ) -> Result<(Option<candid::Nat>,)> {
         ic_cdk::call(self.0, "icrc7_max_approvals_per_token_or_collection", ()).await
     }
@@ -2717,7 +2978,7 @@ impl Service {
     }
     pub async fn icrc_7_owner_of(
         &self,
-        arg0: Vec<candid::Nat>
+        arg0: Vec<candid::Nat>,
     ) -> Result<(Vec<Option<Account3>>,)> {
         ic_cdk::call(self.0, "icrc7_owner_of", (arg0,)).await
     }
@@ -2735,14 +2996,14 @@ impl Service {
     }
     pub async fn icrc_7_token_metadata(
         &self,
-        arg0: Vec<candid::Nat>
+        arg0: Vec<candid::Nat>,
     ) -> Result<(Vec<Option<Vec<(String, Value)>>>,)> {
         ic_cdk::call(self.0, "icrc7_token_metadata", (arg0,)).await
     }
     pub async fn icrc_7_tokens(
         &self,
         arg0: Option<candid::Nat>,
-        arg1: Option<u32>
+        arg1: Option<u32>,
     ) -> Result<(Vec<candid::Nat>,)> {
         ic_cdk::call(self.0, "icrc7_tokens", (arg0, arg1)).await
     }
@@ -2750,7 +3011,7 @@ impl Service {
         &self,
         arg0: Account3,
         arg1: Option<candid::Nat>,
-        arg2: Option<u32>
+        arg2: Option<u32>,
     ) -> Result<(Vec<candid::Nat>,)> {
         ic_cdk::call(self.0, "icrc7_tokens_of", (arg0, arg1, arg2)).await
     }
@@ -2768,19 +3029,19 @@ impl Service {
     }
     pub async fn manage_storage_nft_origyn(
         &self,
-        arg0: ManageStorageRequest
+        arg0: ManageStorageRequest,
     ) -> Result<(ManageStorageResult,)> {
         ic_cdk::call(self.0, "manage_storage_nft_origyn", (arg0,)).await
     }
     pub async fn market_transfer_batch_nft_origyn(
         &self,
-        arg0: Vec<MarketTransferRequest>
+        arg0: Vec<MarketTransferRequest>,
     ) -> Result<(Vec<MarketTransferResult>,)> {
         ic_cdk::call(self.0, "market_transfer_batch_nft_origyn", (arg0,)).await
     }
     pub async fn market_transfer_nft_origyn(
         &self,
-        arg0: MarketTransferRequest
+        arg0: MarketTransferRequest,
     ) -> Result<(MarketTransferResult,)> {
         ic_cdk::call(self.0, "market_transfer_nft_origyn", (arg0,)).await
     }
@@ -2792,20 +3053,20 @@ impl Service {
     }
     pub async fn mint_batch_nft_origyn(
         &self,
-        arg0: Vec<(String, Account)>
+        arg0: Vec<(String, Account)>,
     ) -> Result<(Vec<OrigynTextResult>,)> {
         ic_cdk::call(self.0, "mint_batch_nft_origyn", (arg0,)).await
     }
     pub async fn mint_nft_origyn(
         &self,
         arg0: String,
-        arg1: Account
+        arg1: Account,
     ) -> Result<(OrigynTextResult,)> {
         ic_cdk::call(self.0, "mint_nft_origyn", (arg0, arg1)).await
     }
     pub async fn nft_streaming_callback(
         &self,
-        arg0: StreamingCallbackToken
+        arg0: StreamingCallbackToken,
     ) -> Result<(StreamingCallbackResponse,)> {
         ic_cdk::call(self.0, "nftStreamingCallback", (arg0,)).await
     }
@@ -2814,7 +3075,7 @@ impl Service {
     }
     pub async fn nft_batch_secure_origyn(
         &self,
-        arg0: Vec<String>
+        arg0: Vec<String>,
     ) -> Result<(Vec<NftInfoResult>,)> {
         ic_cdk::call(self.0, "nft_batch_secure_origyn", (arg0,)).await
     }
@@ -2826,7 +3087,7 @@ impl Service {
     }
     pub async fn operater_token_metadata(
         &self,
-        arg0: Principal
+        arg0: Principal,
     ) -> Result<(Dip721TokensMetadata,)> {
         ic_cdk::call(self.0, "operaterTokenMetadata", (arg0,)).await
     }
@@ -2838,19 +3099,19 @@ impl Service {
     }
     pub async fn sale_batch_nft_origyn(
         &self,
-        arg0: Vec<ManageSaleRequest>
+        arg0: Vec<ManageSaleRequest>,
     ) -> Result<(Vec<ManageSaleResult>,)> {
         ic_cdk::call(self.0, "sale_batch_nft_origyn", (arg0,)).await
     }
     pub async fn sale_info_batch_nft_origyn(
         &self,
-        arg0: Vec<SaleInfoRequest>
+        arg0: Vec<SaleInfoRequest>,
     ) -> Result<(Vec<SaleInfoResult>,)> {
         ic_cdk::call(self.0, "sale_info_batch_nft_origyn", (arg0,)).await
     }
     pub async fn sale_info_batch_secure_nft_origyn(
         &self,
-        arg0: Vec<SaleInfoRequest>
+        arg0: Vec<SaleInfoRequest>,
     ) -> Result<(Vec<SaleInfoResult>,)> {
         ic_cdk::call(self.0, "sale_info_batch_secure_nft_origyn", (arg0,)).await
     }
@@ -2859,7 +3120,7 @@ impl Service {
     }
     pub async fn sale_info_secure_nft_origyn(
         &self,
-        arg0: SaleInfoRequest
+        arg0: SaleInfoRequest,
     ) -> Result<(SaleInfoResult,)> {
         ic_cdk::call(self.0, "sale_info_secure_nft_origyn", (arg0,)).await
     }
@@ -2874,31 +3135,31 @@ impl Service {
     }
     pub async fn share_wallet_nft_origyn(
         &self,
-        arg0: ShareWalletRequest
+        arg0: ShareWalletRequest,
     ) -> Result<(OwnerUpdateResult,)> {
         ic_cdk::call(self.0, "share_wallet_nft_origyn", (arg0,)).await
     }
     pub async fn stage_batch_nft_origyn(
         &self,
-        arg0: Vec<NftCanisterStageBatchNftOrigynArgItem>
+        arg0: Vec<NftCanisterStageBatchNftOrigynArgItem>,
     ) -> Result<(Vec<OrigynTextResult>,)> {
         ic_cdk::call(self.0, "stage_batch_nft_origyn", (arg0,)).await
     }
     pub async fn stage_library_batch_nft_origyn(
         &self,
-        arg0: Vec<StageChunkArg>
+        arg0: Vec<StageChunkArg>,
     ) -> Result<(Vec<StageLibraryResult>,)> {
         ic_cdk::call(self.0, "stage_library_batch_nft_origyn", (arg0,)).await
     }
     pub async fn stage_library_nft_origyn(
         &self,
-        arg0: StageChunkArg
+        arg0: StageChunkArg,
     ) -> Result<(StageLibraryResult,)> {
         ic_cdk::call(self.0, "stage_library_nft_origyn", (arg0,)).await
     }
     pub async fn stage_nft_origyn(
         &self,
-        arg0: NftCanisterStageNftOrigynArg
+        arg0: NftCanisterStageNftOrigynArg,
     ) -> Result<(OrigynTextResult,)> {
         ic_cdk::call(self.0, "stage_nft_origyn", (arg0,)).await
     }
@@ -2920,7 +3181,7 @@ impl Service {
     pub async fn transfer_dip_721(
         &self,
         arg0: Principal,
-        arg1: candid::Nat
+        arg1: candid::Nat,
     ) -> Result<(Dip721NatResult,)> {
         ic_cdk::call(self.0, "transferDip721", (arg0, arg1)).await
     }
@@ -2931,7 +3192,7 @@ impl Service {
         &self,
         arg0: Principal,
         arg1: Principal,
-        arg2: candid::Nat
+        arg2: candid::Nat,
     ) -> Result<(Dip721NatResult,)> {
         ic_cdk::call(self.0, "transferFrom", (arg0, arg1, arg2)).await
     }
@@ -2939,13 +3200,13 @@ impl Service {
         &self,
         arg0: Principal,
         arg1: Principal,
-        arg2: candid::Nat
+        arg2: candid::Nat,
     ) -> Result<(Dip721NatResult,)> {
         ic_cdk::call(self.0, "transferFromDip721", (arg0, arg1, arg2)).await
     }
     pub async fn update_app_nft_origyn(
         &self,
-        arg0: NftUpdateRequest
+        arg0: NftUpdateRequest,
     ) -> Result<(NftUpdateResult,)> {
         ic_cdk::call(self.0, "update_app_nft_origyn", (arg0,)).await
     }

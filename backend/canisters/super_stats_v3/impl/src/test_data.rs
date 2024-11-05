@@ -1,8 +1,8 @@
 use ic_stable_memory::stable_memory_init;
 use super_stats_v3_api::{
     custom_types::ProcessedTX,
-    runtime::{ RuntimeState, RUNTIME_STATE },
-    stable_memory::{ Main, STABLE_STATE },
+    runtime::{RuntimeState, RUNTIME_STATE},
+    stable_memory::{Main, STABLE_STATE},
 };
 
 pub fn test_state_init() {
@@ -223,11 +223,13 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         spender: None,
     });
 
-    txs.push(ProcessedTX { // 0 Transfer??  Can TX BE 0 value?
+    txs.push(ProcessedTX {
+        // 0 Transfer??  Can TX BE 0 value?
         block: 10,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "0a1c18f29bda699bd646acb47f518b864cb2b35b944dc920b73325680b00b03c".to_string(),
         tx_value: 0,
         tx_time: 1_687_980_500_040_000_000,
@@ -239,7 +241,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 11,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "1046c1fe0868175957d413149774cd6ea01ecb7b8e7cf78d906fd3ba6d44d1e6".to_string(),
         tx_value: 500_000_000,
         tx_time: 1_687_980_700_040_000_000,
@@ -251,7 +254,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 12,
         hash: "No-hash".to_string(),
         tx_type: "Burn".to_string(),
-        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6".to_string(),
+        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6"
+            .to_string(),
         to_account: "Token Ledger".to_string(),
         tx_value: 79_000_000,
         tx_time: 1_687_988_700_540_000_000,
@@ -263,7 +267,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 13,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2".to_string(),
+        from_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2"
+            .to_string(),
         to_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2".to_string(),
         tx_value: 400_000,
         tx_time: 1_687_988_701_540_000_000,
@@ -287,7 +292,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 15,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2".to_string(),
+        from_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2"
+            .to_string(),
         to_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
         tx_value: 1,
         tx_time: 1_687_988_705_540_000_000,
@@ -299,7 +305,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 16,
         hash: "No-hash".to_string(),
         tx_type: "Burn".to_string(),
-        from_account: "f51cb73a607e22971cf01ca7143edc86557003b7d787806544da97d4dcf054d4".to_string(),
+        from_account: "f51cb73a607e22971cf01ca7143edc86557003b7d787806544da97d4dcf054d4"
+            .to_string(),
         to_account: "Token Ledger".to_string(),
         tx_value: 500_000,
         tx_time: 1_687_988_707_540_000_000,
@@ -311,7 +318,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 17,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6".to_string(),
+        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6"
+            .to_string(),
         to_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
         tx_value: 90_000,
         tx_time: 1_687_988_709_540_000_000,
@@ -323,7 +331,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 18,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "0a1c18f29bda699bd646acb47f518b864cb2b35b944dc920b73325680b00b03c".to_string(),
+        from_account: "0a1c18f29bda699bd646acb47f518b864cb2b35b944dc920b73325680b00b03c"
+            .to_string(),
         to_account: "f51cb73a607e22971cf01ca7143edc86557003b7d787806544da97d4dcf054d4".to_string(),
         tx_value: 80_000_000,
         tx_time: 1_687_988_712_540_000_000,
@@ -347,7 +356,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 20,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "b9050eec17b91fb42c125c3c4d1136d7ebe129771a1b6bd781be86d95bdd59cb".to_string(),
         tx_value: 30_000_000,
         tx_time: 1_687_988_718_000_000_000,
@@ -359,7 +369,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 21,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "1046c1fe0868175957d413149774cd6ea01ecb7b8e7cf78d906fd3ba6d44d1e6".to_string(),
+        from_account: "1046c1fe0868175957d413149774cd6ea01ecb7b8e7cf78d906fd3ba6d44d1e6"
+            .to_string(),
         to_account: "4ada598f0657a86ed700d82a07f1308d2d42c953a1d5d79367491b6c09875289".to_string(),
         tx_value: 10_000_000,
         tx_time: 1_687_988_724_666_000_000,
@@ -383,7 +394,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 23,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "1046c1fe0868175957d413149774cd6ea01ecb7b8e7cf78d906fd3ba6d44d1e6".to_string(),
         tx_value: 100_000_000,
         tx_time: 1_687_988_766_132_000_000,
@@ -395,7 +407,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 24,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6".to_string(),
+        from_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6"
+            .to_string(),
         to_account: "9e62737aab36f0baffc1faac9edd92a99279723eb3feb2e916fa99bb7fe54b59".to_string(),
         tx_value: 20_000_00,
         tx_time: 1_687_988_787_872_000_000,
@@ -407,7 +420,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 25,
         hash: "No-hash".to_string(),
         tx_type: "Burn".to_string(),
-        from_account: "d2ff145968b3889873f1ec6689f0fc72deac6ca526d2257a44248de48d6207f4".to_string(),
+        from_account: "d2ff145968b3889873f1ec6689f0fc72deac6ca526d2257a44248de48d6207f4"
+            .to_string(),
         to_account: "Token Ledger".to_string(),
         tx_value: 1_000_000_000,
         tx_time: 1_687_988_788_872_000_000,
@@ -431,7 +445,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 27,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "24879af686568e7e95846e91dc364ee910b7156ddcca9882e0e42b6cd1273da6".to_string(),
         tx_value: 100_000_000,
         tx_time: 1_687_988_888_972_000_000,
@@ -443,7 +458,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 28,
         hash: "No-hash".to_string(),
         tx_type: "Transfer".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "646ca9c5071136d07cf9b8b1a2f09e8bf8c4a1ab00f867194bb955281224a9d2".to_string(),
         tx_value: 500_000,
         tx_time: 1_688_888_888_888_000_000,
@@ -467,7 +483,8 @@ pub fn ptx_test_data() -> Vec<ProcessedTX> {
         block: 30,
         hash: "No-hash".to_string(),
         tx_type: "Approve".to_string(),
-        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5".to_string(),
+        from_account: "220c3a33f90601896e26f76fa619fe288742df1fa75426edfaf759d39f2455a5"
+            .to_string(),
         to_account: "Token Ledger".to_string(),
         tx_value: 1_000_000_000,
         tx_time: 1_688_888_888_888_999_888,

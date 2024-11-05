@@ -3,7 +3,7 @@ mod router;
 
 use serde::Serialize;
 use serde_bytes::ByteBuf;
-use types::{ HeaderField, HttpResponse };
+use types::{HeaderField, HttpResponse};
 
 pub use logs_handler::*;
 pub use router::*;
@@ -19,7 +19,7 @@ pub fn build_response(body: Vec<u8>, content_type: impl Into<String>) -> HttpRes
         status_code: 200,
         headers: vec![
             HeaderField("Content-Type".to_string(), content_type.into()),
-            HeaderField("Content-Length".to_string(), body.len().to_string())
+            HeaderField("Content-Length".to_string(), body.len().to_string()),
         ],
         body: ByteBuf::from(body),
         streaming_strategy: None,

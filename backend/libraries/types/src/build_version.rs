@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Copy, Debug, Default, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(
+    CandidType, Serialize, Deserialize, Clone, Copy, Debug, Default, Ord, PartialOrd, Eq, PartialEq,
+)]
 pub struct BuildVersion {
     pub major: u32,
     pub minor: u32,
@@ -12,7 +14,11 @@ pub struct BuildVersion {
 
 impl BuildVersion {
     pub fn new(major: u32, minor: u32, patch: u32) -> BuildVersion {
-        BuildVersion { major, minor, patch }
+        BuildVersion {
+            major,
+            minor,
+            patch,
+        }
     }
 
     pub fn min() -> BuildVersion {
@@ -39,6 +45,10 @@ impl FromStr for BuildVersion {
         let minor = u32::from_str(parts[1]).map_err(|e| e.to_string())?;
         let patch = u32::from_str(parts[2]).map_err(|e| e.to_string())?;
 
-        Ok(BuildVersion { major, minor, patch })
+        Ok(BuildVersion {
+            major,
+            minor,
+            patch,
+        })
     }
 }

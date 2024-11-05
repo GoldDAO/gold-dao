@@ -1,7 +1,7 @@
-use crate::{ generate_pocket_query_call, generate_pocket_update_call };
+use crate::{generate_pocket_query_call, generate_pocket_update_call};
 
-use gldt_swap_api_canister::*;
 use gldt_swap_api_archive::*;
+use gldt_swap_api_canister::*;
 
 generate_pocket_update_call!(insert_fake_swap);
 generate_pocket_update_call!(insert_fake_bulk_swaps);

@@ -1,15 +1,14 @@
+use crate::state::{mutate_state, read_state};
 use canister_time::run_now_then_interval;
+use std::time::Duration;
 use super_stats_v3_api::{
     account_tree::HistoryData,
     stats::queries::{
-        get_account_history::GetAccountHistoryArgs,
-        get_principal_history::GetPrincipalHistoryArgs,
+        get_account_history::GetAccountHistoryArgs, get_principal_history::GetPrincipalHistoryArgs,
     },
 };
-use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
-use crate::state::{ mutate_state, read_state };
 
 const SYNC_GOVERNANCE_HISTORY_INTERVAL: Milliseconds = 3_600 * 1_000;
 
@@ -36,25 +35,23 @@ pub async fn sync_governance_history() {
         days: 2000,
     };
 
-    match
-        super_stats_v3_c2c_client::get_principal_history(
-            super_stats_canister_id,
-            &principal_history_args
-        ).await
+    match super_stats_v3_c2c_client::get_principal_history(
+        super_stats_canister_id,
+        &principal_history_args,
+    )
+    .await
     {
         Ok(principal_history) => {
-            match
-                super_stats_v3_c2c_client::get_account_history(
-                    super_stats_canister_id,
-                    &treasury_history_args
-                ).await
+            match super_stats_v3_c2c_client::get_account_history(
+                super_stats_canister_id,
+                &treasury_history_args,
+            )
+            .await
             {
                 Ok(treasury_history) => {
                     mutate_state(|state| {
-                        state.data.gov_stake_history = balance_difference(
-                            principal_history,
-                            treasury_history
-                        );
+                        state.data.gov_stake_history =
+                            balance_difference(principal_history, treasury_history);
                     });
                     // We want to sync voting stats now because we rely on stake history
                     sync_voting_stats_job();
@@ -67,14 +64,17 @@ pub async fn sync_governance_history() {
         }
         Err(err) => {
             let message = format!("{err:?}");
-            error!(?message, "Error while getting the governance principal history");
+            error!(
+                ?message,
+                "Error while getting the governance principal history"
+            );
         }
     }
 }
 
 fn balance_difference(
     vec1: Vec<(u64, HistoryData)>,
-    vec2: Vec<(u64, HistoryData)>
+    vec2: Vec<(u64, HistoryData)>,
 ) -> Vec<(u64, HistoryData)> {
     let mut result: Vec<(u64, HistoryData)> = Vec::new();
     for (index, item) in vec1.iter().enumerate() {
@@ -84,7 +84,12 @@ fn balance_difference(
 
         let data2 = vec2[index].clone();
         let history2 = data2.1;
-        result.push((key1, HistoryData { balance: history1.balance - history2.balance }));
+        result.push((
+            key1,
+            HistoryData {
+                balance: history1.balance - history2.balance,
+            },
+        ));
     }
 
     result
@@ -101,8 +106,8 @@ pub fn sync_voting_stats_job() {
     let voting_power_ratio: Vec<(u64, u64)> = stake_history
         .iter()
         .map(|(timestamp, history_data)| {
-            let ratio = (((origyn_voting_power as f64) / (history_data.balance as f64)) *
-                10000.0) as u64;
+            let ratio =
+                (((origyn_voting_power as f64) / (history_data.balance as f64)) * 10000.0) as u64;
             (*timestamp, ratio)
         })
         .collect();

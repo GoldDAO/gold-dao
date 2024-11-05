@@ -1,5 +1,5 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, CandidType, Debug)]
 pub struct InitArgs {

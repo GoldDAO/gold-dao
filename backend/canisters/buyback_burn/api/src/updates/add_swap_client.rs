@@ -1,6 +1,6 @@
-use candid::CandidType;
 use crate::init::TokenAndPool;
-use serde::{ Deserialize, Serialize };
+use candid::CandidType;
+use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Args {

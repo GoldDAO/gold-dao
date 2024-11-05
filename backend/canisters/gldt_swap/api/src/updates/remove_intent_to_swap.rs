@@ -1,5 +1,5 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 use gldt_swap_common::swap::SwapId;
 

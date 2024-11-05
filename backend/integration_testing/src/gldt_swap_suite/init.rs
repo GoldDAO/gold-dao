@@ -1,25 +1,28 @@
-use std::{ env, path::Path, time::SystemTime };
-use candid::{ Nat, Principal };
-use gldt_swap_common::{ gldt::{ GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE }, nft::NftCanisterConf };
-use gldt_swap_api_canister::lifecycle::Args as GldtSwapCanisterArgs;
+use candid::{Nat, Principal};
 use gldt_swap_api_canister::init::InitArgs as GldtSwapCanisterInitArgs;
-use icrc_ledger_canister::init::{ InitArgs, LedgerArgument };
-use pocket_ic::{ PocketIc, PocketIcBuilder };
-use utils::consts::E8S_FEE_OGY;
+use gldt_swap_api_canister::lifecycle::Args as GldtSwapCanisterArgs;
+use gldt_swap_common::{
+    gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE},
+    nft::NftCanisterConf,
+};
+use icrc_ledger_canister::init::{InitArgs, LedgerArgument};
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::ManageStorageRequestConfigureStorage;
-use types::{ BuildVersion, CanisterId };
+use pocket_ic::{PocketIc, PocketIcBuilder};
+use std::{env, path::Path, time::SystemTime};
+use types::{BuildVersion, CanisterId};
+use utils::consts::E8S_FEE_OGY;
 
 // use ic_icrc1_ledger::{ ArchiveOptions, InitArgs as LedgerInitArgs, LedgerArgument };
-use icrc_ledger_types::icrc3::archive::{ GetArchivesArgs, GetArchivesResult };
+use icrc_ledger_types::icrc3::archive::{GetArchivesArgs, GetArchivesResult};
 
 use crate::{
-    client::pocket::{ create_canister, create_canister_with_id, install_canister },
+    client::pocket::{create_canister, create_canister_with_id, install_canister},
     utils::random_principal,
     wasms,
 };
 
-use super::{ nft_utils, CanisterIds, PrincipalIds, TestEnv };
+use super::{nft_utils, CanisterIds, PrincipalIds, TestEnv};
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
@@ -52,11 +55,8 @@ pub fn init() -> TestEnv {
         originator: random_principal(),
         nft_owner: random_principal(),
     };
-    let canister_ids: CanisterIds = install_canisters(
-        &mut pic,
-        principal_ids.controller,
-        principal_ids.nft_owner
-    );
+    let canister_ids: CanisterIds =
+        install_canisters(&mut pic, principal_ids.controller, principal_ids.nft_owner);
     println!("origyn_nft: {:?}", canister_ids.origyn_nft.to_string());
     println!("ogy_ledger: {:?}", canister_ids.ogy_ledger.to_string());
     println!("gldt_ledger: {:?}", canister_ids.gldt_ledger.to_string());
@@ -68,7 +68,7 @@ pub fn init() -> TestEnv {
         principal_ids.controller,
         principal_ids.originator,
         principal_ids.net_principal,
-        canister_ids.ogy_ledger
+        canister_ids.ogy_ledger,
     );
     TestEnv {
         pic: pic,
@@ -83,7 +83,7 @@ fn init_origyn_nft(
     controller: Principal,
     originator: Principal,
     net_principal: Principal,
-    ogy_principal: Principal
+    ogy_principal: Principal,
 ) {
     let manage_storage_return: origyn_nft_reference::origyn_nft_reference_canister::ManageStorageResult = crate::client::origyn_nft_reference::client::manage_storage_nft_origyn(
         pic,
@@ -120,27 +120,24 @@ fn init_origyn_nft(
             decimals: Nat::from(8 as u32),
             standard: nft_utils::TokenStandard::Ledger,
             id: None,
-        }
+        },
     );
-    println!("standard_collection_return: {:?}", standard_collection_return);
+    println!(
+        "standard_collection_return: {:?}",
+        standard_collection_return
+    );
 }
 
 fn install_canisters(
     pic: &mut PocketIc,
     controller: Principal,
-    nft_owner: Principal
+    nft_owner: Principal,
 ) -> CanisterIds {
     let origyn_nft_canister_id: Principal = create_canister(pic, controller);
-    let ogy_ledger_canister_id: Principal = create_canister_with_id(
-        pic,
-        controller,
-        "lkwrt-vyaaa-aaaaq-aadhq-cai"
-    );
-    let icp_ledger_canister_id: Principal = create_canister_with_id(
-        pic,
-        controller,
-        "ryjl3-tyaaa-aaaaa-aaaba-cai"
-    );
+    let ogy_ledger_canister_id: Principal =
+        create_canister_with_id(pic, controller, "lkwrt-vyaaa-aaaaq-aadhq-cai");
+    let icp_ledger_canister_id: Principal =
+        create_canister_with_id(pic, controller, "ryjl3-tyaaa-aaaaa-aaaba-cai");
     let gldt_ledger_canister_id: Principal = create_canister(pic, controller);
     let gldt_swap_canister_id: Principal = create_canister(pic, controller);
     pic.add_cycles(gldt_swap_canister_id, 20_000_000_000_000);
@@ -151,16 +148,34 @@ fn install_canisters(
     let icp_ledger_canister_wasm: Vec<u8> = wasms::IC_ICRC2_LEDGER.clone();
     let gldt_swap_canister_wasm: Vec<u8> = wasms::GLDT_SWAP.clone();
 
-    install_canister(pic, controller, origyn_nft_canister_id, origyn_nft_canister_wasm, {});
+    install_canister(
+        pic,
+        controller,
+        origyn_nft_canister_id,
+        origyn_nft_canister_wasm,
+        {},
+    );
 
-    let ogy_ledger_init_args: icrc_ledger_canister::init::LedgerArgument = icrc_ledger_canister::init::LedgerArgument::Init(
-        icrc_ledger_canister::init::InitArgs {
+    let ogy_ledger_init_args: icrc_ledger_canister::init::LedgerArgument =
+        icrc_ledger_canister::init::LedgerArgument::Init(icrc_ledger_canister::init::InitArgs {
             minting_account: Account::from(controller),
             initial_balances: vec![
-                (Account::from(controller), Nat::from(18_446_744_073_709 as u64)),
-                (Account::from(origyn_nft_canister_id), Nat::from(18_446_744_073_709 as u64)),
-                (Account::from(nft_owner), Nat::from(18_446_744_073_709 as u64)),
-                (Account::from(gldt_swap_canister_id), Nat::from(100_000_000_000_000 as u64))
+                (
+                    Account::from(controller),
+                    Nat::from(18_446_744_073_709 as u64),
+                ),
+                (
+                    Account::from(origyn_nft_canister_id),
+                    Nat::from(18_446_744_073_709 as u64),
+                ),
+                (
+                    Account::from(nft_owner),
+                    Nat::from(18_446_744_073_709 as u64),
+                ),
+                (
+                    Account::from(gldt_swap_canister_id),
+                    Nat::from(100_000_000_000_000 as u64),
+                ),
             ],
             archive_options: icrc_ledger_canister::init::ArchiveOptions {
                 trigger_threshold: 2000,
@@ -172,8 +187,7 @@ fn install_canisters(
             token_symbol: "OGY".into(),
             token_name: "Origyn".into(),
             fee_collector_account: None,
-        }
-    );
+        });
 
     println!("ogy_ledger_canister_id {:?}", ogy_ledger_canister_id);
 
@@ -182,7 +196,7 @@ fn install_canisters(
         controller,
         ogy_ledger_canister_id,
         ogy_ledger_canister_wasm,
-        ogy_ledger_init_args
+        ogy_ledger_init_args,
     );
     let gldt_ledger_init_args = LedgerArgument::Init(InitArgs {
         fee_collector_account: Some(Account {
@@ -207,11 +221,11 @@ fn install_canisters(
         controller,
         gldt_ledger_canister_id,
         gldt_ledger_canister_wasm,
-        gldt_ledger_init_args
+        gldt_ledger_init_args,
     );
 
-    let gldt_swap_init_args: GldtSwapCanisterArgs = GldtSwapCanisterArgs::Init(
-        GldtSwapCanisterInitArgs {
+    let gldt_swap_init_args: GldtSwapCanisterArgs =
+        GldtSwapCanisterArgs::Init(GldtSwapCanisterInitArgs {
             commit_hash: "abcdefgh".to_string(),
             version: BuildVersion::min(),
             test_mode: true,
@@ -219,8 +233,7 @@ fn install_canisters(
             gldnft_canisters: vec![(origyn_nft_canister_id, NftCanisterConf { grams: 1u16 })],
             ogy_ledger_id: ogy_ledger_canister_id,
             authorized_principals: vec![controller.clone()],
-        }
-    );
+        });
 
     pic.set_time(SystemTime::now());
 
@@ -229,17 +242,25 @@ fn install_canisters(
         controller,
         gldt_swap_canister_id,
         gldt_swap_canister_wasm,
-        gldt_swap_init_args
+        gldt_swap_init_args,
     );
 
-    let icp_ledger_init_args: icrc_ledger_canister::init::LedgerArgument = icrc_ledger_canister::init::LedgerArgument::Init(
-        icrc_ledger_canister::init::InitArgs {
+    let icp_ledger_init_args: icrc_ledger_canister::init::LedgerArgument =
+        icrc_ledger_canister::init::LedgerArgument::Init(icrc_ledger_canister::init::InitArgs {
             minting_account: Account::from(controller),
             initial_balances: vec![
-                (Account::from(controller), Nat::from(18_446_744_073_709 as u64)),
-                (Account::from(origyn_nft_canister_id), Nat::from(18_446_744_073_709 as u64)),
-                (Account::from(nft_owner), Nat::from(18_446_744_073_709 as u64))
-                // (Account::from(gldt_swap_canister_id), Nat::from(100_000_000_000_000 as u64))
+                (
+                    Account::from(controller),
+                    Nat::from(18_446_744_073_709 as u64),
+                ),
+                (
+                    Account::from(origyn_nft_canister_id),
+                    Nat::from(18_446_744_073_709 as u64),
+                ),
+                (
+                    Account::from(nft_owner),
+                    Nat::from(18_446_744_073_709 as u64),
+                ), // (Account::from(gldt_swap_canister_id), Nat::from(100_000_000_000_000 as u64))
             ],
             archive_options: icrc_ledger_canister::init::ArchiveOptions {
                 trigger_threshold: 2000,
@@ -251,8 +272,7 @@ fn install_canisters(
             token_symbol: "ICP".into(),
             token_name: "ICP".into(),
             fee_collector_account: None,
-        }
-    );
+        });
 
     println!("ogy_ledger_canister_id {:?}", icp_ledger_canister_id);
 
@@ -261,7 +281,7 @@ fn install_canisters(
         controller,
         icp_ledger_canister_id,
         icp_ledger_canister_wasm,
-        icp_ledger_init_args
+        icp_ledger_init_args,
     );
 
     CanisterIds {

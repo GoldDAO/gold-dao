@@ -1,17 +1,20 @@
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{CandidType, Deserialize, Nat, Principal};
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
     // add_neuron_ownership::Response as AddNeuronOwnerShipResponse,
     // remove_neuron_ownership::Response as RemoveNeuronOwnershipResponse,
-    claim_reward::{ Args as ClaimRewardArgs, Response as ClaimRewardResponse },
+    claim_reward::{Args as ClaimRewardArgs, Response as ClaimRewardResponse},
 };
 
 use crate::{
-    client::{ icrc1::client::{ balance_of, transfer }, rewards::{ claim_reward } },
-    sns_rewards_suite::setup::{ default_test_setup, test_setup_with_no_neuron_hotkeys },
-    utils::{ random_principal, tick_n_blocks },
+    client::{
+        icrc1::client::{balance_of, transfer},
+        rewards::claim_reward,
+    },
+    sns_rewards_suite::setup::{default_test_setup, test_setup_with_no_neuron_hotkeys},
+    utils::{random_principal, tick_n_blocks},
 };
 
 fn is_claim_reward_fail(value: &ClaimRewardResponse) -> bool {
@@ -31,12 +34,22 @@ pub struct GetNeuronRequest {
 fn test_reward_claim_happy_path() {
     let mut test_env = default_test_setup();
 
-    let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let icp_ledger_id = test_env
+        .token_ledgers
+        .get("icp_ledger_canister_id")
+        .unwrap()
+        .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
     let neuron_1 = test_env.neuron_data.get(&0usize).unwrap().clone();
-    let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
+    let neuron_id_1 = test_env
+        .neuron_data
+        .get(&0usize)
+        .unwrap()
+        .clone()
+        .id
+        .unwrap();
     assert!(neuron_1.permissions.get(1).unwrap().principal == Some(user_1)); // double check the data correct ( user_1's hotkey is on the first neuron's permissions list )
 
     // ********************************
@@ -52,8 +65,9 @@ fn test_reward_claim_happy_path() {
         icp_ledger_id,
         None,
         neuron_account_1,
-        (100_000_000_00u64).into()
-    ).unwrap();
+        (100_000_000_00u64).into(),
+    )
+    .unwrap();
     tick_n_blocks(&test_env.pic, 10);
 
     // ********************************
@@ -66,7 +80,7 @@ fn test_reward_claim_happy_path() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
     tick_n_blocks(&test_env.pic, 20);
     assert!(is_claim_reward_success(&res));
@@ -80,7 +94,10 @@ fn test_reward_claim_happy_path() {
     };
     let user_1_icp_balance = balance_of(&test_env.pic, icp_ledger_id, user_1_account);
     tick_n_blocks(&test_env.pic, 10);
-    assert_eq!(user_1_icp_balance, Nat::from(100_000_000_00u64) - Nat::from(10_000u64));
+    assert_eq!(
+        user_1_icp_balance,
+        Nat::from(100_000_000_00u64) - Nat::from(10_000u64)
+    );
     tick_n_blocks(&test_env.pic, 20);
 }
 
@@ -88,12 +105,22 @@ fn test_reward_claim_happy_path() {
 fn test_neuron_with_no_hotkey() {
     let mut test_env = test_setup_with_no_neuron_hotkeys(); // every neuron has no hotkey
 
-    let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let icp_ledger_id = test_env
+        .token_ledgers
+        .get("icp_ledger_canister_id")
+        .unwrap()
+        .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     // let random_principal = Principal::anonymous();
     let neuron_1 = test_env.neuron_data.get(&0usize).unwrap().clone(); // has no hotkey
-    let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
+    let neuron_id_1 = test_env
+        .neuron_data
+        .get(&0usize)
+        .unwrap()
+        .clone()
+        .id
+        .unwrap();
     assert!(neuron_1.permissions.get(1) == None); // should be no hotkey on this neuron
 
     let neuron_account_1 = Account {
@@ -111,8 +138,9 @@ fn test_neuron_with_no_hotkey() {
         icp_ledger_id,
         None,
         neuron_account_1,
-        (100_000_000_00u64).into()
-    ).unwrap();
+        (100_000_000_00u64).into(),
+    )
+    .unwrap();
 
     let res = claim_reward(
         &mut test_env.pic,
@@ -121,7 +149,7 @@ fn test_neuron_with_no_hotkey() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
 
     // ********************************
@@ -134,7 +162,7 @@ fn test_neuron_with_no_hotkey() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
     assert_eq!(res, ClaimRewardResponse::Ok(true));
 }
@@ -143,13 +171,23 @@ fn test_neuron_with_no_hotkey() {
 fn test_claim_reward_failures() {
     let mut test_env = default_test_setup();
 
-    let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let icp_ledger_id = test_env
+        .token_ledgers
+        .get("icp_ledger_canister_id")
+        .unwrap()
+        .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
     let user_2 = test_env.users.get(1).unwrap().clone();
     let neuron_1 = test_env.neuron_data.get(&0usize).unwrap().clone();
-    let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
+    let neuron_id_1 = test_env
+        .neuron_data
+        .get(&0usize)
+        .unwrap()
+        .clone()
+        .id
+        .unwrap();
     assert!(neuron_1.permissions.get(1).unwrap().principal == Some(user_1));
 
     let neuron_account_1 = Account {
@@ -166,8 +204,9 @@ fn test_claim_reward_failures() {
         icp_ledger_id,
         None,
         neuron_account_1,
-        (100_000_000_00u64).into()
-    ).unwrap();
+        (100_000_000_00u64).into(),
+    )
+    .unwrap();
 
     // ********************************
     // 1. Claim reward as user 2 - Should fail because user_2's hotkey is not on the neuron and they don't own it.
@@ -179,7 +218,7 @@ fn test_claim_reward_failures() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
     assert_eq!(res, ClaimRewardResponse::NeuronHotKeyInvalid);
 }
@@ -188,12 +227,22 @@ fn test_claim_reward_failures() {
 fn test_claim_reward_fails_if_there_are_no_rewards() {
     let mut test_env = default_test_setup();
 
-    let icp_ledger_id = test_env.token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let icp_ledger_id = test_env
+        .token_ledgers
+        .get("icp_ledger_canister_id")
+        .unwrap()
+        .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let user_1 = test_env.users.get(0).unwrap().clone();
     let neuron_1 = test_env.neuron_data.get(&0usize).unwrap().clone();
-    let neuron_id_1 = test_env.neuron_data.get(&0usize).unwrap().clone().id.unwrap();
+    let neuron_id_1 = test_env
+        .neuron_data
+        .get(&0usize)
+        .unwrap()
+        .clone()
+        .id
+        .unwrap();
     assert!(neuron_1.permissions.get(1).unwrap().principal == Some(user_1));
 
     let neuron_account_1 = Account {
@@ -212,7 +261,7 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
     assert!(is_claim_reward_fail(&res));
 
@@ -225,8 +274,9 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
         icp_ledger_id,
         None,
         neuron_account_1,
-        (5_000u64).into()
-    ).unwrap();
+        (5_000u64).into(),
+    )
+    .unwrap();
     // claim the reward - should fail because the fee is set to 10_000
     let res = claim_reward(
         &mut test_env.pic,
@@ -235,7 +285,7 @@ fn test_claim_reward_fails_if_there_are_no_rewards() {
         &(ClaimRewardArgs {
             neuron_id: neuron_id_1.clone(),
             token: "ICP".to_string(),
-        })
+        }),
     );
     assert!(is_claim_reward_fail(&res));
 }

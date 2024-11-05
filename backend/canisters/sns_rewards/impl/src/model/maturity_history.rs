@@ -1,9 +1,9 @@
-use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::NeuronId;
-use types::{ NeuronInfo, TimestampMillis };
 use ic_stable_structures::StableBTreeMap;
+use serde::{Deserialize, Serialize};
+use sns_governance_canister::types::NeuronId;
+use types::{NeuronInfo, TimestampMillis};
 
-use crate::memory::{ get_maturity_history_memory, VM };
+use crate::memory::{get_maturity_history_memory, VM};
 
 /// The history of each neuron's maturity.
 // NOTE: Stable structures don't need to be serialized, hence the #[serde(skip)].
@@ -21,7 +21,9 @@ fn init_map() -> StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM> {
 
 impl Default for MaturityHistory {
     fn default() -> Self {
-        Self { history: init_map() }
+        Self {
+            history: init_map(),
+        }
     }
 }
 
@@ -39,7 +41,7 @@ impl MaturityHistory {
     pub fn get_maturity_history(
         &self,
         neuron_id: NeuronId,
-        len: usize
+        len: usize,
     ) -> Vec<(TimestampMillis, NeuronInfo)> {
         history_range(&self.history, neuron_id, len).collect()
     }
@@ -52,7 +54,7 @@ impl MaturityHistory {
 fn history_range(
     hist: &StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM>,
     neuron_id: NeuronId,
-    len: usize
+    len: usize,
 ) -> impl Iterator<Item = (TimestampMillis, NeuronInfo)> + '_ {
     hist.range((neuron_id.clone(), 0)..(neuron_id, u64::MAX))
         .take(len)

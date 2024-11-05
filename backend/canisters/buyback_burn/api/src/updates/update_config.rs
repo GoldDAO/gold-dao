@@ -1,6 +1,6 @@
 use candid::CandidType;
 use ic_ledger_types::Tokens;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Args {

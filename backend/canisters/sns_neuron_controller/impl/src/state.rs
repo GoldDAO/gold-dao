@@ -1,15 +1,18 @@
 use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::Neurons;
 use crate::types::neuron_metrics::NeuronWithMetric;
-use crate::types::{ OgyManager, WtnManager };
-use candid::{ CandidType, Principal };
+use crate::types::{OgyManager, WtnManager};
+use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
 use types::BuildVersion;
 use types::CanisterId;
 use types::TimestampMillis;
-use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
+use utils::{
+    env::{CanisterEnv, Environment},
+    memory::MemorySize,
+};
 
 canister_state!(RuntimeState);
 
@@ -80,7 +83,7 @@ impl Data {
         ogy_sns_ledger_canister_id: CanisterId,
         ogy_sns_rewards_canister_id: CanisterId,
         sns_rewards_canister_id: CanisterId,
-        now: TimestampMillis
+        now: TimestampMillis,
     ) -> Self {
         Self {
             authorized_principals,
@@ -88,7 +91,7 @@ impl Data {
                 ogy_sns_governance_canister_id,
                 ogy_sns_ledger_canister_id,
                 ogy_sns_rewards_canister_id,
-                now
+                now,
             ),
             sns_rewards_canister_id,
         }
@@ -107,7 +110,7 @@ impl NeuronManagers {
         ogy_sns_governance_canister_id: CanisterId,
         ogy_sns_ledger_canister_id: CanisterId,
         ogy_sns_rewards_canister_id: CanisterId,
-        now: TimestampMillis
+        now: TimestampMillis,
     ) -> Self {
         Self {
             now,

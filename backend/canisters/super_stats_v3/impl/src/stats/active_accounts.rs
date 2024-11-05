@@ -1,4 +1,4 @@
-use super_stats_v3_api::{ core::constants::D1_AS_NANOS, stable_memory::STABLE_STATE };
+use super_stats_v3_api::{core::constants::D1_AS_NANOS, stable_memory::STABLE_STATE};
 
 pub fn get_count_of_unique_accounts(stx_ref_vec: Vec<Option<u64>>) -> u64 {
     if stx_ref_vec.len() == 0 {
@@ -26,27 +26,31 @@ pub fn get_count_of_unique_accounts(stx_ref_vec: Vec<Option<u64>>) -> u64 {
 }
 
 pub fn push_activity_snapshot() -> (u64, u64) {
-    let accounts_count = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().account_data.accounts.len()
-    });
-    let principals_count = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().principal_data.accounts.len()
-    });
+    let accounts_count =
+        STABLE_STATE.with(|s| s.borrow().as_ref().unwrap().account_data.accounts.len());
+    let principals_count =
+        STABLE_STATE.with(|s| s.borrow().as_ref().unwrap().principal_data.accounts.len());
     let new_times = STABLE_STATE.with(|s| {
-        s.borrow_mut().as_mut().unwrap().activity_stats.take_activity_snapshot(accounts_count, principals_count)
+        s.borrow_mut()
+            .as_mut()
+            .unwrap()
+            .activity_stats
+            .take_activity_snapshot(accounts_count, principals_count)
     });
     new_times
 }
 
 pub fn push_padding_snapshot(start: u64, end: u64) -> (u64, u64) {
-    let accounts_count = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().account_data.accounts.len()
-    });
-    let principals_count = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().principal_data.accounts.len()
-    });
+    let accounts_count =
+        STABLE_STATE.with(|s| s.borrow().as_ref().unwrap().account_data.accounts.len());
+    let principals_count =
+        STABLE_STATE.with(|s| s.borrow().as_ref().unwrap().principal_data.accounts.len());
     let new_times = STABLE_STATE.with(|s| {
-        s.borrow_mut().as_mut().unwrap().activity_stats.take_activity_snapshot(accounts_count, principals_count)
+        s.borrow_mut()
+            .as_mut()
+            .unwrap()
+            .activity_stats
+            .take_activity_snapshot(accounts_count, principals_count)
     });
     new_times
 }
@@ -66,7 +70,11 @@ pub fn next_midnight_time(time_now: u64) -> u64 {
 pub fn init_activity_stats(first_block_time: u64) -> u64 {
     let end_time = next_midnight_time(first_block_time.clone());
     STABLE_STATE.with(|s| {
-        s.borrow_mut().as_mut().unwrap().activity_stats.init(first_block_time, end_time.clone())
+        s.borrow_mut()
+            .as_mut()
+            .unwrap()
+            .activity_stats
+            .init(first_block_time, end_time.clone())
     });
     end_time
 }

@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::custom_types::IndexerType;
 
-
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct TargetArgs {
     pub target_ledger: String,
@@ -13,8 +12,7 @@ pub struct TargetArgs {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct InitLedgerArgs {
     pub target: TargetArgs,
-    pub index_type: IndexerType, 
-
+    pub index_type: IndexerType,
 }
 pub type Args = InitLedgerArgs;
 pub type Response = String;

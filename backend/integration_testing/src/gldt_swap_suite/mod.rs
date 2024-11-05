@@ -3,8 +3,8 @@ use pocket_ic::PocketIc;
 use types::CanisterId;
 
 mod init;
-mod tests;
 mod nft_utils;
+mod tests;
 
 pub struct TestEnv {
     pub pic: PocketIc,

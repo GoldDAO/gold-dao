@@ -1,5 +1,5 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 use crate::ReserveTokenAmounts;
 #[derive(CandidType, Serialize, Deserialize, Debug, PartialEq, Eq)]

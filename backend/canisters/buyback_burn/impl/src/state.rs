@@ -1,18 +1,18 @@
 use crate::types::token_swaps::TokenSwaps;
+use crate::types::token_swaps::TokenSwapsMetrics;
+use crate::types::SwapClients;
 use buyback_burn_api::get_config::Response as GetConfigResponse;
 use buyback_burn_api::init::TokenAndPool;
-use candid::{ CandidType, Principal };
+use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use types::BuildVersion;
-use types::{ Cycles, TimestampMillis, TokenInfo };
-use utils::env::{ CanisterEnv, Environment };
-use utils::memory::MemorySize;
-use crate::types::SwapClients;
-use crate::types::token_swaps::TokenSwapsMetrics;
 use tracing::error;
+use types::BuildVersion;
+use types::{Cycles, TimestampMillis, TokenInfo};
+use utils::env::{CanisterEnv, Environment};
+use utils::memory::MemorySize;
 
 canister_state!(RuntimeState);
 
@@ -110,7 +110,7 @@ impl Data {
         buyback_burn_interval_in_secs: u64,
         icp_swap_canister_id: Principal,
         burn_rate: u8,
-        min_burn_amount: Tokens
+        min_burn_amount: Tokens,
     ) -> Self {
         let mut swap_clients = SwapClients::init();
 

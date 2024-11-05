@@ -1,8 +1,11 @@
-use serde::{ Deserialize, Serialize };
-use candid::{ CandidType, Principal };
+use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
-use types::{ BuildVersion, TimestampMillis };
-use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
+use serde::{Deserialize, Serialize};
+use types::{BuildVersion, TimestampMillis};
+use utils::{
+    env::{CanisterEnv, Environment},
+    memory::MemorySize,
+};
 
 use crate::model::archive::Archive;
 

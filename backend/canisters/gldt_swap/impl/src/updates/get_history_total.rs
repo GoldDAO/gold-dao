@@ -1,12 +1,11 @@
 use candid::Nat;
 pub use gldt_swap_api_canister::get_history_total::{
-    Args as GetHistoryTotalArgs,
-    Response as GetHistoryTotalResponse,
+    Args as GetHistoryTotalArgs, Response as GetHistoryTotalResponse,
 };
 use ic_cdk::update;
 use tracing::debug;
 
-use crate::{ state::read_state, utils::get_all_user_swap_ids };
+use crate::{state::read_state, utils::get_all_user_swap_ids};
 
 #[update]
 async fn get_history_total(user: GetHistoryTotalArgs) -> GetHistoryTotalResponse {
@@ -21,6 +20,6 @@ async fn get_history_total(user: GetHistoryTotalArgs) -> GetHistoryTotalResponse
                 }
             }
         }
-        None => { read_state(|s| s.data.swaps.get_history_total()) }
+        None => read_state(|s| s.data.swaps.get_history_total()),
     }
 }

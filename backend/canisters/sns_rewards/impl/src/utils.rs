@@ -1,21 +1,23 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
-use candid::{ CandidType, Nat, Principal };
-use time::macros::datetime;
-use time::{ error::ComponentRange, Weekday };
+use candid::{CandidType, Nat, Principal};
+use icrc_ledger_types::icrc1::{
+    account::{Account, Subaccount},
+    transfer::TransferArg,
+};
+use serde::{Deserialize, Serialize};
+use sns_governance_canister::types::{Neuron, NeuronId};
 use time;
-use icrc_ledger_types::icrc1::{ account::{ Account, Subaccount }, transfer::TransferArg };
-use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::{ Neuron, NeuronId };
+use time::macros::datetime;
+use time::{error::ComponentRange, Weekday};
 use tracing::debug;
-use types::{ TimestampMillis, TokenSymbol };
+use types::{TimestampMillis, TokenSymbol};
 
 use crate::state::read_state;
 
 use sns_governance_canister::types::get_neuron_response::Result::{
-    Neuron as NeuronResponse,
-    Error as NeuronErrorResponse,
+    Error as NeuronErrorResponse, Neuron as NeuronResponse,
 };
 
 // specifies a range that the reward interval can occur. e.g on a certain weekday and between a start hour and end hour
@@ -34,7 +36,7 @@ impl Default for TimeInterval {
         Self {
             weekday: Some("Wednesday".to_string()),
             start_hour: 14, // 2pm
-            end_hour: 16, // 4pm
+            end_hour: 16,   // 4pm
         }
     }
 }
@@ -42,7 +44,7 @@ impl Default for TimeInterval {
 impl TimeInterval {
     pub fn is_within_weekly_interval(&self, timestamp_millis: TimestampMillis) -> bool {
         let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
-        // Create a DateTime equivalent using time crate
+                                                      // Create a DateTime equivalent using time crate
         let timestamp = match time::OffsetDateTime::from_unix_timestamp(timestamp_secs as i64) {
             Ok(t) => t,
             Err(_) => {
@@ -76,7 +78,7 @@ impl TimeInterval {
     }
     pub fn is_within_daily_interval(&self, timestamp_millis: TimestampMillis) -> bool {
         let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
-        // Create a DateTime equivalent using time crate
+                                                      // Create a DateTime equivalent using time crate
         let timestamp = match time::OffsetDateTime::from_unix_timestamp(timestamp_secs as i64) {
             Ok(t) => t,
             Err(_) => {
@@ -98,20 +100,20 @@ pub async fn transfer_token(
     from_sub_account: Subaccount,
     to_account: Account,
     ledger_id: Principal,
-    amount: Nat
+    amount: Nat,
 ) -> Result<(), String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_transfer(
-            ledger_id,
-            &(TransferArg {
-                from_subaccount: Some(from_sub_account),
-                to: to_account,
-                fee: None,
-                created_at_time: None,
-                amount: amount,
-                memo: None,
-            })
-        ).await
+    match icrc_ledger_canister_c2c_client::icrc1_transfer(
+        ledger_id,
+        &(TransferArg {
+            from_subaccount: Some(from_sub_account),
+            to: to_account,
+            fee: None,
+            created_at_time: None,
+            amount: amount,
+            memo: None,
+        }),
+    )
+    .await
     {
         Ok(Ok(_)) => Ok(()),
         Ok(Err(error)) => Err(format!("Transfer error: {error:?}")),
@@ -130,23 +132,17 @@ pub async fn fetch_neuron_data_by_id(neuron_id: &NeuronId) -> FetchNeuronDataByI
         neuron_id: Some(neuron_id.clone()),
     };
     match sns_governance_canister_c2c_client::get_neuron(canister_id, &args).await {
-        Ok(neuron_data) => {
-            match neuron_data.result {
-                Some(neuron) => {
-                    match neuron {
-                        NeuronResponse(n) => FetchNeuronDataByIdResponse::Ok(n),
-                        NeuronErrorResponse(_) => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
-                    }
-                }
-                None => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
-            }
-        }
+        Ok(neuron_data) => match neuron_data.result {
+            Some(neuron) => match neuron {
+                NeuronResponse(n) => FetchNeuronDataByIdResponse::Ok(n),
+                NeuronErrorResponse(_) => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
+            },
+            None => FetchNeuronDataByIdResponse::NeuronDoesNotExist,
+        },
         Err(e) => {
             debug!(
                 "Error fetching neuron with id : {:?}, error code : {:?}, message : {:?}",
-                neuron_id,
-                e.0,
-                e.1
+                neuron_id, e.0, e.1
             );
             FetchNeuronDataByIdResponse::InternalError(e.1)
         }
@@ -162,10 +158,11 @@ pub enum AuthenticateByHotkeyResponse {
 
 pub fn authenticate_by_hotkey(
     neuron_data: &Neuron,
-    caller: &Principal
+    caller: &Principal,
 ) -> AuthenticateByHotkeyResponse {
     // Check if any of the permission principals contain an entry that matches the caller principal
-    let matching_caller_hotkey = neuron_data.permissions
+    let matching_caller_hotkey = neuron_data
+        .permissions
         .iter()
         .filter(|permission| permission.principal.as_ref() == Some(caller))
         .count();
@@ -178,7 +175,7 @@ pub fn authenticate_by_hotkey(
 }
 
 pub fn validate_set_reserve_transfer_amounts_payload(
-    args: &HashMap<TokenSymbol, Nat>
+    args: &HashMap<TokenSymbol, Nat>,
 ) -> Result<(), String> {
     if args.len() < (1 as usize) {
         return Err("Should contain at least 1 token symbol and amount to update".to_string());
@@ -187,9 +184,10 @@ pub fn validate_set_reserve_transfer_amounts_payload(
     for (token_symbol, amount) in args {
         // Check the amount is above 0.
         if amount == &Nat::from(0u64) {
-            return Err(
-                format!("ERROR : The amount for token : {:?} must be more than 0", token_symbol)
-            );
+            return Err(format!(
+                "ERROR : The amount for token : {:?} must be more than 0",
+                token_symbol
+            ));
         }
     }
     Ok(())
@@ -197,7 +195,9 @@ pub fn validate_set_reserve_transfer_amounts_payload(
 
 pub fn validate_set_daily_gldgov_burn_rate_payload(amount: &Nat) -> Result<(), String> {
     if amount == &Nat::from(0u64) {
-        return Err(format!("ERROR : The amount for burning must be more than 0"));
+        return Err(format!(
+            "ERROR : The amount for burning must be more than 0"
+        ));
     }
 
     Ok(())
@@ -212,17 +212,17 @@ pub fn tracer(msg: &str) {
 #[cfg(test)]
 mod tests {
     use candid::Principal;
-    use sns_governance_canister::types::{ Neuron, NeuronId, NeuronPermission };
+    use sns_governance_canister::types::{Neuron, NeuronId, NeuronPermission};
     use types::TimestampMillis;
 
-    use crate::utils::{ AuthenticateByHotkeyResponse, TimeInterval };
     use super::authenticate_by_hotkey;
+    use crate::utils::{AuthenticateByHotkeyResponse, TimeInterval};
 
     #[test]
     fn test_authenticate_by_hotkey_with_correct_data() {
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
         let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
@@ -246,9 +246,9 @@ mod tests {
 
     #[test]
     fn test_authenticate_by_hotkey_with_no_hotkey_but_valid_caller() {
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
 
@@ -267,9 +267,9 @@ mod tests {
 
     #[test]
     fn test_authenticate_by_hotkey_with_no_hotkeys_invalid_caller() {
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
         let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
@@ -289,9 +289,9 @@ mod tests {
 
     #[test]
     fn test_authenticate_by_hotkey_with_invalid_hotkey() {
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let caller = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
         let sns_neuron_owner_id = Principal::from_text("tr3th-kiaaa-aaaaq-aab6q-cai").unwrap();
@@ -322,25 +322,46 @@ mod tests {
         }; // wednesday between 14:00 and 16:00
 
         let time_now = 1718809200855; // UTC - wednesday Jun 19, 2024, 3:00:00 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            true
+        );
 
         let time_now = 1718805600855; // UTC - wednesday Jun 19, 2024, 14:00:00 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            true
+        );
 
         let time_now = 1718812799855; // UTC - wednesday Jun 19, 2024, 15:59:59 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            true
+        );
 
         let time_now = 1718812800855; // UTC - wednesday Jun 19, 2024, 16:00:00 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            false
+        );
 
         let time_now = 1718805599855; // UTC - wednesday Jun 19, 2024, 13:59:59 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            false
+        );
 
         let time_now = 1718722800855; // UTC - Tuesday Jun 18, 2024, 15:00:00 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            false
+        );
 
         let time_now = 1719430200000; // UTC - Wednesday Jun 26, 2024, 7:30:00 PM
-        assert_eq!(distribution_interval.is_within_weekly_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_weekly_interval(time_now),
+            false
+        );
     }
 
     #[test]
@@ -352,24 +373,45 @@ mod tests {
         }; // any day between 9:00:00 and 11:00:00
 
         let time_now = 1718787600000; // UTC - wednesday Jun 19, 2024, 09:00:00
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            true
+        );
 
         let time_now = 1718791200000; // UTC - wednesday Jun 19, 2024, 10:00:00
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            true
+        );
 
         let time_now = 1718794800000; // UTC - wednesday Jun 19, 2024, 11:00:00
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            false
+        );
 
         let time_now = 1718794801000; // UTC - wednesday Jun 19, 2024, 11:00:01
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            false
+        );
 
         let time_now = 1718787599000; // UTC - wednesday Jun 19, 2024, 08:59:59
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            false
+        );
 
         let time_now = 1718874000000; // UTC - Thursday Jun 20, 2024, 09:00:00
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), true);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            true
+        );
 
         let time_now = 1718830800000; // UTC - Thursday Jun 20, 2024, 09:00:00
-        assert_eq!(distribution_interval.is_within_daily_interval(time_now), false);
+        assert_eq!(
+            distribution_interval.is_within_daily_interval(time_now),
+            false
+        );
     }
 }

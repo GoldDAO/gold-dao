@@ -8,9 +8,7 @@ use tracing::info;
 use types::TimestampMillis;
 
 use crate::{
-    memory::get_upgrades_memory,
-    migrations::types::state::RuntimeStateV0,
-    state::RuntimeState,
+    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
     utils::TimeInterval,
 };
 

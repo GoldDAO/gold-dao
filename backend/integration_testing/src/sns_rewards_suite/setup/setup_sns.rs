@@ -1,19 +1,12 @@
-use std::collections::{ BTreeMap, HashMap };
+use std::collections::{BTreeMap, HashMap};
 
-use candid::{ encode_one, Principal };
+use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
+use sha2::{Digest, Sha256};
 use sns_governance_canister::types::{
-    governance::SnsMetadata,
-    DefaultFollowees,
-    Governance,
-    NervousSystemParameters,
-    Neuron,
-    NeuronId,
-    NeuronPermission,
-    NeuronPermissionList,
-    VotingRewardsParameters,
+    governance::SnsMetadata, DefaultFollowees, Governance, NervousSystemParameters, Neuron,
+    NeuronId, NeuronPermission, NeuronPermissionList, VotingRewardsParameters,
 };
-use sha2::{ Digest, Sha256 };
 
 use crate::wasms;
 
@@ -22,7 +15,7 @@ pub fn generate_neuron_data(
     start_at: usize,
     n: usize,
     maturity_multiplier: u64,
-    users: &Vec<Principal>
+    users: &Vec<Principal>,
 ) -> (HashMap<usize, Neuron>, HashMap<Principal, usize>) {
     let mut neuron_data = HashMap::new();
     let mut owner_map = HashMap::new();
@@ -47,7 +40,7 @@ pub fn generate_neuron_data(
 pub fn create_neuron(
     id: NeuronId,
     maturity_multiplier: u64,
-    perms: Vec<NeuronPermission>
+    perms: Vec<NeuronPermission>,
 ) -> Neuron {
     Neuron {
         id: Some(id),
@@ -66,8 +59,8 @@ pub fn create_neuron(
         disburse_maturity_in_progress: vec![],
         dissolve_state: Some(
             sns_governance_canister::types::neuron::DissolveState::WhenDissolvedTimestampSeconds(
-                100000000000
-            )
+                100000000000,
+            ),
         ),
     }
 }
@@ -100,7 +93,7 @@ pub fn neuron_id_from_number(n: usize) -> NeuronId {
 pub fn create_sns_with_data(
     pic: &mut PocketIc,
     neuron_data: &HashMap<usize, Neuron>,
-    controller: &Principal
+    controller: &Principal,
 ) -> Principal {
     let sns_init_args = generate_sns_init_args(neuron_data);
     let sns_subnet_id = pic.topology().get_sns().unwrap();
@@ -110,8 +103,9 @@ pub fn create_sns_with_data(
     pic.set_controllers(
         sns_gov_id,
         Some(controller.clone()),
-        vec![controller.clone(), sns_gov_id.clone()]
-    ).unwrap();
+        vec![controller.clone(), sns_gov_id.clone()],
+    )
+    .unwrap();
 
     pic.tick();
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
@@ -119,7 +113,7 @@ pub fn create_sns_with_data(
         sns_gov_id,
         sns_gov_wasm,
         encode_one(sns_init_args.clone()).unwrap(),
-        Some(controller.clone())
+        Some(controller.clone()),
     );
 
     sns_gov_id
@@ -129,21 +123,24 @@ pub fn reinstall_sns_with_data(
     pic: &mut PocketIc,
     neuron_data: &HashMap<usize, Neuron>,
     sns_gov_canister_id: &Principal,
-    controller: &Principal
+    controller: &Principal,
 ) {
     let sns_init_args = generate_sns_init_args(neuron_data);
 
     let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
-    pic.stop_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
+    pic.stop_canister(sns_gov_canister_id.clone(), Some(controller.clone()))
+        .unwrap();
     pic.tick();
     pic.reinstall_canister(
         sns_gov_canister_id.clone(),
         sns_gov_wasm,
         encode_one(sns_init_args.clone()).unwrap(),
-        Some(controller.clone())
-    ).unwrap();
+        Some(controller.clone()),
+    )
+    .unwrap();
     pic.tick();
-    pic.start_canister(sns_gov_canister_id.clone(), Some(controller.clone())).unwrap();
+    pic.start_canister(sns_gov_canister_id.clone(), Some(controller.clone()))
+        .unwrap();
 
     pic.tick();
 }
@@ -155,7 +152,12 @@ pub fn generate_sns_init_args(neuron_data: &HashMap<usize, Neuron>) -> Governanc
 
     let neuron_data_with_neuron_keys: BTreeMap<String, Neuron> = neuron_data
         .iter() // Iterate over the entries of the original map
-        .map(|(key, value)| (neuron_id_from_number(key.clone()).to_string(), value.clone())) // Convert usize keys to String
+        .map(|(key, value)| {
+            (
+                neuron_id_from_number(key.clone()).to_string(),
+                value.clone(),
+            )
+        }) // Convert usize keys to String
         .collect();
 
     Governance {

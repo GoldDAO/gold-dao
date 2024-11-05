@@ -1,5 +1,5 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Deserializer, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 use types::TimestampMillis;
 
@@ -379,7 +379,9 @@ pub struct Ballot {
 }
 
 fn ok_or_default<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-    where T: Deserialize<'de> + Default, D: Deserializer<'de>
+where
+    T: Deserialize<'de> + Default,
+    D: Deserializer<'de>,
 {
     Ok(T::deserialize(deserializer).unwrap_or_default())
 }
@@ -569,7 +571,8 @@ pub mod create_service_nervous_system {
         pub maximum_direct_participation_icp: Option<Tokens>,
         pub minimum_participant_icp: Option<Tokens>,
         pub maximum_participant_icp: Option<Tokens>,
-        pub neuron_basket_construction_parameters: Option<swap_parameters::NeuronBasketConstructionParameters>,
+        pub neuron_basket_construction_parameters:
+            Option<swap_parameters::NeuronBasketConstructionParameters>,
         pub confirmation_text: Option<String>,
         pub restricted_countries: Option<Countries>,
         pub start_time: Option<GlobalTimeOfDay>,
