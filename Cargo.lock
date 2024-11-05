@@ -3690,6 +3690,10 @@ version = "0.1.0"
 [[package]]
 name = "usdg_canister"
 version = "0.1.0"
+dependencies = [
+ "ic-cdk 0.16.0",
+ "ic0 0.23.0",
+]
 
 [[package]]
 name = "utils"

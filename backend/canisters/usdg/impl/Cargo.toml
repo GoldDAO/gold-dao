@@ -13,3 +13,5 @@ default = []  # Empty default features
 inttest = []
 
 [dependencies]
+ic0 = { workspace = true }
+ic-cdk = { workspace = true }
