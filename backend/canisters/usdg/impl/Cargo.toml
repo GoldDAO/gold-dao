@@ -19,7 +19,7 @@ ic-cdk = { workspace = true }
 ic-xrc-types = "1.2.0"
 icrc-ledger-types =  { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 icrc-ledger-client-cdk = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
-minicbor = "0.25.1"
+minicbor = { version = "0.25.1", features = ["alloc", "derive"] }
 rust_decimal = "1.36.0"
 serde = { workspace = true }
 
