@@ -1,10 +1,16 @@
+use candid::Principal;
 use std::cell::RefCell;
 
 thread_local! {
     static __STATE: RefCell<Option<State>> = RefCell::default();
 }
 
-pub struct State {}
+pub struct State {
+    // Canister ids
+    pub usdg_ledger_id: Principal,
+    pub gldt_ledger_id: Principal,
+    pub xrc_id: Principal,
+}
 
 /// Mutates (part of) the current state using `f`.
 ///
