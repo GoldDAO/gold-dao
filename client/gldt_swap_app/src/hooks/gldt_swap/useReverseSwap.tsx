@@ -17,9 +17,12 @@ import {
 } from "@canisters/ledger/interfaces";
 
 import { useNft } from "@context/index";
+import { DateTime } from "luxon";
 
 export const useReverseSwap = () => {
   const { principalId, createActor } = useAuth();
+  const expiresAtApprove =
+    BigInt(DateTime.now().plus({ hours: 1 }).toMillis()) * BigInt(1_000_000);
 
   const { getCollectionSelectedNFTs } = useNft();
   const selected = getCollectionSelectedNFTs();
@@ -55,7 +58,7 @@ export const useReverseSwap = () => {
         memo: [],
         expected_allowance: [],
         created_at_time: [],
-        expires_at: [],
+        expires_at: [expiresAtApprove],
         spender: {
           owner: Principal.fromText(SWAP_CANISTER_ID),
           subaccount: [tokenId.id_byte_array],
@@ -92,11 +95,18 @@ export const useReverseSwap = () => {
       // console.log("approve result:");
       // console.log(approve);
 
-      const approveErrors = approve.filter(
+      const approveRejectedErrors = approve.filter(
         (result) => result.status === "rejected"
       );
-      if (approveErrors.length > 0) {
-        console.error(approveErrors);
+      const approveFulfilled = approve.filter(
+        (result) => result.status === "fulfilled"
+      );
+
+      if (
+        approveRejectedErrors.length > 0 ||
+        approveFulfilled.some((approve) => "Err" in approve.value)
+      ) {
+        console.error(approve);
         throw new Error(
           "Reverse swap error! One or more approve transactions failed."
         );
@@ -106,27 +116,30 @@ export const useReverseSwap = () => {
       // console.log(icrc2_allowance_args);
 
       const swapTasks = icrc2_allowance_args.map(async (_, index) => {
-        try {
-          const swapData = swap_tokens_for_nft_data[index];
-          const swapResult = await swap_tokens_for_nft(swapData);
-          if ("Err" in swapResult) {
-            console.error("Error swap_tokens_for_nft:", swapResult.Err);
-            return;
-          }
-        } catch (error) {
-          console.error("Error swap:", error);
-        }
+        const swapData = swap_tokens_for_nft_data[index];
+        const swapResult = await swap_tokens_for_nft(swapData);
+        return swapResult;
       });
+
       const swap = await Promise.allSettled(swapTasks);
 
-      // console.log("swap result:");
-      // console.log(swap);
+      console.log("swap result:");
+      console.log(swap);
 
-      const swapErrors = swap.filter((result) => result.status === "rejected");
-      if (swapErrors.length > 0) {
-        console.error(approveErrors);
+      const swapRejectedErrors = swap.filter(
+        (result) => result.status === "rejected"
+      );
+      const swapFulfilled = swap.filter(
+        (result) => result.status === "fulfilled"
+      );
+
+      if (
+        swapRejectedErrors.length > 0 ||
+        swapFulfilled.some((swap) => "Err" in swap.value)
+      ) {
+        console.error(swap);
         throw new Error(
-          "Reverse swap error! One or more swap transactions failed."
+          "Reverse swap error! One or more swap tokens for NFT failed."
         );
       }
     },

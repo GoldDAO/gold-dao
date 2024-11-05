@@ -188,6 +188,7 @@ export type SwapErrorReverse = { 'FeeTransferFailed' : FeeTransferError } |
 export type SwapInfo = { 'Forward' : SwapDetailForward } |
   { 'Reverse' : SwapDetailReverse };
 export type SwapNftForTokensErrors = { 'Limit' : string } |
+  { 'CantRunAtThisMoment' : string } |
   { 'ContainsDuplicates' : string } |
   { 'ContainsInvalidNftCanister' : string } |
   {
@@ -197,6 +198,7 @@ export type SwapNftForTokensErrors = { 'Limit' : string } |
     ]
   } |
   { 'CantBeAnonymous' : string } |
+  { 'SwapArgsIsEmpty' : null } |
   { 'ServiceDown' : ServiceDownReason };
 export type SwapStatusForward = {
     'DepositRecoveryFailed' : [SwapStatusForward, DepositRecoveryError]
@@ -240,6 +242,7 @@ export type SwapTokensForNftRequestErrors = {
   } |
   { 'CantForgeSwapId' : null } |
   { 'NftLocked' : LockError } |
+  { 'CantRunAtThisMoment' : string } |
   { 'NftValidationErrors' : Array<NftValidationError> } |
   { 'CantBeAnonymous' : string } |
   { 'NotOwnedBySwapCanister' : null } |
@@ -288,6 +291,7 @@ export interface _SERVICE {
   'get_historic_swaps' : ActorMethod<[Args], Result>,
   'get_historic_swaps_by_user' : ActorMethod<[Args_1], Result_1>,
   'get_history_total' : ActorMethod<[[] | [Principal]], bigint>,
+  'get_owned_nfts' : ActorMethod<[null], Array<[[Principal, number], bigint]>>,
   'get_service_status' : ActorMethod<[null], ServiceStatus>,
   'get_swap' : ActorMethod<
     [[bigint, bigint]],

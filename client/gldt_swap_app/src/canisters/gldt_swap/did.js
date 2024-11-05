@@ -309,6 +309,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const SwapNftForTokensErrors = IDL.Variant({
     Limit: IDL.Text,
+    CantRunAtThisMoment: IDL.Text,
     ContainsDuplicates: IDL.Text,
     ContainsInvalidNftCanister: IDL.Text,
     NftValidationErrors: IDL.Tuple(
@@ -316,6 +317,7 @@ export const idlFactory = ({ IDL }) => {
       IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Vec(NftInvalidError)))
     ),
     CantBeAnonymous: IDL.Text,
+    SwapArgsIsEmpty: IDL.Null,
     ServiceDown: ServiceDownReason,
   });
   const Result_3 = IDL.Variant({
@@ -335,6 +337,7 @@ export const idlFactory = ({ IDL }) => {
     GetNftMetaDetailError: GetNftMetaDetailErrorReason,
     CantForgeSwapId: IDL.Null,
     NftLocked: LockError,
+    CantRunAtThisMoment: IDL.Text,
     NftValidationErrors: IDL.Vec(NftValidationError),
     CantBeAnonymous: IDL.Text,
     NotOwnedBySwapCanister: IDL.Null,
@@ -370,6 +373,11 @@ export const idlFactory = ({ IDL }) => {
     get_historic_swaps: IDL.Func([Args], [Result], []),
     get_historic_swaps_by_user: IDL.Func([Args_1], [Result_1], []),
     get_history_total: IDL.Func([IDL.Opt(IDL.Principal)], [IDL.Nat], []),
+    get_owned_nfts: IDL.Func(
+      [IDL.Null],
+      [IDL.Vec(IDL.Tuple(IDL.Tuple(IDL.Principal, IDL.Nat16), IDL.Nat))],
+      ["query"]
+    ),
     get_service_status: IDL.Func([IDL.Null], [ServiceStatus], []),
     get_swap: IDL.Func(
       [IDL.Tuple(IDL.Nat, IDL.Nat)],
