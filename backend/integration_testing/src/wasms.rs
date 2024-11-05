@@ -25,6 +25,7 @@ lazy_static! {
     pub static ref MANAGEMENT: CanisterWasm = get_canister_wasm_from_bin("management");
     pub static ref SUPER_STATS: CanisterWasm = get_canister_wasm_from_bin("super_stats_v3");
     pub static ref TOKEN_METRICS: CanisterWasm = get_canister_wasm_from_bin("token_metrics");
+    pub static ref USDG_MINTER: CanisterWasm = get_canister_wasm_from_bin("usdg");
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {
@@ -57,9 +58,8 @@ fn read_file_from_local_bin(file_name: &str) -> Vec<u8> {
     let mut file_path = local_bin();
     file_path.push(file_name);
 
-    let mut file = File::open(&file_path).unwrap_or_else(|_|
-        panic!("Failed to open file: {}", file_path.to_str().unwrap())
-    );
+    let mut file = File::open(&file_path)
+        .unwrap_or_else(|_| panic!("Failed to open file: {}", file_path.to_str().unwrap()));
     let mut bytes = Vec::new();
     file.read_to_end(&mut bytes).expect("Failed to read file");
     bytes
@@ -67,7 +67,8 @@ fn read_file_from_local_bin(file_name: &str) -> Vec<u8> {
 
 pub fn local_bin() -> PathBuf {
     let mut file_path = PathBuf::from(
-        std::env::var("CARGO_MANIFEST_DIR").expect("Failed to read CARGO_MANIFEST_DIR env variable")
+        std::env::var("CARGO_MANIFEST_DIR")
+            .expect("Failed to read CARGO_MANIFEST_DIR env variable"),
     );
     file_path.push("wasms");
     file_path

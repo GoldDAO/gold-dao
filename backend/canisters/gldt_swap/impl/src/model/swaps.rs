@@ -1,13 +1,16 @@
+use candid::{Nat, Principal};
+use gldt_swap_common::archive::ArchiveCanister;
+use gldt_swap_common::{
+    nft::NftID,
+    swap::{SwapId, SwapIndex, SwapInfo},
+};
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::mem;
-use candid::{ Nat, Principal };
-use gldt_swap_common::archive::ArchiveCanister;
-use gldt_swap_common::{ nft::NftID, swap::{ SwapId, SwapInfo, SwapIndex } };
-use serde::{ Deserialize, Serialize };
 
 use tracing::debug;
 
-use gldt_swap_common::swap::{ SwapStatusForward, SwapStatusReverse };
+use gldt_swap_common::swap::{SwapStatusForward, SwapStatusReverse};
 
 #[derive(Serialize, Deserialize)]
 pub struct Swaps {
@@ -55,22 +58,20 @@ impl Swaps {
 
     pub fn get_active_swap_by_string_id(
         &self,
-        nft_id_string: &String
+        nft_id_string: &String,
     ) -> Option<(SwapId, SwapInfo)> {
-        self.swap.iter().find_map(|(swap_id, swap)| {
-            match swap {
-                SwapInfo::Forward(details) => {
-                    if &details.nft_id_string == nft_id_string {
-                        return Some((swap_id.clone(), swap.clone()));
-                    }
-                    None
+        self.swap.iter().find_map(|(swap_id, swap)| match swap {
+            SwapInfo::Forward(details) => {
+                if &details.nft_id_string == nft_id_string {
+                    return Some((swap_id.clone(), swap.clone()));
                 }
-                SwapInfo::Reverse(details) => {
-                    if &details.nft_id_string == nft_id_string {
-                        return Some((swap_id.clone(), swap.clone()));
-                    }
-                    None
+                None
+            }
+            SwapInfo::Reverse(details) => {
+                if &details.nft_id_string == nft_id_string {
+                    return Some((swap_id.clone(), swap.clone()));
                 }
+                None
             }
         })
     }
@@ -82,14 +83,14 @@ impl Swaps {
     pub fn get_active_swaps(&self) -> Vec<(SwapId, SwapInfo)> {
         self.swap
             .iter()
-            .map(|(swap_id, swap)| { (swap_id.clone(), swap.clone()) })
+            .map(|(swap_id, swap)| (swap_id.clone(), swap.clone()))
             .collect()
     }
 
     pub fn get_stuck_swaps(&self) -> Vec<(SwapId, SwapInfo)> {
         self.get_active_swaps()
             .into_iter()
-            .filter(|(_, swap_info)| { swap_info.is_swap_over_time_threshold() })
+            .filter(|(_, swap_info)| swap_info.is_swap_over_time_threshold())
             .collect()
     }
 
@@ -99,25 +100,24 @@ impl Swaps {
 
     pub fn get_active_swaps_by_user_principal(
         &self,
-        user_principal: Principal
+        user_principal: Principal,
     ) -> Vec<(SwapId, SwapInfo)> {
-        let swaps: Vec<(SwapId, SwapInfo)> = self.swap
+        let swaps: Vec<(SwapId, SwapInfo)> = self
+            .swap
             .iter()
-            .filter_map(|(swap_id, swap_info)| {
-                match swap_info {
-                    SwapInfo::Forward(details) => {
-                        if details.gldt_receiver.owner == user_principal {
-                            return Some((swap_id.clone(), swap_info.clone()));
-                        } else {
-                            return None;
-                        }
+            .filter_map(|(swap_id, swap_info)| match swap_info {
+                SwapInfo::Forward(details) => {
+                    if details.gldt_receiver.owner == user_principal {
+                        return Some((swap_id.clone(), swap_info.clone()));
+                    } else {
+                        return None;
                     }
-                    SwapInfo::Reverse(details) => {
-                        if details.user == user_principal {
-                            return Some((swap_id.clone(), swap_info.clone()));
-                        } else {
-                            return None;
-                        }
+                }
+                SwapInfo::Reverse(details) => {
+                    if details.user == user_principal {
+                        return Some((swap_id.clone(), swap_info.clone()));
+                    } else {
+                        return None;
                     }
                 }
             })
@@ -130,10 +130,11 @@ impl Swaps {
     }
 
     pub fn find_canister_for_swap_index(&self, swap_index: Nat) -> Option<Principal> {
-        let archive = self.archive_canisters
+        let archive = self
+            .archive_canisters
             .iter()
             .rev()
-            .find(|archive| { swap_index.clone() >= archive.start_index.clone() });
+            .find(|archive| swap_index.clone() >= archive.start_index.clone());
 
         match archive {
             Some(a) => Some(a.canister_id),
@@ -148,7 +149,7 @@ impl Swaps {
     pub fn insert_active_swap(
         &mut self,
         nft_id: &NftID,
-        new_swap: &SwapInfo
+        new_swap: &SwapInfo,
     ) -> Result<SwapId, ()> {
         // check if it already exists - can't insert a swap that already exists
         if self.is_nft_locked(&nft_id) {
@@ -157,28 +158,24 @@ impl Swaps {
         }
         // insert to active or history depending on the status
         match new_swap.clone() {
-            SwapInfo::Forward(swap_details) => {
-                match swap_details.status {
-                    SwapStatusForward::Init => {
-                        let swap_id = new_swap.get_swap_id();
-                        self.swap.insert(swap_id.clone(), new_swap.clone());
-                        debug!("FORWARD SWAP :: SwapId {swap_id:?} :: initialized");
-                        Ok(new_swap.get_swap_id())
-                    }
-                    _ => { Err(()) }
+            SwapInfo::Forward(swap_details) => match swap_details.status {
+                SwapStatusForward::Init => {
+                    let swap_id = new_swap.get_swap_id();
+                    self.swap.insert(swap_id.clone(), new_swap.clone());
+                    debug!("FORWARD SWAP :: SwapId {swap_id:?} :: initialized");
+                    Ok(new_swap.get_swap_id())
                 }
-            }
-            SwapInfo::Reverse(swap_details) => {
-                match swap_details.status {
-                    SwapStatusReverse::Init => {
-                        let swap_id = new_swap.get_swap_id();
-                        self.swap.insert(swap_id.clone(), new_swap.clone());
-                        debug!("FORWARD SWAP :: SwapId {swap_id:?} :: initialized");
-                        Ok(new_swap.get_swap_id())
-                    }
-                    _ => { Err(()) }
+                _ => Err(()),
+            },
+            SwapInfo::Reverse(swap_details) => match swap_details.status {
+                SwapStatusReverse::Init => {
+                    let swap_id = new_swap.get_swap_id();
+                    self.swap.insert(swap_id.clone(), new_swap.clone());
+                    debug!("FORWARD SWAP :: SwapId {swap_id:?} :: initialized");
+                    Ok(new_swap.get_swap_id())
                 }
-            }
+                _ => Err(()),
+            },
         }
     }
     pub fn is_active_swaps_capacity_full(&self) -> bool {
@@ -194,17 +191,17 @@ impl Swaps {
     pub fn set_new_archive_canister(&mut self, archive_canister: ArchiveCanister) {
         if self.archive_canisters.len() > 0 {
             self.update_archive_canister_end_index(
-                archive_canister.start_index.clone() - Nat::from(1u64)
+                archive_canister.start_index.clone() - Nat::from(1u64),
             );
         }
         self.archive_canisters.push(archive_canister);
     }
 
     pub fn set_archive_as_active(&mut self, start_index: &Nat) {
-        if
-            let Some(archive) = self.archive_canisters
-                .iter_mut()
-                .find(|archive| start_index == &archive.start_index)
+        if let Some(archive) = self
+            .archive_canisters
+            .iter_mut()
+            .find(|archive| start_index == &archive.start_index)
         {
             archive.active = true;
         }
@@ -226,10 +223,10 @@ impl Swaps {
 
 #[cfg(test)]
 mod tests {
-    use candid::{ Nat, Principal };
     use super::*;
+    use candid::{Nat, Principal};
 
-    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+    use crate::state::{init_state, mutate_state, read_state, RuntimeState};
 
     fn init_runtime_state() {
         init_state(RuntimeState::default());
@@ -238,24 +235,18 @@ mod tests {
     #[test]
     fn test_find_canister_for_swap_index() {
         init_runtime_state();
-        let archive_canister_1 = Principal::from_slice(
-            &[
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
-            ]
-        );
-        let archive_canister_2 = Principal::from_slice(
-            &[
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 2u8,
-            ]
-        );
-        let archive_canister_3 = Principal::from_slice(
-            &[
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 3u8,
-            ]
-        );
+        let archive_canister_1 = Principal::from_slice(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+        ]);
+        let archive_canister_2 = Principal::from_slice(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 2u8,
+        ]);
+        let archive_canister_3 = Principal::from_slice(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 3u8,
+        ]);
         let archive_canister_1 = ArchiveCanister {
             canister_id: archive_canister_1,
             start_index: Nat::from(0u64),
@@ -277,11 +268,23 @@ mod tests {
             active: true,
         };
         // archive should be from 0u8 - 99
-        mutate_state(|s| s.data.swaps.set_new_archive_canister(archive_canister_1.clone()));
+        mutate_state(|s| {
+            s.data
+                .swaps
+                .set_new_archive_canister(archive_canister_1.clone())
+        });
 
-        mutate_state(|s| s.data.swaps.set_new_archive_canister(archive_canister_2.clone()));
+        mutate_state(|s| {
+            s.data
+                .swaps
+                .set_new_archive_canister(archive_canister_2.clone())
+        });
 
-        mutate_state(|s| s.data.swaps.set_new_archive_canister(archive_canister_3.clone()));
+        mutate_state(|s| {
+            s.data
+                .swaps
+                .set_new_archive_canister(archive_canister_3.clone())
+        });
 
         assert_eq!(
             read_state(|s| s.data.swaps.find_canister_for_swap_index(Nat::from(0u64))).unwrap(),

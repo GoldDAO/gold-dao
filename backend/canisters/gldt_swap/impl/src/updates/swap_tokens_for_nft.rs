@@ -1,20 +1,19 @@
+use crate::service_status::check_service_status;
+use crate::swap::swap_info::SwapInfoTrait;
 use candid::Principal;
-use gldt_swap_common::swap::{ LockError, ServiceStatus, SwapStatus, SwapStatusReverse };
 use gldt_swap_api_canister::swap_tokens_for_nft::SwapTokensForNftRequestErrors;
 pub use gldt_swap_api_canister::swap_tokens_for_nft::{
-    Args as SwapTokensForNftArgs,
-    Response as SwapTokensForNftResponse,
+    Args as SwapTokensForNftArgs, Response as SwapTokensForNftResponse,
 };
+use gldt_swap_common::swap::{LockError, ServiceStatus, SwapStatus, SwapStatusReverse};
 use ic_cdk::update;
 use tracing::debug;
 use utils::env::Environment;
-use crate::service_status::check_service_status;
-use crate::swap::swap_info::SwapInfoTrait;
 
 use crate::{
     state::read_state,
     swap::{
-        reverse_swap::{ burn_gldt, refund, transfer_fees, transfer_nft, transfer_to_escrow },
+        reverse_swap::{burn_gldt, refund, transfer_fees, transfer_nft, transfer_to_escrow},
         swap_builder::SwapBuilder,
     },
 };
@@ -32,11 +31,9 @@ async fn swap_tokens_for_nft(args: SwapTokensForNftArgs) -> SwapTokensForNftResp
     let nft_id = args.nft_id.clone();
 
     if caller == Principal::anonymous() {
-        return Err(
-            SwapTokensForNftRequestErrors::CantBeAnonymous(
-                format!("You can't use an annoymous principal to swap")
-            )
-        );
+        return Err(SwapTokensForNftRequestErrors::CantBeAnonymous(format!(
+            "You can't use an annoymous principal to swap"
+        )));
     }
 
     // 4. build a new swap - error early
@@ -56,9 +53,9 @@ async fn swap_tokens_for_nft(args: SwapTokensForNftArgs) -> SwapTokensForNftResp
     let swap_id = if let Ok(swap_id) = new_swap.insert_swap().await {
         swap_id
     } else {
-        return Err(
-            SwapTokensForNftRequestErrors::NftLocked(LockError::NftAlreadyLocked(vec![nft_id]))
-        );
+        return Err(SwapTokensForNftRequestErrors::NftLocked(
+            LockError::NftAlreadyLocked(vec![nft_id]),
+        ));
     };
 
     // 6. perform the swap and return the swap_id instantly

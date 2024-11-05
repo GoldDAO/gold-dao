@@ -1,8 +1,8 @@
-use candid::{ CandidType, Principal };
+use candid::{CandidType, Principal};
 use ic_ledger_types::Tokens;
-use serde::{ Deserialize, Serialize };
-use types::TokenInfo;
+use serde::{Deserialize, Serialize};
 use types::BuildVersion;
+use types::TokenInfo;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {

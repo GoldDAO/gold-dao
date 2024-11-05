@@ -1,5 +1,5 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use types::TokenInfo;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]

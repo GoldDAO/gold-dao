@@ -1,7 +1,10 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 
-use gldt_swap_common::{ nft::NftID, swap::{ ServiceDownReason, SwapId } };
+use gldt_swap_common::{
+    nft::NftID,
+    swap::{ServiceDownReason, SwapId},
+};
 
 pub type Args = Vec<(NftID, Principal)>;
 

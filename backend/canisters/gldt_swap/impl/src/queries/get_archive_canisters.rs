@@ -1,6 +1,5 @@
 pub use gldt_swap_api_canister::get_archive_canisters::{
-    Args as GetArchiveCanistersArgs,
-    Response as GetArchiveCanistersResponse,
+    Args as GetArchiveCanistersArgs, Response as GetArchiveCanistersResponse,
 };
 use ic_cdk::query;
 

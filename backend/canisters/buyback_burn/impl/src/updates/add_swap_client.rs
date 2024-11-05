@@ -1,9 +1,9 @@
 use crate::guards::caller_is_governance_principal;
-use crate::state::{ mutate_state, RuntimeState };
+use crate::state::{mutate_state, RuntimeState};
 pub use buyback_burn_api::add_swap_client::Args as AddSwapClientArgs;
 pub use buyback_burn_api::add_swap_client::Response as AddSwapClientResponse;
 use canister_tracing_macros::trace;
-use ic_cdk_macros::{ update, query };
+use ic_cdk_macros::{query, update};
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
@@ -22,7 +22,7 @@ fn update_config_impl(args: AddSwapClientArgs, state: &mut RuntimeState) -> AddS
         state.data.swap_clients.add_swap_client(
             token.token,
             state.data.gldgov_token_info,
-            token.swap_pool_id
+            token.swap_pool_id,
         );
     }
 

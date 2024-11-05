@@ -1,39 +1,17 @@
 #![allow(dead_code)] // Ignore warnings for unused code (functions, structs, etc.)
 
 use crate::{
-    generate_pocket_query_call,
-    generate_pocket_update_call,
-    generate_update_call_encoded_args,
+    generate_pocket_query_call, generate_pocket_update_call, generate_update_call_encoded_args,
 };
 use candid::Int;
 
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    NftCanisterStageNftOrigynArg,
-    OrigynTextResult,
-    OrigynBoolResult,
-    StageChunkArg,
-    StageLibraryResult,
-    ManageStorageResult,
-    ManageStorageRequest,
-    ManageCollectionCommand,
-    Account,
-    ApprovalArgs,
-    ApprovalResult,
-    Account3,
-    CollectionMetadata,
-    SupportedStandard,
-    TransferArgs,
-    TransferResult,
-    Value,
-    CollectionResult,
-    MarketTransferRequest,
-    MarketTransferResult,
-    NftInfoResult,
-    SaleInfoRequest,
-    SaleInfoResult,
-    NftCanisterSetTimeModeArg,
-    ManageSaleRequest,
-    ManageSaleResult,
+    Account, Account3, ApprovalArgs, ApprovalResult, CollectionMetadata, CollectionResult,
+    ManageCollectionCommand, ManageSaleRequest, ManageSaleResult, ManageStorageRequest,
+    ManageStorageResult, MarketTransferRequest, MarketTransferResult, NftCanisterSetTimeModeArg,
+    NftCanisterStageNftOrigynArg, NftInfoResult, OrigynBoolResult, OrigynTextResult,
+    SaleInfoRequest, SaleInfoResult, StageChunkArg, StageLibraryResult, SupportedStandard,
+    TransferArgs, TransferResult, Value,
 };
 
 generate_update_call_encoded_args!(stage_nft_origyn);
@@ -324,25 +302,21 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Option<Principal>,
-        args: stage_nft_origyn::Args
+        args: stage_nft_origyn::Args,
     ) -> stage_nft_origyn::Response {
         match sender {
-            Some(sender) => {
-                crate::client::origyn_nft_reference::stage_nft_origyn(
-                    pic,
-                    sender,
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
-            None => {
-                crate::client::origyn_nft_reference::stage_nft_origyn(
-                    pic,
-                    Principal::anonymous(),
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
+            Some(sender) => crate::client::origyn_nft_reference::stage_nft_origyn(
+                pic,
+                sender,
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
+            None => crate::client::origyn_nft_reference::stage_nft_origyn(
+                pic,
+                Principal::anonymous(),
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
         }
     }
 
@@ -350,25 +324,21 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Option<Principal>,
-        args: stage_library_nft_origyn::Args
+        args: stage_library_nft_origyn::Args,
     ) -> stage_library_nft_origyn::Response {
         match sender {
-            Some(sender) => {
-                crate::client::origyn_nft_reference::stage_library_nft_origyn(
-                    pic,
-                    sender,
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
-            None => {
-                crate::client::origyn_nft_reference::stage_library_nft_origyn(
-                    pic,
-                    Principal::anonymous(),
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
+            Some(sender) => crate::client::origyn_nft_reference::stage_library_nft_origyn(
+                pic,
+                sender,
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
+            None => crate::client::origyn_nft_reference::stage_library_nft_origyn(
+                pic,
+                Principal::anonymous(),
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
         }
     }
 
@@ -376,25 +346,21 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Option<Principal>,
-        args: manage_storage_nft_origyn::Args
+        args: manage_storage_nft_origyn::Args,
     ) -> manage_storage_nft_origyn::Response {
         match sender {
-            Some(sender) => {
-                crate::client::origyn_nft_reference::manage_storage_nft_origyn(
-                    pic,
-                    sender,
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
-            None => {
-                crate::client::origyn_nft_reference::manage_storage_nft_origyn(
-                    pic,
-                    Principal::anonymous(),
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
+            Some(sender) => crate::client::origyn_nft_reference::manage_storage_nft_origyn(
+                pic,
+                sender,
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
+            None => crate::client::origyn_nft_reference::manage_storage_nft_origyn(
+                pic,
+                Principal::anonymous(),
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
         }
     }
 
@@ -402,25 +368,21 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Option<Principal>,
-        args: collection_update_nft_origyn::Args
+        args: collection_update_nft_origyn::Args,
     ) -> collection_update_nft_origyn::Response {
         match sender {
-            Some(sender) => {
-                crate::client::origyn_nft_reference::collection_update_nft_origyn(
-                    pic,
-                    sender,
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
-            None => {
-                crate::client::origyn_nft_reference::collection_update_nft_origyn(
-                    pic,
-                    Principal::anonymous(),
-                    canister_id,
-                    candid::encode_one(args).unwrap()
-                )
-            }
+            Some(sender) => crate::client::origyn_nft_reference::collection_update_nft_origyn(
+                pic,
+                sender,
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
+            None => crate::client::origyn_nft_reference::collection_update_nft_origyn(
+                pic,
+                Principal::anonymous(),
+                canister_id,
+                candid::encode_one(args).unwrap(),
+            ),
         }
     }
 
@@ -428,25 +390,21 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Option<Principal>,
-        args: mint_nft_origyn::Args
+        args: mint_nft_origyn::Args,
     ) -> mint_nft_origyn::Response {
         match sender {
-            Some(sender) => {
-                crate::client::origyn_nft_reference::mint_nft_origyn(
-                    pic,
-                    sender,
-                    canister_id,
-                    candid::encode_args(args).unwrap()
-                )
-            }
-            None => {
-                crate::client::origyn_nft_reference::mint_nft_origyn(
-                    pic,
-                    Principal::anonymous(),
-                    canister_id,
-                    candid::encode_args(args).unwrap()
-                )
-            }
+            Some(sender) => crate::client::origyn_nft_reference::mint_nft_origyn(
+                pic,
+                sender,
+                canister_id,
+                candid::encode_args(args).unwrap(),
+            ),
+            None => crate::client::origyn_nft_reference::mint_nft_origyn(
+                pic,
+                Principal::anonymous(),
+                canister_id,
+                candid::encode_args(args).unwrap(),
+            ),
         }
     }
 
@@ -454,26 +412,26 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_approve::Args
+        args: icrc7_approve::Args,
     ) -> icrc7_approve::Response {
         crate::client::origyn_nft_reference::icrc7_approve(
             pic,
             sender,
             canister_id,
-            candid::encode_one(args).unwrap()
+            candid::encode_one(args).unwrap(),
         )
     }
 
     pub fn icrc7_atomic_batch_transfers(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_atomic_batch_transfers::Response {
         crate::client::origyn_nft_reference::icrc7_atomic_batch_transfers(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
@@ -481,7 +439,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_balance_of::Args
+        args: icrc7_balance_of::Args,
     ) -> icrc7_balance_of::Response {
         crate::client::origyn_nft_reference::icrc7_balance_of(pic, sender, canister_id, &args)
     }
@@ -489,20 +447,20 @@ pub mod client {
     pub fn icrc7_collection_metadata(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_collection_metadata::Response {
         crate::client::origyn_nft_reference::icrc7_collection_metadata(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_default_take_value(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_default_take_value::Response {
         crate::client::origyn_nft_reference::icrc7_default_take_value(pic, sender, canister_id, &())
     }
@@ -510,7 +468,7 @@ pub mod client {
     pub fn icrc7_description(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_description::Response {
         crate::client::origyn_nft_reference::icrc7_description(pic, sender, canister_id, &())
     }
@@ -518,7 +476,7 @@ pub mod client {
     pub fn icrc7_logo(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_logo::Response {
         crate::client::origyn_nft_reference::icrc7_logo(pic, sender, canister_id, &())
     }
@@ -526,20 +484,20 @@ pub mod client {
     pub fn icrc7_max_approvals_per_token_or_collection(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_approvals_per_token_or_collection::Response {
         crate::client::origyn_nft_reference::icrc7_max_approvals_per_token_or_collection(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_max_memo_size(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_memo_size::Response {
         crate::client::origyn_nft_reference::icrc7_max_memo_size(pic, sender, canister_id, &())
     }
@@ -547,33 +505,33 @@ pub mod client {
     pub fn icrc7_max_query_batch_size(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_query_batch_size::Response {
         crate::client::origyn_nft_reference::icrc7_max_query_batch_size(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_max_revoke_approvals(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_revoke_approvals::Response {
         crate::client::origyn_nft_reference::icrc7_max_revoke_approvals(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_max_take_value(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_take_value::Response {
         crate::client::origyn_nft_reference::icrc7_max_take_value(pic, sender, canister_id, &())
     }
@@ -581,20 +539,20 @@ pub mod client {
     pub fn icrc7_max_update_batch_size(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_max_update_batch_size::Response {
         crate::client::origyn_nft_reference::icrc7_max_update_batch_size(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_name(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_name::Response {
         crate::client::origyn_nft_reference::icrc7_name(pic, sender, canister_id, &())
     }
@@ -603,7 +561,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_owner_of::Args
+        args: icrc7_owner_of::Args,
     ) -> icrc7_owner_of::Response {
         crate::client::origyn_nft_reference::icrc7_owner_of(pic, sender, canister_id, &args)
     }
@@ -611,7 +569,7 @@ pub mod client {
     pub fn icrc7_permitted_drift(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_permitted_drift::Response {
         crate::client::origyn_nft_reference::icrc7_permitted_drift(pic, sender, canister_id, &())
     }
@@ -619,7 +577,7 @@ pub mod client {
     pub fn icrc7_supply_cap(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_supply_cap::Response {
         crate::client::origyn_nft_reference::icrc7_supply_cap(pic, sender, canister_id, &())
     }
@@ -627,20 +585,20 @@ pub mod client {
     pub fn icrc7_supported_standards(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_supported_standards::Response {
         crate::client::origyn_nft_reference::icrc7_supported_standards(
             pic,
             sender,
             canister_id,
-            &()
+            &(),
         )
     }
 
     pub fn icrc7_symbol(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_symbol::Response {
         crate::client::origyn_nft_reference::icrc7_symbol(pic, sender, canister_id, &())
     }
@@ -649,7 +607,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_token_metadata::Args
+        args: icrc7_token_metadata::Args,
     ) -> icrc7_token_metadata::Response {
         crate::client::origyn_nft_reference::icrc7_token_metadata(pic, sender, canister_id, &args)
     }
@@ -658,7 +616,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_tokens::Args
+        args: icrc7_tokens::Args,
     ) -> icrc7_tokens::Response {
         crate::client::origyn_nft_reference::icrc7_tokens(pic, sender, canister_id, &args)
     }
@@ -667,7 +625,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_tokens_of::Args
+        args: icrc7_tokens_of::Args,
     ) -> icrc7_tokens_of::Response {
         crate::client::origyn_nft_reference::icrc7_tokens_of(pic, sender, canister_id, &args)
     }
@@ -675,7 +633,7 @@ pub mod client {
     pub fn icrc7_total_supply(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_total_supply::Response {
         crate::client::origyn_nft_reference::icrc7_total_supply(pic, sender, canister_id, &())
     }
@@ -684,13 +642,13 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_transfer::Args
+        args: icrc7_transfer::Args,
     ) -> icrc7_transfer::Response {
         crate::client::origyn_nft_reference::icrc7_transfer(
             pic,
             sender,
             canister_id,
-            candid::encode_one(args).unwrap()
+            candid::encode_one(args).unwrap(),
         )
     }
 
@@ -698,7 +656,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: icrc7_transfer_fee::Args
+        args: icrc7_transfer_fee::Args,
     ) -> icrc7_transfer_fee::Response {
         crate::client::origyn_nft_reference::icrc7_transfer_fee(pic, sender, canister_id, &args)
     }
@@ -706,7 +664,7 @@ pub mod client {
     pub fn icrc7_tx_window(
         pic: &PocketIc,
         canister_id: CanisterId,
-        sender: Principal
+        sender: Principal,
     ) -> icrc7_tx_window::Response {
         crate::client::origyn_nft_reference::icrc7_tx_window(pic, sender, canister_id, &())
     }
@@ -715,7 +673,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: get_token_id_as_nat::Args
+        args: get_token_id_as_nat::Args,
     ) -> get_token_id_as_nat::Response {
         crate::client::origyn_nft_reference::get_token_id_as_nat(pic, sender, canister_id, &args)
     }
@@ -724,7 +682,7 @@ pub mod client {
         pic: &PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: collection_nft_origyn::Args
+        args: collection_nft_origyn::Args,
     ) -> collection_nft_origyn::Response {
         crate::client::origyn_nft_reference::collection_nft_origyn(pic, sender, canister_id, &args)
     }
@@ -733,13 +691,13 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: market_transfer_nft_origyn_batch::Args
+        args: market_transfer_nft_origyn_batch::Args,
     ) -> market_transfer_nft_origyn_batch::Response {
         crate::client::origyn_nft_reference::market_transfer_nft_origyn_batch(
             pic,
             sender,
             canister_id,
-            candid::encode_one(args).unwrap()
+            candid::encode_one(args).unwrap(),
         )
     }
 
@@ -747,13 +705,13 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: market_transfer_nft_origyn::Args
+        args: market_transfer_nft_origyn::Args,
     ) -> market_transfer_nft_origyn::Response {
         crate::client::origyn_nft_reference::market_transfer_nft_origyn(
             pic,
             sender,
             canister_id,
-            candid::encode_one(args).unwrap()
+            candid::encode_one(args).unwrap(),
         )
     }
 
@@ -761,7 +719,7 @@ pub mod client {
         pic: &mut PocketIc,
         canister_id: CanisterId,
         sender: Principal,
-        args: nft_origyn::Args
+        args: nft_origyn::Args,
     ) -> nft_origyn::Response {
         crate::client::origyn_nft_reference::nft_origyn(pic, sender, canister_id, &args)
     }

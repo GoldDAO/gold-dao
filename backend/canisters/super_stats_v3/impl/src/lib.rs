@@ -2,13 +2,13 @@ use ic_cdk::export_candid;
 
 pub mod core;
 pub mod stats;
-pub mod timers;
 mod test_data;
+pub mod timers;
 
-use stats::queries::*;
-use stats::updates::*;
 use core::api::*;
 use core::init_and_upgrade::*;
+use stats::queries::*;
+use stats::updates::*;
 
 export_candid!();
 
@@ -17,7 +17,7 @@ mod tests {
     use super_stats_v3_api::{
         account_tree::AccountTree,
         core::constants::D1_AS_NANOS,
-        custom_types::{ IndexerType, ProcessedTX, SmallTX, TransactionType },
+        custom_types::{IndexerType, ProcessedTX, SmallTX, TransactionType},
         fetch_data::dfinity_icrc2::DEFAULT_SUBACCOUNT,
         process_data::process_time_stats::StatsType,
         runtime::RUNTIME_STATE,
@@ -30,17 +30,15 @@ mod tests {
         stats::{
             process_data::{
                 process_index::process_smtx_to_index,
-                process_time_stats::{ calculate_time_stats, top_x_by_txvalue },
+                process_time_stats::{calculate_time_stats, top_x_by_txvalue},
                 small_tx::processedtx_to_smalltx,
             },
             utils::{
-                nearest_day_start,
-                nearest_past_hour,
-                parse_icrc_account,
+                nearest_day_start, nearest_past_hour, parse_icrc_account,
                 principal_subaccount_to_string,
             },
         },
-        test_data::{ ptx_test_data, test_state_init },
+        test_data::{ptx_test_data, test_state_init},
     };
 
     #[test]
@@ -79,12 +77,20 @@ mod tests {
 
         // from account to u32 ref (using Directory)
         let id_ref_from = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&first_ptx.from_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&first_ptx.from_account)
         });
 
         // to account to u32 ref (using Directory)
         let id_ref_to = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&first_ptx.to_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&first_ptx.to_account)
         });
 
         // check from ac on Small TX = from ac on Processed TX
@@ -95,7 +101,7 @@ mod tests {
         assert_eq!(first_stx.time, first_ptx.tx_time);
         // check type
         assert_eq!(first_stx.tx_type, 0_u8); // 0 = transfer, 1 = Mint, 2 = Burn. 3 = approve.
-        // check value
+                                             // check value
         assert_eq!(first_stx.value, first_ptx.tx_value);
         // check block
         assert_eq!(first_stx.block, first_ptx.block);
@@ -107,12 +113,20 @@ mod tests {
 
         // from account to u32 ref (using Directory)
         let mint_ref_from = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&mint_ptx.from_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&mint_ptx.from_account)
         });
 
         // to account to u32 ref (using Directory)
         let mint_ref_to = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&mint_ptx.to_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&mint_ptx.to_account)
         });
 
         // check from ac on Small TX = from ac on Processed TX
@@ -123,7 +137,7 @@ mod tests {
         assert_eq!(mint_stx.time, mint_ptx.tx_time);
         // check type
         assert_eq!(mint_stx.tx_type, 1_u8); // 0 = transfer, 1 = Mint, 2 = Burn. 3 = approve.
-        // check value
+                                            // check value
         assert_eq!(mint_stx.value, mint_ptx.tx_value);
         // check block
         assert_eq!(mint_stx.block, mint_ptx.block);
@@ -135,12 +149,20 @@ mod tests {
 
         // from account to u32 ref (using Directory)
         let burn_ref_from = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&burn_ptx.from_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&burn_ptx.from_account)
         });
 
         // to account to u32 ref (using Directory)
         let burn_ref_to = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&burn_ptx.to_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&burn_ptx.to_account)
         });
 
         // check from ac on Small TX = from ac on Processed TX
@@ -151,7 +173,7 @@ mod tests {
         assert_eq!(burn_stx.time, burn_ptx.tx_time);
         // check type
         assert_eq!(burn_stx.tx_type, 2_u8); // 0 = transfer, 1 = Mint, 2 = Burn. 3 = approve.
-        // check value
+                                            // check value
         assert_eq!(burn_stx.value, burn_ptx.tx_value);
         // check block
         assert_eq!(burn_stx.block, burn_ptx.block);
@@ -163,12 +185,20 @@ mod tests {
 
         // from account to u32 ref (using Directory)
         let ap_ref_from = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&ap_ptx.from_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&ap_ptx.from_account)
         });
 
         // to account to u32 ref (using Directory)
         let ap_ref_to = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().directory_data.get_ref(&ap_ptx.to_account)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_ref(&ap_ptx.to_account)
         });
 
         // check from ac on Small TX = from ac on Processed TX
@@ -179,7 +209,7 @@ mod tests {
         assert_eq!(ap_stx.time, ap_ptx.tx_time);
         // check type
         assert_eq!(ap_stx.tx_type, 3_u8); // 0 = transfer, 1 = Mint, 2 = Burn. 3 = approve.
-        // check value
+                                          // check value
         assert_eq!(ap_stx.value, ap_ptx.tx_value);
         // check block
         assert_eq!(ap_stx.block, ap_ptx.block);
@@ -232,7 +262,7 @@ mod tests {
         let sa = DEFAULT_SUBACCOUNT.to_string();
         let st = principal_subaccount_to_string(pr, sa);
         let res = String::from(
-            "2vxsx-fae.0000000000000000000000000000000000000000000000000000000000000000"
+            "2vxsx-fae.0000000000000000000000000000000000000000000000000000000000000000",
         );
         assert_eq!(res, st);
     }
@@ -240,7 +270,7 @@ mod tests {
     #[test]
     fn test_parse_account() {
         let inpt = String::from(
-            "2vxsx-fae.0000000000000000000000000000000000000000000000000000000000000000"
+            "2vxsx-fae.0000000000000000000000000000000000000000000000000000000000000000",
         );
         let output = parse_icrc_account(&inpt).unwrap();
         let pr = output.0;
@@ -270,13 +300,13 @@ mod tests {
         });
 
         let test_txs = ptx_test_data();
-        RUNTIME_STATE.with(|s| { s.borrow_mut().data.latest_blocks.push_tx_vec(test_txs) });
+        RUNTIME_STATE.with(|s| s.borrow_mut().data.latest_blocks.push_tx_vec(test_txs));
 
         let res = calculate_time_stats(
             process_from,
             StatsType::Daily,
             IndexerType::DfinityIcp,
-            time_now
+            time_now,
         );
 
         println!("RES :: {:?}", res);
@@ -286,17 +316,15 @@ mod tests {
         assert_eq!(res.total_transaction_average, 32391370967.774193);
 
         // Mint/ Burn/ Transfer/ Approve stats
-        let sum_all =
-            res.burn_stats.total_value +
-            res.mint_stats.total_value +
-            res.transfer_stats.total_value +
-            res.approve_stats.total_value;
+        let sum_all = res.burn_stats.total_value
+            + res.mint_stats.total_value
+            + res.transfer_stats.total_value
+            + res.approve_stats.total_value;
 
-        let count_all =
-            res.burn_stats.count +
-            res.mint_stats.count +
-            res.transfer_stats.count +
-            res.approve_stats.count;
+        let count_all = res.burn_stats.count
+            + res.mint_stats.count
+            + res.transfer_stats.count
+            + res.approve_stats.count;
 
         assert_eq!(sum_all, 1_005_132_500_001); // 1_000_000_000 higher than total_transaction_value b/c approve is counted
         assert_eq!(count_all, 31);
@@ -355,7 +383,7 @@ mod tests {
         let stx1 = SmallTX {
             block: 0,
             time: 86_400 * 1_000_000_000, // Day 1
-            tx_type: 1u8, // Mint
+            tx_type: 1u8,                 // Mint
             value: 100_000_000_000,
             fee: Some(0),
             to: Some(account1),
@@ -366,7 +394,8 @@ mod tests {
             Ok("Transfer Processed".to_string())
         );
         account_tree.accounts_history.debug_print();
-        let day1_acc1_history = account_tree.accounts_history
+        let day1_acc1_history = account_tree
+            .accounts_history
             .get(&(account1, 1))
             .unwrap()
             .to_owned();
@@ -379,7 +408,7 @@ mod tests {
         let stx2 = SmallTX {
             block: 1,
             time: 2 * 86_400 * 1_000_000_000, // Day 2
-            tx_type: 0u8, // Transfer
+            tx_type: 0u8,                     // Transfer
             value: 10_000_000_000,
             fee: Some(0),
             to: Some(account2),
@@ -395,12 +424,14 @@ mod tests {
         );
         account_tree.accounts_history.debug_print();
 
-        let day2_acc1_history = account_tree.accounts_history
+        let day2_acc1_history = account_tree
+            .accounts_history
             .get(&(account1, 2))
             .unwrap()
             .to_owned();
         assert_eq!(day2_acc1_history.balance, 90_000_000_000);
-        let day2_acc2_history = account_tree.accounts_history
+        let day2_acc2_history = account_tree
+            .accounts_history
             .get(&(account2, 2))
             .unwrap()
             .to_owned();
@@ -413,7 +444,7 @@ mod tests {
         let stx3 = SmallTX {
             block: 2,
             time: 3 * 86_400 * 1_000_000_000, // Day 3
-            tx_type: 0u8, // Transfer
+            tx_type: 0u8,                     // Transfer
             value: 5_000_000_000,
             fee: Some(0),
             to: Some(account1),
@@ -427,12 +458,14 @@ mod tests {
             account_tree.process_transfer_from(&account2, &stx3),
             Ok("Processed OK".to_string())
         );
-        let day3_acc1_history = account_tree.accounts_history
+        let day3_acc1_history = account_tree
+            .accounts_history
             .get(&(account1, 3))
             .unwrap()
             .to_owned();
         assert_eq!(day3_acc1_history.balance, 95_000_000_000);
-        let day3_acc2_history = account_tree.accounts_history
+        let day3_acc2_history = account_tree
+            .accounts_history
             .get(&(account2, 3))
             .unwrap()
             .to_owned();
@@ -445,7 +478,7 @@ mod tests {
         let stx4 = SmallTX {
             block: 3,
             time: 4 * 86_400 * 1_000_000_000, // Day 4
-            tx_type: 0u8, // Transfer
+            tx_type: 0u8,                     // Transfer
             value: 15_000_000_000,
             fee: Some(0),
             to: Some(account3),
@@ -459,12 +492,14 @@ mod tests {
             account_tree.process_transfer_from(&account1, &stx4),
             Ok("Processed OK".to_string())
         );
-        let day4_acc1_history = account_tree.accounts_history
+        let day4_acc1_history = account_tree
+            .accounts_history
             .get(&(account1, 4))
             .unwrap()
             .to_owned();
         assert_eq!(day4_acc1_history.balance, 80_000_000_000);
-        let day4_acc3_history = account_tree.accounts_history
+        let day4_acc3_history = account_tree
+            .accounts_history
             .get(&(account3, 4))
             .unwrap()
             .to_owned();
@@ -479,7 +514,11 @@ mod tests {
         let ptx = ptx_test_data();
         let _stx = processedtx_to_smalltx(&ptx);
         let snapshots = STABLE_STATE.with(|s| {
-            s.borrow().as_ref().unwrap().activity_stats.get_daily_snapshots(99)
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .activity_stats
+                .get_daily_snapshots(99)
         });
         println!("{:?}", snapshots);
         // First tx date - 28 June 2023

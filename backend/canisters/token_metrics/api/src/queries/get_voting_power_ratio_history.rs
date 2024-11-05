@@ -1,5 +1,5 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Default, Debug)]
 pub struct GetVotingPowerRatioHistory {

@@ -1,7 +1,7 @@
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
 use ledger_utils::icrc_account_to_legacy_account_id;
-use nns_governance_canister::types::{ neuron::DissolveState, Neuron };
+use nns_governance_canister::types::{neuron::DissolveState, Neuron};
 use serde::Serialize;
 use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
 
@@ -69,7 +69,7 @@ mod tests {
     use std::collections::HashMap;
 
     use icrc_ledger_types::icrc1::account::Account;
-    use nns_governance_canister::types::{ Neuron, NeuronId };
+    use nns_governance_canister::types::{Neuron, NeuronId};
     use utils::consts::NNS_GOVERNANCE_CANISTER_ID;
 
     use crate::types::neuron_metrics::DepositAccount;
@@ -79,40 +79,12 @@ mod tests {
     #[test]
     fn convert_neuron_to_neuron_metric() {
         let neuron = Neuron {
-            id: Some(NeuronId { id: 17_481_076_647_658_761_488 }),
+            id: Some(NeuronId {
+                id: 17_481_076_647_658_761_488,
+            }),
             account: vec![
-                149,
-                128,
-                178,
-                23,
-                182,
-                54,
-                48,
-                115,
-                178,
-                174,
-                154,
-                119,
-                21,
-                182,
-                104,
-                106,
-                141,
-                106,
-                190,
-                141,
-                3,
-                144,
-                216,
-                56,
-                228,
-                185,
-                230,
-                194,
-                1,
-                119,
-                126,
-                193
+                149, 128, 178, 23, 182, 54, 48, 115, 178, 174, 154, 119, 21, 182, 104, 106, 141,
+                106, 190, 141, 3, 144, 216, 56, 228, 185, 230, 194, 1, 119, 126, 193,
             ],
             controller: None,
             hot_keys: vec![],
@@ -145,7 +117,8 @@ mod tests {
                         141, 106, 190, 141, 3, 144, 216, 56, 228, 185, 230, 194, 1, 119, 126, 193,
                     ]),
                 },
-                legacy_account_id: "6601afb37d5807c9ed17c8343bb1c7180f98eca73a64727f56134c720cf0304a".to_string(),
+                legacy_account_id:
+                    "6601afb37d5807c9ed17c8343bb1c7180f98eca73a64727f56134c720cf0304a".to_string(),
             }),
             staked_amount: 0,
             maturity: 0,

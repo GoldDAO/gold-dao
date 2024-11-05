@@ -29,7 +29,7 @@ impl WorkingStats {
         return self.metrics.clone();
     }
 
-    pub fn set_next_block(&mut self, block: u64){
+    pub fn set_next_block(&mut self, block: u64) {
         self.next_block = block;
     }
 
@@ -37,24 +37,28 @@ impl WorkingStats {
         return self.next_block.clone();
     }
 
-    pub fn set_is_upto_date(&mut self, value: bool){
+    pub fn set_is_upto_date(&mut self, value: bool) {
         self.is_upto_date = value;
     }
 
     pub fn get_working_stats(&self) -> WorkingStats {
-        let total = STABLE_STATE.with(|s|{
-            s.borrow().as_ref().unwrap().directory_data.get_total_entries()
+        let total = STABLE_STATE.with(|s| {
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .directory_data
+                .get_total_entries()
         });
         let mut ws = self.clone();
         ws.directory_count = total;
         return ws;
     }
 
-    pub fn set_busy(&mut self){
+    pub fn set_busy(&mut self) {
         self.is_busy = true;
     }
-    
-    pub fn set_not_busy(&mut self){
+
+    pub fn set_not_busy(&mut self) {
         self.is_busy = false;
     }
 }
@@ -66,11 +70,11 @@ pub struct Metrics {
 }
 
 impl Metrics {
-    pub fn increment_total_errors(&mut self){
+    pub fn increment_total_errors(&mut self) {
         self.total_errors += 1;
     }
 
-    pub fn increment_total_api(&mut self){
+    pub fn increment_total_api(&mut self) {
         self.total_api_requests += 1;
     }
 }

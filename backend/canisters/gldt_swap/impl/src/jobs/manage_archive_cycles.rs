@@ -1,16 +1,22 @@
-use crate::state::{ mutate_state, read_state };
+use crate::state::{mutate_state, read_state};
 use candid::Nat;
-use canister_time::{ run_now_then_interval, MINUTE_IN_MS };
+use canister_time::{run_now_then_interval, MINUTE_IN_MS};
 use futures::future::join_all;
-use utils::{ canister::{ deposit_cycles, get_cycles_balance }, env::Environment };
 use std::time::Duration;
 use tracing::info;
-use types::{ Cycles, Milliseconds };
+use types::{Cycles, Milliseconds};
+use utils::{
+    canister::{deposit_cycles, get_cycles_balance},
+    env::Environment,
+};
 
 const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = MINUTE_IN_MS * 10;
 
 pub fn start_job() {
-    run_now_then_interval(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL), spawn_transfer_job);
+    run_now_then_interval(
+        Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL),
+        spawn_transfer_job,
+    );
 }
 
 pub fn spawn_transfer_job() {

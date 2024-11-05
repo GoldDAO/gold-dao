@@ -1,7 +1,7 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 
-use gldt_swap_common::swap::{ SwapId, SwapInfo };
+use gldt_swap_common::swap::{SwapId, SwapInfo};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct Args {

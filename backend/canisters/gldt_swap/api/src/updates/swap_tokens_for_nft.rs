@@ -1,9 +1,9 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 
 use gldt_swap_common::{
     nft::NftID,
-    swap::{ LockError, NftValidationError, ServiceDownReason, SwapId },
+    swap::{LockError, NftValidationError, ServiceDownReason, SwapId},
 };
 
 #[derive(CandidType, Deserialize, Clone, Debug, PartialEq)]

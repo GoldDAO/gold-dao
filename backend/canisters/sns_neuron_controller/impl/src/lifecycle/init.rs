@@ -1,12 +1,12 @@
 use crate::lifecycle::init_canister;
-use crate::state::{ Data, RuntimeState };
+use crate::state::{Data, RuntimeState};
 
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 pub use sns_neuron_controller_api_canister::Args;
 use tracing::info;
 use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
-use utils::env::{ CanisterEnv, Environment };
+use utils::env::{CanisterEnv, Environment};
 
 #[init]
 #[trace]
@@ -18,7 +18,7 @@ fn init(args: Args) {
             let env = CanisterEnv::new(
                 init_args.test_mode,
                 init_args.version,
-                init_args.commit_hash
+                init_args.commit_hash,
             );
             let mut data = Data::new(
                 init_args.authorized_principals,
@@ -26,12 +26,13 @@ fn init(args: Args) {
                 init_args.ogy_sns_ledger_canister_id,
                 init_args.ogy_sns_rewards_canister_id,
                 init_args.sns_rewards_canister_id,
-                env.now()
+                env.now(),
             );
 
             if init_args.test_mode {
                 data.authorized_principals.push(env.caller());
-                data.authorized_principals.push(SNS_GOVERNANCE_CANISTER_ID_STAGING);
+                data.authorized_principals
+                    .push(SNS_GOVERNANCE_CANISTER_ID_STAGING);
             }
 
             let runtime_state = RuntimeState::new(env, data);

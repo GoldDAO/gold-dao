@@ -1,17 +1,17 @@
-use crate::types::outstanding_payments::{ PaymentsList, PaymentStatus };
+use crate::state::{mutate_state, read_state, Neurons};
+use crate::types::outstanding_payments::{PaymentStatus, PaymentsList};
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
-use crate::state::{ mutate_state, read_state, Neurons };
-use canister_time::{ run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS };
+use canister_time::{run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS};
 use ledger_utils::icrc_account_to_legacy_account_id;
+use nns_governance_canister::types::ListNeurons;
 use nns_governance_canister::types::{
-    manage_neuron::{ disburse::Amount, Command, Disburse, Spawn },
+    manage_neuron::{disburse::Amount, Command, Disburse, Spawn},
     Neuron,
 };
-use nns_governance_canister::types::ListNeurons;
-use utils::{ consts::E8S_PER_ICP, env::Environment };
 use std::time::Duration;
-use tracing::{ error, info, warn };
+use tracing::{error, info, warn};
 use types::Milliseconds;
+use utils::{consts::E8S_PER_ICP, env::Environment};
 
 // Refresh daily to distribute potential rewards but add 1 minute offset to leave enough time in case a neuron is spawned
 const REFRESH_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS + MINUTE_IN_MS;
@@ -29,29 +29,30 @@ pub fn run() {
 async fn run_async() {
     let nns_governance_canister_id = read_state(|state| state.data.nns_governance_canister_id);
 
-    match
-        nns_governance_canister_c2c_client::list_neurons(
-            nns_governance_canister_id,
-            &(ListNeurons {
-                neuron_ids: Vec::new(),
-                include_neurons_readable_by_caller: true,
-            })
-        ).await
+    match nns_governance_canister_c2c_client::list_neurons(
+        nns_governance_canister_id,
+        &(ListNeurons {
+            neuron_ids: Vec::new(),
+            include_neurons_readable_by_caller: true,
+        }),
+    )
+    .await
     {
         Ok(response) => {
             let now = read_state(|state| state.env.now());
 
-            let neurons_to_spawn: Vec<_> = response.full_neurons
+            let neurons_to_spawn: Vec<_> = response
+                .full_neurons
                 .iter()
-                .filter(
-                    |n|
-                        n.spawn_at_timestamp_seconds.is_none() &&
-                        n.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP
-                )
+                .filter(|n| {
+                    n.spawn_at_timestamp_seconds.is_none()
+                        && n.maturity_e8s_equivalent > SPAWN_LIMIT_ICP * E8S_PER_ICP
+                })
                 .filter_map(|n| n.id.as_ref().map(|id| id.id))
                 .collect();
 
-            let neurons_to_disburse: Vec<Neuron> = response.full_neurons
+            let neurons_to_disburse: Vec<Neuron> = response
+                .full_neurons
                 .iter()
                 .filter(|n| n.is_dissolved(now) && n.cached_neuron_stake_e8s > 0)
                 .cloned()
@@ -98,12 +99,14 @@ async fn run_async() {
             if neurons_updated {
                 // Refresh the neurons again given that they've been updated (spawned neurons and disbursed neurons)
                 // Add a delay of 5 minutes to give enough time for transactions to pass
-                ic_cdk_timers::set_timer(Duration::from_millis(5 * MINUTE_IN_MS), ||
+                ic_cdk_timers::set_timer(Duration::from_millis(5 * MINUTE_IN_MS), || {
                     ic_cdk::spawn(run_async())
-                );
+                });
             }
         }
-        Err(err) => { error!("Error fetching neuron list: {err:?}") }
+        Err(err) => {
+            error!("Error fetching neuron list: {err:?}")
+        }
     }
 }
 
@@ -142,15 +145,15 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
         // This may happen if the payment cycle is interrupted because of an upgrade and then the disburse_neurons()
         // call would rerun on the same neuron. If a payment has already been made, some addresses could receive
         // double payments and others receive less than they should.
-        if
-            let Some(previous_list) = read_state(|s|
-                s.data.outstanding_payments.get_outstanding_payments(neuron_id)
-            )
-        {
+        if let Some(previous_list) = read_state(|s| {
+            s.data
+                .outstanding_payments
+                .get_outstanding_payments(neuron_id)
+        }) {
             payments_list = previous_list;
         } else {
             payments_list = match rewards_recipients.split_amount_to_each_recipient(total_amount) {
-                Ok(list) => { PaymentsList::new(list) }
+                Ok(list) => PaymentsList::new(list),
                 Err(err) => {
                     error!(
                         "Error splitting amount to each recipient for neuron {neuron_id}. Error: {err}"
@@ -159,12 +162,11 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
                 }
             };
             // write to state to make sure its stored
-            mutate_state(|s| (
-                if
-                    let Err(previous_list) = s.data.outstanding_payments.insert(
-                        neuron_id,
-                        payments_list.clone()
-                    )
+            mutate_state(|s| {
+                (if let Err(previous_list) = s
+                    .data
+                    .outstanding_payments
+                    .insert(neuron_id, payments_list.clone())
                 {
                     // This means that there was already an entry in the list for this neuron.
                     // This should not be possible as we previously checked if outstanding payments are left.
@@ -173,8 +175,8 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
                         "Previous payment found for {neuron_id} although it was previously checked. Continuing but this should not happen."
                     );
                     payments_list = previous_list;
-                }
-            ));
+                })
+            });
         }
 
         // would occur if no rewards_recipients are defined
@@ -189,23 +191,25 @@ async fn disburse_neurons(neurons: Vec<Neuron>) {
             let icp_ledger_account = nns_governance_canister::types::AccountIdentifier {
                 hash: icrc_account_to_legacy_account_id(account).as_ref().to_vec(),
             };
-            match
-                manage_nns_neuron_impl(
-                    neuron_id,
-                    Command::Disburse(Disburse {
-                        to_account: Some(icp_ledger_account),
-                        amount: Some(Amount { e8s: payment.get_amount() }),
-                    })
-                ).await
+            match manage_nns_neuron_impl(
+                neuron_id,
+                Command::Disburse(Disburse {
+                    to_account: Some(icp_ledger_account),
+                    amount: Some(Amount {
+                        e8s: payment.get_amount(),
+                    }),
+                }),
+            )
+            .await
             {
                 Ok(_) => {
-                    mutate_state(|s|
+                    mutate_state(|s| {
                         s.data.outstanding_payments.update_status_of_entry_in_list(
                             neuron_id,
                             account,
-                            PaymentStatus::Complete
+                            PaymentStatus::Complete,
                         )
-                    );
+                    });
                 }
                 Err(err) => {
                     error!(

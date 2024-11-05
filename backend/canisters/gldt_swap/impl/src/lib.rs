@@ -1,20 +1,20 @@
 use ic_cdk::export_candid;
-mod utils;
+pub mod archive;
 mod guards;
 mod jobs;
 pub mod lifecycle;
+mod memory;
 pub mod model;
 pub mod queries;
-pub mod state;
-mod memory;
-pub mod updates;
-pub mod swap;
-pub mod archive;
 pub mod service_status;
+pub mod state;
+pub mod swap;
+pub mod updates;
+mod utils;
 
-use updates::*;
 use archive::*;
-use queries::*;
 use lifecycle::*;
+use queries::*;
+use updates::*;
 
 export_candid!();

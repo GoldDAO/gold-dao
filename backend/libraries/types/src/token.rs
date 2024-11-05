@@ -1,10 +1,12 @@
-use std::{ borrow::Cow, fmt::Display };
+use std::{borrow::Cow, fmt::Display};
 
-use candid::{ CandidType, Decode, Encode, Principal };
-use ic_stable_structures::{ storable::Bound, Storable };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Decode, Encode, Principal};
+use ic_stable_structures::{storable::Bound, Storable};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord,
+)]
 pub struct TokenSymbol(String);
 
 #[derive(Debug)]

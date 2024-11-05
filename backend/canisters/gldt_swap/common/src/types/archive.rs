@@ -1,8 +1,8 @@
 use core::fmt;
-use std::fmt::{ Display, Formatter };
+use std::fmt::{Display, Formatter};
 
-use candid::{ CandidType, Nat, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Nat, Principal};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct ArchiveCanister {
@@ -19,7 +19,9 @@ impl Display for ArchiveCanister {
             "{{ canister_id: {}, start_index: {}, end_index: {} }}",
             self.canister_id,
             self.start_index.to_string(),
-            self.end_index.as_ref().map_or("None".to_string(), |v| v.to_string())
+            self.end_index
+                .as_ref()
+                .map_or("None".to_string(), |v| v.to_string())
         )
     }
 }
@@ -35,8 +37,8 @@ pub fn format_archive_canisters(canisters: Vec<ArchiveCanister>) -> String {
 
 #[cfg(test)]
 mod tests {
-    use candid::{ Nat, Principal };
     use super::*;
+    use candid::{Nat, Principal};
 
     #[test]
     fn test_archive_record_formatter() {
@@ -52,7 +54,7 @@ mod tests {
                 canister_id: Principal::anonymous(),
                 end_index: None,
                 active: true,
-            }
+            },
         ];
 
         let expected = format_archive_canisters(archives);

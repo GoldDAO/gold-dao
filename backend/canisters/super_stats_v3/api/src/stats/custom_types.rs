@@ -1,8 +1,8 @@
-use core::fmt;
-use std::collections::VecDeque;
+use super::{account_tree::Overview, constants::MAX_BLOCKS_RETAINED};
 use candid::CandidType;
-use serde::{ Serialize, Deserialize };
-use super::{ constants::MAX_BLOCKS_RETAINED, account_tree::Overview };
+use core::fmt;
+use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
 
 #[derive(CandidType, Debug, Serialize, Default, Deserialize, Clone, PartialEq, Eq)]
 pub enum IndexerType {
@@ -108,7 +108,11 @@ impl BlockHolder {
     }
 
     pub fn get_txs(&self, number_txs: usize) -> Vec<ProcessedTX> {
-        let n = if number_txs > Self::MAX_SIZE { Self::MAX_SIZE } else { number_txs };
+        let n = if number_txs > Self::MAX_SIZE {
+            Self::MAX_SIZE
+        } else {
+            number_txs
+        };
         let vec: Vec<ProcessedTX> = self.blocks.iter().take(n).cloned().collect();
         return vec;
     }
@@ -126,7 +130,8 @@ impl BlockHolder {
 
         // remove old txs
         if self.blocks.len() > 0 {
-            self.blocks.retain(|transaction| transaction.tx_time >= clean_before);
+            self.blocks
+                .retain(|transaction| transaction.tx_time >= clean_before);
         }
 
         // add new blocks

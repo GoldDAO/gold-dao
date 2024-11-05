@@ -1,8 +1,8 @@
-use std::{ borrow::Cow, collections::HashMap };
+use std::{borrow::Cow, collections::HashMap};
 
-use candid::{ CandidType, Decode, Encode };
-use ic_stable_structures::{ storable::Bound, Storable };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Decode, Encode};
+use ic_stable_structures::{storable::Bound, Storable};
+use serde::{Deserialize, Serialize};
 
 use crate::token::TokenSymbol;
 

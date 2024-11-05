@@ -1,43 +1,32 @@
-use candid::{ Encode, Nat, Principal };
-use gldt_swap_common::archive::ArchiveCanister;
+use candid::{Encode, Nat, Principal};
 use gldt_swap_api_archive::lifecycle::Args as ArgsArchive;
-use gldt_swap_api_archive::{ init::InitArgs, post_upgrade::UpgradeArgs };
+use gldt_swap_api_archive::{init::InitArgs, post_upgrade::UpgradeArgs};
 use gldt_swap_archive_c2c_client::get_archive_size;
+use gldt_swap_common::archive::ArchiveCanister;
 use gldt_swap_common::swap::NewArchiveError;
 use ic_cdk::api::management_canister::main::{
-    canister_status,
-    create_canister,
-    install_code,
-    start_canister,
-    stop_canister,
-    CanisterId,
-    CanisterIdRecord,
-    CanisterInstallMode,
-    CanisterSettings,
-    CreateCanisterArgument,
-    InstallCodeArgument,
-    LogVisibility,
+    canister_status, create_canister, install_code, start_canister, stop_canister, CanisterId,
+    CanisterIdRecord, CanisterInstallMode, CanisterSettings, CreateCanisterArgument,
+    InstallCodeArgument, LogVisibility,
 };
-use tracing::{ debug, info };
-use utils::{ env::Environment, retry_async::retry_async };
+use tracing::{debug, info};
+use utils::{env::Environment, retry_async::retry_async};
 
-use crate::state::{ mutate_state, read_state };
+use crate::state::{mutate_state, read_state};
 use crate::utils::trace;
 
 const ARCHIVE_WASM: &[u8] = include_bytes!("../../archive/wasm/gldt_swap_archive_canister.wasm.gz");
 
 pub async fn check_storage_and_create_archive() -> Result<(), ()> {
     // check if the capacity is
-    if
-        let Some(current_archive) = read_state(|s|
-            s.data.swaps.get_archive_canisters().last().cloned()
-        )
+    if let Some(current_archive) =
+        read_state(|s| s.data.swaps.get_archive_canisters().last().cloned())
     {
         if is_archive_canister_at_threshold(&current_archive).await {
             info!("ARCHIVE :: at capacity :: creating new archive canister");
             trace("///// Checking archive 3");
             let archive_principal = match create_archive_canister().await {
-                Ok(principal) => { principal }
+                Ok(principal) => principal,
                 Err(e) => {
                     debug!("{e:?}");
                     mutate_state(|s| {
@@ -49,14 +38,14 @@ pub async fn check_storage_and_create_archive() -> Result<(), ()> {
             let current_swap_index = read_state(|s| s.data.swaps.get_current_swap_index());
             let archive_buffer = read_state(|s| s.data.archive_buffer);
             let future_swap_index = current_swap_index + Nat::from(archive_buffer);
-            mutate_state(|s|
+            mutate_state(|s| {
                 s.data.swaps.set_new_archive_canister(ArchiveCanister {
                     canister_id: archive_principal,
                     start_index: future_swap_index,
                     end_index: None,
                     active: false,
                 })
-            );
+            });
             // new archive created
             return Ok(());
         } else {
@@ -96,19 +85,20 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
         wasm_memory_limit: None, // use default of 3GB
     };
     // Step 1: Create the canister
-    let canister_id = match
-        retry_async(
-            ||
-                create_canister(
-                    CreateCanisterArgument {
-                        settings: Some(settings.clone()),
-                    },
-                    initial_cycles as u128
-                ),
-            3
-        ).await
+    let canister_id = match retry_async(
+        || {
+            create_canister(
+                CreateCanisterArgument {
+                    settings: Some(settings.clone()),
+                },
+                initial_cycles as u128,
+            )
+        },
+        3,
+    )
+    .await
     {
-        Ok(canister) => { canister.0.canister_id }
+        Ok(canister) => canister.0.canister_id,
         Err(e) => {
             return Err(NewArchiveError::CreateCanisterError(format!("{e:?}")));
         }
@@ -118,15 +108,11 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     let commit_hash = read_state(|s| s.env.commit_hash().to_string());
     current_auth_prins.push(this_canister_id);
 
-    let init_args = match
-        Encode!(
-            &ArgsArchive::Init(InitArgs {
-                commit_hash,
-                authorized_principals: current_auth_prins,
-                test_mode,
-            })
-        )
-    {
+    let init_args = match Encode!(&ArgsArchive::Init(InitArgs {
+        commit_hash,
+        authorized_principals: current_auth_prins,
+        test_mode,
+    })) {
         Ok(encoded_init_args) => encoded_init_args,
         Err(e) => {
             return Err(NewArchiveError::FailedToSerializeInitArgs(format!("{e}")));
@@ -156,9 +142,8 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
 
 pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool {
     let res = retry_async(|| get_archive_size(archive.canister_id, &()), 3).await;
-    let max_canister_archive_threshold = read_state(|s|
-        s.data.max_canister_archive_threshold.clone()
-    );
+    let max_canister_archive_threshold =
+        read_state(|s| s.data.max_canister_archive_threshold.clone());
     let archive_id = archive.canister_id;
     trace(
         &format!(
@@ -169,8 +154,8 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
         "ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
     );
     match res {
-        Ok(size) => { (size as u128) >= max_canister_archive_threshold }
-        Err(_) => { false }
+        Ok(size) => (size as u128) >= max_canister_archive_threshold,
+        Err(_) => false,
     }
 }
 
@@ -182,31 +167,30 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
     let this_canister_id = read_state(|s| s.env.canister_id());
     current_auth_prins.push(this_canister_id);
 
-    let init_args = match
-        Encode!(
-            &ArgsArchive::Upgrade(UpgradeArgs {
-                commit_hash,
-                version,
-            })
-        )
-    {
+    let init_args = match Encode!(&ArgsArchive::Upgrade(UpgradeArgs {
+        commit_hash,
+        version,
+    })) {
         Ok(encoded_init_args) => encoded_init_args,
         Err(e) => {
-            return Err(vec![format!("ERROR : failed to create init args with error - {e}")]);
+            return Err(vec![format!(
+                "ERROR : failed to create init args with error - {e}"
+            )]);
         }
     };
 
     let mut canister_upgrade_errors = vec![];
 
     for archive in archive_canisters {
-        match
-            retry_async(
-                ||
-                    stop_canister(CanisterIdRecord {
-                        canister_id: archive.canister_id,
-                    }),
-                3
-            ).await
+        match retry_async(
+            || {
+                stop_canister(CanisterIdRecord {
+                    canister_id: archive.canister_id,
+                })
+            },
+            3,
+        )
+        .await
         {
             Ok(_) => {}
             Err(e) => {
@@ -236,14 +220,15 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
 
         match result {
             Ok(_) => {
-                match
-                    retry_async(
-                        ||
-                            start_canister(CanisterIdRecord {
-                                canister_id: archive.canister_id,
-                            }),
-                        3
-                    ).await
+                match retry_async(
+                    || {
+                        start_canister(CanisterIdRecord {
+                            canister_id: archive.canister_id,
+                        })
+                    },
+                    3,
+                )
+                .await
                 {
                     Ok(_) => {}
                     Err(e) => {
@@ -277,10 +262,10 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
 }
 
 async fn get_canister_controllers(
-    canister_id: CanisterId
+    canister_id: CanisterId,
 ) -> Result<Vec<Principal>, NewArchiveError> {
     match retry_async(|| canister_status(CanisterIdRecord { canister_id }), 3).await {
         Ok(res) => Ok(res.0.settings.controllers),
-        Err(e) => { Err(NewArchiveError::CantFindControllers(format!("{e:?}"))) }
+        Err(e) => Err(NewArchiveError::CantFindControllers(format!("{e:?}"))),
     }
 }

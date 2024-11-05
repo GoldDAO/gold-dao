@@ -1,7 +1,7 @@
-use candid::CandidType;
-use serde::{ Deserialize, Serialize };
-use types::TokenInfo;
 use crate::icpswap::ICPSwapConfig;
+use candid::CandidType;
+use serde::{Deserialize, Serialize};
+use types::TokenInfo;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct SwapConfig {

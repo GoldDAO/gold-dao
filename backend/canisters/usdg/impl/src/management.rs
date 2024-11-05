@@ -70,7 +70,9 @@ impl fmt::Display for Reason {
 /// https://github.com/dfinity/exchange-rate-canister
 // pub async fn fetch_gold_price() -> Result<GetExchangeRateResult, String> {
 //     const XRC_CALL_COST_CYCLES: u64 = 10_000_000_000;
-
+//
+//     1 GLDT = 0.01g of gold
+//
 //     let gold = Asset {
 //         symbol: "GOLD".to_string(),
 //         class: AssetClass::RWA,
@@ -133,7 +135,7 @@ pub async fn transfer(
     Ok(block_index.0.try_into().unwrap())
 }
 
-async fn transfer_from(
+pub async fn transfer_from(
     from: impl Into<Account>,
     to: impl Into<Account>,
     amount: Nat,

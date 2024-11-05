@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use candid::Nat;
-use types::{ TokenInfo, TokenSymbol };
+use std::collections::HashMap;
+use types::{TokenInfo, TokenSymbol};
 
 pub mod payment_round;
 pub mod subaccounts;

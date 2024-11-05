@@ -6,9 +6,7 @@ pub use token_metrics_api::Args;
 use tracing::info;
 
 use crate::{
-    memory::get_upgrades_memory,
-    migrations::types::state::RuntimeStateV0,
-    state::RuntimeState,
+    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
 };
 
 use super::init_canister;

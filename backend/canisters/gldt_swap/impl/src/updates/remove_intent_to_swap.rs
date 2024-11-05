@@ -1,13 +1,15 @@
 use gldt_swap_api_canister::remove_intent_to_swap::RemoveIntentToSwapError;
-use gldt_swap_common::swap::{ SwapInfo, SwapStatusForward };
 pub use gldt_swap_api_canister::remove_intent_to_swap::{
-    Args as RemoveIntentToSwapArgs,
-    Response as RemoveIntentToSwapResponse,
+    Args as RemoveIntentToSwapArgs, Response as RemoveIntentToSwapResponse,
 };
+use gldt_swap_common::swap::{SwapInfo, SwapStatusForward};
 use ic_cdk::update;
 use utils::env::Environment;
 
-use crate::{ state::{ mutate_state, read_state }, utils::is_nft_in_sale_state };
+use crate::{
+    state::{mutate_state, read_state},
+    utils::is_nft_in_sale_state,
+};
 
 #[update]
 async fn remove_intent_to_swap(args: RemoveIntentToSwapArgs) -> RemoveIntentToSwapResponse {
@@ -31,11 +33,9 @@ async fn remove_intent_to_swap(args: RemoveIntentToSwapArgs) -> RemoveIntentToSw
             mutate_state(|s| s.data.swaps.remove_swap_from_active_swaps(&args));
             Ok(())
         } else {
-            Err(
-                RemoveIntentToSwapError::InvalidSwapType(
-                    format!("You may only remove forward swaps")
-                )
-            )
+            Err(RemoveIntentToSwapError::InvalidSwapType(format!(
+                "You may only remove forward swaps"
+            )))
         }
     } else {
         Err(RemoveIntentToSwapError::SwapNotFound)

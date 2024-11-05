@@ -1,10 +1,10 @@
-use crate::{ generate_pocket_query_call, generate_pocket_update_call };
-use candid::{ CandidType, Nat };
-use icrc_ledger_types::icrc2::approve::{ ApproveArgs, ApproveError };
-use icrc_ledger_types::icrc2::allowance::{ Allowance, AllowanceArgs };
-use icrc_ledger_types::icrc2::transfer_from::{ TransferFromArgs, TransferFromError };
+use crate::{generate_pocket_query_call, generate_pocket_update_call};
+use candid::{CandidType, Nat};
 use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc1::transfer::{ TransferArg, TransferError };
+use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
+use icrc_ledger_types::icrc2::allowance::{Allowance, AllowanceArgs};
+use icrc_ledger_types::icrc2::approve::{ApproveArgs, ApproveError};
+use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 
 use serde::Deserialize;
 

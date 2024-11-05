@@ -1,6 +1,6 @@
-use crate::{ CanisterId, NnsNeuronId, ProposalId, SnsNeuronId, TimestampMillis };
+use crate::{CanisterId, NnsNeuronId, ProposalId, SnsNeuronId, TimestampMillis};
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub enum Proposal {

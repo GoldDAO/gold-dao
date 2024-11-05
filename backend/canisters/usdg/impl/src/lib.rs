@@ -1,3 +1,5 @@
+use crate::numeric::GLDT;
+
 pub mod cbor;
 pub mod lifecycle;
 pub mod management;
@@ -17,3 +19,6 @@ const SEC_NANOS: u64 = 1_000_000_000;
 /// Fee constants
 const GLDT_TRANSFER_FEE: u64 = 10_000;
 const USDG_TRANSFER_FEE: u64 = 1_000_000;
+
+/// Minimum Amounts
+const MINIMUM_MARGIN_AMOUNT: GLDT = GLDT::from_unscaled(50);

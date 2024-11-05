@@ -1,20 +1,25 @@
 use std::time::Duration;
 
 use crate::{
-    check_storage_and_create_archive,
-    create_archive_canister,
-    state::{ mutate_state, read_state },
+    check_storage_and_create_archive, create_archive_canister,
+    state::{mutate_state, read_state},
     update_archive_canisters,
 };
 use candid::Nat;
-use gldt_swap_common::{ archive::ArchiveCanister, swap::{ ArchiveDownReason, ArchiveStatus } };
+use canister_time::{run_interval, run_once, SECOND_IN_MS};
+use gldt_swap_common::{
+    archive::ArchiveCanister,
+    swap::{ArchiveDownReason, ArchiveStatus},
+};
 use ic_cdk::trap;
-use tracing::{ debug, info };
-use canister_time::{ run_interval, run_once, SECOND_IN_MS };
+use tracing::{debug, info};
 
 pub fn start_job() {
     run_once(spawn_archive_on_init);
-    run_interval(Duration::from_millis(SECOND_IN_MS * 30), spawn_manage_archives);
+    run_interval(
+        Duration::from_millis(SECOND_IN_MS * 30),
+        spawn_manage_archives,
+    );
 }
 
 pub fn spawn_archive_on_init() {
@@ -46,9 +51,9 @@ async fn archive_on_init() {
             }
             Err(e) => {
                 mutate_state(|s| {
-                    s.set_archive_status(
-                        ArchiveStatus::Down(ArchiveDownReason::NewArchiveError(e.clone()))
-                    );
+                    s.set_archive_status(ArchiveStatus::Down(ArchiveDownReason::NewArchiveError(
+                        e.clone(),
+                    )));
                 });
 
                 trap(&format!("{e:?}"));
@@ -68,11 +73,11 @@ async fn archive_on_init() {
             Err(errors) => {
                 for e in errors {
                     debug!(e);
-                    mutate_state(|s|
-                        s.set_archive_status(
-                            ArchiveStatus::Down(ArchiveDownReason::UpgradingArchivesFailed(e))
-                        )
-                    );
+                    mutate_state(|s| {
+                        s.set_archive_status(ArchiveStatus::Down(
+                            ArchiveDownReason::UpgradingArchivesFailed(e),
+                        ))
+                    });
                 }
             }
         }

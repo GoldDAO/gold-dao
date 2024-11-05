@@ -4,14 +4,13 @@
 #![allow(unused_mut)] // Ignore warnings for unused mutable variables
 #![allow(unused_macros)]
 
-use gldt_swap_common::swap::{ trace, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
-use ic_cdk::update;
-pub use gldt_swap_api_canister::insert_fake_bulk_swaps::{
-    Args as InsertFakeBulkSwapArgs,
-    Response as InsertFakeBulkSwapResponse,
-};
 use crate::guards::caller_is_authorized;
 use crate::swap::swap_info::SwapInfoTrait;
+pub use gldt_swap_api_canister::insert_fake_bulk_swaps::{
+    Args as InsertFakeBulkSwapArgs, Response as InsertFakeBulkSwapResponse,
+};
+use gldt_swap_common::swap::{trace, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse};
+use ic_cdk::update;
 
 #[cfg(feature = "inttest")]
 #[update(hidden = true, guard = "caller_is_authorized")]
@@ -44,9 +43,8 @@ async fn insert_fake_bulk_swaps_impl(swaps: InsertFakeBulkSwapArgs) -> InsertFak
                 let nft_id = swap_details.nft_id.clone();
                 match new_swap.insert_swap().await {
                     Ok(swap_id) => {
-                        new_swap.update_status(
-                            SwapStatus::Reverse(new_reverse_swap_status.clone())
-                        );
+                        new_swap
+                            .update_status(SwapStatus::Reverse(new_reverse_swap_status.clone()));
                     }
                     Err(_) => {
                         return Err(format!("Something went wrong 2"));
