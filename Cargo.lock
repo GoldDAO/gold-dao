@@ -64,9 +64,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.82"
+version = "0.1.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a27b8a3a6e1a44fa4c8baf1f653e4172e81486d4941f2237e20dc2d0cf4ddff1"
+checksum = "721cae7de5c34fbb2acd27e21e6d2cf7b886dce0c27388d46c4e6c47ea4318dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -216,7 +216,7 @@ dependencies = [
  "ic-stable-structures",
  "icpswap_swap_pool_canister",
  "icpswap_swap_pool_canister_c2c_client",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "serde",
  "serde_json",
@@ -234,7 +234,7 @@ dependencies = [
  "candid 0.10.10",
  "ic-ledger-types",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "types",
 ]
@@ -867,7 +867,7 @@ dependencies = [
  "ic-cdk-macros 0.13.2",
  "ic-stable-structures",
  "ic0 0.23.0",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister",
  "icrc_ledger_canister_c2c_client",
  "origyn_nft_reference",
@@ -899,7 +899,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "num-bigint",
  "origyn_nft_reference",
@@ -933,7 +933,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "num-bigint",
  "origyn_nft_reference",
@@ -969,7 +969,7 @@ dependencies = [
  "ic-ledger-types",
  "ic-stable-structures",
  "ic0 0.23.0",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister",
  "icrc_ledger_canister_c2c_client",
  "origyn_nft_reference",
@@ -1011,7 +1011,7 @@ dependencies = [
  "ic-ledger-types",
  "ic-stable-structures",
  "ic0 0.23.0",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "num-bigint",
  "origyn_nft_reference",
@@ -1474,6 +1474,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-xrc-types"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1a2b2eaa332201f4abbd1192a307f7a5b6ea55d077a7f489ac62bf8e358b5a2"
+dependencies = [
+ "candid 0.10.10",
+ "serde",
+]
+
+[[package]]
 name = "ic0"
 version = "0.18.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1538,7 +1548,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-stable-structures",
  "ic-transport-types",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "k256",
  "ledger_utils",
@@ -1574,6 +1584,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "icrc-ledger-client"
+version = "0.1.2"
+source = "git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb#1488a310043f6a0907f4a84ba7af00e3d90d16eb"
+dependencies = [
+ "async-trait",
+ "candid 0.10.10",
+ "icrc-ledger-types 0.1.6 (git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb)",
+ "serde",
+]
+
+[[package]]
+name = "icrc-ledger-client-cdk"
+version = "0.1.2"
+source = "git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb#1488a310043f6a0907f4a84ba7af00e3d90d16eb"
+dependencies = [
+ "async-trait",
+ "candid 0.10.10",
+ "ic-cdk 0.16.0",
+ "icrc-ledger-client",
+]
+
+[[package]]
 name = "icrc-ledger-types"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1594,12 +1626,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "icrc-ledger-types"
+version = "0.1.6"
+source = "git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb#1488a310043f6a0907f4a84ba7af00e3d90d16eb"
+dependencies = [
+ "base32",
+ "candid 0.10.10",
+ "crc32fast",
+ "hex",
+ "ic-stable-structures",
+ "itertools 0.12.1",
+ "num-bigint",
+ "num-traits",
+ "serde",
+ "serde_bytes",
+ "sha2",
+ "strum",
+ "strum_macros",
+ "time",
+]
+
+[[package]]
 name = "icrc_ledger_canister"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "candid_gen",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
 ]
 
@@ -1664,7 +1717,7 @@ dependencies = [
  "gldt_swap_common",
  "hex",
  "ic-ledger-types",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister",
  "lazy_static",
  "management_api_canister",
@@ -1803,7 +1856,7 @@ dependencies = [
  "candid 0.10.10",
  "ic-ledger-types",
  "icp_ledger_canister_c2c_client",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "sha2",
  "sha256",
@@ -2985,7 +3038,7 @@ dependencies = [
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "ledger_utils",
  "ogy_sns_rewards_api_canister",
@@ -3029,7 +3082,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-stable-structures",
  "ic0 0.23.0",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "serde",
  "serde_json",
@@ -3051,7 +3104,7 @@ dependencies = [
  "candid 0.10.10",
  "canister_time",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint",
  "serde",
  "sns_governance_canister",
@@ -3340,7 +3393,7 @@ dependencies = [
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "serde",
  "serde_json",
@@ -3363,7 +3416,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "ic-ledger-types",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "super_stats_v3_api",
  "types",
@@ -3595,7 +3648,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.10",
  "ic-stable-structures",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_bytes",
 ]
@@ -3691,8 +3744,12 @@ version = "0.1.0"
 name = "usdg_canister"
 version = "0.1.0"
 dependencies = [
+ "candid 0.10.10",
  "ic-cdk 0.16.0",
+ "ic-xrc-types",
  "ic0 0.23.0",
+ "icrc-ledger-client-cdk",
+ "icrc-ledger-types 0.1.6 (git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb)",
 ]
 
 [[package]]
@@ -3703,7 +3760,7 @@ dependencies = [
  "canister_time",
  "hex",
  "ic-cdk 0.16.0",
- "icrc-ledger-types",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "stable_memory",
  "tokio",
