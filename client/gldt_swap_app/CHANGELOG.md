@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Handling errors on reverse swap.
 
+#### Fix
+
+- User can't reconnect after manually disconnect.
+
 ### [1.0.4] - 2024-11-04
 
 #### Description
