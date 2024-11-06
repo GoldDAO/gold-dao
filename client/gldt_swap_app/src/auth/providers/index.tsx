@@ -150,6 +150,7 @@ export const AuthProvider = ({
           isConnecting: false,
           agent: undefined,
         }));
+        window.location.reload();
         // console.log("disconnected");
       }}
     >
