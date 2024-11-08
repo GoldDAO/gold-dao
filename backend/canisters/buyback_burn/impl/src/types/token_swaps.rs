@@ -1,13 +1,13 @@
 use crate::memory::get_swap_history_memory;
 use crate::memory::VM;
-use ic_stable_structures::StableBTreeMap;
-use serde::{ Deserialize, Serialize };
-use std::collections::HashMap;
-use tracing::error;
-use types::TimestampMillis;
 use crate::types::*;
 use buyback_burn_api::get_active_swaps::Response;
 use candid::CandidType;
+use ic_stable_structures::StableBTreeMap;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tracing::error;
+use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {

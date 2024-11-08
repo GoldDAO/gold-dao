@@ -13,7 +13,7 @@ impl From<RuntimeStateV0> for RuntimeState {
             env: CanisterEnv::new(
                 old_state.env.is_test_mode(),
                 BuildVersion::default(),
-                "".to_string()
+                "".to_string(),
             ),
             data: old_state.data,
         }

@@ -1,17 +1,13 @@
-use candid::{ decode_one, encode_one };
-use ic_cdk_macros::{ init, pre_upgrade, post_upgrade };
+use candid::{decode_one, encode_one};
+use ic_cdk_macros::{init, post_upgrade, pre_upgrade};
 use ic_stable_memory::{
-    stable_memory_init,
-    store_custom_data,
-    stable_memory_pre_upgrade,
-    SBox,
-    stable_memory_post_upgrade,
-    retrieve_custom_data,
+    retrieve_custom_data, stable_memory_init, stable_memory_post_upgrade,
+    stable_memory_pre_upgrade, store_custom_data, SBox,
 };
 pub use super_stats_v3_api::{
     init_and_upgrade::InitArgs,
-    runtime::{ Data, RuntimeState, RUNTIME_STATE },
-    stable_memory::{ Main, STABLE_STATE },
+    runtime::{Data, RuntimeState, RUNTIME_STATE},
+    stable_memory::{Main, STABLE_STATE},
     stats::constants::STATS_RETURN_LENGTH,
     utils::log,
     working_stats::WorkingStats,
@@ -49,7 +45,7 @@ fn pre_upgrade() {
     store_custom_data(0, boxed_state);
 
     // Runtime Storage
-    let rstate = RUNTIME_STATE.with(|s| { s.borrow_mut().to_owned() });
+    let rstate = RUNTIME_STATE.with(|s| s.borrow_mut().to_owned());
     let bytes = encode_one(rstate).expect("Unable to candid encode");
     let boxed_bytes = SBox::new(bytes).expect("Out of memory");
     store_custom_data(1, boxed_bytes);

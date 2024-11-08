@@ -1,7 +1,7 @@
+mod lifecycle;
 mod queries;
 mod updates;
-mod lifecycle;
 
+pub use lifecycle::*;
 pub use queries::*;
 pub use updates::*;
-pub use lifecycle::*;

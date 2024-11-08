@@ -1,26 +1,25 @@
 use std::collections::VecDeque;
 
 use super_stats_v3_api::{
-    custom_types::{ IndexerType, ProcessedTX, TimeChunkStats, TimeStats, TotCntAvg },
+    custom_types::{IndexerType, ProcessedTX, TimeChunkStats, TimeStats, TotCntAvg},
     process_data::process_time_stats::StatsType,
     runtime::RUNTIME_STATE,
-    stats::constants::{ DAY_AS_NANOS, HOUR_AS_NANOS },
+    stats::constants::{DAY_AS_NANOS, HOUR_AS_NANOS},
 };
 
 use crate::{
     core::utils::log,
-    stats::utils::{ nearest_day_start, nearest_past_hour, parse_icrc_account },
+    stats::utils::{nearest_day_start, nearest_past_hour, parse_icrc_account},
 };
 
 pub fn calculate_time_stats(
     process_from: u64,
     mode: StatsType,
     ledger_type: IndexerType,
-    time_now: u64
+    time_now: u64,
 ) -> TimeStats {
-    let array: VecDeque<ProcessedTX> = RUNTIME_STATE.with(|s| {
-        s.borrow().data.latest_blocks.blocks.clone()
-    });
+    let array: VecDeque<ProcessedTX> =
+        RUNTIME_STATE.with(|s| s.borrow().data.latest_blocks.blocks.clone());
 
     if array.len() == 0 {
         log("Blockstore is empty: Returning empty TimeStats!");
@@ -113,15 +112,11 @@ pub fn calculate_time_stats(
 
     // VOLUMES PER TIME CHUNK
     let mut count_over_time: Vec<TimeChunkStats> = Vec::new();
-    count_over_time = calculate_time_chunk_stats(
-        time_now.clone(),
-        process_from.clone(),
-        mode.clone(),
-        &array
-    );
+    count_over_time =
+        calculate_time_chunk_stats(time_now.clone(), process_from.clone(), mode.clone(), &array);
 
     // LARGEST BURN/ TX ETC
-    let return_len = RUNTIME_STATE.with(|s| { s.borrow().data.max_return_length });
+    let return_len = RUNTIME_STATE.with(|s| s.borrow().data.max_return_length);
     let top_mints: Vec<ProcessedTX> = top_x_by_txvalue(all_mints, return_len);
     let top_burns: Vec<ProcessedTX> = top_x_by_txvalue(all_burns, return_len);
     let top_transfers: Vec<ProcessedTX> = top_x_by_txvalue(all_transfers, return_len);
@@ -191,7 +186,7 @@ fn calculate_time_chunk_stats(
     time_now: u64,
     process_from: u64,
     mode: StatsType,
-    txs: &VecDeque<ProcessedTX>
+    txs: &VecDeque<ProcessedTX>,
 ) -> Vec<TimeChunkStats> {
     // return early if empty
     if txs.len() == 0 {
@@ -215,16 +210,14 @@ fn calculate_time_chunk_stats(
 
     match mode {
         StatsType::Hourly => {
-            chunks_needed = (
-                ((time_now - process_from) as f64) / (HOUR_AS_NANOS as f64)
-            ).ceil() as u32;
+            chunks_needed =
+                (((time_now - process_from) as f64) / (HOUR_AS_NANOS as f64)).ceil() as u32;
             nearest_past_x = nearest_past_hour(time_now);
             x_in_nanos = HOUR_AS_NANOS;
         }
         StatsType::Daily => {
-            chunks_needed = (
-                ((time_now - process_from) as f64) / (DAY_AS_NANOS as f64)
-            ).ceil() as u32;
+            chunks_needed =
+                (((time_now - process_from) as f64) / (DAY_AS_NANOS as f64)).ceil() as u32;
             nearest_past_x = nearest_day_start(time_now);
             x_in_nanos = DAY_AS_NANOS;
         }
@@ -289,7 +282,7 @@ fn calculate_time_chunk_stats(
 
 pub fn top_x_by_txvalue(
     mut transactions: Vec<ProcessedTX>,
-    result_length: usize
+    result_length: usize,
 ) -> Vec<ProcessedTX> {
     // decending
     transactions.sort_by(|a, b| b.tx_value.cmp(&a.tx_value));
@@ -301,7 +294,7 @@ pub fn top_x_by_txvalue(
 
 pub fn top_x_txcount(
     mut transactions: Vec<(String, u64)>,
-    result_length: usize
+    result_length: usize,
 ) -> Vec<(String, u64)> {
     // decending
     transactions.sort_by(|a, b| b.1.cmp(&a.1));

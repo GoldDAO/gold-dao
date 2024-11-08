@@ -1,13 +1,13 @@
+use crate::types::ExchangeConfig;
+use crate::types::ICPSwapClient;
+use crate::types::SwapConfig;
 use async_trait::async_trait;
+use candid::CandidType;
+use enum_dispatch::enum_dispatch;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::types::SwapConfig;
+use serde::{Deserialize, Serialize};
 use types::CanisterId;
-use enum_dispatch::enum_dispatch;
-use crate::types::ICPSwapClient;
-use serde::{ Deserialize, Serialize };
-use crate::types::ExchangeConfig;
-use candid::CandidType;
 
 #[async_trait]
 #[enum_dispatch(SwapClientEnum)]
@@ -19,7 +19,7 @@ pub trait SwapClient {
     async fn get_quote(
         &self,
         amount: u128,
-        min_amount_out: u128
+        min_amount_out: u128,
     ) -> CallResult<Result<u128, String>>;
     async fn deposit_account(&self) -> CallResult<Account>;
     async fn deposit(&self, amount: u128) -> CallResult<()>;
@@ -52,16 +52,14 @@ impl SwapClientEnum {
                     (output_token, input_token)
                 };
 
-                SwapClientEnum::ICPSwapClient(
-                    ICPSwapClient::new(
-                        config.swap_client_id,
-                        ic_cdk::api::id(),
-                        icpswap.swap_canister_id,
-                        token0,
-                        token1,
-                        icpswap.zero_for_one
-                    )
-                )
+                SwapClientEnum::ICPSwapClient(ICPSwapClient::new(
+                    config.swap_client_id,
+                    ic_cdk::api::id(),
+                    icpswap.swap_canister_id,
+                    token0,
+                    token1,
+                    icpswap.zero_for_one,
+                ))
             }
         }
     }

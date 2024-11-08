@@ -1,7 +1,7 @@
 use candid::CandidType;
 use ic_cdk::query;
 
-use crate::state::{ read_state, NeuronList };
+use crate::state::{read_state, NeuronList};
 
 #[derive(CandidType)]
 pub struct ListNeuronsResponse {
@@ -10,5 +10,7 @@ pub struct ListNeuronsResponse {
 
 #[query]
 fn list_neurons() -> ListNeuronsResponse {
-    read_state(|s| ListNeuronsResponse { neurons: s.data.get_neuron_list() })
+    read_state(|s| ListNeuronsResponse {
+        neurons: s.data.get_neuron_list(),
+    })
 }

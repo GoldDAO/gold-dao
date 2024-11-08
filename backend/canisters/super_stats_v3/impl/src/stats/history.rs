@@ -1,17 +1,21 @@
 use std::collections::HashMap;
 
-use super_stats_v3_api::{ account_tree::HistoryData, stable_memory::STABLE_STATE };
+use super_stats_v3_api::{account_tree::HistoryData, stable_memory::STABLE_STATE};
 
 use utils::time::get_current_day;
 
 pub fn get_history_of_account(
     account: String,
     days: u64,
-    is_principal: bool
+    is_principal: bool,
 ) -> Vec<(u64, HistoryData)> {
     // get ac_ref
     let ac_ref = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().directory_data.get_ref(&account)
+        s.borrow()
+            .as_ref()
+            .unwrap()
+            .directory_data
+            .get_ref(&account)
     });
     match ac_ref {
         Some(ac_ref_value) => {
@@ -20,7 +24,11 @@ pub fn get_history_of_account(
                 let mut days_collected = 0;
 
                 let current_day = get_current_day();
-                let start_day = if current_day > days { current_day - days } else { 0 };
+                let start_day = if current_day > days {
+                    current_day - days
+                } else {
+                    0
+                };
 
                 let stable_state = s.borrow();
                 let state_ref = stable_state.as_ref().unwrap();
@@ -53,10 +61,8 @@ pub fn get_history_of_account(
                     }
                 }
 
-                let vec: Vec<(u64, HistoryData)> = items
-                    .iter()
-                    .map(|(&k, v)| (k, v.clone()))
-                    .collect();
+                let vec: Vec<(u64, HistoryData)> =
+                    items.iter().map(|(&k, v)| (k, v.clone())).collect();
                 return vec;
             });
             return result;

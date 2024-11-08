@@ -1,7 +1,6 @@
 use ic_cdk_macros::query;
 pub use token_metrics_api::queries::get_stake_history::{
-    Response as GetStakeHistoryResponse,
-    Args as GetStakeHistoryArgs,
+    Args as GetStakeHistoryArgs, Response as GetStakeHistoryResponse,
 };
 
 use crate::state::read_state;

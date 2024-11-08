@@ -1,11 +1,9 @@
-use ic_cdk_macros::{ query, update };
+use ic_cdk_macros::{query, update};
+pub use super_stats_v3_api::types::MemoryData;
 pub use super_stats_v3_api::{
-    core::constants::CANISTER_VERSION,
-    runtime::RUNTIME_STATE,
-    types::LogEntry,
+    core::constants::CANISTER_VERSION, runtime::RUNTIME_STATE, types::LogEntry,
     working_stats::WorkingStats,
 };
-pub use super_stats_v3_api::types::MemoryData;
 // [][] -- ADMIN METHODS -- [][]
 #[update]
 fn add_authorised(principal_id: String) -> String {
@@ -41,7 +39,7 @@ fn get_logs() -> Option<Vec<LogEntry>> {
         let s = state.borrow();
         s.data.check_admin(ic_cdk::caller().to_text())
     });
-    RUNTIME_STATE.with(|state| { state.borrow().data.get_logs() })
+    RUNTIME_STATE.with(|state| state.borrow().data.get_logs())
 }
 
 #[query]
@@ -54,9 +52,8 @@ fn get_memory_stats() -> MemoryData {
     });
 
     let wasm_page_size: u64 = 65536;
-    let m: u64 =
-        (ic_cdk::api::stable::stable64_size() as u64) * wasm_page_size +
-        (core::arch::wasm32::memory_size(0) as u64) * wasm_page_size;
+    let m: u64 = (ic_cdk::api::stable::stable64_size() as u64) * wasm_page_size
+        + (core::arch::wasm32::memory_size(0) as u64) * wasm_page_size;
     let m2: u64 = (core::arch::wasm32::memory_size(0) as u64) * wasm_page_size;
     let ret = MemoryData {
         memory: m,
@@ -99,7 +96,7 @@ fn get_working_stats() -> WorkingStats {
         let s = state.borrow();
         s.data.check_admin(ic_cdk::caller().to_text())
     });
-    RUNTIME_STATE.with(|s| { s.borrow().stats.get_working_stats() })
+    RUNTIME_STATE.with(|s| s.borrow().stats.get_working_stats())
 }
 
 // [][] --- Not Gated --- [][]

@@ -1,17 +1,16 @@
-use std::{ collections::HashMap, time::Duration };
+use std::{collections::HashMap, time::Duration};
 
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{CandidType, Deserialize, Nat, Principal};
 use canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
 
-use sns_rewards_api_canister::subaccounts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT };
+use sns_rewards_api_canister::subaccounts::{RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT};
 use types::TokenSymbol;
 
 use sns_rewards_api_canister::set_reserve_transfer_amounts::{
-    Args as SetReserveTransferAmountsArgs,
-    Response as SetReserveTransferAmountsResponse,
+    Args as SetReserveTransferAmountsArgs, Response as SetReserveTransferAmountsResponse,
 };
 use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{
     Args as SetReserveTransferAmountsValidateArgs,
@@ -20,10 +19,9 @@ use sns_rewards_api_canister::set_reserve_transfer_amounts_validate::{
 
 use crate::{
     client::{
-        icrc1::client::{ balance_of, transfer },
+        icrc1::client::{balance_of, transfer},
         rewards::{
-            get_reserve_transfer_amounts,
-            set_reserve_transfer_amounts,
+            get_reserve_transfer_amounts, set_reserve_transfer_amounts,
             set_reserve_transfer_amounts_validate,
         },
     },
@@ -44,7 +42,11 @@ pub struct GetNeuronRequest {
 fn test_reserve_pool_distribution_happy_path() {
     let mut test_env = default_test_setup();
 
-    let gldgov_ledger_id = test_env.token_ledgers.get("gldgov_ledger_canister_id").unwrap().clone();
+    let gldgov_ledger_id = test_env
+        .token_ledgers
+        .get("gldgov_ledger_canister_id")
+        .unwrap()
+        .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let reward_pool = Account {
@@ -72,7 +74,7 @@ fn test_reserve_pool_distribution_happy_path() {
         rewards_canister_id,
         &(SetReserveTransferAmountsArgs {
             transfer_amounts: amounts,
-        })
+        }),
     );
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
     tick_n_blocks(&test_env.pic, 50);
@@ -92,12 +94,15 @@ fn test_reserve_pool_distribution_happy_path() {
         gldgov_ledger_id,
         None,
         reserve_pool_account,
-        (100_000_000_000u64).into()
-    ).unwrap();
+        (100_000_000_000u64).into(),
+    )
+    .unwrap();
     tick_n_blocks(&test_env.pic, 100);
 
     // TRIGGER - reserve_pool_distribution cron job
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS) + Duration::from_secs(10));
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(DAY_IN_MS) + Duration::from_secs(10));
     tick_n_blocks(&test_env.pic, 100);
 
     // reward pool should now have the same as the intial + 1 x reserve pool transfer
@@ -125,7 +130,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
         &mut test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert!(is_set_reserve_pool_distribution_fail(&res));
@@ -150,7 +155,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
@@ -160,7 +165,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &()
+        &(),
     );
     assert_eq!(res, amounts);
 }
@@ -184,8 +189,9 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &reserve_args
-    ).unwrap();
+        &reserve_args,
+    )
+    .unwrap();
 }
 
 #[test]
@@ -207,9 +213,12 @@ fn test_set_reserve_transfer_amounts_validate() {
         &test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
-    assert!(matches!(res, SetReserveTransferAmountsValidateResponse::Ok(_)))
+    assert!(matches!(
+        res,
+        SetReserveTransferAmountsValidateResponse::Ok(_)
+    ))
 }
 
 #[test]
@@ -232,7 +241,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
@@ -242,7 +251,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &()
+        &(),
     );
     assert_eq!(res, amounts);
 
@@ -257,7 +266,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
@@ -267,7 +276,7 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         &test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &()
+        &(),
     );
     assert_eq!(res, amounts);
 }

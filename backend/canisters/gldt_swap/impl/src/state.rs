@@ -1,15 +1,18 @@
+use crate::model::swaps::Swaps;
+use candid::{CandidType, Nat, Principal};
+use canister_state_macros::canister_state;
 use gldt_swap_common::{
     archive::format_archive_canisters,
     nft::NftCanisterConf,
-    swap::{ ArchiveStatus, NewArchiveError, ServiceDownReason, ServiceStatus },
+    swap::{ArchiveStatus, NewArchiveError, ServiceDownReason, ServiceStatus},
 };
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{ Deserialize, Serialize };
-use candid::{ CandidType, Nat, Principal };
-use canister_state_macros::canister_state;
-use types::{ BuildVersion, TimestampMillis };
-use utils::{ env::{ CanisterEnv, Environment }, memory::MemorySize };
-use crate::model::swaps::Swaps;
+use serde::{Deserialize, Serialize};
+use types::{BuildVersion, TimestampMillis};
+use utils::{
+    env::{CanisterEnv, Environment},
+    memory::MemorySize,
+};
 
 canister_state!(RuntimeState);
 
@@ -54,7 +57,10 @@ impl RuntimeState {
 
     pub fn is_caller_is_nft_canister(&self) -> bool {
         let caller = self.env.caller();
-        self.data.gldnft_canisters.iter().any(|(principal, _, _)| *principal == caller)
+        self.data
+            .gldnft_canisters
+            .iter()
+            .any(|(principal, _, _)| *principal == caller)
     }
 
     pub fn is_caller_authorized(&self) -> bool {
@@ -177,7 +183,7 @@ impl Default for Data {
 }
 
 pub fn format_nft_canister_configs(
-    configs: Vec<(Principal, NftCanisterConf, Option<Account>)>
+    configs: Vec<(Principal, NftCanisterConf, Option<Account>)>,
 ) -> String {
     let confs: Vec<String> = configs
         .iter()

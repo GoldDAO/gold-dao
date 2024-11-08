@@ -1,14 +1,13 @@
 use canister_client::generate_candid_c2c_call;
 
-use origyn_nft_reference::origyn_nft_reference_canister::NftInfoResult;
-use origyn_nft_reference::origyn_nft_reference_canister::{ TransferArgs, TransferResult };
 use origyn_nft_reference::origyn_nft_reference_canister::Account3;
-use origyn_nft_reference::origyn_nft_reference_canister::{ SaleInfoRequest, SaleInfoResult };
-use origyn_nft_reference::origyn_nft_reference_canister::{ ManageSaleRequest, ManageSaleResult };
+use origyn_nft_reference::origyn_nft_reference_canister::NftInfoResult;
+use origyn_nft_reference::origyn_nft_reference_canister::{ManageSaleRequest, ManageSaleResult};
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    MarketTransferRequest,
-    MarketTransferResult,
+    MarketTransferRequest, MarketTransferResult,
 };
+use origyn_nft_reference::origyn_nft_reference_canister::{SaleInfoRequest, SaleInfoResult};
+use origyn_nft_reference::origyn_nft_reference_canister::{TransferArgs, TransferResult};
 
 use candid::Nat;
 

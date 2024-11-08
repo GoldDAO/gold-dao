@@ -1,9 +1,8 @@
+use crate::state::read_state;
 use ic_cdk_macros::query;
 pub use token_metrics_api::queries::get_holders::{
-    Args as GetHoldersArgs,
-    Response as GetHoldersResponse,
+    Args as GetHoldersArgs, Response as GetHoldersResponse,
 };
-use crate::state::read_state;
 
 #[query]
 fn get_holders(args: GetHoldersArgs) -> GetHoldersResponse {
@@ -33,6 +32,6 @@ fn get_holders(args: GetHoldersArgs) -> GetHoldersResponse {
         data: result,
         current_offset: args.offset,
         limit: args.limit,
-        total_count: list.len()
+        total_count: list.len(),
     }
 }

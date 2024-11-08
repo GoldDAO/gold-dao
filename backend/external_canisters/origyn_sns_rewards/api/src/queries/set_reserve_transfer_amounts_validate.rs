@@ -1,6 +1,6 @@
+use candid::{CandidType, Nat};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use candid::{ CandidType, Nat };
-use serde::{ Deserialize, Serialize };
 use types::TokenSymbol;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]

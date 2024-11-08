@@ -1,38 +1,29 @@
-use candid::{ Nat, Principal };
+use candid::{Nat, Principal};
 use canister_time::timestamp_millis;
 use gldt_swap_common::{
-    gldt::{ GldtNumTokens, GLDT_PRICE_RATIO, GLDT_SUBDIVIDABLE_BY },
-    nft::{ NftCanisterConf, NftID, NftWeight },
+    gldt::{GldtNumTokens, GLDT_PRICE_RATIO, GLDT_SUBDIVIDABLE_BY},
+    nft::{NftCanisterConf, NftID, NftWeight},
     swap::{
-        NftValidationError,
-        SwapDetailForward,
-        SwapDetailReverse,
-        SwapErrorReverse,
-        SwapInfo,
-        SwapStatusForward,
-        SwapStatusReverse,
-        SwapType,
+        NftValidationError, SwapDetailForward, SwapDetailReverse, SwapErrorReverse, SwapInfo,
+        SwapStatusForward, SwapStatusReverse, SwapType,
     },
 };
 
 use gldt_swap_api_canister::{
-    swap_nft_for_tokens::NftInvalidError,
-    swap_tokens_for_nft::Args as SwapTokensForNftArgs,
+    swap_nft_for_tokens::NftInvalidError, swap_tokens_for_nft::Args as SwapTokensForNftArgs,
 };
 
+use crate::state::{read_state, FeeAccount};
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
 use icrc_ledger_canister::icrc1_balance_of;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::Account3;
 use origyn_nft_reference_c2c_client::{
-    get_nat_as_token_id_origyn,
-    get_token_id_as_nat,
-    icrc7_owner_of,
+    get_nat_as_token_id_origyn, get_token_id_as_nat, icrc7_owner_of,
 };
 use types::TimestampMillis;
-use utils::{ env::Environment, retry_async::retry_async };
-use crate::state::{ read_state, FeeAccount };
+use utils::{env::Environment, retry_async::retry_async};
 
 #[derive(Clone)]
 pub struct SwapBuilder<T> {
@@ -47,11 +38,14 @@ impl SwapBuilder<SwapDetailForward> {
     }
     fn _verify_nft_weight(
         &self,
-        prin: &Principal
+        prin: &Principal,
     ) -> Result<(Principal, NftCanisterConf, Option<FeeAccount>), NftInvalidError> {
         let gldnft_canisters = read_state(|s| s.data.gldnft_canisters.clone());
 
-        match gldnft_canisters.iter().find(|(principal, ..)| principal == prin) {
+        match gldnft_canisters
+            .iter()
+            .find(|(principal, ..)| principal == prin)
+        {
             Some(conf) => Ok(conf.clone()),
             None => Err(NftInvalidError::InvalidNFTCollectionPrincipal),
         }
@@ -60,23 +54,21 @@ impl SwapBuilder<SwapDetailForward> {
     pub async fn _get_nft_nat_id(
         &self,
         nft_id: &String,
-        nft_canister_id: Principal
+        nft_canister_id: Principal,
     ) -> Result<Nat, NftInvalidError> {
         match get_token_id_as_nat(nft_canister_id, &nft_id.into()).await {
             Ok(id) => Ok(id),
-            Err(_) => { Err(NftInvalidError::CantGetNatIdOfNft) }
+            Err(_) => Err(NftInvalidError::CantGetNatIdOfNft),
         }
     }
 
     fn _calculate_tokens_from_weight(
         &self,
-        grams: &NftWeight
+        grams: &NftWeight,
     ) -> Result<GldtNumTokens, NftInvalidError> {
-        match
-            GldtNumTokens::new(
-                Nat::from(*grams) * Nat::from(GLDT_PRICE_RATIO) * GLDT_SUBDIVIDABLE_BY
-            )
-        {
+        match GldtNumTokens::new(
+            Nat::from(*grams) * Nat::from(GLDT_PRICE_RATIO) * GLDT_SUBDIVIDABLE_BY,
+        ) {
             Ok(tokens) => Ok(tokens),
             Err(_) => Err(NftInvalidError::InvalidTokenAmount),
         }
@@ -85,21 +77,22 @@ impl SwapBuilder<SwapDetailForward> {
     pub async fn _get_origyn_id_string(
         &self,
         nft_id: &NftID,
-        nft_canister_id: &Principal
+        nft_canister_id: &Principal,
     ) -> Result<String, NftInvalidError> {
-        match
-            retry_async(|| get_nat_as_token_id_origyn(nft_canister_id.clone(), &nft_id.0), 3).await
+        match retry_async(
+            || get_nat_as_token_id_origyn(nft_canister_id.clone(), &nft_id.0),
+            3,
+        )
+        .await
         {
             Ok(id) => {
                 return Ok(id);
             }
             Err((rejection_code, msg)) => {
                 let msg = format!("{rejection_code:?}. {msg}");
-                return Err(
-                    NftInvalidError::CantGetOrigynID(
-                        format!("Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}")
-                    )
-                );
+                return Err(NftInvalidError::CantGetOrigynID(format!(
+                    "Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}"
+                )));
             }
         }
     }
@@ -108,59 +101,48 @@ impl SwapBuilder<SwapDetailForward> {
         &self,
         nft_canister_id: &Principal,
         nft_id: &NftID,
-        user_principal: &Principal
+        user_principal: &Principal,
     ) -> Result<(), NftInvalidError> {
-        match
-            retry_async(|| icrc7_owner_of(nft_canister_id.clone(), vec![nft_id.0.clone()]), 3).await
+        match retry_async(
+            || icrc7_owner_of(nft_canister_id.clone(), vec![nft_id.0.clone()]),
+            3,
+        )
+        .await
         {
-            Ok(result) => {
-                match &result[0] {
-                    Some(account) => {
-                        if &account.owner != user_principal {
-                            let nft_owner = account.owner;
-                            return Err(
+            Ok(result) => match &result[0] {
+                Some(account) => {
+                    if &account.owner != user_principal {
+                        let nft_owner = account.owner;
+                        return Err(
                                 NftInvalidError::InvalidNftOwner(
                                     format!(
                                         "Nft is owned by : {nft_owner}. but swap has owner of : {user_principal}"
                                     )
                                 )
                             );
-                        } else {
-                            return Ok(());
-                        }
-                    }
-                    None => {
-                        return Err(
-                            NftInvalidError::InvalidNftOwner(
-                                format!(
-                                    "can't verify NFT ownership. Nft with nat id : {nft_id:?} not found"
-                                )
-                            )
-                        );
+                    } else {
+                        return Ok(());
                     }
                 }
-            }
+                None => {
+                    return Err(NftInvalidError::InvalidNftOwner(format!(
+                        "can't verify NFT ownership. Nft with nat id : {nft_id:?} not found"
+                    )));
+                }
+            },
             Err((rejection_code, msg)) => {
-                return Err(
-                    NftInvalidError::InvalidNftOwner(
-                        format!(
-                            "can't verify NFT ownership. call failed. {rejection_code:?} - msg = {msg}"
-                        )
-                    )
-                );
+                return Err(NftInvalidError::InvalidNftOwner(format!(
+                    "can't verify NFT ownership. call failed. {rejection_code:?} - msg = {msg}"
+                )));
             }
         };
     }
 
     pub fn _verify_nft_id_string(&self, nft_id_string: &String) -> Result<bool, NftInvalidError> {
         if nft_id_string.len() > 300 {
-            return Err(
-                NftInvalidError::NftIdStringTooLong(
-                    format!(
-                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
-                    )
-                )
-            );
+            return Err(NftInvalidError::NftIdStringTooLong(format!(
+                "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+            )));
         }
         Ok(true)
     }
@@ -170,12 +152,15 @@ impl SwapBuilder<SwapDetailForward> {
         nft_id: NftID,
         nft_canister_id: Principal,
         time: TimestampMillis,
-        user_principal: Principal
+        user_principal: Principal,
     ) -> Result<SwapInfo, (SwapInfo, Vec<NftInvalidError>)> {
         let mut new_swap = SwapInfo::new(SwapType::Forward);
         let mut errors: Vec<NftInvalidError> = vec![];
 
-        if let Err(e) = &self._check_nft_owner(&nft_canister_id, &nft_id, &user_principal).await {
+        if let Err(e) = &self
+            ._check_nft_owner(&nft_canister_id, &nft_id, &user_principal)
+            .await
+        {
             errors.push(e.clone());
         }
 
@@ -259,11 +244,14 @@ impl SwapBuilder<SwapDetailReverse> {
 
     fn _verify_nft_weight(
         &self,
-        prin: &Principal
+        prin: &Principal,
     ) -> Result<(Principal, NftCanisterConf, Option<FeeAccount>), NftValidationError> {
         let gldnft_canisters = read_state(|s| s.data.gldnft_canisters.clone());
 
-        match gldnft_canisters.iter().find(|(principal, ..)| principal == prin) {
+        match gldnft_canisters
+            .iter()
+            .find(|(principal, ..)| principal == prin)
+        {
             Some(conf) => Ok(conf.clone()),
             None => Err(NftValidationError::InvalidNftWeight),
         }
@@ -272,21 +260,22 @@ impl SwapBuilder<SwapDetailReverse> {
     pub async fn _get_origyn_id_string(
         &self,
         nft_id: &NftID,
-        nft_canister_id: &Principal
+        nft_canister_id: &Principal,
     ) -> Result<String, NftValidationError> {
-        match
-            retry_async(|| get_nat_as_token_id_origyn(nft_canister_id.clone(), &nft_id.0), 3).await
+        match retry_async(
+            || get_nat_as_token_id_origyn(nft_canister_id.clone(), &nft_id.0),
+            3,
+        )
+        .await
         {
             Ok(id) => {
                 return Ok(id);
             }
             Err((rejection_code, msg)) => {
                 let msg = format!("{rejection_code:?}. {msg}");
-                return Err(
-                    NftValidationError::CantGetOrigynID(
-                        format!("Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}")
-                    )
-                );
+                return Err(NftValidationError::CantGetOrigynID(format!(
+                    "Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}"
+                )));
             }
         }
     }
@@ -294,11 +283,14 @@ impl SwapBuilder<SwapDetailReverse> {
     pub async fn _is_owned_by_canister(
         &self,
         nft_id: &NftID,
-        nft_canister_id: &Principal
+        nft_canister_id: &Principal,
     ) -> Result<(), NftValidationError> {
         let this_canister_id = read_state(|s| s.env.canister_id());
-        match
-            retry_async(|| icrc7_owner_of(nft_canister_id.clone(), vec![nft_id.0.clone()]), 3).await
+        match retry_async(
+            || icrc7_owner_of(nft_canister_id.clone(), vec![nft_id.0.clone()]),
+            3,
+        )
+        .await
         {
             Ok(res) => {
                 if let Some(Some(Account3 { owner, .. })) = res.get(0) {
@@ -317,16 +309,12 @@ impl SwapBuilder<SwapDetailReverse> {
 
     pub fn _verify_nft_id_string(
         &self,
-        nft_id_string: &String
+        nft_id_string: &String,
     ) -> Result<bool, NftValidationError> {
         if nft_id_string.len() > 300 {
-            return Err(
-                NftValidationError::NftIdStringTooLong(
-                    format!(
-                        "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
-                    )
-                )
-            );
+            return Err(NftValidationError::NftIdStringTooLong(format!(
+                "ERROR: {nft_id_string} cant be inserted because it's length is longer than 300"
+            )));
         }
         Ok(true)
     }
@@ -334,7 +322,7 @@ impl SwapBuilder<SwapDetailReverse> {
     pub async fn _user_has_tokens_for_swap(
         &self,
         user_principal: &Principal,
-        amount_required: &Nat
+        amount_required: &Nat,
     ) -> Result<bool, NftValidationError> {
         let gldt_ledger_id = read_state(|s| s.data.gldt_ledger_id);
         let args = icrc1_balance_of::Args {
@@ -355,7 +343,9 @@ impl SwapBuilder<SwapDetailReverse> {
                     )
                 }
             }
-            Err(e) => { Err(NftValidationError::CantValidateUserBalanceOfGLDT(format!("{e:?}"))) }
+            Err(e) => Err(NftValidationError::CantValidateUserBalanceOfGLDT(format!(
+                "{e:?}"
+            ))),
         }
 
         // UserDoesNotHaveTheRequiredGLDT
@@ -364,7 +354,7 @@ impl SwapBuilder<SwapDetailReverse> {
     pub async fn init(
         self,
         init_args: &SwapTokensForNftArgs,
-        user_principal: &Principal
+        user_principal: &Principal,
     ) -> Result<SwapInfo, (SwapInfo, Vec<NftValidationError>)> {
         // we need to query the nft meta details to get the correct grams and serial maybe.
         let mut errors: Vec<NftValidationError> = vec![];
@@ -384,29 +374,30 @@ impl SwapBuilder<SwapDetailReverse> {
         };
 
         let _ = self
-            ._user_has_tokens_for_swap(&user_principal, &tokens_to_receive.get_with_fee()).await
+            ._user_has_tokens_for_swap(&user_principal, &tokens_to_receive.get_with_fee())
+            .await
             .map_err(|e| {
                 errors.push(e);
             });
 
         let _ = self
-            ._is_owned_by_canister(&init_args.nft_id, &init_args.nft_canister_id).await
+            ._is_owned_by_canister(&init_args.nft_id, &init_args.nft_canister_id)
+            .await
             .map_err(|e| {
                 errors.push(e);
             });
 
-        let nft_id_string = match
-            self._get_origyn_id_string(&init_args.nft_id, &init_args.nft_canister_id).await
+        let nft_id_string = match self
+            ._get_origyn_id_string(&init_args.nft_id, &init_args.nft_canister_id)
+            .await
         {
-            Ok(id) => {
-                match self._verify_nft_id_string(&id) {
-                    Ok(_) => id,
-                    Err(e) => {
-                        errors.push(e);
-                        "".to_string()
-                    }
+            Ok(id) => match self._verify_nft_id_string(&id) {
+                Ok(_) => id,
+                Err(e) => {
+                    errors.push(e);
+                    "".to_string()
                 }
-            }
+            },
             Err(e) => {
                 errors.push(e);
                 "".to_string()

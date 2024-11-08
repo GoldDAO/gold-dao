@@ -1,16 +1,11 @@
 #![allow(dead_code)]
+use candid::{Nat, Principal};
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    CandyShared,
-    NftCanisterStageNftOrigynArg,
-    OrigynError,
-    OrigynTextResult,
-    PropertyShared,
-    StageChunkArg,
-    StageLibraryResult,
+    CandyShared, NftCanisterStageNftOrigynArg, OrigynError, OrigynTextResult, PropertyShared,
+    StageChunkArg, StageLibraryResult,
 };
-use candid::{ Nat, Principal };
-use serde_bytes::ByteBuf;
 use pocket_ic::PocketIc;
+use serde_bytes::ByteBuf;
 use types::CanisterId;
 
 pub enum TokenStandard {
@@ -145,13 +140,20 @@ pub fn build_standard_nft(
     originator: Principal,
     file_size: Nat,
     is_soulbound: bool,
-    net_principal: Principal
+    net_principal: Principal,
 ) -> BuildStandardNftReturns {
     let stage = crate::client::origyn_nft_reference::client::stage_nft_origyn(
         pic,
         canister_id,
         Some(net_principal),
-        standard_nft(token_id.clone(), canister_id, app, file_size, is_soulbound, originator)
+        standard_nft(
+            token_id.clone(),
+            canister_id,
+            app,
+            file_size,
+            is_soulbound,
+            originator,
+        ),
     );
     println!("stage: {:?}", stage);
 
@@ -164,8 +166,8 @@ pub fn build_standard_nft(
                 token_id.clone(),
                 "page".to_string(),
                 "hello world".to_string(),
-                CandyShared::Option(None)
-            )
+                CandyShared::Option(None),
+            ),
         );
 
     println!("filestage: {:?}", filestage);
@@ -179,8 +181,8 @@ pub fn build_standard_nft(
                 token_id.clone(),
                 "preview".to_string(),
                 "preview hello world".to_string(),
-                CandyShared::Option(None)
-            )
+                CandyShared::Option(None),
+            ),
         );
 
     println!("previewstage: {:?}", previewstage);
@@ -194,8 +196,8 @@ pub fn build_standard_nft(
                 token_id.clone(),
                 "hidden".to_string(),
                 "hidden hello world".to_string(),
-                CandyShared::Option(None)
-            )
+                CandyShared::Option(None),
+            ),
         );
 
     println!("hiddenstage: {:?}", hiddenstage);
@@ -209,32 +211,32 @@ pub fn build_standard_nft(
                 token_id.clone(),
                 "immutable_item".to_string(),
                 "immutable".to_string(),
-                CandyShared::Option(None)
-            )
+                CandyShared::Option(None),
+            ),
         );
 
     println!("immutablestage: {:?}", immutablestage);
 
     let ret_stage = {
         match stage {
-            OrigynTextResult::Ok(response) => { Ok(response) }
-            OrigynTextResult::Err(error) => { Err(error) }
+            OrigynTextResult::Ok(response) => Ok(response),
+            OrigynTextResult::Err(error) => Err(error),
         }
     };
 
     let ret_filestage: Result<Principal, OrigynError> = match filestage {
-        StageLibraryResult::Ok(response) => { Ok(response.canister) }
-        StageLibraryResult::Err(error) => { Err(error) }
+        StageLibraryResult::Ok(response) => Ok(response.canister),
+        StageLibraryResult::Err(error) => Err(error),
     };
 
     let ret_previewstage = match previewstage {
-        StageLibraryResult::Ok(response) => { Ok(response.canister) }
-        StageLibraryResult::Err(error) => { Err(error) }
+        StageLibraryResult::Ok(response) => Ok(response.canister),
+        StageLibraryResult::Err(error) => Err(error),
     };
 
     let ret_hiddenstage = match hiddenstage {
-        StageLibraryResult::Ok(response) => { Ok(response.canister) }
-        StageLibraryResult::Err(error) => { Err(error) }
+        StageLibraryResult::Ok(response) => Ok(response.canister),
+        StageLibraryResult::Err(error) => Err(error),
     };
 
     return BuildStandardNftReturns {
@@ -258,7 +260,7 @@ pub fn build_standard_collection(
     originator: Principal,
     file_size: Nat,
     net_principal: Principal,
-    ledger_token: ICTokenSpec
+    ledger_token: ICTokenSpec,
 ) -> BuildStandardCollectionReturns {
     let aCollection: NftCanisterStageNftOrigynArg = standard_collection(
         canister_id,
@@ -267,7 +269,7 @@ pub fn build_standard_collection(
         originator,
         file_size,
         true,
-        ledger_token
+        ledger_token,
     );
 
     // println!("acollection {:?}", aCollection);
@@ -276,7 +278,7 @@ pub fn build_standard_collection(
         pic,
         canister_id,
         Some(net_principal),
-        aCollection
+        aCollection,
     );
 
     let file_stage: StageLibraryResult =
@@ -288,20 +290,20 @@ pub fn build_standard_collection(
                 "".to_string(),
                 "collection_banner".to_string(),
                 "collection_banner".to_string(),
-                CandyShared::Option(None)
-            )
+                CandyShared::Option(None),
+            ),
         );
 
     let ret_stage = {
         match stage {
-            OrigynTextResult::Ok(response) => { Ok(response) }
-            OrigynTextResult::Err(error) => { Err(error) }
+            OrigynTextResult::Ok(response) => Ok(response),
+            OrigynTextResult::Err(error) => Err(error),
         }
     };
 
     let ret_filestage: Result<Principal, OrigynError> = match file_stage {
-        StageLibraryResult::Ok(response) => { Ok(response.canister) }
-        StageLibraryResult::Err(error) => { Err(error) }
+        StageLibraryResult::Ok(response) => Ok(response.canister),
+        StageLibraryResult::Err(error) => Err(error),
     };
 
     return BuildStandardCollectionReturns {
@@ -316,957 +318,620 @@ fn standard_nft(
     app: Principal,
     file_size: Nat,
     is_soulbound: bool,
-    originator: Principal
+    originator: Principal,
 ) -> NftCanisterStageNftOrigynArg {
     NftCanisterStageNftOrigynArg {
-        metadata: Box::new(
-            CandyShared::Class(
-                vec![
-                    PropertyShared {
-                        name: "id".to_string(),
-                        value: Box::new(CandyShared::Text(format!("{token_id}"))),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "primary_asset".to_string(),
-                        value: Box::new(CandyShared::Text("page".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "preview".to_string(),
-                        value: Box::new(CandyShared::Text("page".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "experience".to_string(),
-                        value: Box::new(CandyShared::Text("page".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "library".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
+        metadata: Box::new(CandyShared::Class(vec![
+            PropertyShared {
+                name: "id".to_string(),
+                value: Box::new(CandyShared::Text(format!("{token_id}"))),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "primary_asset".to_string(),
+                value: Box::new(CandyShared::Text("page".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "preview".to_string(),
+                value: Box::new(CandyShared::Text("page".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "experience".to_string(),
+                value: Box::new(CandyShared::Text("page".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "library".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("page".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("page".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("canister".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "http://localhost:8000/-/1/-/page?canisterId={}",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("preview".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("preview".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("canister".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "http://localhost:8000/-/1/-/preview?canisterId={}",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("hidden".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("hidden".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("canister".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "http://localhost:8000/-/1/-/hidden?canisterId={}",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("collection".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "http://localhost:8000/-/1/-/collection_banner?canisterId={}",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("immutable_item".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("immutable".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("canister".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "http://localhost:8000/-/1/-/immutable_item?canisterId={}",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "com.origyn.immutable_library".to_string(),
+                            value: Box::new(CandyShared::Bool(true)),
+                            immutable: false,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "__apps".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "com.test.__public".to_string(),
+                            value: Box::new(CandyShared::Text("com.test.__public".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "write".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app.clone()),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "permissions".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app.clone()),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "data".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "display_name".to_string(),
+                                    value: Box::new(CandyShared::Text(format!("{token_id}"))),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "description".to_string(),
+                                    value: Box::new(CandyShared::Text(
+                                        "g Gold Bullion Bar Origyn Digital Certificate".to_string(),
+                                    )),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "custom_properties".to_string(),
+                                    immutable: false,
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "Fineness".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text(
+                                                "99.99%".to_string(),
+                                            )),
+                                        },
+                                        PropertyShared {
+                                            name: "Dimensions".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text(
+                                                "8.7 x 15 mm".to_string(),
+                                            )),
+                                        },
+                                        PropertyShared {
+                                            name: "Weight".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text("1g".to_string())),
+                                        },
+                                        PropertyShared {
+                                            name: "Hardness".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text("25 Hv".to_string())),
+                                        },
+                                        PropertyShared {
+                                            name: "Manufacturer".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text(
+                                                "METALOR".to_string(),
+                                            )),
+                                        },
+                                        PropertyShared {
+                                            name: "Serial Number".to_string(),
+                                            immutable: false,
+                                            value: Box::new(CandyShared::Text(
+                                                "012853".to_string(),
+                                            )),
+                                        },
+                                    ])),
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "com.test.__private".to_string(),
+                            value: Box::new(CandyShared::Text("com.test.__private".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app.clone()),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "write".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app.clone()),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "permissions".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app.clone()),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "data".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "val1".to_string(),
+                                    value: Box::new(CandyShared::Text("val1".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val2".to_string(),
+                                    value: Box::new(CandyShared::Text("val2".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val3".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val3".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Text(
+                                                "public".to_string(),
+                                            )),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
                                                 PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("page".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("page".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("canister".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("http://localhost:8000/-/1/-/page?canisterId={}", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("preview".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("preview".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("canister".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("http://localhost:8000/-/1/-/preview?canisterId={}", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("hidden".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("hidden".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("canister".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("http://localhost:8000/-/1/-/hidden?canisterId={}", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "collection_banner".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "collection_banner".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("collection".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("http://localhost:8000/-/1/-/collection_banner?canisterId={}", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "immutable_item".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("immutable".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("canister".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("http://localhost:8000/-/1/-/immutable_item?canisterId={}", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                },
-                                                PropertyShared {
-                                                    name: "com.origyn.immutable_library".to_string(),
-                                                    value: Box::new(CandyShared::Bool(true)),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "__apps".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "com.test.__public".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.test.__public".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                },
-                                                PropertyShared {
-                                                    name: "write".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app.clone()
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
-                                                    immutable: false,
-                                                },
-                                                PropertyShared {
-                                                    name: "permissions".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app.clone()
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "data".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "display_name".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            format!("{token_id}")
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "description".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "g Gold Bullion Bar Origyn Digital Certificate".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "custom_properties".to_string(),
-                                                                    immutable: false,
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "Fineness".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "99.99%".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "Dimensions".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "8.7 x 15 mm".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "Weight".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "1g".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "Hardness".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "25 Hv".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "Manufacturer".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "METALOR".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "Serial Number".to_string(),
-                                                                                    immutable: false,
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "012853".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(
+                                                            app.clone(),
+                                                        )),
+                                                    ])),
                                                     immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "com.test.__private".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.test.__private".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
                                                 },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val4".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val4".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
                                                 PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app.clone()
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "write".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app.clone()
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(
+                                                            app.clone(),
+                                                        )),
+                                                    ])),
+                                                    immutable: false,
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "permissions".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app.clone()
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(
+                                                            app.clone(),
+                                                        )),
+                                                    ])),
                                                     immutable: false,
                                                 },
-                                                PropertyShared {
-                                                    name: "data".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "val1".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val1".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val2".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val2".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val3".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val3".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "public".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app.clone()
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val4".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val4".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app.clone()
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app.clone()
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_host".to_string(),
-                        value: Box::new(CandyShared::Text("localhost".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_port".to_string(),
-                        value: Box::new(CandyShared::Text("8000".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_protocol".to_string(),
-                        value: Box::new(CandyShared::Text("http".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "owner".to_string(),
-                        value: Box::new(CandyShared::Principal_(canister)),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.originator.override".to_string(),
-                        value: Box::new(CandyShared::Principal_(originator)),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "is_soulbound".to_string(),
-                        value: Box::new(CandyShared::Bool(is_soulbound)),
-                        immutable: is_soulbound,
-                    }
-                ]
-            )
-        ),
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_host".to_string(),
+                value: Box::new(CandyShared::Text("localhost".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_port".to_string(),
+                value: Box::new(CandyShared::Text("8000".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_protocol".to_string(),
+                value: Box::new(CandyShared::Text("http".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "owner".to_string(),
+                value: Box::new(CandyShared::Principal_(canister)),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "com.origyn.originator.override".to_string(),
+                value: Box::new(CandyShared::Principal_(originator)),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "is_soulbound".to_string(),
+                value: Box::new(CandyShared::Bool(is_soulbound)),
+                immutable: is_soulbound,
+            },
+        ])),
     }
 }
 
@@ -1277,1294 +942,841 @@ fn standard_collection(
     originator: Principal,
     file_size: Nat,
     broker_override: bool,
-    ledger_token: ICTokenSpec
+    ledger_token: ICTokenSpec,
 ) -> NftCanisterStageNftOrigynArg {
     NftCanisterStageNftOrigynArg {
-        metadata: Box::new(
-            CandyShared::Class(
-                vec![
-                    PropertyShared {
-                        name: "id".to_string(),
-                        value: Box::new(CandyShared::Text("".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "primary_asset".to_string(),
-                        value: Box::new(CandyShared::Text("collection_banner".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "preview".to_string(),
-                        value: Box::new(CandyShared::Text("collection_banner".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "experience".to_string(),
-                        value: Box::new(CandyShared::Text("collection_banner".to_string())),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.node".to_string(),
-                        value: Box::new(CandyShared::Principal_(node)),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.originator".to_string(),
-                        value: Box::new(CandyShared::Principal_(node)),
-                        immutable: true,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.royalties.primary.default".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.broker".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.06)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.node".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.07777)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.network".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.005)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.royalties.secondary.default".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.broker".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.01)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.node".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.02)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.originator".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Float(0.03333333333)
-                                                    ),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.custom".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.04)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "account".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(originator)
-                                                    ),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.network".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.005)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.royalties.primary.default".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.broker".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.06)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.node".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.07777)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.network".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "rate".to_string(),
-                                                    value: Box::new(CandyShared::Float(0.005)),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.royalties.fixed.default".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.broker".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "fixedXDR".to_string(),
-                                                    value: Box::new(CandyShared::Float(1000000.0)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenCanister".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(
-                                                            ledger_token.canister.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenSymbol".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            ledger_token.symbol.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenDecimals".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(ledger_token.decimals.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenFee".to_string(),
-                                                    value: Box::new(match ledger_token.fee.clone() {
-                                                        None => CandyShared::Option(None),
-                                                        Some(val) => CandyShared::Nat(val),
-                                                    }),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.node".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "fixedXDR".to_string(),
-                                                    value: Box::new(CandyShared::Float(1000000.0)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenCanister".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(
-                                                            ledger_token.canister.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenSymbol".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            ledger_token.symbol.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenDecimals".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(ledger_token.decimals.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenFee".to_string(),
-                                                    value: Box::new(match ledger_token.fee.clone() {
-                                                        None => CandyShared::Option(None),
-                                                        Some(val) => CandyShared::Nat(val),
-                                                    }),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.originator".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "fixedXDR".to_string(),
-                                                    value: Box::new(CandyShared::Float(1000000.0)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenCanister".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(
-                                                            ledger_token.canister.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenSymbol".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            ledger_token.symbol.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenDecimals".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(ledger_token.decimals.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenFee".to_string(),
-                                                    value: Box::new(match ledger_token.fee.clone() {
-                                                        None => CandyShared::Option(None),
-                                                        Some(val) => CandyShared::Nat(val),
-                                                    }),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.custom".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "fixedXDR".to_string(),
-                                                    value: Box::new(CandyShared::Float(1000000.0)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenCanister".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(
-                                                            ledger_token.canister.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenSymbol".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            ledger_token.symbol.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenDecimals".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(ledger_token.decimals.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenFee".to_string(),
-                                                    value: Box::new(match ledger_token.fee.clone() {
-                                                        None => CandyShared::Option(None),
-                                                        Some(val) => CandyShared::Nat(val),
-                                                    }),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "account".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(originator)
-                                                    ),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "tag".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.origyn.royalty.network".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "fixedXDR".to_string(),
-                                                    value: Box::new(CandyShared::Float(1000000.0)),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenCanister".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Principal_(
-                                                            ledger_token.canister.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenSymbol".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            ledger_token.symbol.clone()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenDecimals".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(ledger_token.decimals.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "tokenFee".to_string(),
-                                                    value: Box::new(match ledger_token.fee.clone() {
-                                                        None => CandyShared::Option(None),
-                                                        Some(val) => CandyShared::Nat(val),
-                                                    }),
-                                                    immutable: true,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "library".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: "library_id".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "collection_banner".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "title".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "collection_banner".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("canister".to_string())
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "location".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            format!("https://{}.raw.icp0.io/collection/-/collection_banner", canister)
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_type".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "text/html; charset=UTF-8".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "content_hash".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Bytes(
-                                                            ByteBuf::from(vec![0, 0, 0, 0])
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "size".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(
-                                                            Nat::from(file_size.clone())
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "sort".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Nat(Nat::from(0 as u32))
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
-                                                    immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "__apps".to_string(),
-                        value: Box::new(
-                            CandyShared::Array(
-                                vec![
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: metadata.__apps_app_id.to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.test.__public".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
-                                                },
-                                                PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text("public".to_string())
-                                                    ),
+        metadata: Box::new(CandyShared::Class(vec![
+            PropertyShared {
+                name: "id".to_string(),
+                value: Box::new(CandyShared::Text("".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "primary_asset".to_string(),
+                value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "preview".to_string(),
+                value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "experience".to_string(),
+                value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "com.origyn.node".to_string(),
+                value: Box::new(CandyShared::Principal_(node)),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "com.origyn.originator".to_string(),
+                value: Box::new(CandyShared::Principal_(node)),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "com.origyn.royalties.primary.default".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.broker".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.06)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.node".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.07777)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.network".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.005)),
+                            immutable: true,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "com.origyn.royalties.secondary.default".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.broker".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.01)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.node".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.02)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.originator".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.03333333333)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.custom".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.04)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "account".to_string(),
+                            value: Box::new(CandyShared::Principal_(originator)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.network".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.005)),
+                            immutable: true,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "com.origyn.royalties.primary.default".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.broker".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.06)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.node".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.07777)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.network".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "rate".to_string(),
+                            value: Box::new(CandyShared::Float(0.005)),
+                            immutable: true,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "com.origyn.royalties.fixed.default".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.broker".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "fixedXDR".to_string(),
+                            value: Box::new(CandyShared::Float(1000000.0)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenCanister".to_string(),
+                            value: Box::new(CandyShared::Principal_(ledger_token.canister.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenSymbol".to_string(),
+                            value: Box::new(CandyShared::Text(ledger_token.symbol.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenDecimals".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(
+                                ledger_token.decimals.clone(),
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenFee".to_string(),
+                            value: Box::new(match ledger_token.fee.clone() {
+                                None => CandyShared::Option(None),
+                                Some(val) => CandyShared::Nat(val),
+                            }),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.node".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "fixedXDR".to_string(),
+                            value: Box::new(CandyShared::Float(1000000.0)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenCanister".to_string(),
+                            value: Box::new(CandyShared::Principal_(ledger_token.canister.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenSymbol".to_string(),
+                            value: Box::new(CandyShared::Text(ledger_token.symbol.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenDecimals".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(
+                                ledger_token.decimals.clone(),
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenFee".to_string(),
+                            value: Box::new(match ledger_token.fee.clone() {
+                                None => CandyShared::Option(None),
+                                Some(val) => CandyShared::Nat(val),
+                            }),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.originator".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "fixedXDR".to_string(),
+                            value: Box::new(CandyShared::Float(1000000.0)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenCanister".to_string(),
+                            value: Box::new(CandyShared::Principal_(ledger_token.canister.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenSymbol".to_string(),
+                            value: Box::new(CandyShared::Text(ledger_token.symbol.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenDecimals".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(
+                                ledger_token.decimals.clone(),
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenFee".to_string(),
+                            value: Box::new(match ledger_token.fee.clone() {
+                                None => CandyShared::Option(None),
+                                Some(val) => CandyShared::Nat(val),
+                            }),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.custom".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "fixedXDR".to_string(),
+                            value: Box::new(CandyShared::Float(1000000.0)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenCanister".to_string(),
+                            value: Box::new(CandyShared::Principal_(ledger_token.canister.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenSymbol".to_string(),
+                            value: Box::new(CandyShared::Text(ledger_token.symbol.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenDecimals".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(
+                                ledger_token.decimals.clone(),
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenFee".to_string(),
+                            value: Box::new(match ledger_token.fee.clone() {
+                                None => CandyShared::Option(None),
+                                Some(val) => CandyShared::Nat(val),
+                            }),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "account".to_string(),
+                            value: Box::new(CandyShared::Principal_(originator)),
+                            immutable: true,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: "tag".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "com.origyn.royalty.network".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "fixedXDR".to_string(),
+                            value: Box::new(CandyShared::Float(1000000.0)),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenCanister".to_string(),
+                            value: Box::new(CandyShared::Principal_(ledger_token.canister.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenSymbol".to_string(),
+                            value: Box::new(CandyShared::Text(ledger_token.symbol.clone())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenDecimals".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(
+                                ledger_token.decimals.clone(),
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "tokenFee".to_string(),
+                            value: Box::new(match ledger_token.fee.clone() {
+                                None => CandyShared::Option(None),
+                                Some(val) => CandyShared::Nat(val),
+                            }),
+                            immutable: true,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "library".to_string(),
+                value: Box::new(CandyShared::Array(vec![Box::new(CandyShared::Class(
+                    vec![
+                        PropertyShared {
+                            name: "library_id".to_string(),
+                            value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "title".to_string(),
+                            value: Box::new(CandyShared::Text("collection_banner".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location_type".to_string(),
+                            value: Box::new(CandyShared::Text("canister".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "location".to_string(),
+                            value: Box::new(CandyShared::Text(format!(
+                                "https://{}.raw.icp0.io/collection/-/collection_banner",
+                                canister
+                            ))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_type".to_string(),
+                            value: Box::new(CandyShared::Text(
+                                "text/html; charset=UTF-8".to_string(),
+                            )),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "content_hash".to_string(),
+                            value: Box::new(CandyShared::Bytes(ByteBuf::from(vec![0, 0, 0, 0]))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "size".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(file_size.clone()))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "sort".to_string(),
+                            value: Box::new(CandyShared::Nat(Nat::from(0 as u32))),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                    ],
+                ))])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "__apps".to_string(),
+                value: Box::new(CandyShared::Array(vec![
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: metadata.__apps_app_id.to_string(),
+                            value: Box::new(CandyShared::Text("com.test.__public".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Text("public".to_string())),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "write".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "permissions".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "data".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "val1".to_string(),
+                                    value: Box::new(CandyShared::Text("val1".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val2".to_string(),
+                                    value: Box::new(CandyShared::Text("val2".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val3".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val3".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Text(
+                                                "public".to_string(),
+                                            )),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "write".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
+                                                    immutable: false,
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val4".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val4".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "permissions".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
+                                                    immutable: false,
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "data".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "val1".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val1".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val2".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val2".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val3".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val3".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "public".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val4".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val4".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
                                                     immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    ),
-                                    Box::new(
-                                        CandyShared::Class(
-                                            vec![
-                                                PropertyShared {
-                                                    name: metadata.__apps_app_id.to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Text(
-                                                            "com.test.__private".to_string()
-                                                        )
-                                                    ),
-                                                    immutable: true,
                                                 },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                    ])),
+                    Box::new(CandyShared::Class(vec![
+                        PropertyShared {
+                            name: metadata.__apps_app_id.to_string(),
+                            value: Box::new(CandyShared::Text("com.test.__private".to_string())),
+                            immutable: true,
+                        },
+                        PropertyShared {
+                            name: "read".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "write".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "permissions".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "type".to_string(),
+                                    value: Box::new(CandyShared::Text("allow".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "list".to_string(),
+                                    value: Box::new(CandyShared::Array(vec![Box::new(
+                                        CandyShared::Principal_(app),
+                                    )])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                        PropertyShared {
+                            name: "data".to_string(),
+                            value: Box::new(CandyShared::Class(vec![
+                                PropertyShared {
+                                    name: "val1".to_string(),
+                                    value: Box::new(CandyShared::Text("val1".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val2".to_string(),
+                                    value: Box::new(CandyShared::Text("val2".to_string())),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val3".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val3".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Text(
+                                                "public".to_string(),
+                                            )),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
                                                 PropertyShared {
-                                                    name: "read".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "write".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
+                                                    immutable: false,
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                                PropertyShared {
+                                    name: "val4".to_string(),
+                                    value: Box::new(CandyShared::Class(vec![
+                                        PropertyShared {
+                                            name: "data".to_string(),
+                                            value: Box::new(CandyShared::Text("val4".to_string())),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "read".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "permissions".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "type".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "allow".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "list".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Array(
-                                                                            vec![
-                                                                                Box::new(
-                                                                                    CandyShared::Principal_(
-                                                                                        app
-                                                                                    )
-                                                                                )
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
+                                                    immutable: false,
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                        PropertyShared {
+                                            name: "write".to_string(),
+                                            value: Box::new(CandyShared::Class(vec![
+                                                PropertyShared {
+                                                    name: "type".to_string(),
+                                                    value: Box::new(CandyShared::Text(
+                                                        "allow".to_string(),
+                                                    )),
                                                     immutable: false,
                                                 },
                                                 PropertyShared {
-                                                    name: "data".to_string(),
-                                                    value: Box::new(
-                                                        CandyShared::Class(
-                                                            vec![
-                                                                PropertyShared {
-                                                                    name: "val1".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val1".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val2".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Text(
-                                                                            "val2".to_string()
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val3".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val3".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "public".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                },
-                                                                PropertyShared {
-                                                                    name: "val4".to_string(),
-                                                                    value: Box::new(
-                                                                        CandyShared::Class(
-                                                                            vec![
-                                                                                PropertyShared {
-                                                                                    name: "data".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Text(
-                                                                                            "val4".to_string()
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "read".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                },
-                                                                                PropertyShared {
-                                                                                    name: "write".to_string(),
-                                                                                    value: Box::new(
-                                                                                        CandyShared::Class(
-                                                                                            vec![
-                                                                                                PropertyShared {
-                                                                                                    name: "type".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Text(
-                                                                                                            "allow".to_string()
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                },
-                                                                                                PropertyShared {
-                                                                                                    name: "list".to_string(),
-                                                                                                    value: Box::new(
-                                                                                                        CandyShared::Array(
-                                                                                                            vec![
-                                                                                                                Box::new(
-                                                                                                                    CandyShared::Principal_(
-                                                                                                                        app
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            ]
-                                                                                                        )
-                                                                                                    ),
-                                                                                                    immutable: false,
-                                                                                                }
-                                                                                            ]
-                                                                                        )
-                                                                                    ),
-                                                                                    immutable: false,
-                                                                                }
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    immutable: false,
-                                                                }
-                                                            ]
-                                                        )
-                                                    ),
+                                                    name: "list".to_string(),
+                                                    value: Box::new(CandyShared::Array(vec![
+                                                        Box::new(CandyShared::Principal_(app)),
+                                                    ])),
                                                     immutable: false,
-                                                }
-                                            ]
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "owner".to_string(),
-                        value: Box::new(CandyShared::Principal_(canister)),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "is_soulbound".to_string(),
-                        value: Box::new(CandyShared::Bool(false)),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_host".to_string(),
-                        value: Box::new(CandyShared::Text("localhost".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_port".to_string(),
-                        value: Box::new(CandyShared::Text("8000".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "primary_protocol".to_string(),
-                        value: Box::new(CandyShared::Text("http".to_string())),
-                        immutable: false,
-                    },
-                    PropertyShared {
-                        name: "com.origyn.royalties.broker_dev_fund_override".to_string(),
-                        value: Box::new(
-                            if broker_override {
-                                CandyShared::Bool(true)
-                            } else {
-                                CandyShared::Bool(false)
-                            }
-                        ),
-                        immutable: false,
-                    }
-                ]
-            )
-        ),
+                                                },
+                                            ])),
+                                            immutable: false,
+                                        },
+                                    ])),
+                                    immutable: false,
+                                },
+                            ])),
+                            immutable: false,
+                        },
+                    ])),
+                ])),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "owner".to_string(),
+                value: Box::new(CandyShared::Principal_(canister)),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "is_soulbound".to_string(),
+                value: Box::new(CandyShared::Bool(false)),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_host".to_string(),
+                value: Box::new(CandyShared::Text("localhost".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_port".to_string(),
+                value: Box::new(CandyShared::Text("8000".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "primary_protocol".to_string(),
+                value: Box::new(CandyShared::Text("http".to_string())),
+                immutable: false,
+            },
+            PropertyShared {
+                name: "com.origyn.royalties.broker_dev_fund_override".to_string(),
+                value: Box::new(if broker_override {
+                    CandyShared::Bool(true)
+                } else {
+                    CandyShared::Bool(false)
+                }),
+                immutable: false,
+            },
+        ])),
     }
 }
 
@@ -2572,7 +1784,7 @@ fn standardFileChunk(
     token_id: String,
     library_id: String,
     text: String,
-    filedata: CandyShared
+    filedata: CandyShared,
 ) -> StageChunkArg {
     StageChunkArg {
         token_id: token_id,

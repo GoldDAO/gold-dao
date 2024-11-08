@@ -1,6 +1,6 @@
-pub use token_metrics_api::queries::get_active_users_count::Response as GetActiveUsersCountResponse;
-use ic_cdk_macros::query;
 use crate::state::read_state;
+use ic_cdk_macros::query;
+pub use token_metrics_api::queries::get_active_users_count::Response as GetActiveUsersCountResponse;
 
 #[query]
 fn get_active_users_count() -> GetActiveUsersCountResponse {

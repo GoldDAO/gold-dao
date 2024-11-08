@@ -1,6 +1,5 @@
 pub use gldt_swap_api_canister::get_active_swaps::{
-    Args as GetActiveSwapsArgs,
-    Response as GetActiveSwapsResponse,
+    Args as GetActiveSwapsArgs, Response as GetActiveSwapsResponse,
 };
 use ic_cdk::query;
 

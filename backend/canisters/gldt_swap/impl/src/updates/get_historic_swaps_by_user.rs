@@ -2,10 +2,12 @@ use std::collections::HashMap;
 
 use candid::Principal;
 pub use gldt_swap_api_canister::get_historic_swaps_by_user::{
-    Args as GetHistoricSwapsByUserArgs,
-    Response as GetHistoricSwapsByUserResponse,
+    Args as GetHistoricSwapsByUserArgs, Response as GetHistoricSwapsByUserResponse,
 };
-use gldt_swap_common::{ archive::ArchiveCanister, swap::{ SwapId, SwapInfo } };
+use gldt_swap_common::{
+    archive::ArchiveCanister,
+    swap::{SwapId, SwapInfo},
+};
 
 use gldt_swap_api_canister::get_historic_swaps_by_user::GetHistoricSwapsByUserError;
 use gldt_swap_archive_c2c_client::get_swap_bulk;
@@ -15,7 +17,7 @@ use crate::utils::get_all_user_swap_ids;
 
 #[update]
 async fn get_historic_swaps_by_user(
-    args: GetHistoricSwapsByUserArgs
+    args: GetHistoricSwapsByUserArgs,
 ) -> GetHistoricSwapsByUserResponse {
     let limit = args.limit.clone();
     let max_limit = 200usize;
@@ -41,14 +43,13 @@ async fn get_historic_swaps_by_user(
 
     // archives largest index to smallest index
 
-    let mut all_user_swap_ids: Vec<(SwapId, ArchiveCanister)> = match
-        get_all_user_swap_ids(&args.user).await
-    {
-        Ok(swap_ids) => swap_ids,
-        Err(e) => {
-            return Err(e);
-        }
-    };
+    let mut all_user_swap_ids: Vec<(SwapId, ArchiveCanister)> =
+        match get_all_user_swap_ids(&args.user).await {
+            Ok(swap_ids) => swap_ids,
+            Err(e) => {
+                return Err(e);
+            }
+        };
 
     // no swap ids to get
     if all_user_swap_ids.len() == 0 {
@@ -78,7 +79,9 @@ async fn get_historic_swaps_by_user(
                     swaps_to_return.extend(with_swap_id);
                 }
                 Err(e) => {
-                    return Err(GetHistoricSwapsByUserError::QueryCanisterError(format!("{e:?}")));
+                    return Err(GetHistoricSwapsByUserError::QueryCanisterError(format!(
+                        "{e:?}"
+                    )));
                 }
             }
         }
@@ -90,12 +93,15 @@ async fn get_historic_swaps_by_user(
 }
 
 fn group_by_archive_canister_id(
-    swap_ids_and_archives: &Vec<(SwapId, ArchiveCanister)>
+    swap_ids_and_archives: &Vec<(SwapId, ArchiveCanister)>,
 ) -> HashMap<Principal, Vec<SwapId>> {
     let mut grouped: HashMap<Principal, Vec<SwapId>> = HashMap::new();
 
     for (swap_id, archive) in swap_ids_and_archives {
-        grouped.entry(archive.canister_id).or_insert_with(Vec::new).push(swap_id.clone());
+        grouped
+            .entry(archive.canister_id)
+            .or_insert_with(Vec::new)
+            .push(swap_id.clone());
     }
 
     grouped

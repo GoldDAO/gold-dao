@@ -6,9 +6,7 @@ use stable_memory::get_reader;
 use tracing::info;
 
 use crate::{
-    memory::get_upgrades_memory,
-    migrations::types::state::RuntimeStateV0,
-    state::RuntimeState,
+    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
 };
 
 use super::init_canister;

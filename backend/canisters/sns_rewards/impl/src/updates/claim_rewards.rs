@@ -1,25 +1,21 @@
-use candid::{ Nat, Principal };
+use candid::{Nat, Principal};
 use ic_cdk::update;
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use sns_governance_canister::types::NeuronId;
 pub use sns_rewards_api_canister::claim_reward::{
-    Args as ClaimRewardArgs,
-    Response as ClaimRewardResponse,
+    Args as ClaimRewardArgs, Response as ClaimRewardResponse,
 };
 use tracing::error;
-use types::{ TokenInfo, TokenSymbol };
+use types::{TokenInfo, TokenSymbol};
 
-use utils::env::Environment;
 use crate::{
-    state::{ read_state, RuntimeState },
+    state::{read_state, RuntimeState},
     utils::{
-        authenticate_by_hotkey,
-        fetch_neuron_data_by_id,
-        transfer_token,
-        AuthenticateByHotkeyResponse,
-        FetchNeuronDataByIdResponse,
+        authenticate_by_hotkey, fetch_neuron_data_by_id, transfer_token,
+        AuthenticateByHotkeyResponse, FetchNeuronDataByIdResponse,
     },
 };
+use utils::env::Environment;
 
 #[update]
 async fn claim_reward(args: ClaimRewardArgs) -> ClaimRewardResponse {
@@ -30,25 +26,26 @@ async fn claim_reward(args: ClaimRewardArgs) -> ClaimRewardResponse {
 pub async fn claim_reward_impl(
     neuron_id: NeuronId,
     token: String,
-    caller: Principal
+    caller: Principal,
 ) -> ClaimRewardResponse {
     // verify the token symbol is valid
     let token_symbol = match TokenSymbol::parse(&token) {
         Ok(token) => token,
         Err(e) => {
-            return ClaimRewardResponse::TokenSymbolInvalid(
-                format!("{e} : token of type {token:?} is not a valid token symbol.")
-            );
+            return ClaimRewardResponse::TokenSymbolInvalid(format!(
+                "{e} : token of type {token:?} is not a valid token symbol."
+            ));
         }
     };
 
     // get the token meta information associated with the valid token
-    let token_info = match read_state(|s: &RuntimeState| s.data.tokens.get(&token_symbol).copied()) {
+    let token_info = match read_state(|s: &RuntimeState| s.data.tokens.get(&token_symbol).copied())
+    {
         Some(token) => token,
         None => {
-            return ClaimRewardResponse::TokenSymbolInvalid(
-                format!("Token info for type {token_symbol:?} not found in state")
-            );
+            return ClaimRewardResponse::TokenSymbolInvalid(format!(
+                "Token info for type {token_symbol:?} not found in state"
+            ));
         }
     };
 
@@ -83,17 +80,15 @@ pub async fn claim_reward_impl(
 pub async fn transfer_rewards(
     neuron_id: &NeuronId,
     user_id: Principal,
-    token_info: &TokenInfo
+    token_info: &TokenInfo,
 ) -> Result<bool, String> {
     // get the balance of the sub account ( NeuronId is the sub account id )
     let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
     if balance_of_neuron_id <= Nat::from(token_info.fee) {
-        return Err(
-            format!(
-                "Your balance must be higher than the transfer fee of {}",
-                Nat::from(token_info.fee)
-            )
-        );
+        return Err(format!(
+            "Your balance must be higher than the transfer fee of {}",
+            Nat::from(token_info.fee)
+        ));
     }
     let amount_to_transfer = balance_of_neuron_id - Nat::from(token_info.fee);
     if amount_to_transfer == Nat::from(0u64) {
@@ -110,29 +105,30 @@ pub async fn transfer_rewards(
         neuron_sub_account,
         user_account,
         token_info.ledger_id,
-        amount_to_transfer
-    ).await;
+        amount_to_transfer,
+    )
+    .await;
 
     match transfer {
-        Ok(_) => { Ok(true) }
-        Err(e) => { Err(e) }
+        Ok(_) => Ok(true),
+        Err(e) => Err(e),
     }
 }
 
 async fn fetch_balance_of_neuron_id(
     ledger_canister_id: Principal,
-    neuron_id: &NeuronId
+    neuron_id: &NeuronId,
 ) -> Result<Nat, String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_balance_of(
-            ledger_canister_id,
-            &(Account {
-                owner: ic_cdk::api::id(),
-                subaccount: Some(neuron_id.into()),
-            })
-        ).await
+    match icrc_ledger_canister_c2c_client::icrc1_balance_of(
+        ledger_canister_id,
+        &(Account {
+            owner: ic_cdk::api::id(),
+            subaccount: Some(neuron_id.into()),
+        }),
+    )
+    .await
     {
-        Ok(t) => { Ok(t) }
+        Ok(t) => Ok(t),
         Err((rejection_code, message)) => {
             error!("Fail - to neuron rewards: {:?}", message);
             Err(format!("{rejection_code:?} : {message}"))

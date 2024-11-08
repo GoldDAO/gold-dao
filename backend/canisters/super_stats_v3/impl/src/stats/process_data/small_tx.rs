@@ -1,12 +1,13 @@
 use super_stats_v3_api::{
-    core::constants::D1_AS_NANOS, custom_types::{ IndexerType, ProcessedTX, SmallTX }, runtime::RUNTIME_STATE, stable_memory::STABLE_STATE
+    core::constants::D1_AS_NANOS,
+    custom_types::{IndexerType, ProcessedTX, SmallTX},
+    runtime::RUNTIME_STATE,
+    stable_memory::STABLE_STATE,
 };
 
 use crate::stats::{
     active_accounts::{
-        get_count_of_unique_accounts,
-        init_activity_stats,
-        push_activity_snapshot,
+        get_count_of_unique_accounts, init_activity_stats, push_activity_snapshot,
         push_padding_snapshot,
     },
     directory::add_to_directory,
@@ -16,10 +17,20 @@ use crate::stats::{
 pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
     // Vars for calculating simple activity stats (active_accounts.rs)
     let mut activity_start_time = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().activity_stats.chunk_start_time.clone()
+        s.borrow()
+            .as_ref()
+            .unwrap()
+            .activity_stats
+            .chunk_start_time
+            .clone()
     });
     let mut activity_end_time = STABLE_STATE.with(|s| {
-        s.borrow().as_ref().unwrap().activity_stats.chunk_end_time.clone()
+        s.borrow()
+            .as_ref()
+            .unwrap()
+            .activity_stats
+            .chunk_end_time
+            .clone()
     });
     let mut accounts_directory_refs: Vec<Option<u64>> = Vec::new();
     let mut principals_directory_refs: Vec<Option<u64>> = Vec::new();
@@ -45,7 +56,7 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
         let to: Option<u64>;
         let to_ac = tx.to_account.as_str();
         if to_ac != "Token Ledger" {
-            to = add_to_directory(&tx.to_account);            
+            to = add_to_directory(&tx.to_account);
         } else {
             to = None;
         }
@@ -93,9 +104,10 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
                 s.borrow_mut()
                     .as_mut()
                     .unwrap()
-                    .account_data.create_account_if_not_exists(&to_u64, tx.tx_time)
+                    .account_data
+                    .create_account_if_not_exists(&to_u64, tx.tx_time)
             });
-            let index_type = RUNTIME_STATE.with(|s| { s.borrow().data.get_index_type() });
+            let index_type = RUNTIME_STATE.with(|s| s.borrow().data.get_index_type());
 
             if index_type != IndexerType::DfinityIcp {
                 match parse_icrc_account(&tx.to_account) {
@@ -106,9 +118,10 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
                                     s.borrow_mut()
                                         .as_mut()
                                         .unwrap()
-                                        .principal_data.create_account_if_not_exists(
+                                        .principal_data
+                                        .create_account_if_not_exists(
                                             &from_as_principal,
-                                            tx.tx_time
+                                            tx.tx_time,
                                         )
                                 });
                             }
@@ -128,11 +141,13 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
                 s.borrow_mut()
                     .as_mut()
                     .unwrap()
-                    .activity_stats.add_account_to_current_snapshot(unique_accounts);
+                    .activity_stats
+                    .add_account_to_current_snapshot(unique_accounts);
                 s.borrow_mut()
                     .as_mut()
                     .unwrap()
-                    .activity_stats.add_principal_to_current_snapshot(unique_principals);
+                    .activity_stats
+                    .add_principal_to_current_snapshot(unique_principals);
             });
 
             // next tx is within 24 hours of last
@@ -166,8 +181,9 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
             match parse_icrc_account(&tx.from_account) {
                 Some(parsed_from) => {
                     match add_to_directory(&parsed_from.0) {
-                        Some(from_as_principal) =>
-                            principals_directory_refs.push(Some(from_as_principal)),
+                        Some(from_as_principal) => {
+                            principals_directory_refs.push(Some(from_as_principal))
+                        }
                         None => {}
                     };
                 }
@@ -177,8 +193,9 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
             match parse_icrc_account(&tx.to_account) {
                 Some(parsed_to) => {
                     match add_to_directory(&parsed_to.0) {
-                        Some(to_as_principal) =>
-                            principals_directory_refs.push(Some(to_as_principal)),
+                        Some(to_as_principal) => {
+                            principals_directory_refs.push(Some(to_as_principal))
+                        }
                         None => {}
                     };
                 }
@@ -194,11 +211,13 @@ pub fn processedtx_to_smalltx(input_vec: &Vec<ProcessedTX>) -> Vec<SmallTX> {
         s.borrow_mut()
             .as_mut()
             .unwrap()
-            .activity_stats.add_account_to_current_snapshot(unique_accounts);
+            .activity_stats
+            .add_account_to_current_snapshot(unique_accounts);
         s.borrow_mut()
             .as_mut()
             .unwrap()
-            .activity_stats.add_principal_to_current_snapshot(unique_principals);
+            .activity_stats
+            .add_principal_to_current_snapshot(unique_principals);
     });
 
     return stx;

@@ -1,18 +1,18 @@
-use std::collections::{ BTreeMap, HashMap };
-use serde::{ Deserialize, Serialize };
-use sns_governance_canister::types::NeuronId;
-use candid::{ CandidType, Nat, Principal };
+use candid::{CandidType, Nat, Principal};
 use canister_state_macros::canister_state;
-use sns_rewards_api_canister::{ ReserveTokenAmounts, TokenRewardTypes };
-use types::{ BuildVersion, NeuronInfo, TimestampMillis };
+use serde::{Deserialize, Serialize};
+use sns_governance_canister::types::NeuronId;
+use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
+use std::collections::{BTreeMap, HashMap};
+use types::{BuildVersion, NeuronInfo, TimestampMillis};
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
-    env::{ CanisterEnv, Environment },
+    env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
 
 use crate::{
-    model::{ maturity_history::MaturityHistory, payment_processor::PaymentProcessor },
+    model::{maturity_history::MaturityHistory, payment_processor::PaymentProcessor},
     utils::TimeInterval,
 };
 
@@ -44,7 +44,9 @@ impl RuntimeState {
             number_of_neurons: self.data.neuron_maturity.len(),
             sync_info: self.data.sync_info,
             authorized_principals: self.data.authorized_principals.clone(),
-            daily_reserve_transfer: self.data.daily_reserve_transfer
+            daily_reserve_transfer: self
+                .data
+                .daily_reserve_transfer
                 .iter()
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),
@@ -53,17 +55,16 @@ impl RuntimeState {
             daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
             neuron_sync_interval: self.data.neuron_sync_interval.clone(),
-            registered_tokens: self.data.tokens
+            registered_tokens: self
+                .data
+                .tokens
                 .iter()
-                .map(|(token, details)|
+                .map(|(token, details)| {
                     format!(
                         "{:?} - id: {}, fee: {}, decimals: {}",
-                        token,
-                        details.ledger_id,
-                        details.fee,
-                        details.decimals
+                        token, details.ledger_id, details.fee, details.decimals
                     )
-                )
+                })
                 .collect(),
         }
     }
@@ -166,7 +167,11 @@ impl Default for Data {
             last_daily_gldgov_burn: None,
             reward_distribution_interval: Some(TimeInterval::default()),
             reward_distribution_in_progress: Some(false),
-            neuron_sync_interval: Some(TimeInterval { weekday: None, start_hour: 9, end_hour: 11 }),
+            neuron_sync_interval: Some(TimeInterval {
+                weekday: None,
+                start_hour: 9,
+                end_hour: 11,
+            }),
         }
     }
 }

@@ -1,5 +1,5 @@
-use candid::{ CandidType, Nat };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Nat};
+use serde::{Deserialize, Serialize};
 
 pub type Args = Nat;
 

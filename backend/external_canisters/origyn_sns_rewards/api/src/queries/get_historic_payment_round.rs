@@ -1,5 +1,5 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use types::TokenSymbol;
 
 use crate::payment_round::PaymentRound;

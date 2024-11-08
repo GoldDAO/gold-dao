@@ -1,6 +1,6 @@
 use candid::CandidType;
 use candid::Principal;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use types::CanisterId;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]

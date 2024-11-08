@@ -1,23 +1,21 @@
 use std::collections::HashMap;
 
-use candid::{ CandidType, Deserialize, Nat, Principal };
+use candid::{CandidType, Deserialize, Nat, Principal};
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
-use types::{ TokenInfo, TokenSymbol };
+use types::{TokenInfo, TokenSymbol};
 
 use crate::{
-    client::rewards::{ set_reward_token_types, set_reward_token_types_validate },
+    client::rewards::{set_reward_token_types, set_reward_token_types_validate},
     sns_rewards_suite::setup::default_test_setup,
 };
 
 use sns_rewards_api_canister::set_reward_token_types::{
-    Args as SetRewardTokenTypesArgs,
-    Response as SetRewardTokenTypesResponse,
+    Args as SetRewardTokenTypesArgs, Response as SetRewardTokenTypesResponse,
 };
 
 use sns_rewards_api_canister::set_reward_token_types_validate::{
-    Args as SetRewardTokenTypesValidateArgs,
-    Response as SetRewardTokenTypesValidateResponse,
+    Args as SetRewardTokenTypesValidateArgs, Response as SetRewardTokenTypesValidateResponse,
 };
 
 fn is_fail_enum(value: &SetRewardTokenTypesResponse) -> bool {
@@ -42,7 +40,11 @@ fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
     let reserve_args = SetRewardTokenTypesArgs {
         token_list: vec![(
             "ICP".to_string(),
-            TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
+            TokenInfo {
+                ledger_id: Principal::anonymous(),
+                fee: 10_000,
+                decimals: 8,
+            },
         )],
     };
 
@@ -50,7 +52,7 @@ fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
         &mut test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert!(is_fail_enum(&res));
@@ -65,17 +67,19 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
 
     let token_list = vec![(
         "ICP".to_string(),
-        TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
+        TokenInfo {
+            ledger_id: Principal::anonymous(),
+            fee: 10_000,
+            decimals: 8,
+        },
     )];
-    let reserve_args = SetRewardTokenTypesArgs {
-        token_list,
-    };
+    let reserve_args = SetRewardTokenTypesArgs { token_list };
 
     let res = set_reward_token_types(
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert_eq!(res, SetRewardTokenTypesResponse::Success);
@@ -90,17 +94,19 @@ fn test_set_reward_token_types_with_bad_token_symbol() {
 
     let token_list = vec![(
         "WONT_WORK".to_string(),
-        TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
+        TokenInfo {
+            ledger_id: Principal::anonymous(),
+            fee: 10_000,
+            decimals: 8,
+        },
     )];
-    let reserve_args = SetRewardTokenTypesArgs {
-        token_list,
-    };
+    let reserve_args = SetRewardTokenTypesArgs { token_list };
 
     let res = set_reward_token_types(
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
     assert!(is_fail_enum(&res));
 }
@@ -114,18 +120,21 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
 
     let token_list = vec![(
         "ICP".to_string(),
-        TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
+        TokenInfo {
+            ledger_id: Principal::anonymous(),
+            fee: 10_000,
+            decimals: 8,
+        },
     )];
-    let reserve_args = SetRewardTokenTypesValidateArgs {
-        token_list,
-    };
+    let reserve_args = SetRewardTokenTypesValidateArgs { token_list };
 
     set_reward_token_types_validate(
         &mut test_env.pic,
         Principal::anonymous(),
         rewards_canister_id,
-        &reserve_args
-    ).unwrap();
+        &reserve_args,
+    )
+    .unwrap();
 }
 #[test]
 fn test_set_reward_token_validate() {
@@ -136,17 +145,19 @@ fn test_set_reward_token_validate() {
 
     let token_list = vec![(
         "ICP".to_string(),
-        TokenInfo { ledger_id: Principal::anonymous(), fee: 10_000, decimals: 8 },
+        TokenInfo {
+            ledger_id: Principal::anonymous(),
+            fee: 10_000,
+            decimals: 8,
+        },
     )];
-    let reserve_args = SetRewardTokenTypesValidateArgs {
-        token_list,
-    };
+    let reserve_args = SetRewardTokenTypesValidateArgs { token_list };
 
     let res = set_reward_token_types_validate(
         &mut test_env.pic,
         sns_gov_id,
         rewards_canister_id,
-        &reserve_args
+        &reserve_args,
     );
 
     assert!(matches!(res, SetRewardTokenTypesValidateResponse::Ok(_)));

@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-use candid::{ CandidType, Principal };
+use candid::{CandidType, Principal};
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, CandidType, Debug, Clone, PartialEq, Eq)]
 pub struct RewardsRecipient {
@@ -47,7 +47,8 @@ impl RewardsRecipientList {
         // only allow unique accounts
         if !Self::validate_unique_accounts(list) {
             return Err(
-                "Only unique accounts may be defined in the recipients list. Found duplicates.".to_string()
+                "Only unique accounts may be defined in the recipients list. Found duplicates."
+                    .to_string(),
             );
         }
         let mut sum = 0;
@@ -56,22 +57,20 @@ impl RewardsRecipientList {
                 return Err("Invalid rewards recipient: account owner is anonymous.".to_string());
             }
             if recipient.reward_weight == 0 || recipient.reward_weight > Self::TOTAL_REWARD_WEIGHT {
-                return Err(
-                    format!(
-                        "Invalid rewards recipient: reward weight has to be between 1 and {}.",
-                        Self::TOTAL_REWARD_WEIGHT
-                    ).to_string()
-                );
+                return Err(format!(
+                    "Invalid rewards recipient: reward weight has to be between 1 and {}.",
+                    Self::TOTAL_REWARD_WEIGHT
+                )
+                .to_string());
             }
             sum += recipient.reward_weight;
         }
         if sum != Self::TOTAL_REWARD_WEIGHT {
-            return Err(
-                format!(
-                    "Invalid rewards recipient: the sum of all needs to add up to {}.",
-                    Self::TOTAL_REWARD_WEIGHT
-                ).to_string()
-            );
+            return Err(format!(
+                "Invalid rewards recipient: the sum of all needs to add up to {}.",
+                Self::TOTAL_REWARD_WEIGHT
+            )
+            .to_string());
         }
         Ok(())
     }
@@ -90,12 +89,14 @@ impl RewardsRecipientList {
 
     pub fn split_amount_to_each_recipient(
         &self,
-        amount: u64
+        amount: u64,
     ) -> Result<Vec<(Account, u64)>, String> {
         if amount < 100_000_000 {
-            return Err(
-                format!("Amount needs to be at least 100_000_000 (1 ICP). Passed amount: {}", amount).to_string()
-            );
+            return Err(format!(
+                "Amount needs to be at least 100_000_000 (1 ICP). Passed amount: {}",
+                amount
+            )
+            .to_string());
         }
         if self.0.is_empty() {
             return Err("No reward recipients defined.".to_string());
@@ -110,26 +111,23 @@ impl RewardsRecipientList {
                     format!(
                         "Error while multiplying amount with reward_weight for recipient {}.",
                         recipient.tag
-                    ).to_string()
+                    )
+                    .to_string(),
                 )
-                .and_then(|val|
-                    val
-                        .checked_div(Self::TOTAL_REWARD_WEIGHT as u64)
-                        .ok_or(
-                            format!(
-                                "Error while diving amount by TOTAL_REWARD_WEIGHT for recipient {}.",
-                                recipient.tag
-                            ).to_string()
+                .and_then(|val| {
+                    val.checked_div(Self::TOTAL_REWARD_WEIGHT as u64).ok_or(
+                        format!(
+                            "Error while diving amount by TOTAL_REWARD_WEIGHT for recipient {}.",
+                            recipient.tag
                         )
-                )?;
+                        .to_string(),
+                    )
+                })?;
             result.push((recipient.account, amount_share));
         }
         // As division of unsigned ints always applies the 'floor' rounding, we'll add any remainder to the last
         // recipient in the list. This avoids any dust remaining in dissolved neurons.
-        let obtained_sum: u64 = result
-            .iter()
-            .map(|(_, val)| val)
-            .sum();
+        let obtained_sum: u64 = result.iter().map(|(_, val)| val).sum();
         if obtained_sum > amount {
             return Err(
                 format!(
@@ -150,33 +148,36 @@ impl RewardsRecipientList {
 #[cfg(test)]
 mod tests {
     use candid::Principal;
-    use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
+    use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 
-    use crate::{ RewardsRecipient, RewardsRecipientList };
+    use crate::{RewardsRecipient, RewardsRecipientList};
 
     #[test]
     fn initialise_rewards_recipient_list_empty() {
         let mut list = RewardsRecipientList::empty();
         let result = list.set(vec![]);
 
-        assert_eq!(result, Err("Invalid rewards recipients: empty list.".to_string()))
+        assert_eq!(
+            result,
+            Err("Invalid rewards recipients: empty list.".to_string())
+        )
     }
 
     #[test]
     fn initialise_rewards_recipient_list_wrong_sum() {
         let mut list = RewardsRecipientList::empty();
-        let result = list.set(
-            vec![dummy_recipient(1000, Some([0; 32])), dummy_recipient(1000, Some([1; 32]))]
-        );
+        let result = list.set(vec![
+            dummy_recipient(1000, Some([0; 32])),
+            dummy_recipient(1000, Some([1; 32])),
+        ]);
 
         assert_eq!(
             result,
-            Err(
-                format!(
-                    "Invalid rewards recipient: the sum of all needs to add up to {}.",
-                    RewardsRecipientList::TOTAL_REWARD_WEIGHT
-                ).to_string()
+            Err(format!(
+                "Invalid rewards recipient: the sum of all needs to add up to {}.",
+                RewardsRecipientList::TOTAL_REWARD_WEIGHT
             )
+            .to_string())
         )
     }
 
@@ -186,7 +187,7 @@ mod tests {
             dummy_recipient(3300, Some([0; 32])),
             dummy_recipient(3300, Some([1; 32])),
             dummy_recipient(3300, Some([2; 32])),
-            dummy_recipient(100, Some([3; 32]))
+            dummy_recipient(100, Some([3; 32])),
         ];
 
         let mut list = RewardsRecipientList::empty();
@@ -207,27 +208,24 @@ mod tests {
     #[test]
     fn split_amount_to_each_recipient() {
         let mut list = RewardsRecipientList::empty();
-        list.set(
-            vec![
-                dummy_recipient(3300, Some([0; 32])),
-                dummy_recipient(3300, Some([1; 32])),
-                dummy_recipient(3300, Some([2; 32])),
-                dummy_recipient(100, Some([3; 32]))
-            ]
-        ).unwrap();
+        list.set(vec![
+            dummy_recipient(3300, Some([0; 32])),
+            dummy_recipient(3300, Some([1; 32])),
+            dummy_recipient(3300, Some([2; 32])),
+            dummy_recipient(100, Some([3; 32])),
+        ])
+        .unwrap();
 
         let amount1: u64 = 100_000_000_000;
 
         let result1 = list.split_amount_to_each_recipient(amount1);
 
-        let expected_result1 = Ok(
-            vec![
-                (dummy_account(Some([0; 32])), 33_000_000_000 as u64),
-                (dummy_account(Some([1; 32])), 33_000_000_000 as u64),
-                (dummy_account(Some([2; 32])), 33_000_000_000 as u64),
-                (dummy_account(Some([3; 32])), 1_000_000_000 as u64)
-            ]
-        );
+        let expected_result1 = Ok(vec![
+            (dummy_account(Some([0; 32])), 33_000_000_000 as u64),
+            (dummy_account(Some([1; 32])), 33_000_000_000 as u64),
+            (dummy_account(Some([2; 32])), 33_000_000_000 as u64),
+            (dummy_account(Some([3; 32])), 1_000_000_000 as u64),
+        ]);
 
         assert_eq!(result1, expected_result1);
 
@@ -235,28 +233,25 @@ mod tests {
 
         let result2 = list.split_amount_to_each_recipient(amount2);
 
-        let expected_result2 = Ok(
-            vec![
-                (dummy_account(Some([0; 32])), 183_333_333 as u64),
-                (dummy_account(Some([1; 32])), 183_333_333 as u64),
-                (dummy_account(Some([2; 32])), 183_333_333 as u64),
-                (dummy_account(Some([3; 32])), 5_555_556 as u64)
-            ]
-        );
+        let expected_result2 = Ok(vec![
+            (dummy_account(Some([0; 32])), 183_333_333 as u64),
+            (dummy_account(Some([1; 32])), 183_333_333 as u64),
+            (dummy_account(Some([2; 32])), 183_333_333 as u64),
+            (dummy_account(Some([3; 32])), 5_555_556 as u64),
+        ]);
 
         assert_eq!(result2, expected_result2);
     }
     #[test]
     fn split_amount_to_each_recipient_invalid_amount() {
         let mut list = RewardsRecipientList::empty();
-        list.set(
-            vec![
-                dummy_recipient(3300, Some([0; 32])),
-                dummy_recipient(3300, Some([1; 32])),
-                dummy_recipient(3300, Some([2; 32])),
-                dummy_recipient(100, Some([3; 32]))
-            ]
-        ).unwrap();
+        list.set(vec![
+            dummy_recipient(3300, Some([0; 32])),
+            dummy_recipient(3300, Some([1; 32])),
+            dummy_recipient(3300, Some([2; 32])),
+            dummy_recipient(100, Some([3; 32])),
+        ])
+        .unwrap();
 
         let amount: u64 = 123456;
 
@@ -264,17 +259,20 @@ mod tests {
 
         assert_eq!(
             result,
-            Err(
-                format!("Amount needs to be at least 100_000_000 (1 ICP). Passed amount: {}", amount).to_string()
+            Err(format!(
+                "Amount needs to be at least 100_000_000 (1 ICP). Passed amount: {}",
+                amount
             )
+            .to_string())
         );
     }
 
     fn dummy_account(subaccount: Option<Subaccount>) -> Account {
         Account {
             owner: Principal::from_text(
-                "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe"
-            ).unwrap(),
+                "thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe",
+            )
+            .unwrap(),
             subaccount,
         }
     }

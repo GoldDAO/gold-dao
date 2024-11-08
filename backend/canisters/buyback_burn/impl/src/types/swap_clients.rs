@@ -1,9 +1,9 @@
-use serde::{ Deserialize, Serialize };
 use crate::types::*;
-use types::TokenInfo;
-use candid::{ Principal, CandidType };
-use tracing::info;
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use tracing::info;
+use types::TokenInfo;
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct SwapClients {
@@ -21,7 +21,7 @@ impl SwapClients {
         &mut self,
         input_token: TokenInfo,
         output_token: TokenInfo,
-        icp_swap_canister_id: Principal
+        icp_swap_canister_id: Principal,
     ) {
         let swap_client_id = self.get_next_id();
         let exchange_config = ExchangeConfig::ICPSwap(ICPSwapConfig::new(icp_swap_canister_id));
@@ -32,7 +32,7 @@ impl SwapClients {
                 input_token,
                 output_token,
                 exchange_config,
-            })
+            }),
         );
         info!("Added swap client {}", swap_client_id);
     }

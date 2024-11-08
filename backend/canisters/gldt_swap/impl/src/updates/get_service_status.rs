@@ -1,6 +1,5 @@
 pub use gldt_swap_api_canister::get_service_status::{
-    Args as GetServiceStatusArgs,
-    Response as GetServiceStatusResponse,
+    Args as GetServiceStatusArgs, Response as GetServiceStatusResponse,
 };
 use ic_cdk::update;
 

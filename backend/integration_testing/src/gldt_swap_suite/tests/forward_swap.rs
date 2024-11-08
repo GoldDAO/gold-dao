@@ -1,50 +1,39 @@
 use crate::client::icrc1::client::balance_of;
-use crate::client::origyn_nft_reference::client::{
-    get_token_id_as_nat,
-    icrc7_owner_of,
-    market_transfer_nft_origyn,
-};
-use crate::gldt_swap_suite::{ init, CanisterIds, PrincipalIds, TestEnv };
-use crate::utils::tick_n_blocks;
-use crate::gldt_swap_suite::nft_utils;
 use crate::client::icrc1::icrc1_total_supply;
+use crate::client::origyn_nft_reference::client::{
+    get_token_id_as_nat, icrc7_owner_of, market_transfer_nft_origyn,
+};
+use crate::gldt_swap_suite::nft_utils;
+use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
+use crate::utils::tick_n_blocks;
 
-use gldt_swap_common::gldt::{ GLDT_TX_FEE, GldtTokenSpec };
-use gldt_swap_common::swap::{ SwapInfo, SwapStatusForward };
+use candid::{Nat, Principal};
+use gldt_swap_common::gldt::{GldtTokenSpec, GLDT_TX_FEE};
+use gldt_swap_common::swap::{SwapInfo, SwapStatusForward};
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    Account as OrigynAccount,
-    AskFeature,
-    MarketTransferRequest,
-    PricingConfigShared,
-    SalesConfig,
+    Account as OrigynAccount, AskFeature, MarketTransferRequest, PricingConfigShared, SalesConfig,
 };
-use candid::{ Nat, Principal };
 use pocket_ic::PocketIc;
 
 use crate::client::gldt_swap::swap_nft_for_tokens;
-use std::{ array::TryFromSliceError, time::Duration };
+use std::{array::TryFromSliceError, time::Duration};
 
-use canister_time::{ timestamp_millis, MINUTE_IN_MS };
+use canister_time::{timestamp_millis, MINUTE_IN_MS};
 use gldt_swap_common::{
     gldt::GldtNumTokens,
     nft::NftID,
-    swap::{ BidFailError, SwapDetailForward, SwapErrorForward, SwapId, SwapIndex },
+    swap::{BidFailError, SwapDetailForward, SwapErrorForward, SwapId, SwapIndex},
 };
 
 use gldt_swap_api_canister::remove_intent_to_swap::RemoveIntentToSwapError;
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    AuctionStateSharedStatus,
-    EscrowReceipt,
-    MarketTransferRequestReponseTxnType,
-    MarketTransferResult,
-    SaleInfoRequest,
-    SaleInfoResponse,
-    SaleInfoResult,
+    AuctionStateSharedStatus, EscrowReceipt, MarketTransferRequestReponseTxnType,
+    MarketTransferResult, SaleInfoRequest, SaleInfoResponse, SaleInfoResult,
 };
 
 use crate::client::{
-    gldt_swap::{ get_swap, insert_fake_swap, remove_intent_to_swap },
+    gldt_swap::{get_swap, insert_fake_swap, remove_intent_to_swap},
     icrc1::client::transfer,
     origyn_nft_reference::sale_info_nft_origyn,
 };
@@ -55,7 +44,7 @@ fn init_nft_with_premint_nft(
     originator: Principal,
     net_principal: Principal,
     nft_owner: Principal,
-    nft_name: String
+    nft_name: String,
 ) -> bool {
     nft_utils::build_standard_nft(
         pic,
@@ -65,15 +54,22 @@ fn init_nft_with_premint_nft(
         originator.clone(),
         Nat::from(1024 as u32),
         false,
-        net_principal.clone()
+        net_principal.clone(),
     );
 
-    let mint_return: origyn_nft_reference::origyn_nft_reference_canister::OrigynTextResult = crate::client::origyn_nft_reference::client::mint_nft_origyn(
-        pic,
-        origyn_nft.clone(),
-        Some(net_principal.clone()),
-        (nft_name.clone(), OrigynAccount::Account { owner: nft_owner.clone(), sub_account: None })
-    );
+    let mint_return: origyn_nft_reference::origyn_nft_reference_canister::OrigynTextResult =
+        crate::client::origyn_nft_reference::client::mint_nft_origyn(
+            pic,
+            origyn_nft.clone(),
+            Some(net_principal.clone()),
+            (
+                nft_name.clone(),
+                OrigynAccount::Account {
+                    owner: nft_owner.clone(),
+                    sub_account: None,
+                },
+            ),
+        );
 
     println!("mint_return: {:?}", mint_return);
 
@@ -85,21 +81,16 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use gldt_swap_api_canister::swap_nft_for_tokens::{ NftInvalidError, SwapNftForTokensErrors };
+    use gldt_swap_api_canister::swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors};
     use gldt_swap_common::{
         gldt::GLDT_LEDGER_FEE_ACCOUNT,
         swap::{
-            BurnFeesError,
-            ImpossibleErrorReason,
-            MintError,
-            NotificationError,
-            SwapStatus,
-            TransferFailReason,
-            STALE_SWAP_TIME_THRESHOLD_MINUTES,
+            BurnFeesError, ImpossibleErrorReason, MintError, NotificationError, SwapStatus,
+            TransferFailReason, STALE_SWAP_TIME_THRESHOLD_MINUTES,
         },
     };
 
-    use crate::client::{ gldt_swap::recover_stuck_swap, icrc1_icrc2_token::icrc1_balance_of };
+    use crate::client::{gldt_swap::recover_stuck_swap, icrc1_icrc2_token::icrc1_balance_of};
 
     use super::*;
     #[test]
@@ -107,17 +98,25 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_gldt_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -126,14 +125,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
@@ -141,7 +140,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -162,17 +161,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -185,20 +180,20 @@ mod tests {
         }
 
         // check the total supply increased
-        let post_sale_total_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let post_sale_total_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
         let expected_supply = pre_swap_gldt_supply + Nat::from(10_000_000_000u64); // mint incurs fee && nft escrow has to transfer to user ( x 2 transactions )
         assert_eq!(post_sale_total_supply, expected_supply);
 
         // check user got their gldt tokens
-        let user_balance = balance_of(pic, gldt_ledger, Account {
-            owner: nft_owner.clone(),
-            subaccount: None,
-        });
+        let user_balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: nft_owner.clone(),
+                subaccount: None,
+            },
+        );
         assert_eq!(user_balance, Nat::from(10_000_000_000u64));
 
         // ensure canister now owns nft
@@ -206,7 +201,7 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat.clone()]
+            vec![token_id_as_nat.clone()],
         );
         assert_eq!(
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
@@ -219,17 +214,25 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, controller },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    controller,
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_gldt_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -238,24 +241,27 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let res = swap_nft_for_tokens(
             pic,
             controller, // controlelr doesn't own the nft
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
 
-        matches!(res, Err(SwapNftForTokensErrors::NftValidationErrors((_, _))));
+        matches!(
+            res,
+            Err(SwapNftForTokensErrors::NftValidationErrors((_, _)))
+        );
     }
 
     #[test]
@@ -263,8 +269,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
@@ -274,7 +292,7 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
@@ -282,10 +300,12 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), Principal::anonymous())] // use annoymous principal
+            &vec![(NftID(token_id_as_nat.clone()), Principal::anonymous())], // use annoymous principal
         );
         match res {
-            Ok(r) => { assert_eq!(true, false) }
+            Ok(r) => {
+                assert_eq!(true, false)
+            }
             Err(e) => {
                 matches!(e, SwapNftForTokensErrors::ContainsInvalidNftCanister(_));
             }
@@ -297,17 +317,25 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_gldt_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -316,14 +344,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
@@ -331,7 +359,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -352,17 +380,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap, Principal::anonymous()])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap, Principal::anonymous()]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -373,11 +397,9 @@ mod tests {
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::NotificationFailed(
-                        NotificationError::TooManyPrincipalsInAllowList
-                    )
-                )
+                SwapStatusForward::Failed(SwapErrorForward::NotificationFailed(
+                    NotificationError::TooManyPrincipalsInAllowList
+                ))
             );
         }
 
@@ -417,16 +439,24 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
 
-        let pre_swap_gldt_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_gldt_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -435,7 +465,7 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -444,7 +474,7 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "2".to_string()
+            "2".to_string(),
         );
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -453,7 +483,7 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "3".to_string()
+            "3".to_string(),
         );
 
         // verify first owner
@@ -461,17 +491,23 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let owner_of_1 = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_1.clone()]
+            vec![token_id_as_nat_1.clone()],
         );
         assert_eq!(
-            owner_of_1.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_1
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             nft_owner.to_string()
         );
 
@@ -480,34 +516,46 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "2".to_string()
+            "2".to_string(),
         );
 
         let owner_of_2 = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_2.clone()]
+            vec![token_id_as_nat_2.clone()],
         );
         assert_eq!(
-            owner_of_2.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_2
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             nft_owner.to_string()
         );
         let token_id_as_nat_3 = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "3".to_string()
+            "3".to_string(),
         );
 
         let owner_of_3 = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_3.clone()]
+            vec![token_id_as_nat_3.clone()],
         );
         assert_eq!(
-            owner_of_3.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_3
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             nft_owner.to_string()
         );
 
@@ -521,8 +569,8 @@ mod tests {
             &vec![
                 (NftID(token_id_as_nat_1.clone()), origyn_nft),
                 (NftID(token_id_as_nat_2.clone()), origyn_nft),
-                (NftID(token_id_as_nat_3.clone()), origyn_nft)
-            ]
+                (NftID(token_id_as_nat_3.clone()), origyn_nft),
+            ],
         );
         match res {
             Ok(ids) => {
@@ -557,17 +605,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -578,17 +622,13 @@ mod tests {
             token_id: "2".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -599,17 +639,13 @@ mod tests {
             token_id: "3".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -632,20 +668,20 @@ mod tests {
         }
 
         // check the total supply increased
-        let post_sale_total_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let post_sale_total_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
         let expected_supply = pre_swap_gldt_supply + Nat::from(10_000_000_000u64 * 3); // mint incurs fee && nft escrow has to transfer to user ( x 2 transactions )
         assert_eq!(post_sale_total_supply, expected_supply);
 
         // check user got their gldt tokens
-        let user_balance = balance_of(pic, gldt_ledger, Account {
-            owner: nft_owner.clone(),
-            subaccount: None,
-        });
+        let user_balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: nft_owner.clone(),
+                subaccount: None,
+            },
+        );
         assert_eq!(user_balance, Nat::from(10_000_000_000u64 * 3));
 
         // ensure canister now owns nft
@@ -653,30 +689,48 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_1.clone()]
+            vec![token_id_as_nat_1.clone()],
         );
         assert_eq!(
-            owner_of_1.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_1
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             gldt_swap.to_string()
         );
         let owner_of_2 = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_2.clone()]
+            vec![token_id_as_nat_2.clone()],
         );
         assert_eq!(
-            owner_of_2.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_2
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             gldt_swap.to_string()
         );
         let owner_of_3 = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat_3.clone()]
+            vec![token_id_as_nat_3.clone()],
         );
         assert_eq!(
-            owner_of_3.get(0).unwrap().clone().unwrap().owner.to_string(),
+            owner_of_3
+                .get(0)
+                .unwrap()
+                .clone()
+                .unwrap()
+                .owner
+                .to_string(),
             gldt_swap.to_string()
         );
     }
@@ -686,8 +740,19 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -697,21 +762,21 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let owner_of = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat.clone()]
+            vec![token_id_as_nat.clone()],
         );
         assert_eq!(
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
@@ -722,7 +787,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -753,8 +818,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
 
         icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
@@ -766,21 +843,21 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let owner_of = icrc7_owner_of(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat.clone()]
+            vec![token_id_as_nat.clone()],
         );
         assert_eq!(
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
@@ -791,7 +868,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -814,17 +891,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_020_000_000u64)),
-                            AskFeature::Notify(vec![Principal::anonymous()]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_020_000_000u64)),
+                    AskFeature::Notify(vec![Principal::anonymous()]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -845,17 +918,25 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_gldt_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -864,14 +945,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
@@ -879,7 +960,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -894,7 +975,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -924,8 +1005,21 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -935,14 +1029,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
         // let nft_id = NftID(token_id_as_nat.clone());
 
@@ -951,17 +1045,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![Principal::anonymous()]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![Principal::anonymous()]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -970,12 +1060,10 @@ mod tests {
 
         // 3. get the sale_id
         let sale_id = match res {
-            MarketTransferResult::Ok(res_ok) => {
-                match res_ok.txn_type {
-                    MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => { sale_id }
-                    _ => { "bad_sale".to_string() }
-                }
-            }
+            MarketTransferResult::Ok(res_ok) => match res_ok.txn_type {
+                MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => sale_id,
+                _ => "bad_sale".to_string(),
+            },
             MarketTransferResult::Err(e) => {
                 println!("//// there was an error {e:?}");
                 "bad_sale".to_string()
@@ -985,27 +1073,34 @@ mod tests {
         let args = &SaleInfoRequest::EscrowInfo(EscrowReceipt {
             token: GldtTokenSpec::new(gldt_ledger).get_token_spec(),
             token_id: "1".to_string(),
-            seller: OrigynAccount::Account { owner: nft_owner, sub_account: None },
-            buyer: OrigynAccount::Account { owner: gldt_swap, sub_account: None },
+            seller: OrigynAccount::Account {
+                owner: nft_owner,
+                sub_account: None,
+            },
+            buyer: OrigynAccount::Account {
+                owner: gldt_swap,
+                sub_account: None,
+            },
             amount: Nat::from(10_020_000_000u64),
         });
         let res = sale_info_nft_origyn(pic, Principal::anonymous(), origyn_nft, &args);
         let escrow_sub_account = match res {
-            SaleInfoResult::Ok(res_ok) => {
-                match res_ok {
-                    SaleInfoResponse::EscrowInfo(escrow_info) => {
-                        let b: Result<[u8; 32], TryFromSliceError> = escrow_info.account.sub_account
-                            .as_slice()
-                            .try_into();
-                        match b {
-                            Ok(sub_account) => sub_account,
-                            Err(_) => panic!("failed to parse sub account"),
-                        }
+            SaleInfoResult::Ok(res_ok) => match res_ok {
+                SaleInfoResponse::EscrowInfo(escrow_info) => {
+                    let b: Result<[u8; 32], TryFromSliceError> =
+                        escrow_info.account.sub_account.as_slice().try_into();
+                    match b {
+                        Ok(sub_account) => sub_account,
+                        Err(_) => panic!("failed to parse sub account"),
                     }
-                    _ => { panic!("escrow account not found") }
                 }
+                _ => {
+                    panic!("escrow account not found")
+                }
+            },
+            SaleInfoResult::Err(_) => {
+                panic!("escrow account not found")
             }
-            SaleInfoResult::Err(_) => { panic!("escrow account not found") }
         };
         // 5. get the total gldt supply before the mint occurs
         let pre_swap_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
@@ -1019,8 +1114,9 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128 // we intentionally minus 2 transaction fees because
-        ).unwrap();
+            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+        )
+        .unwrap();
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
         let time = timestamp_millis();
@@ -1038,17 +1134,22 @@ mod tests {
                 created_at: time,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),
                 escrow_sub_account: escrow_sub_account,
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 1);
 
         let res = get_swap(
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(details.status, SwapStatusForward::BidRequest);
         }
@@ -1058,20 +1159,20 @@ mod tests {
         // the cron should detect that the swap is expired by the following criteria
         // - time ( more than 3 minutes has passed )
         // - & the sale has expired
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         tick_n_blocks(pic, 1);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 1));
         tick_n_blocks(pic, 2);
 
         // 9. verify the sale is expired
-        let sale_info_status = match
-            sale_info_nft_origyn(
-                pic,
-                nft_owner.clone(),
-                origyn_nft.clone(),
-                &SaleInfoRequest::Status(sale_id.clone())
-            )
-        {
+        let sale_info_status = match sale_info_nft_origyn(
+            pic,
+            nft_owner.clone(),
+            origyn_nft.clone(),
+            &SaleInfoRequest::Status(sale_id.clone()),
+        ) {
             SaleInfoResult::Ok(res_ok) => {
                 match res_ok {
                     SaleInfoResponse::Status(status) => {
@@ -1089,7 +1190,7 @@ mod tests {
                             None => AuctionStateSharedStatus::NotStarted,
                         }
                     }
-                    _ => { AuctionStateSharedStatus::NotStarted }
+                    _ => AuctionStateSharedStatus::NotStarted,
                 }
             }
             SaleInfoResult::Err(_) => AuctionStateSharedStatus::NotStarted,
@@ -1101,14 +1202,15 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::Expired(Box::new(SwapStatusForward::BidRequest))
-                )
+                SwapStatusForward::Failed(SwapErrorForward::Expired(Box::new(
+                    SwapStatusForward::BidRequest
+                )))
             );
         }
         // 11. verify the nft canister sent back the tokens to the swap canister ( burned them ) and so the supply of gldt is the same as when we started
@@ -1120,7 +1222,7 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat.clone()]
+            vec![token_id_as_nat.clone()],
         );
         assert_eq!(
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
@@ -1133,8 +1235,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1144,14 +1258,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
         // let nft_id = NftID(token_id_as_nat.clone());
 
@@ -1160,17 +1274,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![Principal::anonymous()]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![Principal::anonymous()]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -1179,12 +1289,10 @@ mod tests {
 
         // 3. get the sale_id
         let sale_id = match res {
-            MarketTransferResult::Ok(res_ok) => {
-                match res_ok.txn_type {
-                    MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => { sale_id }
-                    _ => { "bad_sale".to_string() }
-                }
-            }
+            MarketTransferResult::Ok(res_ok) => match res_ok.txn_type {
+                MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => sale_id,
+                _ => "bad_sale".to_string(),
+            },
             MarketTransferResult::Err(e) => {
                 println!("//// there was an error {e:?}");
                 "bad_sale".to_string()
@@ -1194,27 +1302,34 @@ mod tests {
         let args = &SaleInfoRequest::EscrowInfo(EscrowReceipt {
             token: GldtTokenSpec::new(gldt_ledger).get_token_spec(),
             token_id: "1".to_string(),
-            seller: OrigynAccount::Account { owner: nft_owner, sub_account: None },
-            buyer: OrigynAccount::Account { owner: gldt_swap, sub_account: None },
+            seller: OrigynAccount::Account {
+                owner: nft_owner,
+                sub_account: None,
+            },
+            buyer: OrigynAccount::Account {
+                owner: gldt_swap,
+                sub_account: None,
+            },
             amount: Nat::from(10_002_000_000u64),
         });
         let res = sale_info_nft_origyn(pic, Principal::anonymous(), origyn_nft, &args);
         let escrow_sub_account = match res {
-            SaleInfoResult::Ok(res_ok) => {
-                match res_ok {
-                    SaleInfoResponse::EscrowInfo(escrow_info) => {
-                        let b: Result<[u8; 32], TryFromSliceError> = escrow_info.account.sub_account
-                            .as_slice()
-                            .try_into();
-                        match b {
-                            Ok(sub_account) => sub_account,
-                            Err(_) => panic!("failed to parse sub account"),
-                        }
+            SaleInfoResult::Ok(res_ok) => match res_ok {
+                SaleInfoResponse::EscrowInfo(escrow_info) => {
+                    let b: Result<[u8; 32], TryFromSliceError> =
+                        escrow_info.account.sub_account.as_slice().try_into();
+                    match b {
+                        Ok(sub_account) => sub_account,
+                        Err(_) => panic!("failed to parse sub account"),
                     }
-                    _ => { panic!("escrow account not found") }
                 }
+                _ => {
+                    panic!("escrow account not found")
+                }
+            },
+            SaleInfoResult::Err(_) => {
+                panic!("escrow account not found")
             }
-            SaleInfoResult::Err(_) => { panic!("escrow account not found") }
         };
         // 5. get the total gldt supply before the mint occurs
         let pre_swap_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
@@ -1228,8 +1343,9 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128 // we intentionally minus 2 transaction fees because
-        ).unwrap();
+            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+        )
+        .unwrap();
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
         let time = timestamp_millis();
@@ -1242,30 +1358,35 @@ mod tests {
                 nft_id: NftID(token_id_as_nat.clone()),
                 nft_id_string: "1".to_string(),
                 nft_canister: origyn_nft.clone(),
-                status: SwapStatusForward::BidFail(
-                    BidFailError::TransferFailed("something went wrong".to_string())
-                ),
+                status: SwapStatusForward::BidFail(BidFailError::TransferFailed(
+                    "something went wrong".to_string(),
+                )),
                 sale_id: sale_id.clone(),
                 created_at: time,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),
                 escrow_sub_account: escrow_sub_account,
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 5);
 
         let res = get_swap(
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::BidFail(
-                    BidFailError::TransferFailed("something went wrong".to_string())
-                )
+                SwapStatusForward::BidFail(BidFailError::TransferFailed(
+                    "something went wrong".to_string()
+                ))
             );
         }
 
@@ -1274,20 +1395,20 @@ mod tests {
         // the cron should detect that the swap is expired by the following criteria
         // - time ( more than 3 minutes has passed )
         // - & the sale has expired
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         tick_n_blocks(pic, 3);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 1));
         tick_n_blocks(pic, 3);
 
         // 9. verify the sale is expired
-        let sale_info_status = match
-            sale_info_nft_origyn(
-                pic,
-                nft_owner.clone(),
-                origyn_nft.clone(),
-                &SaleInfoRequest::Status(sale_id.clone())
-            )
-        {
+        let sale_info_status = match sale_info_nft_origyn(
+            pic,
+            nft_owner.clone(),
+            origyn_nft.clone(),
+            &SaleInfoRequest::Status(sale_id.clone()),
+        ) {
             SaleInfoResult::Ok(res_ok) => {
                 match res_ok {
                     SaleInfoResponse::Status(status) => {
@@ -1305,7 +1426,7 @@ mod tests {
                             None => AuctionStateSharedStatus::NotStarted,
                         }
                     }
-                    _ => { AuctionStateSharedStatus::NotStarted }
+                    _ => AuctionStateSharedStatus::NotStarted,
                 }
             }
             SaleInfoResult::Err(_) => AuctionStateSharedStatus::NotStarted,
@@ -1317,16 +1438,15 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::BidFailed(
-                        BidFailError::TransferFailed("something went wrong".to_string())
-                    )
-                )
+                SwapStatusForward::Failed(SwapErrorForward::BidFailed(
+                    BidFailError::TransferFailed("something went wrong".to_string())
+                ))
             );
         }
         // 11. verify the nft canister sent back the tokens to the swap canister ( burned them ) and so the supply of gldt is the same as when we started
@@ -1338,7 +1458,7 @@ mod tests {
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            vec![token_id_as_nat.clone()]
+            vec![token_id_as_nat.clone()],
         );
         assert_eq!(
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
@@ -1351,8 +1471,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1362,14 +1494,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 6. mint 2x gldt to the gldt ledger fee account
@@ -1382,15 +1514,12 @@ mod tests {
                 owner: gldt_swap,
                 subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
             },
-            (GLDT_TX_FEE * 2) as u128
-        ).unwrap();
+            (GLDT_TX_FEE * 2) as u128,
+        )
+        .unwrap();
 
-        let pre_swap_total_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let pre_swap_total_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
         let time = timestamp_millis();
@@ -1403,11 +1532,9 @@ mod tests {
                 nft_id: NftID(token_id_as_nat.clone()),
                 nft_id_string: "1".to_string(),
                 nft_canister: origyn_nft.clone(),
-                status: SwapStatusForward::BurnFeesFailed(
-                    BurnFeesError::TransferFailed(
-                        TransferFailReason::CallError("simulate_call_error".to_string())
-                    )
-                ),
+                status: SwapStatusForward::BurnFeesFailed(BurnFeesError::TransferFailed(
+                    TransferFailReason::CallError("simulate_call_error".to_string()),
+                )),
                 sale_id: "somerandomsale".to_string(),
                 created_at: time,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),
@@ -1415,29 +1542,34 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         let res = get_swap(
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::BurnFeesFailed(
-                    BurnFeesError::TransferFailed(
-                        TransferFailReason::CallError("simulate_call_error".to_string())
-                    )
-                )
+                SwapStatusForward::BurnFeesFailed(BurnFeesError::TransferFailed(
+                    TransferFailReason::CallError("simulate_call_error".to_string())
+                ))
             );
         }
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1448,14 +1580,13 @@ mod tests {
             assert_eq!(details.status, SwapStatusForward::Complete);
         }
 
-        let post_swap_total_supply = icrc1_total_supply(
-            pic,
-            Principal::anonymous(),
-            gldt_ledger,
-            &()
-        );
+        let post_swap_total_supply =
+            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
-        assert_eq!(post_swap_total_supply, pre_swap_total_supply - Nat::from(2 * GLDT_TX_FEE));
+        assert_eq!(
+            post_swap_total_supply,
+            pre_swap_total_supply - Nat::from(2 * GLDT_TX_FEE)
+        );
 
         // check the burn fees got burnt
     }
@@ -1465,8 +1596,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1476,14 +1619,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1505,13 +1648,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1520,14 +1669,14 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::Expired(Box::new(SwapStatusForward::Init))
-                )
+                SwapStatusForward::Failed(SwapErrorForward::Expired(Box::new(
+                    SwapStatusForward::Init
+                )))
             );
         }
         // check the burn fees got burnt
@@ -1538,8 +1687,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1549,14 +1710,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1578,13 +1739,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1593,7 +1760,7 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusForward::NotificationInProgress);
@@ -1605,8 +1772,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1616,14 +1795,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1638,7 +1817,7 @@ mod tests {
                 nft_id_string: "1".to_string(),
                 nft_canister: origyn_nft.clone(),
                 status: SwapStatusForward::NotificationFailed(
-                    NotificationError::InvalidTokenAmount
+                    NotificationError::InvalidTokenAmount,
                 ),
                 sale_id: "somerandomsale".to_string(),
                 created_at: time,
@@ -1647,13 +1826,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1662,20 +1847,14 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::Expired(
-                        Box::new(
-                            SwapStatusForward::NotificationFailed(
-                                NotificationError::InvalidTokenAmount
-                            )
-                        )
-                    )
-                )
+                SwapStatusForward::Failed(SwapErrorForward::Expired(Box::new(
+                    SwapStatusForward::NotificationFailed(NotificationError::InvalidTokenAmount)
+                )))
             );
         }
         // check the burn fees got burnt
@@ -1685,8 +1864,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1696,14 +1887,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1725,13 +1916,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1740,14 +1937,14 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::Expired(Box::new(SwapStatusForward::MintRequest))
-                )
+                SwapStatusForward::Failed(SwapErrorForward::Expired(Box::new(
+                    SwapStatusForward::MintRequest
+                )))
             );
         }
         // check the burn fees got burnt
@@ -1757,8 +1954,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1768,14 +1977,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1797,13 +2006,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1812,7 +2027,7 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusForward::MintInProgress);
@@ -1824,8 +2039,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1835,14 +2062,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1856,9 +2083,9 @@ mod tests {
                 nft_id: NftID(token_id_as_nat.clone()),
                 nft_id_string: "1".to_string(),
                 nft_canister: origyn_nft.clone(),
-                status: SwapStatusForward::MintFailed(
-                    MintError::UnexpectedError(ImpossibleErrorReason::AmountNotFound)
-                ),
+                status: SwapStatusForward::MintFailed(MintError::UnexpectedError(
+                    ImpossibleErrorReason::AmountNotFound,
+                )),
                 sale_id: "somerandomsale".to_string(),
                 created_at: time,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),
@@ -1866,13 +2093,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1881,20 +2114,16 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::Expired(
-                        Box::new(
-                            SwapStatusForward::MintFailed(
-                                MintError::UnexpectedError(ImpossibleErrorReason::AmountNotFound)
-                            )
-                        )
-                    )
-                )
+                SwapStatusForward::Failed(SwapErrorForward::Expired(Box::new(
+                    SwapStatusForward::MintFailed(MintError::UnexpectedError(
+                        ImpossibleErrorReason::AmountNotFound
+                    ))
+                )))
             );
         }
         // check the burn fees got burnt
@@ -1904,8 +2133,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1915,14 +2156,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -1944,13 +2185,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -1959,7 +2206,7 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusForward::BidInProgress);
@@ -1972,8 +2219,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -1983,14 +2242,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -2012,9 +2271,13 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // transfer some gldt to a random principal to simulate the 2 x gldt fee that ends up in the fee collector account.
@@ -2027,12 +2290,15 @@ mod tests {
                 owner: gldt_swap,
                 subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT.clone()),
             },
-            3_000_000u128 // we intentionally minus 2 transaction fees because
-        ).unwrap();
+            3_000_000u128, // we intentionally minus 2 transaction fees because
+        )
+        .unwrap();
         tick_n_blocks(pic, 3);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -2041,7 +2307,7 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusForward::Complete);
@@ -2054,8 +2320,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -2065,14 +2343,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
@@ -2094,13 +2372,19 @@ mod tests {
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
                 ],
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         // wait for swap to be considered stuck by the backend
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         tick_n_blocks(pic, 6);
 
@@ -2109,7 +2393,7 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64))
+            &SwapId(NftID(token_id_as_nat.clone()), Nat::from(0u64)),
         );
         if let SwapInfo::Forward(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusForward::BurnFeesInProgress);
@@ -2121,8 +2405,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, controller, originator, nft_owner },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    controller,
+                    originator,
+                    nft_owner,
+                },
         } = env;
 
         // 1. setup nft and verify owner
@@ -2132,14 +2428,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
         // let nft_id = NftID(token_id_as_nat.clone());
 
@@ -2148,17 +2444,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![Principal::anonymous()]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![Principal::anonymous()]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -2167,12 +2459,10 @@ mod tests {
 
         // 3. get the sale_id
         let sale_id = match res {
-            MarketTransferResult::Ok(res_ok) => {
-                match res_ok.txn_type {
-                    MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => { sale_id }
-                    _ => { "bad_sale".to_string() }
-                }
-            }
+            MarketTransferResult::Ok(res_ok) => match res_ok.txn_type {
+                MarketTransferRequestReponseTxnType::SaleOpened { sale_id, .. } => sale_id,
+                _ => "bad_sale".to_string(),
+            },
             MarketTransferResult::Err(e) => {
                 println!("//// there was an error {e:?}");
                 "bad_sale".to_string()
@@ -2182,27 +2472,34 @@ mod tests {
         let args = &SaleInfoRequest::EscrowInfo(EscrowReceipt {
             token: GldtTokenSpec::new(gldt_ledger).get_token_spec(),
             token_id: "1".to_string(),
-            seller: OrigynAccount::Account { owner: nft_owner, sub_account: None },
-            buyer: OrigynAccount::Account { owner: gldt_swap, sub_account: None },
+            seller: OrigynAccount::Account {
+                owner: nft_owner,
+                sub_account: None,
+            },
+            buyer: OrigynAccount::Account {
+                owner: gldt_swap,
+                sub_account: None,
+            },
             amount: Nat::from(10_002_000_000u64),
         });
         let res = sale_info_nft_origyn(pic, Principal::anonymous(), origyn_nft, &args);
         let escrow_sub_account = match res {
-            SaleInfoResult::Ok(res_ok) => {
-                match res_ok {
-                    SaleInfoResponse::EscrowInfo(escrow_info) => {
-                        let b: Result<[u8; 32], TryFromSliceError> = escrow_info.account.sub_account
-                            .as_slice()
-                            .try_into();
-                        match b {
-                            Ok(sub_account) => sub_account,
-                            Err(_) => panic!("failed to parse sub account"),
-                        }
+            SaleInfoResult::Ok(res_ok) => match res_ok {
+                SaleInfoResponse::EscrowInfo(escrow_info) => {
+                    let b: Result<[u8; 32], TryFromSliceError> =
+                        escrow_info.account.sub_account.as_slice().try_into();
+                    match b {
+                        Ok(sub_account) => sub_account,
+                        Err(_) => panic!("failed to parse sub account"),
                     }
-                    _ => { panic!("escrow account not found") }
                 }
+                _ => {
+                    panic!("escrow account not found")
+                }
+            },
+            SaleInfoResult::Err(_) => {
+                panic!("escrow account not found")
             }
-            SaleInfoResult::Err(_) => { panic!("escrow account not found") }
         };
         // 5. get the total gldt supply before the mint occurs
         let pre_swap_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
@@ -2230,30 +2527,35 @@ mod tests {
                 nft_id: NftID(token_id_as_nat.clone()),
                 nft_id_string: "1".to_string(),
                 nft_canister: origyn_nft.clone(),
-                status: SwapStatusForward::BidFail(
-                    BidFailError::TransferFailed("something went wrong".to_string())
-                ),
+                status: SwapStatusForward::BidFail(BidFailError::TransferFailed(
+                    "something went wrong".to_string(),
+                )),
                 sale_id: sale_id.clone(),
                 created_at: time,
                 tokens_to_mint: GldtNumTokens::new(Nat::from(10_000_000_000u64)).unwrap(),
                 escrow_sub_account: escrow_sub_account,
-                gldt_receiver: Account { owner: nft_owner.clone(), subaccount: None },
-            })
-        ).unwrap();
+                gldt_receiver: Account {
+                    owner: nft_owner.clone(),
+                    subaccount: None,
+                },
+            }),
+        )
+        .unwrap();
         tick_n_blocks(pic, 5);
 
         let res = get_swap(
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::BidFail(
-                    BidFailError::TransferFailed("something went wrong".to_string())
-                )
+                SwapStatusForward::BidFail(BidFailError::TransferFailed(
+                    "something went wrong".to_string()
+                ))
             );
         }
 
@@ -2262,20 +2564,20 @@ mod tests {
         // the cron should detect that the swap is expired by the following criteria
         // - time ( more than 3 minutes has passed )
         // - & the sale has expired
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         tick_n_blocks(pic, 3);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 1));
         tick_n_blocks(pic, 3);
 
         // 9. verify the sale is expired
-        let sale_info_status = match
-            sale_info_nft_origyn(
-                pic,
-                nft_owner.clone(),
-                origyn_nft.clone(),
-                &SaleInfoRequest::Status(sale_id.clone())
-            )
-        {
+        let sale_info_status = match sale_info_nft_origyn(
+            pic,
+            nft_owner.clone(),
+            origyn_nft.clone(),
+            &SaleInfoRequest::Status(sale_id.clone()),
+        ) {
             SaleInfoResult::Ok(res_ok) => {
                 match res_ok {
                     SaleInfoResponse::Status(status) => {
@@ -2293,7 +2595,7 @@ mod tests {
                             None => AuctionStateSharedStatus::NotStarted,
                         }
                     }
-                    _ => { AuctionStateSharedStatus::NotStarted }
+                    _ => AuctionStateSharedStatus::NotStarted,
                 }
             }
             SaleInfoResult::Err(_) => AuctionStateSharedStatus::NotStarted,
@@ -2305,10 +2607,14 @@ mod tests {
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
-            if !matches!(details.status, SwapStatusForward::DepositRecoveryFailed(_, _)) {
+            if !matches!(
+                details.status,
+                SwapStatusForward::DepositRecoveryFailed(_, _)
+            ) {
                 panic!("{:?} did not match", details.status);
             }
         }
@@ -2323,10 +2629,13 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128 // we intentionally minus 2 transaction fees because
-        ).unwrap();
+            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+        )
+        .unwrap();
 
-        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES));
+        pic.advance_time(Duration::from_millis(
+            MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES,
+        ));
         tick_n_blocks(pic, 3);
         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 1));
         tick_n_blocks(pic, 3);
@@ -2335,24 +2644,24 @@ mod tests {
             pic,
             controller,
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         tick_n_blocks(pic, 2);
 
         let res = get_swap(
             pic,
             Principal::anonymous(),
             gldt_swap,
-            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64))
-        ).unwrap();
+            &SwapId(NftID(token_id_as_nat.clone()), SwapIndex::from(0u64)),
+        )
+        .unwrap();
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(
                 details.status,
-                SwapStatusForward::Failed(
-                    SwapErrorForward::BidFailed(
-                        BidFailError::TransferFailed("something went wrong".to_string())
-                    )
-                )
+                SwapStatusForward::Failed(SwapErrorForward::BidFailed(
+                    BidFailError::TransferFailed("something went wrong".to_string())
+                ))
             );
         }
 
