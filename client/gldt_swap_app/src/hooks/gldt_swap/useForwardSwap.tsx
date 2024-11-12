@@ -131,7 +131,14 @@ export const useForwardSwap = () => {
 
       if ("Err" in swap_nft_for_tokens_results) {
         const err = Object.keys(swap_nft_for_tokens_results.Err)[0];
-        console.log(err);
+
+        if (err === "Retry") {
+          const retryDelay = Number(err[0]) / 1000;
+          const errRetry = new Error("Retry", {
+            cause: { retryDelay: Math.round(retryDelay) },
+          });
+          throw errRetry;
+        }
         throw new Error(
           "Error when swapping GLD NFTs! Swap GLD NTFs for tokens failed."
         );
