@@ -106,10 +106,8 @@ export const useReverseSwap = () => {
         approveRejectedErrors.length > 0 ||
         approveFulfilled.some((approve) => "Err" in approve.value)
       ) {
-        console.error(approve);
-        throw new Error(
-          "Reverse swap error! One or more approve transactions failed."
-        );
+        // console.error(approve);
+        throw new Error("Approve");
       }
 
       // console.log("icrc2_allowance_args:");
@@ -123,8 +121,8 @@ export const useReverseSwap = () => {
 
       const swap = await Promise.allSettled(swapTasks);
 
-      console.log("swap result:");
-      console.log(swap);
+      // console.log("swap result:");
+      // console.log(swap);
 
       const swapRejectedErrors = swap.filter(
         (result) => result.status === "rejected"
@@ -137,9 +135,18 @@ export const useReverseSwap = () => {
         swapRejectedErrors.length > 0 ||
         swapFulfilled.some((swap) => "Err" in swap.value)
       ) {
-        console.error(swap);
+        // console.error(swap);
+        const countErr = swapFulfilled.map(
+          (swap) => "Err" in swap.value
+        ).length;
+        const countSuccess = swapFulfilled.map(
+          (swap) => "Ok" in swap.value
+        ).length;
+        if (countSuccess === 0) {
+          throw new Error("Swap");
+        }
         throw new Error(
-          "Reverse swap error! One or more swap tokens for NFT failed."
+          `Reverse swap warning! ${countSuccess} swap tokens for NFT succeed and ${countErr} failed.`
         );
       }
     },
