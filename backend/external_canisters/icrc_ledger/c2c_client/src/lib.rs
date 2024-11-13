@@ -12,7 +12,6 @@ generate_candid_c2c_call_no_args!(icrc1_symbol);
 generate_candid_c2c_call_no_args!(icrc1_total_supply);
 generate_candid_c2c_call_no_args!(icrc1_minting_account);
 generate_candid_c2c_call!(icrc2_allowance);
-
 // Updates
 generate_candid_c2c_call!(icrc2_approve);
 generate_candid_c2c_call!(icrc2_transfer_from);
