@@ -1,32 +1,22 @@
 use candid::{Nat, Principal};
-use gldt_swap_api_canister::init::InitArgs as GldtSwapCanisterInitArgs;
-use gldt_swap_api_canister::lifecycle::Args as GldtSwapCanisterArgs;
-use gldt_swap_common::{
-    gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE},
-    nft::NftCanisterConf,
-};
+use gldt_swap_common::{gldt::GLDT_TX_FEE, nft::NftCanisterConf};
 use icrc_ledger_canister::init::{InitArgs, LedgerArgument};
 use icrc_ledger_types::icrc1::account::Account;
-use origyn_nft_reference::origyn_nft_reference_canister::ManageStorageRequestConfigureStorage;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use std::{env, path::Path, time::SystemTime};
 use types::{BuildVersion, CanisterId};
-use utils::consts::E8S_FEE_OGY;
-
 // use ic_icrc1_ledger::{ ArchiveOptions, InitArgs as LedgerInitArgs, LedgerArgument };
-use icrc_ledger_types::icrc3::archive::{GetArchivesArgs, GetArchivesResult};
-
+use super::{CanisterIds, PrincipalIds, TestEnv};
 use crate::{
     client::pocket::{create_canister, create_canister_with_id, install_canister},
     utils::random_principal,
     wasms,
 };
-
-use super::{CanisterIds, PrincipalIds, TestEnv};
+use icrc_ledger_types::icrc3::archive::{GetArchivesArgs, GetArchivesResult};
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
-pub fn init() -> TestEnv {
+pub fn default_setup() -> TestEnv {
     validate_pocketic_installation();
 
     let mut pic = PocketIcBuilder::new()
