@@ -1839,6 +1839,7 @@ dependencies = [
  "super_stats_v3_api",
  "token_metrics_api",
  "types",
+ "usdg_minter_api",
  "utils",
 ]
 
@@ -4101,10 +4102,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "usdg_api_canister"
-version = "0.1.0"
-
-[[package]]
 name = "usdg_minter"
 version = "0.1.0"
 dependencies = [
@@ -4118,6 +4115,16 @@ dependencies = [
  "minicbor-derive",
  "proptest",
  "rust_decimal",
+ "serde",
+ "usdg_minter_api",
+]
+
+[[package]]
+name = "usdg_minter_api"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "icrc-ledger-types 0.1.6 (git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb)",
  "serde",
 ]
 

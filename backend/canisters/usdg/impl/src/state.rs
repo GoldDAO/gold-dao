@@ -34,6 +34,16 @@ pub struct State {
 }
 
 impl State {
+    pub fn get_vaults_by_account(&self, account: impl Into<Account>) -> Vec<Vault> {
+        self.account_to_vault_ids
+            .get(&account.into())
+            .unwrap_or(&Default::default())
+            .into_iter()
+            .map(|vault| self.vault_id_to_vault.get(&vault).unwrap())
+            .cloned()
+            .collect()
+    }
+
     pub fn increment_vault_id(&mut self) -> u64 {
         let vault_id = self.next_vault_id;
         self.next_vault_id += 1;
@@ -55,8 +65,9 @@ impl State {
         owner: Account,
         borrowed_amount: USDG,
         margin_amount: GLDT,
-        fee_bucket: FeeBucket,
+        fee_bucket: impl Into<FeeBucket>,
     ) -> VaultId {
+        let fee_bucket: FeeBucket = fee_bucket.into();
         let vault_id = self.increment_vault_id();
         let new_vault = Vault {
             vault_id,

@@ -1,3 +1,4 @@
+use crate::client::usdg::{get_vault, open_vault};
 use crate::usdg_suite::init;
 
 #[test]

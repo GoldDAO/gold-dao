@@ -2,6 +2,7 @@ use crate::numeric::{GLDT, USDG};
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
+use usdg_minter_api::ApiFeeBucket;
 
 pub type VaultId = u64;
 
@@ -26,4 +27,14 @@ pub enum FeeBucket {
     Low,
     Medium,
     High,
+}
+
+impl From<ApiFeeBucket> for FeeBucket {
+    fn from(api_bucket: ApiFeeBucket) -> FeeBucket {
+        match api_bucket {
+            ApiFeeBucket::Low => FeeBucket::Low,
+            ApiFeeBucket::Medium => FeeBucket::Medium,
+            ApiFeeBucket::High => FeeBucket::High,
+        }
+    }
 }

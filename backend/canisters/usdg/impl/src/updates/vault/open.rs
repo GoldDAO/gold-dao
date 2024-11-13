@@ -9,20 +9,7 @@ use ic_cdk::update;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc2::transfer_from::TransferFromError;
 use serde::Deserialize;
-
-#[derive(CandidType, Deserialize)]
-pub struct OpenVaultArg {
-    pub borrowed_amount: USDG,
-    pub margin_amount: GLDT,
-    pub fee_bucket: FeeBucket,
-    pub maybe_subaccount: Option<[u8; 32]>,
-}
-
-#[derive(CandidType, Deserialize)]
-pub struct OpenVaultSuccess {
-    pub block_index: u64,
-    pub vault_id: u64,
-}
+use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 
 #[update]
 async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
@@ -30,7 +17,7 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     reject_anonymous_caller()?;
 
     // Check minimum margin amount
-    if arg.margin_amount < MINIMUM_MARGIN_AMOUNT {
+    if GLDT::from_e8s(arg.margin_amount) < MINIMUM_MARGIN_AMOUNT {
         return Err(VaultError::AmountTooLow {
             minimum_amount: MINIMUM_MARGIN_AMOUNT.0,
         });
