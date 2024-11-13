@@ -1,10 +1,8 @@
-use candid::{ CandidType, Nat, Principal };
+use candid::{CandidType, Nat, Principal};
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    IcTokenSpec,
-    IcTokenSpecStandard,
-    TokenSpec,
+    IcTokenSpec, IcTokenSpecStandard, TokenSpec,
 };
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 use crate::nft::NftWeight;
 
@@ -29,7 +27,9 @@ pub struct GldtNumTokens {
 impl GldtNumTokens {
     pub fn new(initial_value: Nat) -> Result<Self, String> {
         if !Self::is_valid(initial_value.clone()) {
-            return Err(format!("Invalid initial value for GldtNumTokens: {initial_value}"));
+            return Err(format!(
+                "Invalid initial value for GldtNumTokens: {initial_value}"
+            ));
         }
         let with_fee = initial_value.clone() + Nat::from(GLDT_TX_FEE * 2);
 

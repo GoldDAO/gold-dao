@@ -1,7 +1,7 @@
-use crate::state::{ read_state, RuntimeState };
-use http_request::{ build_json_response, encode_logs, extract_route, Route };
+use crate::state::{read_state, RuntimeState};
+use http_request::{build_json_response, encode_logs, extract_route, Route};
 use ic_cdk_macros::query;
-use types::{ HttpRequest, HttpResponse, TimestampMillis };
+use types::{HttpRequest, HttpResponse, TimestampMillis};
 
 #[query(hidden = true)]
 fn http_request(request: HttpRequest) -> HttpResponse {

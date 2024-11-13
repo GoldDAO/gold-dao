@@ -1,10 +1,9 @@
 use candid::Nat;
-pub use gldt_swap_api_canister::get_historic_swaps::{
-    Args as GetHistoricSwapsArgs,
-    Response as GetHistoricSwapsResponse,
-};
-use gldt_swap_api_canister::get_historic_swaps::GetHistoricSwapsError;
 use gldt_swap_api_archive::get_archive_swaps::Args as GetArchiveSwapsArg;
+use gldt_swap_api_canister::get_historic_swaps::GetHistoricSwapsError;
+pub use gldt_swap_api_canister::get_historic_swaps::{
+    Args as GetHistoricSwapsArgs, Response as GetHistoricSwapsResponse,
+};
 use gldt_swap_archive_c2c_client::get_archive_swaps;
 use ic_cdk::update;
 
@@ -15,13 +14,9 @@ async fn get_historic_swaps(args: GetHistoricSwapsArgs) -> GetHistoricSwapsRespo
     let limit = args.limit.clone();
     let max_limit = 200usize;
     if &limit > &max_limit {
-        return Err(
-            GetHistoricSwapsError::LimitTooLarge(
-                format!(
-                    "The limit you passed ({limit}) is too large. The maximum limit is {max_limit}"
-                )
-            )
-        );
+        return Err(GetHistoricSwapsError::LimitTooLarge(format!(
+            "The limit you passed ({limit}) is too large. The maximum limit is {max_limit}"
+        )));
     }
     // create a search index by taking the total and minus the args.start
     let mut total_swaps = read_state(|s| s.data.swaps.get_history_total());
@@ -44,7 +39,9 @@ async fn get_historic_swaps(args: GetHistoricSwapsArgs) -> GetHistoricSwapsRespo
         archives
     });
     // get the largest
-    let initial_archive = archives.iter().find(|archive| start_index >= archive.start_index);
+    let initial_archive = archives
+        .iter()
+        .find(|archive| start_index >= archive.start_index);
 
     let mut remaining = args.limit as usize;
     let mut swaps_to_return = Vec::new();
@@ -60,15 +57,15 @@ async fn get_historic_swaps(args: GetHistoricSwapsArgs) -> GetHistoricSwapsRespo
         while remaining > 0 && archive_index < archives.len() {
             let archive = &archives[archive_index];
 
-            match
-                get_archive_swaps(
-                    archive.canister_id,
-                    &(GetArchiveSwapsArg {
-                        start: current_start_index.clone(),
-                        limit: remaining,
-                        user_principal: None,
-                    })
-                ).await
+            match get_archive_swaps(
+                archive.canister_id,
+                &(GetArchiveSwapsArg {
+                    start: current_start_index.clone(),
+                    limit: remaining,
+                    user_principal: None,
+                }),
+            )
+            .await
             {
                 Ok(mut swaps) => {
                     let count = swaps.len();
@@ -79,7 +76,7 @@ async fn get_historic_swaps(args: GetHistoricSwapsArgs) -> GetHistoricSwapsRespo
                         break;
                     }
                     if let Some(last_swap) = swaps_to_return.last() {
-                        current_start_index = last_swap.0.1.clone();
+                        current_start_index = last_swap.0 .1.clone();
                     }
                 }
                 Err(_) => {}

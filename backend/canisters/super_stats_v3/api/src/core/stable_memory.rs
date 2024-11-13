@@ -1,6 +1,9 @@
+use crate::{
+    active_accounts::ActivityStats,
+    stats::{account_tree::AccountTree, directory::Directory},
+};
+use ic_stable_memory::derive::{AsFixedSizeBytes, StableType};
 use std::cell::RefCell;
-use ic_stable_memory::derive::{ AsFixedSizeBytes, StableType };
-use crate::{active_accounts::ActivityStats, stats::{ account_tree::AccountTree, directory::Directory }};
 
 thread_local! {
     pub static STABLE_STATE: RefCell<Option<Main>> = RefCell::default();

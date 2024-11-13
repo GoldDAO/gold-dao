@@ -1,5 +1,5 @@
-use candid::{ CandidType, Principal };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Principal};
+use serde::{Deserialize, Serialize};
 
 use gldt_swap_common::nft::NftCanisterConf;
 use types::BuildVersion;

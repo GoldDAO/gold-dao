@@ -1,12 +1,12 @@
-use std::{ borrow::Cow, collections::BTreeMap };
-use candid::{ CandidType, Decode, Encode, Nat, Principal };
+use candid::{CandidType, Decode, Encode, Nat, Principal};
 use canister_time::now_millis;
+use ic_stable_structures::{storable::Bound, Storable};
 use icrc_ledger_types::icrc1::account::Subaccount;
 use num_bigint::BigUint;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
-use types::{ NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol };
-use ic_stable_structures::{ storable::Bound, Storable };
+use std::{borrow::Cow, collections::BTreeMap};
+use types::{NeuronInfo, TimestampMillis, TokenInfo, TokenSymbol};
 
 const MAX_VALUE_SIZE: u32 = 1000000;
 
@@ -15,9 +15,9 @@ pub struct PaymentRound {
     pub id: u16, // id of the round. must start at 1 and will go to 65,535 before cycling to 1. Can't be 0 because 0 is the id of the reward pool accounts
     pub round_funds_total: Nat, // total amount to be distributed from the funds sub account
     pub tokens_to_distribute: Nat,
-    pub fees: Nat, // total fees required for all valid transactions
+    pub fees: Nat,            // total fees required for all valid transactions
     pub ledger_id: Principal, // the ledger associated with transferring funds for this round of specific token payments
-    pub token: TokenSymbol, // the token associated with a specific payment round
+    pub token: TokenSymbol,   // the token associated with a specific payment round
     pub date_initialized: TimestampMillis, //
     pub total_neuron_maturity: u64, // total maturity of all neurons for this specific period
     pub payments: BTreeMap<NeuronId, Payment>, // map of payments to process
@@ -34,17 +34,14 @@ impl PaymentRound {
         reward_pool_balance: Nat,
         token_info: TokenInfo,
         token: TokenSymbol,
-        neuron_data: BTreeMap<NeuronId, NeuronInfo>
+        neuron_data: BTreeMap<NeuronId, NeuronInfo>,
     ) -> Result<Self, String> {
         // we must pay a single fee to transfer from the reward pool to the round reward pool
-        let neuron_maturity_for_interval = Self::calculate_neuron_maturity_for_interval(
-            &neuron_data,
-            &token
-        )?;
+        let neuron_maturity_for_interval =
+            Self::calculate_neuron_maturity_for_interval(&neuron_data, &token)?;
 
-        let total_neuron_maturity_for_interval = Self::calculate_aggregated_maturity(
-            &neuron_maturity_for_interval
-        );
+        let total_neuron_maturity_for_interval =
+            Self::calculate_aggregated_maturity(&neuron_maturity_for_interval);
         if token_info.fee > reward_pool_balance.clone() {
             let err = format!(
                 "ROUND ID : {} & TOKEN : {:?} - Can't create PaymentRound. it would cost more than the balance of the reward pool to send it to the round pool",
@@ -55,10 +52,8 @@ impl PaymentRound {
         }
         let round_funds_total = reward_pool_balance.clone() - token_info.fee;
 
-        let transaction_fees = Self::calculate_transaction_fees(
-            &neuron_maturity_for_interval,
-            token_info.fee
-        )?;
+        let transaction_fees =
+            Self::calculate_transaction_fees(&neuron_maturity_for_interval, token_info.fee)?;
 
         if transaction_fees > round_funds_total.clone() {
             let err = format!(
@@ -82,7 +77,7 @@ impl PaymentRound {
         // rewards per neuron
         let payments = Self::calculate_neuron_rewards(
             neuron_maturity_for_interval,
-            tokens_to_distribute.clone()
+            tokens_to_distribute.clone(),
         )?;
 
         Ok(Self {
@@ -101,7 +96,7 @@ impl PaymentRound {
 
     pub fn calculate_neuron_maturity_for_interval(
         neurons: &BTreeMap<NeuronId, NeuronInfo>,
-        token: &TokenSymbol
+        token: &TokenSymbol,
     ) -> Result<Vec<(NeuronId, u64)>, String> {
         // creates a list of the NeuronIds and their respective change in maturity.
         // A comparison is done against the rewarded_maturity ( maturity that has been already distributed to )
@@ -109,7 +104,8 @@ impl PaymentRound {
         let (neuron_maturity_ok, neuron_maturity_err): (Vec<_>, Vec<_>) = neurons
             .iter()
             .map(|(neuron_id, neuron_info)| {
-                let previous_rewarded = neuron_info.rewarded_maturity
+                let previous_rewarded = neuron_info
+                    .rewarded_maturity
                     .get(token)
                     .copied()
                     .unwrap_or(0);
@@ -134,7 +130,7 @@ impl PaymentRound {
 
     pub fn calculate_transaction_fees(
         neuron_maturity_deltas: &[(NeuronId, u64)],
-        single_fee: u64
+        single_fee: u64,
     ) -> Result<Nat, String> {
         // get only the neurons that have a positive maturity delta/change.
         let neurons_with_positive_maturity_delta: Vec<&(NeuronId, u64)> = neuron_maturity_deltas
@@ -152,9 +148,7 @@ impl PaymentRound {
     }
 
     pub fn calculate_aggregated_maturity(data: &[(NeuronId, u64)]) -> u64 {
-        data.iter()
-            .map(|entry| entry.1)
-            .sum()
+        data.iter().map(|entry| entry.1).sum()
     }
 
     // in order to preserve high precision division we use integer division.
@@ -162,12 +156,9 @@ impl PaymentRound {
     // calculates the percentage of a reward each neuron should get.
     pub fn calculate_neuron_rewards(
         neuron_deltas: Vec<(NeuronId, u64)>,
-        reward_pool: Nat
+        reward_pool: Nat,
     ) -> Result<BTreeMap<NeuronId, Payment>, String> {
-        let total_maturity: u64 = neuron_deltas
-            .iter()
-            .map(|entry| entry.1)
-            .sum();
+        let total_maturity: u64 = neuron_deltas.iter().map(|entry| entry.1).sum();
 
         let total_maturity_big = BigUint::from(total_maturity);
         let scale_factor = BigUint::from(100_000_000_000_000u64);
@@ -189,7 +180,10 @@ impl PaymentRound {
                 let percentage = (maturity_big * &scale_factor) / total_maturity_big.clone();
                 let reward = (reward_pool_big.clone() * percentage) / &scale_factor;
                 // return a new Payment
-                (neuron_id.clone(), (Nat::from(reward), PaymentStatus::Pending, *maturity))
+                (
+                    neuron_id.clone(),
+                    (Nat::from(reward), PaymentStatus::Pending, *maturity),
+                )
             })
             .filter(|(_, (reward, _, _))| reward.clone() > 0u64)
             .collect();
@@ -214,7 +208,7 @@ impl PaymentRound {
 pub enum PaymentRoundStatus {
     Pending,
     InProgress,
-    CompletedFull, // all payments completed successfully
+    CompletedFull,    // all payments completed successfully
     CompletedPartial, // some payments completed and some failed
     Failed(String),
 }
@@ -242,76 +236,76 @@ impl Storable for PaymentRound {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{ BTreeMap, HashMap };
+    use std::collections::{BTreeMap, HashMap};
 
     use candid::Nat;
     use sns_governance_canister::types::NeuronId;
-    use types::{ NeuronInfo, TokenSymbol };
+    use types::{NeuronInfo, TokenSymbol};
 
     use crate::payment_round::PaymentRound;
 
     #[test]
     fn test_calculate_neuron_rewards_scenario_1() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_4 = NeuronId::new(
-            "4b9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_5 = NeuronId::new(
-            "3b9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_6 = NeuronId::new(
-            "4c9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_7 = NeuronId::new(
-            "5a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_8 = NeuronId::new(
-            "6a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_9 = NeuronId::new(
-            "7a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_10 = NeuronId::new(
-            "8a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_11 = NeuronId::new(
-            "9a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_12 = NeuronId::new(
-            "109ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_13 = NeuronId::new(
-            "11ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98c"
-        ).unwrap();
-        let neuron_id_14 = NeuronId::new(
-            "129ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_15 = NeuronId::new(
-            "139ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_16 = NeuronId::new(
-            "149ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_17 = NeuronId::new(
-            "159ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_18 = NeuronId::new(
-            "169ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_19 = NeuronId::new(
-            "179ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_20 = NeuronId::new(
-            "189ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_4 =
+            NeuronId::new("4b9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_5 =
+            NeuronId::new("3b9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_6 =
+            NeuronId::new("4c9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_7 =
+            NeuronId::new("5a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_8 =
+            NeuronId::new("6a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_9 =
+            NeuronId::new("7a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_10 =
+            NeuronId::new("8a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_11 =
+            NeuronId::new("9a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_12 =
+            NeuronId::new("109ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_13 =
+            NeuronId::new("11ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98c")
+                .unwrap();
+        let neuron_id_14 =
+            NeuronId::new("129ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_15 =
+            NeuronId::new("139ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_16 =
+            NeuronId::new("149ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_17 =
+            NeuronId::new("159ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_18 =
+            NeuronId::new("169ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_19 =
+            NeuronId::new("179ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_20 =
+            NeuronId::new("189ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         // normal example, we'd have a lower amount of overal maturity filled by many smaller values and so the distance between the max and min is a smaller distribution of delta.
         let neuron_deltas = vec![
@@ -334,13 +328,13 @@ mod tests {
             (neuron_id_17, 300u64),
             (neuron_id_18, 200u64),
             (neuron_id_19, 10000u64),
-            (neuron_id_20, 300u64)
+            (neuron_id_20, 300u64),
         ];
         let reward_pool = Nat::from(33_300_000_000u64); // 333 ICP
         let expected: Vec<u64> = vec![
-            91_227_877, // if 1ICP = 20 USD then rough 0.9 ICP ~ 18 USD
+            91_227_877,    // if 1ICP = 20 USD then rough 0.9 ICP ~ 18 USD
             4_561_393_896, // roughly 45 ICP
-            1_824_557, // 0.01 ICP - 0.20 USD for holding quite small amount
+            1_824_557,     // 0.01 ICP - 0.20 USD for holding quite small amount
             91_227_877,
             4_561_393_896,
             136_841_816,
@@ -357,7 +351,7 @@ mod tests {
             136_841_816,
             91_227_877,
             4_561_393_896,
-            136_841_816
+            136_841_816,
         ];
 
         let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).unwrap();
@@ -366,28 +360,28 @@ mod tests {
             .iter()
             .zip(expected.iter())
             .for_each(|(res, expected_value)| {
-                assert_eq!(&res.1.0, expected_value);
+                assert_eq!(&res.1 .0, expected_value);
             });
         // assert_eq!(true, false)
     }
 
     #[test]
     fn test_calculate_neuron_rewards_scenario_2() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         // extreme example, some neurons have a lot of maturity, some are new. this means we're forced to generate large and small rewards - more representative of when there is a large gap in the time since neuron creation
         let neuron_deltas = vec![
             (neuron_id_1, 20000000u64),
             (neuron_id_2, 10u64),
-            (neuron_id_3, 10u64)
+            (neuron_id_3, 10u64),
         ];
         let reward_pool = Nat::from(33_300_000_000u64); // 333 ICP
         let expected: Vec<u64> = vec![33_299_966_700u64, 16649u64, 16649u64];
@@ -398,24 +392,28 @@ mod tests {
             .iter()
             .zip(expected.iter())
             .for_each(|(res, expected_value)| {
-                assert_eq!(&res.1.0, expected_value);
+                assert_eq!(&res.1 .0, expected_value);
             });
         // assert_eq!(true, false)
     }
 
     #[test]
     fn test_calculate_neuron_rewards_all_zeros() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
-        let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 0u64), (neuron_id_3, 0u64)];
+        let neuron_deltas = vec![
+            (neuron_id_1, 0u64),
+            (neuron_id_2, 0u64),
+            (neuron_id_3, 0u64),
+        ];
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
 
         let result = PaymentRound::calculate_neuron_rewards(neuron_deltas, reward_pool).is_err();
@@ -424,17 +422,21 @@ mod tests {
 
     #[test]
     fn test_calculate_neuron_rewards_with_no_maturity_change() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
-        let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 30u64), (neuron_id_3, 30u64)];
+        let neuron_deltas = vec![
+            (neuron_id_1, 0u64),
+            (neuron_id_2, 30u64),
+            (neuron_id_3, 30u64),
+        ];
         let reward_pool = Nat::from(100_000_000u64); // 1 ICP
         let expected: Vec<u64> = vec![50_000_000u64, 50_000_000u64];
 
@@ -443,7 +445,7 @@ mod tests {
             .iter()
             .zip(expected.iter())
             .for_each(|(res, expected_value)| {
-                assert_eq!(&res.1.0, expected_value);
+                assert_eq!(&res.1 .0, expected_value);
             });
     }
 
@@ -452,9 +454,9 @@ mod tests {
         let mut neurons = BTreeMap::new();
 
         // neuron 1
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let mut neuron_1_rewarded = HashMap::new();
         let icp_symbol = TokenSymbol::parse("ICP").unwrap();
@@ -466,10 +468,8 @@ mod tests {
             rewarded_maturity: neuron_1_rewarded,
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &icp_symbol
-        ).unwrap();
+        let result =
+            PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol).unwrap();
         let expected = 150;
         assert_eq!(result[0].1, expected);
 
@@ -481,10 +481,8 @@ mod tests {
         n.last_synced_maturity = 542;
         let rewarded_mat = n.rewarded_maturity.get_mut(&icp_symbol).unwrap();
         *rewarded_mat += 150;
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &icp_symbol
-        ).unwrap();
+        let result =
+            PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol).unwrap();
         let expected = 392; // 542 (current maturity) - 150 (previous maturity)
         assert_eq!(result[0].1, expected);
     }
@@ -495,9 +493,9 @@ mod tests {
         let icp_symbol = TokenSymbol::parse("ICP").unwrap();
 
         // neuron 1
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let mut neuron_1_rewarded = HashMap::new();
         neuron_1_rewarded.insert(icp_symbol.clone(), 0);
@@ -509,27 +507,29 @@ mod tests {
         };
         neurons.insert(neuron_id_1.clone(), neuron_info_1);
 
-        let result = PaymentRound::calculate_neuron_maturity_for_interval(
-            &neurons,
-            &icp_symbol
-        ).unwrap();
+        let result =
+            PaymentRound::calculate_neuron_maturity_for_interval(&neurons, &icp_symbol).unwrap();
         let expected = 0;
         assert_eq!(result[0].1, expected);
     }
 
     #[test]
     fn test_calculate_aggregated_maturity() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
-        let neuron_deltas = vec![(neuron_id_1, 10u64), (neuron_id_2, 20u64), (neuron_id_3, 30u64)];
+        let neuron_deltas = vec![
+            (neuron_id_1, 10u64),
+            (neuron_id_2, 20u64),
+            (neuron_id_3, 30u64),
+        ];
         let res = PaymentRound::calculate_aggregated_maturity(&neuron_deltas);
         let expected = 60u64;
         assert_eq!(res, expected);
@@ -537,17 +537,21 @@ mod tests {
 
     #[test]
     fn test_calculate_transaction_fees() {
-        let neuron_id_1 = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_2 = NeuronId::new(
-            "3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
-        let neuron_id_3 = NeuronId::new(
-            "4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id_1 =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_2 =
+            NeuronId::new("3a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let neuron_id_3 =
+            NeuronId::new("4a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
-        let neuron_deltas = vec![(neuron_id_1, 0u64), (neuron_id_2, 30u64), (neuron_id_3, 30u64)];
+        let neuron_deltas = vec![
+            (neuron_id_1, 0u64),
+            (neuron_id_2, 30u64),
+            (neuron_id_3, 30u64),
+        ];
         let expected = Nat::from(20_000u64); // 2 x neurons with positive maturity
 
         let result = PaymentRound::calculate_transaction_fees(&neuron_deltas, 10_000u64).unwrap();

@@ -1,12 +1,12 @@
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 pub use gldt_swap_api_canister::Args;
-use gldt_swap_common::swap::{ ArchiveDownReason, ArchiveStatus };
+use gldt_swap_common::swap::{ArchiveDownReason, ArchiveStatus};
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
 
-use crate::{ memory::get_upgrades_memory, state::RuntimeState };
+use crate::{memory::get_upgrades_memory, state::RuntimeState};
 
 use super::init_canister;
 

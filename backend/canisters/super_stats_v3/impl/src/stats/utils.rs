@@ -1,4 +1,4 @@
-use super_stats_v3_api::custom_types::{ ProcessedTX, SmallTX };
+use super_stats_v3_api::custom_types::{ProcessedTX, SmallTX};
 
 pub fn remove_none_ptx_values(vec: Vec<Option<ProcessedTX>>) -> Vec<ProcessedTX> {
     let mut ret: Vec<ProcessedTX> = Vec::new();
@@ -63,5 +63,8 @@ pub fn timestamp_nanos() -> u64 {
 pub fn timestamp_nanos() -> u64 {
     use std::time::SystemTime;
 
-    SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_nanos() as u64
+    SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos() as u64
 }

@@ -1,8 +1,8 @@
-use std::{ collections::HashMap, time::SystemTime };
+use std::{collections::HashMap, time::SystemTime};
 
-use candid::{ encode_one, Nat, Principal };
+use candid::{encode_one, Nat, Principal};
 use icrc_ledger_types::icrc1::account::Account;
-use pocket_ic::{ PocketIc, PocketIcBuilder };
+use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
 use sns_rewards_api_canister::init::InitArgs;
 use sns_rewards_api_canister::Args;
@@ -12,13 +12,13 @@ use crate::{
     client::icrc1::client::transfer,
     sns_rewards_suite::setup::{
         setup_ledger::setup_ledgers,
-        setup_sns::{ create_sns_with_data, generate_neuron_data },
+        setup_sns::{create_sns_with_data, generate_neuron_data},
     },
     utils::random_principal,
     wasms,
 };
 
-use super::{ setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data };
+use super::{setup_rewards::setup_rewards_canister, setup_sns::reinstall_sns_with_data};
 
 pub static POCKET_IC_BIN: &str = "./pocket-ic";
 
@@ -27,13 +27,13 @@ pub fn setup_reward_pools(
     minting_account: &Principal,
     reward_canister_id: &Principal,
     canister_ids: &Vec<Principal>,
-    amount: u64
+    amount: u64,
 ) {
     let reward_account = Account {
         owner: reward_canister_id.clone(),
         subaccount: Some([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0,
         ]),
     };
 
@@ -44,8 +44,9 @@ pub fn setup_reward_pools(
             canister_id.clone(),
             None,
             reward_account,
-            amount.into()
-        ).unwrap();
+            amount.into(),
+        )
+        .unwrap();
     }
 }
 
@@ -64,32 +65,31 @@ impl RewardsTestEnv {
     /// simulate neurons voting by reinstalling the sns gov canister with an increase in maturity
     /// each neuton's initial maturity is multiplied
     pub fn simulate_neuron_voting(&mut self, multiplier: u64) {
-        let (neuron_data, _) = generate_neuron_data(
-            0,
-            self.neuron_data.len(),
-            multiplier,
-            &self.users
-        );
+        let (neuron_data, _) =
+            generate_neuron_data(0, self.neuron_data.len(), multiplier, &self.users);
         self.pic.tick();
         reinstall_sns_with_data(
             &mut self.pic,
             &neuron_data,
             &self.sns_gov_canister_id,
-            &self.controller
+            &self.controller,
         );
         self.pic.tick();
     }
 
     pub fn upgrade_rewards_canister(&mut self) {
-        let icp_ledger_canister_id = self.token_ledgers
+        let icp_ledger_canister_id = self
+            .token_ledgers
             .get("icp_ledger_canister_id")
             .expect("couldn't find ledger with 'icp_ledger_canister_id'")
             .clone();
-        let sns_ledger_canister_id = self.token_ledgers
+        let sns_ledger_canister_id = self
+            .token_ledgers
             .get("gldgov_ledger_canister_id")
             .expect("couldn't find ledger with 'gldgov_ledger_canister_id'")
             .clone();
-        let ogy_ledger_canister_id = self.token_ledgers
+        let ogy_ledger_canister_id = self
+            .token_ledgers
             .get("ogy_ledger_canister_id")
             .expect("couldn't find ledger with 'ogy_ledger_canister_id'")
             .clone();
@@ -103,14 +103,12 @@ impl RewardsTestEnv {
             ogy_ledger_canister_id,
             sns_gov_canister_id: self.sns_gov_canister_id.clone(),
         });
-        match
-            self.pic.upgrade_canister(
-                self.rewards_canister_id,
-                wasms::REWARDS.clone(),
-                encode_one(()).unwrap(),
-                Some(self.controller.clone())
-            )
-        {
+        match self.pic.upgrade_canister(
+            self.rewards_canister_id,
+            wasms::REWARDS.clone(),
+            encode_one(()).unwrap(),
+            Some(self.controller.clone()),
+        ) {
             Ok(m) => println!("{}", "upgrade success"),
             Err(m) => println!("{m:?}"),
         }
@@ -158,7 +156,7 @@ impl RewardsTestEnvBuilder {
         mut self,
         symbol: &str,
         initial_balances: &mut Vec<(Account, Nat)>,
-        transaction_fee: Nat
+        transaction_fee: Nat,
     ) -> Self {
         self.token_symbols.push(symbol.to_string());
         self.initial_ledger_accounts.append(initial_balances);
@@ -177,42 +175,39 @@ impl RewardsTestEnvBuilder {
     }
 
     pub fn build(self) -> RewardsTestEnv {
-        let mut pic = PocketIcBuilder::new().with_sns_subnet().with_application_subnet().build();
+        let mut pic = PocketIcBuilder::new()
+            .with_sns_subnet()
+            .with_application_subnet()
+            .build();
 
         // set the date
         // Wednesday Jun 19, 2024, 7:00:00 AM
 
-        let (neuron_data, neuron_owners) = generate_neuron_data(
-            0,
-            self.neurons_to_create,
-            1,
-            &self.users
-        );
+        let (neuron_data, neuron_owners) =
+            generate_neuron_data(0, self.neurons_to_create, 1, &self.users);
         let sns_gov_canister_id = create_sns_with_data(&mut pic, &neuron_data, &self.controller);
         let token_ledgers = setup_ledgers(
             &pic,
             sns_gov_canister_id.clone(),
             self.token_symbols,
             self.initial_ledger_accounts,
-            self.ledger_fees
+            self.ledger_fees,
         );
         let rewards_canister_id = setup_rewards_canister(
             &mut pic,
             &token_ledgers,
             &sns_gov_canister_id,
-            &self.controller
+            &self.controller,
         );
-        let token_ledger_ids: Vec<Principal> = token_ledgers
-            .iter()
-            .map(|(_, id)| id.clone())
-            .collect();
+        let token_ledger_ids: Vec<Principal> =
+            token_ledgers.iter().map(|(_, id)| id.clone()).collect();
         if self.initial_reward_pool_amount > Nat::from(0u64) {
             setup_reward_pools(
                 &mut pic,
                 &sns_gov_canister_id,
                 &rewards_canister_id,
                 &token_ledger_ids,
-                self.initial_reward_pool_amount.0.try_into().unwrap()
+                self.initial_reward_pool_amount.0.try_into().unwrap(),
             );
         }
         pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718701200000)); // Tuesday Jun 18, 2024, 9:00:00 AM

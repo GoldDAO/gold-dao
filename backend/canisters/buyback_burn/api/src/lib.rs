@@ -1,9 +1,9 @@
 mod lifecycle;
 mod queries;
-mod updates;
 mod types;
+mod updates;
 
 pub use lifecycle::*;
 pub use queries::*;
-pub use updates::*;
 pub use types::*;
+pub use updates::*;

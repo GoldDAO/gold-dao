@@ -4,14 +4,13 @@
 #![allow(unused_mut)] // Ignore warnings for unused mutable variables
 #![allow(unused_macros)]
 
-use gldt_swap_common::swap::{ trace, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
-use ic_cdk::update;
-pub use gldt_swap_api_canister::insert_fake_swap::{
-    Args as InsertFakeSwapArgs,
-    Response as InsertFakeSwapResponse,
-};
 use crate::guards::caller_is_authorized;
 use crate::swap::swap_info::SwapInfoTrait;
+pub use gldt_swap_api_canister::insert_fake_swap::{
+    Args as InsertFakeSwapArgs, Response as InsertFakeSwapResponse,
+};
+use gldt_swap_common::swap::{trace, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse};
+use ic_cdk::update;
 
 #[cfg(feature = "inttest")]
 #[update(hidden = true, guard = "caller_is_authorized")]

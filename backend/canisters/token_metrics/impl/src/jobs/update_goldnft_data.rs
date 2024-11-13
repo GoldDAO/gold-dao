@@ -1,8 +1,8 @@
-use canister_time::{ run_now_then_interval, DAY_IN_MS };
+use crate::state::{mutate_state, read_state};
+use canister_time::{run_now_then_interval, DAY_IN_MS};
 use std::time::Duration;
+use tracing::{error, info};
 use types::Milliseconds;
-use crate::state::{ mutate_state, read_state };
-use tracing::{ info, error };
 
 const REFRESH_GOLD_SUPPLY_INTERVAL: Milliseconds = DAY_IN_MS;
 
@@ -21,16 +21,16 @@ async fn run_async() {
     let mut total_grams: u128 = 0;
 
     for (gold_nft_canister_id, weight) in gold_nft_canisters {
-        let total_supply: u128 = match
-            canister_client::make_c2c_call(
-                gold_nft_canister_id,
-                "dip721_total_supply",
-                {},
-                ::candid::encode_one,
-                |r| { ::candid::decode_one(r) }
-            ).await
+        let total_supply: u128 = match canister_client::make_c2c_call(
+            gold_nft_canister_id,
+            "dip721_total_supply",
+            {},
+            ::candid::encode_one,
+            |r| ::candid::decode_one(r),
+        )
+        .await
         {
-            Ok(val) => { val }
+            Ok(val) => val,
             Err(err) => {
                 error!("The canister_client::make_c2c_call resulted into error : {err:?}");
                 return ();

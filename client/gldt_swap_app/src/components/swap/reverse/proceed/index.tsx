@@ -59,7 +59,6 @@ const Proceed = () => {
       },
       onError: (err) => {
         console.error(err);
-        reset();
       },
     });
   };

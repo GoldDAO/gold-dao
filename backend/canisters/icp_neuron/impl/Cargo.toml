@@ -43,3 +43,6 @@ stable_memory = { path = "../../../libraries/stable_memory" }
 tracing = { workspace = true }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
+icp_ledger_canister = { path = '../../../external_canisters/icp_ledger/api' }
+icp_ledger_canister_c2c_client = { path = '../../../external_canisters/icp_ledger/c2c_client' }
+ic-ledger-types = { workspace = true }

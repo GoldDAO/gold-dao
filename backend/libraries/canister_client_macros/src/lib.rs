@@ -1,6 +1,6 @@
-pub extern crate types;
 pub extern crate candid;
 pub extern crate ic_cdk;
+pub extern crate types;
 
 #[macro_export]
 macro_rules! generate_update_call {
@@ -34,7 +34,10 @@ macro_rules! generate_query_call {
             agent: &ic_agent::Agent,
             canister_id: &candid::Principal,
             args: &$method_name::Args,
-        ) -> Result<$method_name::Response, Box<dyn std::error::Error + std::marker::Send + std::marker::Sync>> {
+        ) -> Result<
+            $method_name::Response,
+            Box<dyn std::error::Error + std::marker::Send + std::marker::Sync>,
+        > {
             use candid::{Decode, Encode};
 
             let candid_args = Encode!(args)?;
@@ -60,9 +63,13 @@ macro_rules! generate_c2c_call {
         ) -> ic_cdk::api::call::CallResult<$method_name::Response> {
             let method_name = concat!(stringify!($method_name), "_msgpack");
 
-            canister_client::make_c2c_call(canister_id, method_name, args, msgpack::serialize, |r| {
-                msgpack::deserialize(r)
-            })
+            canister_client::make_c2c_call(
+                canister_id,
+                method_name,
+                args,
+                msgpack::serialize,
+                |r| msgpack::deserialize(r),
+            )
             .await
         }
     };
@@ -130,9 +137,13 @@ macro_rules! generate_candid_c2c_call_tuple_args {
         ) -> ::ic_cdk::api::call::CallResult<$method_name::Response> {
             let method_name = stringify!($external_canister_method_name);
 
-            canister_client::make_c2c_call(canister_id, method_name, args, ::candid::encode_args, |r| {
-                ::candid::decode_args(r)
-            })
+            canister_client::make_c2c_call(
+                canister_id,
+                method_name,
+                args,
+                ::candid::encode_args,
+                |r| ::candid::decode_args(r),
+            )
             .await
         }
     };
@@ -144,12 +155,18 @@ macro_rules! generate_candid_c2c_call_no_args {
         ::canister_client::generate_candid_c2c_call_no_args!($method_name, $method_name);
     };
     ($method_name:ident, $external_canister_method_name:ident) => {
-        pub async fn $method_name(canister_id: $crate::types::CanisterId) -> $crate::ic_cdk::api::call::CallResult<$method_name::Response> {
+        pub async fn $method_name(
+            canister_id: $crate::types::CanisterId,
+        ) -> $crate::ic_cdk::api::call::CallResult<$method_name::Response> {
             let method_name = stringify!($external_canister_method_name);
 
-            canister_client::make_c2c_call(canister_id, method_name, (), $crate::candid::encode_one, |r| {
-                $crate::candid::decode_one(r)
-            })
+            canister_client::make_c2c_call(
+                canister_id,
+                method_name,
+                (),
+                $crate::candid::encode_one,
+                |r| $crate::candid::decode_one(r),
+            )
             .await
         }
     };

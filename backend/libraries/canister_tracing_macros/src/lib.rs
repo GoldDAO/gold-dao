@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
-use quote::{ format_ident, quote };
-use syn::{ parse_macro_input, FnArg, ItemFn, Pat, PatIdent, PatType, Signature };
+use quote::{format_ident, quote};
+use syn::{parse_macro_input, FnArg, ItemFn, Pat, PatIdent, PatType, Signature};
 
 #[proc_macro_attribute]
 pub fn trace(_: TokenStream, item: TokenStream) -> TokenStream {
@@ -24,8 +24,7 @@ pub fn trace(_: TokenStream, item: TokenStream) -> TokenStream {
         quote! { #inner_method_name ( #(#arg_names),* ) }
     };
 
-    let expanded =
-        quote! {
+    let expanded = quote! {
         #[allow(unused_mut)]
         #[tracing::instrument(level = "trace")]
         #wrapper_sig {
@@ -40,17 +39,16 @@ pub fn trace(_: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 fn get_arg_names(signature: &Signature) -> Vec<Ident> {
-    signature.inputs
+    signature
+        .inputs
         .iter()
-        .map(|arg| {
-            match arg {
-                FnArg::Receiver(r) => r.self_token.into(),
-                FnArg::Typed(PatType { pat, .. }) => {
-                    if let Pat::Ident(PatIdent { ident, .. }) = pat.as_ref() {
-                        ident.clone()
-                    } else {
-                        panic!("Unable to determine arg name");
-                    }
+        .map(|arg| match arg {
+            FnArg::Receiver(r) => r.self_token.into(),
+            FnArg::Typed(PatType { pat, .. }) => {
+                if let Pat::Ident(PatIdent { ident, .. }) = pat.as_ref() {
+                    ident.clone()
+                } else {
+                    panic!("Unable to determine arg name");
                 }
             }
         })

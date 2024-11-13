@@ -4,7 +4,7 @@ use utils::env::CanisterEnv;
 
 pub use gldt_swap_api_canister::Args;
 
-use crate::state::{ Data, RuntimeState };
+use crate::state::{Data, RuntimeState};
 
 use super::init_canister;
 
@@ -21,12 +21,13 @@ fn init(args: Args) {
             let env = CanisterEnv::new(
                 init_args.test_mode,
                 init_args.version,
-                init_args.commit_hash
+                init_args.commit_hash,
             );
             let mut data = Data::default();
 
             data.gldt_ledger_id = init_args.gldt_ledger_id;
-            data.gldnft_canisters = init_args.gldnft_canisters
+            data.gldnft_canisters = init_args
+                .gldnft_canisters
                 .into_iter()
                 .map(|(canister_id, config)| (canister_id, config, None))
                 .collect();

@@ -1,10 +1,10 @@
 use candid::Principal;
 use canister_time::DAY_IN_MS;
+use lazy_static::lazy_static;
 use pocket_ic::PocketIc;
-use rand::{ RngCore, thread_rng };
+use rand::{thread_rng, RngCore};
 use types::Cycles;
 use types::TimestampMillis;
-use lazy_static::lazy_static;
 
 lazy_static! {
     pub static ref HOURS_IN_WEEK: u64 = 168;
@@ -25,7 +25,7 @@ pub const T: Cycles = 1_000_000_000_000;
 
 pub fn is_interval_more_than_7_days(
     previous_time: TimestampMillis,
-    now_time: TimestampMillis
+    now_time: TimestampMillis,
 ) -> bool {
     // convert the milliseconds to the number of days since UNIX Epoch.
     // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245

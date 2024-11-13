@@ -1,22 +1,23 @@
-use canister_time::{ MINUTE_IN_MS, NANOS_PER_MILLISECOND };
+use canister_time::{MINUTE_IN_MS, NANOS_PER_MILLISECOND};
 
+use candid::{CandidType, Principal};
+use canister_state_macros::canister_state;
+use ic_ledger_types::AccountIdentifier;
 use ic_transport_types::EnvelopeContent;
-use k256::{ pkcs8::EncodePublicKey, PublicKey };
+use k256::{pkcs8::EncodePublicKey, PublicKey};
 use ledger_utils::principal_to_legacy_account_id;
 use nns_governance_canister::types::Neuron;
-use serde::{ Deserialize, Serialize };
-use candid::{ CandidType, Principal };
-use canister_state_macros::canister_state;
-use types::{ BuildVersion, CanisterId, RewardsRecipientList, TimestampMillis };
+use serde::{Deserialize, Serialize};
+use types::{BuildVersion, CanisterId, RewardsRecipientList, TimestampMillis};
 use utils::{
-    consts::{ ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID },
-    env::{ CanisterEnv, Environment },
+    consts::{ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
+    env::{CanisterEnv, Environment},
     memory::MemorySize,
 };
 
 use crate::{
-    ecdsa::{ get_key_id, CanisterEcdsaRequest },
-    types::{ neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList },
+    ecdsa::{get_key_id, CanisterEcdsaRequest},
+    types::{neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList},
 };
 
 const IC_URL: &str = "https://icp-api.io";
@@ -47,20 +48,25 @@ impl RuntimeState {
             },
             public_key: hex::encode(&self.data.public_key),
             public_key_der: hex::encode(&self.data.get_public_key_der().unwrap_or_default()),
-            own_principal: self.data
+            own_principal: self
+                .data
                 .get_principal()
                 .map(|p| p.to_text())
                 .unwrap_or("".to_string()),
             canister_default_account_id: principal_to_legacy_account_id(
                 self.env.canister_id(),
-                None
-            ).to_string(),
+                None,
+            )
+            .to_string(),
             authorized_principals: self.data.authorized_principals.clone(),
             neurons: self.data.get_neuron_list(),
             nns_governance_canister_id: self.data.nns_governance_canister_id,
             icp_ledger_canister_id: self.data.icp_ledger_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
             outstanding_payments: self.data.outstanding_payments.clone(),
+            cycle_management_account: self.data.cycle_management_account.map_or("".to_string(), |s|
+                s.to_hex()
+            ),
         }
     }
 
@@ -74,7 +80,7 @@ impl RuntimeState {
         canister_id: CanisterId,
         method_name: String,
         args: A,
-        nonce: Option<[u8; 8]>
+        nonce: Option<[u8; 8]>,
     ) -> Result<CanisterEcdsaRequest, String> {
         let envelope_content = EnvelopeContent::Call {
             nonce: nonce.map(|n| n.to_vec()),
@@ -110,6 +116,7 @@ pub struct Metrics {
     pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
     pub outstanding_payments: OutstandingPaymentsList,
+    pub cycle_management_account: String,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -131,6 +138,7 @@ pub struct Data {
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
+    pub cycle_management_account: Option<AccountIdentifier>,
 }
 
 impl Data {
@@ -143,16 +151,21 @@ impl Data {
             nns_governance_canister_id: NNS_GOVERNANCE_CANISTER_ID,
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             outstanding_payments: OutstandingPaymentsList::default(),
+            cycle_management_account: None,
         }
     }
 
     pub fn get_neuron_list(&self) -> NeuronList {
         NeuronList {
-            active: self.neurons.active_neurons
+            active: self
+                .neurons
+                .active_neurons
                 .iter()
                 .map(|n| NeuronWithMetric::from(n.clone()))
                 .collect(),
-            spawning: self.neurons.spawning_neurons
+            spawning: self
+                .neurons
+                .spawning_neurons
                 .iter()
                 .filter_map(|n| n.id.as_ref().map(|id| id.id))
                 .collect(),
@@ -164,17 +177,17 @@ impl Data {
 impl Data {
     pub fn get_public_key_der(&self) -> Result<Vec<u8>, String> {
         match PublicKey::from_sec1_bytes(&self.public_key) {
-            Ok(val) =>
-                match val.to_public_key_der() {
-                    Ok(pk) => Ok(pk.to_vec()),
-                    Err(_) => Err("Error converting public key.".to_string()),
-                }
+            Ok(val) => match val.to_public_key_der() {
+                Ok(pk) => Ok(pk.to_vec()),
+                Err(_) => Err("Error converting public key.".to_string()),
+            },
             Err(_) => Err("Error converting public key.".to_string()),
         }
     }
 
     pub fn get_principal(&self) -> Result<Principal, String> {
-        self.get_public_key_der().and_then(|pk| Ok(Principal::self_authenticating(pk)))
+        self.get_public_key_der()
+            .and_then(|pk| Ok(Principal::self_authenticating(pk)))
     }
 }
 

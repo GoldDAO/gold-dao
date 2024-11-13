@@ -8,20 +8,26 @@ transfers tokens from reserve pool to the reward pool on a daily basis.
 
 */
 
-use crate::{ state::{ mutate_state, read_state }, utils::transfer_token };
-use candid::{ Nat, Principal };
-use canister_time::{ now_millis, run_interval, DAY_IN_MS };
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
-use sns_rewards_api_canister::subaccounts::{ RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT };
-use utils::env::Environment;
+use crate::{
+    state::{mutate_state, read_state},
+    utils::transfer_token,
+};
+use candid::{Nat, Principal};
+use canister_time::{now_millis, run_interval, DAY_IN_MS};
+use icrc_ledger_types::icrc1::account::{Account, Subaccount};
+use sns_rewards_api_canister::subaccounts::{RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT};
 use std::time::Duration;
-use tracing::{ debug, error, info };
-use types::{ Milliseconds, TimestampMillis, TokenSymbol };
+use tracing::{debug, error, info};
+use types::{Milliseconds, TimestampMillis, TokenSymbol};
+use utils::env::Environment;
 
 const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), run_distribution);
+    run_interval(
+        Duration::from_millis(DISTRIBUTION_INTERVAL),
+        run_distribution,
+    );
 }
 
 pub fn run_distribution() {
@@ -47,20 +53,25 @@ async fn handle_gldgov_distribution() {
     let gldgov_token_info = match read_state(|s| s.data.tokens.get(&token).copied()) {
         Some(token_info) => token_info,
         None => {
-            error!("ERROR : failed to get token information and ledger id for token {:?}", &token);
+            error!(
+                "ERROR : failed to get token information and ledger id for token {:?}",
+                &token
+            );
             return;
         }
     };
     // get the daily transfer amount of gldgov
-    let amount_to_transfer = match
-        read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned())
-    {
-        Some(amount) => amount,
-        None => {
-            error!("ERROR: can't find daily transfer amount for token : {:?} in state", token);
-            return;
-        }
-    };
+    let amount_to_transfer =
+        match read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned()) {
+            Some(amount) => amount,
+            None => {
+                error!(
+                    "ERROR: can't find daily transfer amount for token : {:?} in state",
+                    token
+                );
+                return;
+            }
+        };
     // check we're more than 1 day since the last distribution. The last_daily_reserve_transfer_time will be 0 on the first distribution because in state it's initialized with ::default() // 0
     let previous_time_ms = read_state(|s| s.data.last_daily_reserve_transfer_time);
     let current_time_ms = now_millis();
@@ -73,7 +84,8 @@ async fn handle_gldgov_distribution() {
     }
 
     // check the reserve pool has enough GLDGov to correctly transfer
-    match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await {
+    match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await
+    {
         Ok(balance) => {
             if balance < amount_to_transfer.clone() + gldgov_token_info.fee {
                 debug!(
@@ -96,13 +108,13 @@ async fn handle_gldgov_distribution() {
         subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
     };
 
-    match
-        transfer_token(
-            RESERVE_POOL_SUB_ACCOUNT,
-            reward_pool_account,
-            gldgov_token_info.ledger_id,
-            amount_to_transfer.clone()
-        ).await
+    match transfer_token(
+        RESERVE_POOL_SUB_ACCOUNT,
+        reward_pool_account,
+        gldgov_token_info.ledger_id,
+        amount_to_transfer.clone(),
+    )
+    .await
     {
         Ok(_) => {
             info!(
@@ -125,25 +137,25 @@ async fn handle_gldgov_distribution() {
 
 async fn fetch_balance_of_sub_account(
     ledger_canister_id: Principal,
-    sub_account: Subaccount
+    sub_account: Subaccount,
 ) -> Result<Nat, String> {
-    match
-        icrc_ledger_canister_c2c_client::icrc1_balance_of(
-            ledger_canister_id,
-            &(Account {
-                owner: read_state(|s| s.env.canister_id()),
-                subaccount: Some(sub_account),
-            })
-        ).await
+    match icrc_ledger_canister_c2c_client::icrc1_balance_of(
+        ledger_canister_id,
+        &(Account {
+            owner: read_state(|s| s.env.canister_id()),
+            subaccount: Some(sub_account),
+        }),
+    )
+    .await
     {
-        Ok(t) => { Ok(t) }
-        Err(e) => { Err(format!("ERROR: {:?}", e.1)) }
+        Ok(t) => Ok(t),
+        Err(e) => Err(format!("ERROR: {:?}", e.1)),
     }
 }
 
 pub fn is_valid_distribution_time(
     previous_time: TimestampMillis,
-    now_time: TimestampMillis
+    now_time: TimestampMillis,
 ) -> bool {
     // convert the milliseconds to the number of days since UNIX Epoch.
     // integer division means partial days will be truncated down or effectively rounded down. e.g 245.5 becomes 245

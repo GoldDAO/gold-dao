@@ -2,7 +2,7 @@ pub mod init;
 pub mod post_upgrade;
 pub mod pre_upgrade;
 
-use crate::state::{ init_state, RuntimeState };
+use crate::state::{init_state, RuntimeState};
 
 pub use init::*;
 
