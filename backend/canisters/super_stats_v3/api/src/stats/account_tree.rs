@@ -163,8 +163,7 @@ impl AccountTree {
                 return Ok("Processed OK".to_string());
             }
             None => {
-                let error = 
-               format!("Error - cannot send from a non-existent account (process_transfer_from), Block: {}", stx);
+                let error = format!("Error - cannot send from a non-existent account (process_transfer_from), Block: {}", stx);
                 return Err(error);
             }
         }

@@ -188,6 +188,7 @@ export type SwapErrorReverse = { 'FeeTransferFailed' : FeeTransferError } |
 export type SwapInfo = { 'Forward' : SwapDetailForward } |
   { 'Reverse' : SwapDetailReverse };
 export type SwapNftForTokensErrors = { 'Limit' : string } |
+  { 'Retry' : [bigint, string] } |
   { 'ContainsDuplicates' : string } |
   { 'ContainsInvalidNftCanister' : string } |
   {
@@ -197,6 +198,7 @@ export type SwapNftForTokensErrors = { 'Limit' : string } |
     ]
   } |
   { 'CantBeAnonymous' : string } |
+  { 'SwapArgsIsEmpty' : null } |
   { 'ServiceDown' : ServiceDownReason };
 export type SwapStatusForward = {
     'DepositRecoveryFailed' : [SwapStatusForward, DepositRecoveryError]
@@ -240,6 +242,7 @@ export type SwapTokensForNftRequestErrors = {
   } |
   { 'CantForgeSwapId' : null } |
   { 'NftLocked' : LockError } |
+  { 'Retry' : [bigint, string] } |
   { 'NftValidationErrors' : Array<NftValidationError> } |
   { 'CantBeAnonymous' : string } |
   { 'NotOwnedBySwapCanister' : null } |
