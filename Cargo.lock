@@ -1627,6 +1627,8 @@ dependencies = [
  "candid 0.10.10",
  "candid_gen",
  "ic-ledger-types",
+ "serde",
+ "serde_bytes",
 ]
 
 [[package]]
@@ -1652,8 +1654,11 @@ dependencies = [
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.13.2",
  "ic-cdk-timers",
+ "ic-ledger-types",
  "ic-stable-structures",
  "ic-transport-types",
+ "icp_ledger_canister",
+ "icp_ledger_canister_c2c_client",
  "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "k256",

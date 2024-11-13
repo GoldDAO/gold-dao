@@ -2,6 +2,7 @@ use canister_time::{MINUTE_IN_MS, NANOS_PER_MILLISECOND};
 
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
+use ic_ledger_types::AccountIdentifier;
 use ic_transport_types::EnvelopeContent;
 use k256::{pkcs8::EncodePublicKey, PublicKey};
 use ledger_utils::principal_to_legacy_account_id;
@@ -63,6 +64,9 @@ impl RuntimeState {
             icp_ledger_canister_id: self.data.icp_ledger_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
             outstanding_payments: self.data.outstanding_payments.clone(),
+            cycle_management_account: self.data.cycle_management_account.map_or("".to_string(), |s|
+                s.to_hex()
+            ),
         }
     }
 
@@ -112,6 +116,7 @@ pub struct Metrics {
     pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
     pub outstanding_payments: OutstandingPaymentsList,
+    pub cycle_management_account: String,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -133,6 +138,7 @@ pub struct Data {
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
+    pub cycle_management_account: Option<AccountIdentifier>,
 }
 
 impl Data {
@@ -145,6 +151,7 @@ impl Data {
             nns_governance_canister_id: NNS_GOVERNANCE_CANISTER_ID,
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             outstanding_payments: OutstandingPaymentsList::default(),
+            cycle_management_account: None,
         }
     }
 
