@@ -1,7 +1,7 @@
-pub mod synchronise_neurons;
+pub mod burn_job;
 pub mod distribute_rewards;
 pub mod reserve_pool_distribution;
-pub mod burn_job;
+pub mod synchronise_neurons;
 
 pub(crate) fn start() {
     synchronise_neurons::start_job();

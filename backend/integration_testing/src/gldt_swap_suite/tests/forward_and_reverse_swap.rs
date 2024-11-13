@@ -1,31 +1,29 @@
 use crate::client::origyn_nft_reference::client::{
-    get_token_id_as_nat,
-    market_transfer_nft_origyn,
+    get_token_id_as_nat, market_transfer_nft_origyn,
 };
-use crate::gldt_swap_suite::{ init, CanisterIds, PrincipalIds, TestEnv };
-use crate::utils::tick_n_blocks;
 use crate::gldt_swap_suite::nft_utils;
+use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
+use crate::utils::tick_n_blocks;
 
+use candid::{Nat, Principal};
+use gldt_swap_api_canister::swap_tokens_for_nft::Args as SwapTokensForNftArgs;
 use gldt_swap_common::gldt::GldtTokenSpec;
-use gldt_swap_common::swap::{ SwapInfo, SwapStatusForward };
+use gldt_swap_common::swap::{SwapInfo, SwapStatusForward};
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    Account as OrigynAccount,
-    AskFeature,
-    MarketTransferRequest,
-    PricingConfigShared,
-    SalesConfig,
+    Account as OrigynAccount, AskFeature, MarketTransferRequest, PricingConfigShared, SalesConfig,
 };
-use gldt_swap_api_canister::swap_tokens_for_nft::Args as SwapTokensForNftArgs;
-use candid::{ Nat, Principal };
 use pocket_ic::PocketIc;
 
 use crate::client::gldt_swap::swap_nft_for_tokens;
 use std::time::Duration;
 
-use gldt_swap_common::{ nft::NftID, swap::{ SwapId, SwapIndex } };
+use gldt_swap_common::{
+    nft::NftID,
+    swap::{SwapId, SwapIndex},
+};
 
-use crate::client::{ gldt_swap::get_swap, icrc1::client::transfer };
+use crate::client::{gldt_swap::get_swap, icrc1::client::transfer};
 
 fn init_nft_with_premint_nft(
     pic: &mut PocketIc,
@@ -33,7 +31,7 @@ fn init_nft_with_premint_nft(
     originator: Principal,
     net_principal: Principal,
     nft_owner: Principal,
-    nft_name: String
+    nft_name: String,
 ) -> bool {
     nft_utils::build_standard_nft(
         pic,
@@ -43,15 +41,22 @@ fn init_nft_with_premint_nft(
         originator.clone(),
         Nat::from(1024 as u32),
         false,
-        net_principal.clone()
+        net_principal.clone(),
     );
 
-    let mint_return: origyn_nft_reference::origyn_nft_reference_canister::OrigynTextResult = crate::client::origyn_nft_reference::client::mint_nft_origyn(
-        pic,
-        origyn_nft.clone(),
-        Some(net_principal.clone()),
-        (nft_name.clone(), OrigynAccount::Account { owner: nft_owner.clone(), sub_account: None })
-    );
+    let mint_return: origyn_nft_reference::origyn_nft_reference_canister::OrigynTextResult =
+        crate::client::origyn_nft_reference::client::mint_nft_origyn(
+            pic,
+            origyn_nft.clone(),
+            Some(net_principal.clone()),
+            (
+                nft_name.clone(),
+                OrigynAccount::Account {
+                    owner: nft_owner.clone(),
+                    sub_account: None,
+                },
+            ),
+        );
 
     println!("mint_return: {:?}", mint_return);
 
@@ -63,10 +68,10 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use canister_time::{ timestamp_nanos, SECOND_IN_MS };
+    use canister_time::{timestamp_nanos, SECOND_IN_MS};
     use gldt_swap_common::swap::SwapStatusReverse;
 
-    use crate::client::{ gldt_swap::swap_tokens_for_nft, icrc1_icrc2_token::icrc2_approve };
+    use crate::client::{gldt_swap::swap_tokens_for_nft, icrc1_icrc2_token::icrc2_approve};
 
     use super::*;
 
@@ -84,8 +89,20 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids: CanisterIds { origyn_nft, gldt_ledger, gldt_swap, .. },
-            principal_ids: PrincipalIds { net_principal, originator, nft_owner, .. },
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
         } = env;
         tick_n_blocks(pic, 2);
 
@@ -96,14 +113,14 @@ mod tests {
             originator.clone(),
             net_principal.clone(),
             nft_owner.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
 
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
-            "1".to_string()
+            "1".to_string(),
         );
         let nft_id = NftID(token_id_as_nat.clone());
 
@@ -115,7 +132,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -136,17 +153,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };
@@ -172,8 +185,9 @@ mod tests {
                 owner: nft_owner,
                 subaccount: None,
             },
-            10_100_000_000u128
-        ).unwrap();
+            10_100_000_000u128,
+        )
+        .unwrap();
         tick_n_blocks(pic, 1);
 
         // 3. pre approve the escrow transfer and verify
@@ -194,7 +208,7 @@ mod tests {
                 fee: None,
                 memo: None,
                 created_at_time: Some(now_time),
-            })
+            }),
         );
         pic.advance_time(Duration::from_millis(SECOND_IN_MS * 10));
         tick_n_blocks(pic, 2);
@@ -207,8 +221,9 @@ mod tests {
             &(SwapTokensForNftArgs {
                 nft_id: nft_id.clone(),
                 nft_canister_id: origyn_nft,
-            })
-        ).unwrap();
+            }),
+        )
+        .unwrap();
         matches!(swap_id, SwapId(_, _));
         tick_n_blocks(pic, 90);
 
@@ -227,7 +242,7 @@ mod tests {
             pic,
             nft_owner,
             gldt_swap,
-            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)]
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
             Ok(ids) => {
@@ -248,17 +263,13 @@ mod tests {
             token_id: "1".to_string(),
             sales_config: SalesConfig {
                 broker_id: None,
-                pricing: PricingConfigShared::Ask(
-                    Some(
-                        vec![
-                            AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                            AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
-                            AskFeature::Notify(vec![gldt_swap]),
-                            AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
-                            AskFeature::AllowList(vec![gldt_swap])
-                        ]
-                    )
-                ),
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
                 escrow_receipt: None,
             },
         };

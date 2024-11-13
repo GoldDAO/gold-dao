@@ -1,8 +1,8 @@
 use super::swap_client::SwapClient;
+use crate::types::*;
 use async_trait::async_trait;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
-use crate::types::*;
 use types::CanisterId;
 
 #[async_trait]
@@ -36,7 +36,7 @@ impl SwapClient for ICPSwapClient {
     async fn get_quote(
         &self,
         amount: u128,
-        min_amount_out: u128
+        min_amount_out: u128,
     ) -> CallResult<Result<u128, String>> {
         self.get_quote(amount, min_amount_out).await
     }

@@ -3,7 +3,7 @@ pub use management_api_canister::Args;
 use tracing::info;
 use utils::env::CanisterEnv;
 
-use crate::state::{ Data, RuntimeState };
+use crate::state::{Data, RuntimeState};
 
 use super::init_canister;
 
@@ -16,7 +16,7 @@ fn init(args: Args) {
             let env = CanisterEnv::new(
                 init_args.test_mode,
                 init_args.version,
-                init_args.commit_hash
+                init_args.commit_hash,
             );
             let mut data = Data::default();
             data.authorized_principals = init_args.authorized_principals;

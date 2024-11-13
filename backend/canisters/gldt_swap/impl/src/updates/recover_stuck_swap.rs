@@ -1,19 +1,18 @@
-use gldt_swap_common::swap::{ SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
 use gldt_swap_api_canister::recover_stuck_swap::RecoverSwapError;
+use gldt_swap_common::swap::{SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse};
 
-pub use gldt_swap_api_canister::recover_stuck_swap::{
-    Args as RecoverStuckSwapArgs,
-    Response as RecoverStuckSwapResponse,
-};
-use ic_cdk::update;
-pub use gldt_swap_common::nft::NftID;
 use crate::guards::caller_is_authorized;
+pub use gldt_swap_api_canister::recover_stuck_swap::{
+    Args as RecoverStuckSwapArgs, Response as RecoverStuckSwapResponse,
+};
+pub use gldt_swap_common::nft::NftID;
+use ic_cdk::update;
 
 use crate::swap::forward_swap::forward_swap_perform_deposit_recovery;
 use crate::swap::swap_info::SwapInfoTrait;
 use crate::{
     state::read_state,
-    swap::reverse_swap::{ burn_gldt, refund, transfer_fees, transfer_nft, transfer_to_escrow },
+    swap::reverse_swap::{burn_gldt, refund, transfer_fees, transfer_nft, transfer_to_escrow},
 };
 
 #[update(hidden = true, guard = "caller_is_authorized")]
@@ -34,11 +33,11 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                         swap.update_status(SwapStatus::Reverse(SwapStatusReverse::EscrowRequest));
                     }
                     SwapStatusReverse::NftTransferRequestInProgress => {
-                        swap.update_status(
-                            SwapStatus::Reverse(SwapStatusReverse::NftTransferRequest)
-                        );
+                        swap.update_status(SwapStatus::Reverse(
+                            SwapStatusReverse::NftTransferRequest,
+                        ));
                     }
-                    | SwapStatusReverse::RefundRequestInProgress
+                    SwapStatusReverse::RefundRequestInProgress
                     | SwapStatusReverse::RefundFailed(_) => {
                         swap.update_status(SwapStatus::Reverse(SwapStatusReverse::RefundRequest));
                     }
@@ -47,9 +46,9 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                         swap.update_status(SwapStatus::Reverse(SwapStatusReverse::BurnRequest));
                     }
                     SwapStatusReverse::FeeTransferRequestInProgress => {
-                        swap.update_status(
-                            SwapStatus::Reverse(SwapStatusReverse::FeeTransferRequest)
-                        );
+                        swap.update_status(SwapStatus::Reverse(
+                            SwapStatusReverse::FeeTransferRequest,
+                        ));
                     }
                     _ => {}
                 }
@@ -62,41 +61,33 @@ pub async fn recover_stuck_swap_impl(swap_id: RecoverStuckSwapArgs) -> RecoverSt
                 Ok(swap_id)
             }
             SwapInfo::Forward(details) => {
-                if
-                    matches!(
-                        &details.status,
-                        SwapStatusForward::DepositRecoveryRequest(_) |
-                            SwapStatusForward::DepositRecoveryFailed(_, _) |
-                            SwapStatusForward::DepositRecoveryInProgress(_)
-                    )
-                {
+                if matches!(
+                    &details.status,
+                    SwapStatusForward::DepositRecoveryRequest(_)
+                        | SwapStatusForward::DepositRecoveryFailed(_, _)
+                        | SwapStatusForward::DepositRecoveryInProgress(_)
+                ) {
                     match &details.status {
                         SwapStatusForward::DepositRecoveryRequest(_) => {
-                            swap.update_status(
-                                SwapStatus::Forward(
-                                    SwapStatusForward::DepositRecoveryRequest(
-                                        Box::new(details.status.clone())
-                                    )
-                                )
-                            );
+                            swap.update_status(SwapStatus::Forward(
+                                SwapStatusForward::DepositRecoveryRequest(Box::new(
+                                    details.status.clone(),
+                                )),
+                            ));
                         }
                         SwapStatusForward::DepositRecoveryInProgress(_) => {
-                            swap.update_status(
-                                SwapStatus::Forward(
-                                    SwapStatusForward::DepositRecoveryRequest(
-                                        Box::new(details.status.clone())
-                                    )
-                                )
-                            );
+                            swap.update_status(SwapStatus::Forward(
+                                SwapStatusForward::DepositRecoveryRequest(Box::new(
+                                    details.status.clone(),
+                                )),
+                            ));
                         }
                         SwapStatusForward::DepositRecoveryFailed(swap_status_forward, _) => {
-                            swap.update_status(
-                                SwapStatus::Forward(
-                                    SwapStatusForward::DepositRecoveryRequest(
-                                        swap_status_forward.clone()
-                                    )
-                                )
-                            );
+                            swap.update_status(SwapStatus::Forward(
+                                SwapStatusForward::DepositRecoveryRequest(
+                                    swap_status_forward.clone(),
+                                ),
+                            ));
                         }
                         _ => {}
                     }

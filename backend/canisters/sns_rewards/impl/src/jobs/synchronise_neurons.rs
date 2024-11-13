@@ -7,13 +7,16 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use canister_time::{ now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS };
-use sns_governance_canister::types::{ NeuronId, Neuron };
-use tracing::{ debug, error, info, warn };
-use std::{ collections::{ btree_map, HashMap }, time::Duration };
-use types::{ Maturity, Milliseconds, NeuronInfo };
+use canister_time::{now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS};
+use sns_governance_canister::types::{Neuron, NeuronId};
+use std::{
+    collections::{btree_map, HashMap},
+    time::Duration,
+};
+use tracing::{debug, error, info, warn};
+use types::{Maturity, Milliseconds, NeuronInfo};
 
-use crate::state::{ mutate_state, read_state, RuntimeState };
+use crate::state::{mutate_state, read_state, RuntimeState};
 
 const SYNC_NEURONS_INTERVAL: Milliseconds = HOUR_IN_MS;
 
@@ -132,7 +135,8 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
                         return;
                     }
                     // update accumulated maturity
-                    neuron_info_entry.accumulated_maturity = neuron_info_entry.accumulated_maturity
+                    neuron_info_entry.accumulated_maturity = neuron_info_entry
+                        .accumulated_maturity
                         .checked_add(delta)
                         .unwrap_or(neuron_info_entry.accumulated_maturity);
                 }
@@ -143,10 +147,10 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
         }
         // update history
         if let Some((n_id, n_info)) = updated_neuron {
-            state.data.maturity_history.insert(
-                (n_id, state.data.sync_info.last_synced_start),
-                n_info
-            )
+            state
+                .data
+                .maturity_history
+                .insert((n_id, state.data.sync_info.last_synced_start), n_info)
         }
     }
 }
@@ -154,7 +158,8 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
 // Function to update principal-neuron mapping
 
 fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
-    neuron.maturity_e8s_equivalent
+    neuron
+        .maturity_e8s_equivalent
         .checked_add(neuron.staked_maturity_e8s_equivalent.unwrap_or(0))
         .unwrap_or_else(|| {
             let id = neuron.id.clone().unwrap_or_default();
@@ -167,10 +172,10 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
 mod tests {
     use std::collections::HashMap;
 
-    use sns_governance_canister::types::{ Neuron, NeuronId };
+    use sns_governance_canister::types::{Neuron, NeuronId};
     use types::NeuronInfo;
 
-    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+    use crate::state::{init_state, mutate_state, read_state, RuntimeState};
 
     use super::update_neuron_maturity;
 
@@ -182,9 +187,9 @@ mod tests {
     fn test_insert_update_neuron() {
         init_runtime_state();
 
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
         let limit = 5;
 
         let mut neuron = Neuron::default();
@@ -203,15 +208,17 @@ mod tests {
             last_synced_maturity: 0,
             rewarded_maturity: HashMap::new(),
         };
-        let mut result = read_state(|state| {
-            state.data.neuron_maturity.get(&neuron_id).cloned()
-        }).unwrap();
+        let mut result =
+            read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
         assert_eq!(result, expected_result);
 
         let mut expected_result_history = vec![(0, expected_result)];
         let mut result_history = read_state(|state| {
-            state.data.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
         });
 
         assert_eq!(result_history, expected_result_history);
@@ -233,15 +240,16 @@ mod tests {
             last_synced_maturity: 150,
             rewarded_maturity: HashMap::new(),
         };
-        result = read_state(|state| {
-            state.data.neuron_maturity.get(&neuron_id).cloned()
-        }).unwrap();
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
         assert_eq!(result, expected_result);
 
         expected_result_history.push((100, expected_result));
         result_history = read_state(|state| {
-            state.data.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
         });
 
         assert_eq!(result_history, expected_result_history);
@@ -263,15 +271,16 @@ mod tests {
             last_synced_maturity: 50,
             rewarded_maturity: HashMap::new(),
         };
-        result = read_state(|state| {
-            state.data.neuron_maturity.get(&neuron_id).cloned()
-        }).unwrap();
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
         assert_eq!(result, expected_result);
 
         expected_result_history.push((250, expected_result));
         result_history = read_state(|state| {
-            state.data.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
         });
 
         assert_eq!(result_history, expected_result_history);
@@ -293,15 +302,16 @@ mod tests {
             last_synced_maturity: 50,
             rewarded_maturity: HashMap::new(),
         };
-        result = read_state(|state| {
-            state.data.neuron_maturity.get(&neuron_id).cloned()
-        }).unwrap();
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
         assert_eq!(result, expected_result);
 
         // `expected_result_history` stays the same
         result_history = read_state(|state| {
-            state.data.maturity_history.get_maturity_history(neuron_id.clone(), limit)
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
         });
 
         assert_eq!(result_history, expected_result_history);

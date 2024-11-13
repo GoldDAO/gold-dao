@@ -1,7 +1,7 @@
-use candid::{ CandidType, Principal };
+use candid::{CandidType, Principal};
 use icrc_ledger_types::{
     icrc::generic_metadata_value::MetadataValue,
-    icrc1::{ account::Account, transfer::NumTokens },
+    icrc1::{account::Account, transfer::NumTokens},
 };
 
 #[derive(CandidType)]

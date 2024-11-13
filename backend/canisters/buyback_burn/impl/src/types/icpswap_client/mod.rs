@@ -1,10 +1,10 @@
-use candid::{ Nat, CandidType };
-use ic_cdk::api::call::{ CallResult, RejectionCode };
+use candid::{CandidType, Nat};
+use ic_cdk::api::call::{CallResult, RejectionCode};
 use ic_ledger_types::Subaccount;
-use icpswap_swap_pool_canister::{ ICPSwapError, ICPSwapResult };
+use icpswap_swap_pool_canister::{ICPSwapError, ICPSwapResult};
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{ Deserialize, Serialize };
-use types::{ CanisterId, TokenInfo };
+use serde::{Deserialize, Serialize};
+use types::{CanisterId, TokenInfo};
 
 // NOTE: we use one ICPSwapClient to swap concrete token pair
 #[derive(CandidType, Serialize, Deserialize, Clone)]
@@ -24,7 +24,7 @@ impl ICPSwapClient {
         swap_canister_id: CanisterId,
         token0: TokenInfo,
         token1: TokenInfo,
-        zero_for_one: bool
+        zero_for_one: bool,
     ) -> Self {
         ICPSwapClient {
             client_id,
@@ -46,7 +46,7 @@ impl ICPSwapClient {
     pub async fn get_quote(
         &self,
         amount: u128,
-        min_amount_out: u128
+        min_amount_out: u128,
     ) -> CallResult<Result<u128, String>> {
         let args = icpswap_swap_pool_canister::swap::Args {
             operator: self.this_canister_id,
@@ -77,7 +77,7 @@ impl ICPSwapClient {
     pub async fn swap(
         &self,
         amount: u128,
-        min_amount_out: u128
+        min_amount_out: u128,
     ) -> CallResult<Result<u128, String>> {
         let args = icpswap_swap_pool_canister::swap::Args {
             operator: self.this_canister_id,
@@ -92,14 +92,18 @@ impl ICPSwapClient {
     }
 
     pub async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128> {
-        let token = if successful_swap { self.output_token() } else { self.input_token() };
+        let token = if successful_swap {
+            self.output_token()
+        } else {
+            self.input_token()
+        };
         let args = icpswap_swap_pool_canister::withdraw::Args {
             token: token.ledger_id.to_string(),
             amount: amount.into(),
             fee: token.fee.into(),
         };
         match icpswap_swap_pool_canister_c2c_client::withdraw(self.swap_canister_id, &args).await? {
-            ICPSwapResult::Ok(amount_out) => { Ok(nat_to_u128(amount_out)) }
+            ICPSwapResult::Ok(amount_out) => Ok(nat_to_u128(amount_out)),
             ICPSwapResult::Err(error) => Err(convert_error(error)),
         }
     }
@@ -109,11 +113,19 @@ impl ICPSwapClient {
     }
 
     pub fn input_token(&self) -> TokenInfo {
-        if self.zero_for_one { self.token0 } else { self.token1 }
+        if self.zero_for_one {
+            self.token0
+        } else {
+            self.token1
+        }
     }
 
     pub fn output_token(&self) -> TokenInfo {
-        if self.zero_for_one { self.token1 } else { self.token0 }
+        if self.zero_for_one {
+            self.token1
+        } else {
+            self.token0
+        }
     }
 
     pub fn this_canister_id(&self) -> CanisterId {

@@ -1,9 +1,8 @@
-use ic_cdk::query;
-pub use gldt_swap_api_archive::get_archive_swap::{
-    Args as GetArchiveSwapArgs,
-    Response as GetArchiveSwapResponse,
-};
 use crate::state::read_state;
+pub use gldt_swap_api_archive::get_archive_swap::{
+    Args as GetArchiveSwapArgs, Response as GetArchiveSwapResponse,
+};
+use ic_cdk::query;
 
 #[query]
 async fn get_archive_swap(arg: GetArchiveSwapArgs) -> GetArchiveSwapResponse {

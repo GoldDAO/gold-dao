@@ -1,6 +1,6 @@
 use candid::CandidType;
-use serde::{ Deserialize, Serialize };
 use ic_ledger_types::Tokens;
+use serde::{Deserialize, Serialize};
 
 pub type Args = ();
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]

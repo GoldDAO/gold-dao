@@ -1,13 +1,13 @@
+use crate::state::{mutate_state, read_state};
 use candid::Nat;
 use canister_time::run_now_then_interval;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::account::Account;
-use token_metrics_api::TEAM_PRINCIPALS;
-use utils::principal::string_to_account;
 use std::time::Duration;
-use tracing::{ debug, error };
+use token_metrics_api::TEAM_PRINCIPALS;
+use tracing::{debug, error};
 use types::Milliseconds;
-use crate::state::{ mutate_state, read_state };
+use utils::principal::string_to_account;
 
 const SYNC_SUPPLY_DATA_INTERVAL: Milliseconds = 3_600 * 1_000;
 
@@ -25,9 +25,8 @@ pub async fn sync_supply_data() {
 
     match icrc_ledger_canister_c2c_client::icrc1_total_supply(ledger_canister_id).await {
         Ok(total_supply) => {
-            let foundation_account_strings = read_state(|state|
-                state.data.foundation_accounts.clone()
-            );
+            let foundation_account_strings =
+                read_state(|state| state.data.foundation_accounts.clone());
 
             let mut foundation_accounts = Vec::new();
             for account_str in foundation_account_strings {
@@ -65,7 +64,9 @@ async fn get_total_ledger_balance_of_accounts(accounts: Vec<Account>) -> Nat {
         })
         .collect();
     let results = join_all(getter_futures).await;
-    results.iter().fold(Nat::from(0u64), |acc, x| acc + x.clone())
+    results
+        .iter()
+        .fold(Nat::from(0u64), |acc, x| acc + x.clone())
 }
 
 async fn get_ledger_balance_of(account: Account) -> Nat {

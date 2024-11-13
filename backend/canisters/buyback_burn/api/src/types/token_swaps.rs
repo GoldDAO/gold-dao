@@ -1,7 +1,7 @@
 use candid::CandidType;
-use icrc_ledger_types::icrc1::account::Account;
-use serde::{ Deserialize, Serialize };
 use ic_stable_structures::Storable;
+use icrc_ledger_types::icrc1::account::Account;
+use serde::{Deserialize, Serialize};
 use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
@@ -18,7 +18,7 @@ pub struct TokenSwap {
     pub is_archived: bool,
 }
 
-use candid::{ Decode, Encode };
+use candid::{Decode, Encode};
 use ic_stable_structures::storable::Bound;
 use std::borrow::Cow;
 const MAX_SWAP_INFO_BYTES_SIZE: u32 = 1000;

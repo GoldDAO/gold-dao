@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use candid::Principal;
-use icrc_ledger_types::icrc1::account::{ Account, Subaccount };
-use nns_governance_canister::types::{ Neuron, NeuronId };
+use icrc_ledger_types::icrc1::account::{Account, Subaccount};
+use nns_governance_canister::types::{Neuron, NeuronId};
 
 pub fn dummy_principal() -> Principal {
     Principal::from_text("thrhh-hnmzu-kjquw-6ebmf-vdhed-yf2ry-avwy7-2jrrm-byg34-zoqaz-wqe").unwrap()

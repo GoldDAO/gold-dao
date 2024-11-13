@@ -1,6 +1,6 @@
+use crate::state::read_state;
 use ic_cdk_macros::query;
 pub use management_api_canister::get_gld_dashboard_maintenance_mode::Response as GetGLDDashboardMaintenanceModeResponse;
-use crate::state::read_state;
 
 #[query]
 pub fn get_gld_dashboard_maintenance_mode() -> GetGLDDashboardMaintenanceModeResponse {

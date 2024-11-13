@@ -4,17 +4,13 @@ pub use token_metrics_api::Args;
 use tracing::info;
 use utils::{
     consts::{
-        GOLD_1000G_CANISTER_ID,
-        GOLD_100G_CANISTER_ID,
-        GOLD_10G_CANISTER_ID,
-        GOLD_1G_CANISTER_ID,
-        STAGING_GOLD_10G_CANISTER_ID,
-        STAGING_GOLD_1G_CANISTER_ID,
+        GOLD_1000G_CANISTER_ID, GOLD_100G_CANISTER_ID, GOLD_10G_CANISTER_ID, GOLD_1G_CANISTER_ID,
+        STAGING_GOLD_10G_CANISTER_ID, STAGING_GOLD_1G_CANISTER_ID,
     },
     env::CanisterEnv,
 };
 
-use crate::state::{ Data, RuntimeState };
+use crate::state::{Data, RuntimeState};
 
 use super::init_canister;
 
@@ -25,20 +21,23 @@ fn init(args: Args) {
             canister_logger::init(init_args.test_mode);
 
             let gold_nft_canister: Vec<(Principal, u128)> = if init_args.test_mode {
-                vec![(STAGING_GOLD_1G_CANISTER_ID, 1), (STAGING_GOLD_10G_CANISTER_ID, 10)]
+                vec![
+                    (STAGING_GOLD_1G_CANISTER_ID, 1),
+                    (STAGING_GOLD_10G_CANISTER_ID, 10),
+                ]
             } else {
                 vec![
                     (GOLD_1G_CANISTER_ID, 1),
                     (GOLD_10G_CANISTER_ID, 10),
                     (GOLD_100G_CANISTER_ID, 100),
-                    (GOLD_1000G_CANISTER_ID, 1000)
+                    (GOLD_1000G_CANISTER_ID, 1000),
                 ]
             };
 
             let env = CanisterEnv::new(
                 init_args.test_mode,
                 init_args.version,
-                init_args.commit_hash
+                init_args.commit_hash,
             );
             let data = Data::new(
                 gold_nft_canister,
@@ -47,7 +46,7 @@ fn init(args: Args) {
                 init_args.super_stats_canister_id,
                 init_args.sns_rewards_canister_id,
                 init_args.treasury_account,
-                init_args.foundation_accounts
+                init_args.foundation_accounts,
             );
 
             let runtime_state = RuntimeState::new(env.clone(), data);

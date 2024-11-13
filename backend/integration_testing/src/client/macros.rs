@@ -44,7 +44,13 @@ macro_rules! generate_update_call_encoded_args {
         ) -> $method_name::Response {
             let method_name = stringify!($method_name);
 
-            $crate::client::pocket::execute_update_encoded_args(pic, sender, canister_id, method_name, args)
+            $crate::client::pocket::execute_update_encoded_args(
+                pic,
+                sender,
+                canister_id,
+                method_name,
+                args,
+            )
         }
     };
 }
@@ -61,7 +67,13 @@ macro_rules! generate_pocket_query_call_encoded_args {
         ) -> $method_name::Response {
             let method_name = stringify!($method_name);
 
-            $crate::client::pocket::generate_pocket_query_call(pic, sender, canister_id, method_name, args)
+            $crate::client::pocket::generate_pocket_query_call(
+                pic,
+                sender,
+                canister_id,
+                method_name,
+                args,
+            )
         }
     };
 }

@@ -1,16 +1,16 @@
-use candid::{ Nat, Principal };
+use candid::{Nat, Principal};
 
-use self::setup::{ RewardsTestEnv, RewardsTestEnvBuilder };
+use self::setup::{RewardsTestEnv, RewardsTestEnvBuilder};
 
 pub mod setup;
 pub mod setup_ledger;
-pub mod setup_sns;
 pub mod setup_rewards;
+pub mod setup_sns;
 
 pub fn default_test_setup() -> RewardsTestEnv {
     let users = vec![
         Principal::from_slice(&[0, 0, 0, 1, 0, 1, 0, 1, 0, 1]),
-        Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2])
+        Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2]),
     ];
 
     RewardsTestEnvBuilder::new()
@@ -38,7 +38,7 @@ pub fn test_setup_with_no_neuron_hotkeys() -> RewardsTestEnv {
 pub fn test_setup_with_no_reward_pool_mint() -> RewardsTestEnv {
     let users = vec![
         Principal::from_slice(&[0, 0, 0, 1, 0, 1, 0, 1, 0, 1]),
-        Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2])
+        Principal::from_slice(&[0, 0, 0, 1, 0, 2, 0, 2, 0, 2]),
     ];
 
     RewardsTestEnvBuilder::new()

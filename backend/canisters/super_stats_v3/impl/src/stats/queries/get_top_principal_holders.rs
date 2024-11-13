@@ -1,7 +1,7 @@
+use crate::{core::working_stats::api_count, stats::directory::lookup_directory};
 use ic_cdk::query;
-use crate::{ core::working_stats::api_count, stats::directory::lookup_directory };
 pub use super_stats_v3_api::{
-    custom_types::{ HolderBalance, HolderBalanceResponse },
+    custom_types::{HolderBalance, HolderBalanceResponse},
     runtime::RUNTIME_STATE,
     stable_memory::STABLE_STATE,
     stats::queries::get_top_principal_holders::Response as GetTopPrincipalHoldersResponse,
@@ -10,7 +10,7 @@ pub use super_stats_v3_api::{
 #[query]
 pub fn get_top_principal_holders(number_to_return: u64) -> GetTopPrincipalHoldersResponse {
     // check authorised
-    RUNTIME_STATE.with(|s| { s.borrow().data.check_authorised(ic_cdk::caller().to_text()) });
+    RUNTIME_STATE.with(|s| s.borrow().data.check_authorised(ic_cdk::caller().to_text()));
 
     let top: Vec<HolderBalance> = STABLE_STATE.with(|s| {
         let mut ac_vec: Vec<HolderBalance> = Vec::new();

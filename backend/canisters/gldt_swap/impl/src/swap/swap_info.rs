@@ -1,11 +1,14 @@
 use std::future::Future;
 
-use gldt_swap_common::swap::{ SwapId, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse };
 use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
-use tracing::{ debug, info };
+use gldt_swap_common::swap::{SwapId, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse};
+use tracing::{debug, info};
 
-use crate::{ state::{ mutate_state, read_state }, utils::{ commit_changes, get_historic_swap } };
+use crate::{
+    state::{mutate_state, read_state},
+    utils::{commit_changes, get_historic_swap},
+};
 
 pub trait SwapInfoTrait {
     fn insert_swap(&self) -> impl Future<Output = Result<SwapId, ()>> + Send;
@@ -43,19 +46,19 @@ impl SwapInfoTrait for SwapInfo {
 
         // insert to active or history depending on the status
         match new_swap.get_status() {
-            | SwapStatus::Forward(SwapStatusForward::Init)
+            SwapStatus::Forward(SwapStatusForward::Init)
             | SwapStatus::Reverse(SwapStatusReverse::Init) => {
-                if
-                    let Ok(swap_id) = mutate_state(|s|
-                        s.data.swaps.insert_active_swap(&nft_id.clone(), &new_swap.clone())
-                    )
-                {
+                if let Ok(swap_id) = mutate_state(|s| {
+                    s.data
+                        .swaps
+                        .insert_active_swap(&nft_id.clone(), &new_swap.clone())
+                }) {
                     Ok(swap_id)
                 } else {
                     Err(())
                 }
             }
-            | SwapStatus::Forward(SwapStatusForward::Failed(_))
+            SwapStatus::Forward(SwapStatusForward::Failed(_))
             | SwapStatus::Reverse(SwapStatusReverse::Failed(_)) => {
                 if let Ok(swap_id) = new_swap.move_swap_to_history().await {
                     Ok(swap_id)
@@ -63,7 +66,7 @@ impl SwapInfoTrait for SwapInfo {
                     Err(())
                 }
             }
-            _ => { Err(()) }
+            _ => Err(()),
         }
     }
 
@@ -94,10 +97,10 @@ impl SwapInfoTrait for SwapInfo {
 
         let should_move_to_history = matches!(
             status,
-            SwapStatus::Forward(SwapStatusForward::Complete) |
-                SwapStatus::Forward(SwapStatusForward::Failed(_)) |
-                SwapStatus::Reverse(SwapStatusReverse::Complete) |
-                SwapStatus::Reverse(SwapStatusReverse::Failed(_))
+            SwapStatus::Forward(SwapStatusForward::Complete)
+                | SwapStatus::Forward(SwapStatusForward::Failed(_))
+                | SwapStatus::Reverse(SwapStatusReverse::Complete)
+                | SwapStatus::Reverse(SwapStatusReverse::Failed(_))
         );
 
         if matches!(status, SwapStatus::Forward(SwapStatusForward::Complete)) {
@@ -113,13 +116,11 @@ impl SwapInfoTrait for SwapInfo {
             });
         }
 
-        if
-            matches!(
-                status,
-                SwapStatus::Forward(SwapStatusForward::Failed(_)) |
-                    SwapStatus::Reverse(SwapStatusReverse::Failed(_))
-            )
-        {
+        if matches!(
+            status,
+            SwapStatus::Forward(SwapStatusForward::Failed(_))
+                | SwapStatus::Reverse(SwapStatusReverse::Failed(_))
+        ) {
             mutate_state(|s| {
                 s.data.total_failed_swaps += 1;
             });
@@ -140,14 +141,13 @@ impl SwapInfoTrait for SwapInfo {
 
     async fn move_swap_to_history(&self) -> Result<SwapId, ()> {
         let swap_id = self.get_swap_id();
-        let archive_canister = match
-            read_state(|s| s.data.swaps.find_canister_for_swap_index(swap_id.1.clone()))
-        {
-            Some(canister_id) => canister_id,
-            None => {
-                return Err(());
-            }
-        };
+        let archive_canister =
+            match read_state(|s| s.data.swaps.find_canister_for_swap_index(swap_id.1.clone())) {
+                Some(canister_id) => canister_id,
+                None => {
+                    return Err(());
+                }
+            };
 
         if get_historic_swap(&swap_id).await.is_some() {
             let message = format!(

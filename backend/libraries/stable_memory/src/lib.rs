@@ -1,10 +1,10 @@
-use ic_cdk::api::stable::WASM_PAGE_SIZE_IN_BYTES;
 use ic_cdk::api::stable::stable_size;
-use ic_stable_structures::reader::{ BufferedReader, Reader };
-use ic_stable_structures::writer::{ BufferedWriter, Writer };
+use ic_cdk::api::stable::WASM_PAGE_SIZE_IN_BYTES;
+use ic_stable_structures::reader::{BufferedReader, Reader};
+use ic_stable_structures::writer::{BufferedWriter, Writer};
 use ic_stable_structures::Memory;
 use std::cmp::min;
-use std::io::{ Read, Write };
+use std::io::{Read, Write};
 
 const MAX_READER_WRITER_BUFFER_SIZE: usize = 1024 * 1024; // 1MB
 

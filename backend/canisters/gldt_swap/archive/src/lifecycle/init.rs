@@ -3,7 +3,7 @@ use tracing::info;
 use types::BuildVersion;
 use utils::env::CanisterEnv;
 
-use crate::state::{ Data, RuntimeState };
+use crate::state::{Data, RuntimeState};
 
 use super::init_canister;
 pub use gldt_swap_api_archive::lifecycle::Args;
@@ -17,7 +17,7 @@ fn init(args: Args) {
             let env = CanisterEnv::new(
                 init_args.test_mode,
                 BuildVersion::min(),
-                init_args.commit_hash
+                init_args.commit_hash,
             );
             let mut data = Data::default();
 

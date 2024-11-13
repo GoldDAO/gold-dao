@@ -1,6 +1,6 @@
 use candid::Principal;
-use std::str::FromStr;
 use icrc_ledger_types::icrc1::account::Account;
+use std::str::FromStr;
 
 pub trait PrincipalDotAccountFormat {
     fn to_principal_dot_account(&self) -> String;
@@ -10,11 +10,10 @@ impl PrincipalDotAccountFormat for Account {
     fn to_principal_dot_account(&self) -> String {
         match &self.subaccount {
             Some(subaccount) => format!("{}.{}", self.owner, hex::encode(subaccount)),
-            None =>
-                format!(
-                    "{}.0000000000000000000000000000000000000000000000000000000000000000",
-                    self.owner.to_string()
-                ),
+            None => format!(
+                "{}.0000000000000000000000000000000000000000000000000000000000000000",
+                self.owner.to_string()
+            ),
         }
     }
 }
@@ -58,12 +57,10 @@ pub fn string_to_account(input: String) -> Result<Account, String> {
         }
     } else {
         match Principal::from_str(input.as_str()) {
-            Ok(valid_principal) => {
-                Ok(Account {
-                    owner: valid_principal,
-                    subaccount: None,
-                })
-            }
+            Ok(valid_principal) => Ok(Account {
+                owner: valid_principal,
+                subaccount: None,
+            }),
             Err(err) => Err(err.to_string()),
         }
     }
@@ -72,15 +69,13 @@ pub fn string_to_account(input: String) -> Result<Account, String> {
 pub fn validate_principal_dot_account(input: &str) -> Option<String> {
     match string_to_account(input.to_string()) {
         Ok(account) => Some(account.to_principal_dot_account()),
-        Err(_) => {
-            match Account::from_str(input) {
-                Ok(account) => Some(account.to_principal_dot_account()),
-                Err(err) => {
-                    println!("{err:?}");
-                    None
-                }
+        Err(_) => match Account::from_str(input) {
+            Ok(account) => Some(account.to_principal_dot_account()),
+            Err(err) => {
+                println!("{err:?}");
+                None
             }
-        }
+        },
     }
 }
 #[cfg(test)]
@@ -93,7 +88,10 @@ mod tests {
             "yuijc-oiaaa-aaaap-ahezq-cai-7qfaeci.100000000000000000000000000000000000000000000000000000000000000";
         let expected =
             "yuijc-oiaaa-aaaap-ahezq-cai.0100000000000000000000000000000000000000000000000000000000000000";
-        assert_eq!(validate_principal_dot_account(input), Some(expected.to_string()));
+        assert_eq!(
+            validate_principal_dot_account(input),
+            Some(expected.to_string())
+        );
     }
 
     #[test]
@@ -102,7 +100,10 @@ mod tests {
             "yuijc-oiaaa-aaaap-ahezq-cai.100000000000000000000000000000000000000000000000000000000000000";
         let expected =
             "yuijc-oiaaa-aaaap-ahezq-cai.0100000000000000000000000000000000000000000000000000000000000000";
-        assert_eq!(validate_principal_dot_account(input), Some(expected.to_string()));
+        assert_eq!(
+            validate_principal_dot_account(input),
+            Some(expected.to_string())
+        );
     }
 
     #[test]
@@ -116,6 +117,9 @@ mod tests {
         let input = "yuijc-oiaaa-aaaap-ahezq-cai.1";
         let expected =
             "yuijc-oiaaa-aaaap-ahezq-cai.0000000000000000000000000000000000000000000000000000000000000001";
-        assert_eq!(validate_principal_dot_account(input), Some(expected.to_string()));
+        assert_eq!(
+            validate_principal_dot_account(input),
+            Some(expected.to_string())
+        );
     }
 }

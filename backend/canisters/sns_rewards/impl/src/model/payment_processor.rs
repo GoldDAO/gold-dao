@@ -1,12 +1,12 @@
-use std::collections::BTreeMap;
-use serde::{ Deserialize, Serialize };
+use ic_stable_structures::StableBTreeMap;
+use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::payment_round::{ PaymentRound, PaymentStatus };
+use sns_rewards_api_canister::payment_round::{PaymentRound, PaymentStatus};
+use std::collections::BTreeMap;
 use tracing::debug;
 use types::TokenSymbol;
-use ic_stable_structures::StableBTreeMap;
 
-use crate::memory::{ get_payment_round_history_memory, VM };
+use crate::memory::{get_payment_round_history_memory, VM};
 
 // ********************************
 //    Payment Processor
@@ -64,7 +64,7 @@ impl PaymentProcessor {
         &mut self,
         round_token: &TokenSymbol,
         neuron_id: &NeuronId,
-        new_status: PaymentStatus
+        new_status: PaymentStatus,
     ) {
         if let Some(round) = self.active_rounds.get_mut(round_token) {
             if let Some(payment) = round.payments.get_mut(neuron_id) {
@@ -88,11 +88,12 @@ impl PaymentProcessor {
     pub fn get_payment_round_history(
         &self,
         token: TokenSymbol,
-        id: u16
+        id: u16,
     ) -> Vec<(u16, PaymentRound)> {
-        let rounds = self.round_history
+        let rounds = self
+            .round_history
             .iter()
-            .filter(|((_, round_id), round)| { *round_id == id && round.token == token })
+            .filter(|((_, round_id), round)| *round_id == id && round.token == token)
             .map(|((_, round_id), payment_round)| (round_id, payment_round.clone()))
             .collect();
 
@@ -100,7 +101,10 @@ impl PaymentProcessor {
     }
 
     pub fn add_to_history(&mut self, payment_round: PaymentRound) {
-        self.round_history.insert((payment_round.token.clone(), payment_round.id), payment_round);
+        self.round_history.insert(
+            (payment_round.token.clone(), payment_round.id),
+            payment_round,
+        );
     }
 
     pub fn delete_active_round(&mut self, round_token: TokenSymbol) {
@@ -123,12 +127,12 @@ impl PaymentProcessor {
 mod tests {
     use std::collections::BTreeMap;
 
-    use candid::{ Nat, Principal };
+    use candid::{Nat, Principal};
     use sns_governance_canister::types::NeuronId;
     use sns_rewards_api_canister::payment_round::PaymentRound;
-    use types::{ TimestampMillis, TokenSymbol };
+    use types::{TimestampMillis, TokenSymbol};
 
-    use crate::state::{ init_state, mutate_state, read_state, RuntimeState };
+    use crate::state::{init_state, mutate_state, read_state, RuntimeState};
 
     fn init_runtime_state() {
         init_state(RuntimeState::default());
@@ -137,15 +141,15 @@ mod tests {
     #[test]
     fn test_key_incrementation() {
         init_runtime_state();
-        let neuron_id = NeuronId::new(
-            "2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98"
-        ).unwrap();
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
 
         let icp_token = TokenSymbol::parse("ICP").unwrap();
         let ogy_token = TokenSymbol::parse("OGY").unwrap();
         let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
 
-        mutate_state(|s|
+        mutate_state(|s| {
             s.data.payment_processor.add_to_history(PaymentRound {
                 id: 1,
                 round_funds_total: Nat::from(100u64),
@@ -158,8 +162,8 @@ mod tests {
                 payments: BTreeMap::default(),
                 retries: 0,
             })
-        );
-        mutate_state(|s|
+        });
+        mutate_state(|s| {
             s.data.payment_processor.add_to_history(PaymentRound {
                 id: 1,
                 round_funds_total: Nat::from(100u64),
@@ -172,13 +176,13 @@ mod tests {
                 payments: BTreeMap::default(),
                 retries: 0,
             })
-        );
+        });
 
         read_state(|s| {
             assert_eq!(s.data.payment_processor.next_key(), 2);
         });
 
-        mutate_state(|s|
+        mutate_state(|s| {
             s.data.payment_processor.add_to_history(PaymentRound {
                 id: 2,
                 round_funds_total: Nat::from(100u64),
@@ -191,13 +195,13 @@ mod tests {
                 payments: BTreeMap::default(),
                 retries: 0,
             })
-        );
+        });
 
         read_state(|s| {
             assert_eq!(s.data.payment_processor.next_key(), 3);
         });
 
-        mutate_state(|s|
+        mutate_state(|s| {
             s.data.payment_processor.add_to_history(PaymentRound {
                 id: 3,
                 round_funds_total: Nat::from(100u64),
@@ -210,8 +214,8 @@ mod tests {
                 payments: BTreeMap::default(),
                 retries: 0,
             })
-        );
-        mutate_state(|s|
+        });
+        mutate_state(|s| {
             s.data.payment_processor.add_to_history(PaymentRound {
                 id: 3,
                 round_funds_total: Nat::from(100u64),
@@ -224,7 +228,7 @@ mod tests {
                 payments: BTreeMap::default(),
                 retries: 0,
             })
-        );
+        });
 
         read_state(|s| {
             assert_eq!(s.data.payment_processor.next_key(), 4);

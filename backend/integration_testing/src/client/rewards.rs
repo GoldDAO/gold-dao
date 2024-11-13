@@ -1,4 +1,4 @@
-use crate::{ generate_pocket_query_call, generate_pocket_update_call };
+use crate::{generate_pocket_query_call, generate_pocket_update_call};
 
 use sns_rewards_api_canister::*;
 

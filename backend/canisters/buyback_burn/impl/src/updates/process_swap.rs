@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
-use ic_cdk::{ query, update };
 use canister_tracing_macros::trace;
+use ic_cdk::{query, update};
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]

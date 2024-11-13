@@ -36,7 +36,10 @@ define_function!(pub CallbackFunc : (Token) -> (HttpResponse) query);
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub enum StreamingStrategy {
-    Callback { callback: CallbackFunc, token: Token },
+    Callback {
+        callback: CallbackFunc,
+        token: Token,
+    },
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]

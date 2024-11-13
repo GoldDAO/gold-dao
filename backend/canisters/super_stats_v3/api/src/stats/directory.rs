@@ -1,4 +1,7 @@
-use ic_stable_memory::{ derive::{ StableType, AsFixedSizeBytes }, collections::SHashMap };
+use ic_stable_memory::{
+    collections::SHashMap,
+    derive::{AsFixedSizeBytes, StableType},
+};
 
 use crate::core::types::IDKey;
 
@@ -22,8 +25,12 @@ impl Directory {
                     None => {
                         // not handling result on inserts as
                         // id_bytes match handles 'entry exists already' scenario.
-                        self.id_to_ref.insert(key.clone(), self.next_ref).expect("Storage is full");
-                        self.ref_to_id.insert(self.next_ref, key).expect("Storage is full");
+                        self.id_to_ref
+                            .insert(key.clone(), self.next_ref)
+                            .expect("Storage is full");
+                        self.ref_to_id
+                            .insert(self.next_ref, key)
+                            .expect("Storage is full");
                         let ret = self.next_ref.clone();
                         self.next_ref += 1_u64;
                         return Some(ret);

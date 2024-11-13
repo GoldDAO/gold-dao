@@ -13,9 +13,9 @@ export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
 export const ICP_SWAP_CANISTER_ID = import.meta.env.VITE_ICP_SWAP_CANISTER_ID;
+export const GOLD_API_BASE_URL = import.meta.env.VITE_GOLD_API_BASE_URL;
 
 export const API_OGY_BASE_URL="https://api.origyn.com"
-export const GOLD_API_BASE_URL="https://price-history.api.bity.com"
 
 export const OGY_TX_FEE=200000
 export const GLDT_TX_FEE = 1000000;
@@ -25,6 +25,12 @@ export const GLDT_VALUE_1G_NFT = 100;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
+
+  if (!GOLD_API_BASE_URL)
+    console.log(
+      "No GOLD_API_BASE_URL environment variable. Set GOLD_API_BASE_URL environment variable."
+    );
+  else console.log(`GOLD_API_BASE_URL=${GOLD_API_BASE_URL}`);
 
   if (!GLD_NFT_1G_CANISTER_ID)
     console.log(

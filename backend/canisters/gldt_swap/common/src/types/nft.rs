@@ -1,23 +1,13 @@
 use std::borrow::Cow;
 
-use candid::{ CandidType, Decode, Encode, Nat };
-use ic_stable_structures::{ storable::Bound, Storable };
-use serde::{ Deserialize, Serialize };
+use candid::{CandidType, Decode, Encode, Nat};
+use ic_stable_structures::{storable::Bound, Storable};
+use serde::{Deserialize, Serialize};
 
 const MAX_NFT_ID_BYTE_SIZE: u32 = 40;
 
 #[derive(
-    CandidType,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Hash,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Default
+    CandidType, Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Default,
 )]
 pub struct NftID(pub Nat);
 
@@ -37,7 +27,7 @@ impl Storable for NftID {
 impl Into<[u8; 32]> for NftID {
     fn into(self) -> [u8; 32] {
         let mut array = [0u8; 32]; // Fixed length array
-        let bytes = self.0.0.to_bytes_le(); // Assuming `Nat` has a `to_bytes_le` method
+        let bytes = self.0 .0.to_bytes_le(); // Assuming `Nat` has a `to_bytes_le` method
         let len = bytes.len().min(array.len());
         array[..len].copy_from_slice(&bytes[..len]);
         array
