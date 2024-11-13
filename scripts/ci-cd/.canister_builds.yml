@@ -7,6 +7,7 @@ spec:
           'buyback_burn',
           'gldt_swap',
           'icp_neuron',
+          'usdg_minter',
           'management',
           'sns_neuron_controller',
           'sns_rewards',
