@@ -137,6 +137,7 @@ export const useForwardSwap = () => {
           const errRetry = new Error("Retry", {
             cause: { retryDelay: Math.round(retryDelay) },
           });
+          console.error(errRetry);
           throw errRetry;
         }
         throw new Error(
@@ -153,7 +154,7 @@ export const useForwardSwap = () => {
           );
         if ("err" in market_transfer_batch_nft_origyn_results) {
           const err = market_transfer_batch_nft_origyn_results.err;
-          console.log(err);
+          console.error(err);
           throw new Error(
             "Error when swapping GLD NFTs! Swap market transfer failed."
           );

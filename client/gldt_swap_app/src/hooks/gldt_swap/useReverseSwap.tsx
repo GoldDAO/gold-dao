@@ -121,6 +121,7 @@ export const useReverseSwap = () => {
 
       const swap = await Promise.allSettled(swapTasks);
 
+      console.log("all swaps", swap);
       // console.log("swap result:");
       // console.log(swap);
 
@@ -136,17 +137,20 @@ export const useReverseSwap = () => {
         swapFulfilled.some((swap) => "Err" in swap.value)
       ) {
         // console.error(swap);
-        const countErr = swapFulfilled.map(
-          (swap) => "Err" in swap.value
-        ).length;
-        const countSuccess = swapFulfilled.map(
-          (swap) => "Ok" in swap.value
-        ).length;
-        if (countSuccess === 0) {
-          throw new Error("Swap");
-        }
+        const { countErr, countSuccess } = swapFulfilled.reduce(
+          (acc, swap) => {
+            if ("Err" in swap.value) acc.countErr += 1;
+            else if ("Ok" in swap.value) acc.countSuccess += 1;
+            return acc;
+          },
+          { countErr: swapRejectedErrors.length, countSuccess: 0 }
+        );
+        if (countSuccess === 0) throw new Error("Swap");
+
         throw new Error(
-          `Reverse swap warning! ${countSuccess} swap tokens for NFT succeed and ${countErr} failed.`
+          `Warning! ${countSuccess} swap${
+            countSuccess > 1 ? "s" : ""
+          } succeeded and ${countErr} swap${countErr > 1 ? "s" : ""} failed.`
         );
       }
     },
