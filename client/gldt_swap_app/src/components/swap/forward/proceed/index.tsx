@@ -52,10 +52,6 @@ const Proceed = () => {
       onSuccess: () => {
         reset();
       },
-      onError: (err) => {
-        console.error(err);
-        reset();
-      },
     });
   };
 
