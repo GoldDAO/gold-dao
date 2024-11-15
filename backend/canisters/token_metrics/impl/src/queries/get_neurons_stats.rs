@@ -11,11 +11,14 @@ use crate::state::read_state;
 #[query]
 fn get_neurons_stats(principal: GetNeuronsStatsArgs) -> GetNeuronsStatsResponse {
     if let Some(prin) = principal {
-        let stats_by_principal = read_state(|state| state.data.principal_gov_stats.clone());
-        return stats_by_principal
-            .get(&prin)
-            .unwrap_or(&GovernanceStats::default())
-            .clone();
+        read_state(|state| {
+            let stats = &state.data.principal_gov_stats;
+
+            stats
+                .get(&prin)
+                .unwrap_or(GovernanceStats::default())
+                .clone()
+        })
     } else {
         read_state(|state| state.data.all_gov_stats.clone())
     }

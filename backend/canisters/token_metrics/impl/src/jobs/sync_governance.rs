@@ -3,17 +3,18 @@ use canister_time::{now_millis, run_now_then_interval, timestamp_seconds, DAY_IN
 use futures::future::join_all;
 use ic_cdk::api::call::RejectionCode;
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
-use sns_governance_canister::types::{neuron::DissolveState, Neuron, NeuronId};
+use sns_governance_canister::types::{neuron::DissolveState, Neuron, NeuronId, VecNeurons};
 use std::collections::BTreeMap as NormalBTreeMap;
 use std::time::Duration;
 use super_stats_v3_api::stats::constants::SECONDS_IN_ONE_YEAR;
 use token_metrics_api::token_data::{GovernanceStats, LockedNeuronsAmount};
 use tracing::{debug, error, info};
 use types::Milliseconds;
+use utils::principal::PrincipalDotAccountFormat;
 
 use crate::{
     jobs::{sync_supply_data, update_balance_list},
-    state::{mutate_state, read_state, PrincipalDotAccountFormat},
+    state::{mutate_state, read_state},
 };
 
 const SYNC_NEURONS_INTERVAL: Milliseconds = DAY_IN_MS;
@@ -25,6 +26,15 @@ pub fn start_job() {
 
 pub fn run() {
     ic_cdk::spawn(sync_neurons_data())
+}
+
+pub async fn commit_changes() {
+    let _ = ic_cdk::call::<(), ()>(
+        Principal::from_text("yfjcz-3iaaa-aaaap-accjq-cai").unwrap(),
+        "commit",
+        (),
+    )
+    .await;
 }
 
 pub async fn sync_neurons_data() {
@@ -47,7 +57,7 @@ pub async fn sync_neurons_data() {
     // We want new empty structures when re-computing the data, otherwise it will
     // sum up with data from previous job
     // Q: BTreeMap is a stable structure? Do we want that for a temp variable like this?
-    let mut temp_principal_with_neurons: NormalBTreeMap<Principal, Vec<NeuronId>> =
+    let mut temp_principal_with_neurons: NormalBTreeMap<Principal, VecNeurons> =
         NormalBTreeMap::new();
     let mut temp_principal_with_stats: NormalBTreeMap<Principal, GovernanceStats> =
         NormalBTreeMap::new();
@@ -103,6 +113,7 @@ pub async fn sync_neurons_data() {
         "Total rewards in the sns canister: {}",
         total_rewards_in_sns_canister
     );
+    commit_changes().await;
 
     mutate_state(|state| {
         state.data.sync_info.last_synced_end = now_millis();
@@ -114,8 +125,8 @@ pub async fn sync_neurons_data() {
         let locked_neurons_amount = &mut state.data.locked_neurons_amount;
 
         // Update the state with the newly computed data
-        principal_with_neurons.clear();
-        principal_with_stats.clear();
+        principal_with_neurons.clear_new();
+        principal_with_stats.clear_new();
         for (key, value) in temp_principal_with_neurons {
             principal_with_neurons.insert(key, value);
         }
@@ -127,8 +138,10 @@ pub async fn sync_neurons_data() {
 
         all_gov_stats.total_rewards += total_rewards_in_sns_canister;
     });
+    info!("I am after mutate_state");
 
     // After we have computed governance stats, update the total supply and circulating supply
+    // update_balance_list::run();
     sync_supply_data::run();
 }
 fn check_locked_neurons_period(
@@ -183,7 +196,7 @@ fn update_locked_neurons_amount(locked_neurons_amount: &mut LockedNeuronsAmount,
     }
 }
 fn update_principal_neuron_mapping(
-    principal_with_neurons: &mut NormalBTreeMap<Principal, Vec<NeuronId>>,
+    principal_with_neurons: &mut NormalBTreeMap<Principal, VecNeurons>,
     principal_with_stats: &mut NormalBTreeMap<Principal, GovernanceStats>,
     all_gov_stats: &mut GovernanceStats,
     neuron: &Neuron,
@@ -195,16 +208,16 @@ fn update_principal_neuron_mapping(
                 .entry(pid)
                 .and_modify(|neurons| {
                     if let Some(id) = &neuron.id {
-                        if !neurons.contains(id) {
-                            neurons.push(id.clone());
+                        if !neurons.0.contains(id) {
+                            neurons.0.push(id.clone());
                         }
                     }
                 })
                 .or_insert_with(|| {
                     if let Some(id) = &neuron.id {
-                        vec![id.clone()]
+                        VecNeurons(vec![id.clone()])
                     } else {
-                        vec![]
+                        VecNeurons(vec![])
                     }
                 });
 
@@ -285,6 +298,9 @@ async fn get_total_from_sns_rewards_canister() -> Nat {
     ];
 
     let results = join_all(getter_futures).await;
+    info!("/// get_total_from_sns_rewards_canister :: {results:?}");
+    let calc = results[0].clone() - results[1].clone() - results[2].clone();
+    info!("calc {calc:?}");
     return results[0].clone() - results[1].clone() - results[2].clone();
 }
 async fn get_super_stats_balance_of(account: String, is_subaccount: bool) -> Nat {

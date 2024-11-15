@@ -1,10 +1,11 @@
-use candid::CandidType;
+use candid::{CandidType, Decode, Encode};
 use ic_stable_memory::{
-    collections::{SBTreeMap, SVec},
+    collections::SBTreeMap,
     derive::{AsFixedSizeBytes, StableType},
 };
+use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
-use std::ops::Add;
+use std::{borrow::Cow, ops::Add};
 
 use crate::core::{runtime::RUNTIME_STATE, stable_memory::Main};
 
@@ -48,10 +49,10 @@ impl AccountTree {
 
         let fee: u128;
         if let Some(f) = stx.fee {
-            fee = f
+            fee = f;
         } else {
-            fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee())
-        };
+            fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee());
+        }
 
         // This needs to find the last day available for this account
         if !self.accounts_history.contains_key(&account_history_key) {
@@ -155,15 +156,16 @@ impl AccountTree {
             Some(mut ac) => {
                 let fee: u128;
                 if let Some(f) = stx.fee {
-                    fee = f
+                    fee = f;
                 } else {
-                    fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee())
-                };
+                    fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee());
+                }
                 ac.debit_account(stx.time, stx.value, fee);
                 return Ok("Processed OK".to_string());
             }
             None => {
-                let error = format!("Error - cannot send from a non-existent account (process_transfer_from), Block: {}", stx);
+                let error =
+                    format!("Error - cannot send from a non-existent account (process_transfer_from), Block: {}", stx);
                 return Err(error);
             }
         }
@@ -181,10 +183,10 @@ impl AccountTree {
             Some(mut ac) => {
                 let fee: u128;
                 if let Some(f) = stx.fee {
-                    fee = f
+                    fee = f;
                 } else {
-                    fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee())
-                };
+                    fee = RUNTIME_STATE.with(|s| s.borrow().data.get_ledger_fee());
+                }
                 ac.debit_account(stx.time, 0, fee);
                 return Ok("Approve Processed".to_string());
             }
@@ -192,7 +194,7 @@ impl AccountTree {
                 return Err(
                     "Error - cannot send from a non-existent account (process_approve_from)"
                         .to_string(),
-                )
+                );
             }
         }
     }
@@ -217,6 +219,20 @@ impl Add for HistoryData {
         }
     }
 }
+impl Storable for HistoryData {
+    const BOUND: Bound = Bound::Bounded {
+        max_size: 32,
+        is_fixed_size: false,
+    };
+
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(&bytes, Self).unwrap()
+    }
+}
 #[derive(
     CandidType, StableType, Deserialize, Serialize, Clone, Default, AsFixedSizeBytes, Copy, Debug,
 )]
@@ -231,10 +247,10 @@ pub struct Overview {
 impl Overview {
     pub fn debit_account(&mut self, time: u64, value: u128, tx_fee: u128) {
         if self.first_active == 0 || time < self.first_active {
-            self.first_active = time
+            self.first_active = time;
         }
         if self.last_active < time {
-            self.last_active = time
+            self.last_active = time;
         }
 
         // update balances
@@ -248,10 +264,10 @@ impl Overview {
 
     pub fn credit_account(&mut self, time: u64, value: u128) {
         if self.first_active == 0 || time < self.first_active {
-            self.first_active = time
+            self.first_active = time;
         }
         if self.last_active < time {
-            self.last_active = time
+            self.last_active = time;
         }
 
         // update balances
@@ -308,9 +324,13 @@ impl Main {
                     };
                     return Some(ov);
                 }
-                None => return None,
+                None => {
+                    return None;
+                }
             },
-            None => return None,
+            None => {
+                return None;
+            }
         }
     }
 
@@ -327,7 +347,9 @@ impl Main {
                 };
                 return Some(ov);
             }
-            None => return None,
+            None => {
+                return None;
+            }
         }
     }
 }

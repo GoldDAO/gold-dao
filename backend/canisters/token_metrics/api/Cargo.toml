@@ -11,7 +11,9 @@ inttest = []
 candid = { workspace = true }
 icrc-ledger-types = { workspace = true }
 ic-ledger-types = { workspace = true }
+ic-stable-structures = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 super_stats_v3_api = { path = "../../../canisters/super_stats_v3/api" }
+sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }

@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.5] - 2024-11-15
+
+#### Changed
+
+- **State**: Updated most of the data variable to use stable instead of heap memory, using `ic_stable_structures`.
+
 ### [1.0.4] - 2024-09-25
 
 #### New

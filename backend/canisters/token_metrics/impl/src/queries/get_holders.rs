@@ -6,32 +6,35 @@ pub use token_metrics_api::queries::get_holders::{
 
 #[query]
 fn get_holders(args: GetHoldersArgs) -> GetHoldersResponse {
-    let mut result = Vec::new();
-    let mut current_offset = args.offset;
-    let list = read_state(|state| {
-        if args.merge_accounts_to_principals {
-            state.data.merged_wallets_list.clone()
+    let response = read_state(|state| {
+        let list = if args.merge_accounts_to_principals {
+            &state.data.merged_wallets_list
         } else {
-            state.data.wallets_list.clone()
+            &state.data.wallets_list
+        };
+
+        let mut current_offset = args.offset;
+        let mut result = Vec::new();
+
+        for entry in list.iter() {
+            if current_offset > 0 {
+                current_offset -= 1;
+                continue;
+            }
+
+            if result.len() >= (args.limit as usize) {
+                break;
+            }
+
+            result.push((entry.0, entry.1));
         }
+        result
     });
-    for (key, value) in list.iter() {
-        if current_offset > 0 {
-            current_offset -= 1;
-            continue;
-        }
-
-        if result.len() >= (args.limit as usize) {
-            break;
-        }
-
-        result.push((key.clone(), value.clone()));
-    }
 
     GetHoldersResponse {
-        data: result,
+        data: response.clone(),
         current_offset: args.offset,
         limit: args.limit,
-        total_count: list.len(),
+        total_count: response.len() as usize,
     }
 }

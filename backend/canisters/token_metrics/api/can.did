@@ -3,6 +3,8 @@ type ActiveUsers = record {
   active_principals_count : nat64;
   active_accounts_count : nat64;
 };
+type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type GetHoldersArgs = record {
   offset : nat64;
   limit : nat64;
@@ -27,9 +29,12 @@ type InitArgs = record {
   test_mode : bool;
   foundation_accounts : vec text;
   treasury_account : text;
+  version : BuildVersion;
   sns_rewards_canister_id : principal;
   ogy_new_ledger_canister_id : principal;
+  commit_hash : text;
   super_stats_canister_id : principal;
+  gldt_ledger_canister_id : principal;
   sns_governance_canister_id : principal;
 };
 type LockedNeuronsAmount = record {
@@ -56,12 +61,13 @@ type ProposalsMetrics = record {
   total_proposals : nat64;
 };
 type TokenSupplyData = record { circulating_supply : nat; total_supply : nat };
+type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 type WalletOverview = record {
   total : nat64;
   ledger : Overview;
   governance : GovernanceStats;
 };
-service : (InitArgs) -> {
+service : (Args) -> {
   get_active_users_count : () -> (ActiveUsers) query;
   get_all_neuron_owners : () -> (vec principal) query;
   get_foundation_assets : () -> (vec record { text; WalletOverview }) query;
