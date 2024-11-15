@@ -10,11 +10,12 @@ use crate::state::read_state;
 fn get_voting_participation_history(
     args: GetVotingParticipationArgs,
 ) -> GetVotingParticipationHistory {
-    let voting_participation_history =
-        read_state(|state| state.data.voting_participation_history.clone());
-    let history = voting_participation_history.into_iter().collect();
+    read_state(|state| {
+        let data = &state.data.voting_participation_history;
 
-    let mut filled_history = fill_missing_days(history, args.days, 0u64);
-    let ret = filled_history.split_off(filled_history.len() - (args.days as usize));
-    return ret;
+        let history = data.iter().collect();
+
+        let mut filled_history = fill_missing_days(history, args.days, 0u64);
+        filled_history.split_off(filled_history.len() - (args.days as usize))
+    })
 }

@@ -1,4 +1,4 @@
-use super_stats_v3_api::account_tree::HistoryData;
+use crate::token_data::GovHistoryEntry;
 
 pub type Args = usize;
-pub type Response = Vec<(u64, HistoryData)>;
+pub type Response = Vec<GovHistoryEntry>;

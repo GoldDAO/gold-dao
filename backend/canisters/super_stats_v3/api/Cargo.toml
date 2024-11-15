@@ -9,5 +9,6 @@ ic-cdk = { workspace = true }
 candid = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }
+ic-stable-structures = { workspace = true }
 ic-stable-memory = "0.4.4"
 hex = "0.4.2"

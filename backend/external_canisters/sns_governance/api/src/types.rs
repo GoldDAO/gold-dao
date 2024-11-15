@@ -1,9 +1,10 @@
-use candid::CandidType;
+use candid::{CandidType, Decode, Encode};
 use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
     fmt::{self, Display, Formatter},
+    u32,
 };
 
 /// A principal with a particular set of permissions over a neuron.
@@ -93,6 +94,33 @@ impl<'a> From<NeuronId> for [u8; 32] {
 impl From<[u8; 32]> for NeuronId {
     fn from(value: [u8; 32]) -> Self {
         Self { id: value.to_vec() }
+    }
+}
+#[derive(
+    CandidType,
+    Serialize,
+    Deserialize,
+    Eq,
+    std::hash::Hash,
+    Clone,
+    PartialEq,
+    PartialOrd,
+    Ord,
+    Debug,
+    Default,
+)]
+pub struct VecNeurons(pub Vec<NeuronId>);
+
+impl Storable for VecNeurons {
+    const BOUND: Bound = Bound::Unbounded;
+
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(&self.0).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let neurons: Vec<NeuronId> = Decode!(&bytes, Vec<NeuronId>).unwrap();
+        Self(neurons)
     }
 }
 
@@ -1887,14 +1915,18 @@ pub struct GetMaturityModulationResponse {
     pub maturity_modulation: Option<governance::MaturityModulation>,
 }
 /// A Ledger subaccount.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize, Debug)]
+#[derive(
+    candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize, Debug, PartialOrd, Eq, Ord,
+)]
 pub struct Subaccount {
     pub subaccount: Vec<u8>,
 }
 /// A Ledger account identified by the owner of the account `of` and
 /// the `subaccount`. If the `subaccount` is not specified then the default
 /// one is used.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize, Debug)]
+#[derive(
+    candid::CandidType, candid::Deserialize, Clone, PartialEq, Serialize, Debug, PartialOrd, Eq, Ord,
+)]
 pub struct Account {
     /// The owner of the account.
     pub owner: Option<candid::Principal>,
@@ -1902,6 +1934,22 @@ pub struct Account {
     /// subaccount (all bytes set to 0) is used.
     pub subaccount: Option<Subaccount>,
 }
+
+impl Storable for Account {
+    const BOUND: Bound = Bound::Bounded {
+        max_size: 100,
+        is_fixed_size: false,
+    };
+
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(&bytes, Self).unwrap()
+    }
+}
+
 /// The different types of neuron permissions, i.e., privileges to modify a neuron,
 /// that principals can have.
 #[derive(

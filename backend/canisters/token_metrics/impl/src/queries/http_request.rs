@@ -35,6 +35,20 @@ fn http_request(request: HttpRequest) -> HttpResponse {
         build_json_response(&result_float)
     }
 
+    fn get_gldt_total_supply(state: &RuntimeState) -> HttpResponse {
+        let result = state.data.gldt_supply_data.total_supply.clone();
+        let result_u64: u64 = result.0.try_into().unwrap_or(0);
+        let result_float: f64 = (result_u64 as f64) / 1e8;
+        build_json_response(&result_float)
+    }
+
+    fn get_gldt_circulating_supply(state: &RuntimeState) -> HttpResponse {
+        let result = state.data.gldt_supply_data.circulating_supply.clone();
+        let result_u64: u64 = result.0.try_into().unwrap_or(0);
+        let result_float: f64 = (result_u64 as f64) / 1e8;
+        build_json_response(&result_float)
+    }
+
     fn get_gold_nft_metrics() -> HttpResponse {
         let total_gold_grams = read_state(|s| s.data.total_gold_grams.clone());
         info!("total_gold_grams : {total_gold_grams:?}");
@@ -67,6 +81,12 @@ fn http_request(request: HttpRequest) -> HttpResponse {
             }
             if path == "circulating-supply" {
                 return read_state(get_circulating_supply);
+            }
+            if path == "gldt/total-supply" {
+                return read_state(get_gldt_total_supply);
+            }
+            if path == "gldt/circulating-supply" {
+                return read_state(get_gldt_circulating_supply);
             } else {
                 HttpResponse::not_found()
             }

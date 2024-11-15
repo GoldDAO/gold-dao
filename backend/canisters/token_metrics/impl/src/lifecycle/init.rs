@@ -42,6 +42,7 @@ fn init(args: Args) {
             let data = Data::new(
                 gold_nft_canister,
                 init_args.ogy_new_ledger_canister_id,
+                init_args.gldt_ledger_canister_id,
                 init_args.sns_governance_canister_id,
                 init_args.super_stats_canister_id,
                 init_args.sns_rewards_canister_id,
