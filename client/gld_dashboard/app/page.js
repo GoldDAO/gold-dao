@@ -12,6 +12,7 @@ import useTokenMetrics from '../hooks/useTokenMetrics';
 import useSuperStats from '../hooks/useSuperStats';
 import { fetchBurnData } from '../services/icpApi';
 import useCharts from '../hooks/useCharts';
+import useServices from '../hooks/useServices';
 
 export const viewport = {
   themeColor: '#c6c6c6',
@@ -25,6 +26,7 @@ export default function Home() {
   } = useSuperStats();
   const { setBurnData } = useCharts();
   fetchBurnData();
+  const { getTreasuryChart } = useServices();
 
   useEffect(() => {
     let metaTag = document.querySelector('meta[name="theme-color"]');
@@ -48,6 +50,7 @@ export default function Home() {
         getRewardPool(),
         getReservePool(),
         getSNSFundCanister(),
+        getTreasuryChart(),
       ]);
 
       setBurnData(burnData.value ?? []);

@@ -1,14 +1,14 @@
 use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
+use ic_stable_structures::{StableBTreeMap, StableVec};
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::{NeuronId, ProposalId};
-use std::collections::BTreeMap;
+use sns_governance_canister::types::{NeuronId, ProposalId, VecNeurons};
 use super_stats_v3_api::account_tree::HistoryData;
 use token_metrics_api::token_data::{
-    ActiveUsers, DailyVotingMetrics, GovernanceStats, LockedNeuronsAmount, PrincipalBalance,
-    ProposalsMetrics, ProposalsMetricsCalculations, TokenSupplyData, VotingHistoryCalculations,
-    WalletOverview,
+    ActiveUsers, DailyVotingMetrics, GovHistoryEntry, GovernanceStats, LockedNeuronsAmount,
+    PrincipalBalance, ProposalsMetrics, ProposalsMetricsCalculations, TokenSupplyData,
+    VotingHistoryCalculations, WalletEntry, WalletOverview,
 };
 use types::{BuildVersion, CanisterId, TimestampMillis};
 use utils::{
@@ -17,6 +17,12 @@ use utils::{
 };
 
 canister_state!(RuntimeState);
+
+use crate::memory::{
+    init_balance_list, init_daily_voting_metrics, init_gov_stake_history, init_merged_wallet_list,
+    init_pricipal_gov_stats, init_principal_neurons, init_voting_participation_history,
+    init_voting_participation_history_calculations, init_wallet_list, VM,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct RuntimeState {
@@ -41,7 +47,7 @@ impl RuntimeState {
                 commit_hash: self.env.commit_hash().to_string(),
             },
             sync_info: self.data.sync_info.clone(),
-            number_of_owners: self.data.principal_neurons.len(),
+            number_of_owners: self.data.principal_neurons.len() as usize,
             sns_governance_canister: self.data.sns_governance_canister,
             sns_ledger_canister: self.data.sns_ledger_canister,
             sync_config: SyncConfig {
@@ -108,6 +114,8 @@ pub struct Data {
     pub sns_governance_canister: Principal,
     /// SNS ledger canister
     pub sns_ledger_canister: Principal,
+    /// GLDT ledger canister
+    pub gldt_ledger_canister: Principal,
     /// SNS Rewards canister that distirbutes rewards
     pub sns_rewards_canister: Principal,
     /// Super Stats canister that provides ledger stats
@@ -117,21 +125,29 @@ pub struct Data {
     /// Information about governance neurons sync
     pub sync_info: SyncInfo,
     /// Stores the mapping of each principal to its neurons
-    pub principal_neurons: BTreeMap<Principal, Vec<NeuronId>>,
+    #[serde(skip, default = "init_principal_neurons")]
+    pub principal_neurons: StableBTreeMap<Principal, VecNeurons, VM>,
     /// Stores governance stats by principal
-    pub principal_gov_stats: BTreeMap<Principal, GovernanceStats>,
+    #[serde(skip, default = "init_pricipal_gov_stats")]
+    pub principal_gov_stats: StableBTreeMap<Principal, GovernanceStats, VM>,
     /// Balance list containing all principals, with their governance and
     /// ledger balances, updated every 1hr
-    pub balance_list: BTreeMap<Principal, PrincipalBalance>,
-    /// Token supply data, such as total supply and circulating supply
+    #[serde(skip, default = "init_balance_list")]
+    pub balance_list: StableBTreeMap<Principal, PrincipalBalance, VM>,
+    /// Token supply data, such as total supply and circulating supply, for GoldGov
     pub supply_data: TokenSupplyData,
+    /// Token supply data, such as total supply and circulating supply, for GLDT
+    pub gldt_supply_data: TokenSupplyData,
     /// The list of all principals from ledger and governance, including their stats
-    pub wallets_list: Vec<(Account, WalletOverview)>,
+    #[serde(skip, default = "init_wallet_list")]
+    pub wallets_list: StableVec<WalletEntry, VM>,
     /// Same thing as above, but we now merge all subaccounts stats of a principal
     /// under the same principal item in the Map
-    pub merged_wallets_list: Vec<(Account, WalletOverview)>,
+    #[serde(skip, default = "init_merged_wallet_list")]
+    pub merged_wallets_list: StableVec<WalletEntry, VM>,
     /// Staking history for governance
-    pub gov_stake_history: Vec<(u64, HistoryData)>,
+    #[serde(skip, default = "init_gov_stake_history")]
+    pub gov_stake_history: StableVec<GovHistoryEntry, VM>,
     /// These accounts hold the tokens in hand of foundation, passed as init args
     pub foundation_accounts: Vec<String>,
     /// Holds the total value of tokens in hand of foundation
@@ -143,11 +159,15 @@ pub struct Data {
     /// Used to calculate proposals_metrics
     pub proposals_metrics_calculations: ProposalsMetricsCalculations,
     /// Daily metrics for org voting power / total voting power and voting participation
-    pub daily_voting_metrics: BTreeMap<u64, DailyVotingMetrics>,
+    #[serde(skip, default = "init_daily_voting_metrics")]
+    pub daily_voting_metrics: StableBTreeMap<u64, DailyVotingMetrics, VM>,
     /// Voting Participation History, (days, u64 as percentage)
-    pub voting_participation_history: BTreeMap<u64, u64>,
+    #[serde(skip, default = "init_voting_participation_history")]
+    pub voting_participation_history: StableBTreeMap<u64, u64, VM>,
     /// Used to calculate voting_participation_history
-    pub voting_participation_history_calculations: BTreeMap<u64, VotingHistoryCalculations>,
+    #[serde(skip, default = "init_voting_participation_history_calculations")]
+    pub voting_participation_history_calculations:
+        StableBTreeMap<u64, VotingHistoryCalculations, VM>,
     /// Ratio foundation's voting power and total voting power (day, u64 as percentage)
     pub voting_power_ratio_history: Vec<(u64, u64)>,
     /// Active users = users with > 0 OGY in their wallet
@@ -158,6 +178,7 @@ impl Data {
     pub fn new(
         gold_nft_canisters: Vec<(Principal, u128)>,
         ogy_new_ledger: CanisterId,
+        gldt_ledger: CanisterId,
         sns_governance_canister_id: CanisterId,
         super_stats_canister_id: CanisterId,
         sns_rewards_canister_id: CanisterId,
@@ -171,45 +192,49 @@ impl Data {
             super_stats_canister: super_stats_canister_id,
             sns_governance_canister: sns_governance_canister_id,
             sns_ledger_canister: ogy_new_ledger,
+            gldt_ledger_canister: gldt_ledger,
             sns_rewards_canister: sns_rewards_canister_id,
             treasury_account,
             foundation_accounts,
             foundation_accounts_data: Vec::new(),
             authorized_principals: vec![sns_governance_canister_id],
-            principal_neurons: BTreeMap::new(),
-            principal_gov_stats: BTreeMap::new(),
-            wallets_list: Vec::new(),
+            principal_neurons: init_principal_neurons(),
+            principal_gov_stats: init_pricipal_gov_stats(),
+            wallets_list: init_wallet_list(),
             voting_power_ratio_history: Vec::new(),
-            merged_wallets_list: Vec::new(),
-            voting_participation_history: BTreeMap::new(),
-            voting_participation_history_calculations: BTreeMap::new(),
-            balance_list: BTreeMap::new(),
+            merged_wallets_list: init_merged_wallet_list(),
+            voting_participation_history: init_voting_participation_history(),
+            voting_participation_history_calculations:
+                init_voting_participation_history_calculations(),
+            balance_list: init_balance_list(),
             all_gov_stats: GovernanceStats::default(),
             supply_data: TokenSupplyData::default(),
+            gldt_supply_data: TokenSupplyData::default(),
             sync_info: SyncInfo::default(),
-            gov_stake_history: Vec::new(),
+            gov_stake_history: init_gov_stake_history(),
             locked_neurons_amount: LockedNeuronsAmount::default(),
             porposals_metrics: ProposalsMetrics::default(),
             proposals_metrics_calculations: ProposalsMetricsCalculations::default(),
-            daily_voting_metrics: BTreeMap::new(),
+            daily_voting_metrics: init_daily_voting_metrics(),
             active_users: ActiveUsers::default(),
         }
     }
 
     pub fn update_foundation_accounts_data(&mut self) {
         let mut temp_foundation_accounts_data: Vec<(String, WalletOverview)> = Vec::new();
-        for (account, wallet_overview) in &self.wallets_list {
+        for entry in self.wallets_list.iter() {
             if self
                 .foundation_accounts
-                .contains(&account.to_principal_dot_account())
+                .contains(&entry.0.to_principal_dot_account())
             {
                 temp_foundation_accounts_data
-                    .push((account.to_principal_dot_account(), wallet_overview.clone()));
+                    .push((entry.0.to_principal_dot_account(), entry.1.clone()));
             }
         }
         self.foundation_accounts_data = temp_foundation_accounts_data;
     }
 }
+
 pub trait PrincipalDotAccountFormat {
     fn to_principal_dot_account(&self) -> String;
 }

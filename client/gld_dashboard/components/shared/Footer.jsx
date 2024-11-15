@@ -60,10 +60,10 @@ export default function Footer() {
           <div className="w-[100%] sm:w-[40%] mb-10">
             <div className="flex items-center justify-start sm:px-2">
               <Link href={'/'} className='hidden sm:block'>
-                <img src="svg/logo-full.svg" alt="" class="w-[188px]" />
+                <img src="svg/logo-full.svg" alt="" className="w-[188px]" />
               </Link>
               <Link href={'/'} className='sm:hidden'>
-                <img src="svg/logo-full.svg" alt="" class="w-[149px]" />
+                <img src="svg/logo-full.svg" alt="" className="w-[149px]" />
               </Link>
             </div>
           </div>
