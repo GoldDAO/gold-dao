@@ -308,7 +308,7 @@ const OverviewTable = () => {
               <h4>GLDGov Treasury</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='GLDGov tokens which are at the disposition of the Gold DAO SNS DAO, allocated by the Gold DAO decentralization swap.'
+                  content="GLDGov tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products."
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
