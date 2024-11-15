@@ -23,25 +23,15 @@ pub fn run() {
 pub async fn sync_supply_data() {
     let ledger_canister_id = read_state(|state| state.data.sns_ledger_canister);
 
+    // Get the total supply of GoldGov
     match icrc_ledger_canister_c2c_client::icrc1_total_supply(ledger_canister_id).await {
         Ok(total_supply) => {
-            let foundation_account_strings =
-                read_state(|state| state.data.foundation_accounts.clone());
+            let treasury_acocunt_string = read_state(|state| state.data.treasury_account.clone());
 
-            let mut foundation_accounts = Vec::new();
-            for account_str in foundation_account_strings {
-                match string_to_account(account_str) {
-                    Ok(account) => {
-                        foundation_accounts.push(account);
-                    }
-                    Err(err) => error!(err),
-                }
-            }
-
-            foundation_accounts.extend_from_slice(&TEAM_PRINCIPALS);
-            let total_foundation_balance =
-                get_total_ledger_balance_of_accounts(foundation_accounts).await;
-            let circulating_supply = total_supply.clone() - total_foundation_balance;
+            let treasury_account = string_to_account(treasury_acocunt_string)
+                .expect("Treasury account provided as init arg is invalid!");
+            let non_circulating_balance = get_ledger_balance_of(treasury_account).await;
+            let circulating_supply = total_supply.clone() - non_circulating_balance;
 
             mutate_state(|state| {
                 state.data.supply_data.total_supply = total_supply.clone();
@@ -50,7 +40,30 @@ pub async fn sync_supply_data() {
         }
         Err(err) => {
             let message = format!("{err:?}");
-            error!(?message, "Error while getting the total supply data");
+            error!(
+                ?message,
+                "Error while getting the total supply data for GoldGov"
+            );
+        }
+    }
+
+    let gldt_canister_id = read_state(|state| state.data.gldt_ledger_canister);
+
+    // Get the total supply of GLDT
+    match icrc_ledger_canister_c2c_client::icrc1_total_supply(gldt_canister_id).await {
+        Ok(total_supply) => {
+            mutate_state(|state| {
+                state.data.gldt_supply_data.total_supply = total_supply.clone();
+                // Update the calculations for GLDT
+                state.data.gldt_supply_data.circulating_supply = total_supply.clone();
+            });
+        }
+        Err(err) => {
+            let message = format!("{err:?}");
+            error!(
+                ?message,
+                "Error while getting the total supply data for GLDT"
+            );
         }
     }
 }

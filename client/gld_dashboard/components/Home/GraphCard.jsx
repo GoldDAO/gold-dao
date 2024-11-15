@@ -11,19 +11,20 @@ import { data1 } from '../../utils/datas';
 import { parseNumbers } from '../../utils/parsers';
 import useServices from '../../hooks/useServices';
 import useCharts from '../../hooks/useCharts';
+// import { treasuryData } from '../../services/icpApi';
 
 export default function Graphs() {
   const [burnAmount, setBurnedAmount] = useState();
   const [liquidAmount, setLiquidAmount] = useState();
   const [holdersAmount, setHoldersAmount] = useState();
-  const [treasuryAmount, setTreasuryAmount] = useState();
+  const [treasuryAmount] = useState();
   const [stakedAmount, setStakedAmount] = useState();
   const [selectedTab, setSelectedTab] = useState('Treasury');
-  const { getSupplyChart, getTreasuryChart, gldGovTreasury } = useServices();
+  const { getSupplyChart, getTreasuryChart } = useServices();
   const {
     stakersData, holdersData, burnData, gldGovSupply,
     setLiquidChartData, liquidData, rewardPoolData,
-    reservePoolData, gldGovTreasury: gldGovTreasuryData, snsFundData,
+    reservePoolData, gldGovTreasury: gldGovTreasuryData,
   } = useCharts();
   const [amount, setAmount] = useState();
   const [, setInfoModal] = useState(null);
@@ -39,40 +40,20 @@ export default function Graphs() {
 
   const deriveLiquidData = (
     gldgovSupply,
-    staked,
-    rewardPool,
-    reservePool,
     treasuryData,
-    snsFund,
   ) => {
     const liquid = gldgovSupply.map(({ label: supplyLabel, value }) => {
-      const stakedValue = staked.find(
-        ({ label }) => label === supplyLabel,
-      );
-      const rewardPoolValue = rewardPool.find(
-        ({ label }) => label === supplyLabel,
-      );
-      const reservePoolValue = reservePool.find(
-        ({ label }) => label === supplyLabel,
-      );
       const treasuryValue = treasuryData.find(
         ({ label }) => label === supplyLabel,
       );
-      const snsFundValue = snsFund.find(
-        ({ label }) => label === supplyLabel,
-      );
-      if (!stakedValue || !rewardPoolValue
-        || !reservePoolValue || !treasuryValue || !snsFundValue) {
+
+      if (!treasuryValue) {
         return null;
       }
 
       return {
         label: supplyLabel,
-        value: (((value - (stakedValue?.value ?? 0))
-        - (rewardPoolValue?.value ?? 0))
-        - (reservePoolValue?.value ?? 0))
-        - (treasuryValue?.value ?? 0)
-        - (snsFundValue?.value ?? 0),
+        value: value - (treasuryValue?.value ?? 0),
       };
     });
 
@@ -82,26 +63,15 @@ export default function Graphs() {
   };
 
   useEffect(() => {
-    if (gldGovSupply?.data.length && stakersData?.data.length
-      && rewardPoolData?.data.length && reservePoolData?.data.length
-      && gldGovTreasuryData?.data.length && snsFundData?.data.length) {
+    if (gldGovSupply?.data.length && gldGovTreasuryData?.data.length) {
       deriveLiquidData(
         gldGovSupply.data,
-        stakersData.data,
-        rewardPoolData.data,
-        reservePoolData.data,
         gldGovTreasuryData.data,
-        snsFundData.data,
       );
     }
   }, [
-    stakersData?.data, stakersData?.data.length, stakersData.loading,
     gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading,
-    rewardPoolData.loading, rewardPoolData?.data, rewardPoolData?.data.length,
-    reservePoolData.loading, reservePoolData?.data, reservePoolData?.data.length,
     gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
-    snsFundData.loading, snsFundData?.data, snsFundData?.data.length,
-
   ]);
 
   useEffect(() => {
@@ -121,10 +91,9 @@ export default function Graphs() {
 
       try {
         if (selectedTab === 'Treasury') {
-          const result = await gldGovTreasury();
-          setTreasuryAmount(result);
-          setInfoModal(result);
-          setAmount(result);
+          // setTreasuryAmount(result);
+          // setInfoModal(result);
+          setAmount(gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value);
         }
         if (selectedTab === 'Staked' && !stakersData?.loading) {
           setAmount(stakersData.data[stakersData.data.length - 1].value);

@@ -5,5 +5,5 @@ use crate::state::read_state;
 
 #[query]
 fn get_all_neuron_owners() -> GetAllNeuronOwnersResponse {
-    read_state(|state| state.data.principal_neurons.keys().cloned().collect())
+    read_state(|state| state.data.principal_neurons.iter().map(|n| n.0).collect())
 }

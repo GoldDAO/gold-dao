@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.10] - 2024-11-14
+
+#### Improvements
+
+- **Update Chart Descriptions**: descriptions on the charts are now more in line with what the charts display. 
+- **Update Liquid Chart**: Display the liquid chart as circulating supply minus treasury as per industry standard.
+
 ### [1.0.9] - 2024-10-29
 
 #### Fixed

@@ -213,7 +213,7 @@ const OverviewItem = ({
       value: `${parseNumbers(gldGovTreasury)} GLDGov`,
       style: '-top-20 -left-0',
       tooltip:
-        'GLDGov tokens which are at the disposition of the Gold DAO SNS DAO, allocated by the Gold DAO decentralization swap.',
+        "GLDGov tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products.",
     },
   ];
   return (
