@@ -30,9 +30,9 @@ export default function MaintenanceLayout() {
           <body className={`${inter.className} flex h-screen bg-white text-black`}>
             <section className="w-full overflow-y-scroll flex flex-col justify-between ">
               <div className="flex py-16  justify-center text-center align-center items-center flex-col">
-                <img src="svg/logo-full.svg" alt="" class="w-[188px]" />
-                <h2 class="font-bold">Site is under maintenance.</h2>
-                <p class="mt-3">We&apos;re just upgrading the site. We&apos;ll be back very soon.</p>
+                <img src="svg/logo-full.svg" alt="" className="w-[188px]" />
+                <h2 className="font-bold">Site is under maintenance.</h2>
+                <p className="mt-3">We&apos;re just upgrading the site. We&apos;ll be back very soon.</p>
               </div>
               <Footer />
             </section>
