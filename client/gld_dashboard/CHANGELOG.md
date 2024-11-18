@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.11] - 2024-11-18
+
+#### Fixes
+
+- **Fix treasury chart**: On mobile devices, there was a bug when showing the treasury amount, this has now been fixed. 
+
 ### [1.0.10] - 2024-11-14
 
 #### Improvements
