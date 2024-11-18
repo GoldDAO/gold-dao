@@ -25,5 +25,4 @@ backend/canisters/gldt_swap/api/declarations.zip
 console.log
 /CHANGELOG.md
 .cargo
-backend/integration_testing/pocket-ic
 proptest-regressions
