@@ -1,10 +1,13 @@
-use crate::numeric::{GLDT, USDG};
+use crate::numeric::{GoldPrice, GLDT, USDG};
 use crate::transfer::{PendingTransfer, TransferId, Unit};
 use crate::vault::{FeeBucket, Vault, VaultId};
+use crate::{DEFAULT_GOLD_PRICE, MINIMUM_COLLATERAL_RATIO};
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
+use usdg_minter_api::lifecycle::InitArgument;
+use usdg_minter_api::VaultError;
 
 #[cfg(test)]
 pub mod tests;
@@ -26,6 +29,9 @@ pub struct State {
     // Pending transfers to be processed
     pub pending_transfers: BTreeMap<TransferId, PendingTransfer>,
 
+    // 0.01g of gold price in USD
+    pub one_centigram_of_gold_price: GoldPrice,
+
     // Canister ids
     pub usdg_ledger_id: Principal,
     pub gldt_ledger_id: Principal,
@@ -34,6 +40,42 @@ pub struct State {
 }
 
 impl State {
+    pub fn new(init_arg: InitArgument) -> State {
+        State {
+            next_vault_id: 0,
+            next_transfer_id: 0,
+            fee_bucket_to_vault_ids: Default::default(),
+            account_to_vault_ids: Default::default(),
+            vault_id_to_vault: Default::default(),
+            pending_transfers: Default::default(),
+            one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
+            usdg_ledger_id: init_arg.usdg_ledger_id,
+            gldt_ledger_id: init_arg.gldt_ledger_id,
+            gold_dao_governance_id: init_arg.gold_dao_governance_id,
+            xrc_id: init_arg.xrc_id,
+        }
+    }
+
+    pub fn check_open_vault_args_validity(
+        &self,
+        gldt_margin: GLDT,
+        usdg_borrowed: USDG,
+    ) -> Result<(), VaultError> {
+        let max_borrowable_amount = gldt_margin
+            .checked_mul_rate(self.one_centigram_of_gold_price)
+            .unwrap()
+            .checked_div_factor(MINIMUM_COLLATERAL_RATIO)
+            .unwrap();
+
+        if usdg_borrowed > max_borrowable_amount {
+            return Err(VaultError::BorrowedAmountTooBig {
+                maximum_borrowable_amount: max_borrowable_amount.0,
+            });
+        }
+
+        Ok(())
+    }
+
     pub fn get_vaults_by_account(&self, account: impl Into<Account>) -> Vec<Vault> {
         self.account_to_vault_ids
             .get(&account.into())

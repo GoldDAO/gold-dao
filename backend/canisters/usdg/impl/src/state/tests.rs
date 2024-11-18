@@ -1,6 +1,10 @@
 use crate::state::{Account, State, GLDT, USDG};
 use crate::vault::FeeBucket;
+use crate::DEFAULT_GOLD_PRICE;
+use assert_matches::assert_matches;
 use candid::Principal;
+use proptest::prelude::*;
+use usdg_minter_api::VaultError::BorrowedAmountTooBig;
 
 fn default_state() -> State {
     State {
@@ -15,6 +19,8 @@ fn default_state() -> State {
 
         // Pending transfers
         pending_transfers: Default::default(),
+
+        one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
 
         // Canister ids
         usdg_ledger_id: Principal::management_canister(),
@@ -55,4 +61,53 @@ fn should_create_vault() {
 
     assert_eq!(state.active_vault_count(), 2);
     assert_eq!(state.pending_transfers.len(), 2);
+}
+
+#[test]
+fn should_reject_unvalid_open_vault() {
+    let state = default_state();
+
+    let margin = GLDT::from_unscaled(100); // 1g of gold
+
+    let usdg_borrowed = USDG::from_e8s(890_047_619);
+    assert_matches!(
+        state.check_open_vault_args_validity(margin, usdg_borrowed),
+        Err(BorrowedAmountTooBig {
+            maximum_borrowable_amount: 790476190,
+        },)
+    );
+
+    let usdg_borrowed = USDG::from_e8s(100_047_619);
+    assert_matches!(
+        state.check_open_vault_args_validity(margin, usdg_borrowed),
+        Ok(())
+    );
+}
+
+fn arb_usdg_amount() -> impl Strategy<Value = USDG> {
+    (0..10_000_000_000_000_000_u64).prop_map(|a| USDG::from_e8s(a))
+}
+
+proptest! {
+    #[test]
+    fn should_not_borrow_more_than_maximum(usdg_borrowed in arb_usdg_amount()) {
+        let state = default_state();
+
+        let margin = GLDT::from_unscaled(100); // 1g of gold
+
+        let max_borrowable_amount = USDG::from_e8s(790476190); // 79 USDG
+        if usdg_borrowed > max_borrowable_amount {
+            assert_matches!(
+                state.check_open_vault_args_validity(margin, usdg_borrowed),
+                Err(BorrowedAmountTooBig {
+                    maximum_borrowable_amount: 790476190,
+                },)
+            );
+        } else {
+            assert_matches!(
+                state.check_open_vault_args_validity(margin, usdg_borrowed),
+                Ok(())
+            );
+        }
+    }
 }

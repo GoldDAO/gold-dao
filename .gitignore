@@ -26,3 +26,4 @@ console.log
 /CHANGELOG.md
 .cargo
 backend/integration_testing/pocket-ic
+proptest-regressions

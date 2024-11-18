@@ -1,5 +1,5 @@
 use crate::state::read_state;
-use crate::{GLDT_TRANSFER_FEE, USDG_TRANSFER_FEE};
+use crate::GLDT_TRANSFER_FEE;
 use candid::{CandidType, Principal};
 use icrc_ledger_types::icrc1::account::Account;
 use minicbor::{Decode, Encode};

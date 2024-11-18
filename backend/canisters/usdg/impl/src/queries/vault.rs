@@ -5,7 +5,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use usdg_minter_api::{ApiFeeBucket, ApiVault};
 
 #[query]
-pub fn get_vaults_by_account(account: Option<Account>) -> Vec<ApiVault> {
+fn get_vaults_by_account(account: Option<Account>) -> Vec<ApiVault> {
     let account = account.unwrap_or(ic_cdk::caller().into());
     read_state(|s| {
         s.get_vaults_by_account(account)

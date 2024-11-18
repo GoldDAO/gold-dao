@@ -23,8 +23,10 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
         });
     }
 
-    // TODO: Check if borrowed amount makes sense
-    // read_state(|s| s.are_valid_parameters(arg.borrowed_amount, arg.margin_amount))?;
+    // Check if borrowed amount makes sense
+    let usdg_borrowed = USDG::from_e8s(arg.borrowed_amount);
+    let gldt_margin = GLDT::from_e8s(arg.margin_amount);
+    read_state(|s| s.check_open_vault_args_validity(gldt_margin, usdg_borrowed))?;
 
     let from = Account {
         owner: ic_cdk::caller(),
