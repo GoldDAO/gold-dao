@@ -17,7 +17,7 @@ export default function Graphs() {
   const [burnAmount, setBurnedAmount] = useState();
   const [liquidAmount, setLiquidAmount] = useState();
   const [holdersAmount, setHoldersAmount] = useState();
-  const [treasuryAmount] = useState();
+  const [treasuryAmount, setTreasuryAmount] = useState();
   const [stakedAmount, setStakedAmount] = useState();
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart } = useServices();
@@ -88,11 +88,12 @@ export default function Graphs() {
       if (stakersData?.data.length) {
         setStakedAmount(stakersData.data[stakersData.data.length - 1].value);
       }
+      if (gldGovTreasuryData?.data.length) {
+        setTreasuryAmount(gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value);
+      }
 
       try {
-        if (selectedTab === 'Treasury') {
-          // setTreasuryAmount(result);
-          // setInfoModal(result);
+        if (selectedTab === 'Treasury' && !gldGovTreasuryData?.loading) {
           setAmount(gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value);
         }
         if (selectedTab === 'Staked' && !stakersData?.loading) {
