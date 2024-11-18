@@ -17,14 +17,20 @@ export default function Graphs() {
   const [burnAmount, setBurnedAmount] = useState();
   const [liquidAmount, setLiquidAmount] = useState();
   const [holdersAmount, setHoldersAmount] = useState();
-  const [treasuryAmount] = useState();
+  const [treasuryAmount, setTreasuryAmount] = useState();
   const [stakedAmount, setStakedAmount] = useState();
   const [selectedTab, setSelectedTab] = useState('Treasury');
   const { getSupplyChart, getTreasuryChart } = useServices();
   const {
-    stakersData, holdersData, burnData, gldGovSupply,
-    setLiquidChartData, liquidData, rewardPoolData,
-    reservePoolData, gldGovTreasury: gldGovTreasuryData,
+    stakersData,
+    holdersData,
+    burnData,
+    gldGovSupply,
+    setLiquidChartData,
+    liquidData,
+    rewardPoolData,
+    reservePoolData,
+    gldGovTreasury: gldGovTreasuryData,
   } = useCharts();
   const [amount, setAmount] = useState();
   const [, setInfoModal] = useState(null);
@@ -38,10 +44,7 @@ export default function Graphs() {
     getTreasuryChart();
   }, [selectedTab]);
 
-  const deriveLiquidData = (
-    gldgovSupply,
-    treasuryData,
-  ) => {
+  const deriveLiquidData = (gldgovSupply, treasuryData) => {
     const liquid = gldgovSupply.map(({ label: supplyLabel, value }) => {
       const treasuryValue = treasuryData.find(
         ({ label }) => label === supplyLabel,
@@ -64,14 +67,15 @@ export default function Graphs() {
 
   useEffect(() => {
     if (gldGovSupply?.data.length && gldGovTreasuryData?.data.length) {
-      deriveLiquidData(
-        gldGovSupply.data,
-        gldGovTreasuryData.data,
-      );
+      deriveLiquidData(gldGovSupply.data, gldGovTreasuryData.data);
     }
   }, [
-    gldGovSupply?.data, gldGovSupply?.data.length, gldGovSupply.loading,
-    gldGovTreasuryData.loading, gldGovTreasuryData?.data, gldGovTreasuryData?.data.length,
+    gldGovSupply?.data,
+    gldGovSupply?.data.length,
+    gldGovSupply.loading,
+    gldGovTreasuryData.loading,
+    gldGovTreasuryData?.data,
+    gldGovTreasuryData?.data.length,
   ]);
 
   useEffect(() => {
@@ -88,12 +92,17 @@ export default function Graphs() {
       if (stakersData?.data.length) {
         setStakedAmount(stakersData.data[stakersData.data.length - 1].value);
       }
+      if (gldGovTreasuryData?.data.length) {
+        setTreasuryAmount(
+          gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value,
+        );
+      }
 
       try {
-        if (selectedTab === 'Treasury') {
-          // setTreasuryAmount(result);
-          // setInfoModal(result);
-          setAmount(gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value);
+        if (selectedTab === 'Treasury' && !gldGovTreasuryData?.loading) {
+          setAmount(
+            gldGovTreasuryData.data[gldGovTreasuryData.data.length - 1].value,
+          );
         }
         if (selectedTab === 'Staked' && !stakersData?.loading) {
           setAmount(stakersData.data[stakersData.data.length - 1].value);
@@ -116,14 +125,22 @@ export default function Graphs() {
 
     fetchData();
   }, [
-    selectedTab, stakersData?.data, stakersData.loading,
-    stakersData?.data.length, burnData?.data.length, burnData.loading,
-    liquidData?.data.length, liquidData.loading, liquidData?.data,
-    holdersData?.data.length, holdersData.loading,
-    rewardPoolData?.data.length, rewardPoolData.loading,
-    reservePoolData?.data.length, reservePoolData.loading,
+    selectedTab,
+    stakersData?.data,
+    stakersData.loading,
+    stakersData?.data.length,
+    burnData?.data.length,
+    burnData.loading,
+    liquidData?.data.length,
+    liquidData.loading,
+    liquidData?.data,
+    holdersData?.data.length,
+    holdersData.loading,
+    rewardPoolData?.data.length,
+    rewardPoolData.loading,
+    reservePoolData?.data.length,
+    reservePoolData.loading,
     gldGovSupply?.data.length,
-
   ]);
 
   const displayAmount = parseNumbers(amount);
@@ -154,7 +171,9 @@ export default function Graphs() {
               }}
             >
               <div className="flex w-[60%] justify-between items-center">
-                <h3 className="max-md:text-xs pl-2 sm:pl-5 max-md:font-bold">{tab}</h3>
+                <h3 className="max-md:text-xs pl-2 sm:pl-5 max-md:font-bold">
+                  {tab}
+                </h3>
                 <Image
                   src={'/svg/chartIcon.svg'}
                   alt=""
@@ -165,63 +184,59 @@ export default function Graphs() {
               </div>
               <div className="flex justify-end min-w-[120px] sm:hidden items-center gap-1">
                 {tab === 'Treasury' && (
-                    < >
-                      <h5 className="font-bold text-xs">
-                       {parseNumbers(treasuryAmount)}
-                      </h5>
-                      <GLDGovIcon />
-                    </>
-                )
-                }
+                  <>
+                    <h5 className="font-bold text-xs">
+                      {parseNumbers(treasuryAmount)}
+                    </h5>
+                    <GLDGovIcon />
+                  </>
+                )}
 
                 {tab === 'Liquid' && (
-                    < >
-                      <h5 className="font-bold text-xs">
-                       {parseNumbers(liquidAmount)}
-                      </h5>
-                      <GLDGovIcon />
-                    </>
-                )
-                }
+                  <>
+                    <h5 className="font-bold text-xs">
+                      {parseNumbers(liquidAmount)}
+                    </h5>
+                    <GLDGovIcon />
+                  </>
+                )}
 
                 {tab === 'Burned' && (
-                    < >
-                      <h5 className="font-bold text-xs">
-                       {parseNumbers(burnAmount)}
-                      </h5>
-                      <GLDGovIcon />
-                    </>
-                )
-                }
+                  <>
+                    <h5 className="font-bold text-xs">
+                      {parseNumbers(burnAmount)}
+                    </h5>
+                    <GLDGovIcon />
+                  </>
+                )}
 
                 {tab === 'Holders' && (
-                    < >
-                      <h5 className="font-bold text-xs">
-                       {parseNumbers(holdersAmount)}
-                      </h5>
-                    </>
-                )
-                }
+                  <>
+                    <h5 className="font-bold text-xs">
+                      {parseNumbers(holdersAmount)}
+                    </h5>
+                  </>
+                )}
 
                 {tab === 'Staked' && (
-                    < >
-                      <h5 className="font-bold text-xs">
-                       {parseNumbers(stakedAmount)}
-                      </h5>
-                      <GLDGovIcon />
-                    </>
-                )
-                }
-
+                  <>
+                    <h5 className="font-bold text-xs">
+                      {parseNumbers(stakedAmount)}
+                    </h5>
+                    <GLDGovIcon />
+                  </>
+                )}
               </div>
             </span>
           ))}
         </div>
-        <Chart name={selectedTab}
-        amount={displayAmount}
-         />
+        <Chart name={selectedTab} amount={displayAmount} />
       </article>
-      <Modal title={`chart${selectedTab}`} idModal="chartmodalgraph" amount={amount}>
+      <Modal
+        title={`chart${selectedTab}`}
+        idModal="chartmodalgraph"
+        amount={amount}
+      >
         <ModalChartMobile name={selectedTab} />
       </Modal>
     </>
