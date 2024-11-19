@@ -18,3 +18,6 @@ generate_pocket_update_call!(get_history_total);
 generate_pocket_update_call!(get_historic_swaps_by_user);
 generate_pocket_query_call!(get_version);
 generate_pocket_query_call!(get_archive_swaps);
+generate_pocket_query_call!(get_owned_nfts);
+generate_pocket_query_call!(http_request);
+generate_pocket_update_call!(force_toggle_gldt_supply_cron);

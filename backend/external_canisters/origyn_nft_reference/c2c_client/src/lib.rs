@@ -66,6 +66,20 @@ pub mod market_transfer_nft_origyn {
     pub type Response = MarketTransferResult;
 }
 
+pub mod icrc7_tokens_of {
+    use super::*;
+    pub type Args = Account3;
+    pub type Response = Vec<candid::Nat>;
+}
+
+pub mod count_unlisted_tokens_of {
+    use icrc_ledger_types::icrc1::account::Account;
+
+    use super::*;
+    pub type Args = Account;
+    pub type Response = Nat;
+}
+
 generate_candid_c2c_call!(nft_origyn);
 generate_candid_c2c_call!(icrc7_transfer);
 generate_candid_c2c_call!(get_token_id_as_nat);
@@ -75,3 +89,5 @@ generate_candid_c2c_call!(icrc7_owner_of);
 generate_candid_c2c_call!(sale_info_nft_origyn);
 generate_candid_c2c_call!(sale_nft_origyn);
 generate_candid_c2c_call!(market_transfer_nft_origyn);
+generate_candid_c2c_call!(icrc7_tokens_of);
+generate_candid_c2c_call!(count_unlisted_tokens_of);

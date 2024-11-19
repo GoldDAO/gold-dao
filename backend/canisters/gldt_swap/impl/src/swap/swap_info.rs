@@ -1,8 +1,7 @@
-use std::future::Future;
-
 use gldt_swap_api_archive::archive_swap::Args as ArchiveSwapArg;
 use gldt_swap_archive_c2c_client::archive_swap;
 use gldt_swap_common::swap::{SwapId, SwapInfo, SwapStatus, SwapStatusForward, SwapStatusReverse};
+use std::future::Future;
 use tracing::{debug, info};
 
 use crate::{
@@ -72,13 +71,13 @@ impl SwapInfoTrait for SwapInfo {
 
     fn update_status(&self, status: SwapStatus) {
         let swap_id = self.get_swap_id();
-
         mutate_state(|s| {
             let mut swap = s.data.swaps.get_active_swap_mut(&swap_id);
             match &status {
                 SwapStatus::Forward(new_status) => {
                     if let Some(SwapInfo::Forward(swap_detail)) = &mut swap {
                         swap_detail.status = new_status.clone();
+
                         info!(
                             "FORWARD SWAP :: SwapId {swap_id:?} :: status updated -> {new_status:?} :: swap detail -> {swap_detail:?}"
                         );
@@ -87,6 +86,7 @@ impl SwapInfoTrait for SwapInfo {
                 SwapStatus::Reverse(new_status) => {
                     if let Some(SwapInfo::Reverse(swap_detail)) = &mut swap {
                         swap_detail.status = new_status.clone();
+
                         info!(
                             "REVERSE SWAP :: SwapId {swap_id:?} :: status updated -> {new_status:?} :: swap detail -> {swap_detail:?}"
                         );

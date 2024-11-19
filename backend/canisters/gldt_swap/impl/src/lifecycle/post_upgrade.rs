@@ -29,8 +29,6 @@ fn post_upgrade(args: Args) {
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
-            state.data.should_upgrade_archives = true;
-            state.data.is_init_archive_cron_running = false;
             state.data.archive_status = ArchiveStatus::Down(ArchiveDownReason::Upgrading);
 
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);

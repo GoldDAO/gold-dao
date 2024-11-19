@@ -28,7 +28,7 @@ serde_bytes = { workspace = true }
 serializer = { path = '../../../libraries/serializer' }
 icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
 gldt_swap_archive_c2c_client = { path = "../../../external_canisters/gldt_swap_archive/c2c_client" }
-
+serde_json = { workspace =  true }
 icrc_ledger_canister = { path = "../../../external_canisters/icrc_ledger/api" }
 stable_memory = { path = '../../../libraries/stable_memory' }
 types = { path = '../../../libraries/types' }
@@ -41,3 +41,4 @@ gldt_swap_common = { path = "../common"}
 origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api'}
 origyn_nft_reference_c2c_client = { path = '../../../external_canisters/origyn_nft_reference/c2c_client'}
 ic0 = "0.23.0"
+ic-cdk-timers = { workspace = true }

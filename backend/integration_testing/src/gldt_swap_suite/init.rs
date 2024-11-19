@@ -1,4 +1,4 @@
-use candid::{Nat, Principal};
+use candid::{encode_one, Nat, Principal};
 use gldt_swap_api_canister::init::InitArgs as GldtSwapCanisterInitArgs;
 use gldt_swap_api_canister::lifecycle::Args as GldtSwapCanisterArgs;
 use gldt_swap_common::{
@@ -12,9 +12,6 @@ use pocket_ic::{PocketIc, PocketIcBuilder};
 use std::{env, path::Path, time::SystemTime};
 use types::{BuildVersion, CanisterId};
 use utils::consts::E8S_FEE_OGY;
-
-// use ic_icrc1_ledger::{ ArchiveOptions, InitArgs as LedgerInitArgs, LedgerArgument };
-use icrc_ledger_types::icrc3::archive::{GetArchivesArgs, GetArchivesResult};
 
 use crate::{
     client::pocket::{create_canister, create_canister_with_id, install_canister},
@@ -204,7 +201,8 @@ fn install_canisters(
             subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
         }),
         minting_account: Account::from(gldt_swap_canister_id),
-        initial_balances: vec![(Account::from(controller), Nat::from(100_000_000_000 as u64))],
+        // initial_balances: vec![(Account::from(controller), Nat::from(100_000_000_000 as u64))],
+        initial_balances: vec![],
         archive_options: icrc_ledger_canister::init::ArchiveOptions {
             trigger_threshold: 2000,
             num_blocks_to_archive: 1000,
@@ -310,4 +308,42 @@ pub fn validate_pocketic_installation() {
                 .unwrap_or_else(|_| "an unknown directory".to_string())
         );
     }
+}
+
+pub fn reinstall_gldt_swap_canister(
+    pic: &mut PocketIc,
+    controller: &Principal,
+    gldt_swap_id: Principal,
+    gldt_ledger_id: Principal,
+    origyn_ledger_id: Principal,
+    nft_canister_id: Principal,
+) {
+    let gldt_swap_canister_wasm = wasms::GLDT_SWAP.clone();
+    pic.stop_canister(gldt_swap_id.clone(), Some(controller.clone()))
+        .unwrap();
+    pic.tick();
+
+    let gldt_swap_init_args: GldtSwapCanisterArgs =
+        GldtSwapCanisterArgs::Init(GldtSwapCanisterInitArgs {
+            commit_hash: "abcdefgh".to_string(),
+            version: BuildVersion::min(),
+            test_mode: true,
+            gldt_ledger_id: gldt_ledger_id.clone(),
+            gldnft_canisters: vec![(nft_canister_id, NftCanisterConf { grams: 1u16 })],
+            ogy_ledger_id: origyn_ledger_id,
+            authorized_principals: vec![controller.clone()],
+        });
+
+    pic.reinstall_canister(
+        gldt_swap_id.clone(),
+        gldt_swap_canister_wasm,
+        encode_one(gldt_swap_init_args).unwrap(),
+        Some(controller.clone()),
+    )
+    .unwrap();
+    pic.tick();
+    pic.start_canister(gldt_swap_id.clone(), Some(controller.clone()))
+        .unwrap();
+
+    pic.tick();
 }

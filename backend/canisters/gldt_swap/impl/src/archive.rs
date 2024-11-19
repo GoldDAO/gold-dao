@@ -150,9 +150,6 @@ pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool
             "///// Checking archive 4 : {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
         )
     );
-    info!(
-        "ARCHIVE :: threshold check :: {archive_id:?}. archive size {res:?}. max allowed size : {max_canister_archive_threshold}"
-    );
     match res {
         Ok(size) => (size as u128) >= max_canister_archive_threshold,
         Err(_) => false,

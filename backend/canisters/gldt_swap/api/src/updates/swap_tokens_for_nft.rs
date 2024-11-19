@@ -24,7 +24,11 @@ pub enum SwapTokensForNftRequestErrors {
     SwapCreationError,
     NotOwnedBySwapCanister,
     CantBeAnonymous(String),
+    Retry(RetryInMilliseconds),
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
+pub struct RetryInMilliseconds(pub u64, pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
 pub enum GetNftMetaDetailErrorReason {

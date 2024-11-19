@@ -8,21 +8,19 @@ use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 
+use crate::client::gldt_swap::get_swap;
 use candid::{Nat, Principal};
 use canister_time::{timestamp_millis, WEEK_IN_MS};
+use canister_time::{MINUTE_IN_MS, SECOND_IN_MS};
 use gldt_swap_common::gldt::{GldtNumTokens, GldtTokenSpec};
 use gldt_swap_common::nft::NftID;
+use gldt_swap_common::swap::SwapErrorForward;
 use gldt_swap_common::swap::{SwapDetailForward, SwapIndex, SwapInfo, SwapStatusForward};
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::{
     Account as OrigynAccount, AskFeature, MarketTransferRequest, PricingConfigShared, SalesConfig,
 };
 use pocket_ic::PocketIc;
-
-use canister_time::{MINUTE_IN_MS, SECOND_IN_MS};
-use gldt_swap_common::swap::SwapErrorForward;
-
-use crate::client::gldt_swap::get_swap;
 
 fn init_nft_with_premint_nft(
     pic: &mut PocketIc,
@@ -127,8 +125,6 @@ fn insert_bulk_fake_swaps(env: &mut TestEnv, num_to_insert: usize) {
 
 #[cfg(test)]
 mod tests {
-    use gldt_swap_common::swap::SwapStatus;
-
     use super::*;
 
     #[test]

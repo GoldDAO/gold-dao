@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use candid::{CandidType, Decode, Encode, Nat, Principal};
-use canister_time::{timestamp_millis, MINUTE_IN_MS};
+use canister_time::{timestamp_millis, HOUR_IN_MS, MINUTE_IN_MS};
 use ic_ledger_types::{AccountIdentifier, TransferError};
 use ic_stable_structures::{storable::Bound, Storable};
 use icrc_ledger_types::{
@@ -13,7 +13,7 @@ use icrc_ledger_types::{
 };
 use serde::{Deserialize, Serialize};
 use tracing::debug;
-use types::TimestampMillis;
+use types::{Milliseconds, TimestampMillis};
 
 use crate::{
     gldt::{GldtNumTokens, GLDT_TX_FEE},
@@ -29,6 +29,17 @@ pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
 const MAX_SWAP_TYPE_BYTES_SIZE: u32 = 100;
 const MAX_SWAP_ID_BYTES_SIZE: u32 = 100;
 pub const STALE_SWAP_TIME_THRESHOLD_MINUTES: u64 = 3;
+
+// ----------------------
+//     CRON JOB INTERVALS & Retrys & delays
+// ----------------------
+pub const MANAGE_GLDT_SUPPLY_INTERVAL: Milliseconds = HOUR_IN_MS * 6;
+pub const MANAGE_GLDT_SUPPLY_RETRY_DELAY: Milliseconds = MINUTE_IN_MS * 3;
+pub const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = MINUTE_IN_MS * 10;
+pub const MANAGE_NEW_ARCHIVES_INTERVAL: Milliseconds = MINUTE_IN_MS;
+pub const MANAGE_OGY_FEE_ACCOUNTS_INTERVAL: Milliseconds = MINUTE_IN_MS;
+pub const MANAGE_SERVICE_STATUS_INTERVAL: Milliseconds = MINUTE_IN_MS;
+pub const MANAGE_STALE_SWAPS_INTERVAL: Milliseconds = MINUTE_IN_MS;
 
 // -----------------
 //     Shared
@@ -94,6 +105,13 @@ impl SwapInfo {
         match &self {
             SwapInfo::Forward(details) => details.nft_id.clone(),
             SwapInfo::Reverse(details) => details.nft_id.clone(),
+        }
+    }
+
+    pub fn get_nft_canister(&self) -> Principal {
+        match &self {
+            SwapInfo::Forward(details) => details.nft_canister.clone(),
+            SwapInfo::Reverse(details) => details.nft_canister.clone(),
         }
     }
 
