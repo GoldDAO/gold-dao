@@ -48,6 +48,12 @@ const Proceed = () => {
     queryClient.invalidateQueries({
       queryKey: ["FETCH_AVAILABLE_NFTS"],
     });
+    queryClient.invalidateQueries({
+      queryKey: ["USER_FETCH_BALANCE_GLDT"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["USER_FETCH_NFTS"],
+    });
     setCanCloseDialog(true);
   };
 
@@ -59,6 +65,7 @@ const Proceed = () => {
       },
       onError: (err) => {
         console.error(err);
+        reset();
       },
     });
   };

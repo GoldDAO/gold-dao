@@ -5,18 +5,9 @@ import { useReverseSwapProceed } from "@context/index";
 const Error = () => {
   const navigate = useNavigate();
   const { handleClose, reverseSwap } = useReverseSwapProceed();
-  const { reset, error } = reverseSwap;
+  const { error } = reverseSwap;
   const approveError = error?.message === "Approve";
   const swapError = error?.message === "Swap";
-
-  const handleOnClose = () => {
-    reset();
-    handleClose();
-  };
-
-  const handleRetry = () => {
-    reset();
-  };
 
   const handleOnClickGoToTxView = () => {
     handleClose();
@@ -42,12 +33,10 @@ const Error = () => {
         </div>
       </div>
       <div className="flex items-center">
-        <Button className="mr-4" onClick={handleOnClose}>
+        <Button className="mr-4" onClick={handleClose}>
           Close
         </Button>
-        {approveError || swapError ? (
-          <Button onClick={handleRetry}>Retry</Button>
-        ) : (
+        {!approveError && !swapError && (
           <Button onClick={handleOnClickGoToTxView}>
             Go to transactions history
           </Button>
