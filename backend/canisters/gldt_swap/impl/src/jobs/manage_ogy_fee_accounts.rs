@@ -3,8 +3,10 @@ use crate::{
     utils::trace,
 };
 use candid::{Nat, Principal};
-use canister_time::{run_now_then_interval, MINUTE_IN_MS};
-use gldt_swap_common::{gldt::OGYTokenSpec, nft::NftCanisterConf};
+use canister_time::run_now_then_interval;
+use gldt_swap_common::{
+    gldt::OGYTokenSpec, nft::NftCanisterConf, swap::MANAGE_OGY_FEE_ACCOUNTS_INTERVAL,
+};
 use icrc_ledger_canister_c2c_client::{icrc1_balance_of, icrc1_transfer};
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use origyn_nft_reference::origyn_nft_reference_canister::{
@@ -14,14 +16,11 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
 use origyn_nft_reference_c2c_client::{sale_info_nft_origyn, sale_nft_origyn};
 use std::{borrow::Borrow, time::Duration};
 use tracing::{debug, info};
-use types::Milliseconds;
 use utils::env::Environment;
-
-const MANAGE_FEE_ACCOUNTS: Milliseconds = MINUTE_IN_MS;
 
 pub fn start_job() {
     run_now_then_interval(
-        Duration::from_millis(MANAGE_FEE_ACCOUNTS),
+        Duration::from_millis(MANAGE_OGY_FEE_ACCOUNTS_INTERVAL),
         spawn_transfer_job,
     );
 }
@@ -31,8 +30,6 @@ pub fn spawn_transfer_job() {
 }
 
 async fn manage_fee_accounts() {
-    // sale_info_nft_origyn(#fee_deposit_info
-
     let ogy_ledger = read_state(|s| s.data.ogy_ledger_id);
     let nft_canisters = read_state(|s| s.data.gldnft_canisters.clone());
     let this_canister_id = read_state(|s| s.env.canister_id());
@@ -61,12 +58,14 @@ async fn manage_fee_accounts() {
     )
     .await
     {
-        Ok(b) => {
-            if b < min_total_threshold {
+        Ok(balance_of_canister) => {
+            mutate_state(|s| {
+                s.data.ogy_balance = balance_of_canister.clone();
+            });
+            if balance_of_canister < min_total_threshold {
                 info!(
-                    "MANAGE FEE ACCOUNTS : total OGY balance is {b} for swap canister but needs to be above {min_total_threshold}"
+                    "MANAGE FEE ACCOUNTS : total OGY balance is {balance_of_canister} for swap canister but needs to be above {min_total_threshold}"
                 );
-                return;
             }
         }
         Err(e) => {

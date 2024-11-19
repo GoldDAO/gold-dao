@@ -1,18 +1,36 @@
 use std::time::Duration;
 
-use crate::client::gldt_swap::{get_swap, insert_fake_bulk_swaps, insert_fake_swap};
+use crate::client::gldt_swap::{get_swap, insert_fake_bulk_swaps};
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 
+use candid::Encode;
 use candid::{Nat, Principal};
-use canister_time::{timestamp_millis, HOUR_IN_MS, MINUTE_IN_MS, WEEK_IN_MS};
+use canister_time::{timestamp_millis, MINUTE_IN_MS, WEEK_IN_MS};
 use gldt_swap_common::gldt::GldtNumTokens;
 use gldt_swap_common::nft::NftID;
 use gldt_swap_common::swap::{
-    SwapDetailForward, SwapErrorForward, SwapIndex, SwapInfo, SwapStatus, SwapStatusForward,
+    SwapDetailForward, SwapErrorForward, SwapIndex, SwapInfo, SwapStatusForward,
 };
+use gldt_swap_common::{archive::ArchiveCanister, swap::SwapId};
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::PocketIc;
+
+use crate::{
+    client::gldt_swap::{
+        get_archive_canisters, get_archive_swaps, get_historic_swaps, get_historic_swaps_by_user,
+        get_history_total, get_version,
+    },
+    wasms,
+};
+use gldt_swap_api_archive::get_archive_swaps::Args as GetArchiveSwapArgs;
+use gldt_swap_api_canister::{
+    get_historic_swaps::{Args as GetHistoricSwapsArgs, GetHistoricSwapsError},
+    get_historic_swaps_by_user::Args as GetHistoricSwapsByUserArgs,
+    lifecycle::Args as GldtSwapCanisterArgs,
+    post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
+};
+use types::BuildVersion;
 
 fn insert_bulk_fake_swaps(
     pic: &mut PocketIc,
@@ -67,20 +85,7 @@ fn insert_bulk_fake_swaps(
 }
 #[cfg(test)]
 mod tests {
-    use candid::Encode;
-    use gldt_swap_common::{archive::ArchiveCanister, nft::NftCanisterConf, swap::SwapId};
-
-    use gldt_swap_api_archive::get_archive_swaps::{
-        Args as GetArchiveSwapArgs, Response as GetArchiveSwapResponse,
-    };
-    use gldt_swap_api_canister::{
-        get_historic_swaps::{Args as GetHistoricSwapsArgs, GetHistoricSwapsError},
-        get_historic_swaps_by_user::Args as GetHistoricSwapsByUserArgs,
-        init::InitArgs as GldtSwapCanisterInitArgs,
-        lifecycle::Args as GldtSwapCanisterArgs,
-        post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
-    };
-    use types::BuildVersion;
+    use super::*;
 
     #[test]
     pub fn init_should_create_a_default_archive() {
@@ -96,28 +101,12 @@ mod tests {
         assert_eq!(archive_canisters.len(), 1);
     }
 
-    use crate::{
-        client::gldt_swap::{
-            get_archive_canisters, get_archive_swaps, get_historic_swaps,
-            get_historic_swaps_by_user, get_history_total, get_version,
-        },
-        wasms,
-    };
-
-    use super::*;
     #[test]
     pub fn archive_features_work_correctly() {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids:
-                CanisterIds {
-                    origyn_nft,
-                    gldt_swap,
-                    gldt_ledger,
-                    ogy_ledger,
-                    ..
-                },
+            canister_ids: CanisterIds { gldt_swap, .. },
             principal_ids: PrincipalIds { controller, .. },
         } = env;
         tick_n_blocks(pic, 2); // need to wait for cron job to finish creating the archive
@@ -127,7 +116,7 @@ mod tests {
         // In test mode there is a threshhold of approximately 10MB before a new archive canister is created.
         // at 366 a new archive is created ( based on memory size ).the buffer ( 100 ) means that no new swaps will be stored in archive 2 466
         // test that the correct index
-        let (user_a, _) = insert_bulk_fake_swaps(pic, 0, 366, controller, gldt_swap);
+        let (_, _) = insert_bulk_fake_swaps(pic, 0, 366, controller, gldt_swap);
 
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
         println!("///////////////{archive_canisters:?}");
@@ -140,18 +129,7 @@ mod tests {
         println!("archive canisters : {archive_canisters:?}");
         let total_swaps: Nat = get_history_total(pic, Principal::anonymous(), gldt_swap, &None);
         assert_eq!(total_swaps, Nat::from(366u64));
-        let mut start_swap_index = 0usize;
 
-        // test all individual swaps are locatable first with no duplicates or extra swaps
-        // for i in 0..366u64 {
-        //     let res = get_swap(
-        //         pic,
-        //         Principal::anonymous(),
-        //         gldt_swap,
-        //         &SwapId(NftID(Nat::from(i)), Nat::from(i))
-        //     ).unwrap();
-        //     assert_eq!(res.0.1, Nat::from(i));
-        // }
         let res = get_swap(
             pic,
             Principal::anonymous(),
@@ -222,7 +200,7 @@ mod tests {
         // now we're going to fill up archive 1 and test that swaps are automatically inserted into archive 2
         // archive 1 is currently at 365 index out of a max 465 so we're going to insert 110 swaps
         // 100 to fill up archive 1 and 10 to check in archive 2
-        let (user_a, _) = insert_bulk_fake_swaps(pic, 366, 476, controller, gldt_swap);
+        let (_, _) = insert_bulk_fake_swaps(pic, 366, 476, controller, gldt_swap);
 
         // recheck the no new archives got created
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
@@ -265,21 +243,14 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids:
-                CanisterIds {
-                    origyn_nft,
-                    gldt_swap,
-                    gldt_ledger,
-                    ogy_ledger,
-                    ..
-                },
+            canister_ids: CanisterIds { gldt_swap, .. },
             principal_ids: PrincipalIds { controller, .. },
         } = env;
         tick_n_blocks(pic, 2); // need to wait for cron job to finish creating the archive
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
         assert_eq!(archive_canisters.len(), 1);
 
-        let (user_a, _) = insert_bulk_fake_swaps(pic, 0, 366, controller, gldt_swap);
+        let (_, _) = insert_bulk_fake_swaps(pic, 0, 366, controller, gldt_swap);
         let (user_a, _) = insert_bulk_fake_swaps(pic, 366, 476, controller, gldt_swap);
 
         let archive_canisters = get_archive_canisters(pic, Principal::anonymous(), gldt_swap, &());
@@ -579,14 +550,7 @@ mod tests {
         let mut env = init::init();
         let TestEnv {
             ref mut pic,
-            canister_ids:
-                CanisterIds {
-                    origyn_nft,
-                    gldt_swap,
-                    gldt_ledger,
-                    ogy_ledger,
-                    ..
-                },
+            canister_ids: CanisterIds { gldt_swap, .. },
             principal_ids: PrincipalIds { controller, .. },
         } = env;
         tick_n_blocks(pic, 5);

@@ -78,7 +78,7 @@ pub struct MetadataStruct {
     __system_current_sale_id: &'static str,
 }
 
-const metadata: MetadataStruct = MetadataStruct {
+const METADATA: MetadataStruct = MetadataStruct {
     __system: "__system",
     __system_status: "status",
     __system_secondary_royalty: "com.origyn.royalties.secondary",
@@ -162,7 +162,7 @@ pub fn build_standard_nft(
             pic,
             canister_id,
             Some(net_principal),
-            standardFileChunk(
+            standard_file_chunk(
                 token_id.clone(),
                 "page".to_string(),
                 "hello world".to_string(),
@@ -177,7 +177,7 @@ pub fn build_standard_nft(
             pic,
             canister_id,
             Some(net_principal),
-            standardFileChunk(
+            standard_file_chunk(
                 token_id.clone(),
                 "preview".to_string(),
                 "preview hello world".to_string(),
@@ -192,7 +192,7 @@ pub fn build_standard_nft(
             pic,
             canister_id,
             Some(net_principal),
-            standardFileChunk(
+            standard_file_chunk(
                 token_id.clone(),
                 "hidden".to_string(),
                 "hidden hello world".to_string(),
@@ -207,7 +207,7 @@ pub fn build_standard_nft(
             pic,
             canister_id,
             Some(net_principal),
-            standardFileChunk(
+            standard_file_chunk(
                 token_id.clone(),
                 "immutable_item".to_string(),
                 "immutable".to_string(),
@@ -262,7 +262,7 @@ pub fn build_standard_collection(
     net_principal: Principal,
     ledger_token: ICTokenSpec,
 ) -> BuildStandardCollectionReturns {
-    let aCollection: NftCanisterStageNftOrigynArg = standard_collection(
+    let a_collection: NftCanisterStageNftOrigynArg = standard_collection(
         canister_id,
         app,
         net_principal,
@@ -272,13 +272,13 @@ pub fn build_standard_collection(
         ledger_token,
     );
 
-    // println!("acollection {:?}", aCollection);
-    // println!("acollection IDLValue {:?}", IDLValue::try_from_candid_type(&&aCollection).unwrap());
+    // println!("a_collection {:?}", a_collection);
+    // println!("a_collection IDLValue {:?}", IDLValue::try_from_candid_type(&&a_collection).unwrap());
     let stage: OrigynTextResult = crate::client::origyn_nft_reference::client::stage_nft_origyn(
         pic,
         canister_id,
         Some(net_principal),
-        aCollection,
+        a_collection,
     );
 
     let file_stage: StageLibraryResult =
@@ -286,7 +286,7 @@ pub fn build_standard_collection(
             pic,
             canister_id,
             Some(net_principal),
-            standardFileChunk(
+            standard_file_chunk(
                 "".to_string(),
                 "collection_banner".to_string(),
                 "collection_banner".to_string(),
@@ -1422,7 +1422,7 @@ fn standard_collection(
                 value: Box::new(CandyShared::Array(vec![
                     Box::new(CandyShared::Class(vec![
                         PropertyShared {
-                            name: metadata.__apps_app_id.to_string(),
+                            name: METADATA.__apps_app_id.to_string(),
                             value: Box::new(CandyShared::Text("com.test.__public".to_string())),
                             immutable: true,
                         },
@@ -1575,7 +1575,7 @@ fn standard_collection(
                     ])),
                     Box::new(CandyShared::Class(vec![
                         PropertyShared {
-                            name: metadata.__apps_app_id.to_string(),
+                            name: METADATA.__apps_app_id.to_string(),
                             value: Box::new(CandyShared::Text("com.test.__private".to_string())),
                             immutable: true,
                         },
@@ -1780,7 +1780,7 @@ fn standard_collection(
     }
 }
 
-fn standardFileChunk(
+fn standard_file_chunk(
     token_id: String,
     library_id: String,
     text: String,

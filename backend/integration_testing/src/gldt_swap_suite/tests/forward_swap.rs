@@ -33,9 +33,21 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
 };
 
 use crate::client::{
+    gldt_swap::{force_toggle_gldt_supply_cron, get_owned_nfts, recover_stuck_swap},
+    icrc1::icrc1_transfer,
+};
+use crate::client::{
     gldt_swap::{get_swap, insert_fake_swap, remove_intent_to_swap},
     icrc1::client::transfer,
     origyn_nft_reference::sale_info_nft_origyn,
+};
+use gldt_swap_api_canister::swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors};
+use gldt_swap_common::{
+    gldt::GLDT_LEDGER_FEE_ACCOUNT,
+    swap::{
+        BurnFeesError, ImpossibleErrorReason, MintError, NotificationError, ServiceDownReason,
+        TransferFailReason, MANAGE_GLDT_SUPPLY_INTERVAL, STALE_SWAP_TIME_THRESHOLD_MINUTES,
+    },
 };
 
 fn init_nft_with_premint_nft(
@@ -81,17 +93,6 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use gldt_swap_api_canister::swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors};
-    use gldt_swap_common::{
-        gldt::GLDT_LEDGER_FEE_ACCOUNT,
-        swap::{
-            BurnFeesError, ImpossibleErrorReason, MintError, NotificationError, SwapStatus,
-            TransferFailReason, STALE_SWAP_TIME_THRESHOLD_MINUTES,
-        },
-    };
-
-    use crate::client::{gldt_swap::recover_stuck_swap, icrc1_icrc2_token::icrc1_balance_of};
-
     use super::*;
     #[test]
     pub fn forward_swap_basic_only() {
@@ -207,6 +208,13 @@ mod tests {
             owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
             gldt_swap.to_string()
         );
+        pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL));
+        tick_n_blocks(pic, 3);
+        let canister_owned_nfts = get_owned_nfts(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(
+            canister_owned_nfts.get(&(origyn_nft, 1u16)),
+            Some(&Nat::from(1u64))
+        );
     }
 
     #[test]
@@ -231,8 +239,7 @@ mod tests {
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply =
-            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -272,14 +279,12 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
             principal_ids:
                 PrincipalIds {
                     net_principal,
-                    originator,
                     nft_owner,
                     ..
                 },
@@ -295,7 +300,6 @@ mod tests {
             "1".to_string(),
         );
 
-        let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
         let res = swap_nft_for_tokens(
             pic,
             nft_owner,
@@ -303,7 +307,7 @@ mod tests {
             &vec![(NftID(token_id_as_nat.clone()), Principal::anonymous())], // use annoymous principal
         );
         match res {
-            Ok(r) => {
+            Ok(_) => {
                 assert_eq!(true, false)
             }
             Err(e) => {
@@ -334,8 +338,7 @@ mod tests {
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply =
-            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -402,36 +405,6 @@ mod tests {
                 ))
             );
         }
-
-        // // check the total supply increased
-        // let post_sale_total_supply = icrc1_total_supply(
-        //     pic,
-        //     Principal::anonymous(),
-        //     gldt_ledger,
-        //     &()
-        // );
-        // let expected_supply =
-        //     pre_swap_gldt_supply + Nat::from(10_000_000_000u64) - Nat::from(GLDT_TX_FEE * 2); // mint incurs fee && nft escrow has to transfer to user ( x 2 transactions )
-        // assert_eq!(post_sale_total_supply, expected_supply);
-
-        // // check user got their gldt tokens
-        // let user_balance = balance_of(pic, gldt_ledger, Account {
-        //     owner: nft_owner.clone(),
-        //     subaccount: None,
-        // });
-        // assert_eq!(user_balance, Nat::from(10_000_000_000u64) - Nat::from(GLDT_TX_FEE * 2));
-
-        // // ensure canister now owns nft
-        // let owner_of = icrc7_owner_of(
-        //     pic,
-        //     origyn_nft.clone(),
-        //     net_principal.clone(),
-        //     vec![token_id_as_nat.clone()]
-        // );
-        // assert_eq!(
-        //     owner_of.get(0).unwrap().clone().unwrap().owner.to_string(),
-        //     gldt_swap.to_string()
-        // );
     }
 
     #[test]
@@ -935,8 +908,7 @@ mod tests {
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply =
-            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -955,7 +927,6 @@ mod tests {
             "1".to_string(),
         );
 
-        let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
         let res = swap_nft_for_tokens(
             pic,
             nft_owner,
@@ -963,9 +934,7 @@ mod tests {
             &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
-            Ok(ids) => {
-                swap_id = ids[0].clone();
-            }
+            Ok(_) => {}
             Err(e) => {
                 println!("/// intent to swap errors : {e:?}");
             }
@@ -978,9 +947,7 @@ mod tests {
             &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
         );
         match res {
-            Ok(ids) => {
-                swap_id = ids[0].clone();
-            }
+            Ok(_) => {}
             Err(e) => {
                 match e {
                     gldt_swap_api_canister::swap_nft_for_tokens::SwapNftForTokensErrors::NftValidationErrors(
@@ -1599,7 +1566,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -1690,7 +1656,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -1775,7 +1740,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -1867,7 +1831,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -1957,7 +1920,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -2042,7 +2004,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -2136,7 +2097,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -2323,7 +2283,6 @@ mod tests {
             canister_ids:
                 CanisterIds {
                     origyn_nft,
-                    gldt_ledger,
                     gldt_swap,
                     ..
                 },
@@ -2503,18 +2462,6 @@ mod tests {
         };
         // 5. get the total gldt supply before the mint occurs
         let pre_swap_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
-        // 6. mint gldt to the escrow account of the sale
-        // transfer(
-        //     pic,
-        //     gldt_swap,
-        //     gldt_ledger,
-        //     None,
-        //     Account {
-        //         owner: origyn_nft,
-        //         subaccount: Some(escrow_sub_account.clone()),
-        //     },
-        //     10_002_000_000u128 // we intentionally minus 2 transaction fees because
-        // ).unwrap();
 
         // 7. insert a fake swap that simulates a forward swap that got stuck at bid request ( just after the escrow has been completed )
         let time = timestamp_millis();
@@ -2667,5 +2614,231 @@ mod tests {
 
         let post_fail_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
         assert_eq!(pre_swap_supply, post_fail_supply);
+    }
+
+    #[test]
+    pub fn forward_swap_should_fail_if_ogy_fee_account_doesnt_have_enough() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ogy_ledger,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
+        } = env;
+        tick_n_blocks(pic, 2);
+
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+
+        // 1. setup nft and verify owner
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            nft_owner.clone(),
+            "1".to_string(),
+        );
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string(),
+        );
+
+        ////////////////////////
+        /////  remove all OGY from nft fee account
+        //////////////////////
+
+        let info_req = sale_info_nft_origyn(
+            pic,
+            gldt_swap,
+            origyn_nft,
+            &SaleInfoRequest::FeeDepositInfo(Some(OrigynAccount::Account {
+                owner: gldt_swap,
+                sub_account: None,
+            })),
+        );
+
+        let account = match info_req {
+            SaleInfoResult::Ok(ok_res) => match ok_res {
+                SaleInfoResponse::FeeDepositInfo(fee_deposit_info) => {
+                    let account = Account {
+                        owner: fee_deposit_info.account.principal,
+                        subaccount: Some(
+                            fee_deposit_info
+                                .account
+                                .sub_account
+                                .as_slice()
+                                .try_into()
+                                .unwrap(),
+                        ),
+                    };
+                    account
+                }
+                _ => {
+                    panic!("Can't find account")
+                }
+            },
+            SaleInfoResult::Err(error) => {
+                panic!("Can't find account {error:?}")
+            }
+        };
+
+        let starting_ogy_balance = balance_of(pic, ogy_ledger, account);
+        println!("{starting_ogy_balance:?}");
+        assert_eq!(starting_ogy_balance, Nat::from(1_000_000_000_000u64)); // starting fee balance
+
+        let transfer_amount = starting_ogy_balance - Nat::from(200_000u64);
+        // reduce the balance
+        let dummy_account = Account {
+            owner: origyn_nft,
+            subaccount: Some([
+                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            ]),
+        };
+
+        let l = icrc1_transfer(
+            pic,
+            origyn_nft,
+            ogy_ledger,
+            &(icrc1_transfer::Args {
+                from_subaccount: account.subaccount,
+                to: dummy_account,
+                fee: None,
+                created_at_time: None,
+                memo: None,
+                amount: transfer_amount.clone(),
+            }),
+        );
+        match l {
+            icrc1_transfer::Response::Ok(a) => {
+                println!("{a:?}");
+            }
+            icrc1_transfer::Response::Err(b) => {
+                println!("{b:?}");
+            }
+        }
+
+        tick_n_blocks(pic, 2);
+
+        let res = balance_of(pic, ogy_ledger, account);
+        assert_eq!(res, Nat::from(0u64));
+
+        ///////////////////////
+        //// try to swap
+        //////////////////////
+
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
+        );
+        match res {
+            Ok(_) => {
+                panic!("Should not be an ok response");
+            }
+            Err(e) => {
+                matches!(
+                    e,
+                    SwapNftForTokensErrors::ServiceDown(ServiceDownReason::LowOrigynToken(_))
+                );
+            }
+        }
+    }
+
+    #[test]
+    pub fn forward_swap_should_fail_if_gldt_supply_is_running() {
+        let mut env = init::init();
+        let TestEnv {
+            ref mut pic,
+            canister_ids:
+                CanisterIds {
+                    origyn_nft,
+                    gldt_ledger,
+                    gldt_swap,
+                    ..
+                },
+            principal_ids:
+                PrincipalIds {
+                    controller,
+                    net_principal,
+                    originator,
+                    nft_owner,
+                    ..
+                },
+        } = env;
+
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+
+        // 1. setup nft and verify owner
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            nft_owner.clone(),
+            "1".to_string(),
+        );
+
+        let token_id_as_nat = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "1".to_string(),
+        );
+
+        force_toggle_gldt_supply_cron(pic, controller, gldt_swap, &());
+        tick_n_blocks(pic, 1);
+
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
+        );
+        match res {
+            Ok(_) => {
+                panic!("should have errored");
+            }
+            Err(e) => {
+                matches!(e, SwapNftForTokensErrors::Retry(_));
+            }
+        }
+
+        force_toggle_gldt_supply_cron(pic, controller, gldt_swap, &());
+
+        let swap_id: SwapId = SwapId(
+            NftID(Nat::from(token_id_as_nat.clone())),
+            SwapIndex::from(0u64),
+        );
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat.clone()), origyn_nft)],
+        );
+        match res {
+            Ok(ids) => {
+                assert_eq!(ids[0].clone(), swap_id)
+            }
+            Err(e) => {
+                panic!("should not have errored : {e:?}")
+            }
+        }
     }
 }

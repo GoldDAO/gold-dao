@@ -212,6 +212,7 @@ type SwapInfo = variant {
 };
 type SwapNftForTokensErrors = variant {
   Limit : text;
+  Retry : record { nat64; text };
   ContainsDuplicates : text;
   ContainsInvalidNftCanister : text;
   NftValidationErrors : record {
@@ -219,6 +220,7 @@ type SwapNftForTokensErrors = variant {
     vec record { nat; vec NftInvalidError };
   };
   CantBeAnonymous : text;
+  SwapArgsIsEmpty;
   ServiceDown : ServiceDownReason;
 };
 type SwapStatusForward = variant {
@@ -264,6 +266,7 @@ type SwapTokensForNftRequestErrors = variant {
   GetNftMetaDetailError : GetNftMetaDetailErrorReason;
   CantForgeSwapId;
   NftLocked : LockError;
+  Retry : record { nat64; text };
   NftValidationErrors : vec NftValidationError;
   CantBeAnonymous : text;
   NotOwnedBySwapCanister;

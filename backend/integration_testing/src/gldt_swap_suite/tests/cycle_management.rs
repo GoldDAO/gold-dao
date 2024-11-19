@@ -1,15 +1,11 @@
+use candid::Nat;
+use candid::Principal;
 use canister_time::HOUR_IN_MS;
-use gldt_swap_common::swap::SwapStatus;
 use gldt_swap_common::{archive::ArchiveCanister, swap::SwapIndex};
 use std::time::Duration;
 
 use crate::client::gldt_swap::get_archive_canisters;
 use crate::client::gldt_swap::insert_fake_bulk_swaps;
-use crate::client::gldt_swap::insert_fake_swap;
-use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
-use crate::utils::tick_n_blocks;
-
-use candid::{Nat, Principal};
 use canister_time::{timestamp_millis, WEEK_IN_MS};
 use gldt_swap_common::gldt::GldtNumTokens;
 use gldt_swap_common::nft::NftID;
@@ -68,6 +64,11 @@ fn insert_bulk_fake_swaps(
 #[cfg(test)]
 mod tests {
     use canister_time::MINUTE_IN_MS;
+
+    use crate::{
+        gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv},
+        utils::tick_n_blocks,
+    };
 
     use super::*;
     #[test]

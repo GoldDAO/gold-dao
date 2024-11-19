@@ -6,10 +6,10 @@ use crate::{
     update_archive_canisters,
 };
 use candid::Nat;
-use canister_time::{run_interval, run_once, SECOND_IN_MS};
+use canister_time::{run_interval, run_once};
 use gldt_swap_common::{
     archive::ArchiveCanister,
-    swap::{ArchiveDownReason, ArchiveStatus},
+    swap::{ArchiveDownReason, ArchiveStatus, MANAGE_NEW_ARCHIVES_INTERVAL},
 };
 use ic_cdk::trap;
 use tracing::{debug, info};
@@ -17,23 +17,16 @@ use tracing::{debug, info};
 pub fn start_job() {
     run_once(spawn_archive_on_init);
     run_interval(
-        Duration::from_millis(SECOND_IN_MS * 30),
+        Duration::from_millis(MANAGE_NEW_ARCHIVES_INTERVAL),
         spawn_manage_archives,
     );
 }
 
 pub fn spawn_archive_on_init() {
-    let is_running = read_state(|s| s.data.is_init_archive_cron_running);
-    if is_running {
-        return;
-    }
     ic_cdk::spawn(archive_on_init())
 }
 
 async fn archive_on_init() {
-    mutate_state(|s| {
-        s.data.should_upgrade_archives = true;
-    });
     let num_archive_canisters = read_state(|s| s.data.swaps.get_total_archive_canisters());
     if num_archive_canisters == 0 {
         match create_archive_canister().await {
@@ -62,28 +55,21 @@ async fn archive_on_init() {
         return;
     }
 
-    let should_upgrade_archives = read_state(|s| s.data.should_upgrade_archives);
-
-    if should_upgrade_archives {
-        match update_archive_canisters().await {
-            Ok(_) => {
-                info!("SUCCESS : archive upgrade - all archives upgraded successfully");
-                mutate_state(|s| s.set_archive_status(ArchiveStatus::Up));
-            }
-            Err(errors) => {
-                for e in errors {
-                    debug!(e);
-                    mutate_state(|s| {
-                        s.set_archive_status(ArchiveStatus::Down(
-                            ArchiveDownReason::UpgradingArchivesFailed(e),
-                        ))
-                    });
-                }
+    match update_archive_canisters().await {
+        Ok(_) => {
+            info!("SUCCESS : archive upgrade - all archives upgraded successfully");
+            mutate_state(|s| s.set_archive_status(ArchiveStatus::Up));
+        }
+        Err(errors) => {
+            for e in errors {
+                debug!(e);
+                mutate_state(|s| {
+                    s.set_archive_status(ArchiveStatus::Down(
+                        ArchiveDownReason::UpgradingArchivesFailed(e),
+                    ))
+                });
             }
         }
-        mutate_state(|s| {
-            s.data.should_upgrade_archives = false;
-        });
     }
 }
 
