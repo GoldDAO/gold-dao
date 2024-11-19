@@ -51,6 +51,9 @@ const Proceed = () => {
     queryClient.invalidateQueries({
       queryKey: ["USER_FETCH_BALANCE_GLDT"],
     });
+    queryClient.invalidateQueries({
+      queryKey: ["USER_FETCH_NFTS"],
+    });
     setCanCloseDialog(true);
   };
 
