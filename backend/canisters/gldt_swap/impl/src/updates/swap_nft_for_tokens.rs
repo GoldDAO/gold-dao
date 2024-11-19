@@ -1,17 +1,21 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
-use candid::Principal;
-use canister_time::timestamp_millis;
+use candid::{Nat, Principal};
+use canister_time::{timestamp_millis, SECOND_IN_MS};
 use futures::future::join_all;
-use gldt_swap_api_canister::swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors};
+use gldt_swap_api_canister::{
+    swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors},
+    swap_tokens_for_nft::RetryInMilliseconds,
+};
 use gldt_swap_common::{
     nft::NftID,
-    swap::{ServiceStatus, SwapId, SwapInfo},
+    swap::{ServiceDownReason, ServiceStatus, SwapId, SwapInfo},
 };
 
 use crate::swap::swap_info::SwapInfoTrait;
 use crate::{
     service_status::check_service_status, state::read_state, swap::swap_builder::SwapBuilder,
+    utils::check_fee_account_has_enough_ogy,
 };
 pub use gldt_swap_api_canister::swap_nft_for_tokens::{
     Args as SwapNftForTokensArgs, Response as SwapNftForTokensResponse,
@@ -48,7 +52,7 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
 
     //  check there are no duplicates
     if args.is_empty() {
-        return Ok(vec![]);
+        return Err(SwapNftForTokensErrors::SwapArgsIsEmpty);
     }
 
     if contains_duplicates(&args) {
@@ -78,6 +82,23 @@ pub async fn swap_nft_for_tokens_impl(args: SwapNftForTokensArgs) -> SwapNftForT
                 )
             )
         );
+    }
+
+    if !has_enough_ogy_for_multiple_swaps(&args).await {
+        return Err(
+            SwapNftForTokensErrors::ServiceDown(
+                ServiceDownReason::LowOrigynToken(
+                    "One of the OGY fee accounts does not have enough OGY to process all the swaps required".to_string()
+                )
+            )
+        );
+    }
+
+    if read_state(|s| s.data.is_gldt_supply_balancer_running) {
+        return Err(SwapNftForTokensErrors::Retry(RetryInMilliseconds(
+            SECOND_IN_MS * 30,
+            format!("the supply is currently being balanced. please try again in 15 seconds"),
+        )));
     }
 
     let mut swap_chunks = args.chunks(10);
@@ -168,4 +189,34 @@ fn contains_valid_nft_canisters(args: &SwapNftForTokensArgs) -> bool {
     // if any of the intended swaps don't match one of the weights return false
     args.iter()
         .all(|(_, nft_canister)| nft_canisters.contains(&nft_canister))
+}
+
+async fn has_enough_ogy_for_multiple_swaps(args: &SwapNftForTokensArgs) -> bool {
+    let mut ogy_required_per_nft_canister: HashMap<Principal, Nat> = HashMap::new();
+    let ogy_swap_fee = read_state(|s| s.data.base_ogy_swap_fee.clone());
+
+    args.iter().for_each(|(_, nft_canister)| {
+        let current_amount = ogy_required_per_nft_canister.get(nft_canister);
+        match current_amount {
+            Some(amount) => {
+                ogy_required_per_nft_canister
+                    .insert(nft_canister.clone(), amount.clone() + ogy_swap_fee.clone());
+            }
+            None => {
+                ogy_required_per_nft_canister.insert(nft_canister.clone(), ogy_swap_fee.clone());
+            }
+        }
+    });
+
+    let mut all_valid = true;
+    for (prin, amount) in ogy_required_per_nft_canister {
+        match check_fee_account_has_enough_ogy(prin, amount).await {
+            true => {}
+            false => {
+                all_valid = false;
+            }
+        }
+    }
+
+    all_valid
 }

@@ -25,6 +25,7 @@ gldt_swap_api_archive = { path = "../canisters/gldt_swap/api_archive"}
 gldt_swap_common = { path = "../canisters/gldt_swap/common"}
 origyn_nft_reference = { path = '../external_canisters/origyn_nft_reference/api' }
 serde_bytes = { workspace = true }
+serde_json = { workspace = true }
 sns_neuron_controller_api_canister = { path = "../canisters/sns_neuron_controller/api" }
 
 buyback_burn_api = { path = "../canisters/buyback_burn/api" }

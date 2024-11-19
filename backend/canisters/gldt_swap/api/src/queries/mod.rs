@@ -3,3 +3,5 @@ pub mod get_active_swap_ids_by_user;
 pub mod get_active_swaps;
 pub mod get_active_swaps_by_user;
 pub mod get_archive_canisters;
+pub mod get_owned_nfts;
+pub mod http_request;

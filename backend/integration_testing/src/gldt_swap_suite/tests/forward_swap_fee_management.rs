@@ -1,42 +1,22 @@
 use crate::client::icrc1::client::balance_of;
 use crate::client::icrc1::icrc1_total_supply;
-use crate::client::origyn_nft_reference::client::{
-    get_token_id_as_nat, icrc7_owner_of, market_transfer_nft_origyn,
-};
+use crate::client::origyn_nft_reference::client::get_token_id_as_nat;
 use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
-
 use candid::{Nat, Principal};
-use gldt_swap_common::gldt::{GldtTokenSpec, GLDT_TX_FEE};
-use gldt_swap_common::swap::{SwapInfo, SwapStatusForward};
+use canister_time::MINUTE_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
+use origyn_nft_reference::origyn_nft_reference_canister::Account as OrigynAccount;
 use origyn_nft_reference::origyn_nft_reference_canister::{
-    Account as OrigynAccount, AskFeature, MarketTransferRequest, PricingConfigShared, SalesConfig,
+    SaleInfoRequest, SaleInfoResponse, SaleInfoResult,
 };
 use pocket_ic::PocketIc;
+use std::time::Duration;
 
-use crate::client::gldt_swap::swap_nft_for_tokens;
-use std::{array::TryFromSliceError, time::Duration};
-
-use canister_time::{timestamp_millis, MINUTE_IN_MS};
-use gldt_swap_common::{
-    gldt::GldtNumTokens,
-    nft::NftID,
-    swap::{BidFailError, SwapDetailForward, SwapErrorForward, SwapId, SwapIndex},
-};
-
-use gldt_swap_api_canister::remove_intent_to_swap::RemoveIntentToSwapError;
-use origyn_nft_reference::origyn_nft_reference_canister::{
-    AuctionStateSharedStatus, EscrowReceipt, MarketTransferRequestReponseTxnType,
-    MarketTransferResult, SaleInfoRequest, SaleInfoResponse, SaleInfoResult,
-};
-
-use crate::client::{
-    gldt_swap::{get_swap, insert_fake_swap, remove_intent_to_swap},
-    icrc1::client::transfer,
-    origyn_nft_reference::sale_info_nft_origyn,
-};
+use crate::client::icrc1_icrc2_token::icrc1_transfer;
+use crate::client::origyn_nft_reference::sale_info_nft_origyn;
+use utils::consts::E8S_FEE_OGY;
 
 fn init_nft_with_premint_nft(
     pic: &mut PocketIc,
@@ -81,17 +61,6 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use gldt_swap_common::swap::{NotificationError, STALE_SWAP_TIME_THRESHOLD_MINUTES};
-    use utils::consts::E8S_FEE_OGY;
-
-    use crate::{
-        client::{
-            icrc1_icrc2_token::{icrc1_transfer, icrc2_transfer_from},
-            origyn_nft_reference::nft_origyn,
-        },
-        wasms::ORIGYN_NFT,
-    };
-
     use super::*;
     #[test]
     pub fn forward_swap_fee_account_is_automatically_topped_up() {
@@ -116,8 +85,7 @@ mod tests {
         } = env;
         tick_n_blocks(pic, 2);
 
-        let pre_swap_gldt_supply =
-            icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         // 1. setup nft and verify owner
         init_nft_with_premint_nft(
@@ -129,7 +97,7 @@ mod tests {
             "1".to_string(),
         );
 
-        let token_id_as_nat = get_token_id_as_nat(
+        get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
             net_principal.clone(),
@@ -177,7 +145,7 @@ mod tests {
 
         let transfer_amount = Nat::from(1_000_000_000u64 * 20u64);
         // reduce the balance
-        let dummyAccount = Account {
+        let dummy_account = Account {
             owner: origyn_nft,
             subaccount: Some([
                 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
@@ -191,7 +159,7 @@ mod tests {
             ogy_ledger,
             &(icrc1_transfer::Args {
                 from_subaccount: account.subaccount,
-                to: dummyAccount,
+                to: dummy_account,
                 fee: None,
                 created_at_time: None,
                 memo: None,

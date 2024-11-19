@@ -15,5 +15,7 @@ serde = { workspace = true }
 stable_memory = { path = "../stable_memory" }
 types = { path = "../types" }
 tracing = { workspace = true }
-sns_governance_canister = { path = '../../external_canisters/sns_governance/api' }
 tokio = { version = "1.39.2", features = ["macros"]}
+ic-cdk-timers = { workspace = true }
+ic0 = { workspace = true }
+sns_governance_canister = { path = '../../external_canisters/sns_governance/api' }

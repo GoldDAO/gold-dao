@@ -9,3 +9,4 @@ edition = "2021"
 candid = { workspace = true }
 canister_client = { path = "../../../libraries/canister_client" }
 origyn_nft_reference = { path = "../api" }
+icrc-ledger-types = { workspace = true }

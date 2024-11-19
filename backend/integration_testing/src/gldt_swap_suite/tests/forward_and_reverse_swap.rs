@@ -23,7 +23,7 @@ use gldt_swap_common::{
     swap::{SwapId, SwapIndex},
 };
 
-use crate::client::{gldt_swap::get_swap, icrc1::client::transfer};
+use crate::client::gldt_swap::get_swap;
 
 fn init_nft_with_premint_nft(
     pic: &mut PocketIc,
@@ -68,10 +68,17 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use canister_time::{timestamp_nanos, SECOND_IN_MS};
-    use gldt_swap_common::swap::SwapStatusReverse;
+    use canister_time::{timestamp_nanos, HOUR_IN_MS, SECOND_IN_MS};
+    use gldt_swap_common::{
+        gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT},
+        swap::{SwapStatusReverse, MANAGE_GLDT_SUPPLY_INTERVAL},
+    };
 
-    use crate::client::{gldt_swap::swap_tokens_for_nft, icrc1_icrc2_token::icrc2_approve};
+    use crate::client::{
+        gldt_swap::{get_owned_nfts, swap_tokens_for_nft},
+        icrc1::{client::balance_of, icrc1_total_supply},
+        icrc1_icrc2_token::icrc2_approve,
+    };
 
     use super::*;
 
@@ -116,6 +123,15 @@ mod tests {
             "1".to_string(),
         );
 
+        init_nft_with_premint_nft(
+            pic,
+            origyn_nft.clone(),
+            originator.clone(),
+            net_principal.clone(),
+            nft_owner.clone(),
+            "2".to_string(),
+        );
+
         let token_id_as_nat = get_token_id_as_nat(
             pic,
             origyn_nft.clone(),
@@ -124,9 +140,21 @@ mod tests {
         );
         let nft_id = NftID(token_id_as_nat.clone());
 
+        let token_id_as_nat_2 = get_token_id_as_nat(
+            pic,
+            origyn_nft.clone(),
+            net_principal.clone(),
+            "2".to_string(),
+        );
+
         /////////////////////////////////
         /////  Forward swap
         /////////////////////////////////
+
+        // nft 1
+        let gldt_supply_pre = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        println!("///// presale supply : {gldt_supply_pre}");
+        assert_eq!(gldt_supply_pre, Nat::from(0u64));
         let mut swap_id: SwapId = SwapId(NftID(Nat::from(0u64)), SwapIndex::from(0u64));
         let res = swap_nft_for_tokens(
             pic,
@@ -171,24 +199,81 @@ mod tests {
             assert_eq!(details.status, SwapStatusForward::Complete);
         }
 
+        // nft 2
+        let mut swap_id: SwapId = SwapId(NftID(Nat::from(1u64)), SwapIndex::from(1u64));
+        let res = swap_nft_for_tokens(
+            pic,
+            nft_owner,
+            gldt_swap,
+            &vec![(NftID(token_id_as_nat_2.clone()), origyn_nft)],
+        );
+        match res {
+            Ok(ids) => {
+                swap_id = ids[0].clone();
+            }
+            Err(e) => {
+                println!("/// intent to swap errors : {e:?}");
+            }
+        }
+
+        // verify swap got inserted with init state
+        let res = get_swap(pic, Principal::anonymous(), gldt_swap, &swap_id).unwrap();
+        if let SwapInfo::Forward(details) = res.1 {
+            assert_eq!(details.status, SwapStatusForward::Init);
+        }
+        // 2. start the forward swap
+        let market_args = MarketTransferRequest {
+            token_id: "2".to_string(),
+            sales_config: SalesConfig {
+                broker_id: None,
+                pricing: PricingConfigShared::Ask(Some(vec![
+                    AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
+                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::Notify(vec![gldt_swap]),
+                    AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
+                    AskFeature::AllowList(vec![gldt_swap]),
+                ])),
+                escrow_receipt: None,
+            },
+        };
+        market_transfer_nft_origyn(pic, origyn_nft.clone(), nft_owner, market_args);
+        tick_n_blocks(pic, 100);
+        // check swap completed
+        let res = get_swap(pic, Principal::anonymous(), gldt_swap, &swap_id).unwrap();
+        if let SwapInfo::Forward(details) = res.1 {
+            assert_eq!(details.status, SwapStatusForward::Complete);
+        }
+
+        pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL));
+        tick_n_blocks(pic, 3);
+        let canister_owned_nfts = get_owned_nfts(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(
+            canister_owned_nfts.get(&(origyn_nft, 1u16)),
+            Some(&Nat::from(2u64))
+        );
+
+        let gldt_supply_post = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        assert_eq!(gldt_supply_post, Nat::from(20_000_000_000u64));
+        println!("///// gldt_supply_post : {gldt_supply_post}");
+
         /////////////////////////////////
         /////  Reverse Swap
         /////////////////////////////////
 
-        // 2. mint some gldt to user
-        transfer(
+        // check suer has 200 gldt
+        let user_balance = balance_of(
             pic,
-            gldt_swap, // minting account
             gldt_ledger,
-            None,
             Account {
-                owner: nft_owner,
+                owner: nft_owner.clone(),
                 subaccount: None,
             },
-            10_100_000_000u128,
-        )
-        .unwrap();
-        tick_n_blocks(pic, 1);
+        );
+        assert_eq!(user_balance, Nat::from(20_000_000_000u64));
+
+        let gldt_supply_pre = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        println!("///// presale supply : {gldt_supply_pre}");
+        assert_eq!(gldt_supply_pre, Nat::from(20_000_000_000u64));
 
         // 3. pre approve the escrow transfer and verify
         let now_time = timestamp_nanos();
@@ -225,7 +310,12 @@ mod tests {
         )
         .unwrap();
         matches!(swap_id, SwapId(_, _));
-        tick_n_blocks(pic, 90);
+        tick_n_blocks(pic, 50);
+        pic.advance_time(Duration::from_millis(SECOND_IN_MS * 40));
+        tick_n_blocks(pic, 20);
+        pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3));
+        pic.advance_time(Duration::from_millis(SECOND_IN_MS * 40));
+        tick_n_blocks(pic, 50);
 
         // 5. check swap completed and is now in history
         let user_swap = get_swap(pic, Principal::anonymous(), gldt_swap, &swap_id);
@@ -233,6 +323,61 @@ mod tests {
         if let SwapInfo::Reverse(details) = user_swap.unwrap().1 {
             assert_eq!(details.status, SwapStatusReverse::Complete);
         }
+        // wait for the supply balancer to process
+        pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL));
+        tick_n_blocks(pic, 5);
+        let canister_owned_nfts = get_owned_nfts(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(
+            canister_owned_nfts.get(&(origyn_nft, 1u16)),
+            Some(&Nat::from(1u64))
+        );
+
+        let gldt_supply_post = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
+        assert_eq!(gldt_supply_post, Nat::from(10_000_000_000u64)); // we kept the swap fee so user has 99 and swap canister has 1
+        println!("///// gldt_supply_post : {gldt_supply_post}");
+
+        // 8. ensure escrow account is empty
+        let balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: gldt_swap,
+                subaccount: Some(nft_id.clone().into()),
+            },
+        );
+        assert_eq!(balance, Nat::from(0u64));
+
+        let balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: nft_owner,
+                subaccount: None,
+            },
+        );
+        assert_eq!(balance, Nat::from(9_900_000_000u64)); // user had 200 but spent 101 to swap so has 99
+
+        // 9. ensure fees account has correct fees
+        let balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: gldt_swap,
+                subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
+            },
+        );
+        assert_eq!(balance, Nat::from(97_000_000u64)); // swap fee account should have 97 inside of it
+
+        // 10. ensure ledger fee account kept the remaining tx fees - escrow transfer from user to escrow takes 2x and then transfer swap fee from escrow to swap fee collection
+        let balance = balance_of(
+            pic,
+            gldt_ledger,
+            Account {
+                owner: gldt_swap,
+                subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
+            },
+        );
+        assert_eq!(balance, Nat::from(3_000_000u64)); //
 
         /////////////////////////////////
         /////  Forward swap
@@ -280,5 +425,12 @@ mod tests {
         if let SwapInfo::Forward(details) = res.1 {
             assert_eq!(details.status, SwapStatusForward::Complete);
         }
+        pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL));
+        tick_n_blocks(pic, 3);
+        let canister_owned_nfts = get_owned_nfts(pic, Principal::anonymous(), gldt_swap, &());
+        assert_eq!(
+            canister_owned_nfts.get(&(origyn_nft, 1u16)),
+            Some(&Nat::from(2u64))
+        );
     }
 }

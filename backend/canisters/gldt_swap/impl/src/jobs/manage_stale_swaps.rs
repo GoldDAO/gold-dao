@@ -4,19 +4,18 @@ use crate::{
     swap::forward_swap::{forward_swap_perform_burn_fees, forward_swap_perform_deposit_recovery},
     utils::is_nft_in_sale_state,
 };
-use canister_time::{run_interval, MINUTE_IN_MS};
+use canister_time::run_interval;
 use futures::{
     future::{join_all, BoxFuture},
     FutureExt,
 };
-use gldt_swap_common::swap::{SwapErrorForward, SwapId, SwapInfo, SwapStatus, SwapStatusForward};
+use gldt_swap_common::swap::{
+    SwapErrorForward, SwapId, SwapInfo, SwapStatus, SwapStatusForward, MANAGE_STALE_SWAPS_INTERVAL,
+};
 use std::time::Duration;
-use types::Milliseconds;
-
-const INTERVAL: Milliseconds = MINUTE_IN_MS * 1;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(INTERVAL), || {
+    run_interval(Duration::from_millis(MANAGE_STALE_SWAPS_INTERVAL), || {
         let is_running = read_state(|s| s.data.is_remove_stale_swaps_cron_running);
         if is_running {
             return;

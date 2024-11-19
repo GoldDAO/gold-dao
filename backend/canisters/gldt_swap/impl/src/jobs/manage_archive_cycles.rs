@@ -1,16 +1,15 @@
 use crate::state::{mutate_state, read_state};
 use candid::Nat;
-use canister_time::{run_now_then_interval, MINUTE_IN_MS};
+use canister_time::run_now_then_interval;
 use futures::future::join_all;
+use gldt_swap_common::swap::MANAGE_ARCHIVE_CYCLE_INTERVAL;
 use std::time::Duration;
 use tracing::info;
-use types::{Cycles, Milliseconds};
+use types::Cycles;
 use utils::{
     canister::{deposit_cycles, get_cycles_balance},
     env::Environment,
 };
-
-const MANAGE_ARCHIVE_CYCLE_INTERVAL: Milliseconds = MINUTE_IN_MS * 10;
 
 pub fn start_job() {
     run_now_then_interval(

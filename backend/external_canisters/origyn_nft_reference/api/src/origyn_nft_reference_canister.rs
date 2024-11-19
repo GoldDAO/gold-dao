@@ -120,9 +120,11 @@ pub type FeeAccountsParams = Vec<FeeName>;
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]
 pub struct NiftySettlementType {
     pub fixed: bool,
+    #[allow(non_snake_case)]
     pub interestRatePerSecond: f64,
     pub duration: Option<candid::Int>,
     pub expiration: Option<candid::Int>,
+    #[allow(non_snake_case)]
     pub lenderOffer: bool,
 }
 #[derive(CandidType, Deserialize, Debug, Clone, PartialEq)]

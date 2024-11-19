@@ -34,12 +34,20 @@ if [[ $DEPLOYMENT_VIA == "direct" ]]; then
       -y
   else
     echo "Upgrading $CANISTER directly via dfx with arguments: $ARGUMENTS"
+
+    echo "Attemping to stop canister $CANISTER";
+    dfx canister stop $CANISTER --network $NETWORK;
+
+    echo "Attemping to install canister $CANISTER"
     dfx canister install $CANISTER \
       --network $NETWORK \
       --mode upgrade \
       --argument "$ARGUMENTS" \
       --wasm backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
       -y
+
+    echo "Attemping to start canister $CANISTER";
+    dfx canister start $CANISTER --network $NETWORK;
   fi
 
 elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then

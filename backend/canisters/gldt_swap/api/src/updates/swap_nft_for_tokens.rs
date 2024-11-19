@@ -6,6 +6,8 @@ use gldt_swap_common::{
     swap::{ServiceDownReason, SwapId},
 };
 
+use super::swap_tokens_for_nft::RetryInMilliseconds;
+
 pub type Args = Vec<(NftID, Principal)>;
 
 pub type Response = Result<Vec<SwapId>, SwapNftForTokensErrors>;
@@ -18,6 +20,8 @@ pub enum SwapNftForTokensErrors {
     ServiceDown(ServiceDownReason),
     Limit(String),
     CantBeAnonymous(String),
+    Retry(RetryInMilliseconds),
+    SwapArgsIsEmpty,
 }
 
 #[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]

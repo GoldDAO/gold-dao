@@ -8,6 +8,7 @@ use gldt_swap_common::{
     swap::{SwapId, SwapInfo},
 };
 
+use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::{
     account::{Account, Subaccount},
     transfer::{Memo, TransferArg},
@@ -16,7 +17,8 @@ use origyn_nft_reference::origyn_nft_reference_canister::{
     AuctionStateSharedStatus, NftInfoResult, SaleStatusSharedSaleType,
 };
 use origyn_nft_reference_c2c_client::nft_origyn;
-use utils::env::Environment;
+use tracing::debug;
+use utils::{env::Environment, retry_async::retry_async};
 
 use crate::state::read_state;
 
@@ -138,4 +140,41 @@ pub async fn get_historic_swap(swap_id: &SwapId) -> Option<SwapInfo> {
 pub async fn commit_changes() {
     let this_canister_id = read_state(|s| s.env.canister_id());
     let _ = ic_cdk::call::<(), ()>(this_canister_id, "commit", ()).await;
+}
+
+pub async fn check_fee_account_has_enough_ogy(nft_canister: Principal, threshold: Nat) -> bool {
+    let ogy_ledger_id = read_state(|s| s.data.ogy_ledger_id);
+    let fee_accounts = read_state(|s| s.data.gldnft_canisters.clone());
+
+    let correct_record = fee_accounts
+        .iter()
+        .find(|(prin, _, _)| prin == &nft_canister);
+
+    match correct_record {
+        Some((_, _, fee_accont)) => match fee_accont {
+            Some(account) => {
+                match retry_async(|| icrc1_balance_of(ogy_ledger_id, account), 3).await {
+                    Ok(balance) => {
+                        return balance > threshold;
+                    }
+                    Err(e) => {
+                        debug!("CHECK_FEE_ACCOUNT :: error {e:?}");
+                        return false;
+                    }
+                };
+            }
+            None => {
+                debug!(
+                        "CHECK_FEE_ACCOUNT :: fee account does not exist yet for nft canister {nft_canister:?}"
+                    );
+                return false;
+            }
+        },
+        None => {
+            debug!(
+                "CHECK_FEE_ACCOUNT :: fee account does not exist yet for nft canister {nft_canister:?}"
+            );
+            return false;
+        }
+    }
 }
