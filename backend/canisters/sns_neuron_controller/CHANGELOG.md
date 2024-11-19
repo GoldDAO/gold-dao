@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.6] - 2024-11-19
+
+#### Fixed
+
+- **Candid interface**: Add __get_candid_interface_tmp_hack to depict the interface on the dashboard.
+
 ### [1.0.5] - 2024-09-25
 
 #### New
