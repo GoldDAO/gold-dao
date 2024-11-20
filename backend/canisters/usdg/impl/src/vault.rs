@@ -4,8 +4,6 @@ use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
 use usdg_minter_api::ApiFeeBucket;
 
-pub type VaultId = u64;
-
 #[derive(CandidType, Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Vault {
     // The vault unique Id.
