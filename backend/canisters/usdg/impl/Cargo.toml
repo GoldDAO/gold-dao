@@ -14,6 +14,7 @@ inttest = []
 
 [dependencies]
 candid = { workspace = true }
+canister_state_macros = { path = '../../../libraries/canister_state_macros' }
 gldt_swap_common = { path = "../../gldt_swap/common" }
 ic0 = { workspace = true }
 ic-cdk = { workspace = true }
