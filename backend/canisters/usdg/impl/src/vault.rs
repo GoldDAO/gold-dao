@@ -1,13 +1,15 @@
 use crate::numeric::{GLDT, USDG};
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use usdg_minter_api::ApiFeeBucket;
+
+pub type VaultId = u64;
 
 #[derive(CandidType, Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Vault {
     // The vault unique Id.
-    pub vault_id: u64,
+    pub vault_id: VaultId,
     // The owner of the vault.
     pub owner: Account,
     // The amount of USDG currently borrowed from this vault.

@@ -1,6 +1,4 @@
-use candid::{CandidType, Principal};
-use icrc_ledger_types::icrc2::transfer_from::TransferFromError;
-use serde::Deserialize;
+use candid::Principal;
 use usdg_minter_api::VaultError;
 
 pub mod timer;

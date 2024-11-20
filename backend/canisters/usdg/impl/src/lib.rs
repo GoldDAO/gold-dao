@@ -6,7 +6,6 @@ pub mod management;
 pub mod numeric;
 pub mod queries;
 pub mod state;
-pub mod tasks;
 pub mod transfer;
 pub mod updates;
 pub mod vault;

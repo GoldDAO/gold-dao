@@ -2,13 +2,10 @@ use crate::management::transfer_from;
 use crate::numeric::{GLDT, USDG};
 use crate::state::{mutate_state, read_state};
 use crate::updates::{reject_anonymous_caller, VaultError};
-use crate::vault::FeeBucket;
 use crate::MINIMUM_MARGIN_AMOUNT;
-use candid::{CandidType, Nat, Principal};
+use candid::Nat;
 use ic_cdk::update;
 use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc2::transfer_from::TransferFromError;
-use serde::Deserialize;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 
 #[update]

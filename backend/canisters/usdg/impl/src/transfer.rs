@@ -1,9 +1,9 @@
 use crate::state::read_state;
-use crate::GLDT_TRANSFER_FEE;
 use candid::{CandidType, Principal};
+use gldt_swap_common::gldt::GLDT_TX_FEE;
 use icrc_ledger_types::icrc1::account::Account;
 use minicbor::{Decode, Encode};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::fmt;
 
 pub type TransferId = u64;
@@ -27,7 +27,7 @@ impl Unit {
 
     pub fn fee(&self) -> u64 {
         match self {
-            Unit::GLDT => GLDT_TRANSFER_FEE,
+            Unit::GLDT => GLDT_TX_FEE,
             Unit::USDG => 0, // The transfer fee should be 0 as this canister is the minter.
         }
     }

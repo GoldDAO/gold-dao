@@ -2,7 +2,7 @@
 
 #[export_name = "canister_global_timer"]
 fn timer() {
-    use crate::tasks::{pop_if_ready, TaskType};
+    use crate::lifecycle::tasks::{pop_if_ready, TaskType};
 
     // const INTERVAL_PROCESSING: Duration = Duration::from_secs(5);
 
