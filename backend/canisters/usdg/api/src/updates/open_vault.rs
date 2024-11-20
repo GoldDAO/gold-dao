@@ -1,4 +1,4 @@
-use crate::{ApiFeeBucket, VaultError, DisplayAmount};
+use crate::{types::DisplayAmount, ApiFeeBucket, VaultError};
 use candid::CandidType;
 use serde::Deserialize;
 use std::fmt;

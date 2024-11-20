@@ -1,10 +1,10 @@
-use candid::{Principal, CandidType};
+use candid::{CandidType, Principal};
 use serde::Deserialize;
 
 #[derive(CandidType, Deserialize)]
 pub enum MinterArgument {
     Init(InitArgument),
-    Upgrade(UpgradeArgument)
+    Upgrade(UpgradeArgument),
 }
 
 #[derive(CandidType, Deserialize)]
