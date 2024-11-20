@@ -31,7 +31,6 @@ integration tests:
       'super_stats_v3 integration-test build',
       'token_metrics integration-test build',
       'gldt_swap integration-test build',
-      'usdg_minter integration-test build',
     ]
   extends: .rust template
   tags:
