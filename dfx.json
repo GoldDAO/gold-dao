@@ -138,7 +138,7 @@
       "type": "assets"
     },
     "usdg": {
-      "build": ["./scripts/build_canister.sh usdg"],
+      "build": ["./scripts/build_canister.sh usdg_minter"],
       "candid": "backend/canisters/usdg/api/can.did",
       "declarations": {
         "bindings": ["js", "did"],
