@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NETWORK=$1
-DEPLOYMENT_VIA="direct"
+DEPLOYMENT_VIA="proposal"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
 
