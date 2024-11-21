@@ -146,10 +146,6 @@ include:
       sns-controlled: "false"
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
-      src-folder: usdg_minter
-      sns-controlled: "false"
-  - local: scripts/ci-cd/.frontend_deploys.yml
-    inputs:
       src-folder: gld_landing_page
       sns-controlled: "false"
 
