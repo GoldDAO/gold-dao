@@ -138,13 +138,15 @@
       "type": "assets"
     },
     "usdg": {
+      "build": ["./scripts/build_canister.sh usdg_minter"],
+      "candid": "backend/canisters/usdg/api/can.did",
       "declarations": {
-        "bindings": [],
+        "bindings": ["js", "did"],
         "env_override": null,
-        "output": null
+        "output": "backend/canisters/usdg/api/declarations"
       },
-      "source": ["client/usdg/dist"],
-      "type": "assets"
+      "type": "custom",
+      "wasm": "backend/canisters/usdg/target/wasm32-unknown-unknown/release/usdg_canister.wasm.gz"
     },
     "icp_neuron": {
       "build": ["./scripts/build_canister.sh icp_neuron"],

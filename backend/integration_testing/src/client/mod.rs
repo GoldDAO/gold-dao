@@ -6,3 +6,4 @@ pub mod origyn_nft_reference;
 pub mod pocket;
 pub mod rewards;
 pub mod sns_neuron_controller;
+pub mod usdg;

@@ -80,6 +80,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "assert_matches"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
+
+[[package]]
 name = "async-trait"
 version = "0.1.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1822,6 +1828,7 @@ dependencies = [
 name = "integration_testing"
 version = "0.1.0"
 dependencies = [
+ "assert_matches",
  "buyback_burn_api",
  "candid 0.10.10",
  "canister_time",
@@ -1831,6 +1838,7 @@ dependencies = [
  "hex",
  "ic-ledger-types",
  "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "icrc-ledger-types 0.1.6 (git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb)",
  "icrc_ledger_canister",
  "lazy_static",
  "management_api_canister",
@@ -1847,6 +1855,7 @@ dependencies = [
  "super_stats_v3_api",
  "token_metrics_api",
  "types",
+ "usdg_minter_api",
  "utils",
 ]
 
@@ -4113,14 +4122,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "usdg_api_canister"
-version = "0.1.0"
-
-[[package]]
-name = "usdg_canister"
+name = "usdg_minter"
 version = "0.1.0"
 dependencies = [
+ "assert_matches",
  "candid 0.10.10",
+ "gldt_swap_common",
  "ic-cdk 0.16.0",
  "ic-xrc-types",
  "ic0 0.23.0",
@@ -4130,6 +4137,16 @@ dependencies = [
  "minicbor-derive",
  "proptest",
  "rust_decimal",
+ "serde",
+ "usdg_minter_api",
+]
+
+[[package]]
+name = "usdg_minter_api"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "icrc-ledger-types 0.1.6 (git+https://github.com/dfinity/ic.git?rev=1488a310043f6a0907f4a84ba7af00e3d90d16eb)",
  "serde",
 ]
 
