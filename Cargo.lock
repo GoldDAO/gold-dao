@@ -4115,7 +4115,6 @@ version = "0.1.0"
 dependencies = [
  "assert_matches",
  "candid 0.10.10",
- "canister_state_macros",
  "gldt_swap_common",
  "ic-cdk 0.16.0",
  "ic-xrc-types",

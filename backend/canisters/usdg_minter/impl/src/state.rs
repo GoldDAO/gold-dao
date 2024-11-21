@@ -3,8 +3,8 @@ use crate::transfer::{PendingTransfer, TransferId, Unit};
 use crate::vault::{FeeBucket, Vault, VaultId};
 use crate::{DEFAULT_GOLD_PRICE, MINIMUM_COLLATERAL_RATIO};
 use candid::Principal;
-use canister_state_macros::canister_state;
 use icrc_ledger_types::icrc1::account::Account;
+use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
 use usdg_minter_api::lifecycle::InitArgument;
 use usdg_minter_api::VaultError;
@@ -12,7 +12,9 @@ use usdg_minter_api::VaultError;
 #[cfg(test)]
 pub mod tests;
 
-canister_state!(State);
+thread_local! {
+    static __STATE: RefCell<Option<State>> = RefCell::default();
+}
 
 pub struct State {
     pub next_vault_id: VaultId,
@@ -144,4 +146,24 @@ impl State {
         }
         vault_id
     }
+}
+
+pub fn mutate_state<F, R>(f: F) -> R
+where
+    F: FnOnce(&mut State) -> R,
+{
+    __STATE.with(|s| f(s.borrow_mut().as_mut().expect("State not initialized!")))
+}
+
+pub fn read_state<F, R>(f: F) -> R
+where
+    F: FnOnce(&State) -> R,
+{
+    __STATE.with(|s| f(s.borrow().as_ref().expect("State not initialized!")))
+}
+
+pub fn replace_state(state: State) {
+    __STATE.with(|s| {
+        *s.borrow_mut() = Some(state);
+    });
 }
