@@ -1,0 +1,32 @@
+[package]
+name = "usdg_minter"
+version = "0.1.0"
+description = "USDG protocol"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+default = []  # Empty default features
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+canister_state_macros = { path = '../../../libraries/canister_state_macros' }
+gldt_swap_common = { path = "../../gldt_swap/common" }
+ic0 = { workspace = true }
+ic-cdk = { workspace = true }
+ic-xrc-types = { workspace = true }
+icrc-ledger-types =  { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
+icrc-ledger-client-cdk = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
+minicbor = { workspace = true }
+minicbor-derive = { workspace = true }
+rust_decimal = { workspace = true }
+serde = { workspace = true }
+usdg_minter_api = { path = "../api" }
+
+[dev-dependencies]
+proptest = "1.5.0"
+assert_matches = { workspace = true }
