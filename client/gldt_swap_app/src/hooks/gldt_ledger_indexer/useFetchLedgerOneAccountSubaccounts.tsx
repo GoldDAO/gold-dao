@@ -40,7 +40,11 @@ export const fetchSubaccounts = async ({
     return Buffer.from(s).toString("hex");
   });
 
-  return subaccounts;
+  const data = subaccounts.map((sub: string) => {
+    if (Number(sub) === 0) return "Default subaccount";
+    return sub;
+  });
+  return data;
 };
 
 export const useFetchLedgerOneAccountSubaccounts = ({

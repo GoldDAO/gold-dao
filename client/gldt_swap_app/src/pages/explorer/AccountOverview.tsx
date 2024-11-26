@@ -10,7 +10,7 @@ import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
 import NavbarHome from "@components/shared/navbars/Home";
 import { AccountBalanceGLDT } from "@components/explorer/card/AccountBalanceGLDT";
-import { AccountOwner } from "@components/explorer/card/AccountOwner";
+import { FullAccount } from "@components/explorer/card/FullAccount";
 import { OwnerSubaccounts } from "@components/explorer/card/OwnerSubaccounts";
 
 import { Transaction, TxAccount } from "@hooks/gldt_ledger_indexer/utils";
@@ -196,14 +196,18 @@ export const AccountOverview = () => {
       <div className="bg-surface-2">
         <NavbarHome />
         <section className="container mx-auto px-4 py-8 xl:py-16">
-          <Breadcrumb owner={owner} />
+          <Breadcrumb owner={owner} subaccount={subaccount} />
           <div className="my-8">
             <div className="text-4xl font-semibold text-gold">GLDT</div>
             <div className="text-4xl">Account Overview</div>
           </div>
           <div className="mt-16">
             <div className="grid grid-cols-1 lg:grid-cols-3 lg:items-center gap-4 mb-8 h-42">
-              <AccountOwner owner={owner} className="h-full" />
+              <FullAccount
+                owner={owner}
+                subaccount={subaccount}
+                className="h-full"
+              />
               <OwnerSubaccounts
                 owner={owner}
                 subaccount={subaccount}

@@ -85,7 +85,7 @@ export const AccountTransactionDetails = () => {
                     <div className="font-semibold">
                       {data.fee ? (
                         <div className="flex items-center gap-2">
-                          <div className="font-semibold">{data.amount}</div>
+                          <div className="font-semibold">{data.fee}</div>
                           <LogoGLDT className="w-4 h-4" />
                         </div>
                       ) : (

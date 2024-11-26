@@ -37,7 +37,7 @@ export interface Transaction {
   type?: string;
   index?: number;
   memo?: string;
-  fee?: number;
+  fee?: string;
 }
 
 const getAccountText = ({
@@ -76,7 +76,6 @@ const getAccountText = ({
       owner = from.owner;
       subaccount = from.subaccount?.[0] ?? undefined;
     } else {
-      //   console.log(to);
       owner = to.owner;
       subaccount = to.subaccount?.[0] ?? undefined;
     }
@@ -147,7 +146,7 @@ export const formatTransactionsResults = (results: GetTransactions) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const txData = (tx.transaction as any)[type][0];
-    // console.log(tx);
+    // console.log(txData);
 
     const amount = roundAndFormatLocale({
       number: divideBy1e8(txData.amount),
@@ -175,7 +174,12 @@ export const formatTransactionsResults = (results: GetTransactions) => {
             kind: type,
             account: "to",
           });
-    const fee = txData.fee && txData.fee[0] ? Number(txData.fee[0]) : undefined;
+    const fee =
+      txData.fee && txData.fee[0]
+        ? roundAndFormatLocale({
+            number: divideBy1e8(Number(txData.fee[0])),
+          })
+        : undefined;
     const memo =
       txData.memo && txData.memo[0]
         ? Buffer.from(txData.memo[0] as Uint8Array).toString()
