@@ -20,22 +20,22 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/20/solid";
-import SelectPagination from "@components/ui/table/SelectPagination";
+import { SelectTablePageLimit } from "@components/ui/select/index";
 
 interface ReactTableProps<T extends object> {
-  data: T[];
-  columns: ColumnDef<T>[];
+  data: T;
+  columns: ColumnDef<T.rows>[];
   pagination?: PaginationState;
   setPagination?: OnChangeFn<PaginationState>;
   sorting?: SortingState;
   setSorting?: OnChangeFn<SortingState>;
-  getRowCanExpand?: (row: Row<T>) => boolean;
+  getRowCanExpand?: (row: Row<T.rows>) => boolean;
   subComponent?: ReactNode;
   identifier?: string;
 }
 
 const linesPerPageOptions = [
-  { value: 10 },
+  { value: 5 },
   { value: 20 },
   { value: 50 },
   { value: 100 },
@@ -223,52 +223,56 @@ const Table = <T extends object>({
 
       <div className="p-1 w-full">
         {pagination && setPagination && (
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6">
+            <div className="flex order-last justify-center md:order-first md:justify-start items-center">
               <span>Lines per page</span>
-              <SelectPagination
+              <SelectTablePageLimit
                 options={linesPerPageOptions}
                 value={table.getState().pagination.pageSize}
                 handleOnChange={(value) => handleOnChangePageSize(value)}
                 className="ml-2 w-25"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                className="p-1"
-                onClick={handleOnClickFirstPage}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronDoubleLeftIcon className="h-5 w-5" />
-              </button>
-              <button
-                className="p-1"
-                onClick={handleOnClickPreviousPage}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeftIcon className="h-5 w-5" />
-              </button>
-              <button
-                className="p-1"
-                onClick={handleOnClickNextPage}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRightIcon className="h-5 w-5" />
-              </button>
-              <button
-                className="p-1"
-                onClick={handleOnClickLastPage}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronDoubleRightIcon className="h-5 w-5" />
-              </button>
-              <span className="flex items-center gap-1">
+
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+              <div className="flex justify-center md:justify-start mb-2 md:mb-0">
+                <button
+                  className="p-1"
+                  onClick={handleOnClickFirstPage}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronDoubleLeftIcon className="h-5 w-5" />
+                </button>
+                <button
+                  className="p-1"
+                  onClick={handleOnClickPreviousPage}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </button>
+                <button
+                  className="p-1"
+                  onClick={handleOnClickNextPage}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronRightIcon className="h-5 w-5" />
+                </button>
+                <button
+                  className="p-1"
+                  onClick={handleOnClickLastPage}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronDoubleRightIcon className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex justify-center md:justify-start mb-4 md:mb-0 items-center gap-1">
                 <div>Page</div>
                 <strong>
                   {table.getState().pagination.pageIndex + 1} of{" "}
                   {table.getPageCount().toLocaleString()}
                 </strong>
-              </span>
+              </div>
               {/* <span className="flex items-center gap-1">
             | Go to page:
             <input

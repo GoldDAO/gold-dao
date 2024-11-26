@@ -1,5 +1,5 @@
 import { Mode, useSwap } from "@context/index";
-import { Select } from "@components/ui";
+import { SelectToken } from "@components/ui/select/index";
 import { LogoGLDT } from "@components/shared/logos";
 
 const SWAP_MODE_OPTIONS = [
@@ -19,7 +19,7 @@ const SelectSwapMode = () => {
   };
 
   return (
-    <Select
+    <SelectToken
       options={SWAP_MODE_OPTIONS}
       value={swapState.mode === Mode.FORWARD ? "GLD NFT" : "GLDT"}
       handleOnChange={(value) =>

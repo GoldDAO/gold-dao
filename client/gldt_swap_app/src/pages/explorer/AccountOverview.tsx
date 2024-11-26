@@ -1,0 +1,250 @@
+import { useMemo } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { CellContext, ColumnDef } from "@tanstack/react-table";
+import { BugAntIcon } from "@heroicons/react/24/solid";
+
+import { Table, LoaderSpin } from "@components/ui";
+import { BadgeTransactionType } from "@components/shared/badge/TransactionType";
+// import { usePaginationCursor } from "@utils/table/useTable";
+import CopyToClipboard from "@components/shared/button/CopyToClipboard";
+
+import NavbarHome from "@components/shared/navbars/Home";
+import { AccountBalanceGLDT } from "@components/explorer/card/AccountBalanceGLDT";
+import { AccountOwner } from "@components/explorer/card/AccountOwner";
+import { OwnerSubaccounts } from "@components/explorer/card/OwnerSubaccounts";
+
+import { Transaction, TxAccount } from "@hooks/gldt_ledger_indexer/utils";
+import { useFetchLedgerAccountTransactions } from "@hooks/gldt_ledger_indexer/useFetchLedgerAccountTransactions";
+import { Breadcrumb } from "@components/explorer/Breadcrumb";
+
+export const AccountOverview = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // const [pagination] = usePaginationCursor();
+  const owner = searchParams.get("owner") as string;
+  const subaccount = searchParams.get("subaccount") as string | undefined;
+  const { data, isSuccess, isLoading, isError, error } =
+    useFetchLedgerAccountTransactions({
+      pageSize: 100,
+      start: undefined,
+      owner,
+      subaccount,
+    });
+
+  // useEffect(() => {
+  //   if (isSuccess && data) {
+  //     if (data.start) {
+  //       searchParams.set("page_start", data.start.toString());
+  //       setSearchParams(searchParams);
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isSuccess, data]);
+
+  const handleClickCol = (cell: CellContext<Transaction, unknown>) => {
+    const columnId = cell.column.id;
+    const row = cell.row.original;
+    const pathnames: { [key: string]: string } = {
+      index: `/explorer/transaction/${row.index}${
+        row.from?.owner
+          ? `?owner=${row.from?.owner}${
+              row.from?.subaccount ? `&subaccount=${row.from.subaccount}` : ""
+            }`
+          : ""
+      }`,
+      to: `/explorer/account?owner=${row.to?.owner}${
+        row.to?.subaccount ? `&subaccount=${row.to?.subaccount}` : ""
+      }`,
+      from: `/explorer/account?owner=${row.from?.owner}${
+        row.from?.subaccount ? `&subaccount=${row.from?.subaccount}` : ""
+      }`,
+    };
+    navigate(pathnames[columnId]);
+  };
+
+  const columns = useMemo<ColumnDef<Transaction>[]>(
+    () => [
+      {
+        accessorKey: "index",
+        id: "index",
+        cell: (info) => {
+          const value = info.getValue() as string;
+          return (
+            <div className="flex items-center">
+              <button onClick={() => handleClickCol(info)}>{value}</button>
+            </div>
+          );
+        },
+        header: "Index",
+        meta: {
+          className: "",
+        },
+      },
+      // {
+      //   accessorKey: "hash",
+      //   id: "hash",
+      //   cell: (info) => {
+      //     const value = info.getValue() as string;
+      //     return value ? (
+      //       <div className="flex items-center max-w-32">
+      //         <button
+      //           onClick={() => handleClickCol(info)}
+      //           data-tooltip-id="tooltip"
+      //           data-tooltip-content={value}
+      //           className="mr-2 truncate"
+      //         >
+      //           {value}
+      //         </button>
+      //         <CopyToClipboard value={value} />
+      //       </div>
+      //     ) : null;
+      //   },
+      //   header: "Hash",
+      //   meta: {
+      //     className: "",
+      //   },
+      // },
+      {
+        accessorKey: "date",
+        id: "date",
+        cell: ({ getValue }) => {
+          return <div className="text-sm">{getValue() as string}</div>;
+        },
+        header: "Date",
+      },
+      {
+        accessorKey: "type",
+        id: "type",
+        cell: ({ getValue }) => (
+          <BadgeTransactionType type={getValue() as string} />
+          // <Badge className="bg-gold/20 px-2">
+          //   <div className="text-gold text-xs font-semibold shrink-0">
+          //     {getValue() as string}
+          //   </div>
+          // </Badge>
+        ),
+        header: "Type",
+      },
+      {
+        accessorKey: "amount",
+        id: "amount",
+        cell: ({ getValue }) => getValue(),
+        header: "Amount",
+      },
+      {
+        accessorKey: "from",
+        id: "from",
+        cell: (info) => {
+          const value = info.getValue() as TxAccount;
+          if (!value) return <div>-</div>;
+          return (
+            <div className="flex items-center max-w-56">
+              {value.full && value.full === "Minting account" ? (
+                <div>{value.full}</div>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleClickCol(info)}
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content={value.full}
+                    className="mr-2 truncate"
+                  >
+                    {value.full}
+                  </button>
+                  <CopyToClipboard value={value.full} />
+                </>
+              )}
+            </div>
+          );
+        },
+        header: "From",
+      },
+      {
+        accessorKey: "to",
+        id: "to",
+        cell: (info) => {
+          const value = info.getValue() as TxAccount;
+          if (!value) return <div>-</div>;
+          return (
+            <div className="flex items-center max-w-56">
+              {value.full && value.full === "Minting account" ? (
+                <div>{value.full}</div>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleClickCol(info)}
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content={value.full}
+                    className="mr-2 truncate"
+                  >
+                    {value.full}
+                  </button>
+                  <CopyToClipboard value={value.full} />
+                </>
+              )}
+            </div>
+          );
+        },
+        header: "To",
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  return (
+    <>
+      <div className="bg-surface-2">
+        <NavbarHome />
+        <section className="container mx-auto px-4 py-8 xl:py-16">
+          <Breadcrumb owner={owner} />
+          <div className="my-8">
+            <div className="text-4xl font-semibold text-gold">GLDT</div>
+            <div className="text-4xl">Account Overview</div>
+          </div>
+          <div className="mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-3 lg:items-center gap-4 mb-8 h-42">
+              <AccountOwner owner={owner} className="h-full" />
+              <OwnerSubaccounts
+                owner={owner}
+                subaccount={subaccount}
+                className="h-full"
+              />
+              <AccountBalanceGLDT
+                owner={owner}
+                subaccount={subaccount}
+                className="h-full"
+              />
+            </div>
+
+            {isLoading && (
+              <div className="flex justify-center my-16">
+                <LoaderSpin />
+              </div>
+            )}
+            {isSuccess &&
+              (data.hasResults ? (
+                <Table
+                  columns={columns}
+                  data={data}
+                  // pagination={pagination}
+                  // setPagination={setPagination}
+                />
+              ) : (
+                <div className="text-center my-16">
+                  No transactions found for this subaccount.
+                </div>
+              ))}
+            {isError && (
+              <div className="flex flex-col justify-center items-center my-16">
+                <div>
+                  <BugAntIcon className="size-16 mb-6 text-gold/80 animate-bounce" />
+                </div>
+                <div>{error.message}</div>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </>
+  );
+};

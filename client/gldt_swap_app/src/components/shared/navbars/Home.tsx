@@ -12,6 +12,7 @@ const Default = () => {
 
   const navItems: { title: string; url: string }[] = [
     { title: "Home", url: "/" },
+    { title: "GLDT Explorer", url: "/explorer" },
     { title: "FAQ", url: "/faqs" },
   ];
 
@@ -34,7 +35,9 @@ const Default = () => {
               <Link
                 to={url}
                 className={`text-content hover:font-semibold ${
-                  active === url ? "font-semibold" : ""
+                  (active.includes(url) && url !== "/") || active === url
+                    ? "font-semibold"
+                    : ""
                 }`}
                 key={i}
               >
@@ -62,7 +65,7 @@ const Default = () => {
               className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-2 focus:outline-none"
             >
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+              <Bars3Icon className="h-6 w-6" />
             </button>
           </div>
         </div>
@@ -78,7 +81,6 @@ const Default = () => {
           >
             <div
               className="absolute z-50 inset-0 overflow-hidden"
-              aria-hidden="true"
               onClick={() => setShowMenu(false)}
             >
               <TransitionChild
@@ -117,7 +119,7 @@ const Default = () => {
                           className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-2 focus:outline-none"
                         >
                           <span className="sr-only">Open main menu</span>
-                          <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                          <XMarkIcon className="h-6 w-6" />
                         </button>
                       </div>
 
