@@ -21,7 +21,9 @@ export const OwnerSubaccounts = ({
     });
 
   const handleOnChange = (subaccount: string) => {
-    searchParams.set("subaccount", subaccount);
+    if (subaccount !== "Default subaccount")
+      searchParams.set("subaccount", subaccount);
+    else searchParams.delete("subaccount");
     setSearchParams(searchParams, { replace: true });
   };
 
@@ -30,19 +32,14 @@ export const OwnerSubaccounts = ({
       className={`border border-border rounded-xl bg-surface p-6 ${className}`}
     >
       <div className="text-center lg:text-left mb-4">Subaccount</div>
-      {isSuccess &&
-        data &&
-        (Number(data) !== 0 ? (
-          <div>
-            <SelectSubaccount
-              options={data}
-              handleOnChange={(v) => handleOnChange(v)}
-              value={subaccount ?? ""}
-            />
-          </div>
-        ) : (
-          <div className="font-semibold">No subaccount</div>
-        ))}
+      {isSuccess && data.length && (
+        <SelectSubaccount
+          options={data}
+          handleOnChange={(v) => handleOnChange(v)}
+          value={subaccount ?? "Default subaccount"}
+          disabled={data.length === 1 && data[0] === "Default subaccount"}
+        />
+      )}
       {(isLoading || isError) && (
         <div className="flex justify-center">
           <LoaderSpin />

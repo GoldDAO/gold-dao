@@ -12,7 +12,7 @@ const Default = () => {
 
   const navItems: { title: string; url: string }[] = [
     { title: "Home", url: "/" },
-    { title: "GLDT Explorer", url: "/explorer" },
+    { title: "Explorer", url: "/explorer" },
     { title: "FAQ", url: "/faqs" },
   ];
 

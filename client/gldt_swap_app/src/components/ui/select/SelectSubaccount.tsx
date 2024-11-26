@@ -12,17 +12,20 @@ export const SelectSubaccount = ({
   value,
   handleOnChange,
   className,
+  disabled = false,
 }: {
   options: string[];
   value: string;
   handleOnChange: (v: string) => void;
   className?: string;
+  disabled?: boolean;
 }) => {
   return (
     <div className={className}>
-      <Listbox value={value} onChange={handleOnChange}>
+      <Listbox value={value} onChange={handleOnChange} disabled={disabled}>
         <ListboxButton
           className={clsx(
+            `${disabled ? "cursor-not-allowed" : ""}`,
             "relative block w-full rounded-full bg-surface border border-border py-1.5 text-left text-sm/6 pl-4 pr-11",
             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
           )}
@@ -34,7 +37,7 @@ export const SelectSubaccount = ({
           anchor="bottom"
           transition
           className={clsx(
-            "mt-1 w-[var(--button-width)] h-64 overflow-y-auto rounded-xl border border-border bg-surface p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
+            "mt-1 w-[var(--button-width)] !max-h-64 overflow-y-auto rounded-xl border border-border bg-surface p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
             "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0"
           )}
         >
