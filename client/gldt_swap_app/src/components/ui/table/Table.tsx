@@ -93,6 +93,7 @@ const Table = <T extends object>({
     table.setPageIndex(0);
     searchParams.set(pageSize, value);
     searchParams.set(pageIndex, "1");
+    setPagination({ pageIndex: 1, pageSize: value });
     setSearchParams(searchParams);
   };
 

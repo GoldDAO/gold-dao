@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { PaginationState, SortingState } from "@tanstack/react-table";
 import { useSearchParams } from "react-router-dom";
 
@@ -15,16 +15,24 @@ export const usePagination = ({
   identifier = "",
 } = {}): [PaginationState, Dispatch<SetStateAction<PaginationState>>] => {
   const [searchParams] = useSearchParams();
-  const _pageSize = Number(
-    searchParams.get(`page_size${identifier ?? `_${identifier}`}`)
-  );
-  const _pageIndex = Number(
-    searchParams.get(`page_index${identifier ?? `_${identifier}`}`)
-  );
   const [pagination, setPagination] = useState<PaginationState>({
-    pageSize: _pageSize ? _pageSize : pageSize,
-    pageIndex: _pageIndex ? _pageIndex - 1 : pageIndex,
+    pageSize,
+    pageIndex,
   });
+
+  useEffect(() => {
+    const _pageSize = Number(
+      searchParams.get(`page_size${identifier ? `_${identifier}` : ""}`)
+    );
+    const _pageIndex = Number(
+      searchParams.get(`page_index${identifier ? `_${identifier}` : ""}`)
+    );
+    setPagination({
+      pageSize: _pageSize || pageSize,
+      pageIndex: _pageIndex ? _pageIndex - 1 : pageIndex,
+    });
+  }, [searchParams, identifier, pageSize, pageIndex]);
+
   return [pagination, setPagination];
 };
 

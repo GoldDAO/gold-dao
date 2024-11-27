@@ -29,13 +29,7 @@ export const Explorer = () => {
     const columnId = cell.column.id;
     const row = cell.row.original;
     const pathnames: { [key: string]: string } = {
-      index: `/explorer/transaction/${row.index}${
-        row.from?.owner
-          ? `?owner=${row.from?.owner}${
-              row.from?.subaccount ? `&subaccount=${row.from.subaccount}` : ""
-            }`
-          : ""
-      }`,
+      index: `/explorer/transaction/${row.index}`,
       to: `/explorer/account?owner=${row.to?.owner}${
         row.to?.subaccount ? `&subaccount=${row.to?.subaccount}` : ""
       }`,
