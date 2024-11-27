@@ -3,11 +3,11 @@ use ic_cdk::export_candid;
 use icrc_ledger_types::icrc1::account::Account;
 use usdg_minter_api::lifecycle::MinterArgument;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
-use usdg_minter_api::ApiVault;
-use usdg_minter_api::VaultError;
+use usdg_minter_api::{ApiVault, VaultError};
 
 pub mod cbor;
 pub mod lifecycle;
+pub mod logs;
 pub mod management;
 pub mod numeric;
 pub mod queries;
