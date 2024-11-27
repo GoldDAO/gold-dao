@@ -1,8 +1,9 @@
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { LoaderSpin } from "@components/ui";
 
 import { useFetchLedgerOneAccountSubaccounts } from "@hooks/gldt_ledger_indexer";
 import { SelectSubaccount } from "@components/ui/select/index";
+import { usePagination } from "@utils/table/useTable";
 
 export const OwnerSubaccounts = ({
   owner,
@@ -13,7 +14,8 @@ export const OwnerSubaccounts = ({
   subaccount?: string | undefined;
   className?: string;
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [pagination] = usePagination();
 
   const { data, isSuccess, isLoading, isError } =
     useFetchLedgerOneAccountSubaccounts({
@@ -21,10 +23,12 @@ export const OwnerSubaccounts = ({
     });
 
   const handleOnChange = (subaccount: string) => {
+    let path: string;
     if (subaccount !== "Default subaccount")
-      searchParams.set("subaccount", subaccount);
-    else searchParams.delete("subaccount");
-    setSearchParams(searchParams, { replace: true });
+      path = `/explorer/account?owner=${owner}&subaccount=${subaccount}&page_size=${pagination.pageSize}&page_index=0`;
+    else
+      path = `/explorer/account?owner=${owner}&page_size=${pagination.pageSize}&page_index=0`;
+    navigate(path, { replace: true });
   };
 
   return (
