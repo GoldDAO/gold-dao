@@ -1,9 +1,11 @@
+use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::numeric::{GLDT, USDG};
 use crate::state::{mutate_state, read_state};
 use crate::updates::{reject_anonymous_caller, VaultError};
 use crate::MINIMUM_MARGIN_AMOUNT;
 use candid::Nat;
+use ic_canister_log::log;
 use ic_cdk::update;
 use icrc_ledger_types::icrc1::account::Account;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
@@ -30,6 +32,13 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
         subaccount: arg.maybe_subaccount,
     };
     let gldt_ledger_id = read_state(|s| s.gldt_ledger_id);
+
+    log!(
+        INFO,
+        "[open_vault] {} requested vault opening with args: {}",
+        ic_cdk::caller(),
+        arg
+    );
     match transfer_from(
         from,
         ic_cdk::id(),
@@ -40,7 +49,6 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     .await
     {
         Ok(block_index) => {
-            // TODO log success
             let vault_id = mutate_state(|s| {
                 s.record_vault_creation(
                     from,
@@ -49,6 +57,11 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
                     arg.fee_bucket,
                 )
             });
+            log!(
+                INFO,
+                "[open_vault] {} successfully opened vault at index {block_index} with id: {vault_id}",
+                ic_cdk::caller(),
+            );
             Ok(OpenVaultSuccess {
                 block_index,
                 vault_id,
