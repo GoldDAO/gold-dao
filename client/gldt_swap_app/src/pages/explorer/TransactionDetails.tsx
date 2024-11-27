@@ -17,7 +17,7 @@ export const AccountTransactionDetails = () => {
   // const [pagination, setPagination] = usePagination();
   const owner = searchParams.get("owner") as string;
   const subaccount = searchParams.get("subaccount") as string | undefined;
-  const start = params.index ? Number(params.index) + 1 : undefined;
+  const start = params.index ? Number(params.index) : undefined;
 
   const { data, isSuccess, isLoading, isError, error } =
     useFetchLedgerOneAccountTransaction({

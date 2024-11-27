@@ -121,7 +121,6 @@ export const useReverseSwap = () => {
 
       const swap = await Promise.allSettled(swapTasks);
 
-      console.log("all swaps", swap);
       // console.log("swap result:");
       // console.log(swap);
 

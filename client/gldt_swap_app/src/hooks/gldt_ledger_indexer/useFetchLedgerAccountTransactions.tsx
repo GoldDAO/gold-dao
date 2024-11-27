@@ -7,13 +7,14 @@ import {
   Transaction,
 } from "./utils";
 import { useAuth } from "@auth/index";
+import { TransactionWithId } from "@canisters/gldt_ledger_indexer/interface";
 
 interface Transactions {
   rows: Transaction[];
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  // hasNextPage: boolean;
+  // hasPreviousPage: boolean;
   hasResults: boolean;
-  start: number | undefined;
+  // start: number | undefined;
 }
 
 type FetchLedgerTransactions = Omit<
@@ -43,7 +44,6 @@ export const useFetchLedgerAccountTransactions = ({
       const actor = createActor("gldt_ledger_indexer");
 
       try {
-        // Get first tx to get oldest tx id and do some useful calculations for pagination
         const defaultTx = await getAccountTransactions({
           actor,
           pageSize: 1,
@@ -53,34 +53,48 @@ export const useFetchLedgerAccountTransactions = ({
         });
         const newestTx = defaultTx?.transactions[0]?.id ?? 0n;
         const oldestTx = defaultTx?.oldest_tx_id[0] ?? 0n;
-        const maxCount = Number(newestTx - oldestTx);
 
-        const results = await getAccountTransactions({
-          actor,
-          pageSize: maxCount ? maxCount : 1,
-          // pageSize,
-          owner,
-          subaccount,
-          start,
-        });
+        let results: Array<TransactionWithId> = [];
 
-        const firstPageTx = results?.transactions[0]?.id;
-        const lastTxPage =
-          results?.transactions[results?.transactions.length - 1]?.id;
+        const fetchPage = async (
+          start: number | undefined = undefined,
+          retries = 3
+        ): Promise<Array<TransactionWithId>> => {
+          try {
+            const res = await getAccountTransactions({
+              actor,
+              pageSize: 2000,
+              owner,
+              subaccount,
+              start,
+            });
 
-        // console.log(`newestTx: ${newestTx}`);
-        // console.log(`oldestTx: ${oldestTx}`);
-        // console.log(`firstPageTx: ${firstPageTx}`);
-        // console.log(`lastTxPage: ${lastTxPage}`);
-        // console.log(results);
+            results = results.concat(res?.transactions ?? []);
+            const lastTxPage =
+              res?.transactions[res?.transactions.length - 1]?.id;
+
+            if (lastTxPage && lastTxPage !== oldestTx) {
+              return await fetchPage(Number(lastTxPage));
+            }
+
+            return results;
+          } catch (error) {
+            if (retries > 0) {
+              return await fetchPage(start, retries - 1);
+            }
+            throw error;
+          }
+        };
+
+        await fetchPage();
 
         const transactions = formatTransactionsResults(results);
 
         return {
           rows: transactions,
-          hasNextPage: newestTx ? lastTxPage !== oldestTx : false,
-          hasPreviousPage: newestTx ? firstPageTx !== newestTx : false,
-          start: newestTx ? Number(firstPageTx) : undefined,
+          // hasNextPage: newestTx ? lastTxPage !== oldestTx : false,
+          // hasPreviousPage: newestTx ? firstPageTx !== newestTx : false,
+          // start: newestTx ? Number(firstPageTx) : undefined,
           hasResults: !!newestTx,
         };
       } catch (err) {

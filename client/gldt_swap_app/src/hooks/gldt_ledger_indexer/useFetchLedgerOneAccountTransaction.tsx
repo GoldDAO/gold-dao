@@ -4,12 +4,7 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 
-import {
-  getAccountTransactions,
-  formatTransactionsResults,
-  GetAccountTransactionsParams,
-  Transaction,
-} from "./utils";
+import { getBlocks, GetAccountTransactionsParams, Transaction } from "./utils";
 import { useAuth } from "@auth/index";
 
 type FetchLedgerTransactions = Omit<
@@ -20,35 +15,24 @@ type FetchLedgerTransactions = Omit<
 
 export const useFetchLedgerOneAccountTransaction = ({
   pageSize = 1,
-  owner,
-  subaccount,
   start,
   ...queryParams
 }: FetchLedgerTransactions) => {
   const { createActor } = useAuth();
 
   return useQuery({
-    queryKey: [
-      "FETCH_LEDGER_ONE_ACCOUNT_TRANSACTION",
-      start,
-      pageSize,
-      owner,
-      subaccount,
-    ],
+    queryKey: ["FETCH_LEDGER_ONE_ACCOUNT_TRANSACTION", start, pageSize],
     queryFn: async (): Promise<Transaction> => {
       const actor = createActor("gldt_ledger_indexer");
 
       try {
-        const results = await getAccountTransactions({
+        const results = await getBlocks({
           actor,
           pageSize: 1,
-          owner,
-          subaccount,
           start,
         });
 
-        const transactions = formatTransactionsResults(results);
-        return transactions[0];
+        return results[0];
       } catch (err) {
         console.error(err);
         throw new Error(

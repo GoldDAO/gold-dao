@@ -24,9 +24,10 @@ export const AccountOverview = () => {
   // const [sorting, setSorting] = useSorting({});
   const owner = searchParams.get("owner") as string;
   const subaccount = searchParams.get("subaccount") as string | undefined;
+
   const { data, isSuccess, isLoading, isError, error } =
     useFetchLedgerAccountTransactions({
-      pageSize: 100,
+      pageSize: pagination.pageSize,
       start: undefined,
       owner,
       subaccount,
@@ -36,19 +37,13 @@ export const AccountOverview = () => {
     const columnId = cell.column.id;
     const row = cell.row.original;
     const pathnames: { [key: string]: string } = {
-      index: `/explorer/transaction/${row.index}${
-        row.from?.owner
-          ? `?owner=${row.from?.owner}${
-              row.from?.subaccount ? `&subaccount=${row.from.subaccount}` : ""
-            }`
-          : ""
-      }`,
+      index: `/explorer/transaction/${row.index}`,
       to: `/explorer/account?owner=${row.to?.owner}${
         row.to?.subaccount ? `&subaccount=${row.to?.subaccount}` : ""
-      }`,
+      }&page_size=${pagination.pageSize}&page_index=0`,
       from: `/explorer/account?owner=${row.from?.owner}${
         row.from?.subaccount ? `&subaccount=${row.from?.subaccount}` : ""
-      }`,
+      }&page_size=${pagination.pageSize}&page_index=0`,
     };
     navigate(pathnames[columnId]);
   };
@@ -180,7 +175,7 @@ export const AccountOverview = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [pagination]
   );
   return (
     <>

@@ -126,40 +126,6 @@ const getAccountText = ({
   };
 };
 
-// const getAccountText = (account: Value[], op: string, txDirection: string) => {
-//   const isMintingAccount =
-//     (txDirection === "from" && op === "mint") ||
-//     (txDirection === "to" && op === "burn");
-
-//   if (!account && !isMintingAccount) return undefined;
-
-//   if (isMintingAccount)
-//     return {
-//       owner: SWAP_CANISTER_ID,
-//       subaccount:
-//         "0000000000000000000000000000000000000000000000000000000000000001",
-//       full: "Minting account",
-//     };
-
-//   const principal =
-//     account[0] && "Blob" in account[0]
-//       ? Principal.fromHex(Buffer.from(account[0].Blob).toString("hex")).toText()
-//       : "";
-//   const subaccount =
-//     account[1] && "Blob" in account[1]
-//       ? Buffer.from(account[1].Blob).toString("hex")
-//       : undefined;
-
-//   return {
-//     owner: principal,
-//     subaccount: subaccount ?? "",
-//     full: encodeIcrcAccount({
-//       owner: Principal.fromText(principal),
-//       subaccount: subaccount as IcrcSubaccount | undefined,
-//     }),
-//   };
-// };
-
 const parseTxBlock = (map: Map) => {
   const TYPES: { [key: string]: string } = {
     xfer: "transfer",
@@ -218,7 +184,7 @@ export const useFetchLedgerTransactions = ({
     return data;
   };
 
-  const fetch_transactions = async ({
+  const get_blocks = async ({
     start,
     length,
   }: GetBlocksRequest): Promise<Transaction[]> => {
@@ -242,7 +208,7 @@ export const useFetchLedgerTransactions = ({
         };
       }
     });
-    return data.reverse() as Transaction[];
+    return data as Transaction[];
   };
 
   return useQuery({
@@ -258,13 +224,13 @@ export const useFetchLedgerTransactions = ({
           start = 0n;
         }
 
-        const transactions = await fetch_transactions({ start, length });
+        const transactions = await get_blocks({ start, length });
         const pageCount = Math.ceil(totalCount / pageSize);
 
         const ret = {
           rowCount: totalCount - pageSize,
           pageCount,
-          rows: transactions,
+          rows: transactions.reverse(),
         };
         return ret;
       } catch (err) {
