@@ -9,11 +9,6 @@ export interface TableProps {
   setSorting?: Dispatch<SetStateAction<SortingState>>;
 }
 
-interface PaginationStateCursor {
-  pageSize: number;
-  pageStart: number | undefined;
-}
-
 export const usePagination = ({
   pageSize = 10,
   pageIndex = 0,
@@ -29,19 +24,6 @@ export const usePagination = ({
   const [pagination, setPagination] = useState<PaginationState>({
     pageSize: _pageSize ? _pageSize : pageSize,
     pageIndex: _pageIndex ? _pageIndex - 1 : pageIndex,
-  });
-  return [pagination, setPagination];
-};
-
-export const usePaginationCursor = (
-  { pageSize, pageStart } = { pageSize: 5, pageStart: undefined }
-): [PaginationStateCursor, Dispatch<SetStateAction<PaginationStateCursor>>] => {
-  const [searchParams] = useSearchParams();
-  const _pageSize = Number(searchParams.get(`page_size`));
-  const _pageStart = Number(searchParams.get(`page_start`));
-  const [pagination, setPagination] = useState<PaginationStateCursor>({
-    pageSize: _pageSize ? _pageSize : pageSize,
-    pageStart: _pageStart ? _pageStart : pageStart,
   });
   return [pagination, setPagination];
 };

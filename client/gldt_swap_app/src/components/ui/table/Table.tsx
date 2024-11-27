@@ -5,7 +5,10 @@ import { useSearchParams } from "react-router-dom";
 import {
   useReactTable,
   getCoreRowModel,
+  getSortedRowModel,
   getExpandedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
   flexRender,
   ColumnDef,
   PaginationState,
@@ -32,6 +35,7 @@ interface ReactTableProps<T extends object> {
   getRowCanExpand?: (row: Row<T.rows>) => boolean;
   subComponent?: ReactNode;
   identifier?: string;
+  serverSide?: boolean;
 }
 
 const linesPerPageOptions = [
@@ -51,6 +55,7 @@ const Table = <T extends object>({
   getRowCanExpand,
   identifier = "",
   subComponent,
+  serverSide = true,
 }: ReactTableProps<T>) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const pageIndex = `page_index${identifier ?? `_${identifier}`}`;
@@ -61,7 +66,6 @@ const Table = <T extends object>({
   const table = useReactTable({
     data: data?.rows ?? defaultData,
     columns,
-    rowCount: data?.rowCount ?? 0,
     state: {
       pagination,
       sorting,
@@ -71,8 +75,17 @@ const Table = <T extends object>({
     getCoreRowModel: getCoreRowModel(),
     getRowCanExpand,
     getExpandedRowModel: getExpandedRowModel(),
-    manualPagination: setPagination ? true : undefined,
-    manualSorting: setSorting ? true : undefined,
+    ...(serverSide && {
+      rowCount: data?.rowCount ?? 0,
+      manualPagination: setPagination ? true : undefined,
+      manualSorting: setSorting ? true : undefined,
+    }),
+    ...(!serverSide && {
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      onPaginationChange: setPagination,
+    }),
   });
 
   const handleOnChangePageSize = (value: string) => {
@@ -90,6 +103,12 @@ const Table = <T extends object>({
   //   setSearchParams(searchParams);
   // };
 
+  const handleOnClickFirstPage = () => {
+    table.firstPage();
+    searchParams.set(pageIndex, "1");
+    setSearchParams(searchParams);
+  };
+
   const handleOnClickPreviousPage = () => {
     table.previousPage();
     searchParams.set(
@@ -105,12 +124,6 @@ const Table = <T extends object>({
       pageIndex,
       (table.getState().pagination.pageIndex + 2).toString()
     );
-    setSearchParams(searchParams);
-  };
-
-  const handleOnClickFirstPage = () => {
-    table.firstPage();
-    searchParams.set(pageIndex, "1");
     setSearchParams(searchParams);
   };
 
@@ -229,7 +242,7 @@ const Table = <T extends object>({
               <SelectTablePageLimit
                 options={linesPerPageOptions}
                 value={table.getState().pagination.pageSize}
-                handleOnChange={(value) => handleOnChangePageSize(value)}
+                handleOnChange={(v) => handleOnChangePageSize(v)}
                 className="ml-2 w-25"
               />
             </div>

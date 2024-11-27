@@ -5,7 +5,7 @@ import { BugAntIcon } from "@heroicons/react/24/solid";
 
 import { Table, LoaderSpin } from "@components/ui";
 import { BadgeTransactionType } from "@components/shared/badge/TransactionType";
-// import { usePaginationCursor } from "@utils/table/useTable";
+import { usePagination } from "@utils/table/useTable";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
 import NavbarHome from "@components/shared/navbars/Home";
@@ -20,7 +20,8 @@ import { Breadcrumb } from "@components/explorer/Breadcrumb";
 export const AccountOverview = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // const [pagination] = usePaginationCursor();
+  const [pagination, setPagination] = usePagination();
+  // const [sorting, setSorting] = useSorting({});
   const owner = searchParams.get("owner") as string;
   const subaccount = searchParams.get("subaccount") as string | undefined;
   const { data, isSuccess, isLoading, isError, error } =
@@ -30,16 +31,6 @@ export const AccountOverview = () => {
       owner,
       subaccount,
     });
-
-  // useEffect(() => {
-  //   if (isSuccess && data) {
-  //     if (data.start) {
-  //       searchParams.set("page_start", data.start.toString());
-  //       setSearchParams(searchParams);
-  //     }
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isSuccess, data]);
 
   const handleClickCol = (cell: CellContext<Transaction, unknown>) => {
     const columnId = cell.column.id;
@@ -230,8 +221,11 @@ export const AccountOverview = () => {
                 <Table
                   columns={columns}
                   data={data}
-                  // pagination={pagination}
-                  // setPagination={setPagination}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                  // sorting={sorting}
+                  // setSorting={setSorting}
+                  serverSide={false}
                 />
               ) : (
                 <div className="text-center my-16">
