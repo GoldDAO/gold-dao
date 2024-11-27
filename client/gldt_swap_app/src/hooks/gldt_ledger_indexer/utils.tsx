@@ -47,6 +47,7 @@ export interface Transaction {
   index?: number;
   memo?: string;
   fee?: string;
+  hash: string;
 }
 
 const getAccountTextTransactions = ({
@@ -306,7 +307,7 @@ export const getBlocks = async ({
       return {
         ...tx,
         date: getDateUTC(Number(timestamp), { fromNanos: true }),
-        hash: hash ? Buffer.from(hash).toString("hex") : undefined,
+        hash: hash ? Buffer.from(hash).toString("hex") : "-",
         index: Number(start),
         fee: fee
           ? roundAndFormatLocale({

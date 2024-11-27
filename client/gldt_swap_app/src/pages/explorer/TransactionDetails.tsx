@@ -64,6 +64,23 @@ export const AccountTransactionDetails = () => {
                     <div className="text-content/60">{data.index}</div>
                   </div>
                   <div className="flex justify-between items-center border-b border-border py-4">
+                    <div className="font-semibold text-content/60">Hash</div>
+                    <div className="max-w-48 lg:max-w-96">
+                      <div className="flex items-center truncate">
+                        <div className="flex ml-8 items-center truncate">
+                          <div
+                            className="truncate text-content/60"
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content={data.hash}
+                          >
+                            {data.hash}
+                          </div>
+                          <CopyToClipboard value={data.hash} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-border py-4">
                     <div className="font-semibold text-content/60">Type</div>
                     <BadgeTransactionType type={data.type as string} />
                   </div>
