@@ -17,7 +17,7 @@ const AccordionItem = ({
   <Item
     {...rest}
     header={({ state: { isEnter } }) => (
-      <div className="flex w-full items-center justify-between border-t border-gold/60 py-2">
+      <div className="flex w-full items-center justify-between border-t border-gold/60 py-3 pl-2">
         {header}
         <ChevronDownIcon
           className={`size-5 fill-content ml-auto transition-transform duration-300 ease-out ${
@@ -150,7 +150,7 @@ export const FrequentlyAskedQuestions = ({
       <Accordion transition transitionTimeout={250}>
         {_faqs.map(({ q, a }, index) => (
           <AccordionItem key={index} header={q}>
-            {a}
+            <div className="pl-2">{a}</div>
           </AccordionItem>
         ))}
       </Accordion>
