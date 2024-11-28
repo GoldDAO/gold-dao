@@ -67,16 +67,20 @@ export const AccountTransactionDetails = () => {
                     <div className="font-semibold text-content/60">Hash</div>
                     <div className="max-w-48 lg:max-w-96">
                       <div className="flex items-center truncate">
-                        <div className="flex ml-8 items-center truncate">
-                          <div
-                            className="truncate text-content/60"
-                            data-tooltip-id="tooltip"
-                            data-tooltip-content={data.hash}
-                          >
-                            {data.hash}
+                        {data.hash ? (
+                          <div className="flex ml-8 items-center truncate">
+                            <div
+                              className="truncate text-content/60"
+                              data-tooltip-id="tooltip"
+                              data-tooltip-content={data.hash}
+                            >
+                              {data.hash}
+                            </div>
+                            <CopyToClipboard value={data.hash} />
                           </div>
-                          <CopyToClipboard value={data.hash} />
-                        </div>
+                        ) : (
+                          <div>-</div>
+                        )}
                       </div>
                     </div>
                   </div>

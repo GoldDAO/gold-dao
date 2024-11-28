@@ -42,7 +42,7 @@ export const useLedgerAccountBalance = ({
     subaccount?: string | undefined;
     ledger: string;
   }) => {
-    const actor = createActor(`${ledger}_ledger`);
+    const actor = createActor(`${ledger.toLowerCase()}_ledger`);
 
     const account = encodeIcrcAccount({
       owner: Principal.fromText(owner),

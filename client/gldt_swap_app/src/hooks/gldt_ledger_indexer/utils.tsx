@@ -299,21 +299,20 @@ export const getBlocks = async ({
   })) as GetBlocksResponse;
   const data = results.blocks.map((block) => {
     if ("Map" in block) {
+      // console.log(block);
       const tx = parseTxBlock(block.Map);
       const hash = getMapValue(findMapByKey(block.Map, "phash"));
       const timestamp = getMapValue(findMapByKey(block.Map, "ts"));
-      const fee = getMapValue(findMapByKey(block.Map, "fee"));
+      const fee = !tx?.fee
+        ? getMapValue(findMapByKey(block.Map, "fee"))
+        : tx.fee;
 
       return {
         ...tx,
         date: getDateUTC(Number(timestamp), { fromNanos: true }),
-        hash: hash ? Buffer.from(hash).toString("hex") : "-",
+        hash: hash ? Buffer.from(hash).toString("hex") : undefined,
         index: Number(start),
-        fee: fee
-          ? roundAndFormatLocale({
-              number: divideBy1e8(Number(fee)),
-            })
-          : "-",
+        fee: fee ? roundAndFormatLocale({ number: divideBy1e8(fee) }) : "-",
       };
     }
   });
@@ -339,6 +338,7 @@ const parseTxBlock = (map: Map) => {
     const txMap = tx[1].Map;
     const amount = getMapValue(findMapByKey(txMap, "amt"));
     const op = getMapValue(findMapByKey(txMap, "op"));
+    const fee = getMapValue(findMapByKey(txMap, "fee"));
     const from = getAccountTextBlocks({
       from: getMapValue(findMapByKey(txMap, "from")),
       to: getMapValue(findMapByKey(txMap, "to")),
@@ -362,6 +362,7 @@ const parseTxBlock = (map: Map) => {
     const memo = getMapValue(findMapByKey(txMap, "memo"));
     return {
       amount: roundAndFormatLocale({ number: divideBy1e8(amount) }),
+      fee: fee ? fee : undefined,
       from,
       to,
       type: TYPES[op],
