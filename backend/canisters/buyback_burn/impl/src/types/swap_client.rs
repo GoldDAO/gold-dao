@@ -1,10 +1,10 @@
 use crate::types::ExchangeConfig;
-use crate::types::ICPSwapClient;
 use crate::types::SwapConfig;
 use async_trait::async_trait;
 use candid::CandidType;
 use enum_dispatch::enum_dispatch;
 use ic_cdk::api::call::CallResult;
+use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
 use types::CanisterId;

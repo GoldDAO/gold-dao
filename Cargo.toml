@@ -31,6 +31,7 @@ members = [
   "backend/libraries/canister_state_macros",
   "backend/libraries/canister_time",
   "backend/libraries/canister_tracing_macros",
+  "backend/libraries/icpswap_client",
   "backend/libraries/http_request",
   "backend/libraries/serializer",
   "backend/libraries/stable_memory",

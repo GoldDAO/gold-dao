@@ -2,12 +2,18 @@ use crate::state::read_state;
 use crate::utils::retry_with_attempts;
 use crate::utils::{get_token_balance, RETRY_DELAY};
 use candid::{Nat, Principal};
+use canister_time::start_job_daily_at;
 use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use tracing::error;
+use tracing::{error, info};
 
 const MAX_ATTEMPTS: u8 = 1;
+
+pub fn start_job() {
+    // NOTE: 12 UTC
+    start_job_daily_at(12, run);
+}
 
 pub fn run() {
     ic_cdk::spawn(run_async());
@@ -21,13 +27,15 @@ async fn run_async() {
     .await
     {
         error!(
-            "Failed to swap tokens after {} attempts: {:?}",
+            "Failed to burn tokens after {} attempts: {:?}",
             MAX_ATTEMPTS, err
         );
     }
 }
 
 pub async fn process_token_burn() -> Result<(), String> {
+    info!("Starting token burn process");
+
     let burn_config = read_state(|s| s.data.burn_config.clone());
     let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_token_info.ledger_id);
 

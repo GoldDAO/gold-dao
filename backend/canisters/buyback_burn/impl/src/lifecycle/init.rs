@@ -23,7 +23,7 @@ fn init(args: Args) {
                 init_args.authorized_principals,
                 init_args.tokens,
                 init_args.gldgov_token_info,
-                init_args.buyback_burn_interval_in_secs,
+                init_args.buyback_interval_in_secs,
                 init_args.icp_swap_canister_id,
                 init_args.burn_rate,
                 init_args.min_burn_amount,
