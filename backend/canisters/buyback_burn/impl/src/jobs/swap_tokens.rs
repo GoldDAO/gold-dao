@@ -17,9 +17,9 @@ const MAX_ATTEMPTS: u8 = 1;
 pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC_SWAP
 
 pub fn start_job() {
-    let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);
+    let buyback_interval = read_state(|s| s.data.buyback_interval);
     if read_state(|s| s.data.burn_config.validate_burn_rate()) {
-        run_now_then_interval(buyback_burn_interval, run);
+        run_now_then_interval(buyback_interval, run);
     } else {
         error!("Burn rate is invalid. The job wouldn't start");
     }
@@ -35,9 +35,9 @@ pub fn run_now() {
 
 #[trace]
 async fn run_async_with_rand_delay() {
-    let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);
+    let buyback_interval = read_state(|s| s.data.buyback_interval);
 
-    match generate_random_delay(buyback_burn_interval).await {
+    match generate_random_delay(buyback_interval).await {
         Ok(random_delay) => {
             ic_cdk_timers::set_timer(random_delay, || ic_cdk::spawn(run_async()));
         }
@@ -72,8 +72,6 @@ async fn run_async() {
         for token_swap_id in token_swap_ids {
             let _ = mutate_state(|state| state.data.token_swaps.archive_swap(token_swap_id));
         }
-
-        crate::jobs::burn_tokens::run();
     } else {
         error!(
             "Failed to process some token swaps:\n{}",
@@ -344,8 +342,8 @@ pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, St
         let amount_per_week = calculate_percentage_of_amount(available_amount, burn_rate);
         debug!("amount_per_week: {}", amount_per_week);
 
-        let buyback_burn_interval = read_state(|s| s.data.buyback_burn_interval);
-        let times = (WEEK_IN_MS as u128) / buyback_burn_interval.as_millis();
+        let buyback_interval = read_state(|s| s.data.buyback_interval);
+        let times = (WEEK_IN_MS as u128) / buyback_interval.as_millis();
 
         let amount_per_interval = (amount_per_week / times).saturating_sub(input_token.fee.into());
         debug!("amount_per_interval: {}", amount_per_interval);

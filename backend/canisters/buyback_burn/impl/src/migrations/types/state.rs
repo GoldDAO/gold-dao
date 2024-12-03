@@ -1,13 +1,13 @@
-use serde::{ Deserialize, Serialize };
 use crate::state::BurnConfig;
 use crate::types::token_swaps::TokenSwaps;
+use crate::types::SwapClients;
 use candid::Principal;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::time::Duration;
+use types::TimestampMillis;
 use types::TokenInfo;
 use utils::env::CanisterEnv;
-use crate::types::SwapClients;
-use std::collections::BTreeMap;
-use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize)]
 pub struct RuntimeStateV0 {

@@ -59,9 +59,7 @@ pub fn calculate_percentage_of_amount(amount_available: Nat, burn_rate: u8) -> u
         return 0;
     }
 
-    let amount_to_burn = balance_u128.saturating_mul(burn_rate as u128) / 100;
-
-    amount_to_burn
+    balance_u128.saturating_mul(burn_rate as u128) / 100
 }
 
 #[cfg(test)]

@@ -1,16 +1,16 @@
 type Account = record { owner : principal; subaccount : opt blob };
 type Args = record {
+  buyback_interval_in_secs : opt nat64;
   burn_rate : opt nat8;
-  buyback_burn_interval_in_secs : opt nat64;
   min_burn_amount : opt Tokens;
 };
 type Args_1 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
+  buyback_interval_in_secs : nat64;
   test_mode : bool;
   icp_swap_canister_id : principal;
   burn_rate : nat8;
-  buyback_burn_interval_in_secs : nat64;
   gldgov_token_info : TokenInfo;
   authorized_principals : vec principal;
   version : BuildVersion;
@@ -48,4 +48,4 @@ service : (Args_1) -> {
   get_active_swaps : () -> (vec record { nat; TokenSwap }) query;
   get_swap : (nat) -> (opt TokenSwap) query;
   update_config : (Args) -> (Response);
-}
+};
