@@ -53,6 +53,7 @@ export const useLedgerMetadata = (
         const fee = divideBy1e8(result_fee);
         const totalSupply = divideBy1e8(result_total_supply);
         const marketCap = (totalSupply / 100) * goldPrice;
+
         const data = {
           name,
           decimals,

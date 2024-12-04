@@ -26,7 +26,7 @@ export const LandingPage = () => {
   ];
 
   const { data: GLDTMetadata, isSuccess: isSuccessGLDTMetadata } =
-    useLedgerMetadata();
+    useLedgerMetadata({ ledger: "GLDT" });
 
   const { data: NFTLocked, isSuccess: isSuccessNFTLocked } = useGLDNFTLocked();
 
