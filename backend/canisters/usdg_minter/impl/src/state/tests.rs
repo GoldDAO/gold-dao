@@ -129,6 +129,33 @@ fn should_borrow_from_vault() {
 }
 
 #[test]
+fn should_add_margin_to_vault() {
+    let mut state = default_state();
+    let owner = Account {
+        owner: Principal::from_text(
+            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
+        )
+        .unwrap(),
+        subaccount: None,
+    };
+    let margin = GLDT::from_unscaled(500);
+    let borrowed = USDG::from_unscaled(100);
+    let fee_bucket = FeeBucket::Medium;
+
+    assert_eq!(
+        state.record_vault_creation(owner, borrowed, margin, fee_bucket),
+        0
+    );
+
+    state.record_add_margin_to_vault(0, margin);
+
+    assert_eq!(
+        state.get_vault(0).unwrap().margin_amount,
+        GLDT::from_unscaled(1000)
+    );
+}
+
+#[test]
 #[should_panic]
 fn should_not_borrow_more_than_max() {
     let mut state = default_state();

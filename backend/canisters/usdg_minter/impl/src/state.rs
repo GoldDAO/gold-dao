@@ -153,9 +153,17 @@ impl State {
         match self.vault_id_to_vault.get_mut(&vault_id) {
             Some(vault) => {
                 vault.borrowed_amount = vault.borrowed_amount.checked_add(borrowed_amount).unwrap();
-                vault.clone()
             }
             None => panic!("attempted to borrow from unkown vault"),
+        };
+    }
+
+    pub fn record_add_margin_to_vault(&mut self, vault_id: VaultId, margin_amount: GLDT) {
+        match self.vault_id_to_vault.get_mut(&vault_id) {
+            Some(vault) => {
+                vault.margin_amount = vault.margin_amount.checked_add(margin_amount).unwrap();
+            }
+            None => panic!("attempted to add maring to unkown vault"),
         };
     }
 }
