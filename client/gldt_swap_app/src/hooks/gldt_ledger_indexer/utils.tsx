@@ -47,7 +47,7 @@ export interface Transaction {
   index?: number;
   memo?: string;
   fee?: string;
-  hash: string;
+  hash?: string;
 }
 
 const getAccountTextTransactions = ({

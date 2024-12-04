@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CellContext, ColumnDef } from "@tanstack/react-table";
 import { BugAntIcon } from "@heroicons/react/24/solid";
 
@@ -8,31 +8,19 @@ import { BadgeTransactionType } from "@components/shared/badge/TransactionType";
 import { usePagination } from "@utils/table/useTable";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
-import NavbarHome from "@components/shared/navbars/Home";
-import { AccountBalanceGLDT } from "@components/explorer/card/AccountBalanceGLDT";
-import { FullAccount } from "@components/explorer/card/FullAccount";
-import { OwnerSubaccounts } from "@components/explorer/card/OwnerSubaccounts";
+import {
+  useFetchLedgerTransactions,
+  Transaction,
+  TxAccount,
+} from "@hooks/gldt_ledger_indexer/useFetchLedgerTransactions";
 
-import { Transaction, TxAccount } from "@hooks/gldt_ledger_indexer/utils";
-import { useFetchLedgerAccountTransactions } from "@hooks/gldt_ledger_indexer/useFetchLedgerAccountTransactions";
-import { Breadcrumb } from "@components/explorer/Breadcrumb";
-
-export const AccountOverview = () => {
+export const ExplorerTable = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const currentExplorerTab = location.pathname.split("/")[2];
-  const [searchParams] = useSearchParams();
   const [pagination, setPagination] = usePagination();
-
-  const owner = searchParams.get("owner") as string;
-  const subaccount = searchParams.get("subaccount") as string | undefined;
-
   const { data, isSuccess, isLoading, isError, error } =
-    useFetchLedgerAccountTransactions({
+    useFetchLedgerTransactions({
       pageSize: pagination.pageSize,
-      start: undefined,
-      owner,
-      subaccount,
+      page: pagination.pageIndex,
     });
 
   const handleClickCol = (cell: CellContext<Transaction, unknown>) => {
@@ -42,10 +30,9 @@ export const AccountOverview = () => {
     else {
       const account = columnId === "to" ? row.to : row.from;
       navigate(
-        `/explorer/${currentExplorerTab}/account?owner=${account?.owner}${
+        `/explorer/transactions/account?owner=${account?.owner}${
           account?.subaccount ? `&subaccount=${account?.subaccount}` : ""
-        }`,
-        { replace: true }
+        }`
       );
     }
   };
@@ -64,6 +51,29 @@ export const AccountOverview = () => {
           );
         },
         header: "Index",
+        meta: {
+          className: "",
+        },
+      },
+      {
+        accessorKey: "hash",
+        id: "hash",
+        cell: (info) => {
+          const value = info.getValue() as string;
+          return value ? (
+            <div className="flex items-center max-w-32">
+              <div
+                data-tooltip-id="tooltip"
+                data-tooltip-content={value}
+                className="mr-2 truncate"
+              >
+                {value}
+              </div>
+              <CopyToClipboard value={value} />
+            </div>
+          ) : null;
+        },
+        header: "Hash",
         meta: {
           className: "",
         },
@@ -148,67 +158,32 @@ export const AccountOverview = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pagination]
+    []
   );
+
   return (
     <>
-      <div className="bg-surface-2">
-        <NavbarHome />
-        <section className="container mx-auto px-4 py-8 xl:py-16">
-          <Breadcrumb owner={owner} subaccount={subaccount} />
-          <div className="my-8">
-            <div className="text-4xl font-semibold text-gold">GLDT</div>
-            <div className="text-4xl">Account Overview</div>
+      {isLoading && (
+        <div className="flex justify-center">
+          <LoaderSpin />
+        </div>
+      )}
+      {isSuccess && (
+        <Table
+          columns={columns}
+          data={data}
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+      )}
+      {isError && (
+        <div className="flex flex-col justify-center items-center">
+          <div>
+            <BugAntIcon className="size-16 mb-6 text-gold/80 animate-bounce" />
           </div>
-          <div className="mt-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 lg:items-center gap-4 mb-8 h-42">
-              <FullAccount
-                owner={owner}
-                subaccount={subaccount}
-                className="h-full"
-              />
-              <OwnerSubaccounts
-                owner={owner}
-                subaccount={subaccount}
-                className="h-full"
-              />
-              <AccountBalanceGLDT
-                owner={owner}
-                subaccount={subaccount}
-                className="h-full"
-              />
-            </div>
-
-            {isLoading && (
-              <div className="flex justify-center my-16">
-                <LoaderSpin />
-              </div>
-            )}
-            {isSuccess &&
-              (data.hasResults ? (
-                <Table
-                  columns={columns}
-                  data={data}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                  serverSide={false}
-                />
-              ) : (
-                <div className="text-center my-16">
-                  No transactions found for this subaccount.
-                </div>
-              ))}
-            {isError && (
-              <div className="flex flex-col justify-center items-center my-16">
-                <div>
-                  <BugAntIcon className="size-16 mb-6 text-gold/80 animate-bounce" />
-                </div>
-                <div>{error.message}</div>
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
+          <div>{error.message}</div>
+        </div>
+      )}
     </>
   );
 };

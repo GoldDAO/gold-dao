@@ -20,4 +20,3 @@ export const fetchGoldPrice1G = async () => {
   };
 
 export * from "./useBalanceGLDTUSD"
-export * from "./useGLDTMarketcapUSD"
