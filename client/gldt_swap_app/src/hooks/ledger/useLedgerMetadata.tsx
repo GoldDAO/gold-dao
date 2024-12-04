@@ -38,7 +38,7 @@ export const useLedgerMetadata = (
   const { createActor } = useAuth();
 
   return useQuery({
-    queryKey: ["USER_FETCH_METADATA_LEDGER_${ledger}"],
+    queryKey: [`USER_FETCH_METADATA_LEDGER_${ledger}`],
     queryFn: async () => {
       try {
         const actor = createActor(`${ledger.toLocaleLowerCase()}_ledger`);
