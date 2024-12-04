@@ -33,7 +33,7 @@ export const useForwardSwap = () => {
     nfts: TransferBatchNft[]
   ): Promise<PromiseSettledResult<[MarketTransferResult]>[]> => {
     const promises = nfts.map(async (nft: TransferBatchNft) => {
-      const actor = createActor(nft.canister);
+      const actor = createActor(nft.canister, { authenticated: true });
       const marketTransferResults =
         await actor.market_transfer_batch_nft_origyn(nft.data);
       return marketTransferResults as [MarketTransferResult];
@@ -120,7 +120,7 @@ export const useForwardSwap = () => {
   return useMutation({
     mutationKey: ["GLD_NFT_SWAP_GLDT"],
     mutationFn: async (): Promise<void> => {
-      const actorSwap = createActor("gldt_swap");
+      const actorSwap = createActor("gldt_swap", { authenticated: true });
 
       // * add intent to swap
       // console.log(data_swap_nft_for_tokens);

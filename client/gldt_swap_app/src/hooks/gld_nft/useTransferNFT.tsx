@@ -12,7 +12,7 @@ export const useTransferNFT = () => {
   const { createActor } = useAuth();
 
   const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
-    const actor = createActor("ogy_ledger");
+    const actor = createActor("ogy_ledger", { authenticated: true });
     const result = await actor.icrc2_approve(arg);
     return result as Result_2;
   };
@@ -22,7 +22,7 @@ export const useTransferNFT = () => {
     tokenIds: TransferArgs[];
   }): Promise<TransferResult> => {
     const { canister, tokenIds } = arg;
-    const actor = createActor(canister);
+    const actor = createActor(canister, { authenticated: true });
     const result = await actor.icrc7_transfer(tokenIds);
     return result as TransferResult;
   };

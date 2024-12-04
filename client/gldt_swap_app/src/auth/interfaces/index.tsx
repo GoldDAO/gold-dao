@@ -12,6 +12,7 @@ export interface AuthState {
   isConnected: boolean;
   isConnecting: boolean;
   principalId: string;
-  agent: HttpAgent | Agent | null | undefined;
+  unauthenticatedAgent: HttpAgent | Agent | undefined;
+  authenticatedAgent: Agent | undefined;
   canisters: Canisters;
 }

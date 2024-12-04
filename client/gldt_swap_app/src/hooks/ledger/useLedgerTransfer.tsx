@@ -26,7 +26,7 @@ export const useLedgerTransfer = ({ ledger = "OGY" }: { ledger: string }) => {
     amount: bigint;
     to: string;
   }) => {
-    const actor = createActor(`${ledger}_ledger`);
+    const actor = createActor(`${ledger}_ledger`, { authenticated: true });
 
     const decodedAccount = decodeIcrcAccount(to);
     const owner = decodedAccount.owner;

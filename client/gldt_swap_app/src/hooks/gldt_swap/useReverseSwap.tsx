@@ -28,13 +28,13 @@ export const useReverseSwap = () => {
   const selected = getCollectionSelectedNFTs();
 
   const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
-    const actor = createActor("gldt_ledger");
+    const actor = createActor("gldt_ledger", { authenticated: true });
     const result = await actor.icrc2_approve(arg);
     return result as Result_2;
   };
 
   const swap_tokens_for_nft = async (token: Args_2): Promise<Result_4> => {
-    const actor = createActor("gldt_swap");
+    const actor = createActor("gldt_swap", { authenticated: true });
     const result = await actor.swap_tokens_for_nft(token);
     return result as Result_4;
   };
