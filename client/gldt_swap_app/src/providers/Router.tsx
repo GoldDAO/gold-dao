@@ -88,7 +88,11 @@ const router = createBrowserRouter([
             element: <Explorer />,
           },
           {
-            path: "account",
+            path: "transactions/account",
+            element: <AccountOverview />,
+          },
+          {
+            path: "top_holders/account",
             element: <AccountOverview />,
           },
           {

@@ -9,6 +9,7 @@ import NavbarHome from "@components/shared/navbars/Home";
 
 import { useFetchLedgerOneAccountTransaction } from "@hooks/gldt_ledger_indexer/useFetchLedgerOneAccountTransaction";
 import { LogoGLDT } from "@components/shared/logos";
+import { TxAccount } from "@hooks/gldt_ledger_indexer/useFetchLedgerTransactions";
 
 export const AccountTransactionDetails = () => {
   const navigate = useNavigate();
@@ -32,6 +33,14 @@ export const AccountTransactionDetails = () => {
 
     if (windowHS && windowHS.idx > 0) navigate(-1);
     else navigate("/explorer");
+  };
+
+  const handleClickAccount = (account: TxAccount) => {
+    navigate(
+      `/explorer/transactions/account?owner=${account?.owner}${
+        account?.subaccount ? `&subaccount=${account?.subaccount}` : ""
+      }`
+    );
   };
 
   return (
@@ -122,7 +131,10 @@ export const AccountTransactionDetails = () => {
                         {data.from?.full !== "Minting account" ? (
                           <div className="flex ml-8 items-center truncate">
                             <div
-                              className="truncate text-content/60"
+                              onClick={() =>
+                                handleClickAccount(data.from as TxAccount)
+                              }
+                              className="truncate text-content/60 cursor-pointer"
                               data-tooltip-id="tooltip"
                               data-tooltip-content={data.from?.full}
                             >
@@ -145,7 +157,10 @@ export const AccountTransactionDetails = () => {
                         {data.to?.full !== "Minting account" ? (
                           <div className="flex ml-8 items-center truncate">
                             <div
-                              className="truncate text-content/60"
+                              onClick={() =>
+                                handleClickAccount(data.from as TxAccount)
+                              }
+                              className="truncate text-content/60 cursor-pointer"
                               data-tooltip-id="tooltip"
                               data-tooltip-content={data.to?.full}
                             >
