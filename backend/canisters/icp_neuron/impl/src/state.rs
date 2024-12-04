@@ -64,9 +64,10 @@ impl RuntimeState {
             icp_ledger_canister_id: self.data.icp_ledger_canister_id,
             rewards_recipients: self.data.rewards_recipients.clone(),
             outstanding_payments: self.data.outstanding_payments.clone(),
-            cycle_management_account: self.data.cycle_management_account.map_or("".to_string(), |s|
-                s.to_hex()
-            ),
+            cycle_management_account: self
+                .data
+                .cycle_management_account
+                .map_or("".to_string(), |s| s.to_hex()),
         }
     }
 
