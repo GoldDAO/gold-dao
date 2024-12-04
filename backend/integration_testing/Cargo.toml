@@ -5,13 +5,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pocket-ic = {workspace = true}
+assert_matches = { workspace = true}
+pocket-ic = { workspace = true}
 candid = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 types = { path = "../libraries/types" }
 utils = { path = '../libraries/utils' }
 canister_time = { path = '../libraries/canister_time' }
 icrc-ledger-types = { workspace = true }
+icrc-ledger-types-ic-main-repo =  { package = "icrc-ledger-types", git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 ic-ledger-types = { workspace = true }
 sns_governance_canister = { path = '../external_canisters/sns_governance/api' }
 icrc_ledger_canister = { path = "../external_canisters/icrc_ledger/api" }
@@ -23,6 +25,7 @@ sns_rewards_api_canister = { path = "../canisters/sns_rewards/api" }
 gldt_swap_api_canister = { path = "../canisters/gldt_swap/api"}
 gldt_swap_api_archive = { path = "../canisters/gldt_swap/api_archive"}
 gldt_swap_common = { path = "../canisters/gldt_swap/common"}
+usdg_minter_api = { path = "../canisters/usdg_minter/api"}
 origyn_nft_reference = { path = '../external_canisters/origyn_nft_reference/api' }
 serde_bytes = { workspace = true }
 serde_json = { workspace = true }

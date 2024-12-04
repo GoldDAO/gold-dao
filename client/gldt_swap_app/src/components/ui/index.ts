@@ -1,6 +1,5 @@
 import Card from "@components/ui/Card";
 import Button from "@components/ui/Button";
-import Select from "@components/ui/Select";
 import Table from "@components/ui/table/Table";
 import Tooltip from '@components/ui/tooltip/Tooltip'
 import TooltipInfo from '@components/ui/tooltip/TooltipInfo'
@@ -11,4 +10,4 @@ import Badge from '@components/ui/Badge'
 import Skeleton from '@components/ui/Skeleton'
 import ExternalLink from '@components/ui/links/ExternalLink'
 
-export {Card, Button, Select, Table, Tooltip, TooltipInfo, Dialog, Tile, LoaderSpin, Badge, Skeleton, ExternalLink}
+export {Card, Button, Table, Tooltip, TooltipInfo, Dialog, Tile, LoaderSpin, Badge, Skeleton, ExternalLink}

@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.1] - 2024-12-02
+
+#### Updates
+
+- **ICRC10 && ICRC28 Delegation support**: Add support for these new standards to enable NFID wallets to work correctly.
+
 ### [1.1.0] - 2024-11-18
 
 #### Description

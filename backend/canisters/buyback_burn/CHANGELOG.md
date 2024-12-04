@@ -7,11 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.2] - 2024-12-03
+
+#### Changed
+
+- **Burn frequency**: The burn process would become less frequent - once per day at 12:00 UTC.
+
 ### [1.0.1] - 2024-10-14
 
 #### Changed
 
-- **Burn amount calculation**: Previously, the buyback&burn amount was calculated once per week, while in current version, it's calculated dynamically every interval
+- **Burn amount calculation**: Previously, the buyback&burn amount was calculated once per week, while in current version, it's calculated dynamically every interval.
 
 ### [1.0.0] - 2024-08-29
 

@@ -52,7 +52,7 @@ impl RuntimeState {
             gldgov_token_info: self.data.gldgov_token_info,
             burn_config: self.data.burn_config.clone(),
             token_swaps_metrics: self.data.token_swaps.get_metrics(),
-            buyback_burn_interval_in_secs: self.data.buyback_burn_interval.as_secs(),
+            buyback_interval_in_secs: self.data.buyback_interval.as_secs(),
             icp_swap_canister_id: self.data.icp_swap_canister_id,
             swap_clients: self.data.swap_clients.clone(),
         }
@@ -64,7 +64,7 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     pub gldgov_token_info: TokenInfo,
     pub icp_swap_canister_id: Principal,
-    pub buyback_burn_interval: Duration,
+    pub buyback_interval: Duration,
     pub swap_clients: SwapClients,
     pub burn_config: BurnConfig,
     pub token_swaps: TokenSwaps,
@@ -93,12 +93,6 @@ impl BurnConfig {
     pub fn validate_burn_rate(&self) -> bool {
         self.burn_rate > 0 && self.burn_rate <= 100
     }
-
-    // Get the 100% of the min_burn_amount to know what the balance should be after swap (to have enough funds)
-    pub fn get_min_after_swap_amount(&self) -> u128 {
-        let min_burn_amount = self.min_burn_amount.e8s() as u128;
-        (min_burn_amount * 100) / (self.burn_rate as u128)
-    }
 }
 
 impl Data {
@@ -107,7 +101,7 @@ impl Data {
         authorized_principals: Vec<Principal>,
         tokens: Vec<TokenAndPool>,
         gldgov_token_info: TokenInfo,
-        buyback_burn_interval_in_secs: u64,
+        buyback_interval_in_secs: u64,
         icp_swap_canister_id: Principal,
         burn_rate: u8,
         min_burn_amount: Tokens,
@@ -121,7 +115,7 @@ impl Data {
         Self {
             authorized_principals: authorized_principals.into_iter().collect(),
             gldgov_token_info,
-            buyback_burn_interval: Duration::from_secs(buyback_burn_interval_in_secs),
+            buyback_interval: Duration::from_secs(buyback_interval_in_secs),
             swap_clients,
             icp_swap_canister_id,
             burn_config: BurnConfig::new(burn_rate, min_burn_amount),
@@ -135,7 +129,7 @@ pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
     pub gldgov_token_info: TokenInfo,
-    pub buyback_burn_interval_in_secs: u64,
+    pub buyback_interval_in_secs: u64,
     pub icp_swap_canister_id: Principal,
     pub burn_config: BurnConfig,
     pub token_swaps_metrics: TokenSwapsMetrics,
@@ -156,6 +150,12 @@ pub struct CanisterInfo {
 mod tests {
     use super::*;
 
+    // Get the 100% of the min_burn_amount to know what the balance should be after swap (to have enough funds)
+    fn get_min_after_swap_amount(burn_config: BurnConfig) -> u128 {
+        let min_burn_amount = burn_config.min_burn_amount.e8s() as u128;
+        (min_burn_amount * 100) / (burn_config.burn_rate as u128)
+    }
+
     #[test]
     fn test_validate_burn_rate() {
         let valid_burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
@@ -170,15 +170,15 @@ mod tests {
     #[test]
     fn test_get_after_swap_amount() {
         let burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
-        assert_eq!(burn_config.get_min_after_swap_amount(), 200);
+        assert_eq!(get_min_after_swap_amount(burn_config), 200);
 
         let burn_config = BurnConfig::new(90, Tokens::from_e8s(900));
-        assert_eq!(burn_config.get_min_after_swap_amount(), 1000);
+        assert_eq!(get_min_after_swap_amount(burn_config), 1000);
 
         let burn_config = BurnConfig::new(1, Tokens::from_e8s(1));
-        assert_eq!(burn_config.get_min_after_swap_amount(), 100);
+        assert_eq!(get_min_after_swap_amount(burn_config), 100);
 
         let burn_config = BurnConfig::new(33, Tokens::from_e8s(100));
-        assert_eq!(burn_config.get_min_after_swap_amount(), 303);
+        assert_eq!(get_min_after_swap_amount(burn_config), 303);
     }
 }

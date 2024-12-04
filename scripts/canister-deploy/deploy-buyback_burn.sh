@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 NETWORK=$1
-DEPLOYMENT_VIA="direct"
+DEPLOYMENT_VIA="proposal"
+
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh buyback_burn $NETWORK
 
@@ -11,13 +12,13 @@ if [[ $REINSTALL == "reinstall" ]]; then
     TESTMODE=true
     AUTHORIZED_PRINCIPAL=465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae
     # 4 hours
-    BUYBACK_BURN_INTERVAL_IN_SECS=$((4 * 3600))
+    BUYBACK_INTERVAL_IN_SECS=$((4 * 3600))
 
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
     AUTHORIZED_PRINCIPAL=$(dfx canister id --network $NETWORK sns_governance)
     # 4 hours
-    BUYBACK_BURN_INTERVAL_IN_SECS=$((4 * 3600))
+    BUYBACK_INTERVAL_IN_SECS=$((4 * 3600))
 
   else
     echo "Error: unknown network for deployment. Found $NETWORK."
@@ -57,7 +58,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
         tokens = vec {$GLDGOV_ICP_POOL};
         burn_rate = $BURN_RATE : nat8;
         min_burn_amount = record { e8s = $MIN_BURN_AMOUNT : nat64 };
-        buyback_burn_interval_in_secs = $BUYBACK_BURN_INTERVAL_IN_SECS : nat64;
+        buyback_interval_in_secs = $BUYBACK_INTERVAL_IN_SECS : nat64;
       }
     }
   )"

@@ -1,14 +1,14 @@
 import { MouseEventHandler } from "react";
-import { useAtom } from "jotai";
-import { useIdentityKit } from "@nfid/identitykit/react";
-import { Actor, ActorSubclass, Agent } from "@dfinity/agent";
+import { useAtomValue } from "jotai";
+import { useAuth as useAuthIK } from "@nfid/identitykit/react";
+import { Actor, ActorSubclass } from "@dfinity/agent";
 
 import { stateAtom } from "../atoms";
 
 export const useAuth = () => {
-  const { connect: connectIK, disconnect: disconnectIK } = useIdentityKit();
+  const { connect: connectIK, disconnect: disconnectIK } = useAuthIK();
 
-  const [state, setState] = useAtom(stateAtom);
+  const state = useAtomValue(stateAtom);
 
   const connect: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -17,36 +17,30 @@ export const useAuth = () => {
   };
 
   const disconnect = () => {
-    setState((prevState) => ({
-      ...prevState,
-      principalId: "",
-      isConnected: false,
-      isConnecting: false,
-      agent: undefined,
-    }));
+    // setState((prevState) => ({
+    //   ...prevState,
+    //   principalId: "",
+    //   isConnected: false,
+    //   isConnecting: false,
+    //   agent: undefined,
+    // }));
     disconnectIK();
   };
 
   const createActor = (
-    canister:
-      | string
-      | "gld_nft_1g"
-      | "gld_nft_10g"
-      | "gld_nft_100g"
-      | "gld_nft_1000g"
-      | "gldt_swap"
-      | "gldt_ledger"
-      | "ogy_ledger"
-      | "icp_swap"
+    canister: string,
+    options: { authenticated: boolean } = { authenticated: false }
   ): ActorSubclass => {
     const { canisterId, idlFactory } = state.canisters[canister];
 
     const actor = Actor.createActor(idlFactory, {
-      agent: state.agent as Agent,
+      agent: options.authenticated
+        ? state.authenticatedAgent
+        : state.unauthenticatedAgent,
       canisterId,
     });
-
-    return actor as ActorSubclass;
+    // console.log(actor);
+    return actor;
   };
 
   return {

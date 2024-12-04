@@ -1,0 +1,14 @@
+[package]
+name = "usdg_minter_api"
+version = "0.1.0"
+description = "USDG - api"
+edition = "2021"
+
+[features]
+default = []  # Empty default features
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+icrc-ledger-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
+serde = { workspace = true }

@@ -43,13 +43,18 @@ export const nowMinusOneYearToSeconds = () =>
 
 export const getDateUTC = (
   date: string | number,
-  options?: { fromSeconds?: boolean; fromMillis?: boolean; fromISO?: boolean }
+  options?: {
+    fromSeconds?: boolean;
+    fromMillis?: boolean;
+    fromISO?: boolean;
+    fromNanos?: boolean;
+  }
 ): string => {
   let dateTime = DateTime.fromMillis(Number(date), { zone: "utc" });
   if (options?.fromSeconds)
     dateTime = DateTime.fromSeconds(Number(date), { zone: "utc" });
-  // else if (options?.fromMillis)
-  //   dateTime = DateTime.fromMillis(Number(date) / 1000000, { zone: "utc" });
+  else if (options?.fromNanos)
+    dateTime = DateTime.fromMillis(Number(date) / 1000000, { zone: "utc" });
   else if (options?.fromISO)
     dateTime = DateTime.fromISO(date.toString(), { zone: "utc" });
   const result = dateTime.toFormat("yyyy-LL-dd, hh:mm:ss a z");

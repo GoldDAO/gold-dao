@@ -25,3 +25,4 @@ backend/canisters/gldt_swap/api/declarations.zip
 console.log
 /CHANGELOG.md
 .cargo
+proptest-regressions

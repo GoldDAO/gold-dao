@@ -1,5 +1,5 @@
 import { Token as TokenType, useTransfer } from "@context/index";
-import { Select } from "@components/ui";
+import { SelectToken } from "@components/ui/select/index";
 import { LogoGLDT } from "@components/shared/logos";
 
 const TOKEN_OPTIONS = [
@@ -37,7 +37,7 @@ const Token = ({ className }: { className?: string }) => {
 
   return (
     <div className={className}>
-      <Select
+      <SelectToken
         options={TOKEN_OPTIONS}
         value={getValue()}
         handleOnChange={(value) => handleOnChangeToken(getToken(value))}
