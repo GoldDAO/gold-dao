@@ -10,10 +10,11 @@ import { useAtom, useSetAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
-  useIdentityKit,
   useAgent,
+  useAuth,
+  useIsInitializing,
 } from "@nfid/identitykit/react";
-import { HttpAgent } from "@dfinity/agent";
+import { Agent, HttpAgent } from "@dfinity/agent";
 import { isMobile } from "react-device-detect";
 
 import { stateAtom } from "../atoms";
@@ -29,21 +30,24 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  const { user, isInitializing } = useIdentityKit();
+  const { user } = useAuth();
+  const isInitializing = useIsInitializing();
 
   const [state, setState] = useAtom(stateAtom);
-  const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<
-    HttpAgent | undefined
-  >();
+  const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
   const agent = useAgent();
+  // console.log("unauthenticatedAgent");
+  // console.log(unauthenticatedAgent);
+  // console.log("agent useAgent()");
+  // console.log(agent);
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
+      setUnauthenticatedAgent(res);
       setState((prevState) => ({
         ...prevState,
-        agent: res,
+        unauthenticatedAgent: res,
       }));
-      setUnauthenticatedAgent(res);
     });
     setState((prevState) => ({
       ...prevState,
@@ -80,20 +84,20 @@ const AuthProviderInit = ({
         principalId: user.principal.toText(),
         isConnected: true,
         isConnecting: false,
-        agent,
+        authenticatedAgent: agent as unknown as Agent,
       }));
     } else {
       setState((prevState) => ({
         ...prevState,
         principalId: "",
         isConnected: false,
-        agent: unauthenticatedAgent,
+        authenticatedAgent: undefined,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, agent, state.canisters, unauthenticatedAgent]);
+  }, [user, agent, state.canisters]);
 
-  if (!Object.keys(state.canisters).length || !state.agent) {
+  if (!Object.keys(state.canisters).length || !state.unauthenticatedAgent) {
     return (
       <div className="flex h-screen">
         <div className="m-auto">
@@ -134,9 +138,9 @@ export const AuthProvider = ({
           disableIdle: false,
         },
       }}
-      onConnectFailure={(e: Error) => {
-        window.location.reload();
-        console.log(e);
+      onConnectFailure={(err: Error) => {
+        // window.location.reload();
+        console.log(err);
       }}
       onConnectSuccess={() => {
         // console.log("connected");
@@ -148,9 +152,9 @@ export const AuthProvider = ({
           principalId: "",
           isConnected: false,
           isConnecting: false,
-          agent: undefined,
+          authenticatedAgent: undefined,
         }));
-        window.location.reload();
+        // window.location.reload();
         // console.log("disconnected");
       }}
     >
