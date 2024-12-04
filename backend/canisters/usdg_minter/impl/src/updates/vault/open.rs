@@ -25,7 +25,7 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     // Check if borrowed amount makes sense
     let usdg_borrowed = USDG::from_e8s(arg.borrowed_amount);
     let gldt_margin = GLDT::from_e8s(arg.margin_amount);
-    read_state(|s| s.check_open_vault_args_validity(gldt_margin, usdg_borrowed))?;
+    read_state(|s| s.check_max_borrowable_amount(gldt_margin, usdg_borrowed))?;
 
     let from = Account {
         owner: ic_cdk::caller(),

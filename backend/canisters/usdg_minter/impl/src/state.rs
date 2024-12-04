@@ -56,7 +56,7 @@ impl State {
         }
     }
 
-    pub fn check_open_vault_args_validity(
+    pub fn check_max_borrowable_amount(
         &self,
         gldt_margin: GLDT,
         usdg_borrowed: USDG,
@@ -80,10 +80,14 @@ impl State {
         self.account_to_vault_ids
             .get(&account.into())
             .unwrap_or(&Default::default())
-            .into_iter()
-            .map(|vault| self.vault_id_to_vault.get(&vault).unwrap())
+            .iter()
+            .map(|vault| self.vault_id_to_vault.get(vault).unwrap())
             .cloned()
             .collect()
+    }
+
+    pub fn get_vault(&self, vault_id: u64) -> Option<Vault> {
+        self.vault_id_to_vault.get(&vault_id).cloned()
     }
 
     pub fn increment_vault_id(&mut self) -> u64 {
@@ -98,10 +102,6 @@ impl State {
         transfer_id
     }
 
-    pub fn active_vault_count(&self) -> usize {
-        self.vault_id_to_vault.len()
-    }
-
     pub fn record_vault_creation(
         &mut self,
         owner: Account,
@@ -109,6 +109,8 @@ impl State {
         margin_amount: GLDT,
         fee_bucket: impl Into<FeeBucket>,
     ) -> VaultId {
+        self.check_max_borrowable_amount(margin_amount, borrowed_amount)
+            .unwrap();
         let fee_bucket: FeeBucket = fee_bucket.into();
         let vault_id = self.increment_vault_id();
         let new_vault = Vault {
@@ -145,6 +147,16 @@ impl State {
                 .is_none());
         }
         vault_id
+    }
+
+    pub fn record_borrow_from_vault(&mut self, vault_id: VaultId, borrowed_amount: USDG) {
+        match self.vault_id_to_vault.get_mut(&vault_id) {
+            Some(vault) => {
+                vault.borrowed_amount = vault.borrowed_amount.checked_add(borrowed_amount).unwrap();
+                vault.clone()
+            }
+            None => panic!("attempted to borrow from unkown vault"),
+        };
     }
 }
 
