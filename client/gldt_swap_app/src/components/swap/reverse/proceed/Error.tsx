@@ -6,8 +6,7 @@ const Error = () => {
   const navigate = useNavigate();
   const { handleClose, reverseSwap } = useReverseSwapProceed();
   const { error } = reverseSwap;
-  const approveError = error?.message === "Approve";
-  const swapError = error?.message === "Swap";
+  const partialFailureError = error?.message === "swap_partial_failure";
 
   const handleOnClickGoToTxView = () => {
     handleClose();
@@ -15,14 +14,8 @@ const Error = () => {
   };
 
   const renderErrorMessage = () => {
-    switch (error?.message) {
-      case "Approve":
-        return "Reverse swap error! Approve transactions failed.";
-      case "Swap":
-        return "Reverse swap error! Swap tokens for NFT failed.";
-      default:
-        return error?.message;
-    }
+    if (partialFailureError) return error.cause as string;
+    return error?.message;
   };
 
   return (
@@ -36,7 +29,7 @@ const Error = () => {
         <Button className="mr-4" onClick={handleClose}>
           Close
         </Button>
-        {!approveError && !swapError && (
+        {partialFailureError && (
           <Button onClick={handleOnClickGoToTxView}>
             Go to transactions history
           </Button>

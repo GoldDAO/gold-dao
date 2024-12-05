@@ -17,13 +17,6 @@ export const useAuth = () => {
   };
 
   const disconnect = () => {
-    // setState((prevState) => ({
-    //   ...prevState,
-    //   principalId: "",
-    //   isConnected: false,
-    //   isConnecting: false,
-    //   agent: undefined,
-    // }));
     disconnectIK();
   };
 
@@ -39,7 +32,17 @@ export const useAuth = () => {
         : state.unauthenticatedAgent,
       canisterId,
     });
-    // console.log(actor);
+
+    // console.groupCollapsed(
+    //   "Create actor fn w/ details on agent and actor created"
+    // );
+    // console.log({ canister });
+    // console.log({ authenticated: options.authenticated });
+    // console.log({ authenticatedAgent: state.authenticatedAgent });
+    // console.log({ unauthenticatedAgent: state.unauthenticatedAgent });
+    // console.log({ actor });
+    // console.groupEnd();
+
     return actor;
   };
 
