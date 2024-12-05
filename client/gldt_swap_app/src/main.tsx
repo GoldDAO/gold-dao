@@ -59,7 +59,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             ? "https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io"
             : undefined
         }
-        targets={[SWAP_CANISTER_ID]}
+        targets={[
+          GLD_NFT_1G_CANISTER_ID,
+          GLD_NFT_10G_CANISTER_ID,
+          GLD_NFT_100G_CANISTER_ID,
+          GLD_NFT_1000G_CANISTER_ID,
+          OGY_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_INDEXER_CANISTER_ID,
+          GLDT_SUPER_STATS_V3_CANISTER_ID,
+          SWAP_CANISTER_ID,
+          ICP_SWAP_CANISTER_ID,
+        ]}
         canisters={{
           gld_nft_1g: {
             canisterId: GLD_NFT_1G_CANISTER_ID,
