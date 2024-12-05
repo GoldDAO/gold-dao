@@ -1,12 +1,13 @@
 import { MouseEventHandler } from "react";
 import { useAtomValue } from "jotai";
-import { useAuth as useAuthIK } from "@nfid/identitykit/react";
+import { useIdentityKit } from "@nfid/identitykit/react";
+// import { useAuth as useAuthIK } from "@nfid/identitykit/react";
 import { Actor, ActorSubclass } from "@dfinity/agent";
 
 import { stateAtom } from "../atoms";
 
 export const useAuth = () => {
-  const { connect: connectIK, disconnect: disconnectIK } = useAuthIK();
+  const { connect: connectIK, disconnect: disconnectIK } = useIdentityKit();
 
   const state = useAtomValue(stateAtom);
 
