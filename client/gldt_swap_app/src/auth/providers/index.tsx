@@ -35,11 +35,7 @@ const AuthProviderInit = ({
 
   const [state, setState] = useAtom(stateAtom);
   const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
-  const agent = useAgent();
-  // console.log("unauthenticatedAgent");
-  // console.log(unauthenticatedAgent);
-  // console.log("agent useAgent()");
-  // console.log(agent);
+  const agent = useAgent({ host: "https://ic0.app" });
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
@@ -143,7 +139,6 @@ export const AuthProvider = ({
         console.log(err);
       }}
       onConnectSuccess={() => {
-        // console.log("connected");
         queryClient.clear();
       }}
       onDisconnect={() => {
@@ -155,7 +150,6 @@ export const AuthProvider = ({
           authenticatedAgent: undefined,
         }));
         // window.location.reload();
-        // console.log("disconnected");
       }}
     >
       <AuthProviderInit canisters={canisters}>{children}</AuthProviderInit>

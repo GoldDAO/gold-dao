@@ -13,7 +13,7 @@ const Error = () => {
   };
 
   useEffect(() => {
-    if (error?.message === "Retry") {
+    if (error?.message === "retry") {
       setRetryCountdown((error?.cause as { retryDelay: number }).retryDelay);
     }
   }, [error]);
@@ -34,7 +34,7 @@ const Error = () => {
     <div className="flex flex-col items-center">
       <div className="border border-red-400 bg-red-400/5 py-8 px-4 flex flex-col justify-center items-center rounded-xl w-full mb-8">
         <div className="font-semibold text-red-400 text-center">
-          {error?.message === "Retry"
+          {error?.message === "retry"
             ? `Error when swapping GLD NFTs! Please retry${
                 isRetryCountdown ? ` in ${retryCountdown} seconds` : ""
               }.`
