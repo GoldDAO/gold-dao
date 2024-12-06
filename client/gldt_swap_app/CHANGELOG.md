@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.0] - 2024-12-06
+
+#### Description
+
+This version integrate Explorer view, also fix small issues.
+
+#### Added
+
+- Explorer view, users can now follow transactions, top 100 GLDT holders and token infos.
+
 ### [1.0.8] - 2024-11-19
 
 #### Fix
