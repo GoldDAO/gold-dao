@@ -1,5 +1,6 @@
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::icrc1::transfer::TransferError;
 use icrc_ledger_types::icrc2::transfer_from::TransferFromError;
 use serde::Deserialize;
 
@@ -20,10 +21,13 @@ pub enum ApiFeeBucket {
 #[derive(CandidType, Deserialize, Debug)]
 pub enum VaultError {
     TransferFromError(TransferFromError),
+    TransferError(TransferError),
     AnonymousCaller,
     AmountTooLow { minimum_amount: u64 },
     NoRecentGoldPrice,
     BorrowedAmountTooBig { maximum_borrowable_amount: u64 },
+    VaultNotFound,
+    CallerNotOwner,
 }
 
 #[derive(CandidType, Deserialize, Debug, Eq, PartialEq)]

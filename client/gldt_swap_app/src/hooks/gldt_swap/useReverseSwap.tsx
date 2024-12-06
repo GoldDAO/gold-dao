@@ -86,71 +86,91 @@ export const useReverseSwap = () => {
   return useMutation({
     mutationKey: ["REVERSE_SWAP"],
     mutationFn: async (): Promise<void> => {
-      // console.log("approve_args:");
-      // console.log(icrc2_approve_args);
-      const approve = await Promise.allSettled(
-        icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
-      );
-
-      // console.log("approve result:");
-      // console.log(approve);
-
-      const approveRejectedErrors = approve.filter(
-        (result) => result.status === "rejected"
-      );
-      const approveFulfilled = approve.filter(
-        (result) => result.status === "fulfilled"
-      );
-
-      if (
-        approveRejectedErrors.length > 0 ||
-        approveFulfilled.some((approve) => "Err" in approve.value)
-      ) {
-        // console.error(approve);
-        throw new Error("Approve");
-      }
-
-      // console.log("icrc2_allowance_args:");
-      // console.log(icrc2_allowance_args);
-
-      const swapTasks = icrc2_allowance_args.map(async (_, index) => {
-        const swapData = swap_tokens_for_nft_data[index];
-        const swapResult = await swap_tokens_for_nft(swapData);
-        return swapResult;
-      });
-
-      const swap = await Promise.allSettled(swapTasks);
-
-      // console.log("swap result:");
-      // console.log(swap);
-
-      const swapRejectedErrors = swap.filter(
-        (result) => result.status === "rejected"
-      );
-      const swapFulfilled = swap.filter(
-        (result) => result.status === "fulfilled"
-      );
-
-      if (
-        swapRejectedErrors.length > 0 ||
-        swapFulfilled.some((swap) => "Err" in swap.value)
-      ) {
-        // console.error(swap);
-        const { countErr, countSuccess } = swapFulfilled.reduce(
-          (acc, swap) => {
-            if ("Err" in swap.value) acc.countErr += 1;
-            else if ("Ok" in swap.value) acc.countSuccess += 1;
-            return acc;
-          },
-          { countErr: swapRejectedErrors.length, countSuccess: 0 }
+      try {
+        const approve = await Promise.allSettled(
+          icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
         );
-        if (countSuccess === 0) throw new Error("Swap");
 
-        throw new Error(
-          `Warning! ${countSuccess} swap${
-            countSuccess > 1 ? "s" : ""
-          } succeeded and ${countErr} swap${countErr > 1 ? "s" : ""} failed.`
+        const approveRejected = approve.filter(
+          (result) => result.status === "rejected"
         );
+        const approveFulfilled = approve.filter(
+          (result) => result.status === "fulfilled"
+        );
+
+        if (approveRejected.length) {
+          throw new Error("approve", { cause: approveRejected });
+        } else if (approveFulfilled.some((approve) => "Err" in approve.value)) {
+          throw new Error("approve", {
+            cause: approveFulfilled.filter((approve) => "Err" in approve.value),
+          });
+        }
+
+        const swapTasks = icrc2_allowance_args.map(async (_, index) => {
+          const swapData = swap_tokens_for_nft_data[index];
+          const swapResult = await swap_tokens_for_nft(swapData);
+          return swapResult;
+        });
+
+        const swap = await Promise.allSettled(swapTasks);
+
+        const swapRejected = swap.filter(
+          (result) => result.status === "rejected"
+        );
+        const swapFulfilled = swap.filter(
+          (result) => result.status === "fulfilled"
+        );
+
+        if (swapRejected.length) {
+          console.error({ swap_tokens_for_nft: swapRejected });
+        } else if (swapFulfilled.some((swap) => "Err" in swap.value)) {
+          console.error({
+            swap_tokens_for_nft: swapFulfilled.filter(
+              (swap) => "Err" in swap.value
+            ),
+          });
+        }
+
+        if (
+          swapRejected.length ||
+          swapFulfilled.some((swap) => "Err" in swap.value)
+        ) {
+          const { countErr, countSuccess } = swapFulfilled.reduce(
+            (acc, swap) => {
+              if ("Err" in swap.value) acc.countErr += 1;
+              else if ("Ok" in swap.value) acc.countSuccess += 1;
+              return acc;
+            },
+            { countErr: swapRejected.length, countSuccess: 0 }
+          );
+          if (countSuccess === 0) throw new Error("swap_failure");
+          throw new Error("swap_partial_failure", {
+            cause: `Warning! ${countSuccess} swap${
+              countSuccess > 1 ? "s" : ""
+            } succeeded and ${countErr} swap${countErr > 1 ? "s" : ""} failed.`,
+          });
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          switch (err.message) {
+            case "approve":
+              console.error({
+                icrc2_approve: err.cause,
+              });
+              throw new Error(
+                "Reverse swap error! Approve transactions failed."
+              );
+            case "swap_failure":
+              throw new Error(
+                "Reverse swap error! Swap tokens for NFT failed."
+              );
+            case "swap_partial_failure":
+              throw new Error("swap_partial_failure", { cause: err.cause });
+            default:
+              console.error(err);
+              throw new Error("Reverse swap error! Unexpected error.");
+          }
+        }
       }
     },
   });

@@ -94,7 +94,7 @@ const Table = <T extends object>({
     searchParams.set(pageSize, value);
     searchParams.set(pageIndex, "1");
     setPagination({ pageIndex: 1, pageSize: value });
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   // const handleOnChangePageIndex = (e) => {
@@ -107,7 +107,7 @@ const Table = <T extends object>({
   const handleOnClickFirstPage = () => {
     table.firstPage();
     searchParams.set(pageIndex, "1");
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   const handleOnClickPreviousPage = () => {
@@ -116,7 +116,7 @@ const Table = <T extends object>({
       pageIndex,
       table.getState().pagination.pageIndex.toString()
     );
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   const handleOnClickNextPage = () => {
@@ -125,13 +125,13 @@ const Table = <T extends object>({
       pageIndex,
       (table.getState().pagination.pageIndex + 2).toString()
     );
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   const handleOnClickLastPage = () => {
     table.lastPage();
     searchParams.set(pageIndex, table.getPageCount().toString());
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   const handleOnChangeSorting = (columnId: string) => {

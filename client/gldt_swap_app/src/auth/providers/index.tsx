@@ -11,8 +11,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
   useAgent,
-  useAuth,
-  useIsInitializing,
+  // useAuth,
+  // useIsInitializing,
+  useIdentityKit,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
 import { isMobile } from "react-device-detect";
@@ -30,16 +31,14 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  const { user } = useAuth();
-  const isInitializing = useIsInitializing();
+  // const { user } = useAuth();
+  const agent = useAgent({ host: "https://ic0.app" });
+  // const agent = useAgent({ host: "https://ic0.app" });
+  // const isInitializing = useIsInitializing();
+  const { user, isInitializing } = useIdentityKit();
 
   const [state, setState] = useAtom(stateAtom);
   const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
-  const agent = useAgent();
-  // console.log("unauthenticatedAgent");
-  // console.log(unauthenticatedAgent);
-  // console.log("agent useAgent()");
-  // console.log(agent);
 
   useEffect(() => {
     HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
@@ -143,7 +142,6 @@ export const AuthProvider = ({
         console.log(err);
       }}
       onConnectSuccess={() => {
-        // console.log("connected");
         queryClient.clear();
       }}
       onDisconnect={() => {
@@ -155,7 +153,6 @@ export const AuthProvider = ({
           authenticatedAgent: undefined,
         }));
         // window.location.reload();
-        // console.log("disconnected");
       }}
     >
       <AuthProviderInit canisters={canisters}>{children}</AuthProviderInit>

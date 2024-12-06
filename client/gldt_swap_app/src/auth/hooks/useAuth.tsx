@@ -1,12 +1,13 @@
 import { MouseEventHandler } from "react";
 import { useAtomValue } from "jotai";
-import { useAuth as useAuthIK } from "@nfid/identitykit/react";
+import { useIdentityKit } from "@nfid/identitykit/react";
+// import { useAuth as useAuthIK } from "@nfid/identitykit/react";
 import { Actor, ActorSubclass } from "@dfinity/agent";
 
 import { stateAtom } from "../atoms";
 
 export const useAuth = () => {
-  const { connect: connectIK, disconnect: disconnectIK } = useAuthIK();
+  const { connect: connectIK, disconnect: disconnectIK } = useIdentityKit();
 
   const state = useAtomValue(stateAtom);
 
@@ -17,13 +18,6 @@ export const useAuth = () => {
   };
 
   const disconnect = () => {
-    // setState((prevState) => ({
-    //   ...prevState,
-    //   principalId: "",
-    //   isConnected: false,
-    //   isConnecting: false,
-    //   agent: undefined,
-    // }));
     disconnectIK();
   };
 
@@ -39,7 +33,17 @@ export const useAuth = () => {
         : state.unauthenticatedAgent,
       canisterId,
     });
-    // console.log(actor);
+
+    // console.groupCollapsed(
+    //   "Create actor fn w/ details on agent and actor created"
+    // );
+    // console.log({ canister });
+    // console.log({ authenticated: options.authenticated });
+    // console.log({ authenticatedAgent: state.authenticatedAgent });
+    // console.log({ unauthenticatedAgent: state.unauthenticatedAgent });
+    // console.log({ actor });
+    // console.groupEnd();
+
     return actor;
   };
 

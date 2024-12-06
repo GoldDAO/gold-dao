@@ -11,22 +11,6 @@ import { NftCollection } from "@context/index";
 export const useTransferNFT = () => {
   const { createActor } = useAuth();
 
-  const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
-    const actor = createActor("ogy_ledger", { authenticated: true });
-    const result = await actor.icrc2_approve(arg);
-    return result as Result_2;
-  };
-
-  const icrc7_transfer = async (arg: {
-    canister: string;
-    tokenIds: TransferArgs[];
-  }): Promise<TransferResult> => {
-    const { canister, tokenIds } = arg;
-    const actor = createActor(canister, { authenticated: true });
-    const result = await actor.icrc7_transfer(tokenIds);
-    return result as TransferResult;
-  };
-
   return useMutation({
     mutationKey: ["TRANSFER_NFT"],
     mutationFn: async ({
@@ -38,6 +22,22 @@ export const useTransferNFT = () => {
       nfts: NftCollection[];
       fee: number;
     }): Promise<void> => {
+      const icrc2_approve = async (arg: ApproveArgs): Promise<Result_2> => {
+        const actor = createActor("ogy_ledger", { authenticated: true });
+        const result = await actor.icrc2_approve(arg);
+        return result as Result_2;
+      };
+
+      const icrc7_transfer = async (arg: {
+        canister: string;
+        tokenIds: TransferArgs[];
+      }): Promise<TransferResult> => {
+        const { canister, tokenIds } = arg;
+        const actor = createActor(canister, { authenticated: true });
+        const result = await actor.icrc7_transfer(tokenIds);
+        return result as TransferResult;
+      };
+
       const icrc2_approve_args = nfts.flatMap((nft) => {
         const amount = BigInt(nft.tokenIds.length * Math.floor(fee * 10 ** 8));
         return {
@@ -55,27 +55,8 @@ export const useTransferNFT = () => {
         };
       }) as ApproveArgs[];
 
-      // console.log("approve_args:");
-      // console.log(icrc2_approve_args);
-      const approve = await Promise.allSettled(
-        icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
-      );
-
-      const approveErrors = approve.filter(
-        (result) => result.status === "rejected"
-      );
-      if (approveErrors.length > 0) {
-        console.error(approveErrors);
-        throw new Error(
-          "Transfer error! One or more approve transactions failed."
-        );
-      }
-      // console.log("approve result:");
-      // console.log(approve);
-
       const icrc7_transfer_args = nfts.map((nft) => {
         const tokenIds = nft.tokenIds.map((tokenId) => {
-          // console.log(`transfer_args to address: ${to}`);
           return {
             to: {
               owner: Principal.fromText(to),
@@ -93,8 +74,27 @@ export const useTransferNFT = () => {
         };
       });
 
-      // console.log("transfer_args:");
-      // console.log(icrc7_transfer_args);
+      // console.groupCollapsed(
+      //   "Transfer fn w/ icrc2_approve & icrc7_transfer args"
+      // );
+      // console.log({ icrc2_approve_args });
+      // console.log({ icrc7_transfer_args });
+      // console.groupEnd();
+
+      const approve = await Promise.allSettled(
+        icrc2_approve_args.map(async (arg) => await icrc2_approve(arg))
+      );
+      const approveErrors = approve.filter(
+        (result) => result.status === "rejected"
+      );
+      if (approveErrors.length > 0) {
+        console.error({ approveErrors });
+        throw new Error(
+          "Transfer error! One or more approve transactions failed."
+        );
+      }
+      // console.log({ "Approve results": approve });
+
       const transfer = await Promise.allSettled(
         icrc7_transfer_args.map(async (arg) => await icrc7_transfer(arg))
       );
@@ -102,13 +102,12 @@ export const useTransferNFT = () => {
         (result) => result.status === "rejected"
       );
       if (transferErrors.length > 0) {
-        console.error(transferErrors);
+        console.error({ transferErrors });
         throw new Error(
-          "Transfer error! One or more transfer transactions failed"
+          "Transfer error! One or more transfer transactions failed."
         );
       }
-      // console.log("transfer result:");
-      // console.log(transfer);
+      // console.log({ "Transfer results": transfer });
     },
   });
 };

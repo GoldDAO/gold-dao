@@ -24,7 +24,7 @@ export const useGetGLDTPrice = () => {
       );
       return pool2?.token1Price || 0.05;
     } catch (err) {
-      console.log("GLDT price error:", err);
+      console.error("GLDT price error:", err);
       return 0.05;
     }
   };

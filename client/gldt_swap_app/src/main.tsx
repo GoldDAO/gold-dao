@@ -18,6 +18,7 @@ import {
   OGY_LEDGER_CANISTER_ID,
   GLDT_LEDGER_CANISTER_ID,
   GLDT_LEDGER_INDEXER_CANISTER_ID,
+  GLDT_SUPER_STATS_V3_CANISTER_ID,
   SWAP_CANISTER_ID,
   ICP_SWAP_CANISTER_ID,
 } from "@constants";
@@ -27,6 +28,7 @@ import { idlFactory as gldt_swap_idl } from "@canisters/gldt_swap/did";
 import { idlFactory as ledger_idl } from "@canisters/ledger/did";
 import { idlFactory as icp_swap_idl } from "@canisters/icp_swap/did";
 import { idlFactory as gldt_ledger_indexer_idl } from "@canisters/gldt_ledger_indexer/interface";
+import { idlFactory as gldt_super_stats_v3_idl } from "@canisters/gldt_super_stats_v3/interface";
 
 const queryClient = new QueryClient();
 
@@ -57,7 +59,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             ? "https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io"
             : undefined
         }
-        targets={[SWAP_CANISTER_ID]}
+        targets={[
+          GLD_NFT_1G_CANISTER_ID,
+          GLD_NFT_10G_CANISTER_ID,
+          GLD_NFT_100G_CANISTER_ID,
+          GLD_NFT_1000G_CANISTER_ID,
+          OGY_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_CANISTER_ID,
+          GLDT_LEDGER_INDEXER_CANISTER_ID,
+          GLDT_SUPER_STATS_V3_CANISTER_ID,
+          SWAP_CANISTER_ID,
+          ICP_SWAP_CANISTER_ID,
+        ]}
         canisters={{
           gld_nft_1g: {
             canisterId: GLD_NFT_1G_CANISTER_ID,
@@ -86,6 +99,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           gldt_ledger_indexer: {
             canisterId: GLDT_LEDGER_INDEXER_CANISTER_ID,
             idlFactory: gldt_ledger_indexer_idl,
+          },
+          gldt_super_stats_v3: {
+            canisterId: GLDT_SUPER_STATS_V3_CANISTER_ID,
+            idlFactory: gldt_super_stats_v3_idl,
           },
           ogy_ledger: {
             canisterId: OGY_LEDGER_CANISTER_ID,

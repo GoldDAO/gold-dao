@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import NavbarHome from "@components/shared/navbars/Home";
 import { Button, Skeleton } from "@components/ui";
 import { FrequentlyAskedQuestions } from "@components/landing-page";
-import { useGLDTMarketcapUSD } from "@hooks/gold_api";
+import { useLedgerMetadata } from "@hooks/ledger";
 import { useGLDNFTLocked } from "@hooks/gld_nft/useGLDNFTLocked";
 
 const Logo = ({ name, alt = "" }: { name: string; alt?: string }) => {
@@ -25,8 +25,8 @@ export const LandingPage = () => {
     { name: "BITY", alt: "BITY brand logo" },
   ];
 
-  const { data: GLDTMarketcap, isSuccess: isSuccessGLDTMarketcap } =
-    useGLDTMarketcapUSD();
+  const { data: GLDTMetadata, isSuccess: isSuccessGLDTMetadata } =
+    useLedgerMetadata({ ledger: "GLDT" });
 
   const { data: NFTLocked, isSuccess: isSuccessNFTLocked } = useGLDNFTLocked();
 
@@ -76,8 +76,8 @@ export const LandingPage = () => {
                   <div className="flex flex-col items-center border border-gold/60 rounded-full px-8 py-2">
                     <div className="text-sm">GLDT marketcap in USD</div>
                     <div className="font-semibold">
-                      {isSuccessGLDTMarketcap ? (
-                        <div>{GLDTMarketcap} $</div>
+                      {isSuccessGLDTMetadata ? (
+                        <div>{GLDTMetadata.marketCap} $</div>
                       ) : (
                         <Skeleton className="w-32" />
                       )}

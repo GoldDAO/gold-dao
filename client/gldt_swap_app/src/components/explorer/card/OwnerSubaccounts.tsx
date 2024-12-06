@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LoaderSpin } from "@components/ui";
 
 import { useFetchLedgerOneAccountSubaccounts } from "@hooks/gldt_ledger_indexer";
@@ -15,6 +15,8 @@ export const OwnerSubaccounts = ({
   className?: string;
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentExplorerTab = location.pathname.split("/")[2];
   const [pagination] = usePagination();
 
   const { data, isSuccess, isLoading, isError } =
@@ -25,9 +27,9 @@ export const OwnerSubaccounts = ({
   const handleOnChange = (subaccount: string) => {
     let path: string;
     if (subaccount !== "Default subaccount")
-      path = `/explorer/account?owner=${owner}&subaccount=${subaccount}&page_size=${pagination.pageSize}&page_index=0`;
+      path = `/explorer/${currentExplorerTab}/account?owner=${owner}&subaccount=${subaccount}&page_size=${pagination.pageSize}&page_index=1`;
     else
-      path = `/explorer/account?owner=${owner}&page_size=${pagination.pageSize}&page_index=0`;
+      path = `/explorer/${currentExplorerTab}/account?owner=${owner}&page_size=${pagination.pageSize}&page_index=1`;
     navigate(path, { replace: true });
   };
 
