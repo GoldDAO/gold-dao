@@ -28,6 +28,8 @@ pub enum VaultError {
     BorrowedAmountTooBig { maximum_borrowable_amount: u64 },
     VaultNotFound,
     CallerNotOwner,
+    AlreadyProcessing,
+    TooManyConcurrentRequests
 }
 
 #[derive(CandidType, Deserialize, Debug, Eq, PartialEq)]

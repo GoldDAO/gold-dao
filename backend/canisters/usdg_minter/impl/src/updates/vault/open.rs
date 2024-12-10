@@ -1,3 +1,4 @@
+use crate::guard::GuardPrincipal;
 use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::numeric::{GLDT, USDG};
@@ -15,6 +16,9 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     // Check anonymous caller
     reject_anonymous_caller()?;
 
+    let caller = ic_cdk::caller();
+    let _guard_principal = GuardPrincipal::new(caller)?;
+
     // Check minimum margin amount
     if GLDT::from_e8s(arg.margin_amount) < MINIMUM_MARGIN_AMOUNT {
         return Err(VaultError::AmountTooLow {
@@ -28,16 +32,14 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     read_state(|s| s.check_max_borrowable_amount(gldt_margin, usdg_borrowed))?;
 
     let from = Account {
-        owner: ic_cdk::caller(),
+        owner: caller,
         subaccount: arg.maybe_subaccount,
     };
     let gldt_ledger_id = read_state(|s| s.gldt_ledger_id);
 
     log!(
         INFO,
-        "[open_vault] {} requested vault opening with args: {}",
-        ic_cdk::caller(),
-        arg
+        "[open_vault] {caller} requested vault opening with args: {arg}",
     );
     match transfer_from(
         from,
@@ -59,8 +61,7 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
             });
             log!(
                 INFO,
-                "[open_vault] {} successfully opened vault at index {block_index} with id: {vault_id}",
-                ic_cdk::caller(),
+                "[open_vault] {caller} successfully opened vault at index {block_index} with id: {vault_id}",
             );
             Ok(OpenVaultSuccess {
                 block_index,

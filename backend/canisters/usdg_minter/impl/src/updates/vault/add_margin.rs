@@ -1,3 +1,4 @@
+use crate::guard::GuardPrincipal;
 use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::state::{mutate_state, read_state};
@@ -13,11 +14,13 @@ use usdg_minter_api::VaultError;
 #[update]
 async fn add_margin_to_vault(arg: AddMarginArg) -> Result<u64, VaultError> {
     reject_anonymous_caller()?;
+    let caller = ic_cdk::caller();
+    let _guard_principal = GuardPrincipal::new(caller)?;
 
     let vault: Vault =
         read_state(|s| s.get_vault(arg.vault_id)).ok_or(VaultError::VaultNotFound)?;
 
-    if vault.owner.owner != ic_cdk::caller() {
+    if vault.owner.owner != caller {
         return Err(VaultError::CallerNotOwner);
     }
 

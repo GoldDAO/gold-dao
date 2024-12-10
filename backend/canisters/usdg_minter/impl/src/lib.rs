@@ -8,6 +8,7 @@ use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 use usdg_minter_api::{ApiVault, VaultError};
 
 pub mod cbor;
+pub mod guard;
 pub mod lifecycle;
 pub mod logs;
 pub mod management;
