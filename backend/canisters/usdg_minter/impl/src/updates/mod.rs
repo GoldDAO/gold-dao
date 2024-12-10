@@ -1,7 +1,6 @@
 use candid::Principal;
 use usdg_minter_api::VaultError;
 
-pub mod timer;
 pub mod vault;
 
 pub fn reject_anonymous_caller() -> Result<(), VaultError> {

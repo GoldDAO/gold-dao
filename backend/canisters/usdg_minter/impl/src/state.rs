@@ -1,3 +1,4 @@
+use crate::lifecycle::tasks::TaskType;
 use crate::numeric::{GoldPrice, GLDT, USDG};
 use crate::transfer::{PendingTransfer, TransferId, Unit};
 use crate::vault::{FeeBucket, Vault, VaultId};
@@ -5,7 +6,7 @@ use crate::{DEFAULT_GOLD_PRICE, MINIMUM_COLLATERAL_RATIO};
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::cell::RefCell;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use usdg_minter_api::lifecycle::InitArgument;
 use usdg_minter_api::VaultError;
 
@@ -37,6 +38,11 @@ pub struct State {
     pub gldt_ledger_id: Principal,
     pub gold_dao_governance_id: Principal,
     pub xrc_id: Principal,
+
+    /// Per-principal guard for all endpoints
+    pub principal_guards: BTreeSet<Principal>,
+    /// Guards preventing concurrent execution timer tasks
+    pub active_tasks: HashSet<TaskType>,
 }
 
 impl State {
@@ -53,6 +59,8 @@ impl State {
             gldt_ledger_id: init_arg.gldt_ledger_id,
             gold_dao_governance_id: init_arg.gold_dao_governance_id,
             xrc_id: init_arg.xrc_id,
+            principal_guards: Default::default(),
+            active_tasks: Default::default(),
         }
     }
 

@@ -1,3 +1,4 @@
+use crate::guard::GuardPrincipal;
 use crate::logs::INFO;
 use crate::management::transfer;
 use crate::numeric::{DisplayAmount, USDG};
@@ -13,6 +14,9 @@ use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
 async fn borrow_from_vault(arg: BorrowArg) -> Result<u64, VaultError> {
     // Check anonymous caller
     reject_anonymous_caller()?;
+
+    let caller = ic_cdk::caller();
+    let _guard_principal = GuardPrincipal::new(caller)?;
 
     // Check minimum margin amount
     if USDG::from_e8s(arg.borrowed_amount) < MINIMUM_BORROW_AMOUNT {
