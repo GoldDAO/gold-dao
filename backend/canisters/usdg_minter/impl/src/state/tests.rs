@@ -1,12 +1,12 @@
 use crate::state::{Account, State, GLDT, USDG};
 use crate::transfer::PendingTransfer;
 use crate::transfer::Unit;
-use crate::vault::FeeBucket;
-use crate::vault::Vault;
+use crate::vault::{FeeBucket, Vault};
 use crate::{Factor, DEFAULT_GOLD_PRICE};
 use assert_matches::assert_matches;
 use candid::Principal;
 use proptest::prelude::*;
+use std::collections::{BTreeMap, HashSet};
 use usdg_minter_api::VaultError::BorrowedAmountTooBig;
 
 fn default_state() -> State {
@@ -24,6 +24,12 @@ fn default_state() -> State {
         pending_transfers: Default::default(),
 
         one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
+
+        active_tasks: HashSet::default(),
+        principal_guards: Default::default(),
+
+        liquidation_pool: BTreeMap::default(),
+        liquidation_return: BTreeMap::default(),
 
         // Canister ids
         usdg_ledger_id: Principal::management_canister(),
@@ -79,7 +85,7 @@ fn should_not_borrow_more_than_max_vault_creation() {
         subaccount: None,
     };
     let margin = GLDT::from_unscaled(500);
-    let borrowed = USDG::from_unscaled(1000);
+    let borrowed = USDG::from_unscaled(1_000);
     let fee_bucket = FeeBucket::Medium;
 
     state.record_vault_creation(owner, borrowed, margin, fee_bucket);
@@ -197,6 +203,53 @@ fn should_reject_unvalid_open_vault() {
         state.check_max_borrowable_amount(margin, usdg_borrowed),
         Ok(())
     );
+}
+
+#[test]
+fn should_deposit_liquidity() {
+    let mut state = default_state();
+
+    let owner = Account {
+        owner: Principal::from_text(
+            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
+        )
+        .unwrap(),
+        subaccount: None,
+    };
+    let usdg_borrowed = USDG::from_unscaled(2_000);
+
+    state.deposit_liquidity(owner, usdg_borrowed);
+    assert_eq!(
+        state
+            .liquidation_pool
+            .get(&owner)
+            .unwrap_or(&USDG::ZERO)
+            .clone(),
+        usdg_borrowed
+    );
+
+    state.deposit_liquidity(owner, usdg_borrowed);
+    assert_eq!(
+        state
+            .liquidation_pool
+            .get(&owner)
+            .unwrap_or(&USDG::ZERO)
+            .clone(),
+        USDG::from_unscaled(4_000)
+    );
+
+    state.withdraw_liquidity(USDG::from_unscaled(1_000), owner);
+    assert_eq!(
+        state
+            .liquidation_pool
+            .get(&owner)
+            .unwrap_or(&USDG::ZERO)
+            .clone(),
+        USDG::from_unscaled(3_000)
+    );
+
+    state.withdraw_liquidity(USDG::from_unscaled(3_000), owner);
+    assert!(state.liquidation_pool.get(&owner).is_none());
 }
 
 fn arb_usdg_amount() -> impl Strategy<Value = USDG> {

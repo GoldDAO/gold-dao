@@ -2,7 +2,7 @@ use crate::lifecycle::tasks::TaskType;
 use crate::state::mutate_state;
 use candid::Principal;
 use std::marker::PhantomData;
-use usdg_minter_api::VaultError;
+use usdg_minter_api::GuardError;
 
 const MAX_CONCURRENT: usize = 100;
 
@@ -18,13 +18,13 @@ impl GuardPrincipal {
     /// Attempts to create a new guard for the current block. Fails if there is
     /// already a pending request for the specified [principal] or if there
     /// are at least [MAX_CONCURRENT] pending requests.
-    pub fn new(principal: Principal) -> Result<Self, VaultError> {
+    pub fn new(principal: Principal) -> Result<Self, GuardError> {
         mutate_state(|s| {
             if s.principal_guards.contains(&principal) {
-                return Err(VaultError::AlreadyProcessing);
+                return Err(GuardError::AlreadyProcessing);
             }
             if s.principal_guards.len() >= MAX_CONCURRENT {
-                return Err(VaultError::TooManyConcurrentRequests);
+                return Err(GuardError::TooManyConcurrentRequests);
             }
             s.principal_guards.insert(principal);
             Ok(Self {

@@ -14,11 +14,11 @@ use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 #[update]
 async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     // Check anonymous caller
-    reject_anonymous_caller()?;
+    reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
 
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
-
+    
     // Check minimum margin amount
     if GLDT::from_e8s(arg.margin_amount) < MINIMUM_MARGIN_AMOUNT {
         return Err(VaultError::AmountTooLow {

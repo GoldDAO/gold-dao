@@ -13,7 +13,7 @@ use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
 #[update]
 async fn borrow_from_vault(arg: BorrowArg) -> Result<u64, VaultError> {
     // Check anonymous caller
-    reject_anonymous_caller()?;
+    reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
 
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;

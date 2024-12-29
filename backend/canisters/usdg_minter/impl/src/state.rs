@@ -6,6 +6,7 @@ use crate::{DEFAULT_GOLD_PRICE, MINIMUM_COLLATERAL_RATIO};
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::cell::RefCell;
+use std::collections::btree_map::Entry::{Occupied, Vacant};
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use usdg_minter_api::lifecycle::InitArgument;
 use usdg_minter_api::VaultError;
@@ -26,6 +27,10 @@ pub struct State {
     pub account_to_vault_ids: BTreeMap<Account, BTreeSet<VaultId>>,
 
     pub vault_id_to_vault: BTreeMap<VaultId, Vault>,
+
+    // Liquidation pool
+    pub liquidation_pool: BTreeMap<Account, USDG>,
+    pub liquidation_return: BTreeMap<Account, GLDT>,
 
     // Pending transfers to be processed
     pub pending_transfers: BTreeMap<TransferId, PendingTransfer>,
@@ -53,6 +58,8 @@ impl State {
             fee_bucket_to_vault_ids: Default::default(),
             account_to_vault_ids: Default::default(),
             vault_id_to_vault: Default::default(),
+            liquidation_pool: Default::default(),
+            liquidation_return: Default::default(),
             pending_transfers: Default::default(),
             one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
             usdg_ledger_id: init_arg.usdg_ledger_id,
@@ -158,9 +165,13 @@ impl State {
     }
 
     pub fn record_borrow_from_vault(&mut self, vault_id: VaultId, borrowed_amount: USDG) {
+        let vault = self.get_vault(vault_id).unwrap();
+        let new_borrowed_amount = vault.borrowed_amount.checked_add(borrowed_amount).unwrap();
+        self.check_max_borrowable_amount(vault.margin_amount, new_borrowed_amount)
+            .unwrap();
         match self.vault_id_to_vault.get_mut(&vault_id) {
-            Some(vault) => {
-                vault.borrowed_amount = vault.borrowed_amount.checked_add(borrowed_amount).unwrap();
+            Some(vault_mut) => {
+                vault_mut.borrowed_amount = new_borrowed_amount;
             }
             None => panic!("attempted to borrow from unkown vault"),
         };
@@ -173,6 +184,25 @@ impl State {
             }
             None => panic!("attempted to add maring to unkown vault"),
         };
+    }
+
+    pub fn deposit_liquidity(&mut self, to: Account, amount: USDG) {
+        self.liquidation_pool
+            .entry(to)
+            .and_modify(|balance| *balance = balance.checked_add(amount).unwrap())
+            .or_insert(amount);
+    }
+
+    pub fn withdraw_liquidity(&mut self, amount: USDG, from: Account) {
+        match self.liquidation_pool.entry(from) {
+            Occupied(mut entry) => {
+                *entry.get_mut() = entry.get().checked_sub(amount).unwrap();
+                if *entry.get() == USDG::ZERO {
+                    entry.remove_entry();
+                }
+            }
+            Vacant(_) => ic_cdk::trap("cannot remove liquidity from unknow principal"),
+        }
     }
 }
 
