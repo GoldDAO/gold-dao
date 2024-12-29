@@ -13,7 +13,7 @@ use usdg_minter_api::VaultError;
 
 #[update]
 async fn add_margin_to_vault(arg: AddMarginArg) -> Result<u64, VaultError> {
-    reject_anonymous_caller()?;
+    reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
 

@@ -2,9 +2,13 @@ use crate::numeric::{Factor, GoldPrice, GLDT, USDG};
 use ic_cdk::export_candid;
 use icrc_ledger_types::icrc1::account::Account;
 use usdg_minter_api::lifecycle::MinterArgument;
+use usdg_minter_api::queries::get_lp_position::LiquidationPoolPosition;
 use usdg_minter_api::updates::add_margin_to_vault::AddMarginArg;
 use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
+use usdg_minter_api::updates::deposit_liquidity::DepositArg;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
+use usdg_minter_api::updates::withdraw_liquidity::WithdrawArg;
+use usdg_minter_api::LiquidityError;
 use usdg_minter_api::{ApiVault, VaultError};
 
 pub mod cbor;

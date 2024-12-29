@@ -32,6 +32,39 @@ pub enum VaultError {
     TooManyConcurrentRequests
 }
 
+#[derive(CandidType, Deserialize, Debug)]
+pub enum LiquidityError {
+    TransferFromError(TransferFromError),
+    TransferError(TransferError),
+    AnonymousCaller,
+    BalanceTooLow { balance: u64 },
+    AlreadyProcessing,
+    TooManyConcurrentRequests
+}
+
+pub enum GuardError {
+    AlreadyProcessing,
+    TooManyConcurrentRequests,
+}
+
+impl From<GuardError> for LiquidityError {
+    fn from(g: GuardError) -> LiquidityError {
+        match g {
+            GuardError::AlreadyProcessing => LiquidityError::AlreadyProcessing,
+            GuardError::TooManyConcurrentRequests => LiquidityError::TooManyConcurrentRequests,
+        }
+    }
+}
+
+impl From<GuardError> for VaultError {
+    fn from(g: GuardError) -> VaultError {
+        match g {
+            GuardError::AlreadyProcessing => VaultError::AlreadyProcessing,
+            GuardError::TooManyConcurrentRequests => VaultError::TooManyConcurrentRequests,
+        }
+    }
+}
+
 #[derive(CandidType, Deserialize, Debug, Eq, PartialEq)]
 pub struct ApiVault {
     pub vault_id: u64,
