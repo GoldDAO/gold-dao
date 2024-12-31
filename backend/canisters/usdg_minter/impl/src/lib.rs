@@ -37,4 +37,11 @@ pub const DEFAULT_GOLD_PRICE: GoldPrice = GoldPrice::from_e8s(83_000_000);
 
 pub const MINIMUM_COLLATERAL_RATIO: Factor = Factor::from_e8s(105_000_000);
 
+// The default medium rate is 5%
+pub const DEFAULT_MEDIUM_RATE: f64 = 0.05;
+// Determines the rate at which the interest rate will evolve.
+pub const ALPHA_FACTOR: f64 = 0.1;
+pub const MAXIUM_INTEREST_RATE: f64 = 1.0;
+pub const MINIMUM_INTEREST_RATE: f64 = 0.01;
+
 export_candid!();

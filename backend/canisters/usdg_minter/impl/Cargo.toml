@@ -26,6 +26,7 @@ ic-metrics-encoder = { workspace = true }
 minicbor = { workspace = true }
 minicbor-derive = { workspace = true }
 rust_decimal = { workspace = true }
+rust_decimal_macros = "1.36.0"
 serde = { workspace = true }
 serde_json = { workspace = true }
 usdg_minter_api = { path = "../api" }

@@ -38,7 +38,7 @@ async fn deposit_liquidity(arg: DepositArg) -> Result<u64, LiquidityError> {
     {
         Ok(block_index) => {
             log!(INFO, "[deposit_liquidity] Succesfully added liquidity to pool {deposit_amount} at index {block_index}",);
-            /// TODO RECORD EVENT
+            // TODO RECORD EVENT
             mutate_state(|s| s.deposit_liquidity(from, deposit_amount));
             Ok(block_index)
         }

@@ -29,7 +29,7 @@ pub enum VaultError {
     VaultNotFound,
     CallerNotOwner,
     AlreadyProcessing,
-    TooManyConcurrentRequests
+    TooManyConcurrentRequests,
 }
 
 #[derive(CandidType, Deserialize, Debug)]
@@ -39,7 +39,7 @@ pub enum LiquidityError {
     AnonymousCaller,
     BalanceTooLow { balance: u64 },
     AlreadyProcessing,
-    TooManyConcurrentRequests
+    TooManyConcurrentRequests,
 }
 
 pub enum GuardError {

@@ -38,7 +38,7 @@ async fn withdraw_liquidity(arg: WithdrawArg) -> Result<u64, LiquidityError> {
     match transfer(to, Nat::from(arg.amount), None, usdg_ledger_id).await {
         Ok(block_index) => {
             log!(INFO, "[withdraw_liquidity] Succesfully withdrew liquidity to pool {withdraw_amount} at index {block_index}",);
-            /// TODO RECORD EVENT
+            // TODO RECORD EVENT
             Ok(block_index)
         }
         Err(e) => {

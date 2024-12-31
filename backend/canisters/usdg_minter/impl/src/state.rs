@@ -2,7 +2,10 @@ use crate::lifecycle::tasks::TaskType;
 use crate::numeric::{GoldPrice, GLDT, USDG};
 use crate::transfer::{PendingTransfer, TransferId, Unit};
 use crate::vault::{FeeBucket, Vault, VaultId};
-use crate::{DEFAULT_GOLD_PRICE, MINIMUM_COLLATERAL_RATIO};
+use crate::{
+    ALPHA_FACTOR, DEFAULT_GOLD_PRICE, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE,
+    MINIMUM_COLLATERAL_RATIO, MINIMUM_INTEREST_RATE,
+};
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::cell::RefCell;
@@ -38,6 +41,10 @@ pub struct State {
     // 0.01g of gold price in USD
     pub one_centigram_of_gold_price: GoldPrice,
 
+    // Medium Rate, governed by GOLDGov
+    pub interest_rates: BTreeMap<FeeBucket, f64>,
+    pub previous_medium_rate: f64,
+
     // Canister ids
     pub usdg_ledger_id: Principal,
     pub gldt_ledger_id: Principal,
@@ -62,6 +69,12 @@ impl State {
             liquidation_return: Default::default(),
             pending_transfers: Default::default(),
             one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
+            interest_rates: BTreeMap::from([
+                (FeeBucket::Low, DEFAULT_MEDIUM_RATE),
+                (FeeBucket::Medium, DEFAULT_MEDIUM_RATE),
+                (FeeBucket::High, DEFAULT_MEDIUM_RATE),
+            ]),
+            previous_medium_rate: DEFAULT_MEDIUM_RATE,
             usdg_ledger_id: init_arg.usdg_ledger_id,
             gldt_ledger_id: init_arg.gldt_ledger_id,
             gold_dao_governance_id: init_arg.gold_dao_governance_id,
@@ -69,6 +82,107 @@ impl State {
             principal_guards: Default::default(),
             active_tasks: Default::default(),
         }
+    }
+
+    pub fn sum_usdg_by_fee_bucket(&self, bucket: FeeBucket) -> USDG {
+        self.fee_bucket_to_vault_ids
+            .get(&bucket)
+            .map(|set| {
+                set.iter()
+                    .map(|id| self.vault_id_to_vault.get(id).unwrap().borrowed_amount)
+                    .sum()
+            })
+            .unwrap_or(USDG::ZERO)
+    }
+
+    pub fn get_pull_factor(&self) -> f64 {
+        let numerator = self.sum_usdg_by_fee_bucket(FeeBucket::High).0 as f64
+            - self.sum_usdg_by_fee_bucket(FeeBucket::Low).0 as f64;
+        let denominator = self
+            .sum_usdg_by_fee_bucket(FeeBucket::Low)
+            .checked_add(self.sum_usdg_by_fee_bucket(FeeBucket::Medium))
+            .unwrap()
+            .checked_add(self.sum_usdg_by_fee_bucket(FeeBucket::High))
+            .unwrap();
+        assert!(denominator > USDG::ZERO);
+        numerator / denominator.0 as f64
+    }
+
+    pub fn update_interest_rate(&mut self) {
+        let previous_medium_rate = self.previous_medium_rate;
+        let medium_rate = *self.interest_rates.get(&FeeBucket::Medium).unwrap();
+        let previous_low_rate = self.interest_rates.get(&FeeBucket::Low).unwrap();
+        let previous_high_rate = self.interest_rates.get(&FeeBucket::High).unwrap();
+        let pull_factor = self.get_pull_factor();
+        if pull_factor == 0.0 {
+            return;
+        }
+        if pull_factor > 0.0 {
+            let new_high_rate = medium_rate
+                * (1.0 + (previous_high_rate - previous_medium_rate) / previous_medium_rate)
+                * (1.0
+                    + ALPHA_FACTOR * pull_factor * (MAXIUM_INTEREST_RATE - previous_high_rate)
+                        / MAXIUM_INTEREST_RATE);
+            let new_low_rate = medium_rate
+                * (1.0 - (previous_medium_rate - previous_low_rate) / previous_medium_rate)
+                * (1.0
+                    + ALPHA_FACTOR * pull_factor * (previous_medium_rate - previous_low_rate)
+                        / previous_medium_rate);
+            self.interest_rates.insert(
+                FeeBucket::Low,
+                new_low_rate.max(MINIMUM_INTEREST_RATE).min(medium_rate),
+            );
+            self.interest_rates.insert(
+                FeeBucket::High,
+                new_high_rate.min(MAXIUM_INTEREST_RATE).max(medium_rate),
+            );
+        } else {
+            let new_high_rate = medium_rate
+                * (1.0 + (previous_high_rate - previous_medium_rate) / previous_medium_rate)
+                * (1.0
+                    + ALPHA_FACTOR * pull_factor * (previous_high_rate - previous_medium_rate)
+                        / previous_medium_rate);
+            let new_low_rate = medium_rate
+                * (1.0 - (previous_medium_rate - previous_low_rate) / previous_medium_rate)
+                * (1.0
+                    + ALPHA_FACTOR * pull_factor * (previous_low_rate - MINIMUM_INTEREST_RATE)
+                        / previous_low_rate);
+            self.interest_rates.insert(
+                FeeBucket::Low,
+                new_low_rate.max(MINIMUM_INTEREST_RATE).min(medium_rate),
+            );
+            self.interest_rates.insert(
+                FeeBucket::High,
+                new_high_rate.min(MAXIUM_INTEREST_RATE).max(medium_rate),
+            );
+        }
+        self.previous_medium_rate = medium_rate;
+    }
+
+    pub fn charge_fee(&mut self) {
+        for id in self
+            .vault_id_to_vault
+            .keys()
+            .cloned()
+            .collect::<Vec<VaultId>>()
+        {
+            self.charge_fee_on_vault(id);
+        }
+    }
+
+    fn charge_fee_on_vault(&mut self, vault_id: VaultId) {
+        let vault = self.get_vault(vault_id).unwrap();
+        let interest_rate = self.interest_rates.get(&vault.fee_bucket).unwrap();
+        let daily_fee = interest_rate / 365.0;
+        let fee_amount = vault.borrowed_amount.0 as f64 * daily_fee;
+        let fee_e8s = USDG::from_e8s(fee_amount as u64);
+        let new_borrowed_amount = vault.borrowed_amount.checked_add(fee_e8s).unwrap();
+        match self.vault_id_to_vault.get_mut(&vault_id) {
+            Some(vault_mut) => {
+                vault_mut.borrowed_amount = new_borrowed_amount;
+            }
+            None => panic!("attempted to modify unkown vault"),
+        };
     }
 
     pub fn check_max_borrowable_amount(
