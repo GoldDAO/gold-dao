@@ -32,6 +32,7 @@ const SEC_NANOS: u64 = 1_000_000_000;
 /// Minimum Amounts
 const MINIMUM_MARGIN_AMOUNT: GLDT = GLDT::from_unscaled(50);
 const MINIMUM_BORROW_AMOUNT: USDG = USDG::from_unscaled(10);
+pub const MINIMUM_CLAIMABLE_RETURN: GLDT = GLDT::from_unscaled(5);
 
 // Default price for 0.01g of gold of $0.83.
 pub const DEFAULT_GOLD_PRICE: GoldPrice = GoldPrice::from_e8s(83_000_000);

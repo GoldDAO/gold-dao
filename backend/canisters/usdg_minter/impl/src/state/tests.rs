@@ -3,9 +3,7 @@ use crate::transfer::PendingTransfer;
 use crate::transfer::Unit;
 use crate::vault::check_vaults;
 use crate::vault::{FeeBucket, Vault};
-use crate::{
-    Factor, DEFAULT_GOLD_PRICE, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE, MINIMUM_INTEREST_RATE,
-};
+use crate::{Factor, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE, MINIMUM_INTEREST_RATE};
 use assert_matches::assert_matches;
 use candid::Principal;
 use proptest::prelude::*;
@@ -215,6 +213,23 @@ fn should_deposit_liquidity() {
 
     state.withdraw_liquidity(USDG::from_unscaled(3_000), owner);
     assert!(state.liquidation_pool.get(&owner).is_none());
+}
+
+#[test]
+fn should_claim_returns() {
+    let mut state = default_state();
+
+    let owner = default_account_2();
+    state
+        .liquidation_return
+        .insert(owner, GLDT::from_unscaled(100));
+    state.record_claimed_returns(owner, GLDT::from_unscaled(50));
+    assert_eq!(
+        state.liquidation_return.get(&owner).unwrap(),
+        &GLDT::from_unscaled(50)
+    );
+    state.record_claimed_returns(owner, GLDT::from_unscaled(50));
+    assert!(state.liquidation_return.get(&owner).is_none());
 }
 
 #[test]

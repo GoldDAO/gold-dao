@@ -341,6 +341,18 @@ impl State {
             .is_none());
     }
 
+    pub fn record_claimed_returns(&mut self, from: Account, amount: GLDT) {
+        match self.liquidation_return.entry(from) {
+            Occupied(mut entry) => {
+                *entry.get_mut() = entry.get().checked_sub(amount).unwrap();
+                if *entry.get() == GLDT::ZERO {
+                    entry.remove_entry();
+                }
+            }
+            Vacant(_) => ic_cdk::trap("cannot claim from unknow principal"),
+        }
+    }
+
     pub fn deposit_liquidity(&mut self, to: Account, amount: USDG) {
         self.liquidation_pool
             .entry(to)

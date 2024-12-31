@@ -39,6 +39,7 @@ pub enum LiquidityError {
     TransferError(TransferError),
     AnonymousCaller,
     BalanceTooLow { balance: u64 },
+    NotEnoughGLDT { minimum_amount: u64 },
     AlreadyProcessing,
     TooManyConcurrentRequests,
 }
