@@ -7,6 +7,7 @@ use usdg_minter_api::updates::add_margin_to_vault::AddMarginArg;
 use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
 use usdg_minter_api::updates::deposit_liquidity::DepositArg;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
+use usdg_minter_api::updates::redeem::RedeemArg;
 use usdg_minter_api::updates::repay_debt_to_vault::RepayDebtArg;
 use usdg_minter_api::updates::withdraw_liquidity::WithdrawArg;
 use usdg_minter_api::LiquidityError;
@@ -33,6 +34,7 @@ const SEC_NANOS: u64 = 1_000_000_000;
 const MINIMUM_MARGIN_AMOUNT: GLDT = GLDT::from_unscaled(50);
 const MINIMUM_BORROW_AMOUNT: USDG = USDG::from_unscaled(10);
 pub const MINIMUM_CLAIMABLE_RETURN: GLDT = GLDT::from_unscaled(5);
+pub const MINIMUM_REDEEM_AMOUNT: USDG = USDG::from_unscaled(10);
 
 // Default price for 0.01g of gold of $0.83.
 pub const DEFAULT_GOLD_PRICE: GoldPrice = GoldPrice::from_e8s(83_000_000);

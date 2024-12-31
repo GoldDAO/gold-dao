@@ -4,5 +4,6 @@ pub mod claim_returns;
 pub mod close_vault;
 pub mod deposit_liquidity;
 pub mod open_vault;
+pub mod redeem;
 pub mod repay_debt_to_vault;
 pub mod withdraw_liquidity;
