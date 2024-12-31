@@ -1,5 +1,5 @@
-use icrc_ledger_types::icrc1::account::Account;
 use candid::CandidType;
+use icrc_ledger_types::icrc1::account::Account;
 use serde::Deserialize;
 
 #[derive(CandidType, Deserialize, Debug, Eq, PartialEq)]

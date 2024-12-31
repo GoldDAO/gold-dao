@@ -3,6 +3,7 @@ use candid::CandidType;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
+use std::iter::Sum;
 use std::marker::PhantomData;
 
 #[cfg(test)]
@@ -124,6 +125,18 @@ impl<Unit> CheckedAmountOf<Unit> {
         let mut result = self.to_decimal().checked_div(amount.to_decimal())?;
         result.rescale(8);
         Some(Factor::from_e8s(result.mantissa() as u64))
+    }
+}
+
+impl<Unit> Sum for CheckedAmountOf<Unit> {
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        iter.into_iter()
+            .fold(CheckedAmountOf(0, PhantomData), |acc, x| {
+                acc.checked_add(x).unwrap()
+            })
     }
 }
 

@@ -1,5 +1,4 @@
 use crate::state::read_state;
-use crate::vault::FeeBucket;
 use crate::{GLDT, USDG};
 use ic_cdk::query;
 use icrc_ledger_types::icrc1::account::Account;

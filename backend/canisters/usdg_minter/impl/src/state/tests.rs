@@ -2,40 +2,29 @@ use crate::state::{Account, State, GLDT, USDG};
 use crate::transfer::PendingTransfer;
 use crate::transfer::Unit;
 use crate::vault::{FeeBucket, Vault};
-use crate::{Factor, DEFAULT_GOLD_PRICE};
+use crate::{Factor, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE, MINIMUM_INTEREST_RATE};
 use assert_matches::assert_matches;
 use candid::Principal;
 use proptest::prelude::*;
-use std::collections::{BTreeMap, HashSet};
+use usdg_minter_api::lifecycle::InitArgument;
 use usdg_minter_api::VaultError::BorrowedAmountTooBig;
 
 fn default_state() -> State {
-    State {
-        next_vault_id: 0,
-        next_transfer_id: 0,
-
-        // Vault related fields
-        fee_bucket_to_vault_ids: Default::default(),
-        account_to_vault_ids: Default::default(),
-
-        vault_id_to_vault: Default::default(),
-
-        // Pending transfers
-        pending_transfers: Default::default(),
-
-        one_centigram_of_gold_price: DEFAULT_GOLD_PRICE,
-
-        active_tasks: HashSet::default(),
-        principal_guards: Default::default(),
-
-        liquidation_pool: BTreeMap::default(),
-        liquidation_return: BTreeMap::default(),
-
-        // Canister ids
+    State::new(InitArgument {
         usdg_ledger_id: Principal::management_canister(),
         gldt_ledger_id: Principal::management_canister(),
         gold_dao_governance_id: Principal::management_canister(),
         xrc_id: Principal::management_canister(),
+    })
+}
+
+fn default_account() -> Account {
+    Account {
+        owner: Principal::from_text(
+            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
+        )
+        .unwrap(),
+        subaccount: None,
     }
 }
 
@@ -45,13 +34,7 @@ fn should_create_vault() {
 
     assert_eq!(state.vault_id_to_vault.len(), 0);
 
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let margin = GLDT::from_unscaled(500);
     let borrowed = USDG::from_unscaled(100);
     let fee_bucket = FeeBucket::Medium;
@@ -77,13 +60,7 @@ fn should_create_vault() {
 #[should_panic]
 fn should_not_borrow_more_than_max_vault_creation() {
     let mut state = default_state();
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let margin = GLDT::from_unscaled(500);
     let borrowed = USDG::from_unscaled(1_000);
     let fee_bucket = FeeBucket::Medium;
@@ -94,13 +71,7 @@ fn should_not_borrow_more_than_max_vault_creation() {
 #[test]
 fn should_borrow_from_vault() {
     let mut state = default_state();
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let margin = GLDT::from_unscaled(500);
     let borrowed = USDG::from_unscaled(100);
     let fee_bucket = FeeBucket::Medium;
@@ -137,13 +108,7 @@ fn should_borrow_from_vault() {
 #[test]
 fn should_add_margin_to_vault() {
     let mut state = default_state();
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let margin = GLDT::from_unscaled(500);
     let borrowed = USDG::from_unscaled(100);
     let fee_bucket = FeeBucket::Medium;
@@ -165,13 +130,7 @@ fn should_add_margin_to_vault() {
 #[should_panic]
 fn should_not_borrow_more_than_max() {
     let mut state = default_state();
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let margin = GLDT::from_unscaled(500);
     let borrowed = USDG::from_unscaled(100);
     let fee_bucket = FeeBucket::Medium;
@@ -209,13 +168,7 @@ fn should_reject_unvalid_open_vault() {
 fn should_deposit_liquidity() {
     let mut state = default_state();
 
-    let owner = Account {
-        owner: Principal::from_text(
-            "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
-        )
-        .unwrap(),
-        subaccount: None,
-    };
+    let owner = default_account();
     let usdg_borrowed = USDG::from_unscaled(2_000);
 
     state.deposit_liquidity(owner, usdg_borrowed);
@@ -252,6 +205,291 @@ fn should_deposit_liquidity() {
     assert!(state.liquidation_pool.get(&owner).is_none());
 }
 
+#[test]
+fn should_adjust_interest_scenario_0() {
+    let mut state = default_state();
+    state
+        .interest_rates
+        .insert(FeeBucket::High, MAXIUM_INTEREST_RATE);
+    state
+        .interest_rates
+        .insert(FeeBucket::Low, MINIMUM_INTEREST_RATE);
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        MINIMUM_INTEREST_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        MAXIUM_INTEREST_RATE
+    );
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(100_000);
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(10_000), margin, FeeBucket::Low),
+        0
+    );
+    assert_eq!(
+        state.record_vault_creation(
+            owner,
+            USDG::from_unscaled(24_000),
+            margin,
+            FeeBucket::Medium
+        ),
+        1
+    );
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(50_000), margin, FeeBucket::High),
+        2
+    );
+
+    assert_eq!(state.get_pull_factor(), 0.47619047619047616);
+
+    for _ in 0..100 {
+        state.update_interest_rate();
+    }
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.04840829192465135
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.9999999999999999
+    );
+
+    state.charge_fee();
+
+    assert_eq!(
+        state.get_vault(0).unwrap(),
+        Vault {
+            vault_id: 0,
+            owner,
+            borrowed_amount: USDG::from_e8s(10_001_32_625_457),
+            margin_amount: margin,
+            fee_bucket: FeeBucket::Low,
+        }
+    );
+}
+
+#[test]
+fn should_adjust_interest_scenario_1() {
+    let mut state = default_state();
+
+    state
+        .interest_rates
+        .insert(FeeBucket::High, MAXIUM_INTEREST_RATE);
+    state
+        .interest_rates
+        .insert(FeeBucket::Low, MINIMUM_INTEREST_RATE);
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(100_000);
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(50_000), margin, FeeBucket::Low),
+        0
+    );
+    assert_eq!(
+        state.record_vault_creation(
+            owner,
+            USDG::from_unscaled(24_000),
+            margin,
+            FeeBucket::Medium
+        ),
+        1
+    );
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(10_000), margin, FeeBucket::High),
+        2
+    );
+
+    assert_eq!(state.get_pull_factor(), -0.47619047619047616);
+
+    state.update_interest_rate();
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.010000000000000004
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.09523809523809544
+    );
+
+    for _ in 0..100 {
+        state.update_interest_rate();
+    }
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.010000000000000004
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.050175464160250705
+    );
+}
+
+#[test]
+fn should_adjust_interest_scenario_2() {
+    let mut state = default_state();
+
+    state
+        .interest_rates
+        .insert(FeeBucket::High, DEFAULT_MEDIUM_RATE);
+    state
+        .interest_rates
+        .insert(FeeBucket::Low, MINIMUM_INTEREST_RATE);
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(100_000);
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(10_000), margin, FeeBucket::Low),
+        0
+    );
+    assert_eq!(
+        state.record_vault_creation(
+            owner,
+            USDG::from_unscaled(24_000),
+            margin,
+            FeeBucket::Medium
+        ),
+        1
+    );
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(50_000), margin, FeeBucket::High),
+        2
+    );
+
+    assert_eq!(state.get_pull_factor(), 0.47619047619047616);
+
+    for _ in 0..100 {
+        state.update_interest_rate();
+    }
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.04840829192465135
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.8575332998211325
+    );
+}
+
+#[test]
+fn should_adjust_interest_scenario_3() {
+    let mut state = default_state();
+
+    state
+        .interest_rates
+        .insert(FeeBucket::High, DEFAULT_MEDIUM_RATE);
+    state
+        .interest_rates
+        .insert(FeeBucket::Low, MINIMUM_INTEREST_RATE);
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(100_000);
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(10_000), margin, FeeBucket::Low),
+        0
+    );
+    assert_eq!(
+        state.record_vault_creation(
+            owner,
+            USDG::from_unscaled(24_000),
+            margin,
+            FeeBucket::Medium
+        ),
+        1
+    );
+    assert_eq!(
+        state.record_vault_creation(owner, USDG::from_unscaled(50_000), margin, FeeBucket::High),
+        2
+    );
+
+    assert_eq!(state.get_pull_factor(), 0.47619047619047616);
+
+    for _ in 0..24 {
+        state.update_interest_rate();
+    }
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.02184522811328816
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+        DEFAULT_MEDIUM_RATE
+    );
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.13901719125399048
+    );
+
+    state.interest_rates.insert(FeeBucket::Medium, 0.15);
+
+    state.update_interest_rate();
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.06729296266655824
+    );
+    assert_eq!(*state.interest_rates.get(&FeeBucket::Medium).unwrap(), 0.15);
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.4341503468748059
+    );
+
+    for _ in 0..50 {
+        state.update_interest_rate();
+    }
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.13502052660942984
+    );
+    assert_eq!(*state.interest_rates.get(&FeeBucket::Medium).unwrap(), 0.15);
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.8946126169337145
+    );
+
+    state.interest_rates.insert(FeeBucket::Medium, 0.1);
+    state.update_interest_rate();
+
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::Low).unwrap(),
+        0.09044173443496947
+    );
+    assert_eq!(*state.interest_rates.get(&FeeBucket::Medium).unwrap(), 0.1);
+    assert_eq!(
+        *state.interest_rates.get(&FeeBucket::High).unwrap(),
+        0.5994014551798327
+    );
+}
+
 fn arb_usdg_amount() -> impl Strategy<Value = USDG> {
     (0..10_000_000_000_000_000_u64).prop_map(|a| USDG::from_e8s(a))
 }
@@ -277,5 +515,59 @@ proptest! {
                 Ok(())
             );
         }
+    }
+
+    #[test]
+    fn should_sum_usdg_in_bucket(vault_count in 0..100_u64, borrowed in arb_usdg_amount()) {
+        let mut state = default_state();
+
+        for index in 0..vault_count {
+            let owner = Account {
+                owner: Principal::from_text(
+                    "5lo5n-u62y5-bemys-zhepa-tz63u-7qe47-wlsa6-5f7ek-rfbwz-xb5re-bae",
+                )
+                .unwrap(),
+                subaccount: None,
+            };
+            let margin = GLDT::from_e8s(u64::MAX);
+            assert_eq!(state.record_vault_creation(owner, borrowed, margin, FeeBucket::Low), index * 2 + index);
+            assert_eq!(state.record_vault_creation(owner, borrowed, margin, FeeBucket::Medium), index * 2 + index + 1);
+            assert_eq!(state.record_vault_creation(owner, borrowed, margin, FeeBucket::High), index * 2 + index + 2);
+        }
+        assert_eq!(state.sum_usdg_by_fee_bucket(FeeBucket::Low), USDG::from_e8s(borrowed.0 * vault_count as u64));
+    }
+
+    #[test]
+    fn should_awlays_have_in_bound_rates(low in arb_usdg_amount(), medium in arb_usdg_amount(), high in arb_usdg_amount()) {
+        let mut state = default_state();
+
+        let owner = default_account();
+        let margin = GLDT::from_e8s(u64::MAX);
+        assert_eq!(
+            state.record_vault_creation(owner, low, margin, FeeBucket::Low),
+            0
+        );
+        assert_eq!(
+            state.record_vault_creation(owner, medium, margin, FeeBucket::Medium),
+            1
+        );
+        assert_eq!(
+            state.record_vault_creation(owner, high, margin, FeeBucket::High),
+            2
+        );
+
+        for _ in 0..100 {
+            state.update_interest_rate();
+        }
+
+        let low_rate = *state.interest_rates.get(&FeeBucket::Low).unwrap();
+
+        assert!(low_rate <= DEFAULT_MEDIUM_RATE && DEFAULT_MEDIUM_RATE >= MINIMUM_INTEREST_RATE);
+        assert_eq!(
+            *state.interest_rates.get(&FeeBucket::Medium).unwrap(),
+            DEFAULT_MEDIUM_RATE
+        );
+        let high_rate = *state.interest_rates.get(&FeeBucket::High).unwrap();
+        assert!(high_rate >= DEFAULT_MEDIUM_RATE && DEFAULT_MEDIUM_RATE <= MAXIUM_INTEREST_RATE);
     }
 }

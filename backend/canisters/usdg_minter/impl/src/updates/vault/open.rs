@@ -18,7 +18,7 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
 
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
-    
+
     // Check minimum margin amount
     if GLDT::from_e8s(arg.margin_amount) < MINIMUM_MARGIN_AMOUNT {
         return Err(VaultError::AmountTooLow {
