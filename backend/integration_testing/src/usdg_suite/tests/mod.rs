@@ -226,6 +226,72 @@ fn usdg_should_borrow_from_vault() {
         &borrow_arg,
     );
     assert_matches!(borrow_result, Ok(1));
+
+    let usdg_balance = icrc1_balance_of(
+        &mut env.pic,
+        env.principal_ids.user,
+        env.canister_ids.usdg_ledger,
+        &Account {
+            owner: env.principal_ids.user,
+            subaccount: None,
+        },
+    );
+    assert_eq!(usdg_balance, Nat::from(100 * E8S));
+}
+
+#[test]
+fn usdg_should_repay_and_close() {
+    let mut env = init::default_setup();
+
+    icrc2_approve(
+        &mut env.pic,
+        env.principal_ids.user,
+        env.canister_ids.gldt_ledger,
+        &(icrc2_approve::Args {
+            from_subaccount: None,
+            spender: Account {
+                owner: env.canister_ids.usdg_minter,
+                subaccount: None,
+            },
+            amount: Nat::from(2_000 * E8S),
+            expected_allowance: Some(Nat::from(0u64)),
+            expires_at: None,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+        }),
+    );
+
+    let open_vault_arg = OpenVaultArg {
+        margin_amount: 1_000 * E8S,
+        borrowed_amount: 300 * E8S,
+        fee_bucket: ApiFeeBucket::Low,
+        maybe_subaccount: None,
+    };
+    let open_result = open_vault(
+        &mut env.pic,
+        env.principal_ids.user,
+        env.canister_ids.usdg_minter,
+        &open_vault_arg,
+    );
+    assert_matches!(
+        open_result,
+        Ok(OpenVaultSuccess {
+            block_index: 2,
+            vault_id: 0,
+        })
+    );
+
+    let usdg_balance = icrc1_balance_of(
+        &mut env.pic,
+        env.principal_ids.user,
+        env.canister_ids.usdg_ledger,
+        &Account {
+            owner: env.principal_ids.user,
+            subaccount: None,
+        },
+    );
+    // assert_eq!(usdg_balance, Nat::from(300 * E8S));
 }
 
 #[test]

@@ -26,6 +26,7 @@ pub enum VaultError {
     AmountTooLow { minimum_amount: u64 },
     NoRecentGoldPrice,
     BorrowedAmountTooBig { maximum_borrowable_amount: u64 },
+    RepayingAmountTooBig { maximum_repayable_amount: u64 },
     VaultNotFound,
     CallerNotOwner,
     AlreadyProcessing,

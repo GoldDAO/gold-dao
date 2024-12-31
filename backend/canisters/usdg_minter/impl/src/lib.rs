@@ -7,6 +7,7 @@ use usdg_minter_api::updates::add_margin_to_vault::AddMarginArg;
 use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
 use usdg_minter_api::updates::deposit_liquidity::DepositArg;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
+use usdg_minter_api::updates::repay_debt_to_vault::RepayDebtArg;
 use usdg_minter_api::updates::withdraw_liquidity::WithdrawArg;
 use usdg_minter_api::LiquidityError;
 use usdg_minter_api::{ApiVault, VaultError};
