@@ -1,5 +1,5 @@
 use crate::lifecycle::tasks::TaskType;
-use crate::numeric::{GoldPrice, GLDT, USDG};
+use crate::numeric::{Factor, GoldPrice, GLDT, USDG};
 use crate::transfer::{PendingTransfer, TransferId, Unit};
 use crate::vault::{FeeBucket, Vault, VaultId};
 use crate::{
@@ -28,7 +28,6 @@ pub struct State {
     // Vault related fields
     pub fee_bucket_to_vault_ids: BTreeMap<FeeBucket, BTreeSet<VaultId>>,
     pub account_to_vault_ids: BTreeMap<Account, BTreeSet<VaultId>>,
-
     pub vault_id_to_vault: BTreeMap<VaultId, Vault>,
 
     // Liquidation pool
@@ -93,6 +92,22 @@ impl State {
                     .sum()
             })
             .unwrap_or(USDG::ZERO)
+    }
+
+    pub fn total_gldt_margin(&self) -> GLDT {
+        self.vault_id_to_vault
+            .values()
+            .fold(GLDT::ZERO, |acc, vault| {
+                acc.checked_add(vault.margin_amount).unwrap()
+            })
+    }
+
+    pub fn total_usdg_debt(&self) -> USDG {
+        self.vault_id_to_vault
+            .values()
+            .fold(USDG::ZERO, |acc, vault| {
+                acc.checked_add(vault.borrowed_amount).unwrap()
+            })
     }
 
     pub fn get_pull_factor(&self) -> f64 {
@@ -317,6 +332,277 @@ impl State {
             }
             Vacant(_) => ic_cdk::trap("cannot remove liquidity from unknow principal"),
         }
+    }
+
+    pub fn remove_vault(&mut self, vault_id: u64) {
+        let vault = self
+            .vault_id_to_vault
+            .remove(&vault_id)
+            .expect("BUG: tried to remove unknown vault");
+        assert!(self
+            .account_to_vault_ids
+            .get_mut(&vault.owner)
+            .expect("BUG: key should exist")
+            .remove(&vault_id));
+        assert!(self
+            .fee_bucket_to_vault_ids
+            .get_mut(&vault.fee_bucket)
+            .expect("BUG: key should exist")
+            .remove(&vault_id));
+    }
+
+    pub fn total_usdg_in_liquidation_pool(&self) -> USDG {
+        self.liquidation_pool
+            .values()
+            .fold(USDG::ZERO, |acc, &amount| acc.checked_add(amount).unwrap())
+    }
+
+    pub fn total_gldt_in_returns(&self) -> GLDT {
+        self.liquidation_return
+            .values()
+            .fold(GLDT::ZERO, |acc, &amount| acc.checked_add(amount).unwrap())
+    }
+
+    fn lp_remove_debt_add_returns(
+        &mut self,
+        owner: Account,
+        usdg_to_debit: USDG,
+        gldt_reward: GLDT,
+    ) {
+        match self.liquidation_pool.entry(owner) {
+            Occupied(mut lp_entry) => {
+                *lp_entry.get_mut() = lp_entry.get().checked_sub(usdg_to_debit).unwrap();
+                if *lp_entry.get() == USDG::ZERO {
+                    lp_entry.remove();
+                }
+            }
+            Vacant(_) => {
+                ic_cdk::trap("bug: principal not found in liquidation_pool");
+            }
+        }
+        self.liquidation_return
+            .entry(owner)
+            .and_modify(|v| *v = v.checked_add(gldt_reward).unwrap())
+            .or_insert(gldt_reward);
+    }
+
+    pub fn get_biggest_liquidity_provider(&self) -> Option<Account> {
+        self.liquidation_pool
+            .iter()
+            .max_by_key(|(_, usdg_balance)| *usdg_balance)
+            .map(|(account, _)| *account)
+    }
+
+    pub fn get_most_margin_vault(&self) -> Option<VaultId> {
+        self.vault_id_to_vault
+            .iter()
+            .max_by_key(|(_, vault)| vault.margin_amount)
+            .map(|(vault_id, _)| *vault_id)
+    }
+
+    pub fn get_most_debt_vault(&self) -> Option<VaultId> {
+        self.vault_id_to_vault
+            .iter()
+            .max_by_key(|(_, vault)| vault.borrowed_amount)
+            .map(|(vault_id, _)| *vault_id)
+    }
+
+    pub fn record_liquidate_vault_liquidation_pool(&mut self, vault_id: VaultId) {
+        let vault = self.get_vault(vault_id).expect("vault should exist");
+        let total_provided_amount: USDG = self.total_usdg_in_liquidation_pool();
+        assert!(total_provided_amount >= vault.borrowed_amount);
+
+        let mut debt_allocated = USDG::ZERO;
+        let mut reward_allocated = GLDT::ZERO;
+
+        let liquidation_pool = self.liquidation_pool.clone();
+        for (owner, provided_amount) in liquidation_pool.iter() {
+            let share: Factor = provided_amount.checked_div(total_provided_amount).unwrap();
+            let gldt_reward = vault.margin_amount.checked_mul(share).unwrap();
+            reward_allocated = reward_allocated.checked_add(gldt_reward).unwrap();
+            let usdg_to_debit = vault.borrowed_amount.checked_mul(share).unwrap();
+            debt_allocated = debt_allocated.checked_add(usdg_to_debit).unwrap();
+            self.lp_remove_debt_add_returns(*owner, usdg_to_debit, gldt_reward);
+        }
+
+        if vault.borrowed_amount > debt_allocated {
+            let usdg_remainder = vault.borrowed_amount.checked_sub(debt_allocated).unwrap();
+            match self
+                .liquidation_pool
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+            {
+                Occupied(mut lp_entry) => {
+                    *lp_entry.get_mut() = lp_entry.get().checked_sub(usdg_remainder).unwrap();
+                    if *lp_entry.get() == USDG::ZERO {
+                        lp_entry.remove();
+                    }
+                }
+                Vacant(_) => {
+                    ic_cdk::trap("bug: principal not found in liquidation_pool");
+                }
+            }
+        } else if vault.borrowed_amount < debt_allocated {
+            let extra_usdg = debt_allocated.checked_sub(vault.borrowed_amount).unwrap();
+            match self
+                .liquidation_pool
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+            {
+                Occupied(mut lp_entry) => {
+                    *lp_entry.get_mut() = lp_entry.get().checked_add(extra_usdg).unwrap();
+                }
+                Vacant(_) => {
+                    ic_cdk::trap("bug: principal not found in liquidation_pool");
+                }
+            }
+        }
+
+        if vault.margin_amount > reward_allocated {
+            let gldt_remainder = vault.margin_amount.checked_sub(reward_allocated).unwrap();
+            self.liquidation_return
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+                .and_modify(|v| *v = v.checked_add(gldt_remainder).unwrap())
+                .or_insert(gldt_remainder);
+        } else if reward_allocated > vault.margin_amount {
+            let extra_gldt = reward_allocated.checked_sub(vault.margin_amount).unwrap();
+            self.liquidation_return
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+                .and_modify(|v| *v = v.checked_sub(extra_gldt).unwrap());
+        }
+
+        self.remove_vault(vault_id);
+    }
+
+    pub fn record_redistribute_vault(&mut self, target_vault_id: VaultId) {
+        let target_vault = self
+            .vault_id_to_vault
+            .get(&target_vault_id)
+            .expect("bug: vault not found")
+            .clone();
+
+        let vaults = self.vault_id_to_vault.clone();
+        assert!(!vaults.is_empty());
+
+        let total_gldt_margin: GLDT = vaults.iter().fold(GLDT::ZERO, |acc, (&vault_id, vault)| {
+            if vault_id != target_vault_id {
+                acc.checked_add(vault.margin_amount).unwrap()
+            } else {
+                acc
+            }
+        });
+        assert_ne!(total_gldt_margin, GLDT::ZERO);
+
+        let mut margin_distributed = GLDT::ZERO;
+        let mut debt_distributed = USDG::ZERO;
+
+        for (vault_id, vault) in vaults {
+            if vault_id != target_vault_id {
+                let share: Factor = vault
+                    .margin_amount
+                    .checked_div(total_gldt_margin)
+                    .expect("bug: failed to divide margin amount by total margins");
+                let gldt_share_amount = target_vault
+                    .margin_amount
+                    .checked_mul(share)
+                    .expect("bug: failed to get gldt share amount");
+                margin_distributed = margin_distributed.checked_add(gldt_share_amount).unwrap();
+                let usdg_share_amount = target_vault
+                    .borrowed_amount
+                    .checked_mul(share)
+                    .expect("bug: failed to compute usdg share amount");
+                debt_distributed = debt_distributed.checked_add(usdg_share_amount).unwrap();
+                match self.vault_id_to_vault.entry(vault_id) {
+                    Occupied(mut vault_entry) => {
+                        vault_entry.get_mut().margin_amount = vault_entry
+                            .get()
+                            .margin_amount
+                            .checked_add(gldt_share_amount)
+                            .unwrap();
+                        vault_entry.get_mut().borrowed_amount = vault_entry
+                            .get()
+                            .borrowed_amount
+                            .checked_add(usdg_share_amount)
+                            .unwrap();
+                    }
+                    Vacant(_) => panic!("bug: vault not found"),
+                }
+            }
+        }
+
+        if target_vault.borrowed_amount > debt_distributed {
+            let debt_remainder = target_vault
+                .borrowed_amount
+                .checked_sub(debt_distributed)
+                .unwrap();
+            match self
+                .vault_id_to_vault
+                .entry(self.get_most_debt_vault().unwrap())
+            {
+                Occupied(mut vault_entry) => {
+                    vault_entry.get_mut().borrowed_amount = vault_entry
+                        .get()
+                        .borrowed_amount
+                        .checked_add(debt_remainder)
+                        .unwrap();
+                }
+                Vacant(_) => panic!("bug: vault not found"),
+            }
+        } else if debt_distributed > target_vault.borrowed_amount {
+            let extra_debt = debt_distributed
+                .checked_sub(target_vault.borrowed_amount)
+                .unwrap();
+            match self
+                .vault_id_to_vault
+                .entry(self.get_most_debt_vault().unwrap())
+            {
+                Occupied(mut vault_entry) => {
+                    vault_entry.get_mut().borrowed_amount = vault_entry
+                        .get()
+                        .borrowed_amount
+                        .checked_sub(extra_debt)
+                        .unwrap();
+                }
+                Vacant(_) => panic!("bug: vault not found"),
+            }
+        }
+
+        if target_vault.margin_amount > margin_distributed {
+            let margin_remainder = target_vault
+                .margin_amount
+                .checked_sub(margin_distributed)
+                .unwrap();
+            match self
+                .vault_id_to_vault
+                .entry(self.get_most_margin_vault().unwrap())
+            {
+                Occupied(mut vault_entry) => {
+                    vault_entry.get_mut().margin_amount = vault_entry
+                        .get()
+                        .margin_amount
+                        .checked_add(margin_remainder)
+                        .unwrap();
+                }
+                Vacant(_) => panic!("bug: vault not found"),
+            }
+        } else if margin_distributed > target_vault.margin_amount {
+            let extra_margin = margin_distributed
+                .checked_sub(target_vault.margin_amount)
+                .unwrap();
+            match self
+                .vault_id_to_vault
+                .entry(self.get_most_margin_vault().unwrap())
+            {
+                Occupied(mut vault_entry) => {
+                    vault_entry.get_mut().margin_amount = vault_entry
+                        .get()
+                        .margin_amount
+                        .checked_sub(extra_margin)
+                        .unwrap();
+                }
+                Vacant(_) => panic!("bug: vault not found"),
+            }
+        }
+
+        self.remove_vault(target_vault_id);
     }
 }
 
