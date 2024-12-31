@@ -1,4 +1,4 @@
-use crate::{types::DisplayAmount, VaultError};
+use crate::{types::DisplayAmount, LiquidityError};
 use candid::CandidType;
 use serde::Deserialize;
 use std::fmt;
@@ -10,7 +10,7 @@ pub struct WithdrawArg {
 }
 
 pub type Args = WithdrawArg;
-pub type Response = Result<u64, VaultError>;
+pub type Response = Result<u64, LiquidityError>;
 
 impl fmt::Display for WithdrawArg {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
