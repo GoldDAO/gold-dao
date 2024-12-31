@@ -315,6 +315,32 @@ impl State {
         };
     }
 
+    pub fn record_repay_debt_to_vault(&mut self, vault_id: VaultId, debt_repayed: USDG) {
+        match self.vault_id_to_vault.get_mut(&vault_id) {
+            Some(vault) => {
+                vault.borrowed_amount = vault.borrowed_amount.checked_sub(debt_repayed).unwrap();
+            }
+            None => panic!("attempted to repay to unkown vault"),
+        };
+    }
+
+    pub fn record_close_vault(&mut self, vault_id: VaultId) {
+        let vault = self.remove_vault(vault_id);
+        let transfer_id = self.increment_transfer_id();
+        assert!(self
+            .pending_transfers
+            .insert(
+                transfer_id,
+                PendingTransfer {
+                    transfer_id,
+                    amount: vault.margin_amount.0,
+                    receiver: vault.owner,
+                    unit: Unit::GLDT,
+                }
+            )
+            .is_none());
+    }
+
     pub fn deposit_liquidity(&mut self, to: Account, amount: USDG) {
         self.liquidation_pool
             .entry(to)
@@ -334,7 +360,7 @@ impl State {
         }
     }
 
-    pub fn remove_vault(&mut self, vault_id: u64) {
+    pub fn remove_vault(&mut self, vault_id: u64) -> Vault {
         let vault = self
             .vault_id_to_vault
             .remove(&vault_id)
@@ -349,6 +375,7 @@ impl State {
             .get_mut(&vault.fee_bucket)
             .expect("BUG: key should exist")
             .remove(&vault_id));
+        vault
     }
 
     pub fn total_usdg_in_liquidation_pool(&self) -> USDG {
