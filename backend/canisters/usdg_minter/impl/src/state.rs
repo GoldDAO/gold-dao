@@ -1,7 +1,7 @@
 use crate::lifecycle::tasks::TaskType;
 use crate::numeric::{Factor, GoldPrice, GLDT, USDG};
 use crate::transfer::{PendingTransfer, TransferId, Unit};
-use crate::vault::{FeeBucket, Vault, VaultId};
+use crate::vault::{get_redemption_fee, FeeBucket, Vault, VaultId};
 use crate::{
     ALPHA_FACTOR, DEFAULT_GOLD_PRICE, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE,
     MINIMUM_COLLATERAL_RATIO, MINIMUM_INTEREST_RATE,
@@ -9,6 +9,7 @@ use crate::{
 use candid::Principal;
 use icrc_ledger_types::icrc1::account::Account;
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::collections::btree_map::Entry::{Occupied, Vacant};
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use usdg_minter_api::lifecycle::InitArgument;
@@ -44,6 +45,9 @@ pub struct State {
     pub interest_rates: BTreeMap<FeeBucket, f64>,
     pub previous_medium_rate: f64,
 
+    // Reserve
+    pub reserve_usdg: USDG,
+
     // Canister ids
     pub usdg_ledger_id: Principal,
     pub gldt_ledger_id: Principal,
@@ -73,6 +77,7 @@ impl State {
                 (FeeBucket::Medium, DEFAULT_MEDIUM_RATE),
                 (FeeBucket::High, DEFAULT_MEDIUM_RATE),
             ]),
+            reserve_usdg: USDG::ZERO,
             previous_medium_rate: DEFAULT_MEDIUM_RATE,
             usdg_ledger_id: init_arg.usdg_ledger_id,
             gldt_ledger_id: init_arg.gldt_ledger_id,
@@ -642,6 +647,89 @@ impl State {
         }
 
         self.remove_vault(target_vault_id);
+    }
+
+    pub fn get_ordered_vault_ids(&self, gold_price: GoldPrice) -> Vec<VaultId> {
+        let mut sorted_vaults = Vec::new();
+
+        for vaults in self.fee_bucket_to_vault_ids.values() {
+            let mut vaults: Vec<&Vault> = vaults
+                .iter()
+                .map(|id| self.vault_id_to_vault.get(id).unwrap())
+                .collect();
+
+            vaults.sort_by(|a, b| {
+                a.compute_collateral_ratio(gold_price)
+                    .partial_cmp(&b.compute_collateral_ratio(gold_price))
+                    .unwrap_or(Ordering::Equal)
+            });
+
+            let vault_ids: Vec<VaultId> = vaults.iter().map(|vault| vault.vault_id).collect();
+            sorted_vaults.extend(vault_ids);
+        }
+
+        sorted_vaults
+    }
+
+    fn deduct_amount_from_vault(&mut self, vault_id: VaultId, margin: GLDT, debt: USDG) {
+        match self.vault_id_to_vault.get_mut(&vault_id) {
+            Some(vault) => {
+                vault.borrowed_amount = vault.borrowed_amount.checked_sub(debt).unwrap();
+                vault.margin_amount = vault.margin_amount.checked_sub(margin).unwrap();
+            }
+            None => ic_cdk::trap("cannot deduct from unknown vault"),
+        }
+    }
+
+    pub fn record_redemption(
+        &mut self,
+        from: Account,
+        amount: USDG,
+        gold_price: GoldPrice,
+    ) -> GLDT {
+        let fee_amount = amount
+            .checked_mul(get_redemption_fee(amount, self.total_usdg_debt()))
+            .unwrap();
+        self.reserve_usdg = self.reserve_usdg.checked_add(fee_amount).unwrap();
+        let mut amount_to_convert = amount.checked_sub(fee_amount).unwrap();
+
+        let vault_ids = self.get_ordered_vault_ids(gold_price);
+
+        let mut index: usize = 0;
+        let mut total_redeemed_gldt = GLDT::ZERO;
+        while amount_to_convert > USDG::ZERO && index < vault_ids.len() {
+            let vault = self.vault_id_to_vault.get(&vault_ids[index]).unwrap();
+            let redeemable_amount = vault.borrowed_amount.min(amount_to_convert);
+            amount_to_convert = amount_to_convert.checked_sub(redeemable_amount).unwrap();
+            let redeemable_gldt_amount: GLDT =
+                redeemable_amount.checked_div_rate(gold_price).unwrap();
+            total_redeemed_gldt = total_redeemed_gldt
+                .checked_add(redeemable_gldt_amount)
+                .unwrap();
+            self.deduct_amount_from_vault(
+                vault_ids[index],
+                redeemable_gldt_amount,
+                redeemable_amount,
+            );
+            index += 1;
+        }
+        assert_eq!(amount_to_convert, USDG::ZERO);
+
+        let transfer_id = self.increment_transfer_id();
+        assert!(self
+            .pending_transfers
+            .insert(
+                transfer_id,
+                PendingTransfer {
+                    transfer_id,
+                    amount: total_redeemed_gldt.0,
+                    receiver: from,
+                    unit: Unit::GLDT,
+                }
+            )
+            .is_none());
+
+        total_redeemed_gldt
     }
 }
 

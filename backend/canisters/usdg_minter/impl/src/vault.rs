@@ -49,9 +49,9 @@ impl Vault {
 
 #[derive(CandidType, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum FeeBucket {
-    Low,
-    Medium,
-    High,
+    Low = 0,
+    Medium = 1,
+    High = 2,
 }
 
 impl fmt::Display for FeeBucket {
@@ -125,4 +125,18 @@ pub fn check_vaults(state: &mut State) {
             // });
         }
     }
+}
+
+pub fn get_redemption_fee(redeemed_amount: USDG, total_borrowed: USDG) -> Factor {
+    const ONE_HALF: Factor = Factor::from_e8s(50_000_000);
+    if total_borrowed == USDG::ZERO {
+        return Factor::from_e8s(500_000);
+    }
+    redeemed_amount
+        .checked_div(total_borrowed)
+        .unwrap()
+        .checked_mul(ONE_HALF)
+        .unwrap()
+        .max(Factor::from_e8s(500_000))
+        .min(Factor::from_e8s(5_000_000))
 }

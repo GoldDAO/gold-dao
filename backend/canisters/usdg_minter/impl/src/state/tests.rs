@@ -39,6 +39,143 @@ fn default_account_2() -> Account {
 }
 
 #[test]
+fn should_redeem() {
+    let mut state = default_state();
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(500);
+
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(100), margin, FeeBucket::Medium);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(200), margin, FeeBucket::Medium);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(300), margin, FeeBucket::High);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(200), margin, FeeBucket::Low);
+
+    assert_eq!(
+        state.record_redemption(
+            default_account_2(),
+            USDG::from_unscaled(100),
+            state.one_centigram_of_gold_price
+        ),
+        GLDT::from_e8s(114_45_783_133)
+    );
+    assert_eq!(
+        state.vault_id_to_vault.get(&3).unwrap().borrowed_amount,
+        USDG::from_unscaled(105)
+    );
+    assert_eq!(state.reserve_usdg, USDG::from_unscaled(5));
+
+    assert_eq!(
+        state.record_redemption(
+            default_account_2(),
+            USDG::from_unscaled(200),
+            state.one_centigram_of_gold_price
+        ),
+        GLDT::from_e8s(228_91_566_265)
+    );
+    assert_eq!(
+        state.vault_id_to_vault.get(&3).unwrap().borrowed_amount,
+        USDG::ZERO
+    );
+    assert_eq!(
+        state.vault_id_to_vault.get(&1).unwrap().borrowed_amount,
+        USDG::from_unscaled(115)
+    );
+    assert_eq!(
+        state.pending_transfers,
+        BTreeMap::from([
+            (
+                0,
+                PendingTransfer {
+                    transfer_id: 0,
+                    amount: 100_00_000_000,
+                    receiver: owner,
+                    unit: Unit::USDG,
+                }
+            ),
+            (
+                1,
+                PendingTransfer {
+                    transfer_id: 1,
+                    amount: 200_00_000_000,
+                    receiver: owner,
+                    unit: Unit::USDG,
+                }
+            ),
+            (
+                2,
+                PendingTransfer {
+                    transfer_id: 2,
+                    amount: 300_00_000_000,
+                    receiver: owner,
+                    unit: Unit::USDG,
+                }
+            ),
+            (
+                3,
+                PendingTransfer {
+                    transfer_id: 3,
+                    amount: 200_00_000_000,
+                    receiver: owner,
+                    unit: Unit::USDG,
+                }
+            ),
+            (
+                4,
+                PendingTransfer {
+                    transfer_id: 4,
+                    amount: 114_45_783_133,
+                    receiver: default_account_2(),
+                    unit: Unit::GLDT,
+                }
+            ),
+            (
+                5,
+                PendingTransfer {
+                    transfer_id: 5,
+                    amount: 228_91_566_265,
+                    receiver: default_account_2(),
+                    unit: Unit::GLDT,
+                }
+            ),
+        ])
+    );
+    assert_eq!(state.reserve_usdg, USDG::from_unscaled(15));
+}
+
+#[test]
+fn should_order_vaults_as_expected() {
+    let mut state = default_state();
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(500);
+
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(100), margin, FeeBucket::Medium);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(200), margin, FeeBucket::Medium);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(300), margin, FeeBucket::Medium);
+
+    assert_eq!(
+        state.get_ordered_vault_ids(state.one_centigram_of_gold_price),
+        vec![2, 1, 0]
+    );
+
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(300), margin, FeeBucket::Low);
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(200), margin, FeeBucket::Low);
+
+    assert_eq!(
+        state.get_ordered_vault_ids(state.one_centigram_of_gold_price),
+        vec![3, 4, 2, 1, 0]
+    );
+
+    let _ = state.record_vault_creation(owner, USDG::from_unscaled(300), margin, FeeBucket::High);
+    let _ = state.record_vault_creation(owner, USDG::ZERO, margin, FeeBucket::High);
+
+    assert_eq!(
+        state.get_ordered_vault_ids(state.one_centigram_of_gold_price),
+        vec![3, 4, 2, 1, 0, 5, 6]
+    );
+}
+
+#[test]
 fn should_create_vault() {
     let mut state = default_state();
 
@@ -288,6 +425,76 @@ fn should_add_and_remove_vault() {
                 unit: Unit::USDG,
             }
         )])
+    );
+}
+
+#[test]
+fn should_close_vault() {
+    let mut state = default_state();
+
+    let owner = default_account();
+    let margin = GLDT::from_unscaled(500);
+    let borrowed = USDG::from_unscaled(100);
+    let fee_bucket = FeeBucket::Medium;
+
+    assert_eq!(
+        state.record_vault_creation(owner, borrowed, margin, fee_bucket),
+        0
+    );
+
+    assert_eq!(
+        state.fee_bucket_to_vault_ids.get(&fee_bucket).unwrap(),
+        &BTreeSet::from([0_u64])
+    );
+    assert_eq!(
+        state.account_to_vault_ids.get(&owner).unwrap(),
+        &BTreeSet::from([0_u64])
+    );
+    assert_eq!(
+        state.vault_id_to_vault.get(&0).unwrap(),
+        &Vault {
+            vault_id: 0,
+            owner,
+            borrowed_amount: borrowed,
+            margin_amount: margin,
+            fee_bucket,
+        }
+    );
+
+    state.record_close_vault(0);
+
+    assert_eq!(
+        state.fee_bucket_to_vault_ids.get(&fee_bucket).unwrap(),
+        &BTreeSet::default()
+    );
+    assert_eq!(
+        state.account_to_vault_ids.get(&owner).unwrap(),
+        &BTreeSet::default()
+    );
+    assert!(state.vault_id_to_vault.get(&0).is_none(),);
+
+    assert_eq!(
+        state.pending_transfers,
+        BTreeMap::from([
+            (
+                0,
+                PendingTransfer {
+                    transfer_id: 0,
+                    amount: 100_00_000_000,
+                    receiver: owner,
+                    unit: Unit::USDG,
+                }
+            ),
+            (
+                1,
+                PendingTransfer {
+                    transfer_id: 1,
+                    amount: 500_00_000_000,
+                    receiver: owner,
+                    unit: Unit::GLDT,
+                }
+            ),
+        ])
     );
 }
 
