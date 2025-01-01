@@ -42,6 +42,51 @@ fn default_account_2() -> Account {
 }
 
 #[test]
+fn should_update_vault() {
+    let mut state = default_state();
+
+    let owner = default_account();
+    let margin_amount = GLDT::from_unscaled(500);
+    let borrowed_amount = USDG::from_unscaled(100);
+
+    let _ = state.record_vault_creation(owner, borrowed_amount, margin_amount, FeeBucket::Medium);
+
+    state.record_update_vault(0, None, Some(FeeBucket::Low));
+    assert_eq!(
+        state.get_vault(0).unwrap(),
+        Vault {
+            vault_id: 0,
+            owner,
+            borrowed_amount,
+            margin_amount,
+            fee_bucket: FeeBucket::Low,
+        }
+    );
+    state.record_update_vault(0, Some(default_account_2()), Some(FeeBucket::Low));
+    assert_eq!(
+        state.get_vault(0).unwrap(),
+        Vault {
+            vault_id: 0,
+            owner: default_account_2(),
+            borrowed_amount,
+            margin_amount,
+            fee_bucket: FeeBucket::Low,
+        }
+    );
+    state.record_update_vault(0, None, None);
+    assert_eq!(
+        state.get_vault(0).unwrap(),
+        Vault {
+            vault_id: 0,
+            owner: default_account_2(),
+            borrowed_amount,
+            margin_amount,
+            fee_bucket: FeeBucket::Low,
+        }
+    );
+}
+
+#[test]
 fn should_redeem() {
     let mut state = default_state();
 
@@ -1203,6 +1248,20 @@ prop_compose! {
 }
 
 prop_compose! {
+    fn arb_update_vault()(
+        vault_id in any::<u64>(),
+        new_owner in proptest::option::of(arb_account()),
+        fee_bucket in proptest::option::of(arb_fee_bucket()),
+    ) -> EventType {
+        EventType::UpdateVault {
+            vault_id,
+            new_owner,
+            fee_bucket
+        }
+    }
+}
+
+prop_compose! {
     fn arb_account()(
         owner in arb_principal(),
         subaccount in arb_subaccount(),
@@ -1254,6 +1313,7 @@ fn arb_event_type() -> impl Strategy<Value = EventType> {
         arb_redemption_on_vaults(),
         arb_liquidate_vault(),
         arb_redistribute_on_vault(),
+        arb_update_vault()
     ]
 }
 

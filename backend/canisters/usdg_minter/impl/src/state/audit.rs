@@ -85,6 +85,11 @@ pub fn apply_state_transition(state: &mut State, payload: EventType, _timestamp:
         EventType::Redistribute { vault_id } => {
             state.record_redistribute_vault(vault_id);
         }
+        EventType::UpdateVault {
+            vault_id,
+            new_owner,
+            fee_bucket,
+        } => state.record_update_vault(vault_id, new_owner, fee_bucket),
     }
 }
 

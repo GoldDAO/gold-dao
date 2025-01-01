@@ -134,4 +134,10 @@ pub enum CandidEventType {
     Redistribute {
         vault_id: u64,
     },
+
+    UpdateVault {
+        vault_id: u64,
+        fee_bucket: Option<ApiFeeBucket>,
+        new_owner: Option<Account>,
+    },
 }
