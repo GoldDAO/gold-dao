@@ -2,11 +2,16 @@ use crate::guard::TimerGuard;
 use crate::lifecycle::tasks::schedule_after;
 use crate::lifecycle::tasks::{pop_if_ready, TaskType};
 use crate::logs::INFO;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
+use crate::state::mutate_state;
 use crate::transfer::process_pending_transfer;
 use ic_canister_log::log;
 use std::time::Duration;
 
-pub fn setup_timers() {}
+pub fn setup_timers() {
+    schedule_after(Duration::from_secs(24 * 60 * 60), TaskType::ChargeFees);
+}
 
 #[cfg(feature = "inttest")]
 fn ok_or_die(result: Result<(), String>) {
@@ -75,6 +80,20 @@ fn timer() {
                     if process_pending_transfer().await > 0 {
                         schedule_after(DEFAULT_RETRY_DELAY, TaskType::ProcessPendingTransfer);
                     }
+                });
+            }
+            TaskType::ChargeFees => {
+                ic_cdk::spawn(async {
+                    let _guard = match TimerGuard::new(task_type) {
+                        Ok(guard) => guard,
+                        Err(_) => {
+                            log!(INFO, "[timer] Already processing ChargeFees",);
+                            return;
+                        }
+                    };
+
+                    mutate_state(|s| process_event(s, EventType::ChargeFee));
+                    schedule_after(Duration::from_secs(24 * 60 * 60), TaskType::ChargeFees);
                 });
             }
         }

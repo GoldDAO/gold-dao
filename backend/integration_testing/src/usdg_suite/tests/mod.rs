@@ -285,6 +285,7 @@ fn usdg_should_repay_and_close() {
 
     env.pic.advance_time(Duration::from_secs(5));
     env.pic.tick();
+    env.pic.tick();
 
     let usdg_balance = icrc1_balance_of(
         &mut env.pic,
