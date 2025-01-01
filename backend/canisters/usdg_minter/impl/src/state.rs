@@ -346,6 +346,10 @@ impl State {
             .is_none());
     }
 
+    pub fn record_process_pending_transfer(&mut self, transfer_id: u64) {
+        assert!(self.pending_transfers.remove(&transfer_id).is_some());
+    }
+
     pub fn record_claimed_returns(&mut self, from: Account, amount: GLDT) {
         match self.liquidation_return.entry(from) {
             Occupied(mut entry) => {

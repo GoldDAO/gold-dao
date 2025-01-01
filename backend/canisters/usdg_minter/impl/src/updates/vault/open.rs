@@ -1,4 +1,5 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::tasks::{schedule_now, TaskType};
 use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::numeric::{GLDT, USDG};
@@ -63,6 +64,7 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
                 INFO,
                 "[open_vault] {caller} successfully opened vault at index {block_index} with id: {vault_id}",
             );
+            schedule_now(TaskType::ProcessPendingTransfer);
             Ok(OpenVaultSuccess {
                 block_index,
                 vault_id,

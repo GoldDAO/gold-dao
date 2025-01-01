@@ -9,6 +9,7 @@ use assert_matches::assert_matches;
 use candid::Nat;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types_ic_main_repo::icrc1::account::Account as ICAccount;
+use std::time::Duration;
 use usdg_minter_api::queries::get_lp_position::LiquidationPoolPosition;
 use usdg_minter_api::updates::add_margin_to_vault::AddMarginArg;
 use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
@@ -282,6 +283,9 @@ fn usdg_should_repay_and_close() {
         })
     );
 
+    env.pic.advance_time(Duration::from_secs(5));
+    env.pic.tick();
+
     let usdg_balance = icrc1_balance_of(
         &mut env.pic,
         env.principal_ids.user,
@@ -291,7 +295,7 @@ fn usdg_should_repay_and_close() {
             subaccount: None,
         },
     );
-    // assert_eq!(usdg_balance, Nat::from(300 * E8S));
+    assert_eq!(usdg_balance, Nat::from(300 * E8S));
 }
 
 #[test]
