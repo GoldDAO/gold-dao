@@ -194,17 +194,86 @@ impl State {
     }
 
     pub fn charge_fee(&mut self) {
+        let mut total_charged = USDG::ZERO;
         for id in self
             .vault_id_to_vault
             .keys()
             .cloned()
             .collect::<Vec<VaultId>>()
         {
-            self.charge_fee_on_vault(id);
+            let charged = self.charge_fee_on_vault(id);
+            total_charged = total_charged.checked_add(charged).unwrap();
+        }
+        let reserve_share = USDG::from_e8s(total_charged.0 / 4);
+        self.reserve_usdg = self.reserve_usdg.checked_add(reserve_share).unwrap();
+        let lp_share = total_charged.checked_sub(reserve_share).unwrap();
+        if self.total_usdg_in_liquidation_pool() > USDG::ZERO {
+            self.dispatch_fee_on_lp(lp_share);
+        } else {
+            self.reserve_usdg = self.reserve_usdg.checked_add(lp_share).unwrap();
+        }
+        println!(
+            "[charge_fee] charged a total of {total_charged} over {} vaults.",
+            self.vault_id_to_vault.len()
+        );
+    }
+
+    fn dispatch_fee_on_lp(&mut self, fee: USDG) {
+        let total_provided_amount = self.total_usdg_in_liquidation_pool();
+        if total_provided_amount == USDG::ZERO {
+            return;
+        }
+
+        let mut fee_distributed = USDG::ZERO;
+
+        let liquidation_pool = self.liquidation_pool.clone();
+        for (owner, provided_amount) in liquidation_pool.iter() {
+            let share: Factor = provided_amount.checked_div(total_provided_amount).unwrap();
+            let usdg_to_add = fee.checked_mul(share).unwrap();
+            fee_distributed = fee_distributed.checked_add(usdg_to_add).unwrap();
+            match self.liquidation_pool.entry(*owner) {
+                Occupied(mut lp_entry) => {
+                    *lp_entry.get_mut() = lp_entry.get().checked_add(usdg_to_add).unwrap();
+                }
+                Vacant(_) => {
+                    ic_cdk::trap("bug: principal not found in liquidation_pool");
+                }
+            }
+        }
+
+        if fee_distributed < fee {
+            let remainder = fee.checked_sub(fee_distributed).unwrap();
+            match self
+                .liquidation_pool
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+            {
+                Occupied(mut lp_entry) => {
+                    *lp_entry.get_mut() = lp_entry.get().checked_add(remainder).unwrap();
+                }
+                Vacant(_) => {
+                    ic_cdk::trap("bug: principal not found in liquidation_pool");
+                }
+            }
+        } else if fee < fee_distributed {
+            let excess = fee_distributed.checked_sub(fee).unwrap();
+            match self
+                .liquidation_pool
+                .entry(self.get_biggest_liquidity_provider().unwrap())
+            {
+                Occupied(mut lp_entry) => {
+                    *lp_entry.get_mut() = lp_entry.get().checked_sub(excess).unwrap();
+                    if *lp_entry.get() == USDG::ZERO {
+                        lp_entry.remove();
+                    }
+                }
+                Vacant(_) => {
+                    ic_cdk::trap("bug: principal not found in liquidation_pool");
+                }
+            }
         }
     }
 
-    fn charge_fee_on_vault(&mut self, vault_id: VaultId) {
+    fn charge_fee_on_vault(&mut self, vault_id: VaultId) -> USDG {
         let vault = self.get_vault(vault_id).unwrap();
         let interest_rate = self.interest_rates.get(&vault.fee_bucket).unwrap();
         let daily_fee = interest_rate / 365.0;
@@ -217,6 +286,7 @@ impl State {
             }
             None => panic!("attempted to modify unkown vault"),
         };
+        fee_e8s
     }
 
     pub fn check_max_borrowable_amount(

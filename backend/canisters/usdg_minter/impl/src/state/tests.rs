@@ -41,6 +41,63 @@ fn default_account_2() -> Account {
     }
 }
 
+fn default_account_with_sub(sub: u8) -> Account {
+    Account {
+        owner: Principal::from_text("jmod6-4iaaa-aaaaq-aadkq-cai").unwrap(),
+        subaccount: Some([sub; 32]),
+    }
+}
+
+#[test]
+fn should_dispatch_fees() {
+    let mut state = default_state();
+
+    let owner = default_account();
+    let margin_amount = GLDT::from_unscaled(100_000);
+    let borrowed_amount = USDG::from_e8s(10_000_00_100_001);
+
+    let _ = state.record_vault_creation(owner, borrowed_amount, margin_amount, FeeBucket::Medium);
+
+    state.deposit_liquidity(default_account_2(), USDG::from_unscaled(100));
+    state.deposit_liquidity(default_account(), USDG::from_unscaled(100));
+
+    state.charge_fee();
+
+    let lp_balance_2 = state
+        .liquidation_pool
+        .get(&default_account_2())
+        .unwrap_or(&USDG::ZERO)
+        .clone();
+
+    assert_eq!(lp_balance_2, USDG::from_e8s(100_51_369_869));
+
+    let lp_balance = state
+        .liquidation_pool
+        .get(&default_account())
+        .unwrap_or(&USDG::ZERO)
+        .clone();
+
+    assert_eq!(lp_balance, USDG::from_e8s(100_51_369_868));
+
+    let total_fee_occured = lp_balance_2
+        .checked_add(lp_balance)
+        .unwrap()
+        .checked_sub(USDG::from_unscaled(200))
+        .unwrap()
+        .checked_add(state.reserve_usdg)
+        .unwrap();
+
+    assert_eq!(
+        total_fee_occured,
+        state
+            .get_vault(0)
+            .unwrap()
+            .borrowed_amount
+            .checked_sub(borrowed_amount)
+            .unwrap()
+    );
+}
+
 #[test]
 fn should_update_vault() {
     let mut state = default_state();
@@ -839,15 +896,42 @@ fn should_adjust_interest_scenario_0() {
     state.charge_fee();
 
     assert_eq!(
-        state.get_vault(0).unwrap(),
-        Vault {
-            vault_id: 0,
-            owner,
-            borrowed_amount: USDG::from_e8s(10_001_32_625_457),
-            margin_amount: margin,
-            fee_bucket: FeeBucket::Low,
-        }
+        state.vault_id_to_vault,
+        BTreeMap::from([
+            (
+                0,
+                Vault {
+                    vault_id: 0,
+                    owner,
+                    borrowed_amount: USDG::from_e8s(10_001_32_625_457),
+                    margin_amount: margin,
+                    fee_bucket: FeeBucket::Low,
+                }
+            ),
+            (
+                1,
+                Vault {
+                    vault_id: 1,
+                    owner,
+                    borrowed_amount: USDG::from_e8s(24_003_28_767_123),
+                    margin_amount: margin,
+                    fee_bucket: FeeBucket::Medium,
+                }
+            ),
+            (
+                2,
+                Vault {
+                    vault_id: 2,
+                    owner,
+                    borrowed_amount: USDG::from_e8s(50_136_98_630_136),
+                    margin_amount: margin,
+                    fee_bucket: FeeBucket::High,
+                }
+            ),
+        ])
     );
+
+    assert_eq!(state.reserve_usdg, 141_60_022_716_u64.into());
 }
 
 #[test]
@@ -1372,7 +1456,11 @@ proptest! {
     }
 
     #[test]
-    fn should_awlays_have_in_bound_rates(low in arb_usdg_amount(), medium in arb_usdg_amount(), high in arb_usdg_amount()) {
+    fn should_awlays_have_in_bound_rates(
+        low in arb_usdg_amount(),
+        medium in arb_usdg_amount(),
+        high in arb_usdg_amount()
+    ) {
         let mut state = default_state();
 
         let owner = default_account();
@@ -1432,7 +1520,9 @@ proptest! {
     }
 
     #[test]
-    fn should_always_liquidate_correct_margin_amount(margin_amount in 0..10_000_000_000_000_000_u64) {
+    fn should_always_liquidate_correct_margin_amount(
+        margin_amount in 0..10_000_000_000_000_000_u64
+    ) {
         let mut state = default_state();
 
         let owner = default_account();
@@ -1459,7 +1549,9 @@ proptest! {
     }
 
     #[test]
-    fn should_always_redistribute_correct_margin_amount(margin_amount in 100_00_000_000_u64..10_000_000_000_000_000_u64) {
+    fn should_always_redistribute_correct_margin_amount(
+        margin_amount in 100_00_000_000_u64..10_000_000_000_000_000_u64
+    ) {
         let mut state = default_state();
 
         let owner = default_account();
@@ -1503,5 +1595,68 @@ proptest! {
         assert_eq!(state.total_usdg_debt(), expected_borrowed);
         assert_eq!(state.total_usdg_in_liquidation_pool(), USDG::ZERO);
         assert_eq!(state.total_gldt_in_returns(), GLDT::ZERO);
+    }
+
+    #[test]
+    fn should_keep_track_of_fees(
+        borrowed_amount in arb_usdg_amount(),
+        provided_liquidity_1 in arb_usdg_amount(),
+        provided_liquidity_2 in arb_usdg_amount(),
+        provided_liquidity_3 in arb_usdg_amount(),
+    ) {
+        let mut state = default_state();
+
+        let owner = default_account();
+        let margin_amount = GLDT::from_e8s(u64::MAX);
+
+        let _ = state.record_vault_creation(owner, borrowed_amount, margin_amount, FeeBucket::Medium);
+
+        state.deposit_liquidity(default_account_2(), provided_liquidity_1);
+        state.deposit_liquidity(default_account(), provided_liquidity_2);
+        state.deposit_liquidity(default_account_with_sub(9), provided_liquidity_3);
+
+        state.charge_fee();
+
+        let lp_balance_2 = state
+            .liquidation_pool
+            .get(&default_account_2())
+            .unwrap_or(&USDG::ZERO)
+            .clone();
+
+        let lp_balance = state
+            .liquidation_pool
+            .get(&default_account())
+            .unwrap_or(&USDG::ZERO)
+            .clone();
+
+        let lp_balance_3 = state
+            .liquidation_pool
+            .get(&default_account_with_sub(9))
+            .unwrap_or(&USDG::ZERO)
+            .clone();
+
+        let total_fee_occured = lp_balance_2
+            .checked_add(lp_balance)
+            .unwrap()
+            .checked_add(lp_balance_3)
+            .unwrap()
+            .checked_sub(provided_liquidity_1.
+                checked_add(provided_liquidity_2)
+                .unwrap()
+                .checked_add(provided_liquidity_3)
+                .unwrap())
+            .unwrap()
+            .checked_add(state.reserve_usdg)
+            .unwrap();
+
+        assert_eq!(
+            total_fee_occured,
+            state
+                .get_vault(0)
+                .unwrap()
+                .borrowed_amount
+                .checked_sub(borrowed_amount)
+                .unwrap()
+        );
     }
 }

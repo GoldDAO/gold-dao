@@ -16,6 +16,7 @@ pub enum TaskType {
     ProcessLogic,
     FetchGoldPrice,
     ProcessPendingTransfer,
+    ChargeFees,
 }
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
