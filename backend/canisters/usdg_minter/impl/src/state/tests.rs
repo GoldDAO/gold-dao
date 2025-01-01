@@ -1,3 +1,4 @@
+use crate::state::event::{Event, EventType};
 use crate::state::{Account, GoldPrice, State, GLDT, USDG};
 use crate::transfer::PendingTransfer;
 use crate::transfer::Unit;
@@ -6,6 +7,8 @@ use crate::vault::{FeeBucket, Vault};
 use crate::{Factor, DEFAULT_MEDIUM_RATE, MAXIUM_INTEREST_RATE, MINIMUM_INTEREST_RATE};
 use assert_matches::assert_matches;
 use candid::Principal;
+use proptest::array::uniform32;
+use proptest::collection::vec as pvec;
 use proptest::prelude::*;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -1011,11 +1014,261 @@ fn should_adjust_interest_scenario_3() {
     );
 }
 
+prop_compose! {
+    fn arb_init_arg()(
+        usdg_ledger_id in arb_principal(),
+        gldt_ledger_id in arb_principal(),
+        gold_dao_governance_id in arb_principal(),
+        xrc_id in arb_principal(),
+    ) -> EventType {
+        EventType::Init {
+            usdg_ledger_id,
+            gldt_ledger_id,
+            gold_dao_governance_id,
+            xrc_id
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_upgrade_arg()(
+        new_medium_fee_percent in proptest::option::of(any::<u64>()),
+    ) -> EventType {
+        EventType::Upgrade {
+            new_medium_fee_percent,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_open_vault()(
+        owner in arb_account(),
+        margin_amount in arb_gldt_amount(),
+        block_index in any::<u64>(),
+        borrowed_amount in arb_usdg_amount(),
+        fee_bucket in arb_fee_bucket()
+    ) -> EventType {
+        EventType::OpenVault {
+            owner,
+            margin_amount,
+            borrowed_amount,
+            fee_bucket,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_borrow()(
+        vault_id in any::<u64>(),
+        block_index in any::<u64>(),
+        borrowed_amount in arb_usdg_amount(),
+    ) -> EventType {
+        EventType::Borrow {
+            vault_id,
+            borrowed_amount,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_add_margin()(
+        vault_id in any::<u64>(),
+        block_index in any::<u64>(),
+        margin_added in arb_gldt_amount(),
+    ) -> EventType {
+        EventType::AddMargin {
+            vault_id,
+            margin_added,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_repay()(
+        vault_id in any::<u64>(),
+        block_index in any::<u64>(),
+        debt in arb_usdg_amount(),
+    ) -> EventType {
+        EventType::Repay {
+            vault_id,
+            debt,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_close_vault()(
+        vault_id in any::<u64>(),
+        block_index in proptest::option::of(any::<u64>()),
+    ) -> EventType {
+        EventType::Close {
+            vault_id,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_transfer_executed()(
+        block_index in any::<u64>(),
+        transfer_id in  any::<u64>(),
+    ) -> EventType {
+        EventType::TransferExecuted {
+            transfer_id,
+            block_index,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_provide_liquidity()(
+        caller in arb_account(),
+        amount in arb_usdg_amount(),
+        block_index in any::<u64>(),
+    ) -> EventType {
+        EventType::DepositLiquidity {
+            caller,
+            block_index,
+            amount,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_withdraw_liquidity()(
+        caller in arb_account(),
+        amount in arb_usdg_amount(),
+        block_index in any::<u64>(),
+    ) -> EventType {
+        EventType::WithdrawLiquidity {
+            caller,
+            block_index,
+            amount,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_claim_returns()(
+        caller in arb_account(),
+        amount in arb_gldt_amount(),
+        block_index in any::<u64>(),
+    ) -> EventType {
+        EventType::ClaimReturns {
+            caller,
+            block_index,
+            amount,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_redemption_on_vaults()(
+        owner in arb_account(),
+        amount in arb_usdg_amount(),
+        block_index in any::<u64>(),
+        current_rate in any::<u64>(),
+    ) -> EventType {
+        EventType::Redeem {
+            owner,
+            block_index,
+            amount,
+            current_rate: GoldPrice::from_e8s(current_rate)
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_liquidate_vault()(
+        vault_id in any::<u64>(),
+    ) -> EventType {
+        EventType::Liquidate {
+            vault_id,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_redistribute_on_vault()(
+        vault_id in any::<u64>(),
+    ) -> EventType {
+        EventType::Redistribute {
+            vault_id,
+        }
+    }
+}
+
+prop_compose! {
+    fn arb_account()(
+        owner in arb_principal(),
+        subaccount in arb_subaccount(),
+    ) -> Account {
+        Account {
+            owner,
+            subaccount: subaccount,
+        }
+    }
+}
+
+fn arb_fee_bucket() -> impl Strategy<Value = FeeBucket> {
+    prop_oneof![
+        Just(FeeBucket::Low),
+        Just(FeeBucket::Medium),
+        Just(FeeBucket::High),
+    ]
+}
+
+fn arb_principal() -> impl Strategy<Value = Principal> {
+    pvec(any::<u8>(), 0..=29).prop_map(|bytes| Principal::from_slice(&bytes))
+}
+
+fn arb_subaccount() -> impl Strategy<Value = Option<[u8; 32]>> {
+    proptest::option::of(uniform32(any::<u8>()))
+}
+
 fn arb_usdg_amount() -> impl Strategy<Value = USDG> {
     (0..10_000_000_000_000_000_u64).prop_map(|a| USDG::from_e8s(a))
 }
 
+fn arb_gldt_amount() -> impl Strategy<Value = GLDT> {
+    (0..10_000_000_000_000_000_u64).prop_map(|a| GLDT::from_e8s(a))
+}
+
+fn arb_event_type() -> impl Strategy<Value = EventType> {
+    prop_oneof![
+        arb_init_arg(),
+        arb_upgrade_arg(),
+        arb_open_vault(),
+        arb_borrow(),
+        arb_repay(),
+        arb_add_margin(),
+        arb_close_vault(),
+        arb_transfer_executed(),
+        arb_provide_liquidity(),
+        arb_withdraw_liquidity(),
+        arb_claim_returns(),
+        arb_redemption_on_vaults(),
+        arb_liquidate_vault(),
+        arb_redistribute_on_vault(),
+    ]
+}
+
+fn arb_event() -> impl Strategy<Value = Event> {
+    (any::<u64>(), arb_event_type()).prop_map(|(timestamp, payload)| Event { timestamp, payload })
+}
+
 proptest! {
+    #[test]
+    fn event_encoding_roundtrip(event in arb_event()) {
+        use ic_stable_structures::storable::Storable;
+        let bytes = event.to_bytes();
+        prop_assert_eq!(&event, &Event::from_bytes(bytes.clone()), "failed to decode bytes {}", hex::encode(bytes));
+    }
+
     #[test]
     fn should_not_borrow_more_than_maximum(usdg_borrowed in arb_usdg_amount()) {
         let state = default_state();

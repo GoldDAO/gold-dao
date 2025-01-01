@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer_from;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::vault::Vault;
@@ -13,6 +16,10 @@ use usdg_minter_api::VaultError;
 
 #[update]
 async fn add_margin_to_vault(arg: AddMarginArg) -> Result<u64, VaultError> {
+    check_postcondition(_add_margin_to_vault(arg)).await
+}
+
+async fn _add_margin_to_vault(arg: AddMarginArg) -> Result<u64, VaultError> {
     reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -40,7 +47,16 @@ async fn add_margin_to_vault(arg: AddMarginArg) -> Result<u64, VaultError> {
     {
         Ok(block_index) => {
             log!(INFO, "[add_margin_to_vault] Succesfully added margin for vault {} at index {block_index}", vault.vault_id);
-            mutate_state(|s| s.record_add_margin_to_vault(vault.vault_id, margin_amount));
+            mutate_state(|s| {
+                process_event(
+                    s,
+                    EventType::AddMargin {
+                        vault_id: arg.vault_id,
+                        margin_added: margin_amount,
+                        block_index,
+                    },
+                )
+            });
             Ok(block_index)
         }
         Err(e) => Err(VaultError::TransferFromError(e)),

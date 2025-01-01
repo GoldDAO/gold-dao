@@ -11,10 +11,12 @@ crate-type = ["cdylib"]
 [features]
 default = []  # Empty default features
 inttest = []
+self_check = []
 
 [dependencies]
 candid = { workspace = true }
 gldt_swap_common = { path = "../../gldt_swap/common" }
+hex = { workspace = true }
 ic0 = { workspace = true }
 ic-canisters-http-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 ic-canister-log = "0.2.0"
@@ -23,6 +25,7 @@ ic-xrc-types = { workspace = true }
 icrc-ledger-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 icrc-ledger-client-cdk = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 ic-metrics-encoder = { workspace = true }
+ic-stable-structures = { workspace = true }
 minicbor = { workspace = true }
 minicbor-derive = { workspace = true }
 rust_decimal = { workspace = true }

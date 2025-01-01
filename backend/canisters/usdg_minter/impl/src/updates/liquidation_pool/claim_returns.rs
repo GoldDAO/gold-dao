@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::{GLDT, MINIMUM_CLAIMABLE_RETURN};
@@ -12,6 +15,10 @@ use usdg_minter_api::LiquidityError;
 
 #[update]
 async fn claim_returns(maybe_subaccount: Option<[u8; 32]>) -> Result<u64, LiquidityError> {
+    check_postcondition(_claim_returns(maybe_subaccount)).await
+}
+
+async fn _claim_returns(maybe_subaccount: Option<[u8; 32]>) -> Result<u64, LiquidityError> {
     reject_anonymous_caller().map_err(|_| LiquidityError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -39,8 +46,16 @@ async fn claim_returns(maybe_subaccount: Option<[u8; 32]>) -> Result<u64, Liquid
                 INFO,
                 "[claim_returns] Succesfully claimed {available_returns} at index {block_index}",
             );
-            // TODO RECORD EVENT
-            mutate_state(|s| s.record_claimed_returns(from, available_returns));
+            mutate_state(|s| {
+                process_event(
+                    s,
+                    EventType::ClaimReturns {
+                        caller: from,
+                        amount: available_returns,
+                        block_index,
+                    },
+                )
+            });
             Ok(block_index)
         }
         Err(e) => Err(LiquidityError::TransferError(e)),

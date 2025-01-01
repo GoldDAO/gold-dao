@@ -6,8 +6,39 @@ use crate::transfer::process_pending_transfer;
 use ic_canister_log::log;
 use std::time::Duration;
 
+pub fn setup_timers() {}
+
+#[cfg(feature = "inttest")]
+fn ok_or_die(result: Result<(), String>) {
+    if let Err(msg) = result {
+        ic_cdk::println!("{}", msg);
+        ic_cdk::trap(&msg);
+    }
+}
+
+/// Checks that the canister state is internally consistent.
+#[cfg(feature = "inttest")]
+fn check_invariants() -> Result<(), String> {
+    crate::state::read_state(|s| {
+        let recovered_state = crate::state::audit::replay_events();
+
+        s.check_semantically_eq(&recovered_state)?;
+
+        Ok(())
+    })
+}
+
+pub fn check_postcondition<T>(t: T) -> T {
+    #[cfg(feature = "inttest")]
+    ok_or_die(check_invariants());
+    t
+}
+
 #[export_name = "canister_global_timer"]
 fn timer() {
+    #[cfg(feature = "inttest")]
+    ok_or_die(check_invariants());
+
     const DEFAULT_RETRY_DELAY: Duration = Duration::from_secs(5);
 
     if let Some(task) = pop_if_ready() {

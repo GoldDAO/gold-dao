@@ -15,8 +15,22 @@ use std::collections::{BTreeMap, BTreeSet, HashSet};
 use usdg_minter_api::lifecycle::InitArgument;
 use usdg_minter_api::VaultError;
 
+pub mod audit;
+pub mod event;
 #[cfg(test)]
 pub mod tests;
+
+// Like assert_eq, but returns an error instead of panicking.
+macro_rules! ensure_eq {
+    ($lhs:expr, $rhs:expr, $msg:expr $(, $args:expr)* $(,)*) => {
+        if $lhs != $rhs {
+            return Err(format!("{} ({:?}) != {} ({:?}): {}",
+                               std::stringify!($lhs), $lhs,
+                               std::stringify!($rhs), $rhs,
+                               format!($msg $(,$args)*)));
+        }
+    }
+}
 
 thread_local! {
     static __STATE: RefCell<Option<State>> = RefCell::default();
@@ -734,6 +748,65 @@ impl State {
             .is_none());
 
         total_redeemed_gldt
+    }
+
+    /// Checks whether the internal state of the core canister matches the other state
+    /// semantically (the state holds the same data, but maybe in a slightly
+    /// different form).
+    pub fn check_semantically_eq(&self, other: &Self) -> Result<(), String> {
+        use crate::memory::total_event_count;
+        ensure_eq!(
+            total_event_count(),
+            total_event_count(),
+            "total_event_count does not match"
+        );
+        ensure_eq!(
+            self.next_vault_id,
+            other.next_vault_id,
+            "next_vault_id does not match"
+        );
+        ensure_eq!(
+            self.next_transfer_id,
+            other.next_transfer_id,
+            "next_transfer_id does not match"
+        );
+        ensure_eq!(
+            self.vault_id_to_vault,
+            other.vault_id_to_vault,
+            "vault_id_to_vault does not match"
+        );
+        ensure_eq!(
+            self.fee_bucket_to_vault_ids,
+            other.fee_bucket_to_vault_ids,
+            "fee_bucket_to_vault_ids does not match"
+        );
+        ensure_eq!(
+            self.account_to_vault_ids,
+            other.account_to_vault_ids,
+            "account_to_vault_ids does not match"
+        );
+        ensure_eq!(
+            self.liquidation_pool,
+            other.liquidation_pool,
+            "liquidation_pool does not match"
+        );
+        ensure_eq!(
+            self.liquidation_return,
+            other.liquidation_return,
+            "liquidation_return does not match"
+        );
+        ensure_eq!(
+            self.pending_transfers,
+            other.pending_transfers,
+            "pending_transfers does not match"
+        );
+        ensure_eq!(
+            self.reserve_usdg,
+            other.reserve_usdg,
+            "reserve_usdg does not match"
+        );
+
+        Ok(())
     }
 }
 

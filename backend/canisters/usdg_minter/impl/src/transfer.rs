@@ -1,5 +1,7 @@
 use crate::logs::{DEBUG, INFO};
 use crate::numeric::DisplayAmount;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use candid::Nat;
 use candid::{CandidType, Principal};
@@ -7,6 +9,7 @@ use gldt_swap_common::gldt::GLDT_TX_FEE;
 use ic_canister_log::log;
 use icrc_ledger_types::icrc1::account::Account;
 use minicbor::{Decode, Encode};
+
 use serde::Deserialize;
 use std::fmt;
 
@@ -83,7 +86,7 @@ pub async fn process_pending_transfer() -> u64 {
         )
         .await
         {
-            Ok(_block_index) => {
+            Ok(block_index) => {
                 log!(
                     INFO,
                     "[process_pending_transfer] successfully transfered: {} {} to {}, transfer id: {}",
@@ -93,14 +96,13 @@ pub async fn process_pending_transfer() -> u64 {
                     transfer.transfer_id
                 );
                 mutate_state(|s| {
-                    // process_event(
-                    //     s,
-                    //     EventType::TransferExecuted {
-                    //         transfer_id: transfer.transfer_id,
-                    //         block_index,
-                    //     },
-                    // )
-                    s.record_process_pending_transfer(transfer.transfer_id);
+                    process_event(
+                        s,
+                        EventType::TransferExecuted {
+                            transfer_id: transfer.transfer_id,
+                            block_index,
+                        },
+                    )
                 });
             }
             Err(error) => {
