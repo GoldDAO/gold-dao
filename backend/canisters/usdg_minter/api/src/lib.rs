@@ -11,7 +11,7 @@ pub mod updates;
 
 pub const USDG_TRANSFER_FEE: u64 = 1_000_000;
 
-#[derive(CandidType, Deserialize, Debug, Eq, PartialEq)]
+#[derive(Clone, CandidType, Deserialize, Debug, Eq, PartialEq)]
 pub enum ApiFeeBucket {
     Low,
     Medium,

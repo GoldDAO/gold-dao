@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer_from;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::{MINIMUM_REDEEM_AMOUNT, USDG};
@@ -13,6 +16,10 @@ use usdg_minter_api::VaultError;
 
 #[update]
 async fn redeem(arg: RedeemArg) -> Result<u64, VaultError> {
+    check_postcondition(_redeem(arg)).await
+}
+
+async fn _redeem(arg: RedeemArg) -> Result<u64, VaultError> {
     reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -49,7 +56,15 @@ async fn redeem(arg: RedeemArg) -> Result<u64, VaultError> {
                 "[redeem] Succesfully redeemed margin for vault at index {block_index}",
             );
             mutate_state(|s| {
-                s.record_redemption(from, redeem_amount, s.one_centigram_of_gold_price)
+                process_event(
+                    s,
+                    EventType::Redeem {
+                        owner: from,
+                        current_rate: s.one_centigram_of_gold_price,
+                        amount: redeem_amount,
+                        block_index,
+                    },
+                )
             });
             Ok(block_index)
         }

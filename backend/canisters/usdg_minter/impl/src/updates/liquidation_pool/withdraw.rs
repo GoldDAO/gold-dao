@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer;
+use crate::memory::record_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::USDG;
@@ -13,6 +16,10 @@ use usdg_minter_api::LiquidityError;
 
 #[update]
 async fn withdraw_liquidity(arg: WithdrawArg) -> Result<u64, LiquidityError> {
+    check_postcondition(_withdraw_liquidity(arg)).await
+}
+
+async fn _withdraw_liquidity(arg: WithdrawArg) -> Result<u64, LiquidityError> {
     reject_anonymous_caller().map_err(|_| LiquidityError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -38,7 +45,14 @@ async fn withdraw_liquidity(arg: WithdrawArg) -> Result<u64, LiquidityError> {
     match transfer(to, Nat::from(arg.amount), None, usdg_ledger_id).await {
         Ok(block_index) => {
             log!(INFO, "[withdraw_liquidity] Succesfully withdrew liquidity to pool {withdraw_amount} at index {block_index}",);
-            // TODO RECORD EVENT
+            record_event(
+                EventType::WithdrawLiquidity {
+                    caller: to,
+                    amount: withdraw_amount,
+                    block_index,
+                },
+                ic_cdk::api::time(),
+            );
             Ok(block_index)
         }
         Err(e) => {

@@ -7,7 +7,7 @@ pub enum MinterArgument {
     Upgrade(UpgradeArgument),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone, Eq, PartialEq, Debug)]
 pub struct InitArgument {
     pub usdg_ledger_id: Principal,
     pub gldt_ledger_id: Principal,
@@ -15,5 +15,7 @@ pub struct InitArgument {
     pub xrc_id: Principal,
 }
 
-#[derive(CandidType, Deserialize)]
-pub struct UpgradeArgument {}
+#[derive(CandidType, Deserialize, Clone, Eq, PartialEq, Debug)]
+pub struct UpgradeArgument {
+    pub new_medium_fee_percent: Option<u64>,
+}

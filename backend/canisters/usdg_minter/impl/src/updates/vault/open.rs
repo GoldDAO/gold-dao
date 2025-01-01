@@ -1,8 +1,11 @@
 use crate::guard::GuardPrincipal;
 use crate::lifecycle::tasks::{schedule_now, TaskType};
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::numeric::{GLDT, USDG};
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::{reject_anonymous_caller, VaultError};
 use crate::MINIMUM_MARGIN_AMOUNT;
@@ -14,6 +17,10 @@ use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 
 #[update]
 async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
+    check_postcondition(_open_vault(arg)).await
+}
+
+async fn _open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     // Check anonymous caller
     reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
 
@@ -53,12 +60,18 @@ async fn open_vault(arg: OpenVaultArg) -> Result<OpenVaultSuccess, VaultError> {
     {
         Ok(block_index) => {
             let vault_id = mutate_state(|s| {
-                s.record_vault_creation(
-                    from,
-                    arg.borrowed_amount.into(),
-                    arg.margin_amount.into(),
-                    arg.fee_bucket,
-                )
+                let vault_id = s.next_vault_id;
+                process_event(
+                    s,
+                    EventType::OpenVault {
+                        owner: from,
+                        margin_amount: arg.margin_amount.into(),
+                        borrowed_amount: arg.borrowed_amount.into(),
+                        fee_bucket: arg.fee_bucket.into(),
+                        block_index,
+                    },
+                );
+                vault_id
             });
             log!(
                 INFO,

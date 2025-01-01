@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer_from;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::vault::Vault;
@@ -13,6 +16,10 @@ use usdg_minter_api::VaultError;
 
 #[update]
 async fn repay_debt_to_vault(arg: RepayDebtArg) -> Result<u64, VaultError> {
+    check_postcondition(_repay_debt_to_vault(arg)).await
+}
+
+async fn _repay_debt_to_vault(arg: RepayDebtArg) -> Result<u64, VaultError> {
     reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -47,7 +54,16 @@ async fn repay_debt_to_vault(arg: RepayDebtArg) -> Result<u64, VaultError> {
     {
         Ok(block_index) => {
             log!(INFO, "[repay_debt_to_vault] Succesfully repayed debt for vault {} at index {block_index}", vault.vault_id);
-            mutate_state(|s| s.record_repay_debt_to_vault(vault.vault_id, debt_amount));
+            mutate_state(|s| {
+                process_event(
+                    s,
+                    EventType::Repay {
+                        vault_id: arg.vault_id,
+                        debt: debt_amount,
+                        block_index,
+                    },
+                )
+            });
             Ok(block_index)
         }
         Err(e) => Err(VaultError::TransferFromError(e)),

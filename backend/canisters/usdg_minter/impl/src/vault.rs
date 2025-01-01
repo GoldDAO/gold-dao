@@ -1,10 +1,13 @@
 use crate::logs::INFO;
 use crate::numeric::{Factor, GoldPrice, GLDT, USDG};
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::State;
 use crate::MINIMUM_COLLATERAL_RATIO;
 use candid::CandidType;
 use ic_canister_log::log;
 use icrc_ledger_types::icrc1::account::Account;
+use minicbor::{Decode, Encode};
 use serde::Deserialize;
 use std::fmt;
 use usdg_minter_api::ApiFeeBucket;
@@ -47,10 +50,15 @@ impl Vault {
     }
 }
 
-#[derive(CandidType, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    CandidType, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode,
+)]
 pub enum FeeBucket {
+    #[n(0)]
     Low = 0,
+    #[n(1)]
     Medium = 1,
+    #[n(2)]
     High = 2,
 }
 
@@ -102,27 +110,13 @@ pub fn check_vaults(state: &mut State) {
                 "[check_vaults] liquidate vault {vault_id} to liquidity pool with liquidity: {provided_liquidity} USDG",
             );
             // TODO this should be recorded as an event
-            state.record_liquidate_vault_liquidation_pool(vault_id);
-            // process_event(
-            //     s,
-            //     EventType::LiquidateVault {
-            //         vault_id: vault.vault_id,
-            //     },
-            // )
+            process_event(state, EventType::Liquidate { vault_id });
         } else if has_healthy_vault {
             log!(
                 INFO,
                 "[check_vaults] redistribute vault {vault_id} to all the other vaults.",
             );
-            state.record_redistribute_vault(vault_id);
-            // mutate_state(|s| {
-            //     process_event(
-            //         s,
-            //         EventType::RedistributeVault {
-            //             vault_id: vault.vault_id,
-            //         },
-            //     )
-            // });
+            process_event(state, EventType::Redistribute { vault_id });
         }
     }
 }

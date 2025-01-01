@@ -1,6 +1,9 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer_from;
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::reject_anonymous_caller;
 use crate::USDG;
@@ -13,6 +16,10 @@ use usdg_minter_api::LiquidityError;
 
 #[update]
 async fn deposit_liquidity(arg: DepositArg) -> Result<u64, LiquidityError> {
+    check_postcondition(_deposit_liquidity(arg)).await
+}
+
+async fn _deposit_liquidity(arg: DepositArg) -> Result<u64, LiquidityError> {
     reject_anonymous_caller().map_err(|_| LiquidityError::AnonymousCaller)?;
     let caller = ic_cdk::caller();
     let _guard_principal = GuardPrincipal::new(caller)?;
@@ -38,8 +45,17 @@ async fn deposit_liquidity(arg: DepositArg) -> Result<u64, LiquidityError> {
     {
         Ok(block_index) => {
             log!(INFO, "[deposit_liquidity] Succesfully added liquidity to pool {deposit_amount} at index {block_index}",);
-            // TODO RECORD EVENT
-            mutate_state(|s| s.deposit_liquidity(from, deposit_amount));
+            mutate_state(|s| {
+                process_event(
+                    s,
+                    EventType::DepositLiquidity {
+                        caller: from,
+                        amount: deposit_amount,
+                        block_index,
+                    },
+                )
+            });
+
             Ok(block_index)
         }
         Err(e) => Err(LiquidityError::TransferFromError(e)),
