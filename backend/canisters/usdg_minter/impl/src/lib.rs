@@ -10,6 +10,7 @@ use usdg_minter_api::updates::deposit_liquidity::DepositArg;
 use usdg_minter_api::updates::open_vault::{OpenVaultArg, OpenVaultSuccess};
 use usdg_minter_api::updates::redeem::RedeemArg;
 use usdg_minter_api::updates::repay_debt_to_vault::RepayDebtArg;
+use usdg_minter_api::updates::update_vault::UpdateVaultArg;
 use usdg_minter_api::updates::withdraw_liquidity::WithdrawArg;
 use usdg_minter_api::LiquidityError;
 use usdg_minter_api::{ApiVault, VaultError};

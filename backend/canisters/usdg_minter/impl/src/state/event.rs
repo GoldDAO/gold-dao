@@ -142,6 +142,16 @@ pub enum EventType {
         #[n(0)]
         vault_id: u64,
     },
+
+    #[n(15)]
+    UpdateVault {
+        #[n(0)]
+        vault_id: u64,
+        #[cbor(n(1), with = "crate::cbor::account::option")]
+        new_owner: Option<Account>,
+        #[n(2)]
+        fee_bucket: Option<FeeBucket>,
+    },
 }
 
 #[derive(CandidType, Encode, Decode, Debug, PartialEq, Eq, Clone)]
@@ -274,6 +284,23 @@ pub fn event_to_candid_event(event: Event) -> CandidEvent {
         EventType::ChargeFee => CandidEventType::ChargeFee,
         EventType::Liquidate { vault_id } => CandidEventType::Liquidate { vault_id },
         EventType::Redistribute { vault_id } => CandidEventType::Redistribute { vault_id },
+        EventType::UpdateVault {
+            vault_id,
+            new_owner,
+            fee_bucket,
+        } => {
+            let api_fee_bucket = match fee_bucket {
+                Some(FeeBucket::Low) => Some(ApiFeeBucket::Low),
+                Some(FeeBucket::Medium) => Some(ApiFeeBucket::Medium),
+                Some(FeeBucket::High) => Some(ApiFeeBucket::High),
+                None => None,
+            };
+            CandidEventType::UpdateVault {
+                vault_id,
+                new_owner,
+                fee_bucket: api_fee_bucket,
+            }
+        }
     };
     CandidEvent {
         timestamp: event.timestamp,

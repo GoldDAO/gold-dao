@@ -312,6 +312,30 @@ impl State {
         vault_id
     }
 
+    pub fn record_update_vault(
+        &mut self,
+        vault_id: VaultId,
+        new_owner: Option<Account>,
+        fee_bucket: Option<FeeBucket>,
+    ) {
+        if let Some(new_owner) = new_owner {
+            match self.vault_id_to_vault.get_mut(&vault_id) {
+                Some(vault) => {
+                    vault.owner = new_owner;
+                }
+                None => panic!("attempted to update unkown vault"),
+            };
+        }
+        if let Some(fee_bucket) = fee_bucket {
+            match self.vault_id_to_vault.get_mut(&vault_id) {
+                Some(vault) => {
+                    vault.fee_bucket = fee_bucket;
+                }
+                None => panic!("attempted to update unkown vault"),
+            };
+        }
+    }
+
     pub fn record_borrow_from_vault(&mut self, vault_id: VaultId, borrowed_amount: USDG) {
         let vault = self.get_vault(vault_id).unwrap();
         let new_borrowed_amount = vault.borrowed_amount.checked_add(borrowed_amount).unwrap();
@@ -330,7 +354,7 @@ impl State {
             Some(vault) => {
                 vault.margin_amount = vault.margin_amount.checked_add(margin_amount).unwrap();
             }
-            None => panic!("attempted to add maring to unkown vault"),
+            None => panic!("attempted to add margin to unkown vault"),
         };
     }
 

@@ -31,6 +31,7 @@ pub enum VaultError {
     CallerNotOwner,
     AlreadyProcessing,
     TooManyConcurrentRequests,
+    NoChange,
 }
 
 #[derive(CandidType, Deserialize, Debug)]

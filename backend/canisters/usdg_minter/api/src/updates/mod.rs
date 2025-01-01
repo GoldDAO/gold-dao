@@ -6,4 +6,5 @@ pub mod deposit_liquidity;
 pub mod open_vault;
 pub mod redeem;
 pub mod repay_debt_to_vault;
+pub mod update_vault;
 pub mod withdraw_liquidity;
