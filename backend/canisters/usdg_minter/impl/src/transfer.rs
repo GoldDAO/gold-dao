@@ -1,6 +1,10 @@
-use crate::state::read_state;
+use crate::logs::{DEBUG, INFO};
+use crate::numeric::DisplayAmount;
+use crate::state::{mutate_state, read_state};
+use candid::Nat;
 use candid::{CandidType, Principal};
 use gldt_swap_common::gldt::GLDT_TX_FEE;
+use ic_canister_log::log;
 use icrc_ledger_types::icrc1::account::Account;
 use minicbor::{Decode, Encode};
 use serde::Deserialize;
@@ -53,4 +57,62 @@ pub struct PendingTransfer {
     pub receiver: Account,
     #[n(3)]
     pub unit: Unit,
+}
+
+pub async fn process_pending_transfer() -> u64 {
+    let mut error_count = 0;
+
+    let pending_transfers: Vec<PendingTransfer> = read_state(|s| {
+        s.pending_transfers
+            .values()
+            .cloned()
+            .collect::<Vec<PendingTransfer>>()
+    });
+
+    for transfer in pending_transfers {
+        let (ledger_id, fee) = (transfer.unit.ledger_id(), transfer.unit.fee());
+        match crate::management::transfer(
+            transfer.receiver,
+            transfer
+                .amount
+                .checked_sub(fee)
+                .expect("bug: transfer should always be greater than the fee.")
+                .into(),
+            Some(Nat::from(fee)),
+            ledger_id,
+        )
+        .await
+        {
+            Ok(_block_index) => {
+                log!(
+                    INFO,
+                    "[process_pending_transfer] successfully transfered: {} {} to {}, transfer id: {}",
+                    DisplayAmount(transfer.amount),
+                    transfer.unit,
+                    transfer.receiver,
+                    transfer.transfer_id
+                );
+                mutate_state(|s| {
+                    // process_event(
+                    //     s,
+                    //     EventType::TransferExecuted {
+                    //         transfer_id: transfer.transfer_id,
+                    //         block_index,
+                    //     },
+                    // )
+                    s.record_process_pending_transfer(transfer.transfer_id);
+                });
+            }
+            Err(error) => {
+                log!(
+                    DEBUG,
+                    "[process_pending_transfer] failed to transfer margin: {}, with error: {}",
+                    transfer.amount,
+                    error
+                );
+                error_count += 1;
+            }
+        }
+    }
+    error_count
 }

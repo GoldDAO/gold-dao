@@ -1,4 +1,5 @@
 use crate::guard::GuardPrincipal;
+use crate::lifecycle::tasks::{schedule_now, TaskType};
 use crate::logs::INFO;
 use crate::management::transfer_from;
 use crate::state::{mutate_state, read_state};
@@ -47,6 +48,7 @@ async fn close_vault(vault_id: u64) -> Result<Option<u64>, VaultError> {
                 vault.vault_id
             );
             mutate_state(|s| s.record_close_vault(vault.vault_id));
+            schedule_now(TaskType::ProcessPendingTransfer);
             Ok(Some(block_index))
         }
         Err(e) => Err(VaultError::TransferFromError(e)),
