@@ -54,6 +54,7 @@ pub struct State {
 
     // 0.01g of gold price in USD
     pub one_centigram_of_gold_price: GoldPrice,
+    pub last_rate_fetched_timestamp_nanos: u64,
 
     // Medium Rate, governed by GOLDGov
     pub interest_rates: BTreeMap<FeeBucket, f64>,
@@ -91,6 +92,7 @@ impl State {
                 (FeeBucket::Medium, DEFAULT_MEDIUM_RATE),
                 (FeeBucket::High, DEFAULT_MEDIUM_RATE),
             ]),
+            last_rate_fetched_timestamp_nanos: 0,
             reserve_usdg: USDG::ZERO,
             previous_medium_rate: DEFAULT_MEDIUM_RATE,
             usdg_ledger_id: init_arg.usdg_ledger_id,

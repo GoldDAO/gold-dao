@@ -1,4 +1,5 @@
 use crate::state::read_state;
+use crate::vault::FeeBucket;
 use ic_canisters_http_types::{HttpRequest, HttpResponse, HttpResponseBuilder};
 use ic_cdk::query;
 
@@ -39,6 +40,51 @@ fn http_request(req: HttpRequest) -> HttpResponse {
                     "one_centigram_of_gold_price",
                     s.one_centigram_of_gold_price.to_f64(),
                     "Price of one centigram of gold.",
+                )?;
+                w.encode_gauge(
+                    "total_gldt_margin",
+                    s.total_gldt_margin().to_f64(),
+                    "Total GLDT margin.",
+                )?;
+                w.encode_gauge(
+                    "total_usdg_debt",
+                    s.total_usdg_debt().to_f64(),
+                    "Total USDG debt.",
+                )?;
+                w.encode_gauge(
+                    "liquidation_pool_total_usdg_staked",
+                    s.total_usdg_in_liquidation_pool().to_f64(),
+                    "Total USDG in the liquidation pool.",
+                )?;
+                w.encode_gauge(
+                    "liquidation_pool_stakers",
+                    s.liquidation_pool.len() as f64,
+                    "Count of users in staking USDG in the liquidation pool.",
+                )?;
+                w.encode_gauge(
+                    "liquidation_pool_total_gldt_returns",
+                    s.total_gldt_in_returns().to_f64(),
+                    "Total GLDT in claimable returns the liquidation pool.",
+                )?;
+                w.encode_gauge(
+                    "interest_rate_low",
+                    *s.interest_rates.get(&FeeBucket::Low).unwrap(),
+                    "Interest rate of the low bucket.",
+                )?;
+                w.encode_gauge(
+                    "interest_rate_medium",
+                    *s.interest_rates.get(&FeeBucket::Medium).unwrap(),
+                    "Interest rate of the medium bucket.",
+                )?;
+                w.encode_gauge(
+                    "interest_rate_high",
+                    *s.interest_rates.get(&FeeBucket::High).unwrap(),
+                    "Interest rate of the high bucket.",
+                )?;
+                w.encode_gauge(
+                    "reserve_usdg",
+                    s.reserve_usdg.to_f64(),
+                    "USDG sitting in reserve.",
                 )?;
 
                 Ok(())

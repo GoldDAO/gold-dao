@@ -11,7 +11,6 @@ crate-type = ["cdylib"]
 [features]
 default = []  # Empty default features
 inttest = []
-self_check = []
 
 [dependencies]
 candid = { workspace = true }
@@ -30,6 +29,7 @@ minicbor = { workspace = true }
 minicbor-derive = { workspace = true }
 rust_decimal = { workspace = true }
 rust_decimal_macros = "1.36.0"
+scopeguard = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 usdg_minter_api = { path = "../api" }

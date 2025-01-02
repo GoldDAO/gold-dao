@@ -27,6 +27,7 @@ pub mod state;
 pub mod transfer;
 pub mod updates;
 pub mod vault;
+pub mod xrc;
 
 pub const E8S: u64 = 100_000_000;
 

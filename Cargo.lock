@@ -4389,6 +4389,7 @@ dependencies = [
  "proptest",
  "rust_decimal",
  "rust_decimal_macros",
+ "scopeguard",
  "serde",
  "serde_json",
  "usdg_minter_api",
