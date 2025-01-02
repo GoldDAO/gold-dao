@@ -1,16 +1,21 @@
 use crate::guard::TimerGuard;
-use crate::lifecycle::tasks::schedule_after;
-use crate::lifecycle::tasks::{pop_if_ready, TaskType};
+use crate::lifecycle::tasks::{pop_if_ready, schedule_after, schedule_now, TaskType};
 use crate::logs::INFO;
 use crate::state::audit::process_event;
 use crate::state::event::EventType;
 use crate::state::mutate_state;
 use crate::transfer::process_pending_transfer;
+use crate::vault::check_vaults;
+use crate::xrc::fetch_gold_price;
 use ic_canister_log::log;
+use scopeguard::guard;
 use std::time::Duration;
 
 pub fn setup_timers() {
     schedule_after(Duration::from_secs(24 * 60 * 60), TaskType::ChargeFees);
+    schedule_after(Duration::from_secs(60), TaskType::ProcessLogic);
+    #[cfg(not(feature = "inttest"))]
+    schedule_after(Duration::from_secs(60), TaskType::FetchGoldPrice);
 }
 
 #[cfg(feature = "inttest")]
@@ -57,15 +62,33 @@ fn timer() {
                         return;
                     }
                 };
+
+                let _enqueue_followup_guard = guard((), |_| {
+                    log!(INFO, "[timer] ProcessLogic panicked",);
+                    schedule_after(Duration::from_secs(10), TaskType::ProcessLogic);
+                });
+
+                mutate_state(|s| check_vaults(s));
+                schedule_after(Duration::from_secs(60), TaskType::FetchGoldPrice);
+                scopeguard::ScopeGuard::into_inner(_enqueue_followup_guard);
             }),
             TaskType::FetchGoldPrice => {
-                let _guard = match TimerGuard::new(task_type) {
-                    Ok(guard) => guard,
-                    Err(_) => {
-                        log!(INFO, "[timer] Already processing FetchGoldPrice",);
-                        return;
+                ic_cdk::spawn(async {
+                    let _guard = match TimerGuard::new(task_type) {
+                        Ok(guard) => guard,
+                        Err(_) => {
+                            log!(INFO, "[timer] Already processing FetchGoldPrice",);
+                            return;
+                        }
+                    };
+
+                    if fetch_gold_price().await {
+                        schedule_after(Duration::from_secs(5 * 60), TaskType::FetchGoldPrice);
+                        schedule_now(TaskType::ProcessLogic);
+                    } else {
+                        schedule_after(DEFAULT_RETRY_DELAY, TaskType::FetchGoldPrice);
                     }
-                };
+                });
             }
             TaskType::ProcessPendingTransfer => {
                 ic_cdk::spawn(async {

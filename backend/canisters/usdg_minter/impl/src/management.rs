@@ -1,5 +1,6 @@
+use crate::state::read_state;
 use candid::{Nat, Principal};
-// use ic_xrc_types::{Asset, AssetClass, GetExchangeRateRequest, GetExchangeRateResult};
+use ic_xrc_types::{Asset, AssetClass, GetExchangeRateRequest, GetExchangeRateResult};
 use icrc_ledger_client_cdk::{CdkRuntime, ICRC1Client};
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
@@ -67,45 +68,46 @@ impl fmt::Display for Reason {
 
 /// Query the XRC canister to retrieve the last GOLD/USD price.
 /// https://github.com/dfinity/exchange-rate-canister
-// pub async fn fetch_gold_price() -> Result<GetExchangeRateResult, String> {
-//     const XRC_CALL_COST_CYCLES: u64 = 10_000_000_000;
-//
-//     1 GLDT = 0.01g of gold
-//
-//     let gold = Asset {
-//         symbol: "GOLD".to_string(),
-//         class: AssetClass::RWA,
-//     };
-//     let usd = Asset {
-//         symbol: "USD".to_string(),
-//         class: AssetClass::FiatCurrency,
-//     };
+pub async fn fetch_gold_price() -> Result<GetExchangeRateResult, String> {
+    const XRC_CALL_COST_CYCLES: u64 = 10_000_000_000;
 
-//     let args = GetExchangeRateRequest {
-//         base_asset: gold,
-//         quote_asset: usd,
-//         timestamp: None,
-//     };
+    // 1 GLDT = 0.01g of gold
+    // 1 PAXG = 31.1034768g of gold
 
-//     let xrc_principal = read_state(|s| s.xrc_id);
+    let gold = Asset {
+        symbol: "PAXG".to_string(),
+        class: AssetClass::Cryptocurrency,
+    };
+    let usd = Asset {
+        symbol: "USD".to_string(),
+        class: AssetClass::FiatCurrency,
+    };
 
-//     let res_xrc: Result<(GetExchangeRateResult,), (i32, String)> =
-//         ic_cdk::api::call::call_with_payment(
-//             xrc_principal,
-//             "get_exchange_rate",
-//             (args,),
-//             XRC_CALL_COST_CYCLES,
-//         )
-//         .await
-//         .map_err(|(code, msg)| (code as i32, msg));
-//     match res_xrc {
-//         Ok((xr,)) => Ok(xr),
-//         Err((code, msg)) => Err(format!(
-//             "Error while calling XRC canister ({}): {:?}",
-//             code, msg
-//         )),
-//     }
-// }
+    let args = GetExchangeRateRequest {
+        base_asset: gold,
+        quote_asset: usd,
+        timestamp: None,
+    };
+
+    let xrc_principal = read_state(|s| s.xrc_id);
+
+    let res_xrc: Result<(GetExchangeRateResult,), (i32, String)> =
+        ic_cdk::api::call::call_with_payment(
+            xrc_principal,
+            "get_exchange_rate",
+            (args,),
+            XRC_CALL_COST_CYCLES,
+        )
+        .await
+        .map_err(|(code, msg)| (code as i32, msg));
+    match res_xrc {
+        Ok((xr,)) => Ok(xr),
+        Err((code, msg)) => Err(format!(
+            "Error while calling XRC canister ({}): {:?}",
+            code, msg
+        )),
+    }
+}
 
 pub async fn transfer(
     to: impl Into<Account>,

@@ -109,7 +109,6 @@ pub fn check_vaults(state: &mut State) {
                 INFO,
                 "[check_vaults] liquidate vault {vault_id} to liquidity pool with liquidity: {provided_liquidity} USDG",
             );
-            // TODO this should be recorded as an event
             process_event(state, EventType::Liquidate { vault_id });
         } else if has_healthy_vault {
             log!(
