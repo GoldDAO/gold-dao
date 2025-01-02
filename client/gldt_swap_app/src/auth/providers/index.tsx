@@ -11,9 +11,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
   useAgent,
-  // useAuth,
-  // useIsInitializing,
-  useIdentityKit,
+  useAuth,
+  useIsInitializing,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
 import { isMobile } from "react-device-detect";
@@ -31,17 +30,16 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  // const { user } = useAuth();
-  const agent = useAgent({ host: "https://ic0.app" });
-  // const agent = useAgent({ host: "https://ic0.app" });
-  // const isInitializing = useIsInitializing();
-  const { user, isInitializing } = useIdentityKit();
+  const { user } = useAuth();
+  const isInitializing = useIsInitializing();
+  const HOST = "https://ic0.app"; // "https://icp-api.io/"
+  const agent = useAgent({ host: HOST });
 
   const [state, setState] = useAtom(stateAtom);
   const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
 
   useEffect(() => {
-    HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
+    HttpAgent.create({ host: HOST }).then((res) => {
       setUnauthenticatedAgent(res);
       setState((prevState) => ({
         ...prevState,
