@@ -15,7 +15,7 @@ import {
   useIsInitializing,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
-import { isMobile } from "react-device-detect";
+// import { isMobile } from "react-device-detect";
 
 import { stateAtom } from "../atoms";
 import { Canisters } from "../interfaces";
@@ -125,7 +125,8 @@ export const AuthProvider = ({
 
   return (
     <IdentityKitProvider
-      signers={isMobile ? [NFIDW, InternetIdentity] : signers}
+      // signers={isMobile ? [NFIDW, InternetIdentity] : signers}
+      signers={signers}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
         targets,
