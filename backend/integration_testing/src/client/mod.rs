@@ -1,3 +1,4 @@
+pub mod gldt_stake;
 pub mod gldt_swap;
 pub mod icrc1;
 pub mod icrc1_icrc2_token;

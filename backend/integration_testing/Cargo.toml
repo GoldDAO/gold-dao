@@ -25,6 +25,8 @@ sns_rewards_api_canister = { path = "../canisters/sns_rewards/api" }
 gldt_swap_api_canister = { path = "../canisters/gldt_swap/api"}
 gldt_swap_api_archive = { path = "../canisters/gldt_swap/api_archive"}
 gldt_swap_common = { path = "../canisters/gldt_swap/common"}
+gldt_stake_api_canister = { path = "../canisters/gldt_stake/api"}
+gldt_stake_common = { path = "../canisters/gldt_stake/common"}
 usdg_minter_api = { path = "../canisters/usdg_minter/api"}
 origyn_nft_reference = { path = '../external_canisters/origyn_nft_reference/api' }
 serde_bytes = { workspace = true }
