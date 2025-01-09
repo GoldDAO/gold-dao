@@ -12,6 +12,7 @@ spec:
           'integration_testing',
           'management',
           'gldt_swap',
+          'gldt_stake',
           # "super_stats_v3",
         ]
 ---
@@ -37,7 +38,8 @@ $[[ inputs.src-folder ]] unit tests:
     DOCKER_SECURITY_OPT: '--security-opt seccomp=unconfined'
   script:
     # - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
-    - cargo test -p $[[ inputs.src-folder ]]
+    # - cargo test -p $[[ inputs.src-folder ]]
+    - find backend/canisters/$[[inputs.src-folder]] -name Cargo.toml -execdir cargo test \;
   # coverage: /^\d+.\d+% coverage/
   # artifacts:
   #   reports:

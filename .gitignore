@@ -13,6 +13,7 @@ out/
 target
 backend/canisters/**/target
 backend/**/api/declarations
+backend/integration_testing/pocket-ic
 .vscode
 lcov.info
 cobertura.xml

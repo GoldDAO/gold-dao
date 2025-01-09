@@ -1,0 +1,49 @@
+[package]
+name = "gldt_stake"
+version = "0.1.0"
+description = "GLDT stake backend application - impl"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+default = []  # Empty default features
+inttest = ["gldt_stake_common/inttest", "gldt_stake_api_canister/inttest" ]
+
+[dependencies]
+candid = { workspace = true }
+canister_logger = { path = '../../../libraries/canister_logger' }
+canister_state_macros = { path = '../../../libraries/canister_state_macros' }
+canister_time = { path = '../../../libraries/canister_time' }
+canister_tracing_macros = { path = '../../../libraries/canister_tracing_macros' }
+http_request = { path = '../../../libraries/http_request' }
+ic-cdk = { workspace = true }
+ic-cdk-macros = { workspace = true }
+ic-stable-structures = { workspace = true }
+icrc-ledger-types = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_bytes = { workspace = true }
+serializer = { path = '../../../libraries/serializer' }
+icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
+serde_json = { workspace =  true }
+icrc_ledger_canister = { path = "../../../external_canisters/icrc_ledger/api" }
+stable_memory = { path = '../../../libraries/stable_memory' }
+types = { path = '../../../libraries/types' }
+utils = { path = '../../../libraries/utils' }
+tracing = { workspace = true }
+futures = { workspace = true }
+gldt_stake_api_canister = { path = "../api"}
+gldt_stake_common = { path = "../common"}
+origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api'}
+origyn_nft_reference_c2c_client = { path = '../../../external_canisters/origyn_nft_reference/c2c_client'}
+ic0 = "0.23.0"
+ic-cdk-timers = { workspace = true }
+sns_governance_canister = { path = "../../../external_canisters/sns_governance/api" }
+sns_governance_canister_c2c_client = { path = "../../../external_canisters/sns_governance/c2c_client" }
+ledger_utils = { path = "../../../libraries/ledger_utils" }
+time = {workspace = true }
+sns_rewards_api_canister = {path = "../../sns_rewards/api"}
+sns_rewards_c2c_client = {path = "../../../external_canisters/sns_rewards/c2c_client"}
+typetag = { workspace = true }

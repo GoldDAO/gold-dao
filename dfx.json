@@ -244,6 +244,17 @@
       "type": "custom",
       "wasm": "backend/canisters/gldt_swap/target/wasm32-unknown-unknown/release/gldt_swap_canister.wasm.gz"
     },
+    "gldt_stake": {
+      "build": ["./scripts/build_canister.sh gldt_stake"],
+      "candid": "backend/canisters/gldt_stake/api/can.did",
+      "declarations": {
+        "bindings": ["ts", "js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_stake/api/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/gldt_stake/target/wasm32-unknown-unknown/release/gldt_stake_canister.wasm.gz"
+    },
     "gldt_swap_archive": {
       "build": [""],
       "candid": "backend/canisters/gldt_swap/api_archive/can.did",
