@@ -32,7 +32,7 @@ const AuthProviderInit = ({
 
   const { user } = useAuth();
   const isInitializing = useIsInitializing();
-  const HOST = "https://ic0.app"; // "https://icp-api.io/"
+  const HOST = "https://icp-api.io/"; // "https://ic0.app"
   const agent = useAgent({ host: HOST });
 
   const [state, setState] = useAtom(stateAtom);
