@@ -10,7 +10,6 @@ import { useAtom, useSetAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
-  useAgent,
   useAuth,
   useIsInitializing,
   useIdentity,
