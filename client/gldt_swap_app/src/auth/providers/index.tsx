@@ -10,9 +10,9 @@ import { useAtom, useSetAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
-  useAgent,
   useAuth,
   useIsInitializing,
+  useIdentity,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
 // import { isMobile } from "react-device-detect";
@@ -33,21 +33,21 @@ const AuthProviderInit = ({
   const { user } = useAuth();
   const isInitializing = useIsInitializing();
   const HOST = "https://icp-api.io/"; // "https://ic0.app"
-  const agent = useAgent({ host: HOST });
+  const identity = useIdentity();
+  const agent = HttpAgent.createSync({
+    host: HOST,
+    identity: identity,
+  });
 
   const [state, setState] = useAtom(stateAtom);
   const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
 
   useEffect(() => {
-    HttpAgent.create({ host: HOST }).then((res) => {
-      setUnauthenticatedAgent(res);
-      setState((prevState) => ({
-        ...prevState,
-        unauthenticatedAgent: res,
-      }));
-    });
+    setUnauthenticatedAgent(agent);
+
     setState((prevState) => ({
       ...prevState,
+      unauthenticatedAgent: agent,
       canisters: canisters,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,7 +92,7 @@ const AuthProviderInit = ({
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, agent, state.canisters]);
+  }, [user, state.canisters]);
 
   if (!Object.keys(state.canisters).length || !state.unauthenticatedAgent) {
     return (
