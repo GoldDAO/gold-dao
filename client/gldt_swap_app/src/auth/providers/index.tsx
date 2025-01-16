@@ -11,12 +11,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
   useAgent,
-  // useAuth,
-  // useIsInitializing,
-  useIdentityKit,
+  useAuth,
+  useIsInitializing,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
-import { isMobile } from "react-device-detect";
+// import { isMobile } from "react-device-detect";
 
 import { stateAtom } from "../atoms";
 import { Canisters } from "../interfaces";
@@ -31,17 +30,16 @@ const AuthProviderInit = ({
 }) => {
   const connected = localStorage.getItem("connected");
 
-  // const { user } = useAuth();
-  const agent = useAgent({ host: "https://ic0.app" });
-  // const agent = useAgent({ host: "https://ic0.app" });
-  // const isInitializing = useIsInitializing();
-  const { user, isInitializing } = useIdentityKit();
+  const { user } = useAuth();
+  const isInitializing = useIsInitializing();
+  const HOST = "https://icp-api.io/"; // "https://ic0.app"
+  const agent = useAgent({ host: HOST });
 
   const [state, setState] = useAtom(stateAtom);
   const [, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();
 
   useEffect(() => {
-    HttpAgent.create({ host: "https://icp-api.io/" }).then((res) => {
+    HttpAgent.create({ host: HOST }).then((res) => {
       setUnauthenticatedAgent(res);
       setState((prevState) => ({
         ...prevState,
@@ -127,7 +125,8 @@ export const AuthProvider = ({
 
   return (
     <IdentityKitProvider
-      signers={isMobile ? [NFIDW, InternetIdentity] : signers}
+      // signers={isMobile ? [NFIDW, InternetIdentity] : signers}
+      signers={signers}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
         targets,

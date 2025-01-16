@@ -15,6 +15,7 @@ inttest = []
 [dependencies]
 candid = { workspace = true }
 gldt_swap_common = { path = "../../gldt_swap/common" }
+hex = { workspace = true }
 ic0 = { workspace = true }
 ic-canisters-http-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 ic-canister-log = "0.2.0"
@@ -23,9 +24,12 @@ ic-xrc-types = { workspace = true }
 icrc-ledger-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 icrc-ledger-client-cdk = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 ic-metrics-encoder = { workspace = true }
+ic-stable-structures = { workspace = true }
 minicbor = { workspace = true }
 minicbor-derive = { workspace = true }
 rust_decimal = { workspace = true }
+rust_decimal_macros = "1.36.0"
+scopeguard = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 usdg_minter_api = { path = "../api" }

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.1] - 2025-01-13
+
+#### Changed
+
+- Update NFID identityKit to version 1.0.7
+- Enable Plug wallet on mobile device (for in-browser Plug app)
+
 ### [1.1.0] - 2024-12-06
 
 #### Description

@@ -1050,6 +1050,120 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32085ea23f3234fc7846555e85283ba4de91e21016dc0455a16286d87a292d64"
 
 [[package]]
+name = "gldt_stake"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "gldt_stake_api_canister",
+ "gldt_stake_common",
+ "http_request",
+ "ic-cdk 0.16.0",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
+ "ic-stable-structures",
+ "ic0 0.23.0",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "icrc_ledger_canister",
+ "icrc_ledger_canister_c2c_client",
+ "ledger_utils",
+ "origyn_nft_reference",
+ "origyn_nft_reference_c2c_client",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "sns_rewards_api_canister",
+ "sns_rewards_c2c_client",
+ "stable_memory",
+ "time",
+ "tracing",
+ "types",
+ "typetag",
+ "utils",
+]
+
+[[package]]
+name = "gldt_stake_api_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.10",
+ "candid_gen",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "gldt_stake_common",
+ "http_request",
+ "ic-cdk 0.16.0",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "icrc_ledger_canister_c2c_client",
+ "num-bigint",
+ "origyn_nft_reference",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "stable_memory",
+ "tracing",
+ "types",
+ "utils",
+]
+
+[[package]]
+name = "gldt_stake_common"
+version = "0.1.0"
+dependencies = [
+ "assert_matches",
+ "candid 0.10.10",
+ "candid_gen",
+ "canister_logger",
+ "canister_state_macros",
+ "canister_time",
+ "canister_tracing_macros",
+ "futures",
+ "http_request",
+ "ic-cdk 0.16.0",
+ "ic-cdk-macros 0.13.2",
+ "ic-cdk-timers",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "ic0 0.23.0",
+ "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "icrc_ledger_canister_c2c_client",
+ "num-bigint",
+ "num-traits",
+ "origyn_nft_reference",
+ "proptest",
+ "rust_decimal",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "serializer",
+ "sns_governance_canister",
+ "sns_governance_canister_c2c_client",
+ "stable_memory",
+ "time",
+ "tracing",
+ "types",
+ "typetag",
+ "utils",
+]
+
+[[package]]
 name = "gldt_swap"
 version = "0.1.0"
 dependencies = [
@@ -2013,6 +2127,8 @@ dependencies = [
  "buyback_burn_api",
  "candid 0.10.10",
  "canister_time",
+ "gldt_stake_api_canister",
+ "gldt_stake_common",
  "gldt_swap_api_archive",
  "gldt_swap_api_canister",
  "gldt_swap_common",
@@ -3124,6 +3240,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust_decimal_macros"
+version = "1.36.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da991f231869f34268415a49724c6578e740ad697ba0999199d6f22b3949332c"
+dependencies = [
+ "quote",
+ "rust_decimal",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3649,6 +3775,7 @@ dependencies = [
  "icrc-ledger-types 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "icrc_ledger_canister_c2c_client",
  "serde",
+ "serde_bytes",
  "serde_json",
  "serializer",
  "sns_governance_canister",
@@ -3673,6 +3800,14 @@ dependencies = [
  "serde",
  "sns_governance_canister",
  "types",
+]
+
+[[package]]
+name = "sns_rewards_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "canister_client",
+ "sns_rewards_api_canister",
 ]
 
 [[package]]
@@ -4364,10 +4499,12 @@ dependencies = [
  "assert_matches",
  "candid 0.10.10",
  "gldt_swap_common",
+ "hex",
  "ic-canister-log",
  "ic-canisters-http-types",
  "ic-cdk 0.16.0",
  "ic-metrics-encoder",
+ "ic-stable-structures",
  "ic-xrc-types",
  "ic0 0.23.0",
  "icrc-ledger-client-cdk",
@@ -4376,6 +4513,8 @@ dependencies = [
  "minicbor-derive",
  "proptest",
  "rust_decimal",
+ "rust_decimal_macros",
+ "scopeguard",
  "serde",
  "serde_json",
  "usdg_minter_api",

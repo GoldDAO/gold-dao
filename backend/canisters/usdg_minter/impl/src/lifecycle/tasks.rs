@@ -11,10 +11,12 @@ thread_local! {
     static LAST_GLOBAL_TIMER: Cell<u64> = Cell::default();
 }
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 pub enum TaskType {
     ProcessLogic,
     FetchGoldPrice,
+    ProcessPendingTransfer,
+    ChargeFees,
 }
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]

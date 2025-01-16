@@ -1,3 +1,7 @@
+use crate::ApiFeeBucket;
+use candid::CandidType;
+use candid::Principal;
+use icrc_ledger_types::icrc1::account::Account;
 use std::fmt;
 
 pub struct DisplayAmount(pub u64);
@@ -38,4 +42,102 @@ impl fmt::Display for DisplayAmount {
             write!(fmt, "{}.0", int)
         }
     }
+}
+
+#[derive(CandidType, Debug, PartialEq, Eq, Clone)]
+pub struct CandidEvent {
+    /// The canister time at which the minter generated this event.
+    pub timestamp: u64,
+    /// The event type.
+    pub payload: CandidEventType,
+}
+
+#[derive(CandidType, Clone, Debug, PartialEq, Eq)]
+pub enum CandidEventType {
+    Init {
+        usdg_ledger_id: Principal,
+        gldt_ledger_id: Principal,
+        gold_dao_governance_id: Principal,
+        xrc_id: Principal,
+    },
+
+    Upgrade {
+        new_medium_fee_percent: Option<u64>,
+    },
+
+    OpenVault {
+        owner: Account,
+        margin_amount: u64,
+        borrowed_amount: u64,
+        fee_bucket: ApiFeeBucket,
+        block_index: u64,
+    },
+
+    Borrow {
+        vault_id: u64,
+        borrowed_amount: u64,
+        block_index: u64,
+    },
+
+    AddMargin {
+        vault_id: u64,
+        margin_added: u64,
+        block_index: u64,
+    },
+
+    Repay {
+        vault_id: u64,
+        debt: u64,
+        block_index: u64,
+    },
+
+    Close {
+        vault_id: u64,
+        block_index: Option<u64>,
+    },
+    TransferExecuted {
+        transfer_id: u64,
+        block_index: u64,
+    },
+
+    DepositLiquidity {
+        caller: Account,
+        amount: u64,
+        block_index: u64,
+    },
+
+    WithdrawLiquidity {
+        caller: Account,
+        amount: u64,
+        block_index: u64,
+    },
+
+    ClaimReturns {
+        caller: Account,
+        amount: u64,
+        block_index: u64,
+    },
+
+    Redeem {
+        owner: Account,
+        current_rate: u64,
+        amount: u64,
+        block_index: u64,
+    },
+
+    ChargeFee,
+
+    Liquidate {
+        vault_id: u64,
+    },
+
+    Redistribute {
+        vault_id: u64,
+    },
+
+    UpdateVault {
+        vault_id: u64,
+        fee_bucket: Option<ApiFeeBucket>,
+        new_owner: Option<Account>,
+    },
 }

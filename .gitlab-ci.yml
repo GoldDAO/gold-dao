@@ -70,6 +70,9 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_stake
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
   # Canister builds
@@ -100,6 +103,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: usdg_minter
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_stake
   # Frontend builds
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
@@ -129,6 +135,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: sns_rewards
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_stake
   # - local: scripts/ci-cd/.canister_deploys.yml
   #   inputs:
   #     src-folder: super_stats_v3

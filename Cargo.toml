@@ -7,6 +7,9 @@ members = [
   "backend/canisters/gldt_swap/api",
   "backend/canisters/gldt_swap/archive",
   "backend/canisters/gldt_swap/api_archive",
+  "backend/canisters/gldt_stake/common",
+  "backend/canisters/gldt_stake/impl",
+  "backend/canisters/gldt_stake/api",
   "backend/canisters/management/impl",
   "backend/canisters/management/api",
   "backend/canisters/sns_rewards/impl",
@@ -70,6 +73,7 @@ proc-macro2 = "1.0.78"
 quote = "1.0.33"
 rmp-serde = "1.1.2"
 rust_decimal = "1.36.0"
+scopeguard = "1.2.0"
 serde = "1.0.196"
 serde_bytes = "0.11.12"
 serde_cbor = "0.11.2"
@@ -93,3 +97,4 @@ pocket-ic = "5.0.0"
 async-trait = "0.1.81"
 enum_dispatch = "0.3.13"
 typetag = "0.2.18"
+num-traits = "0.2.19"

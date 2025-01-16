@@ -26,6 +26,7 @@ lazy_static! {
     pub static ref SUPER_STATS: CanisterWasm = get_canister_wasm_from_bin("super_stats_v3");
     pub static ref TOKEN_METRICS: CanisterWasm = get_canister_wasm_from_bin("token_metrics");
     pub static ref USDG_MINTER: CanisterWasm = get_canister_wasm_from_bin("usdg_minter");
+    pub static ref GLDT_STAKE: CanisterWasm = get_canister_wasm_from_bin("gldt_stake");
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {

@@ -1,6 +1,10 @@
+use crate::guard::GuardPrincipal;
+use crate::lifecycle::timer::check_postcondition;
 use crate::logs::INFO;
 use crate::management::transfer;
 use crate::numeric::{DisplayAmount, USDG};
+use crate::state::audit::process_event;
+use crate::state::event::EventType;
 use crate::state::{mutate_state, read_state};
 use crate::updates::{reject_anonymous_caller, VaultError};
 use crate::vault::Vault;
@@ -11,8 +15,15 @@ use usdg_minter_api::updates::borrow_from_vault::BorrowArg;
 
 #[update]
 async fn borrow_from_vault(arg: BorrowArg) -> Result<u64, VaultError> {
+    check_postcondition(_borrow_from_vault(arg)).await
+}
+
+async fn _borrow_from_vault(arg: BorrowArg) -> Result<u64, VaultError> {
     // Check anonymous caller
-    reject_anonymous_caller()?;
+    reject_anonymous_caller().map_err(|_| VaultError::AnonymousCaller)?;
+
+    let caller = ic_cdk::caller();
+    let _guard_principal = GuardPrincipal::new(caller)?;
 
     // Check minimum margin amount
     if USDG::from_e8s(arg.borrowed_amount) < MINIMUM_BORROW_AMOUNT {
@@ -53,8 +64,14 @@ async fn borrow_from_vault(arg: BorrowArg) -> Result<u64, VaultError> {
                 vault.vault_id
             );
             mutate_state(|s| {
-                // TODO when recording the event we should keep track of the block index
-                s.record_borrow_from_vault(arg.vault_id, borrowed_amount)
+                process_event(
+                    s,
+                    EventType::Borrow {
+                        vault_id: arg.vault_id,
+                        borrowed_amount,
+                        block_index,
+                    },
+                );
             });
             Ok(block_index)
         }

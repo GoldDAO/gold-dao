@@ -21,6 +21,10 @@
     "ic": "oo6x4-xiaaa-aaaap-abrza-cai",
     "staging": "wusb2-uiaaa-aaaao-a2lca-cai"
   },
+  "gldt_stake": {
+    "ic": "sqpxs-piaaa-aaaaj-qneva-cai",
+    "staging": "whvny-7yaaa-aaaap-anupa-cai"
+  },
   "gldt_swap": {
     "ic": "6f6ua-hqaaa-aaaar-qairq-cai",
     "staging": "m45be-jaaaa-aaaak-qcgnq-cai"
@@ -77,7 +81,7 @@
     "staging": "j7n5o-wyaaa-aaaap-qhskq-cai"
   },
   "super_stats_v3_gldt": {
-    "ic": "hgbea-2aaaa-aaaal-qjo4q-cai",
+    "ic": "usw2n-uyaaa-aaaai-aqhzq-cai",
     "staging": "tgkyf-oaaaa-aaaap-qplbq-cai"
   },
   "token_metrics": {

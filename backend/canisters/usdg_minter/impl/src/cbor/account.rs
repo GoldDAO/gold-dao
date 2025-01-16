@@ -46,3 +46,24 @@ pub fn encode<Ctx, W: Write>(
 
     Ok(())
 }
+
+pub mod option {
+    use super::*;
+    use minicbor::{Decode, Encode};
+
+    #[derive(Decode, Encode)]
+    #[cbor(transparent)]
+    struct CborAccount(#[cbor(n(0), with = "crate::cbor::account")] pub Account);
+
+    pub fn decode<Ctx>(d: &mut Decoder<'_>, ctx: &mut Ctx) -> Result<Option<Account>, Error> {
+        Ok(Option::<CborAccount>::decode(d, ctx)?.map(|n| n.0))
+    }
+
+    pub fn encode<Ctx, W: Write>(
+        v: &Option<Account>,
+        e: &mut Encoder<W>,
+        ctx: &mut Ctx,
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        (*v).map(CborAccount).encode(e, ctx)
+    }
+}
