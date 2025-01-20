@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.2] - 2025-01-20
+
+#### Fix
+
+- Set correct canisterId for super stats canister (e.g. display correct data on GLDT Explorer top holders table).
+
 ### [1.1.1] - 2025-01-13
 
 #### Changed
