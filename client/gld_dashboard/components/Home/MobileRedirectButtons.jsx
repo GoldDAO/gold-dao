@@ -15,7 +15,7 @@ const MobileRedirectButtons = ({ className }) => (
       </Link>
       <Link href={'/transactions'}>
         <div className='w-full rounded-full h-16 bg-SoftGrey border-[0.5px] border-DarkGrey p-5'>
-          GLDGov transactions
+          GOLDAO transactions
         </div>
       </Link>
       <Link href={'/canisters'}>

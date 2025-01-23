@@ -347,7 +347,7 @@ const useNeurons = ({ neuronId, token, neuronsToClaim }) => {
         rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'ICP'));
       }
       if (neuronsToClaim[i].ledgerRewards > 0) {
-        rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'GLDGov'));
+        rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'GOLDAO'));
       }
       if (neuronsToClaim[i].ogyRewards > 0) {
         rewardsToClaim.push(claimOneReward(neuronsToClaim[i].id, 'OGY'));

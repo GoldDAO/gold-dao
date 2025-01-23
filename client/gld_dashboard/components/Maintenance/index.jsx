@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: 'Gold DAO - Dashboard',
   description:
-    'Access the Gold DAO Dashboard to manage your GLDGov tokens, view neuron ownership details, and claim your rewards. Enhance your DAO experience with comprehensive tools and real-time insights.',
+    'Access the Gold DAO Dashboard to manage your GOLDAO tokens, view neuron ownership details, and claim your rewards. Enhance your DAO experience with comprehensive tools and real-time insights.',
   keywords: ['RWA', 'DAO', 'WEB3', 'GOLD', 'BLOCKCHAIN'],
 };
 

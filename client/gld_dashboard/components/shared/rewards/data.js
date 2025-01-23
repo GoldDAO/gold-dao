@@ -15,7 +15,7 @@ const fakeData = [
   },
   {
     id: 3,
-    title: 'GLDGov',
+    title: 'GOLDAO',
     value: 1,
     svg: 'svg/g-logo.svg',
     status: false,

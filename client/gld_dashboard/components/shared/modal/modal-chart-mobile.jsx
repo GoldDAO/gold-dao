@@ -46,7 +46,7 @@ export default function ModalChartMobile({ name }) {
       </section>
       {/* <span className="text-base text-[#C6C6C6]">
         {
-          name === 'Treasury' && 'Total amount of GLDGov tokens minted.'
+          name === 'Treasury' && 'Total amount of GOLDAO tokens minted.'
         }
       </span> */}
     </div>

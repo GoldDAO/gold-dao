@@ -1,16 +1,16 @@
 {
-  "gldgov": {
-    "title": "GLDGov",
+  "goldao": {
+    "title": "GOLDAO",
     "subtitle": "Decentralised governance with industry-leading security and transparency",
     "tag": "Governance",
     "description1": "Gold DAO operates as a Decentralised Autonomous Organisation (DAO), powered by the ORIGYN Protocol and running on the Internet Computer (ICP). This cutting-edge infrastructure ensures fully decentralised governance, secure, transparent and tamper-proof transactions, with all operations conducted 100% on-chain.",
-    "description2": "At the core of Gold DAO’s governance structure is the GLDGov token, also known as the Gold Governance token. This token empowers users to actively participate in decision-making processes. Holders of the GLDGov token gain the ability to:",
+    "description2": "At the core of Gold DAO’s governance structure is the GOLDAO token, also known as the Gold Governance token. This token empowers users to actively participate in decision-making processes. Holders of the GOLDAO token gain the ability to:",
     "imageSrc": "/static/illustrations/Gold-gov-big.svg",
     "logoSrc": "/static/icons/Gold-Gov.svg",
     "points": [
       "Shape the future: Propose and vote on key decisions that guide the direction and strategy of Gold DAO.",
       "Oversee upgrades: Participate in the governance of any upgrades or improvements to the system’s infrastructure.",
-      "Earn rewards: Stakers of GLDGov tokens receive staking rewards and financially benefit from the project’s success, as a portion of the revenue flows back into the DAO."
+      "Earn rewards: Stakers of GOLDAO tokens receive staking rewards and financially benefit from the project’s success, as a portion of the revenue flows back into the DAO."
     ],
     "bottomDescription": "Experience industry-leading security and full transparency through Gold DAO’s decentralised governance, where your decisions help shape a secure, trusted system for all participants.",
     "learnMoreLink": "https://docs.gold-dao.org/",

@@ -54,8 +54,8 @@ const OverviewItem = ({
     },
     {
       label: 'Transaction Fee',
-      value: `${txFee} GLDGov`,
-      tooltip: 'The default GLDGov transaction fee.',
+      value: `${txFee} GOLDAO`,
+      tooltip: 'The default GOLDAO transaction fee.',
       style: 'top-10 left-10',
     },
     {
@@ -74,13 +74,13 @@ const OverviewItem = ({
 
     {
       label: 'Reject Cost',
-      value: `${rejectCost} GLDGov`,
-      tooltip: 'The number of GLDGov tokens charged to the proposer if a proposal is rejected.',
+      value: `${rejectCost} GOLDAO`,
+      tooltip: 'The number of GOLDAO tokens charged to the proposer if a proposal is rejected.',
     },
     {
       label: 'Min Neuron Stake',
-      value: `${minNeuStake} GLDGov`,
-      tooltip: 'The minimum number of GLDGov tokens that can be staked in a neuron.',
+      value: `${minNeuStake} GOLDAO`,
+      tooltip: 'The minimum number of GOLDAO tokens that can be staked in a neuron.',
     },
     {
       label: 'Min Dissolve Delay to Vote',
@@ -94,7 +94,7 @@ const OverviewItem = ({
           <br />
           <p>
             Dissolve delay is the minimum time period over which the neuron owner locks up their
-            staked GLDGov tokens.
+            staked GOLDAO tokens.
           </p>
         </div>
       ),
@@ -108,7 +108,7 @@ const OverviewItem = ({
           <br />
           <p>
             Dissolve delay is the minimum time period over which the neuron owner locks up their
-            staked GLDGov tokens.
+            staked GOLDAO tokens.
           </p>
         </div>
       ),
@@ -209,11 +209,11 @@ const OverviewItem = ({
         'ICP tokens which are at the disposition of the Gold DAO SNS DAO, raised by the Gold DAO decentralization swap.',
     },
     {
-      label: 'GLDGov Treasury',
-      value: `${parseNumbers(gldGovTreasury)} GLDGov`,
+      label: 'GOLDAO Treasury',
+      value: `${parseNumbers(gldGovTreasury)} GOLDAO`,
       style: '-top-20 -left-0',
       tooltip:
-        "GLDGov tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products.",
+        "GOLDAO tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products.",
     },
   ];
   return (
@@ -249,16 +249,16 @@ const OverviewItem = ({
               </div>
             </div>
             <h1 className="text-sm sm:text-xl ml-3 whitespace-nowrap">
-              {item.value.endsWith('GLDGov') || item.value.endsWith('ICP') ? (
+              {item.value.endsWith('GOLDAO') || item.value.endsWith('ICP') ? (
                 <div className="sm:text-[20px]">
                   {item.value.length === 6 ? (
                     <span className="font-bold">{item.value}</span>
                   ) : (
                     <>
                       <span className="font-bold">
-                        {item.value.replace('GLDGov', '').replace('ICP', '')}
+                        {item.value.replace('GOLDAO', '').replace('ICP', '')}
                       </span>
-                      {item.value.endsWith('GLDGov') ? 'GLDGov' : 'ICP'}
+                      {item.value.endsWith('GOLDAO') ? 'GOLDAO' : 'ICP'}
                     </>
                   )}
                 </div>

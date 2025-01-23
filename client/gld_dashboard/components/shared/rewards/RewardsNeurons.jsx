@@ -111,7 +111,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
       <section className="flex flex-col justify-start  my-0 sm:mx-2  mb-10 relative bg-SoftGrey mt-2 rounded-[2rem] border-[#C6C6C6] border">
         <div className="w-full p-6 flex justify-between items-center h-20 border-[#C6C6C6] border-b text-xs">
           <div className="flex gap-2 font-bold">
-            My GLDGov neurons
+            My GOLDAO neurons
             <div
               className={`hidden sm:flex rounded-full justify-center items-center cursor-pointer ${reloadPrincipal ? 'animate-spin' : ''}`}
               onClick={handleReloadClick}
@@ -166,7 +166,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                         ? parseNumbers(Number(item.cached_neuron_stake_e8s) / 10e7)
                         : 0}
                     </span>{' '}
-                    GLDGov
+                    GOLDAO
                   </p>
                   <button
                     onClick={() => {
@@ -196,7 +196,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                       setClaimState({
                         name: item.id,
                         amount: item.ledgerRewards,
-                        claim: 'GLDGov',
+                        claim: 'GOLDAO',
                         ...item,
                       });
                     }}
@@ -206,7 +206,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                     Claim {item.ledgerRewards / 1e8 || 0}
                     <Image
                       className="h-4 w-4"
-                      alt="gldgov governance token"
+                      alt="GOLDAO token"
                       src="svg/g-logo.svg"
                       width={13}
                       height={13}
@@ -280,12 +280,12 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                     >
                       <Tooltip
                         content="The minimum time period over which the neuron owner locks up their staked
-                        GLDGov tokens. This determines how long it will take to dissolve if the
+                        GOLDAO tokens. This determines how long it will take to dissolve if the
                         neuron is placed into the Dissolving state. Once a neuron has been placed
                         into the Dissolving state, its dissolve delay falls over the passage of
                         time, rather like a kitchen timer, until either it is stopped or it reaches
                         zero. When it reaches zero and enters the Dissolved state, its owner can
-                        perform a final disburse action to unlock the balance of GLDGov tokens. The
+                        perform a final disburse action to unlock the balance of GOLDAO tokens. The
                         dissolve delay can be configured up to a maximum of 2 years, and must be 91
                         days or greater for a neuron to be able to vote and earn voting rewards."
                         classNames={{

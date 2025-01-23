@@ -85,7 +85,7 @@ const OverviewTable = () => {
               <h4>Transaction Fee</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='The default GLDGov transaction fee.'
+                  content='The default GOLDAO transaction fee.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -131,7 +131,7 @@ const OverviewTable = () => {
               <h4>reject cost</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='The number of GLDGov tokens charged to the proposer if a proposal is rejected.'
+                  content='The number of GOLDAO tokens charged to the proposer if a proposal is rejected.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -148,7 +148,7 @@ const OverviewTable = () => {
               <h4>Min neuron stake</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='The minimum number of GLDGov tokens that can be staked in a neuron.'
+                  content='The minimum number of GOLDAO tokens that can be staked in a neuron.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -166,7 +166,7 @@ const OverviewTable = () => {
               <h4>min dissolve delay to vote</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='The minimum dissolve delay that a neuron must have to be eligible to vote on proposals. Dissolve delay is the minimum time period over which the neuron owner locks up their staked GLDGov tokens.'
+                  content='The minimum dissolve delay that a neuron must have to be eligible to vote on proposals. Dissolve delay is the minimum time period over which the neuron owner locks up their staked GOLDAO tokens.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -180,7 +180,7 @@ const OverviewTable = () => {
               <h4>max dissolve delay</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content='The maximum dissolve delay that a neuron can have. Dissolve delay is the minimum time period over which the neuron owner locks up their staked GLDGov tokens.'
+                  content='The maximum dissolve delay that a neuron can have. Dissolve delay is the minimum time period over which the neuron owner locks up their staked GOLDAO tokens.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -305,10 +305,10 @@ const OverviewTable = () => {
           </div>
           <div className='flex flex-col gap-y-4 py-6 px-5 border-[0.5px] border-t-0 sm:border-t-[0.5px] border-DarkGrey sm:rounded-br-4xl'>
             <div className='flex items-center gap-x-2'>
-              <h4>GLDGov Treasury</h4>
+              <h4>GOLDAO Treasury</h4>
               <div className='hidden sm:block'>
                 <Tooltip
-                  content="GLDGov tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products."
+                  content="GOLDAO tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products."
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -317,7 +317,7 @@ const OverviewTable = () => {
             </div>
             <h2 className='text-sm sm:text-xl font-bold'>
               {parseNumbers(overviewItems.data[0].gldGovTreasury)}
-              <span className='font-normal ml-2'>GLDGov</span>
+              <span className='font-normal ml-2'>GOLDAO</span>
             </h2>
           </div>
         </div>)}

@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <Head>
         <title>Gold DAO - Dashboard</title>
-        <meta name="description" content="Access the Gold DAO Dashboard to manage your GLDGov tokens, view neuron ownership details, and claim your rewards. Enhance your DAO experience with comprehensive tools and real-time insights." />
+        <meta name="description" content="Access the Gold DAO Dashboard to manage your GOLDAO tokens, view neuron ownership details, and claim your rewards. Enhance your DAO experience with comprehensive tools and real-time insights." />
         <meta name="keywords" content="RWA, DAO, WEB3, GOLD, BLOCKCHAIN" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#c6c6c6" />

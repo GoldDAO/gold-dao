@@ -19,7 +19,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
                 ? Number(item.staked_maturity_e8s_equivalent)
                 : 0}
             </span>{' '}
-            GLDGov
+            GOLDAO
           </p>
         </div>
         <div className="w-full flex flex-col justify-center gap-5">
@@ -57,7 +57,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
                 setClaimState({
                   name: item.id,
                   amount: item.ledgerRewards,
-                  claim: 'GLDGov',
+                  claim: 'GOLDAO',
                   ...item,
                 });
                 document.getElementById('my_modal_confirm').showModal();
@@ -69,7 +69,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               </span>
               <Image
                 className="h-4 w-4"
-                alt="gldgov governance token"
+                alt="GOLDAO token"
                 src="svg/g-logo.svg"
                 width={13}
                 height={13}
@@ -104,7 +104,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               State
               <Image
                 className="h-4 w-4"
-                alt="gldgov governance token"
+                alt="GOLDAO governance token"
                 src="svg/info.svg"
                 width={13}
                 height={13}
@@ -117,7 +117,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               Voting Power
               <Image
                 className="h-4 w-4"
-                alt="gldgov governance token"
+                alt="GOLDAO token"
                 src="svg/info.svg"
                 width={13}
                 height={13}
@@ -132,7 +132,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               Dissolve Delay
               <Image
                 className="h-4 w-4"
-                alt="gldgov governance token"
+                alt="GOLDAO token"
                 src="svg/info.svg"
                 width={13}
                 height={13}
@@ -145,7 +145,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
               Age
               <Image
                 className="h-4 w-4"
-                alt="gldgov governance token"
+                alt="GOLDAO token"
                 src="svg/info.svg"
                 width={13}
                 height={13}
