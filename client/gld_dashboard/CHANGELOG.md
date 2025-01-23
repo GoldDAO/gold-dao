@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.12] - 2025-01-23
+
+#### Changed
+
+- Rename GLDGov ticker to GOLDAO
+
 ### [1.0.11] - 2024-11-18
 
 #### Fixes
