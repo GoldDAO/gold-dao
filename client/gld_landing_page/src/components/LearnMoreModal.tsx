@@ -9,7 +9,7 @@ import { TFunction } from 'i18next'
 
 interface LearnMoreModalProps {
   onClose: () => void
-  cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg' | ''
+  cardKey: 'goldao' | 'gld_nft' | 'gldt' | 'usdg' | ''
   t: TFunction
 }
 

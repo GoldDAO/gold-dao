@@ -23,7 +23,7 @@ const GoldDAOChart = () => {
           className='mx-auto self-center pt-4 hidden md:block'
         />
         <Image
-          src='/static/illustrations/GoldDAO-chart-mobile.svg'
+          src='/static/illustrations/GoldDAO-Ecosystem-mobile.svg'
           alt={t('ecosystemAlt')}
           width={480}
           height={1200}

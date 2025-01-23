@@ -255,7 +255,7 @@ const CanistersTable = () => {
               Cycles Balance
               <div className="hidden sm:block">
                 <Tooltip
-                  content='The number of GLDGov tokens staked in the canister. The dissolve delay bonus and age bonus are applied to this value plus staked maturity in order to calculate the voting power of the canister.'
+                  content='The number of GOLDAO tokens staked in the canister. The dissolve delay bonus and age bonus are applied to this value plus staked maturity in order to calculate the voting power of the canister.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}
@@ -266,7 +266,7 @@ const CanistersTable = () => {
               Freezing Threshold Cycles
               <div className="hidden sm:block">
                 <Tooltip
-                  content='The minimum time period over which the canister owner locks up their staked GLDGov tokens. This determines how long it will take to dissolve if the canister is placed into the Dissolving state. Once a canister has been placed into the Dissolving state, its dissolve delay falls over the passage of time, rather like a kitchen timer, until either it is stopped or it reaches zero. When it reaches zero and enters the Dissolved state, its owner can perform a final disburse action to unlock the balance of GLDGov tokens. The dissolve delay can be configured up to a maximum of 2 years, and must be 91 days or greater for a canister to be able to vote and earn voting rewards.'
+                  content='The minimum time period over which the canister owner locks up their staked GOLDAO tokens. This determines how long it will take to dissolve if the canister is placed into the Dissolving state. Once a canister has been placed into the Dissolving state, its dissolve delay falls over the passage of time, rather like a kitchen timer, until either it is stopped or it reaches zero. When it reaches zero and enters the Dissolved state, its owner can perform a final disburse action to unlock the balance of GOLDAO tokens. The dissolve delay can be configured up to a maximum of 2 years, and must be 91 days or greater for a canister to be able to vote and earn voting rewards.'
                   classNames={tooltipClassName}
                 >
                   {InfoIcon}

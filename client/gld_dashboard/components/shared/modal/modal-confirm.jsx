@@ -8,7 +8,7 @@ import useBalances from '../../../hooks/useBalances';
 const amounts = {
   OGY: 'ogyRewards',
   ICP: 'icpRewards',
-  GLDGov: 'ledgerRewards',
+  GOLDAO: 'ledgerRewards',
 };
 
 export default function ModalConfirm({

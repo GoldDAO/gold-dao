@@ -28,7 +28,7 @@ const TransactionItem = ({
       </div>
       <div className="flex flex-row items-center  justify-start w-[90%]">
         <p className="flex justify-start gap-1 truncate">
-          <span className="font-bold text-[16px truncate]">{formattedAmount}</span> GLDGov
+          <span className="font-bold text-[16px truncate]">{formattedAmount}</span> GOLDAO
         </p>
       </div>
       <div className="w-full flex flex-row items-center  justify-start min-w-40">

@@ -7,7 +7,7 @@ const ModalNeurons = ({ neurons }) => {
   const headerItems = [
     { label: 'ID', iconSrc: '/svg/info.svg' },
     { label: 'State', iconSrc: '/svg/info.svg' },
-    { label: 'Staked GLDGov', iconSrc: '/svg/info.svg' },
+    { label: 'Staked GOLDAO', iconSrc: '/svg/info.svg' },
     { label: 'Maturity', iconSrc: '/svg/info.svg' },
     { label: 'Dissolve Delay', iconSrc: '/svg/info.svg' },
     { label: 'Age', iconSrc: '/svg/info.svg' },

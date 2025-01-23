@@ -31,10 +31,10 @@ const useServices = () => {
     try {
       const pools = await icpSwap.getPoolsForToken('tyyy3-4aaaa-aaaaq-aab7a-cai');
 
-      const pool = pools?.find((po) => po?.token0Symbol === 'GLDGov' && po?.token1Symbol === 'ICP');
+      const pool = pools?.find((po) => po?.token0Symbol === 'GOLDAO' && po?.token1Symbol === 'ICP');
       if (pool) return pool.token0Price;
       const pool2 = pools?.find(
-        (po) => po?.token1Symbol === 'GLDGov' && po?.token0Symbol === 'ICP',
+        (po) => po?.token1Symbol === 'GOLDAO' && po?.token0Symbol === 'ICP',
       );
       return pool2?.token1Price || 0.05;
     } catch (err) {
@@ -218,8 +218,8 @@ const useServices = () => {
       const parsed = [
         {
           status: 'SNS Launched',
-          tokenName: 'Gold Governance Token',
-          tokenSymbol: 'GLDGov',
+          tokenName: 'GOLDAO',
+          tokenSymbol: 'GOLDAO',
           txFee: 0.001,
           initialVotingPeriod: Number(sp?.initial_voting_period_seconds?.[0]) / (60 * 60 * 24),
           maxVotingPeriod:

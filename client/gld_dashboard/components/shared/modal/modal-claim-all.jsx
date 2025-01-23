@@ -41,7 +41,7 @@ export default function ModalClaimAll({
           You are about to claim{' '}
           <span className="font-bold">{neuronAmountsToClaim.icpAmount / 1e8 || 0} ICP,&nbsp;</span>
           <span className="font-bold">
-            {neuronAmountsToClaim.ledgerAmount / 1e8 || 0} GLDGov, and
+            {neuronAmountsToClaim.ledgerAmount / 1e8 || 0} GOLDAO, and
           </span>
           <span className="font-bold"> {neuronAmountsToClaim.ogyAmount / 1e8 || 0} OGY.</span>
         </p>

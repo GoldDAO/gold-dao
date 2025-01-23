@@ -100,14 +100,14 @@ const CardGrid: React.FC = () => {
   const cards = [
     {
       logoSrc: '/static/icons/Gold-Gov.svg',
-      title: t('tokens.gldgov.title'),
-      description: t('tokens.gldgov.description'),
-      learnMoreButton: t('tokens.gldgov.learnMoreButton'),
+      title: t('tokens.goldao.title'),
+      description: t('tokens.goldao.description'),
+      learnMoreButton: t('tokens.goldao.learnMoreButton'),
       learnMoreLink: 'https://docs.gold-dao.org/',
       buyLink:
         'https://info.icpswap.com/swap/token/details/tyyy3-4aaaa-aaaaq-aab7a-cai',
       imageSrc: '/static/illustrations/Gold-gov.png',
-      button: t('tokens.gldgov.button')
+      button: t('tokens.goldao.button')
     },
     {
       logoSrc: '/static/icons/Gold-NFT.svg',

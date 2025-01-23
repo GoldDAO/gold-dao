@@ -1,12 +1,12 @@
 {
   "cards": [
     {
-      "title": "GLDGov",
+      "title": "GOLDAO",
       "subtitle": "Decentralised governance with industry-leading security and transparency.",
       "tag": "Governance",
       "description": "Gold DAO operates as a Decentralised Autonomous Organisation (DAO), powered by the ORIGYN Protocol and running on the Internet Computer (ICP). This cutting-edge infrastructure ensures fully decentralised governance, secure, transparent and tamper-proof transactions, with all operations conducted 100% on-chain.",
       "imageSrc": "/static/illustrations/Gold-gov-big.png",
-      "cardKey": "gldgov"
+      "cardKey": "goldao"
     },
     {
       "title": "GLD NFT",

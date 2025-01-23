@@ -13,35 +13,35 @@ const TransactionsHeader = () => {
     {
       label: 'Index',
       infoSrc: '/svg/info.svg',
-      tooltip: 'The index of the transaction in the GLDGov ledger.',
+      tooltip: 'The index of the transaction in the GOLDAO ledger.',
     },
     {
       label: 'Amount',
       infoSrc: '/svg/info.svg',
       tooltip:
-        "The amount of GLDGov tokens transferred, or for 'approve' transactions, the designated amount of GLDGov tokens that the 'Spender Account' is authorized to transfer on behalf of the 'From' account.",
+        "The amount of GOLDAO tokens transferred, or for 'approve' transactions, the designated amount of GOLDAO tokens that the 'Spender Account' is authorized to transfer on behalf of the 'From' account.",
     },
     {
       label: 'Type',
       infoSrc: '/svg/info.svg',
-      tooltip: 'The type of GLDGov transaction (i.e., mint, burn, approve, or transfer).',
+      tooltip: 'The type of GOLDAO transaction (i.e., mint, burn, approve, or transfer).',
     },
     {
       label: 'Timestamp',
       infoSrc: '/svg/info.svg',
-      tooltip: 'The date the GLDGov ledger constructed the block containing the transaction.',
+      tooltip: 'The date the GOLDAO ledger constructed the block containing the transaction.',
     },
     {
       label: 'From',
       infoSrc: '/svg/info.svg',
       tooltip:
-        "The account that GLDGov tokens were transferred from, or for 'approve' transactions, the account whose owner has authorized the 'spender' account to transfer a designated amount of GLDGov tokens from the account on their behalf.",
+        "The account that GOLDAO tokens were transferred from, or for 'approve' transactions, the account whose owner has authorized the 'spender' account to transfer a designated amount of GOLDAO tokens from the account on their behalf.",
     },
     {
       label: 'To',
       infoSrc: '/svg/info.svg',
       tooltip:
-        "The account that GLDGov tokens were transferred to. Not applicable for 'approve' transactions.",
+        "The account that GOLDAO tokens were transferred to. Not applicable for 'approve' transactions.",
     },
   ];
 

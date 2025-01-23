@@ -13,13 +13,13 @@ import useSession from '../../../hooks/useSession';
 import useTransfer from '../../../hooks/useTransfer';
 
 const tokens = {
-  GLDGov: 'ledger',
+  GOLDAO: 'ledger',
   ICP: 'icp',
   OGY: 'ogy',
 };
 
 const fees = {
-  GLDGov: 0.001,
+  GOLDAO: 0.001,
   ICP: 0.0001,
   OGY: 0.002,
 };
@@ -124,7 +124,7 @@ export default function ModalTransfer({
     await icrc1Transfer();
     const newAmount = await getBalance(tokens[title] || 'icp');
 
-    if (title === 'GLDGov') setGold({ loading: false, amount: newAmount });
+    if (title === 'GOLDAO') setGold({ loading: false, amount: newAmount });
     else if (title === 'OGY') setOgy({ loading: false, amount: newAmount });
     else setIcp({ loading: false, amount: newAmount });
     setInputValue('');
@@ -157,12 +157,12 @@ export default function ModalTransfer({
   // const handleReloadClick = async () => {
   //   setReloadPrincipal(true);
 
-  //   const newAmount = await getBalance(title === 'GLDGov' ? 'ledger' : 'icp');
-  //   if (title === 'GLDGov') setGold({ loading: false, amount: newAmount });
+  //   const newAmount = await getBalance(title === 'GOLDAO' ? 'ledger' : 'icp');
+  //   if (title === 'GOLDAO') setGold({ loading: false, amount: newAmount });
   //   else setIcp({ loading: false, amount: newAmount });
   //   setAmount(newAmount / 1e8 / 1e8);
 
-  //   // setParsedAmount(Number(await getBalance(title === "GLDGov" ? "ledger" : "icp")) / 10e7);
+  //   // setParsedAmount(Number(await getBalance(title === "GOLDAO" ? "ledger" : "icp")) / 10e7);
   //   setReloadPrincipal(false);
   // };
 

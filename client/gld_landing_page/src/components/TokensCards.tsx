@@ -15,17 +15,17 @@ interface Card {
   imageSrc?: string
   videoSrc?: string
   points: string[]
-  cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg'
+  cardKey: 'goldao' | 'gld_nft' | 'gldt' | 'usdg'
 }
 
 const TokensCards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCardKey, setSelectedCardKey] = useState<
-    'gldgov' | 'gld_nft' | 'gldt' | 'usdg'
-  >('gldgov')
+    'goldao' | 'gld_nft' | 'gldt' | 'usdg'
+  >('goldao')
 
   const openModal = useCallback(
-    (cardKey: 'gldgov' | 'gld_nft' | 'gldt' | 'usdg') => {
+    (cardKey: 'goldao' | 'gld_nft' | 'gldt' | 'usdg') => {
       setSelectedCardKey(cardKey)
       setIsModalOpen(true)
     },

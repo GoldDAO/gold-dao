@@ -12,10 +12,10 @@ const NeuronsHeader = () => {
     { label: 'ID', iconSrc: '/svg/info.svg', tooltip: 'The unique identifier of the neuron.' },
     { label: 'State', iconSrc: '/svg/info.svg', tooltip: 'The state of the neuron.' },
     {
-      label: 'Staked GLDGov',
+      label: 'Staked GOLDAO',
       iconSrc: '/svg/info.svg',
       tooltip:
-        'The number of GLDGov tokens staked in the neuron. The dissolve delay bonus and age bonus are applied to this value plus staked maturity in order to calculate the voting power of the neuron.',
+        'The number of GOLDAO tokens staked in the neuron. The dissolve delay bonus and age bonus are applied to this value plus staked maturity in order to calculate the voting power of the neuron.',
     },
     {
       label: 'Maturity',
@@ -26,7 +26,7 @@ const NeuronsHeader = () => {
       label: 'Dissolve Delay',
       iconSrc: '/svg/info.svg',
       tooltip:
-        'The minimum time period over which the neuron owner locks up their staked GLDGov tokens. This determines how long it will take to dissolve if the neuron is placed into the Dissolving state. Once a neuron has been placed into the Dissolving state, its dissolve delay falls over the passage of time, rather like a kitchen timer, until either it is stopped or it reaches zero. When it reaches zero and enters the Dissolved state, its owner can perform a final disburse action to unlock the balance of GLDGov tokens. The dissolve delay can be configured up to a maximum of 2 years, and must be 91 days or greater for a neuron to be able to vote and earn voting rewards.',
+        'The minimum time period over which the neuron owner locks up their staked GOLDAO tokens. This determines how long it will take to dissolve if the neuron is placed into the Dissolving state. Once a neuron has been placed into the Dissolving state, its dissolve delay falls over the passage of time, rather like a kitchen timer, until either it is stopped or it reaches zero. When it reaches zero and enters the Dissolved state, its owner can perform a final disburse action to unlock the balance of GOLDAO tokens. The dissolve delay can be configured up to a maximum of 2 years, and must be 91 days or greater for a neuron to be able to vote and earn voting rewards.',
     },
     {
       label: 'Age',
