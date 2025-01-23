@@ -104,7 +104,7 @@ const CollapseContainer = ({ className }) => {
         </div>
       </Collapse>
       <Collapse
-        title="GLDGov Transactions"
+        title="GOLDAO Transactions"
         setInfoModal={setInfoModal}
         item={transactions}
         name={'transactions'}

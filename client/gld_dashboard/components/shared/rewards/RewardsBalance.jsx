@@ -53,7 +53,7 @@ export default function RewardsBalance({
         <LoaderDataCard className="basis-1/3" />
       ) : (
         <RewardsCards
-          title="GLDGov"
+          title="GOLDAO"
           value={gold.amount}
           svg="svg/g-logo.svg"
           status={true}

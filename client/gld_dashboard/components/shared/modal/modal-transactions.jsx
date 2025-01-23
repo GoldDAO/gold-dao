@@ -42,7 +42,7 @@ const ModalTransactions = ({ transactions }) => {
               </div>
               <div className="w-full flex flex-row items-center  justify-center min-w-fit">
                 <p className="flex flex-wrap justify-center gap-1 min-w-fit text-[8px]">
-                  <span className="font-bold">{amount}</span> GLDGov
+                  <span className="font-bold">{amount}</span> GOLDAO
                 </p>
               </div>
               <div className="flex flex-row items-center  justify-center min-w-fit">

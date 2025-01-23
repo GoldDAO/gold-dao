@@ -18,7 +18,7 @@ export default function Footer() {
 
       title: 'Token',
       content: [
-        // { text: "GLDGov", link: "https://www.gold-dao.org/" },
+        // { text: "GOLDAO", link: "https://www.gold-dao.org/" },
         { text: 'GLD NFT', link: 'https://6mrot-oaaaa-aaaal-qdfna-cai.icp0.io/gold' },
         { text: 'GLDT', link: 'https://gldt.org/' },
         // { text: "GLDT Swap", link: "#" },

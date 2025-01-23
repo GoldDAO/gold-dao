@@ -20,11 +20,11 @@ const Chart = ({
   ];
 
   const toolTips = {
-    Treasury: "GLDGov tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products.",
-    Staked: 'GLDGov tokens which are staked in the SNS as Gold DAO neurons.',
-    Liquid: 'GLDGov tokens that are publicly available and not locked in the treasury',
-    Burned: 'GLDGov tokens that have been burned and are permanently taken out of existence.',
-    Holders: 'The number of unique accounts that hold GLDGov tokens.',
+    Treasury: "GOLDAO tokens which are locked in the Gold DAO treasury. These are locked and dedicated for growth of the DAO's products.",
+    Staked: 'GOLDAO tokens which are staked in the SNS as Gold DAO neurons.',
+    Liquid: 'GOLDAO tokens that are publicly available and not locked in the treasury',
+    Burned: 'GOLDAO tokens that have been burned and are permanently taken out of existence.',
+    Holders: 'The number of unique accounts that hold GOLDAO tokens.',
   };
 
   return (

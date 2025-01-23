@@ -46,9 +46,9 @@ export default function GLDGovInfo() {
         {allDataLoaded ? (
           <>
             <DataCardCopy
-              title="Total GLDGov Supply"
+              title="Total GOLDAO Supply"
               image="svg/g-logo.svg"
-              info="Total amount of GLDGov tokens in existence."
+              info="Total amount of GOLDAO tokens in existence."
               amount={totalSupply.amount}
               className="basis-1/3"
               setInfoModal={setInfoModal}
@@ -56,9 +56,9 @@ export default function GLDGovInfo() {
               openModal={false}
             />
             <DataCardCopy
-              title="GLDGov Price"
+              title="GOLDAO Price"
               isPrice={true}
-              info="Average price of GLDGov on the market."
+              info="Average price of GOLDAO on the market."
               amount={price.amount}
               className="basis-1/3"
               setInfoModal={setInfoModal}
@@ -66,9 +66,9 @@ export default function GLDGovInfo() {
               openModal={false}
             />
             <DataCardCopy
-              title="GLDGov Marketcap"
+              title="GOLDAO Marketcap"
               isPrice={true}
-              info="Total amount of GLDGov multiplied by the average price."
+              info="Total amount of GOLDAO multiplied by the average price."
               amount={marketcap.amount}
               className="basis-1/3"
               setInfoModal={setInfoModal}

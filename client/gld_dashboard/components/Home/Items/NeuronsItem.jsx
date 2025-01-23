@@ -52,7 +52,7 @@ const NeuronsItem = ({ neuron }) => {
               <span className="font-bold whitespace-nowrap truncate">
                 {parseNumbers(neuron.stakedAmount, 10)}
               </span>{' '}
-              GLDGov
+              GOLDAO
             </p>
           </div>
           <div className=" flex justify-start">

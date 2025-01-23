@@ -48,9 +48,9 @@ export default function Modal({
           {title?.substring(0, 5) === 'chart' ? (
             <h1 className="flex flex-row absolute mb-5 text-3xl font-bold text-black">
               {title?.substring(5) === 'Treasury'
-                || title?.substring(5) === ' Total GLDGov Supply'
-                || title?.substring(5) === ' GLDGov Price'
-                || title?.substring(5) === ' GLDGov Marketcap'
+                || title?.substring(5) === ' Total GOLDAO Supply'
+                || title?.substring(5) === ' GOLDAO Price'
+                || title?.substring(5) === ' GOLDAO Marketcap'
                 ? parseNumbers(amount)
                 : parseNumbers(amount)}
               <Image width={25} height={25} src="svg/g-logo.svg" className="ml-2" alt="gold dao" />
@@ -61,10 +61,10 @@ export default function Modal({
 
           {children}
           <h3 className="text-base font-normal leading-5 text-DarkGrey mt-4">
-            {title?.toLowerCase().includes('supply') && 'Total amount of GLDGov tokens minted.'}
-            {title?.toLowerCase().includes('price') && 'Average price of GLDGov on the market.'}
+            {title?.toLowerCase().includes('supply') && 'Total amount of GOLDAO tokens minted.'}
+            {title?.toLowerCase().includes('price') && 'Average price of GOLDAO on the market.'}
             {title?.toLowerCase().includes('marketcap')
-              && 'Total amount of GLDGov multiplied by the average price.'}
+              && 'Total amount of GOLDAO multiplied by the average price.'}
           </h3>
         </div>
       </dialog>

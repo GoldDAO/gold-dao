@@ -241,7 +241,7 @@ const TransactionsTable = () => {
             <h2 className="flex items-center justify-start gap-x-2 h-12 sm:w-1/12 ">
               Index
               <Tooltip
-                content="The index of the transaction in the GLDGov ledger."
+                content="The index of the transaction in the GOLDAO ledger."
                 classNames={tooltipClassName}
               >
                 {InfoIcon}
@@ -250,7 +250,7 @@ const TransactionsTable = () => {
             <h2 className="flex items-center justify-start gap-x-2 h-12 sm:w-1/12 ">
               Amount
               <Tooltip
-                content="The amount of GLDGov tokens transferred, or for 'approve' transactions, the designated amount of GLDGov tokens that the 'Spender Account' is authorized to transfer on behalf of the 'From' account."
+                content="The amount of GOLDAO tokens transferred, or for 'approve' transactions, the designated amount of GOLDAO tokens that the 'Spender Account' is authorized to transfer on behalf of the 'From' account."
                 classNames={tooltipClassName}
               >
                 {InfoIcon}
@@ -259,7 +259,7 @@ const TransactionsTable = () => {
             <h2 className="flex items-center justify-start gap-x-2 h-12 pl-3 sm:pl-0 sm:w-1/12 ">
               Type
               <Tooltip
-                content="The type of GLDGov transaction (i.e., mint, burn, approve, or transfer)."
+                content="The type of GOLDAO transaction (i.e., mint, burn, approve, or transfer)."
                 classNames={tooltipClassName}
               >
                 {InfoIcon}
@@ -267,14 +267,14 @@ const TransactionsTable = () => {
             </h2>
             <h2 className="flex items-center justify-start gap-x-2 h-12 -ml-4 sm:-ml-0 sm:w-1/6 ">
               Timestamp
-              <Tooltip content="The date the GLDGov ledger constructed the block containing the transaction." classNames={tooltipClassName}>
+              <Tooltip content="The date the GOLDAO ledger constructed the block containing the transaction." classNames={tooltipClassName}>
                 {InfoIcon}
               </Tooltip>
             </h2>
             <h2 className="flex items-center justify-start -ml-7 sm:-ml-0 gap-x-2 h-12 w-1/6">
               From
               <Tooltip
-                content="The account that GLDGov tokens were transferred from, or for 'approve' transactions, the account whose owner has authorized the 'spender' account to transfer a designated amount of GLDGov tokens from the account on their behalf."
+                content="The account that GOLDAO tokens were transferred from, or for 'approve' transactions, the account whose owner has authorized the 'spender' account to transfer a designated amount of GOLDAO tokens from the account on their behalf."
                 classNames={tooltipClassName}
               >
                 {InfoIcon}
@@ -283,7 +283,7 @@ const TransactionsTable = () => {
             <h2 className="flex items-center justify-start -ml-1 sm:-ml-0 gap-x-2 h-12 w-1/6">
               To
               <Tooltip
-                content="The account that GLDGov tokens were transferred to. Not applicable for 'approve' transactions."
+                content="The account that GOLDAO tokens were transferred to. Not applicable for 'approve' transactions."
                 classNames={tooltipClassName}
               >
                 {InfoIcon}
@@ -306,7 +306,7 @@ const TransactionsTable = () => {
             <TableCell className='' aria-label={tx.index}>
               <div className='flex justify-between gap-16 mx-6 items-center text-start text-base font-normal'>
                 <h2 className='w-1/12'>{tx.index}</h2>
-                <h2 className='sm:w-1/12'>{(tx.amount / 1e8) % 1 !== 0 ? (tx.amount / 1e8).toFixed(2) : tx.amount / 1e8} GLDGov</h2>
+                <h2 className='sm:w-1/12'>{(tx.amount / 1e8) % 1 !== 0 ? (tx.amount / 1e8).toFixed(2) : tx.amount / 1e8} GOLDAO</h2>
                 <h2 className=' py-2 px-4 text-white text-center font-bold rounded-full bg-[#C6C6C6] flex justify-center items-center gap-2'>{tx.kind.charAt(0).toUpperCase() + tx.kind.slice(1)} {TransferIcon}</h2>
 
                 <h2 className='w-1/6'>{formatDateFromSeconds((tx.timestamp / 1000000000))},{' '}
