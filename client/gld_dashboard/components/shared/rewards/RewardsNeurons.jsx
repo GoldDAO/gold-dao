@@ -196,7 +196,7 @@ export default function RewardsNeurons({ setIcp, setGold, setOgy }) {
                       setClaimState({
                         name: item.id,
                         amount: item.ledgerRewards,
-                        claim: 'GOLDAO',
+                        claim: 'GLDGov',
                         ...item,
                       });
                     }}

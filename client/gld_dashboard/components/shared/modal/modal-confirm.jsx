@@ -8,7 +8,7 @@ import useBalances from '../../../hooks/useBalances';
 const amounts = {
   OGY: 'ogyRewards',
   ICP: 'icpRewards',
-  GOLDAO: 'ledgerRewards',
+  GLDGov: 'ledgerRewards',
 };
 
 export default function ModalConfirm({
@@ -46,7 +46,7 @@ export default function ModalConfirm({
         <p className="text-center font-medium text-lg">
           You are about to claim{' '}
           <span className="font-bold">
-            {amount / 1e8} {claim}.
+            {amount / 1e8} {claim === 'GLDGov' ? 'GOLDAO' : claim}.
           </span>
         </p>
         <p className="text-center font-medium text-lg flex flex-col">
