@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.13] - 2025-01-24
+
+#### Fix
+
+- Typogaphy error on the claim reward preventing it from working properly
+- GOLDAO price
+
 ### [1.0.12] - 2025-01-23
 
 #### Changed
