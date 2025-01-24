@@ -57,7 +57,7 @@ export default function ModalClaimMobile({ item, setClaimState }) {
                 setClaimState({
                   name: item.id,
                   amount: item.ledgerRewards,
-                  claim: 'GOLDAO',
+                  claim: 'GLDGov',
                   ...item,
                 });
                 document.getElementById('my_modal_confirm').showModal();
