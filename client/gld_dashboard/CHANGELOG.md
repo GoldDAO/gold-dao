@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.14] - 2025-01-25
+
+#### Fix
+
+- GOLDAO price
+
 ### [1.0.13] - 2025-01-24
 
 #### Fix
