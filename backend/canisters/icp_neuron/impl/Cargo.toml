@@ -1,6 +1,7 @@
 [package]
 name = "icp_neuron"
 version = "0.1.0"
+description = "ICP neuron controller backend - implementation"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -26,6 +27,8 @@ ic-cdk-macros = { workspace = true }
 ic-cdk-timers = { workspace = true }
 ic-stable-structures = { workspace = true }
 ic-transport-types = { workspace = true }
+icp_neuron_api_canister = { path = "../api" }
+icp_neuron_common = { path = "../common" }
 icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
 icrc-ledger-types = { workspace = true }
 k256 = { workspace = true }
@@ -35,7 +38,6 @@ nns_governance_canister_c2c_client = { path = "../../../external_canisters/nns_g
 serde = { workspace = true }
 serde_cbor = { workspace = true }
 serde_json = { workspace = true }
-serde_with = { workspace = true }
 serde_bytes = { workspace = true }
 serializer = { path = "../../../libraries/serializer" }
 sha256 = { path = "../../../libraries/sha256" }

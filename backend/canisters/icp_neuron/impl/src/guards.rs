@@ -8,7 +8,7 @@ pub fn caller_is_governance_principal() -> Result<(), String> {
     }
 }
 
-pub fn is_test_mode() -> Result<(), String> {
+pub fn _is_test_mode() -> Result<(), String> {
     if read_state(|s| s.env.is_test_mode()) {
         Ok(())
     } else {

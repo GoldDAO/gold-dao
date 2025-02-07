@@ -33,6 +33,11 @@ pub struct Neuron {
     pub joined_community_fund_timestamp_seconds: Option<u64>,
     pub known_neuron_data: Option<KnownNeuronData>,
     pub dissolve_state: Option<neuron::DissolveState>,
+    pub voting_power_refreshed_timestamp_seconds: Option<u64>,
+    pub potential_voting_power: Option<u64>,
+    pub neuron_type: Option<i32>,
+    pub deciding_voting_power: Option<u64>,
+    pub visibility: Option<i32>,
 }
 
 impl Neuron {
@@ -231,6 +236,9 @@ pub mod manage_neuron {
     }
 
     #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+    pub struct RefreshVotingPower {}
+
+    #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
     pub enum Command {
         Configure(Configure),
         Disburse(Disburse),
@@ -243,6 +251,7 @@ pub mod manage_neuron {
         MergeMaturity(MergeMaturity),
         Merge(Merge),
         StakeMaturity(StakeMaturity),
+        RefreshVotingPower(RefreshVotingPower),
     }
 }
 

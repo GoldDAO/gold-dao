@@ -6,9 +6,9 @@ CANISTER_IDS="sns_canister_ids.json"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
-CID="rbv23-fqaaa-aaaam-qbfma-cai"
-METHOD_NAME="set_reward_token_types"
-VALIDATE_METHOD_NAME="set_reward_token_types_validate"
+CID="j2neh-vqaaa-aaaal-aduxq-cai"
+METHOD_NAME="manage_nns_neuron"
+VALIDATE_METHOD_NAME="manage_nns_neuron_validate"
 
 ./scripts/_local/sns_testing/prepare_scripts.sh staging
 
@@ -19,14 +19,13 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
     record {
         title=\"Register new method with SNS.\";
         url=\"https://example.com/\";
-        summary=\"Register the method \`set_reward_token_types\` of the sns_rewards canister to the SNS.
-This method allows to define the tokens in which rewards are paid to stakers.
+        summary=\"Register the method ${METHOD_NAME} of the canister ${CID}.
 \";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_006 : nat64);
-                name = \"Set reward token types.\";
-                description = opt \"Proposal to define the tokens in which rewards are paid to GLD neurons.\";
+                id = (1_001 : nat64);
+                name = \"Manage NNS neuron.\";
+                description = opt \"Manage NNS neuron\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
                         validator_canister_id = opt principal \"$CID\";

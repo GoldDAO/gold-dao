@@ -1,21 +1,11 @@
 use crate::lifecycle::init_canister;
-use crate::lifecycle::Args;
 use crate::state::{Data, RuntimeState};
-use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
-use serde::{Deserialize, Serialize};
+pub use icp_neuron_api_canister::Args;
 use tracing::info;
-use types::BuildVersion;
 use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
 use utils::env::{CanisterEnv, Environment};
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct InitArgs {
-    test_mode: bool,
-    version: BuildVersion,
-    commit_hash: String,
-}
 
 #[init]
 #[trace]
