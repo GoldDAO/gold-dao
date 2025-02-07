@@ -1,0 +1,17 @@
+[package]
+name = "icp_neuron_api_canister"
+version = "0.1.0"
+description = "ICP neuron controller backend - API"
+edition = "2021"
+
+[features]
+default = [] # Empty default features
+inttest = []
+
+[dependencies]
+candid = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_bytes = { workspace = true }
+types = { path = '../../../libraries/types' }
+icp_neuron_common = { path = "../common" }
+nns_governance_canister = { path = "../../../external_canisters/nns_governance/api" }

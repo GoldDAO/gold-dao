@@ -4,7 +4,7 @@
   tags:
     - docker
     # - big
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters/rust-dfinity-build-ci:latest@sha256:6b841e86ec586bc2e64bee556ae480a567ab6fbf3e87890db28ca0fbfccb834b
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters/rust-dfinity-build-ci:latest@sha256:7a8c861d0bf4d3d31a4a423ee328f7b62b0a4faaa77ecf87d372a09178d1b33f
   before_script:
     - cargo --version
     - rustc --version

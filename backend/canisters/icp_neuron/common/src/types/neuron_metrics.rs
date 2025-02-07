@@ -13,6 +13,7 @@ pub struct NeuronWithMetric {
     pub maturity: u64,
     pub dissolve_delay: u64,
     pub dissolving: bool,
+    pub voting_power_refreshed_timestamp_seconds: Option<u64>,
 }
 
 impl From<Neuron> for NeuronWithMetric {
@@ -54,6 +55,8 @@ impl From<Neuron> for NeuronWithMetric {
             maturity: neuron.maturity_e8s_equivalent,
             dissolve_delay,
             dissolving,
+            voting_power_refreshed_timestamp_seconds: neuron
+                .voting_power_refreshed_timestamp_seconds,
         }
     }
 }
@@ -103,6 +106,11 @@ mod tests {
             joined_community_fund_timestamp_seconds: None,
             known_neuron_data: None,
             dissolve_state: None,
+            deciding_voting_power: Some(0),
+            neuron_type: Some(0),
+            potential_voting_power: Some(0),
+            visibility: Some(0),
+            voting_power_refreshed_timestamp_seconds: Some(1234),
         };
 
         let result = NeuronWithMetric::from(neuron);
@@ -124,6 +132,7 @@ mod tests {
             maturity: 0,
             dissolve_delay: 0,
             dissolving: false,
+            voting_power_refreshed_timestamp_seconds: Some(1234),
         };
 
         assert_eq!(result, expeted_result)
