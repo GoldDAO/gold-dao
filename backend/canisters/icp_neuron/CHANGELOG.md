@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.1] - 2025-02-07
+
+- **Refresh neurons**: With DFINITY introducing the 6 month refresh neuron restriction, the followees of the NNS neurons of the Gold DAO need to also be refreshed every six months. The API had to be updated to enable proposals to call the RefreshVotingPower command on the canister.
+
 ### [1.1.0] - 2024-11-12
 
 - **Cycle Management**: This feature transfers from the DAO ICP neurons to a cycle management platform which in turn
