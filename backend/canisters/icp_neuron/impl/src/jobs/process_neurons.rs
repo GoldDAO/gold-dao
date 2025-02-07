@@ -1,20 +1,18 @@
-use crate::state::{mutate_state, read_state, Neurons};
-use crate::types::outstanding_payments::{PaymentStatus, PaymentsList};
+use crate::state::{mutate_state, read_state};
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
-use candid::{Nat, Principal};
+use candid::Nat;
 use canister_time::{run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS};
-use ic_ledger_types::{transfer, Memo, Tokens};
 use icp_ledger_canister::account_balance::Args as AccountBalanceArgs;
 
-use icp_ledger_canister::transfer::Args as TransferArgs;
 use icp_ledger_canister_c2c_client::account_balance;
+use icp_neuron_common::neurons::Neurons;
+use icp_neuron_common::outstanding_payments::{PaymentStatus, PaymentsList};
 use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{
     manage_neuron::{disburse::Amount, Command, Disburse, Spawn},
     Neuron,
 };
 use nns_governance_canister::types::{AccountIdentifier as NNSAccountIdendifier, ListNeurons};
-use std::hash::Hash;
 use std::time::Duration;
 use tracing::{error, info, warn};
 use types::Milliseconds;
@@ -180,7 +178,7 @@ async fn disburse_neurons(mut neurons: Vec<Neuron>) {
             };
             // write to state to make sure its stored
             mutate_state(|s| {
-                (if let Err(previous_list) = s
+                if let Err(previous_list) = s
                     .data
                     .outstanding_payments
                     .insert(neuron_id, payments_list.clone())
@@ -192,7 +190,7 @@ async fn disburse_neurons(mut neurons: Vec<Neuron>) {
                         "Previous payment found for {neuron_id} although it was previously checked. Continuing but this should not happen."
                     );
                     payments_list = previous_list;
-                })
+                }
             });
         }
 

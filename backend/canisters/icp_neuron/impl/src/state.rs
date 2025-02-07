@@ -4,9 +4,12 @@ use candid::{CandidType, Principal};
 use canister_state_macros::canister_state;
 use ic_ledger_types::AccountIdentifier;
 use ic_transport_types::EnvelopeContent;
+use icp_neuron_common::{
+    neuron_list::NeuronList, neuron_metrics::NeuronWithMetric, neurons::Neurons,
+    outstanding_payments::OutstandingPaymentsList,
+};
 use k256::{pkcs8::EncodePublicKey, PublicKey};
 use ledger_utils::principal_to_legacy_account_id;
-use nns_governance_canister::types::Neuron;
 use serde::{Deserialize, Serialize};
 use types::{BuildVersion, CanisterId, RewardsRecipientList, TimestampMillis};
 use utils::{
@@ -15,10 +18,7 @@ use utils::{
     memory::MemorySize,
 };
 
-use crate::{
-    ecdsa::{get_key_id, CanisterEcdsaRequest},
-    types::{neuron_metrics::NeuronWithMetric, outstanding_payments::OutstandingPaymentsList},
-};
+use crate::ecdsa::{get_key_id, CanisterEcdsaRequest};
 
 const IC_URL: &str = "https://icp-api.io";
 
@@ -190,19 +190,4 @@ impl Data {
         self.get_public_key_der()
             .and_then(|pk| Ok(Principal::self_authenticating(pk)))
     }
-}
-
-#[derive(Serialize, Deserialize, Default)]
-pub struct Neurons {
-    pub timestamp: TimestampMillis,
-    pub active_neurons: Vec<Neuron>,
-    pub spawning_neurons: Vec<Neuron>,
-    pub disbursed_neurons: Vec<u64>,
-}
-
-#[derive(CandidType, Serialize)]
-pub struct NeuronList {
-    active: Vec<NeuronWithMetric>,
-    spawning: Vec<u64>,
-    disbursed: Vec<u64>,
 }

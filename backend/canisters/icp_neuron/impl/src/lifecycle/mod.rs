@@ -6,6 +6,8 @@ pub mod init;
 pub mod post_upgrade;
 pub mod pre_upgrade;
 
+pub use init::*;
+
 use crate::state::{init_state, RuntimeState};
 
 pub fn init_canister(runtime_state: RuntimeState) {
@@ -29,16 +31,4 @@ fn init_public_key() {
             });
         }
     }
-}
-
-use candid::CandidType;
-use serde::{Deserialize, Serialize};
-
-use crate::InitArgs;
-use crate::UpgradeArgs;
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum Args {
-    Init(InitArgs),
-    Upgrade(UpgradeArgs),
 }
