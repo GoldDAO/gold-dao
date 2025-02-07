@@ -1,12 +1,7 @@
-use candid::CandidType;
 use ic_cdk::query;
+pub use icp_neuron_api_canister::list_neurons::ListNeuronsResponse;
 
-use crate::state::{read_state, NeuronList};
-
-#[derive(CandidType)]
-pub struct ListNeuronsResponse {
-    neurons: NeuronList,
-}
+use crate::state::read_state;
 
 #[query]
 fn list_neurons() -> ListNeuronsResponse {

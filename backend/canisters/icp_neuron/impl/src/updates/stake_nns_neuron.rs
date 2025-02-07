@@ -1,24 +1,18 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{read_state, RuntimeState};
-use candid::{CandidType, Principal};
+use candid::Principal;
 use canister_tracing_macros::trace;
 use ic_cdk::{query, update};
+pub use icp_neuron_api_canister::stake_nns_neuron::StakeNnsNeuronResponse;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use nns_governance_canister::types::manage_neuron::claim_or_refresh::{By, MemoAndController};
 use nns_governance_canister::types::manage_neuron::{ClaimOrRefresh, Command};
 use nns_governance_canister::types::{manage_neuron_response, ManageNeuron};
-use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 use types::CanisterId;
 use utils::rand::generate_rand_nonce;
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum StakeNnsNeuronResponse {
-    Success(u64),
-    InternalError(String),
-}
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]

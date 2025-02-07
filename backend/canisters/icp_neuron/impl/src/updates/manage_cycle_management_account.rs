@@ -1,20 +1,10 @@
 use crate::{guards::caller_is_governance_principal, state::mutate_state};
-use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk::{query, update};
 use ic_ledger_types::AccountIdentifier;
-use serde::{Deserialize, Serialize};
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum ManageCycleManagementAccountResponse {
-    Success,
-    InternalError(String),
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct ManageCycleManagementRequest {
-    account_identifier: String,
-}
+pub use icp_neuron_api_canister::manage_cycle_management_account::{
+    ManageCycleManagementAccountResponse, ManageCycleManagementRequest,
+};
 
 #[update(guard = "caller_is_governance_principal")]
 #[trace]

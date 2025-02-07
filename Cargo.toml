@@ -17,6 +17,8 @@ members = [
   "backend/canisters/super_stats_v3/api",
   "backend/canisters/super_stats_v3/impl",
   "backend/canisters/super_stats_v3/c2c_client",
+  "backend/canisters/icp_neuron/api",
+  "backend/canisters/icp_neuron/common",
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",

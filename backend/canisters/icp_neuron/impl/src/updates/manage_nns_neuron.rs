@@ -1,24 +1,13 @@
 use crate::guards::caller_is_governance_principal;
 use crate::{ecdsa::make_canister_call_via_ecdsa, state::read_state};
-use candid::CandidType;
 use canister_tracing_macros::trace;
 use ic_cdk::{query, update};
+pub use icp_neuron_api_canister::manage_nns_neuron::{
+    ManageNnsNeuronRequest, ManageNnsNeuronResponse,
+};
 use nns_governance_canister::types::manage_neuron::Command;
 use nns_governance_canister::types::ManageNeuron;
-use serde::{Deserialize, Serialize};
 use utils::rand::generate_rand_byte_array;
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
-pub struct ManageNnsNeuronRequest {
-    pub neuron_id: u64,
-    pub command: Command,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum ManageNnsNeuronResponse {
-    Success(String),
-    InternalError(String),
-}
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
