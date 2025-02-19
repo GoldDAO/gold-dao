@@ -22,7 +22,7 @@ export const GOLD_API_BASE_URL = import.meta.env.VITE_GOLD_API_BASE_URL;
 export const API_OGY_BASE_URL="https://api.origyn.com"
 
 export const OGY_TX_FEE=200000
-export const GLDT_TX_FEE = 1000000;
+export const GLDT_TX_FEE = 10000000;
 export const GLDT_DECIMAL = 100000000;
 export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
