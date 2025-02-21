@@ -538,7 +538,7 @@ mod tests {
                 owner: gldt_swap,
                 subaccount: Some(nft_id.clone().into()),
             },
-            10_098_000_000u128, // we intentionally minus 2 transaction fees because
+            10_100_000_000u128 - (2 * GLDT_TX_FEE) as u128, // we intentionally minus 2 transaction fees because
         )
         .unwrap();
         tick_n_blocks(pic, 3);
@@ -676,7 +676,7 @@ mod tests {
                 owner: gldt_swap,
                 subaccount: Some(nft_id.clone().into()),
             },
-            10_098_000_000u128, // we intentionally minus 2 transaction fees because
+            10_100_000_000u128 - (2 * GLDT_TX_FEE) as u128, // we intentionally minus 2 transaction fees because
         )
         .unwrap();
         tick_n_blocks(pic, 3);
@@ -761,6 +761,6 @@ mod tests {
                 subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
             },
         );
-        assert_eq!(balance, Nat::from(97_000_000u64));
+        assert_eq!(balance, Nat::from(70_000_000u64));
     }
 }
