@@ -119,6 +119,7 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
             last_synced_maturity: maturity,
             accumulated_maturity: 0,
             rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
         };
 
         // TODO - check age of neuron to avoid someone gaming the system by spawning neurons (check if really relevant)
@@ -129,7 +130,15 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
             }
             btree_map::Entry::Occupied(mut entry) => {
                 let neuron_info_entry = entry.get_mut();
-                if let Some(delta) = maturity.checked_sub(neuron_info_entry.last_synced_maturity) {
+                let spawning_maturity =
+                    extract_and_sum_up_new_disburse_events(neuron, neuron_info_entry);
+                println!("spawning_maturity {spawning_maturity}");
+                let total_maturity = maturity + spawning_maturity;
+                println!("total_maturity {total_maturity}");
+
+                if let Some(delta) =
+                    total_maturity.checked_sub(neuron_info_entry.last_synced_maturity)
+                {
                     // only add the difference if the maturity has increased
                     if delta == 0 {
                         return;
@@ -156,6 +165,29 @@ fn update_neuron_maturity(state: &mut RuntimeState, neuron: &Neuron) {
 }
 
 // Function to update principal-neuron mapping
+fn extract_and_sum_up_new_disburse_events(neuron: &Neuron, neuron_info: &mut NeuronInfo) -> u64 {
+    let mut last_disburse_event_considered =
+        neuron_info.last_disburse_event_considered.unwrap_or(0);
+    let total_from_new_disburse_events =
+        neuron
+            .disburse_maturity_in_progress
+            .iter()
+            .fold(0u64, |mut acc, event| {
+                if event.timestamp_of_disbursement_seconds
+                    > neuron_info.last_disburse_event_considered.unwrap_or(0)
+                {
+                    acc += event.amount_e8s;
+                }
+                if event.timestamp_of_disbursement_seconds > last_disburse_event_considered {
+                    last_disburse_event_considered = event.timestamp_of_disbursement_seconds;
+                }
+                acc
+            });
+
+    neuron_info.last_disburse_event_considered = Some(last_disburse_event_considered);
+    println!("total_from_new_disburse_events {total_from_new_disburse_events}");
+    total_from_new_disburse_events
+}
 
 fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
     neuron
@@ -172,7 +204,7 @@ fn calculate_total_maturity(neuron: &Neuron) -> Maturity {
 mod tests {
     use std::collections::HashMap;
 
-    use sns_governance_canister::types::{Neuron, NeuronId};
+    use sns_governance_canister::types::{DisburseMaturityInProgress, Neuron, NeuronId};
     use types::NeuronInfo;
 
     use crate::state::{init_state, mutate_state, read_state, RuntimeState};
@@ -207,6 +239,7 @@ mod tests {
             accumulated_maturity: 0,
             last_synced_maturity: 0,
             rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
         };
         let mut result =
             read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
@@ -239,6 +272,7 @@ mod tests {
             accumulated_maturity: 150,
             last_synced_maturity: 150,
             rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
         };
         result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
@@ -270,6 +304,7 @@ mod tests {
             accumulated_maturity: 150,
             last_synced_maturity: 50,
             rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
         };
         result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
@@ -301,6 +336,7 @@ mod tests {
             accumulated_maturity: 150,
             last_synced_maturity: 50,
             rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
         };
         result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
 
@@ -315,5 +351,208 @@ mod tests {
         });
 
         assert_eq!(result_history, expected_result_history);
+    }
+
+    #[test]
+    fn test_neuron_with_disburse_event() {
+        init_runtime_state();
+
+        let neuron_id =
+            NeuronId::new("2a9ab729b173e14cc88c6c4d7f7e9f3e7468e72fc2b49f76a6d4f5af37397f98")
+                .unwrap();
+        let limit = 5;
+
+        let mut neuron = Neuron::default();
+        neuron.id = Some(neuron_id.clone());
+
+        // ********************************
+        // 1. Insert new neuron
+        // ********************************
+
+        mutate_state(|state| {
+            update_neuron_maturity(state, &neuron);
+        });
+
+        let mut expected_result = NeuronInfo {
+            accumulated_maturity: 0,
+            last_synced_maturity: 0,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
+        };
+        let mut result =
+            read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        let mut expected_result_history = vec![(0, expected_result)];
+        let mut result_history = read_state(|state| {
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+
+        // ********************************
+        // 2. Increase neuron maturity
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 100;
+        neuron.staked_maturity_e8s_equivalent = Some(50);
+
+        mutate_state(|state| {
+            state.data.sync_info.last_synced_start += 100;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo {
+            accumulated_maturity: 150,
+            last_synced_maturity: 150,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(0),
+        };
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        expected_result_history.push((100, expected_result));
+        result_history = read_state(|state| {
+            state
+                .data
+                .maturity_history
+                .get_maturity_history(neuron_id.clone(), limit)
+        });
+
+        assert_eq!(result_history, expected_result_history);
+
+        // ********************************
+        // 3. Reduce neuron maturity with a disburse event
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 0;
+        neuron.staked_maturity_e8s_equivalent = None;
+        neuron.disburse_maturity_in_progress = vec![DisburseMaturityInProgress {
+            amount_e8s: 500u64,
+            timestamp_of_disbursement_seconds: 10,
+            account_to_disburse_to: None,
+        }];
+
+        mutate_state(|state| {
+            state.data.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo {
+            accumulated_maturity: 500,
+            last_synced_maturity: 0,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(10),
+        };
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        // ********************************
+        // 4. Reduce neuron maturity with a second disburse event but with the other still present as a record
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 0;
+        neuron.staked_maturity_e8s_equivalent = None;
+        neuron.disburse_maturity_in_progress = vec![
+            DisburseMaturityInProgress {
+                amount_e8s: 500u64,
+                timestamp_of_disbursement_seconds: 10,
+                account_to_disburse_to: None,
+            },
+            DisburseMaturityInProgress {
+                amount_e8s: 400u64,
+                timestamp_of_disbursement_seconds: 20,
+                account_to_disburse_to: None,
+            },
+        ];
+
+        mutate_state(|state| {
+            state.data.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo {
+            accumulated_maturity: 900,
+            last_synced_maturity: 0,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(20),
+        };
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        // ********************************
+        // 5. Keep the same disburse events but nothing extra should happen because they were already accounted for
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 0;
+        neuron.staked_maturity_e8s_equivalent = None;
+        neuron.disburse_maturity_in_progress = vec![
+            DisburseMaturityInProgress {
+                amount_e8s: 500u64,
+                timestamp_of_disbursement_seconds: 10,
+                account_to_disburse_to: None,
+            },
+            DisburseMaturityInProgress {
+                amount_e8s: 400u64,
+                timestamp_of_disbursement_seconds: 20,
+                account_to_disburse_to: None,
+            },
+        ];
+
+        mutate_state(|state| {
+            state.data.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo {
+            accumulated_maturity: 900,
+            last_synced_maturity: 0,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(20),
+        };
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
+
+        // ********************************
+        // 6. increase the normal maturity
+        // ********************************
+
+        neuron.maturity_e8s_equivalent = 50;
+        neuron.staked_maturity_e8s_equivalent = None;
+        neuron.disburse_maturity_in_progress = vec![
+            DisburseMaturityInProgress {
+                amount_e8s: 500u64,
+                timestamp_of_disbursement_seconds: 10,
+                account_to_disburse_to: None,
+            },
+            DisburseMaturityInProgress {
+                amount_e8s: 400u64,
+                timestamp_of_disbursement_seconds: 20,
+                account_to_disburse_to: None,
+            },
+        ];
+
+        mutate_state(|state| {
+            state.data.sync_info.last_synced_start += 150;
+            update_neuron_maturity(state, &neuron);
+        });
+
+        expected_result = NeuronInfo {
+            accumulated_maturity: 950,
+            last_synced_maturity: 50,
+            rewarded_maturity: HashMap::new(),
+            last_disburse_event_considered: Some(20),
+        };
+        result = read_state(|state| state.data.neuron_maturity.get(&neuron_id).cloned()).unwrap();
+
+        assert_eq!(result, expected_result);
     }
 }

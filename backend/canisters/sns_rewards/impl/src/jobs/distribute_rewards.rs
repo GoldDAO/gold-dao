@@ -555,6 +555,7 @@ mod tests {
             accumulated_maturity: 0,
             last_synced_maturity: 0,
             rewarded_maturity: neuron_1_rewarded,
+            last_disburse_event_considered: Some(0),
         };
 
         mutate_state(|state| {
