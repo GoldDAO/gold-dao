@@ -4,20 +4,14 @@ PEM_FILE="tmp.pem"
 DEVELOPER_NEURON_ID="2c21f2deae7502b97d63bf871381e0fdde5c9c68d499344eb2231d109bb9ffc9"
 CANISTER_IDS="sns_canister_ids.json"
 
-NNS_NEURON_ID=8820325433984509404
-HOTKEY_TO_ADD="465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae"
-
 FID=1001
+
+NNS_NEURON_ID=17481076647658761488
+SOURCE_NEURON_ID=8820325433984509404
 
 export BLOB="$(didc encode --format blob "(record {
     command = variant {
-        Configure = record {
-            operation = opt variant {
-                AddHotKey = record {
-                    new_hot_key = opt principal \"${HOTKEY_TO_ADD}\"
-                }
-            }
-        }
+        Merge = record { source_neuron_id = opt record { id = $SOURCE_NEURON_ID : nat64 }}
     };
     neuron_id = ${NNS_NEURON_ID}:nat64
 })")"
@@ -28,11 +22,11 @@ dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
 [ -e message.json ] && rm message.json
 
-quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-proposal $DEVELOPER_NEURON_ID --proposal "(
+quill sns --canister-ids-file $CANISTER_IDS --pem-file $PEM_FILE make-proposal $DEVELOPER_NEURON_ID --proposal "(
     record {
-        title=\"Add hotkey to neuron.\";
-        url=\"https://example.com/\";
-        summary=\"Add hotkey ${HOTKEY_TO_ADD} to neuron ${NNS_NEURON_ID}.\";
+        title=\"Merge NNS neurons.\";
+        url=\"https://gold-dao.org/\";
+        summary=\"Merge NNS neurons.\";
         action= opt variant {
             ExecuteGenericNervousSystemFunction = record {
                 function_id= ${FID}:nat64;
@@ -42,7 +36,6 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE make-
     }
 )" > message.json
 
-
-quill send message.json -y
+quill send message.json
 
 rm tmp.pem && rm message.json && rm sns_canister_ids.json

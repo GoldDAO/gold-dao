@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.5] - 2025-02-21
+
+#### Fixed
+
+- SNS neuron disburse events create the posibility of some neurons not gaining maturity despite being a valid neuron that should receive rewards. This change allows the system to take into consideration the maturity reset that occurs when an SNS neuron has one or more disburse events active.
+
 ### [1.0.4] - 2024-10-10
 
 #### Changed
