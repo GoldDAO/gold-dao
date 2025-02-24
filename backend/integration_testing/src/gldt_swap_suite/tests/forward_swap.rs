@@ -164,7 +164,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + Nat::from(GLDT_TX_FEE * 2))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -385,7 +385,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap, Principal::anonymous()]),
@@ -580,7 +580,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -597,7 +597,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -614,7 +614,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -1014,7 +1014,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![Principal::anonymous()]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -1081,7 +1081,7 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+            10_000_000_000u128 + (2 * GLDT_TX_FEE) as u128, // we intentionally minus 2 transaction fees because
         )
         .unwrap();
 
@@ -1243,7 +1243,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![Principal::anonymous()]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -1277,7 +1277,7 @@ mod tests {
                 owner: gldt_swap,
                 sub_account: None,
             },
-            amount: Nat::from(10_002_000_000u64),
+            amount: Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE)),
         });
         let res = sale_info_nft_origyn(pic, Principal::anonymous(), origyn_nft, &args);
         let escrow_sub_account = match res {
@@ -1310,7 +1310,7 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+            10_000_000_000u128 + (2 * GLDT_TX_FEE) as u128, // we intentionally minus 2 transaction fees because
         )
         .unwrap();
 
@@ -2250,7 +2250,7 @@ mod tests {
                 owner: gldt_swap,
                 subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT.clone()),
             },
-            3_000_000u128, // we intentionally minus 2 transaction fees because
+            (3 * GLDT_TX_FEE) as u128,
         )
         .unwrap();
         tick_n_blocks(pic, 3);
@@ -2405,7 +2405,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![Principal::anonymous()]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -2439,7 +2439,7 @@ mod tests {
                 owner: gldt_swap,
                 sub_account: None,
             },
-            amount: Nat::from(10_002_000_000u64),
+            amount: Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE)),
         });
         let res = sale_info_nft_origyn(pic, Principal::anonymous(), origyn_nft, &args);
         let escrow_sub_account = match res {
@@ -2576,7 +2576,7 @@ mod tests {
                 owner: origyn_nft,
                 subaccount: Some(escrow_sub_account.clone()),
             },
-            10_002_000_000u128, // we intentionally minus 2 transaction fees because
+            10_000_000_000u128 + (2 * GLDT_TX_FEE) as u128, // we intentionally minus 2 transaction fees because
         )
         .unwrap();
 

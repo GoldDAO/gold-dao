@@ -70,7 +70,7 @@ fn init_nft_with_premint_nft(
 mod tests {
     use canister_time::{timestamp_nanos, HOUR_IN_MS, SECOND_IN_MS};
     use gldt_swap_common::{
-        gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT},
+        gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE},
         swap::{SwapStatusReverse, MANAGE_GLDT_SUPPLY_INTERVAL},
     };
 
@@ -183,7 +183,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -228,7 +228,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),
@@ -366,7 +366,7 @@ mod tests {
                 subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
             },
         );
-        assert_eq!(balance, Nat::from(97_000_000u64)); // swap fee account should have 97 inside of it
+        assert_eq!(balance, Nat::from(70_000_000u64)); // swap fee account should have 97 inside of it
 
         // 10. ensure ledger fee account kept the remaining tx fees - escrow transfer from user to escrow takes 2x and then transfer swap fee from escrow to swap fee collection
         let balance = balance_of(
@@ -377,7 +377,7 @@ mod tests {
                 subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
             },
         );
-        assert_eq!(balance, Nat::from(3_000_000u64)); //
+        assert_eq!(balance, Nat::from(30_000_000u64)); //
 
         /////////////////////////////////
         /////  Forward swap
@@ -410,7 +410,7 @@ mod tests {
                 broker_id: None,
                 pricing: PricingConfigShared::Ask(Some(vec![
                     AskFeature::Token(GldtTokenSpec::new(gldt_ledger).get_token_spec()),
-                    AskFeature::BuyNow(Nat::from(10_002_000_000u64)),
+                    AskFeature::BuyNow(Nat::from(10_000_000_000u64 + (2 * GLDT_TX_FEE))),
                     AskFeature::Notify(vec![gldt_swap]),
                     AskFeature::FeeSchema("com.origyn.royalties.fixed".to_string()),
                     AskFeature::AllowList(vec![gldt_swap]),

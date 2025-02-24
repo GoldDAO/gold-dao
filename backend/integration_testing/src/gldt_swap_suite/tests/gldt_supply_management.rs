@@ -326,7 +326,10 @@ mod tests {
         .unwrap();
         tick_n_blocks(pic, 1);
         let real_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
-        assert_eq!(real_supply, Nat::from(30_003_000_000u64));
+        assert_eq!(
+            real_supply,
+            Nat::from(30_000_000_000u64 + (3 * GLDT_TX_FEE))
+        );
 
         // there is now an imbalance
         // there should be 50_000_000_000
@@ -334,7 +337,7 @@ mod tests {
         pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL));
         tick_n_blocks(pic, 5);
 
-        let expected_supply = Nat::from(30_003_000_000u64);
+        let expected_supply = Nat::from(30_000_000_000u64 + (3 * GLDT_TX_FEE));
         let real_supply = icrc1_total_supply(pic, Principal::anonymous(), gldt_ledger, &());
 
         assert_eq!(real_supply, expected_supply);

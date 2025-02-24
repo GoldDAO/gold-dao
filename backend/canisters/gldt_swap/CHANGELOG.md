@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.2] - 2025-02-21
+
+#### Updates
+
+- **Use new GLDT Ledger fee**: The GLDT fee was recently increased. Internally we reference a global variable for the tx fee and so we have updated it here in the swap canister as well as fixing any tests that may have broken.
+
 ### [1.1.1] - 2024-12-02
 
 #### Updates

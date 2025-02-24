@@ -58,6 +58,7 @@ type GetNftMetaDetailErrorReason = variant {
   UnexpectedError : text;
 };
 type GldtNumTokens = record { value_with_fee : nat; value : nat };
+type Icrc28TrustedOriginsResponse = record { trusted_origins : vec text };
 type ImpossibleErrorReason = variant {
   AmountNotFound;
   NFTResponseInvalid;
@@ -165,6 +166,7 @@ type ServiceDownReason = variant {
   LowOrigynToken : text;
 };
 type ServiceStatus = variant { Up; Down : ServiceDownReason };
+type SupportedStandard = record { url : text; name : text };
 type SwapDetailForward = record {
   nft_id : nat;
   status : SwapStatusForward;
@@ -319,6 +321,8 @@ service : (Args_3) -> {
   get_swap : (record { nat; nat }) -> (
       opt record { record { nat; nat }; SwapInfo },
     );
+  icrc10_supported_standards : () -> (vec SupportedStandard) query;
+  icrc28_trusted_origins : () -> (Icrc28TrustedOriginsResponse);
   remove_intent_to_swap : (record { nat; nat }) -> (Result_2);
   swap_nft_for_tokens : (vec record { nat; principal }) -> (Result_3);
   swap_tokens_for_nft : (Args_2) -> (Result_4);
