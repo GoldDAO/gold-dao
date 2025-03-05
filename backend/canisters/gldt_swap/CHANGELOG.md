@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+
+### [1.1.3] - 2025-02-25
+
+#### Feature
+
+- **Transfer GLDT Fees for GOLDAO Buy back and burn**: Ledger fees and Swap fees for GLDT will accure to 10 GLDT and then be transferred to the buyback and burn canister upon which it will be converted to GOLDAO and burned.
+
 ### [1.1.2] - 2025-02-21
 
 #### Updates

@@ -8,6 +8,7 @@ pub mod gldt_supply_management;
 pub mod metrics;
 pub mod remove_stale_swaps_cron_job;
 pub mod reverse_swap;
+pub mod transfer_to_buy_back_burn;
 #[cfg(test)]
 mod tests {
     use super::*;
