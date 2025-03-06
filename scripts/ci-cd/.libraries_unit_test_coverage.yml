@@ -1,0 +1,25 @@
+# Library crates unit test with coverage
+
+library unit tests:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_REF_NAME == "develop"
+      changes:
+        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+  extends: .rust template
+  tags:
+    - dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: '/certs'
+    DOCKER_SECURITY_OPT: '--security-opt seccomp=unconfined'
+  script:
+    - for CRATE_PATH in $(find backend/libraries/ -mindepth 1 -maxdepth 1 -type d); do
+        echo "Testing crate $CRATE_PATH";
+        cd $CRATE_PATH;
+        cargo test || exit 1;
+        cd -;
+      done
