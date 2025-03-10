@@ -35,6 +35,7 @@ async fn transfer_gldt_fees_job_impl() {
 
     let this_canister_id = read_state(|s| s.env.canister_id());
     let _ = check_and_transfer_for_account(
+        "SWAP_FEE_ACCOUNT".to_string(),
         Account {
             owner: this_canister_id,
             subaccount: Some(GLDT_SWAP_FEE_ACCOUNT),
@@ -43,6 +44,7 @@ async fn transfer_gldt_fees_job_impl() {
     )
     .await;
     let _ = check_and_transfer_for_account(
+        "LEDGER_FEE_ACCOUNT".to_string(),
         Account {
             owner: this_canister_id,
             subaccount: Some(GLDT_LEDGER_FEE_ACCOUNT),
@@ -53,6 +55,7 @@ async fn transfer_gldt_fees_job_impl() {
 }
 
 async fn check_and_transfer_for_account(
+    name: String,
     account: Account,
     buy_back_canister_id: Account,
 ) -> Result<(), ()> {
@@ -61,20 +64,28 @@ async fn check_and_transfer_for_account(
     let gldt_balance = icrc1_balance_of(ledger_canister_id, account.clone())
         .await
         .map_err(|e| {
-            info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: check_and_transfer_for_account {e:?}");
+            info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: {name} :: check_and_transfer_for_account  :: error getting balance - {e:?}");
             ()
         })?;
 
     // if more than 100 GLDT then we can send the balance to the buy back and burn canister otherwise return early
     if gldt_balance < Nat::from(10_000_000_000u64) {
-        info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: this account does not have over 10 GLDT yet and so will not transfer");
+        info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: {name} :: this account does not have over 10 GLDT yet and so will not transfer");
         return Err(());
     }
 
-    let _ = transfer_to_buy_back_and_burn_canister(account, gldt_balance, buy_back_canister_id).await.map_err(|e| {
-        info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: transfer_to_buy_back_and_burn_canister failed with error - {e:?}");
+    info!(
+        "TRANSFER GLDT FEES FOR BUY BACK BURN :: {name} :: will attempt to transfer {gldt_balance} GLDT"
+    );
+
+    let _ = transfer_to_buy_back_and_burn_canister(account, gldt_balance.clone(), buy_back_canister_id).await.map_err(|e| {
+        info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: {name} :: transfer_to_buy_back_and_burn_canister failed with error - {e:?}");
         ()
     })?;
+
+    info!(
+        "TRANSFER GLDT FEES FOR BUY BACK BURN :: {name} :: successfully transferred {gldt_balance} GLDT to buyback and burn"
+    );
 
     Ok(())
 }
