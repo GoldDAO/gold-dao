@@ -12,6 +12,7 @@ pub mod notify_sale_nft_origyn;
 pub mod recover_stuck_swap;
 pub mod remove_intent_to_swap;
 pub mod set_base_ogy_swap_fee;
+pub mod set_buy_back_canister;
 pub mod swap_nft_for_tokens;
 pub mod swap_tokens_for_nft;
 
@@ -28,5 +29,6 @@ pub use notify_sale_nft_origyn::*;
 pub use recover_stuck_swap::*;
 pub use remove_intent_to_swap::*;
 pub use set_base_ogy_swap_fee::*;
+pub use set_buy_back_canister::*;
 pub use swap_nft_for_tokens::*;
 pub use swap_tokens_for_nft::*;
