@@ -187,6 +187,7 @@ pub struct Data {
     pub gldt_ledger_id: Principal,
     pub ogy_ledger_id: Principal,
     pub authorized_principals: Vec<Principal>,
+    pub buy_back_burn_canister: Option<Account>,
     // swap state
     pub swaps: Swaps,
     pub base_ogy_swap_fee: Nat,
@@ -237,6 +238,7 @@ impl Default for Data {
             total_failed_swaps: 0,
             canister_owned_nfts: BTreeMap::new(),
             is_gldt_supply_balancer_running: false,
+            buy_back_burn_canister: None,
         }
     }
 }

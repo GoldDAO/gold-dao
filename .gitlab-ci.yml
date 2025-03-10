@@ -46,6 +46,7 @@ include:
     inputs:
       src-folder: gld_dashboard
   # Unit tests
+  - local: scripts/ci-cd/.libraries_unit_test_coverage.yml
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: buyback_burn
@@ -195,6 +196,7 @@ rust lint:
   extends: .rust template
   script:
     - cargo clippy
+
 ################################################################################
 # Unit tests
 ################################################################################

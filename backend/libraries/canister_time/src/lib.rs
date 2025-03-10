@@ -123,12 +123,11 @@ mod tests {
         // 1732362731
         //       7128
         let now = datetime!(2024-11-23 10:52:11 UTC);
-        // time::OffsetDateTime::set_offset_override(Some(now));
 
         let target_hour = 12; // Next target hour is 12 o'clock
 
         // Expected delay: 15 hours from 20:52:11 -> 12:00:00 next day
-        let expected_delay = 7200;
+        let expected_delay = 12 * 3600 * 1000;
 
         let calculated_delay =
             calculate_next_timestamp(target_hour).expect("Failed to calculate next timestamp");

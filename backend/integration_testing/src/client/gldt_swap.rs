@@ -21,3 +21,4 @@ generate_pocket_query_call!(get_archive_swaps);
 generate_pocket_query_call!(get_owned_nfts);
 generate_pocket_query_call!(http_request);
 generate_pocket_update_call!(force_toggle_gldt_supply_cron);
+generate_pocket_update_call!(set_buy_back_canister);
