@@ -59,6 +59,7 @@ impl RuntimeState {
             is_gldt_supply_balancer_running: self.data.is_gldt_supply_balancer_running.clone(),
             is_archive_cron_running: self.data.is_archive_cron_running,
             is_remove_stale_swaps_cron_running: self.data.is_remove_stale_swaps_cron_running,
+            buyback_burn_account: self.data.buy_back_burn_canister,
         }
     }
 
@@ -155,6 +156,7 @@ pub struct Metrics {
     pub is_gldt_supply_balancer_running: bool,
     pub is_archive_cron_running: bool,
     pub is_remove_stale_swaps_cron_running: bool,
+    pub buyback_burn_account: Option<Account>,
 }
 
 #[derive(CandidType, Serialize)]
