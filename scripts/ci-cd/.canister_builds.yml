@@ -20,6 +20,7 @@ spec:
 
 $[[ inputs.src-folder ]] staging build:
   extends: .rust template
+  stage: build
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
