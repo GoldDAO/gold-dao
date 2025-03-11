@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.5] - 2025-03-11
+
+#### Add
+
+- Include set_buy_back_canister_validate in order to be able to call via SNS proposals
+
+#### Change
+
+- Unhide set_buy_back_canister on candid
+
 ### [1.1.4] - 2025-03-11
 
 #### Add
