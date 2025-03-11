@@ -7,7 +7,7 @@ pub use gldt_swap_api_canister::set_buy_back_canister::{
 use ic_cdk::update;
 use icrc_ledger_types::icrc1::account::Account;
 
-#[update(guard = "caller_is_authorized", hidden = true)]
+#[update(guard = "caller_is_authorized")]
 #[trace]
 pub async fn set_buy_back_canister(account: SetBuyBackCanisterArgs) -> SetBuyBackCanisterResponse {
     match validate_set_buy_back_canister_payload(&account) {
