@@ -142,6 +142,7 @@ type RemoveIntentToSwapError = variant {
   SwapNotFound;
   InProgress;
 };
+type Response = variant { Success; InternalError : text };
 type Result = variant {
   Ok : vec record { record { nat; nat }; SwapInfo };
   Err : GetHistoricSwapsError;
@@ -324,6 +325,7 @@ service : (Args_3) -> {
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
   icrc28_trusted_origins : () -> (Icrc28TrustedOriginsResponse);
   remove_intent_to_swap : (record { nat; nat }) -> (Result_2);
+  set_buy_back_canister : (opt Account) -> (Response);
   swap_nft_for_tokens : (vec record { nat; principal }) -> (Result_3);
   swap_tokens_for_nft : (Args_2) -> (Result_4);
 }

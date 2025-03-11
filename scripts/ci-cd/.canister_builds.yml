@@ -18,18 +18,9 @@ spec:
 ---
 # Rust canisters builds
 
-.canister build template:
-  stage: build
-  extends: .rust template
-  script:
-    - scripts/build_canister.sh --wasmonly $[[ inputs.src-folder ]]
-    - scripts/generate_did.sh $[[ inputs.src-folder ]]
-    - scripts/build_canister.sh --checksum $[[ inputs.src-folder ]]
-    - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
-
-
 $[[ inputs.src-folder ]] staging build:
-  extends: .canister build template
+  extends: .rust template
+  stage: build
   rules:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
       when: never
@@ -40,6 +31,11 @@ $[[ inputs.src-folder ]] staging build:
       changes:
         - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
       allow_failure: true
+  script:
+    - scripts/build_canister.sh --wasmonly $[[ inputs.src-folder ]]
+    - scripts/generate_did.sh $[[ inputs.src-folder ]]
+    - scripts/build_canister.sh --checksum $[[ inputs.src-folder ]]
+    - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
   artifacts:
     name: "${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm-STAGING"
     paths:
@@ -48,9 +44,15 @@ $[[ inputs.src-folder ]] staging build:
     expire_in: 1 day
 
 $[[ inputs.src-folder ]] production build:
-  extends: .canister build template
+  extends: .rust template
+  stage: build
   rules:
    - if: $CI_COMMIT_REF_NAME =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
+  script:
+    - scripts/build_canister.sh --wasmonly $[[ inputs.src-folder ]]
+    - scripts/generate_did.sh $[[ inputs.src-folder ]]
+    - scripts/build_canister.sh --checksum $[[ inputs.src-folder ]]
+    - ic-wasm backend/canisters/$[[ inputs.src-folder ]]/target/wasm32-unknown-unknown/release/$[[ inputs.src-folder ]]_canister.wasm info
   artifacts:
     name: '${CI_PROJECT_NAME}-$[[ inputs.src-folder ]]-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-wasm'
     paths:
