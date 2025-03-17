@@ -255,6 +255,17 @@
       "type": "custom",
       "wasm": "backend/canisters/gldt_stake/target/wasm32-unknown-unknown/release/gldt_stake_canister.wasm.gz"
     },
+    "gldt_stake_archive": {
+      "build": [""],
+      "candid": "backend/canisters/gldt_stake/api_archive/can.did",
+      "declarations": {
+        "bindings": ["ts", "js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_stake/api_archive/declarations"
+      },
+      "type": "custom",
+      "wasm": "backend/canisters/gldt_stake_archive/target/wasm32-unknown-unknown/release/gldt_stake_archive_canister.wasm.gz"
+    },
     "gldt_swap_archive": {
       "build": [""],
       "candid": "backend/canisters/gldt_swap/api_archive/can.did",

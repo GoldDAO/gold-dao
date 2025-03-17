@@ -99,8 +99,12 @@ async fn fetch_neurons(
 
 pub async fn sync_neurons() -> Result<(), String> {
     info!("SYNC NEURONS :: start");
-    let (this_canister_id, sns_governance_canister_id) =
-        read_state(|s| (s.env.canister_id(), s.data.gld_sns_governance_canister_id));
+    let (this_canister_id, sns_governance_canister_id) = read_state(|s| {
+        (
+            s.env.canister_id(),
+            s.data.goldao_sns_governance_canister_id,
+        )
+    });
 
     // Error is handled in fetch_neurons
     let neurons = fetch_neurons(sns_governance_canister_id, this_canister_id).await?;

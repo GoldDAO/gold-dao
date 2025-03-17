@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [features]
 default = []  # Empty default features
-inttest = ["gldt_stake_common/inttest", "gldt_stake_api_canister/inttest" ]
+inttest = ["gldt_stake_common/inttest", "gldt_stake_api_canister/inttest", "gldt_stake_api_archive/inttest" ]
 
 [dependencies]
 candid = { workspace = true }
@@ -36,6 +36,7 @@ tracing = { workspace = true }
 futures = { workspace = true }
 gldt_stake_api_canister = { path = "../api"}
 gldt_stake_common = { path = "../common"}
+gldt_stake_api_archive = { path = "../api_archive"}
 origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api'}
 origyn_nft_reference_c2c_client = { path = '../../../external_canisters/origyn_nft_reference/c2c_client'}
 ic0 = "0.23.0"
@@ -47,3 +48,6 @@ time = {workspace = true }
 sns_rewards_api_canister = {path = "../../sns_rewards/api"}
 sns_rewards_c2c_client = {path = "../../../external_canisters/sns_rewards/c2c_client"}
 typetag = { workspace = true }
+gldt_stake_archive_c2c_client = { path = "../../../external_canisters/gldt_stake_archive/c2c_client" }
+icpswap_token_canister = { path = "../../../external_canisters/icpswap_token_canister/api" }
+icpswap_token_canister_c2c_client = { path = "../../../external_canisters/icpswap_token_canister/c2c_client" }

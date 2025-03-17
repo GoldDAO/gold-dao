@@ -42,7 +42,7 @@ fn test_can_claim_gldt_stake_rewards() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // 10,000 GLDGov, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
+    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
         pic,
@@ -71,16 +71,16 @@ fn test_can_claim_gldt_stake_rewards() {
     let position_id = user_0_positions.get(0).unwrap().id;
 
     // claim rewards
-    let gldgov_ledger = token_ledgers.get("gldgov_ledger_canister_id").unwrap();
-    let gldgov_tx_fee = ledger_fees.get("GLDGov").unwrap();
+    let goldao_ledger = token_ledgers.get("goldao_ledger_canister_id").unwrap();
+    let goldao_tx_fee = ledger_fees.get("GOLDAO").unwrap();
     let expected_reward = user_0_positions
         .get(0)
         .unwrap()
         .claimable_rewards
-        .get("GLDGov")
+        .get("GOLDAO")
         .unwrap()
         .clone()
-        - gldgov_tx_fee.clone();
+        - goldao_tx_fee.clone();
 
     let res = claim_reward(
         pic,
@@ -88,24 +88,24 @@ fn test_can_claim_gldt_stake_rewards() {
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
             id: position_id,
-            token: "GLDGov".to_string(),
+            token: "GOLDAO".to_string(),
         },
     )
     .unwrap();
 
     assert_eq!(
-        res.claimable_rewards.get("GLDGov").unwrap(),
+        res.claimable_rewards.get("GOLDAO").unwrap(),
         &Nat::from(0u64)
     );
-    let user_gldgov_balance = balance_of(
+    let user_goldao_balance = balance_of(
         pic,
-        gldgov_ledger.clone(),
+        goldao_ledger.clone(),
         Account {
             owner: user_0,
             subaccount: None,
         },
     );
-    assert_eq!(user_gldgov_balance, expected_reward);
+    assert_eq!(user_goldao_balance, expected_reward);
 
     // get user position to double check it was saved to state
     let position = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None)
@@ -113,7 +113,7 @@ fn test_can_claim_gldt_stake_rewards() {
         .unwrap()
         .clone();
     assert_eq!(
-        position.claimable_rewards.get("GLDGov").unwrap().clone(),
+        position.claimable_rewards.get("GOLDAO").unwrap().clone(),
         Nat::from(0u64)
     );
 }
@@ -146,7 +146,7 @@ fn test_claim_rewards_guards_as_anonymous_principal() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // 10,000 GLDGov, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
+    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
         pic,
@@ -181,7 +181,7 @@ fn test_claim_rewards_guards_as_anonymous_principal() {
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
             id: position_id,
-            token: "GLDGov".to_string(),
+            token: "GOLDAO".to_string(),
         },
     );
 
@@ -220,7 +220,7 @@ fn test_claim_rewards_after_successful_claim() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // 10,000 GLDGov, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
+    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
         pic,
@@ -254,7 +254,7 @@ fn test_claim_rewards_after_successful_claim() {
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
             id: position_id,
-            token: "GLDGov".to_string(),
+            token: "GOLDAO".to_string(),
         },
     );
     let res = claim_reward(
@@ -263,7 +263,7 @@ fn test_claim_rewards_after_successful_claim() {
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
             id: position_id,
-            token: "GLDGov".to_string(),
+            token: "GOLDAO".to_string(),
         },
     );
 
@@ -302,7 +302,7 @@ fn test_claim_rewards_duplicate_calls_should_fail() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // 10,000 GLDGov, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
+    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
         pic,
@@ -337,7 +337,7 @@ fn test_claim_rewards_duplicate_calls_should_fail() {
             "claim_reward",
             Encode!(&gldt_stake_api_canister::claim_reward::Args {
                 id: position_id,
-                token: "GLDGov".to_string(),
+                token: "GOLDAO".to_string(),
             })
             .unwrap(),
         )
@@ -349,7 +349,7 @@ fn test_claim_rewards_duplicate_calls_should_fail() {
             "claim_reward",
             Encode!(&gldt_stake_api_canister::claim_reward::Args {
                 id: position_id,
-                token: "GLDGov".to_string(),
+                token: "GOLDAO".to_string(),
             })
             .unwrap(),
         )

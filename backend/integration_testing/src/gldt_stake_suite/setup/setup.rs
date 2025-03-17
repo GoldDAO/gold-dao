@@ -106,6 +106,9 @@ impl GldtStakeTestEnvBuilder {
         let mut pic = PocketIcBuilder::new()
             .with_sns_subnet()
             .with_application_subnet()
+            .with_fiduciary_subnet()
+            .with_nns_subnet()
+            .with_system_subnet()
             .build();
 
         let sns_subnet = pic.topology().get_sns().unwrap();
@@ -146,13 +149,13 @@ impl GldtStakeTestEnvBuilder {
         //     token_ledgers.iter().map(|(_, id)| id.clone()).collect();
         let mut reward_types = HashMap::new();
         reward_types.insert(
-            "GLDGov".to_string(),
+            "GOLDAO".to_string(),
             (
                 token_ledgers
-                    .get("gldgov_ledger_canister_id")
+                    .get("goldao_ledger_canister_id")
                     .unwrap()
                     .clone(),
-                self.ledger_fees.get("GLDGov").unwrap().clone(),
+                self.ledger_fees.get("GOLDAO").unwrap().clone(),
             ),
         );
         reward_types.insert(
@@ -177,8 +180,8 @@ impl GldtStakeTestEnvBuilder {
             authorized_principals: vec![self.controller],
             gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
             gld_sns_governance_canister_id: self.sns_governance_id,
-            gldgov_ledger_id: token_ledgers
-                .get("gldgov_ledger_canister_id")
+            goldao_ledger_id: token_ledgers
+                .get("goldao_ledger_canister_id")
                 .unwrap()
                 .clone(),
             gldt_ledger_id: token_ledgers
