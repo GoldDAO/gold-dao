@@ -6,4 +6,4 @@ pub type RewardTokens = HashMap<String, Nat>;
 pub type TokenSymbol = String;
 pub type LedgerId = Principal;
 pub type LedgerFee = Nat;
-pub type RewardTypes = HashMap<TokenSymbol, (LedgerId, LedgerFee)>; // e.g GLDGov -> (ledger_id, fee)
+pub type RewardTypes = HashMap<TokenSymbol, (LedgerId, LedgerFee)>; // e.g GOLDAO -> (ledger_id, fee)

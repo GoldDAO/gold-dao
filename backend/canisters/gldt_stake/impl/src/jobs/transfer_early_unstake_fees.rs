@@ -4,7 +4,7 @@ use gldt_stake_common::{accounts::EARLY_UNSTAKE_FEE_ACCOUNT, ledgers::GLDT_TX_FE
 use icrc_ledger_canister_c2c_client::icrc1_transfer;
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use std::time::Duration;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 use utils::env::Environment;
 
 use crate::state::{mutate_state, read_state};

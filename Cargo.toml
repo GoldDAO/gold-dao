@@ -10,6 +10,8 @@ members = [
   "backend/canisters/gldt_stake/common",
   "backend/canisters/gldt_stake/impl",
   "backend/canisters/gldt_stake/api",
+  "backend/canisters/gldt_stake/api_archive",
+  "backend/canisters/gldt_stake/archive",
   "backend/canisters/management/impl",
   "backend/canisters/management/api",
   "backend/canisters/sns_rewards/impl",

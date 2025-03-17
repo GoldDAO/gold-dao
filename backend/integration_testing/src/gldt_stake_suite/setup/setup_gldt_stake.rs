@@ -10,7 +10,7 @@ pub fn setup_gldt_stake_canister(
     controller: Principal,
 ) -> Principal {
     let sns_neuron_controller_wasm = GLDT_STAKE.clone();
-    pic.add_cycles(canister_id, 1_000_000_000_000_000);
+    pic.add_cycles(canister_id, 10_000_000_000_000_000);
 
     pic.set_controllers(
         canister_id,

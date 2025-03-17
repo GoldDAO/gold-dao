@@ -19,12 +19,12 @@ dfx deploy --network staging gldt_stake --argument "(variant { Init = record {
     commit_hash = \"stagingcommit\";
     authorized_principals = vec { principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\" };
     gldt_ledger_id = principal \"6uad6-fqaaa-aaaam-abovq-cai\";
-    gldgov_ledger_id = principal \"irhm6-5yaaa-aaaap-ab24q-cai\";
+    goldao_ledger_id = principal \"irhm6-5yaaa-aaaap-ab24q-cai\";
     gld_sns_rewards_canister_id = principal \"rbv23-fqaaa-aaaam-qbfma-cai\";
     gld_sns_governance_canister_id = principal \"j3ioe-7iaaa-aaaap-ab23q-cai\";
     reward_types = vec { 
         record {
-            \"GLDGov\";
+            \"GOLDAO\";
             1 = record {
                 0 = principal \"irhm6-5yaaa-aaaap-ab24q-cai\";
                 1 = 100000:nat;

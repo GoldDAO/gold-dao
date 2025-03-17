@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, CandidType)]
 pub struct MemorySize {
-    heap: u64,
-    stable: u64,
+    pub heap: u64,
+    pub stable: u64,
 }
 
 impl MemorySize {

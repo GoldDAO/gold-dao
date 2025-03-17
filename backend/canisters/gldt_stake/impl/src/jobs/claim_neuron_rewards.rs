@@ -121,11 +121,11 @@ async fn fetch_neuron_reward_balance(
     neuron_id: &NeuronId,
     token_ledger: &LedgerId,
 ) -> Result<Nat, String> {
-    let gldgov_sns_rewards_canister_id = read_state(|s| s.data.gld_sns_rewards_canister_id);
+    let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
     match icrc1_balance_of(
         token_ledger.clone(),
         Account {
-            owner: gldgov_sns_rewards_canister_id.clone(),
+            owner: sns_rewards_canister_id.clone(),
             subaccount: Some(neuron_id.clone().into()),
         },
     )
@@ -141,11 +141,16 @@ async fn claim_reward(neuron_id: NeuronId, token_symbol: &TokenSymbol) -> Result
         "CLAIM_NEURON_REWARDS :: neuron id - {} :: attempting to claim {} reward",
         neuron_id, token_symbol
     );
-    let sns_rewards_canister_id = read_state(|s| s.data.gld_sns_rewards_canister_id);
-    let args = sns_rewards_api_canister::claim_reward::Args {
+    let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
+
+    let mut args = sns_rewards_api_canister::claim_reward::Args {
         neuron_id: neuron_id.clone(),
         token: token_symbol.clone(),
     };
+
+    if token_symbol == "GOLDAO" {
+        args.token = "GLDGov".to_string()
+    }
 
     match sns_rewards_c2c_client::claim_reward(sns_rewards_canister_id, args).await {
         Ok(response) => match response {

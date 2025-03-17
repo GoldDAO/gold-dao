@@ -1,6 +1,7 @@
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::Args;
+use gldt_stake_common::archive::{ArchiveDownReason, ArchiveStatus};
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
@@ -28,7 +29,7 @@ fn post_upgrade(args: Args) {
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
-            // state.data.archive_status = ArchiveStatus::Down(ArchiveDownReason::Upgrading);
+            state.data.archive_system.archive_status = ArchiveStatus::Down(ArchiveDownReason::Upgrading);
 
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);

@@ -12,8 +12,8 @@ use sns_governance_canister::types::NeuronId;
 use std::time::Duration;
 
 use crate::client::gldt_stake::{
-    _set_position_unstake_state, claim_reward, get_active_user_positions, get_total_staked,
-    start_dissolving, unstake,
+    _set_position_unstake_state, claim_reward, get_active_user_positions,
+    get_historic_position_by_id, get_total_staked, start_dissolving, unstake,
 };
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
@@ -65,7 +65,7 @@ fn test_unstake() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // 10,000 GLDGov, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
+    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
         pic,
@@ -83,6 +83,7 @@ fn test_unstake() {
     tick_n_blocks(pic, 5);
 
     let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    println!("{user_0_positions:?}");
     user_0_positions
         .get(0)
         .unwrap()
@@ -127,7 +128,7 @@ fn test_unstake() {
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
             id: position_id,
-            token: "GLDGov".to_string(),
+            token: "GOLDAO".to_string(),
         },
     )
     .unwrap();
@@ -174,6 +175,20 @@ fn test_unstake() {
 
     let total_staked = get_total_staked(pic, Principal::anonymous(), gldt_stake_canister_id, &());
     assert_eq!(total_staked, Nat::from(0u64));
+
+    // check the position was moved to history
+    tick_n_blocks(pic, 5);
+    let res = get_historic_position_by_id(
+        pic,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &position_id,
+    )
+    .unwrap();
+    assert_eq!(res.id, position_id);
+
+    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    assert_eq!(user_0_positions.len(), 0);
 }
 
 #[test]

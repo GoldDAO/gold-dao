@@ -12,11 +12,6 @@ pub fn start_job() {
     );
 }
 
-// todo
-// when a round's rewards have been allocated. the total of that reward is added to a global amount
-// we also keep track of when the canister went live and so we have a created date to figure out the number
-// of weeks that have passed so that we can figure out the APY
-
 fn process_reward_rounds_job_impl() {
     info!("PROCESS REWARD ROUND :: start");
     if read_state(|s| s.data.is_reward_allocation_in_progress) {
@@ -46,22 +41,18 @@ pub fn allocate_rewards(round: RewardRound) {
     });
     let mut stake_positions =
         read_state(|s| s.data.stake_system.get_reward_eligible_stake_positions());
-    let now = round.get_round_timestamp();
 
-    let total_weighted_stake =
-        stake_positions
-            .iter()
-            .fold(Nat::from(0u64), |acc, (_, position)| {
-                let age_bonus_multiplier = position.calculate_age_bonus_multiplier(now);
-                let weighted_stake = position.calculate_weighted_stake(age_bonus_multiplier);
-                acc + weighted_stake
-            });
+    let total_weighted_stake = round.calculate_total_weighted_stake(&stake_positions);
 
     stake_positions.iter_mut().for_each(|(id, position)| {
         let rewards = round.get_rewards();
         let token_symbol = round.get_token_symbol();
 
-        let reward = position.calculate_new_reward(&total_weighted_stake, now, rewards);
+        let reward = position.calculate_new_reward(
+            &total_weighted_stake,
+            round.get_round_timestamp(),
+            rewards,
+        );
         position
             .claimable_rewards
             .entry(token_symbol.clone())

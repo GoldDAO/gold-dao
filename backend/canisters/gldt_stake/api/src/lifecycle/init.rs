@@ -11,7 +11,7 @@ pub struct InitArgs {
     pub version: BuildVersion,
     pub commit_hash: String,
     pub authorized_principals: Vec<Principal>,
-    pub gldgov_ledger_id: Principal,
+    pub goldao_ledger_id: Principal,
     pub gldt_ledger_id: Principal,
     pub gld_sns_rewards_canister_id: Principal,
     pub gld_sns_governance_canister_id: Principal,

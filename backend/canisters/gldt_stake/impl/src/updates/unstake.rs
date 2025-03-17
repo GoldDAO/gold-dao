@@ -1,9 +1,11 @@
-use candid::Nat;
+use candid::{Nat, Principal};
 use canister_time::timestamp_millis;
 use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::unstake::{Args as UnstakeArgs, Response as UnstakeResponse};
 use gldt_stake_common::ledgers::GLDT_TX_FEE;
-use gldt_stake_common::stake_position::{DissolveState, UnstakeErrors, UnstakeRequestErrors};
+use gldt_stake_common::stake_position::{
+    DissolveState, StakePosition, StakePositionId, UnstakeErrors, UnstakeRequestErrors,
+};
 use gldt_stake_common::stake_position_event::{NormalUnstakeStatus, UnstakeState};
 use icrc_ledger_canister_c2c_client::icrc1_transfer;
 use icrc_ledger_types::icrc1::account::Account;
@@ -11,6 +13,7 @@ use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::error;
 
 use crate::guards::GuardPrincipal;
+use crate::model::archive_system::archive_stake_position;
 use crate::utils::{commit_changes, set_unstake_state_of_position};
 use crate::{
     guards::reject_anonymous_caller,
@@ -50,7 +53,6 @@ async fn unstake_impl(position_id: UnstakeArgs) -> UnstakeResponse {
 
     let amount_to_unstake = position.staked.clone();
     let amount_to_transfer = amount_to_unstake.clone() - GLDT_TX_FEE;
-    let gldt_ledger = read_state(|s| s.data.gldt_ledger_id);
     set_unstake_state_of_position(
         &position_id,
         &position,
@@ -58,6 +60,32 @@ async fn unstake_impl(position_id: UnstakeArgs) -> UnstakeResponse {
     );
     commit_changes().await;
 
+    let stake_position = transfer_stake_to_user(
+        amount_to_transfer,
+        amount_to_unstake,
+        caller,
+        position_id,
+        position,
+    )
+    .await?;
+
+    let position_id_to_archive = position_id.clone();
+    let position_to_archive = stake_position.clone();
+    ic_cdk::spawn(async move {
+        let _ = archive_stake_position(position_id_to_archive, position_to_archive).await;
+    });
+
+    Ok((stake_position, timestamp_millis(), position_id).into())
+}
+
+async fn transfer_stake_to_user(
+    amount_to_transfer: Nat,
+    amount_to_unstake: Nat,
+    caller: Principal,
+    position_id: StakePositionId,
+    position: StakePosition,
+) -> Result<StakePosition, UnstakeRequestErrors> {
+    let gldt_ledger = read_state(|s| s.data.gldt_ledger_id);
     let transfer_args = TransferArg {
         from_subaccount: None,
         to: Account {
@@ -86,7 +114,7 @@ async fn unstake_impl(position_id: UnstakeArgs) -> UnstakeResponse {
                     .update_stake_position(&position_id, updated_position.clone());
                 s.data.stake_system.total_staked -= amount_to_unstake;
 
-                return Ok((updated_position, timestamp_millis(), position_id).into());
+                Ok(updated_position)
             })
         }
         Ok(Err(e)) => {

@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use crate::client::gldt_stake::{
-    _add_reward_round, get_active_user_positions, get_total_allocated_rewards,
+    _add_reward_round, get_active_user_positions, get_reward_rounds, get_total_allocated_rewards,
     process_oldest_reward_round, start_dissolving,
 };
 use crate::client::icrc1::client::transfer;
@@ -116,7 +116,7 @@ fn process_staking_rewards_works() {
     //              W E E K   0
     // ---------------------------------------
     // wait for reward allocation to process
-    // we expect each stake position to receive 1,000 GLDGov because there are 10 stake positions each with a 10% share of the GLDT Stake pool
+    // we expect each stake position to receive 1,000 GOLDAO because there are 10 stake positions each with a 10% share of the GLDT Stake pool
     // we setup the environment so that the date is friday which means each position will still have an age bonus of 1.0 after advancing 6 days, see docs on how age bonus advances
 
     add_rewards_to_neurons(
@@ -145,7 +145,7 @@ fn process_staking_rewards_works() {
                 .get(0)
                 .unwrap()
                 .claimable_rewards
-                .get("GLDGov")
+                .get("GOLDAO")
                 .unwrap(),
             &Nat::from(100_000_000_000u64)
         );
@@ -270,8 +270,8 @@ fn test_processing_faulty_rounds() {
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
-    let gldgov_ledger = token_ledgers
-        .get("gldgov_ledger_canister_id")
+    let goldao_ledger = token_ledgers
+        .get("goldao_ledger_canister_id")
         .unwrap()
         .clone();
 
@@ -280,7 +280,7 @@ fn test_processing_faulty_rounds() {
     transfer(
         pic,
         controller,
-        gldgov_ledger,
+        goldao_ledger,
         None,
         Account {
             owner: gldt_stake_canister_id,
@@ -290,15 +290,19 @@ fn test_processing_faulty_rounds() {
     )
     .unwrap();
     let mut rewards = HashMap::new();
-    rewards.insert("GLDGov".to_string(), Nat::from(amount_1));
+    rewards.insert("GOLDAO".to_string(), Nat::from(amount_1));
     _add_reward_round(pic, controller, gldt_stake_canister_id, &rewards).unwrap();
+
+    let current_reward_rounds =
+        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    assert_eq!(current_reward_rounds.len(), 1);
 
     // add second round
     let amount_2 = 2_000_000_000u128;
     transfer(
         pic,
         controller,
-        gldgov_ledger,
+        goldao_ledger,
         None,
         Account {
             owner: gldt_stake_canister_id,
@@ -308,8 +312,12 @@ fn test_processing_faulty_rounds() {
     )
     .unwrap();
     let mut rewards = HashMap::new();
-    rewards.insert("GLDGov".to_string(), Nat::from(amount_2));
+    rewards.insert("GOLDAO".to_string(), Nat::from(amount_2));
     _add_reward_round(pic, controller, gldt_stake_canister_id, &rewards).unwrap();
+
+    let current_reward_rounds =
+        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    assert_eq!(current_reward_rounds.len(), 2);
 
     // process rounds
     process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &()).unwrap();
@@ -318,10 +326,13 @@ fn test_processing_faulty_rounds() {
         .get(0)
         .unwrap()
         .claimable_rewards
-        .get("GLDGov")
+        .get("GOLDAO")
         .unwrap();
 
     assert_eq!(rewards, &amount_1);
+    let current_reward_rounds =
+        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    assert_eq!(current_reward_rounds.len(), 1);
 
     process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &()).unwrap();
     let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
@@ -329,10 +340,13 @@ fn test_processing_faulty_rounds() {
         .get(0)
         .unwrap()
         .claimable_rewards
-        .get("GLDGov")
+        .get("GOLDAO")
         .unwrap();
 
     assert_eq!(rewards, &(amount_1.clone() + amount_2.clone()));
+    let current_reward_rounds =
+        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    assert_eq!(current_reward_rounds.len(), 0);
 
     // try to process when there are no rounds left
     let res = process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &());
@@ -343,7 +357,7 @@ fn test_processing_faulty_rounds() {
         get_total_allocated_rewards(pic, Principal::anonymous(), gldt_stake_canister_id, &());
 
     assert_eq!(
-        total_rewards_allocated.get("GLDGov").unwrap(),
+        total_rewards_allocated.get("GOLDAO").unwrap(),
         &Nat::from(amount_1.clone() + amount_2.clone())
     )
 }

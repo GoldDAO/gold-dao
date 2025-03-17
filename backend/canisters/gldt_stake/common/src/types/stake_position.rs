@@ -7,9 +7,7 @@ use std::{borrow::Cow, collections::HashMap};
 use types::TimestampMillis;
 
 use super::reward_tokens::TokenSymbol;
-use super::stake_position_event::{
-    ClaimRewardStatus, UnstakeEarlyStatus, UnstakeState, UnstakeStatus,
-};
+use super::stake_position_event::{ClaimRewardStatus, UnstakeState};
 use super::{ledgers::GLDT_TX_FEE, numeric::ScaledArithmetic, reward_tokens::RewardTokens};
 
 pub type StakePositionId = u64;
@@ -44,6 +42,12 @@ pub struct StakePosition {
     pub unstake_state: UnstakeState,
 }
 
+#[cfg(feature = "inttest")]
+pub const MAX_STAKE_POSITION_SIZE: u32 = 90_000;
+
+#[cfg(not(feature = "inttest"))]
+pub const MAX_STAKE_POSITION_SIZE: u32 = 400;
+
 impl Storable for StakePosition {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
@@ -51,7 +55,10 @@ impl Storable for StakePosition {
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
-    const BOUND: Bound = Bound::Unbounded;
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_STAKE_POSITION_SIZE,
+        is_fixed_size: false,
+    };
 }
 
 impl StakePosition {
@@ -59,7 +66,7 @@ impl StakePosition {
         let mut claimable_rewards = HashMap::new();
         claimable_rewards.insert("ICP".to_string(), Nat::from(0u64));
         claimable_rewards.insert("OGY".to_string(), Nat::from(0u64));
-        claimable_rewards.insert("GLDGov".to_string(), Nat::from(0u64));
+        claimable_rewards.insert("GOLDAO".to_string(), Nat::from(0u64));
         Self {
             owned_by: owner,
             staked: initial_stake_amount,
@@ -276,6 +283,7 @@ pub enum RemoveRewardErrors {
 }
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub enum AddStakePositionErrors {
+    CanisterAtCapacity(String),
     MaxActiveStakePositions(String),
     InvalidPrincipal(String),
     InvalidStakeAmount(String),
@@ -580,7 +588,7 @@ mod tests {
 
         position
             .claimable_rewards
-            .insert(format!("GLDGov"), Nat::from(1000u64));
+            .insert(format!("GOLDAO"), Nat::from(1000u64));
         position
             .claimable_rewards
             .insert(format!("ICP"), Nat::from(1000u64));
@@ -589,7 +597,7 @@ mod tests {
             .insert(format!("OGY"), Nat::from(1000u64));
 
         assert_eq!(
-            position.claimable_rewards.get("GLDGov"),
+            position.claimable_rewards.get("GOLDAO"),
             Some(&Nat::from(1000u64))
         );
         assert_eq!(
@@ -601,10 +609,10 @@ mod tests {
             Some(&Nat::from(1000u64))
         );
 
-        let res = position.can_claim_reward(&"GLDGov".to_string(), &Nat::from(1000u64));
+        let res = position.can_claim_reward(&"GOLDAO".to_string(), &Nat::from(1000u64));
         assert_matches!(res, Ok(_));
 
-        let res = position.can_claim_reward(&"GLDGov".to_string(), &Nat::from(1001u64));
+        let res = position.can_claim_reward(&"GOLDAO".to_string(), &Nat::from(1001u64));
         matches!(res, Err(RemoveRewardErrors::InsufficientBalance(_)));
     }
 
@@ -615,7 +623,7 @@ mod tests {
         let _ = position.prepare_start_dissolving();
 
         assert_eq!(
-            position.claimable_rewards.get("GLDGov"),
+            position.claimable_rewards.get("GOLDAO"),
             Some(&Nat::from(0u64))
         );
 
@@ -623,7 +631,7 @@ mod tests {
         matches!(res, Err(StakePositionError::StartDissolvingError(_)));
 
         assert_eq!(
-            position.claimable_rewards.get("GLDGov"),
+            position.claimable_rewards.get("GOLDAO"),
             Some(&Nat::from(0u64))
         );
     }

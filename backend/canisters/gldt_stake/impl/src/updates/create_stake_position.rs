@@ -16,7 +16,7 @@ use ic_cdk::{caller, update};
 use icrc_ledger_canister_c2c_client::icrc2_transfer_from;
 use icrc_ledger_types::{icrc1::account::Account, icrc2::transfer_from::TransferFromArgs};
 use tracing::error;
-use utils::{env::Environment, retry_async::retry_async};
+use utils::{env::Environment, memory::MemorySize, retry_async::retry_async};
 
 use crate::{
     guards::{reject_anonymous_caller, GuardPrincipal},
@@ -30,6 +30,9 @@ async fn create_stake_position(args: CreateStakePositionArgs) -> CreateStakePosi
 }
 
 async fn create_stake_position_impl(amount: Nat) -> CreateStakePositionResponse {
+    // 0. check capacity to hold more positions
+    is_main_canister_at_capacity()?;
+
     // 1. check user isn't anon
     let caller = caller();
     reject_anonymous_caller().map_err(|e| AddStakePositionErrors::InvalidPrincipal(e))?;
@@ -112,4 +115,16 @@ async fn transfer_gldt(amount: &Nat) -> Result<Nat, AddStakePositionErrors> {
             Err(AddStakePositionErrors::CallError(format!("{e:?}")))
         }
     }
+}
+
+fn is_main_canister_at_capacity() -> Result<(), AddStakePositionErrors> {
+    let memory = MemorySize::used();
+    let used_stable = memory.stable as u128;
+    let limit = 300 * 1024 * 1024 * (1024 as u128); // 300GB
+
+    if used_stable > limit {
+        return Err(AddStakePositionErrors::CanisterAtCapacity(format!("Cant add more stake positions because the main canister is using {used_stable} bytes. limit is {limit}")));
+    }
+
+    Ok(())
 }
