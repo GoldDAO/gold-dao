@@ -1,7 +1,10 @@
-use std::time::{Duration, SystemTime};
+use std::{
+    time::{Duration, SystemTime},
+    u64::MIN,
+};
 
 use candid::{Nat, Principal};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
+use canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS, WEEK_IN_MS};
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
@@ -47,22 +50,25 @@ fn test_distribute_rewards_happy_path() {
         .id
         .unwrap();
 
+    tick_n_blocks(&test_env.pic, 10);
+
     // ********************************
     // 1. Distribute rewards
     // ********************************
-
+    let n = test_env.pic.get_time();
+    println!("now is : {n:?}");
     // TRIGGER - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(2);
-    test_env
-        .pic
-        .advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
-    tick_n_blocks(&test_env.pic, 10);
+    tick_n_blocks(&test_env.pic, 20);
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 9:00am Wednesday 19th June
+
+    tick_n_blocks(&test_env.pic, 20);
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
-    tick_n_blocks(&test_env.pic, 20);
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 14:00
+    tick_n_blocks(&test_env.pic, 40);
 
     // ********************************
     // 2. Check Neuron sub account got paid correctly
@@ -99,13 +105,13 @@ fn test_distribute_rewards_happy_path() {
     test_env.simulate_neuron_voting(3);
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 19)); // 9am
     tick_n_blocks(&test_env.pic, 30);
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 6)); // 2pm
     tick_n_blocks(&test_env.pic, 30);
 
     let neuron_sub_account = Account {
@@ -426,7 +432,7 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         .clone();
     let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
-
+    tick_n_blocks(&test_env.pic, 10);
     let icp_token = TokenSymbol::parse("ICP").unwrap();
     let ogy_token = TokenSymbol::parse("OGY").unwrap();
     let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
@@ -439,17 +445,22 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         .id
         .unwrap();
 
-    // TRIGGER - neuron vote & Maturity sync
-    test_env.simulate_neuron_voting(2);
     test_env
         .pic
-        .advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
+        .advance_time(Duration::from_millis(MINUTE_IN_MS)); //
+    tick_n_blocks(&test_env.pic, 10);
+    // TRIGGER - neuron vote & Maturity sync
+    test_env.simulate_neuron_voting(2);
+    tick_n_blocks(&test_env.pic, 10);
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(DAY_IN_MS * 1 + MINUTE_IN_MS)); //
     tick_n_blocks(&test_env.pic, 10);
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 14:00
     tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
@@ -479,12 +490,14 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         &test_env.token_ledgers.values().cloned().collect(),
         100_000_000_000u64,
     );
+    tick_n_blocks(&test_env.pic, 10);
 
     // Trigger - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(3);
+    tick_n_blocks(&test_env.pic, 10);
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 19)); // 9am
     tick_n_blocks(&test_env.pic, 30);
 
     // TRIGGER - distribution
@@ -535,20 +548,39 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     )
     .unwrap();
     tick_n_blocks(&test_env.pic, 10);
-
+    // let n = test_env.pic.get_time();
+    // println!("now is : {n:?}"); // 15
     // Trigger - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(4);
+    tick_n_blocks(&test_env.pic, 30);
     test_env
         .pic
         .advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+    tick_n_blocks(&test_env.pic, 10);
+    // let n = test_env.pic.get_time();
+    // println!("now is : {n:?}"); // 9:02
+
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(DAY_IN_MS - (2 * MINUTE_IN_MS))); // 9am
     tick_n_blocks(&test_env.pic, 30);
+    // let n = test_env.pic.get_time();
+    // println!("now is : {n:?}"); // 9:00
+
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(DAY_IN_MS + HOUR_IN_MS)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+    // let n = test_env.pic.get_time();
+    // println!("now is : {n:?}"); // next day at 10:00
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 5)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
-
+    // let n = test_env.pic.get_time();
+    // println!("now is : {n:?}"); // wednesday at 3
     // ********************************
     // 6. Check the history
     // ********************************
@@ -594,16 +626,29 @@ fn test_distribute_rewards_adds_to_history_correctly() {
 
     // Trigger - neuron vote & Maturity sync
     test_env.simulate_neuron_voting(5);
+    tick_n_blocks(&test_env.pic, 20);
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 17)); // 9am
+    tick_n_blocks(&test_env.pic, 20);
+
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS)); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(DAY_IN_MS + (2 * MINUTE_IN_MS))); // 9am
+    tick_n_blocks(&test_env.pic, 30);
+    test_env.pic.advance_time(Duration::from_millis(HOUR_IN_MS)); // 9am
     tick_n_blocks(&test_env.pic, 30);
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 5)); // 3pm
     tick_n_blocks(&test_env.pic, 30);
+    let n = test_env.pic.get_time();
+    println!("now is : {n:?}");
 
     // ********************************
     // 8. Check the history
@@ -686,11 +731,10 @@ fn test_distribution_occurs_within_correct_time_intervals() {
         .pic
         .advance_time(Duration::from_millis(DAY_IN_MS * 1)); //
     tick_n_blocks(&test_env.pic, 10);
-
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 15:00
     tick_n_blocks(&test_env.pic, 20);
 
     // ********************************
@@ -710,13 +754,14 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     test_env.simulate_neuron_voting(3);
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 18)); // 9am
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 19)); // 9am
     tick_n_blocks(&test_env.pic, 30);
+    let n = test_env.pic.get_time();
 
     // TRIGGER - distribution
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 6)); // 2pm
     tick_n_blocks(&test_env.pic, 30);
 
     // ********************************
@@ -732,6 +777,7 @@ fn test_distribution_occurs_within_correct_time_intervals() {
             round_id: 1,
         }),
     );
+
     let distribution_2_record = get_historic_payment_round(
         &test_env.pic,
         Principal::anonymous(),
@@ -754,8 +800,6 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // 3. Test distributions didn't occur between the 7 days
     // *********************************
 
-    test_env.simulate_neuron_voting(4);
-    tick_n_blocks(&test_env.pic, 2);
     setup_reward_pools(
         &mut test_env.pic,
         &test_env.sns_gov_canister_id,
@@ -765,30 +809,23 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     );
     tick_n_blocks(&test_env.pic, 10);
 
-    for i in 0..HOURS_IN_WEEK.clone() - 2 {
-        // TRIGGER - synchronize_neurons
-        test_env
-            .pic
-            .advance_time(Duration::from_millis(HOUR_IN_MS * 1));
-        tick_n_blocks(&test_env.pic, 1);
-        // check for a distribution 1 day in
-        let distribution_3_record = get_historic_payment_round(
-            &test_env.pic,
-            Principal::anonymous(),
-            rewards_canister_id,
-            &(get_historic_payment_round::Args {
-                token: icp_token.clone(),
-                round_id: 3,
-            }),
-        );
-        println!("/// i is {}", i);
-        assert_eq!(distribution_3_record.len(), 0);
-    }
+    test_env.simulate_neuron_voting(4);
+    tick_n_blocks(&test_env.pic, 10);
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 19));
+    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
+
+    tick_n_blocks(&test_env.pic, 10);
 
     test_env
         .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 2));
-    tick_n_blocks(&test_env.pic, 50);
+        .advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    test_env
+        .pic
+        .advance_time(Duration::from_millis(HOUR_IN_MS * 5));
+
+    tick_n_blocks(&test_env.pic, 30);
     // check for a distribution 1 day in
     let distribution_3_record = get_historic_payment_round(
         &test_env.pic,

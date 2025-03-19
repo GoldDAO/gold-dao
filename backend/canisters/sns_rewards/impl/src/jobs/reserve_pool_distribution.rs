@@ -13,10 +13,9 @@ use crate::{
     utils::transfer_token,
 };
 use candid::{Nat, Principal};
-use canister_time::{now_millis, run_interval, DAY_IN_MS};
+use canister_time::{now_millis, start_job_daily_at, DAY_IN_MS};
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use sns_rewards_api_canister::subaccounts::{RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT};
-use std::time::Duration;
 use tracing::{debug, error, info};
 use types::{Milliseconds, TimestampMillis, TokenSymbol};
 use utils::env::Environment;
@@ -24,14 +23,15 @@ use utils::env::Environment;
 const DISTRIBUTION_INTERVAL: Milliseconds = DAY_IN_MS;
 
 pub fn start_job() {
-    run_interval(
-        Duration::from_millis(DISTRIBUTION_INTERVAL),
-        run_distribution,
-    );
+    start_job_daily_at(6, run);
 }
 
-pub fn run_distribution() {
-    ic_cdk::spawn(distribute_reserve_pool())
+pub fn run() {
+    ic_cdk::spawn(run_async());
+}
+
+async fn run_async() {
+    distribute_reserve_pool().await;
 }
 
 pub async fn distribute_reserve_pool() {

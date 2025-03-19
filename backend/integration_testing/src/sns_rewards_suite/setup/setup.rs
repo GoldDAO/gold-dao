@@ -1,6 +1,10 @@
-use std::{collections::HashMap, time::SystemTime};
+use std::{
+    collections::HashMap,
+    time::{Duration, SystemTime},
+};
 
 use candid::{encode_one, Nat, Principal};
+use canister_time::HOUR_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
@@ -179,6 +183,7 @@ impl RewardsTestEnvBuilder {
             .with_sns_subnet()
             .with_application_subnet()
             .build();
+        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718697600000)); // 18 June 2024 08:00
 
         // set the date
         // Wednesday Jun 19, 2024, 7:00:00 AM
@@ -210,8 +215,12 @@ impl RewardsTestEnvBuilder {
                 self.initial_reward_pool_amount.0.try_into().unwrap(),
             );
         }
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718701200000)); // Tuesday Jun 18, 2024, 9:00:00 AM
-
+        // Tuesday Jun 18, 2024, 9:00:00 AM
+        pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+        pic.tick();
+        pic.tick();
+        pic.tick();
+        pic.tick();
         RewardsTestEnv {
             controller: self.controller,
             neuron_data,
