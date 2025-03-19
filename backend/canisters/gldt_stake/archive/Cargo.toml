@@ -1,0 +1,44 @@
+[package]
+name = "gldt_stake_archive"
+version = "0.1.0"
+description = "GLDT stake archive"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+default = []  # Empty default features
+inttest = ["gldt_stake_common/inttest",  "gldt_stake_api_archive/inttest"]
+
+[dependencies]
+candid = { workspace = true }
+canister_logger = { path = '../../../libraries/canister_logger' }
+canister_state_macros = { path = '../../../libraries/canister_state_macros' }
+canister_time = { path = '../../../libraries/canister_time' }
+canister_tracing_macros = { path = '../../../libraries/canister_tracing_macros' }
+http_request = { path = '../../../libraries/http_request' }
+ic-cdk = { workspace = true }
+ic-cdk-macros = { workspace = true }
+ic-cdk-timers = { workspace = true }
+ic-stable-structures = { workspace = true }
+serde_json = { workspace = true }
+icrc-ledger-types = { workspace = true }
+ic-ledger-types = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_bytes = { workspace = true }
+serializer = { path = '../../../libraries/serializer' }
+icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
+icrc_ledger_canister = { path = "../../../external_canisters/icrc_ledger/api" }
+stable_memory = { path = '../../../libraries/stable_memory' }
+types = { path = '../../../libraries/types' }
+utils = { path = '../../../libraries/utils' }
+tracing = { workspace = true }
+futures = { workspace = true }
+gldt_stake_api_archive = { path = "../api_archive", features = []}
+gldt_stake_common = { path = "../common", features = []}
+candid_gen = { path = "../../../libraries/candid_gen" }
+origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api'}
+origyn_nft_reference_c2c_client = { path = '../../../external_canisters/origyn_nft_reference/c2c_client'}
+ic0 = "0.23.0"

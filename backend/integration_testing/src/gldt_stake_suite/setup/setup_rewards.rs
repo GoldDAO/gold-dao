@@ -31,8 +31,8 @@ pub fn setup_rewards_canister(
         .expect("couldn't find ledger with 'icp_ledger_canister_id'")
         .clone();
     let sns_ledger_canister_id = token_ledgers
-        .get("gldgov_ledger_canister_id")
-        .expect("couldn't find ledger with 'gldgov_ledger_canister_id'")
+        .get("goldao_ledger_canister_id")
+        .expect("couldn't find ledger with 'goldao_ledger_canister_id'")
         .clone();
     let ogy_ledger_canister_id = token_ledgers
         .get("ogy_ledger_canister_id")

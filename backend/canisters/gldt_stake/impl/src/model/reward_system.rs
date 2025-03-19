@@ -19,13 +19,9 @@ pub struct RewardSystem {
 
 impl Default for RewardSystem {
     fn default() -> Self {
-        let mut reward_history = HashMap::new();
-        reward_history.insert("ICP".to_string(), Nat::from(0u64));
-        reward_history.insert("OGY".to_string(), Nat::from(0u64));
-        reward_history.insert("GLDGov".to_string(), Nat::from(0u64));
         Self {
             rounds: VecDeque::default(),
-            reward_history,
+            reward_history: HashMap::new(),
         }
     }
 }
@@ -82,6 +78,7 @@ impl RewardSystem {
     pub fn add_to_reward_history(&mut self, token_symbol: &TokenSymbol, rewards: Nat) {
         self.reward_history
             .entry(token_symbol.clone())
-            .and_modify(|current_reward| *current_reward += rewards);
+            .and_modify(|current_reward| *current_reward += rewards.clone())
+            .or_insert(rewards);
     }
 }

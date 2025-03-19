@@ -27,6 +27,7 @@ if [[ $DEPLOYMENT_VIA == "direct" ]]; then
   if [[ $REINSTALL == "reinstall" ]]; then
     echo "Reinstalling $CANISTER directly via dfx with arguments: $ARGUMENTS"
     dfx canister install $CANISTER \
+      -q \
       --network $NETWORK \
       --mode reinstall \
       --argument "$ARGUMENTS" \
@@ -40,11 +41,13 @@ if [[ $DEPLOYMENT_VIA == "direct" ]]; then
 
     echo "Attemping to install canister $CANISTER"
     dfx canister install $CANISTER \
+      -q \
       --network $NETWORK \
       --mode upgrade \
       --argument "$ARGUMENTS" \
       --wasm backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
       -y
+
 
     echo "Attemping to start canister $CANISTER";
     dfx canister start $CANISTER --network $NETWORK;

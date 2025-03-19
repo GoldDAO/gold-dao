@@ -71,8 +71,8 @@ pub fn generate_ledger_canister_init_args(
         fee_collector_account: None,
         metadata: Vec::new(),
         archive_options: ArchiveOptionsIcrc {
-            trigger_threshold: 1000,
-            num_blocks_to_archive: 1000,
+            trigger_threshold: 100000,
+            num_blocks_to_archive: 100000,
             controller_id: controller,
         },
     })

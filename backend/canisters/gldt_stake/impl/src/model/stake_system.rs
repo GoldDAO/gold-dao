@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use crate::memory::{get_stake_positions_memory, VM};
 use candid::{Nat, Principal};
+use canister_time::timestamp_millis;
 use gldt_stake_common::{
-    reward_tokens::RewardTypes,
+    reward_tokens::{RewardTypes, TokenSymbol},
     stake_position::{StakePosition, StakePositionId},
 };
 use ic_stable_structures::BTreeMap as StableBTreeMap;
@@ -27,6 +28,10 @@ pub struct StakeSystem {
     pub reward_types: RewardTypes,
     /// available to transfer to fee account
     pub pending_fee_transfer_amount: Nat,
+    /// the date time that the canister went live set in init - used for APY calculations - calculating an average of weekly rewards based on the number of weeks that has passed
+    pub genesis_datetime: TimestampMillis,
+    /// usd price of reward tokens + gldt - used for APY calculations
+    pub token_usd_values: HashMap<TokenSymbol, f64>,
 }
 
 fn init_stake_system_memory() -> StableBTreeMap<StakePositionId, StakePosition, VM> {
@@ -44,6 +49,8 @@ impl Default for StakeSystem {
             cached_total_weighted_stake: Nat::from(0u64),
             reward_types: HashMap::new(),
             pending_fee_transfer_amount: Nat::from(0u64),
+            genesis_datetime: timestamp_millis(),
+            token_usd_values: HashMap::new(),
         }
     }
 }
@@ -120,6 +127,10 @@ impl StakeSystem {
         updated_position: StakePosition,
     ) -> Option<StakePosition> {
         self.stakes.insert(*id, updated_position)
+    }
+
+    pub fn set_token_usd_values(&mut self, values: HashMap<TokenSymbol, f64>) {
+        self.token_usd_values = values;
     }
 }
 

@@ -4,7 +4,7 @@
   before_script:
     - echo "Loading identity for network" $TARGET_NETWORK
     - dfx --version
-    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE
+    - dfx identity import --storage-mode plaintext gitlab-ci-gldt $PEM_FILE > /dev/null 2>&1
     - dfx identity use gitlab-ci-gldt
     - dfx identity whoami
     - if [[ $(date -R) == "Fri"* ]]; then echo "It appear you are deploying on a Friday....."; fi

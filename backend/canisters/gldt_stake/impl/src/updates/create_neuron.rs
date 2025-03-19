@@ -42,8 +42,8 @@ async fn create_neuron_impl(amount: u64) -> Result<Vec<u8>, CreateNeuronError> {
 
     let (sns_governance_canister, gld_ledger_id) = read_state(|s| {
         (
-            s.data.gld_sns_governance_canister_id,
-            s.data.gldgov_ledger_id,
+            s.data.goldao_sns_governance_canister_id,
+            s.data.goldao_ledger_id,
         )
     });
 
@@ -79,7 +79,6 @@ async fn create_neuron_impl(amount: u64) -> Result<Vec<u8>, CreateNeuronError> {
     match sns_governance_canister_c2c_client::manage_neuron(
         sns_governance_canister,
         &(ManageNeuron {
-            // TODO: fix
             subaccount: vec![],
             command: Some(Command::ClaimOrRefresh(ClaimOrRefresh {
                 by: Some(By::MemoAndController(MemoAndController {

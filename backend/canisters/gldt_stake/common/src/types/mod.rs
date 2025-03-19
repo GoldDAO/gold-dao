@@ -1,4 +1,5 @@
 pub mod accounts;
+pub mod archive;
 pub mod ledgers;
 pub mod numeric;
 pub mod reward_round;

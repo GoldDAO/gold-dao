@@ -19,7 +19,7 @@ async fn manage_sns_neuron_validate(args: ManageSnsNeuronArgs) -> Result<String,
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
 async fn manage_sns_neuron(args: ManageSnsNeuronArgs) -> ManageSnsNeuronResponse {
-    let canister_id = read_state(|s| s.data.gld_sns_governance_canister_id);
+    let canister_id = read_state(|s| s.data.goldao_sns_governance_canister_id);
 
     match manage_sns_neuron_impl(canister_id, args.neuron_id, args.command).await {
         Ok(ok) => {
