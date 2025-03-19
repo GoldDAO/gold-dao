@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NETWORK=$1
-DEPLOYMENT_VIA="proposal"
+DEPLOYMENT_VIA="direct"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh gldt_stake $NETWORK
 
@@ -95,4 +95,4 @@ else
   }})"
 fi
 
-. ./scripts/deploy_backend_canister.sh sns_rewards $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
+. ./scripts/deploy_backend_canister.sh gldt_stake $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
