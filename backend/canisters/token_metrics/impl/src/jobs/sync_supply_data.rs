@@ -23,7 +23,7 @@ pub fn run() {
 pub async fn sync_supply_data() {
     let ledger_canister_id = read_state(|state| state.data.sns_ledger_canister);
 
-    // Get the total supply of GoldGov
+    // Get the total supply of GOLDAO
     match icrc_ledger_canister_c2c_client::icrc1_total_supply(ledger_canister_id).await {
         Ok(total_supply) => {
             let treasury_acocunt_string = read_state(|state| state.data.treasury_account.clone());
@@ -42,7 +42,7 @@ pub async fn sync_supply_data() {
             let message = format!("{err:?}");
             error!(
                 ?message,
-                "Error while getting the total supply data for GoldGov"
+                "Error while getting the total supply data for GOLDAO"
             );
         }
     }

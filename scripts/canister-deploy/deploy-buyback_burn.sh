@@ -29,7 +29,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
   MIN_BURN_AMOUNT=30_000_000_000
   ICP_SWAP_CANISTER_ID="7eikv-2iaaa-aaaag-qdgwa-cai"
 
-  # ICP token data + GOLDGov/ICP swap pool
+  # ICP token data + GOLDAO/ICP swap pool
   GLDGOV_ICP_POOL='record {
       token = record {
           fee = 10_000 : nat64;

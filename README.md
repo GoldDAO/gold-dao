@@ -10,9 +10,16 @@ See the [official website](https://gldt.org/) for more informations about the pr
 
 All the backend canisters are included in the folder [`backend/canisters`](backend/canisters/). This includes
 
-- [`gldt_swap (WIP)`](backend/canisters/gldt_swap/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
+- [`buyback_burn`](backend/canisters/buyback_burn/): A canister that swaps `ICP` tokens for `GOLDAO` and then burns the tokens.
+- [`gldt_stake (WIP)`](backend/canisters/gldt_stake/): The core logic for the `GLDT` staking.
+- [`gldt_swap`](backend/canisters/gldt_swap/): The core logic for the swapping in between `GLD NFT` and `GLDT`.
+- [`gldt_swap_archive`](backend/canisters/gldt_swap_archive/): The archive canister used for the scalability of gldt_swap.
 - [`icp_neuron`](backend/canisters/icp_neuron/): The canister that controls the ICP neurons of the Gold DAO.
-- [`sns_rewards (WIP)`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
+- [`sns_neuron_controller`](backend/canisters/sns_neuron_controller/): The canister that controls the SNS neurons of the Gold DAO.
+- [`sns_rewards`](backend/canisters/sns_rewards/): The canister that manages the staking rewards of the Gold DAO. governance participants.
+- [`super_stats_v3`](backend/canisters/super_stats_v3/): The canister that collects the Gold DAO statistics.
+- [`token_metrics`](backend/canisters/token_metrics/): The canister that collects the Gold NFT metrics.
+- [`usdg_minter (WIP)`](backend/canisters/usdg_minter/): The canister that allows users to mint `USDG` using `GLDT` as collateral.
 
 ### Frontend canisters
 

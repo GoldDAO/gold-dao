@@ -56,7 +56,7 @@ pub struct State {
     pub one_centigram_of_gold_price: GoldPrice,
     pub last_rate_fetched_timestamp_nanos: u64,
 
-    // Medium Rate, governed by GOLDGov
+    // Medium Rate, governed by GOLDAO
     pub interest_rates: BTreeMap<FeeBucket, f64>,
     pub previous_medium_rate: f64,
 
