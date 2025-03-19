@@ -171,7 +171,7 @@ impl Default for ProposalsMetrics {
     fn default() -> Self {
         ProposalsMetrics {
             total_proposals: 0,
-            // This needs a new value for GoldGov
+            // This needs a new value for GOLDAO
             reward_base_current_year: 250_000_000 * E8S_PER_ICP,
             daily_voting_rewards: (250_000_000 / 365) * E8S_PER_ICP,
             total_voting_power: 0,

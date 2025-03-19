@@ -134,7 +134,7 @@ pub struct Data {
     /// ledger balances, updated every 1hr
     #[serde(skip, default = "init_balance_list")]
     pub balance_list: StableBTreeMap<Principal, PrincipalBalance, VM>,
-    /// Token supply data, such as total supply and circulating supply, for GoldGov
+    /// Token supply data, such as total supply and circulating supply, for GOLDAO
     pub supply_data: TokenSupplyData,
     /// Token supply data, such as total supply and circulating supply, for GLDT
     pub gldt_supply_data: TokenSupplyData,
