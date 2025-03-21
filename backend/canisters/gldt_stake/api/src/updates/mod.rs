@@ -8,6 +8,7 @@ pub mod get_historic_positions_by_user;
 pub mod get_historic_positions_total_by_user;
 pub mod manage_neuron;
 pub mod manual_sync_neurons;
+pub mod manual_token_transfer;
 pub mod process_oldest_reward_round;
 pub mod start_dissolving;
 pub mod unstake;

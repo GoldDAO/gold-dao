@@ -7,7 +7,9 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use canister_time::{now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS};
+use canister_time::{
+    now_millis, run_interval, start_job_daily_at, timestamp_millis, DAY_IN_MS, HOUR_IN_MS,
+};
 use sns_governance_canister::types::{Neuron, NeuronId};
 use std::{
     collections::{btree_map, HashMap},
@@ -16,37 +18,33 @@ use std::{
 use tracing::{debug, error, info, warn};
 use types::{Maturity, Milliseconds, NeuronInfo};
 
-use crate::state::{mutate_state, read_state, RuntimeState};
-
-const SYNC_NEURONS_INTERVAL: Milliseconds = HOUR_IN_MS;
+use crate::{
+    state::{mutate_state, read_state, RuntimeState},
+    utils::tracer,
+};
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(SYNC_NEURONS_INTERVAL), run);
+    start_job_daily_at(9, run);
 }
 
 pub fn run() {
-    ic_cdk::spawn(synchronise_neuron_data())
+    ic_cdk::spawn(run_async());
+}
+
+async fn run_async() {
+    synchronise_neuron_data().await;
 }
 
 pub async fn synchronise_neuron_data() {
     let is_synchronizing_neurons = read_state(|s| s.data.is_synchronizing_neurons);
-    // check neuron sync is within correct time frame
-    let sync_interval = match read_state(|s| s.data.neuron_sync_interval.clone()) {
-        Some(interval) => interval,
-        None => {
-            return;
-        }
-    };
-
-    let is_sync_time_valid = sync_interval.is_within_daily_interval(now_millis());
-    if !is_sync_time_valid && !is_synchronizing_neurons {
+    if is_synchronizing_neurons {
         return;
     }
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let is_test_mode = read_state(|s| s.env.is_test_mode());
     mutate_state(|state| {
-        state.data.sync_info.last_synced_start = now_millis();
-        state.set_is_synchronizing_neurons(true);
+        state.data.sync_info.last_synced_start = timestamp_millis();
+        state.set_is_synchronizing_neurons(false);
     });
 
     let mut number_of_scanned_neurons = 0;
@@ -101,7 +99,7 @@ pub async fn synchronise_neuron_data() {
     }
     info!("Successfully scanned {number_of_scanned_neurons} neurons.");
     mutate_state(|state| {
-        state.data.sync_info.last_synced_end = now_millis();
+        state.data.sync_info.last_synced_end = timestamp_millis();
         state.data.sync_info.last_synced_number_of_neurons = number_of_scanned_neurons;
         state.set_is_synchronizing_neurons(false);
     });

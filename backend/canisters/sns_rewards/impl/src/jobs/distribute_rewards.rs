@@ -18,10 +18,14 @@ payments are done in batches and upon each individual transfer response it's sta
 
 use crate::{
     state::{mutate_state, read_state},
-    utils::transfer_token,
+    utils::{tracer, transfer_token},
 };
+
 use candid::{Nat, Principal};
-use canister_time::{now_millis, run_interval, DAY_IN_MS, HOUR_IN_MS, WEEK_IN_MS};
+use canister_time::{
+    now_millis, run_interval, start_job_weekly_at, timestamp_millis, DAY_IN_MS, HOUR_IN_MS,
+    WEEK_IN_MS,
+};
 use futures::{
     future::{err, join_all},
     Future, FutureExt,
@@ -35,14 +39,20 @@ use sns_rewards_api_canister::{
 use std::time::Duration;
 use tracing::{debug, error, info};
 use types::{Milliseconds, TimestampMillis, TokenSymbol};
+use utils::retry_async;
 
-const DISTRIBUTION_INTERVAL: Milliseconds = HOUR_IN_MS;
 const MAX_RETRIES: u8 = 3;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(DISTRIBUTION_INTERVAL), || {
-        run_distribution(now_millis())
-    });
+    start_job_weekly_at(time::Weekday::Wednesday, 14, run, &|| timestamp_millis());
+}
+
+pub fn run() {
+    ic_cdk::spawn(run_async());
+}
+
+async fn run_async() {
+    run_distribution(timestamp_millis());
 }
 
 pub fn run_distribution(initial_run_time: TimestampMillis) {
@@ -54,9 +64,18 @@ pub fn run_distribution(initial_run_time: TimestampMillis) {
         return;
     }
 
-    if !is_distribution_allowed(initial_run_time) {
+    let distribution_in_progress = match read_state(|s| s.data.reward_distribution_in_progress) {
+        Some(boolean) => boolean,
+        None => false,
+    };
+
+    if distribution_in_progress {
         return;
     }
+
+    mutate_state(|s| {
+        s.data.reward_distribution_in_progress = Some(true);
+    });
 
     ic_cdk::spawn(distribute_rewards(0).then(move |_| {
         mutate_state(|s| {
@@ -64,49 +83,6 @@ pub fn run_distribution(initial_run_time: TimestampMillis) {
         });
         async {}
     }));
-}
-
-fn is_distribution_allowed(initial_run_time: TimestampMillis) -> bool {
-    let distribution_in_progress = match read_state(|s| s.data.reward_distribution_in_progress) {
-        Some(boolean) => boolean,
-        None => false,
-    };
-    let distribution_interval = match read_state(|s| s.data.reward_distribution_interval.clone()) {
-        Some(interval) => interval,
-        None => {
-            return false;
-        }
-    };
-    let is_distribution_time_valid =
-        distribution_interval.is_within_weekly_interval(initial_run_time.clone());
-
-    // in_progress
-    if distribution_in_progress {
-        return false;
-    }
-    if is_distribution_time_valid {
-        mutate_state(|s| {
-            s.data.reward_distribution_in_progress = Some(true);
-        });
-        return true;
-    }
-    if should_retry_existing_distribution() {
-        mutate_state(|s| {
-            s.data.reward_distribution_in_progress = Some(true);
-        });
-        return true;
-    }
-
-    false
-    // should_retry_existing_distribution()
-    // valid time
-}
-
-fn should_retry_existing_distribution() -> bool {
-    let active_rounds = read_state(|state| state.data.payment_processor.get_active_rounds());
-    active_rounds
-        .iter()
-        .any(|round| round.retries < MAX_RETRIES)
 }
 
 fn schedule_retry(initial_run_time: TimestampMillis, delay: Duration) {
@@ -190,7 +166,7 @@ pub async fn create_new_payment_rounds() {
                     });
                 }
                 Err(e) => {
-                    debug!(
+                    info!(
                         "ERROR - transferring funds to payment round sub account : {}",
                         e
                     );

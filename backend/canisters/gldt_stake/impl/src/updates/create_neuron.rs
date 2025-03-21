@@ -20,7 +20,7 @@ use sns_governance_canister::types::{
     manage_neuron_response, ManageNeuron,
 };
 use tracing::error;
-use utils::rand::generate_rand_nonce;
+use utils::{env::Environment, rand::generate_rand_nonce};
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
@@ -38,7 +38,7 @@ async fn create_neuron_impl(amount: u64) -> Result<Vec<u8>, CreateNeuronError> {
     let nonce = generate_rand_nonce()
         .await
         .map_err(|e| CreateNeuronError::InternalError(e))?;
-    let this_canister_id = caller();
+    let this_canister_id = read_state(|s| s.env.canister_id());
 
     let (sns_governance_canister, gld_ledger_id) = read_state(|s| {
         (

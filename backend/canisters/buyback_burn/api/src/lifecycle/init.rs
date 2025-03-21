@@ -15,7 +15,7 @@ pub struct InitArgs {
     pub buyback_interval_in_secs: u64,
     pub icp_swap_canister_id: Principal,
     pub burn_rate: u8,
-    pub min_burn_amount: Tokens, // in GoldGov tokens
+    pub min_burn_amount: Tokens, // in GOLDAO tokens
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug, Clone)]
