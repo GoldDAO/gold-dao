@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+#### Add
+
+- Add a method 'manual_token_transfer' to enable to let the DAO transfer funds from the canister in case needed.
+
+#### Fix
+
+- Correct the owner of a newly created SNS neuron to be the canister, not the caller
+
 ### [1.0.0] - 2025-03-10
 
 #### Description
