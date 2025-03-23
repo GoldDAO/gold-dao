@@ -1,0 +1,14 @@
+{
+    "total_gldgov_supply": {
+        "title": "Total GLDGov supply",
+        "tooltip": "Total amount of GLDGov tokens."
+    },
+    "gldgov_price": {
+        "title": "GLDGov price",
+        "tooltip": "Average price of GLDGov on the market."
+    },
+    "gldgov_marketcap": {
+        "title": "GLDGov marketcap",
+        "tooltip": "Total amount of GLDGov multiplied by the average price."
+    }
+}

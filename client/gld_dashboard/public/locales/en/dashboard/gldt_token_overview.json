@@ -1,0 +1,7 @@
+{
+    "title": "Gold Token (GLDT)",
+    "description": "Canisters are smart contracts that scale — interoperable compute units that bundle code and state, designed for internet-scale services.",
+    "total_weight_locked_in_canister_in_kg": "Total weight locked in canister in kg",
+    "number_of_swaps": "Number of swaps",
+    "gldt_marketcap": "GLDT marketcap"
+}

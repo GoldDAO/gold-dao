@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+/* html {
+  scroll-behavior: smooth;
+} */
+
+:root {
+  font-family: "Lexend", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+
+  --color-background: oklch(99.16% 0.0017 67.8);
+  --color-surface-primary: oklch(100% 0 0);
+  --color-surface-secondary: oklch(98.26% 0.0017 67.8);
+  --color-content: oklch(0 0 0);
+  --color-border: oklch(92.51% 0.0071 88.65);
+  --color-primary: oklch(73.13% 0.1059 78.87);
+  --color-secondary: oklch(0 0 0);
+
+  @media (prefers-color-scheme: dark) {
+    --color-background: oklch(19.57% 0 0);
+    --color-content: oklch(100% 0 0);
+    --color-surface-primary: oklch(23.08% 0 0);
+    --color-surface-secondary: oklch(28.09% 0 0);
+    --color-border: oklch(26.03% 0 0);
+    --color-secondary: oklch(28% 0 0);
+  }
+}
+
+@theme {
+  --color-background: var(--color-background);
+  --color-surface-primary: var(--color-surface-primary);
+  --color-surface-secondary: var(--color-surface-secondary);
+  --color-content: var(--color-content);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+}

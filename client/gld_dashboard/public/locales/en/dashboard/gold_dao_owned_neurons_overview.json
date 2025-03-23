@@ -1,0 +1,15 @@
+{
+    "title": "Gold DAO owned neurons",
+    "icp_neurons": {
+        "title": "ICP Neurons",
+        "tooltip": "Total amount of ICP stake in neurons owned by the Gold DAO."
+    },
+    "ogy_neurons": {
+        "title": "OGY Neurons",
+        "tooltip": "Total amount of OGY stake in neurons owned by the Gold DAO."
+    },
+    "wtn_neurons": {
+        "title": "WTN Neurons",
+        "tooltip": "Total amount of WTN stake in neurons owned by the Gold DAO."
+    }
+}
