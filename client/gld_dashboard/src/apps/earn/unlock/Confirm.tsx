@@ -33,6 +33,9 @@ const Confirm = () => {
     }
   );
 
+  console.log("stake_id", stateUnlock.stake_id);
+  console.log("stake", stake);
+
   if (!stateUnlock.stake_id || !stake.isSuccess) {
     return (
       <div className="flex justify-center items-center px-4 py-16 lg:py-32">

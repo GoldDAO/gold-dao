@@ -43,13 +43,13 @@ const initialState: ClaimRewardState = {
 const claimRewardReducer = (
   prev: ClaimRewardState,
   action:
-    | { type: "OPEN_CLAIM_DIALOG"; value: { stake_id: bigint } }
+    | { type: "OPEN_DIALOG_CONFIRM"; value: { stake_id: bigint } }
     | { type: "CANCEL" }
     | { type: "CONFIRM" }
     | { type: "RESET" }
 ) => {
   switch (action.type) {
-    case "OPEN_CLAIM_DIALOG":
+    case "OPEN_DIALOG_CONFIRM":
       return {
         ...prev,
         is_open_claim_dialog_confirm: true,

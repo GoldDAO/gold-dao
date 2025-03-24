@@ -24,6 +24,7 @@ import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
+import { useEffect } from "react";
 
 const StakeList = () => {
   const { authenticatedAgent, isConnected } = useAuth();
@@ -55,6 +56,13 @@ const StakeList = () => {
       fee: fee.data as bigint,
     }
   );
+
+  useEffect(() => {
+    if (fetchUserStake.isSuccess) {
+      console.log(fetchUserStake.data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchUserStake.isSuccess]);
 
   const renderDisconnectedPlaceholder = () => {
     return (
@@ -176,7 +184,7 @@ const StakeList = () => {
                 )}
                 onClick={() =>
                   dispatchClaimReward({
-                    type: "OPEN_CLAIM_DIALOG",
+                    type: "OPEN_DIALOG_CONFIRM",
                     value: { stake_id: stake.id },
                   })
                 }
@@ -189,10 +197,7 @@ const StakeList = () => {
       ))}
       {/* CLAIM REWARDS DIALOGS */}
       <Dialog
-        open={
-          claimRewardState.is_open_claim_dialog_confirm &&
-          !!claimRewardState.stake_id
-        }
+        open={claimRewardState.is_open_claim_dialog_confirm}
         handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
         title="Confirm claim rewards"
       >
