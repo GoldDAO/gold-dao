@@ -34,6 +34,9 @@ const DetailsUnstakeEarly = () => {
             queryKey: ["USER_STAKE_FETCH_ALL"],
           });
           queryClient.invalidateQueries({
+            queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
+          });
+          queryClient.invalidateQueries({
             queryKey: ["USER_FETCH_LEDGER_BALANCE_GLDT"],
           });
         },
@@ -43,7 +46,6 @@ const DetailsUnstakeEarly = () => {
 
   useEffect(() => {
     if (unstakeEarly.isIdle) {
-      // console.log("unstake early");
       handleOnUnstake();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
