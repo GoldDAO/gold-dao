@@ -16,7 +16,8 @@ const Confirm = () => {
 
   const fee = useFetchTransferFee(GLDT_LEDGER_CANISTER_ID, authenticatedAgent, {
     ledger: "gldt",
-    enabled: !!authenticatedAgent && !!isConnected && !!stateUnlock.stake_id,
+    enabled:
+      !!authenticatedAgent && isConnected && stateUnlock.stake_id !== undefined,
   });
 
   const stake = useFetchUserStakeById(
@@ -27,16 +28,13 @@ const Confirm = () => {
         isConnected &&
         !!authenticatedAgent &&
         fee.isSuccess &&
-        !!stateUnlock.stake_id,
+        stateUnlock.stake_id !== undefined,
       fee: fee.data as bigint,
       id: stateUnlock.stake_id as bigint,
     }
   );
 
-  console.log("stake_id", stateUnlock.stake_id);
-  console.log("stake", stake);
-
-  if (!stateUnlock.stake_id || !stake.isSuccess) {
+  if (!stake.isSuccess) {
     return (
       <div className="flex justify-center items-center px-4 py-16 lg:py-32">
         Loading...

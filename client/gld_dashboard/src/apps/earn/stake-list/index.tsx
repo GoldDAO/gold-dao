@@ -24,7 +24,6 @@ import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
-import { useEffect } from "react";
 
 const StakeList = () => {
   const { authenticatedAgent, isConnected } = useAuth();
@@ -56,13 +55,6 @@ const StakeList = () => {
       fee: fee.data as bigint,
     }
   );
-
-  useEffect(() => {
-    if (fetchUserStake.isSuccess) {
-      console.log(fetchUserStake.data);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchUserStake.isSuccess]);
 
   const renderDisconnectedPlaceholder = () => {
     return (
