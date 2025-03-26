@@ -12,7 +12,7 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const ConfirmSwap = ({ className }: { className?: string }) => {
-  const { authenticatedAgent, isConnected } = useAuth();
+  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, setBuyAtomstate] = useAtom(BuyGLDTStateAtom);
   const {
     pay_token,
@@ -25,7 +25,7 @@ const ConfirmSwap = ({ className }: { className?: string }) => {
 
   const decimals = useFetchDecimals(pay_token.canisterId, authenticatedAgent, {
     ledger: pay_token.id,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
   const handleConfirmTrade = () => {

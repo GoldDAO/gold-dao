@@ -27,7 +27,8 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@services/kongswap/hooks/useFetchTokenPrice";
 
 const BuyGLDT = () => {
-  const { principalId, authenticatedAgent, isConnected } = useAuth();
+  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
+    useAuth();
   const [buyAtomState, setBuyAtomstate] = useAtom(BuyGLDTStateAtom);
   const {
     pay_token,
@@ -44,7 +45,7 @@ const BuyGLDT = () => {
     {
       ledger: pay_token.id,
       owner: principalId,
-      enabled: !!authenticatedAgent && !!isConnected,
+      enabled: !!authenticatedAgent && isConnected,
     }
   );
 
@@ -55,7 +56,7 @@ const BuyGLDT = () => {
       from: "GLDT",
       to: pay_token.name,
       amount: receive_amount,
-      enabled: !!authenticatedAgent && !!isConnected,
+      enabled: !!authenticatedAgent && isConnected,
     }
   );
 
@@ -66,14 +67,18 @@ const BuyGLDT = () => {
       from: pay_token.name,
       to: "GLDT",
       amount: (midPrice.data?.mid_price ?? 0) * receive_amount,
-      enabled: !!authenticatedAgent && !!isConnected && !!midPrice.isSuccess,
+      enabled: !!authenticatedAgent && isConnected && midPrice.isSuccess,
     }
   );
 
-  const decimals = useFetchDecimals(pay_token.canisterId, authenticatedAgent, {
-    ledger: pay_token.id,
-    enabled: !!authenticatedAgent && !!isConnected,
-  });
+  const decimals = useFetchDecimals(
+    pay_token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: pay_token.id,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   const handleOnChangeReceiveAmount = (receive_amount: number) => {
     setBuyAtomstate((state) => ({

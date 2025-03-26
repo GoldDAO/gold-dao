@@ -15,19 +15,20 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import { TokenSelectedAtom } from "./balance.atoms";
 
 const Token = ({ className }: { className?: string }) => {
-  const { principalId, authenticatedAgent, isConnected } = useAuth();
+  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
+    useAuth();
   const token = useAtomValue(TokenSelectedAtom);
   const { id, name, label } = token;
 
   const balance = useFetchUserBalance(token.canisterId, authenticatedAgent, {
     ledger: id,
     owner: principalId,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!authenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(token.canisterId, authenticatedAgent, {
+  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
     ledger: id,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
   const renderTokenUserBalance = () => {

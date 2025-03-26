@@ -1,10 +1,12 @@
 import { useAuth } from "@auth/index";
+import { useAtom } from "jotai";
 
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
 import { GLDTToken } from "../earn.utils";
 
 import { Button, Logo } from "@components/index";
+import Dialog from "@components/dialogs/Dialog";
 
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
@@ -13,11 +15,15 @@ import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 import { MIN_STAKE_AMOUNT } from "./utils";
 
 import Form from "./Form";
-import ConfirmDialog from "./ConfirmDialog";
-import DetailsDialog from "./DetailsDialog";
+import Confirm from "./Confirm";
+import Details from "./Details";
+
+import { StakeStateReducerAtom } from "./atoms";
 
 const StakeForm = () => {
-  const { principalId, authenticatedAgent, isConnected } = useAuth();
+  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
+    useAuth();
+  const [stakeState, dispatchStake] = useAtom(StakeStateReducerAtom);
 
   const balance = useFetchUserBalance(
     GLDTToken.canisterId,
@@ -25,19 +31,23 @@ const StakeForm = () => {
     {
       ledger: GLDTToken.id,
       owner: principalId,
-      enabled: !!authenticatedAgent && !!isConnected,
+      enabled: !!authenticatedAgent && isConnected,
     }
   );
 
-  const fee = useFetchTransferFee(GLDTToken.canisterId, authenticatedAgent, {
+  const fee = useFetchTransferFee(GLDTToken.canisterId, unauthenticatedAgent, {
     ledger: GLDTToken.id,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(GLDTToken.canisterId, authenticatedAgent, {
-    ledger: GLDTToken.id,
-    enabled: !!authenticatedAgent && !!isConnected,
-  });
+  const decimals = useFetchDecimals(
+    GLDTToken.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: GLDTToken.id,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   if (
     !isConnected ||
@@ -104,8 +114,22 @@ const StakeForm = () => {
         />
         <div>GLDT</div>
       </div>
-      <ConfirmDialog />
-      <DetailsDialog />
+
+      <Dialog
+        open={stakeState.is_open_stake_dialog_confirm}
+        handleOnClose={() => dispatchStake({ type: "CANCEL" })}
+        title="Confirm stake"
+      >
+        <Confirm />
+      </Dialog>
+
+      <Dialog
+        open={stakeState.is_open_stake_dialog_details}
+        handleOnClose={() => dispatchStake({ type: "RESET" })}
+        title="Stake details"
+      >
+        <Details />
+      </Dialog>
     </>
   );
 };

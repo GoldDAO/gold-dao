@@ -7,53 +7,32 @@ import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import { ClaimRewardStateReducerAtom } from "./atoms";
-import { TokenData } from "./utils";
+import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
+import { Reward } from "./utils";
 
 const TokenItem = ({
-  token,
+  reward,
   stake_id,
 }: {
-  token: TokenData;
+  reward: Reward;
   stake_id: bigint;
 }) => {
   const { authenticatedAgent } = useAuth();
 
   const claim = useClaimReward(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
-  // const decimals = useFetchDecimals(token.canisterId, authenticatedAgent, {
-  //   ledger: token.id,
-  //   enabled: !!authenticatedAgent && !!isConnected,
+  // const decimals = useFetchDecimals(reward.canisterId, unauthenticatedAgent, {
+  //   ledger: reward.id,
+  //   enabled: !!unauthenticatedAgent && isConnected,
   // });
 
-  useEffect(() => {
-    if (claim.isIdle) {
-      claim.mutate(
-        {
-          id: stake_id,
-          token: token.name,
-        },
-        {
-          onSuccess: (res) => {
-            console.log("claimed");
-            console.log(res);
-          },
-        }
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [claim.isIdle]);
-
-  // <div className="flex justify-center items-center">Loading...</div>
-
-  const handleOnRetry = () => {
-    claim.reset();
+  const handleClaimReward = () => {
     claim.mutate(
       {
         id: stake_id,
-        token: token.name,
+        token: reward.name,
       },
       {
         onSuccess: (res) => {
@@ -64,12 +43,24 @@ const TokenItem = ({
     );
   };
 
+  useEffect(() => {
+    if (claim.isIdle) handleClaimReward();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [claim.isIdle]);
+
+  // <div className="flex justify-center items-center">Loading...</div>
+
+  const handleOnRetry = () => {
+    claim.reset();
+    handleClaimReward();
+  };
+
   return (
     <div className="p-4 border border-border rounded-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <MutationStatusIcons status={claim.status} />
-          <div>Claim {token.name} reward</div>
+          <div>Claim {reward.name} reward</div>
         </div>
         {claim.isError && (
           <div>
@@ -91,14 +82,15 @@ const TokenItem = ({
 
 const Details = () => {
   const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
+  const [selectedRewards] = useAtom(SelectedRewardsAtom);
 
   return (
     <>
       <div className="grid grid-cols-1 gap-4 my-8">
-        {claimRewardState.token_selected.map((token) => (
+        {selectedRewards.map((reward) => (
           <TokenItem
-            key={token.id}
-            token={token}
+            key={reward.id}
+            reward={reward}
             stake_id={claimRewardState.stake_id as bigint}
           />
         ))}

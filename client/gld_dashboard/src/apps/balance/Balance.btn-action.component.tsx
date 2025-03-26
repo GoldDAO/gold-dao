@@ -146,7 +146,6 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            <ButtonAction action="stake" />
           </>
         );
       } else {

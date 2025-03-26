@@ -1,15 +1,15 @@
 export type DissolveState = "NotDissolving" | "Dissolving" | "Dissolved";
 
+export type Reward =
+  {
+    name: string;
+    amount: bigint;
+  }
+
+
 export type Stake = {
   is_dissolved: boolean;
-  claimable_rewards: {
-    list: {
-      name: string;
-      amount: bigint;
-      is_claimable: boolean;
-    }[];
-    total_amount: bigint;
-  };
+  rewards: Reward[];
   created_at: bigint;
   id: bigint;
   unstake_early_fee: bigint;

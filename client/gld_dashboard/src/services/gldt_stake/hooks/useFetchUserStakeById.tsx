@@ -17,14 +17,12 @@ const useFetchUserStakeById = (
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<Stake, Error>, "queryKey" | "queryFn"> & {
     id: bigint;
-    fee: bigint;
   }
 ) => {
   const {
     enabled = true,
     refetchInterval = false,
     id,
-    fee,
     placeholderData = keepPreviousData,
   } = options;
 
@@ -61,29 +59,16 @@ const useFetchUserStakeById = (
           dissolve_state === "Dissolving" &&
           DateTime.now() > DateTime.fromMillis(Number(stake.dissolved_date));
 
-        const claimable_rewards_list = stake.claimable_rewards.map(
-          ([name, amount]) => {
-            return {
-              name: name,
-              amount: amount,
-              is_claimable: amount >= fee,
-            };
-          }
-        );
-
-        const claimable_rewards_total_amount = claimable_rewards_list.reduce(
-          (acc, { amount }) => acc + amount,
-          0n
-        );
+        const rewards = stake.claimable_rewards.map(([name, amount]) => {
+          return {
+            name: name,
+            amount: amount,
+          };
+        });
 
         return {
           is_dissolved,
-          claimable_rewards: !is_dissolved
-            ? {
-                list: claimable_rewards_list,
-                total_amount: claimable_rewards_total_amount,
-              }
-            : { list: [], total_amount: 0n },
+          rewards: !is_dissolved ? rewards : [],
           created_at: stake.created_at,
           id: stake.id,
           unstake_early_fee: stake.early_unstake_fee,

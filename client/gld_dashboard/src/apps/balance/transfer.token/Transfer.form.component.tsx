@@ -17,7 +17,8 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 
 const TransferToken = ({ className }: { className?: string }) => {
-  const { authenticatedAgent, principalId, isConnected } = useAuth();
+  const { authenticatedAgent, unauthenticatedAgent, principalId, isConnected } =
+    useAuth();
 
   const token = useAtomValue(TokenSelectedAtom);
   const [sendState, setSendState] = useAtom(SendTokenStateAtom);
@@ -45,17 +46,17 @@ const TransferToken = ({ className }: { className?: string }) => {
   const balance = useFetchUserBalance(token.canisterId, authenticatedAgent, {
     ledger: token.id,
     owner: principalId,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!authenticatedAgent && isConnected,
   });
 
-  const fee = useFetchTransferFee(token.canisterId, authenticatedAgent, {
+  const fee = useFetchTransferFee(token.canisterId, unauthenticatedAgent, {
     ledger: token.id,
-    enabled: !!authenticatedAgent,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(token.canisterId, authenticatedAgent, {
+  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
     ledger: token.id,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
   useEffect(() => {

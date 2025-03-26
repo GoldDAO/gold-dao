@@ -6,10 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnlockStateReducerAtom } from "./atoms";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useDissolveStake from "@services/gldt_stake/hooks/useDissolveStake";
 
 const DetailsDissolve = () => {
@@ -18,7 +15,7 @@ const DetailsDissolve = () => {
   const [unlockState, dispatch] = useAtom(UnlockStateReducerAtom);
   const dissolve = useDissolveStake(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
-  const handleOnDissolve = () => {
+  const handleDissolve = () => {
     dissolve.mutate(
       {
         id: unlockState.stake_id as bigint,
@@ -36,55 +33,72 @@ const DetailsDissolve = () => {
   };
 
   useEffect(() => {
-    if (dissolve.isIdle) {
-      handleOnDissolve();
-    }
+    if (dissolve.isIdle) handleDissolve();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dissolve.isIdle]);
 
-  const handleOnRetry = () => {
+  const handleRetry = () => {
     dissolve.reset();
-    handleOnDissolve();
+    handleDissolve();
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 gap-4 my-8">
-        <div className="p-4 border border-border rounded-md">
-          <div className="flex items-center gap-4">
-            <MutationStatusIcons status={dissolve.status} />
-            <div>Dissolve stake</div>
+    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+      {(dissolve.isIdle || dissolve.isPending) && (
+        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+          <div className="flex flex-col gap-4 text-center">
+            <div>Loading...</div>
+            <div className="mt-2">Dissolving...</div>
           </div>
         </div>
-      </div>
+      )}
       {dissolve.isError && (
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-amber-700">Unlock stake error</div>
+            <div>Something went wrong, please retry.</div>
+          </div>
+          <div className="flex justify-center items-center gap-2">
+            <Button
+              onClick={handleRetry}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Retry
+            </Button>
+            <Button
+              onClick={() => dispatch({ type: "RESET" })}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+      {dissolve.isSuccess && (
+        <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-green-700">Unlock stake success</div>
+            <div>You successfully unlocked your stake.</div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 text-center">
+            <div className="p-4 border border-border bg-surface-secondary rounded-md text-sm">
+              You will receive your GLDT liquid in your wallet in one week.
+              <br />
+              During this time, you are not receiving any new rewards.
+            </div>
+          </div>
           <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-            onClick={handleOnRetry}
-          >
-            Retry
-          </Button>
-          <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
+            className={clsx(
+              "px-4 py-3 rounded-md",
+              "bg-secondary text-white w-full"
+            )}
             onClick={() => dispatch({ type: "RESET" })}
           >
             Close
           </Button>
         </div>
       )}
-      {dissolve.isSuccess && (
-        <Button
-          className={clsx(
-            "px-4 py-3 rounded-md",
-            "bg-secondary text-white w-full"
-          )}
-          onClick={() => dispatch({ type: "RESET" })}
-        >
-          Close
-        </Button>
-      )}
-    </>
+    </div>
   );
 };
 

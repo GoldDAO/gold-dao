@@ -22,19 +22,20 @@ import useUserNFTMetrics from "../../hooks/useUserNFTMetrics";
 
 const TokenItem = ({ token }: { token: Token }) => {
   const { id, name, label } = token;
-  const { principalId, authenticatedAgent, isConnected } = useAuth();
+  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
+    useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const setSelectedToken = useSetAtom(TokenSelectedAtom);
 
   const balance = useFetchUserBalance(token.canisterId, authenticatedAgent, {
     ledger: id,
     owner: principalId,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!authenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(token.canisterId, authenticatedAgent, {
+  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
     ledger: id,
-    enabled: !!authenticatedAgent && !!isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
   });
 
   const onClickToken = () => {

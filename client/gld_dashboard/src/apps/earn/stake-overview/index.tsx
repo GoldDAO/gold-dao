@@ -10,14 +10,14 @@ import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTota
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const StakeOverview = ({ className }: { className?: string }) => {
-  const { authenticatedAgent, isConnected } = useAuth();
+  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
 
   const decimals = useFetchDecimals(
     GLDT_LEDGER_CANISTER_ID,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       ledger: "gldt",
-      enabled: !!authenticatedAgent && !!isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 

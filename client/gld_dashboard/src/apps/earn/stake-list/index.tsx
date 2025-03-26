@@ -13,7 +13,6 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import useFetchUserStakeList from "@services/gldt_stake/hooks/useFetchUserStakeList";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/atoms";
 import { UnlockStateReducerAtom } from "../unlock/atoms";
 import { UnstakeStateReducerAtom } from "../unstake/atoms";
@@ -25,34 +24,35 @@ import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
 
+import useStakeRewardsFee, { RewardFeeData } from "@hooks/useStakeRewardsFee";
+import { Reward } from "@services/gldt_stake/utils/interfaces";
+
 const StakeList = () => {
-  const { authenticatedAgent, isConnected } = useAuth();
+  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
   const [claimRewardState, dispatchClaimReward] = useAtom(
     ClaimRewardStateReducerAtom
   );
   const [unlockState, dispatchUnlock] = useAtom(UnlockStateReducerAtom);
   const [unstakeState, dispatchUnstake] = useAtom(UnstakeStateReducerAtom);
 
+  const stakeRewardsFee = useStakeRewardsFee(unauthenticatedAgent, {
+    enabled: isConnected && !!unauthenticatedAgent,
+  });
+
   const decimals = useFetchDecimals(
     GLDT_LEDGER_CANISTER_ID,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       ledger: "gldt",
-      enabled: !!authenticatedAgent && !!isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
-
-  const fee = useFetchTransferFee(GLDT_LEDGER_CANISTER_ID, authenticatedAgent, {
-    ledger: "gldt",
-    enabled: !!authenticatedAgent && !!isConnected,
-  });
 
   const fetchUserStake = useFetchUserStakeList(
     GLDT_STAKE_CANISTER_ID,
     authenticatedAgent,
     {
-      enabled: isConnected && !!authenticatedAgent && fee.isSuccess,
-      fee: fee.data as bigint,
+      enabled: isConnected && !!authenticatedAgent,
     }
   );
 
@@ -109,6 +109,45 @@ const StakeList = () => {
   ) {
     return renderEmptyStakeList();
   }
+
+  const enableClaimRewards = (
+    rewards: Reward[],
+    rewardsFee: RewardFeeData[]
+  ): boolean => {
+    return rewards.some((reward) => {
+      const found = rewardsFee.find(
+        (rewardFee) => rewardFee.name === reward.name
+      );
+      return found ? reward.amount >= found.fee : false;
+    });
+    return true;
+  };
+
+  const renderClaimRewardsButton = (
+    stake_id: bigint,
+    rewards: Reward[],
+    rewards_fee: RewardFeeData[]
+  ) => {
+    const disabled =
+      !enableClaimRewards(rewards, rewards_fee) || !stakeRewardsFee.isSuccess;
+    return (
+      <Button
+        className={clsx(
+          "px-2 py-1 rounded-md shrink-0",
+          "bg-secondary text-white text-sm"
+        )}
+        disabled={disabled}
+        onClick={() =>
+          dispatchClaimReward({
+            type: "OPEN_DIALOG_CONFIRM",
+            value: { stake_id },
+          })
+        }
+      >
+        {!disabled ? "Claim rewards" : "Loading..."}
+      </Button>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4 pb-4 lg:overflow-y-auto lg:pr-4">
@@ -169,20 +208,11 @@ const StakeList = () => {
                   Unstake
                 </Button>
               )}
-              <Button
-                className={clsx(
-                  "px-2 py-1 rounded-md shrink-0",
-                  "bg-secondary text-white text-sm"
-                )}
-                onClick={() =>
-                  dispatchClaimReward({
-                    type: "OPEN_DIALOG_CONFIRM",
-                    value: { stake_id: stake.id },
-                  })
-                }
-              >
-                Claim rewards
-              </Button>
+              {renderClaimRewardsButton(
+                stake.id,
+                stake.rewards,
+                stakeRewardsFee.data
+              )}
             </div>
           </div>
         </div>
@@ -225,8 +255,7 @@ const StakeList = () => {
       <Dialog
         open={unlockState.is_open_unlock_dialog_confirm}
         handleOnClose={() => dispatchUnlock({ type: "CANCEL" })}
-        title="Unlock stake"
-        size="xxl"
+        title="Confirm unlock"
       >
         <ConfirmUnlock />
       </Dialog>
@@ -234,7 +263,7 @@ const StakeList = () => {
       <Dialog
         open={unlockState.is_open_dissolve_dialog_details}
         handleOnClose={() => dispatchUnlock({ type: "RESET" })}
-        title="Dissolve stake"
+        title="Dissolve details"
       >
         <DetailsDissolve />
       </Dialog>
