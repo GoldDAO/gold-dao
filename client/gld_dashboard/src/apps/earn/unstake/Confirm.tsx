@@ -1,26 +1,17 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
 
-import { GLDT_STAKE_CANISTER_ID, GLDT_LEDGER_CANISTER_ID } from "@constants";
+import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnstakeStateReducerAtom } from "./atoms";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 
 const Confirm = () => {
   const { authenticatedAgent, isConnected } = useAuth();
   const [stateUnstake, dispatch] = useAtom(UnstakeStateReducerAtom);
-
-  const fee = useFetchTransferFee(GLDT_LEDGER_CANISTER_ID, authenticatedAgent, {
-    ledger: "gldt",
-    enabled:
-      !!authenticatedAgent &&
-      isConnected &&
-      stateUnstake.stake_id !== undefined,
-  });
 
   const stake = useFetchUserStakeById(
     GLDT_STAKE_CANISTER_ID,
@@ -29,9 +20,7 @@ const Confirm = () => {
       enabled:
         isConnected &&
         !!authenticatedAgent &&
-        fee.isSuccess &&
         stateUnstake.stake_id !== undefined,
-      fee: fee.data as bigint,
       id: stateUnstake.stake_id as bigint,
     }
   );

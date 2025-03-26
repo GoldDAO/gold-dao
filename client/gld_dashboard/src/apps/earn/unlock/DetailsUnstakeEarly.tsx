@@ -6,7 +6,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnlockStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
@@ -21,7 +20,7 @@ const DetailsUnstakeEarly = () => {
     authenticatedAgent
   );
 
-  const handleOnUnstake = () => {
+  const handleUnstake = () => {
     unstakeEarly.mutate(
       {
         id: unlockState.stake_id as bigint,
@@ -45,55 +44,70 @@ const DetailsUnstakeEarly = () => {
   };
 
   useEffect(() => {
-    if (unstakeEarly.isIdle) {
-      handleOnUnstake();
-    }
+    if (unstakeEarly.isIdle) handleUnstake();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unstakeEarly.isIdle]);
 
-  const handleOnRetry = () => {
+  const handleRetry = () => {
     unstakeEarly.reset();
-    handleOnUnstake();
+    handleUnstake();
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 gap-4 my-8">
-        <div className="p-4 border border-border rounded-md">
-          <div className="flex items-center gap-4">
-            <MutationStatusIcons status={unstakeEarly.status} />
-            <div>Unstake</div>
+    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+      {(unstakeEarly.isIdle || unstakeEarly.isPending) && (
+        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+          <div className="flex flex-col gap-4 text-center">
+            <div>Loading...</div>
+            <div className="mt-2">Unstaking...</div>
           </div>
         </div>
-      </div>
+      )}
       {unstakeEarly.isError && (
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-amber-700">Unstake error</div>
+            <div>Something went wrong, please retry.</div>
+          </div>
+          <div className="flex justify-center items-center gap-2">
+            <Button
+              onClick={handleRetry}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Retry
+            </Button>
+            <Button
+              onClick={() => dispatch({ type: "RESET" })}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+      {unstakeEarly.isSuccess && (
+        <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-green-700">Unstake success</div>
+            <div>You successfully unstaked your stake.</div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 text-center">
+            <div className="p-4 border border-border bg-surface-secondary rounded-md text-sm">
+              You will be charged of (todo) GLDT.
+            </div>
+          </div>
           <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-            onClick={handleOnRetry}
-          >
-            Retry
-          </Button>
-          <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
+            className={clsx(
+              "px-4 py-3 rounded-md",
+              "bg-secondary text-white w-full"
+            )}
             onClick={() => dispatch({ type: "RESET" })}
           >
             Close
           </Button>
         </div>
       )}
-      {unstakeEarly.isSuccess && (
-        <Button
-          className={clsx(
-            "px-4 py-3 rounded-md",
-            "bg-secondary text-white w-full"
-          )}
-          onClick={() => dispatch({ type: "RESET" })}
-        >
-          Close
-        </Button>
-      )}
-    </>
+    </div>
   );
 };
 
