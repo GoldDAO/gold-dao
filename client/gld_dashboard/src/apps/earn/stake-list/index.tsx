@@ -120,23 +120,21 @@ const StakeList = () => {
       );
       return found ? reward.amount >= found.fee : false;
     });
-    return true;
   };
 
   const renderClaimRewardsButton = (
     stake_id: bigint,
     rewards: Reward[],
-    rewards_fee: RewardFeeData[]
+    rewards_fee: RewardFeeData[] | undefined
   ) => {
-    const disabled =
-      !enableClaimRewards(rewards, rewards_fee) || !stakeRewardsFee.isSuccess;
+    const enabled = !!rewards_fee && enableClaimRewards(rewards, rewards_fee);
     return (
       <Button
         className={clsx(
           "px-2 py-1 rounded-md shrink-0",
           "bg-secondary text-white text-sm"
         )}
-        disabled={disabled}
+        disabled={!enabled}
         onClick={() =>
           dispatchClaimReward({
             type: "OPEN_DIALOG_CONFIRM",
@@ -144,7 +142,7 @@ const StakeList = () => {
           })
         }
       >
-        {!disabled ? "Claim rewards" : "Loading..."}
+        {rewards_fee !== undefined ? "Claim rewards" : "Loading..."}
       </Button>
     );
   };
