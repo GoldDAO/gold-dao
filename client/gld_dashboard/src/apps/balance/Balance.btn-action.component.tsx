@@ -83,7 +83,7 @@ const ButtonAction = ({
         href="https://gold.bity.com/"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex shrink-0"
+        className="lg:flex shrink-0"
       >
         {renderBtn()}
       </a>

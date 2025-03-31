@@ -11,14 +11,24 @@ export const GLD_NFT_1000G_CANISTER_ID = import.meta.env
 
 export const GOLDAO_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GOLDAO_LEDGER_CANISTER_ID;
+export const GOLDAO_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_GOLDAO_LEDGER_INDEX_CANISTER_ID;
 export const OGY_LEDGER_CANISTER_ID = import.meta.env
   .VITE_OGY_LEDGER_CANISTER_ID;
+export const OGY_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_OGY_LEDGER_INDEX_CANISTER_ID;
 export const GLDT_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_CANISTER_ID;
+export const GLDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_GLDT_LEDGER_INDEX_CANISTER_ID;
 export const ICP_LEDGER_CANISTER_ID = import.meta.env
   .VITE_ICP_LEDGER_CANISTER_ID;
+export const ICP_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_ICP_LEDGER_INDEX_CANISTER_ID;
 export const WTN_LEDGER_CANISTER_ID = import.meta.env
   .VITE_WTN_LEDGER_CANISTER_ID;
+export const WTN_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_WTN_LEDGER_INDEX_CANISTER_ID;
 
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const SNS_NEURONS_ICP_CANISTER_ID = import.meta.env
@@ -38,23 +48,23 @@ export const GLDT_STAKE_CANISTER_ID = import.meta.env
 
 export const BITY_GOLD_API_BASE_URL = import.meta.env.VITE_BITY_GOLD_API_BASE_URL;
 
-export const ICP_ICRC_API_BASE_URL="https://icrc-api.internetcomputer.org/api/v1"
-export const OGY_API_BASE_URL="https://api.origyn.com"
+export const ICP_ICRC_API_BASE_URL = "https://icrc-api.internetcomputer.org/api/v1"
+export const OGY_API_BASE_URL = "https://api.origyn.com"
 
-export const GOLDAO_LEDGER_CANISTER_ID_IC="tyyy3-4aaaa-aaaaq-aab7a-cai"
-export const GLDT_LEDGER_CANISTER_ID_IC="6c7su-kiaaa-aaaar-qaira-cai"
-export const ICP_LEDGER_CANISTER_ID_IC="ryjl3-tyaaa-aaaaa-aaaba-cai"
-export const CK_USDT_LEDGER_CANISTER_ID_IC="cngnf-vqaaa-aaaar-qag4q-cai"
-export const CK_USDC_LEDGER_CANISTER_ID_IC="xevnm-gaaaa-aaaar-qafnq-cai"
-export const SNS_ROOT_CANISTER_ID_IC="tw2vt-hqaaa-aaaaq-aab6a-cai"
-export const SNS_GOVERNANCE_CANISTER_ID_IC="tr3th-kiaaa-aaaaq-aab6q-cai"
-export const ROOT_ACCOUNT_GLDGOV="tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
+export const GOLDAO_LEDGER_CANISTER_ID_IC = "tyyy3-4aaaa-aaaaq-aab7a-cai"
+export const GLDT_LEDGER_CANISTER_ID_IC = "6c7su-kiaaa-aaaar-qaira-cai"
+export const ICP_LEDGER_CANISTER_ID_IC = "ryjl3-tyaaa-aaaaa-aaaba-cai"
+export const CK_USDT_LEDGER_CANISTER_ID_IC = "cngnf-vqaaa-aaaar-qag4q-cai"
+export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai"
+export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai"
+export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai"
+export const ROOT_ACCOUNT_GLDGOV = "tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
 export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
 export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
 
 // start delete (fetched now from backend)
-export const OGY_TX_FEE=200000
+export const OGY_TX_FEE = 200000
 export const GLDT_TX_FEE = 1000000;
 export const GLDGOV_TX_FEE = 1000000;
 export const ICP_TX_FEE = 10000;
@@ -106,11 +116,23 @@ if (!(APP_MODE === "production")) {
     );
   else console.log(`GOLDAO_LEDGER_CANISTER_ID=${GOLDAO_LEDGER_CANISTER_ID}`);
 
+  if (!GOLDAO_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No GOLDAO_LEDGER_INDEX_CANISTER_ID environment variable. Set GOLDAO_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`GOLDAO_LEDGER_INDEX_CANISTER_ID=${GOLDAO_LEDGER_INDEX_CANISTER_ID}`);
+
   if (!OGY_LEDGER_CANISTER_ID)
     console.log(
       "No OGY_LEDGER_CANISTER_ID environment variable. Set OGY_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`OGY_LEDGER_CANISTER_ID=${OGY_LEDGER_CANISTER_ID}`);
+
+  if (!OGY_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No OGY_LEDGER_INDEX_CANISTER_ID environment variable. Set OGY_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`OGY_LEDGER_INDEX_CANISTER_ID=${OGY_LEDGER_INDEX_CANISTER_ID}`);
 
   if (!GLDT_LEDGER_CANISTER_ID)
     console.log(
@@ -118,17 +140,35 @@ if (!(APP_MODE === "production")) {
     );
   else console.log(`GLDT_LEDGER_CANISTER_ID=${GLDT_LEDGER_CANISTER_ID}`);
 
+  if (!GLDT_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No GLDT_LEDGER_INDEX_CANISTER_ID environment variable. Set GLDT_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`GLDT_LEDGER_INDEX_CANISTER_ID=${GLDT_LEDGER_INDEX_CANISTER_ID}`);
+
   if (!WTN_LEDGER_CANISTER_ID)
     console.log(
       "No WTN_LEDGER_CANISTER_ID environment variable. Set WTN_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`WTN_LEDGER_CANISTER_ID=${WTN_LEDGER_CANISTER_ID}`);
 
+  if (!WTN_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No WTN_LEDGER_INDEX_CANISTER_ID environment variable. Set WTN_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`WTN_LEDGER_INDEX_CANISTER_ID=${WTN_LEDGER_INDEX_CANISTER_ID}`);
+
   if (!ICP_LEDGER_CANISTER_ID)
     console.log(
       "No ICP_LEDGER_CANISTER_ID environment variable. Set ICP_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`ICP_LEDGER_CANISTER_ID=${ICP_LEDGER_CANISTER_ID}`);
+
+  if (!ICP_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No ICP_LEDGER_INDEX_CANISTER_ID environment variable. Set ICP_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`ICP_LEDGER_INDEX_CANISTER_ID=${ICP_LEDGER_INDEX_CANISTER_ID}`);
 
   if (!SWAP_CANISTER_ID)
     console.log(
