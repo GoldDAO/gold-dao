@@ -1,1 +1,1 @@
-./scripts/_local/manual/integration-test.sh gldt_swap
+./scripts/_local/manual/integration-test.sh sns_neuron_controller

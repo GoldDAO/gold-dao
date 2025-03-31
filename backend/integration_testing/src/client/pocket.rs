@@ -49,7 +49,7 @@ pub fn unwrap_response<R: CandidType + DeserializeOwned>(
 }
 
 pub fn execute_update_encoded_args<R: CandidType + DeserializeOwned>(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     sender: Principal,
     canister_id: CanisterId,
     method_name: &str,
@@ -59,7 +59,7 @@ pub fn execute_update_encoded_args<R: CandidType + DeserializeOwned>(
     unwrap_response(pic.update_call(canister_id, sender, method_name, payload))
 }
 
-pub fn create_canister(pic: &mut PocketIc, controller: Principal) -> CanisterId {
+pub fn create_canister(pic: &PocketIc, controller: Principal) -> CanisterId {
     let canister_id = pic.create_canister_with_settings(Some(controller), None);
     pic.add_cycles(canister_id, INIT_CYCLES_BALANCE);
     pic.advance_time(Duration::from_secs(1));
@@ -67,7 +67,7 @@ pub fn create_canister(pic: &mut PocketIc, controller: Principal) -> CanisterId 
 }
 
 pub fn create_canister_with_id(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     controller: Principal,
     canister_id: &str,
 ) -> CanisterId {
@@ -79,16 +79,16 @@ pub fn create_canister_with_id(
     canister_id
 }
 
-pub fn start_canister(pic: &mut PocketIc, sender: Principal, canister_id: CanisterId) {
+pub fn start_canister(pic: &PocketIc, sender: Principal, canister_id: CanisterId) {
     pic.start_canister(canister_id, Some(sender)).unwrap();
 }
 
-pub fn stop_canister(pic: &mut PocketIc, sender: Principal, canister_id: CanisterId) {
+pub fn stop_canister(pic: &PocketIc, sender: Principal, canister_id: CanisterId) {
     pic.stop_canister(canister_id, Some(sender)).unwrap();
 }
 
 pub fn install_canister<P: CandidType>(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     sender: Principal,
     canister_id: CanisterId,
     wasm: Vec<u8>,

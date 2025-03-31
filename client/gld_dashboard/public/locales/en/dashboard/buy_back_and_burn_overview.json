@@ -1,0 +1,15 @@
+{
+    "title": "Buy back & <1>Burn</1>",
+    "description": "Scarcity is key! The Gold DAO is using parts of its revenue streams to buy back GLDGov and subsequently burn them, taking them from existence forever!",
+    "learn_more_link": "Learn more",
+    "buy_back": {
+        "canister_icp_balance": "Buy back canister ICP balance",
+        "total_icp_used": "Total ICP used to buy back GLDGov"
+    },
+    "burn": {
+        "gldgov_burnt": "Burnt GLDGov"
+    },
+    "select_period": {
+        "week": "Last 7 days"
+    }
+}

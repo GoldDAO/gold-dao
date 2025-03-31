@@ -6,9 +6,9 @@ CANISTER_IDS="sns_canister_ids.json"
 
 dfx identity export gitlab_ci_gldt_staging > tmp.pem
 
-CID="j2neh-vqaaa-aaaal-aduxq-cai"
-METHOD_NAME="manage_nns_neuron"
-VALIDATE_METHOD_NAME="manage_nns_neuron_validate"
+CID="s2ryu-oyaaa-aaaap-qhq2q-cai"
+METHOD_NAME="manage_sns_neuron"
+VALIDATE_METHOD_NAME="manage_sns_neuron_validate"
 
 ./scripts/_local/sns_testing/prepare_scripts.sh staging
 
@@ -23,9 +23,9 @@ quill sns --canister-ids-file ./sns_canister_ids.json --pem-file $PEM_FILE \
 \";
         action= opt variant {
             AddGenericNervousSystemFunction = record {
-                id = (1_001 : nat64);
-                name = \"Manage NNS neuron.\";
-                description = opt \"Manage NNS neuron\";
+                id = (1_010 : nat64);
+                name = \"$METHOD_NAME.\";
+                description = opt \"$METHOD_NAME\";
                 function_type = opt variant {
                     GenericNervousSystemFunction = record {
                         validator_canister_id = opt principal \"$CID\";

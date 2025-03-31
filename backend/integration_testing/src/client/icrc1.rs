@@ -39,7 +39,7 @@ pub mod client {
     use types::CanisterId;
 
     pub fn transfer(
-        pic: &mut PocketIc,
+        pic: &PocketIc,
         sender: Principal,
         ledger_canister_id: CanisterId,
         from: Option<Subaccount>,

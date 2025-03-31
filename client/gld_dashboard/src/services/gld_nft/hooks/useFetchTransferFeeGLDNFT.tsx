@@ -1,0 +1,36 @@
+// import { useQuery, keepPreviousData } from "@tanstack/react-query";
+
+// import { useAuth } from "@auth/index";
+// import { divideBy1e8 } from "@utils/numbers";
+// import { OGY_TX_FEE } from "@constants";
+
+// export const useFetchTransferFeeGLDNFT = ({
+//   nftId,
+//   canister,
+// }: {
+//   nftId: bigint | undefined;
+//   canister: string;
+// }) => {
+//   const { isConnected, principalId, createActor } = useAuth();
+
+//   const icrc7_transfer_fee = async ({
+//     nftId,
+//     canister,
+//   }: {
+//     nftId: bigint | undefined;
+//     canister: string;
+//   }): Promise<number | undefined> => {
+//     const actor = createActor(canister);
+//     const result = (await actor.icrc7_transfer_fee(
+//       BigInt(nftId as bigint)
+//     )) as [bigint];
+//     return divideBy1e8(result[0] + BigInt(OGY_TX_FEE)) ?? undefined;
+//   };
+
+//   return useQuery({
+//     queryKey: ["FETCH_TRANSFER_FEE_NFT", principalId],
+//     queryFn: () => icrc7_transfer_fee({ nftId, canister }),
+//     placeholderData: keepPreviousData,
+//     enabled: !!isConnected && !!nftId,
+//   });
+// };
