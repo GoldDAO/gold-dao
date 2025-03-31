@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
@@ -7,12 +6,7 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
-import {
-  TokensList,
-  Token,
-  TokensWhitelist,
-  GLDT_INDEX,
-} from "./balance.utils";
+import { TokensList, Token, GLDT_INDEX } from "./balance.utils";
 import { TokenSelectedAtom } from "./balance.atoms";
 
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
@@ -157,31 +151,10 @@ const DisconnectedPlaceholder = () => {
 const BalanceList = () => {
   const { isConnected } = useAuth();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const setSelectedToken = useSetAtom(TokenSelectedAtom);
-
-  useEffect(() => {
-    if (
-      !searchParams.get("token") ||
-      !TokensWhitelist.includes(searchParams.get("token")!)
-    ) {
-      searchParams.set("token", TokensList[GLDT_INDEX].id);
-      setSelectedToken(TokensList[GLDT_INDEX]);
-      setSearchParams(searchParams);
-    } else {
-      if (searchParams.get("token") !== "nft") {
-        setSelectedToken(
-          TokensList.find((t) => t.id === searchParams.get("token"))!
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
   return (
     <>
       {isConnected ? (
-        <div className="flex lg:flex-grow lg:h-100 pb-4 lg:overflow-y-auto overflow-x-auto lg:overflow-x-hidden flex-row lg:flex-col gap-4 lg:pr-4">
+        <div className="flex lg:flex-grow flex-row lg:flex-col lg:h-100 pb-4 lg:overflow-y-auto overflow-x-auto lg:overflow-x-hidden gap-4 lg:pr-4">
           <TokenItem
             token={TokensList[GLDT_INDEX]}
             key={TokensList[GLDT_INDEX].id}

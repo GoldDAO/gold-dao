@@ -18,7 +18,7 @@ const AppLayout = () => {
 
   return (
     <div className="lg:bg-[url(/src/assets/bg-cover.png)] bg-cover bg-fixed bg-background">
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col h-screen lg:min-h-[900px] overflow-y-auto">
         <TopNav className="sticky top-0 bg-background py-5 px-4 lg:px-16" />
         <div className="lg:container flex flex-col lg:mx-auto items-center flex-grow lg:h-100">
           <div className="bg-background lg:rounded-xl flex lg:border-y lg:border-r border-border lg:shadow-xl w-full lg:h-28/30 lg:my-auto overflow-y-hidden">
