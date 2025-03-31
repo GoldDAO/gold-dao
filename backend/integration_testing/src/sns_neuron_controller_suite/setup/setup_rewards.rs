@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use candid::{encode_one, CandidType, Principal};
+use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
-use serde::Deserialize;
 use sns_rewards_api_canister::init::InitArgs;
 use sns_rewards_api_canister::Args;
 use types::BuildVersion;
@@ -10,7 +9,7 @@ use types::BuildVersion;
 use crate::wasms;
 
 pub fn setup_rewards_canister(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     sns_rewards_id: Principal,
     token_ledgers: &HashMap<String, Principal>,
     sns_canister_id: Principal,

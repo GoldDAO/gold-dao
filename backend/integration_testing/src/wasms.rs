@@ -8,10 +8,15 @@ lazy_static! {
     // Wasms in wasms folder
     pub static ref IC_ICRC1_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
     pub static ref IC_ICRC2_LEDGER: CanisterWasm = get_canister_wasm_gz("icrc_ledger");
-    pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
-    pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm("sns_root");
     pub static ref ICP_LEDGER: CanisterWasm = get_canister_wasm("ledger");
     pub static ref BURNER: CanisterWasm = get_canister_wasm("cycles_burner");
+
+    // SNS wasms
+    pub static ref SNS_SWAP: CanisterWasm = get_canister_wasm_gz("sns_swap");
+    pub static ref SNS_INDEX: CanisterWasm = get_canister_wasm_gz("ic_icrc1_index");
+    pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
+    pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm_gz("sns_root");
+    pub static ref SNS_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
 
     // Wasms in particular canister folder
     pub static ref REWARDS: CanisterWasm = get_canister_wasm_from_bin("sns_rewards");

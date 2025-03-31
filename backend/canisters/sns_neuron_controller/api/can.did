@@ -23,7 +23,11 @@ type Args = record {
   command : Command;
   neuron_id : blob;
 };
-type Args_1 = record { amount : nat64 };
+type Args_1 = record {
+  neuron_type : NeuronType;
+  amount : nat64;
+  add_disolve_delay : opt nat32;
+};
 type Args_2 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type By = variant {
@@ -89,15 +93,13 @@ type IncreaseDissolveDelay = record {
 };
 type InitArgs = record {
   test_mode : bool;
-  ogy_sns_ledger_canister_id : principal;
-  ogy_sns_rewards_canister_id : principal;
+  wtn_manager_config : WtnManagerConfig;
   authorized_principals : vec principal;
   version : BuildVersion;
   sns_rewards_canister_id : principal;
+  ogy_manager_config : OgyManagerConfig;
   commit_hash : text;
-  ogy_sns_governance_canister_id : principal;
 };
-type ListNeuronsResponse = record { neurons : NeuronList };
 type ManageSnsMetadata = record {
   url : opt text;
   logo : opt text;
@@ -159,7 +161,13 @@ type NeuronPermission = record {
   permission_type : vec int32;
 };
 type NeuronPermissionList = record { permissions : vec int32 };
-type NeuronType = variant { Ogy; Wtn };
+type NeuronType = variant { OGY; WTN; Other : text };
+type OgyManagerConfig = record {
+  ogy_rewards_threshold : nat;
+  ogy_sns_ledger_canister_id : principal;
+  ogy_sns_rewards_canister_id : principal;
+  ogy_sns_governance_canister_id : principal;
+};
 type Operation = variant {
   ChangeAutoStakeMaturity : ChangeAutoStakeMaturity;
   StopDissolving : record {};
@@ -180,8 +188,9 @@ type RemoveNeuronPermissions = record {
   permissions_to_remove : opt NeuronPermissionList;
   principal_id : opt principal;
 };
-type Response = variant { Success : text; InternalError : text };
-type Response_1 = variant { Success : blob; InternalError : text };
+type Response = record { neurons : NeuronList };
+type Response_1 = variant { Success : text; InternalError : text };
+type Response_2 = variant { Success : blob; InternalError : text };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
 type Split = record { memo : nat64; amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
@@ -206,8 +215,15 @@ type VotingRewardsParameters = record {
   reward_rate_transition_duration_seconds : opt nat64;
   round_duration_seconds : opt nat64;
 };
+type WtnManagerConfig = record {
+  wtn_sns_governance_canister_id : principal;
+  icp_rewards_threshold : nat;
+  wtn_sns_ledger_canister_id : principal;
+  icp_ledger : principal;
+  wtn_rewards_threshold : nat;
+};
 service : (Args_2) -> {
-  list_ogy_neurons : () -> (ListNeuronsResponse) query;
-  manage_sns_neuron : (Args) -> (Response);
-  stake_ogy_neuron : (Args_1) -> (Response_1);
+  list_neurons : () -> (Response) query;
+  manage_sns_neuron : (Args) -> (Response_1);
+  stake_sns_neuron : (Args_1) -> (Response_2);
 }

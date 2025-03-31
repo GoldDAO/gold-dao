@@ -190,8 +190,8 @@ pub fn generate_sns_init_args(neuron_data: &HashMap<usize, Neuron>) -> Governanc
             voting_rewards_parameters: Some(VotingRewardsParameters {
                 round_duration_seconds: Some(1000),
                 reward_rate_transition_duration_seconds: Some(100),
-                initial_reward_rate_basis_points: Some(5),
-                final_reward_rate_basis_points: Some(5),
+                initial_reward_rate_basis_points: Some(500),
+                final_reward_rate_basis_points: Some(500),
             }),
             max_dissolve_delay_bonus_percentage: Some(10u64),
             max_age_bonus_percentage: Some(10u64),
