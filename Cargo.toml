@@ -28,6 +28,8 @@ members = [
   "backend/canisters/usdg_minter/api",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
+  "backend/external_canisters/wtn_protocol/api",
+  "backend/external_canisters/wtn_protocol/c2c_client",
   "backend/external_canisters/origyn_nft_reference/api",
   "backend/external_canisters/origyn_nft_reference/c2c_client",
   "backend/external_canisters/gldt_swap_archive/c2c_client",

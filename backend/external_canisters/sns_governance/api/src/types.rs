@@ -83,7 +83,7 @@ impl<'a> From<&'a NeuronId> for [u8; 32] {
         array
     }
 }
-impl<'a> From<NeuronId> for [u8; 32] {
+impl From<NeuronId> for [u8; 32] {
     fn from(neuron_id: NeuronId) -> Self {
         let mut array = [0u8; 32];
         array.copy_from_slice(&neuron_id.id[..32]); // Copy the first 32 bytes
@@ -649,7 +649,7 @@ pub mod governance_error {
 /// automatically caused by a neuron following other neurons.
 ///
 /// Once a ballot's vote is set it cannot be changed.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
 pub struct Ballot {
     /// The ballot's vote.
     pub vote: i32,
@@ -664,7 +664,7 @@ pub struct Ballot {
     pub cast_timestamp_seconds: u64,
 }
 /// A tally of votes associated with a proposal.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
 pub struct Tally {
     /// The time when this tally was made, in seconds from the Unix epoch.
     pub timestamp_seconds: u64,
@@ -680,7 +680,7 @@ pub struct Tally {
 }
 /// The wait-for-quiet state associated with a proposal, storing the
 /// data relevant to the "wait-for-quiet" implementation.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
 pub struct WaitForQuietState {
     /// The current deadline of the proposal associated with this
     /// WaitForQuietState, in seconds from the Unix epoch.
@@ -688,7 +688,7 @@ pub struct WaitForQuietState {
 }
 /// The ProposalData that contains everything related to a proposal:
 /// the proposal itself (immutable), as well as mutable data such as ballots.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Default)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Default, Debug)]
 pub struct ProposalData {
     /// The proposal's action.
     /// Types 0-999 are reserved for current (and future) core governance
@@ -1770,7 +1770,7 @@ pub struct ListProposals {
     pub include_status: Vec<i32>,
 }
 /// A response to the ListProposals command.
-#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq)]
+#[derive(candid::CandidType, candid::Deserialize, Clone, PartialEq, Debug)]
 pub struct ListProposalsResponse {
     /// The returned list of proposals' ProposalData.
     pub proposals: Vec<ProposalData>,

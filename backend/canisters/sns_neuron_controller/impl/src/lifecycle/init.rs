@@ -22,9 +22,8 @@ fn init(args: Args) {
             );
             let mut data = Data::new(
                 init_args.authorized_principals,
-                init_args.ogy_sns_governance_canister_id,
-                init_args.ogy_sns_ledger_canister_id,
-                init_args.ogy_sns_rewards_canister_id,
+                init_args.ogy_manager_config,
+                init_args.wtn_manager_config,
                 init_args.sns_rewards_canister_id,
                 env.now(),
             );

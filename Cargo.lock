@@ -2450,9 +2450,14 @@ dependencies = [
  "serde_bytes",
  "serde_json",
  "sha2",
+ "slog",
  "sns_governance_canister",
+ "sns_index_canister",
+ "sns_ledger_canister",
  "sns_neuron_controller_api_canister",
  "sns_rewards_api_canister",
+ "sns_root_canister",
+ "sns_swap_canister",
  "super_stats_v3_api",
  "token_metrics_api",
  "types",
@@ -3985,6 +3990,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "sns_index_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.13",
+ "candid_gen",
+ "serde",
+ "serde_bytes",
+ "types",
+]
+
+[[package]]
+name = "sns_ledger_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.13",
+ "candid_gen",
+ "icrc-ledger-types 0.1.8",
+ "serde",
+ "serde_bytes",
+ "types",
+]
+
+[[package]]
 name = "sns_neuron_controller"
 version = "0.1.0"
 dependencies = [
@@ -3994,6 +4022,7 @@ dependencies = [
  "canister_state_macros",
  "canister_time",
  "canister_tracing_macros",
+ "enum_dispatch",
  "futures",
  "http_request",
  "ic-cdk 0.16.0",
@@ -4079,6 +4108,28 @@ version = "0.1.0"
 dependencies = [
  "canister_client",
  "sns_rewards_api_canister",
+]
+
+[[package]]
+name = "sns_root_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.13",
+ "candid_gen",
+ "serde",
+ "serde_bytes",
+ "types",
+]
+
+[[package]]
+name = "sns_swap_canister"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.13",
+ "candid_gen",
+ "serde",
+ "serde_bytes",
+ "types",
 ]
 
 [[package]]
@@ -5207,6 +5258,31 @@ name = "writeable"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
+
+[[package]]
+name = "wtn_protocol_api"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.13",
+ "candid_gen",
+ "canister_time",
+ "hex",
+ "ic-cdk 0.16.0",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+ "types",
+]
+
+[[package]]
+name = "wtn_protocol_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "canister_client",
+ "ic-cdk 0.16.0",
+ "types",
+ "wtn_protocol_api",
+]
 
 [[package]]
 name = "wyz"

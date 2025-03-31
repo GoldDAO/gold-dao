@@ -4,10 +4,14 @@ use icrc_ledger_types::icrc1::{
     account::{Account, Subaccount},
     transfer::TransferArg,
 };
-use sns_governance_canister::types::ListNeurons;
-use sns_governance_canister::types::Neuron;
+use sns_governance_canister::types::manage_neuron::Command;
+use sns_governance_canister::types::ManageNeuron;
+use sns_governance_canister::types::{
+    manage_neuron::DisburseMaturity, manage_neuron_response, ListNeurons, Neuron,
+};
 use tracing::debug;
-use tracing::{error, info};
+use tracing::{error, info, trace};
+use types::SnsNeuronId;
 
 pub async fn transfer_token(
     from_sub_account: Subaccount,
@@ -169,4 +173,87 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
             Err(error_message)
         }
     }
+}
+
+// NOTE: those tokens transaction is a minting transfer, from the governance canister's
+// main account (which is also the minting account) to the provided account.
+pub async fn disburse_neuron_maturity(
+    sns_governance_canister_id: Principal,
+    neuron_ids: Vec<SnsNeuronId>,
+    to_account: Option<sns_governance_canister::types::Account>,
+) -> Result<(), Vec<String>> {
+    let mut errors = Vec::new();
+
+    for neuron_id in neuron_ids {
+        match sns_governance_canister_c2c_client::manage_neuron(
+            sns_governance_canister_id,
+            &ManageNeuron {
+                subaccount: neuron_id.into(),
+                command: Some(Command::DisburseMaturity(DisburseMaturity {
+                    percentage_to_disburse: 100,
+                    to_account: to_account.clone(),
+                })),
+            },
+        )
+        .await
+        {
+            Ok(manage_neuron_response) => match manage_neuron_response.command {
+                Some(manage_neuron_response::Command::DisburseMaturity(response)) => {
+                    trace!("Successfully disbursed maturity for neuron {:?}", response);
+                }
+                Some(response) => {
+                    let error_msg =
+                        format!("Unexpected response from manage_neuron: {:?}", response);
+                    error!("{}", error_msg);
+                    errors.push(error_msg);
+                }
+                None => {
+                    let error_msg = "manage_neuron response contained no command.".to_string();
+                    error!("{}", &error_msg);
+                    errors.push(error_msg);
+                }
+            },
+            Err(e) => {
+                let error_msg = format!(
+                    "Failed to disburse maturity for neuron {:?}: {:?}",
+                    neuron_id, e
+                );
+                error!("{}", &error_msg);
+                errors.push(error_msg);
+            }
+        }
+    }
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
+}
+
+// TODO: think on how to add delay here
+use std::time::Duration;
+pub async fn retry_with_attempts<F, Fut>(
+    max_attempts: u8,
+    _delay_duration: Duration,
+    mut f: F,
+) -> Result<(), String>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<(), String>>,
+{
+    for attempt in 1..=max_attempts {
+        match f().await {
+            Ok(_) => {
+                return Ok(());
+            }
+            Err(err) => {
+                error!("Attempt {}: Error - {:?}", attempt, err);
+                if attempt == max_attempts {
+                    return Err(err);
+                }
+            }
+        }
+    }
+    Ok(())
 }

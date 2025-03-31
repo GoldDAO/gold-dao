@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.7] - 2025-03-27
+
+#### New
+
+- **WTN Neuron support**: Add methods allowing to stake WTN tokens and specify dissolve delay for the created neuron.
+
 ### [1.0.6] - 2024-11-19
 
 #### Fixed

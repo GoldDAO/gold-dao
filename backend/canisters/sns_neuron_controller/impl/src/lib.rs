@@ -26,7 +26,7 @@ claims rewards and re-distribute them to sns_rewards canister.
 */
 
 use ic_cdk::export_candid;
-use queries::list_ogy_neurons::ListNeuronsResponse;
+use queries::list_neurons::ListNeuronsResponse;
 
 mod guards;
 mod jobs;

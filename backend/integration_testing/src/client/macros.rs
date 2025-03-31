@@ -20,7 +20,7 @@ macro_rules! generate_pocket_update_call {
     ($method_name:ident) => {
         #[allow(dead_code)]
         pub fn $method_name(
-            pic: &mut pocket_ic::PocketIc,
+            pic: &pocket_ic::PocketIc,
             sender: candid::Principal,
             canister_id: candid::Principal,
             args: &$method_name::Args,
