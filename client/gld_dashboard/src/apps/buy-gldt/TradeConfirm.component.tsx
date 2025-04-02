@@ -1,115 +1,91 @@
-import clsx from "clsx";
 import { useAtom } from "jotai";
 
-import { useAuth } from "@auth/index";
-
-import BuyGLDTStateAtom from "./atoms";
+import { BuyGLDTStateReducerAtom } from "./atoms";
 
 import { Logo } from "@components/index";
 import { Button } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-
-const ConfirmSwap = ({ className }: { className?: string }) => {
-  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
-  const [buyAtomState, setBuyAtomstate] = useAtom(BuyGLDTStateAtom);
-  const {
-    pay_token,
-    pay_amount,
-    receive_amount,
-    pay_token_decimals,
-    receive_token,
-    pay_token_user_balance,
-  } = buyAtomState;
-
-  const decimals = useFetchDecimals(pay_token.canisterId, authenticatedAgent, {
-    ledger: pay_token.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const handleConfirmTrade = () => {
-    setBuyAtomstate((state) => ({
-      ...state,
-      is_open_confirm_dialog: false,
-      is_open_details_dialog: true,
-    }));
-  };
+const ConfirmSwap = () => {
+  const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
+  const { pay_token, receive_token } = buyAtomState;
 
   return (
-    <div className={className}>
-      <div className="flex flex-col gap-4 lg:gap-8 items-center text-center mt-4 lg:mt-8">
-        <div
-          className={clsx(
-            "bg-surface-primary",
-            "text-3xl lg:text-6xl font-semibold"
-          )}
-        >
-          <div className="flex items-center justify-center gap-4">
-            {receive_amount} GLDT{" "}
-            <div className="rounded-full bg-surface-secondary h-10 w-10 lg:h-16 lg:w-16 shrink-0 aspect-square">
-              <Logo name="gldt" className="p-1" />
+    <div className="flex flex-col gap-4 lg:gap-8 mt-4 lg:mt-8">
+      <div className="rounded-xl bg-surface-secondary border border-border">
+        <div className="p-4 lg:p-6 border-b border-border">
+          <div className="text-sm mb-4 text-content/60">You pay</div>
+          <div className="flex flex-row justify-between items-end">
+            <div className="flex items-center gap-2 text-4xl">
+              <Logo
+                name={pay_token.token.id}
+                className="h-10 w-10 shrink-0 aspect-square"
+              />
+              <TokenValueToLocaleString
+                value={pay_token.amount as bigint}
+                tokenDecimals={pay_token.decimals as number}
+              />
+              <div>{pay_token.token.name}</div>
             </div>
-          </div>
-          <div className="font-semibold text-lg lg:text-2xl mt-1">
-            {pay_amount && pay_token_decimals ? (
-              <>
-                Spend ≈{" "}
-                <TokenValueToLocaleString
-                  value={pay_amount}
-                  tokenDecimals={pay_token_decimals}
-                />{" "}
-                {pay_token.name}
-              </>
-            ) : (
-              <div>Loading...</div>
-            )}
+            <div className="text-content/60">≈ $todo</div>
           </div>
         </div>
-
-        <div className="p-8">Transactions Details (todo)</div>
-
-        <div className="w-full">
-          <Button
-            onClick={handleConfirmTrade}
-            disabled={!decimals.isSuccess}
-            className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
-          >
-            {decimals.isSuccess ? (
-              <>
-                Buy ≈{" "}
-                <TokenValueToLocaleString
-                  value={BigInt(receive_amount * 10 ** decimals.data)}
-                  tokenDecimals={decimals.data}
-                />{" "}
-                {receive_token.name}
-              </>
-            ) : (
-              "Loading..."
-            )}
-          </Button>
-
-          <div className="mt-4 text-sm lg:text-base">
-            {pay_token_user_balance !== null && decimals.isSuccess ? (
-              <div className="flex items-center justify-center gap-2">
-                <div>
-                  Your balance:{" "}
-                  <TokenValueToLocaleString
-                    value={pay_token_user_balance}
-                    tokenDecimals={decimals.data}
-                  />{" "}
-                  {pay_token.name}
-                </div>
-                <div className="rounded-full bg-surface-secondary h-8 w-8 shrink-0 aspect-square">
-                  <Logo name={pay_token.id} className="p-1" />
-                </div>
-              </div>
-            ) : (
-              "Loading..."
-            )}
+        <div className="p-4 lg:p-6">
+          <div className="text-sm mb-4 text-content/60">
+            You receive approximately
+          </div>
+          <div className="flex flex-row justify-between items-end">
+            <div className="flex items-center gap-2 text-4xl">
+              <Logo
+                name={receive_token.token.id}
+                className="h-10 w-10 shrink-0 aspect-square"
+              />
+              <TokenValueToLocaleString
+                value={receive_token.amount as bigint}
+                tokenDecimals={receive_token.decimals as number}
+              />
+              <div>{receive_token.token.name}</div>
+            </div>
+            <div className="text-content/60">≈ $todo</div>
           </div>
         </div>
       </div>
+
+      <div className="rounded-xl border border-border p-4 lg:p-6">
+        <div className="mb-4">Transaction details</div>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <div className="text-content/60">Slippage</div>
+            <div className="text-content/60">todo%</div>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="text-content/60">Fees</div>
+            <div>todo</div>
+          </div>
+          <div className="flex justify-between items-start">
+            <div className="text-content/60">Amount received on wallet</div>
+            <div className="flex flex-col items-end">
+              <div>todo</div>
+              <div className="text-content/60">$todo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Button
+        onClick={() => dispatch({ type: "CONFIRM" })}
+        className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+      >
+        <>
+          Buy ≈{" "}
+          <TokenValueToLocaleString
+            value={receive_token.amount}
+            tokenDecimals={receive_token.decimals}
+            decimals={5}
+          />{" "}
+          GLDT
+        </>
+      </Button>
     </div>
   );
 };

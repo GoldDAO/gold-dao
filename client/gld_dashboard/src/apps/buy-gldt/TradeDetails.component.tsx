@@ -7,143 +7,132 @@ import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 import { useAuth } from "@auth/index";
 
 import { Button } from "@components/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 
-import BuyGLDTStateAtom from "./atoms";
+import { BuyGLDTStateReducerAtom } from "./atoms";
 
 // import { Logo } from "@components/index";
-// import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
 
 import useApprove from "@services/ledger/hooks/useApprove";
-import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 import useSwap from "@services/kongswap/hooks/useSwap";
-import { RESET } from "jotai/utils";
 
-const TradeDetails = ({ className }: { className?: string }) => {
-  const { authenticatedAgent, principalId, isConnected } = useAuth();
+const TradeDetails = () => {
+  const { authenticatedAgent, principalId } = useAuth();
   const queryClient = useQueryClient();
-  const [buyAtomState, setBuyAtomstate] = useAtom(BuyGLDTStateAtom);
-  const { pay_token, pay_amount, receive_token, is_open_details_dialog } =
-    buyAtomState;
+  const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
+  const { pay_token, receive_token } = buyAtomState;
 
-  const transferFee = useFetchTransferFee(
-    pay_token.canisterId,
-    authenticatedAgent,
-    {
-      ledger: pay_token.id,
-      enabled: !!authenticatedAgent && !!isConnected,
-    }
-  );
-
-  const approve = useApprove(pay_token.canisterId, authenticatedAgent);
+  const approve = useApprove(pay_token.token.canisterId, authenticatedAgent);
   const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent);
 
-  const handleRetry = () => {
-    if (approve.isError) approve.reset();
-    if (swap.isError && pay_amount !== null) {
-      swap.reset();
-      swap.mutate(
-        {
-          receive_token: receive_token.name,
-          pay_token: pay_token.name,
-          pay_amount,
-          receive_address: principalId,
+  const handleSwap = () => {
+    swap.mutate(
+      {
+        receive_token: "GLDT",
+        pay_token: pay_token.token.name,
+        pay_amount: pay_token.amount as bigint,
+        receive_address: principalId,
+      },
+      {
+        onSuccess: (res) => {
+          console.log("swapped");
+          console.log(res);
+          queryClient.invalidateQueries({
+            queryKey: [`USER_FETCH_LEDGER_BALANCE_${pay_token.token.name}`],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [`USER_FETCH_LEDGER_BALANCE_${receive_token.token.name}`],
+          });
         },
-        {
-          onSuccess: (res) => {
-            console.log("swapped");
-            console.log(res);
-          },
-        }
-      );
-    }
-  };
-
-  const handleClose = () => {
-    setBuyAtomstate(RESET);
-    approve.reset();
-    swap.reset();
+      }
+    );
   };
 
   useEffect(() => {
-    if (
-      approve.isIdle &&
-      is_open_details_dialog &&
-      transferFee.isSuccess &&
-      pay_amount
-    ) {
+    if (approve.isIdle) {
       approve.mutate(
         {
-          amount: pay_amount + transferFee.data,
+          amount: (pay_token.amount as bigint) + (pay_token.fee as bigint),
           spender: { owner: KONGSWAP_CANISTER_ID_IC },
         },
         {
           onSuccess: (res) => {
             console.log("approved");
             console.log(res);
-            swap.mutate(
-              {
-                receive_token: receive_token.name,
-                pay_token: pay_token.name,
-                pay_amount,
-                receive_address: principalId,
-              },
-              {
-                onSuccess: (res) => {
-                  console.log("swapped");
-                  console.log(res);
-                  queryClient.invalidateQueries({
-                    queryKey: [`USER_FETCH_LEDGER_BALANCE_${pay_token.name}`],
-                  });
-                },
-              }
-            );
+            handleSwap();
           },
         }
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    is_open_details_dialog,
-    transferFee.isSuccess,
-    pay_amount,
-    transferFee.data,
-    principalId,
-    pay_token.name,
-    approve.isIdle,
-  ]);
+  }, [approve.isIdle]);
+
+  useEffect(() => {
+    return () => {
+      approve.reset();
+      swap.reset();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleRetry = () => {
+    if (approve.isError) approve.reset();
+    if (swap.isError) {
+      swap.reset();
+      handleSwap();
+    }
+  };
 
   return (
-    <div className={className}>
-      <div className="flex flex-col gap-4 mt-4 lg:mt-8">
-        <div className="flex items-center gap-4">
-          <MutationStatusIcons status={approve.status} />
-          <div>1. Approve</div>
+    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+      {(approve.isIdle ||
+        swap.isIdle ||
+        approve.isPending ||
+        swap.isPending) && (
+        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+          <div className="flex flex-col gap-4 text-center">
+            <div>Loading...</div>
+            {approve.isPending && <div className="mt-2">Approving...</div>}
+            {swap.isPending && <div className="mt-2">Buying GLDT...</div>}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <MutationStatusIcons status={swap.status} />
-          <div>2. Swap</div>
+      )}
+      {(approve.isError || swap.isError) && (
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-amber-700">Buy GLDT error</div>
+            <div>Something went wrong, please retry.</div>
+          </div>
+          <div className="flex justify-center items-center gap-2">
+            <Button
+              onClick={handleRetry}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Retry
+            </Button>
+            <Button
+              onClick={() => dispatch({ type: "RESET" })}
+              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            >
+              Close
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
+      {approve.isSuccess && swap.isSuccess && (
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 gap-2 text-center">
+            <div className="text-xl text-green-700">Buy GLDT success</div>
+            <div>You successfully bought GLDT.</div>
+          </div>
 
-      <div className="flex justify-center items-center gap-2 mt-4 lg:mt-8">
-        {(approve.isError || swap.isError) && (
           <Button
-            onClick={handleRetry}
-            className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
-          >
-            Retry
-          </Button>
-        )}
-        {!(approve.isPending || swap.isPending) && (
-          <Button
-            onClick={handleClose}
+            onClick={() => dispatch({ type: "RESET" })}
             className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
           >
             Close
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

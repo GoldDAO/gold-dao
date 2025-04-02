@@ -1,61 +1,65 @@
 import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
+import { useForm, useWatch } from "react-hook-form";
 
-import { KONGSWAP_CANISTER_ID_IC, GLDT_VALUE_1G_NFT } from "@constants";
+import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 
-import BuyGLDTStateAtom from "./atoms";
+import { BuyGLDTStateReducerAtom } from "./atoms";
 
 import { useAuth } from "@auth/index";
 
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
 
-import { Button } from "@components/index";
+import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
 
-import SelectBuyMethod from "./SelectToken.component";
+import SelectToken from "./SelectToken.component";
 import { Token } from "./tokensList.utils";
-import InputGLDTAmount from "./InputGLDTAmount.component";
 import TradeConfirm from "./TradeConfirm.component";
 import TradeDetails from "./TradeDetails.component";
 
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
+import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@services/kongswap/hooks/useFetchTokenPrice";
 
 const BuyGLDT = () => {
   const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
     useAuth();
-  const [buyAtomState, setBuyAtomstate] = useAtom(BuyGLDTStateAtom);
+  const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const {
     pay_token,
-    pay_amount,
-    receive_amount,
-    pay_token_decimals,
+    receive_token,
     is_open_confirm_dialog,
     is_open_details_dialog,
   } = buyAtomState;
 
-  const balance = useFetchUserBalance(
-    pay_token.canisterId,
-    authenticatedAgent,
-    {
-      ledger: pay_token.id,
-      owner: principalId,
-      enabled: !!authenticatedAgent && isConnected,
-    }
-  );
+  const {
+    register,
+    reset,
+    control,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: "onChange",
+    shouldUnregister: true,
+    shouldFocusError: false,
+  });
 
-  const midPrice = useFetchTokenPrice(
-    KONGSWAP_CANISTER_ID_IC,
+  const amount = useWatch({
+    control,
+    name: "amount",
+  });
+
+  const balance = useFetchUserBalance(
+    pay_token.token.canisterId,
     authenticatedAgent,
     {
-      from: "GLDT",
-      to: pay_token.name,
-      amount: receive_amount,
+      ledger: pay_token.token.id,
+      owner: principalId,
       enabled: !!authenticatedAgent && isConnected,
     }
   );
@@ -64,114 +68,176 @@ const BuyGLDT = () => {
     KONGSWAP_CANISTER_ID_IC,
     authenticatedAgent,
     {
-      from: pay_token.name,
+      from: pay_token.token.name,
       to: "GLDT",
-      amount: (midPrice.data?.mid_price ?? 0) * receive_amount,
-      enabled: !!authenticatedAgent && isConnected && midPrice.isSuccess,
+      amount: amount ?? 0,
+      enabled: !!authenticatedAgent && isConnected,
     }
   );
 
-  const decimals = useFetchDecimals(
-    pay_token.canisterId,
+  const payTokenFee = useFetchTransferFee(
+    pay_token.token.canisterId,
     unauthenticatedAgent,
     {
-      ledger: pay_token.id,
+      ledger: pay_token.token.id,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
+
+  const receiveTokenFee = useFetchTransferFee(
+    receive_token.token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: receive_token.token.id,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
+
+  const payTokenDecimals = useFetchDecimals(
+    pay_token.token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: pay_token.token.id,
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
-  const handleOnChangeReceiveAmount = (receive_amount: number) => {
-    setBuyAtomstate((state) => ({
-      ...state,
-      receive_amount,
-    }));
-  };
-
-  const handleOnChangePayToken = (pay_token: Token) => {
-    setBuyAtomstate((state) => ({
-      ...state,
-      pay_token,
-    }));
-  };
-
-  const handleOpenConfirmDialog = () => {
-    setBuyAtomstate((state) => ({
-      ...state,
-      is_open_confirm_dialog: true,
-    }));
-  };
-
-  const handleCloseConfirmDialog = () => {
-    setBuyAtomstate((state) => ({
-      ...state,
-      is_open_confirm_dialog: false,
-    }));
-  };
+  const receiveTokenDecimals = useFetchDecimals(
+    receive_token.token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: receive_token.token.id,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   useEffect(
     () => {
-      if (midPrice.isSuccess && price.isSuccess && decimals.isSuccess) {
-        setBuyAtomstate((state) => ({
-          ...state,
-          pay_amount: BigInt(
-            BigInt(
-              Math.round(
-                midPrice.data?.mid_price * receive_amount * 1.01 * 10e7
-              )
-            ) +
-              BigInt(
-                Math.round(
-                  midPrice.data?.mid_price *
-                    receive_amount *
-                    (price.data?.slippage / 100) *
-                    10e7
-                )
-              )
-          ),
-          pay_token_decimals: decimals.data,
-        }));
+      if (
+        price.isSuccess &&
+        receiveTokenDecimals.isSuccess &&
+        receiveTokenFee.isSuccess
+      ) {
+        dispatch({
+          type: "SET_RECEIVE_TOKEN_DATA",
+          value: {
+            amount: price.data.receive_amount,
+            decimals: receiveTokenDecimals.data,
+            fee: receiveTokenFee.data,
+          },
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      midPrice.isSuccess,
-      midPrice.data,
       price.isSuccess,
       price.data,
-      decimals.isSuccess,
-      decimals.data,
+      receiveTokenDecimals.isSuccess,
+      receiveTokenFee.isSuccess,
     ]
   );
 
   useEffect(
     () => {
-      if (balance.isSuccess) {
-        setBuyAtomstate((state) => ({
-          ...state,
-          pay_token_user_balance: balance.data,
-        }));
+      if (
+        amount &&
+        balance.isSuccess &&
+        payTokenDecimals.isSuccess &&
+        payTokenFee.isSuccess
+      ) {
+        dispatch({
+          type: "SET_PAY_TOKEN_DATA",
+          value: {
+            decimals: payTokenDecimals.data,
+            user_balance: balance.data,
+            fee: payTokenFee.data,
+            amount,
+          },
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [balance.isSuccess, balance.data]
+    [
+      balance.isSuccess,
+      payTokenDecimals.isSuccess,
+      payTokenFee.isSuccess,
+      amount,
+    ]
   );
+
+  useEffect(() => {
+    if (pay_token.amount === null) {
+      reset({
+        amount: "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pay_token.amount]);
+
+  const handleOnChangePayToken = (token: Token) => {
+    dispatch({ type: "RESET" });
+    dispatch({ type: "SET_PAY_TOKEN", value: token });
+  };
+
+  const isInsufficientFunds = (value: number) => {
+    return (
+      BigInt(Math.round(value * 10 ** (payTokenDecimals.data as number))) +
+        (payTokenFee.data as bigint) <=
+      (balance.data as bigint)
+    );
+  };
+
+  const isAmountGreaterThanFee = (value: number) => {
+    return value === 0
+      ? true
+      : BigInt(Math.round(value * 10 ** (payTokenDecimals.data as number))) >=
+          (payTokenFee.data as bigint);
+  };
+
+  const isAmountGreaterThanZero = (value: number) => value > 0;
+
+  const preventNoDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "e" || e.key === "-" || e.key === "+") e.preventDefault();
+  };
+
+  const preventPasteNoDigits = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const clipboardData = e.clipboardData;
+    const text = clipboardData.getData("text");
+    const number = parseFloat(text);
+    if (number < 0) e.preventDefault();
+    if (text === "e" || text === "+" || text === "-") e.preventDefault();
+  };
+
+  const isDataFetched =
+    price.isSuccess &&
+    balance.isSuccess &&
+    payTokenDecimals.isSuccess &&
+    payTokenFee.isSuccess;
+
+  const isReceiveTokenDataFetched =
+    price.isSuccess && receiveTokenDecimals.isSuccess;
 
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col h-full">
           <div className="text-left text-2xl lg:text-4xl flex flex-row gap-2 lg:flex-col lg:gap-0 font-semibold">
-            <div>Buy Gold</div>
-            <div className="text-primary">with no cost</div>
+            <div>Buy</div>
+            <div className="text-primary">Tokenized Gold</div>
           </div>
           <div className="hidden lg:flex lg:justify-center w-full my-4 lg:my-12">
             <img className="max-w-48" src={ImgBuyGold} alt="Buy Gold" />
           </div>
-          <div className="hidden lg:block text-left text-sm lg:text-base text-content/60 mt-2">
-            Purchase GLDT, tokenised gold, with each token fully backed by
-            physical gold reserves securely stored in Swiss vaults at a ratio of
-            100 GLDT to 1 gram. Everything fully transparent and accessible to
-            anyone, anywhere.
+          <div className="hidden lg:block text-left text-sm lg:text-base mt-2">
+            <div className="font-semibold">
+              Unlock Gold's Potential. Digitally.
+            </div>
+            <div className="text-content/60 mt-1">
+              GLDT revolutionizes gold ownership. Each Gold token (GLDT)
+              represents a tangible claim to securely vaulted Swiss gold, 100
+              GLDT per gram. Own your future, with complete transparency,
+              anywhere.
+            </div>
           </div>
         </div>
       </InnerAppLayout.LeftPanel>
@@ -179,78 +245,157 @@ const BuyGLDT = () => {
         <div className="px-4 lg:px-8 pt-4 lg:pt-16 pb-4 lg:pb-8">
           <div
             className={clsx(
-              "max-w-2xl mx-auto p-4 lg:p-8 bg-surface-primary border border-border rounded-xl",
-              "flex flex-col gap-12 lg:gap-24 items-center text-center"
+              "max-w-3xl mx-auto bg-surface-primary border border-border rounded-xl",
+              "flex flex-col items-center text-center"
             )}
           >
-            <div>
-              <div className="mb-8">Buy GLDT</div>
-              <InputGLDTAmount handleOnChange={handleOnChangeReceiveAmount} />
-              <div className="font-semibold text-lg lg:text-2xl mt-1">
-                {receive_amount / GLDT_VALUE_1G_NFT}g of gold
+            <div className="w-full px-4 lg:px-8 pt-8 lg:pt-16 pb-8 lg:pb-16">
+              <div className="mb-4 text-xl lg:text-4xl">
+                Buy GLDT <span className="text-primary">Gold Tokens</span>
               </div>
+              <div className="mb-2 text-sm text-content/60">
+                GLDT is a{" "}
+                <span className="text-content">gold-backed token</span> where{" "}
+                <span className="text-content">
+                  100 GLDT = 1 gram of physical gold
+                </span>
+              </div>
+              <div className="flex flex-col lg:flex-row gap-4 mt-8 lg:mt-12">
+                <div className="flex items-center border border-border rounded-md grow bg-surface-secondary">
+                  <div className="p-4 border-r border-border text-primary">
+                    Pay with
+                  </div>
+                  <div className="p-4">
+                    {isDataFetched ? (
+                      <form className="flex justify-center items-center gap-2">
+                        <input
+                          id="amount"
+                          type="number"
+                          autoComplete="off"
+                          placeholder="0.00"
+                          className={clsx(
+                            "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
+                            "placeholder:text-content/40",
+                            "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          )}
+                          onPaste={preventPasteNoDigits}
+                          onKeyDown={preventNoDigits}
+                          {...register("amount", {
+                            pattern: /[0-9.]/,
+                            required: "",
+                            // onChange: (e) =>
+                            //   handleOnChangePayTokenAmount(
+                            //     Number(e.target.value)
+                            //   ),
+                            validate: {
+                              isInsufficientFunds: (v: string) =>
+                                isInsufficientFunds(Number(v)) ||
+                                "Amount must not exceed your balance minus network fees",
+                              isAmountGreaterThanFee: (v: string) =>
+                                isAmountGreaterThanFee(Number(v)) ||
+                                "Amount must not be less or equal than transaction fee",
+                              isAmountGreaterThanZero: (v: string) =>
+                                isAmountGreaterThanZero(Number(v)) || "",
+                            },
+                          })}
+                        />
+                        <div className={clsx("")}>{pay_token.token.name}</div>
 
-              <div
-                className={clsx(
-                  "flex flex-col lg:flex-row items-center gap-2 lg:gap-4 mt-8"
-                )}
-              >
-                <div className="shrink-0">Purchase with:</div>
-                <SelectBuyMethod
-                  className="w-80"
-                  value={pay_token}
+                        <div className="flex items-center justify-center rounded-full h-6 w-6 shrink-0 aspect-square">
+                          <Logo name={pay_token.token.id} className="p-1" />
+                        </div>
+                      </form>
+                    ) : (
+                      <div>Loading...</div>
+                    )}
+                  </div>
+                </div>
+
+                <SelectToken
+                  value={pay_token.token}
                   handleOnChange={handleOnChangePayToken}
                 />
               </div>
             </div>
 
-            <div className="w-full">
-              {pay_amount && pay_token_decimals && receive_amount > 0 ? (
-                <>
-                  <Button
-                    className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
-                    onClick={handleOpenConfirmDialog}
-                  >
-                    Buy for ≈{" "}
-                    <TokenValueToLocaleString
-                      value={pay_amount}
-                      tokenDecimals={pay_token_decimals}
-                      decimals={5}
-                    />{" "}
-                    {pay_token.name}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  disabled={true}
-                  className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
-                >
-                  Buy for ≈ 0 {pay_token.name}
-                </Button>
+            <div
+              className={clsx(
+                "w-full px-4 lg:px-8 pt-8 lg:pt-16 pb-4 lg:pb-8",
+                "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
               )}
+            >
+              <div className="text-primary">You will receive</div>
+              <div className="mt-4">
+                <div className="text-2xl lg:text-4xl">
+                  {isReceiveTokenDataFetched ? (
+                    <>
+                      <TokenValueToLocaleString
+                        value={receive_token.amount}
+                        tokenDecimals={receive_token.decimals}
+                        decimals={5}
+                      />{" "}
+                      GLDT
+                    </>
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </div>
+                <div className="font-semibold text-lg lg:text-xl mt-1">
+                  {isReceiveTokenDataFetched ? (
+                    <>
+                      ≈{" "}
+                      <TokenValueToLocaleString
+                        value={receive_token.amount_in_gold}
+                        tokenDecimals={receive_token.decimals}
+                        decimals={5}
+                      />
+                      g of gold
+                    </>
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </div>
+              </div>
 
-              <div className="mt-4 text-sm lg:text-base text-content/40">
-                Estimated price 1 GLDT ≈ (todo)$
+              <div className="mt-8 lg:mt-16">
+                <Button
+                  className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                  onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}
+                  disabled={!isValid || !isDataFetched}
+                >
+                  {isReceiveTokenDataFetched ? (
+                    <>
+                      Buy for ≈{" "}
+                      <TokenValueToLocaleString
+                        value={receive_token.amount}
+                        tokenDecimals={receive_token.decimals}
+                        decimals={5}
+                      />{" "}
+                      GLDT
+                    </>
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </Button>
+                {errors.amount && errors.amount?.message !== "" && (
+                  <div className="mt-2">
+                    {errors?.amount?.message as string}
+                  </div>
+                )}
               </div>
             </div>
-            {/* Dialogs */}
             <>
               <Dialog
                 open={is_open_confirm_dialog}
-                handleOnClose={handleCloseConfirmDialog}
-                title="Confirm Trade"
+                handleOnClose={() => dispatch({ type: "CANCEL" })}
+                title="Confirm Purchase"
               >
                 <TradeConfirm />
               </Dialog>
               <Dialog
                 open={is_open_details_dialog}
-                handleOnClose={() =>
-                  setBuyAtomstate((state) => ({
-                    ...state,
-                    is_open_details_dialog: false,
-                  }))
-                }
-                title="Trade Details"
+                handleOnClose={() => dispatch({ type: "OPEN_DIALOG_DETAILS" })}
+                title="Purchase Details"
               >
                 <TradeDetails />
               </Dialog>
