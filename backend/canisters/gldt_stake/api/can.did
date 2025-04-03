@@ -32,9 +32,10 @@ type Args = record { id : nat64; state : UnstakeState };
 type Args_1 = record { id : nat64; token : text };
 type Args_2 = record { amount : nat64 };
 type Args_3 = record { amount : nat };
-type Args_4 = record { user : principal; limit : nat64; start : nat64 };
-type Args_5 = record { command : Command; neuron_id : blob };
-type Args_6 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_4 = record { limit : opt nat64; starting_week : nat64 };
+type Args_5 = record { user : principal; limit : nat64; start : nat64 };
+type Args_6 = record { command : Command; neuron_id : blob };
+type Args_7 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type By = variant {
   MemoAndController : MemoAndController;
@@ -332,9 +333,10 @@ type VotingRewardsParameters = record {
   reward_rate_transition_duration_seconds : opt nat64;
   round_duration_seconds : opt nat64;
 };
-service : (Args_6) -> {
+service : (Args_7) -> {
   _add_reward_round : (vec record { text; nat }) -> (Result);
   _set_position_unstake_state : (Args) -> (Result_1);
+  _set_token_usd_values : (vec record { text; float64 }) -> (null);
   claim_reward : (Args_1) -> (Result_2);
   commit : () -> ();
   create_neuron : (Args_2) -> (Result_3);
@@ -342,17 +344,18 @@ service : (Args_6) -> {
   get_active_user_positions : (opt principal) -> (
       vec StakePositionResponse,
     ) query;
-  get_apy : (null) -> (float64) query;
+  get_apy_overall : (null) -> (float64) query;
+  get_apy_timeseries : (Args_4) -> (vec record { nat64; float64 }) query;
   get_archive_canisters : (null) -> (vec ArchiveCanister) query;
   get_historic_position_by_id : (nat64) -> (opt StakePositionResponse);
-  get_historic_positions_by_user : (Args_4) -> (vec StakePositionResponse);
+  get_historic_positions_by_user : (Args_5) -> (vec StakePositionResponse);
   get_historic_positions_total_by_user : (opt principal) -> (nat64);
   get_neurons : (null) -> (vec Neuron) query;
   get_position_by_id : (nat64) -> (opt StakePositionResponse) query;
   get_reward_rounds : (null) -> (vec RewardRound) query;
   get_total_allocated_rewards : (null) -> (vec record { text; nat }) query;
   get_total_staked : (null) -> (nat) query;
-  manage_sns_neuron : (Args_5) -> (Response);
+  manage_sns_neuron : (Args_6) -> (Response);
   manual_sync_neurons : (null) -> (Result_1);
   process_oldest_reward_round : (null) -> (Result);
   start_dissolving : (nat64) -> (Result_5);

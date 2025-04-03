@@ -1,6 +1,7 @@
 pub mod candid;
 pub mod get_active_user_positions;
-pub mod get_apy;
+pub mod get_apy_overall;
+pub mod get_apy_timeseries;
 pub mod get_archive_canisters;
 pub mod get_neurons;
 pub mod get_position_by_id;
@@ -10,7 +11,8 @@ pub mod get_total_staked;
 pub mod http_request;
 
 pub use get_active_user_positions::*;
-pub use get_apy::*;
+pub use get_apy_overall::*;
+pub use get_apy_timeseries::*;
 pub use get_archive_canisters::*;
 pub use get_neurons::*;
 pub use get_position_by_id::*;

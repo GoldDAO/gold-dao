@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::memory::{get_stake_positions_memory, VM};
+use crate::memory::{get_stake_positions_memory, get_weekly_apy_memory, VM};
 use candid::{Nat, Principal};
-use canister_time::timestamp_millis;
+use canister_time::{timestamp_millis, WEEK_IN_MS};
 use gldt_stake_common::{
     reward_tokens::{RewardTypes, TokenSymbol},
     stake_position::{StakePosition, StakePositionId},
@@ -32,10 +32,21 @@ pub struct StakeSystem {
     pub genesis_datetime: TimestampMillis,
     /// usd price of reward tokens + gldt - used for APY calculations
     pub token_usd_values: HashMap<TokenSymbol, f64>,
+    /// weekly APY computations available for querying
+    #[serde(skip, default = "init_weekly_apy_history")]
+    pub weekly_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
+    // tracks the weekly timestamp for calculating weekly APY
+    pub weekly_apy_timestamp: TimestampMillis,
+    // tracks the weekly staked GLDT
+    pub weekly_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
 }
 
 fn init_stake_system_memory() -> StableBTreeMap<StakePositionId, StakePosition, VM> {
     let memory = get_stake_positions_memory();
+    StableBTreeMap::init(memory)
+}
+fn init_weekly_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
+    let memory = get_weekly_apy_memory();
     StableBTreeMap::init(memory)
 }
 
@@ -51,6 +62,9 @@ impl Default for StakeSystem {
             pending_fee_transfer_amount: Nat::from(0u64),
             genesis_datetime: timestamp_millis(),
             token_usd_values: HashMap::new(),
+            weekly_apy_history: init_weekly_apy_history(),
+            weekly_apy_timestamp: timestamp_millis(),
+            weekly_weighted_staked_gldt: HashMap::new(),
         }
     }
 }
@@ -131,6 +145,10 @@ impl StakeSystem {
 
     pub fn set_token_usd_values(&mut self, values: HashMap<TokenSymbol, f64>) {
         self.token_usd_values = values;
+    }
+
+    pub fn bump_weekly_timestamp(&mut self) {
+        self.weekly_apy_timestamp += WEEK_IN_MS
     }
 }
 
