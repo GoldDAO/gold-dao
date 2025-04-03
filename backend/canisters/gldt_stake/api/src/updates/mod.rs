@@ -1,5 +1,6 @@
 pub mod _add_reward_round;
 pub mod _set_position_unstake_state;
+pub mod _set_token_usd_values;
 pub mod claim_reward;
 pub mod create_neuron;
 pub mod create_stake_position;

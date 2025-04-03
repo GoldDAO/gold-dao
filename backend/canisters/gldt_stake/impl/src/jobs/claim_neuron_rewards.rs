@@ -93,7 +93,7 @@ async fn spawn_claim_procedure(
         "CLAIM_NEURON_REWARDS :: neuron id - {} :: found rewards of {} {}",
         neuron_id, reward_balance, token_symbol
     );
-    if reward_balance < Nat::from(1_000_000_000u64) {
+    if reward_balance < Nat::from(10_000_000u64) {
         info!(
             "CLAIM_NEURON_REWARDS :: neuron id - {} :: reward of {} {} is less than the threshold of 1_000_000_000",
             neuron_id, reward_balance, token_symbol

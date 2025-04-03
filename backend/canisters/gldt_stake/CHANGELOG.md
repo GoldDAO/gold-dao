@@ -16,6 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Correct the owner of a newly created SNS neuron to be the canister, not the caller
 
+### [1.0.1] - 2025-03-25
+
+#### Description
+
+Changes get_apy to get_apy_overall which represents an APY in that instant. Also adds a new endpoint get_apy_timeseries which returns a set of weekly timestamps and corresponding APY snapshots
+
 ### [1.0.0] - 2025-03-10
 
 #### Description

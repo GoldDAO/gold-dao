@@ -172,6 +172,7 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
+        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)); // Friday 6 Dec 2024, 12:01:00
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
             test_mode: true,
@@ -199,7 +200,6 @@ impl GldtStakeTestEnvBuilder {
         );
 
         // pic.set_time(SystemTime::now());
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)); // Friday 6 Dec 2024, 12:01:00
 
         GldtStakeTestEnv {
             controller: self.controller,
