@@ -6,7 +6,7 @@ use super::{reward_tokens::TokenSymbol, stake_position::StakePosition};
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct RewardRound {
-    created_at: TimestampMillis,
+    pub created_at: TimestampMillis,
     pub rewards: Nat,
     pub token_symbol: TokenSymbol,
     pub status: RewardRoundStatus,

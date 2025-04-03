@@ -15,6 +15,8 @@ pub struct RewardSystem {
     pub rounds: VecDeque<RewardRound>,
     // all the previous rewards added together when a round has been processed. useful for APY calculations
     pub reward_history: HashMap<TokenSymbol, Nat>,
+    // tracks weekly rewards that have been allocated so that we may calculate a weekly reward APY. this value is set to 0 each week in the calculate_weekly_apy job once a weekly APY has been calcualted
+    pub weekly_allocated_rewards: HashMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // weekly reward history - keeps track of the total rewards for each week that have been allocated for each token
 }
 
 impl Default for RewardSystem {
@@ -22,6 +24,7 @@ impl Default for RewardSystem {
         Self {
             rounds: VecDeque::default(),
             reward_history: HashMap::new(),
+            weekly_allocated_rewards: HashMap::new(),
         }
     }
 }
@@ -79,6 +82,15 @@ impl RewardSystem {
         self.reward_history
             .entry(token_symbol.clone())
             .and_modify(|current_reward| *current_reward += rewards.clone())
-            .or_insert(rewards);
+            .or_insert(rewards.clone());
+    }
+
+    pub fn add_reward(&mut self, timestamp: TimestampMillis, token: TokenSymbol, amount: Nat) {
+        self.weekly_allocated_rewards
+            .entry(timestamp) // Get or insert the inner HashMap
+            .or_insert_with(HashMap::new)
+            .entry(token) // Get or insert the Nat value
+            .and_modify(|existing| *existing += amount.clone())
+            .or_insert(amount);
     }
 }

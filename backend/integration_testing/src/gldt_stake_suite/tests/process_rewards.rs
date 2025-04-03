@@ -2,6 +2,7 @@ use assert_matches::assert_matches;
 use candid::{CandidType, Deserialize};
 use candid::{Nat, Principal};
 use canister_time::{DAY_IN_MS, HOUR_IN_MS};
+use gldt_stake_common::reward_tokens::TokenSymbol;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::Serialize;
 use sns_governance_canister::types::NeuronId;
@@ -9,8 +10,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use crate::client::gldt_stake::{
-    _add_reward_round, get_active_user_positions, get_reward_rounds, get_total_allocated_rewards,
-    process_oldest_reward_round, start_dissolving,
+    _add_reward_round, _set_token_usd_values, get_active_user_positions, get_apy_timeseries,
+    get_reward_rounds, get_total_allocated_rewards, process_oldest_reward_round, start_dissolving,
 };
 use crate::client::icrc1::client::transfer;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
@@ -36,6 +37,14 @@ fn process_staking_rewards_works() {
         ledger_fees,
         ..
     } = test_env;
+    tick_n_blocks(pic, 10);
+    // set the usd values so that an APY may be calculated later on
+    let mut usd_token_values: HashMap<TokenSymbol, f64> = HashMap::new();
+    usd_token_values.insert("GOLDAO".to_string(), 1.0);
+    usd_token_values.insert("OGY".to_string(), 1.0);
+    usd_token_values.insert("ICP".to_string(), 1.0);
+    usd_token_values.insert("GLDT".to_string(), 1.0);
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_token_values);
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
@@ -170,6 +179,25 @@ fn process_staking_rewards_works() {
             &Nat::from(100_000_000_000u64)
         );
     });
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 5);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(pic, 5);
+    // check APY history works
+    let apy_history = get_apy_timeseries(
+        pic,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &gldt_stake_api_canister::get_apy_timeseries::Args {
+            starting_week: 0,
+            limit: None,
+        },
+    );
+
+    println!("{apy_history:?}");
+    assert_eq!(apy_history.len(), 1);
+
+    assert_eq!(apy_history[0].1 > 0.0, true);
 }
 
 #[test]

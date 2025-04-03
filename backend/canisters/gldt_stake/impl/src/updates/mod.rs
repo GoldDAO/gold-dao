@@ -1,5 +1,6 @@
 pub mod _add_reward_round;
 pub mod _set_position_unstake_state;
+pub mod _set_token_usd_values;
 pub mod claim_reward;
 pub mod commit;
 pub mod create_neuron;
@@ -17,6 +18,7 @@ pub mod unstake_early;
 
 pub use _add_reward_round::*;
 pub use _set_position_unstake_state::*;
+pub use _set_token_usd_values::*;
 pub use claim_reward::*;
 pub use create_neuron::{StakeSnsNeuronArgs, StakeSnsNeuronResponse};
 pub use create_stake_position::*;

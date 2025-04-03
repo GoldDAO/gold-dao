@@ -31,7 +31,7 @@ const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   );
 
   return (
-    <div className="m-2 font-semibold text-sm cursor-default hover:bg-surface-secondary hover:rounded-lg">
+    <div className="m-2 font-semibold text-sm cursor-pointer hover:bg-surface-secondary hover:rounded-lg">
       <div className="flex justify-between items-center p-4">
         <div className="flex items-center gap-2">
           <Logo name={id} className="h-10 w-10" />
@@ -85,12 +85,12 @@ const SelectBuyMethod = ({
       <Listbox value={selected} onChange={handleChange}>
         <ListboxButton
           className={clsx(
-            "w-[300px] rounded-full border border-border py-2 px-4",
+            "min-w-[300px] rounded-md border border-border p-4",
             "text-sm/6"
           )}
           disabled={!isSuccess}
         >
-          <div className="cursor-default">
+          <div className="cursor-pointer">
             {isSuccess ? (
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
