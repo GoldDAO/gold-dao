@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.6] - 2025-04-07
+
+#### Improved
+
+- cron timing - An upgrade to how weekly scheduled tasks are run between upgrades now means our scheduled jobs can run at specific times instead of between hourly ranges.
+
 ### [1.0.5] - 2025-02-21
 
 #### Fixed
