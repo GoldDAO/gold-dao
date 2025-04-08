@@ -9,7 +9,7 @@ import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAc
 import ListItem from "./ListItem";
 
 const List = () => {
-  const { authenticatedAgent, isConnected } = useAuth();
+  const { authenticatedAgent, isConnected, principalId } = useAuth();
   const { ref, inView } = useInView();
   const token = useAtomValue(TokenSelectedAtom);
 
@@ -18,8 +18,7 @@ const List = () => {
       token.canister_id_ledger_index,
       authenticatedAgent,
       {
-        account:
-          "4lxgi-y7rlh-onvu4-jtszk-z67wq-ldekw-rfsp3-yxrjy-dgwsl-zn6tl-eqe", // principalId
+        account: principalId, // "4lxgi-y7rlh-onvu4-jtszk-z67wq-ldekw-rfsp3-yxrjy-dgwsl-zn6tl-eqe"
         enabled: !!authenticatedAgent && isConnected,
         ledger: token.id,
       }
