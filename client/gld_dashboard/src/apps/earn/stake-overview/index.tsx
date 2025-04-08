@@ -8,6 +8,8 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTotalStaked";
+import useFetchStakeAPY from "@services/gldt_stake/hooks/useFetchStakeAPY";
+
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const StakeOverview = () => {
@@ -30,6 +32,14 @@ const StakeOverview = () => {
     }
   );
 
+  const fetchStakeAPY = useFetchStakeAPY(
+    GLDT_STAKE_CANISTER_ID,
+    unauthenticatedAgent,
+    {
+      enabled: isConnected && !!unauthenticatedAgent,
+    }
+  );
+
   return (
     <div
       className={clsx(
@@ -38,12 +48,29 @@ const StakeOverview = () => {
       )}
     >
       <div className="flex flex-col items-center">
-        <div className="flex flex-col gap-2 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 w-full">
+          <div></div>
+          <div className="flex justify-center items-center gap-2">
+            <Logo name="gldt" className="h-8 w-8" />
+            <div>GLDT</div>
+          </div>
+          <div className="flex justify-center items-center lg:justify-end">
+            <div className="px-4 py-1 text-sm bg-secondary text-white/90 rounded-full">
+              Current APY:{" "}
+              <span>
+                {fetchStakeAPY.isSuccess
+                  ? `${fetchStakeAPY.data}%`
+                  : "Loading..."}
+              </span>
+            </div>
+          </div>
+        </div>
+        {/* <div className="flex flex-col gap-2 items-center">
           <div className="flex items-center gap-2">
             <Logo name="gldt" className="h-8 w-8" />
             <div>GLDT</div>
           </div>
-        </div>
+        </div> */}
         <div className="py-8">
           <div className="flex flex-col items-center gap-2">
             <div>

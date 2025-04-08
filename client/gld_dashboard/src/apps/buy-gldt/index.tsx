@@ -219,7 +219,7 @@ const BuyGLDT = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center text-center lg:text-left lg:items-start h-full">
+        <div className="flex flex-col items-center text-center lg:text-left lg:items-start h-full px-4 lg:px-8">
           <div className="text-5xl lg:text-6xl flex flex-row gap-2 lg:flex-col lg:gap-0 font-semibold mt-4">
             <div>Buy</div>
             <div className="text-primary font-light">tokenized Gold</div>
