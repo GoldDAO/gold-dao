@@ -6,12 +6,11 @@ import {
   GOLDAO_LEDGER_CANISTER_ID,
   ICP_LEDGER_CANISTER_ID,
   OGY_LEDGER_CANISTER_ID,
-  WTN_LEDGER_CANISTER_ID,
 } from "@constants";
 
-import { Reward } from "./utils";
+import { PositionRewards } from "./utils/index";
+import { Reward } from "./utils/index";
 import { RewardFeeData } from "@utils/useRewardsFee";
-import { TokensRewards } from "./utils/useGetAllTokenTotalStakedAmount";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;
@@ -29,44 +28,30 @@ const initialState: ClaimRewardState = {
       name: "GOLDAO",
       label: "GOLDAO",
       canister_id: GOLDAO_LEDGER_CANISTER_ID,
-      is_selected: true,
+      is_selected: false,
       is_claimable: false,
       amount: 0n,
-
-      neurons: [],
+      positions: [],
     },
     {
       id: "icp",
       name: "ICP",
       label: "Internet Computer",
       canister_id: ICP_LEDGER_CANISTER_ID,
-      is_selected: true,
+      is_selected: false,
       is_claimable: false,
       amount: 0n,
-
-      neurons: [],
+      positions: [],
     },
     {
       id: "ogy",
       name: "OGY",
       label: "OGY",
       canister_id: OGY_LEDGER_CANISTER_ID,
-      is_selected: true,
+      is_selected: false,
       is_claimable: false,
       amount: 0n,
-
-      neurons: [],
-    },
-    {
-      id: "wtn",
-      name: "WTN",
-      label: "Waterneuron",
-      canister_id: WTN_LEDGER_CANISTER_ID,
-      is_selected: true,
-      is_claimable: false,
-      amount: 0n,
-
-      neurons: [],
+      positions: [],
     },
   ],
   is_rewards_initialized: false,
@@ -77,7 +62,7 @@ const claimRewardReducer = (
   action:
     | {
         type: "SET_REWARDS";
-        value: { rewards: TokensRewards[]; rewards_fee: RewardFeeData[] };
+        value: { rewards: PositionRewards[]; rewards_fee: RewardFeeData[] };
       }
     | { type: "SET_SELECTED_REWARD"; value: { name: string } }
     | { type: "OPEN_DIALOG_CONFIRM" }
@@ -89,26 +74,27 @@ const claimRewardReducer = (
     case "SET_REWARDS": {
       const rewards = action.value.rewards.map((reward) => {
         const found = action.value.rewards_fee.find(
-          (rewardFee) => rewardFee.id === reward.id
+          (rewardFee) => rewardFee.name === reward.name
         );
         const is_claimable = found
           ? (reward.amount as bigint) >= found.fee
           : false;
 
-        const neurons_claimable = found
-          ? reward.neurons.filter((neuron) => neuron.staked_amount >= found.fee)
+        const positions_claimable = found
+          ? reward.positions.filter((p) => p.amount >= found.fee)
           : [];
 
         return {
           ...reward,
           is_selected: is_claimable,
-          is_claimable: !!neurons_claimable.length,
-          neurons: neurons_claimable,
+          is_claimable: !!positions_claimable.length,
+          positions: positions_claimable,
         };
       });
       const merged = _.values(
-        _.merge(_.keyBy(prev.rewards, "id"), _.keyBy(rewards, "id"))
+        _.merge(_.keyBy(prev.rewards, "name"), _.keyBy(rewards, "name"))
       );
+
       return {
         ...prev,
         rewards: merged,

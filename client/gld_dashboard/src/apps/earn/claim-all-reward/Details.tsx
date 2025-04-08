@@ -10,15 +10,9 @@ import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
-import { Reward } from "./utils";
+import { Reward } from "./utils/index";
 
-const TokenItem = ({
-  reward,
-  stake_id,
-}: {
-  reward: Reward;
-  stake_id: bigint;
-}) => {
+const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();
 
   const claim = useClaimReward(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
@@ -31,7 +25,7 @@ const TokenItem = ({
   const handleClaimReward = () => {
     claim.mutate(
       {
-        position_ids: [stake_id],
+        position_ids: reward.positions.map((n) => n.id),
         token: reward.name,
       },
       {
@@ -81,18 +75,14 @@ const TokenItem = ({
 };
 
 const Details = () => {
-  const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
+  const [, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   const [selectedRewards] = useAtom(SelectedRewardsAtom);
 
   return (
     <>
       <div className="grid grid-cols-1 gap-4 my-8">
         {selectedRewards.map((reward) => (
-          <TokenItem
-            key={reward.id}
-            reward={reward}
-            stake_id={claimRewardState.stake_id as bigint}
-          />
+          <TokenItem key={reward.id} reward={reward} />
         ))}
       </div>
       <Button
@@ -102,7 +92,7 @@ const Details = () => {
         )}
         onClick={() => dispatch({ type: "RESET" })}
       >
-        Go to balance view
+        Go to earn view
       </Button>
     </>
   );
