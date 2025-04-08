@@ -42,8 +42,8 @@ const Wallet = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col flex-grow">
-          <div className="text-center lg:text-left text-2xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-semibold mb-4 lg:mb-8">
+        <div className="flex flex-col flex-grow px-4 lg:px-8">
+          <div className="text-center lg:text-left text-5xl lg:text-6xl font-semibold my-4">
             Wallet
           </div>
           <div className="text-center lg:text-left mb-4 lg:mb-6">Balance</div>

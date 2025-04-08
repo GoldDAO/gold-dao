@@ -22,7 +22,7 @@ const Govern = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow">
+        <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow px-4 lg:px-8">
           <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4">
             <div>Govern</div>
             <div className="text-primary font-light">with gold</div>
