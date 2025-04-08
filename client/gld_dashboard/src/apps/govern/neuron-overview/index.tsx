@@ -1,32 +1,27 @@
 import clsx from "clsx";
-import {
-  GLDT_VALUE_1G_NFT,
-  GLDT_LEDGER_CANISTER_ID,
-  GLDT_STAKE_CANISTER_ID,
-} from "@constants";
+import { GOLDAO_LEDGER_CANISTER_ID, GLDT_VALUE_1G_NFT } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTotalStaked";
+import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
-const StakeOverview = () => {
-  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
+const NeuronOverview = () => {
+  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
+
+  const stakedAmount = useGetTokenTotalStakedAmount({
+    canisterIdLedger: GOLDAO_LEDGER_CANISTER_ID,
+    owner: principalId,
+    agent: unauthenticatedAgent,
+    enabled: !!unauthenticatedAgent && isConnected && !!principalId,
+  });
 
   const decimals = useFetchDecimals(
-    GLDT_LEDGER_CANISTER_ID,
+    GOLDAO_LEDGER_CANISTER_ID,
     unauthenticatedAgent,
     {
-      ledger: "gldt",
+      ledger: GOLDAO_LEDGER_CANISTER_ID,
       enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  const fetchUserTotalStaked = useFetchUserTotalStaked(
-    GLDT_STAKE_CANISTER_ID,
-    authenticatedAgent,
-    {
-      enabled: isConnected && !!authenticatedAgent,
     }
   );
 
@@ -34,14 +29,14 @@ const StakeOverview = () => {
     <div
       className={clsx(
         "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] p-4 lg:p-8"
+        "rounded-tr-[inherit] rounded-tl-0 px-4 lg:px-8 pt-4 lg:pt-8 pb-24"
       )}
     >
       <div className="flex flex-col items-center">
         <div className="flex flex-col gap-2 items-center">
           <div className="flex items-center gap-2">
-            <Logo name="gldt" className="h-8 w-8" />
-            <div>GLDT</div>
+            <Logo name="goldao" className="h-8 w-8" />
+            <div>GOLDAO</div>
           </div>
         </div>
         <div className="py-8">
@@ -50,13 +45,13 @@ const StakeOverview = () => {
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
                 <div className="text-2xl lg:text-4xl  flex items-center gap-2">
-                  {fetchUserTotalStaked.isSuccess && decimals.isSuccess ? (
+                  {stakedAmount.isSuccess && decimals.isSuccess ? (
                     <>
                       <TokenValueToLocaleString
-                        value={fetchUserTotalStaked.data}
+                        value={stakedAmount.data}
                         tokenDecimals={decimals.data}
                       />
-                      <div className="text-content/60 font-normal">GLDT</div>
+                      <div className="text-content/60 font-normal">GOLDAO</div>
                     </>
                   ) : (
                     <div>Loading...</div>
@@ -65,12 +60,10 @@ const StakeOverview = () => {
               </div>
             </div>
             <div>
-              {fetchUserTotalStaked.isSuccess && decimals.isSuccess ? (
+              {stakedAmount.isSuccess && decimals.isSuccess ? (
                 <div>
                   <TokenValueToLocaleString
-                    value={
-                      fetchUserTotalStaked.data / BigInt(GLDT_VALUE_1G_NFT)
-                    }
+                    value={stakedAmount.data / BigInt(GLDT_VALUE_1G_NFT)}
                     tokenDecimals={decimals.data}
                   />{" "}
                   grams of Gold ($todo)
@@ -86,4 +79,4 @@ const StakeOverview = () => {
   );
 };
 
-export default StakeOverview;
+export default NeuronOverview;

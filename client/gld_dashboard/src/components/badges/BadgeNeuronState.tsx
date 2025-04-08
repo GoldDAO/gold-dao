@@ -10,17 +10,17 @@ export const BadgeNeuronState = ({
   const neuronState = {
     "not dissolving": {
       label: "Not Dissolving",
-      bgCn: "bg-[#e0e8ff]",
+      bgCn: "bg-[#e0e8ff]/60",
       textCn: "text-sky",
     },
     dissolving: {
       label: "Dissolving",
-      bgCn: "bg-[#d9f2e8]",
+      bgCn: "bg-[#d9f2e8]/60",
       textCn: "text-jade",
     },
     dissolved: {
       label: "Dissolved",
-      bgCn: "bg-[#feefd8]",
+      bgCn: "bg-[#feefd8]/60",
       textCn: "text-jade",
     },
   };

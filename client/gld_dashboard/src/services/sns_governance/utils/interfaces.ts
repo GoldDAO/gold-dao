@@ -1,5 +1,5 @@
 export interface NeuronData {
-  staked_amount: number;
+  staked_amount: bigint;
   staked_maturity: number;
   total_maturity: number;
   age: number | undefined;
@@ -16,6 +16,45 @@ export interface NeuronData {
   auto_stake_maturity: boolean;
   total_bonus: number | undefined;
   neuron_minimum_dissolve_delay_to_vote_seconds: number | undefined;
+}
+
+export interface NeuronPartial {
+  staked_amount: string;
+  total_maturity: string;
+  age: string;
+  state: string;
+  voting_power: string;
+  dissolve_delay: string;
+  id: string;
+  created_at: string;
+  age_bonus: string;
+  dissolve_delay_bonus: string;
+  auto_stake_maturity: string;
+  total_bonus: string;
+  is_voting_power: boolean;
+}
+
+export interface NeuronsData {
+  data: NeuronData[];
+  cursor_index: string | null;
+}
+
+export interface NeuronPartialData {
+  data: NeuronPartialData[];
+  cursor_index: string | null;
+}
+
+export interface NeuronUser {
+  id: string;
+  staked_amount: bigint;
+  state: string;
+  dissolve_delay: string;
+  age: string;
+}
+
+export interface NeuronUserData {
+  data: NeuronUser[];
+  cursor_index: string | null;
 }
 
 export interface Proposal {

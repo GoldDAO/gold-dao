@@ -10,9 +10,10 @@ import { NotFound, LoadingNavigation } from "views/index";
 
 import BuyGLDT from "apps/buy-gldt";
 import Earn from "apps/earn";
-import Balance from "apps/balance";
-import routesDashboard from "apps/dashboard/routes/index";
-import { routes as routesStake } from "apps/stake/routes";
+import Govern from "apps/govern";
+import Wallet from "apps/wallet";
+
+// import routesDashboard from "apps/dashboard/routes/index";
 
 const router = createBrowserRouter([
   {
@@ -46,20 +47,32 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "balance",
+        path: "govern",
         children: [
           {
             index: true,
             element: (
               <Suspense fallback={<div>Loading...</div>}>
-                <Balance />
+                <Govern />
               </Suspense>
             ),
           },
         ],
       },
-      ...routesDashboard,
-      ...routesStake,
+      {
+        path: "wallet",
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Wallet />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      // ...routesDashboard,
       {
         path: "*",
         element: <NotFound />,

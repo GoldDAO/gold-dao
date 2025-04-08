@@ -24,7 +24,7 @@ import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
 
-import useStakeRewardsFee, { RewardFeeData } from "@hooks/useStakeRewardsFee";
+import useRewardsFee, { RewardFeeData } from "@utils/useRewardsFee";
 import { Reward } from "@services/gldt_stake/utils/interfaces";
 
 const StakeList = () => {
@@ -35,7 +35,7 @@ const StakeList = () => {
   const [unlockState, dispatchUnlock] = useAtom(UnlockStateReducerAtom);
   const [unstakeState, dispatchUnstake] = useAtom(UnstakeStateReducerAtom);
 
-  const stakeRewardsFee = useStakeRewardsFee(unauthenticatedAgent, {
+  const stakeRewardsFee = useRewardsFee(unauthenticatedAgent, {
     enabled: isConnected && !!unauthenticatedAgent,
   });
 
