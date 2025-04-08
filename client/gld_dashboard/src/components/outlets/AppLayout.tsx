@@ -21,7 +21,7 @@ const AppLayout = () => {
       <div className="flex flex-col h-screen lg:min-h-[900px] overflow-y-auto">
         <TopNav className="sticky top-0 bg-background py-5 px-4 lg:px-16" />
         <div className="lg:container flex flex-col lg:mx-auto items-center flex-grow lg:h-100">
-          <div className="bg-background lg:rounded-xl flex lg:border-y lg:border-r border-border lg:shadow-xl w-full lg:h-28/30 lg:my-auto overflow-y-hidden">
+          <div className="bg-background lg:rounded-xl flex lg:border-y lg:border-r border-border lg:shadow-xl w-full lg:h-29/30 lg:my-auto overflow-y-hidden">
             <SideNav className="hidden bg-surface-primary lg:block p-4 border-r border-border rounded-l-[inherit]" />
             {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
           </div>

@@ -6,16 +6,16 @@ import {
   GOLDAO_LEDGER_CANISTER_ID,
   ICP_LEDGER_CANISTER_ID,
   OGY_LEDGER_CANISTER_ID,
+  WTN_LEDGER_CANISTER_ID,
 } from "@constants";
 
 import { Reward } from "./utils";
 import { RewardFeeData } from "@utils/useRewardsFee";
-import { Reward as RewardStake } from "@services/gldt_stake/utils/interfaces";
+import { TokensRewards } from "./utils/useGetAllTokenTotalStakedAmount";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;
   is_open_claim_dialog_details: boolean;
-  stake_id: bigint | undefined;
   rewards: Reward[];
   is_rewards_initialized: boolean;
 };
@@ -23,34 +23,50 @@ type ClaimRewardState = {
 const initialState: ClaimRewardState = {
   is_open_claim_dialog_confirm: false,
   is_open_claim_dialog_details: false,
-  stake_id: undefined,
   rewards: [
     {
       id: "goldao",
       name: "GOLDAO",
       label: "GOLDAO",
       canister_id: GOLDAO_LEDGER_CANISTER_ID,
-      is_selected: false,
+      is_selected: true,
       is_claimable: false,
       amount: 0n,
+
+      neurons: [],
     },
     {
       id: "icp",
       name: "ICP",
       label: "Internet Computer",
       canister_id: ICP_LEDGER_CANISTER_ID,
-      is_selected: false,
+      is_selected: true,
       is_claimable: false,
       amount: 0n,
+
+      neurons: [],
     },
     {
       id: "ogy",
       name: "OGY",
       label: "OGY",
       canister_id: OGY_LEDGER_CANISTER_ID,
-      is_selected: false,
+      is_selected: true,
       is_claimable: false,
       amount: 0n,
+
+      neurons: [],
+    },
+    {
+      id: "wtn",
+      name: "WTN",
+      label: "Waterneuron",
+      canister_id: WTN_LEDGER_CANISTER_ID,
+      is_selected: true,
+      is_claimable: false,
+      amount: 0n,
+
+      neurons: [],
     },
   ],
   is_rewards_initialized: false,
@@ -61,10 +77,10 @@ const claimRewardReducer = (
   action:
     | {
         type: "SET_REWARDS";
-        value: { rewards: RewardStake[]; rewards_fee: RewardFeeData[] };
+        value: { rewards: TokensRewards[]; rewards_fee: RewardFeeData[] };
       }
     | { type: "SET_SELECTED_REWARD"; value: { name: string } }
-    | { type: "OPEN_DIALOG_CONFIRM"; value: { stake_id: bigint } }
+    | { type: "OPEN_DIALOG_CONFIRM" }
     | { type: "CANCEL" }
     | { type: "CONFIRM" }
     | { type: "RESET" }
@@ -73,19 +89,25 @@ const claimRewardReducer = (
     case "SET_REWARDS": {
       const rewards = action.value.rewards.map((reward) => {
         const found = action.value.rewards_fee.find(
-          (rewardFee) => rewardFee.name === reward.name
+          (rewardFee) => rewardFee.id === reward.id
         );
         const is_claimable = found
           ? (reward.amount as bigint) >= found.fee
           : false;
+
+        const neurons_claimable = found
+          ? reward.neurons.filter((neuron) => neuron.staked_amount >= found.fee)
+          : [];
+
         return {
           ...reward,
           is_selected: is_claimable,
-          is_claimable,
+          is_claimable: !!neurons_claimable.length,
+          neurons: neurons_claimable,
         };
       });
       const merged = _.values(
-        _.merge(_.keyBy(prev.rewards, "name"), _.keyBy(rewards, "name"))
+        _.merge(_.keyBy(prev.rewards, "id"), _.keyBy(rewards, "id"))
       );
       return {
         ...prev,
@@ -111,7 +133,6 @@ const claimRewardReducer = (
       return {
         ...prev,
         is_open_claim_dialog_confirm: true,
-        stake_id: action.value.stake_id,
       };
     case "CANCEL":
       return initialState;

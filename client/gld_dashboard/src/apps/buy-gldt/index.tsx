@@ -28,8 +28,7 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@services/kongswap/hooks/useFetchTokenPrice";
 
 const BuyGLDT = () => {
-  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
-    useAuth();
+  const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const {
     pay_token,
@@ -56,22 +55,22 @@ const BuyGLDT = () => {
 
   const balance = useFetchUserBalance(
     pay_token.token.canisterId,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       ledger: pay_token.token.id,
       owner: principalId,
-      enabled: !!authenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
   const price = useFetchTokenPrice(
     KONGSWAP_CANISTER_ID_IC,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       from: pay_token.token.name,
       to: "GLDT",
       amount: amount ?? 0,
-      enabled: !!authenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
@@ -220,19 +219,19 @@ const BuyGLDT = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col h-full">
-          <div className="text-left text-2xl lg:text-4xl flex flex-row gap-2 lg:flex-col lg:gap-0 font-semibold">
+        <div className="flex flex-col items-center text-center lg:text-left lg:items-start h-full">
+          <div className="text-5xl lg:text-6xl flex flex-row gap-2 lg:flex-col lg:gap-0 font-semibold mt-4">
             <div>Buy</div>
-            <div className="text-primary">Tokenized Gold</div>
+            <div className="text-primary font-light">tokenized Gold</div>
           </div>
           <div className="hidden lg:flex lg:justify-center w-full my-4 lg:my-12">
             <img className="max-w-48" src={ImgBuyGold} alt="Buy Gold" />
           </div>
-          <div className="hidden lg:block text-left text-sm lg:text-base mt-2">
+          <div className="mt-3">
             <div className="font-semibold">
               Unlock Gold's Potential. Digitally.
             </div>
-            <div className="text-content/60 mt-1">
+            <div className="text-content/60 mt-2">
               GLDT revolutionizes gold ownership. Each Gold token (GLDT)
               represents a tangible claim to securely vaulted Swiss gold, 100
               GLDT per gram. Own your future, with complete transparency,
@@ -242,7 +241,7 @@ const BuyGLDT = () => {
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="px-4 lg:px-8 pt-4 lg:pt-16 pb-4 lg:pb-8">
+        <div className="p-4 lg:p-8">
           <div
             className={clsx(
               "max-w-3xl mx-auto bg-surface-primary border border-border rounded-xl",

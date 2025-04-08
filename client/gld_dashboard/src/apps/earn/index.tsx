@@ -1,5 +1,3 @@
-import clsx from "clsx";
-
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
@@ -13,37 +11,39 @@ const Earn = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col lg:flex-grow">
-          <div className="text-left text-2xl lg:text-4xl flex flex-row lg:flex-col gap-2 lg:gap-0 font-semibold mb-2">
+        <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow">
+          <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4 px-4 lg:px-8">
             <div>Earn</div>
-            <div className="text-primary">with gold</div>
+            <div className="text-primary font-light">with gold</div>
           </div>
-          <div className="text-left text-sm lg:text-base text-content/60">
+          <div className="text-content/60 my-3 px-4 lg:px-8">
             Stake your GLDT to{" "}
             <span className="font-semibold">earn weekly rewards</span> in
             governance tokens, unlocking passive income from your gold holdings.
           </div>
-          <div className="mt-8">
+          <div className="lg:hidden mt-8 w-full">
+            <StakeOverview />
+          </div>
+          <div className="mt-8 w-full px-4 lg:px-8">
             <StakeForm />
           </div>
           {!isConnected && (
-            <Button
-              className="mt-auto w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
-              onClick={connect}
-            >
-              Connect Wallet
-            </Button>
+            <div className="px-4 lg:px-8">
+              <Button
+                className="mt-auto w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                onClick={connect}
+              >
+                Connect Wallet
+              </Button>
+            </div>
           )}
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <div className="flex flex-col lg:flex-grow">
-          <StakeOverview
-            className={clsx(
-              "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-              "rounded-tr-[inherit] p-4 lg:p-8"
-            )}
-          />
+          <div className="hidden lg:block">
+            <StakeOverview />
+          </div>
           {/* <div className="relative px-4">
           <div
             className={clsx(

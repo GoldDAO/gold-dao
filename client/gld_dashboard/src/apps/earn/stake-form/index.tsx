@@ -1,19 +1,13 @@
 import { useAuth } from "@auth/index";
 import { useAtom } from "jotai";
-
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
-import { GLDTToken } from "../earn.utils";
-
+import { GLDTToken } from "../utils";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-
+import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
-
 import { MIN_STAKE_AMOUNT } from "./utils";
-
 import Form from "./Form";
 import Confirm from "./Confirm";
 import Details from "./Details";
@@ -21,17 +15,16 @@ import Details from "./Details";
 import { StakeStateReducerAtom } from "./atoms";
 
 const StakeForm = () => {
-  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
-    useAuth();
+  const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [stakeState, dispatchStake] = useAtom(StakeStateReducerAtom);
 
   const balance = useFetchUserBalance(
     GLDTToken.canisterId,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       ledger: GLDTToken.id,
       owner: principalId,
-      enabled: !!authenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
