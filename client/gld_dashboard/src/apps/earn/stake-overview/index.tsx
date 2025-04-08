@@ -44,7 +44,7 @@ const StakeOverview = () => {
     <div
       className={clsx(
         "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] p-4 lg:p-8"
+        "rounded-tr-[inherit] px-4 lg:px-8 pt-4 lg:pt-8 pb-24"
       )}
     >
       <div className="flex flex-col items-center">
@@ -54,7 +54,7 @@ const StakeOverview = () => {
             <Logo name="gldt" className="h-8 w-8" />
             <div>GLDT</div>
           </div>
-          <div className="flex justify-center items-center lg:justify-end">
+          <div className="flex justify-center items-center lg:justify-end mt-2 lg:mt-0">
             <div className="px-4 py-1 text-sm bg-secondary text-white/90 rounded-full">
               Current APY:{" "}
               <span>

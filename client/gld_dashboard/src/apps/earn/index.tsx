@@ -1,12 +1,22 @@
+import clsx from "clsx";
+import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
+import Dialog from "@components/dialogs/Dialog";
 import { Button } from "@components/index";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
 import StakeForm from "./stake-form";
 import StakeOverview from "./stake-overview";
 import StakeList from "./stake-list";
+import { ClaimRewardStateReducerAtom } from "./claim-all-reward/atoms";
+import ClaimRewardDisclaimer from "./claim-all-reward-disclaimer";
+import ClaimRewardsConfirm from "./claim-all-reward/Confirm";
+import ClaimRewardsDetails from "./claim-all-reward/Details";
 
 const Earn = () => {
   const { connect, isConnected } = useAuth();
+  const [claimRewardState, dispatchClaimReward] = useAtom(
+    ClaimRewardStateReducerAtom
+  );
 
   return (
     <InnerAppLayout>
@@ -23,6 +33,16 @@ const Earn = () => {
           </div>
           <div className="lg:hidden mt-8 w-full">
             <StakeOverview />
+            <div className="relative w-full px-4 lg:pb-16 pb-32">
+              <div
+                className={clsx(
+                  "my-4",
+                  "absolute -top-26 lg:-top-16 left-1/2 lg:my-0 -translate-x-1/2 w-full lg:w-xl px-4"
+                )}
+              >
+                <ClaimRewardDisclaimer />
+              </div>
+            </div>
           </div>
           <div className="mt-8 w-full px-4 lg:px-8">
             <StakeForm />
@@ -40,25 +60,42 @@ const Earn = () => {
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="flex flex-col lg:flex-grow">
+        <div className="flex flex-col lg:flex-grow lg:overflow-y-auto">
           <div className="hidden lg:block">
             <StakeOverview />
+            <div className="relative w-full px-4 lg:pb-16 pb-32">
+              <div
+                className={clsx(
+                  "my-4",
+                  "absolute -top-26 lg:-top-16 left-1/2 lg:my-0 -translate-x-1/2 w-full lg:w-xl px-4"
+                )}
+              >
+                <ClaimRewardDisclaimer />
+              </div>
+            </div>
           </div>
-          {/* <div className="relative px-4">
-          <div
-            className={clsx(
-              "my-4",
-              "lg:absolute lg:-top-11 lg:left-1/2 lg:my-0 lg:-translate-x-1/2"
-            )}
-          >
-            Rewards
-          </div>
-        </div> */}
-          <div className="flex flex-col lg:flex-grow lg:h-100 p-4 lg:p-8">
+
+          <div className="p-4 lg:p-8">
             <div className="mb-4 lg:mb-8">My Stakes</div>
             <StakeList />
           </div>
         </div>
+
+        <Dialog
+          open={claimRewardState.is_open_claim_dialog_confirm}
+          handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
+          title="Confirm claim rewards"
+        >
+          <ClaimRewardsConfirm />
+        </Dialog>
+
+        <Dialog
+          open={claimRewardState.is_open_claim_dialog_details}
+          handleOnClose={() => dispatchClaimReward({ type: "RESET" })}
+          title="Claim details"
+        >
+          <ClaimRewardsDetails />
+        </Dialog>
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>
   );

@@ -8,9 +8,10 @@ import InnerAppLayout from "@components/outlets/InnerAppLayout";
 import NeuronOverview from "./neuron-overview";
 import RewardAssets from "./reward-assets";
 import NeuronList from "./neuron-list/List";
-import { ClaimRewardStateReducerAtom } from "./claim-reward/atoms";
-import ClaimRewardsConfirm from "./claim-reward/Confirm";
-import ClaimRewardsDetails from "./claim-reward/Details";
+import { ClaimRewardStateReducerAtom } from "./claim-all-reward/atoms";
+import ClaimRewardDisclaimer from "./claim-all-reward-disclaimer";
+import ClaimRewardsConfirm from "./claim-all-reward/Confirm";
+import ClaimRewardsDetails from "./claim-all-reward/Details";
 
 const Govern = () => {
   const { connect, isConnected } = useAuth();
@@ -42,7 +43,7 @@ const Govern = () => {
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="flex flex-col lg:flex-grow overflow-y-auto">
+        <div className="flex flex-col lg:flex-grow lg:overflow-y-auto">
           <NeuronOverview />
           <div className="relative w-full px-4 lg:pb-16 pb-32">
             <div
@@ -51,32 +52,7 @@ const Govern = () => {
                 "absolute -top-26 lg:-top-16 left-1/2 lg:my-0 -translate-x-1/2 w-full lg:w-xl px-4"
               )}
             >
-              <div className="border border-green-700 bg-surface-primary rounded-xl">
-                <div className="rounded-[inherit] p-4 bg-green-700/10">
-                  <div className="text-green-700 text-center lg:text-left">
-                    Unclaimed rewards available
-                  </div>
-                  <div className="flex flex-col lg:flex-row justify-between items-center mt-2 gap-4">
-                    <div className="flex flex-col items-center lg:items-start shrink-0">
-                      <div className="font-semibold text-xl">Total of: $</div>
-                      <div className="text-sm text-content/60">
-                        dispatched in GOLDAO, ICP, OGY and WTN
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="border border-green-700 rounded-xl px-4 py-4 bg-green-700 text-white text-sm font-semibold shrink-0 cursor-pointer"
-                      onClick={() =>
-                        dispatchClaimReward({
-                          type: "OPEN_DIALOG_CONFIRM",
-                        })
-                      }
-                    >
-                      Claim rewards
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ClaimRewardDisclaimer />
             </div>
           </div>
           <div className="p-4 lg:p-8">

@@ -82,7 +82,6 @@ const useGetTokenTotalStakedAmount = (
             return {
               id: token.id,
               amount: neuronsStakedAmount,
-              neuron_ids: neurons.map((neuron) => neuron.id),
               neurons: neuronStakedAmount,
             };
           })
