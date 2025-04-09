@@ -2,40 +2,32 @@ import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useForm, useWatch } from "react-hook-form";
-
-import { KONGSWAP_CANISTER_ID_IC } from "@constants";
-
+import {
+  KONGSWAP_CANISTER_ID_IC,
+  GLDT_LEDGER_CANISTER_ID,
+  GLDT_VALUE_1G_NFT,
+} from "@constants";
 import { BuyGLDTStateReducerAtom } from "./atoms";
-
 import { useAuth } from "@auth/index";
-
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
-
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
-
 import SelectToken from "./SelectToken.component";
 import { Token } from "./tokensList.utils";
 import TradeConfirm from "./TradeConfirm.component";
 import TradeDetails from "./TradeDetails.component";
-
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@services/kongswap/hooks/useFetchTokenPrice";
+import useFetchToken from "@hooks/useFetchTokenPrice";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const BuyGLDT = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
-  const {
-    pay_token,
-    receive_token,
-    is_open_confirm_dialog,
-    is_open_details_dialog,
-  } = buyAtomState;
+  const { pay_token, is_open_confirm_dialog, is_open_details_dialog } =
+    buyAtomState;
 
   const {
     register,
@@ -74,94 +66,57 @@ const BuyGLDT = () => {
     }
   );
 
-  const payTokenFee = useFetchTransferFee(
-    pay_token.token.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: pay_token.token.id,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
+  const payTokenPrice = useFetchToken(unauthenticatedAgent, {
+    from: pay_token.token.name,
+    from_canister_id: pay_token.token.canisterId,
+    amount: price.data?.pay_amount ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && price.isSuccess,
+  });
 
-  const receiveTokenFee = useFetchTransferFee(
-    receive_token.token.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: receive_token.token.id,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
-
-  const payTokenDecimals = useFetchDecimals(
-    pay_token.token.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: pay_token.token.id,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  const receiveTokenDecimals = useFetchDecimals(
-    receive_token.token.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: receive_token.token.id,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
+  const receiveTokenPrice = useFetchToken(unauthenticatedAgent, {
+    from: "GLDT",
+    from_canister_id: GLDT_LEDGER_CANISTER_ID,
+    amount: price.data?.receive_amount ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && price.isSuccess,
+  });
 
   useEffect(
     () => {
-      if (
-        price.isSuccess &&
-        receiveTokenDecimals.isSuccess &&
-        receiveTokenFee.isSuccess
-      ) {
+      if (receiveTokenPrice.isSuccess) {
         dispatch({
           type: "SET_RECEIVE_TOKEN_DATA",
           value: {
-            amount: price.data.receive_amount,
-            decimals: receiveTokenDecimals.data,
-            fee: receiveTokenFee.data,
+            amount: receiveTokenPrice.data.amount,
+            amount_usd: receiveTokenPrice.data.amount_usd,
+            amount_gold:
+              receiveTokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT),
+            decimals: receiveTokenPrice.data.decimals,
+            fee: receiveTokenPrice.data.fee,
           },
         });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      price.isSuccess,
-      price.data,
-      receiveTokenDecimals.isSuccess,
-      receiveTokenFee.isSuccess,
-    ]
+    [receiveTokenPrice.isSuccess, receiveTokenPrice.data]
   );
 
   useEffect(
     () => {
-      if (
-        amount &&
-        balance.isSuccess &&
-        payTokenDecimals.isSuccess &&
-        payTokenFee.isSuccess
-      ) {
+      if (amount && balance.isSuccess && payTokenPrice.isSuccess) {
         dispatch({
           type: "SET_PAY_TOKEN_DATA",
           value: {
-            decimals: payTokenDecimals.data,
+            amount: payTokenPrice.data.amount,
+            amount_usd: payTokenPrice.data.amount_usd,
+            decimals: payTokenPrice.data.decimals,
             user_balance: balance.data,
-            fee: payTokenFee.data,
-            amount,
+            fee: payTokenPrice.data.fee,
           },
         });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      balance.isSuccess,
-      payTokenDecimals.isSuccess,
-      payTokenFee.isSuccess,
-      amount,
-    ]
+    [balance.isSuccess, payTokenPrice.isSuccess, amount]
   );
 
   useEffect(() => {
@@ -180,8 +135,10 @@ const BuyGLDT = () => {
 
   const isInsufficientFunds = (value: number) => {
     return (
-      BigInt(Math.round(value * 10 ** (payTokenDecimals.data as number))) +
-        (payTokenFee.data as bigint) <=
+      BigInt(
+        Math.round(value * 10 ** (payTokenPrice.data?.decimals as number))
+      ) +
+        (payTokenPrice.data?.fee as bigint) <=
       (balance.data as bigint)
     );
   };
@@ -189,8 +146,9 @@ const BuyGLDT = () => {
   const isAmountGreaterThanFee = (value: number) => {
     return value === 0
       ? true
-      : BigInt(Math.round(value * 10 ** (payTokenDecimals.data as number))) >=
-          (payTokenFee.data as bigint);
+      : BigInt(
+          Math.round(value * 10 ** (payTokenPrice.data?.decimals as number))
+        ) >= (payTokenPrice.data?.fee as bigint);
   };
 
   const isAmountGreaterThanZero = (value: number) => value > 0;
@@ -208,13 +166,19 @@ const BuyGLDT = () => {
   };
 
   const isDataFetched =
-    price.isSuccess &&
     balance.isSuccess &&
-    payTokenDecimals.isSuccess &&
-    payTokenFee.isSuccess;
+    price.isSuccess &&
+    receiveTokenPrice.isSuccess &&
+    payTokenPrice.isSuccess;
 
-  const isReceiveTokenDataFetched =
-    price.isSuccess && receiveTokenDecimals.isSuccess;
+  const isReceiveTokenPriceIsFetched =
+    receiveTokenPrice.isSuccess && !receiveTokenPrice.isFetching;
+
+  const isDisabledBuyButton =
+    !isValid ||
+    !receiveTokenPrice.isSuccess ||
+    !isDataFetched ||
+    receiveTokenPrice.isFetching;
 
   return (
     <InnerAppLayout>
@@ -282,10 +246,6 @@ const BuyGLDT = () => {
                           {...register("amount", {
                             pattern: /[0-9.]/,
                             required: "",
-                            // onChange: (e) =>
-                            //   handleOnChangePayTokenAmount(
-                            //     Number(e.target.value)
-                            //   ),
                             validate: {
                               isInsufficientFunds: (v: string) =>
                                 isInsufficientFunds(Number(v)) ||
@@ -326,11 +286,11 @@ const BuyGLDT = () => {
               <div className="text-primary">You will receive</div>
               <div className="mt-4">
                 <div className="text-2xl lg:text-4xl">
-                  {isReceiveTokenDataFetched ? (
+                  {isReceiveTokenPriceIsFetched ? (
                     <>
                       <TokenValueToLocaleString
-                        value={receive_token.amount}
-                        tokenDecimals={receive_token.decimals}
+                        value={receiveTokenPrice.data.amount}
+                        tokenDecimals={receiveTokenPrice.data.decimals}
                         decimals={5}
                       />{" "}
                       GLDT
@@ -340,15 +300,25 @@ const BuyGLDT = () => {
                   )}
                 </div>
                 <div className="font-semibold text-lg lg:text-xl mt-1">
-                  {isReceiveTokenDataFetched ? (
+                  {isReceiveTokenPriceIsFetched ? (
                     <>
                       ≈{" "}
                       <TokenValueToLocaleString
-                        value={receive_token.amount_in_gold}
-                        tokenDecimals={receive_token.decimals}
+                        value={
+                          receiveTokenPrice.data.amount /
+                          BigInt(GLDT_VALUE_1G_NFT)
+                        }
+                        tokenDecimals={receiveTokenPrice.data.decimals}
                         decimals={5}
                       />
-                      g of gold
+                      g of gold{" "}
+                      <span className="text-content/60 font-normal">
+                        ($
+                        <NumberToLocaleString
+                          value={receiveTokenPrice.data.amount_usd}
+                        />
+                        )
+                      </span>
                     </>
                   ) : (
                     <div>Loading...</div>
@@ -360,14 +330,14 @@ const BuyGLDT = () => {
                 <Button
                   className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
                   onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}
-                  disabled={!isValid || !isDataFetched}
+                  disabled={isDisabledBuyButton}
                 >
-                  {isReceiveTokenDataFetched ? (
+                  {isReceiveTokenPriceIsFetched ? (
                     <>
                       Buy for ≈{" "}
                       <TokenValueToLocaleString
-                        value={receive_token.amount}
-                        tokenDecimals={receive_token.decimals}
+                        value={receiveTokenPrice.data.amount}
+                        tokenDecimals={receiveTokenPrice.data.decimals}
                         decimals={5}
                       />{" "}
                       GLDT

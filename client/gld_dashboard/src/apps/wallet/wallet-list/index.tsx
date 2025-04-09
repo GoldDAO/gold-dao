@@ -7,8 +7,9 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import { TokensList, Token, GLDT_INDEX } from "../utils";
 import { TokenSelectedAtom } from "../atoms";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useUserNFTMetrics from "../../../hooks/useUserNFTMetrics";
+import useUserNFTMetrics from "@hooks/useUserNFTMetrics";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const TokenItem = ({ token }: { token: Token }) => {
   const { id, name, label } = token;
@@ -22,9 +23,11 @@ const TokenItem = ({ token }: { token: Token }) => {
     enabled: !!unauthenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
-    ledger: id,
-    enabled: !!unauthenticatedAgent && isConnected,
+  const tokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
+    from: name,
+    from_canister_id: token.canisterId,
+    amount: balance.data ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && balance.isSuccess,
   });
 
   const onClickToken = () => {
@@ -51,16 +54,25 @@ const TokenItem = ({ token }: { token: Token }) => {
         </div>
         <div className="text-end">
           <div>
-            {balance.isSuccess && decimals.isSuccess ? (
+            {tokenPrice.isSuccess ? (
               <TokenValueToLocaleString
-                value={balance.data}
-                tokenDecimals={decimals.data}
+                value={tokenPrice.data.amount}
+                tokenDecimals={tokenPrice.data.decimals}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
-          <div className="text-content/60 text-sm">$todo</div>
+          <div className="text-content/60 text-sm">
+            {tokenPrice.isSuccess ? (
+              <>
+                $
+                <NumberToLocaleString value={tokenPrice.data.amount_usd} />
+              </>
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
         </div>
       </div>
     </div>

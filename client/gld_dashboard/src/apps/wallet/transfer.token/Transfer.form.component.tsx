@@ -71,11 +71,11 @@ const TransferToken = ({ className }: { className?: string }) => {
         shouldValidate: true,
       });
     }
-    setValue(
-      "recipient_address",
-      "oxh25-vm4xh-tmsig-jsjms-3ra3g-jyyqy-nqb2k-swild-u5hfd-qvmmf-qqe",
-      { shouldValidate: true }
-    );
+    // setValue(
+    //   "recipient_address",
+    //   "oxh25-vm4xh-tmsig-jsjms-3ra3g-jyyqy-nqb2k-swild-u5hfd-qvmmf-qqe",
+    //   { shouldValidate: true }
+    // );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
