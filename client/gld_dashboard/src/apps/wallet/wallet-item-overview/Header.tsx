@@ -4,10 +4,12 @@ import { GLDT_VALUE_1G_NFT } from "@constants";
 import { useAuth } from "@auth/index";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import useUserNFTMetrics from "@hooks/useUserNFTMetrics";
 import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { TokenSelectedAtom } from "../atoms";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const Token = ({ className }: { className?: string }) => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -25,14 +27,28 @@ const Token = ({ className }: { className?: string }) => {
     enabled: !!unauthenticatedAgent && isConnected,
   });
 
+  const tokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
+    from: name,
+    from_canister_id: token.canisterId,
+    amount: balance.data ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && balance.isSuccess,
+  });
+
+  const tokenPriceOne = useFetchTokenPrice(unauthenticatedAgent, {
+    from: name,
+    from_canister_id: token.canisterId,
+    amount: BigInt(1 * 10 ** (decimals.data ?? 0)),
+    enabled: !!unauthenticatedAgent && isConnected && decimals.isSuccess,
+  });
+
   const renderTokenUserBalance = () => {
     return (
       <div>
-        {balance.isSuccess && decimals.isSuccess ? (
+        {tokenPrice.isSuccess ? (
           <div className="text-2xl lg:text-4xl font-semibold flex items-center gap-2">
             <TokenValueToLocaleString
-              value={balance.data}
-              tokenDecimals={decimals.data}
+              value={tokenPrice.data.amount}
+              tokenDecimals={tokenPrice.data.decimals}
             />
             <div className="text-content/60 font-normal">{name}</div>
           </div>
@@ -47,14 +63,19 @@ const Token = ({ className }: { className?: string }) => {
     return (
       <div className="flex flex-col items-center gap-2">
         {renderTokenUserBalance()}
-        <div>
-          {balance.isSuccess && decimals.isSuccess ? (
+        <div className="text-sm text-content/60">
+          {tokenPrice.isSuccess ? (
             <div>
               <TokenValueToLocaleString
-                value={balance.data / BigInt(GLDT_VALUE_1G_NFT)}
-                tokenDecimals={decimals.data}
+                value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
+                tokenDecimals={tokenPrice.data.decimals}
               />{" "}
-              grams of Gold ($todo)
+              grams of Gold ({" "}
+              <span>
+                $
+                <NumberToLocaleString value={tokenPrice.data.amount_usd} />
+              </span>
+              )
             </div>
           ) : (
             <div>Loading...</div>
@@ -68,7 +89,16 @@ const Token = ({ className }: { className?: string }) => {
     return (
       <div className="flex flex-col items-center gap-2">
         {renderTokenUserBalance()}
-        <div>($todo)</div>
+        <div className="text-sm text-content/60">
+          {tokenPrice.isSuccess ? (
+            <div>
+              $
+              <NumberToLocaleString value={tokenPrice.data.amount_usd} />
+            </div>
+          ) : (
+            <div>Loading...</div>
+          )}
+        </div>
       </div>
     );
   };
@@ -93,7 +123,16 @@ const Token = ({ className }: { className?: string }) => {
               <div className="text-content/60 text-sm">{label}</div>
             </div>
           </div>
-          <div className="text-sm text-content/60">1 {name} ≈ $todo</div>
+          <div className="text-sm text-content/60">
+            {tokenPriceOne.isSuccess ? (
+              <>
+                1 {name} ≈ $
+                <NumberToLocaleString value={tokenPriceOne.data.amount_usd} />
+              </>
+            ) : (
+              <span>Loading...</span>
+            )}
+          </div>
         </div>
         <div className="py-8 lg:py-12">{renderTokenHeaderContent()}</div>
       </div>

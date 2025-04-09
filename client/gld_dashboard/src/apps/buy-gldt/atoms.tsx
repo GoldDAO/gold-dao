@@ -1,23 +1,25 @@
 import { atomWithReducer } from "jotai/utils";
 
-import { GLDT_LEDGER_CANISTER_ID_IC, GLDT_VALUE_1G_NFT } from "@constants";
+import { GLDT_LEDGER_CANISTER_ID_IC } from "@constants";
 
 import TOKENS_LIST, { Token } from "./tokensList.utils";
 
 type BuyGLDTState = {
   pay_token: {
     token: Token;
+    amount: bigint | null;
+    amount_usd: number | null;
     decimals: number | null;
     user_balance: bigint | null;
     fee: bigint | null;
-    amount: bigint | null;
   };
   receive_token: {
     token: Token;
     amount: bigint;
+    amount_usd: number | null;
+    amount_gold: bigint;
     fee: bigint | null;
-    amount_in_gold: bigint;
-    decimals: number | undefined;
+    decimals: number | null;
   };
   is_open_confirm_dialog: boolean;
   is_open_details_dialog: boolean;
@@ -26,10 +28,11 @@ type BuyGLDTState = {
 const initialState: BuyGLDTState = {
   pay_token: {
     token: TOKENS_LIST[0], // default to ICP,
+    amount: null,
+    amount_usd: null,
     decimals: null,
     user_balance: null,
     fee: null,
-    amount: null,
   },
   receive_token: {
     token: {
@@ -39,9 +42,10 @@ const initialState: BuyGLDTState = {
       canisterId: GLDT_LEDGER_CANISTER_ID_IC,
     },
     amount: 0n,
-    amount_in_gold: 0n,
+    amount_usd: 0,
+    amount_gold: 0n,
+    decimals: null,
     fee: null,
-    decimals: undefined,
   },
   is_open_confirm_dialog: false,
   is_open_details_dialog: false,
@@ -57,16 +61,19 @@ const reducer = (
     | {
         type: "SET_PAY_TOKEN_DATA";
         value: {
+          amount: bigint;
+          amount_usd: number;
           decimals: number;
           user_balance: bigint;
           fee: bigint;
-          amount: number;
         };
       }
     | {
         type: "SET_RECEIVE_TOKEN_DATA";
         value: {
           amount: bigint;
+          amount_usd: number;
+          amount_gold: bigint;
           decimals: number;
           fee: bigint;
         };
@@ -91,12 +98,7 @@ const reducer = (
         ...prev,
         pay_token: {
           ...prev.pay_token,
-          decimals: action.value.decimals,
-          user_balance: action.value.user_balance,
-          fee: action.value.fee,
-          amount: BigInt(
-            Math.round(action.value.amount * 10 ** action.value.decimals)
-          ),
+          ...action.value,
         },
       };
     case "SET_RECEIVE_TOKEN_DATA":
@@ -104,10 +106,7 @@ const reducer = (
         ...prev,
         receive_token: {
           ...prev.receive_token,
-          amount: action.value.amount,
-          amount_in_gold: action.value.amount / BigInt(GLDT_VALUE_1G_NFT),
-          decimals: action.value.decimals,
-          fee: action.value.fee,
+          ...action.value,
         },
       };
     case "OPEN_DIALOG_CONFIRM":

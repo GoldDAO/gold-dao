@@ -3,8 +3,9 @@ import { GOLDAO_LEDGER_CANISTER_ID, GLDT_VALUE_1G_NFT } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -16,14 +17,12 @@ const NeuronOverview = () => {
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,
   });
 
-  const decimals = useFetchDecimals(
-    GOLDAO_LEDGER_CANISTER_ID,
-    unauthenticatedAgent,
-    {
-      ledger: GOLDAO_LEDGER_CANISTER_ID,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
+  const tokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
+    from: "GOLDAO",
+    from_canister_id: GOLDAO_LEDGER_CANISTER_ID,
+    amount: stakedAmount.data ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && stakedAmount.isSuccess,
+  });
 
   return (
     <div
@@ -45,11 +44,11 @@ const NeuronOverview = () => {
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
                 <div className="text-2xl lg:text-4xl  flex items-center gap-2">
-                  {stakedAmount.isSuccess && decimals.isSuccess ? (
+                  {tokenPrice.isSuccess ? (
                     <>
                       <TokenValueToLocaleString
-                        value={stakedAmount.data}
-                        tokenDecimals={decimals.data}
+                        value={tokenPrice.data.amount}
+                        tokenDecimals={tokenPrice.data.decimals}
                       />
                       <div className="text-content/60 font-normal">GOLDAO</div>
                     </>
@@ -59,14 +58,19 @@ const NeuronOverview = () => {
                 </div>
               </div>
             </div>
-            <div>
-              {stakedAmount.isSuccess && decimals.isSuccess ? (
+            <div className="text-sm text-content/60">
+              {tokenPrice.isSuccess ? (
                 <div>
                   <TokenValueToLocaleString
-                    value={stakedAmount.data / BigInt(GLDT_VALUE_1G_NFT)}
-                    tokenDecimals={decimals.data}
+                    value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
+                    tokenDecimals={tokenPrice.data.decimals}
                   />{" "}
-                  grams of Gold ($todo)
+                  grams of Gold ({" "}
+                  <span>
+                    $
+                    <NumberToLocaleString value={tokenPrice.data.amount_usd} />
+                  </span>
+                  )
                 </div>
               ) : (
                 <div>Loading...</div>

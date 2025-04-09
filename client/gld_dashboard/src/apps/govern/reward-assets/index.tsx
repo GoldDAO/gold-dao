@@ -1,9 +1,10 @@
 import { useAuth } from "@auth/index";
 import { Token, TokensList } from "../utils";
 import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { Logo } from "@components/logos";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const RewardAssetItem = ({ token }: { token: Token }) => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -15,30 +16,41 @@ const RewardAssetItem = ({ token }: { token: Token }) => {
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,
   });
 
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
-    ledger: token.id,
-    enabled: !!unauthenticatedAgent && isConnected,
+  const tokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
+    from: token.name,
+    from_canister_id: token.canisterId,
+    amount: stakedAmount.data ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected && stakedAmount.isSuccess,
   });
 
   return (
     <div className="flex flex-col items-center p-4 lg:p-2">
-      {!stakedAmount.isSuccess || !decimals.isSuccess ? (
-        <div>Loading...</div>
-      ) : (
+      {tokenPrice.isSuccess ? (
         <div className="flex items-center gap-2">
           <Logo name={token.id} className="h-4" />
           <div className="text-2xl">
             <TokenValueToLocaleString
-              value={stakedAmount.data}
-              decimals={decimals.data}
+              value={tokenPrice.data.amount}
+              decimals={tokenPrice.data.decimals}
             />
           </div>
 
           <div className="text-lg text-content/60">{token.name}</div>
         </div>
+      ) : (
+        <div className="text-2xl">Loading...</div>
       )}
 
-      <div className="text-content/60 text-sm">$0</div>
+      <div className="text-content/60 text-sm">
+        {tokenPrice.isSuccess ? (
+          <div>
+            $
+            <NumberToLocaleString value={tokenPrice.data.amount_usd} />{" "}
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
+      </div>
     </div>
   );
 };

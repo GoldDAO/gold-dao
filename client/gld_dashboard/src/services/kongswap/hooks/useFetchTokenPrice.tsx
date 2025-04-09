@@ -3,26 +3,11 @@ import {
   keepPreviousData,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { Actor, Agent, HttpAgent, ActorSubclass } from "@dfinity/agent";
+import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { idlFactory } from "../idlFactory";
-import { SwapAmountsResult, SwapAmountsReply } from "../interfaces";
-
-const swap_amounts = async (
-  actor: ActorSubclass,
-  options: { from: string; to: string; amount: number }
-) => {
-  const { from, to, amount } = options;
-  const result = (await actor.swap_amounts(
-    from,
-    BigInt(Math.round(amount * 1e8)),
-    to
-  )) as SwapAmountsResult;
-
-  if ("Err" in result) throw new Error(result.Err);
-
-  return result.Ok;
-};
+import { SwapAmountsReply } from "../interfaces";
+import swap_amounts from "../swap_amounts";
 
 const useFetchTokenPrice = (
   canisterId: string,
