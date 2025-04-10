@@ -13,7 +13,6 @@ const swap_amounts = async (
   )) as SwapAmountsResult;
 
   if ("Err" in result) throw new Error(result.Err);
-
   return result.Ok;
 };
 

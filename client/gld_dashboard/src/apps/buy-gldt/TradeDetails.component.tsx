@@ -19,7 +19,7 @@ const TradeDetails = () => {
   const { authenticatedAgent, principalId } = useAuth();
   const queryClient = useQueryClient();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
-  const { pay_token, receive_token } = buyAtomState;
+  const { pay_token, receive_token, max_slippage } = buyAtomState;
 
   const approve = useApprove(pay_token.token.canisterId, authenticatedAgent);
   const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent);
@@ -31,6 +31,7 @@ const TradeDetails = () => {
         pay_token: pay_token.token.name,
         pay_amount: pay_token.amount as bigint,
         receive_address: principalId,
+        max_slippage: max_slippage as number,
       },
       {
         onSuccess: (res) => {

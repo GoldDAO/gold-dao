@@ -7,28 +7,26 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-
 import { useAuth } from "@auth/index";
-
 import { Logo } from "@components/index";
-import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
-
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-
+import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import TOKENS_LIST, { Token } from "./tokensList.utils";
+import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();
 
-  const { data, isSuccess } = useFetchUserBalance(
-    canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: id,
-      owner: principalId,
-      enabled: !!unauthenticatedAgent && !!isConnected,
-    }
-  );
+  const balance = useFetchUserBalance(canisterId, unauthenticatedAgent, {
+    ledger: id,
+    owner: principalId,
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
+
+  const decimals = useFetchDecimals(canisterId, unauthenticatedAgent, {
+    ledger: id,
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
 
   return (
     <div className="m-2 font-semibold text-sm cursor-pointer hover:bg-surface-secondary hover:rounded-lg">
@@ -41,8 +39,11 @@ const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
           </div>
         </div>
         <div className="">
-          {isSuccess ? (
-            <E8sToLocaleString value={data} />
+          {balance.isSuccess && decimals.isSuccess ? (
+            <TokenValueToLocaleString
+              value={balance.data}
+              tokenDecimals={decimals.data}
+            />
           ) : (
             <div>Loading...</div>
           )}
@@ -65,15 +66,20 @@ const SelectBuyMethod = ({
 
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();
 
-  const { data, isSuccess } = useFetchUserBalance(
+  const balance = useFetchUserBalance(
     selected.canisterId,
     unauthenticatedAgent,
     {
       ledger: selected.id,
       owner: principalId,
-      enabled: !!unauthenticatedAgent && !!isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
+
+  const decimals = useFetchDecimals(selected.canisterId, unauthenticatedAgent, {
+    ledger: selected.id,
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
 
   const handleChange = (token: Token) => {
     setSelected(token);
@@ -88,14 +94,19 @@ const SelectBuyMethod = ({
             "min-w-[300px] rounded-md border border-border p-4",
             "text-sm/6"
           )}
-          disabled={!isSuccess}
+          disabled={!balance.isSuccess || !decimals.isSuccess}
         >
           <div className="cursor-pointer">
-            {isSuccess ? (
+            {balance.isSuccess && decimals.isSuccess ? (
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Logo name={selected.id} className="w-6 h-6" />
-                  Balance: <E8sToLocaleString value={data} /> {selected.name}
+                  Balance:{" "}
+                  <TokenValueToLocaleString
+                    value={balance.data}
+                    tokenDecimals={decimals.data}
+                  />{" "}
+                  {selected.name}
                 </div>
                 <ChevronDownIcon className="h-6 w-6" />
               </div>

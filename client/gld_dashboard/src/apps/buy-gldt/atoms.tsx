@@ -1,8 +1,7 @@
 import { atomWithReducer } from "jotai/utils";
-
 import { GLDT_LEDGER_CANISTER_ID_IC } from "@constants";
-
 import TOKENS_LIST, { Token } from "./tokensList.utils";
+import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 
 type BuyGLDTState = {
   pay_token: {
@@ -21,6 +20,10 @@ type BuyGLDTState = {
     fee: bigint | null;
     decimals: number | null;
   };
+  slippage: number | null;
+  max_slippage: number | null;
+  network_fee: bigint | null;
+  lp_fee: bigint | null;
   is_open_confirm_dialog: boolean;
   is_open_details_dialog: boolean;
 };
@@ -47,6 +50,10 @@ const initialState: BuyGLDTState = {
     decimals: null,
     fee: null,
   },
+  slippage: null,
+  max_slippage: 5,
+  network_fee: null,
+  lp_fee: null,
   is_open_confirm_dialog: false,
   is_open_details_dialog: false,
 };
@@ -57,6 +64,13 @@ const reducer = (
     | {
         type: "SET_PAY_TOKEN";
         value: Token;
+      }
+    | {
+        type: "SET_PRICE_DATA";
+        value: {
+          slippage: number;
+          txs: Array<SwapAmountsTxReply>;
+        };
       }
     | {
         type: "SET_PAY_TOKEN_DATA";
@@ -93,6 +107,19 @@ const reducer = (
           token: action.value,
         },
       };
+    case "SET_PRICE_DATA": {
+      const network_fee = action.value.txs.reduce(
+        (acc, tx) => acc + tx.gas_fee,
+        0n
+      );
+      const lp_fee = action.value.txs.reduce((acc, tx) => acc + tx.lp_fee, 0n);
+      return {
+        ...prev,
+        slippage: action.value.slippage,
+        network_fee,
+        lp_fee,
+      };
+    }
     case "SET_PAY_TOKEN_DATA":
       return {
         ...prev,

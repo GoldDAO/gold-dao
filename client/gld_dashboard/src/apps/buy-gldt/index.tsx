@@ -80,6 +80,19 @@ const BuyGLDT = () => {
     enabled: !!unauthenticatedAgent && isConnected && price.isSuccess,
   });
 
+  useEffect(() => {
+    if (price.isSuccess) {
+      dispatch({
+        type: "SET_PRICE_DATA",
+        value: {
+          slippage: price.data.slippage,
+          txs: price.data.txs,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [price.isSuccess, price.data]);
+
   useEffect(
     () => {
       if (receiveTokenPrice.isSuccess) {
@@ -102,7 +115,7 @@ const BuyGLDT = () => {
 
   useEffect(
     () => {
-      if (amount && balance.isSuccess && payTokenPrice.isSuccess) {
+      if (balance.isSuccess && payTokenPrice.isSuccess) {
         dispatch({
           type: "SET_PAY_TOKEN_DATA",
           value: {
@@ -116,7 +129,7 @@ const BuyGLDT = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [balance.isSuccess, payTokenPrice.isSuccess, amount]
+    [balance.isSuccess, payTokenPrice.isSuccess, payTokenPrice.data]
   );
 
   useEffect(() => {
@@ -134,21 +147,21 @@ const BuyGLDT = () => {
   };
 
   const isInsufficientFunds = (value: number) => {
+    if (!balance.isSuccess || !payTokenPrice.isSuccess) return false;
     return (
-      BigInt(
-        Math.round(value * 10 ** (payTokenPrice.data?.decimals as number))
-      ) +
-        (payTokenPrice.data?.fee as bigint) <=
-      (balance.data as bigint)
+      BigInt(Math.round(value * 10 ** payTokenPrice.data.decimals)) +
+        payTokenPrice.data.fee <=
+      balance.data
     );
   };
 
   const isAmountGreaterThanFee = (value: number) => {
-    return value === 0
-      ? true
-      : BigInt(
-          Math.round(value * 10 ** (payTokenPrice.data?.decimals as number))
-        ) >= (payTokenPrice.data?.fee as bigint);
+    if (!payTokenPrice.isSuccess) return false;
+    if (value === 0) return true;
+    return (
+      BigInt(Math.round(value * 10 ** payTokenPrice.data.decimals)) >=
+      payTokenPrice.data.fee
+    );
   };
 
   const isAmountGreaterThanZero = (value: number) => value > 0;
@@ -178,7 +191,14 @@ const BuyGLDT = () => {
     !isValid ||
     !receiveTokenPrice.isSuccess ||
     !isDataFetched ||
-    receiveTokenPrice.isFetching;
+    receiveTokenPrice.isFetching ||
+    price.data.receive_amount <= 0n;
+
+  const errorReceiveAmountLowerThanZero =
+    price.isSuccess &&
+    payTokenPrice.isSuccess &&
+    payTokenPrice.data.amount > 0n &&
+    price.data.receive_amount <= 0n;
 
   return (
     <InnerAppLayout>
@@ -349,6 +369,11 @@ const BuyGLDT = () => {
                 {errors.amount && errors.amount?.message !== "" && (
                   <div className="mt-2">
                     {errors?.amount?.message as string}
+                  </div>
+                )}
+                {errorReceiveAmountLowerThanZero && (
+                  <div className="mt-2">
+                    Receive amount is too low. Please increase it a bit
                   </div>
                 )}
               </div>
