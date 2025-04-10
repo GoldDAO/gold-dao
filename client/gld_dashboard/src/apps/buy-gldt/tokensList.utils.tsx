@@ -1,7 +1,8 @@
 import { Ledger } from "@services/ledger/utils/interfaces";
 
 import {
-  ICP_LEDGER_CANISTER_ID_IC,
+  ICP_LEDGER_CANISTER_ID,
+  // ICP_LEDGER_CANISTER_ID_IC,
   CK_USDT_LEDGER_CANISTER_ID_IC,
   CK_USDC_LEDGER_CANISTER_ID_IC,
 } from "@constants";
@@ -18,7 +19,7 @@ const tokensList: Token[] = [
     id: "icp",
     name: "ICP",
     label: "Internet Computer",
-    canisterId: ICP_LEDGER_CANISTER_ID_IC,
+    canisterId: ICP_LEDGER_CANISTER_ID, //ICP_LEDGER_CANISTER_ID_IC,
   },
   {
     id: "ckusdt",

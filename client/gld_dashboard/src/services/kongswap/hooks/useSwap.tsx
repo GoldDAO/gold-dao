@@ -13,15 +13,20 @@ const swap = async (
     pay_token: string;
     pay_amount: bigint;
     receive_address: string;
+    max_slippage: number;
   }
 ): Promise<SwapReply> => {
-  const { receive_token, pay_token, pay_amount, receive_address } = swapArgs;
-
-  console.log(swapArgs);
+  const {
+    receive_token,
+    pay_token,
+    pay_amount,
+    receive_address,
+    max_slippage,
+  } = swapArgs;
 
   const result = (await actor.swap({
     receive_token,
-    max_slippage: [],
+    max_slippage: [max_slippage],
     pay_amount,
     referred_by: [],
     receive_amount: [],
@@ -42,11 +47,13 @@ const useSwap = (canisterId: string, agent: Agent | HttpAgent | undefined) => {
       pay_token,
       pay_amount,
       receive_address,
+      max_slippage,
     }: {
       receive_token: string;
       pay_token: string;
       pay_amount: bigint;
       receive_address: string;
+      max_slippage: number;
     }) => {
       try {
         const actor = Actor.createActor(idlFactory, {
@@ -59,6 +66,7 @@ const useSwap = (canisterId: string, agent: Agent | HttpAgent | undefined) => {
           pay_token,
           pay_amount,
           receive_address,
+          max_slippage,
         });
         return swapResult;
       } catch (err) {
