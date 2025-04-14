@@ -3,24 +3,16 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
-
+import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
 import { Button } from "@components/index";
 import UserNFTSelect from "./nft.select/UserNFTSelect";
-import { SendStateAtom } from "./atoms";
-import {
-  CollectionNFT1GAtom,
-  CollectionNFT10GAtom,
-  CollectionNFT100GAtom,
-  CollectionNFT1KGAtom,
-} from "@atoms/NFTState";
+import { TransferNFTStateReducerAtom } from "./atoms";
+import { IsOneOrMoreSelectedNFTAtom } from "@atoms/NFTState";
 
-const TransferNFT = ({ className }: { className?: string }) => {
-  const collNFT1GState = useAtomValue(CollectionNFT1GAtom);
-  const collNFT10GState = useAtomValue(CollectionNFT10GAtom);
-  const collNFT100GState = useAtomValue(CollectionNFT100GAtom);
-  const collNFT1KGState = useAtomValue(CollectionNFT1KGAtom);
-
-  const [, setSendState] = useAtom(SendStateAtom);
+const SendNFTForm = ({ className }: { className?: string }) => {
+  const [, dispatchTransferNFTState] = useAtom(TransferNFTStateReducerAtom);
+  const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
+  const collections: CollectionNameNFT[] = ["1G", "10G", "100G", "1KG"];
 
   const {
     register,
@@ -54,21 +46,18 @@ const TransferNFT = ({ className }: { className?: string }) => {
   };
 
   const handleOnSubmit = (data: FieldValues) => {
-    setSendState((state) => ({
-      ...state,
-      receive_address: data.recipient_address,
-      is_step_send_form: false,
-      is_step_send_confirm: true,
-    }));
+    dispatchTransferNFTState({
+      type: "STEP_SEND_CONFIRM",
+      value: data.recipient_address,
+    });
   };
 
   return (
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
       <div className="flex flex-col gap-2 mb-8 border border-border p-4 rounded-xl">
-        <UserNFTSelect collectionAtom={CollectionNFT1GAtom} />
-        <UserNFTSelect collectionAtom={CollectionNFT10GAtom} />
-        <UserNFTSelect collectionAtom={CollectionNFT100GAtom} />
-        <UserNFTSelect collectionAtom={CollectionNFT1KGAtom} />
+        {collections.map((collection) => (
+          <UserNFTSelect key={collection} collection={collection} />
+        ))}
       </div>
 
       <input
@@ -101,13 +90,7 @@ const TransferNFT = ({ className }: { className?: string }) => {
       <div className="mt-8">
         <Button
           type="submit"
-          disabled={
-            !isValid ||
-            (!collNFT1GState.totalCountSelected &&
-              !collNFT10GState.totalCountSelected &&
-              !collNFT100GState.totalCountSelected &&
-              !collNFT1KGState.totalCountSelected)
-          }
+          disabled={!isValid || !IsOneOrMoreSelectedNFT}
           className="w-full px-6 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
         >
           Transfer
@@ -117,4 +100,4 @@ const TransferNFT = ({ className }: { className?: string }) => {
   );
 };
 
-export default TransferNFT;
+export default SendNFTForm;

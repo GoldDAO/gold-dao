@@ -1,4 +1,4 @@
-import { atomWithReset, atomWithReducer } from "jotai/utils";
+import { atomWithReducer } from "jotai/utils";
 import { atom } from "jotai";
 import _ from "lodash";
 
@@ -130,9 +130,6 @@ export const ClaimRewardStateReducerAtom = atomWithReducer(
   initialState,
   claimRewardReducer
 );
-
-export const ClaimRewardStateAtom =
-  atomWithReset<ClaimRewardState>(initialState);
 
 export const TotalSelectedAmountAtom = atom((get) => {
   const state = get(ClaimRewardStateReducerAtom);

@@ -2,17 +2,13 @@ import { useEffect } from "react";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
-
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
-
 import WalletList from "./wallet-list";
 import WalletItemOverviewHeader from "./wallet-item-overview/Header";
 import WalletItemOverviewBtnAction from "./wallet-item-overview/BtnAction";
-
 import TxHistory from "./transactions-history";
-
 import { TokensList, TokensWhitelist, GLDT_INDEX } from "./utils";
 import { TokenSelectedAtom } from "./atoms";
 
