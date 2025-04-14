@@ -8,7 +8,7 @@ import Redeem from "@components/icons/Redeem";
 const navItems: { title: string; url: string; icon: ReactNode }[] = [
   {
     title: "Buy",
-    url: "/buy-gldt",
+    url: "/buy",
     icon: <Redeem />,
   },
   {

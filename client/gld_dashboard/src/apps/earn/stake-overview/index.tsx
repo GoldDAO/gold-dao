@@ -57,9 +57,17 @@ const StakeOverview = () => {
             <div className="px-4 py-1 text-sm bg-secondary text-white/90 rounded-full">
               Current APY:{" "}
               <span>
-                {fetchStakeAPY.isSuccess
-                  ? `${fetchStakeAPY.data}%`
-                  : "Loading..."}
+                {fetchStakeAPY.isSuccess ? (
+                  <>
+                    <NumberToLocaleString
+                      value={fetchStakeAPY.data}
+                      decimals={1}
+                    />
+                    {"%"}
+                  </>
+                ) : (
+                  "Loading..."
+                )}
               </span>
             </div>
           </div>

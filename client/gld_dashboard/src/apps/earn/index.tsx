@@ -22,10 +22,8 @@ const Earn = () => {
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow">
-          <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4 px-4 lg:px-8">
-            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
-              Earn
-            </div>
+          <div className="text-5xl lg:text-6xl flex flex-col justify-center items-center lg:items-start font-semibold mt-4 px-4 lg:px-8">
+            <div className="font-semibold text-primary/90">Earn</div>
             <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3 px-4 lg:px-8">
@@ -50,9 +48,9 @@ const Earn = () => {
             <StakeForm />
           </div>
           {!isConnected && (
-            <div className="px-4 lg:px-8">
+            <div className="px-4 lg:px-8 mt-auto w-full">
               <Button
-                className="mt-auto w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
                 onClick={connect}
               >
                 Connect Wallet
@@ -86,7 +84,7 @@ const Earn = () => {
         <Dialog
           open={claimRewardState.is_open_claim_dialog_confirm}
           handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
-          title="Confirm claim rewards"
+          title="Claim rewards"
         >
           <ClaimRewardsConfirm />
         </Dialog>

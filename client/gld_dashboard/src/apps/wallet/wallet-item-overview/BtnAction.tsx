@@ -117,9 +117,9 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
               dispatchTransferNFT({ type: "OPEN_TRANSFER_DIALOG" })
             }
           />
-          <ButtonAction action="mint" />
+          {/* <ButtonAction action="mint" /> */}
           <ButtonAction action="buy-on-bity" />
-          <ButtonAction action="redeem" />
+          {/* <ButtonAction action="redeem" /> */}
         </>
       );
     } else {
@@ -128,13 +128,13 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
           <>
             <ButtonAction
               action="buy-gldt"
-              handleOnClick={() => navigate("/buy-gldt")}
+              handleOnClick={() => navigate("/buy")}
             />
             <ButtonAction
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            <ButtonAction action="swap" />
+            {/* <ButtonAction action="swap" /> */}
             <ButtonAction
               action="earn"
               handleOnClick={() => navigate("/earn")}
@@ -148,7 +148,7 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            <ButtonAction action="swap" />
+            {/* <ButtonAction action="swap" /> */}
             <ButtonAction
               action="govern"
               handleOnClick={() => navigate("/govern")}
@@ -162,7 +162,7 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            <ButtonAction action="swap" />
+            {/* <ButtonAction action="swap" /> */}
           </>
         );
       }

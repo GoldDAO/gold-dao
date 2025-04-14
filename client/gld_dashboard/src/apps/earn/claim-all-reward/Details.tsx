@@ -54,7 +54,7 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <MutationStatusIcons status={claim.status} />
-          <div>Claim {reward.name} reward</div>
+          <div>Claiming {reward.name} reward</div>
         </div>
         {claim.isError && (
           <div>

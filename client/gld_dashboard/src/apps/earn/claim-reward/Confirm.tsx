@@ -51,6 +51,7 @@ const RewardItem = ({ name }: { name: string }) => {
               <TokenValueToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
+                decimals={2}
               />
             ) : (
               <div>Loading...</div>

@@ -44,19 +44,21 @@ const Wallet = () => {
           </div>
           <div className="flex flex-col border border-border p-4 rounded-lg h-full mt-4">
             <div className="text-center lg:text-left mb-4 text-primary/90">
-              Balance
+              Tokens
             </div>
 
             <WalletList />
           </div>
 
           {!isConnected && (
-            <Button
-              className="mt-auto w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
-              onClick={connect}
-            >
-              Connect Wallet
-            </Button>
+            <div className="w-full mt-12">
+              <Button
+                className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                onClick={connect}
+              >
+                Connect Wallet
+              </Button>
+            </div>
           )}
         </div>
       </InnerAppLayout.LeftPanel>
