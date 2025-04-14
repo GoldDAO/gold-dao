@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
@@ -15,7 +15,7 @@ const TokenItem = ({ token }: { token: Token }) => {
   const { id, name, label } = token;
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const setSelectedToken = useSetAtom(TokenSelectedAtom);
+  const [selectedToken, setSelectedToken] = useAtom(TokenSelectedAtom);
 
   const balance = useFetchUserBalance(token.canisterId, unauthenticatedAgent, {
     ledger: id,
@@ -40,16 +40,17 @@ const TokenItem = ({ token }: { token: Token }) => {
     <div
       className={clsx(
         "shrink-0",
-        "rounded-xl border border-border p-4 cursor-pointer"
+        "rounded-xl border border-border p-3 cursor-pointer",
+        `${searchParams.get("token") !== "nft" && selectedToken.id === id ? "border-primary bg-primary/10" : ""}`
       )}
       onClick={onClickToken}
     >
       <div className="flex justify-between items-center p-2 font-semibold">
         <div className="flex items-center gap-2">
-          <Logo name={id} className="h-10 w-10" />
+          <Logo name={id} className="h-9 w-9" />
           <div>
             <div>{name}</div>
-            <div className="text-content/60 text-sm">{label}</div>
+            <div className="text-content/60 text-sm font-normal">{label}</div>
           </div>
         </div>
         <div className="text-end">
@@ -93,16 +94,17 @@ const NFTItem = () => {
     <div
       className={clsx(
         "shrink-0",
-        "rounded-xl border border-border p-4 cursor-pointer"
+        "rounded-xl border border-border p-3 cursor-pointer",
+        `${searchParams.get("token") === "nft" ? "border-primary bg-primary/10" : ""}`
       )}
       onClick={onClickToken}
     >
       <div className="flex justify-between items-center p-2 font-semibold">
         <div className="flex items-center gap-2">
-          <Logo name="gld_nft" className="h-10 w-10" />
+          <Logo name="gld_nft" className="h-9 w-9" />
           <div>
             <div>GLD NFT</div>
-            <div className="text-content/60 text-sm">GLD NFT</div>
+            <div className="text-content/60 text-sm font-normal">Gold NFT</div>
           </div>
         </div>
         <div className="text-end">

@@ -10,18 +10,9 @@ import { LoaderSpin } from '@components/loaders'
 import Badge from '@components/badges/Badge'
 import Skeleton from '@components/skeletons/Skeleton'
 import ExternalLink from '@components/links/ExternalLink'
-
 import { Logo } from '@components/logos'
 
-import {
-    DropdownUserBalance,
-    DropdownUserMenu
-} from '@components/dropdowns'
-
-import { NavBar } from '@components/navbars'
-
 export {
-    NavBar,
     Card,
     Button,
     Select,
@@ -34,7 +25,5 @@ export {
     Badge,
     Skeleton,
     ExternalLink,
-    DropdownUserBalance,
-    DropdownUserMenu,
     Logo
 }

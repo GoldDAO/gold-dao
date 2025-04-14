@@ -1,12 +1,10 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
 import NeuronOverview from "./neuron-overview";
-import RewardAssets from "./reward-assets";
 import NeuronList from "./neuron-list/List";
 import { ClaimRewardStateReducerAtom } from "./claim-all-reward/atoms";
 import ClaimRewardDisclaimer from "./claim-all-reward-disclaimer";
@@ -15,7 +13,6 @@ import ClaimRewardsDetails from "./claim-all-reward/Details";
 
 const Govern = () => {
   const { connect, isConnected } = useAuth();
-  const navigate = useNavigate();
   const [claimRewardState, dispatchClaimReward] = useAtom(
     ClaimRewardStateReducerAtom
   );
@@ -25,11 +22,13 @@ const Govern = () => {
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow px-4 lg:px-8">
           <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4">
-            <div>Govern</div>
-            <div className="text-primary font-light">with gold</div>
+            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
+              Govern
+            </div>
+            <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3">
-            Stake your GOLDAO to earn weekly rewards in governance tokens,
+            Stake your GLDT to earn weekly rewards in governance tokens,
             unlocking passive income from your gold holdings.
           </div>
           {!isConnected && (
@@ -54,18 +53,6 @@ const Govern = () => {
             >
               <ClaimRewardDisclaimer />
             </div>
-          </div>
-          <div className="p-4 lg:p-8">
-            <div className="flex justify-between items-center mb-8">
-              <div>Assets</div>
-              <div
-                className="cursor-pointer"
-                onClick={() => navigate("/wallet")}
-              >
-                My wallet
-              </div>
-            </div>
-            <RewardAssets />
           </div>
 
           <div className="p-4 lg:p-8">

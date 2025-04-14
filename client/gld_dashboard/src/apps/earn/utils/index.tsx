@@ -12,6 +12,6 @@ export interface Token {
 export const GLDTToken: Token = {
   id: "gldt",
   name: "GLDT",
-  label: "GLDT",
+  label: "Gold Token",
   canisterId: GLDT_LEDGER_CANISTER_ID,
 };

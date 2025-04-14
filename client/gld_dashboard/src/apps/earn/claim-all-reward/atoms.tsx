@@ -46,7 +46,7 @@ const initialState: ClaimRewardState = {
     {
       id: "ogy",
       name: "OGY",
-      label: "OGY",
+      label: "Origyn",
       canister_id: OGY_LEDGER_CANISTER_ID,
       is_selected: false,
       is_claimable: false,

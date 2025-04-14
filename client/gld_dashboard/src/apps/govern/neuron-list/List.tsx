@@ -13,15 +13,14 @@ import {
 } from "@constants";
 
 const List = () => {
-  const { authenticatedAgent, unauthenticatedAgent, isConnected, principalId } =
-    useAuth();
+  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
 
   const { status, data } = useFetchUserNeuronsList(
     SNS_GOVERNANCE_CANISTER_ID,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       owner: principalId,
-      enabled: !!authenticatedAgent && isConnected && !!principalId,
+      enabled: !!unauthenticatedAgent && isConnected && !!principalId,
     }
   );
 

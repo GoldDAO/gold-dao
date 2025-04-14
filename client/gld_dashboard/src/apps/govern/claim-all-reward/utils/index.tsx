@@ -2,7 +2,8 @@ import { Ledger } from "@services/ledger/utils/interfaces";
 
 export interface Neuron {
   id: string;
-  staked_amount: bigint;
+  reward: bigint;
+  reward_usd: number;
 }
 
 export interface Reward {
@@ -13,5 +14,6 @@ export interface Reward {
   is_selected: boolean;
   is_claimable: boolean;
   amount: bigint;
+  amount_usd: number;
   neurons: Neuron[];
 }

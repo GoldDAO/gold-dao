@@ -38,13 +38,17 @@ const Wallet = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col flex-grow px-4 lg:px-8">
-          <div className="text-center lg:text-left text-5xl lg:text-6xl font-semibold my-4">
+        <div className="flex flex-col flex-grow px-4">
+          <div className="text-center lg:text-left text-5xl lg:text-6xl text-primary/90 font-semibold my-4">
             Wallet
           </div>
-          <div className="text-center lg:text-left mb-4 lg:mb-6">Balance</div>
+          <div className="flex flex-col border border-border p-4 rounded-lg h-full mt-4">
+            <div className="text-center lg:text-left mb-4 text-primary/90">
+              Balance
+            </div>
 
-          <WalletList />
+            <WalletList />
+          </div>
 
           {!isConnected && (
             <Button
