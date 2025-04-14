@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
@@ -24,7 +25,7 @@ const icrc2_approve = async (
     memo: [],
     expected_allowance: [],
     created_at_time: [],
-    expires_at: [],
+    expires_at: [DateTime.now().plus({ seconds: 3600 }).toMillis() * 1000000],
     spender: {
       owner,
       subaccount,

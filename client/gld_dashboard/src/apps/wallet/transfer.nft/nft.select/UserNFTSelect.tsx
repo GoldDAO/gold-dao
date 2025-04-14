@@ -1,50 +1,44 @@
 import { useEffect } from "react";
-import { SetStateAction, useAtom, WritableAtom } from "jotai";
-
+import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { CollectionNFT } from "@atoms/NFTState";
-
+import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
 import NFTSelect from "./NFTSelect";
 import useFetchUserNFT from "@services/gld_nft/hooks/useFetchUserNFT";
+import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
 
 const UserNFTSelect = ({
   className,
-  collectionAtom,
+  collection,
 }: {
   className?: string;
-  collectionAtom: WritableAtom<
-    CollectionNFT,
-    [SetStateAction<CollectionNFT>],
-    void
-  >;
+  collection: CollectionNameNFT;
 }) => {
   const { authenticatedAgent, principalId, isConnected } = useAuth();
-  const [collectionState, setCollectionState] = useAtom(collectionAtom);
+  const [selectNFTState, dispatchSelectNFTState] = useAtom(
+    SelectNFTStateReducerAtom
+  );
 
   const fetchCollection = useFetchUserNFT(
-    collectionState.canisterId,
+    selectNFTState[collection].canister_id,
     authenticatedAgent,
     {
       owner: principalId,
-      collectionName: collectionState.name,
-      enabled: !!authenticatedAgent && !!isConnected,
+      collectionName: selectNFTState[collection].name,
+      enabled: !!authenticatedAgent && isConnected,
     }
   );
 
   useEffect(() => {
     if (fetchCollection.isSuccess) {
-      setCollectionState((state: CollectionNFT) => ({
-        ...state,
-        isInititialized: true,
-        nfts: fetchCollection.data,
-        isEmpty: fetchCollection.data.length === 0,
-        totalCount: fetchCollection.data.length,
-      }));
+      dispatchSelectNFTState({
+        type: "SET_COLLECTION_NFT",
+        value: { name: collection, nfts: fetchCollection.data },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchCollection.isSuccess]);
 
-  return <NFTSelect collectionAtom={collectionAtom} className={className} />;
+  return <NFTSelect collection={collection} className={className} />;
 };
 
 export default UserNFTSelect;

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useAtom } from "jotai";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -8,20 +9,15 @@ import BuyOnBity from "@assets/icons/buy_on_bity.svg";
 import Redeem from "@assets/icons/redeem.svg";
 import Govern from "@assets/icons/govern.svg";
 import Earn from "@assets/icons/earn.svg";
-
 import { TokenSelectedAtom } from "../atoms";
 import {
   TransferTokenStateAtom,
   SendTokenStateAtom,
 } from "../transfer.token/atoms";
-
-import {
-  TransferStateAtom as TransferNFTStateAtom,
-  SendStateAtom as SendNFTStateAtom,
-} from "../transfer.nft/atoms";
-
-import TransferTokenDialog from "../transfer.token/Dialog.component";
-import TransferNFTDIalog from "../transfer.nft/Dialog.component";
+import { TransferNFTStateReducerAtom } from "../transfer.nft/atoms";
+import TransferDialogToken from "../transfer.token/Dialog.component";
+import TransferDialogNFT from "../transfer.nft";
+import SendDialogNFTDetails from "../transfer.nft/SendDialogNFTDetails";
 
 type Action =
   | "buy-gldt"
@@ -99,8 +95,7 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
   const token = useAtomValue(TokenSelectedAtom);
   const setTransferTokenState = useSetAtom(TransferTokenStateAtom);
   const setSendTokenState = useSetAtom(SendTokenStateAtom);
-  const setTransferNFTState = useSetAtom(TransferNFTStateAtom);
-  const setSendNFTState = useSetAtom(SendNFTStateAtom);
+  const [, dispatchTransferNFT] = useAtom(TransferNFTStateReducerAtom);
 
   const { id } = token;
 
@@ -112,21 +107,15 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
     }));
   };
 
-  const handleOpenTransferNFTDialog = () => {
-    setSendNFTState(RESET);
-    setTransferNFTState((state) => ({
-      ...state,
-      is_open_transfer_dialog: true,
-    }));
-  };
-
   const renderTokenAction = () => {
     if (searchParams.get("token") === "nft") {
       return (
         <>
           <ButtonAction
             action="transfer"
-            handleOnClick={handleOpenTransferNFTDialog}
+            handleOnClick={() =>
+              dispatchTransferNFT({ type: "OPEN_TRANSFER_DIALOG" })
+            }
           />
           <ButtonAction action="mint" />
           <ButtonAction action="buy-on-bity" />
@@ -192,8 +181,9 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
           {renderTokenAction()}
         </div>
       </div>
-      <TransferTokenDialog />
-      <TransferNFTDIalog />
+      <TransferDialogToken />
+      <TransferDialogNFT />
+      <SendDialogNFTDetails />
     </>
   );
 };
