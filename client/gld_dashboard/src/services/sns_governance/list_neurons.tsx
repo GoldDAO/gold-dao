@@ -33,7 +33,9 @@ const list_neurons = async (
       return parseNeuronData(neuron, nervousSystemParameters);
     }) ?? [];
 
-  return data;
+  return data.filter((neuron) => {
+    return neuron.staked_amount > 0n && neuron.state !== "Dissolved";
+  }) as NeuronData[];
 };
 
 export default list_neurons;

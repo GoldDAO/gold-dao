@@ -30,7 +30,7 @@ export const TokensList: Token[] = [
   {
     id: "ogy",
     name: "OGY",
-    label: "OGY",
+    label: "Origyn",
     canisterId: OGY_LEDGER_CANISTER_ID,
   },
   {

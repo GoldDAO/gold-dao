@@ -7,9 +7,10 @@ import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "./utils";
-import useGetAllTokenTotalStakedAmount from "./utils/useGetAllTokenTotalStakedAmount";
+import useGetAllTokenTotalStakedAmount from "./utils/useGetAllTokenTotalStakedRewards";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useRewardsFee from "@utils/useRewardsFee";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -54,7 +55,9 @@ const RewardItem = ({ name }: { name: string }) => {
               <div>Loading...</div>
             )}
           </div>
-          <div className="text-content/60 text-sm">$todo</div>
+          <div className="text-content/60 text-sm">
+            $<NumberToLocaleString value={reward.amount_usd} />
+          </div>
         </div>
       </div>
     </button>

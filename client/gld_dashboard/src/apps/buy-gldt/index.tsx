@@ -203,16 +203,19 @@ const BuyGLDT = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center text-center lg:text-left lg:items-start h-full px-4 lg:px-8">
-          <div className="text-5xl lg:text-6xl flex flex-row gap-2 lg:flex-col lg:gap-0 font-semibold mt-4">
-            <div>Buy</div>
-            <div className="text-primary font-light">tokenized Gold</div>
+        <div className="flex flex-col items-center justify-between text-center lg:text-left lg:items-start h-full px-4 lg:px-8">
+          <div className="text-5xl lg:text-6xl flex flex-col">
+            <div className="font-light">Buy</div>
+            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
+              <div>Tokenized</div>
+              <div>Gold</div>
+            </div>
           </div>
-          <div className="hidden lg:flex lg:justify-center w-full my-4 lg:my-12">
-            <img className="max-w-48" src={ImgBuyGold} alt="Buy Gold" />
+          <div className="hidden lg:flex lg:justify-center w-full my-4">
+            <img className="max-w-58" src={ImgBuyGold} alt="Buy Gold" />
           </div>
           <div className="mt-3">
-            <div className="font-semibold">
+            <div className="font-semibold text-content/70">
               Unlock Gold's Potential. Digitally.
             </div>
             <div className="text-content/60 mt-2">
@@ -225,7 +228,7 @@ const BuyGLDT = () => {
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="p-4 lg:p-8">
+        <div className="p-4 lg:p-8 my-auto">
           <div
             className={clsx(
               "max-w-3xl mx-auto bg-surface-primary border border-border rounded-xl",

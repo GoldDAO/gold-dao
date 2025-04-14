@@ -3,20 +3,21 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import { ClaimRewardStateReducerAtom } from "../claim-all-reward/atoms";
-import useGetAllTokenTotalStakedAmount from "../claim-all-reward/utils/useGetAllTokenTotalStakedAmount";
+import useGetAllTokenTotalStakedRewards from "../claim-all-reward/utils/useGetAllTokenTotalStakedRewards";
 import useRewardsFee from "@utils/useRewardsFee";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ClaimRewardDisclaimer = () => {
-  const { authenticatedAgent, principalId, isConnected, unauthenticatedAgent } =
-    useAuth();
+  const { principalId, isConnected, unauthenticatedAgent } = useAuth();
   const [, dispatchClaimReward] = useAtom(ClaimRewardStateReducerAtom);
   const [enableClaimAll, setEnableClaimAll] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [totalRewards, setTotalRewards] = useState(0);
 
-  const rewards = useGetAllTokenTotalStakedAmount({
-    agent: authenticatedAgent,
+  const rewards = useGetAllTokenTotalStakedRewards({
+    agent: unauthenticatedAgent,
     owner: principalId,
-    enabled: isConnected && !!authenticatedAgent,
+    enabled: isConnected && !!unauthenticatedAgent,
   });
 
   const rewardsFee = useRewardsFee(unauthenticatedAgent, {
@@ -31,8 +32,12 @@ const ClaimRewardDisclaimer = () => {
         );
         return found ? reward.amount >= found.fee : false;
       });
-      setIsSuccess(true);
+      const totalRewards = rewards.data.reduce((acc, reward) => {
+        return acc + reward.amount_usd;
+      }, 0);
+      setTotalRewards(totalRewards);
       setEnableClaimAll(enabled);
+      setIsSuccess(true);
     }
   }, [rewards.data, rewards.isSuccess, rewardsFee.data, rewardsFee.isSuccess]);
 
@@ -46,7 +51,16 @@ const ClaimRewardDisclaimer = () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-between items-center mt-2 gap-4">
           <div className="flex flex-col items-center lg:items-start shrink-0">
-            <div className="font-semibold text-xl">Total of: $</div>
+            <div className="font-semibold text-xl">
+              Total of:{" "}
+              {isSuccess ? (
+                <span>
+                  <NumberToLocaleString value={totalRewards} />$
+                </span>
+              ) : (
+                <span>Loading...</span>
+              )}
+            </div>
             <div className="text-sm text-content/60">
               dispatched in GOLDAO, ICP, OGY and WTN
             </div>

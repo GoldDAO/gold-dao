@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { GOLDAO_LEDGER_CANISTER_ID, GLDT_VALUE_1G_NFT } from "@constants";
+import { GOLDAO_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
@@ -11,7 +11,6 @@ const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
 
   const stakedAmount = useGetTokenTotalStakedAmount({
-    canisterIdLedger: GOLDAO_LEDGER_CANISTER_ID,
     owner: principalId,
     agent: unauthenticatedAgent,
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,
@@ -58,19 +57,11 @@ const NeuronOverview = () => {
                 </div>
               </div>
             </div>
-            <div className="text-sm text-content/60">
+            <div className="text-lg text-content/60">
               {tokenPrice.isSuccess ? (
                 <div>
-                  <TokenValueToLocaleString
-                    value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
-                    tokenDecimals={tokenPrice.data.decimals}
-                  />{" "}
-                  grams of Gold ({" "}
-                  <span>
-                    $
-                    <NumberToLocaleString value={tokenPrice.data.amount_usd} />
-                  </span>
-                  )
+                  ($
+                  <NumberToLocaleString value={tokenPrice.data.amount_usd} />)
                 </div>
               ) : (
                 <div>Loading...</div>

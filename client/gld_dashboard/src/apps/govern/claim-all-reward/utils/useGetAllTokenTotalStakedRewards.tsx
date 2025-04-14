@@ -7,12 +7,16 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import {
   SNS_REWARDS_CANISTER_ID,
   SNS_GOVERNANCE_CANISTER_ID,
+  KONGSWAP_CANISTER_ID_IC,
 } from "@constants";
 
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryGovernance } from "@services/sns_governance/idlFactory";
+import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
+import icrc1_decimals from "@services/ledger/icrc1_decimals";
+import swap_amounts from "@services/kongswap/swap_amounts";
 import { TokensList } from "../../utils/index";
 import { Ledger } from "@services/ledger/utils/interfaces";
 import { Neuron } from "./index";
@@ -20,6 +24,7 @@ import { Neuron } from "./index";
 export type TokensRewards = {
   id: Ledger;
   amount: bigint;
+  amount_usd: number;
   neurons: Neuron[];
 };
 
@@ -49,6 +54,11 @@ const useGetTokenTotalStakedAmount = (
           canisterId: SNS_GOVERNANCE_CANISTER_ID,
         });
 
+        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+          agent,
+          canisterId: KONGSWAP_CANISTER_ID_IC,
+        });
+
         const neurons = await list_neurons(actor, {
           limit: 100,
           start_page_at: null,
@@ -57,32 +67,48 @@ const useGetTokenTotalStakedAmount = (
 
         const data = await Promise.all(
           TokensList.map(async (token) => {
-            const neuronStakedAmount = await Promise.all(
+            const neuronData = await Promise.all(
               neurons.map(async (neuron) => {
                 const actorLedger = Actor.createActor(idlFactoryLedger, {
                   agent,
                   canisterId: token.canisterId,
                 });
-                const neuronStakedAmount = await icrc1_balance_of({
+                const reward = await icrc1_balance_of({
                   actor: actorLedger,
                   owner: SNS_REWARDS_CANISTER_ID,
                   subaccount: neuron.id,
                 });
 
+                const decimals = await icrc1_decimals(actorLedger);
+
+                const amount = Number(reward) / 10 ** decimals;
+
+                const price = await swap_amounts(actorKongswap, {
+                  from: token.name,
+                  to: "ckUSDC",
+                  amount,
+                });
+
                 return {
                   id: neuron.id,
-                  staked_amount: neuronStakedAmount,
+                  reward,
+                  reward_usd: price.mid_price * amount,
                 };
               })
             );
-            const neuronsStakedAmount = neuronStakedAmount.reduce(
-              (acc, curr) => acc + curr.staked_amount,
+            const amount = neuronData.reduce(
+              (acc, curr) => acc + curr.reward,
               0n
+            );
+            const amount_usd = neuronData.reduce(
+              (acc, curr) => acc + curr.reward_usd,
+              0
             );
             return {
               id: token.id,
-              amount: neuronsStakedAmount,
-              neurons: neuronStakedAmount,
+              amount,
+              amount_usd,
+              neurons: neuronData,
             };
           })
         );

@@ -29,7 +29,7 @@ export const TokensList: Token[] = [
   {
     id: "gldt",
     name: "GLDT",
-    label: "GLDT",
+    label: "Gold Token",
     canisterId: GLDT_LEDGER_CANISTER_ID,
     canister_id_ledger_index: GLDT_LEDGER_INDEX_CANISTER_ID,
   },
@@ -50,7 +50,7 @@ export const TokensList: Token[] = [
   {
     id: "ogy",
     name: "OGY",
-    label: "OGY",
+    label: "Origyn",
     canisterId: OGY_LEDGER_CANISTER_ID,
     canister_id_ledger_index: OGY_LEDGER_INDEX_CANISTER_ID,
   },

@@ -41,7 +41,7 @@ const initialState: BuyGLDTState = {
     token: {
       id: "gldt",
       name: "GLDT",
-      label: "GLDT",
+      label: "Gold Token",
       canisterId: GLDT_LEDGER_CANISTER_ID_IC,
     },
     amount: 0n,

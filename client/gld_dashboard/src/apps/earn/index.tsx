@@ -23,8 +23,10 @@ const Earn = () => {
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow">
           <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4 px-4 lg:px-8">
-            <div>Earn</div>
-            <div className="text-primary font-light">with gold</div>
+            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
+              Earn
+            </div>
+            <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3 px-4 lg:px-8">
             Stake your GLDT to{" "}

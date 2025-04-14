@@ -11,7 +11,7 @@ import {
 
 import { Reward } from "./utils";
 import { RewardFeeData } from "@utils/useRewardsFee";
-import { TokensRewards } from "./utils/useGetAllTokenTotalStakedAmount";
+import { TokensRewards } from "./utils/useGetAllTokenTotalStakedRewards";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;
@@ -32,6 +32,7 @@ const initialState: ClaimRewardState = {
       is_selected: true,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
       neurons: [],
     },
     {
@@ -42,16 +43,18 @@ const initialState: ClaimRewardState = {
       is_selected: true,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
       neurons: [],
     },
     {
       id: "ogy",
       name: "OGY",
-      label: "OGY",
+      label: "Origyn",
       canister_id: OGY_LEDGER_CANISTER_ID,
       is_selected: true,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
       neurons: [],
     },
     {
@@ -62,6 +65,7 @@ const initialState: ClaimRewardState = {
       is_selected: true,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
       neurons: [],
     },
   ],
@@ -92,7 +96,7 @@ const claimRewardReducer = (
           : false;
 
         const neurons_claimable = found
-          ? reward.neurons.filter((neuron) => neuron.staked_amount >= found.fee)
+          ? reward.neurons.filter((neuron) => neuron.reward >= found.fee)
           : [];
 
         return {

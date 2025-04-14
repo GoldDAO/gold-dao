@@ -51,17 +51,17 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
 };
 
 const List = () => {
-  const { authenticatedAgent, isConnected, principalId } = useAuth();
+  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
   const { ref, inView } = useInView();
   const token = useAtomValue(TokenSelectedAtom);
 
   const { status, data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useFetchAccountTransactions(
       token.canister_id_ledger_index,
-      authenticatedAgent,
+      unauthenticatedAgent,
       {
         account: principalId, // "4lxgi-y7rlh-onvu4-jtszk-z67wq-ldekw-rfsp3-yxrjy-dgwsl-zn6tl-eqe"
-        enabled: !!authenticatedAgent && isConnected,
+        enabled: !!unauthenticatedAgent && isConnected,
         ledger: token.id,
       }
     );

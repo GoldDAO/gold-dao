@@ -20,7 +20,7 @@
   --color-surface-secondary: oklch(98.26% 0.0017 67.8);
   --color-content: oklch(0 0 0);
   --color-border: oklch(92.51% 0.0071 88.65);
-  --color-primary: oklch(73.13% 0.1059 78.87);
+  --color-primary: oklch(0.79 0.0944 89.09);
   --color-secondary: oklch(0 0 0);
 
   @media (prefers-color-scheme: dark) {
