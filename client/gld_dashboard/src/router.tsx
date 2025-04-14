@@ -8,7 +8,7 @@ import AppLayout from "@components/outlets/AppLayout";
 
 import { NotFound, LoadingNavigation } from "views/index";
 
-import BuyGLDT from "apps/buy-gldt";
+import Buy from "apps/buy";
 import Earn from "apps/earn";
 import Govern from "apps/govern";
 import Wallet from "apps/wallet";
@@ -21,13 +21,13 @@ const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       {
-        path: "buy-gldt",
+        path: "buy",
         children: [
           {
             index: true,
             element: (
               <Suspense fallback={<div>Loading...</div>}>
-                <BuyGLDT />
+                <Buy />
               </Suspense>
             ),
           },

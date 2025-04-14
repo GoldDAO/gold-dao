@@ -26,7 +26,7 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
     claim.mutate(
       {
         neuron_ids: reward.neurons.map((n) => n.id),
-        token: reward.name,
+        token: reward.name === "GOLDAO" ? "GLDGov" : reward.name, // !TODO fix when sns_rewards canister will be updated
       },
       {
         onSuccess: (res) => {
@@ -54,7 +54,7 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <MutationStatusIcons status={claim.status} />
-          <div>Claim {reward.name} reward</div>
+          <div>Claiming {reward.name} reward</div>
         </div>
         {claim.isError && (
           <div>

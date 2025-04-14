@@ -26,8 +26,12 @@ import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 const BuyGLDT = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
-  const { pay_token, is_open_confirm_dialog, is_open_details_dialog } =
-    buyAtomState;
+  const {
+    pay_token,
+    receive_token,
+    is_open_confirm_dialog,
+    is_open_details_dialog,
+  } = buyAtomState;
 
   const {
     register,
@@ -66,11 +70,30 @@ const BuyGLDT = () => {
     }
   );
 
+  const priceExchangeRate = useFetchTokenPrice(
+    KONGSWAP_CANISTER_ID_IC,
+    unauthenticatedAgent,
+    {
+      from: pay_token.token.name,
+      to: "GLDT",
+      amount: 1,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
+
   const payTokenPrice = useFetchToken(unauthenticatedAgent, {
     from: pay_token.token.name,
     from_canister_id: pay_token.token.canisterId,
     amount: price.data?.pay_amount ?? 0n,
     enabled: !!unauthenticatedAgent && isConnected && price.isSuccess,
+  });
+
+  const payTokenPriceExchangeRate = useFetchToken(unauthenticatedAgent, {
+    from: pay_token.token.name,
+    from_canister_id: pay_token.token.canisterId,
+    amount: priceExchangeRate.data?.receive_amount ?? 0n,
+    enabled:
+      !!unauthenticatedAgent && isConnected && priceExchangeRate.isSuccess,
   });
 
   const receiveTokenPrice = useFetchToken(unauthenticatedAgent, {
@@ -239,14 +262,10 @@ const BuyGLDT = () => {
               <div className="mb-4 text-xl lg:text-4xl">
                 Buy GLDT <span className="text-primary">Gold Tokens</span>
               </div>
-              <div className="mb-2 text-sm text-content/60">
-                GLDT is a{" "}
-                <span className="text-content">gold-backed token</span> where{" "}
-                <span className="text-content">
-                  100 GLDT = 1 gram of physical gold
-                </span>
+              <div className="inline-flex text-sm text-content/60 border border-border rounded-full px-6 py-2">
+                100 GLDT = 1 gram of physical gold
               </div>
-              <div className="flex flex-col lg:flex-row gap-4 mt-8 lg:mt-12">
+              <div className="flex flex-col lg:flex-row gap-4 mt-8">
                 <div className="flex items-center border border-border rounded-md grow bg-surface-secondary">
                   <div className="p-4 border-r border-border text-primary">
                     Pay with
@@ -343,6 +362,27 @@ const BuyGLDT = () => {
                         )
                       </span>
                     </>
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </div>
+                <div className="bg-surface-secondary mt-8 inline-flex flex-col lg:flex-row gap-1 lg:gap-2 text-sm text-content/60 border border-border rounded-xl lg:rounded-full px-6 py-2">
+                  <div>Current exchange rate:</div>
+
+                  {payTokenPriceExchangeRate.isSuccess ? (
+                    <div className="flex items-center gap-1">
+                      <Logo name={pay_token.token.id} className="h-4 w-4" />
+                      <div>1</div>
+                      <div>{pay_token.token.name}</div>
+                      <div>=</div>
+                      <TokenValueToLocaleString
+                        value={payTokenPriceExchangeRate.data.amount}
+                        tokenDecimals={payTokenPriceExchangeRate.data.decimals}
+                        decimals={2}
+                      />
+                      <div>{receive_token.token.name}</div>
+                      <Logo name={receive_token.token.id} className="h-4 w-4" />
+                    </div>
                   ) : (
                     <div>Loading...</div>
                   )}

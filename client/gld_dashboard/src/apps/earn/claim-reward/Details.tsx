@@ -11,6 +11,7 @@ import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
 import { Reward } from "./utils";
+import { useNavigate } from "react-router-dom";
 
 const TokenItem = ({
   reward,
@@ -60,7 +61,7 @@ const TokenItem = ({
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <MutationStatusIcons status={claim.status} />
-          <div>Claim {reward.name} reward</div>
+          <div>Claiming {reward.name} reward</div>
         </div>
         {claim.isError && (
           <div>
@@ -83,6 +84,12 @@ const TokenItem = ({
 const Details = () => {
   const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   const [selectedRewards] = useAtom(SelectedRewardsAtom);
+  const navigate = useNavigate();
+
+  const handleNavigateToWallet = () => {
+    dispatch({ type: "RESET" });
+    navigate("/wallet");
+  };
 
   return (
     <>
@@ -100,9 +107,9 @@ const Details = () => {
           "px-4 py-3 rounded-md w-full",
           "bg-secondary text-white"
         )}
-        onClick={() => dispatch({ type: "RESET" })}
+        onClick={handleNavigateToWallet}
       >
-        Go to balance view
+        Go to wallet view
       </Button>
     </>
   );

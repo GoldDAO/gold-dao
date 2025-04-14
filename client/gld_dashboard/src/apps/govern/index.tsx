@@ -21,10 +21,8 @@ const Govern = () => {
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center lg:text-left lg:items-start lg:flex-grow px-4 lg:px-8">
-          <div className="text-5xl lg:text-6xl flex flex-row lg:flex-col justify-center gap-2 lg:gap-0 font-semibold mt-4">
-            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
-              Govern
-            </div>
+          <div className="text-5xl lg:text-6xl flex flex-col justify-center items-center lg:items-start font-semibold mt-4">
+            <div className="font-semibold text-primary/90">Govern</div>
             <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3">
@@ -33,7 +31,7 @@ const Govern = () => {
           </div>
           {!isConnected && (
             <Button
-              className="mt-auto w-full px-4 py-3 bg-secondary text-white rounded-md"
+              className="mt-auto w-full px-4 py-3 bg-secondary lg:text-lg text-white rounded-md"
               onClick={connect}
             >
               Connect Wallet
@@ -65,7 +63,7 @@ const Govern = () => {
         <Dialog
           open={claimRewardState.is_open_claim_dialog_confirm}
           handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
-          title="Confirm claim rewards"
+          title="Claim rewards"
         >
           <ClaimRewardsConfirm />
         </Dialog>

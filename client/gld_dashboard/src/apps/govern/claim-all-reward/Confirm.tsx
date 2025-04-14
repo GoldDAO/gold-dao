@@ -50,13 +50,14 @@ const RewardItem = ({ name }: { name: string }) => {
               <TokenValueToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
+                decimals={2}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
           <div className="text-content/60 text-sm">
-            $<NumberToLocaleString value={reward.amount_usd} />
+            $<NumberToLocaleString value={reward.amount_usd} decimals={2} />
           </div>
         </div>
       </div>

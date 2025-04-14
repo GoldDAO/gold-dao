@@ -219,7 +219,7 @@ const StakeList = () => {
       <Dialog
         open={claimRewardState.is_open_claim_dialog_confirm}
         handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
-        title="Confirm claim rewards"
+        title="Claim rewards"
       >
         <ClaimRewardsConfirm />
       </Dialog>
