@@ -81,18 +81,17 @@ const useGetTokenTotalStakedAmount = (
 
                 const decimals = await icrc1_decimals(actorLedger);
 
-                const amount = Number(reward) / 10 ** decimals;
-
                 const price = await swap_amounts(actorKongswap, {
                   from: token.name,
                   to: "ckUSDC",
-                  amount,
+                  amount: reward,
                 });
 
                 return {
                   id: neuron.id,
                   reward,
-                  reward_usd: price.mid_price * amount,
+                  reward_usd:
+                    price.mid_price * (Number(reward) / 10 ** decimals),
                 };
               })
             );
