@@ -19,8 +19,9 @@ import { Token } from "./tokensList.utils";
 import TradeConfirm from "./TradeConfirm.component";
 import TradeDetails from "./TradeDetails.component";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchTokenPrice from "@services/kongswap/hooks/useFetchTokenPrice";
-import useFetchToken from "@hooks/useFetchTokenPrice";
+import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const BuyGLDT = () => {
@@ -59,44 +60,57 @@ const BuyGLDT = () => {
     }
   );
 
-  const price = useFetchTokenPrice(
+  const payTokenDecimals = useFetchDecimals(
+    pay_token.token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: pay_token.token.id,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
+
+  const price = useFetchSwapAmount(
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
       from: pay_token.token.name,
       to: "GLDT",
-      amount: amount ?? 0,
-      enabled: !!unauthenticatedAgent && isConnected,
+      amount: amount
+        ? BigInt(Math.round(amount * 10 ** (payTokenDecimals.data ?? 0)))
+        : 0n,
+      enabled:
+        !!unauthenticatedAgent && isConnected && payTokenDecimals.isSuccess,
     }
   );
 
-  const priceExchangeRate = useFetchTokenPrice(
+  const priceExchangeRate = useFetchSwapAmount(
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
       from: pay_token.token.name,
       to: "GLDT",
-      amount: 1,
-      enabled: !!unauthenticatedAgent && isConnected,
+      amount: BigInt(1 * 10 ** (payTokenDecimals.data ?? 0)),
+      enabled:
+        !!unauthenticatedAgent && isConnected && payTokenDecimals.isSuccess,
     }
   );
 
-  const payTokenPrice = useFetchToken(unauthenticatedAgent, {
+  const payTokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
     from: pay_token.token.name,
     from_canister_id: pay_token.token.canisterId,
     amount: price.data?.pay_amount ?? 0n,
     enabled: !!unauthenticatedAgent && isConnected && price.isSuccess,
   });
 
-  const payTokenPriceExchangeRate = useFetchToken(unauthenticatedAgent, {
-    from: pay_token.token.name,
-    from_canister_id: pay_token.token.canisterId,
+  const payTokenPriceExchangeRate = useFetchTokenPrice(unauthenticatedAgent, {
+    from: "GLDT",
+    from_canister_id: GLDT_LEDGER_CANISTER_ID,
     amount: priceExchangeRate.data?.receive_amount ?? 0n,
     enabled:
       !!unauthenticatedAgent && isConnected && priceExchangeRate.isSuccess,
   });
 
-  const receiveTokenPrice = useFetchToken(unauthenticatedAgent, {
+  const receiveTokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
     from: "GLDT",
     from_canister_id: GLDT_LEDGER_CANISTER_ID,
     amount: price.data?.receive_amount ?? 0n,

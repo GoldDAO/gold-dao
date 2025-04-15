@@ -61,12 +61,10 @@ const useFetchTokenPrice = (
         const feeToken = await icrc1_fee(actorTokenLedger);
         const decimalsToken = await icrc1_decimals(actorTokenLedger);
 
-        const amount_price = amount_number / 10 ** decimalsToken;
-
         const price = await swap_amounts(actorKongswap, {
           from: from,
           to: "ckUSDC",
-          amount: amount_price,
+          amount,
         });
 
         return {
@@ -75,7 +73,7 @@ const useFetchTokenPrice = (
           amount,
           decimals: decimalsToken,
           fee: feeToken,
-          amount_usd: amount_price * price.mid_price,
+          amount_usd: (amount_number / 10 ** decimalsToken) * price.mid_price,
         };
       } catch (err) {
         console.log(err);

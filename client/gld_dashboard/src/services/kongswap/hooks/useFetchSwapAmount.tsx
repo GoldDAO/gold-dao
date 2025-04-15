@@ -9,13 +9,13 @@ import { idlFactory } from "../idlFactory";
 import { SwapAmountsReply } from "../interfaces";
 import swap_amounts from "../swap_amounts";
 
-const useFetchTokenPrice = (
+const useFetchSwapAmount = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<SwapAmountsReply>, "queryKey" | "queryFn"> & {
     from: string;
     to: string;
-    amount: number;
+    amount: bigint;
   }
 ) => {
   const {
@@ -28,7 +28,7 @@ const useFetchTokenPrice = (
   } = options;
 
   return useQuery({
-    queryKey: [`FETCH_${from}_${to}_PRICE`, from, to, amount],
+    queryKey: [`FETCH_${from}_${to}_PRICE`, from, to, Number(amount)],
     queryFn: async () => {
       try {
         const actor = Actor.createActor(idlFactory, {
@@ -55,4 +55,4 @@ const useFetchTokenPrice = (
   });
 };
 
-export default useFetchTokenPrice;
+export default useFetchSwapAmount;

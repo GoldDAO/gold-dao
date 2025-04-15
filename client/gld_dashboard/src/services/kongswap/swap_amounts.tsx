@@ -3,12 +3,12 @@ import { SwapAmountsResult } from "./interfaces";
 
 const swap_amounts = async (
   actor: ActorSubclass,
-  options: { from: string; to: string; amount: number }
+  options: { from: string; to: string; amount: bigint }
 ) => {
   const { from, to, amount } = options;
   const result = (await actor.swap_amounts(
     from,
-    BigInt(Math.round(amount * 1e8)),
+    amount,
     to
   )) as SwapAmountsResult;
 
