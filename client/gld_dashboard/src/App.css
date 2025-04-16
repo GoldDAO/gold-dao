@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
 @layer theme, base, components, utilities;
 
@@ -11,7 +11,7 @@
 } */
 
 :root {
-  font-family: "Lexend", serif;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
 
@@ -20,7 +20,7 @@
   --color-surface-secondary: oklch(98.26% 0.0017 67.8);
   --color-content: oklch(0 0 0);
   --color-border: oklch(92.51% 0.0071 88.65);
-  --color-primary: oklch(73.13% 0.1059 78.87);
+  --color-primary: oklch(0.79 0.0944 89.09);
   --color-secondary: oklch(0 0 0);
 
   @media (prefers-color-scheme: dark) {

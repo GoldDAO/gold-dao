@@ -19,7 +19,7 @@ const CopyToClipboard = ({ value = "" }: { value: string | undefined }) => {
 
   return (
     <ReactCopyToClipboard onCopy={onCopy} text={valueCopied}>
-      <button onClick={(e) => handleClick(e)} className="p-1">
+      <button onClick={(e) => handleClick(e)}>
         <ClipboardDocumentIcon className="h-4 w-4" />
       </button>
     </ReactCopyToClipboard>

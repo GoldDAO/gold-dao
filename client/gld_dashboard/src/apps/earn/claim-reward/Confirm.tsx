@@ -11,7 +11,7 @@ import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "./utils";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useStakeRewardsFee from "@hooks/useStakeRewardsFee";
+import useRewardsFee from "@utils/useRewardsFee";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -28,7 +28,7 @@ const RewardItem = ({ name }: { name: string }) => {
   return (
     <button
       className={clsx(
-        "p-4 border border-border rounded-md",
+        "p-4 border border-border rounded-xl",
         `${reward.is_selected ? "bg-green-700/10 border-green-700 hover:bg-green-700/15" : "bg-surface hover:bg-surface-secondary"}`,
         `${reward.is_claimable ? "cursor-pointer " : "cursor-not-allowed"}`
       )}
@@ -51,6 +51,7 @@ const RewardItem = ({ name }: { name: string }) => {
               <TokenValueToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
+                decimals={2}
               />
             ) : (
               <div>Loading...</div>
@@ -81,7 +82,7 @@ const Confirm = () => {
     }
   );
 
-  const stakeRewardsFee = useStakeRewardsFee(unauthenticatedAgent, {
+  const stakeRewardsFee = useRewardsFee(unauthenticatedAgent, {
     enabled: isConnected && !!unauthenticatedAgent,
   });
 

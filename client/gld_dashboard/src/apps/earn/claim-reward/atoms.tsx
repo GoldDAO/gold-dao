@@ -1,4 +1,4 @@
-import { atomWithReset, atomWithReducer } from "jotai/utils";
+import { atomWithReducer } from "jotai/utils";
 import { atom } from "jotai";
 import _ from "lodash";
 
@@ -9,7 +9,7 @@ import {
 } from "@constants";
 
 import { Reward } from "./utils";
-import { RewardFeeData } from "@hooks/useStakeRewardsFee";
+import { RewardFeeData } from "@utils/useRewardsFee";
 import { Reward as RewardStake } from "@services/gldt_stake/utils/interfaces";
 
 type ClaimRewardState = {
@@ -46,7 +46,7 @@ const initialState: ClaimRewardState = {
     {
       id: "ogy",
       name: "OGY",
-      label: "OGY",
+      label: "Origyn",
       canister_id: OGY_LEDGER_CANISTER_ID,
       is_selected: false,
       is_claimable: false,
@@ -130,9 +130,6 @@ export const ClaimRewardStateReducerAtom = atomWithReducer(
   initialState,
   claimRewardReducer
 );
-
-export const ClaimRewardStateAtom =
-  atomWithReset<ClaimRewardState>(initialState);
 
 export const TotalSelectedAmountAtom = atom((get) => {
   const state = get(ClaimRewardStateReducerAtom);

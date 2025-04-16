@@ -2,7 +2,6 @@ import { ReactNode, useEffect, useState } from "react";
 import {
   IdentityKitAuthType,
   NFIDW,
-  Plug,
   InternetIdentity,
   IdentityKitSignerConfig,
 } from "@nfid/identitykit";
@@ -83,7 +82,7 @@ const AuthProviderInit = ({ children }: { children: ReactNode }) => {
 const AuthProvider = ({
   children,
   targets = [],
-  signers = [NFIDW, Plug, InternetIdentity],
+  signers = [NFIDW, InternetIdentity],
   derivationOrigin = undefined,
   maxTimeToLive = 604800000000000n, // ? one week
 }: {

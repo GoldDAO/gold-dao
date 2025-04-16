@@ -1,48 +1,34 @@
 import { useMutation } from "@tanstack/react-query";
-import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { idlFactory } from "@services/gldt_stake/idlFactory";
+import claim_reward from "../claim_reward";
 
-import {
-  Result,
-  StakePositionResponse,
-  Args,
-} from "@services/gldt_stake/interfaces";
-
-const claim_reward = async (
-  actor: ActorSubclass,
-  args: Args
-): Promise<StakePositionResponse> => {
-  const { id, token } = args;
-
-  const result = (await actor.claim_reward({ id, token })) as Result;
-
-  if ("Err" in result) throw result.Err;
-
-  return result.Ok;
-};
+type RewardsArgs = { token: string; position_ids: bigint[] };
 
 const useClaimReward = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined
 ) => {
   return useMutation({
-    mutationFn: async ({ id, token }: Args) => {
+    mutationFn: async ({ position_ids, token }: RewardsArgs) => {
       try {
         const actor = Actor.createActor(idlFactory, {
           agent,
           canisterId,
         });
 
-        const result = await claim_reward(actor, {
-          id,
-          token,
-        });
-        return result;
+        await Promise.all(
+          position_ids.map(async (id) => {
+            return claim_reward(actor, {
+              id,
+              token,
+            });
+          })
+        );
       } catch (err) {
         console.error(err);
-        throw new Error(`claim_reward error! Please retry later.`);
+        throw new Error(`Claim rewards error! Please retry later.`);
       }
     },
   });

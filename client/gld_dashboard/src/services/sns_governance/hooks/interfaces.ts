@@ -29,9 +29,6 @@ export interface NeuronUser {
   dissolve_delay_bonus: string;
   auto_stake_maturity: string;
   total_bonus: string;
-  claim_balance_gldgov: string;
-  claim_balance_icp: string;
-  claim_balance_ogy: string;
 }
 
 export interface NeuronFull extends NeuronPartial {

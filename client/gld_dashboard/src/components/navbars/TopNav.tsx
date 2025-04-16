@@ -5,14 +5,12 @@ import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 
 import { useAuth } from "@auth/index";
 
-import {
-  Button,
-  DropdownUserMenu,
-  // DropdownUserBalance,
-} from "@components/index";
+import DropdownUserMenu from "@components/dropdowns/UserMenu";
+import { Button } from "@components/index";
 import { Logo } from "@components/logos";
 
 import navItems from "./navItems.utils";
+import clsx from "clsx";
 
 const TopNav = ({ className }: { className?: string }) => {
   const { isConnected, connect } = useAuth();
@@ -35,14 +33,24 @@ const TopNav = ({ className }: { className?: string }) => {
 
         {/* Menu */}
         <div className="flex justify-self-end items-center">
-          {!isConnected && <Button onClick={connect}>Connect</Button>}
+          {!isConnected && (
+            <Button
+              className={clsx(
+                "px-4 py-2 rounded-xl w-full",
+                "bg-secondary text-white"
+              )}
+              onClick={connect}
+            >
+              Connect Wallet
+            </Button>
+          )}
+
           {isConnected && (
             <div className="flex items-center gap-2 bg-surface-primary border border-border rounded-lg">
-              {/* <DropdownUserBalance /> */}
               <DropdownUserMenu />
             </div>
           )}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setShowMenu(!showMenu)}
               type="button"

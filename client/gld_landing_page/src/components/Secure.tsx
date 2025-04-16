@@ -15,7 +15,7 @@ const Secure = () => {
           independent audit report verifying that the physical gold bullion is
           present and securely stored. These audit reports can be viewed at{' '}
           <a
-            href='https://yumi.io/gold/audit'
+            href='https://docs.gold-dao.org/other/audit-reports'
             target='_blank'
             rel='noopener noreferrer'
             className=' underline hover:opacity-80'
