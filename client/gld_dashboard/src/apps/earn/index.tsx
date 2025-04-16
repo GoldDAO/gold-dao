@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
+import { ExportSquare } from "iconsax-react";
 import { useAuth } from "@auth/index";
 import Dialog from "@components/dialogs/Dialog";
 import { Button } from "@components/index";
@@ -30,7 +31,21 @@ const Earn = () => {
             Stake your GLDT to{" "}
             <span className="font-semibold">earn weekly rewards</span> in
             governance tokens, unlocking passive income from your gold holdings.
+            <a
+              href="https://docs.gold-dao.org/resources/gldt-staking/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 mt-4"
+            >
+              <div className="text-sm font-semibold tracking-widest">
+                LEARN MORE
+              </div>
+              <div className="px-4 py-1 border border-border rounded-full">
+                <ExportSquare size={16} />
+              </div>
+            </a>
           </div>
+
           <div className="lg:hidden mt-8 w-full">
             <StakeOverview />
             <div className="relative w-full px-4 lg:pb-16 pb-32">

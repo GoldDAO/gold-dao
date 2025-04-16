@@ -46,7 +46,7 @@ const ClaimRewardDisclaimer = () => {
           <div className="flex flex-col items-center lg:items-start shrink-0">
             <div className="font-semibold text-xl">Total of: $</div>
             <div className="text-sm text-content/60">
-              dispatched in GOLDAO, ICP, OGY and WTN
+              dispatched in GOLDAO, ICP and OGY
             </div>
           </div>
           <button

@@ -1,11 +1,7 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
-import {
-  GLDT_VALUE_1G_NFT,
-  GLDT_LEDGER_CANISTER_ID,
-  GLDT_STAKE_CANISTER_ID,
-} from "@constants";
+import { Clock } from "iconsax-react";
+import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
@@ -23,7 +19,6 @@ import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
-
 import useRewardsFee, { RewardFeeData } from "@utils/useRewardsFee";
 import { Reward } from "@services/gldt_stake/utils/interfaces";
 
@@ -132,7 +127,7 @@ const StakeList = () => {
       <Button
         className={clsx(
           "px-2 py-1 rounded-md shrink-0",
-          "bg-secondary text-white text-sm"
+          "bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm"
         )}
         disabled={!enabled}
         onClick={() =>
@@ -142,47 +137,49 @@ const StakeList = () => {
           })
         }
       >
-        {rewards_fee !== undefined ? "Claim rewards" : "Loading..."}
+        {rewards_fee !== undefined ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Logo name="goldao" className="h-4 w-4" />
+              <Logo name="icp" className="h-4 w-4" />
+              <Logo name="ogy" className="h-4 w-4" />
+            </div>
+            Claim rewards
+          </div>
+        ) : (
+          "Loading..."
+        )}
       </Button>
     );
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-4 lg:overflow-y-auto lg:pr-4">
+    <div className="flex flex-col pb-4 lg:overflow-y-auto lg:pr-4">
       {fetchUserStake.data.map((stake, index) => (
         <div
           key={index}
-          className="@container flex justify-between items-center p-3 border border-border/60 rounded-md lg:rounded-xl"
+          className="@container flex justify-between items-center p-3 border-b border-border/60 last:border-0 odd:bg-primary/5"
         >
           <div className="flex flex-col @sm:flex-row @sm:items-center @sm:justify-between w-full">
-            <div className="flex items-start gap-2 lg:gap-4">
-              <Logo name="gldt" className="h-10 w-10" />
-              <div className="flex flex-col items-start">
-                <div className="flex flex-row items-center gap-2">
-                  <div className="font-semibold">
-                    <TokenValueToLocaleString
-                      value={stake.amount}
-                      tokenDecimals={decimals.data}
-                    />{" "}
-                    GLDT
-                  </div>
-                  <div className="text-content/60 text-sm">
-                    <TokenValueToLocaleString
-                      value={stake.amount / BigInt(GLDT_VALUE_1G_NFT)}
-                    />
-                    g of gold
-                  </div>
-                </div>
-                <div className="flex flex-col items-center text-sm">
-                  x<NumberToLocaleString value={stake.age_bonus_multiplier} />{" "}
-                  age bonus
-                </div>
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <Logo name="gldt" className="h-5 w-5" />
+                <TokenValueToLocaleString
+                  value={stake.amount}
+                  tokenDecimals={decimals.data}
+                />{" "}
+                GLDT
+              </div>
+              <div className="flex gap-1 items-center text-content/60">
+                <Clock size={16} />
+                Age Bonus{" "}
+                <NumberToLocaleString value={stake.age_bonus_multiplier} />
               </div>
             </div>
             <div className="flex flex-row gap-2 mt-4 @lg:mt-0">
               {stake.is_unlockable && (
                 <Button
-                  className="shrink-0 px-2 py-1 bg-secondary text-white text-sm rounded-md"
+                  className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
                   onClick={() =>
                     dispatchUnlock({
                       type: "OPEN_DIALOG_CONFIRM",
@@ -195,7 +192,7 @@ const StakeList = () => {
               )}
               {stake.is_unstakable && (
                 <Button
-                  className="shrink-0 px-2 py-1 bg-secondary text-white text-sm rounded-md"
+                  className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
                   onClick={() =>
                     dispatchUnstake({
                       type: "OPEN_DIALOG_CONFIRM",
