@@ -62,14 +62,23 @@ const StakeForm = () => {
               <Logo name="gldt" className="p-1" />
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2">
-            <div className="text-sm">Min Stake: {MIN_STAKE_AMOUNT} GLDT</div>
-            <div className="text-sm">Unlock Delay: one week</div>
+          <div className="mt-4 inline-flex flex-col gap-2">
+            <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+              <div className="text-content/60 text-sm">
+                Min Stake: {MIN_STAKE_AMOUNT} GLDT
+              </div>
+              <Logo name="gldt" className="w-4 h-4" />
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+              <div className="text-content/60 text-sm">
+                Unlock Delay: 1 week
+              </div>
+            </div>
           </div>
           {isConnected ? (
             <Button
               disabled={true}
-              className="mt-8 w-full px-4 h-[52px] bg-secondary rounded-md"
+              className="mt-4 w-full px-4 h-[52px] bg-secondary rounded-md"
             >
               <div className="flex justify-center items-center gap-2">
                 <div className="sr-only">Loading...</div>
@@ -99,13 +108,18 @@ const StakeForm = () => {
         fee={fee.data}
         decimals={decimals.data}
       />
-      <div className="p-4 flex justify-center items-center gap-2">
-        <div>Your balance:</div>
-        <TokenValueToLocaleString
-          value={balance.data}
-          tokenDecimals={decimals.data}
-        />
-        <div>GLDT</div>
+      <div className="mt-4 flex justify-center">
+        <div className="px-2 py-1 flex items-center gap-2 border border-border rounded-md bg-surface-secondary">
+          <div className="text-content/60 text-sm">
+            Your balance:{" "}
+            <TokenValueToLocaleString
+              value={balance.data}
+              tokenDecimals={decimals.data}
+            />{" "}
+            GLDT
+          </div>
+          <Logo name="gldt" className="w-4 h-4" />
+        </div>
       </div>
 
       <Dialog
