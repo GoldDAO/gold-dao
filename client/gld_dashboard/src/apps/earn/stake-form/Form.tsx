@@ -67,7 +67,7 @@ const Form = ({
 
   return (
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
-      <div>Stake GLDT</div>
+      <div className="text-primary font-semibold">Stake GLDT</div>
       <div className="p-4 mt-4 lg:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
         <input
           id="amount"
@@ -112,12 +112,19 @@ const Form = ({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2">
-        <div className="text-sm">Min Stake: {MIN_STAKE_AMOUNT} GLDT</div>
-        <div className="text-sm">Unlock Delay: one week</div>
+      <div className="mt-4 inline-flex flex-col gap-2">
+        <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+          <div className="text-content/60 text-sm">
+            Min Stake: {MIN_STAKE_AMOUNT} GLDT
+          </div>
+          <Logo name="gldt" className="w-4 h-4" />
+        </div>
+        <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+          <div className="text-content/60 text-sm">Unlock Delay: 1 week</div>
+        </div>
       </div>
       <Button
-        className="mt-8 w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+        className="mt-4 w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
         type="submit"
         disabled={!isValid}
       >

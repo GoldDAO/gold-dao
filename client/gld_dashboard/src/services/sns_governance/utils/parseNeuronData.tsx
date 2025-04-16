@@ -133,9 +133,7 @@ export const parseNeuronData = (
       currentTimestampSeconds
     ) ?? undefined;
 
-  const staked_amount = divideBy1e8(
-    Number(neuron.cached_neuron_stake_e8s ?? 0)
-  );
+  const staked_amount = neuron.cached_neuron_stake_e8s;
 
   const staked_maturity = divideBy1e8(Number(stakedMaturityEquivalent ?? 0));
 
@@ -187,7 +185,7 @@ export const parseNeuronData = (
     minDissolveDelayToVote &&
     dissolve_delay >= neuron_minimum_dissolve_delay_to_vote_seconds &&
     calculateTimeDifferenceInSeconds(dissolve_delay) > minDissolveDelayToVote
-      ? (staked_amount + staked_maturity) *
+      ? (Number(staked_amount) + staked_maturity) *
         (1 + age_bonus) *
         (1 + dissolve_delay_bonus)
       : undefined;

@@ -1,19 +1,13 @@
 import { useAuth } from "@auth/index";
 import { useAtom } from "jotai";
-
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
-import { GLDTToken } from "../earn.utils";
-
+import { GLDTToken } from "../utils";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-
+import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
-
 import { MIN_STAKE_AMOUNT } from "./utils";
-
 import Form from "./Form";
 import Confirm from "./Confirm";
 import Details from "./Details";
@@ -21,17 +15,16 @@ import Details from "./Details";
 import { StakeStateReducerAtom } from "./atoms";
 
 const StakeForm = () => {
-  const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
-    useAuth();
+  const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [stakeState, dispatchStake] = useAtom(StakeStateReducerAtom);
 
   const balance = useFetchUserBalance(
     GLDTToken.canisterId,
-    authenticatedAgent,
+    unauthenticatedAgent,
     {
       ledger: GLDTToken.id,
       owner: principalId,
-      enabled: !!authenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
@@ -69,14 +62,23 @@ const StakeForm = () => {
               <Logo name="gldt" className="p-1" />
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2">
-            <div className="text-sm">Min Stake: {MIN_STAKE_AMOUNT} GLDT</div>
-            <div className="text-sm">Unlock Delay: one week</div>
+          <div className="mt-4 inline-flex flex-col gap-2">
+            <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+              <div className="text-content/60 text-sm">
+                Min Stake: {MIN_STAKE_AMOUNT} GLDT
+              </div>
+              <Logo name="gldt" className="w-4 h-4" />
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
+              <div className="text-content/60 text-sm">
+                Unlock Delay: 1 week
+              </div>
+            </div>
           </div>
           {isConnected ? (
             <Button
               disabled={true}
-              className="mt-8 w-full px-4 h-[52px] bg-secondary rounded-md"
+              className="mt-4 w-full px-4 h-[52px] bg-secondary rounded-md"
             >
               <div className="flex justify-center items-center gap-2">
                 <div className="sr-only">Loading...</div>
@@ -106,13 +108,18 @@ const StakeForm = () => {
         fee={fee.data}
         decimals={decimals.data}
       />
-      <div className="p-4 flex justify-center items-center gap-2">
-        <div>Your balance:</div>
-        <TokenValueToLocaleString
-          value={balance.data}
-          tokenDecimals={decimals.data}
-        />
-        <div>GLDT</div>
+      <div className="mt-4 flex justify-center">
+        <div className="px-2 py-1 flex items-center gap-2 border border-border rounded-md bg-surface-secondary">
+          <div className="text-content/60 text-sm">
+            Your balance:{" "}
+            <TokenValueToLocaleString
+              value={balance.data}
+              tokenDecimals={decimals.data}
+            />{" "}
+            GLDT
+          </div>
+          <Logo name="gldt" className="w-4 h-4" />
+        </div>
       </div>
 
       <Dialog
