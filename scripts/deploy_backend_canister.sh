@@ -22,7 +22,7 @@ if [[ $NETWORK == ic && ! $CI_COMMIT_TAG =~ ^($CANISTER-v[0-9]+\.[0-9]+\.[0-9]+(
   exit 2
 fi
 
-if [[ $DEPLOYMENT_VIA == "direct" ]]; then
+if [[ $DEPLOYMENT_VIA == "direct" || $NETWORK != "ic" ]]; then
 
   if [[ $REINSTALL == "reinstall" ]]; then
     echo "Reinstalling $CANISTER directly via dfx with arguments: $ARGUMENTS"
@@ -62,13 +62,15 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
 
   echo "Deploying $CANISTER via SNS proposal on $NETWORK."
 
-  if [[ $NETWORK == "ic" ]]; then
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+  PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
+
+  # if [[ $NETWORK == "ic" ]]; then
+    # PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
     # UPGRADEVERSION="${CI_COMMIT_TAG#*-v}"
-  else
-    PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
+  # else
+    # PROPOSER=$SNS_PROPOSER_NEURON_ID_STAGING
     # UPGRADEVERSION=$CI_COMMIT_SHORT_SHA
-  fi
+  # fi
 
   # # Extract version info and commit sha from CICD pipeline variables
   # . scripts/extract_commit_tag_data_and_commit_sha.sh $CANISTER $NETWORK

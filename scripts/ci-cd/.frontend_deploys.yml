@@ -29,7 +29,6 @@ $[[ inputs.src-folder ]] staging deploy:
   extends: .staging deploy template
   variables:
     TARGET_NETWORK: staging
-    DEPLOY_VIA_SNS_PROPOSAL: $[[ inputs.sns-controlled ]]
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
@@ -43,13 +42,7 @@ $[[ inputs.src-folder ]] staging deploy:
       allow_failure: true
   needs: ["$[[ inputs.src-folder ]] staging build"]
   script:
-    - |
-      echo "Deploying via proposal: " $DEPLOY_VIA_SNS_PROPOSAL
-      if [ "$DEPLOY_VIA_SNS_PROPOSAL" = true ]; then
-        . scripts/frontend-deploy/sns_frontend_deploy.sh $[[ inputs.src-folder ]] $TARGET_NETWORK
-      else
-        dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
-      fi
+    - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
   environment:
     name: $[[ inputs.src-folder ]] frontend
     deployment_tier: staging
@@ -64,6 +57,12 @@ $[[ inputs.src-folder ]] preprod deploy:
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+      changes:
+        - "client/$[[ inputs.src-folder ]]/*.{js,json}"
+        - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+      when: manual
+      allow_failure: true
   needs: ["$[[ inputs.src-folder ]] preprod build"]
   script:
     - dfx deploy --network $TARGET_NETWORK --no-wallet --mode reinstall -y $[[ inputs.src-folder ]]
