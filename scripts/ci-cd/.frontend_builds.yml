@@ -45,7 +45,7 @@ $[[ inputs.src-folder ]] staging build:
 $[[ inputs.src-folder ]] preprod build:
   stage: build
   rules:
-    - if: $CI_COMMIT_REF_NAME == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: ($CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_REF_NAME == "develop") || ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop")
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/{**,**/**,**/**/**}/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
