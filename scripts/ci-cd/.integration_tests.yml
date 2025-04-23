@@ -3,10 +3,10 @@ integration tests trigger:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
+        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}"
       when: manual
   script:
     - echo "Running integration tests"
@@ -18,21 +18,22 @@ integration tests:
       when: always
     - if: $CI_COMMIT_REF_NAME == "develop" || $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - 'backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}'
-        - 'backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}'
-  needs: [
-      'buyback_burn integration-test build',
-      'icp_neuron integration-test build',
-      'management integration-test build',
-      'sns_neuron_controller integration-test build',
-      'sns_rewards integration-test build',
-      'super_stats_v3 integration-test build',
-      'token_metrics integration-test build',
-      'gldt_swap integration-test build',
-      'gldt_stake integration-test build',
-      'usdg_minter integration-test build',
+        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/integration_testing/**/*.{rs,toml,lock,md,did,wasm,gz}"
+  needs:
+    [
+      "buyback_burn integration-test build",
+      "icp_neuron integration-test build",
+      "management integration-test build",
+      "sns_neuron_controller integration-test build",
+      "sns_rewards integration-test build",
+      "super_stats_v3 integration-test build",
+      "token_metrics integration-test build",
+      "gldt_swap integration-test build",
+      "gldt_stake integration-test build",
+      "usdg_minter integration-test build",
     ]
   extends: .rust template
   tags:
@@ -40,10 +41,10 @@ integration tests:
   services:
     - docker:dind
   variables:
-    DOCKER_TLS_CERTDIR: '/certs'
-    DOCKER_SECURITY_OPT: '--security-opt seccomp=unconfined'
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/6.0.0/pocket-ic-x86_64-linux.gz
+    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/7.0.0/pocket-ic-x86_64-linux.gz
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic

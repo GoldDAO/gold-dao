@@ -37,81 +37,88 @@ fn process_staking_rewards_works() {
         ledger_fees,
         ..
     } = test_env;
-    tick_n_blocks(pic, 10);
+    let pic_borrowed = &pic.borrow();
+
+    tick_n_blocks(pic_borrowed, 10);
     // set the usd values so that an APY may be calculated later on
     let mut usd_token_values: HashMap<TokenSymbol, f64> = HashMap::new();
     usd_token_values.insert("GOLDAO".to_string(), 1.0);
     usd_token_values.insert("OGY".to_string(), 1.0);
     usd_token_values.insert("ICP".to_string(), 1.0);
     usd_token_values.insert("GLDT".to_string(), 1.0);
-    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_token_values);
+    _set_token_usd_values(
+        pic_borrowed,
+        controller,
+        gldt_stake_canister_id,
+        &usd_token_values,
+    );
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_1, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_2, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_3, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_4, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_5, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_6, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_7, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_8, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_9, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -129,7 +136,7 @@ fn process_staking_rewards_works() {
     // we setup the environment so that the date is friday which means each position will still have an age bonus of 1.0 after advancing 6 days, see docs on how age bonus advances
 
     add_rewards_to_neurons(
-        pic,
+        pic_borrowed,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -139,14 +146,14 @@ fn process_staking_rewards_works() {
     );
 
     // first distribution
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic, 5);
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 5);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(pic_borrowed, 5);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
 
     all_users.iter().for_each(|user| {
         let positions =
-            get_active_user_positions(pic, user.clone(), gldt_stake_canister_id, &(None));
+            get_active_user_positions(pic_borrowed, user.clone(), gldt_stake_canister_id, &(None));
         assert_eq!(positions.len(), 1);
 
         assert_eq!(
@@ -179,13 +186,13 @@ fn process_staking_rewards_works() {
             &Nat::from(100_000_000_000u64)
         );
     });
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 5);
-    pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(pic, 5);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
     // check APY history works
     let apy_history = get_apy_timeseries(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &gldt_stake_api_canister::get_apy_timeseries::Args {
@@ -214,17 +221,18 @@ fn test_only_non_dissolving_positions_receive_rewards() {
         ledger_fees,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
     let (user_1, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -232,10 +240,11 @@ fn test_only_non_dissolving_positions_receive_rewards() {
     );
 
     // begin dissolving user_1's position, this will mean user_0 will get all the rewards
-    let user_1_positions = get_active_user_positions(pic, user_1, gldt_stake_canister_id, &None);
+    let user_1_positions =
+        get_active_user_positions(pic_borrowed, user_1, gldt_stake_canister_id, &None);
     let position_id = user_1_positions.get(0).unwrap().id;
-    let _ = start_dissolving(pic, user_1, gldt_stake_canister_id, &position_id);
-    tick_n_blocks(pic, 1);
+    let _ = start_dissolving(pic_borrowed, user_1, gldt_stake_canister_id, &position_id);
+    tick_n_blocks(pic_borrowed, 1);
 
     // ---------------------------------------
     //              W E E K   0
@@ -244,7 +253,7 @@ fn test_only_non_dissolving_positions_receive_rewards() {
     // only one position will be eligble for rewards and it's bonus will be 1.0 because not enough time has passed for it's age bonus to increase
 
     add_rewards_to_neurons(
-        pic,
+        pic_borrowed,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -253,12 +262,13 @@ fn test_only_non_dissolving_positions_receive_rewards() {
         ledger_fees.clone(),
     );
 
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic, 5);
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 5);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(pic_borrowed, 5);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
 
-    let user_1_positions = get_active_user_positions(pic, user_1, gldt_stake_canister_id, &None);
+    let user_1_positions =
+        get_active_user_positions(pic_borrowed, user_1, gldt_stake_canister_id, &None);
     user_1_positions
         .get(0)
         .unwrap()
@@ -268,7 +278,8 @@ fn test_only_non_dissolving_positions_receive_rewards() {
             assert_eq!(reward, &Nat::from(0u64));
         });
 
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     user_0_positions
         .get(0)
         .unwrap()
@@ -290,9 +301,10 @@ fn test_processing_faulty_rounds() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -306,7 +318,7 @@ fn test_processing_faulty_rounds() {
     // add first round
     let amount_1 = 1_000_000_000u128;
     transfer(
-        pic,
+        pic_borrowed,
         controller,
         goldao_ledger,
         None,
@@ -319,16 +331,20 @@ fn test_processing_faulty_rounds() {
     .unwrap();
     let mut rewards = HashMap::new();
     rewards.insert("GOLDAO".to_string(), Nat::from(amount_1));
-    _add_reward_round(pic, controller, gldt_stake_canister_id, &rewards).unwrap();
+    _add_reward_round(pic_borrowed, controller, gldt_stake_canister_id, &rewards).unwrap();
 
-    let current_reward_rounds =
-        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let current_reward_rounds = get_reward_rounds(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(current_reward_rounds.len(), 1);
 
     // add second round
     let amount_2 = 2_000_000_000u128;
     transfer(
-        pic,
+        pic_borrowed,
         controller,
         goldao_ledger,
         None,
@@ -341,15 +357,20 @@ fn test_processing_faulty_rounds() {
     .unwrap();
     let mut rewards = HashMap::new();
     rewards.insert("GOLDAO".to_string(), Nat::from(amount_2));
-    _add_reward_round(pic, controller, gldt_stake_canister_id, &rewards).unwrap();
+    _add_reward_round(pic_borrowed, controller, gldt_stake_canister_id, &rewards).unwrap();
 
-    let current_reward_rounds =
-        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let current_reward_rounds = get_reward_rounds(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(current_reward_rounds.len(), 2);
 
     // process rounds
-    process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &()).unwrap();
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    process_oldest_reward_round(pic_borrowed, controller, gldt_stake_canister_id, &()).unwrap();
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     let rewards = user_0_positions
         .get(0)
         .unwrap()
@@ -358,12 +379,17 @@ fn test_processing_faulty_rounds() {
         .unwrap();
 
     assert_eq!(rewards, &amount_1);
-    let current_reward_rounds =
-        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let current_reward_rounds = get_reward_rounds(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(current_reward_rounds.len(), 1);
 
-    process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &()).unwrap();
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    process_oldest_reward_round(pic_borrowed, controller, gldt_stake_canister_id, &()).unwrap();
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     let rewards = user_0_positions
         .get(0)
         .unwrap()
@@ -372,17 +398,25 @@ fn test_processing_faulty_rounds() {
         .unwrap();
 
     assert_eq!(rewards, &(amount_1.clone() + amount_2.clone()));
-    let current_reward_rounds =
-        get_reward_rounds(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let current_reward_rounds = get_reward_rounds(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(current_reward_rounds.len(), 0);
 
     // try to process when there are no rounds left
-    let res = process_oldest_reward_round(pic, controller, gldt_stake_canister_id, &());
+    let res = process_oldest_reward_round(pic_borrowed, controller, gldt_stake_canister_id, &());
     assert_matches!(res, Err(_));
 
     // check the total_allocated_rewards
-    let total_rewards_allocated =
-        get_total_allocated_rewards(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let total_rewards_allocated = get_total_allocated_rewards(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
 
     assert_eq!(
         total_rewards_allocated.get("GOLDAO").unwrap(),

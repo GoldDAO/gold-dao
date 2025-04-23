@@ -8,8 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.2] - 2025-04-23
+
 #### Add
 
+- Add the feature to vote with neurons based on the majority of the public's vote at the end of the voting period.
 - Add a method 'manual_token_transfer' to enable to let the DAO transfer funds from the canister in case needed.
 
 #### Fix

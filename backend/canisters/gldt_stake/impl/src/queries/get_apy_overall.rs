@@ -151,7 +151,7 @@ fn convert_to_usd(tokens: Nat, usd_price: f64) -> f64 {
 pub fn calculate_weighted_stake_usd(tokens: Nat, token_usd_values: &HashMap<String, f64>) -> f64 {
     let gldt_price = token_usd_values.get("GLDT");
     match gldt_price {
-        Some(usd_price) => convert_to_usd(tokens, usd_price.clone()),
+        Some(usd_price) => convert_to_usd(tokens, *usd_price),
         None => 0.0,
     }
 }

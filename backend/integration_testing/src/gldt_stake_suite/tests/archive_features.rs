@@ -40,15 +40,23 @@ fn creates_new_archive_on_init() {
         ..
     } = test_env;
 
-    pic.advance_time(Duration::from_millis(SECOND_IN_MS));
-    tick_n_blocks(pic, 10);
-    let res = get_archive_canisters(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let pic_borrowed = &pic.borrow();
+
+    pic_borrowed.advance_time(Duration::from_millis(SECOND_IN_MS));
+    tick_n_blocks(pic_borrowed, 10);
+    let res = get_archive_canisters(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(res.len(), 1);
 }
 
 #[test]
 fn test_get_historic_user_positions() {
     let mut test_env = default_test_setup();
+    // println!("test_env : {:?}", test_env);
 
     let GldtStakeTestEnv {
         ref mut pic,
@@ -61,6 +69,8 @@ fn test_get_historic_user_positions() {
         ..
     } = test_env;
 
+    let pic_borrowed = &pic.borrow();
+
     println!("gldt_stake_canister_id : {gldt_stake_canister_id}");
     println!("controller : {controller}");
     token_ledgers.iter().for_each(|(name, principal)| {
@@ -72,14 +82,14 @@ fn test_get_historic_user_positions() {
 
     const POSITIONS_PER_USER: usize = 70;
     let positions_by_user = create_multiple_early_unstaked_positions(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         2,
         POSITIONS_PER_USER,
     );
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic_borrowed, 5);
 
     assert_eq!(positions_by_user.len(), 2);
 
@@ -106,7 +116,7 @@ fn test_get_historic_user_positions() {
 
     // basic test
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -128,7 +138,7 @@ fn test_get_historic_user_positions() {
     let limit = 10;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -143,7 +153,7 @@ fn test_get_historic_user_positions() {
     start = 10;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -158,7 +168,7 @@ fn test_get_historic_user_positions() {
     start = 20;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -173,7 +183,7 @@ fn test_get_historic_user_positions() {
     start = 30;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -188,7 +198,7 @@ fn test_get_historic_user_positions() {
     start = 40;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -203,7 +213,7 @@ fn test_get_historic_user_positions() {
     start = 50;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -218,7 +228,7 @@ fn test_get_historic_user_positions() {
     start = 60;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -233,7 +243,7 @@ fn test_get_historic_user_positions() {
     start = 70;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -249,7 +259,7 @@ fn test_get_historic_user_positions() {
     let limit = 10;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -264,7 +274,7 @@ fn test_get_historic_user_positions() {
     start = 10;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -279,7 +289,7 @@ fn test_get_historic_user_positions() {
     start = 20;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -294,7 +304,7 @@ fn test_get_historic_user_positions() {
     start = 30;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -309,7 +319,7 @@ fn test_get_historic_user_positions() {
     start = 40;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -324,7 +334,7 @@ fn test_get_historic_user_positions() {
     start = 50;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -339,7 +349,7 @@ fn test_get_historic_user_positions() {
     start = 60;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -354,7 +364,7 @@ fn test_get_historic_user_positions() {
     start = 70;
 
     let res = get_historic_positions_by_user(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &GetHistoricPositionsByUserArgs {
@@ -367,17 +377,21 @@ fn test_get_historic_user_positions() {
 
     // test getting the totals for each user
     let total_number_of_positions =
-        get_historic_positions_total_by_user(pic, user_1, gldt_stake_canister_id, &(None));
+        get_historic_positions_total_by_user(pic_borrowed, user_1, gldt_stake_canister_id, &(None));
     assert_eq!(total_number_of_positions, POSITIONS_PER_USER);
 
     let total_number_of_positions =
-        get_historic_positions_total_by_user(pic, user_2, gldt_stake_canister_id, &(None));
+        get_historic_positions_total_by_user(pic_borrowed, user_2, gldt_stake_canister_id, &(None));
     assert_eq!(total_number_of_positions, POSITIONS_PER_USER);
 
     // test archive state - the second archvie canister should be active and the first should be false because it is full
 
-    let archive_canisters =
-        get_archive_canisters(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let archive_canisters = get_archive_canisters(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
 
     assert_eq!(archive_canisters.get(0).unwrap().active, false);
     assert_eq!(archive_canisters.get(1).unwrap().active, true);
@@ -397,20 +411,26 @@ fn test_upgrading_will_also_upgrade_archives() {
         ledger_fees,
         ..
     } = test_env;
-    tick_n_blocks(pic, 1);
+    let pic_borrowed = &pic.borrow();
 
-    let archive_canisters =
-        get_archive_canisters(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    tick_n_blocks(pic_borrowed, 1);
+
+    let archive_canisters = get_archive_canisters(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     for archive in archive_canisters {
         let version = get_version(
-            pic,
+            pic_borrowed,
             Principal::anonymous(),
             archive.canister_id.clone(),
             &(),
         );
         assert_eq!(version, BuildVersion::new(0, 0, 0));
     }
-    tick_n_blocks(pic, 20);
+    tick_n_blocks(pic_borrowed, 20);
     // upgrading should work fine
     let gldt_stake_canister_wasm: Vec<u8> = wasms::GLDT_STAKE.clone();
     let gldt_stake_init_args = Encode!(&GldtStakeCanisterArgs::Upgrade(GldtStakeUpgradeArgs {
@@ -419,19 +439,24 @@ fn test_upgrading_will_also_upgrade_archives() {
     }))
     .unwrap();
 
-    pic.upgrade_canister(
+    pic_borrowed
+        .upgrade_canister(
+            gldt_stake_canister_id,
+            gldt_stake_canister_wasm,
+            gldt_stake_init_args,
+            Some(controller),
+        )
+        .unwrap();
+    tick_n_blocks(pic_borrowed, 5);
+    let archive_canisters = get_archive_canisters(
+        pic_borrowed,
+        Principal::anonymous(),
         gldt_stake_canister_id,
-        gldt_stake_canister_wasm,
-        gldt_stake_init_args,
-        Some(controller),
-    )
-    .unwrap();
-    tick_n_blocks(pic, 5);
-    let archive_canisters =
-        get_archive_canisters(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+        &(),
+    );
     for archive in archive_canisters {
         let version = get_version(
-            pic,
+            pic_borrowed,
             Principal::anonymous(),
             archive.canister_id.clone(),
             &(),

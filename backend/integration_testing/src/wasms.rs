@@ -14,7 +14,7 @@ lazy_static! {
     // SNS wasms
     pub static ref SNS_SWAP: CanisterWasm = get_canister_wasm_gz("sns_swap");
     pub static ref SNS_INDEX: CanisterWasm = get_canister_wasm_gz("ic_icrc1_index");
-    pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm("sns_governance");
+    pub static ref SNS_GOVERNANCE: CanisterWasm = get_canister_wasm_gz("sns_governance");
     pub static ref SNS_ROOT: CanisterWasm = get_canister_wasm_gz("sns_root");
     pub static ref SNS_LEDGER: CanisterWasm = get_canister_wasm("ic_icrc1_ledger");
 

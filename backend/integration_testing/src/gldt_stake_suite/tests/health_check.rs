@@ -12,5 +12,5 @@ pub struct GetNeuronRequest {
 #[test]
 fn inits_correctly() {
     let test_env = default_test_setup();
-    println!("{:?}", test_env);
+    // println!("{:?}", test_env);
 }

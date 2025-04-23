@@ -35,9 +35,9 @@ async fn create_stake_position_impl(amount: Nat) -> CreateStakePositionResponse 
 
     // 1. check user isn't anon
     let caller = caller();
-    reject_anonymous_caller().map_err(|e| AddStakePositionErrors::InvalidPrincipal(e))?;
+    reject_anonymous_caller().map_err(AddStakePositionErrors::InvalidPrincipal)?;
     let _guard_principal =
-        GuardPrincipal::new(caller).map_err(|e| AddStakePositionErrors::AlreadyProcessing(e))?;
+        GuardPrincipal::new(caller).map_err(AddStakePositionErrors::AlreadyProcessing)?;
 
     // 2 - check minimum stake amount
     if amount < MINIMUM_STAKE_AMOUNT_WITH_FEE {
@@ -52,9 +52,9 @@ async fn create_stake_position_impl(amount: Nat) -> CreateStakePositionResponse 
         s.data.stake_system.count_user_stake_positions(&caller)
     }) >= GLDT_STAKE_MAX_ACTIVE_STAKE_POSITIONS_PER_USER
     {
-        return Err(AddStakePositionErrors::MaxActiveStakePositions(format!(
-            "You may not have more than 10 stake positions at any given moment"
-        )));
+        return Err(AddStakePositionErrors::MaxActiveStakePositions(
+            "You may not have more than 10 stake positions at any given moment".to_string(),
+        ));
     }
 
     // 4. approve call
@@ -120,7 +120,7 @@ async fn transfer_gldt(amount: &Nat) -> Result<Nat, AddStakePositionErrors> {
 fn is_main_canister_at_capacity() -> Result<(), AddStakePositionErrors> {
     let memory = MemorySize::used();
     let used_stable = memory.stable as u128;
-    let limit = 300 * 1024 * 1024 * (1024 as u128); // 300GB
+    let limit = 300 * 1024 * 1024 * 1024_u128; // 300GB
 
     if used_stable > limit {
         return Err(AddStakePositionErrors::CanisterAtCapacity(format!("Cant add more stake positions because the main canister is using {used_stable} bytes. limit is {limit}")));

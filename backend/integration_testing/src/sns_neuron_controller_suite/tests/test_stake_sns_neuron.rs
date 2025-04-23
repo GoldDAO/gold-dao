@@ -1,10 +1,6 @@
-use crate::client;
-use crate::client::sns_neuron_controller::list_neurons;
 use crate::client::sns_neuron_controller::stake_sns_neuron;
-use crate::sns_neuron_controller_suite::setup::test_setup_with_predefined_wtn_neurons;
 use crate::{
-    client::icrc1::client::{balance_of, transfer},
-    sns_neuron_controller_suite::setup::default_test_setup,
+    client::icrc1::client::transfer, sns_neuron_controller_suite::setup::default_test_setup,
     utils::tick_n_blocks,
 };
 use candid::{CandidType, Deserialize};
@@ -21,8 +17,6 @@ pub struct GetNeuronRequest {
 #[test]
 fn test_stake_sns_neuron_happy_path() {
     let test_env = default_test_setup();
-
-    println!("test_env: {:#?}", test_env);
 
     let wtn_ledger_canister_id = test_env.wtn_sns_test_env.ledger_id;
     let sns_neuron_controller_id = test_env.sns_neuron_controller_id;

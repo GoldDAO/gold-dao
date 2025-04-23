@@ -76,7 +76,7 @@ impl StakeSystem {
         user: Principal,
     ) -> (StakePositionId, StakePosition) {
         let new_position = StakePosition::new(user, stake_amount);
-        let id = self.current_stake_index.clone();
+        let id = self.current_stake_index;
         self.stakes
             .insert(self.current_stake_index, new_position.clone());
         self.total_staked += new_position.staked.clone();

@@ -1,13 +1,14 @@
-use crate::guards::caller_is_governance_principal;
 use crate::state::mutate_state;
-use crate::state::read_state;
-use crate::utils::commit_changes;
 use canister_time::timestamp_millis;
-use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::_add_reward_round::{
     Args as AddRewardRoundArgs, Response as AddRewardRoundResponse,
 };
-use gldt_stake_common::reward_round::RewardRoundStatus;
+
+#[cfg(feature = "inttest")]
+use crate::guards::caller_is_governance_principal;
+#[cfg(feature = "inttest")]
+use crate::state::read_state;
+#[cfg(feature = "inttest")]
 use ic_cdk::update;
 
 #[update(guard = "caller_is_governance_principal")]
@@ -25,5 +26,5 @@ async fn _add_reward_round_impl(args: AddRewardRoundArgs) -> AddRewardRoundRespo
         });
     });
 
-    Ok(format!("fake round added successfully"))
+    Ok("fake round added successfully".to_string())
 }

@@ -17,8 +17,8 @@ use utils::{
 
 use crate::{
     model::{
-        archive_system::ArchiveSystem, neuron_system::NeuronSystem, reward_system::RewardSystem,
-        stake_system::StakeSystem,
+        archive_system::ArchiveSystem, neuron_system::NeuronSystem,
+        proposal_system::ProposalSystem, reward_system::RewardSystem, stake_system::StakeSystem,
     },
     utils::TimeInterval,
 };
@@ -51,7 +51,7 @@ impl RuntimeState {
             },
             authorized_principals: self.data.authorized_principals.clone(),
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
-            total_active_stake_positions: self.data.stake_system.total_stake_positions.clone(),
+            total_active_stake_positions: self.data.stake_system.total_stake_positions,
             token_usd_values: self.data.stake_system.token_usd_values.clone(),
             genesis_datetime: self.data.stake_system.genesis_datetime,
             reward_types: self.data.stake_system.reward_types.clone(),
@@ -118,6 +118,7 @@ pub struct Data {
     pub neuron_system: NeuronSystem,
     pub reward_system: RewardSystem,
     pub archive_system: ArchiveSystem,
+    pub proposal_system: ProposalSystem,
 
     // cron job related
     /// the weekly interval that governs when neuron rewards are claimed from the sns_rewards canister
@@ -153,6 +154,7 @@ impl Default for Data {
             is_archive_cron_running: false,
             principal_guards: BTreeSet::new(),
             archive_system: ArchiveSystem::default(),
+            proposal_system: ProposalSystem::default(),
         }
     }
 }

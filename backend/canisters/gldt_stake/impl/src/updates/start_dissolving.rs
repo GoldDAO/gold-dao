@@ -19,26 +19,26 @@ async fn start_dissolving_impl(position_id: StartDissolvingArgs) -> StartDissolv
     // 1. check user isn't anon
     let caller = caller();
     if caller == Principal::anonymous() {
-        return Err(StartDissolvingErrors::InvalidPrincipal(format!(
-            "You may not use an anonymous principal"
-        )));
+        return Err(StartDissolvingErrors::InvalidPrincipal(
+            "You may not use an anonymous principal".to_string(),
+        ));
     }
 
     // find the position
     let mut position = read_state(|s| s.data.stake_system.get_stake_position(position_id)).ok_or(
-        StartDissolvingErrors::NotFound(format!(
-            "Cant find active stake position with ID : {position_id}"
-        )),
+        StartDissolvingErrors::NotFound(
+            "Cant find active stake position with ID : {position_id}".to_string(),
+        ),
     )?;
 
     if position.owned_by != caller {
-        return Err(StartDissolvingErrors::NotAuthorized(format!(
-            "You do not have permission to dissolve this stake position"
-        )));
+        return Err(StartDissolvingErrors::NotAuthorized(
+            "You do not have permission to dissolve this stake position".to_string(),
+        ));
     }
     position
         .can_start_dissolving()
-        .map_err(|e| StartDissolvingErrors::StakePositionError(e))?;
+        .map_err(StartDissolvingErrors::StakePositionError)?;
 
     position.dissolve_state = DissolveState::Dissolving;
     position.dissolved_date = Some(timestamp_millis() + position.dissolve_delay.as_millis() as u64);

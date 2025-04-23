@@ -71,7 +71,7 @@ impl StakePosition {
             owned_by: owner,
             staked: initial_stake_amount,
             created_at: timestamp_millis(),
-            claimable_rewards: claimable_rewards,
+            claimable_rewards,
             dissolve_state: DissolveState::default(),
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
             dissolved_date: None,
@@ -94,7 +94,7 @@ impl StakePosition {
     ) -> Nat {
         let age_bonus_multiplier = self.calculate_age_bonus_multiplier(current_timestamp);
         let position_weighted_stake = self.calculate_weighted_stake(age_bonus_multiplier);
-        let percentage_scaled = position_weighted_stake.scaled_e8s_div(&total_weighted_stake_pool);
+        let percentage_scaled = position_weighted_stake.scaled_e8s_div(total_weighted_stake_pool);
         let reward = (reward_pool_amount.clone() * percentage_scaled).scale_e8s_down();
         reward
     }
@@ -184,7 +184,7 @@ impl StakePosition {
         }
         self.unstake_state.is_valid_state_to_unstake()?;
         if self.has_rewards() {
-            return Err(UnstakeErrors::CantUnstakeWithRewardsBalance(format!("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking")));
+            return Err(UnstakeErrors::CantUnstakeWithRewardsBalance("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking".to_string()));
         }
 
         Ok(())
@@ -213,16 +213,16 @@ impl StakePosition {
             Some(dissolve_date) => {
                 if now >= dissolve_date {
                     if self.has_rewards() {
-                        return Err(UnstakeErrors::CantUnstakeWithRewardsBalance(format!("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking")));
+                        return Err(UnstakeErrors::CantUnstakeWithRewardsBalance("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking".to_string()));
                     }
                     Ok(())
                 } else {
                     Err(UnstakeErrors::DissolveDateNotSatisfied(format!("The stake position has a dissolve date of {} and this is less than the current time {}", dissolve_date, now)))
                 }
             }
-            None => Err(UnstakeErrors::NoDissolveDateSet(format!(
-                "The stake position has no dissolve date"
-            ))),
+            None => Err(UnstakeErrors::NoDissolveDateSet(
+                "The stake position has no dissolve date".to_string(),
+            )),
         }
     }
 
@@ -378,7 +378,7 @@ impl From<(StakePosition, TimestampMillis, StakePositionId)> for StakePositionRe
             dissolved_date: position.dissolved_date,
             age_bonus_multiplier,
             weighted_stake,
-            early_unstake_fee: early_unstake_fee,
+            early_unstake_fee,
         }
     }
 }

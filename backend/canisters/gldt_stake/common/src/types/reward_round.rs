@@ -23,8 +23,8 @@ impl RewardRound {
     pub fn new(rewards: Nat, token_symbol: TokenSymbol, timestamp: TimestampMillis) -> Self {
         Self {
             created_at: timestamp,
-            rewards: rewards,
-            token_symbol: token_symbol,
+            rewards,
+            token_symbol,
             status: RewardRoundStatus::RewardsClaimed,
         }
     }
@@ -45,10 +45,7 @@ impl RewardRound {
         self.created_at
     }
 
-    pub fn calculate_total_weighted_stake(
-        &self,
-        stake_positions: &Vec<(u64, StakePosition)>,
-    ) -> Nat {
+    pub fn calculate_total_weighted_stake(&self, stake_positions: &[(u64, StakePosition)]) -> Nat {
         stake_positions
             .iter()
             .fold(Nat::from(0u64), |acc, (_, position)| {

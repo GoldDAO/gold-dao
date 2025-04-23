@@ -28,10 +28,10 @@ async fn claim_reward(args: ClaimRewardArgs) -> ClaimRewardResponse {
 async fn claim_reward_impl(args: ClaimRewardArgs) -> ClaimRewardResponse {
     let caller = caller();
 
-    reject_anonymous_caller().map_err(|e| ClaimRewardErrors::InvalidPrincipal(e))?;
+    reject_anonymous_caller().map_err(ClaimRewardErrors::InvalidPrincipal)?;
 
     let _guard_principal =
-        GuardPrincipal::new(caller).map_err(|e| ClaimRewardErrors::AlreadyProcessing(e))?;
+        GuardPrincipal::new(caller).map_err(ClaimRewardErrors::AlreadyProcessing)?;
 
     // find the position
     let mut position = read_state(|s| s.data.stake_system.get_stake_position(args.id)).ok_or(
@@ -43,9 +43,9 @@ async fn claim_reward_impl(args: ClaimRewardArgs) -> ClaimRewardResponse {
 
     // check ownership
     if position.owned_by != caller {
-        return Err(ClaimRewardErrors::NotAuthorized(format!(
-            "You do not have permission to claim rewards with this stake position"
-        )));
+        return Err(ClaimRewardErrors::NotAuthorized(
+            "You do not have permission to claim rewards with this stake position".to_string(),
+        ));
     }
     // check token type is correct
     let (token_ledger, ledger_fee) =
@@ -61,7 +61,7 @@ async fn claim_reward_impl(args: ClaimRewardArgs) -> ClaimRewardResponse {
     position.can_claim_reward(&args.token, &reward).map_err(|e| {
         match e {
             RemoveRewardErrors::InsufficientBalance(_) => {
-                ClaimRewardErrors::TokenImbalance(format!("Cant claim rewards because the fee to transfer is higher than the reward balance and would result in a failed transfer or a 0 reward transfer"))
+                ClaimRewardErrors::TokenImbalance("Cant claim rewards because the fee to transfer is higher than the reward balance and would result in a failed transfer or a 0 reward transfer".to_string())
             }
             RemoveRewardErrors::RewardTokenTypeDoesNotExist(_) => {
                 ClaimRewardErrors::InvalidRewardToken(format!(
@@ -101,7 +101,7 @@ async fn claim_reward_impl(args: ClaimRewardArgs) -> ClaimRewardResponse {
                 .stake_system
                 .update_stake_position(&args.id, position.clone());
 
-            return Ok((position, timestamp_millis(), args.id).into());
+            Ok((position, timestamp_millis(), args.id).into())
         }),
         Ok(Err(e)) => {
             error!(
@@ -146,9 +146,9 @@ fn reject_stake_position_for_invalid_state(
             });
             Ok(())
         }
-        ClaimRewardStatus::InProgress => Err(ClaimRewardErrors::AlreadyProcessing(format!(
-            "reward claim process has already been initiated and is in progress"
-        ))),
+        ClaimRewardStatus::InProgress => Err(ClaimRewardErrors::AlreadyProcessing(
+            "reward claim process has already been initiated and is in progress".to_string(),
+        )),
     }
 }
 
