@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub fn create_stake_position_util(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     controller: Principal,
     token_ledgers: &HashMap<String, Principal>,
     gldt_stake_canister_id: Principal,
@@ -94,7 +94,7 @@ pub fn create_stake_position_util(
 }
 
 pub fn create_stake_position_util_for_user(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     controller: Principal,
     token_ledgers: &HashMap<String, Principal>,
     gldt_stake_canister_id: Principal,
@@ -166,7 +166,7 @@ pub fn create_stake_position_util_for_user(
 }
 
 pub fn create_multiple_early_unstaked_positions(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     controller: Principal,
     token_ledgers: &HashMap<String, Principal>,
     gldt_stake_canister_id: Principal,
@@ -204,7 +204,7 @@ pub fn create_multiple_early_unstaked_positions(
 
 // adds 10,000 neuron rewards of each token type
 pub fn add_rewards_to_neurons(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     neuron_data: HashMap<usize, Neuron>,
     controller: Principal,
     token_ledgers: &HashMap<String, Principal>,
@@ -247,7 +247,7 @@ pub fn add_rewards_to_neurons(
             subaccount: Some(neuron_id.clone().into()),
         };
         assert_eq!(
-            neuron.permissions.get(1).unwrap().principal,
+            neuron.permissions.get(0).unwrap().principal,
             Some(gldt_stake_canister_id)
         );
 

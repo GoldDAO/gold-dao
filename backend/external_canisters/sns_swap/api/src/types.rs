@@ -3,13 +3,13 @@
 #![allow(dead_code, unused_imports)]
 use candid::{self, CandidType, Decode, Deserialize, Encode, Principal};
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct NeuronBasketConstructionParameters {
     pub dissolve_delay_interval_seconds: u64,
     pub count: u64,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct LinearScalingCoefficient {
     pub slope_numerator: Option<u64>,
     pub intercept_icp_e8s: Option<u64>,
@@ -18,12 +18,12 @@ pub struct LinearScalingCoefficient {
     pub to_direct_participation_icp_e8s: Option<u64>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct IdealMatchedParticipationFunction {
     pub serialized_representation: Option<String>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct NeuronsFundParticipationConstraints {
     pub coefficient_intervals: Vec<LinearScalingCoefficient>,
     pub max_neurons_fund_participation_icp_e8s: Option<u64>,
@@ -31,12 +31,12 @@ pub struct NeuronsFundParticipationConstraints {
     pub ideal_matched_participation_function: Option<IdealMatchedParticipationFunction>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct Countries {
     pub iso_codes: Vec<String>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct Init {
     pub nns_proposal_id: Option<u64>,
     pub sns_root_canister_id: String,

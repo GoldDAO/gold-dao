@@ -27,12 +27,10 @@ async fn process_oldest_reward_round(_args: ProcessOldestRoundArgs) -> ProcessOl
 
 async fn process_oldest_reward_round_impl() -> ProcessOldestRoundResponse {
     let latest_round = read_state(|s| s.data.reward_system.peek_oldest_round().cloned())
-        .ok_or(format!("No rounds to process"))?;
+        .ok_or("No rounds to process".to_string())?;
 
     if read_state(|s| s.data.is_reward_allocation_in_progress) {
-        return Err(format!(
-            "process_reward_rounds cron job is already in progress"
-        ));
+        return Err("process_reward_rounds cron job is already in progress".to_string());
     }
     mutate_state(|s| s.data.is_reward_allocation_in_progress = true);
 
@@ -48,5 +46,5 @@ async fn process_oldest_reward_round_impl() -> ProcessOldestRoundResponse {
 
     allocate_rewards(latest_round);
     mutate_state(|s| s.data.is_reward_allocation_in_progress = false);
-    return Ok(format!("rewards processed successfully"));
+    Ok("rewards processed successfully".to_string())
 }

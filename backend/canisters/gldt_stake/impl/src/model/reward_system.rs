@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 use types::TimestampMillis;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 pub struct RewardSystem {
     // rounds that are due to be processed
     pub rounds: VecDeque<RewardRound>,
@@ -19,15 +19,6 @@ pub struct RewardSystem {
     pub weekly_allocated_rewards: HashMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // weekly reward history - keeps track of the total rewards for each week that have been allocated for each token
 }
 
-impl Default for RewardSystem {
-    fn default() -> Self {
-        Self {
-            rounds: VecDeque::default(),
-            reward_history: HashMap::new(),
-            weekly_allocated_rewards: HashMap::new(),
-        }
-    }
-}
 // front is the oldest
 // back is the newest
 impl RewardSystem {

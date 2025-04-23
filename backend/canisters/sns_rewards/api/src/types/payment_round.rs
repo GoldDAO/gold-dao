@@ -81,8 +81,8 @@ impl PaymentRound {
         )?;
 
         Ok(Self {
-            id: id,
-            round_funds_total: round_funds_total,
+            id,
+            round_funds_total,
             tokens_to_distribute,
             fees: transaction_fees,
             ledger_id: token_info.ledger_id,

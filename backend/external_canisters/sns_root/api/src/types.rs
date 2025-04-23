@@ -3,14 +3,14 @@
 #![allow(dead_code, unused_imports)]
 use candid::{self, CandidType, Decode, Deserialize, Encode, Principal};
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct Timers {
     pub last_spawned_timestamp_seconds: Option<u64>,
     pub last_reset_timestamp_seconds: Option<u64>,
     pub requires_periodic_tasks: Option<bool>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct SnsRootCanister {
     pub dapp_canister_ids: Vec<Principal>,
     pub timers: Option<Timers>,

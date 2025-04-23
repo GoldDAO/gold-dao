@@ -22,23 +22,29 @@ fn cycles_are_transfered_to_archive_correctly() {
         ledger_fees,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
-    pic.advance_time(Duration::from_millis(SECOND_IN_MS));
-    tick_n_blocks(pic, 10);
-    let res = get_archive_canisters(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    pic_borrowed.advance_time(Duration::from_millis(SECOND_IN_MS));
+    tick_n_blocks(pic_borrowed, 10);
+    let res = get_archive_canisters(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     let archive_canister_id = res.get(0).unwrap().clone().canister_id;
     assert_eq!(res.len(), 1);
 
-    let archive_canister_cycles = pic.cycle_balance(archive_canister_id);
+    let archive_canister_cycles = pic_borrowed.cycle_balance(archive_canister_id);
     println!("cycles before : {archive_canister_cycles}");
 
     assert!(archive_canister_cycles < 5_000_000_000_000 as u128);
-    pic.advance_time(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL));
-    tick_n_blocks(pic, 2);
-    pic.advance_time(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL));
-    tick_n_blocks(pic, 2);
+    pic_borrowed.advance_time(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL));
+    tick_n_blocks(pic_borrowed, 40);
+    pic_borrowed.advance_time(Duration::from_millis(MANAGE_ARCHIVE_CYCLE_INTERVAL));
+    tick_n_blocks(pic_borrowed, 40);
 
-    let archive_canister_cycles = pic.cycle_balance(archive_canister_id);
+    let archive_canister_cycles = pic_borrowed.cycle_balance(archive_canister_id);
     println!("cycles after : {archive_canister_cycles}");
     assert!(archive_canister_cycles > 5_000_000_000_000 as u128);
 }

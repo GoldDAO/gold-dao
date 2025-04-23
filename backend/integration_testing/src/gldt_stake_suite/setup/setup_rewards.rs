@@ -10,7 +10,7 @@ use types::BuildVersion;
 use crate::wasms;
 
 pub fn setup_rewards_canister(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     sns_rewards_id: Principal,
     token_ledgers: &HashMap<String, Principal>,
     sns_canister_id: Principal,

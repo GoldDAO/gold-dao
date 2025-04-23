@@ -71,7 +71,7 @@ pub fn allocate_rewards(round: RewardRound) {
         mutate_state(|s| {
             s.data
                 .stake_system
-                .update_stake_position(&id, position.clone())
+                .update_stake_position(id, position.clone())
         });
     });
 
@@ -97,7 +97,7 @@ pub fn allocate_rewards(round: RewardRound) {
 }
 
 fn calculate_weekly_variables() {
-    let weekly_apy_timestamp = read_state(|s| s.data.stake_system.weekly_apy_timestamp.clone());
+    let weekly_apy_timestamp = read_state(|s| s.data.stake_system.weekly_apy_timestamp);
 
     let now = timestamp_millis();
     let threshold = weekly_apy_timestamp + WEEK_IN_MS;

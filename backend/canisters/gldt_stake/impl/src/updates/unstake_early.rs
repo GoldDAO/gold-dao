@@ -32,9 +32,9 @@ async fn unstake_early(position_id: UnstakeEarlyArgs) -> UnstakeEarlyResponse {
 async fn unstake_early_impl(position_id: UnstakeEarlyArgs) -> UnstakeEarlyResponse {
     // 1. check user isn't anon
     let caller = caller();
-    reject_anonymous_caller().map_err(|e| UnstakeEarlyRequestErrors::InvalidPrincipal(e))?;
+    reject_anonymous_caller().map_err(UnstakeEarlyRequestErrors::InvalidPrincipal)?;
     let _guard_principal =
-        GuardPrincipal::new(caller).map_err(|e| UnstakeEarlyRequestErrors::AlreadyProcessing(e))?;
+        GuardPrincipal::new(caller).map_err(UnstakeEarlyRequestErrors::AlreadyProcessing)?;
 
     // find the position
     let position = read_state(|s| s.data.stake_system.get_stake_position(position_id)).ok_or(
@@ -44,14 +44,14 @@ async fn unstake_early_impl(position_id: UnstakeEarlyArgs) -> UnstakeEarlyRespon
     )?;
 
     if position.owned_by != caller {
-        return Err(UnstakeEarlyRequestErrors::NotAuthorized(format!(
-            "You do not have permission to unstake this stake position early"
-        )));
+        return Err(UnstakeEarlyRequestErrors::NotAuthorized(
+            "You do not have permission to unstake this stake position early".to_string(),
+        ));
     }
 
     position
         .can_unstake_early()
-        .map_err(|e| UnstakeEarlyRequestErrors::UnstakeErrors(e))?;
+        .map_err(UnstakeEarlyRequestErrors::UnstakeErrors)?;
 
     let early_unstake_fee = position.calculate_unstake_early_fee();
     let position_stake = position.staked.clone();
@@ -75,7 +75,7 @@ async fn unstake_early_impl(position_id: UnstakeEarlyArgs) -> UnstakeEarlyRespon
     )
     .await?;
 
-    let position_id_to_archive = position_id.clone();
+    let position_id_to_archive = position_id;
     let position_to_archive = stake_position.clone();
     ic_cdk::spawn(async move {
         let _ = archive_stake_position(position_id_to_archive, position_to_archive).await;

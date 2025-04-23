@@ -63,7 +63,7 @@ fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
         }
     };
     let is_distribution_time_valid =
-        distribution_interval.is_within_weekly_interval(initial_run_time.clone());
+        distribution_interval.is_within_weekly_interval(initial_run_time);
 
     // in_progress
     if distribution_in_progress {
@@ -98,7 +98,7 @@ async fn spawn_claim_procedure(
             "CLAIM_NEURON_REWARDS :: neuron id - {} :: reward of {} {} is less than the threshold of 1_000_000_000",
             neuron_id, reward_balance, token_symbol
         );
-        return Err(format!("Not enough rewards to process this neuron"));
+        return Err("Not enough rewards to process this neuron".to_string());
     };
     claim_reward(neuron_id.clone(), &token_symbol).await?;
 
@@ -123,9 +123,9 @@ async fn fetch_neuron_reward_balance(
 ) -> Result<Nat, String> {
     let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
     match icrc1_balance_of(
-        token_ledger.clone(),
+        *token_ledger,
         Account {
-            owner: sns_rewards_canister_id.clone(),
+            owner: sns_rewards_canister_id,
             subaccount: Some(neuron_id.clone().into()),
         },
     )

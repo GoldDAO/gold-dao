@@ -41,11 +41,12 @@ fn test_unstake_early() {
         ledger_fees,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -53,7 +54,7 @@ fn test_unstake_early() {
     );
 
     let user_gldt_balance = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: user_0,
@@ -68,7 +69,7 @@ fn test_unstake_early() {
     // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
-        pic,
+        pic_borrowed,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -77,12 +78,13 @@ fn test_unstake_early() {
         ledger_fees.clone(),
     );
 
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic, 5);
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 5);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(pic_borrowed, 5);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
 
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     user_0_positions
         .get(0)
         .unwrap()
@@ -96,11 +98,11 @@ fn test_unstake_early() {
     let position_early_unstake_fee = user_0_positions.get(0).unwrap().early_unstake_fee.clone();
 
     // wait the remaining 6 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
 
     // // claim rewards
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -110,7 +112,7 @@ fn test_unstake_early() {
     )
     .unwrap();
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -120,7 +122,7 @@ fn test_unstake_early() {
     )
     .unwrap();
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -130,15 +132,15 @@ fn test_unstake_early() {
     )
     .unwrap();
 
-    let res = unstake_early(pic, user_0, gldt_stake_canister_id, &position_id);
-    tick_n_blocks(pic, 5);
+    let res = unstake_early(pic_borrowed, user_0, gldt_stake_canister_id, &position_id);
+    tick_n_blocks(pic_borrowed, 5);
     assert_matches!(res, Ok(_));
     let position = res.unwrap();
     assert_eq!(position.staked, Nat::from(0u64));
-    tick_n_blocks(pic, 2);
+    tick_n_blocks(pic_borrowed, 2);
 
     let user_gldt_balance_after_unstake = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: user_0,
@@ -153,11 +155,11 @@ fn test_unstake_early() {
     );
 
     // wait one hour for the fees to be transferred
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 2);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 2);
 
     let fee_account_balance = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: gldt_stake_canister_id,
@@ -170,13 +172,18 @@ fn test_unstake_early() {
         position_early_unstake_fee - GLDT_TX_FEE
     );
 
-    let total_staked = get_total_staked(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let total_staked = get_total_staked(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(total_staked, Nat::from(0u64));
 
     // check the position was moved to history
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic_borrowed, 5);
     let res = get_historic_position_by_id(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &position_id,
@@ -184,7 +191,8 @@ fn test_unstake_early() {
     .unwrap();
     assert_eq!(res.id, position_id);
 
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     assert_eq!(user_0_positions.len(), 0);
 }
 
@@ -199,9 +207,10 @@ fn test_unstake_early_when_position_is_dissolving() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     let (user_0, stake_position) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -209,12 +218,23 @@ fn test_unstake_early_when_position_is_dissolving() {
     );
 
     // start dissolving
-    let _ = start_dissolving(pic, user_0, gldt_stake_canister_id, &stake_position.id).unwrap();
+    let _ = start_dissolving(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    )
+    .unwrap();
 
     // wait 7 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 7));
 
-    let res = unstake_early(pic, user_0, gldt_stake_canister_id, &stake_position.id);
+    let res = unstake_early(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    );
 
     println!("{res:?}");
     assert_matches!(

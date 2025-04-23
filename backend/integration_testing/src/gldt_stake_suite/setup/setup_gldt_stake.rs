@@ -4,7 +4,7 @@ use candid::Principal;
 use pocket_ic::PocketIc;
 
 pub fn setup_gldt_stake_canister(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     canister_id: Principal,
     args: gldt_stake_api_canister::Args,
     controller: Principal,
