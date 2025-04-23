@@ -9,7 +9,7 @@ pub struct UpgradeArg {
     pub retrieve_blocks_from_ledger_interval_seconds: Option<u64>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct InitArg {
     pub ledger_id: Principal,
     pub retrieve_blocks_from_ledger_interval_seconds: Option<u64>,

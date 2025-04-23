@@ -19,8 +19,6 @@ use candid::Nat;
 fn test_disburse_maturity() {
     let test_env = test_setup_with_predefined_wtn_neurons();
 
-    println!("test_env: {:#?}", test_env);
-
     test_env.get_pic().advance_time(Duration::from_secs(100));
     tick_n_blocks(&test_env.get_pic(), 10);
 
@@ -57,6 +55,14 @@ fn test_disburse_maturity() {
         .get_pic()
         .advance_time(Duration::from_secs(9 * 24 * 60 * 60));
     tick_n_blocks(&test_env.get_pic(), 100);
+
+    // FIXME
+    test_env
+        .get_pic()
+        .advance_time(Duration::from_secs(100 * 24 * 60 * 60));
+    tick_n_blocks(&test_env.get_pic(), 100);
+
+    // println!("time: {:?}", test_env.get_pic().get_time());
 
     let neurons = crate::client::sns_governance::list_neurons(
         &test_env.get_pic(),

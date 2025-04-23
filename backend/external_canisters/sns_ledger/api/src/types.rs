@@ -16,7 +16,7 @@ pub struct ChangeArchiveOptions {
     pub controller_id: Option<Principal>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub enum MetadataValue {
     Int(candid::Int),
     Nat(candid::Nat),
@@ -24,7 +24,7 @@ pub enum MetadataValue {
     Text(String),
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct Account {
     pub owner: Principal,
     pub subaccount: Option<serde_bytes::ByteBuf>,
@@ -36,7 +36,7 @@ pub enum ChangeFeeCollector {
     Unset,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct FeatureFlags {
     pub icrc2: bool,
 }
@@ -53,7 +53,7 @@ pub struct UpgradeArgs {
     pub feature_flags: Option<FeatureFlags>,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct ArchiveOptions {
     pub num_blocks_to_archive: u64,
     pub max_transactions_per_response: Option<u64>,
@@ -65,7 +65,7 @@ pub struct ArchiveOptions {
     pub controller_id: Principal,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct InitArgs {
     pub decimals: Option<u8>,
     pub token_symbol: String,

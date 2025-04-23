@@ -41,11 +41,12 @@ fn test_unstake() {
         ledger_fees,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -53,7 +54,7 @@ fn test_unstake() {
     );
 
     let user_gldt_balance = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: user_0,
@@ -68,7 +69,7 @@ fn test_unstake() {
     // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
 
     add_rewards_to_neurons(
-        pic,
+        pic_borrowed,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -77,12 +78,13 @@ fn test_unstake() {
         ledger_fees.clone(),
     );
 
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic, 5);
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 5);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(pic_borrowed, 5);
+    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic_borrowed, 5);
 
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     println!("{user_0_positions:?}");
     user_0_positions
         .get(0)
@@ -96,12 +98,13 @@ fn test_unstake() {
     let position_stake_amount = user_0_positions.get(0).unwrap().staked.clone();
 
     // start dissolving
-    let response = start_dissolving(pic, user_0, gldt_stake_canister_id, &position_id).unwrap();
+    let response =
+        start_dissolving(pic_borrowed, user_0, gldt_stake_canister_id, &position_id).unwrap();
     assert_eq!(response.dissolve_state, DissolveState::Dissolving);
 
     // wait 1 day and try to unstake - SHOULD FAIL because we haven't waited a full 7 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &position_id);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS));
+    let res = unstake(pic_borrowed, user_0, gldt_stake_canister_id, &position_id);
 
     assert_matches!(
         res,
@@ -111,8 +114,8 @@ fn test_unstake() {
     );
 
     // wait the remaining 6 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &position_id);
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    let res = unstake(pic_borrowed, user_0, gldt_stake_canister_id, &position_id);
 
     assert_matches!(
         res,
@@ -123,7 +126,7 @@ fn test_unstake() {
 
     // // claim rewards
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -133,7 +136,7 @@ fn test_unstake() {
     )
     .unwrap();
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -143,7 +146,7 @@ fn test_unstake() {
     )
     .unwrap();
     let _ = claim_reward(
-        pic,
+        pic_borrowed,
         user_0,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::claim_reward::Args {
@@ -153,14 +156,14 @@ fn test_unstake() {
     )
     .unwrap();
 
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &position_id);
-    tick_n_blocks(pic, 5);
+    let res = unstake(pic_borrowed, user_0, gldt_stake_canister_id, &position_id);
+    tick_n_blocks(pic_borrowed, 5);
     assert_matches!(res, Ok(_));
     let position = res.unwrap();
     assert_eq!(position.staked, Nat::from(0u64));
 
     let user_gldt_balance_after_unstake = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: user_0,
@@ -173,13 +176,18 @@ fn test_unstake() {
         user_gldt_balance + position_stake_amount - GLDT_TX_FEE
     );
 
-    let total_staked = get_total_staked(pic, Principal::anonymous(), gldt_stake_canister_id, &());
+    let total_staked = get_total_staked(
+        pic_borrowed,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &(),
+    );
     assert_eq!(total_staked, Nat::from(0u64));
 
     // check the position was moved to history
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic_borrowed, 5);
     let res = get_historic_position_by_id(
-        pic,
+        pic_borrowed,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &position_id,
@@ -187,7 +195,8 @@ fn test_unstake() {
     .unwrap();
     assert_eq!(res.id, position_id);
 
-    let user_0_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_0_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     assert_eq!(user_0_positions.len(), 0);
 }
 
@@ -202,10 +211,11 @@ fn test_invalid_unstake_states_in_progress() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, stake_position) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -213,14 +223,20 @@ fn test_invalid_unstake_states_in_progress() {
     );
 
     // start dissolving
-    let _ = start_dissolving(pic, user_0, gldt_stake_canister_id, &stake_position.id).unwrap();
+    let _ = start_dissolving(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    )
+    .unwrap();
 
     // wait 7 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 7));
 
     // force position into an InProgress state
     _set_position_unstake_state(
-        pic,
+        pic_borrowed,
         controller,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::_set_position_unstake_state::Args {
@@ -231,7 +247,12 @@ fn test_invalid_unstake_states_in_progress() {
     .unwrap();
 
     // attempt to unstake using normal API - it should fail because the position is already in progress.
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &stake_position.id);
+    let res = unstake(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    );
     println!("{res:?}");
     assert_eq!(
         matches!(
@@ -255,10 +276,11 @@ fn test_invalid_unstake_states_failed() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, stake_position) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -266,14 +288,20 @@ fn test_invalid_unstake_states_failed() {
     );
 
     // start dissolving
-    let _ = start_dissolving(pic, user_0, gldt_stake_canister_id, &stake_position.id).unwrap();
+    let _ = start_dissolving(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    )
+    .unwrap();
 
     // wait 7 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 7));
 
     // force position into an InProgress state
     _set_position_unstake_state(
-        pic,
+        pic_borrowed,
         controller,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::_set_position_unstake_state::Args {
@@ -284,7 +312,12 @@ fn test_invalid_unstake_states_failed() {
     .unwrap();
 
     // attempt to unstake using normal API - it should fail because the position is already in progress.
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &stake_position.id);
+    let res = unstake(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    );
     assert_eq!(res.is_ok(), true);
 }
 
@@ -299,10 +332,11 @@ fn test_invalid_unstake_states_unstaked() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, stake_position) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
@@ -310,14 +344,20 @@ fn test_invalid_unstake_states_unstaked() {
     );
 
     // start dissolving
-    let _ = start_dissolving(pic, user_0, gldt_stake_canister_id, &stake_position.id).unwrap();
+    let _ = start_dissolving(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    )
+    .unwrap();
 
     // wait 7 days
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
+    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 7));
 
     // force position into an InProgress state
     _set_position_unstake_state(
-        pic,
+        pic_borrowed,
         controller,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::_set_position_unstake_state::Args {
@@ -328,7 +368,12 @@ fn test_invalid_unstake_states_unstaked() {
     .unwrap();
 
     // attempt to unstake using normal API - it should fail because the position is already in progress.
-    let res = unstake(pic, user_0, gldt_stake_canister_id, &stake_position.id);
+    let res = unstake(
+        pic_borrowed,
+        user_0,
+        gldt_stake_canister_id,
+        &stake_position.id,
+    );
     println!("{res:?}");
     assert_matches!(
         res,

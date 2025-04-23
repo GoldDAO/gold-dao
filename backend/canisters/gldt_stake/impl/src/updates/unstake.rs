@@ -30,26 +30,26 @@ async fn unstake(position_id: UnstakeArgs) -> UnstakeResponse {
 async fn unstake_impl(position_id: UnstakeArgs) -> UnstakeResponse {
     // 1. check user isn't anon
     let caller = caller();
-    reject_anonymous_caller().map_err(|e| UnstakeRequestErrors::InvalidPrincipal(e))?;
+    reject_anonymous_caller().map_err(UnstakeRequestErrors::InvalidPrincipal)?;
     let _guard_principal = GuardPrincipal::new(caller)
         .map_err(|e| UnstakeRequestErrors::UnstakeErrors(UnstakeErrors::AlreadyProcessing(e)))?;
 
     // find the position
     let position = read_state(|s| s.data.stake_system.get_stake_position(position_id)).ok_or(
-        UnstakeRequestErrors::NotFound(format!(
-            "Cant find active stake position with ID : {position_id}"
-        )),
+        UnstakeRequestErrors::NotFound(
+            "Cant find active stake position with ID : {position_id}".to_string(),
+        ),
     )?;
 
     if position.owned_by != caller {
-        return Err(UnstakeRequestErrors::NotAuthorized(format!(
-            "You do not have permission to unstake this stake position"
-        )));
+        return Err(UnstakeRequestErrors::NotAuthorized(
+            "You do not have permission to unstake this stake position".to_string(),
+        ));
     }
 
     position
         .can_unstake()
-        .map_err(|e| UnstakeRequestErrors::UnstakeErrors(e))?;
+        .map_err(UnstakeRequestErrors::UnstakeErrors)?;
 
     let amount_to_unstake = position.staked.clone();
     let amount_to_transfer = amount_to_unstake.clone() - GLDT_TX_FEE;
@@ -69,7 +69,7 @@ async fn unstake_impl(position_id: UnstakeArgs) -> UnstakeResponse {
     )
     .await?;
 
-    let position_id_to_archive = position_id.clone();
+    let position_id_to_archive = position_id;
     let position_to_archive = stake_position.clone();
     ic_cdk::spawn(async move {
         let _ = archive_stake_position(position_id_to_archive, position_to_archive).await;

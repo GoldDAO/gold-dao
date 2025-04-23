@@ -86,7 +86,7 @@ async fn fetch_positions(
             Ok(positions) => Some(
                 positions
                     .into_iter()
-                    .map(|(id, position)| StakePositionResponse::from((position, now.clone(), id)))
+                    .map(|(id, position)| StakePositionResponse::from((position, now, id)))
                     .collect::<Vec<_>>(),
             ),
             Err(_) => None,

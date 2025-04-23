@@ -25,13 +25,15 @@ fn init(args: Args) {
                 init_args.version,
                 init_args.commit_hash,
             );
-            let mut data = Data::default();
 
-            data.gldt_ledger_id = init_args.gldt_ledger_id;
-            data.goldao_ledger_id = init_args.goldao_ledger_id;
-            data.authorized_principals = init_args.authorized_principals;
-            data.goldao_sns_rewards_canister_id = init_args.gld_sns_rewards_canister_id;
-            data.goldao_sns_governance_canister_id = init_args.gld_sns_governance_canister_id;
+            let mut data = Data {
+                gldt_ledger_id: init_args.gldt_ledger_id,
+                goldao_ledger_id: init_args.goldao_ledger_id,
+                authorized_principals: init_args.authorized_principals,
+                goldao_sns_rewards_canister_id: init_args.gld_sns_rewards_canister_id,
+                goldao_sns_governance_canister_id: init_args.gld_sns_governance_canister_id,
+                ..Default::default()
+            };
             data.stake_system.reward_types = init_args.reward_types.clone();
 
             init_args.reward_types.iter().for_each(|(token_symbol, _)| {
@@ -41,7 +43,7 @@ fn init(args: Args) {
 
             if init_args.test_mode {
                 info!("INIT :: settingg max threshold to 32mb");
-                data.archive_system.max_canister_archive_threshold = 32 * 1024 * (1024 as u128);
+                data.archive_system.max_canister_archive_threshold = 32 * 1024 * 1024_u128;
             }
 
             info!("INIT  :: MAX position size {MAX_STAKE_POSITION_SIZE}");

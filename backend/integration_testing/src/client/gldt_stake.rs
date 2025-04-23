@@ -11,6 +11,7 @@ generate_pocket_query_call!(get_total_staked);
 generate_pocket_query_call!(get_archive_canisters);
 generate_pocket_query_call!(get_reward_rounds);
 generate_pocket_query_call!(get_apy_timeseries);
+generate_pocket_query_call!(get_proposal_votes_of_neuron);
 
 // Updates
 generate_pocket_update_call!(create_neuron);

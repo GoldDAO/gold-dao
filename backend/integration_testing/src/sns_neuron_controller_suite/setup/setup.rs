@@ -4,6 +4,7 @@ use crate::sns_neuron_controller_suite::setup::setup_sns_neuron_controller::setu
 use crate::sns_neuron_controller_suite::setup::*;
 use crate::sns_test_env::sns_test_env::generate_neuron_data;
 use crate::sns_test_env::sns_test_env::SnsTestEnv;
+use crate::sns_test_env::sns_test_env::SnsTestEnvBuilder;
 use crate::utils::random_principal;
 use crate::utils::tick_n_blocks;
 use candid::CandidType;
@@ -45,31 +46,6 @@ pub struct SNCTestEnv {
 impl SNCTestEnv {
     pub fn get_pic(&self) -> std::cell::Ref<PocketIc> {
         self.pic.borrow()
-    }
-}
-
-use std::fmt;
-use std::fmt::Debug;
-use std::fmt::Formatter;
-impl Debug for SNCTestEnv {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("SNCTestEnv")
-            .field("controller", &self.controller.to_text())
-            .field(
-                "sns_neuron_controller_id",
-                &self.sns_neuron_controller_id.to_text(),
-            )
-            .field("ogy_sns_test_env", &self.ogy_sns_test_env)
-            .field("ogy_sns_test_env", &self.wtn_sns_test_env)
-            .field(
-                "ogy_rewards_canister_id",
-                &self.ogy_rewards_canister_id.to_text(),
-            )
-            .field(
-                "gld_rewards_canister_id",
-                &self.gld_rewards_canister_id.to_text(),
-            )
-            .finish()
     }
 }
 
@@ -171,12 +147,19 @@ impl SNCTestEnvBuilder {
             tick_n_blocks(&pic, 50);
         }
 
-        let ogy_sns_test_env = SnsTestEnv::new(&pic_ref, self.controller, &ogy_neuron_data);
-        let wtn_sns_test_env = SnsTestEnv::new(&pic_ref, self.controller, &wtn_neuron_data);
+        let mut ogy_sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
+        ogy_sns_test_env_builder.generate_ids();
+        let ogy_sns_test_env = ogy_sns_test_env_builder
+            .with_ogy_init_args(&ogy_neuron_data)
+            .build();
+
+        let mut wtn_sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
+        wtn_sns_test_env_builder.generate_ids();
+        let wtn_sns_test_env = wtn_sns_test_env_builder
+            .with_wtn_init_args(&wtn_neuron_data)
+            .build();
 
         let ogy_sns_ledger_canister_id = ogy_sns_test_env.ledger_id;
-
-        // let mut token_ledgers = HashMap::new();
 
         let mut token_ledgers = setup_ledgers(
             &pic,

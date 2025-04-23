@@ -31,13 +31,14 @@ fn create_stake_position_works() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     let user_1 = random_principal();
 
     let _ = transfer(
-        pic,
+        pic_borrowed,
         controller,
         gldt_ledger_id.clone(),
         None,
@@ -49,7 +50,7 @@ fn create_stake_position_works() {
     );
 
     let balance = balance_of(
-        pic,
+        pic_borrowed,
         gldt_ledger_id.clone(),
         Account {
             owner: user_1,
@@ -61,7 +62,7 @@ fn create_stake_position_works() {
 
     // approve the required minimum stake amount
     let res = icrc2_approve(
-        pic,
+        pic_borrowed,
         user_1,
         gldt_ledger_id.clone(),
         &(icrc2_approve::Args {
@@ -80,11 +81,11 @@ fn create_stake_position_works() {
     );
     println!("{res:?}");
     assert_eq!(matches!(res, icrc2_approve::Response::Ok(_)), true);
-    tick_n_blocks(pic, 2);
+    tick_n_blocks(pic_borrowed, 2);
 
     // create the stake position
     let res = create_stake_position(
-        pic,
+        pic_borrowed,
         user_1,
         gldt_stake_canister_id,
         &create_stake_position::Args {
@@ -96,6 +97,7 @@ fn create_stake_position_works() {
     assert_eq!(res.age_bonus_multiplier, 1.0);
 
     // get user stake positions
-    let positions = get_active_user_positions(pic, user_1, gldt_stake_canister_id, &(None));
+    let positions =
+        get_active_user_positions(pic_borrowed, user_1, gldt_stake_canister_id, &(None));
     assert_eq!(positions.len(), 1);
 }

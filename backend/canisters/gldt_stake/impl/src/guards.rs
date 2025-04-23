@@ -20,10 +20,10 @@ impl GuardPrincipal {
     pub fn new(principal: Principal) -> Result<Self, String> {
         mutate_state(|s| {
             if s.data.principal_guards.contains(&principal) {
-                return Err(format!("Error: Duplicate request"));
+                return Err("Error: Duplicate request".to_string());
             }
             if s.data.principal_guards.len() >= MAX_CONCURRENT {
-                return Err(format!("Service is too busy, try again shortly"));
+                return Err("Service is too busy, try again shortly".to_string());
             }
             s.data.principal_guards.insert(principal);
             Ok(Self {
@@ -50,7 +50,7 @@ pub fn caller_is_governance_principal() -> Result<(), String> {
 
 pub fn reject_anonymous_caller() -> Result<(), String> {
     if ic_cdk::caller() == Principal::anonymous() {
-        return Err(format!("You may not use an anonymous principal"));
+        return Err("You may not use an anonymous principal".to_string());
     }
     Ok(())
 }

@@ -16,28 +16,32 @@ fn test_start_dissolving() {
         gldt_stake_canister_id,
         ..
     } = test_env;
+    let pic_borrowed = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
     let (user_0, _) = create_stake_position_util(
-        pic,
+        pic_borrowed,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
 
-    let user_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     assert_eq!(user_positions.len(), 1);
 
     let position = user_positions.get(0).unwrap();
 
-    let response = start_dissolving(pic, user_0, gldt_stake_canister_id, &position.id).unwrap();
+    let response =
+        start_dissolving(pic_borrowed, user_0, gldt_stake_canister_id, &position.id).unwrap();
 
     assert_eq!(response.dissolve_state, DissolveState::Dissolving);
 
-    tick_n_blocks(pic, 1);
+    tick_n_blocks(pic_borrowed, 1);
 
-    let user_positions = get_active_user_positions(pic, user_0, gldt_stake_canister_id, &None);
+    let user_positions =
+        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
     assert_eq!(user_positions.len(), 1);
 
     let position = user_positions.get(0).unwrap();

@@ -1,10 +1,12 @@
-use crate::guards::caller_is_governance_principal;
 use crate::state::mutate_state;
 use crate::state::read_state;
 pub use gldt_stake_api_canister::_set_position_unstake_state::{
     Args as SetPositionUnstakeStateArgs, Response as SetPositionUnstakeStateResponse,
 };
-use gldt_stake_common::reward_round::RewardRoundStatus;
+
+#[cfg(feature = "inttest")]
+use crate::guards::caller_is_governance_principal;
+#[cfg(feature = "inttest")]
 use ic_cdk::update;
 
 #[update(guard = "caller_is_governance_principal")]

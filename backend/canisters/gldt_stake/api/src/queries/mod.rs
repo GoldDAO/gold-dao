@@ -8,3 +8,4 @@ pub mod get_reward_rounds;
 pub mod get_total_allocated_rewards;
 pub mod get_total_staked;
 pub mod http_request;
+pub mod get_proposal_votes_of_neuron;

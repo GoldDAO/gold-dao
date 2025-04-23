@@ -125,7 +125,7 @@ impl Storable for VecNeurons {
 }
 
 /// The id of a specific proposal.
-#[derive(candid::CandidType, Serialize, candid::Deserialize, Eq, Copy, Clone, PartialEq, Debug)]
+#[derive(candid::CandidType, Serialize, Deserialize, Eq, Copy, Clone, PartialEq, Debug)]
 pub struct ProposalId {
     pub id: u64,
 }
@@ -1774,6 +1774,8 @@ pub struct ListProposals {
 pub struct ListProposalsResponse {
     /// The returned list of proposals' ProposalData.
     pub proposals: Vec<ProposalData>,
+    /// Whether ballots cast by the caller are included in the returned proposals.
+    pub include_ballots_by_caller: Option<bool>,
 }
 /// An operation that lists all neurons tracked in the Governance state in a
 /// paginated fashion.

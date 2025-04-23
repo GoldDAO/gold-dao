@@ -39,7 +39,7 @@ impl Default for ArchiveSystem {
             archive_canisters: Default::default(),
             archive_status: ArchiveStatus::Initializing,
             required_cycle_balance: Nat::default(),
-            max_canister_archive_threshold: 300 * 1024 * 1024 * (1024 as u128), // 300GB
+            max_canister_archive_threshold: 300 * 1024 * 1024 * 1024_u128, // 300GB
             new_archive_error: None,
         }
     }
@@ -195,7 +195,7 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     // Step 2: Install the Wasm module to the newly created canister
     let install_args = InstallCodeArgument {
         mode: CanisterInstallMode::Install,
-        canister_id: canister_id,
+        canister_id,
         wasm_module: ARCHIVE_WASM.to_vec(),
         arg: init_args,
     };
@@ -205,18 +205,16 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
             mutate_state(|s| {
                 s.data.archive_system.new_archive_error = None;
             });
-            return Ok(canister_id);
+            Ok(canister_id)
         }
-        Err(e) => {
-            return Err(NewArchiveError::InstallCodeError(format!("{e:?}")));
-        }
+        Err(e) => Err(NewArchiveError::InstallCodeError(format!("{e:?}"))),
     }
 }
 
 pub async fn is_archive_canister_at_threshold(archive: &ArchiveCanister) -> bool {
     let res = retry_async(|| get_archive_size(archive.canister_id, &()), 3).await;
     let max_canister_archive_threshold =
-        read_state(|s| s.data.archive_system.max_canister_archive_threshold.clone());
+        read_state(|s| s.data.archive_system.max_canister_archive_threshold);
 
     match res {
         Ok(size) => (size as u128) >= max_canister_archive_threshold,
@@ -319,10 +317,10 @@ pub async fn update_archive_canisters() -> Result<(), Vec<String>> {
         }
     }
 
-    if canister_upgrade_errors.len() > 0 {
-        return Err(canister_upgrade_errors);
-    } else {
+    if canister_upgrade_errors.is_empty() {
         Ok(())
+    } else {
+        Err(canister_upgrade_errors)
     }
 }
 
@@ -350,7 +348,7 @@ pub async fn archive_stake_position(
     let args: ArchiveItemArgs = (id, position);
     match archive_item(archive_canister.canister_id, &args).await {
         Ok(()) => {
-            mutate_state(|s| s.data.stake_system.remove_stake_position(id.clone()));
+            mutate_state(|s| s.data.stake_system.remove_stake_position(id));
             debug!("position archived :: ID {id:?}");
             trace(&format!("position archived :: ID {id:?}"));
             Ok(id)

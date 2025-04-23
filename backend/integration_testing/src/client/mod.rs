@@ -9,4 +9,5 @@ pub mod pocket;
 pub mod rewards;
 pub mod sns_governance;
 pub mod sns_neuron_controller;
+pub mod sns_root_canister;
 pub mod usdg;

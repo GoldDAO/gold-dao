@@ -1,23 +1,17 @@
-use std::collections::HashMap;
-
-use candid::Nat;
-use canister_time::{timestamp_millis, WEEK_IN_MS};
 pub use gldt_stake_api_canister::get_apy_timeseries::{
     Args as GetApyTimeseriesArgs, Response as GetApyTimeseriesResponse,
 };
 use ic_cdk::query;
-use ic_stable_structures::BTreeMap;
-use tracing::info;
 use types::TimestampMillis;
 
-use crate::{memory::VM, state::read_state};
+use crate::state::read_state;
 
 #[query]
 fn get_apy_timeseries(args: GetApyTimeseriesArgs) -> GetApyTimeseriesResponse {
     let weekly_apy_history: Vec<(TimestampMillis, f64)> =
         read_state(|s| s.data.stake_system.weekly_apy_history.iter().collect());
     let limit = args.limit.unwrap_or(usize::MAX);
-    let starting_week = args.starting_week.clone();
+    let starting_week = args.starting_week;
     get_weekly_series(starting_week, limit, &weekly_apy_history)
 }
 

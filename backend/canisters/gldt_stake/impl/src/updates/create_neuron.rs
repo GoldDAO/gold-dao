@@ -9,7 +9,7 @@ pub use gldt_stake_api_canister::create_neuron::{
 };
 
 use gldt_stake_common::{accounts::NEURON_CREATION_POOL, ledgers::GLD_GOV_TX_FEE};
-use ic_cdk::{caller, query, update};
+use ic_cdk::{query, update};
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
 use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use sns_governance_canister::types::{
@@ -37,7 +37,7 @@ async fn create_neuron(args: StakeSnsNeuronArgs) -> StakeSnsNeuronResponse {
 async fn create_neuron_impl(amount: u64) -> Result<Vec<u8>, CreateNeuronError> {
     let nonce = generate_rand_nonce()
         .await
-        .map_err(|e| CreateNeuronError::InternalError(e))?;
+        .map_err(CreateNeuronError::InternalError)?;
     let this_canister_id = read_state(|s| s.env.canister_id());
 
     let (sns_governance_canister, gld_ledger_id) = read_state(|s| {
@@ -99,9 +99,9 @@ async fn create_neuron_impl(amount: u64) -> Result<Vec<u8>, CreateNeuronError> {
                         });
                         Ok(neuron_id.id)
                     }
-                    None => Err(CreateNeuronError::InternalError(format!(
-                        "create_neuron error - newly created neuron had no ID"
-                    ))),
+                    None => Err(CreateNeuronError::InternalError(
+                        "create_neuron error - newly created neuron had no ID".to_string()
+                    )),
                 }
             }
             response => Err(CreateNeuronError::InternalError(format!(

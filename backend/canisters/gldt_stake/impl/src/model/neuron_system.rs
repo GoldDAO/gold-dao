@@ -6,17 +6,9 @@ use tracing::error;
 use tracing::info;
 use utils::env::Environment;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 pub struct NeuronSystem {
     pub neurons: Vec<Neuron>,
-}
-
-impl Default for NeuronSystem {
-    fn default() -> Self {
-        Self {
-            neurons: Default::default(),
-        }
-    }
 }
 
 impl NeuronSystem {

@@ -1,4 +1,4 @@
-use canister_client::{generate_c2c_call, generate_candid_c2c_call};
+use canister_client::generate_candid_c2c_call;
 use gldt_stake_api_archive::get_archive_size::{
     Args as GetArchiveSizeArgs, Response as GetArchiveSizeResponse,
 };

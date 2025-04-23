@@ -49,7 +49,7 @@ async fn handle_archive_canister_cycles() {
         info!(
             "CYCLE MANAGER :: WARNING :: Not enough total cycles to top up all potential archive canisters. required minimum : {required_base_cycles}. current cycle balance : {this_canister_cycle_balance}"
         );
-        return ();
+        return;
     }
 
     let tasks: Vec<_> = archive_canisters

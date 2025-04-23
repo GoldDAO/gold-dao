@@ -80,23 +80,23 @@ impl UnstakeState {
             UnstakeState::None => Ok(()),
             UnstakeState::NormalUnstake(normal_unstake_status) => match normal_unstake_status {
                 NormalUnstakeStatus::None => Ok(()),
-                NormalUnstakeStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(format!(
-                    "unstake procedure is already in progress"
-                ))),
+                NormalUnstakeStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(
+                    "unstake procedure is already in progress".to_string(),
+                )),
                 NormalUnstakeStatus::Failed(_) => Ok(()),
-                NormalUnstakeStatus::Unstaked => Err(UnstakeErrors::AlreadyUnstaked(format!(
-                    "position already is already unstaked"
-                ))),
+                NormalUnstakeStatus::Unstaked => Err(UnstakeErrors::AlreadyUnstaked(
+                    "position already is already unstaked".to_string(),
+                )),
             },
             UnstakeState::EarlyUnstake(unstake_early_status) => match unstake_early_status {
                 UnstakeEarlyStatus::None => Ok(()),
-                UnstakeEarlyStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(format!(
-                    "early unstake procedure is already in progress"
-                ))),
+                UnstakeEarlyStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(
+                    "early unstake procedure is already in progress".to_string(),
+                )),
                 UnstakeEarlyStatus::Failed(_) => Ok(()),
-                UnstakeEarlyStatus::UnstakedEarly => Err(UnstakeErrors::AlreadyUnstaked(format!(
-                    "position already is already unstaked early"
-                ))),
+                UnstakeEarlyStatus::UnstakedEarly => Err(UnstakeErrors::AlreadyUnstaked(
+                    "position already is already unstaked early".to_string(),
+                )),
             },
         }
     }
