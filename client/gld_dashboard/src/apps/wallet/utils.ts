@@ -11,6 +11,7 @@ import {
   OGY_LEDGER_INDEX_CANISTER_ID,
   WTN_LEDGER_CANISTER_ID,
   WTN_LEDGER_INDEX_CANISTER_ID,
+  CK_USDT_LEDGER_CANISTER_ID_IC
 } from "@constants";
 
 export interface Token {
@@ -21,7 +22,7 @@ export interface Token {
   canister_id_ledger_index: string;
 }
 
-export const TokensWhitelist = ["gldt", "nft", "goldao", "icp", "ogy", "wtn"];
+export const TokensWhitelist = ["gldt", "nft", "goldao", "icp", "ogy", "wtn", "ckusdt"];
 
 export const GLDT_INDEX = 0;
 
@@ -59,6 +60,13 @@ export const TokensList: Token[] = [
     name: "WTN",
     label: "Waterneuron",
     canisterId: WTN_LEDGER_CANISTER_ID,
+    canister_id_ledger_index: WTN_LEDGER_INDEX_CANISTER_ID,
+  },
+  {
+    id: "ckusdt",
+    name: "ckUSDT",
+    label: "ckUSDT",
+    canisterId: CK_USDT_LEDGER_CANISTER_ID_IC,
     canister_id_ledger_index: WTN_LEDGER_INDEX_CANISTER_ID,
   },
 ];

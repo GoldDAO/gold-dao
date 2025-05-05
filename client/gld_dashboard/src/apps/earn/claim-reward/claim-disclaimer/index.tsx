@@ -2,9 +2,10 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { ClaimRewardStateReducerAtom } from "../claim-all-reward/atoms";
-import useGetAllStakePositionRewards from "../claim-all-reward/utils/useGetAllStakePositions";
+import { ClaimRewardStateReducerAtom } from "../claim-all/atoms";
+import useGetAllPositionsRewards from "../../utils/useGetAllPositionsRewards";
 import useRewardsFee from "@utils/useRewardsFee";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ClaimRewardDisclaimer = () => {
   const { authenticatedAgent, principalId, isConnected, unauthenticatedAgent } =
@@ -12,8 +13,9 @@ const ClaimRewardDisclaimer = () => {
   const [, dispatchClaimReward] = useAtom(ClaimRewardStateReducerAtom);
   const [enableClaimAll, setEnableClaimAll] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [totalRewards, setTotalRewards] = useState(0);
 
-  const rewards = useGetAllStakePositionRewards({
+  const rewards = useGetAllPositionsRewards({
     agent: authenticatedAgent,
     owner: principalId,
     enabled: isConnected && !!authenticatedAgent,
@@ -31,6 +33,10 @@ const ClaimRewardDisclaimer = () => {
         );
         return found ? reward.amount >= found.fee : false;
       });
+      const totalRewards = rewards.data.reduce((acc, reward) => {
+        return acc + reward.amount_usd;
+      }, 0);
+      setTotalRewards(totalRewards);
       setIsSuccess(true);
       setEnableClaimAll(enabled);
     }
@@ -44,7 +50,16 @@ const ClaimRewardDisclaimer = () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-between items-center mt-2 gap-4">
           <div className="flex flex-col items-center lg:items-start shrink-0">
-            <div className="font-semibold text-xl">Total of: $</div>
+            <div className="font-semibold text-xl">
+              Total of:{" "}
+              {isSuccess ? (
+                <span>
+                  <NumberToLocaleString value={totalRewards} />$
+                </span>
+              ) : (
+                <span>Loading...</span>
+              )}
+            </div>
             <div className="text-sm text-content/60">
               dispatched in GOLDAO, ICP and OGY
             </div>

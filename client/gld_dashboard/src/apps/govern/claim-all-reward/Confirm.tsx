@@ -2,12 +2,11 @@ import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-import { Logo } from "@components/index";
+import { Button, Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
-import { Reward } from "./utils";
-import useGetAllTokenTotalStakedAmount from "./utils/useGetAllTokenTotalStakedRewards";
+import { Reward } from "../utils";
+import useGetAllNeuronsRewards from "../utils/useGetAllNeuronsRewards";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useRewardsFee from "@utils/useRewardsFee";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
@@ -71,7 +70,7 @@ const Confirm = () => {
   // const [totalSelectedAmount] = useAtom(TotalSelectedAmountAtom);
   const [confirmClaimEnable] = useAtom(ConfirmClaimEnableAtom);
 
-  const stake = useGetAllTokenTotalStakedAmount({
+  const rewards = useGetAllNeuronsRewards({
     owner: principalId,
     agent: unauthenticatedAgent,
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,
@@ -82,17 +81,17 @@ const Confirm = () => {
   });
 
   useEffect(() => {
-    if (stake.isSuccess && rewardsFee.isSuccess) {
+    if (rewards.isSuccess && rewardsFee.isSuccess) {
       dispatch({
         type: "SET_REWARDS",
         value: {
-          rewards: stake.data,
+          rewards: rewards.data,
           rewards_fee: rewardsFee.data,
         },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stake.isSuccess, rewardsFee.isSuccess]);
+  }, [rewards.isSuccess, rewardsFee.isSuccess]);
 
   useEffect(() => {}, [
     claimRewardState.rewards,
@@ -100,7 +99,7 @@ const Confirm = () => {
   ]);
 
   if (
-    !stake.isSuccess ||
+    !rewards.isSuccess ||
     !rewardsFee.isSuccess ||
     !claimRewardState.is_rewards_initialized
   ) {

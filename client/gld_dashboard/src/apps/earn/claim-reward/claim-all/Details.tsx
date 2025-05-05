@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
@@ -10,7 +9,7 @@ import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
-import { Reward } from "./utils/index";
+import { Reward } from "../../utils";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();

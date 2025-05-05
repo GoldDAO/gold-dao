@@ -9,11 +9,11 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import useFetchUserStakeList from "@services/gldt_stake/hooks/useFetchUserStakeList";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import { ClaimRewardStateReducerAtom } from "../claim-reward/atoms";
+import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
 import { UnlockStateReducerAtom } from "../unlock/atoms";
 import { UnstakeStateReducerAtom } from "../unstake/atoms";
-import ClaimRewardsConfirm from "../claim-reward/Confirm";
-import ClaimRewardsDetails from "../claim-reward/Details";
+import ClaimRewardsConfirm from "../claim-reward/claim-one/Confirm";
+import ClaimRewardsDetails from "../claim-reward/claim-one/Details";
 import ConfirmUnlock from "../unlock/Confirm";
 import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
@@ -80,7 +80,7 @@ const StakeList = () => {
 
   const renderEmptyStakeList = () => {
     return (
-      <div className="p-4 lg:p-8 border border-border rounded-md lg:rounded-xl text-center">
+      <div className="p-4 lg:p-8 border border-border rounded-md lg:rounded-xl text-center bg-surface-primary">
         <div className="font-semibold">You currently don’t have any stakes</div>
         <div className="text-content/60">
           Start staking to earn rewards in GOLDAO, OGY & ICP.

@@ -1,17 +1,15 @@
 import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
-import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-import { Logo } from "@components/index";
+import { Button, Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
-import { Reward } from "./utils";
-import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
+import useGetAllPositionsRewards from "../../utils/useGetAllPositionsRewards";
+import { Reward } from "../../utils";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useRewardsFee from "@utils/useRewardsFee";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -50,14 +48,16 @@ const RewardItem = ({ name }: { name: string }) => {
             {decimals.isSuccess ? (
               <TokenValueToLocaleString
                 value={reward.amount as bigint}
-                tokenDecimals={decimals.data}
                 decimals={2}
+                tokenDecimals={decimals.data}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
-          <div className="text-content/60 text-sm">$todo</div>
+          <div className="text-content/60 text-sm">
+            $<NumberToLocaleString value={reward.amount_usd} decimals={2} />
+          </div>
         </div>
       </div>
     </button>
@@ -65,39 +65,34 @@ const RewardItem = ({ name }: { name: string }) => {
 };
 
 const Confirm = () => {
-  const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
+  const { authenticatedAgent, principalId, isConnected, unauthenticatedAgent } =
+    useAuth();
   const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   // const [totalSelectedAmount] = useAtom(TotalSelectedAmountAtom);
   const [confirmClaimEnable] = useAtom(ConfirmClaimEnableAtom);
 
-  const stake = useFetchUserStakeById(
-    GLDT_STAKE_CANISTER_ID,
-    authenticatedAgent,
-    {
-      enabled:
-        isConnected &&
-        !!authenticatedAgent &&
-        claimRewardState.stake_id !== undefined,
-      id: claimRewardState.stake_id as bigint,
-    }
-  );
+  const rewards = useGetAllPositionsRewards({
+    agent: authenticatedAgent,
+    owner: principalId,
+    enabled: isConnected && !!authenticatedAgent,
+  });
 
-  const stakeRewardsFee = useRewardsFee(unauthenticatedAgent, {
+  const rewardsFee = useRewardsFee(unauthenticatedAgent, {
     enabled: isConnected && !!unauthenticatedAgent,
   });
 
   useEffect(() => {
-    if (stake.isSuccess && stakeRewardsFee.isSuccess) {
+    if (rewards.isSuccess && rewardsFee.isSuccess) {
       dispatch({
         type: "SET_REWARDS",
         value: {
-          rewards: stake.data.rewards,
-          rewards_fee: stakeRewardsFee.data,
+          rewards: rewards.data,
+          rewards_fee: rewardsFee.data,
         },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stake.isSuccess, stakeRewardsFee.isSuccess]);
+  }, [rewards.isSuccess, rewardsFee.isSuccess]);
 
   useEffect(() => {}, [
     claimRewardState.rewards,
@@ -105,8 +100,8 @@ const Confirm = () => {
   ]);
 
   if (
-    !stake.isSuccess ||
-    !stakeRewardsFee.isSuccess ||
+    !rewards.isSuccess ||
+    !rewardsFee.isSuccess ||
     !claimRewardState.is_rewards_initialized
   ) {
     return (

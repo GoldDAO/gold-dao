@@ -272,7 +272,7 @@ const BuyGLDT = () => {
               "flex flex-col items-center text-center"
             )}
           >
-            <div className="w-full px-4 lg:px-8 pt-8 lg:pt-16 pb-8 lg:pb-16">
+            <div className="w-full px-4 lg:px-8 pt-8 lg:pt-12 pb-8 lg:pb-12">
               <div className="mb-4 text-xl lg:text-4xl">
                 Buy GLDT <span className="text-primary">Gold Tokens</span>
               </div>
@@ -335,7 +335,7 @@ const BuyGLDT = () => {
 
             <div
               className={clsx(
-                "w-full px-4 lg:px-8 pt-8 lg:pt-16 pb-4 lg:pb-8",
+                "w-full px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-8",
                 "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
               )}
             >
@@ -403,7 +403,7 @@ const BuyGLDT = () => {
                 </div>
               </div>
 
-              <div className="mt-8 lg:mt-16">
+              <div className="mt-8 lg:mt-12">
                 <Button
                   className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
                   onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}

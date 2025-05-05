@@ -6,6 +6,7 @@ import { Logo } from "@components/index";
 import { Button } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 const ConfirmSwap = () => {
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
@@ -19,7 +20,7 @@ const ConfirmSwap = () => {
   } = buyAtomState;
 
   return (
-    <div className="flex flex-col gap-4 lg:gap-8 mt-4 lg:mt-8">
+    <div className="flex flex-col gap-4 mt-4">
       <div className="rounded-xl bg-surface-secondary border border-border">
         <div className="p-4 lg:p-6 border-b border-border">
           <div className="text-sm mb-4 text-content/60">You pay</div>
@@ -144,6 +145,21 @@ const ConfirmSwap = () => {
           GLDT
         </>
       </Button>
+
+      <div className="flex justify-center">
+        <div className="flex items-center gap-1 text-content/60 text-sm">
+          In partnership with
+          <a
+            href="https://www.kongswap.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center text-content hover:text-primary`}
+          >
+            <div>KongSwap</div>
+            <ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5" />
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

@@ -4,21 +4,15 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import {
-  SNS_REWARDS_CANISTER_ID,
-  SNS_GOVERNANCE_CANISTER_ID,
-} from "@constants";
+import { SNS_GOVERNANCE_CANISTER_ID } from "@constants";
 
-import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryGovernance } from "@services/sns_governance/idlFactory";
-import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
 
-const useGetTokenTotalStakedRewards = (
+const useGetAllNeuronsTotalStakedAmount = (
   options: Omit<UseQueryOptions<bigint, Error>, "queryKey" | "queryFn"> & {
     agent: Agent | HttpAgent | undefined;
     owner: string;
-    canisterIdLedger: string;
   }
 ) => {
   const {
@@ -27,11 +21,10 @@ const useGetTokenTotalStakedRewards = (
     placeholderData = keepPreviousData,
     agent,
     owner,
-    canisterIdLedger,
   } = options;
 
   return useQuery({
-    queryKey: ["USER_NEURONS_TOKEN_TOTAL_STAKED_REWARDS"],
+    queryKey: ["USER_NEURONS_TOKEN_TOTAL_STAKED_AMOUNT"],
     queryFn: async (): Promise<bigint> => {
       try {
         const actor = Actor.createActor(idlFactoryGovernance, {
@@ -47,16 +40,7 @@ const useGetTokenTotalStakedRewards = (
 
         const results = await Promise.all(
           neurons.map(async (neuron) => {
-            const actorLedger = Actor.createActor(idlFactoryLedger, {
-              agent,
-              canisterId: canisterIdLedger,
-            });
-            const neuronStakedAmount = await icrc1_balance_of({
-              actor: actorLedger,
-              owner: SNS_REWARDS_CANISTER_ID,
-              subaccount: neuron.id,
-            });
-            return neuronStakedAmount;
+            return neuron.staked_amount;
           })
         );
 
@@ -66,7 +50,7 @@ const useGetTokenTotalStakedRewards = (
       } catch (err) {
         console.log(err);
         throw new Error(
-          "Fetch neurons total staked rewards error! Please retry later."
+          "Fetch neurons total staked amount error! Please retry later."
         );
       }
     },
@@ -76,4 +60,4 @@ const useGetTokenTotalStakedRewards = (
   });
 };
 
-export default useGetTokenTotalStakedRewards;
+export default useGetAllNeuronsTotalStakedAmount;

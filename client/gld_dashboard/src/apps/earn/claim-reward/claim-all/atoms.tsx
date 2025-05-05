@@ -1,21 +1,17 @@
 import { atomWithReducer } from "jotai/utils";
 import { atom } from "jotai";
 import _ from "lodash";
-
 import {
   GOLDAO_LEDGER_CANISTER_ID,
   ICP_LEDGER_CANISTER_ID,
   OGY_LEDGER_CANISTER_ID,
 } from "@constants";
-
-import { Reward } from "./utils";
+import { PositionRewards, Reward } from "../../utils";
 import { RewardFeeData } from "@utils/useRewardsFee";
-import { Reward as RewardStake } from "@services/gldt_stake/utils/interfaces";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;
   is_open_claim_dialog_details: boolean;
-  stake_id: bigint | undefined;
   rewards: Reward[];
   is_rewards_initialized: boolean;
 };
@@ -23,7 +19,6 @@ type ClaimRewardState = {
 const initialState: ClaimRewardState = {
   is_open_claim_dialog_confirm: false,
   is_open_claim_dialog_details: false,
-  stake_id: undefined,
   rewards: [
     {
       id: "goldao",
@@ -33,6 +28,8 @@ const initialState: ClaimRewardState = {
       is_selected: false,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
+      positions: [],
     },
     {
       id: "icp",
@@ -42,6 +39,8 @@ const initialState: ClaimRewardState = {
       is_selected: false,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
+      positions: [],
     },
     {
       id: "ogy",
@@ -51,6 +50,8 @@ const initialState: ClaimRewardState = {
       is_selected: false,
       is_claimable: false,
       amount: 0n,
+      amount_usd: 0,
+      positions: [],
     },
   ],
   is_rewards_initialized: false,
@@ -61,10 +62,10 @@ const claimRewardReducer = (
   action:
     | {
         type: "SET_REWARDS";
-        value: { rewards: RewardStake[]; rewards_fee: RewardFeeData[] };
+        value: { rewards: PositionRewards[]; rewards_fee: RewardFeeData[] };
       }
     | { type: "SET_SELECTED_REWARD"; value: { name: string } }
-    | { type: "OPEN_DIALOG_CONFIRM"; value: { stake_id: bigint } }
+    | { type: "OPEN_DIALOG_CONFIRM" }
     | { type: "CANCEL" }
     | { type: "CONFIRM" }
     | { type: "RESET" }
@@ -78,15 +79,22 @@ const claimRewardReducer = (
         const is_claimable = found
           ? (reward.amount as bigint) >= found.fee
           : false;
+
+        const positions_claimable = found
+          ? reward.positions.filter((p) => p.amount >= found.fee)
+          : [];
+
         return {
           ...reward,
           is_selected: is_claimable,
-          is_claimable,
+          is_claimable: !!positions_claimable.length,
+          positions: positions_claimable,
         };
       });
       const merged = _.values(
         _.merge(_.keyBy(prev.rewards, "name"), _.keyBy(rewards, "name"))
       );
+
       return {
         ...prev,
         rewards: merged,
@@ -111,7 +119,6 @@ const claimRewardReducer = (
       return {
         ...prev,
         is_open_claim_dialog_confirm: true,
-        stake_id: action.value.stake_id,
       };
     case "CANCEL":
       return initialState;

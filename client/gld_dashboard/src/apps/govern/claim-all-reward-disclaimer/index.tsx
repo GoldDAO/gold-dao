@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import { ClaimRewardStateReducerAtom } from "../claim-all-reward/atoms";
-import useGetAllTokenTotalStakedRewards from "../claim-all-reward/utils/useGetAllTokenTotalStakedRewards";
+import useGetAllNeuronsRewards from "../utils/useGetAllNeuronsRewards";
 import useRewardsFee from "@utils/useRewardsFee";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
@@ -14,7 +14,7 @@ const ClaimRewardDisclaimer = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [totalRewards, setTotalRewards] = useState(0);
 
-  const rewards = useGetAllTokenTotalStakedRewards({
+  const rewards = useGetAllNeuronsRewards({
     agent: unauthenticatedAgent,
     owner: principalId,
     enabled: isConnected && !!unauthenticatedAgent,

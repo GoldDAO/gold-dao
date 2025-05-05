@@ -10,7 +10,7 @@ import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
-import { Reward } from "./utils";
+import { Reward } from "../utils";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();

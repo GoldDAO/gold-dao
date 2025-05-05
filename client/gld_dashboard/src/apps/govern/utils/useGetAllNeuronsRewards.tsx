@@ -17,7 +17,7 @@ import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { TokensList } from "../../utils/index";
+import { TokensList } from "./index";
 import { Ledger } from "@services/ledger/utils/interfaces";
 import { Neuron } from "./index";
 
@@ -28,7 +28,7 @@ export type TokensRewards = {
   neurons: Neuron[];
 };
 
-const useGetTokenTotalStakedAmount = (
+const useGetAllNeuronsRewards = (
   options: Omit<
     UseQueryOptions<TokensRewards[], Error>,
     "queryKey" | "queryFn"
@@ -46,7 +46,7 @@ const useGetTokenTotalStakedAmount = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_NEURONS_ALL_TOTAL_STAKED_REWARDS"],
+    queryKey: ["USER_NEURONS_REWARDS"],
     queryFn: async (): Promise<TokensRewards[]> => {
       try {
         const actor = Actor.createActor(idlFactoryGovernance, {
@@ -67,19 +67,18 @@ const useGetTokenTotalStakedAmount = (
 
         const data = await Promise.all(
           TokensList.map(async (token) => {
+            const actorLedger = Actor.createActor(idlFactoryLedger, {
+              agent,
+              canisterId: token.canisterId,
+            });
+            const decimals = await icrc1_decimals(actorLedger);
             const neuronData = await Promise.all(
               neurons.map(async (neuron) => {
-                const actorLedger = Actor.createActor(idlFactoryLedger, {
-                  agent,
-                  canisterId: token.canisterId,
-                });
                 const reward = await icrc1_balance_of({
                   actor: actorLedger,
                   owner: SNS_REWARDS_CANISTER_ID,
                   subaccount: neuron.id,
                 });
-
-                const decimals = await icrc1_decimals(actorLedger);
 
                 const price = await swap_amounts(actorKongswap, {
                   from: token.name,
@@ -111,7 +110,6 @@ const useGetTokenTotalStakedAmount = (
             };
           })
         );
-
         return data;
       } catch (err) {
         console.log(err);
@@ -124,4 +122,4 @@ const useGetTokenTotalStakedAmount = (
   });
 };
 
-export default useGetTokenTotalStakedAmount;
+export default useGetAllNeuronsRewards;

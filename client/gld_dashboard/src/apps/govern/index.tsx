@@ -26,8 +26,8 @@ const Govern = () => {
             <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3">
-            Stake your GLDT to earn weekly rewards in governance tokens,
-            unlocking passive income from your gold holdings.
+            Stake GOLDAO tokens to govern the Gold DAO and earn rewards yielding
+            up to 30% APY.
           </div>
           {!isConnected && (
             <Button

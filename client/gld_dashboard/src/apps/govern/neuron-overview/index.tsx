@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { GOLDAO_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
+import useGetAllNeuronsTotalStakedAmount from "../utils/useGetAllNeuronsTotalStakedAmount";
 import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
@@ -10,7 +10,7 @@ import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
 
-  const stakedAmount = useGetTokenTotalStakedAmount({
+  const stakedAmount = useGetAllNeuronsTotalStakedAmount({
     owner: principalId,
     agent: unauthenticatedAgent,
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,

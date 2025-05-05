@@ -8,10 +8,10 @@ import InnerAppLayout from "@components/outlets/InnerAppLayout";
 import StakeForm from "./stake-form";
 import StakeOverview from "./stake-overview";
 import StakeList from "./stake-list";
-import { ClaimRewardStateReducerAtom } from "./claim-all-reward/atoms";
-import ClaimRewardDisclaimer from "./claim-all-reward-disclaimer";
-import ClaimRewardsConfirm from "./claim-all-reward/Confirm";
-import ClaimRewardsDetails from "./claim-all-reward/Details";
+import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";
+import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
+import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
+import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
 
 const Earn = () => {
   const { connect, isConnected } = useAuth();
