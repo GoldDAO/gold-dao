@@ -44,8 +44,7 @@ const StyledTooltip = styled(ReactTooltip)`
 const Tooltip = ({
   className,
   id,
-  place = "right",
-  children,
+  place = "bottom",
   clickable = false,
   ...restProps
 }: TooltipProps) => {
@@ -57,9 +56,7 @@ const Tooltip = ({
       clickable={clickable}
       delayShow={300}
       {...restProps}
-    >
-      {children}
-    </StyledTooltip>
+    />
   );
 };
 
