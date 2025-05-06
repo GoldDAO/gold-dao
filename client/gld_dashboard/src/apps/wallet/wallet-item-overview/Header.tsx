@@ -45,7 +45,7 @@ const Token = ({ className }: { className?: string }) => {
     return (
       <div>
         {tokenPrice.isSuccess ? (
-          <div className="text-2xl lg:text-4xl font-semibold flex items-center gap-2">
+          <div className="text-2xl xl:text-4xl font-semibold flex items-center gap-2">
             <TokenValueToLocaleString
               value={tokenPrice.data.amount}
               tokenDecimals={tokenPrice.data.decimals}
@@ -134,7 +134,7 @@ const Token = ({ className }: { className?: string }) => {
             )}
           </div>
         </div>
-        <div className="py-8 lg:py-12">{renderTokenHeaderContent()}</div>
+        <div className="py-8 xl:py-12">{renderTokenHeaderContent()}</div>
       </div>
     </div>
   );
@@ -158,9 +158,9 @@ const NFT = ({ className }: { className?: string }) => {
           </div>
           {/* <div className="text-sm text-content/60">1 {name} ≈ $(todo)</div> */}
         </div>
-        <div className="py-8 lg:py-12">
+        <div className="py-8 xl:py-12">
           <div className="flex flex-col items-center gap-2">
-            <div className="text-2xl lg:text-4xl font-semibold">
+            <div className="text-2xl xl:text-4xl font-semibold">
               {isSuccessFetchUserNFTs ? (
                 <div className="flex items-center gap-2">
                   {nfts.totalCount}

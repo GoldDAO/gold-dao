@@ -60,7 +60,7 @@ const StakeList = () => {
               className={clsx(
                 "@container",
                 "shrink-0",
-                "rounded-md lg:rounded-xl border border-surface-secondary p-4 cursor-pointer"
+                "rounded-md xl:rounded-xl border border-surface-secondary p-4 cursor-pointer"
               )}
             >
               <div className="flex justify-between items-center p-2">
@@ -80,7 +80,7 @@ const StakeList = () => {
 
   const renderEmptyStakeList = () => {
     return (
-      <div className="p-4 lg:p-8 border border-border rounded-md lg:rounded-xl text-center bg-surface-primary">
+      <div className="p-4 xl:p-8 border border-border rounded-md xl:rounded-xl text-center bg-surface-primary">
         <div className="font-semibold">You currently don’t have any stakes</div>
         <div className="text-content/60">
           Start staking to earn rewards in GOLDAO, OGY & ICP.
@@ -154,7 +154,7 @@ const StakeList = () => {
   };
 
   return (
-    <div className="flex flex-col pb-4 lg:overflow-y-auto lg:pr-4">
+    <div className="flex flex-col pb-4 xl:overflow-y-auto xl:pr-4">
       {fetchUserStake.data.map((stake, index) => (
         <div
           key={index}
@@ -176,7 +176,7 @@ const StakeList = () => {
                 <NumberToLocaleString value={stake.age_bonus_multiplier} />
               </div>
             </div>
-            <div className="flex flex-row gap-2 mt-4 @lg:mt-0">
+            <div className="flex flex-row gap-2 mt-4 @xl:mt-0">
               {stake.is_unlockable && (
                 <Button
                   className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"

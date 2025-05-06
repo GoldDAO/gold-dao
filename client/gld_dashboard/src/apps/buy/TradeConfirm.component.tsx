@@ -22,7 +22,7 @@ const ConfirmSwap = () => {
   return (
     <div className="flex flex-col gap-4 mt-4">
       <div className="rounded-xl bg-surface-secondary border border-border">
-        <div className="p-4 lg:p-6 border-b border-border">
+        <div className="p-4 xl:p-6 border-b border-border">
           <div className="text-sm mb-4 text-content/60">You pay</div>
           <div className="flex flex-row justify-between items-end">
             <div className="flex items-center gap-2 text-4xl">
@@ -41,7 +41,7 @@ const ConfirmSwap = () => {
             </div>
           </div>
         </div>
-        <div className="p-4 lg:p-6">
+        <div className="p-4 xl:p-6">
           <div className="text-sm mb-4 text-content/60">
             You receive approximately
           </div>
@@ -68,7 +68,7 @@ const ConfirmSwap = () => {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border p-4 lg:p-6">
+      <div className="rounded-xl border border-border p-4 xl:p-6">
         <div className="mb-4">Transaction details</div>
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center px-2">
@@ -133,7 +133,7 @@ const ConfirmSwap = () => {
 
       <Button
         onClick={() => dispatch({ type: "CONFIRM" })}
-        className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+        className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
       >
         <>
           Buy ≈{" "}

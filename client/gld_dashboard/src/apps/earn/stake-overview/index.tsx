@@ -43,17 +43,17 @@ const StakeOverview = () => {
     <div
       className={clsx(
         "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] px-4 lg:px-8 pt-4 lg:pt-8 pb-24"
+        "rounded-tr-[inherit] px-4 xl:px-8 pt-4 xl:pt-8 pb-24"
       )}
     >
       <div className="flex flex-col items-center">
-        <div className="grid grid-cols-1 lg:grid-cols-3 w-full">
+        <div className="grid grid-cols-1 xl:grid-cols-3 w-full">
           <div></div>
           <div className="flex justify-center items-center gap-2">
             <Logo name="gldt" className="h-8 w-8" />
             <div>GLDT</div>
           </div>
-          <div className="flex justify-center items-center lg:justify-end mt-2 lg:mt-0">
+          <div className="flex justify-center items-center xl:justify-end mt-2 xl:mt-0">
             <div className="px-4 py-1 text-sm bg-secondary text-white/90 rounded-full">
               Current APY:{" "}
               <span>
@@ -77,7 +77,7 @@ const StakeOverview = () => {
             <div>
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
-                <div className="text-2xl lg:text-4xl  flex items-center gap-2">
+                <div className="text-2xl xl:text-4xl  flex items-center gap-2">
                   {tokenPrice.isSuccess ? (
                     <>
                       <TokenValueToLocaleString

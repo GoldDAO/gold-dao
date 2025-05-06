@@ -91,7 +91,7 @@ const SendNFTForm = ({ className }: { className?: string }) => {
         <Button
           type="submit"
           disabled={!isValid || !IsOneOrMoreSelectedNFT}
-          className="w-full px-6 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+          className="w-full px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
         >
           Transfer
         </Button>

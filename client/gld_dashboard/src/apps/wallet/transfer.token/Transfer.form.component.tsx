@@ -81,7 +81,7 @@ const TransferToken = ({ className }: { className?: string }) => {
 
   if (!decimals.isSuccess || !balance.isSuccess || !fee.isSuccess) {
     return (
-      <div className="flex justify-center items-center px-4 py-16 lg:py-32">
+      <div className="flex justify-center items-center px-4 py-16 xl:py-32">
         Loading...
       </div>
     );
@@ -255,7 +255,7 @@ const TransferToken = ({ className }: { className?: string }) => {
         <Button
           type="submit"
           disabled={!isValid}
-          className="w-full px-6 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+          className="w-full px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
         >
           Transfer
         </Button>

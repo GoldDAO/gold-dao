@@ -38,17 +38,17 @@ const Confirm = () => {
   }
 
   return (
-    <div className="mt-8 lg:mt-12">
-      <div className="text-center lg:text-2xl font-semibold">
+    <div className="mt-8 xl:mt-12">
+      <div className="text-center xl:text-2xl font-semibold">
         You are about to create a stake of{" "}
-        <div className="text-primary lg:text-4xl mt-2">
+        <div className="text-primary xl:text-4xl mt-2">
           <TokenValueToLocaleString value={stakeState.amount} /> GLDT
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-4 mt-4 lg:mt-12">
+      <div className="grid grid-cols-1 gap-4 mt-4 xl:mt-12">
         {infos.map(({ icon, title, description }, index) => (
           <div key={index}>
-            <div className="p-4 grid grid-cols-1 lg:grid-cols-5 border border-border rounded-lg">
+            <div className="p-4 grid grid-cols-1 xl:grid-cols-5 border border-border rounded-lg">
               <div className="flex justify-center items-center">
                 <div>{icon}</div>
               </div>
@@ -61,7 +61,7 @@ const Confirm = () => {
         ))}
       </div>
       <Button
-        className="mt-8 w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+        className="mt-8 w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
         type="button"
         onClick={() => dispatch({ type: "CONFIRM" })}
       >

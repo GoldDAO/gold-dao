@@ -53,14 +53,14 @@ const GLDTTokenOverview = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
       <div className="border border-border rounded-xl bg-surface-primary">
-        <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="grid grid-cols-1 xl:grid-cols-2">
           <div className="p-12">
-            <div className="text-center lg:text-left mb-6">
+            <div className="text-center xl:text-left mb-6">
               <h4 className="text-2xl font-semibold mb-6">{t("title")}</h4>
               <p>{t("description")}</p>
             </div>
             <div>
-              <div className="flex flex-col items-center lg:items-start">
+              <div className="flex flex-col items-center xl:items-start">
                 {/* Locked GLD NFT */}
                 <div className="mb-2">
                   {lockedGLDNFT.isSuccess && (
@@ -94,7 +94,7 @@ const GLDTTokenOverview = ({ className }: { className?: string }) => {
               </div>
             </div>
           </div>
-          <div className="bg-[#EBE7D6] dark:bg-surface-secondary rounded-b-xl lg:rounded-bl-none lg:rounded-r-xl bg-[url('/src/assets/bg-cover.png')] bg-cover">
+          <div className="bg-[#EBE7D6] dark:bg-surface-secondary rounded-b-xl xl:rounded-bl-none xl:rounded-r-xl bg-[url('/src/assets/bg-cover.png')] bg-cover">
             <div className="p-12">
               <video autoPlay loop muted preload="auto" playsInline>
                 <source

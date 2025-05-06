@@ -25,7 +25,7 @@ const Account = () => {
             <BalanceOverview />
           </section>
           <section className="rounded-xl bg-surface-primary/40 mb-6">
-            <div className="flex items-center justify-between px-6 pt-6 mb-4 lg:mb-6">
+            <div className="flex items-center justify-between px-6 pt-6 mb-4 xl:mb-6">
               <h6 className="text-lg font-semibold">My GLDGov Neurons</h6>
               {/* <div className="font-semibold text-accent cursor-pointer text-sm">
         Claim All

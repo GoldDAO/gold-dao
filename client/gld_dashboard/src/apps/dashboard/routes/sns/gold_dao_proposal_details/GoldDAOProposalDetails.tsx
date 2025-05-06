@@ -72,7 +72,7 @@ const GoldDAOProposalDetails = () => {
       <section className="pb-16">
         {isSuccess && (
           <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-3 lg:col-span-2">
+            <div className="col-span-3 xl:col-span-2">
               <CardSection title="Summary" className="mb-4">
                 <Markdown
                   remarkPlugins={[remarkGfm]}
@@ -100,7 +100,7 @@ const GoldDAOProposalDetails = () => {
                   <div className="px-6 pt-6 pb-8 text-center md:text-left font-semibold text-xl">
                     Overview
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 xl:grid-cols-2">
                     <CardInner title="Type" className="">
                       {data.type}
                     </CardInner>
@@ -125,13 +125,13 @@ const GoldDAOProposalDetails = () => {
                     </CardInner>
                     <CardInner
                       title="Type"
-                      className="col-span-1 lg:col-span-2"
+                      className="col-span-1 xl:col-span-2"
                     >
                       {data.type}
                     </CardInner>
                     <CardInner
                       title="Type"
-                      className="col-span-1 lg:col-span-2"
+                      className="col-span-1 xl:col-span-2"
                     >
                       {data.type}
                     </CardInner>
@@ -139,11 +139,11 @@ const GoldDAOProposalDetails = () => {
                 </div>
               </div>
             </div>
-            <div className="order-first lg:order-last col-span-3 lg:col-span-1">
+            <div className="order-first xl:order-last col-span-3 xl:col-span-1">
               Voting Results
             </div>
           </div>
-          // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+          // <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xl:grid-cols-4 gap-2">
 
           //   <Card title="Staked Amount">{data.staked_amount}</Card>
           //   <Card title="Total Maturity">{data.total_maturity}</Card>

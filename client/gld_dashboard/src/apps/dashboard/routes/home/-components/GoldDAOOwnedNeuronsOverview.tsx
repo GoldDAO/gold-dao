@@ -39,9 +39,9 @@ const GoldDAOOwnedNeuronsOverview = ({ className }: { className?: string }) => {
     <div className={className}>
       <div className="border border-border rounded-xl bg-surface-primary">
         <div className="p-6">
-          <div className="text-center lg:text-left mb-6">
-            <h6 className="text-lg font-semibold mb-4 lg:mb-6">{t("title")}</h6>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="text-center xl:text-left mb-6">
+            <h6 className="text-lg font-semibold mb-4 xl:mb-6">{t("title")}</h6>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               <div className="border border-border rounded-xl bg-surface-primary p-6">
                 <div className="flex items-center gap-3 mb-4 justify-center xl:justify-start">
                   <div className="font-light text-content/60">

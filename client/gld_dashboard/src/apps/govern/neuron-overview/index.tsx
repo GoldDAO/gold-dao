@@ -27,7 +27,7 @@ const NeuronOverview = () => {
     <div
       className={clsx(
         "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] rounded-tl-0 px-4 lg:px-8 pt-4 lg:pt-8 pb-24"
+        "rounded-tr-[inherit] rounded-tl-0 px-4 xl:px-8 pt-4 xl:pt-8 pb-24"
       )}
     >
       <div className="flex flex-col items-center">
@@ -42,7 +42,7 @@ const NeuronOverview = () => {
             <div>
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
-                <div className="text-2xl lg:text-4xl  flex items-center gap-2">
+                <div className="text-2xl xl:text-4xl  flex items-center gap-2">
                   {tokenPrice.isSuccess ? (
                     <>
                       <TokenValueToLocaleString

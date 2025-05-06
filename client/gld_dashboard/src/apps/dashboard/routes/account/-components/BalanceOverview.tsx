@@ -63,10 +63,10 @@ const BalanceOverview = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 xl:grid-cols-4 gap-4">
       {tokensList.map(({ name, label, canisterId }) => (
         <div
-          className="border border-border rounded-xl bg-surface-primary p-6 lg:p-8"
+          className="border border-border rounded-xl bg-surface-primary p-6 xl:p-8"
           key={name}
         >
           <div className="flex items-center gap-3 mb-4">

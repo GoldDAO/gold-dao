@@ -90,7 +90,7 @@ const List = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-grow lg:h-full gap-2 lg:overflow-y-auto lg:pr-4">
+    <div className="flex flex-col xl:flex-grow xl:h-full gap-2 xl:overflow-y-auto xl:pr-4">
       {data?.pages.map((page) => (
         <Fragment key={page.cursor_index}>
           {page.data.map((tx) => (
