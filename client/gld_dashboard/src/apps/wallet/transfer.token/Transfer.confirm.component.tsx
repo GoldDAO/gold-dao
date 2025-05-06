@@ -31,7 +31,7 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
     receive_address === null
   ) {
     return (
-      <div className="flex justify-center items-center px-4 py-16 lg:py-32">
+      <div className="flex justify-center items-center px-4 py-16 xl:py-32">
         Loading...
       </div>
     );
@@ -74,23 +74,23 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
     <div className={className}>
       {transfer.isIdle && (
         <>
-          <div className="border border-border rounded-md lg:rounded-lg p-4">
+          <div className="border border-border rounded-md xl:rounded-lg p-4">
             <div className="mb-2">Sending Account</div>
             <div className="text-content/60 text-sm">{principalId}</div>
 
-            <div className="my-4 lg:my-6 text-content/20 border-b border-dashed" />
+            <div className="my-4 xl:my-6 text-content/20 border-b border-dashed" />
 
             <div>Receiver Account</div>
             <div className="text-content/60 text-sm mt-2">
               {receive_address}
             </div>
 
-            <div className="my-4 lg:my-6 text-content/20 border-b border-dashed" />
+            <div className="my-4 xl:my-6 text-content/20 border-b border-dashed" />
 
             <div className="mb-2">Total</div>
 
-            <div className={clsx("flex flex-col gap-1 lg:gap-2")}>
-              <div className="flex flex-col lg:flex-row lg:justify-between gap-2 text-sm">
+            <div className={clsx("flex flex-col gap-1 xl:gap-2")}>
+              <div className="flex flex-col xl:flex-row xl:justify-between gap-2 text-sm">
                 <div className="text-content/60">
                   Amount deducted (including fee)
                 </div>
@@ -101,7 +101,7 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
                 {token.name}
               </div>
 
-              <div className="flex flex-col lg:flex-row lg:justify-between gap-2 text-content/60 text-sm">
+              <div className="flex flex-col xl:flex-row xl:justify-between gap-2 text-content/60 text-sm">
                 <div>Fee</div>
                 <TokenValueToLocaleString
                   value={fee}
@@ -110,7 +110,7 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
                 {token.name}
               </div>
 
-              <div className="flex flex-col lg:flex-row lg:justify-between gap-2 text-sm">
+              <div className="flex flex-col xl:flex-row xl:justify-between gap-2 text-sm">
                 <div className="text-content/60">
                   Amount received on new wallet
                 </div>
@@ -123,7 +123,7 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
             <Button
               type="button"
               onClick={handleConfirm}
-              className="w-full px-6 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="w-full px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Confirm Transfer
             </Button>
@@ -132,18 +132,18 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
       )}
       {!transfer.isIdle && (
         <>
-          <div className="flex flex-col gap-4 mt-4 lg:mt-8">
+          <div className="flex flex-col gap-4 mt-4 xl:mt-8">
             <div className="flex items-center gap-4">
               <MutationStatusIcons status={transfer.status} />
               <div>1. Transfer</div>
             </div>
           </div>
 
-          <div className="flex justify-center items-center gap-2 mt-4 lg:mt-8">
+          <div className="flex justify-center items-center gap-2 mt-4 xl:mt-8">
             {transfer.isError && (
               <Button
                 onClick={handleRetry}
-                className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
               >
                 Retry
               </Button>
@@ -151,7 +151,7 @@ const TransferTokenConfirm = ({ className }: { className?: string }) => {
             {!transfer.isPending && (
               <Button
                 onClick={handleClose}
-                className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
               >
                 Close
               </Button>

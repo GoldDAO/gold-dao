@@ -46,11 +46,11 @@ const ClaimRewardDisclaimer = () => {
       className={clsx("border border-green-700 bg-surface-primary rounded-xl")}
     >
       <div className="rounded-[inherit] p-4 bg-green-700/10">
-        <div className="text-green-700 text-center lg:text-left">
+        <div className="text-green-700 text-center xl:text-left">
           Unclaimed rewards available
         </div>
-        <div className="flex flex-col lg:flex-row justify-between items-center mt-2 gap-4">
-          <div className="flex flex-col items-center lg:items-start shrink-0">
+        <div className="flex flex-col xl:flex-row justify-between items-center mt-2 gap-4">
+          <div className="flex flex-col items-center xl:items-start shrink-0">
             <div className="font-semibold text-xl">
               Total of:{" "}
               {isSuccess ? (

@@ -54,8 +54,8 @@ const StakeForm = () => {
           className={`p-4 bg-surface-primary border border-border rounded-xl`}
         >
           <div>Stake GLDT</div>
-          <div className="p-4 text-center mt-4 lg:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
-            <div className="lg:text-xl font-semibold">
+          <div className="p-4 text-center mt-4 xl:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
+            <div className="xl:text-xl font-semibold">
               {MIN_STAKE_AMOUNT} GLDT
             </div>
             <div className="flex items-center justify-center rounded-full bg-surface-secondary h-10 w-10 shrink-0 aspect-square">

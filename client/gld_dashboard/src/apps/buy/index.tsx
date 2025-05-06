@@ -240,15 +240,15 @@ const BuyGLDT = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center justify-between text-center lg:text-left lg:items-start h-full px-4 lg:px-8">
-          <div className="text-5xl lg:text-6xl flex flex-col">
-            <div className="font-light">Buy</div>
-            <div className="flex lg:flex-col gap-2 lg:gap-0 font-semibold text-primary/90">
+        <div className="flex flex-col items-center justify-between text-center xl:text-left xl:items-start h-full px-4 xl:px-8">
+          <div className="text-5xl xl:text-6xl flex flex-col">
+            <div className="font-semibold text-primary/90">Buy</div>
+            <div className="flex xl:flex-col gap-2 xl:gap-0 font-light">
               <div>Tokenized</div>
               <div>Gold</div>
             </div>
           </div>
-          <div className="hidden lg:flex lg:justify-center w-full my-4">
+          <div className="hidden xl:flex xl:justify-center w-full my-4">
             <img className="max-w-58" src={ImgBuyGold} alt="Buy Gold" />
           </div>
           <div className="mt-3">
@@ -265,21 +265,21 @@ const BuyGLDT = () => {
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="p-4 lg:p-8 my-auto">
+        <div className="p-4 xl:p-8 my-auto">
           <div
             className={clsx(
               "max-w-3xl mx-auto bg-surface-primary border border-border rounded-xl",
               "flex flex-col items-center text-center"
             )}
           >
-            <div className="w-full px-4 lg:px-8 pt-8 lg:pt-12 pb-8 lg:pb-12">
-              <div className="mb-4 text-xl lg:text-4xl">
+            <div className="w-full px-4 xl:px-8 pt-8 xl:pt-12 pb-8 xl:pb-12">
+              <div className="mb-4 text-xl xl:text-4xl">
                 Buy GLDT <span className="text-primary">Gold Tokens</span>
               </div>
               <div className="inline-flex text-sm text-content/60 border border-border rounded-full px-6 py-2">
                 100 GLDT = 1 gram of physical gold
               </div>
-              <div className="flex flex-col lg:flex-row gap-4 mt-8">
+              <div className="flex flex-col xl:flex-row gap-4 mt-8">
                 <div className="flex items-center border border-border rounded-md grow bg-surface-secondary">
                   <div className="p-4 border-r border-border text-primary">
                     Pay with
@@ -335,13 +335,13 @@ const BuyGLDT = () => {
 
             <div
               className={clsx(
-                "w-full px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-8",
+                "w-full px-4 xl:px-8 pt-8 xl:pt-12 pb-4 xl:pb-8",
                 "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
               )}
             >
               <div className="text-primary">You will receive</div>
               <div className="mt-4">
-                <div className="text-2xl lg:text-4xl">
+                <div className="text-2xl xl:text-4xl">
                   {isReceiveTokenPriceIsFetched ? (
                     <>
                       <TokenValueToLocaleString
@@ -355,7 +355,7 @@ const BuyGLDT = () => {
                     <div>Loading...</div>
                   )}
                 </div>
-                <div className="font-semibold text-lg lg:text-xl mt-1">
+                <div className="font-semibold text-lg xl:text-xl mt-1">
                   {isReceiveTokenPriceIsFetched ? (
                     <>
                       ≈{" "}
@@ -380,7 +380,7 @@ const BuyGLDT = () => {
                     <div>Loading...</div>
                   )}
                 </div>
-                <div className="bg-surface-secondary mt-8 inline-flex flex-col lg:flex-row gap-1 lg:gap-2 text-sm text-content/60 border border-border rounded-xl lg:rounded-full px-6 py-2">
+                <div className="bg-surface-secondary mt-8 inline-flex flex-col xl:flex-row gap-1 xl:gap-2 text-sm text-content/60 border border-border rounded-xl xl:rounded-full px-6 py-2">
                   <div>Current exchange rate:</div>
 
                   {payTokenPriceExchangeRate.isSuccess ? (
@@ -403,9 +403,9 @@ const BuyGLDT = () => {
                 </div>
               </div>
 
-              <div className="mt-8 lg:mt-12">
+              <div className="mt-8 xl:mt-12">
                 <Button
-                  className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                  className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
                   onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}
                   disabled={isDisabledBuyButton}
                 >

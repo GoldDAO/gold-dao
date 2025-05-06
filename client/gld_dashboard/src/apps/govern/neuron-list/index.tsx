@@ -207,7 +207,7 @@ const List = () => {
             serverSide={false}
           />
         ) : (
-          <div className="flex justify-center items-center p-4 lg:p-8">
+          <div className="flex justify-center items-center p-4 xl:p-8">
             {status === "pending" && <div>Loading...</div>}
             {status === "error" && <div>Error</div>}
           </div>

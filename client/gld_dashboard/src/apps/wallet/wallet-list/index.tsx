@@ -163,7 +163,7 @@ const WalletList = () => {
   return (
     <>
       {isConnected ? (
-        <div className="flex lg:flex-grow flex-row lg:flex-col lg:h-100 pb-4 lg:overflow-y-auto overflow-x-auto lg:overflow-x-hidden gap-4 lg:pr-4">
+        <div className="flex xl:flex-grow flex-row xl:flex-col xl:h-100 pb-4 xl:overflow-y-auto overflow-x-auto xl:overflow-x-hidden gap-4 xl:pr-4">
           <TokenItem
             token={TokensList[GLDT_INDEX]}
             key={TokensList[GLDT_INDEX].id}

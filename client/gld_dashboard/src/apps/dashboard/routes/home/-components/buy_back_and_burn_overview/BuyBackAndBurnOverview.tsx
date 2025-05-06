@@ -12,7 +12,7 @@ const BuyBackAndBurnOverview = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
       <div className="border border-border rounded-xl bg-surface-primary p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <BuyBackOverview />
           <div className="p-6 text-center">
             <div className="flex items-center">

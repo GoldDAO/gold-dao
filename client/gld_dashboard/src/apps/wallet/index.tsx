@@ -39,11 +39,11 @@ const Wallet = () => {
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col flex-grow px-4">
-          <div className="text-center lg:text-left text-5xl lg:text-6xl text-primary/90 font-semibold my-4">
+          <div className="text-center xl:text-left text-5xl xl:text-6xl text-primary/90 font-semibold my-4">
             Wallet
           </div>
           <div className="flex flex-col border border-border p-4 rounded-lg h-full mt-4">
-            <div className="text-center lg:text-left mb-4 text-primary/90">
+            <div className="text-center xl:text-left mb-4 text-primary/90">
               Tokens
             </div>
 
@@ -53,7 +53,7 @@ const Wallet = () => {
           {!isConnected && (
             <div className="w-full mt-12">
               <Button
-                className="w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+                className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
                 onClick={connect}
               >
                 Connect Wallet
@@ -69,17 +69,17 @@ const Wallet = () => {
               "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
             )}
           >
-            <WalletItemOverviewHeader className="p-4 lg:p-12" />
+            <WalletItemOverviewHeader className="p-4 xl:p-12" />
           </div>
           <div className="relative px-4">
             <WalletItemOverviewBtnAction
               className={clsx(
                 "my-4",
-                "lg:absolute lg:-top-11 lg:left-1/2 lg:my-0 lg:-translate-x-1/2"
+                "xl:absolute xl:-top-11 xl:left-1/2 xl:my-0 xl:-translate-x-1/2"
               )}
             />
           </div>
-          <div className="p-4 lg:p-8 mt-4 lg:mt-12 flex flex-col overflow-hidden">
+          <div className="p-4 xl:p-8 mt-4 xl:mt-12 flex flex-col overflow-hidden">
             <div className="mb-4">Transactions</div>
             <TxHistory />
           </div>

@@ -5,16 +5,31 @@ const Address = ({
   enableCopyToClipboard = true,
   enableTooltip = true,
   tooltipId = "tooltip",
+  size = "sm",
 }: {
   value: string;
   enableCopyToClipboard?: boolean;
   enableTooltip?: boolean;
   tooltipId?: string;
+  size?: "sm" | "md" | "lg" | "full";
 }) => {
+  const getSize = (size?: string) => {
+    switch (size) {
+      case "sm":
+        return "max-w-32";
+      case "md":
+        return "max-w-64";
+      case "lg":
+        return "max-w-100";
+      case "full":
+        return "max-w-full";
+    }
+  };
+
   return (
-    <div className="max-w-32 flex items-center gap-2">
+    <div className={`${getSize(size)} flex items-center gap-2`}>
       <div
-        className="truncate"
+        className={`${size !== "full" ? "truncate" : ""}`}
         {...(enableTooltip && { "data-tooltip-id": tooltipId })}
         {...(enableTooltip && { "data-tooltip-content": value })}
       >

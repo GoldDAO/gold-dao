@@ -44,8 +44,8 @@ const Dexs = ({ className }: { className?: string }) => {
         />
 
         <div className="relative z-10 h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-4 h-full">
-            <div className="flex items-center justify-center h-full lg:col-start-2 lg:col-span-3">
+          <div className="grid grid-cols-1 xl:grid-cols-4 h-full">
+            <div className="flex items-center justify-center h-full xl:col-start-2 xl:col-span-3">
               <div className="text-center">
                 <h1 className="text-5xl">
                   <Trans
@@ -57,7 +57,7 @@ const Dexs = ({ className }: { className?: string }) => {
                   />
                 </h1>
                 <div className="mt-6">
-                  <div className="flex flex-col lg:flex-row justify-center items-center gap-3">
+                  <div className="flex flex-col xl:flex-row justify-center items-center gap-3">
                     {dexs.map((dex) => (
                       <div key={dex.name}>
                         <Link

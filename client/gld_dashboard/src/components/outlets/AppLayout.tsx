@@ -18,17 +18,17 @@ const AppLayout = () => {
   const navigation = useNavigation();
 
   return (
-    <div className="lg:bg-[url(/src/assets/bg-cover.png)] bg-cover bg-fixed bg-background">
+    <div className="xl:bg-[url(/src/assets/bg-cover.png)] bg-cover bg-fixed bg-background">
       <div className="flex flex-col h-screen overflow-y-auto">
-        <TopNav className="sticky top-0 bg-background py-5 px-4 lg:px-16 z-40" />
-        <div className="lg:container flex flex-col lg:mx-auto items-center flex-grow lg:h-100">
-          <div className="relative bg-background lg:rounded-xl flex lg:border-y lg:border-r border-border lg:shadow-xl w-full lg:h-[864px] lg:my-auto overflow-y-hidden">
-            <SideNav className="hidden bg-surface-primary lg:block p-4 border-r border-border rounded-l-[inherit]" />
+        <TopNav className="sticky top-0 bg-background py-5 px-4 xl:px-16 z-40" />
+        <div className="xl:container flex flex-col xl:mx-auto items-center flex-grow xl:h-100">
+          <div className="relative bg-background xl:rounded-xl flex xl:border-y xl:border-r border-border xl:shadow-xl w-full xl:h-[864px] xl:my-auto overflow-y-hidden">
+            <SideNav className="hidden bg-surface-primary xl:block p-4 border-r border-border rounded-l-[inherit]" />
             {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
             <div className="absolute bottom-0 left-0 h-full w-full bg-linear-to-tr from-primary/8 from-20% via-transparent to-transparent to-100% pointer-events-none" />
           </div>
         </div>
-        <div className="py-5 px-4 lg:px-16">
+        <div className="py-5 px-4 xl:px-16">
           <BottomNav />
         </div>
       </div>

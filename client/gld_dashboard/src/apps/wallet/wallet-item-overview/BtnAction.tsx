@@ -57,13 +57,13 @@ const ButtonAction = ({
         className={clsx(
           "flex justify-center px-3 py-4 rounded-md shrink-0",
           "bg-secondary text-white cursor-pointer",
-          "xl:px-12 lg:px-8 lg:rounded-lg"
+          "xl:px-12 xl:px-8 xl:rounded-lg"
         )}
       >
         <div
           className={clsx(
             "flex justify-center items-center gap-2",
-            "lg:flex-col lg:gap-1"
+            "xl:flex-col xl:gap-1"
           )}
         >
           {actions[action].icon}
@@ -79,7 +79,7 @@ const ButtonAction = ({
         href="https://gold.bity.com/"
         target="_blank"
         rel="noopener noreferrer"
-        className="lg:flex shrink-0"
+        className="xl:flex shrink-0"
       >
         {renderBtn()}
       </a>
@@ -175,7 +175,7 @@ const BalanceBtnAction = ({ className }: { className?: string }) => {
         <div
           className={clsx(
             "flex flex-col justify-center gap-2",
-            "lg:flex-row lg:gap-4"
+            "xl:flex-row xl:gap-4"
           )}
         >
           {renderTokenAction()}

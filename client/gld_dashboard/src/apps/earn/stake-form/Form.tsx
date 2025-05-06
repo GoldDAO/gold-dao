@@ -68,7 +68,7 @@ const Form = ({
   return (
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
       <div className="text-primary font-semibold">Stake GLDT</div>
-      <div className="p-4 mt-4 lg:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
+      <div className="p-4 mt-4 xl:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
         <input
           id="amount"
           type="number"
@@ -78,8 +78,8 @@ const Form = ({
           autoFocus={true}
           className={clsx(
             "field-sizing-content max-w-56 text-right outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
-            "lg:text-xl font-semibold",
-            "placeholder:text-content/60 placeholder:lg:text-xl placeholder:font-semibold",
+            "xl:text-xl font-semibold",
+            "placeholder:text-content/60 placeholder:xl:text-xl placeholder:font-semibold",
             "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           )}
           {...register("amount", {
@@ -105,7 +105,7 @@ const Form = ({
           }}
         />
 
-        <div className={clsx("lg:text-xl font-semibold text-accent")}>GLDT</div>
+        <div className={clsx("xl:text-xl font-semibold text-accent")}>GLDT</div>
 
         <div className="flex items-center justify-center rounded-full bg-surface-secondary h-10 w-10 shrink-0 aspect-square">
           <Logo name="gldt" className="p-1" />
@@ -124,7 +124,7 @@ const Form = ({
         </div>
       </div>
       <Button
-        className="mt-4 w-full px-4 py-3 bg-secondary text-white lg:text-lg font-medium rounded-md"
+        className="mt-4 w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
         type="submit"
         disabled={!isValid}
       >
