@@ -2,8 +2,8 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { ClaimRewardStateReducerAtom } from "../claim-all-reward/atoms";
-import useGetAllNeuronsRewards from "../utils/useGetAllNeuronsRewards";
+import { ClaimRewardStateReducerAtom } from "../claim-all/atoms";
+import useGetAllNeuronsRewards from "../../utils/useGetAllNeuronsRewards";
 import useRewardsFee from "@utils/useRewardsFee";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 

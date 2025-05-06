@@ -46,7 +46,7 @@ const useGetAllNeuronsRewards = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_NEURONS_REWARDS"],
+    queryKey: ["USER_NEURONS_REWARDS", owner],
     queryFn: async (): Promise<TokensRewards[]> => {
       try {
         const actor = Actor.createActor(idlFactoryGovernance, {

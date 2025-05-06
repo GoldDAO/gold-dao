@@ -4,12 +4,12 @@ import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
-import NeuronOverview from "./neuron-overview";
-import NeuronList from "./neuron-list/List";
-import { ClaimRewardStateReducerAtom } from "./claim-all-reward/atoms";
-import ClaimRewardDisclaimer from "./claim-all-reward-disclaimer";
-import ClaimRewardsConfirm from "./claim-all-reward/Confirm";
-import ClaimRewardsDetails from "./claim-all-reward/Details";
+import NeuronsOverview from "./neuron-overview";
+import NeuronsList from "./neuron-list";
+import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";
+import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
+import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
+import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
 
 const Govern = () => {
   const { connect, isConnected } = useAuth();
@@ -41,7 +41,7 @@ const Govern = () => {
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <div className="flex flex-col lg:flex-grow lg:overflow-y-auto">
-          <NeuronOverview />
+          <NeuronsOverview />
           <div className="relative w-full px-4 lg:pb-16 pb-32">
             <div
               className={clsx(
@@ -55,7 +55,7 @@ const Govern = () => {
 
           <div className="p-4 lg:p-8">
             <div className="mb-4 lg:mb-8">My GOLDAO neurons</div>
-            <NeuronList />
+            <NeuronsList />
           </div>
         </div>
 

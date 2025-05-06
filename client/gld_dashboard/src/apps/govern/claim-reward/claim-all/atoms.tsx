@@ -9,9 +9,9 @@ import {
   WTN_LEDGER_CANISTER_ID,
 } from "@constants";
 
-import { Reward } from "../utils";
+import { Reward } from "../../utils";
 import { RewardFeeData } from "@utils/useRewardsFee";
-import { TokensRewards } from "../utils/useGetAllNeuronsRewards";
+import { TokensRewards } from "../../utils/useGetAllNeuronsRewards";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;

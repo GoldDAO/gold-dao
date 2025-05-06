@@ -10,9 +10,15 @@ import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
-import { Reward } from "../utils";
+import { Reward } from "../../utils";
 
-const TokenItem = ({ reward }: { reward: Reward }) => {
+const TokenItem = ({
+  reward,
+  neuron_id,
+}: {
+  reward: Reward;
+  neuron_id: string;
+}) => {
   const { authenticatedAgent } = useAuth();
 
   const claim = useClaimReward(SNS_REWARDS_CANISTER_ID, authenticatedAgent);
@@ -25,7 +31,7 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
   const handleClaimReward = () => {
     claim.mutate(
       {
-        neuron_ids: reward.neurons.map((n) => n.id),
+        neuron_ids: [neuron_id],
         token: reward.name === "GOLDAO" ? "GLDGov" : reward.name, // !TODO fix when sns_rewards canister will be updated
       },
       {
@@ -75,14 +81,18 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
 };
 
 const Details = () => {
-  const [, dispatch] = useAtom(ClaimRewardStateReducerAtom);
+  const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   const [selectedRewards] = useAtom(SelectedRewardsAtom);
 
   return (
     <>
       <div className="grid grid-cols-1 gap-4 my-8">
         {selectedRewards.map((reward) => (
-          <TokenItem key={reward.id} reward={reward} />
+          <TokenItem
+            key={reward.id}
+            reward={reward}
+            neuron_id={claimRewardState.neuron_id as string}
+          />
         ))}
       </div>
       <Button
