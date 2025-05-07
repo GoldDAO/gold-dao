@@ -8,17 +8,16 @@ import useRewardsFee from "@utils/useRewardsFee";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ClaimRewardDisclaimer = () => {
-  const { authenticatedAgent, principalId, isConnected, unauthenticatedAgent } =
-    useAuth();
+  const { principalId, isConnected, unauthenticatedAgent } = useAuth();
   const [, dispatchClaimReward] = useAtom(ClaimRewardStateReducerAtom);
   const [enableClaimAll, setEnableClaimAll] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [totalRewards, setTotalRewards] = useState(0);
 
   const rewards = useGetAllPositionsRewards({
-    agent: authenticatedAgent,
+    agent: unauthenticatedAgent,
     owner: principalId,
-    enabled: isConnected && !!authenticatedAgent,
+    enabled: isConnected && !!unauthenticatedAgent,
   });
 
   const rewardsFee = useRewardsFee(unauthenticatedAgent, {

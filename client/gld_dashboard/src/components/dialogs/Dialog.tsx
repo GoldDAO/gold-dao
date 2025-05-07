@@ -12,7 +12,6 @@ const SIZES = {
   xs: "max-w-xs",
   sm: "max-w-sm",
   md: "max-w-md",
-  xl: "max-w-lg",
   xl: "max-w-2xl",
   xxl: "max-w-7xl",
   auto: "max-w-auto",
