@@ -40,7 +40,7 @@ const AddNeuron = () => {
             Copy you principal from the Gold DAO dashboard
           </Card.Title>
           <Card.Text>
-            <Address value={principalId} size="lg" />
+            <Address size="lg">{principalId}</Address>
           </Card.Text>
         </Card>
         <Card step={2}>

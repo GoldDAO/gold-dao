@@ -4,8 +4,9 @@ import {
   UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
-
+import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { idlFactory } from "@services/ledger-index/idlFactory";
 import { idlFactory as idlFactoryICP } from "@services/ledger-index/idlFactory_icp";
 import get_account_transactions from "@services/ledger-index/get_account_transactions";
@@ -45,6 +46,9 @@ const useFetchAccountTransactions = (
         const subaccount = decodedAccount?.subaccount
           ? [decodedAccount.subaccount]
           : [];
+        const accountId = AccountIdentifier.fromPrincipal({
+          principal: Principal.fromText(account),
+        }).toHex();
 
         let results: Transactions;
 
@@ -73,7 +77,24 @@ const useFetchAccountTransactions = (
           });
         }
 
-        return results;
+        const newData = results.data?.map((tx) => {
+          // console.log(tx);
+          const is_credit = tx.to === accountId || tx.to === account;
+          const from = tx.from && tx.from === accountId ? account : tx.from;
+          const to = tx.to && tx.to === accountId ? account : tx.to;
+
+          return {
+            ...tx,
+            is_credit,
+            from,
+            to,
+          };
+        });
+
+        return {
+          data: newData,
+          cursor_index: results.cursor_index,
+        };
       } catch (err) {
         console.error(err);
         throw new Error(

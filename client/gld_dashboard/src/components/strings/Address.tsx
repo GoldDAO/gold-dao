@@ -1,17 +1,17 @@
 import CopyToClipboard from "@components/buttons/CopyToClipboard";
 
 const Address = ({
-  value,
   enableCopyToClipboard = true,
   enableTooltip = true,
   tooltipId = "tooltip",
   size = "sm",
+  children,
 }: {
-  value: string;
   enableCopyToClipboard?: boolean;
   enableTooltip?: boolean;
   tooltipId?: string;
   size?: "sm" | "md" | "lg" | "full";
+  children: string;
 }) => {
   const getSize = (size?: string) => {
     switch (size) {
@@ -31,11 +31,11 @@ const Address = ({
       <div
         className={`${size !== "full" ? "truncate" : ""}`}
         {...(enableTooltip && { "data-tooltip-id": tooltipId })}
-        {...(enableTooltip && { "data-tooltip-content": value })}
+        {...(enableTooltip && { "data-tooltip-content": children })}
       >
-        {value}
+        {children}
       </div>
-      {enableCopyToClipboard && <CopyToClipboard value={value} />}
+      {enableCopyToClipboard && <CopyToClipboard value={children} />}
     </div>
   );
 };

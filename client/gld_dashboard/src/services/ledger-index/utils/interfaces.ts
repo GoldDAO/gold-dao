@@ -9,6 +9,7 @@ export interface Transaction {
   fee: bigint | undefined;
   memo: string | undefined;
   kind: string;
+  is_credit: boolean;
 }
 
 export interface Transactions {

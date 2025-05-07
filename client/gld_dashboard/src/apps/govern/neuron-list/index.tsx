@@ -110,7 +110,7 @@ const List = () => {
       {
         accessorKey: "id",
         id: "id",
-        cell: ({ getValue }) => <Address value={getValue() as string} />,
+        cell: ({ getValue }) => <Address>{getValue() as string}</Address>,
         header: "ID",
         meta: {
           className: "text-left",
