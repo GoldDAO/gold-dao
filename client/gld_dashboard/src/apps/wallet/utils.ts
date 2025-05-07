@@ -11,7 +11,8 @@ import {
   OGY_LEDGER_INDEX_CANISTER_ID,
   WTN_LEDGER_CANISTER_ID,
   WTN_LEDGER_INDEX_CANISTER_ID,
-  CK_USDT_LEDGER_CANISTER_ID_IC
+  CKUSDT_LEDGER_CANISTER_ID,
+  CKUSDT_LEDGER_INDEX_CANISTER_ID
 } from "@constants";
 
 export interface Token {
@@ -66,7 +67,7 @@ export const TokensList: Token[] = [
     id: "ckusdt",
     name: "ckUSDT",
     label: "ckUSDT",
-    canisterId: CK_USDT_LEDGER_CANISTER_ID_IC,
-    canister_id_ledger_index: WTN_LEDGER_INDEX_CANISTER_ID,
+    canisterId: CKUSDT_LEDGER_CANISTER_ID,
+    canister_id_ledger_index: CKUSDT_LEDGER_INDEX_CANISTER_ID,
   },
 ];

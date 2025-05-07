@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { CopyToClipboard as ReactCopyToClipboard } from "react-copy-to-clipboard";
-import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
+import { Copy } from "iconsax-react";
 
 const CopyToClipboard = ({ value = "" }: { value?: string }) => {
   const [valueCopied] = useState(value);
@@ -20,7 +20,7 @@ const CopyToClipboard = ({ value = "" }: { value?: string }) => {
   return (
     <ReactCopyToClipboard onCopy={onCopy} text={valueCopied}>
       <button onClick={(e) => handleClick(e)} className="cursor-pointer">
-        <ClipboardDocumentIcon className="h-4 w-4" />
+        <Copy size={16} className="text-content/60" />
       </button>
     </ReactCopyToClipboard>
   );

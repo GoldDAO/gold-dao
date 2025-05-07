@@ -8,6 +8,10 @@ import { Transaction } from "@services/ledger-index/utils/interfaces";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAccountTransactions";
+import Address from "@components/strings/Address";
+import { ArrowRight } from "iconsax-react";
+import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ListItem = ({ tx }: { tx: Transaction }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -18,29 +22,91 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
     enabled: !!unauthenticatedAgent && isConnected,
   });
 
+  const price = useFetchTokenPrice(unauthenticatedAgent, {
+    from: token.name,
+    from_canister_id: token.canisterId,
+    amount: tx.amount ?? 0n,
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
+
+  const renderAddress = (address: string | undefined) => {
+    return address ? <Address size="sm">{address}</Address> : "N/A";
+  };
+
+  const renderAmount = (amount: bigint | undefined) => {
+    if (!decimals.isSuccess) return <div>Loading...</div>;
+    if (tx.is_credit) {
+      return (
+        <div className="text-green-500">
+          +
+          <TokenValueToLocaleString
+            value={amount as bigint}
+            tokenDecimals={decimals.data}
+          />{" "}
+          {token.name}
+        </div>
+      );
+    } else {
+      return (
+        <div className="text-red-500">
+          -
+          <TokenValueToLocaleString
+            value={amount as bigint}
+            tokenDecimals={decimals.data}
+          />{" "}
+          {token.name}
+        </div>
+      );
+    }
+  };
+
   return (
     <div
       className={clsx(
-        "p-4 border border-border rounded-lg",
+        "p-2 lg:p-4 border border-border rounded-lg",
         "flex items-start justify-between"
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-start lg:items-center gap-4">
         <div className="w-24 flex justify-center px-4 py-3 border border-primary/5 bg-primary/10 text-primary rounded-lg">
           <div>{tx.kind}</div>
         </div>
         <div className="text-sm">
-          <div>{tx.to}</div>
-          <div className="text-content/60">{tx.timestamp}</div>
+          <div className="inline-flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-2">
+            <div className="flex gap-2 items-center lg:hidden">
+              <div className="text-lg">{renderAmount(tx.amount)}</div>
+              <div className="text-content/60 text-sm">
+                {price.isSuccess ? (
+                  <>
+                    $
+                    <NumberToLocaleString value={price.data.amount_usd} />
+                  </>
+                ) : (
+                  <div>Loading...</div>
+                )}
+              </div>
+            </div>
+            <div className="text-center mb-2 lg:mb-0">
+              {renderAddress(tx.from)}
+            </div>
+            <div className="flex justify-center">
+              <ArrowRight size={12} className="rotate-90 lg:rotate-0" />
+            </div>
+            <div className="text-center">{renderAddress(tx.to)}</div>
+          </div>
+          <div className="text-content/60 text-sm mt-2 lg:mt-0">
+            {tx.timestamp}
+          </div>
         </div>
       </div>
-      <div>
-        <div>
-          {decimals.isSuccess ? (
-            <TokenValueToLocaleString
-              value={tx.amount as bigint}
-              tokenDecimals={decimals.data}
-            />
+      <div className="hidden lg:block">
+        <div className="text-right text-lg">{renderAmount(tx.amount)}</div>
+        <div className="text-content/60 text-sm text-right">
+          {price.isSuccess ? (
+            <>
+              $
+              <NumberToLocaleString value={price.data.amount_usd} />
+            </>
           ) : (
             <div>Loading...</div>
           )}
