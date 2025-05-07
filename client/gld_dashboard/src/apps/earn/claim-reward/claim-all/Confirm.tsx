@@ -65,16 +65,15 @@ const RewardItem = ({ name }: { name: string }) => {
 };
 
 const Confirm = () => {
-  const { authenticatedAgent, principalId, isConnected, unauthenticatedAgent } =
-    useAuth();
+  const { principalId, isConnected, unauthenticatedAgent } = useAuth();
   const [claimRewardState, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   // const [totalSelectedAmount] = useAtom(TotalSelectedAmountAtom);
   const [confirmClaimEnable] = useAtom(ConfirmClaimEnableAtom);
 
   const rewards = useGetAllPositionsRewards({
-    agent: authenticatedAgent,
+    agent: unauthenticatedAgent,
     owner: principalId,
-    enabled: isConnected && !!authenticatedAgent,
+    enabled: isConnected && !!unauthenticatedAgent,
   });
 
   const rewardsFee = useRewardsFee(unauthenticatedAgent, {
