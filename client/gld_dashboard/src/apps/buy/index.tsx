@@ -449,7 +449,6 @@ const Buy = () => {
               <Dialog
                 open={is_open_details_dialog}
                 handleOnClose={() => dispatch({ type: "OPEN_DIALOG_DETAILS" })}
-                title="Purchase Details"
               >
                 <BuyDetails />
               </Dialog>
