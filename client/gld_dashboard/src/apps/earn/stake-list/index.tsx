@@ -7,7 +7,7 @@ import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import useFetchUserStakeList from "@services/gldt_stake/hooks/useFetchUserStakeList";
+import useFetchUserPositions from "@services/gldt_stake/hooks/useFetchUserPositions";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
 import { UnlockStateReducerAtom } from "../unlock/atoms";
@@ -43,7 +43,7 @@ const StakeList = () => {
     }
   );
 
-  const fetchUserStake = useFetchUserStakeList(
+  const fetchUserPositions = useFetchUserPositions(
     GLDT_STAKE_CANISTER_ID,
     authenticatedAgent,
     {
@@ -93,14 +93,14 @@ const StakeList = () => {
     return renderDisconnectedPlaceholder();
   }
 
-  if (!fetchUserStake.isSuccess || !decimals.isSuccess) {
+  if (!fetchUserPositions.isSuccess || !decimals.isSuccess) {
     return <div className="flex justify-center p-4">Loading...</div>;
   }
 
   if (
     !!isConnected &&
-    fetchUserStake.isSuccess &&
-    !fetchUserStake.data.length
+    fetchUserPositions.isSuccess &&
+    !fetchUserPositions.data.length
   ) {
     return renderEmptyStakeList();
   }
@@ -155,7 +155,7 @@ const StakeList = () => {
 
   return (
     <div className="flex flex-col pb-4 xl:overflow-y-auto xl:pr-4">
-      {fetchUserStake.data.map((stake, index) => (
+      {fetchUserPositions.data.map((stake, index) => (
         <div
           key={index}
           className="@container flex justify-between items-center p-3 border-b border-border/60 last:border-0 odd:bg-primary/5"

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
 import { SNS_REWARDS_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
@@ -20,6 +20,7 @@ const TokenItem = ({
   neuron_id: string;
 }) => {
   const { authenticatedAgent } = useAuth();
+  const queryClient = useQueryClient();
 
   const claim = useClaimReward(SNS_REWARDS_CANISTER_ID, authenticatedAgent);
 
@@ -38,6 +39,15 @@ const TokenItem = ({
         onSuccess: (res) => {
           console.log("claimed");
           console.log(res);
+          queryClient.invalidateQueries({
+            queryKey: ["USER_NEURONS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_NEURONS_REWARDS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_NEURONS_TOTAL_STAKED_AMOUNT"],
+          });
         },
       }
     );

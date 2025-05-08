@@ -22,7 +22,7 @@ const useFetchUserTotalStaked = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
+    queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
     queryFn: async (): Promise<bigint> => {
       try {
         const actor = Actor.createActor(idlFactory, {
@@ -38,7 +38,9 @@ const useFetchUserTotalStaked = (
         );
       } catch (err) {
         console.log(err);
-        throw new Error("Fetch user total staked error! Please retry later.");
+        throw new Error(
+          "Fetch user positions total staked amount error! Please retry later."
+        );
       }
     },
     enabled,

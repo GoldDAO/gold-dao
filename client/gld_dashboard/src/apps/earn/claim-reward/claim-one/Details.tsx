@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
@@ -20,6 +21,7 @@ const TokenItem = ({
   stake_id: bigint;
 }) => {
   const { authenticatedAgent } = useAuth();
+  const queryClient = useQueryClient();
 
   const claim = useClaimReward(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
@@ -38,6 +40,15 @@ const TokenItem = ({
         onSuccess: (res) => {
           console.log("claimed");
           console.log(res);
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS_REWARDS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
+          });
         },
       }
     );

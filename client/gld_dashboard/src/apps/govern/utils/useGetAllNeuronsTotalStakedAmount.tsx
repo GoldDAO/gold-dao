@@ -24,7 +24,7 @@ const useGetAllNeuronsTotalStakedAmount = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_NEURONS_TOKEN_TOTAL_STAKED_AMOUNT"],
+    queryKey: ["USER_NEURONS_TOTAL_STAKED_AMOUNT"],
     queryFn: async (): Promise<bigint> => {
       try {
         const actor = Actor.createActor(idlFactoryGovernance, {

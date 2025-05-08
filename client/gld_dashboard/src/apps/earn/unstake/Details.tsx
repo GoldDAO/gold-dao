@@ -28,10 +28,10 @@ const DetailsUnstake = () => {
           console.log("unstaked");
           console.log(res);
           queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
+            queryKey: ["USER_POSITIONS"],
           });
           queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
+            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
           });
         },
       }
