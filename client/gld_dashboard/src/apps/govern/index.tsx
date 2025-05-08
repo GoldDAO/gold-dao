@@ -64,6 +64,7 @@ const Govern = () => {
               <Button
                 className="px-4 py-2 bg-secondary text-white rounded-full"
                 onClick={() => dispatchAddNeuron({ type: "OPEN_DIALOG" })}
+                disabled={!isConnected}
               >
                 Add neuron
               </Button>

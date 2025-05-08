@@ -73,7 +73,7 @@ const StakeList = () => {
             </div>
           </div>
         ))}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-primary dark:from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </div>
     );
   };
