@@ -23,6 +23,46 @@ const NeuronOverview = () => {
     enabled: !!unauthenticatedAgent && isConnected && stakedAmount.isSuccess,
   });
 
+  const renderTotalActiveStake = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            <TokenValueToLocaleString
+              value={tokenPrice.data.amount}
+              tokenDecimals={tokenPrice.data.decimals}
+            />
+            <div className="text-content/60 font-normal">GOLDAO</div>
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return (
+        <>
+          0<div className="text-content/60 font-normal">GOLDAO</div>
+        </>
+      );
+    }
+  };
+
+  const renderTotalActiveStakePrice = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            $<NumberToLocaleString value={tokenPrice.data.amount_usd} />
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return <>$0</>;
+    }
+  };
+
   return (
     <div
       className={clsx(
@@ -43,29 +83,12 @@ const NeuronOverview = () => {
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
                 <div className="text-2xl xl:text-4xl  flex items-center gap-2">
-                  {tokenPrice.isSuccess ? (
-                    <>
-                      <TokenValueToLocaleString
-                        value={tokenPrice.data.amount}
-                        tokenDecimals={tokenPrice.data.decimals}
-                      />
-                      <div className="text-content/60 font-normal">GOLDAO</div>
-                    </>
-                  ) : (
-                    <div>Loading...</div>
-                  )}
+                  {renderTotalActiveStake()}
                 </div>
               </div>
             </div>
-            <div className="text-lg text-content/60">
-              {tokenPrice.isSuccess ? (
-                <div>
-                  ($
-                  <NumberToLocaleString value={tokenPrice.data.amount_usd} />)
-                </div>
-              ) : (
-                <div>Loading...</div>
-              )}
+            <div className="text-sm text-content/60">
+              {renderTotalActiveStakePrice()}
             </div>
           </div>
         </div>

@@ -40,7 +40,7 @@ const TokenItem = ({ token }: { token: Token }) => {
     <div
       className={clsx(
         "shrink-0",
-        "rounded-xl border border-border p-3 cursor-pointer",
+        "rounded-xl border border-border p-2 cursor-pointer",
         `${searchParams.get("token") !== "nft" && selectedToken.id === id ? "border-primary bg-primary/10" : ""}`
       )}
       onClick={onClickToken}
@@ -94,7 +94,7 @@ const NFTItem = () => {
     <div
       className={clsx(
         "shrink-0",
-        "rounded-xl border border-border p-3 cursor-pointer",
+        "rounded-xl border border-border p-2 cursor-pointer",
         `${searchParams.get("token") === "nft" ? "border-primary bg-primary/10" : ""}`
       )}
       onClick={onClickToken}
@@ -126,12 +126,12 @@ const NFTItem = () => {
 
 const DisconnectedPlaceholder = () => {
   return (
-    <div className="flex flex-col gap-4 relative">
-      {[...Array(2)].map((_, index) => (
+    <div className="flex xl:flex-grow flex-row xl:flex-col xl:h-100 pb-4 overflow-hidden gap-4 relative">
+      {[...Array(4)].map((_, index) => (
         <div key={index}>
           <div
             className={clsx(
-              "@container",
+              "lg:@container",
               "shrink-0",
               "rounded-xl border border-surface-secondary p-4 cursor-pointer"
             )}
@@ -161,9 +161,9 @@ const WalletList = () => {
   const { isConnected } = useAuth();
 
   return (
-    <>
+    <div className="flex xl:flex-grow flex-row xl:flex-col xl:h-100 pb-4 xl:overflow-y-auto overflow-x-auto xl:overflow-x-hidden gap-4 xl:pr-4">
       {isConnected ? (
-        <div className="flex xl:flex-grow flex-row xl:flex-col xl:h-100 pb-4 xl:overflow-y-auto overflow-x-auto xl:overflow-x-hidden gap-4 xl:pr-4">
+        <>
           <TokenItem
             token={TokensList[GLDT_INDEX]}
             key={TokensList[GLDT_INDEX].id}
@@ -172,11 +172,11 @@ const WalletList = () => {
           {TokensList.slice(1).map((token) => (
             <TokenItem token={token} key={token.id} />
           ))}
-        </div>
+        </>
       ) : (
         <DisconnectedPlaceholder />
       )}
-    </>
+    </div>
   );
 };
 

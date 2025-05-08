@@ -25,7 +25,7 @@ const AppLayout = () => {
           <div className="relative bg-background xl:rounded-xl flex xl:border-y xl:border-r border-border xl:shadow-xl w-full xl:h-[864px] xl:my-auto overflow-y-hidden">
             <SideNav className="hidden bg-surface-primary xl:block p-4 border-r border-border rounded-l-[inherit]" />
             {navigation.state !== "idle" ? <NavigationProgress /> : <Outlet />}
-            <div className="absolute bottom-0 left-0 h-full w-full bg-linear-to-tr from-primary/8 from-20% via-transparent to-transparent to-100% pointer-events-none" />
+            <div className="absolute bottom-0 left-0 h-full w-full xl:bg-linear-to-tr xl:from-primary/8 xl:from-20% xl:via-transparent xl:to-transparent xl:to-100% pointer-events-none" />
           </div>
         </div>
         <div className="py-5 px-4 xl:px-16">

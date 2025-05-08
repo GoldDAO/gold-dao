@@ -64,6 +64,9 @@ const Earn = () => {
           </div>
           {!isConnected && (
             <div className="px-4 xl:px-8 mt-auto w-full">
+              <div className="my-4 text-center">
+                Connect a wallet and start staking GLDT
+              </div>
               <Button
                 className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
                 onClick={connect}

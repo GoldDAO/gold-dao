@@ -35,9 +35,57 @@ const StakeOverview = () => {
     GLDT_STAKE_CANISTER_ID,
     unauthenticatedAgent,
     {
-      enabled: isConnected && !!unauthenticatedAgent,
+      enabled: !!unauthenticatedAgent,
     }
   );
+
+  const renderTotalActiveStake = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            <TokenValueToLocaleString
+              value={tokenPrice.data.amount}
+              tokenDecimals={tokenPrice.data.decimals}
+            />
+            <div className="text-content/60 font-normal">GLDT</div>
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return (
+        <>
+          0<div className="text-content/60 font-normal">GLDT</div>
+        </>
+      );
+    }
+  };
+
+  const renderTotalActiveStakePrice = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            <TokenValueToLocaleString
+              value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
+              tokenDecimals={tokenPrice.data.decimals}
+            />{" "}
+            grams of Gold ({" "}
+            <span>
+              $<NumberToLocaleString value={tokenPrice.data.amount_usd} />
+            </span>
+            )
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return <>0 grams of Gold ($0)</>;
+    }
+  };
 
   return (
     <div
@@ -78,37 +126,12 @@ const StakeOverview = () => {
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
                 <div className="text-2xl xl:text-4xl  flex items-center gap-2">
-                  {tokenPrice.isSuccess ? (
-                    <>
-                      <TokenValueToLocaleString
-                        value={tokenPrice.data.amount}
-                        tokenDecimals={tokenPrice.data.decimals}
-                      />
-                      <div className="text-content/60 font-normal">GLDT</div>
-                    </>
-                  ) : (
-                    <div>Loading...</div>
-                  )}
+                  {renderTotalActiveStake()}
                 </div>
               </div>
             </div>
             <div className="text-sm text-content/60">
-              {tokenPrice.isSuccess ? (
-                <div>
-                  <TokenValueToLocaleString
-                    value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
-                    tokenDecimals={tokenPrice.data.decimals}
-                  />{" "}
-                  grams of Gold ({" "}
-                  <span>
-                    $
-                    <NumberToLocaleString value={tokenPrice.data.amount_usd} />
-                  </span>
-                  )
-                </div>
-              ) : (
-                <div>Loading...</div>
-              )}
+              {renderTotalActiveStakePrice()}
             </div>
           </div>
         </div>
