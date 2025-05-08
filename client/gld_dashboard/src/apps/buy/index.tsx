@@ -7,24 +7,24 @@ import {
   GLDT_LEDGER_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
 } from "@constants";
-import { BuyGLDTStateReducerAtom } from "./atoms";
+import { BuyGLDTStateReducerAtom } from "./atoms/BuyGLDT";
 import { useAuth } from "@auth/index";
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
-import SelectToken from "./SelectToken.component";
-import { Token } from "./tokensList.utils";
-import TradeConfirm from "./TradeConfirm.component";
-import TradeDetails from "./TradeDetails.component";
+import SelectToken from "./components/select-token/SelectToken";
+import { Token } from "./utils/Tokens";
+import BuyConfirm from "./components/buy-dialog/Confirm";
+import BuyDetails from "./components/buy-dialog/Details";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
 import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
-const BuyGLDT = () => {
+const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const {
@@ -118,17 +118,19 @@ const BuyGLDT = () => {
   });
 
   useEffect(() => {
-    if (price.isSuccess) {
+    if (price.isSuccess && receiveTokenPrice.isSuccess && amount > 0) {
       dispatch({
         type: "SET_PRICE_DATA",
         value: {
           slippage: price.data.slippage,
           txs: price.data.txs,
+          receive_token_decimals: receiveTokenPrice.data.decimals,
+          receive_token_amount: price.data.receive_amount,
         },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [price.isSuccess, price.data]);
+  }, [price.isSuccess, price.data, receiveTokenPrice.isSuccess]);
 
   useEffect(
     () => {
@@ -276,7 +278,8 @@ const BuyGLDT = () => {
               <div className="mb-4 text-xl xl:text-4xl">
                 Buy GLDT <span className="text-primary">Gold Tokens</span>
               </div>
-              <div className="inline-flex text-sm text-content/60 border border-border rounded-full px-6 py-2">
+              <div className="inline-flex items-center text-sm text-content/60 border border-border rounded-full px-4 py-2">
+                <Logo name="gldt" className="h-5 w-5 mr-1" />
                 100 GLDT = 1 gram of physical gold
               </div>
               <div className="flex flex-col xl:flex-row gap-4 mt-8">
@@ -424,12 +427,12 @@ const BuyGLDT = () => {
                   )}
                 </Button>
                 {errors.amount && errors.amount?.message !== "" && (
-                  <div className="mt-2">
+                  <div className="mt-2 text-red-500">
                     {errors?.amount?.message as string}
                   </div>
                 )}
                 {errorReceiveAmountLowerThanZero && (
-                  <div className="mt-2">
+                  <div className="mt-2 text-red-500">
                     Receive amount is too low. Please increase it a bit
                   </div>
                 )}
@@ -441,14 +444,14 @@ const BuyGLDT = () => {
                 handleOnClose={() => dispatch({ type: "CANCEL" })}
                 title="Confirm Purchase"
               >
-                <TradeConfirm />
+                <BuyConfirm />
               </Dialog>
               <Dialog
                 open={is_open_details_dialog}
                 handleOnClose={() => dispatch({ type: "OPEN_DIALOG_DETAILS" })}
                 title="Purchase Details"
               >
-                <TradeDetails />
+                <BuyDetails />
               </Dialog>
             </>
           </div>
@@ -458,4 +461,4 @@ const BuyGLDT = () => {
   );
 };
 
-export default BuyGLDT;
+export default Buy;

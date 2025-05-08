@@ -1,14 +1,12 @@
 import { useAtom } from "jotai";
-
-import { BuyGLDTStateReducerAtom } from "./atoms";
-
+import { BuyGLDTStateReducerAtom } from "../../atoms/BuyGLDT";
 import { Logo } from "@components/index";
 import { Button } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
-const ConfirmSwap = () => {
+const Confirm = () => {
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const {
     pay_token,
@@ -164,4 +162,4 @@ const ConfirmSwap = () => {
   );
 };
 
-export default ConfirmSwap;
+export default Confirm;

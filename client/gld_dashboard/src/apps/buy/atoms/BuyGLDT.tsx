@@ -1,6 +1,6 @@
 import { atomWithReducer } from "jotai/utils";
-import { GLDT_LEDGER_CANISTER_ID_IC } from "@constants";
-import TOKENS_LIST, { Token } from "./tokensList.utils";
+import { GLDT_LEDGER_CANISTER_ID_IC, MAX_SWAP_SLIPPAGE } from "@constants";
+import Tokens, { Token } from "../utils/Tokens";
 import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 
 type BuyGLDTState = {
@@ -30,7 +30,7 @@ type BuyGLDTState = {
 
 const initialState: BuyGLDTState = {
   pay_token: {
-    token: TOKENS_LIST[0], // default to ICP,
+    token: Tokens[0], // default to ICP,
     amount: null,
     amount_usd: null,
     decimals: null,
@@ -51,7 +51,7 @@ const initialState: BuyGLDTState = {
     fee: null,
   },
   slippage: null,
-  max_slippage: 5,
+  max_slippage: MAX_SWAP_SLIPPAGE,
   network_fee: null,
   lp_fee: null,
   is_open_confirm_dialog: false,
@@ -70,6 +70,8 @@ const reducer = (
         value: {
           slippage: number;
           txs: Array<SwapAmountsTxReply>;
+          receive_token_decimals: number;
+          receive_token_amount: bigint;
         };
       }
     | {
@@ -108,14 +110,28 @@ const reducer = (
         },
       };
     case "SET_PRICE_DATA": {
-      const network_fee = action.value.txs.reduce(
-        (acc, tx) => acc + tx.gas_fee,
-        0n
-      );
-      const lp_fee = action.value.txs.reduce((acc, tx) => acc + tx.lp_fee, 0n);
+      const { txs, slippage } = action.value;
+      // const { txs, receive_token_decimals, receive_token_amount, slippage } =
+      //   action.value;
+      const network_fee = txs.reduce((acc, tx) => acc + tx.gas_fee, 0n);
+      const lp_fee = txs.reduce((acc, tx) => acc + tx.lp_fee, 0n);
+
+      // const network_fee_number =
+      //   (Number(network_fee) + Number(lp_fee)) / 10 ** receive_token_decimals;
+
+      // const receive_token_amount_number =
+      //   Number(receive_token_amount) / 10 ** receive_token_decimals;
+
+      // console.log("fee", network_fee_number);
+      // console.log("slippage", slippage);
+      // console.log(
+      //   "slippage with fee deducted",
+      //   Math.abs(network_fee_number / receive_token_amount_number - slippage)
+      // );
+
       return {
         ...prev,
-        slippage: action.value.slippage,
+        slippage,
         network_fee,
         lp_fee,
       };

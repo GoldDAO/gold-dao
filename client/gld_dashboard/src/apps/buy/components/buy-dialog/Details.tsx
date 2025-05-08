@@ -1,21 +1,14 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-
 import { KONGSWAP_CANISTER_ID_IC } from "@constants";
-
 import { useAuth } from "@auth/index";
-
 import { Button } from "@components/index";
-
-import { BuyGLDTStateReducerAtom } from "./atoms";
-
-// import { Logo } from "@components/index";
-
+import { BuyGLDTStateReducerAtom } from "../../atoms/BuyGLDT";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useSwap from "@services/kongswap/hooks/useSwap";
 
-const TradeDetails = () => {
+const Details = () => {
   const { authenticatedAgent, principalId } = useAuth();
   const queryClient = useQueryClient();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
@@ -138,4 +131,4 @@ const TradeDetails = () => {
   );
 };
 
-export default TradeDetails;
+export default Details;
