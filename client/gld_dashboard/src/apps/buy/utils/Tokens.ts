@@ -1,5 +1,4 @@
 import { Ledger } from "@services/ledger/utils/interfaces";
-
 import { ICP_LEDGER_CANISTER_ID, CKUSDT_LEDGER_CANISTER_ID } from "@constants";
 
 export interface Token {
@@ -9,7 +8,7 @@ export interface Token {
   canisterId: string;
 }
 
-const tokensList: Token[] = [
+const Tokens: Token[] = [
   {
     id: "icp",
     name: "ICP",
@@ -24,4 +23,4 @@ const tokensList: Token[] = [
   },
 ];
 
-export default tokensList;
+export default Tokens;

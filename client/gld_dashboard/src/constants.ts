@@ -67,19 +67,9 @@ export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
 export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
 
-// start delete (fetched now from backend)
-export const OGY_TX_FEE = 200000
-export const GLDT_TX_FEE = 1000000;
-export const GLDGOV_TX_FEE = 1000000;
-export const ICP_TX_FEE = 10000;
-export const GLDT_DECIMAL = 10e8;
-export const ICP_DECIMAL = 10e8;
-export const CK_USDT_DECIMAL = 10e6;
-export const CK_USDC_DECIMAL = 10e6;
-// end delete
-
 export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
+export const MAX_SWAP_SLIPPAGE = 5;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);

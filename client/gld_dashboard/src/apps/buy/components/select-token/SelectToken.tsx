@@ -11,7 +11,7 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import TOKENS_LIST, { Token } from "./tokensList.utils";
+import Tokens, { Token } from "../../utils/Tokens";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
@@ -123,7 +123,7 @@ const SelectBuyMethod = ({
             "transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
           )}
         >
-          {TOKENS_LIST.map((token) => (
+          {Tokens.map((token) => (
             <ListboxOption key={token.name} value={token}>
               <ListboxTokenOption
                 id={token.id}
