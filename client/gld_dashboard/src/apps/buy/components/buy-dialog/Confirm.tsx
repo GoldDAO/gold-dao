@@ -35,7 +35,8 @@ const Confirm = () => {
               <div>{pay_token.token.name}</div>
             </div>
             <div className="text-content/60">
-              ≈ $<NumberToLocaleString value={pay_token.amount_usd as number} />
+              ≈ $
+              <NumberToLocaleString value={pay_token.amount_usd as number} />
             </div>
           </div>
         </div>
