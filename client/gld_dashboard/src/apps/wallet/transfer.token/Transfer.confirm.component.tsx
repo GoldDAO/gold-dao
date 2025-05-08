@@ -2,16 +2,12 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-
 import { useAuth } from "@auth/index";
-
 import { Button } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-
 import { TokenSelectedAtom } from "../atoms";
 import { SendTokenStateAtom, TransferTokenStateAtom } from "./atoms";
-
 import useTransfer from "@services/ledger/hooks/useTransfer";
 
 const TransferTokenConfirm = ({ className }: { className?: string }) => {

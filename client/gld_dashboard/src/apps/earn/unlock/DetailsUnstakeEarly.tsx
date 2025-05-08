@@ -30,13 +30,16 @@ const DetailsUnstakeEarly = () => {
           console.log("unstaked early");
           console.log(res);
           queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
-          });
-          queryClient.invalidateQueries({
             queryKey: ["USER_FETCH_LEDGER_BALANCE_GLDT"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS_REWARDS"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
           });
         },
       }

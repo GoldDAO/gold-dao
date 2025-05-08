@@ -25,7 +25,7 @@ const useFetchUserNeuronsList = (
   } = args;
 
   return useQuery({
-    queryKey: ["USER_FETCH_NEURONS_LIST", owner],
+    queryKey: ["USER_NEURONS", owner],
     queryFn: async () => {
       try {
         const actor = Actor.createActor(idlFactory, {

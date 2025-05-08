@@ -42,7 +42,7 @@ const useGetOneNeuronRewards = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_ONE_NEURON_REWARDS", owner, neuronId],
+    queryKey: ["USER_NEURON_REWARDS", owner, neuronId],
     queryFn: async (): Promise<TokensRewards[]> => {
       try {
         const actorKongswap = Actor.createActor(idlFactoryKongswap, {

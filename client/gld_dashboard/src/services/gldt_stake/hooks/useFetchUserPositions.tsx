@@ -4,15 +4,12 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { DateTime } from "luxon";
-
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-
 import { idlFactory } from "../idlFactory";
-
 import { DissolveState, Stake } from "../utils/interfaces";
 import get_active_user_positions from "../get_active_user_positions";
 
-const useFetchUserStake = (
+const useFetchUserPositions = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<Stake[], Error>, "queryKey" | "queryFn">
@@ -24,7 +21,7 @@ const useFetchUserStake = (
   } = options;
 
   return useQuery({
-    queryKey: ["USER_STAKE_FETCH_ALL"],
+    queryKey: ["USER_POSITIONS"],
     queryFn: async (): Promise<Stake[]> => {
       try {
         const actor = Actor.createActor(idlFactory, {
@@ -78,7 +75,7 @@ const useFetchUserStake = (
         return data;
       } catch (err) {
         console.log(err);
-        throw new Error("Fetch user stake list error! Please retry later.");
+        throw new Error("Fetch user positions error! Please retry later.");
       }
     },
     enabled,
@@ -87,4 +84,4 @@ const useFetchUserStake = (
   });
 };
 
-export default useFetchUserStake;
+export default useFetchUserPositions;

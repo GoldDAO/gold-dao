@@ -25,7 +25,7 @@ const DetailsDissolve = () => {
           console.log("dissolved");
           console.log(res);
           queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
+            queryKey: ["USER_POSITIONS"],
           });
         },
       }
