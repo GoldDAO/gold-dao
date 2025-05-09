@@ -4,6 +4,7 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 // import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+// import { Buffer } from "buffer";
 
 import { idlFactory } from "../idlFactory";
 
@@ -21,7 +22,10 @@ const icrc1_transfer = async (
     : [];
 
   const result = await actor.icrc1_transfer({
-    to: { owner: owner, subaccount: subaccount },
+    to: {
+      owner,
+      subaccount,
+    },
     fee: [],
     memo: [],
     from_subaccount: [],
