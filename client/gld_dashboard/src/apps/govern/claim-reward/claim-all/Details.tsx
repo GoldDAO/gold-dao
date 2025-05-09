@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 
@@ -15,7 +14,6 @@ import { Reward } from "../../utils";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
 
   const claim = useClaimReward(SNS_REWARDS_CANISTER_ID, authenticatedAgent);
 
@@ -25,27 +23,10 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
   // });
 
   const handleClaimReward = () => {
-    claim.mutate(
-      {
-        neuron_ids: reward.neurons.map((n) => n.id),
-        token: reward.name === "GOLDAO" ? "GLDGov" : reward.name, // !TODO fix when sns_rewards canister will be updated
-      },
-      {
-        onSuccess: (res) => {
-          console.log("claimed");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_NEURONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_NEURONS_REWARDS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_NEURONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    claim.mutate({
+      neuron_ids: reward.neurons.map((n) => n.id),
+      token: reward.name === "GOLDAO" ? "GLDGov" : reward.name, // !TODO fix when sns_rewards canister will be updated
+    });
   };
 
   useEffect(() => {

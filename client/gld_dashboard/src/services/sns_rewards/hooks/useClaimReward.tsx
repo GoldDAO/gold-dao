@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Buffer } from "buffer";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { idlFactory } from "../idlFactory";
 
@@ -49,6 +50,7 @@ const useClaimReward = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined
 ) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ neuron_ids, token }: RewardsArgs) => {
       try {
@@ -69,6 +71,25 @@ const useClaimReward = (
         console.error(err);
         throw new Error(`claim_reward error! Please retry later.`);
       }
+    },
+    onError: (err) => {
+      console.log("claim error");
+      console.log(err);
+    },
+    onSuccess: (res) => {
+      console.log("claim success");
+      console.log(res);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURONS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURON_REWARDS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURONS_REWARDS"],
+      });
     },
   });
 };
