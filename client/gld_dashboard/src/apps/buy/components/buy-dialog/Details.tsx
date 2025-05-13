@@ -1,10 +1,9 @@
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button, LoaderSpin, Logo } from "@components/index";
-import { BuyGLDTStateReducerAtom } from "../../atoms/BuyGLDT";
+import { BuyGLDTStateReducerAtom } from "@buy/atoms/BuyGLDTAtom";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useSwap from "@services/kongswap/hooks/useSwap";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
@@ -13,7 +12,6 @@ import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 const Details = () => {
   const { authenticatedAgent, principalId, unauthenticatedAgent, isConnected } =
     useAuth();
-  const queryClient = useQueryClient();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const { pay_token, receive_token, max_slippage } = buyAtomState;
 
@@ -28,30 +26,17 @@ const Details = () => {
   );
 
   const approve = useApprove(pay_token.token.canisterId, authenticatedAgent);
-  const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent);
+  const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent, {
+    pay_token: pay_token.token.id,
+    receive_token: "gldt",
+  });
 
   const handleSwap = () => {
-    swap.mutate(
-      {
-        receive_token: "GLDT",
-        pay_token: pay_token.token.name,
-        pay_amount: pay_token.amount as bigint,
-        receive_address: principalId,
-        max_slippage: max_slippage as number,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("swapped");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_LEDGER_BALANCE_${pay_token.token.name}`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_LEDGER_BALANCE_${receive_token.token.name}`],
-          });
-        },
-      }
-    );
+    swap.mutate({
+      pay_amount: pay_token.amount as bigint,
+      receive_address: principalId,
+      max_slippage: max_slippage as number,
+    });
   };
 
   useEffect(() => {
@@ -62,11 +47,7 @@ const Details = () => {
           spender: { owner: KONGSWAP_CANISTER_ID_IC },
         },
         {
-          onSuccess: (res) => {
-            console.log("approved");
-            console.log(res);
-            handleSwap();
-          },
+          onSuccess: () => handleSwap(),
         }
       );
     }

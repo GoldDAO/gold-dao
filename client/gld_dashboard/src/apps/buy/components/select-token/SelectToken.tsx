@@ -9,10 +9,10 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
+import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import Tokens, { Token } from "../../utils/Tokens";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import Tokens, { Token } from "@buy/utils";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();

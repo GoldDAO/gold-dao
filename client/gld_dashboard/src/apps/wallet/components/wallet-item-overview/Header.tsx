@@ -8,7 +8,7 @@ import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import useUserNFTMetrics from "@hooks/useUserNFTMetrics";
 import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import { TokenSelectedAtom } from "../atoms";
+import { TokenSelectedAtom } from "@wallet/atoms/WalletAtom";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const Token = ({ className }: { className?: string }) => {

@@ -3,11 +3,10 @@ import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
-import { TransferNFTStateReducerAtom } from "./atoms";
+import { TransferNFTStateReducerAtom } from "../../../atoms/TransferNFTAtom";
 // import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
 
-const SendNFTConfirm = () => {
+const Confirm = () => {
   const { principalId } = useAuth();
   const [transferNFTState, dispatchTransferNFTState] = useAtom(
     TransferNFTStateReducerAtom
@@ -81,4 +80,4 @@ const SendNFTConfirm = () => {
   );
 };
 
-export default SendNFTConfirm;
+export default Confirm;

@@ -2,14 +2,14 @@ import { Fragment, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
+import { ArrowRight } from "iconsax-react";
 import { useAuth } from "@auth/index";
-import { TokenSelectedAtom } from "../atoms";
+import { TokenSelectedAtom } from "@wallet/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAccountTransactions";
 import Address from "@components/strings/Address";
-import { ArrowRight } from "iconsax-react";
 import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 

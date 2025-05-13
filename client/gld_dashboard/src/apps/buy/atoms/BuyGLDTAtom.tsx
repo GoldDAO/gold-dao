@@ -1,6 +1,6 @@
 import { atomWithReducer } from "jotai/utils";
 import { GLDT_LEDGER_CANISTER_ID_IC, MAX_SWAP_SLIPPAGE } from "@constants";
-import Tokens, { Token } from "../utils/Tokens";
+import Tokens, { Token } from "../utils";
 import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 
 type BuyGLDTState = {

@@ -69,20 +69,21 @@ const useClaimReward = (
         );
       } catch (err) {
         console.error(err);
-        throw new Error(`claim_reward error! Please retry later.`);
+        throw new Error(`Claim reward error! Please retry later.`);
       }
     },
     onError: (err) => {
-      console.log("claim error");
       console.log(err);
     },
-    onSuccess: (res) => {
-      console.log("claim success");
-      console.log(res);
+    onSuccess: () => {
+      // console.log(res);
     },
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ["USER_NEURONS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE"],
       });
       queryClient.invalidateQueries({
         queryKey: ["USER_NEURON_REWARDS"],

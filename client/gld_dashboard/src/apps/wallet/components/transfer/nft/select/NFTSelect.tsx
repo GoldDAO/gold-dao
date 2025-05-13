@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import clsx from "clsx";
 import { PlusIcon, MinusIcon } from "@heroicons/react/20/solid";
 import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
-import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
+import { SelectNFTStateReducerAtom } from "@wallet/atoms/NFTStateAtom";
 
 const BtnSelect = ({
   handleOnClick,

@@ -1,21 +1,15 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
-
 import { useAuth } from "@auth/index";
-
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { Button } from "@components/index";
-
 import useApprove from "@services/ledger/hooks/useApprove";
 import useCreateStake from "@services/gldt_stake/hooks/useCreateStake";
 
 import { StakeStateReducerAtom } from "./atoms";
 
 const Details = () => {
-  const queryClient = useQueryClient();
   const { authenticatedAgent } = useAuth();
   const [stakeState, dispatch] = useAtom(StakeStateReducerAtom);
   const amount = (stakeState.amount as bigint) + (stakeState.fee as bigint);
@@ -27,26 +21,9 @@ const Details = () => {
   );
 
   const handleCreateStake = () => {
-    createStakePosition.mutate(
-      {
-        amount,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("stake position opened");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_LEDGER_BALANCE_GLDT`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    createStakePosition.mutate({
+      amount,
+    });
   };
 
   useEffect(() => {

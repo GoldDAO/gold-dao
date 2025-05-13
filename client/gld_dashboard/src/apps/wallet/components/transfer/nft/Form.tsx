@@ -5,11 +5,11 @@ import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
 import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
 import { Button } from "@components/index";
-import UserNFTSelect from "./nft.select/UserNFTSelect";
-import { TransferNFTStateReducerAtom } from "./atoms";
-import { IsOneOrMoreSelectedNFTAtom } from "@atoms/NFTState";
+import UserNFTSelect from "./select/UserNFTSelect";
+import { TransferNFTStateReducerAtom } from "@wallet/atoms/TransferNFTAtom";
+import { IsOneOrMoreSelectedNFTAtom } from "@wallet/atoms/NFTStateAtom";
 
-const SendNFTForm = ({ className }: { className?: string }) => {
+const Form = ({ className }: { className?: string }) => {
   const [, dispatchTransferNFTState] = useAtom(TransferNFTStateReducerAtom);
   const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
   const collections: CollectionNameNFT[] = ["1G", "10G", "100G", "1KG"];
@@ -100,4 +100,4 @@ const SendNFTForm = ({ className }: { className?: string }) => {
   );
 };
 
-export default SendNFTForm;
+export default Form;

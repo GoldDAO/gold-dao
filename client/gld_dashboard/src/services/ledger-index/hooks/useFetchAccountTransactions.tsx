@@ -12,6 +12,7 @@ import { idlFactory as idlFactoryICP } from "@services/ledger-index/idlFactory_i
 import get_account_transactions from "@services/ledger-index/get_account_transactions";
 import get_account_transactions_icp from "@services/ledger-index/get_account_transactions_icp";
 import { Transactions } from "@services/ledger-index/utils/interfaces";
+import { Ledger } from "@services/ledger/utils/interfaces";
 
 const useFetchAccountTransactions = (
   canisterId: string,
@@ -26,7 +27,7 @@ const useFetchAccountTransactions = (
   > & {
     max_results?: number;
     account: string;
-    ledger: string;
+    ledger: Ledger;
   }
 ) => {
   const {
@@ -38,7 +39,7 @@ const useFetchAccountTransactions = (
   } = args;
 
   return useInfiniteQuery({
-    queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", account, ledger],
+    queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", ledger, account],
     queryFn: async ({ pageParam = null }) => {
       try {
         const decodedAccount = decodeIcrcAccount(account);

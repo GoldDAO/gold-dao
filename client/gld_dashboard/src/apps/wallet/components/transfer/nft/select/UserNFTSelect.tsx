@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
-import NFTSelect from "./NFTSelect";
 import useFetchUserNFT from "@services/gld_nft/hooks/useFetchUserNFT";
-import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
+import { SelectNFTStateReducerAtom } from "@wallet/atoms/NFTStateAtom";
+import NFTSelect from "./NFTSelect";
 
 const UserNFTSelect = ({
   className,
