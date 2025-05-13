@@ -5,12 +5,12 @@ import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
-import WalletList from "./wallet-list";
-import WalletItemOverviewHeader from "./wallet-item-overview/Header";
-import WalletItemOverviewBtnAction from "./wallet-item-overview/BtnAction";
-import TxHistory from "./transactions-history";
+import WalletList from "./components/wallet-list";
+import WalletItemOverviewHeader from "./components/wallet-item-overview/Header";
+import WalletItemOverviewBtnAction from "./components/wallet-item-overview/BtnAction";
+import Transactions from "./components/transactions";
 import { TokensList, TokensWhitelist, GLDT_INDEX } from "./utils";
-import { TokenSelectedAtom } from "./atoms";
+import { TokenSelectedAtom } from "./atoms/WalletAtom";
 
 const Wallet = () => {
   const { isConnected, connect } = useAuth();
@@ -107,7 +107,7 @@ const Wallet = () => {
           </div>
           <div className="p-4 xl:p-8 mt-4 xl:mt-12 flex flex-col overflow-hidden">
             <div className="mb-4">Transactions</div>
-            {isConnected ? <TxHistory /> : renderDisconnectedPlaceholder()}
+            {isConnected ? <Transactions /> : renderDisconnectedPlaceholder()}
           </div>
         </div>
       </InnerAppLayout.RightPanel>

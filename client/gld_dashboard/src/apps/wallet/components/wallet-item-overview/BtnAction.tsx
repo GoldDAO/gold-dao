@@ -9,15 +9,15 @@ import BuyOnBity from "@assets/icons/buy_on_bity.svg";
 import Redeem from "@assets/icons/redeem.svg";
 import Govern from "@assets/icons/govern.svg";
 import Earn from "@assets/icons/earn.svg";
-import { TokenSelectedAtom } from "../atoms";
+import { TokenSelectedAtom } from "@wallet/atoms/WalletAtom";
 import {
   TransferTokenStateAtom,
   SendTokenStateAtom,
-} from "../transfer.token/atoms";
-import { TransferNFTStateReducerAtom } from "../transfer.nft/atoms";
-import TransferDialogToken from "../transfer.token/Dialog.component";
-import TransferDialogNFT from "../transfer.nft";
-import SendDialogNFTDetails from "../transfer.nft/SendDialogNFTDetails";
+} from "@wallet/atoms/TransferTokenAtom";
+import { TransferNFTStateReducerAtom } from "@wallet/atoms/TransferNFTAtom";
+import TransferDialogToken from "@wallet/components/transfer/token";
+import TransferDialogNFT from "@wallet/components/transfer/nft";
+import SendDialogNFTDetails from "@wallet/components/transfer/nft/Details";
 
 type Action =
   | "buy-gldt"
@@ -57,7 +57,7 @@ const ButtonAction = ({
         className={clsx(
           "flex justify-center px-3 py-4 rounded-md shrink-0",
           "bg-secondary text-white cursor-pointer",
-          "xl:px-12 xl:px-8 xl:rounded-lg"
+          "xl:px-8 xl:rounded-lg"
         )}
       >
         <div

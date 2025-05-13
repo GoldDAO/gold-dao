@@ -23,6 +23,8 @@ export const GLDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_INDEX_CANISTER_ID;
 export const ICP_LEDGER_CANISTER_ID = import.meta.env
   .VITE_ICP_LEDGER_CANISTER_ID;
+export const ICP_LEDGER_LEGACY_CANISTER_ID = import.meta.env
+  .VITE_ICP_LEDGER_LEGACY_CANISTER_ID;
 export const ICP_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_ICP_LEDGER_INDEX_CANISTER_ID;
 export const WTN_LEDGER_CANISTER_ID = import.meta.env
@@ -169,6 +171,12 @@ if (!(APP_MODE === "production")) {
       "No ICP_LEDGER_CANISTER_ID environment variable. Set ICP_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`ICP_LEDGER_CANISTER_ID=${ICP_LEDGER_CANISTER_ID}`);
+
+  if (!ICP_LEDGER_LEGACY_CANISTER_ID)
+    console.log(
+      "No ICP_LEDGER_LEGACY_CANISTER_ID environment variable. Set ICP_LEDGER_LEGACY_CANISTER_ID environment variable."
+    );
+  else console.log(`ICP_LEDGER_LEGACY_CANISTER_ID=${ICP_LEDGER_LEGACY_CANISTER_ID}`);
 
   if (!ICP_LEDGER_INDEX_CANISTER_ID)
     console.log(

@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
@@ -13,7 +11,6 @@ import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
 
 const DetailsUnstakeEarly = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
   const [unlockState, dispatch] = useAtom(UnlockStateReducerAtom);
   const unstakeEarly = useUnstakeEarly(
     GLDT_STAKE_CANISTER_ID,
@@ -21,29 +18,9 @@ const DetailsUnstakeEarly = () => {
   );
 
   const handleUnstake = () => {
-    unstakeEarly.mutate(
-      {
-        id: unlockState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("unstaked early");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_FETCH_LEDGER_BALANCE_GLDT"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_REWARDS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    unstakeEarly.mutate({
+      id: unlockState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {

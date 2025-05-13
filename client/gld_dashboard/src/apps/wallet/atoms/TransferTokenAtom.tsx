@@ -11,17 +11,21 @@ export const TransferTokenStateAtom = atomWithReset<{
 export const SendTokenStateAtom = atomWithReset<{
   amount: bigint;
   amount_input: string;
-  receive_address: string | null;
-  fee: bigint | null;
-  decimals: number | null;
+  principal: string;
+  subaccount: string;
+  receive_account: string;
+  is_icrc_account: boolean;
+  is_principal_standard: boolean;
   is_step_send_form: boolean;
   is_step_send_confirm: boolean;
 }>({
   amount: 0n,
   amount_input: "",
-  receive_address: null,
-  fee: null,
-  decimals: null,
+  principal: "",
+  subaccount: "",
+  receive_account: "",
+  is_icrc_account: false,
+  is_principal_standard: true,
   is_step_send_form: true,
   is_step_send_confirm: false,
 });

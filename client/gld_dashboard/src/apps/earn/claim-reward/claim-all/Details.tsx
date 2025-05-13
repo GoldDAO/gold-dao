@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
@@ -14,8 +13,6 @@ import { Reward } from "../../utils";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
-
   const claim = useClaimReward(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
   // const decimals = useFetchDecimals(reward.canisterId, unauthenticatedAgent, {
@@ -24,27 +21,10 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
   // });
 
   const handleClaimReward = () => {
-    claim.mutate(
-      {
-        position_ids: reward.positions.map((n) => n.id),
-        token: reward.name,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("claimed");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_REWARDS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    claim.mutate({
+      position_ids: reward.positions.map((n) => n.id),
+      token: reward.name,
+    });
   };
 
   useEffect(() => {

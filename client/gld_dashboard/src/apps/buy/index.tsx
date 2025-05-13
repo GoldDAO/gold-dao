@@ -7,22 +7,26 @@ import {
   GLDT_LEDGER_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
 } from "@constants";
-import { BuyGLDTStateReducerAtom } from "./atoms/BuyGLDT";
+import { BuyGLDTStateReducerAtom } from "./atoms/BuyGLDTAtom";
 import { useAuth } from "@auth/index";
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
+import {
+  onKeyDownPreventNoDigits,
+  onPastePreventNoDigits,
+} from "@utils/form/input";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import InnerAppLayout from "@components/outlets/InnerAppLayout";
+import { Token } from "./utils";
 import SelectToken from "./components/select-token/SelectToken";
-import { Token } from "./utils/Tokens";
 import BuyConfirm from "./components/buy-dialog/Confirm";
 import BuyDetails from "./components/buy-dialog/Details";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
 import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -48,7 +52,7 @@ const Buy = () => {
   const amount = useWatch({
     control,
     name: "amount",
-  });
+  }) as number;
 
   const balance = useFetchUserBalance(
     pay_token.token.canisterId,
@@ -89,7 +93,7 @@ const Buy = () => {
     {
       from: pay_token.token.name,
       to: "GLDT",
-      amount: BigInt(1 * 10 ** (payTokenDecimals.data ?? 0)),
+      amount: BigInt(10 ** (payTokenDecimals.data ?? 0)),
       enabled:
         !!unauthenticatedAgent && isConnected && payTokenDecimals.isSuccess,
     }
@@ -205,23 +209,12 @@ const Buy = () => {
 
   const isAmountGreaterThanZero = (value: number) => value > 0;
 
-  const preventNoDigits = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "e" || e.key === "-" || e.key === "+") e.preventDefault();
-  };
-
-  const preventPasteNoDigits = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const clipboardData = e.clipboardData;
-    const text = clipboardData.getData("text");
-    const number = parseFloat(text);
-    if (number < 0) e.preventDefault();
-    if (text === "e" || text === "+" || text === "-") e.preventDefault();
-  };
-
   const isDataFetched =
     balance.isSuccess &&
     price.isSuccess &&
     receiveTokenPrice.isSuccess &&
-    payTokenPrice.isSuccess;
+    payTokenPrice.isSuccess &&
+    payTokenDecimals.isSuccess;
 
   const isReceiveTokenPriceIsFetched =
     receiveTokenPrice.isSuccess && !receiveTokenPrice.isFetching;
@@ -300,8 +293,10 @@ const Buy = () => {
                             "placeholder:text-content/40",
                             "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           )}
-                          onPaste={preventPasteNoDigits}
-                          onKeyDown={preventNoDigits}
+                          onPaste={onPastePreventNoDigits}
+                          onKeyDown={(e) => {
+                            onKeyDownPreventNoDigits(e);
+                          }}
                           {...register("amount", {
                             pattern: /[0-9.]/,
                             required: "",

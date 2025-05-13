@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { BuyGLDTStateReducerAtom } from "../../atoms/BuyGLDT";
+import { BuyGLDTStateReducerAtom } from "@buy/atoms/BuyGLDTAtom";
 import { Logo } from "@components/index";
 import { Button } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";

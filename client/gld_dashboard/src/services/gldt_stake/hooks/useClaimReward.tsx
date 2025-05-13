@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { idlFactory } from "@services/gldt_stake/idlFactory";
@@ -10,6 +10,7 @@ const useClaimReward = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined
 ) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ position_ids, token }: RewardsArgs) => {
       try {
@@ -30,6 +31,26 @@ const useClaimReward = (
         console.error(err);
         throw new Error(`Claim rewards error! Please retry later.`);
       }
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+    onSuccess: () => {
+      // console.log(res);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS_REWARDS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE"],
+      });
     },
   });
 };

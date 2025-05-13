@@ -3,10 +3,12 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { Button, Dialog } from "@components/index";
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
-import { TransferNFTStateReducerAtom } from "./atoms";
+import { TransferNFTStateReducerAtom } from "@wallet/atoms/TransferNFTAtom";
 import { IdNFT } from "@services/gld_nft/utils/interfaces";
-import { CollectionNFT, SelectNFTStateReducerAtom } from "@atoms/NFTState";
+import {
+  CollectionNFT,
+  SelectNFTStateReducerAtom,
+} from "@wallet/atoms/NFTStateAtom";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -247,7 +249,7 @@ const SendNFTDetails = () => {
   );
 };
 
-const SendDialogNFTDetails = () => {
+const Details = () => {
   const [transferNFTState, dispatchTransferNFTState] = useAtom(
     TransferNFTStateReducerAtom
   );
@@ -271,4 +273,4 @@ const SendDialogNFTDetails = () => {
   );
 };
 
-export default SendDialogNFTDetails;
+export default Details;

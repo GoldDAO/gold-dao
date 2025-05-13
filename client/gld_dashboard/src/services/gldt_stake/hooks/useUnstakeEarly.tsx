@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
@@ -14,11 +14,8 @@ const unstake_early = async (
   args: { id: bigint }
 ): Promise<StakePositionResponse> => {
   const { id } = args;
-
   const result = (await actor.unstake_early(id)) as Result_7;
-
   if ("Err" in result) throw result.Err;
-
   return result.Ok;
 };
 
@@ -26,6 +23,7 @@ const useUnstakeEarly = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined
 ) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id }: { id: bigint }) => {
       try {
@@ -42,6 +40,21 @@ const useUnstakeEarly = (
         console.error(err);
         throw new Error(`unstake_early error! Please retry later.`);
       }
+    },
+    onSuccess: () => {
+      // console.log(res);
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE", { ledger: "gldt" }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS_REWARDS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
+      });
     },
   });
 };

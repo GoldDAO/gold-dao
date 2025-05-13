@@ -2,10 +2,11 @@ import { useAtom } from "jotai";
 import clsx from "clsx";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import Dialog from "@components/dialogs/Dialog";
-import { TransferNFTStateReducerAtom } from "./atoms";
-import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
-import SendNFTForm from "./SendNFTForm";
-import SendNFTConfirm from "./SendNFTConfirm";
+import { TransferNFTStateReducerAtom } from "@wallet/atoms/TransferNFTAtom";
+import { SelectNFTStateReducerAtom } from "@wallet/atoms/NFTStateAtom";
+import SendForm from "./Form";
+import SendConfirm from "./Confirm";
+import ReceiveAddress from "@wallet/components/transfer/receive-address";
 
 const TransferNFTDialog = () => {
   const [transferState, dispatchTransferState] = useAtom(
@@ -63,11 +64,11 @@ const TransferNFTDialog = () => {
         </div>
       )}
       <div className="mt-8">
-        {transfer_tab === "receive" && <div>Receive</div>}
+        {transfer_tab === "receive" && <ReceiveAddress />}
         {transfer_tab === "send" && (
           <>
-            {is_step_send_form && <SendNFTForm />}
-            {is_step_send_confirm && <SendNFTConfirm />}
+            {is_step_send_form && <SendForm />}
+            {is_step_send_confirm && <SendConfirm />}
           </>
         )}
       </div>
