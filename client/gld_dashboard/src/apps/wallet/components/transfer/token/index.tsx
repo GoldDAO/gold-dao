@@ -7,8 +7,8 @@ import {
   TransferTokenStateAtom,
   SendTokenStateAtom,
 } from "@wallet/atoms/TransferTokenAtom";
-import Form from "./Form";
-import Confirm from "./Confirm";
+import Form from "./form";
+import Confirm from "./confirm/Confirm";
 import ReceiveAddress from "@wallet/components/transfer/receive-address";
 
 const TransferTokenDialog = () => {

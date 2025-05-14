@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useState } from "react";
-import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { ReactNode, useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm, useWatch } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
 import { useAuth } from "@auth/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
@@ -11,10 +11,9 @@ import { TokenSelectedAtom } from "@wallet/atoms/WalletAtom";
 import { SendTokenStateAtom } from "@wallet/atoms/TransferTokenAtom";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchTokenData from "@hooks/useFetchTokenData";
-import { Principal } from "@dfinity/principal";
-import { Buffer } from "buffer";
-import { isValidAccount } from "@utils/isValidAccount";
-import { isValidPrincipal } from "@utils/isValidPrincipal";
+import ICRCAccount from "./components/form/input/ICRCAccount";
+import PrincipalAndSubaccount from "./components/form/input/PrincipalAndSubaccount";
+import ICRCAccountOrAccountId from "./components/form/input/ICRCAccountOrAccountId";
 
 const InputCard = ({ children }: { children: ReactNode }) => {
   return (
@@ -29,8 +28,12 @@ const Form = ({ className }: { className?: string }) => {
 
   const token = useAtomValue(TokenSelectedAtom);
   const [sendState, setSendState] = useAtom(SendTokenStateAtom);
-  const { amount_input, principal, subaccount, is_icrc_account } = sendState;
-  const [isInvalidAddress, setIsValidAddress] = useState<null | string>(null);
+  const {
+    amount_input,
+    is_use_icrc_account,
+    is_valid_receive_address,
+    error_message_receive_address,
+  } = sendState;
 
   const {
     register,
@@ -38,7 +41,7 @@ const Form = ({ className }: { className?: string }) => {
     control,
     setFocus,
     setValue,
-    reset,
+    // reset,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -49,16 +52,6 @@ const Form = ({ className }: { className?: string }) => {
   const watchedAmount = useWatch({
     control,
     name: "amount",
-    defaultValue: "",
-  });
-  const watchedPrincipal = useWatch({
-    control,
-    name: "principal",
-    defaultValue: "",
-  });
-  const watchedSubaccount = useWatch({
-    control,
-    name: "subaccount",
     defaultValue: "",
   });
 
@@ -80,49 +73,35 @@ const Form = ({ className }: { className?: string }) => {
         shouldValidate: true,
       });
     }
-    if (principal !== "") {
-      setValue("principal", principal, {
-        shouldValidate: true,
-      });
-    }
-    if (subaccount !== "") {
-      setValue("subaccount", subaccount, {
-        shouldValidate: true,
-      });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isValidSendAddress = (principal: string, subaccount?: string) => {
-    try {
-      if (!is_icrc_account) {
-        const encoded = encodeIcrcAccount({
-          owner: Principal.fromText(principal),
-          subaccount: subaccount ? Buffer.from(subaccount, "hex") : [],
-        });
-        decodeIcrcAccount(encoded);
-        setIsValidAddress(null);
-      } else {
-        if (!isValidAccount(principal) && !isValidPrincipal(principal)) {
-          setIsValidAddress(
-            "Invalid ICRC account or account ID or principal ID"
-          );
-          return;
-        }
-        // decodeIcrcAccount(principal);
-      }
-      setIsValidAddress(null);
-    } catch (err: unknown) {
-      setIsValidAddress(err instanceof Error ? err.message : String(err));
-    }
-  };
-
-  useEffect(() => {
-    if (watchedPrincipal !== "") {
-      isValidSendAddress(watchedPrincipal, watchedSubaccount);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedPrincipal, watchedSubaccount]);
+  // const isValidSendAddress = (principal: string, subaccount?: string) => {
+  //   try {
+  //     if (!is_use_icrc_account) {
+  //       const encoded = encodeIcrcAccount({
+  //         owner: Principal.fromText(principal),
+  //         subaccount: subaccount ? Buffer.from(subaccount, "hex") : [],
+  //       });
+  //       decodeIcrcAccount(encoded);
+  //       setIsValidAddress(null);
+  //     } else {
+  //       if (
+  //         !isValidAccount(principal) &&
+  //         !isValidPrincipalOrICRCAccount(principal)
+  //       ) {
+  //         setIsValidAddress(
+  //           "Invalid ICRC account or account ID or principal ID"
+  //         );
+  //         return;
+  //       }
+  //       // decodeIcrcAccount(principal);
+  //     }
+  //     setIsValidAddress(null);
+  //   } catch (err: unknown) {
+  //     setIsValidAddress(err instanceof Error ? err.message : String(err));
+  //   }
+  // };
 
   if (!balance.isSuccess || !tokenData.isSuccess) {
     return (
@@ -175,92 +154,20 @@ const Form = ({ className }: { className?: string }) => {
   };
 
   const handleOnSubmit = (data: FieldValues) => {
-    if (!is_icrc_account) {
-      const encoded = encodeIcrcAccount({
-        owner: Principal.fromText(watchedPrincipal),
-        subaccount: watchedSubaccount
-          ? Buffer.from(watchedSubaccount, "hex")
-          : [],
-      });
-      const value = encoded;
-      setSendState((state) => ({
-        ...state,
-        receive_account: value,
-        is_principal_standard: true,
-      }));
-    } else {
-      if (token.id === "icp" && isValidAccount(data.principal)) {
-        setSendState((state) => ({
-          ...state,
-          receive_account: data.principal,
-          is_principal_standard: false,
-        }));
-      } else {
-        setSendState((state) => ({
-          ...state,
-          receive_account: data.principal,
-          is_principal_standard: true,
-        }));
-      }
-    }
     setSendState((state) => ({
       ...state,
       amount_input: data.amount,
       amount: getAmount(),
-      principal: data.principal,
-      subaccount: data.subaccount,
       is_step_send_form: false,
       is_step_send_confirm: true,
     }));
   };
 
   const handleSwitchAddress = () => {
-    if (watchedPrincipal === "") {
-      setSendState((state) => ({
-        ...state,
-        is_icrc_account: !is_icrc_account,
-      }));
-      setIsValidAddress(null);
-      reset();
-      return;
-    }
-    if (!is_icrc_account) {
-      const encoded = encodeIcrcAccount({
-        owner: Principal.fromText(watchedPrincipal),
-        subaccount: watchedSubaccount
-          ? Buffer.from(watchedSubaccount, "hex")
-          : [],
-      });
-      const value = encoded;
-      setValue("principal", value, {
-        shouldValidate: true,
-      });
-      setSendState((state) => ({
-        ...state,
-        is_icrc_account: true,
-      }));
-    } else {
-      if (isValidPrincipal(watchedPrincipal)) {
-        const value = decodeIcrcAccount(watchedPrincipal);
-        setValue("principal", value.owner.toText(), {
-          shouldValidate: true,
-        });
-        setValue(
-          "subaccount",
-          value.subaccount ? Buffer.from(value.subaccount).toString("hex") : "",
-          {
-            shouldValidate: true,
-          }
-        );
-      } else {
-        reset();
-      }
-
-      setSendState((state) => ({
-        ...state,
-        is_icrc_account: false,
-      }));
-    }
+    setSendState((state) => ({
+      ...state,
+      is_use_icrc_account: !is_use_icrc_account,
+    }));
   };
 
   return (
@@ -273,92 +180,36 @@ const Form = ({ className }: { className?: string }) => {
       <div className="flex flex-col gap-4 mt-4">
         <div className="w-full">
           <div className="flex flex-col md:flex-row md:items-end gap-4">
-            {!is_icrc_account ? (
-              <>
-                <div className="w-full">
-                  <div className="text-primary text-sm mb-2">Principal</div>
-                  <InputCard>
-                    <input
-                      id="principal"
-                      type="text"
-                      autoComplete="off"
-                      placeholder="Enter a Principal"
-                      className={clsx(
-                        "w-full outline-none focus:outline-none focus:ring-0 bg-surface-secondary",
-                        "placeholder:text-content/40"
-                      )}
-                      {...register("principal", {
-                        required: "Principal is required",
-                      })}
-                    />
-                  </InputCard>
-                </div>
-                <div className="w-full">
-                  <div className="text-primary text-sm mb-2">Subaccount</div>
-                  <InputCard>
-                    <input
-                      id="subaccount"
-                      type="text"
-                      autoComplete="off"
-                      placeholder="Enter a Subaccount"
-                      className={clsx(
-                        "w-full outline-none focus:outline-none focus:ring-0 bg-surface-secondary",
-                        "placeholder:text-content/40"
-                      )}
-                      {...register("subaccount", {})}
-                    />
-                  </InputCard>
-                </div>
-              </>
+            {is_use_icrc_account ? (
+              <div className="w-full">
+                {token.id === "icp" ? (
+                  <ICRCAccountOrAccountId />
+                ) : (
+                  <ICRCAccount />
+                )}
+              </div>
             ) : (
-              <>
-                <div className="w-full">
-                  <div className="text-primary text-sm mb-2">
-                    Principal ID (or ICRC account or Account ID)
-                  </div>
-                  <InputCard>
-                    <input
-                      id="principal"
-                      type="text"
-                      autoComplete="off"
-                      placeholder="Enter Principal ID or Account ID or ICRC Account"
-                      className={clsx(
-                        "w-full outline-none focus:outline-none focus:ring-0 bg-surface-secondary",
-                        "placeholder:text-content/40"
-                      )}
-                      {...register("principal", {
-                        required:
-                          "Principal ID or Account ID or ICRC account is required",
-                      })}
-                    />
-                  </InputCard>
-                </div>
-              </>
+              <div className="w-full">
+                <PrincipalAndSubaccount />
+              </div>
             )}
             <div className="shrink-0">
               <Button
                 onClick={handleSwitchAddress}
                 className="w-full px-4 py-4 border border-primary bg-primary/10 text-primary font-medium rounded-md"
               >
-                {!is_icrc_account
+                {!is_use_icrc_account
                   ? "Use ICRC Account"
                   : "Use Principal & Subaccount"}
               </Button>
             </div>
           </div>
-          {errors && (
-            <>
-              <div className="text-red-600 text-sm mt-1">
-                {typeof errors?.principal?.message === "string" &&
-                  errors.principal.message}
-              </div>
-              {!!isInvalidAddress && (
-                <div className="text-red-600 text-sm mt-1">
-                  {isInvalidAddress}
-                </div>
-              )}
-            </>
-          )}
+          <ErrorMessage
+            errors={error_message_receive_address}
+            name="principal"
+            as="div"
+            className="text-red-600 text-sm mt-1"
+          />
         </div>
         <div>
           <div className="text-primary text-sm mb-2">Amount</div>
@@ -439,7 +290,7 @@ const Form = ({ className }: { className?: string }) => {
       <div className="mt-8">
         <Button
           type="submit"
-          disabled={!isValid || !!isInvalidAddress}
+          disabled={!isValid || !is_valid_receive_address}
           className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
         >
           Transfer

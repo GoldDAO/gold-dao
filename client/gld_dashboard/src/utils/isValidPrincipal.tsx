@@ -1,10 +1,8 @@
-// import { Principal } from "@dfinity/principal";
-import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
+import { Principal } from "@dfinity/principal";
 
 export const isValidPrincipal = (principal: string): boolean => {
   try {
-    decodeIcrcAccount(principal);
-    return true;
+    return principal === Principal.fromText(principal).toText();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return false;

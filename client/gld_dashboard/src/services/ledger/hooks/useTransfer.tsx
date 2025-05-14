@@ -1,10 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { Principal } from "@dfinity/principal";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
-// import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-// import { Buffer } from "buffer";
 import { idlFactory } from "../idlFactory";
 import { idlFactory as idlFactoryLegacy } from "../idlFactoryLegacy";
 import { Result } from "../interfaces/ledger";
@@ -40,15 +37,11 @@ const send_dfx = async (
   actor: ActorSubclass,
   transferArgs: { amount: bigint; account: string; fee: bigint; memo?: bigint }
 ) => {
-  const { amount, account, fee, memo } = transferArgs;
-  // const to = AccountIdentifier.fromPrincipal({
-  //   principal: Principal.fromText(account),
-  // }).toHex();
-
+  const { amount, account, memo } = transferArgs;
   const result = await actor.send_dfx({
     to: account,
     fee: {
-      e8s: fee,
+      e8s: 200000n,
     },
     memo: memo ?? 0n,
     from_subaccount: [],
