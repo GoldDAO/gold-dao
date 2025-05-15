@@ -76,36 +76,6 @@ const Form = ({ className }: { className?: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-<<<<<<< HEAD
-  // const isValidSendAddress = (principal: string, subaccount?: string) => {
-  //   try {
-  //     if (!is_use_icrc_account) {
-  //       const encoded = encodeIcrcAccount({
-  //         owner: Principal.fromText(principal),
-  //         subaccount: subaccount ? Buffer.from(subaccount, "hex") : [],
-  //       });
-  //       decodeIcrcAccount(encoded);
-  //       setIsValidAddress(null);
-  //     } else {
-  //       if (
-  //         !isValidAccount(principal) &&
-  //         !isValidPrincipalOrICRCAccount(principal)
-  //       ) {
-  //         setIsValidAddress(
-  //           "Invalid ICRC account or account ID or principal ID"
-  //         );
-  //         return;
-  //       }
-  //       // decodeIcrcAccount(principal);
-  //     }
-  //     setIsValidAddress(null);
-  //   } catch (err: unknown) {
-  //     setIsValidAddress(err instanceof Error ? err.message : String(err));
-  //   }
-  // };
-
-=======
->>>>>>> transfer-send_dfx
   if (!balance.isSuccess || !tokenData.isSuccess) {
     return (
       <div className="flex justify-center items-center px-4 py-16 xl:py-32">

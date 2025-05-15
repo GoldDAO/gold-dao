@@ -12,11 +12,7 @@ const ICRCAccount = () => {
     register,
     control,
     setValue,
-<<<<<<< HEAD
-    // reset,
-=======
     reset,
->>>>>>> transfer-send_dfx
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -71,8 +67,6 @@ const ICRCAccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 
-<<<<<<< HEAD
-=======
   useEffect(() => {
     return () => {
       reset();
@@ -84,7 +78,6 @@ const ICRCAccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
->>>>>>> transfer-send_dfx
   const validatePrincipal = (value: string) => {
     if (isValidPrincipalOrICRCAccount(value)) return true;
     return false;

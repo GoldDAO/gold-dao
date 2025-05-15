@@ -36,11 +36,7 @@ const send_dfx = async (
   actor: ActorSubclass,
   transferArgs: { amount: bigint; account: string; fee: bigint; memo?: bigint }
 ) => {
-<<<<<<< HEAD
-  const { amount, account, memo } = transferArgs;
-=======
   const { amount, account, memo, fee } = transferArgs;
->>>>>>> transfer-send_dfx
   const result = await actor.send_dfx({
     to: account,
     fee: {

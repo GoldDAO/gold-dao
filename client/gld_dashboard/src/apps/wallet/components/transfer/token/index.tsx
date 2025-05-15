@@ -8,11 +8,7 @@ import {
   SendTokenStateAtom,
 } from "@wallet/atoms/TransferTokenAtom";
 import Form from "./form";
-<<<<<<< HEAD
-import Confirm from "./confirm/Confirm";
-=======
 import Confirm from "./confirm";
->>>>>>> transfer-send_dfx
 import ReceiveAddress from "@wallet/components/transfer/receive-address";
 
 const TransferTokenDialog = () => {
