@@ -76,6 +76,7 @@ const Form = ({ className }: { className?: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+<<<<<<< HEAD
   // const isValidSendAddress = (principal: string, subaccount?: string) => {
   //   try {
   //     if (!is_use_icrc_account) {
@@ -103,6 +104,8 @@ const Form = ({ className }: { className?: string }) => {
   //   }
   // };
 
+=======
+>>>>>>> transfer-send_dfx
   if (!balance.isSuccess || !tokenData.isSuccess) {
     return (
       <div className="flex justify-center items-center px-4 py-16 xl:py-32">
@@ -160,6 +163,7 @@ const Form = ({ className }: { className?: string }) => {
       amount: getAmount(),
       is_step_send_form: false,
       is_step_send_confirm: true,
+      is_send_confirm: true,
     }));
   };
 

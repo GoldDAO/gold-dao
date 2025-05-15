@@ -8,7 +8,11 @@ import {
   SendTokenStateAtom,
 } from "@wallet/atoms/TransferTokenAtom";
 import Form from "./form";
+<<<<<<< HEAD
 import Confirm from "./confirm/Confirm";
+=======
+import Confirm from "./confirm";
+>>>>>>> transfer-send_dfx
 import ReceiveAddress from "@wallet/components/transfer/receive-address";
 
 const TransferTokenDialog = () => {
@@ -16,7 +20,8 @@ const TransferTokenDialog = () => {
   const [sendState, setSendState] = useAtom(SendTokenStateAtom);
 
   const { is_open_transfer_dialog, transfer_tab } = transferState;
-  const { is_step_send_form, is_step_send_confirm } = sendState;
+  const { is_step_send_form, is_step_send_confirm, is_send_confirm } =
+    sendState;
 
   const handleOnChangeTab = (tab: "send" | "receive") => {
     setTransferState((state) => ({
@@ -29,6 +34,7 @@ const TransferTokenDialog = () => {
     setSendState((state) => ({
       ...state,
       is_step_send_confirm: false,
+      is_send_confirm: false,
       is_step_send_form: true,
     }));
   };
@@ -43,7 +49,7 @@ const TransferTokenDialog = () => {
       handleOnClose={handleCloseTransferDialog}
       size="xxl"
       title={
-        is_step_send_confirm && (
+        is_send_confirm && (
           <div
             className={clsx(
               "p-1 rounded-full cursor-pointer",

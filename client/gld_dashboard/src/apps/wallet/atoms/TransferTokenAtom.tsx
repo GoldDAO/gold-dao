@@ -19,6 +19,7 @@ export const SendTokenStateAtom = atomWithReset<{
   is_use_icrc_account: boolean;
   is_step_send_form: boolean;
   is_step_send_confirm: boolean;
+  is_send_confirm: boolean;
 }>({
   amount: 0n,
   amount_input: "",
@@ -29,4 +30,5 @@ export const SendTokenStateAtom = atomWithReset<{
   is_use_icrc_account: true,
   is_step_send_form: true,
   is_step_send_confirm: false,
+  is_send_confirm: false,
 });

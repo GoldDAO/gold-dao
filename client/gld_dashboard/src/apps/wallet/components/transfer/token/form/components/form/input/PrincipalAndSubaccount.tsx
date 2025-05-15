@@ -15,9 +15,14 @@ const PrincipalAndSubaccount = () => {
   const {
     register,
     control,
+<<<<<<< HEAD
 
     setValue,
     // reset,
+=======
+    setValue,
+    reset,
+>>>>>>> transfer-send_dfx
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -89,6 +94,20 @@ const PrincipalAndSubaccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    return () => {
+      reset();
+      setSendState((state) => ({
+        ...state,
+        error_message_receive_address: {},
+      }));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+>>>>>>> transfer-send_dfx
   const validatePrincipal = (value: string) => {
     if (isValidPrincipalAndSubaccount(value, watchedSubaccount)) return true;
     return false;

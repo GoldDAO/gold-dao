@@ -13,7 +13,11 @@ const ICRCAccountOrAccountId = () => {
     register,
     control,
     setValue,
+<<<<<<< HEAD
     // reset,
+=======
+    reset,
+>>>>>>> transfer-send_dfx
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -73,6 +77,20 @@ const ICRCAccountOrAccountId = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.principal]);
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    return () => {
+      reset();
+      setSendState((state) => ({
+        ...state,
+        error_message_receive_address: {},
+      }));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+>>>>>>> transfer-send_dfx
   const validatePrincipal = (value: string) => {
     if (isValidPrincipalOrICRCAccount(value) || isValidAccount(value))
       return true;

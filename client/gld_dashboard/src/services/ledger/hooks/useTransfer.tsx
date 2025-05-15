@@ -3,10 +3,9 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../idlFactory";
-import { idlFactory as idlFactoryLegacy } from "../idlFactoryLegacy";
+import { idlFactory as idlFactoryICP } from "../idlFactoryICP";
 import { Result } from "../interfaces/ledger";
 import { Ledger } from "../utils/interfaces";
-import { ICP_LEDGER_LEGACY_CANISTER_ID } from "@constants";
 
 const icrc1_transfer = async (
   actor: ActorSubclass,
@@ -37,7 +36,11 @@ const send_dfx = async (
   actor: ActorSubclass,
   transferArgs: { amount: bigint; account: string; fee: bigint; memo?: bigint }
 ) => {
+<<<<<<< HEAD
   const { amount, account, memo } = transferArgs;
+=======
+  const { amount, account, memo, fee } = transferArgs;
+>>>>>>> transfer-send_dfx
   const result = await actor.send_dfx({
     to: account,
     fee: {
@@ -76,13 +79,14 @@ const useTransfer = (
           agent,
           canisterId,
         });
-        const actorLedgerLegacy = Actor.createActor(idlFactoryLegacy, {
+
+        const actorLedgerICP = Actor.createActor(idlFactoryICP, {
           agent,
-          canisterId: ICP_LEDGER_LEGACY_CANISTER_ID,
+          canisterId,
         });
 
         if (!is_principal_standard) {
-          await send_dfx(actorLedgerLegacy, {
+          await send_dfx(actorLedgerICP, {
             amount,
             account,
             fee,
@@ -107,10 +111,10 @@ const useTransfer = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["FETCH_LEDGER_BALANCE", { ledger }],
+        queryKey: [`FETCH_LEDGER_BALANCE_${ledger.toUpperCase()}`],
       });
       queryClient.invalidateQueries({
-        queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", { ledger }],
+        queryKey: [`FETCH_ACCOUNT_TRANSACTIONS_${ledger.toUpperCase()}`],
       });
     },
   });
