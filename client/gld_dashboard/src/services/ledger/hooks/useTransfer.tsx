@@ -40,7 +40,7 @@ const send_dfx = async (
   const result = await actor.send_dfx({
     to: account,
     fee: {
-      e8s: 200000n,
+      e8s: fee,
     },
     memo: memo ?? 0n,
     from_subaccount: [],
