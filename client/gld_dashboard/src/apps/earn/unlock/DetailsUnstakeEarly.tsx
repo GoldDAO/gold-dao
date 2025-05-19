@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
@@ -13,7 +11,6 @@ import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
 
 const DetailsUnstakeEarly = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
   const [unlockState, dispatch] = useAtom(UnlockStateReducerAtom);
   const unstakeEarly = useUnstakeEarly(
     GLDT_STAKE_CANISTER_ID,
@@ -21,26 +18,9 @@ const DetailsUnstakeEarly = () => {
   );
 
   const handleUnstake = () => {
-    unstakeEarly.mutate(
-      {
-        id: unlockState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("unstaked early");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_FETCH_LEDGER_BALANCE_GLDT"],
-          });
-        },
-      }
-    );
+    unstakeEarly.mutate({
+      id: unlockState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {
@@ -54,9 +34,9 @@ const DetailsUnstakeEarly = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+    <div className="grid grid-cols-1 gap-8 mt-4 xl:mt-6">
       {(unstakeEarly.isIdle || unstakeEarly.isPending) && (
-        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+        <div className="flex justify-center items-center px-4 py-8 xl:py-16">
           <div className="flex flex-col gap-4 text-center">
             <div>Loading...</div>
             <div className="mt-2">Unstaking...</div>
@@ -72,13 +52,13 @@ const DetailsUnstakeEarly = () => {
           <div className="flex justify-center items-center gap-2">
             <Button
               onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Retry
             </Button>
             <Button
               onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Close
             </Button>

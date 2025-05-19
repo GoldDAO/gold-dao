@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider as ReactRouterProvider,
 } from "react-router-dom";
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <AppLayout />,
     children: [
+      {
+        index: true,
+        element: <Navigate to="/buy" replace />,
+      },
       {
         path: "buy",
         children: [

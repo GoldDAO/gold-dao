@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { idlFactory } from "../idlFactory";
@@ -13,6 +13,7 @@ const useClaimRewards = (
   }
 ) => {
   const { neuronIds } = options;
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -40,6 +41,26 @@ const useClaimRewards = (
         console.error(err);
         throw new Error("Claim rewards error! Please retry later.");
       }
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+    onSuccess: () => {
+      // console.log(res);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURONS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURON_REWARDS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["USER_NEURONS_REWARDS"],
+      });
     },
   });
 };

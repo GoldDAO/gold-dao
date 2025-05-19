@@ -85,7 +85,7 @@ const GLDGovAccount = () => {
       </section>
 
       <section className="rounded-xl bg-surface-primary/40 mb-6">
-        <div className="px-6 pt-6 mb-4 lg:mb-6">
+        <div className="px-6 pt-6 mb-4 xl:mb-6">
           <h6 className="text-lg font-semibold">GLDGov Transactions</h6>
         </div>
         <GLDGovTransactionsAccountTable

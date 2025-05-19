@@ -7,7 +7,7 @@ import Dexs from "./-components/Dexs";
 
 const Home = () => {
   return (
-    <div className="py-4 lg:py-8">
+    <div className="py-4 xl:py-8">
       <div className="mb-8">
         <div className="text-4xl font-bold text-accent">Gold DAO</div>
         <div className="text-4xl">Overview</div>

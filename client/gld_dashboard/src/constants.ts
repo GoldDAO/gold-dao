@@ -23,12 +23,18 @@ export const GLDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_GLDT_LEDGER_INDEX_CANISTER_ID;
 export const ICP_LEDGER_CANISTER_ID = import.meta.env
   .VITE_ICP_LEDGER_CANISTER_ID;
+export const ICP_LEDGER_LEGACY_CANISTER_ID = import.meta.env
+  .VITE_ICP_LEDGER_LEGACY_CANISTER_ID;
 export const ICP_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_ICP_LEDGER_INDEX_CANISTER_ID;
 export const WTN_LEDGER_CANISTER_ID = import.meta.env
   .VITE_WTN_LEDGER_CANISTER_ID;
 export const WTN_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_WTN_LEDGER_INDEX_CANISTER_ID;
+export const CKUSDT_LEDGER_CANISTER_ID = import.meta.env
+  .VITE_CKUSDT_LEDGER_CANISTER_ID;
+export const CKUSDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
+  .VITE_CKUSDT_LEDGER_INDEX_CANISTER_ID;
 
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
 export const SNS_NEURONS_ICP_CANISTER_ID = import.meta.env
@@ -50,11 +56,11 @@ export const BITY_GOLD_API_BASE_URL = import.meta.env.VITE_BITY_GOLD_API_BASE_UR
 
 export const ICP_ICRC_API_BASE_URL = "https://icrc-api.internetcomputer.org/api/v1"
 export const OGY_API_BASE_URL = "https://api.origyn.com"
+export const IC_EXPLORER_API_BASE_URL = "https://api.icexplorer.io/api"
 
 export const GOLDAO_LEDGER_CANISTER_ID_IC = "tyyy3-4aaaa-aaaaq-aab7a-cai"
 export const GLDT_LEDGER_CANISTER_ID_IC = "6c7su-kiaaa-aaaar-qaira-cai"
 export const ICP_LEDGER_CANISTER_ID_IC = "ryjl3-tyaaa-aaaaa-aaaba-cai"
-export const CK_USDT_LEDGER_CANISTER_ID_IC = "cngnf-vqaaa-aaaar-qag4q-cai"
 export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai"
 export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai"
 export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai"
@@ -63,19 +69,9 @@ export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
 export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
 
-// start delete (fetched now from backend)
-export const OGY_TX_FEE = 200000
-export const GLDT_TX_FEE = 1000000;
-export const GLDGOV_TX_FEE = 1000000;
-export const ICP_TX_FEE = 10000;
-export const GLDT_DECIMAL = 10e8;
-export const ICP_DECIMAL = 10e8;
-export const CK_USDT_DECIMAL = 10e6;
-export const CK_USDC_DECIMAL = 10e6;
-// end delete
-
 export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
+export const MAX_SWAP_SLIPPAGE = 5;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
@@ -158,11 +154,29 @@ if (!(APP_MODE === "production")) {
     );
   else console.log(`WTN_LEDGER_INDEX_CANISTER_ID=${WTN_LEDGER_INDEX_CANISTER_ID}`);
 
+  if (!CKUSDT_LEDGER_CANISTER_ID)
+    console.log(
+      "No CKUSDT_LEDGER_CANISTER_ID environment variable. Set CKUSDT_LEDGER_CANISTER_ID environment variable."
+    );
+  else console.log(`CKUSDT_LEDGER_CANISTER_ID=${CKUSDT_LEDGER_CANISTER_ID}`);
+
+  if (!CKUSDT_LEDGER_INDEX_CANISTER_ID)
+    console.log(
+      "No CKUSDT_LEDGER_INDEX_CANISTER_ID environment variable. Set CKUSDT_LEDGER_INDEX_CANISTER_ID environment variable."
+    );
+  else console.log(`CKUSDT_LEDGER_INDEX_CANISTER_ID=${CKUSDT_LEDGER_INDEX_CANISTER_ID}`);
+
   if (!ICP_LEDGER_CANISTER_ID)
     console.log(
       "No ICP_LEDGER_CANISTER_ID environment variable. Set ICP_LEDGER_CANISTER_ID environment variable."
     );
   else console.log(`ICP_LEDGER_CANISTER_ID=${ICP_LEDGER_CANISTER_ID}`);
+
+  if (!ICP_LEDGER_LEGACY_CANISTER_ID)
+    console.log(
+      "No ICP_LEDGER_LEGACY_CANISTER_ID environment variable. Set ICP_LEDGER_LEGACY_CANISTER_ID environment variable."
+    );
+  else console.log(`ICP_LEDGER_LEGACY_CANISTER_ID=${ICP_LEDGER_LEGACY_CANISTER_ID}`);
 
   if (!ICP_LEDGER_INDEX_CANISTER_ID)
     console.log(
@@ -222,7 +236,6 @@ if (!(APP_MODE === "production")) {
   console.log(`GOLDAO_LEDGER_CANISTER_ID_IC=${GOLDAO_LEDGER_CANISTER_ID_IC}`)
   console.log(`GLDT_LEDGER_CANISTER_ID_IC=${GLDT_LEDGER_CANISTER_ID_IC}`)
   console.log(`ICP_LEDGER_CANISTER_ID_IC=${ICP_LEDGER_CANISTER_ID_IC}`)
-  console.log(`CK_USDT_LEDGER_CANISTER_ID_IC=${CK_USDT_LEDGER_CANISTER_ID_IC}`)
   console.log(`CK_USDC_LEDGER_CANISTER_ID_IC=${CK_USDC_LEDGER_CANISTER_ID_IC}`)
   console.log(`SNS_ROOT_CANISTER_ID_IC=${SNS_ROOT_CANISTER_ID_IC}`)
   console.log(`SNS_GOVERNANCE_CANISTER_ID_IC=${SNS_GOVERNANCE_CANISTER_ID_IC}`)

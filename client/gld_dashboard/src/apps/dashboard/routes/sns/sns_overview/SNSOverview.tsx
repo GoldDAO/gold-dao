@@ -43,7 +43,7 @@ const SNSOverview = () => {
   return (
     <>
       {isSuccess && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xl:grid-cols-4 gap-2">
           <Card title="Status">
             <div
               className={`rounded-full inline-flex items-center justify-center gap-2 bg-[#d9f2e8] py-2 px-4`}

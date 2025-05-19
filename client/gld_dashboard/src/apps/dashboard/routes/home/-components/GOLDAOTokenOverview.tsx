@@ -34,9 +34,9 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
 
   return (
     <div className={className}>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 justify-between">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 justify-between">
         <div className="w-full">
-          <div className="border border-border rounded-xl bg-surface-primary p-6 lg:p-8">
+          <div className="border border-border rounded-xl bg-surface-primary p-6 xl:p-8">
             <div className="flex items-center gap-3 mb-4 justify-center xl:justify-start">
               <div className="font-light text-content/60">
                 {t("total_gldgov_supply.title")}
@@ -64,7 +64,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
           </div>
         </div>
         <div className="w-full">
-          <div className="border border-border rounded-xl bg-surface-primary p-6 lg:p-8">
+          <div className="border border-border rounded-xl bg-surface-primary p-6 xl:p-8">
             <div className="flex items-center gap-3 mb-4 justify-center xl:justify-start">
               <div className="font-light text-content/60">
                 {t("gldgov_price.title")}
@@ -92,7 +92,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
           </div>
         </div>
         <div className="w-full">
-          <div className="border border-border rounded-xl bg-surface-primary p-6 lg:p-8">
+          <div className="border border-border rounded-xl bg-surface-primary p-6 xl:p-8">
             <div className="flex items-center gap-3 mb-4 justify-center xl:justify-start">
               <div className="font-light text-content/60">
                 {t("gldgov_marketcap.title")}

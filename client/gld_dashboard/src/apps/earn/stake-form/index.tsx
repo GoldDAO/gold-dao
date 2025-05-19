@@ -54,8 +54,8 @@ const StakeForm = () => {
           className={`p-4 bg-surface-primary border border-border rounded-xl`}
         >
           <div>Stake GLDT</div>
-          <div className="p-4 text-center mt-4 lg:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
-            <div className="lg:text-xl font-semibold">
+          <div className="p-4 text-center mt-4 xl:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
+            <div className="xl:text-xl font-semibold text-content/60">
               {MIN_STAKE_AMOUNT} GLDT
             </div>
             <div className="flex items-center justify-center rounded-full bg-surface-secondary h-10 w-10 shrink-0 aspect-square">
@@ -75,7 +75,7 @@ const StakeForm = () => {
               </div>
             </div>
           </div>
-          {isConnected ? (
+          {isConnected && (
             <Button
               disabled={true}
               className="mt-4 w-full px-4 h-[52px] bg-secondary rounded-md"
@@ -87,14 +87,10 @@ const StakeForm = () => {
                 <div className="h-2 w-2 bg-white rounded-full animate-bounce" />
               </div>
             </Button>
-          ) : (
-            <div className="relative p-4 flex items-center justify-center text-center z-[2] text-primary">
-              Connect a wallet and start staking GLDT
-            </div>
           )}
         </div>
         {!isConnected && (
-          <div className="absolute bottom-0 w-full h-100 bg-gradient-to-t from-surface-primary to-transparent z-[1]" />
+          <div className="absolute bottom-0 w-full h-100 bg-gradient-to-t from-background xl:from-surface-primary to-transparent" />
         )}
       </div>
     );

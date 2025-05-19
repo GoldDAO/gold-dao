@@ -1,6 +1,6 @@
 import {
   useQuery,
-  keepPreviousData,
+  // keepPreviousData,
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
@@ -21,17 +21,13 @@ const useFetchUserBalance = (
   const {
     enabled = true,
     refetchInterval = false,
-    placeholderData = keepPreviousData,
+    placeholderData = undefined,
     ledger,
     owner,
   } = options;
 
   return useQuery({
-    queryKey: [
-      `USER_FETCH_LEDGER_BALANCE_${ledger.toLocaleUpperCase()}`,
-      owner,
-      ledger,
-    ],
+    queryKey: [`FETCH_LEDGER_BALANCE_${ledger.toUpperCase()}`, ledger, owner],
     queryFn: async () => {
       const actor = Actor.createActor(idlFactory, {
         agent,

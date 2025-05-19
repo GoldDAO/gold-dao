@@ -9,7 +9,7 @@ import {
   ArrowsRightLeftIcon,
   ArrowUpTrayIcon,
   ClipboardDocumentIcon,
-  EllipsisHorizontalIcon,
+  ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 
 import { useAuth } from "@auth/index";
@@ -96,7 +96,7 @@ const DropdownUserMenu = () => {
                   rel="noopener noreferrer"
                   className={`group flex w-full items-center gap-2 py-1.5 px-3`}
                 >
-                  <EllipsisHorizontalIcon className="size-4" />
+                  <ArrowTopRightOnSquareIcon className="size-4" />
                   View in explorer
                 </a>
               </MenuItem>

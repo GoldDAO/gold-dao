@@ -36,7 +36,11 @@
       "@assets/*": ["assets/*"],
       "@constants": ["constants.ts"],
       "@auth/*": ["auth/*"],
-      "@dashboard/*": ["apps/dashboard/*"]
+      "@dashboard/*": ["apps/dashboard/*"],
+      "@buy/*": ["apps/buy/*"],
+      "@earn/*": ["apps/earn/*"],
+      "@govern/*": ["apps/govern/*"],
+      "@wallet/*": ["apps/wallet/*"],
     }
   },
   "include": ["src"],

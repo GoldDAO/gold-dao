@@ -2,7 +2,7 @@ import { ActorSubclass } from "@dfinity/agent";
 import { Buffer } from "buffer";
 import { Principal } from "@dfinity/principal";
 import { Subaccount } from "@dfinity/ledger-icrc/dist/candid/icrc_ledger";
-
+import _upperFirst from "lodash/upperFirst";
 import {
   GetAccountIdentifierTransactionsResult,
   TransactionWithId,
@@ -37,6 +37,8 @@ const get_account_transactions_icp = async (
       const timestamp = tx.timestamp?.[0]?.timestamp_nanos;
       const operation = tx.operation;
 
+      // console.log(tx);
+
       let from: string | undefined;
       let to: string | undefined;
       let amount: bigint | undefined = undefined;
@@ -61,6 +63,7 @@ const get_account_transactions_icp = async (
       } else if ("Approve" in operation) {
         from = operation.Approve.from;
         kind = "approve";
+        amount = operation.Approve.allowance.e8s;
       }
 
       if (tx.icrc1_memo?.[0]) {
@@ -77,7 +80,8 @@ const get_account_transactions_icp = async (
         amount,
         fee,
         memo,
-        kind,
+        kind: _upperFirst(kind),
+        is_credit: false,
       };
     }
   );

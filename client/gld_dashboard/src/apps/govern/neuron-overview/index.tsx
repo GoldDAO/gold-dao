@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { GOLDAO_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import useGetTokenTotalStakedAmount from "../utils/useGetTokenTotalStakedAmount";
+import useGetAllNeuronsTotalStakedAmount from "../utils/useGetAllNeuronsTotalStakedAmount";
 import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
@@ -10,7 +10,7 @@ import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
 
-  const stakedAmount = useGetTokenTotalStakedAmount({
+  const stakedAmount = useGetAllNeuronsTotalStakedAmount({
     owner: principalId,
     agent: unauthenticatedAgent,
     enabled: !!unauthenticatedAgent && isConnected && !!principalId,
@@ -23,11 +23,51 @@ const NeuronOverview = () => {
     enabled: !!unauthenticatedAgent && isConnected && stakedAmount.isSuccess,
   });
 
+  const renderTotalActiveStake = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            <TokenValueToLocaleString
+              value={tokenPrice.data.amount}
+              tokenDecimals={tokenPrice.data.decimals}
+            />
+            <div className="text-content/60 font-normal">GOLDAO</div>
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return (
+        <>
+          0<div className="text-content/60 font-normal">GOLDAO</div>
+        </>
+      );
+    }
+  };
+
+  const renderTotalActiveStakePrice = () => {
+    if (isConnected) {
+      if (tokenPrice.isSuccess) {
+        return (
+          <>
+            $<NumberToLocaleString value={tokenPrice.data.amount_usd} />
+          </>
+        );
+      } else {
+        return "Loading...";
+      }
+    } else {
+      return <>$0</>;
+    }
+  };
+
   return (
     <div
       className={clsx(
         "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] rounded-tl-0 px-4 lg:px-8 pt-4 lg:pt-8 pb-24"
+        "rounded-tr-[inherit] rounded-tl-0 px-4 xl:px-8 pt-4 xl:pt-8 pb-24"
       )}
     >
       <div className="flex flex-col items-center">
@@ -42,30 +82,13 @@ const NeuronOverview = () => {
             <div>
               <div className="font-semibold flex flex-col items-center gap-2">
                 <div>Total active stake</div>
-                <div className="text-2xl lg:text-4xl  flex items-center gap-2">
-                  {tokenPrice.isSuccess ? (
-                    <>
-                      <TokenValueToLocaleString
-                        value={tokenPrice.data.amount}
-                        tokenDecimals={tokenPrice.data.decimals}
-                      />
-                      <div className="text-content/60 font-normal">GOLDAO</div>
-                    </>
-                  ) : (
-                    <div>Loading...</div>
-                  )}
+                <div className="text-2xl xl:text-4xl  flex items-center gap-2">
+                  {renderTotalActiveStake()}
                 </div>
               </div>
             </div>
-            <div className="text-lg text-content/60">
-              {tokenPrice.isSuccess ? (
-                <div>
-                  ($
-                  <NumberToLocaleString value={tokenPrice.data.amount_usd} />)
-                </div>
-              ) : (
-                <div>Loading...</div>
-              )}
+            <div className="text-sm text-content/60">
+              {renderTotalActiveStakePrice()}
             </div>
           </div>
         </div>

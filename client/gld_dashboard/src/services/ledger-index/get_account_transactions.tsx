@@ -3,7 +3,7 @@ import { ActorSubclass } from "@dfinity/agent";
 import { Buffer } from "buffer";
 import { Principal } from "@dfinity/principal";
 import { Subaccount } from "@dfinity/ledger-icrc/dist/candid/icrc_ledger";
-
+import _upperFirst from "lodash/upperFirst";
 import { GetTransactionsResult } from "./idlFactory.interface";
 import { Transactions } from "./utils/interfaces";
 import { getDateUTC } from "@utils/dates";
@@ -75,7 +75,8 @@ const get_account_transactions = async (
       amount: amount ?? undefined,
       fee: fee ?? undefined,
       memo: memo?.[0] ? Buffer.from(memo[0]).toString("utf-8") : undefined,
-      kind,
+      kind: _upperFirst(kind),
+      is_credit: false,
     };
   });
 

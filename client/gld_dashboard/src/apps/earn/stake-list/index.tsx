@@ -7,13 +7,13 @@ import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import useFetchUserStakeList from "@services/gldt_stake/hooks/useFetchUserStakeList";
+import useFetchUserPositions from "@services/gldt_stake/hooks/useFetchUserPositions";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import { ClaimRewardStateReducerAtom } from "../claim-reward/atoms";
+import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
 import { UnlockStateReducerAtom } from "../unlock/atoms";
 import { UnstakeStateReducerAtom } from "../unstake/atoms";
-import ClaimRewardsConfirm from "../claim-reward/Confirm";
-import ClaimRewardsDetails from "../claim-reward/Details";
+import ClaimRewardsConfirm from "../claim-reward/claim-one/Confirm";
+import ClaimRewardsDetails from "../claim-reward/claim-one/Details";
 import ConfirmUnlock from "../unlock/Confirm";
 import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
@@ -43,7 +43,7 @@ const StakeList = () => {
     }
   );
 
-  const fetchUserStake = useFetchUserStakeList(
+  const fetchUserPositions = useFetchUserPositions(
     GLDT_STAKE_CANISTER_ID,
     authenticatedAgent,
     {
@@ -60,7 +60,7 @@ const StakeList = () => {
               className={clsx(
                 "@container",
                 "shrink-0",
-                "rounded-md lg:rounded-xl border border-surface-secondary p-4 cursor-pointer"
+                "rounded-md xl:rounded-xl border border-surface-secondary p-4 cursor-pointer"
               )}
             >
               <div className="flex justify-between items-center p-2">
@@ -73,14 +73,14 @@ const StakeList = () => {
             </div>
           </div>
         ))}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-primary dark:from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </div>
     );
   };
 
   const renderEmptyStakeList = () => {
     return (
-      <div className="p-4 lg:p-8 border border-border rounded-md lg:rounded-xl text-center">
+      <div className="p-4 xl:p-8 border border-border rounded-md xl:rounded-xl text-center bg-surface-primary">
         <div className="font-semibold">You currently don’t have any stakes</div>
         <div className="text-content/60">
           Start staking to earn rewards in GOLDAO, OGY & ICP.
@@ -93,14 +93,14 @@ const StakeList = () => {
     return renderDisconnectedPlaceholder();
   }
 
-  if (!fetchUserStake.isSuccess || !decimals.isSuccess) {
+  if (!fetchUserPositions.isSuccess || !decimals.isSuccess) {
     return <div className="flex justify-center p-4">Loading...</div>;
   }
 
   if (
     !!isConnected &&
-    fetchUserStake.isSuccess &&
-    !fetchUserStake.data.length
+    fetchUserPositions.isSuccess &&
+    !fetchUserPositions.data.length
   ) {
     return renderEmptyStakeList();
   }
@@ -154,8 +154,8 @@ const StakeList = () => {
   };
 
   return (
-    <div className="flex flex-col pb-4 lg:overflow-y-auto lg:pr-4">
-      {fetchUserStake.data.map((stake, index) => (
+    <div className="flex flex-col pb-4 xl:overflow-y-auto xl:pr-4">
+      {fetchUserPositions.data.map((stake, index) => (
         <div
           key={index}
           className="@container flex justify-between items-center p-3 border-b border-border/60 last:border-0 odd:bg-primary/5"
@@ -176,7 +176,7 @@ const StakeList = () => {
                 <NumberToLocaleString value={stake.age_bonus_multiplier} />
               </div>
             </div>
-            <div className="flex flex-row gap-2 mt-4 @lg:mt-0">
+            <div className="flex flex-row gap-2 mt-4 @xl:mt-0">
               {stake.is_unlockable && (
                 <Button
                   className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"

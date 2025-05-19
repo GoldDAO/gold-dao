@@ -25,7 +25,7 @@ const DetailsDissolve = () => {
           console.log("dissolved");
           console.log(res);
           queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
+            queryKey: ["USER_POSITIONS"],
           });
         },
       }
@@ -43,9 +43,9 @@ const DetailsDissolve = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+    <div className="grid grid-cols-1 gap-8 mt-4 xl:mt-6">
       {(dissolve.isIdle || dissolve.isPending) && (
-        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+        <div className="flex justify-center items-center px-4 py-8 xl:py-16">
           <div className="flex flex-col gap-4 text-center">
             <div>Loading...</div>
             <div className="mt-2">Dissolving...</div>
@@ -61,13 +61,13 @@ const DetailsDissolve = () => {
           <div className="flex justify-center items-center gap-2">
             <Button
               onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Retry
             </Button>
             <Button
               onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Close
             </Button>

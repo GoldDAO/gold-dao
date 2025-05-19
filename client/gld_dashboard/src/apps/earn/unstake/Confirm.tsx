@@ -27,7 +27,7 @@ const Confirm = () => {
 
   if (!stake.isSuccess) {
     return (
-      <div className="flex justify-center items-center px-4 py-16 lg:py-32">
+      <div className="flex justify-center items-center px-4 py-16 xl:py-32">
         Loading...
       </div>
     );

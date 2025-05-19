@@ -4,13 +4,15 @@ import {
   UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
-
+import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { idlFactory } from "@services/ledger-index/idlFactory";
 import { idlFactory as idlFactoryICP } from "@services/ledger-index/idlFactory_icp";
 import get_account_transactions from "@services/ledger-index/get_account_transactions";
 import get_account_transactions_icp from "@services/ledger-index/get_account_transactions_icp";
 import { Transactions } from "@services/ledger-index/utils/interfaces";
+import { Ledger } from "@services/ledger/utils/interfaces";
 
 const useFetchAccountTransactions = (
   canisterId: string,
@@ -25,7 +27,7 @@ const useFetchAccountTransactions = (
   > & {
     max_results?: number;
     account: string;
-    ledger: string;
+    ledger: Ledger;
   }
 ) => {
   const {
@@ -37,7 +39,11 @@ const useFetchAccountTransactions = (
   } = args;
 
   return useInfiniteQuery({
-    queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", account, ledger],
+    queryKey: [
+      `FETCH_ACCOUNT_TRANSACTIONS_${ledger.toUpperCase()}`,
+      ledger,
+      account,
+    ],
     queryFn: async ({ pageParam = null }) => {
       try {
         const decodedAccount = decodeIcrcAccount(account);
@@ -45,6 +51,9 @@ const useFetchAccountTransactions = (
         const subaccount = decodedAccount?.subaccount
           ? [decodedAccount.subaccount]
           : [];
+        const accountId = AccountIdentifier.fromPrincipal({
+          principal: Principal.fromText(account),
+        }).toHex();
 
         let results: Transactions;
 
@@ -73,7 +82,24 @@ const useFetchAccountTransactions = (
           });
         }
 
-        return results;
+        const newData = results.data?.map((tx) => {
+          // console.log(tx);
+          const is_credit = tx.to === accountId || tx.to === account;
+          const from = tx.from && tx.from === accountId ? account : tx.from;
+          const to = tx.to && tx.to === accountId ? account : tx.to;
+
+          return {
+            ...tx,
+            is_credit,
+            from,
+            to,
+          };
+        });
+
+        return {
+          data: newData,
+          cursor_index: results.cursor_index,
+        };
       } catch (err) {
         console.error(err);
         throw new Error(

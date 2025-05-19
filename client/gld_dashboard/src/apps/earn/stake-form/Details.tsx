@@ -1,21 +1,15 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
-
 import { useAuth } from "@auth/index";
-
 // import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { Button } from "@components/index";
-
 import useApprove from "@services/ledger/hooks/useApprove";
 import useCreateStake from "@services/gldt_stake/hooks/useCreateStake";
 
 import { StakeStateReducerAtom } from "./atoms";
 
 const Details = () => {
-  const queryClient = useQueryClient();
   const { authenticatedAgent } = useAuth();
   const [stakeState, dispatch] = useAtom(StakeStateReducerAtom);
   const amount = (stakeState.amount as bigint) + (stakeState.fee as bigint);
@@ -27,26 +21,9 @@ const Details = () => {
   );
 
   const handleCreateStake = () => {
-    createStakePosition.mutate(
-      {
-        amount,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("stake position opened");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: [`USER_FETCH_LEDGER_BALANCE_GLDT`],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_ALL"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_STAKE_FETCH_TOTAL_STAKED"],
-          });
-        },
-      }
-    );
+    createStakePosition.mutate({
+      amount,
+    });
   };
 
   useEffect(() => {
@@ -84,12 +61,12 @@ const Details = () => {
     }
   };
   return (
-    <div className="grid grid-cols-1 gap-8 mt-4 lg:mt-6">
+    <div className="grid grid-cols-1 gap-8 mt-4 xl:mt-6">
       {(approve.isIdle ||
         createStakePosition.isIdle ||
         approve.isPending ||
         createStakePosition.isPending) && (
-        <div className="flex justify-center items-center px-4 py-8 lg:py-16">
+        <div className="flex justify-center items-center px-4 py-8 xl:py-16">
           <div className="flex flex-col gap-4 text-center">
             <div>Loading...</div>
             {approve.isPending && <div className="mt-2">Approving...</div>}
@@ -108,13 +85,13 @@ const Details = () => {
           <div className="flex justify-center items-center gap-2">
             <Button
               onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Retry
             </Button>
             <Button
               onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
             >
               Close
             </Button>
@@ -130,7 +107,7 @@ const Details = () => {
 
           <Button
             onClick={() => dispatch({ type: "RESET" })}
-            className="px-6 py-2 bg-secondary text-white lg:text-lg font-medium rounded-md"
+            className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
           >
             Close
           </Button>
