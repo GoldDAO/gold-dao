@@ -3,10 +3,15 @@ type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type InitArgs = record {
   test_mode : bool;
   authorized_principals : vec principal;
+  version : BuildVersion;
   commit_hash : text;
 };
+type Result = variant { Ok : text; Err : text };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
+  dex_transfer_position_validate : (principal, principal, nat64) -> (
+      Result,
+    ) query;
   get_gld_dashboard_maintenance_mode : () -> (bool) query;
   update_gld_dashboard_maintenance_mode : (bool) -> (null);
 }

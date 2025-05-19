@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.4] - 2025-05-19
+
+#### Fix
+
+- fix payload for dex_transfer_position_validate
+
 ### [1.0.3] - 2025-05-19
 
 #### New
