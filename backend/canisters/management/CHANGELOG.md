@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2025-05-19
+
+#### New
+
+- Add dex_transfer_position_validate method to management canister. This method is required to transfer liquidity positions on DEXs owned by the DAO to another principal.
+  
 ### [1.0.2] - 2024-09-25
 
 #### New
