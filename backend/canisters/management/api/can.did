@@ -9,7 +9,7 @@ type InitArgs = record {
 type Result = variant { Ok : text; Err : text };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 service : (Args) -> {
-  dex_transfer_position_validate : (principal, principal, nat64) -> (
+  dex_transfer_position_validate : (principal, principal, nat) -> (
       Result,
     ) query;
   get_gld_dashboard_maintenance_mode : () -> (bool) query;
