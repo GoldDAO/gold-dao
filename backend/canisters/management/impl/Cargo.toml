@@ -21,6 +21,7 @@ ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 ic-stable-structures = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 serializer = { path = '../../../libraries/serializer' }
 stable_memory = { path = '../../../libraries/stable_memory' }
 types = { path = '../../../libraries/types' }
