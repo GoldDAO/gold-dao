@@ -1,7 +1,5 @@
 default:
   image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.22.0@sha256:11730bea35bb5b41aaec9c600a6b7ac837188d21d8d9ce97f781a7b74ad1fd01
-  tags:
-    - docker
   interruptible: true
   before_script:
     - dfx --version
