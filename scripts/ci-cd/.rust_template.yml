@@ -2,7 +2,7 @@
 
 .rust template:
   tags:
-    - docker
+    # - docker
     # - big
   image: registry.bochslerfinance.com/runners-images/dfinity-canisters/rust-dfinity-build-ci:latest@sha256:7a8c861d0bf4d3d31a4a423ee328f7b62b0a4faaa77ecf87d372a09178d1b33f
   before_script:
