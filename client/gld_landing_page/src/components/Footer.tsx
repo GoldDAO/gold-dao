@@ -7,7 +7,7 @@ const Footer = () => {
   const links = [
     {
       name: 'X',
-      href: 'https://x.com/gldrwa?mx=2',
+      href: 'https://x.com/thegolddao',
       iconSrc: '/static/icons/gold-menu-x.svg',
       iconAlt: 'X'
     },
