@@ -4,11 +4,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import clsx from "clsx";
-import { BuyCrypto, ArrangeVertical, Refresh } from "iconsax-react";
-import BuyOnBity from "@assets/icons/buy_on_bity.svg";
+import { BuyCrypto, ArrangeVertical, Refresh, HuobiToken } from "iconsax-react";
 import Redeem from "@assets/icons/redeem.svg";
 import Govern from "@assets/icons/govern.svg";
 import Earn from "@assets/icons/earn.svg";
+import BuyOnBity from "@assets/icons/bity_white.svg";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import {
   TransferTokenStateAtom,
@@ -51,7 +51,7 @@ const ButtonAction = ({
     redeem: { icon: <img src={Redeem} alt="Redeem" />, text: "Redeem" },
     govern: { icon: <img src={Govern} alt="Govern" />, text: "Govern" },
     "mint-nft": { icon: <BuyCrypto />, text: "Mint" },
-    "burn-nft": { icon: <BuyCrypto />, text: "Burn" },
+    "burn-nft": { icon: <HuobiToken />, text: "Burn" },
   };
 
   const renderBtn = () => {

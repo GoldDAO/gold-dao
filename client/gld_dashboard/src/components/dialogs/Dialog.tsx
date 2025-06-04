@@ -32,7 +32,7 @@ const BackIcon = ({ handleOnClick }: { handleOnClick: () => void }) => {
 const Dialog = ({
   open = false,
   handleOnClose = () => null,
-  disableClose = false,
+  closeEnabled = true,
   title = undefined,
   children,
   size = "xl",
@@ -42,14 +42,14 @@ const Dialog = ({
   title?: ReactNode;
   handleOnClose?: () => void;
   children?: ReactNode;
-  disableClose?: boolean;
+  closeEnabled?: boolean;
   size?: keyof typeof SIZES;
   handlePreviousStep?: () => void;
 }) => {
   return open ? (
     <HUIDialog
       open={open}
-      onClose={!disableClose ? handleOnClose : () => null}
+      onClose={closeEnabled ? handleOnClose : () => null}
       transition
       className={clsx(
         "relative z-50",
@@ -81,7 +81,7 @@ const Dialog = ({
                 )}
               </div>
             )}
-            {!disableClose && (
+            {closeEnabled && (
               <div className="w-full text-end">
                 <button onClick={handleOnClose}>
                   <div

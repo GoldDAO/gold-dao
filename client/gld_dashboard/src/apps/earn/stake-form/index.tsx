@@ -11,7 +11,6 @@ import { MIN_STAKE_AMOUNT } from "./utils";
 import Form from "./Form";
 import Confirm from "./Confirm";
 import Details from "./Details";
-
 import { StakeStateReducerAtom } from "./atoms";
 
 const StakeForm = () => {

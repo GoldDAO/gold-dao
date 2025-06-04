@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { InfoCircle } from "iconsax-react";
 import { BuyGLDTStateReducerAtom } from "@buy/atoms/BuyGLDTAtom";
 import { Logo } from "@components/index";
 import { Button } from "@components/index";
@@ -41,9 +42,19 @@ const Confirm = () => {
           </div>
         </div>
         <div className="p-4 xl:p-6">
-          <div className="text-sm mb-4 text-content/60">
-            You receive approximately
+          <div className="flex items-center gap-2 mb-4">
+            <div className="text-sm text-content/60">
+              You receive approximately
+            </div>
+
+            <InfoCircle
+              size={16}
+              data-tooltip-id="tooltip"
+              data-tooltip-content="The exact amount of GLDT received will vary due to market
+                    fluctuations and slippage."
+            />
           </div>
+
           <div className="flex flex-row justify-between items-end">
             <div className="flex items-center gap-2 text-4xl">
               <Logo
