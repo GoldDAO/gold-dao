@@ -36,9 +36,7 @@ const AddNeuron = () => {
       </div>
       <div className="my-8 grid grid-cols-1 gap-4">
         <Card step={1}>
-          <Card.Title>
-            Copy you principal from the Gold DAO dashboard
-          </Card.Title>
+          <Card.Title>Copy you principal from the Gold DAO dApp</Card.Title>
           <Card.Text>
             <Address size="lg">{principalId}</Address>
           </Card.Text>
@@ -64,8 +62,7 @@ const AddNeuron = () => {
         <Card step={4}>
           <Card.Title>It's done!</Card.Title>
           <Card.Text>
-            Refresh your Gold DAO dashboard and you will now see your neuron
-            linked.
+            Refresh your Gold DAO dApp and you will now see your neuron linked.
           </Card.Text>
         </Card>
       </div>
