@@ -30,8 +30,10 @@ const Address = ({
     <div className={`${getSize(size)} flex items-center gap-2`}>
       <div
         className={`${size !== "full" ? "truncate" : ""}`}
-        {...(enableTooltip && { "data-tooltip-id": tooltipId })}
-        {...(enableTooltip && { "data-tooltip-content": children })}
+        {...(enableTooltip && {
+          "data-tooltip-id": tooltipId,
+          "data-tooltip-content": children,
+        })}
       >
         {children}
       </div>

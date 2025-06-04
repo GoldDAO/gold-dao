@@ -8,12 +8,14 @@ export interface StateSwapNFT {
   mode: Mode;
   step: Step;
   collections: SelectNFTState | undefined;
+  close_dialog_enabled: boolean;
 }
 
 const initialState: StateSwapNFT = {
   mode: "mint",
   step: "idle",
   collections: undefined,
+  close_dialog_enabled: false,
 };
 
 const reducer = (
@@ -22,6 +24,10 @@ const reducer = (
     | {
         type: "SET_MODE";
         value: Mode;
+      }
+    | {
+        type: "SET_CLOSE_DIALOG_ENABLED";
+        value: boolean;
       }
     | {
         type: "INIT_MINT_MODE";
@@ -49,6 +55,12 @@ const reducer = (
       return {
         ...initialState,
         mode: action.value,
+      };
+    }
+    case "SET_CLOSE_DIALOG_ENABLED": {
+      return {
+        ...initialState,
+        close_dialog_enabled: action.value,
       };
     }
     case "INIT_MINT_MODE": {

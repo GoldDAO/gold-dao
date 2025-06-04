@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useAtom } from "jotai";
 import clsx from "clsx";
 import { BuyCrypto, HuobiToken } from "iconsax-react";
-import BuyOnBity from "@assets/icons/buy_on_bity.svg";
+import BuyOnBity from "@assets/icons/bity_white.svg";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import MintNFT from "@advanced/gldt/overview-section/mint-nft";
 import BurnNFT from "@advanced/gldt/overview-section/burn-nft";
