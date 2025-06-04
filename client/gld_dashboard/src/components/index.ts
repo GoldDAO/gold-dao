@@ -1,6 +1,5 @@
 import Card from "@components/cards/Card";
 import Button from "@components/buttons/Button";
-import Select from "@components/selects/Select";
 import Table from "@components/tables/Table";
 import Tooltip from '@components/tooltips/Tooltip'
 import TooltipInfo from '@components/tooltips/TooltipInfo'
@@ -15,7 +14,6 @@ import { Logo } from '@components/logos'
 export {
     Card,
     Button,
-    Select,
     Table,
     Tooltip,
     TooltipInfo,

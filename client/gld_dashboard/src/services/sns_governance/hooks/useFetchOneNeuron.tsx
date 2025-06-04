@@ -7,12 +7,12 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { NeuronFull } from "./interfaces";
 import fetch_one_neuron from "../fetch_one_neuron";
-import { numberToLocaleString } from "@utils/numbers";
+import { numberToLocaleString } from "@shared/utils/numbers";
 import {
   calculateTimeDifferenceInSeconds,
   formatRoundedTimeUnits,
   getRoundedYears,
-} from "@utils/dates";
+} from "@shared/utils/dates";
 import { idlFactory } from "../idlFactory";
 
 const useFetchOneNeuron = (

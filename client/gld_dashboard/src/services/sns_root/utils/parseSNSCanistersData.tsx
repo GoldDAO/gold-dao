@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import { Principal } from "@dfinity/principal";
 
-import { roundAndFormatLocale, divideBy1e8 } from "@utils/numbers";
+import { roundAndFormatLocale, divideBy1e8 } from "@shared/utils/numbers";
 import { GetSnsCanistersSummaryResponse, CanisterSummary } from "../interfaces";
 import { SNSCanistersSummaryData } from "./interfaces";
 

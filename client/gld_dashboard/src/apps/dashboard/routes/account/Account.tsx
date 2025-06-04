@@ -1,4 +1,4 @@
-import { usePagination } from "@utils/table/useTable";
+import { usePagination } from "@shared/utils/table/useTable";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 

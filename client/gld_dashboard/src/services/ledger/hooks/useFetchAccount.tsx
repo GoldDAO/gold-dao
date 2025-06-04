@@ -4,7 +4,7 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 
-import { divideBy1e8, numberToLocaleString } from "@utils/numbers";
+import { divideBy1e8, numberToLocaleString } from "@shared/utils/numbers";
 import { fetch_one_account } from "@services/ledger";
 
 const useFetchAccount = (

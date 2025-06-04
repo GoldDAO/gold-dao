@@ -15,7 +15,7 @@ import {
 } from "@constants";
 import Address from "@components/strings/Address";
 import useGetOneNeuronRewards from "../utils/useGetOneNeuronRewards";
-import useRewardsFee from "@utils/useRewardsFee";
+import useRewardsFee from "@shared/hooks/useRewardsFee";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
 import Dialog from "@components/dialogs/Dialog";
 import ClaimRewardsConfirm from "../claim-reward/claim-one/Confirm";

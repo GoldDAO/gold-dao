@@ -4,13 +4,15 @@ import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
-import InnerAppLayout from "@components/outlets/InnerAppLayout";
-import WalletList from "./components/wallet-list";
-import WalletItemOverviewHeader from "./components/wallet-item-overview/Header";
-import WalletItemOverviewBtnAction from "./components/wallet-item-overview/BtnAction";
-import Transactions from "./components/transactions";
-import { TokensList, TokensWhitelist, GLDT_INDEX } from "./utils";
-import { TokenSelectedAtom } from "./atoms/WalletAtom";
+import InnerAppLayout from "@shared/components/layouts/app/inner-app";
+import WalletList from "@wallet/wallet-list";
+import WalletItemHeader from "@wallet/wallet-item-header";
+import WalletItemAction from "@wallet/wallet-item-action";
+import TxHistoryToken from "@wallet/tx-history-token";
+import TxHistoryNFT from "@wallet/tx-history-nft";
+import { TokensList, TokensWhitelist, GLDT_INDEX } from "@wallet/shared/utils";
+import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
+import GradientCard from "@shared/components/ui/card/GradientCard";
 
 const Wallet = () => {
   const { isConnected, connect } = useAuth();
@@ -90,24 +92,28 @@ const Wallet = () => {
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <div className="flex flex-col overflow-hidden">
-          <div
-            className={clsx(
-              "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
-            )}
-          >
-            <WalletItemOverviewHeader className="p-4 xl:p-12" />
-          </div>
+          <GradientCard className="rounded-tr-[inherit]">
+            <WalletItemHeader className="p-4 xl:p-12" />
+          </GradientCard>
           <div className="relative px-4">
-            <WalletItemOverviewBtnAction
+            <WalletItemAction
               className={clsx(
                 "my-4",
-                "xl:absolute xl:-top-11 xl:left-1/2 xl:my-0 xl:-translate-x-1/2"
+                "xl:absolute xl:-top-10 xl:left-1/2 xl:my-0 xl:-translate-x-1/2"
               )}
             />
           </div>
           <div className="p-4 xl:p-8 mt-4 xl:mt-12 flex flex-col overflow-hidden">
             <div className="mb-4">Transactions</div>
-            {isConnected ? <Transactions /> : renderDisconnectedPlaceholder()}
+            {isConnected ? (
+              searchParams.get("token") === "nft" ? (
+                <TxHistoryNFT />
+              ) : (
+                <TxHistoryToken />
+              )
+            ) : (
+              renderDisconnectedPlaceholder()
+            )}
           </div>
         </div>
       </InnerAppLayout.RightPanel>

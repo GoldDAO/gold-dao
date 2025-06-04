@@ -5,13 +5,13 @@ import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { Table, LoaderSpin } from "@components/index";
 import { BadgeProposalStatus } from "@components/badges/BadgeProposalStatus";
-import { TableProps } from "@utils/table/useTable";
+import { TableProps } from "@shared/utils/table/useTable";
 
 import useFetchAllProposals, {
   ProposalData,
 } from "@services/sns_governance/hooks/useFetchAllProposals";
-import { timestampToRelativeCalendar } from "@utils/dates";
-import { numberToLocaleString } from "@utils/numbers";
+import { timestampToRelativeCalendar } from "@shared/utils/dates";
+import { numberToLocaleString } from "@shared/utils/numbers";
 
 const ProposalExpandedRow = ({
   row,

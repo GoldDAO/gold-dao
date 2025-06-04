@@ -8,7 +8,7 @@ import { Table, LoaderSpin } from "@components/index";
 import CopyToClipboard from "@components/buttons/CopyToClipboard";
 import { BadgeTransactionKind } from "@components/badges/BadgeTransactionKind";
 
-import { TableProps } from "@utils/table/useTable";
+import { TableProps } from "@shared/utils/table/useTable";
 
 import useFetchAllTransactions, {
   Transaction,

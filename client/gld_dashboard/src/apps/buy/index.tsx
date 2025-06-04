@@ -7,18 +7,18 @@ import {
   GLDT_LEDGER_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
 } from "@constants";
-import { BuyGLDTStateReducerAtom } from "./atoms/BuyGLDTAtom";
+import { BuyGLDTStateReducerAtom } from "@buy/atoms/BuyGLDTAtom";
 import { useAuth } from "@auth/index";
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
 import {
   onKeyDownPreventNoDigits,
   onPastePreventNoDigits,
-} from "@utils/form/input";
+} from "@shared/utils/form/input";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import InnerAppLayout from "@components/outlets/InnerAppLayout";
+import InnerAppLayout from "@shared/components/layouts/app/inner-app";
 import { Token } from "./utils";
 import SelectToken from "./components/select-token/SelectToken";
 import BuyConfirm from "./components/buy-dialog/Confirm";
@@ -26,7 +26,8 @@ import BuyDetails from "./components/buy-dialog/Details";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
-import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
+import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
+import GradientCard from "@shared/components/ui/card/GradientCard";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -331,10 +332,10 @@ const Buy = () => {
               </div>
             </div>
 
-            <div
+            <GradientCard
               className={clsx(
                 "w-full px-4 xl:px-8 pt-8 xl:pt-12 pb-4 xl:pb-8",
-                "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800 rounded-tr-[inherit]"
+                "rounded-b-[inherit]"
               )}
             >
               <div className="text-primary">You will receive</div>
@@ -432,7 +433,7 @@ const Buy = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </GradientCard>
             <>
               <Dialog
                 open={is_open_confirm_dialog}

@@ -27,7 +27,7 @@ const useFetchUserBalance = (
   } = options;
 
   return useQuery({
-    queryKey: [`FETCH_LEDGER_BALANCE_${ledger.toUpperCase()}`, ledger, owner],
+    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner],
     queryFn: async () => {
       const actor = Actor.createActor(idlFactory, {
         agent,

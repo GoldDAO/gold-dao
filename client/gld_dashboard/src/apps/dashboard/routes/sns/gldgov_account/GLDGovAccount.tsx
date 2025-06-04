@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import useFetchAccount from "@services/ledger/hooks/useFetchAccount";
 import { LoaderSpin } from "@components/index";
 import { GLDGovTransactionsAccountTable } from "./transactions/table/GLDGovTransactionsAccountTable";
-import { usePagination } from "@utils/table/useTable";
+import { usePagination } from "@shared/utils/table/useTable";
 
 import { GOLDAO_LEDGER_CANISTER_ID_IC } from "@constants";
 

@@ -10,8 +10,8 @@ import {
   formatTimestampToYearsDifference,
   getCurrentTimestampSeconds,
   formatTimestampToYears,
-} from "@utils/dates";
-import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
+} from "@shared/utils/dates";
+import { divideBy1e8, roundAndFormatLocale } from "@shared/utils/numbers";
 
 import { idlFactory } from "../idlFactoryICP";
 

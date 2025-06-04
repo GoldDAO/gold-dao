@@ -10,8 +10,8 @@ import {
   Transactions,
   Transaction,
 } from "@services/ledger";
-import { getDateUTC } from "@utils/dates";
-import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
+import { getDateUTC } from "@shared/utils/dates";
+import { divideBy1e8, roundAndFormatLocale } from "@shared/utils/numbers";
 
 export type { Transaction };
 

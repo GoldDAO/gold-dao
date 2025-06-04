@@ -4,9 +4,9 @@ import {
   formatTimestampToYearsDifference,
   getCurrentTimestampSeconds,
   formatTimestampToYears,
-} from "@utils/dates";
+} from "@shared/utils/dates";
 
-import { divideBy1e8, roundAndFormatLocale } from "@utils/numbers";
+import { divideBy1e8, roundAndFormatLocale } from "@shared/utils/numbers";
 
 export const getIsDissolving = (dissolveState: DissolveState) => {
   if (
