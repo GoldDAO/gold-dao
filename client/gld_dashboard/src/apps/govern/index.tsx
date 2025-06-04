@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import InnerAppLayout from "@shared/components/layouts/app/inner-app";
+import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import NeuronsOverview from "./neuron-overview";
 import NeuronsList from "./neuron-list";
 import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";

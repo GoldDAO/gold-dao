@@ -19,7 +19,7 @@ import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import InnerAppLayout from "@shared/components/layouts/app/inner-app";
+import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import { Token } from "./utils";
 import SelectToken from "./components/select-token/SelectToken";
 import BuyConfirm from "./components/buy-dialog/Confirm";

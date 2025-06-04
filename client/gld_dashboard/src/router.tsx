@@ -4,7 +4,7 @@ import {
   Navigate,
   RouterProvider as ReactRouterProvider,
 } from "react-router-dom";
-import AppLayout from "@shared/components/layouts/app";
+import AppLayout from "@shared/components/app-layout";
 import LoadingNavigation from "@shared/components/LoadingNavigation";
 import NotFound from "@shared/components/NotFound";
 import Buy from "apps/buy";

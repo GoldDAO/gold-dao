@@ -1,4 +1,4 @@
-import InnerAppLayout from "@shared/components/layouts/app/inner-app";
+import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import SideNav from "@advanced/side-nav";
 import OverviewSection from "@advanced/gldt/overview-section";
 import TxSection from "@advanced/gldt/tx-section";
