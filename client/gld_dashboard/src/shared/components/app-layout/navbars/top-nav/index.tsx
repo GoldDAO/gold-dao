@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { useAuth } from "@auth/index";
-import DropdownUserMenu from "@shared/components/layouts/app/navbars/top-nav/user-menu";
+import DropdownUserMenu from "@shared/components/app-layout/navbars/top-nav/user-menu";
 import { Button } from "@components/index";
 import { Logo } from "@components/logos";
-import navItems from "@shared/components/layouts/app/navbars/shared/utils";
+import navItems from "@shared/components/app-layout/navbars/shared/utils";
 
 const TopNav = ({ className }: { className?: string }) => {
   const { isConnected, connect } = useAuth();

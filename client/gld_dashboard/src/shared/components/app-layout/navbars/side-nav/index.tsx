@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import navItems from "@shared/components/layouts/app/navbars/shared/utils";
+import navItems from "@shared/components/app-layout/navbars/shared/utils";
 
 const SideNav = ({ className }: { className?: string }) => {
   const location = useLocation();

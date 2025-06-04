@@ -1,7 +1,7 @@
 import { Outlet, useNavigation } from "react-router-dom";
-import TopNav from "@shared/components/layouts/app/navbars/top-nav";
-import SideNav from "@shared/components/layouts/app/navbars/side-nav";
-import BottomNav from "@shared/components/layouts/app/navbars/bottom-nav";
+import TopNav from "@shared/components/app-layout/navbars/top-nav";
+import SideNav from "@shared/components/app-layout/navbars/side-nav";
+import BottomNav from "@shared/components/app-layout/navbars/bottom-nav";
 
 const NavigationProgress = () => {
   return (

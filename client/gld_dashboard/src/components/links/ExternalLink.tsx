@@ -15,7 +15,7 @@ const ExternalLink = ({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center hover:font-semibold text-accent ${className} hover:underline`}
+      className={`inline-flex items-center ${className} hover:underline`}
     >
       <div>{children}</div>
       <ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5" />

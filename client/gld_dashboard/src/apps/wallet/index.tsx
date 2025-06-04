@@ -4,7 +4,7 @@ import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Button } from "@components/index";
-import InnerAppLayout from "@shared/components/layouts/app/inner-app";
+import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import WalletList from "@wallet/wallet-list";
 import WalletItemHeader from "@wallet/wallet-item-header";
 import WalletItemAction from "@wallet/wallet-item-action";
