@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { usePagination } from "@utils/table/useTable";
+import { usePagination } from "@shared/utils/table/useTable";
 
 import SNSOverview from "./sns_overview/SNSOverview";
 import GoldDAORewards from "./gold_dao_rewards/GoldDAORewards";

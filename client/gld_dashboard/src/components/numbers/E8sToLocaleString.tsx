@@ -1,4 +1,4 @@
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8 } from "@shared/utils/numbers";
 
 const E8sToLocaleString = ({
   value,

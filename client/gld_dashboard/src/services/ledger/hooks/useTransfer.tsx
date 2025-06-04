@@ -107,10 +107,10 @@ const useTransfer = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`FETCH_LEDGER_BALANCE_${ledger.toUpperCase()}`],
+        queryKey: ["FETCH_LEDGER_BALANCE", ledger],
       });
       queryClient.invalidateQueries({
-        queryKey: [`FETCH_ACCOUNT_TRANSACTIONS_${ledger.toUpperCase()}`],
+        queryKey: ["FETCH_ACCOUNT_TRANSACTIONS", ledger],
       });
     },
   });

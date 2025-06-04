@@ -8,9 +8,10 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTotalStaked";
-import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
+import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchStakeAPY from "@services/gldt_stake/hooks/useFetchStakeAPY";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import GradientCard from "@shared/components/ui/card/GradientCard";
 
 const StakeOverview = () => {
   const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
@@ -88,10 +89,10 @@ const StakeOverview = () => {
   };
 
   return (
-    <div
+    <GradientCard
       className={clsx(
-        "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
-        "rounded-tr-[inherit] px-4 xl:px-8 pt-4 xl:pt-8 pb-24"
+        "px-4 xl:px-8 pt-4 xl:pt-8 pb-24",
+        "rounded-tr-[inherit]"
       )}
     >
       <div className="flex flex-col items-center">
@@ -136,7 +137,7 @@ const StakeOverview = () => {
           </div>
         </div>
       </div>
-    </div>
+    </GradientCard>
   );
 };
 

@@ -7,7 +7,7 @@ import {
   OGY_LEDGER_CANISTER_ID,
 } from "@constants";
 import { PositionRewards, Reward } from "../../utils";
-import { RewardFeeData } from "@utils/useRewardsFee";
+import { RewardFeeData } from "@shared/hooks/useRewardsFee";
 
 type ClaimRewardState = {
   is_open_claim_dialog_confirm: boolean;

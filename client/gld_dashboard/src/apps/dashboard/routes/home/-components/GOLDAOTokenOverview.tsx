@@ -10,7 +10,7 @@ import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
 
 import { GOLDAO_LEDGER_CANISTER_ID_IC, ICPSWAP_CANISTER_ID } from "@constants";
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8 } from "@shared/utils/numbers";
 import { useAuth } from "@auth/index";
 
 const GOLDAOTokenOverview = ({ className }: { className?: string }) => {

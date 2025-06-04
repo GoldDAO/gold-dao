@@ -7,7 +7,7 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../idlFactory";
 import { NeuronUser } from "../utils/interfaces";
 import list_neurons from "../list_neurons";
-import { formatRoundedTimeUnits, getRoundedYears } from "@utils/dates";
+import { formatRoundedTimeUnits, getRoundedYears } from "@shared/utils/dates";
 
 const useFetchUserNeuronsList = (
   canisterId: string,

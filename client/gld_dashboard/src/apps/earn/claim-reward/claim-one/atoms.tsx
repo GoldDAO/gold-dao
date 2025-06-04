@@ -7,7 +7,7 @@ import {
   OGY_LEDGER_CANISTER_ID,
 } from "@constants";
 import { Reward } from "../../utils";
-import { RewardFeeData } from "@utils/useRewardsFee";
+import { RewardFeeData } from "@shared/hooks/useRewardsFee";
 import { Reward as RewardStake } from "@services/gldt_stake/utils/interfaces";
 
 type ClaimRewardState = {

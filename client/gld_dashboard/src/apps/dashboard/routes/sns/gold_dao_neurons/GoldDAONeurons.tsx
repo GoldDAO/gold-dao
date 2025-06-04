@@ -1,4 +1,4 @@
-import { usePagination } from "@utils/table/useTable";
+import { usePagination } from "@shared/utils/table/useTable";
 import { GoldDAONeuronsTable } from "./table/GoldDAONeuronsTable";
 
 const GoldDAONeurons = () => {

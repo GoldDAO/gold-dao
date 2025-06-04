@@ -8,7 +8,7 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import { idlFactory } from "../idlFactory";
 
-import { roundAndFormatLocale } from "@utils/numbers";
+import { roundAndFormatLocale } from "@shared/utils/numbers";
 
 const useFetchLockedGLDNFT = (
   canisterId1G: string,

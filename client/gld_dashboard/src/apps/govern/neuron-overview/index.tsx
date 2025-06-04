@@ -3,9 +3,10 @@ import { GOLDAO_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useGetAllNeuronsTotalStakedAmount from "../utils/useGetAllNeuronsTotalStakedAmount";
-import useFetchTokenPrice from "@hooks/useFetchTokenPrice";
+import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import GradientCard from "@shared/components/ui/card/GradientCard";
 
 const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -64,9 +65,9 @@ const NeuronOverview = () => {
   };
 
   return (
-    <div
+    <GradientCard
       className={clsx(
-        "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
+        "px-4 xl:px-8 pt-4 xl:pt-8 pb-24",
         "rounded-tr-[inherit] rounded-tl-0 px-4 xl:px-8 pt-4 xl:pt-8 pb-24"
       )}
     >
@@ -93,7 +94,7 @@ const NeuronOverview = () => {
           </div>
         </div>
       </div>
-    </div>
+    </GradientCard>
   );
 };
 

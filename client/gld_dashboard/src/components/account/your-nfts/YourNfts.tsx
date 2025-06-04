@@ -1,6 +1,6 @@
 import { LoaderSpin } from "@components/index";
 
-import { useGetUserNftsMetrics } from "@hooks/gld_nft";
+import { useGetUserNftsMetrics } from "@shared/hooks/gld_nft";
 
 const CardNFT = ({
   valueNFT,

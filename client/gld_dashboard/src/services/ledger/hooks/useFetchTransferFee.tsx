@@ -25,7 +25,7 @@ const useFetchTransferFee = (
   } = options;
 
   return useQuery({
-    queryKey: [`FETCH_LEDGER_TX_FEE_${ledger.toLocaleUpperCase()}`, ledger],
+    queryKey: ["FETCH_LEDGER_TX_FEE", ledger],
     queryFn: async () => {
       try {
         const actor = Actor.createActor(idlFactory, {

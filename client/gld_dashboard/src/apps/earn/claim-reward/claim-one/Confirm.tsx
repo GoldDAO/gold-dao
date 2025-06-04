@@ -9,7 +9,7 @@ import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "../../utils";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useRewardsFee from "@utils/useRewardsFee";
+import useRewardsFee from "@shared/hooks/useRewardsFee";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const RewardItem = ({ name }: { name: string }) => {
@@ -28,7 +28,11 @@ const RewardItem = ({ name }: { name: string }) => {
     <button
       className={clsx(
         "p-4 border border-border rounded-xl",
-        `${reward.is_selected ? "bg-green-700/10 border-green-700 hover:bg-green-700/15" : "bg-surface hover:bg-surface-secondary"}`,
+        `${
+          reward.is_selected
+            ? "bg-green-700/10 border-green-700 hover:bg-green-700/15"
+            : "bg-surface hover:bg-surface-secondary"
+        }`,
         `${reward.is_claimable ? "cursor-pointer " : "cursor-not-allowed"}`
       )}
       disabled={!reward.is_claimable}

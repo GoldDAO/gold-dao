@@ -41,6 +41,8 @@
       "@earn/*": ["apps/earn/*"],
       "@govern/*": ["apps/govern/*"],
       "@wallet/*": ["apps/wallet/*"],
+      "@advanced/*": ["apps/advanced/*"],
+      "@shared/*": ["shared/*"],
     }
   },
   "include": ["src"],

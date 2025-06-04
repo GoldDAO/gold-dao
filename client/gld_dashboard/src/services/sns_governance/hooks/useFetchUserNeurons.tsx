@@ -13,8 +13,8 @@ import { NeuronUser } from "./interfaces";
 import fetch_user_neurons from "../fetch_user_neurons";
 import { icrc1_balance_of } from "../../ledger/icrc1_balance_of";
 
-import { divideBy1e8, numberToLocaleString } from "@utils/numbers";
-import { calculateTimeDifferenceInSeconds } from "@utils/dates";
+import { divideBy1e8, numberToLocaleString } from "@shared/utils/numbers";
+import { calculateTimeDifferenceInSeconds } from "@shared/utils/dates";
 
 const useFetchUserNeurons = (
   canisterId: string,

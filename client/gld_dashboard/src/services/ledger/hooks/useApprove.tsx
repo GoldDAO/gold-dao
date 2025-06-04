@@ -3,21 +3,25 @@ import { DateTime } from "luxon";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-
 import { idlFactory } from "../idlFactory";
-
 import { Result_2 } from "../interfaces/ledger";
 
 const icrc2_approve = async (
   actor: ActorSubclass,
-  approveArgs: { amount: bigint; spender: { owner: string } }
+  approveArgs: {
+    amount: bigint;
+    spender: { owner: string; subaccount?: Uint8Array<ArrayBufferLike> | [] };
+  }
 ): Promise<bigint> => {
   const { amount, spender } = approveArgs;
   const decodedAccount = decodeIcrcAccount(spender.owner);
   const owner = decodedAccount.owner;
-  const subaccount = decodedAccount?.subaccount
-    ? [decodedAccount.subaccount]
-    : [];
+  let subaccount = [];
+  if (spender.subaccount) {
+    subaccount = [spender.subaccount];
+  } else {
+    subaccount = decodedAccount?.subaccount ? [decodedAccount.subaccount] : [];
+  }
 
   const result = (await actor.icrc2_approve({
     amount,
@@ -25,7 +29,9 @@ const icrc2_approve = async (
     memo: [],
     expected_allowance: [],
     created_at_time: [],
-    expires_at: [DateTime.now().plus({ seconds: 3600 }).toMillis() * 1000000],
+    expires_at: [
+      BigInt(DateTime.now().plus({ hours: 1 }).toMillis()) * BigInt(1_000_000),
+    ],
     spender: {
       owner,
       subaccount,
@@ -34,7 +40,6 @@ const icrc2_approve = async (
   })) as Result_2;
 
   if ("Err" in result) throw result.Err;
-
   return result.Ok;
 };
 
@@ -48,7 +53,7 @@ const useApprove = (
       spender,
     }: {
       amount: bigint;
-      spender: { owner: string };
+      spender: { owner: string; subaccount?: Uint8Array<ArrayBufferLike> | [] };
     }) => {
       try {
         const actor = Actor.createActor(idlFactory, {

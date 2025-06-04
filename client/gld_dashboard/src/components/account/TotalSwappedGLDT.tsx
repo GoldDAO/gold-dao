@@ -1,4 +1,4 @@
-import { useGetUserNftsMetrics } from "@hooks/gld_nft";
+import { useGetUserNftsMetrics } from "@shared/hooks/gld_nft";
 import { LoaderSpin } from "@components/index";
 import { LogoGLDT } from "@components/logos";
 

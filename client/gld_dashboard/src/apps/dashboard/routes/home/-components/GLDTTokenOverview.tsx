@@ -16,7 +16,7 @@ import {
   GLD_NFT_1000G_CANISTER_ID,
 } from "@constants";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8 } from "@shared/utils/numbers";
 import { useAuth } from "@auth/index";
 
 const GLDTTokenOverview = ({ className }: { className?: string }) => {
