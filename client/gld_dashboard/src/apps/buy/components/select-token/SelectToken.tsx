@@ -9,24 +9,26 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import Tokens, { Token } from "@buy/utils";
+import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();
 
-  const balance = useFetchUserBalance(canisterId, unauthenticatedAgent, {
-    ledger: id,
+  const balance = useFetchLedgerBalance(canisterId, unauthenticatedAgent, {
+    ledger: name,
     owner: principalId,
     enabled: !!unauthenticatedAgent && isConnected,
   });
 
-  const decimals = useFetchDecimals(canisterId, unauthenticatedAgent, {
-    ledger: id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
+  const renderBalance = () => {
+    if (balance.isSuccess) {
+      return <NumberToLocaleString value={balance.data.balance} />;
+    } else {
+      return <div>Loading...</div>;
+    }
+  };
 
   return (
     <div className="m-2 font-semibold text-sm cursor-pointer hover:bg-surface-secondary hover:rounded-lg">
@@ -38,16 +40,7 @@ const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
             <div className="text-content/60">{label}</div>
           </div>
         </div>
-        <div className="">
-          {balance.isSuccess && decimals.isSuccess ? (
-            <TokenValueToLocaleString
-              value={balance.data}
-              tokenDecimals={decimals.data}
-            />
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
+        <div>{isConnected && renderBalance()}</div>
       </div>
     </div>
   );
@@ -62,28 +55,35 @@ const SelectBuyMethod = ({
   handleOnChange: (selectedToken: Token) => void;
   className?: string;
 }) => {
+  const { unauthenticatedAgent, principalId, isConnected } = useAuth();
   const [selected, setSelected] = useState(value);
 
-  const { unauthenticatedAgent, principalId, isConnected } = useAuth();
-
-  const balance = useFetchUserBalance(
+  const balance = useFetchLedgerBalance(
     selected.canisterId,
     unauthenticatedAgent,
     {
-      ledger: selected.id,
+      ledger: selected.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
-  const decimals = useFetchDecimals(selected.canisterId, unauthenticatedAgent, {
-    ledger: selected.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
   const handleChange = (token: Token) => {
     setSelected(token);
     handleOnChange(token);
+  };
+
+  const renderBalance = () => {
+    if (balance.isSuccess) {
+      return (
+        <>
+          Balance: <NumberToLocaleString value={balance.data.balance} />{" "}
+          {selected.name}
+        </>
+      );
+    } else {
+      return <div>Fetching your {selected.name} balance...</div>;
+    }
   };
 
   return (
@@ -92,27 +92,15 @@ const SelectBuyMethod = ({
         <ListboxButton
           className={clsx(
             "min-w-[300px] rounded-md border border-border p-4",
-            "text-sm/6"
+            "text-sm/6 cursor-pointer"
           )}
-          disabled={!balance.isSuccess || !decimals.isSuccess}
         >
-          <div className="cursor-pointer">
-            {balance.isSuccess && decimals.isSuccess ? (
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Logo name={selected.id} className="w-6 h-6" />
-                  Balance:{" "}
-                  <TokenValueToLocaleString
-                    value={balance.data}
-                    tokenDecimals={decimals.data}
-                  />{" "}
-                  {selected.name}
-                </div>
-                <ChevronDownIcon className="h-6 w-6" />
-              </div>
-            ) : (
-              <div className="flex">Loading...</div>
-            )}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Logo name={selected.id} className="w-6 h-6" />
+              {isConnected ? renderBalance() : <div>{selected.name}</div>}
+            </div>
+            <ChevronDownIcon className="h-6 w-6" />
           </div>
         </ListboxButton>
         <ListboxOptions

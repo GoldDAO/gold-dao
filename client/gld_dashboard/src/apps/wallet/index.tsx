@@ -40,13 +40,13 @@ const Wallet = () => {
   const renderDisconnectedPlaceholder = () => {
     return (
       <div className="flex flex-col gap-4 relative">
-        {[...Array(2)].map((_, index) => (
+        {[...Array(3)].map((_, index) => (
           <div key={index}>
             <div
               className={clsx(
                 "@container",
                 "shrink-0",
-                "rounded-md xl:rounded-xl border border-border/40 p-4 cursor-pointer"
+                "rounded-md xl:rounded-xl border border-border/40 p-4"
               )}
             >
               <div className="flex justify-between items-center p-2">

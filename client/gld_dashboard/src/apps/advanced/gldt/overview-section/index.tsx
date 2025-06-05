@@ -1,9 +1,10 @@
 import clsx from "clsx";
 import { Logo } from "@components/index";
 import GradientCard from "@shared/components/ui/card/GradientCard";
-import TotalCountUserNFTs from "@advanced/gldt/overview-section/total-count-user-nfts";
+import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
 import ActionBtns from "@advanced/gldt/overview-section/action-btns";
-import TotalCountGLDT from "@advanced/gldt/overview-section/total-count-gldt";
+import TotalCountToken from "@shared/components/total-count-token";
+import { TokensList, GLDT_INDEX } from "@wallet/shared/utils";
 
 const OverviewSection = () => {
   return (
@@ -17,13 +18,12 @@ const OverviewSection = () => {
               <div className="text-content/60 text-sm">Mint & Burn</div>
             </div>
           </div>
-          {/* <div className="text-sm text-content/60">1 {name} ≈ $(todo)</div> */}
         </div>
         <div className="py-8 xl:py-12">
-          <div className="flex items-center gap-4 xl:gap-8 justify-center">
+          <div className="flex items-stretch gap-4 xl:gap-8 justify-center">
             <TotalCountUserNFTs />
-            <div className="border-l border-border"></div>
-            <TotalCountGLDT />
+            <div className="border-l border-border h-auto my-2" />
+            <TotalCountToken token={TokensList[GLDT_INDEX]} />
           </div>
         </div>
       </div>

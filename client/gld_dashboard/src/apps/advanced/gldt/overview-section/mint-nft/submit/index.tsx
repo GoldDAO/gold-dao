@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@components/index";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
-import { NFTCollectionNames } from "@shared/utils/nfts";
+import { NFTCollections } from "@shared/utils/nfts";
 import {
   IsOneOrMoreSelectedNFTAtom,
   TotalGLDTSelectedAtom,
@@ -24,8 +24,8 @@ const Submit = () => {
       <div className="rounded-xl p-4 border border-border">
         <div className="text-primary mb-4">From</div>
         <div className="flex flex-col gap-2">
-          {NFTCollectionNames.map((collection) => (
-            <UserNFTSelect key={collection} collection={collection} />
+          {NFTCollections.map((collection) => (
+            <UserNFTSelect key={collection.name} collection={collection.name} />
           ))}
         </div>
       </div>

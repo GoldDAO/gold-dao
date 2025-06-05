@@ -10,6 +10,7 @@ import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import { NFTCollections } from "@shared/utils/nfts";
 
 const TokenItem = ({ token }: { token: Token }) => {
   const { id, name, label } = token;
@@ -86,13 +87,18 @@ const TokenItem = ({ token }: { token: Token }) => {
 
 const NFTItem = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isConnected, authenticatedAgent, principalId } = useAuth();
 
   const onClickToken = () => {
     searchParams.set("token", "nft");
     setSearchParams(searchParams);
   };
 
-  const { data: nfts, isSuccess: isSuccessFetchUserNFTs } = useUserNFTMetrics();
+  const nfts = useUserNFTMetrics(authenticatedAgent, {
+    owner: principalId,
+    nft_collections: NFTCollections,
+    enabled: !!authenticatedAgent && isConnected,
+  });
 
   return (
     <div
@@ -117,11 +123,11 @@ const NFTItem = () => {
         </div>
         <div className="text-end">
           <div>
-            {isSuccessFetchUserNFTs ? nfts.totalCount : <div>Loading...</div>}
+            {nfts.isSuccess ? nfts.data.totalCount : <div>Loading...</div>}
           </div>
           <div className="text-content/60 text-sm flex items-center justify-end gap-1">
-            {isSuccessFetchUserNFTs ? (
-              <div>({nfts.totalGrams} grams) - $todo</div>
+            {nfts.isSuccess ? (
+              <div>({nfts.data.totalGrams} grams) - $todo</div>
             ) : (
               <div>Loading...</div>
             )}

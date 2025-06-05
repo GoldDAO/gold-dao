@@ -11,7 +11,6 @@ import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { Ledger } from "@services/ledger/utils/interfaces";
 
 const useFetchLedgerBalance = (
   canisterId: string,
@@ -28,7 +27,7 @@ const useFetchLedgerBalance = (
     }>,
     "queryKey" | "queryFn"
   > & {
-    ledger: Ledger;
+    ledger: string;
     owner: string;
   }
 ) => {
@@ -60,7 +59,7 @@ const useFetchLedgerBalance = (
       const decimals = await icrc1_decimals(actorLedger);
 
       const price = await swap_amounts(actorKongswap, {
-        from: ledger.toLocaleUpperCase(),
+        from: ledger,
         to: "ckUSDC",
         amount: 1n,
       });

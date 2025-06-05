@@ -119,12 +119,12 @@ const TxHistory = () => {
     <>
       <div className="overflow-x-auto w-full">
         {ongoingTxs.isLoading && (
-          <div className="flex justify-center items-center h-40">
-            <span>Loading history...</span>
+          <div className="p-4 flex items-center justify-center">
+            Loading on going transactions...
           </div>
         )}
         {ongoingTxs.isError && (
-          <div className="flex justify-center items-center h-40 text-red-500">
+          <div className="flex justify-center items-center text-red-500 p-4">
             Fetching history error.
           </div>
         )}

@@ -132,7 +132,7 @@ const TxHistory = () => {
       <div className="overflow-x-auto w-full">
         {history.isLoading && (
           <div className="flex justify-center items-center p-4">
-            <div>Loading history...</div>
+            <div>Loading past transaction...</div>
           </div>
         )}
         {history.isError && (
@@ -203,12 +203,20 @@ const TxHistory = () => {
       </div>
       {history.isFetchingNextPage && (
         <div className="p-4 flex items-center justify-center">
-          Loading more...
+          Loading past transactions...
         </div>
       )}
-      {!history.hasNextPage && !history.isLoading && !history.isError && (
+      {!history.hasNextPage &&
+        !history.isLoading &&
+        !history.isError &&
+        data.length >= 1 && (
+          <div className="p-4 flex items-center justify-center">
+            No more results
+          </div>
+        )}
+      {history.isSuccess && !data.length && (
         <div className="p-4 flex items-center justify-center">
-          No more results
+          No past transactions
         </div>
       )}
     </>

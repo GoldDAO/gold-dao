@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useAtom } from "jotai";
 import clsx from "clsx";
 import { BuyCrypto, HuobiToken } from "iconsax-react";
+import { useAuth } from "@auth/index";
 import BuyOnBity from "@assets/icons/bity_white.svg";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import MintNFT from "@advanced/gldt/overview-section/mint-nft";
@@ -16,6 +17,8 @@ const Btn = ({
   action: Action;
   handleOnClick?: () => void;
 }) => {
+  const { isConnected } = useAuth();
+
   const actions: Record<Action, { icon: ReactNode; text: string }> = {
     "mint-nft": { icon: <BuyCrypto />, text: "Mint" },
     "burn-nft": { icon: <HuobiToken />, text: "Burn" },
@@ -27,24 +30,29 @@ const Btn = ({
 
   const renderBtn = () => {
     return (
-      <div
+      <button
         onClick={handleOnClick}
         className={clsx(
-          "flex justify-center px-1 py-3 rounded-md shrink-0",
-          "bg-secondary text-white cursor-pointer",
+          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default",
+          "bg-secondary text-white",
           "xl:w-[140px] xl:rounded-lg"
         )}
+        disabled={!isConnected}
       >
         <div
           className={clsx(
             "flex justify-center items-center gap-2",
-            "xl:flex-col xl:gap-1"
+            "xl:flex-col xl:gap-1",
+            "px-1 py-3"
           )}
         >
           {actions[action].icon}
           <div>{actions[action].text}</div>
         </div>
-      </div>
+        {!isConnected && (
+          <div className="absolute rounded-[inherit] top-0 w-full h-full bg-white/30" />
+        )}
+      </button>
     );
   };
 

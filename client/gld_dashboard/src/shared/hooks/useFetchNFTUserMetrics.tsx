@@ -1,124 +1,88 @@
-import { useEffect, useState } from "react";
-
-import { useAuth } from "@auth/index";
-import useFetchUserNFT from "@shared/hooks/useFetchNFTUser";
 import {
-  GLD_NFT_1000G_CANISTER_ID,
-  GLD_NFT_100G_CANISTER_ID,
-  GLD_NFT_10G_CANISTER_ID,
-  GLD_NFT_1G_CANISTER_ID,
-} from "@constants";
+  useQuery,
+  keepPreviousData,
+  UseQueryOptions,
+} from "@tanstack/react-query";
+import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { SWAP_CANISTER_ID } from "@constants";
+import { NFTCollection } from "@services/gld_nft/utils/interfaces";
+import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
+import { idlFactory as idlFactorySwap } from "@services/gldt_swap/idlFactory";
+import unlisted_tokens_of from "@services/gld_nft/fn/unlisted_tokens_of";
+import get_nat_as_token_id_origyn from "@services/gld_nft/fn/get_nat_as_token_id_origyn";
+import get_active_swaps_by_user from "@services/gldt_swap/fn/get_active_swaps_by_user";
+import { bigIntTo32ByteArray } from "@services/gld_nft/utils";
 
-const useFetchUserNFTs = () => {
-  const { principalId, authenticatedAgent, isConnected } = useAuth();
+const useFetchUserNFTMetrics = (
+  agent: Agent | HttpAgent | undefined,
+  options: Omit<
+    UseQueryOptions<{ totalCount: number; totalGrams: number }>,
+    "queryKey" | "queryFn"
+  > & {
+    owner: string;
+    nft_collections: NFTCollection[];
+  }
+) => {
+  const {
+    owner,
+    nft_collections,
+    enabled = true,
+    refetchInterval = false,
+    placeholderData = keepPreviousData,
+  } = options;
 
-  const [totalGrams, setTotalGrams] = useState<number | undefined>(undefined);
-  const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-
-  const collectionNFT1G = useFetchUserNFT(
-    GLD_NFT_1G_CANISTER_ID,
-    authenticatedAgent,
-    {
-      owner: principalId,
-      collection_name: "1G",
-      enabled: !!authenticatedAgent && !!isConnected,
-    }
-  );
-
-  const collectionNFT10G = useFetchUserNFT(
-    GLD_NFT_10G_CANISTER_ID,
-    authenticatedAgent,
-    {
-      owner: principalId,
-      collection_name: "10G",
-      enabled: !!authenticatedAgent && !!isConnected,
-    }
-  );
-
-  const collectionNFT100G = useFetchUserNFT(
-    GLD_NFT_100G_CANISTER_ID,
-    authenticatedAgent,
-    {
-      owner: principalId,
-      collection_name: "100G",
-      enabled: !!authenticatedAgent && !!isConnected,
-    }
-  );
-
-  const collectionNFT1KG = useFetchUserNFT(
-    GLD_NFT_1000G_CANISTER_ID,
-    authenticatedAgent,
-    {
-      owner: principalId,
-      collection_name: "1KG",
-      enabled: !!authenticatedAgent && !!isConnected,
-    }
-  );
-
-  useEffect(() => {
-    if (
-      collectionNFT1G.isFetched &&
-      collectionNFT10G.isFetched &&
-      collectionNFT100G.isFetched &&
-      collectionNFT1KG.isFetched
-    ) {
-      const totalGrams1G = collectionNFT1G.isSuccess
-        ? collectionNFT1G.data.length * 1
-        : 0;
-      const totalGrams10G = collectionNFT10G.isSuccess
-        ? collectionNFT10G.data.length * 10
-        : 0;
-      const totalGrams100G = collectionNFT100G.isSuccess
-        ? collectionNFT100G.data.length * 100
-        : 0;
-      const totalGrams1KG = collectionNFT1KG.isSuccess
-        ? collectionNFT1KG.data.length * 1000
-        : 0;
-
-      const totalCount1G = collectionNFT1G.isSuccess
-        ? collectionNFT1G.data.length
-        : 0;
-      const totalCount10G = collectionNFT10G.isSuccess
-        ? collectionNFT10G.data.length
-        : 0;
-      const totalCount100G = collectionNFT100G.isSuccess
-        ? collectionNFT100G.data.length
-        : 0;
-      const totalCount1KG = collectionNFT1KG.isSuccess
-        ? collectionNFT1KG.data.length
-        : 0;
-
-      setTotalGrams(
-        totalGrams1G + totalGrams10G + totalGrams100G + totalGrams1KG
+  return useQuery({
+    queryKey: ["FETCH_USER_NFT_METRICS", owner],
+    queryFn: async () => {
+      // Préparer l'actor pour le swap une seule fois
+      const actorSwap = Actor.createActor(idlFactorySwap, {
+        agent,
+        canisterId: SWAP_CANISTER_ID,
+      });
+      const activeSwaps = await get_active_swaps_by_user(actorSwap, owner);
+      const activeSwapSet = new Set(
+        activeSwaps.map((swap) => swap.nft_id_string)
       );
-      setTotalCount(
-        totalCount1G + totalCount10G + totalCount100G + totalCount1KG
-      );
-      setIsSuccess(true);
-    }
-  }, [
-    collectionNFT1G.isSuccess,
-    collectionNFT10G.isSuccess,
-    collectionNFT100G.isSuccess,
-    collectionNFT1KG.isSuccess,
-    collectionNFT1G.data,
-    collectionNFT10G.data,
-    collectionNFT100G.data,
-    collectionNFT1KG.data,
-    collectionNFT1G.isFetched,
-    collectionNFT10G.isFetched,
-    collectionNFT100G.isFetched,
-    collectionNFT1KG.isFetched,
-  ]);
 
-  return {
-    data: {
-      totalCount,
-      totalGrams,
+      const results = await Promise.all(
+        nft_collections.map(async ({ canisterId, grams }) => {
+          const actorNFT = Actor.createActor(idlFactoryNFT, {
+            agent,
+            canisterId,
+          });
+          const tokens = await unlisted_tokens_of(actorNFT, {
+            owner,
+          });
+          const nfts = await Promise.all(
+            tokens.map(async (tokenId: bigint) => {
+              const id_string = (await get_nat_as_token_id_origyn(actorNFT, {
+                tokenId,
+              })) as string;
+              return {
+                id_string,
+                id_bigint: tokenId,
+                id_byte_array: bigIntTo32ByteArray(tokenId),
+              };
+            })
+          );
+
+          //? Filter out NFT's that are currently being swapped
+          const filtered = nfts.filter(
+            (nft) => !activeSwapSet.has(nft.id_string)
+          );
+          return { count: filtered.length, grams: filtered.length * grams };
+        })
+      );
+
+      const totalCount = results.reduce((acc, cur) => acc + cur.count, 0);
+      const totalGrams = results.reduce((acc, cur) => acc + cur.grams, 0);
+
+      return { totalCount, totalGrams };
     },
-    isSuccess,
-  };
+    placeholderData,
+    enabled,
+    refetchInterval,
+  });
 };
 
-export default useFetchUserNFTs;
+export default useFetchUserNFTMetrics;
