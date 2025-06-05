@@ -10,7 +10,7 @@ import {
 import styled from "styled-components";
 import { colors } from "@theme/preset";
 import CustomTooltip from "./utils/CustomTooltip";
-import { millify } from "@utils/numbers";
+import { millify } from "@shared/utils/numbers";
 
 type Data = {
   name: string;

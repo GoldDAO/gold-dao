@@ -12,7 +12,7 @@ import {
   BadgeCanisterStatus,
   CanisterStatus,
 } from "@components/badges/BadgeCanisterStatus";
-import { TableProps } from "@utils/table/useTable";
+import { TableProps } from "@shared/utils/table/useTable";
 
 import useFetchAllCanisters, {
   SNSCanistersSummaryData,

@@ -6,7 +6,7 @@ import { Subaccount } from "@dfinity/ledger-icrc/dist/candid/icrc_ledger";
 import _upperFirst from "lodash/upperFirst";
 import { GetTransactionsResult } from "./idlFactory.interface";
 import { Transactions } from "./utils/interfaces";
-import { getDateUTC } from "@utils/dates";
+import { getDateUTC } from "@shared/utils/dates";
 
 const get_account_transactions = async (
   actor: ActorSubclass,

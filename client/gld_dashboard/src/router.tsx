@@ -4,17 +4,14 @@ import {
   Navigate,
   RouterProvider as ReactRouterProvider,
 } from "react-router-dom";
-
-import AppLayout from "@components/outlets/AppLayout";
-
-import { NotFound, LoadingNavigation } from "views/index";
-
+import AppLayout from "@shared/components/app-layout";
+import LoadingNavigation from "@shared/components/LoadingNavigation";
+import NotFound from "@shared/components/NotFound";
 import Buy from "apps/buy";
 import Earn from "apps/earn";
 import Govern from "apps/govern";
 import Wallet from "apps/wallet";
-
-// import routesDashboard from "apps/dashboard/routes/index";
+import AdvancedGLDT from "apps/advanced/gldt";
 
 const router = createBrowserRouter([
   {
@@ -77,7 +74,19 @@ const router = createBrowserRouter([
           },
         ],
       },
-      // ...routesDashboard,
+      {
+        path: "advanced/gldt",
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AdvancedGLDT />
+              </Suspense>
+            ),
+          },
+        ],
+      },
       {
         path: "*",
         element: <NotFound />,

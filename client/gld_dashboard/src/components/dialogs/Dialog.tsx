@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogBackdrop,
 } from "@headlessui/react";
+import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const SIZES = {
@@ -17,25 +18,38 @@ const SIZES = {
   auto: "max-w-auto",
 };
 
+const BackIcon = ({ handleOnClick }: { handleOnClick: () => void }) => {
+  return (
+    <div
+      className="p-1 rounded-full cursor-pointer hover:bg-secondary hover:text-white"
+      onClick={handleOnClick}
+    >
+      <ChevronLeftIcon className="h-6 w-6" />
+    </div>
+  );
+};
+
 const Dialog = ({
   open = false,
   handleOnClose = () => null,
-  disableClose = false,
+  closeEnabled = true,
   title = undefined,
   children,
   size = "xl",
+  handlePreviousStep = undefined,
 }: {
   open: boolean;
   title?: ReactNode;
   handleOnClose?: () => void;
   children?: ReactNode;
-  disableClose?: boolean;
+  closeEnabled?: boolean;
   size?: keyof typeof SIZES;
+  handlePreviousStep?: () => void;
 }) => {
   return open ? (
     <HUIDialog
       open={open}
-      onClose={!disableClose ? handleOnClose : () => null}
+      onClose={closeEnabled ? handleOnClose : () => null}
       transition
       className={clsx(
         "relative z-50",
@@ -55,12 +69,19 @@ const Dialog = ({
           )}
         >
           <DialogTitle className={"flex items-center"}>
-            {title && (
-              <div className="font-semibold text-content/80 shrink-0">
-                {title}
+            {(title || handlePreviousStep) && (
+              <div className="flex items-center gap-2">
+                {handlePreviousStep && (
+                  <BackIcon handleOnClick={handlePreviousStep} />
+                )}
+                {title && (
+                  <h2 className="font-semibold text-content/80 shrink-0">
+                    {title}
+                  </h2>
+                )}
               </div>
             )}
-            {!disableClose && (
+            {closeEnabled && (
               <div className="w-full text-end">
                 <button onClick={handleOnClose}>
                   <div

@@ -11,7 +11,7 @@ import { useAuth } from "@auth/index";
 import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
 import { LoaderSpin } from "@components/loaders";
 import { Logo } from "@components/index";
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8 } from "@shared/utils/numbers";
 
 import { Ledger } from "@services/ledger/utils/interfaces";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";

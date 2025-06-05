@@ -4,7 +4,7 @@ import { ExportSquare } from "iconsax-react";
 import { useAuth } from "@auth/index";
 import Dialog from "@components/dialogs/Dialog";
 import { Button } from "@components/index";
-import InnerAppLayout from "@components/outlets/InnerAppLayout";
+import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import StakeForm from "./stake-form";
 import StakeOverview from "./stake-overview";
 import StakeList from "./stake-list";

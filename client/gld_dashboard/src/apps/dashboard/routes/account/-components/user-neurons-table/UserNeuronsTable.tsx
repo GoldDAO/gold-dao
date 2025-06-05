@@ -13,7 +13,7 @@ import {
 import { Table, LoaderSpin, Logo } from "@components/index";
 import CopyToClipboard from "@components/buttons/CopyToClipboard";
 
-import { TableProps } from "@utils/table/useTable";
+import { TableProps } from "@shared/utils/table/useTable";
 
 import { NeuronUser } from "@services/sns_governance/hooks/interfaces";
 import useFetchUserNeurons from "@services/sns_governance/hooks/useFetchUserNeurons";

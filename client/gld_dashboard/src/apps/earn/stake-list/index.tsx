@@ -19,7 +19,7 @@ import DetailsDissolve from "../unlock/DetailsDissolve";
 import DetailsUnstakeEarly from "../unlock/DetailsUnstakeEarly";
 import ConfirmUnstake from "../unstake/Confirm";
 import DetailsUnstake from "../unstake/Details";
-import useRewardsFee, { RewardFeeData } from "@utils/useRewardsFee";
+import useRewardsFee, { RewardFeeData } from "@shared/hooks/useRewardsFee";
 import { Reward } from "@services/gldt_stake/utils/interfaces";
 
 const StakeList = () => {

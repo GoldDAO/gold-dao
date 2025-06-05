@@ -7,8 +7,8 @@ import {
 import { GOLDAO_LEDGER_CANISTER_ID_IC } from "@constants";
 
 import fetch_one_transaction, { Transaction } from "../fetch_one_transaction";
-import { getDateUTC } from "@utils/dates";
-import { divideBy1e8, numberToLocaleString } from "@utils/numbers";
+import { getDateUTC } from "@shared/utils/dates";
+import { divideBy1e8, numberToLocaleString } from "@shared/utils/numbers";
 
 export type { Transaction };
 

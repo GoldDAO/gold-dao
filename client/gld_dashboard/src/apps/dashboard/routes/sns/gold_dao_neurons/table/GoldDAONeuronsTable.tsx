@@ -13,7 +13,7 @@ import { Table, LoaderSpin } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
 import CopyToClipboard from "@components/buttons/CopyToClipboard";
 
-import { TableProps } from "@utils/table/useTable";
+import { TableProps } from "@shared/utils/table/useTable";
 
 import { NeuronPartial } from "@services/sns_governance/hooks/interfaces";
 import useFetchAllNeurons from "@services/sns_governance/hooks/useFetchAllNeurons";

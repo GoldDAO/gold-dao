@@ -3,19 +3,10 @@ import {
   SwapDetailReverse,
   SwapInfo,
 } from "../interfaces";
-import { getDateUTC } from "@utils/dates";
+import { getDateUTC } from "@shared/utils/dates";
 import { GLDT_VALUE_1G_NFT } from '@constants'
 
-export const bigintTo32ByteArray = (value: bigint) => {
-  const byteArray = new Uint8Array(32);
-  for (let i = byteArray.length - 1; i >= 0; i--) {
-    byteArray[i] = Number(value & 0xffn);
-    value >>= 8n;
-  }
-  return byteArray.reverse();
-};
-
-export const getSwapData = (swap: SwapInfo) => {
+export const getSwapData = (swap: SwapInfo): SwapData => {
   let tx: SwapDetailForward | SwapDetailReverse;
   let type;
   let label;
@@ -34,7 +25,7 @@ export const getSwapData = (swap: SwapInfo) => {
     tx = swap.Forward;
     status =
       swapStatus.Forward[
-        Object.keys(tx.status)[0] as keyof typeof swapStatus.Forward
+      Object.keys(tx.status)[0] as keyof typeof swapStatus.Forward
       ];
     receive_value = Number(tx.tokens_to_mint.value) / 10 ** 8;
     send_value = receive_value / GLDT_VALUE_1G_NFT;
@@ -46,7 +37,7 @@ export const getSwapData = (swap: SwapInfo) => {
     tx = swap.Reverse;
     status =
       swapStatus.Reverse[
-        Object.keys(tx.status)[0] as keyof typeof swapStatus.Reverse
+      Object.keys(tx.status)[0] as keyof typeof swapStatus.Reverse
       ];
     send_value = Number(tx.tokens_to_receive.value) / 10 ** 8;
     receive_value = send_value / GLDT_VALUE_1G_NFT;
@@ -141,3 +132,17 @@ export const swapStatus = {
     Failed: { value: "Failed", label: "Failed" },
   },
 };
+
+export interface SwapData {
+  type: string;
+  label: string;
+  created_at: string;
+  nft_id_string: string;
+  send_value: number;
+  receive_value: number;
+  gldt_value: number;
+  nft_value: number;
+  status: { value: string; label: string };
+  nft_id: string;
+  index: string;
+}

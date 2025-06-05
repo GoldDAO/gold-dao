@@ -10,7 +10,7 @@ import {
 } from "@constants";
 
 import { Reward } from "../../utils";
-import { RewardFeeData } from "@utils/useRewardsFee";
+import { RewardFeeData } from "@shared/hooks/useRewardsFee";
 import { TokensRewards } from "../../utils/useGetAllNeuronsRewards";
 
 type ClaimRewardState = {

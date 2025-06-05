@@ -8,7 +8,7 @@ import {
   TransactionWithId,
 } from "./idlFactory_icp.interface";
 import { Transactions } from "./utils/interfaces";
-import { getDateUTC } from "@utils/dates";
+import { getDateUTC } from "@shared/utils/dates";
 // import { decodeIcrcAccount, encodeIcrcAccount } from "@dfinity/ledger-icrc";
 
 const get_account_transactions_icp = async (

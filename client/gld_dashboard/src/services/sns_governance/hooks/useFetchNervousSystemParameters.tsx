@@ -25,8 +25,8 @@ export interface NervousSystemParametersData {
 }
 
 import get_nervous_system_parameters from "../get_nervous_system_parameters";
-import { divideBy1e8 } from "@utils/numbers";
-import { formatRoundedTimeUnits } from "@utils/dates";
+import { divideBy1e8 } from "@shared/utils/numbers";
+import { formatRoundedTimeUnits } from "@shared/utils/dates";
 
 const useFetchNervousSystemParameters = (
   canisterId: string,

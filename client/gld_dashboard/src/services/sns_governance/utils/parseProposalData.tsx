@@ -1,5 +1,5 @@
-import { divideBy1e8 } from "@utils/numbers";
-import { getDateUTC } from "@utils/dates";
+import { divideBy1e8 } from "@shared/utils/numbers";
+import { getDateUTC } from "@shared/utils/dates";
 
 import { ProposalData, Proposal } from "./interfaces";
 

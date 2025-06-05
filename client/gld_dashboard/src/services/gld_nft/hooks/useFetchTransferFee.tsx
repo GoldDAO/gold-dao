@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../idlFactory";
-import icrc7_transfer_fee from "../icrc7_transfer_fee";
+import icrc7_transfer_fee from "../fn/icrc7_transfer_fee";
 
 const useFetchTransferFeeNFT = (
   canisterId: string,

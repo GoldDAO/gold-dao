@@ -1,11 +1,11 @@
 import { Buffer } from "buffer";
 
-import { divideBy1e8 } from "@utils/numbers";
+import { divideBy1e8 } from "@shared/utils/numbers";
 import {
   getCurrentTimestampSeconds,
   calculateTimeDifferenceInSeconds,
   getDateUTC,
-} from "@utils/dates";
+} from "@shared/utils/dates";
 
 import { Neuron } from "../interfaces";
 import { NeuronData, NervousSystemParameter } from "./interfaces";

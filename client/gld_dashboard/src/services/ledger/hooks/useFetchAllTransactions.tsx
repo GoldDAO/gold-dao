@@ -6,8 +6,8 @@ import {
 import { SortingState } from "@tanstack/react-table";
 
 import { fetchAllTransactions, Transactions, Transaction } from "../index";
-import { getDateUTC } from "@utils/dates";
-import { divideBy1e8, numberToLocaleString } from "@utils/numbers";
+import { getDateUTC } from "@shared/utils/dates";
+import { divideBy1e8, numberToLocaleString } from "@shared/utils/numbers";
 
 export type { Transaction };
 

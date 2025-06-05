@@ -10,11 +10,11 @@ import { idlFactory } from "../idlFactory";
 
 import { NeuronPartial } from "./interfaces";
 import fetch_all_neurons from "../fetch_all_neurons";
-import { numberToLocaleString } from "@utils/numbers";
+import { numberToLocaleString } from "@shared/utils/numbers";
 import {
   calculateTimeDifferenceInSeconds,
   formatRoundedTimeUnits,
-} from "@utils/dates";
+} from "@shared/utils/dates";
 
 export interface Neurons {
   data: NeuronPartial[];
