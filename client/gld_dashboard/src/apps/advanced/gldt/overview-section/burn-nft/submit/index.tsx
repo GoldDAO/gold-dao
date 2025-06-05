@@ -4,7 +4,7 @@ import { GLDT_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button, LoaderSpin } from "@components/index";
 import AvailableNFTSelect from "@shared/components/nft-select/AvailableNFTSelect";
-import { NFTCollectionNames } from "@shared/utils/nfts";
+import { NFTCollections } from "@shared/utils/nfts";
 import {
   IsOneOrMoreSelectedNFTAtom,
   TotalGLDTSelectedAtom,
@@ -29,7 +29,7 @@ const Submit = () => {
     GLDT_LEDGER_CANISTER_ID,
     unauthenticatedAgent,
     {
-      ledger: "gldt",
+      ledger: "GLDT",
       owner: principalId,
       enabled: !!unauthenticatedAgent && isConnected,
     }
@@ -85,8 +85,11 @@ const Submit = () => {
       <div className="mt-8 rounded-xl p-4 border border-border">
         <div className="text-primary mb-4">To</div>
         <div className="flex flex-col gap-2">
-          {NFTCollectionNames.map((collection) => (
-            <AvailableNFTSelect key={collection} collection={collection} />
+          {NFTCollections.map((collection) => (
+            <AvailableNFTSelect
+              key={collection.name}
+              collection={collection.name}
+            />
           ))}
         </div>
       </div>

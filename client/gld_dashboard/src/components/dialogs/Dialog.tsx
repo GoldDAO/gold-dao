@@ -65,7 +65,7 @@ const Dialog = ({
         <DialogPanel
           className={clsx(
             `container ${SIZES[size]}`,
-            "bg-surface-primary rounded-xl p-4 xl:p-8"
+            "bg-surface-primary rounded-xl p-4"
           )}
         >
           <DialogTitle className={"flex items-center"}>

@@ -5,6 +5,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import clsx from "clsx";
 import { BuyCrypto, ArrangeVertical, Refresh, HuobiToken } from "iconsax-react";
+import { useAuth } from "@auth/index";
 import Redeem from "@assets/icons/redeem.svg";
 import Govern from "@assets/icons/govern.svg";
 import Earn from "@assets/icons/earn.svg";
@@ -39,6 +40,7 @@ const ButtonAction = ({
   action: Action;
   handleOnClick?: () => void;
 }) => {
+  const { isConnected } = useAuth();
   const actions: Record<Action, { icon: ReactNode; text: string }> = {
     "buy-gldt": { icon: <BuyCrypto />, text: "Buy GLDT" },
     transfer: { icon: <ArrangeVertical />, text: "Transfer" },
@@ -56,24 +58,29 @@ const ButtonAction = ({
 
   const renderBtn = () => {
     return (
-      <div
+      <button
         onClick={handleOnClick}
         className={clsx(
-          "flex justify-center px-1 py-3 rounded-md shrink-0",
-          "bg-secondary text-white cursor-pointer",
+          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default",
+          "bg-secondary text-white",
           "xl:w-[140px] xl:rounded-lg"
         )}
+        disabled={!isConnected}
       >
         <div
           className={clsx(
             "flex justify-center items-center gap-2",
-            "xl:flex-col xl:gap-1"
+            "xl:flex-col xl:gap-1",
+            "px-1 py-3"
           )}
         >
           {actions[action].icon}
           <div>{actions[action].text}</div>
         </div>
-      </div>
+        {!isConnected && (
+          <div className="absolute rounded-[inherit] top-0 w-full h-full bg-white/30" />
+        )}
+      </button>
     );
   };
 

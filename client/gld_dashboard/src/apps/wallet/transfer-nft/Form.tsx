@@ -2,7 +2,7 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
-import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
+import { NFTCollections } from "@shared/utils/nfts";
 import { Button } from "@components/index";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
@@ -11,7 +11,6 @@ import { IsOneOrMoreSelectedNFTAtom } from "@shared/atoms/NFTStateAtom";
 const Form = ({ className }: { className?: string }) => {
   const [, dispatchTransferNFTState] = useAtom(TransferNFTStateReducerAtom);
   const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
-  const collections: CollectionNameNFT[] = ["1G", "10G", "100G", "1KG"];
 
   const {
     register,
@@ -44,8 +43,8 @@ const Form = ({ className }: { className?: string }) => {
   return (
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
       <div className="flex flex-col gap-2 mb-8 border border-border p-4 rounded-xl">
-        {collections.map((collection) => (
-          <UserNFTSelect key={collection} collection={collection} />
+        {NFTCollections.map((collection) => (
+          <UserNFTSelect key={collection.name} collection={collection.name} />
         ))}
       </div>
 
