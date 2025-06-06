@@ -55,25 +55,26 @@ const useFetchLedgerBalance = (
         agent,
         canisterId: KONGSWAP_CANISTER_ID_IC,
       });
-      const fee = await icrc1_fee(actorLedger);
+      const fee_e8s = await icrc1_fee(actorLedger);
       const decimals = await icrc1_decimals(actorLedger);
 
       const price = await swap_amounts(actorKongswap, {
         from: ledger,
-        to: "ckUSDC",
-        amount: 1n,
+        to: "ckUSDT",
+        amount: BigInt(1 * 10 ** decimals),
       });
-
-      const balance_usd = price.mid_price;
+      const fee = Number(fee_e8s) / 10 ** decimals;
+      const balance = Number(balance_e8s) / 10 ** decimals;
+      const balance_usd = balance * price.mid_price;
 
       return {
-        balance: Number(balance_e8s) / 10 ** decimals,
+        balance,
         balance_e8s,
         balance_usd,
         decimals,
-        fee: Number(fee) / 10 ** decimals,
-        fee_e8s: fee,
-        fee_usd: (Number(fee) / 10 ** decimals) * balance_usd,
+        fee,
+        fee_e8s,
+        fee_usd: fee * price.price,
       };
     },
     placeholderData,
