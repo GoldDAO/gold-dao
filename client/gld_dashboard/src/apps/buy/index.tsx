@@ -129,7 +129,6 @@ const Buy = () => {
         value: {
           slippage: price.data.slippage,
           txs: price.data.txs,
-          receive_token_decimals: receiveTokenPrice.data.decimals,
           receive_token_amount: price.data.receive_amount,
         },
       });

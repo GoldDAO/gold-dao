@@ -83,7 +83,9 @@ const Confirm = () => {
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center px-2">
             <div className="text-content/60">Slippage</div>
-            <div className="text-content/60">{slippage}%</div>
+            <div className="text-content/60">
+              <NumberToLocaleString value={slippage as number} />%
+            </div>
           </div>
           <div className="flex justify-between items-center px-2">
             <div className="text-content/60">
