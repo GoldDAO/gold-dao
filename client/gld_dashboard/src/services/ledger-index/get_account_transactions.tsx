@@ -60,6 +60,7 @@ const get_account_transactions = async (
     } else if (kind === "approve") {
       const approve = tx?.approve?.[0];
       from = approve?.from?.owner.toText() ?? undefined;
+      to = approve?.spender?.owner.toText() ?? undefined;
       amount = approve?.amount;
       fee = approve?.fee?.[0];
       memo = approve?.memo;

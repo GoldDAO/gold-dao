@@ -43,10 +43,10 @@ const PriceToken = ({
         return (
           <>
             <NumberToLocaleString value={balance / GLDT_VALUE_1G_NFT} /> grams
-            of Gold ({" "}
-            <span>
+            of Gold (
+            <>
               $<NumberToLocaleString value={balanceUSD} />
-            </span>
+            </>
             )
           </>
         );

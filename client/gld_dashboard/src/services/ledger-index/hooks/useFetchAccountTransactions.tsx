@@ -79,7 +79,6 @@ const useFetchAccountTransactions = (
         }
 
         const newData = results.data?.map((tx) => {
-          // console.log(tx);
           const is_credit = tx.to === accountId || tx.to === account;
           const from = tx.from && tx.from === accountId ? account : tx.from;
           const to = tx.to && tx.to === accountId ? account : tx.to;
