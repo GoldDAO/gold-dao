@@ -36,7 +36,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "earn",
+        path: "earn-feature-coming-soon",
         children: [
           {
             index: true,

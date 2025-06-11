@@ -94,16 +94,31 @@ const TopNav = ({ className }: { className?: string }) => {
                       </button>
                     </div>
 
-                    {navItems.map(({ title, url }, i) => (
-                      <Link
-                        onClick={handleOnHideMenu}
-                        to={url}
-                        className="font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md"
-                        key={i}
-                      >
-                        {title}
-                      </Link>
-                    ))}
+                    {navItems.map(({ title, url, subtitle }, i) => {
+                      const isDisabled = url === "/earn";
+                      return (
+                        <Link
+                          onClick={isDisabled ? undefined : handleOnHideMenu}
+                          to={isDisabled ? "#" : url}
+                          className={clsx(
+                            "font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md w-full text-center",
+                            {
+                              "pointer-events-none opacity-50 cursor-not-allowed":
+                                isDisabled,
+                            }
+                          )}
+                          aria-disabled={isDisabled}
+                          key={i}
+                        >
+                          {title}
+                          {isDisabled && (
+                            <span className="block text-xs text-content/40 mt-1">
+                              {subtitle ? subtitle : "Coming Soon"}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

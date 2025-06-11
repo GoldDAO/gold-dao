@@ -61,7 +61,7 @@ const ButtonAction = ({
       <button
         onClick={handleOnClick}
         className={clsx(
-          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default",
+          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default w-full",
           "bg-secondary text-white",
           "xl:w-[140px] xl:rounded-lg"
         )}
@@ -153,10 +153,10 @@ const WalletItemAction = ({ className }: { className?: string }) => {
               action="burn-nft"
               handleOnClick={() => navigate("/advanced/gldt")}
             />
-            <ButtonAction
+            {/* <ButtonAction
               action="earn"
               handleOnClick={() => navigate("/earn")}
-            />
+            /> */}
           </>
         );
       } else if (id === "goldao") {

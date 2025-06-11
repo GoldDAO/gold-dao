@@ -33,7 +33,7 @@ const Btn = ({
       <button
         onClick={handleOnClick}
         className={clsx(
-          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default",
+          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default w-full",
           "bg-secondary text-white",
           "xl:w-[140px] xl:rounded-lg"
         )}
