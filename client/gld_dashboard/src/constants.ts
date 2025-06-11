@@ -52,6 +52,8 @@ export const SNS_SUPER_STATS_CANISTER_ID = import.meta.env
 export const GLDT_STAKE_CANISTER_ID = import.meta.env
   .VITE_GLDT_STAKE_CANISTER_ID;
 
+export const VERSION_DAPP = import.meta.env.VITE_VERSION;
+
 export const BITY_GOLD_API_BASE_URL = import.meta.env.VITE_BITY_GOLD_API_BASE_URL;
 
 export const ICP_ICRC_API_BASE_URL = "https://icrc-api.internetcomputer.org/api/v1"

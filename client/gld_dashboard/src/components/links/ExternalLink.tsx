@@ -18,7 +18,7 @@ const ExternalLink = ({
       className={`inline-flex items-center ${className} hover:underline`}
     >
       <div>{children}</div>
-      <ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5" />
+      <ArrowTopRightOnSquareIcon className="ml-2 h-4 w-4" />
     </a>
   );
 };

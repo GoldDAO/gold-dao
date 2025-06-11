@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
+import { NFTCollections } from "@shared/utils/nfts";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import { Logo } from "@components/index";
@@ -8,6 +9,7 @@ import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import TotalCountToken from "@shared/components/total-count-token";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
+import useFetchNFTUserMetrics from "@shared/hooks/useFetchNFTUserMetrics";
 
 const Token = ({ className }: { className?: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -57,6 +59,12 @@ const Token = ({ className }: { className?: string }) => {
 };
 
 const NFT = ({ className }: { className?: string }) => {
+  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
+  const nfts = useFetchNFTUserMetrics(unauthenticatedAgent, {
+    owner: principalId,
+    nft_collections: NFTCollections,
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
   return (
     <div className={className}>
       <div className="flex flex-col items-center">
@@ -67,6 +75,16 @@ const NFT = ({ className }: { className?: string }) => {
               <div>GLD NFT</div>
               <div className="text-content/60 text-sm">GLD NFT</div>
             </div>
+          </div>
+          <div className="text-sm text-content/60">
+            {nfts.isSuccess ? (
+              <>
+                1 gram Gold ≈ $
+                <NumberToLocaleString value={nfts.data.priceGramUSD} />
+              </>
+            ) : (
+              <span>Loading...</span>
+            )}
           </div>
         </div>
         <div className="py-8 xl:py-12">

@@ -8,7 +8,7 @@ import {
   GLDT_LEDGER_CANISTER_ID,
   GLDT_VALUE_1G_NFT,
 } from "@constants";
-import { BuyGLDTStateReducerAtom } from "@buy/atoms/BuyGLDTAtom";
+import { BuyGLDTStateReducerAtom } from "@buy/shared/atoms/BuyGLDTAtom";
 import { useAuth } from "@auth/index";
 import ImgBuyGold from "@assets/img-buy-gold-section.svg";
 import {
@@ -16,19 +16,20 @@ import {
   onPastePreventNoDigits,
 } from "@shared/utils/form/input";
 import { Button, Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
 import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
-import { Token } from "./utils";
-import SelectToken from "./components/select-token/SelectToken";
-import BuyConfirm from "./components/buy-dialog/Confirm";
-import BuyDetails from "./components/buy-dialog/Details";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import GradientCard from "@shared/components/ui/card/GradientCard";
+import { Token, TOKEN_LIST_AVAILABLE } from "@buy/shared/utils";
+import SelectToken from "@buy/select-token";
+import ConfirmDialog from "@buy/confirm-dialog";
+import DetailsDialog from "@buy/details-dialog";
+import DisclaimerAmountReceivedDialog from "@buy/disclaimer-amount-received-dialog";
+import DisclaimerConfirmHighSlippageDialog from "./disclaimer-confirm-high-slippage-dialog";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected, connect } = useAuth();
@@ -36,11 +37,18 @@ const Buy = () => {
   const {
     pay_token,
     receive_token,
+    slippage,
+    network_fee,
+    max_slippage,
+    lp_fee,
     is_open_confirm_dialog,
     is_open_details_dialog,
+    is_open_disclaimer_confirm_high_slippage_dialog,
   } = buyAtomState;
-  const [isOpenInfoUnlockDelayDialog, setIsOpenInfoUnlockDelayDialog] =
-    useState(false);
+  const [
+    openDisclaimerAmountReceivedDialog,
+    setOpenDisclaimerAmountReceivedDialog,
+  ] = useState(false);
 
   const {
     register,
@@ -224,12 +232,12 @@ const Buy = () => {
   const isReceiveTokenPriceIsFetched =
     receiveTokenPrice.isSuccess && !receiveTokenPrice.isFetching;
 
-  const isDisabledBuyButton =
-    !isValid ||
-    !receiveTokenPrice.isSuccess ||
-    !isDataFetched ||
-    receiveTokenPrice.isFetching ||
-    price.data.receive_amount <= 0n;
+  const isBuyEnabled =
+    isValid &&
+    receiveTokenPrice.isSuccess &&
+    !receiveTokenPrice.isFetching &&
+    isDataFetched &&
+    price.data.receive_amount > 0n;
 
   const errorReceiveAmountLowerThanZero =
     price.isSuccess &&
@@ -253,13 +261,13 @@ const Buy = () => {
           </div>
           <div className="mt-3">
             <div className="font-semibold text-content/70">
-              Unlock Gold's Potential. Digitally.
+              The Simplest Way to Own Physical Gold.
             </div>
             <div className="text-content/60 mt-2">
-              GLDT revolutionizes gold ownership. Each Gold token (GLDT)
-              represents a tangible claim to securely vaulted Swiss gold, 100
-              GLDT per gram. Own your future, with complete transparency,
-              anywhere.
+              GLDT removes the complexity of owning gold. Each gold token (GLDT)
+              represents real, physical gold secured in a Swiss vault (100 GLDT
+              = 1 gram). Buy, sell, or hold a timeless store of value with the
+              ease of a digital asset, unlocking its full potential.
             </div>
           </div>
         </div>
@@ -373,6 +381,7 @@ const Buy = () => {
                 </div>
 
                 <SelectToken
+                  tokens={TOKEN_LIST_AVAILABLE}
                   value={pay_token.token}
                   handleOnChange={handleOnChangePayToken}
                 />
@@ -399,7 +408,9 @@ const Buy = () => {
                       <InfoCircle
                         size={16}
                         className="cursor-pointer"
-                        onClick={() => setIsOpenInfoUnlockDelayDialog(true)}
+                        onClick={() =>
+                          setOpenDisclaimerAmountReceivedDialog(true)
+                        }
                       />
                     </div>
                   ) : (
@@ -460,7 +471,7 @@ const Buy = () => {
                     <Button
                       className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
                       onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}
-                      disabled={isDisabledBuyButton}
+                      disabled={!isBuyEnabled}
                     >
                       {isReceiveTokenPriceIsFetched ? (
                         <>
@@ -498,42 +509,54 @@ const Buy = () => {
               </div>
             </GradientCard>
             <>
-              <Dialog
-                open={is_open_confirm_dialog}
-                handleOnClose={() => dispatch({ type: "CANCEL" })}
-                title="Confirm Purchase"
-              >
-                <BuyConfirm />
-              </Dialog>
-              <Dialog
-                open={is_open_details_dialog}
-                handleOnClose={() => dispatch({ type: "OPEN_DIALOG_DETAILS" })}
-              >
-                <BuyDetails />
-              </Dialog>
+              <DisclaimerAmountReceivedDialog
+                open={openDisclaimerAmountReceivedDialog}
+                handleClose={() => setOpenDisclaimerAmountReceivedDialog(false)}
+              />
 
-              <Dialog
-                open={isOpenInfoUnlockDelayDialog}
-                handleOnClose={() => setIsOpenInfoUnlockDelayDialog(false)}
-              >
-                <div className="p-4 text-center">
-                  <div className="font-semibold text-lg mb-4">
-                    Receive amount
-                  </div>
-                  <div className="text-content/60 mb-8">
-                    The exact amount of GLDT received will vary due to market
-                    fluctuations and slippage.
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      className="px-6 py-2 bg-secondary text-white rounded-full"
-                      onClick={() => setIsOpenInfoUnlockDelayDialog(false)}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </Dialog>
+              {isBuyEnabled && (
+                <>
+                  <ConfirmDialog
+                    open={is_open_confirm_dialog}
+                    handleClose={() => dispatch({ type: "CANCEL" })}
+                    handleConfirm={
+                      slippage <= max_slippage
+                        ? () => dispatch({ type: "CONFIRM" })
+                        : () =>
+                            dispatch({
+                              type: "OPEN_CONFIRM_HIGH_SLIPPAGE",
+                            })
+                    }
+                    payToken={pay_token}
+                    receiveToken={receive_token}
+                    slippage={slippage}
+                    maxSlippage={max_slippage}
+                    networkFee={network_fee}
+                    lpFee={lp_fee}
+                  />
+
+                  <DisclaimerConfirmHighSlippageDialog
+                    open={is_open_disclaimer_confirm_high_slippage_dialog}
+                    handleClose={() => dispatch({ type: "CANCEL" })}
+                    handleConfirm={() =>
+                      dispatch({
+                        type: "CONFIRM_HIGH_SLIPPAGE",
+                        value: { slippage },
+                      })
+                    }
+                    slippage={slippage}
+                    maxSlippage={max_slippage}
+                  />
+
+                  <DetailsDialog
+                    open={is_open_details_dialog}
+                    handleClose={() => dispatch({ type: "RESET" })}
+                    payToken={pay_token}
+                    receiveToken={receive_token}
+                    maxSlippage={max_slippage}
+                  />
+                </>
+              )}
             </>
           </div>
         </div>

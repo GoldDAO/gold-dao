@@ -7,7 +7,7 @@ import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleStri
 import { TokensList, Token, GLDT_INDEX } from "@wallet/shared/utils";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
+import useFetchUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 import { NFTCollections } from "@shared/utils/nfts";
@@ -94,7 +94,7 @@ const NFTItem = () => {
     setSearchParams(searchParams);
   };
 
-  const nfts = useUserNFTMetrics(authenticatedAgent, {
+  const nfts = useFetchUserNFTMetrics(authenticatedAgent, {
     owner: principalId,
     nft_collections: NFTCollections,
     enabled: !!authenticatedAgent && isConnected,
@@ -127,7 +127,10 @@ const NFTItem = () => {
           </div>
           <div className="text-content/60 text-sm flex items-center justify-end gap-1">
             {nfts.isSuccess ? (
-              <div>({nfts.data.totalGrams} grams) - $todo</div>
+              <div>
+                {nfts.data.totalGrams} grams - $
+                <NumberToLocaleString value={nfts.data.totalUSD} decimals={2} />
+              </div>
             ) : (
               <div>Loading...</div>
             )}

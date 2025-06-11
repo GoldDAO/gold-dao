@@ -36,6 +36,9 @@ const useSwapTokensForNFT = (
       queryClient.invalidateQueries({
         queryKey: ["FETCH_AVAILABLE_NFT", collection.name],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE_V2", { ledger: "GLDT" }],
+      });
     },
   });
 };

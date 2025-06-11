@@ -10,7 +10,7 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import Tokens, { Token } from "@buy/utils";
+import { Token } from "@buy/shared/utils";
 import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
@@ -46,12 +46,14 @@ const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   );
 };
 
-const SelectBuyMethod = ({
+const SelectToken = ({
   value,
+  tokens,
   handleOnChange,
   className,
 }: {
   value: Token;
+  tokens: Token[];
   handleOnChange: (selectedToken: Token) => void;
   className?: string;
 }) => {
@@ -111,7 +113,7 @@ const SelectBuyMethod = ({
             "transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
           )}
         >
-          {Tokens.map((token) => (
+          {tokens.map((token) => (
             <ListboxOption key={token.name} value={token}>
               <ListboxTokenOption
                 id={token.id}
@@ -127,4 +129,4 @@ const SelectBuyMethod = ({
   );
 };
 
-export default SelectBuyMethod;
+export default SelectToken;

@@ -31,8 +31,8 @@ const Govern = () => {
             <div className="font-light">the DAO</div>
           </div>
           <div className="text-content/60 my-3">
-            Stake GOLDAO tokens to govern the Gold DAO and earn rewards yielding
-            up to 30% APY.
+            Stake GOLDAO tokens to participate in the Gold DAO governance and
+            earn rewards yielding up to 30% APY.
           </div>
           {!isConnected && (
             <Button

@@ -86,6 +86,10 @@ const useSwap = (
       queryClient.invalidateQueries({
         queryKey: ["FETCH_LEDGER_BALANCE", { ledger: receive_token }],
       });
+      //! TODO Add receive_token
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE_V2"],
+      });
     },
   });
 };

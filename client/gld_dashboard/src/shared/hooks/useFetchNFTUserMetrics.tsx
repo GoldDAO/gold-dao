@@ -12,11 +12,17 @@ import unlisted_tokens_of from "@services/gld_nft/fn/unlisted_tokens_of";
 import get_nat_as_token_id_origyn from "@services/gld_nft/fn/get_nat_as_token_id_origyn";
 import get_active_swaps_by_user from "@services/gldt_swap/fn/get_active_swaps_by_user";
 import { bigIntTo32ByteArray } from "@services/gld_nft/utils";
+import { fetch_gold_price } from "@services/bity_gold_api";
 
 const useFetchUserNFTMetrics = (
   agent: Agent | HttpAgent | undefined,
   options: Omit<
-    UseQueryOptions<{ totalCount: number; totalGrams: number }>,
+    UseQueryOptions<{
+      totalCount: number;
+      totalGrams: number;
+      totalUSD: number;
+      priceGramUSD: number;
+    }>,
     "queryKey" | "queryFn"
   > & {
     owner: string;
@@ -43,6 +49,8 @@ const useFetchUserNFTMetrics = (
       const activeSwapSet = new Set(
         activeSwaps.map((swap) => swap.nft_id_string)
       );
+
+      const priceGoldUSD = await fetch_gold_price();
 
       const results = await Promise.all(
         nft_collections.map(async ({ canisterId, grams }) => {
@@ -76,8 +84,9 @@ const useFetchUserNFTMetrics = (
 
       const totalCount = results.reduce((acc, cur) => acc + cur.count, 0);
       const totalGrams = results.reduce((acc, cur) => acc + cur.grams, 0);
+      const totalUSD = totalGrams * priceGoldUSD;
 
-      return { totalCount, totalGrams };
+      return { totalCount, totalGrams, totalUSD, priceGramUSD: priceGoldUSD };
     },
     placeholderData,
     enabled,
