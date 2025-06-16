@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import WalletList from "@wallet/wallet-list";
 import WalletItemHeader from "@wallet/wallet-item-header";
@@ -13,9 +12,10 @@ import TxHistoryNFT from "@wallet/tx-history-nft";
 import { TokensList, TokensWhitelist, GLDT_INDEX } from "@wallet/shared/utils";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import GradientCard from "@shared/components/ui/card/GradientCard";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 
 const Wallet = () => {
-  const { isConnected, connect } = useAuth();
+  const { isConnected } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const setSelectedToken = useSetAtom(TokenSelectedAtom);
 
@@ -68,26 +68,17 @@ const Wallet = () => {
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col flex-grow px-4 xl:px-8">
-          <div className="text-center xl:text-left text-5xl xl:text-6xl text-primary/90 font-semibold my-4">
+          <div className="text-center xl:text-left text-5xl xl:text-6xl text-gold/90 font-semibold my-4">
             Wallet
           </div>
           <div className="flex flex-col xl:flex-grow border border-border p-4 rounded-lg mt-4">
-            <div className="text-center xl:text-left mb-4 text-primary/90">
+            <div className="text-center xl:text-left mb-4 text-copper text-sm font-semibold">
               Tokens
             </div>
             <WalletList />
           </div>
 
-          {!isConnected && (
-            <div className="w-full mt-auto">
-              <Button
-                className="w-full mt-4 xl:mt-16 px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-                onClick={connect}
-              >
-                Connect Wallet
-              </Button>
-            </div>
-          )}
+          {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>

@@ -6,8 +6,7 @@ import { LoaderSpin, Logo } from "@components/index";
 import useFetchTotalSupply from "@services/ledger/hooks/useFetchTotalSupply";
 import useFetchTokenPrice from "@services/icpswap/hooks/useFetchTokenPrice";
 
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 import { GOLDAO_LEDGER_CANISTER_ID_IC, ICPSWAP_CANISTER_ID } from "@constants";
 import { divideBy1e8 } from "@shared/utils/numbers";
@@ -51,9 +50,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
             {totalSupply.isSuccess && (
               <div className="flex items-center justify-center xl:justify-start gap-4">
                 <Logo className="flex-none h-8" name="gldgov" />
-                <div className="font-semibold text-4xl">
-                  <E8sToLocaleString value={totalSupply.data} />
-                </div>
+                <div className="font-semibold text-4xl">0</div>
               </div>
             )}
             {(totalSupply.isLoading || totalSupply.isError) && (

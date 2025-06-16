@@ -1,9 +1,7 @@
 import { useAtom } from "jotai";
-// import clsx from "clsx";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 // import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
 
 const Confirm = () => {
@@ -33,7 +31,7 @@ const Confirm = () => {
 
         <div className="my-4 xl:my-6 text-content/20 border-b border-dashed" />
 
-        <div>Receiver Account</div>
+        <div>Receiving Account</div>
         <div className="text-content/60 text-sm mt-2">
           {send_receive_address}
         </div>
@@ -47,7 +45,7 @@ const Confirm = () => {
             <div className="text-content/60">
               Amount deducted (including fee)
             </div>
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={amount + fee}
               decimals={decimals}
             />{" "}
@@ -56,25 +54,24 @@ const Confirm = () => {
 
           <div className="flex flex-col xl:flex-row xl:justify-between gap-2 text-content/60 text-sm">
             <div>Fee</div>
-            <TokenValueToLocaleString value={fee} decimals={decimals} />{" "}
+            <E8sToLocaleString value={fee} decimals={decimals} />{" "}
             {token.name}
           </div>
 
           <div className="flex flex-col xl:flex-row xl:justify-between gap-2 text-sm">
             <div className="text-content/60">Amount received on new wallet</div>
-            <TokenValueToLocaleString value={amount} decimals={decimals} />{" "}
+            <E8sToLocaleString value={amount} decimals={decimals} />{" "}
             {token.name}
           </div>
         </div> */}
       </div>
       <div className="mt-8">
-        <Button
-          type="button"
+        <BtnPrimary
           onClick={() => dispatchTransferNFTState({ type: "SEND_CONFIRM" })}
-          className="w-full px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
+          className="w-full"
         >
           Confirm Transfer
-        </Button>
+        </BtnPrimary>
       </div>
     </>
   );

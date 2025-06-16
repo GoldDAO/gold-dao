@@ -5,7 +5,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import {
   ChevronDownIcon,
-  UserIcon,
   ArrowsRightLeftIcon,
   ArrowUpTrayIcon,
   ClipboardDocumentIcon,
@@ -15,6 +14,7 @@ import {
 import { useAuth } from "@auth/index";
 
 import { Tile } from "@components/index";
+import { User } from "iconsax-react";
 
 const DropdownUserMenu = () => {
   const { principalId, disconnect } = useAuth();
@@ -46,11 +46,11 @@ const DropdownUserMenu = () => {
             />
             <div className="relative">
               <MenuButton className="inline-flex items-center gap-2 rounded-lg bg-surface-primary py-1.5 px-3 text-sm/6 font-semibold cursor-pointer">
-                <div className="max-w-48 flex items-center gap-2">
+                <div className="max-w-32 xl:max-w-48 flex items-center gap-2">
                   <Tile className="rounded-full h-6 w-6 bg-accent/60">
-                    <UserIcon className="p-1" />
+                    <User className="p-1" />
                   </Tile>
-                  <div className="truncate hidden sm:block">{principalId}</div>
+                  <div className="truncate">{principalId}</div>
                 </div>
                 <ChevronDownIcon className="size-4 fill-content/60" />
               </MenuButton>

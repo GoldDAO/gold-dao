@@ -3,14 +3,15 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button, Logo } from "@components/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import { Logo } from "@components/index";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "../../utils";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -51,17 +52,16 @@ const RewardItem = ({ name }: { name: string }) => {
         <div className="text-end">
           <div className="font-semibold text-lg">
             {decimals.isSuccess ? (
-              <TokenValueToLocaleString
+              <E8sToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
-                decimals={2}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
           <div className="text-content/60 text-sm">
-            $<NumberToLocaleString value={reward.amount_usd} decimals={2} />
+            $<NumberToLocaleString value={reward.amount_usd} />
           </div>
         </div>
       </div>
@@ -129,16 +129,13 @@ const Confirm = () => {
         ))}
       </div>
 
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
+      <BtnPrimary
+        className="w-full"
         onClick={() => dispatch({ type: "CONFIRM" })}
         disabled={!confirmClaimEnable}
       >
         Confirm
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

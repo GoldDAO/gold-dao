@@ -5,7 +5,7 @@ import { useAuth } from "@auth/index";
 import { ClaimRewardStateReducerAtom } from "../claim-all/atoms";
 import useGetAllPositionsRewards from "../../utils/useGetAllPositionsRewards";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { LoaderSpin } from "@components/loaders";
 
 const ClaimRewardDisclaimer = () => {

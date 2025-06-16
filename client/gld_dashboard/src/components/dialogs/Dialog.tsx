@@ -21,7 +21,7 @@ const SIZES = {
 const BackIcon = ({ handleOnClick }: { handleOnClick: () => void }) => {
   return (
     <div
-      className="p-1 rounded-full cursor-pointer hover:bg-secondary hover:text-white"
+      className="p-1 rounded-full cursor-pointer hover:bg-primary hover:text-white"
       onClick={handleOnClick}
     >
       <ChevronLeftIcon className="h-6 w-6" />
@@ -87,7 +87,7 @@ const Dialog = ({
                   <div
                     className={clsx(
                       "p-1 rounded-full cursor-pointer",
-                      "hover:bg-secondary hover:text-white"
+                      "hover:bg-primary hover:text-white"
                     )}
                   >
                     <XMarkIcon className="h-6 w-6" />

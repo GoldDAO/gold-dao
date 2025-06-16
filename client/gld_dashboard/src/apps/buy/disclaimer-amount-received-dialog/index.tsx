@@ -1,5 +1,5 @@
-import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const DisclaimerAmountReceivedDialog = ({
   open,
@@ -17,12 +17,7 @@ const DisclaimerAmountReceivedDialog = ({
           and slippage.
         </div>
         <div className="flex justify-end">
-          <Button
-            className="px-6 py-2 bg-secondary text-white rounded-full"
-            onClick={handleClose}
-          >
-            Close
-          </Button>
+          <BtnPrimary onClick={handleClose}>Close</BtnPrimary>
         </div>
       </div>
     </Dialog>

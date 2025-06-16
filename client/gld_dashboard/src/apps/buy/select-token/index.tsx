@@ -11,7 +11,7 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { Token } from "@buy/shared/utils";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();

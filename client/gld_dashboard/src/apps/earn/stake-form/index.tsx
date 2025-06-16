@@ -1,9 +1,9 @@
 import { useAuth } from "@auth/index";
 import { useAtom } from "jotai";
 import { GLDTToken } from "../utils";
-import { Button, Logo } from "@components/index";
+import { Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
@@ -12,6 +12,7 @@ import Form from "./Form";
 import Confirm from "./Confirm";
 import Details from "./Details";
 import { StakeStateReducerAtom } from "./atoms";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const StakeForm = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -75,17 +76,14 @@ const StakeForm = () => {
             </div>
           </div>
           {isConnected && (
-            <Button
-              disabled={true}
-              className="mt-4 w-full px-4 h-[52px] bg-secondary rounded-md"
-            >
+            <BtnPrimary disabled={true} className="mt-4 w-full">
               <div className="flex justify-center items-center gap-2">
                 <div className="sr-only">Loading...</div>
                 <div className="h-2 w-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
                 <div className="h-2 w-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
                 <div className="h-2 w-2 bg-white rounded-full animate-bounce" />
               </div>
-            </Button>
+            </BtnPrimary>
           )}
         </div>
         {!isConnected && (
@@ -107,7 +105,7 @@ const StakeForm = () => {
         <div className="px-2 py-1 flex items-center gap-2 border border-border rounded-md bg-surface-secondary">
           <div className="text-content/60 text-sm">
             Your balance:{" "}
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={balance.data}
               tokenDecimals={decimals.data}
             />{" "}

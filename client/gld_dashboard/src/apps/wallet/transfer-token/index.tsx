@@ -44,13 +44,13 @@ const TransferTokenDialog = () => {
     <Dialog
       open={is_open_transfer_dialog}
       handleOnClose={handleCloseTransferDialog}
-      size="xxl"
+      size={transfer_tab === "receive" ? "md" : "xxl"}
       title={
         is_send_confirm && (
           <div
             className={clsx(
               "p-1 rounded-full cursor-pointer",
-              "hover:bg-secondary hover:text-white"
+              "hover:bg-primary hover:text-white"
             )}
             onClick={handleBackConfirm}
           >

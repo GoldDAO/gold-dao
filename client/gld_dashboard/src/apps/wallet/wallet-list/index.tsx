@@ -3,13 +3,13 @@ import { useAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { TokensList, Token, GLDT_INDEX } from "@wallet/shared/utils";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
 import useFetchUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { NFTCollections } from "@shared/utils/nfts";
 
 const TokenItem = ({ token }: { token: Token }) => {
@@ -44,7 +44,7 @@ const TokenItem = ({ token }: { token: Token }) => {
         "rounded-xl border border-border p-2 cursor-pointer",
         `${
           searchParams.get("token") !== "nft" && selectedToken.id === id
-            ? "border-primary bg-primary/10"
+            ? "border-gold bg-gold/10"
             : ""
         }`
       )}
@@ -61,7 +61,7 @@ const TokenItem = ({ token }: { token: Token }) => {
         <div className="text-end">
           <div>
             {tokenPrice.isSuccess ? (
-              <TokenValueToLocaleString
+              <E8sToLocaleString
                 value={tokenPrice.data.amount}
                 tokenDecimals={tokenPrice.data.decimals}
               />
@@ -105,11 +105,7 @@ const NFTItem = () => {
       className={clsx(
         "shrink-0",
         "rounded-xl border border-border p-2 cursor-pointer",
-        `${
-          searchParams.get("token") === "nft"
-            ? "border-primary bg-primary/10"
-            : ""
-        }`
+        `${searchParams.get("token") === "nft" ? "border-gold bg-gold/10" : ""}`
       )}
       onClick={onClickToken}
     >
@@ -129,7 +125,7 @@ const NFTItem = () => {
             {nfts.isSuccess ? (
               <div>
                 {nfts.data.totalGrams} grams - $
-                <NumberToLocaleString value={nfts.data.totalUSD} decimals={2} />
+                <NumberToLocaleString value={nfts.data.totalUSD} />
               </div>
             ) : (
               <div>Loading...</div>

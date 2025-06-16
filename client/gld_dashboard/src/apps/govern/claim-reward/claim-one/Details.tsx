@@ -1,15 +1,13 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { SNS_REWARDS_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
 import { Reward } from "../../utils";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const TokenItem = ({
   reward,
@@ -55,15 +53,9 @@ const TokenItem = ({
         </div>
         {claim.isError && (
           <div>
-            <Button
-              className={clsx(
-                "px-2 py-1 rounded-md",
-                "bg-secondary text-white text-sm"
-              )}
-              onClick={handleOnRetry}
-            >
+            <BtnPrimary size="sm" onClick={handleOnRetry}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>
@@ -86,15 +78,12 @@ const Details = () => {
           />
         ))}
       </div>
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
+      <BtnPrimary
+        className="w-full"
         onClick={() => dispatch({ type: "RESET" })}
       >
         Go to govern view
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

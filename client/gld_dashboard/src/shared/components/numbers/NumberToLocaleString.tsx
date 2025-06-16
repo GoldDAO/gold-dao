@@ -1,6 +1,6 @@
 const NumberToLocaleString = ({
   value,
-  decimals = 3,
+  decimals = 2,
   locale = "en-US",
 }: {
   value: number | (() => number);

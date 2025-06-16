@@ -1,12 +1,10 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnlockStateReducerAtom } from "./atoms";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const Confirm = () => {
@@ -40,7 +38,11 @@ const Confirm = () => {
           className={clsx(
             "p-4 xl:p-8 border border-border cursor-pointer rounded-lg",
             "grid grid-cols-1 gap-4",
-            `${stateUnlock.unlock_type === "DISSOLVE" ? "bg-primary/10 border-primary" : "bg-surface border-border"}`
+            `${
+              stateUnlock.unlock_type === "DISSOLVE"
+                ? "bg-gold/10 border-gold"
+                : "bg-surface border-border"
+            }`
           )}
           onClick={() =>
             dispatch({
@@ -53,7 +55,11 @@ const Confirm = () => {
           <div
             className={clsx(
               "p-4 border bg-surface-primary rounded-lg",
-              `${stateUnlock.unlock_type === "DISSOLVE" ? "border-primary/40" : "border-border"}`
+              `${
+                stateUnlock.unlock_type === "DISSOLVE"
+                  ? "border-gold/40"
+                  : "border-border"
+              }`
             )}
           >
             When you start unlocking, you will receive your GLDT liquid in your
@@ -62,7 +68,11 @@ const Confirm = () => {
           <div
             className={clsx(
               "p-4 border bg-surface-primary rounded-lg",
-              `${stateUnlock.unlock_type === "DISSOLVE" ? "border-primary/40" : "border-border"}`
+              `${
+                stateUnlock.unlock_type === "DISSOLVE"
+                  ? "border-gold/40"
+                  : "border-border"
+              }`
             )}
           >
             During this time, you are not receiving any new rewards.
@@ -78,14 +88,22 @@ const Confirm = () => {
           className={clsx(
             "p-4 xl:p-8 border border-border cursor-pointer rounded-lg",
             "grid grid-cols-1 gap-4",
-            `${stateUnlock.unlock_type === "UNSTAKE_EARLY" ? "bg-primary/10 border-primary" : "bg-surface-primary border-border"}`
+            `${
+              stateUnlock.unlock_type === "UNSTAKE_EARLY"
+                ? "bg-gold/10 border-gold"
+                : "bg-surface-primary border-border"
+            }`
           )}
         >
           <div className="text-xl">Unlock immediately</div>
           <div
             className={clsx(
               "p-4 border bg-surface-primary rounded-lg",
-              `${stateUnlock.unlock_type === "UNSTAKE_EARLY" ? "border-primary/40" : "border-border"}`
+              `${
+                stateUnlock.unlock_type === "UNSTAKE_EARLY"
+                  ? "border-gold/40"
+                  : "border-border"
+              }`
             )}
           >
             When unlocking immediately, you will receive your GLDT immediately
@@ -104,12 +122,9 @@ const Confirm = () => {
         </div>
       </div>
       <div className="flex justify-center">
-        <Button
-          className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-          onClick={() => dispatch({ type: "CONFIRM" })}
-        >
+        <BtnPrimary onClick={() => dispatch({ type: "CONFIRM" })}>
           Confirm
-        </Button>
+        </BtnPrimary>
       </div>
     </>
   );

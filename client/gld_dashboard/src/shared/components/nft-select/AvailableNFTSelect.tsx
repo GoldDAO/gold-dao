@@ -4,13 +4,11 @@ import { useAuth } from "@auth/index";
 import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
 import useFetchNFTAvailable from "@shared/hooks/useFetchNFTAvailable";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
-import NFTSelect from "./NFTSelect";
+import NFTSelect from ".";
 
 const AvailableNFTSelect = ({
-  className,
   collection,
 }: {
-  className?: string;
   collection: CollectionNameNFT;
 }) => {
   const { authenticatedAgent, isConnected } = useAuth();
@@ -37,7 +35,7 @@ const AvailableNFTSelect = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchCollection.isSuccess]);
 
-  return <NFTSelect collection={collection} className={className} />;
+  return <NFTSelect collection={collection} />;
 };
 
 export default AvailableNFTSelect;

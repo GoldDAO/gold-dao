@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "@auth/index";
 import { TransferTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
 import Address from "@components/strings/Address";
-import { Button } from "@components/index";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const ReceiveAddress = () => {
   const { principalId } = useAuth();
@@ -19,7 +19,7 @@ const ReceiveAddress = () => {
       <div className="flex flex-col items-center justify-center gap-4 xl:gap-6 border border-border rounded-lg px-4 py-4 xl:py-8">
         <div className="flex flex-col items-center justify-center gap-1 text-4xl font-semibold">
           <div>Scan to</div>
-          <div className="text-primary">receive</div>
+          <div className="text-gold font-semibold">receive</div>
         </div>
         <div>
           <QRCodeSVG value={principalId} size={160} />
@@ -32,12 +32,9 @@ const ReceiveAddress = () => {
         </div>
       </div>
 
-      <Button
-        onClick={handleClose}
-        className="w-full mt-4 xl:mt-6 px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-      >
+      <BtnPrimary onClick={handleClose} className="w-full mt-4 xl:mt-6">
         Close
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

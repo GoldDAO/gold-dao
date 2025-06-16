@@ -25,11 +25,11 @@ const NavLink = ({
       className={clsx(
         "flex flex-col justify-center items-center rounded-xl shrink-0 w-full py-2 min-w-24",
         "text-sm hover:text-white dark:hover:text-black",
-        "hover:bg-linear-to-tr hover:from-[#A0812E] hover:from-30% hover:via-primary hover:via-60% hover:to-[#FFF0CA] hover:to-100%",
+        "hover:bg-linear-to-tr hover:from-[#A0812E] hover:from-30% hover:via-gold hover:via-60% hover:to-[#FFF0CA] hover:to-100%",
         "hover:dark:from-[#A0812E] hover:dark:via-[#A0812E]/60 hover:dark:to-[#A0812E]/30 border hover:border-surface-primary",
         {
           "pointer-events-none opacity-50 cursor-not-allowed": isDisabled,
-          "bg-linear-to-tr from-[#A0812E] from-30% via-primary via-70% to-[#FFF0CA] to-100% dark:from-[#A0812E] dark:via-[#A0812E]/80 dark:to-[#A0812E]/40 text-white dark:text-black border-surface-primary":
+          "bg-linear-to-tr from-[#A0812E] from-30% via-gold via-70% to-[#FFF0CA] to-100% dark:from-[#A0812E] dark:via-[#A0812E]/80 dark:to-[#A0812E]/40 text-white dark:text-black border-surface-primary":
             isActive && !isDisabled,
           "border-border": !isActive || isDisabled,
         }

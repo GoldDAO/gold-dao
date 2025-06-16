@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { GLDT_VALUE_1G_NFT } from "@constants";
 import { useAuth } from "@auth/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Token } from "@wallet/shared/utils";
 
 const Balance = ({

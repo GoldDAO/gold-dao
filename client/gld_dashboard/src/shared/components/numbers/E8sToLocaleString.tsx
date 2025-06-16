@@ -1,7 +1,7 @@
-const TokenValueToLocaleString = ({
+const E8sToLocaleString = ({
   value,
   tokenDecimals = 8,
-  decimals = 3,
+  decimals = 2,
   locale = "en-US",
 }: {
   value: bigint;
@@ -20,4 +20,4 @@ const TokenValueToLocaleString = ({
   return result;
 };
 
-export default TokenValueToLocaleString;
+export default E8sToLocaleString;

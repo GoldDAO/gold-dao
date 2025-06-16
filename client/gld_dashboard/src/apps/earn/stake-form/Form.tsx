@@ -4,9 +4,10 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { StakeStateReducerAtom } from "./atoms";
-import { Button, Logo } from "@components/index";
+import { Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import { MIN_STAKE_AMOUNT } from "./utils";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Form = ({
   balance,
@@ -69,7 +70,7 @@ const Form = ({
   return (
     <>
       <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
-        <div className="text-primary font-semibold">Stake GLDT</div>
+        <div className="text-gold font-semibold">Stake GLDT</div>
         <div className="p-4 mt-4 xl:mt-6 flex justify-center items-center gap-2 bg-surface-secondary border border-border rounded-md">
           <input
             id="amount"
@@ -116,7 +117,7 @@ const Form = ({
           </div>
         </div>
 
-        <div className="mt-4 inline-flex flex-col gap-2">
+        <div className="my-4 inline-flex flex-col gap-2">
           <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
             <div className="text-content/60 text-sm">
               Min Stake: {MIN_STAKE_AMOUNT} GLDT
@@ -132,13 +133,9 @@ const Form = ({
             />
           </div>
         </div>
-        <Button
-          className="mt-4 w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-          type="submit"
-          disabled={!isValid}
-        >
+        <BtnPrimary className="w-full" type="submit" disabled={!isValid}>
           Stake GLDT
-        </Button>
+        </BtnPrimary>
       </form>
       <Dialog
         open={isOpenInfoUnlockDelayDialog}
@@ -151,12 +148,9 @@ const Form = ({
             rewards before they can be withdrawn.
           </div>
           <div className="flex justify-end">
-            <Button
-              className="px-6 py-2 bg-secondary text-white rounded-full"
-              onClick={() => setIsOpenInfoUnlockDelayDialog(false)}
-            >
+            <BtnPrimary onClick={() => setIsOpenInfoUnlockDelayDialog(false)}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       </Dialog>

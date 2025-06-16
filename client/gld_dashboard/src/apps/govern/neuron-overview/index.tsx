@@ -4,8 +4,8 @@ import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useGetAllNeuronsTotalStakedAmount from "../utils/useGetAllNeuronsTotalStakedAmount";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import GradientCard from "@shared/components/ui/card/GradientCard";
 
 const NeuronOverview = () => {
@@ -29,7 +29,7 @@ const NeuronOverview = () => {
       if (tokenPrice.isSuccess) {
         return (
           <>
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={tokenPrice.data.amount}
               tokenDecimals={tokenPrice.data.decimals}
             />

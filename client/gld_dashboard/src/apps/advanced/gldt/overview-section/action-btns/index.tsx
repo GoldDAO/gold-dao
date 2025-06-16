@@ -33,9 +33,9 @@ const Btn = ({
       <button
         onClick={handleOnClick}
         className={clsx(
-          "relative rounded-md shrink-0 cursor-pointer disabled:cursor-default w-full",
-          "bg-secondary text-white",
-          "xl:w-[140px] xl:rounded-lg"
+          "relative rounded-xl shrink-0 cursor-pointer disabled:cursor-default w-full",
+          "bg-primary text-white hover:bg-primary/80 disabled:bg-primary/60",
+          "xl:w-[140px] xl:rounded-xl"
         )}
         disabled={!isConnected}
       >

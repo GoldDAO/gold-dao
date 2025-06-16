@@ -20,7 +20,7 @@ const SwitchWithLabel = ({
         className={`rounded-full px-6 py-3 font-medium ${
           value.toLocaleLowerCase() !== labelLeft.toLocaleLowerCase()
             ? `bg-surface-secondary text-content/60`
-            : `bg-secondary text-white`
+            : `bg-primary text-white`
         }`}
       >
         {labelLeft}
@@ -30,7 +30,7 @@ const SwitchWithLabel = ({
         className={`rounded-full px-6 py-3 font-medium ${
           value.toLocaleLowerCase() !== labelRight.toLocaleLowerCase()
             ? `bg-surface-secondary text-content/60`
-            : `bg-secondary text-white`
+            : `bg-primary text-white`
         }`}
       >
         {labelRight}

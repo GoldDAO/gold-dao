@@ -48,9 +48,9 @@ const TxStatus = ({ status }: { status: string }) => {
     case "Escrow Request":
     case "Burning":
       return (
-        <Badge className="bg-primary/10">
-          <ArrowPathIcon className="h-6 w-6 text-primary" />
-          <div className="text-primary font-semibold text-xs">{status}...</div>
+        <Badge className="bg-gold/10">
+          <ArrowPathIcon className="h-6 w-6 text-gold" />
+          <div className="text-gold font-semibold text-xs">{status}...</div>
         </Badge>
       );
     default:

@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from "jotai";
-import { Button } from "@components/index";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
 import { NFTCollections } from "@shared/utils/nfts";
 import {
@@ -8,6 +7,7 @@ import {
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Submit = () => {
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
@@ -20,9 +20,9 @@ const Submit = () => {
   };
 
   return (
-    <div>
+    <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
       <div className="rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">From</div>
+        <div className="text-copper text-sm font-semibold mb-2">From</div>
         <div className="flex flex-col gap-2">
           {NFTCollections.map((collection) => (
             <UserNFTSelect key={collection.name} collection={collection.name} />
@@ -30,21 +30,21 @@ const Submit = () => {
         </div>
       </div>
 
-      <div className="mt-8 rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">To</div>
+      <div className="mt-4 rounded-xl p-4 border border-border">
+        <div className="text-copper text-sm font-semibold mb-2">To</div>
         <div className="flex justify-center items-center p-4 border border-border rounded-xl bg-surface-secondary">
           <div>{totalGLDTSelected} GLDT</div>
         </div>
       </div>
 
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           onClick={handleSubmit}
           disabled={!IsOneOrMoreSelectedNFT}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
+          className="w-full"
         >
           Submit
-        </Button>
+        </BtnPrimary>
       </div>
     </div>
   );

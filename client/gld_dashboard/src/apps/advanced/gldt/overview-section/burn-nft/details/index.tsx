@@ -1,7 +1,8 @@
 import { useAtom } from "jotai";
-import { Button, LoaderSpin } from "@components/index";
+import { LoaderSpin } from "@components/index";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import Collection from "./Collection";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Details = () => {
   const [swapNFT, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
@@ -32,14 +33,9 @@ const Details = () => {
             <Collection key={collection.name} collection={collection} />
           ))}
       </div>
-
-      <Button
-        onClick={handleClose}
-        disabled={false}
-        className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
-      >
+      <BtnPrimary onClick={handleClose} className="w-full">
         Close
-      </Button>
+      </BtnPrimary>
     </div>
   );
 };

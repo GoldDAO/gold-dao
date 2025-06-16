@@ -1,8 +1,10 @@
 import { useAtom } from "jotai";
-import clsx from "clsx";
+import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Principal } from "@dfinity/principal";
+import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { useAuth } from "@auth/index";
-import { Button, Dialog } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import { Dialog } from "@components/index";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { IdNFT } from "@services/gld_nft/utils/interfaces";
 import {
@@ -10,17 +12,13 @@ import {
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-import { useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
-
-import { Principal } from "@dfinity/principal";
-import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
 import useApprove from "@services/ledger/hooks/useApprove";
 import { TransferResult } from "@services/gld_nft/interfaces";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
 import useFetchTransferFeeNFT from "@services/gld_nft/hooks/useFetchTransferFee";
 import useFetchTransferFeeLedger from "@services/ledger/hooks/useFetchTransferFee";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const useTransferNFT = (
   canisterId: string,
@@ -122,15 +120,9 @@ const NFTItem = ({
         </div>
         {transfer.isError && (
           <div>
-            <Button
-              className={clsx(
-                "px-2 py-1 rounded-md",
-                "bg-secondary text-white text-sm"
-              )}
-              onClick={handleOnRetry}
-            >
+            <BtnPrimary size="sm" onClick={handleOnRetry}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>
@@ -236,15 +228,9 @@ const SendNFTDetails = () => {
             <NFTCollection key={collection.name} collection={collection} />
           ))}
       </div>
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
-        onClick={handleOnClose}
-      >
+      <BtnPrimary className="w-full" onClick={handleOnClose}>
         Go to wallet view
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

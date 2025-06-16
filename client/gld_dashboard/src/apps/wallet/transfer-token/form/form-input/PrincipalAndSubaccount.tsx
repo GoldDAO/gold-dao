@@ -108,7 +108,9 @@ const PrincipalAndSubaccount = () => {
     <div>
       <div className="flex flex-col md:flex-row md:items-end gap-4">
         <div className="flex-1">
-          <div className="text-primary text-sm mb-2">Principal</div>
+          <div className="text-copper text-sm font-semibold mb-2">
+            Principal
+          </div>
           <InputCard>
             <input
               id="principal"
@@ -132,7 +134,9 @@ const PrincipalAndSubaccount = () => {
         </div>
 
         <div className="flex-1">
-          <div className="text-primary text-sm mb-2">Subaccount</div>
+          <div className="text-copper text-sm font-semibold mb-2">
+            Subaccount
+          </div>
           <InputCard>
             <input
               id="subaccount"

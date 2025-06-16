@@ -1,9 +1,7 @@
 import { useAtom } from "jotai";
-
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { StakeStateReducerAtom } from "./atoms";
-import { Button } from "@components/index";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Confirm = () => {
   const [stakeState, dispatch] = useAtom(StakeStateReducerAtom);
@@ -41,8 +39,8 @@ const Confirm = () => {
     <div className="mt-8 xl:mt-12">
       <div className="text-center xl:text-2xl font-semibold">
         You are about to create a stake of{" "}
-        <div className="text-primary xl:text-4xl mt-2">
-          <TokenValueToLocaleString value={stakeState.amount} /> GLDT
+        <div className="text-gold xl:text-4xl mt-2">
+          <E8sToLocaleString value={stakeState.amount} /> GLDT
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4 xl:mt-12">
@@ -60,13 +58,12 @@ const Confirm = () => {
           </div>
         ))}
       </div>
-      <Button
-        className="mt-8 w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-        type="button"
+      <BtnPrimary
+        className="w-full"
         onClick={() => dispatch({ type: "CONFIRM" })}
       >
         Confirm
-      </Button>
+      </BtnPrimary>
     </div>
   );
 };
