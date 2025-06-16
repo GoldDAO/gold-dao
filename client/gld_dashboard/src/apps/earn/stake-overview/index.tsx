@@ -7,14 +7,15 @@ import {
   GLDT_STAKE_CANISTER_ID,
 } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button, Logo } from "@components/index";
+import { Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTotalStaked";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchStakeAPY from "@services/gldt_stake/hooks/useFetchStakeAPY";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import GradientCard from "@shared/components/ui/card/GradientCard";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const StakeOverview = () => {
   const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
@@ -49,7 +50,7 @@ const StakeOverview = () => {
       if (tokenPrice.isSuccess) {
         return (
           <>
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={tokenPrice.data.amount}
               tokenDecimals={tokenPrice.data.decimals}
             />
@@ -73,7 +74,7 @@ const StakeOverview = () => {
       if (tokenPrice.isSuccess) {
         return (
           <>
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={tokenPrice.data.amount / BigInt(GLDT_VALUE_1G_NFT)}
               tokenDecimals={tokenPrice.data.decimals}
             />{" "}
@@ -108,7 +109,7 @@ const StakeOverview = () => {
               <div>GLDT</div>
             </div>
             <div className="flex justify-center items-center xl:justify-end mt-2 xl:mt-0">
-              <div className="flex items-center px-4 py-1 text-sm bg-secondary text-white/90 rounded-full">
+              <div className="flex items-center px-4 py-1 text-sm bg-primary text-white/90 rounded-full">
                 Current APY:{" "}
                 <span>
                   {fetchStakeAPY.isSuccess ? (
@@ -159,12 +160,9 @@ const StakeOverview = () => {
             withdrawn.
           </div>
           <div className="flex justify-end">
-            <Button
-              className="px-6 py-2 bg-secondary text-white rounded-full"
-              onClick={() => setIsOpenInfoAPYDialog(false)}
-            >
+            <BtnPrimary onClick={() => setIsOpenInfoAPYDialog(false)}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       </Dialog>

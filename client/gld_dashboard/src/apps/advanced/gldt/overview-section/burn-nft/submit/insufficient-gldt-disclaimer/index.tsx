@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import { Link } from "react-router-dom";
-import Button from "@components/buttons/Button";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const InsufficientGLDTDisclaimer = ({
   totalGLDTSelected,
@@ -18,8 +18,8 @@ const InsufficientGLDTDisclaimer = ({
   const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
 
   return (
-    <div className="border border-orange-500 bg-orange-500/5 p-4 flex flex-col justify-center items-center rounded-xl text-center">
-      <div className="mb-6 text-orange-500">
+    <div className="border border-amber-500 bg-amber-500/5 p-4 flex flex-col justify-center items-center rounded-xl text-center">
+      <div className="mb-6 text-amber-500">
         <div className="font-semibold mb-2">
           You don't have enough GLDT to process.
         </div>
@@ -38,13 +38,12 @@ const InsufficientGLDTDisclaimer = ({
       <div>
         <Link
           to={"/buy"}
-          className="px-6 py-2 rounded-full bg-secondary text-white"
           onClick={() => {
             dispatchSwapNFT({ type: "RESET" });
             dispatchSelectNFTState({ type: "RESET" });
           }}
         >
-          <Button>Buy GLDT</Button>
+          <BtnPrimary>Buy GLDT</BtnPrimary>
         </Link>
       </div>
     </div>

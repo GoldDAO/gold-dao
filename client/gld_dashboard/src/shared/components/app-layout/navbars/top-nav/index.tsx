@@ -5,12 +5,12 @@ import { Dialog } from "@headlessui/react";
 import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { useAuth } from "@auth/index";
 import DropdownUserMenu from "@shared/components/app-layout/navbars/top-nav/user-menu";
-import { Button } from "@components/index";
 import { Logo } from "@components/logos";
 import navItems from "@shared/components/app-layout/navbars/shared/utils";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 
 const TopNav = ({ className }: { className?: string }) => {
-  const { isConnected, connect } = useAuth();
+  const { isConnected } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleOnHideMenu = () => setShowMenu(false);
@@ -30,17 +30,7 @@ const TopNav = ({ className }: { className?: string }) => {
 
         {/* Menu */}
         <div className="flex justify-self-end items-center">
-          {!isConnected && (
-            <Button
-              className={clsx(
-                "px-4 py-2 rounded-xl w-full",
-                "bg-secondary text-white"
-              )}
-              onClick={connect}
-            >
-              Connect Wallet
-            </Button>
-          )}
+          {!isConnected && <BtnConnectWallet />}
 
           {isConnected && (
             <div className="flex items-center gap-2 bg-surface-primary border border-border rounded-lg">

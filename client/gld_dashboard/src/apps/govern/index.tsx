@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import NeuronsOverview from "./neuron-overview";
@@ -12,9 +11,11 @@ import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
 import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
 import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
 import AddNeuron from "./add-neuron";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Govern = () => {
-  const { connect, isConnected } = useAuth();
+  const { isConnected } = useAuth();
   const [claimRewardState, dispatchClaimReward] = useAtom(
     ClaimRewardStateReducerAtom
   );
@@ -27,21 +28,14 @@ const Govern = () => {
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow px-4 xl:px-8">
           <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4">
-            <div className="font-semibold text-primary/90">Govern</div>
+            <div className="font-semibold text-gold/90">Govern</div>
             <div className="font-light">the DAO</div>
           </div>
           <div className="text-content/60 my-3">
             Stake GOLDAO tokens to participate in the Gold DAO governance and
             earn rewards yielding up to 30% APY.
           </div>
-          {!isConnected && (
-            <Button
-              className="mt-auto w-full px-4 py-3 bg-secondary xl:text-lg text-white rounded-md"
-              onClick={connect}
-            >
-              Connect Wallet
-            </Button>
-          )}
+          {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
         </div>
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
@@ -61,13 +55,13 @@ const Govern = () => {
           <div className="p-4 xl:p-8">
             <div className="flex items-center justify-between mb-4 xl:mb-8">
               <div>My GOLDAO neurons</div>
-              <Button
-                className="px-4 py-2 bg-secondary text-white rounded-full"
+              <BtnPrimary
+                shape="round"
                 onClick={() => dispatchAddNeuron({ type: "OPEN_DIALOG" })}
                 disabled={!isConnected}
               >
                 Add neuron
-              </Button>
+              </BtnPrimary>
             </div>
             <NeuronsList />
           </div>

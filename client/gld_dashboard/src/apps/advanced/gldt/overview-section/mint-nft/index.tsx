@@ -37,9 +37,9 @@ const MintNFT = () => {
             }}
           />
         </div>
-
         <MintSubmit />
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "mint" && swapNFT.step === "confirm"}
         handleOnClose={handleCloseSwapNFTDialog}
@@ -51,6 +51,7 @@ const MintNFT = () => {
           <MintConfirm />
         </div>
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "mint" && swapNFT.step === "details"}
         handleOnClose={handleCloseSwapNFTDialog}

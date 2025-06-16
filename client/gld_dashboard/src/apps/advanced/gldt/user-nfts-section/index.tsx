@@ -9,13 +9,13 @@ const CountCollectionNFT = ({
   className,
 }: {
   count: number;
-  name: string;
+  name: "1G" | "10G" | "100G" | "1KG";
   className?: string;
 }) => {
   return (
     <div className={className}>
       <div className="flex items-center justify-center xl:justify-start gap-2">
-        <div className="px-2 bg-primary text-white flex items-center justify-center rounded">
+        <div className="px-2 bg-gold text-white flex items-center justify-center rounded">
           {count}
         </div>
         <div className="w-[64px] flex justify-center items-center">

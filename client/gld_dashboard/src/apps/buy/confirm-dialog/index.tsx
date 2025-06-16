@@ -1,9 +1,27 @@
 import { InfoCircle, ExportSquare, Warning2 } from "iconsax-react";
-import { Logo, Button } from "@components/index";
+import { Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { PayToken, ReceiveToken } from "@buy/shared/utils";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+
+const AmountUSD = ({
+  className,
+  amount,
+}: {
+  className?: string;
+  amount: number;
+}) => {
+  return (
+    <div className={className}>
+      <div className="text-content/60 text-sm xl:text-base">
+        ≈ $
+        <NumberToLocaleString value={amount} />
+      </div>
+    </div>
+  );
+};
 
 const ConfirmDialog = ({
   open,
@@ -28,26 +46,34 @@ const ConfirmDialog = ({
 }) => {
   return (
     <Dialog open={open} handleOnClose={handleClose} title="Confirm Purchase">
-      <div className="flex flex-col gap-4 mt-4">
+      <div className="flex flex-col gap-4 mt-4 max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
         <div className="rounded-xl bg-surface-secondary border border-border">
           <div className="p-4 xl:p-6 border-b border-border">
             <div className="text-sm mb-4 text-content/60">You pay</div>
-            <div className="flex flex-row justify-between items-end">
-              <div className="flex items-center gap-2 text-4xl">
+            <div className="flex flex-row justify-between items-center xl:items-end">
+              <div className="flex items-center gap-2">
                 <Logo
                   name={payToken.token.id}
                   className="h-10 w-10 shrink-0 aspect-square"
                 />
-                <TokenValueToLocaleString
-                  value={payToken.amount as bigint}
-                  tokenDecimals={payToken.decimals as number}
-                />
-                <div>{payToken.token.name}</div>
+                <div>
+                  <div className="flex items-center gap-2 text-2xl xl:text-4xl">
+                    <E8sToLocaleString
+                      value={payToken.amount as bigint}
+                      tokenDecimals={payToken.decimals as number}
+                    />
+                    <div>{payToken.token.name}</div>
+                  </div>
+                  <AmountUSD
+                    amount={payToken.amount_usd as number}
+                    className="block xl:hidden"
+                  />
+                </div>
               </div>
-              <div className="text-content/60">
-                ≈ $
-                <NumberToLocaleString value={payToken.amount_usd as number} />
-              </div>
+              <AmountUSD
+                amount={payToken.amount_usd as number}
+                className="hidden xl:block"
+              />
             </div>
           </div>
           <div className="p-4 xl:p-6">
@@ -64,25 +90,30 @@ const ConfirmDialog = ({
               />
             </div>
 
-            <div className="flex flex-row justify-between items-end">
-              <div className="flex items-center gap-2 text-4xl">
+            <div className="flex flex-row justify-between items-center xl:items-end">
+              <div className="flex items-center gap-2">
                 <Logo
                   name={receiveToken.token.id}
                   className="h-10 w-10 shrink-0 aspect-square"
                 />
-                <TokenValueToLocaleString
-                  value={receiveToken.amount as bigint}
-                  tokenDecimals={receiveToken.decimals as number}
-                  decimals={5}
-                />
-                <div>{receiveToken.token.name}</div>
+                <div>
+                  <div className="flex items-center gap-2 text-2xl xl:text-4xl">
+                    <E8sToLocaleString
+                      value={receiveToken.amount as bigint}
+                      tokenDecimals={receiveToken.decimals as number}
+                    />
+                    <div>{receiveToken.token.name}</div>
+                  </div>
+                  <AmountUSD
+                    amount={receiveToken.amount_usd as number}
+                    className="block xl:hidden"
+                  />
+                </div>
               </div>
-              <div className="text-content/60">
-                ≈ $
-                <NumberToLocaleString
-                  value={receiveToken.amount_usd as number}
-                />
-              </div>
+              <AmountUSD
+                amount={receiveToken.amount_usd as number}
+                className="hidden xl:block"
+              />
             </div>
           </div>
         </div>
@@ -105,7 +136,7 @@ const ConfirmDialog = ({
                   />
                 )}
                 <div className="text-content/60">
-                  <NumberToLocaleString value={slippage} decimals={2} />%
+                  <NumberToLocaleString value={slippage} />%
                 </div>
               </div>
             </div>
@@ -128,7 +159,7 @@ const ConfirmDialog = ({
                 <div className="text-content/60">Fees</div>
                 {receiveToken.decimals && networkFee && lpFee ? (
                   <>
-                    <TokenValueToLocaleString
+                    <E8sToLocaleString
                       value={networkFee + lpFee}
                       tokenDecimals={receiveToken.decimals}
                     />{" "}
@@ -143,7 +174,7 @@ const ConfirmDialog = ({
                   <div>Network fee</div>
                   {receiveToken.decimals && networkFee ? (
                     <>
-                      <TokenValueToLocaleString
+                      <E8sToLocaleString
                         value={networkFee}
                         tokenDecimals={receiveToken.decimals}
                       />{" "}
@@ -158,7 +189,7 @@ const ConfirmDialog = ({
                   <div>LP fee</div>
                   {receiveToken.decimals && lpFee ? (
                     <>
-                      <TokenValueToLocaleString
+                      <E8sToLocaleString
                         value={lpFee}
                         tokenDecimals={receiveToken.decimals}
                       />{" "}
@@ -172,22 +203,15 @@ const ConfirmDialog = ({
             </div>
           </div>
         </div>
-
-        <Button
-          onClick={handleConfirm}
-          className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-        >
-          <>
-            Buy ≈{" "}
-            <TokenValueToLocaleString
-              value={receiveToken.amount}
-              tokenDecimals={receiveToken.decimals as number}
-              decimals={5}
-            />{" "}
-            {receiveToken.token.name}
-          </>
-        </Button>
-
+        <BtnPrimary onClick={handleConfirm} className="w-full">
+          Buy ≈{" "}
+          <E8sToLocaleString
+            value={receiveToken.amount}
+            tokenDecimals={receiveToken.decimals as number}
+            decimals={5}
+          />{" "}
+          {receiveToken.token.name}
+        </BtnPrimary>
         <div className="flex justify-center">
           <div className="flex items-center gap-1 text-content/60 text-sm">
             In partnership with
@@ -195,7 +219,7 @@ const ConfirmDialog = ({
               href="https://www.kongswap.io/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center text-content hover:text-primary`}
+              className={`flex items-center text-content hover:text-gold`}
             >
               <div>KongSwap</div>
               <ExportSquare className="ml-2 h-4 w-4" />

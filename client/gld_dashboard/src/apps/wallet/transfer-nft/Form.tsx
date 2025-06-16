@@ -3,10 +3,10 @@ import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
 import { NFTCollections } from "@shared/utils/nfts";
-import { Button } from "@components/index";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { IsOneOrMoreSelectedNFTAtom } from "@shared/atoms/NFTStateAtom";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Form = ({ className }: { className?: string }) => {
   const [, dispatchTransferNFTState] = useAtom(TransferNFTStateReducerAtom);
@@ -42,7 +42,7 @@ const Form = ({ className }: { className?: string }) => {
 
   return (
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
-      <div className="flex flex-col gap-2 mb-8 border border-border p-4 rounded-xl">
+      <div className="flex flex-col gap-2 mb-4 border border-border p-4 rounded-xl">
         {NFTCollections.map((collection) => (
           <UserNFTSelect key={collection.name} collection={collection.name} />
         ))}
@@ -54,7 +54,7 @@ const Form = ({ className }: { className?: string }) => {
         autoComplete="off"
         placeholder="Principal ID"
         className={clsx(
-          "mt-4 w-full border border-border outline-none focus:outline-none focus:ring-0 p-4 rounded-md bg-surface-primary",
+          "w-full border border-border outline-none focus:outline-none focus:ring-0 p-4 rounded-xl bg-surface-primary",
           "text-sm font-semibold",
           "placeholder:text-content/60 placeholder:text-sm placeholder:font-semibold"
         )}
@@ -67,22 +67,20 @@ const Form = ({ className }: { className?: string }) => {
           },
         })}
       />
-      <div className="mt-1 h-8 ml-2">
-        {errors && (
-          <p className="text-red-600 text-sm font-semibold">
-            {typeof errors?.recipient_address?.message === "string" &&
-              errors.recipient_address.message}
-          </p>
-        )}
-      </div>
+      {errors && (
+        <p className="text-red-600 text-sm font-semibold mt-1 ml-2">
+          {typeof errors?.recipient_address?.message === "string" &&
+            errors.recipient_address.message}
+        </p>
+      )}
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           type="submit"
           disabled={!isValid || !IsOneOrMoreSelectedNFT}
-          className="w-full px-6 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
+          className="w-full"
         >
           Transfer
-        </Button>
+        </BtnPrimary>
       </div>
     </form>
   );

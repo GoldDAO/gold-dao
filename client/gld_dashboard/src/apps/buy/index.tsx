@@ -15,9 +15,9 @@ import {
   onKeyDownPreventNoDigits,
   onPastePreventNoDigits,
 } from "@shared/utils/form/input";
-import { Button, Logo } from "@components/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import { Logo } from "@components/index";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
@@ -30,9 +30,11 @@ import ConfirmDialog from "@buy/confirm-dialog";
 import DetailsDialog from "@buy/details-dialog";
 import DisclaimerAmountReceivedDialog from "@buy/disclaimer-amount-received-dialog";
 import DisclaimerConfirmHighSlippageDialog from "./disclaimer-confirm-high-slippage-dialog";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Buy = () => {
-  const { principalId, unauthenticatedAgent, isConnected, connect } = useAuth();
+  const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [buyAtomState, dispatch] = useAtom(BuyGLDTStateReducerAtom);
   const {
     pay_token,
@@ -248,26 +250,37 @@ const Buy = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center justify-between text-center xl:text-left xl:items-start h-full px-4 xl:px-8">
+        <div className="flex flex-col items-center gap-4 xl:gap-8 text-center xl:text-left xl:items-start h-full px-4 xl:px-8">
           <div className="text-5xl xl:text-6xl flex flex-col">
-            <div className="font-semibold text-primary/90">Buy</div>
+            <div className="font-semibold text-gold/90">Buy</div>
             <div className="flex xl:flex-col gap-2 xl:gap-0 font-light">
               <div>Tokenized</div>
               <div>Gold</div>
             </div>
           </div>
-          <div className="hidden xl:flex xl:justify-center w-full my-4">
-            <img className="max-w-58" src={ImgBuyGold} alt="Buy Gold" />
+
+          <div className="hidden xl:flex xl:justify-center w-full">
+            <img className="max-w-48" src={ImgBuyGold} alt="Buy Gold" />
           </div>
-          <div className="mt-3">
+
+          <div>
             <div className="font-semibold text-content/70">
               The Simplest Way to Own Physical Gold.
             </div>
-            <div className="text-content/60 mt-2">
-              GLDT removes the complexity of owning gold. Each gold token (GLDT)
-              represents real, physical gold secured in a Swiss vault (100 GLDT
-              = 1 gram). Buy, sell, or hold a timeless store of value with the
-              ease of a digital asset, unlocking its full potential.
+
+            <div className="mt-2 flex flex-col gap-3 text-content/60">
+              <div>
+                GLDT removes the complexity of owning gold. Each gold token
+                (GLDT) represents real, physical gold secured in a Swiss vault.
+              </div>
+              <div className="flex items-center justify-center xl:justify-start">
+                <Logo name="gldt" className="h-6 w-6 mr-2" />
+                <div className="font-semibold">100 GLDT = 1 gram of Gold</div>
+              </div>
+              <div>
+                Buy, sell, or hold a timeless store of value with the ease of a
+                digital asset, unlocking its full potential.
+              </div>
             </div>
           </div>
         </div>
@@ -280,9 +293,10 @@ const Buy = () => {
               "flex flex-col items-center text-center"
             )}
           >
-            <div className="w-full px-4 xl:px-8 pt-8 xl:pt-12 pb-8 xl:pb-12">
+            <div className="w-full px-4 xl:px-8 pt-8 xl:pt-12 pb-8 xl:pb-12 border-b border-border">
               <div className="mb-4 text-xl xl:text-4xl">
-                Buy GLDT <span className="text-primary">Gold Tokens</span>
+                Buy GLDT{" "}
+                <span className="text-gold font-semibold">Gold Tokens</span>
               </div>
               <div className="inline-flex items-center text-sm text-content/60 border border-border rounded-full px-4 py-2">
                 <Logo name="gldt" className="h-5 w-5 mr-1" />
@@ -290,7 +304,7 @@ const Buy = () => {
               </div>
               <div className="flex flex-col xl:flex-row gap-4 mt-8">
                 <div className="flex items-center border border-border rounded-md grow bg-surface-secondary">
-                  <div className="p-4 border-r border-border text-primary">
+                  <div className="p-4 border-r border-border text-copper font-semibold">
                     Pay with
                   </div>
                   <div className="p-4">
@@ -394,12 +408,14 @@ const Buy = () => {
                 "rounded-b-[inherit]"
               )}
             >
-              <div className="text-primary">You will receive</div>
+              <div className="text-copper font-semibold">
+                You will receive approximately
+              </div>
               <div className="mt-4">
                 <div className="text-2xl xl:text-4xl">
                   {isReceiveTokenPriceIsFetched ? (
                     <div className="inline-flex items-center gap-2">
-                      <TokenValueToLocaleString
+                      <E8sToLocaleString
                         value={receiveTokenPrice.data.amount}
                         tokenDecimals={receiveTokenPrice.data.decimals}
                         decimals={5}
@@ -420,8 +436,7 @@ const Buy = () => {
                 <div className="font-semibold text-lg xl:text-xl mt-1">
                   {isReceiveTokenPriceIsFetched ? (
                     <>
-                      ≈{" "}
-                      <TokenValueToLocaleString
+                      <E8sToLocaleString
                         value={
                           receiveTokenPrice.data.amount /
                           BigInt(GLDT_VALUE_1G_NFT)
@@ -451,10 +466,9 @@ const Buy = () => {
                       <div>1</div>
                       <div>{pay_token.token.name}</div>
                       <div>=</div>
-                      <TokenValueToLocaleString
+                      <E8sToLocaleString
                         value={payTokenPriceExchangeRate.data.amount}
                         tokenDecimals={payTokenPriceExchangeRate.data.decimals}
-                        decimals={2}
                       />
                       <div>{receive_token.token.name}</div>
                       <Logo name={receive_token.token.id} className="h-4 w-4" />
@@ -468,15 +482,16 @@ const Buy = () => {
               <div className="mt-8 xl:mt-12">
                 {isConnected ? (
                   <>
-                    <Button
-                      className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
+                    <BtnPrimary
+                      className="w-full"
+                      size="lg"
                       onClick={() => dispatch({ type: "OPEN_DIALOG_CONFIRM" })}
                       disabled={!isBuyEnabled}
                     >
                       {isReceiveTokenPriceIsFetched ? (
                         <>
-                          Buy for ≈{" "}
-                          <TokenValueToLocaleString
+                          Buy ≈{" "}
+                          <E8sToLocaleString
                             value={receiveTokenPrice.data.amount}
                             tokenDecimals={receiveTokenPrice.data.decimals}
                             decimals={5}
@@ -486,7 +501,7 @@ const Buy = () => {
                       ) : (
                         <div>Loading...</div>
                       )}
-                    </Button>
+                    </BtnPrimary>
                     {errors.amount && errors.amount?.message !== "" && (
                       <div className="mt-2 text-red-500">
                         {errors?.amount?.message as string}
@@ -499,12 +514,7 @@ const Buy = () => {
                     )}
                   </>
                 ) : (
-                  <Button
-                    className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-                    onClick={connect}
-                  >
-                    Connect Wallet
-                  </Button>
+                  <BtnConnectWallet className="w-full" size="lg" />
                 )}
               </div>
             </GradientCard>

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { NFTCollections } from "@shared/utils/nfts";
 import useFetchNFTUserMetrics from "@shared/hooks/useFetchNFTUserMetrics";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const CountNFT = ({
   count = 0,
@@ -34,7 +34,7 @@ const PriceNFT = ({
     <div className={className}>
       <div className="text-sm text-content/60">
         {grams} grams of Gold ($
-        <NumberToLocaleString value={priceUSD} decimals={2} />)
+        <NumberToLocaleString value={priceUSD} />)
       </div>
     </div>
   );

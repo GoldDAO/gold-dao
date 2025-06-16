@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { GLDT_LEDGER_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button, LoaderSpin } from "@components/index";
+import { LoaderSpin } from "@components/index";
 import AvailableNFTSelect from "@shared/components/nft-select/AvailableNFTSelect";
 import { NFTCollections } from "@shared/utils/nfts";
 import {
@@ -13,8 +13,8 @@ import {
 } from "@shared/atoms/NFTStateAtom";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
-// import BurnInfos from "./burn-infos";
 import InsufficientGLDTDisclaimer from "./insufficient-gldt-disclaimer";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Submit = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -56,9 +56,9 @@ const Submit = () => {
   };
 
   return balance.isSuccess ? (
-    <div className="max-h-[75vh] overflow-y-auto p-4">
+    <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
       <div className="rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">From</div>
+        <div className="text-copper text-sm font-semibold mb-2">From</div>
         {!canBurnNFT ? (
           <InsufficientGLDTDisclaimer
             totalGLDTSelected={totalGLDTSelected}
@@ -82,8 +82,8 @@ const Submit = () => {
         )}
       </div>
 
-      <div className="mt-8 rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">To</div>
+      <div className="mt-4 rounded-xl p-4 border border-border">
+        <div className="text-copper text-sm font-semibold mb-2">To</div>
         <div className="flex flex-col gap-2">
           {NFTCollections.map((collection) => (
             <AvailableNFTSelect
@@ -95,13 +95,13 @@ const Submit = () => {
       </div>
 
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           onClick={handleSubmit}
           disabled={!IsOneOrMoreSelectedNFT || !canBurnNFT}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
+          className="w-full"
         >
           Submit
-        </Button>
+        </BtnPrimary>
       </div>
     </div>
   ) : (

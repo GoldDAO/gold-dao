@@ -8,7 +8,7 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import { NeuronUser } from "@services/sns_governance/utils/interfaces";
 import { Button, Logo, Table } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import {
   GOLDAO_LEDGER_CANISTER_ID,
   SNS_GOVERNANCE_CANISTER_ID,
@@ -126,7 +126,7 @@ const List = () => {
             ) : (
               <>
                 <Logo name="goldao" className="h-4" />
-                <TokenValueToLocaleString
+                <E8sToLocaleString
                   value={getValue() as bigint}
                   tokenDecimals={decimals.data}
                 />

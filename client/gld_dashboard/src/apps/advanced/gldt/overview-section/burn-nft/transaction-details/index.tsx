@@ -11,7 +11,7 @@ import {
   TotalNFTSelectedAtom,
   CollectionSelectedAtom,
 } from "@shared/atoms/NFTStateAtom";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const TransactionDetails = ({
   className = "",

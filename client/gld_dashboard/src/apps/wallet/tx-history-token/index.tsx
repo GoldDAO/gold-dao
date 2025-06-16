@@ -7,11 +7,11 @@ import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAccountTransactions";
 import Address from "@components/strings/Address";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ListItem = ({ tx }: { tx: Transaction }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();
@@ -39,7 +39,7 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
       return (
         <div className="text-green-500">
           +
-          <TokenValueToLocaleString
+          <E8sToLocaleString
             value={amount as bigint}
             tokenDecimals={decimals.data}
           />{" "}
@@ -50,7 +50,7 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
       return (
         <div className="text-red-500">
           -
-          <TokenValueToLocaleString
+          <E8sToLocaleString
             value={amount as bigint}
             tokenDecimals={decimals.data}
           />{" "}
@@ -63,13 +63,13 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
   return (
     <div
       className={clsx(
-        "p-2 lg:p-4 border border-border rounded-lg",
+        "p-2 lg:p-4 border border-border rounded-xl",
         "flex items-start justify-between"
       )}
     >
       <div className="flex items-start lg:items-center gap-4">
-        <div className="w-24 flex justify-center px-4 py-3 border border-primary/5 bg-primary/10 text-primary rounded-lg">
-          <div>{tx.kind}</div>
+        <div className="w-24 flex justify-center px-4 py-3 border border-gold/5 bg-gold/10 text-copper text-sm font-semibold rounded-xl">
+          {tx.kind}
         </div>
         <div className="text-sm">
           <div className="inline-flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-2">
@@ -149,7 +149,7 @@ const List = () => {
 
   if (status === "success" && data?.pages[0]?.data.length === 0) {
     return (
-      <div className="p-4 flex justify-center border border-border rounded-lg">
+      <div className="p-4 bg-surface-primary flex justify-center border border-border rounded-xl">
         <div>No transactions found</div>
       </div>
     );

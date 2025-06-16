@@ -6,7 +6,7 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import { Logo } from "@components/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import TotalCountToken from "@shared/components/total-count-token";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
 import useFetchNFTUserMetrics from "@shared/hooks/useFetchNFTUserMetrics";

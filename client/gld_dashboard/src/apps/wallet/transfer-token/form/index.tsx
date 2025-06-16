@@ -4,8 +4,8 @@ import clsx from "clsx";
 import { FieldValues, useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useAuth } from "@auth/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Logo, Button } from "@components/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { SendTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
@@ -14,6 +14,7 @@ import useFetchTokenData from "@shared/hooks/useFetchTokenData";
 import ICRCAccount from "./form-input/ICRCAccount";
 import PrincipalAndSubaccount from "./form-input/PrincipalAndSubaccount";
 import ICRCAccountOrAccountId from "./form-input/ICRCAccountOrAccountId";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const InputCard = ({ children }: { children: ReactNode }) => {
   return (
@@ -148,7 +149,7 @@ const Form = ({ className }: { className?: string }) => {
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
       <div className="flex justify-center mb-8">
         <div className="text-4xl">
-          Send <span className="font-semibold text-primary">{token.name}</span>
+          Send <span className="font-semibold text-gold">{token.name}</span>
         </div>
       </div>
       <div className="flex flex-col gap-4 mt-4">
@@ -170,7 +171,7 @@ const Form = ({ className }: { className?: string }) => {
             <div className="shrink-0">
               <Button
                 onClick={handleSwitchAddress}
-                className="w-full px-4 py-4 border border-primary bg-primary/10 text-primary font-medium rounded-md"
+                className="w-full px-6 py-3 border border-gold bg-gold/10 font-semibold text-gold text-base rounded-xl"
               >
                 {!is_use_icrc_account
                   ? "Use ICRC Account"
@@ -186,7 +187,7 @@ const Form = ({ className }: { className?: string }) => {
           />
         </div>
         <div>
-          <div className="text-primary text-sm mb-2">Amount</div>
+          <div className="text-copper text-sm font-semibold mb-2">Amount</div>
           <InputCard>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -243,7 +244,7 @@ const Form = ({ className }: { className?: string }) => {
         <div className="flex items-center justify-between">
           <div className="inline-flex text-content/60 items-center gap-1 text-sm bg-surface-secondary rounded-md px-2 py-1">
             <div className="text-content/40">Available:</div>
-            <TokenValueToLocaleString
+            <E8sToLocaleString
               value={balance.data}
               tokenDecimals={tokenData.data.decimals}
             />
@@ -262,13 +263,13 @@ const Form = ({ className }: { className?: string }) => {
       </div>
 
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           type="submit"
           disabled={!isValid || !is_valid_receive_address}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
+          className="w-full"
         >
           Transfer
-        </Button>
+        </BtnPrimary>
       </div>
     </form>
   );

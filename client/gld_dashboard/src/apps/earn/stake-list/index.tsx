@@ -5,8 +5,8 @@ import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Button, Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import useFetchUserPositions from "@services/gldt_stake/hooks/useFetchUserPositions";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
@@ -158,13 +158,13 @@ const StakeList = () => {
       {fetchUserPositions.data.map((stake, index) => (
         <div
           key={index}
-          className="@container flex justify-between items-center p-3 border-b border-border/60 last:border-0 odd:bg-primary/5"
+          className="@container flex justify-between items-center p-3 border-b border-border/60 last:border-0 odd:bg-gold/5"
         >
           <div className="flex flex-col @sm:flex-row @sm:items-center @sm:justify-between w-full">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
                 <Logo name="gldt" className="h-5 w-5" />
-                <TokenValueToLocaleString
+                <E8sToLocaleString
                   value={stake.amount}
                   tokenDecimals={decimals.data}
                 />{" "}

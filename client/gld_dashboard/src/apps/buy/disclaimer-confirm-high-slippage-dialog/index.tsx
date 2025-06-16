@@ -1,7 +1,7 @@
-import { Button } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
 import { Warning2 } from "iconsax-react";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const DisclaimerConfirmHighSlippageDialog = ({
   open,
@@ -30,7 +30,7 @@ const DisclaimerConfirmHighSlippageDialog = ({
         <div className="inline-block max-w-md mx-auto">
           The current slippage is{" "}
           <span className="text-amber-500 font-semibold">
-            <NumberToLocaleString value={slippage} decimals={2} />%
+            <NumberToLocaleString value={slippage} />%
           </span>{" "}
           , which exceeds the maximum recommended slippage of {maxSlippage}%.
         </div>
@@ -39,19 +39,11 @@ const DisclaimerConfirmHighSlippageDialog = ({
           Please confirm or consider purchasing a smaller amount.
         </div>
       </div>
-      <div className="flex justify-end gap-2">
-        <Button
-          className="px-6 py-2 bg-surface text-content rounded-full"
-          onClick={handleClose}
-        >
+      <div className="flex justify-center gap-2">
+        <BtnPrimary variant="outlined" onClick={handleClose}>
           Cancel
-        </Button>
-        <Button
-          className="px-6 py-2 bg-secondary text-white rounded-full"
-          onClick={handleConfirm}
-        >
-          Confirm
-        </Button>
+        </BtnPrimary>
+        <BtnPrimary onClick={handleConfirm}>Confirm</BtnPrimary>
       </div>
     </Dialog>
   );

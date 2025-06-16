@@ -1,15 +1,15 @@
-import clsx from "clsx";
 import { ReactNode } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { Button, ExternalLink } from "@components/index";
+import { ExternalLink } from "@components/index";
 import { AddNeuronStateReducerAtom } from "./atoms";
 import Address from "@components/strings/Address";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Card = ({ step, children }: { step: number; children: ReactNode }) => {
   return (
     <div className="flex items-center gap-4 bg-surface-secondary border border-border rounded-md p-4">
-      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-primary text-primary border border-primary shrink-0">
+      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-primary text-gold border border-gold shrink-0">
         {step}
       </div>
       <div>{children}</div>
@@ -32,7 +32,7 @@ const AddNeuron = () => {
   return (
     <>
       <div className="text-center mt-4 mb-6 text-4xl xl:text-5xl">
-        Add <span className="font-semibold text-primary">Neuron</span>
+        Add <span className="font-semibold text-gold">Neuron</span>
       </div>
       <div className="my-8 grid grid-cols-1 gap-4">
         <Card step={1}>
@@ -66,15 +66,12 @@ const AddNeuron = () => {
           </Card.Text>
         </Card>
       </div>
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
+      <BtnPrimary
+        className="w-full"
         onClick={() => dispatch({ type: "RESET" })}
       >
         Got it!
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

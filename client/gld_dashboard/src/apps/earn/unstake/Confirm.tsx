@@ -1,12 +1,10 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnstakeStateReducerAtom } from "./atoms";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const Confirm = () => {
@@ -39,12 +37,9 @@ const Confirm = () => {
         <div className={clsx("")}>Withdraw</div>
       </div>
       <div className="flex justify-center">
-        <Button
-          className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-          onClick={() => dispatch({ type: "CONFIRM" })}
-        >
+        <BtnPrimary onClick={() => dispatch({ type: "CONFIRM" })}>
           Confirm
-        </Button>
+        </BtnPrimary>
       </div>
     </>
   );

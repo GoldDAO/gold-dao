@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import useSwapNFTForTokens from "@shared/hooks/useSwapNFTForTokens";
 import useMarketTransferNFTOrigyn from "@services/gld_nft/hooks/useMarketTransferNFTOrigyn";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
 import { CollectionNameNFT, IdNFT } from "@services/gld_nft/utils/interfaces";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const CollectionItem = ({
   nft,
@@ -89,22 +89,16 @@ const CollectionItem = ({
         </div>
         {swapNFTForTokens.isError && (
           <div>
-            <Button
-              className="px-2 py-1 rounded-md bg-secondary text-white text-sm"
-              onClick={handleRetrySwapNFT}
-            >
+            <BtnPrimary size="sm" onClick={handleRetrySwapNFT}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
         {marketTransferNFT.isError && (
           <div>
-            <Button
-              className="px-2 py-1 rounded-md bg-secondary text-white text-sm"
-              onClick={handleRetryMarketTransfer}
-            >
+            <BtnPrimary size="sm" onClick={handleRetryMarketTransfer}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>

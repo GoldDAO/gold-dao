@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnlockStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const DetailsUnstakeEarly = () => {
   const { authenticatedAgent } = useAuth();
@@ -50,18 +48,12 @@ const DetailsUnstakeEarly = () => {
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
-            <Button
-              onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            <BtnPrimary onClick={handleRetry} variant="outlined">
               Retry
-            </Button>
-            <Button
-              onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            </BtnPrimary>
+            <BtnPrimary onClick={() => dispatch({ type: "RESET" })}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       )}
@@ -76,15 +68,12 @@ const DetailsUnstakeEarly = () => {
               You will be charged of (todo) GLDT.
             </div>
           </div>
-          <Button
-            className={clsx(
-              "px-4 py-3 rounded-md",
-              "bg-secondary text-white w-full"
-            )}
+          <BtnPrimary
+            className="w-full"
             onClick={() => dispatch({ type: "RESET" })}
           >
             Close
-          </Button>
+          </BtnPrimary>
         </div>
       )}
     </div>

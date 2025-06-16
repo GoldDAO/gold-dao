@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from "jotai";
-import { Button } from "@components/index";
 import {
   SelectNFTStateReducerAtom,
   TotalGLDTSelectedAtom,
@@ -9,7 +8,8 @@ import {
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import TransactionDetails from "@advanced/gldt/overview-section/burn-nft/transaction-details";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const Confirm = () => {
   const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
@@ -28,22 +28,22 @@ const Confirm = () => {
       <div className="mt-8 flex flex-col gap-8">
         <div className="text-center">
           You are sending{" "}
-          <span className="font-semibold text-primary">
+          <span className="text-copper font-semibold">
             <NumberToLocaleString
               value={totalGLDTSelected + totalNFTSelected}
             />{" "}
             GLDT
           </span>{" "}
           and will receive{" "}
-          <span className="font-semibold text-primary">
+          <span className="text-copper font-semibold">
             {totalGramSelectedAtom}g GLD NFTs
           </span>
           . <br />
-          <span className="font-semibold text-primary">
+          <span className="text-copper font-semibold">
             <NumberToLocaleString value={totalGLDTSelected} /> GLDT
           </span>{" "}
           will be burned and{" "}
-          <span className="font-semibold text-primary">
+          <span className="text-copper font-semibold">
             {totalNFTSelected} GLDT
           </span>{" "}
           fee are charged.
@@ -55,7 +55,6 @@ const Confirm = () => {
             />{" "}
             GLDT
           </div>
-
           <div className="w-full flex justify-center items-center py-4">
             <div className="relative w-full">
               <div className="border-t border-border w-full"></div>
@@ -69,14 +68,9 @@ const Confirm = () => {
           <div className="font-semibold">{totalGramSelectedAtom}g of gold</div>
         </div>
         <TransactionDetails defaultOpen={true} />
-
-        <Button
-          onClick={handleConfirm}
-          disabled={false}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
-        >
+        <BtnPrimary onClick={handleConfirm} disabled={false} className="w-full">
           Confirm
-        </Button>
+        </BtnPrimary>
       </div>
     </div>
   );

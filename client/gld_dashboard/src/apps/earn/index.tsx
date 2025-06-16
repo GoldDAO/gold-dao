@@ -3,7 +3,6 @@ import { useAtom } from "jotai";
 import { ExportSquare } from "iconsax-react";
 import { useAuth } from "@auth/index";
 import Dialog from "@components/dialogs/Dialog";
-import { Button } from "@components/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import StakeForm from "./stake-form";
 import StakeOverview from "./stake-overview";
@@ -12,9 +11,10 @@ import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";
 import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
 import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
 import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 
 const Earn = () => {
-  const { connect, isConnected } = useAuth();
+  const { isConnected } = useAuth();
   const [claimRewardState, dispatchClaimReward] = useAtom(
     ClaimRewardStateReducerAtom
   );
@@ -24,7 +24,7 @@ const Earn = () => {
       <InnerAppLayout.LeftPanel>
         <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow">
           <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4 px-4 xl:px-8">
-            <div className="font-semibold text-primary/90">Earn</div>
+            <div className="font-semibold text-gold/90">Earn</div>
             <div className="font-light">with gold</div>
           </div>
           <div className="text-content/60 my-3 px-4 xl:px-8">
@@ -67,12 +67,7 @@ const Earn = () => {
               <div className="my-4 text-center">
                 Connect a wallet and start staking GLDT
               </div>
-              <Button
-                className="w-full px-4 py-3 bg-secondary text-white xl:text-lg font-medium rounded-md"
-                onClick={connect}
-              >
-                Connect Wallet
-              </Button>
+              <BtnConnectWallet className="w-full" />
             </div>
           )}
         </div>

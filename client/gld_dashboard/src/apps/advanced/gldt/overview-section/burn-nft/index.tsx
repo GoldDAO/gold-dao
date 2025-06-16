@@ -37,9 +37,9 @@ const BurnNFT = () => {
             }}
           />
         </div>
-
         <BurnSubmit />
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "burn" && swapNFT.step === "confirm"}
         handleOnClose={handleCloseSwapNFTDialog}
@@ -51,6 +51,7 @@ const BurnNFT = () => {
           <BurnConfirm />
         </div>
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "burn" && swapNFT.step === "details"}
         handleOnClose={handleCloseSwapNFTDialog}

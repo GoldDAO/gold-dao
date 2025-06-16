@@ -30,12 +30,13 @@ const TransferNFTDialog = () => {
     <Dialog
       open={is_open_transfer_dialog}
       handleOnClose={handleOnClose}
+      size={transfer_tab === "receive" ? "md" : "xl"}
       title={
         is_step_send_confirm && (
           <div
             className={clsx(
               "p-1 rounded-full cursor-pointer",
-              "hover:bg-secondary hover:text-white"
+              "hover:bg-primary hover:text-white"
             )}
             onClick={() =>
               dispatchTransferState({ type: "CANCEL_SEND_CONFIRM" })
@@ -64,10 +65,10 @@ const TransferNFTDialog = () => {
       <div className="mt-8">
         {transfer_tab === "receive" && <ReceiveAddress />}
         {transfer_tab === "send" && (
-          <>
+          <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
             {is_step_send_form && <SendForm />}
             {is_step_send_confirm && <SendConfirm />}
-          </>
+          </div>
         )}
       </div>
     </Dialog>

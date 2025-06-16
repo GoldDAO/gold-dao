@@ -48,7 +48,7 @@ const TxSection = ({ className }: { className?: string }) => {
         <div className="flex flex-col gap-4">
           <Disclosure defaultOpen={true}>
             {({ open }) => (
-              <>
+              <div>
                 <DisclosureButton
                   className={clsx(
                     "flex items-center justify-between w-full p-4 bg-surface-secondary border border-border focus:outline-none",
@@ -68,12 +68,12 @@ const TxSection = ({ className }: { className?: string }) => {
                     <OngoingTxHistory />
                   </div>
                 </DisclosurePanel>
-              </>
+              </div>
             )}
           </Disclosure>
           <Disclosure defaultOpen={true}>
             {({ open }) => (
-              <>
+              <div>
                 <DisclosureButton
                   className={clsx(
                     "flex items-center justify-between w-full p-4 bg-surface-secondary border border-border focus:outline-none",
@@ -93,7 +93,7 @@ const TxSection = ({ className }: { className?: string }) => {
                     <PastTxHistory />
                   </div>
                 </DisclosurePanel>
-              </>
+              </div>
             )}
           </Disclosure>
         </div>
