@@ -21,7 +21,7 @@ const ReceiveAddress = () => {
           <div>Scan to</div>
           <div className="text-gold font-semibold">receive</div>
         </div>
-        <div>
+        <div className="p-3 bg-white rounded-xl">
           <QRCodeSVG value={principalId} size={160} />
         </div>
       </div>
