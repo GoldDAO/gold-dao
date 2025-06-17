@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/logos/gold_dao.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gold DAO Dashboard</title>
+    <script>
+      (() => {
+        try {
+          const theme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const root = document.documentElement;
+          if (theme === 'dark' || (theme === 'system' && prefersDark)) {
+            root.setAttribute('data-theme', 'dark');
+          } else if (theme === 'light' || (theme === 'system' && !prefersDark)) {
+            root.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="text-slate-900 dark:text-slate-100 bg-background">
     <div id="root" aria-hidden="false" data-aria-hidden="false"></div>

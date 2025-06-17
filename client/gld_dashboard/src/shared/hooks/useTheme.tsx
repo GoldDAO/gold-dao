@@ -1,47 +1,47 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark" | "system";
-
 const THEME_KEY = "theme";
 
-export const useTheme = () => {
-  const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
-  const [theme, setTheme] = useState<Theme>(savedTheme || "system");
+function getSavedTheme(): Theme {
+  const saved = localStorage.getItem(THEME_KEY) as Theme | null;
+  if (saved) return saved;
+  return "system";
+}
 
-  const applyTheme = useCallback((theme: Theme, prefersDark: boolean) => {
-    const root = window.document.documentElement;
-    root.classList.remove("dark", "light");
-    if (theme === "dark" || (theme === "system" && prefersDark)) {
-      root.classList.add("dark");
-    } else if (theme === "light" || (theme === "system" && !prefersDark)) {
-      root.classList.add("light");
-    }
-  }, []);
+function getActiveTheme(theme: Theme): "light" | "dark" {
+  if (theme === "system") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return theme;
+}
+
+function setDataTheme(theme: "light" | "dark") {
+  document.documentElement.setAttribute("data-theme", theme);
+}
+
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>(getSavedTheme());
 
   useEffect(() => {
-    const appliedTheme = savedTheme ?? "system";
-    setTheme(appliedTheme);
+    const active = getActiveTheme(theme);
+    setDataTheme(active);
 
-    const mql = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      applyTheme(appliedTheme, mql.matches);
-    };
-    applyTheme(appliedTheme, mql.matches);
-
-    if (appliedTheme === "system") {
-      mql.addEventListener("change", handleChange);
-      return () => mql.removeEventListener("change", handleChange);
+    if (theme === "system") {
+      const mql = window.matchMedia("(prefers-color-scheme: dark)");
+      const handler = () => setDataTheme(getActiveTheme("system"));
+      mql.addEventListener("change", handler);
+      return () => mql.removeEventListener("change", handler);
     }
-  }, [savedTheme, theme, applyTheme]);
+  }, [theme]);
 
   const changeTheme = (newTheme: Theme) => {
     setTheme(newTheme);
     localStorage.setItem(THEME_KEY, newTheme);
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    applyTheme(newTheme, prefersDark);
+    setDataTheme(getActiveTheme(newTheme));
   };
 
   return { theme, changeTheme };
-};
+}
