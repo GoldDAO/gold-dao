@@ -68,7 +68,7 @@ const Form = ({ className }: { className?: string }) => {
         })}
       />
       {errors && (
-        <p className="text-red-600 text-sm font-semibold mt-1 ml-2">
+        <p className="text-danger text-sm font-semibold mt-1 ml-2">
           {typeof errors?.recipient_address?.message === "string" &&
             errors.recipient_address.message}
         </p>

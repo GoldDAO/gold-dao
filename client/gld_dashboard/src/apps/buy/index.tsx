@@ -509,12 +509,12 @@ const Buy = () => {
                       )}
                     </BtnPrimary>
                     {errors.amount && errors.amount?.message !== "" && (
-                      <div className="mt-2 text-red-500">
+                      <div className="mt-2 text-danger">
                         {errors?.amount?.message as string}
                       </div>
                     )}
                     {errorReceiveAmountLowerThanZero && (
-                      <div className="mt-2 text-red-500">
+                      <div className="mt-2 text-danger">
                         Receive amount is too low. Please increase it a bit
                       </div>
                     )}

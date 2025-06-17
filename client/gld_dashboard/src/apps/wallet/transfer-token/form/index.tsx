@@ -183,7 +183,7 @@ const Form = ({ className }: { className?: string }) => {
             errors={error_message_receive_address}
             name="principal"
             as="div"
-            className="text-red-600 text-sm mt-1"
+            className="text-danger text-sm mt-1"
           />
         </div>
         <div>
@@ -235,7 +235,7 @@ const Form = ({ className }: { className?: string }) => {
             </div>
           </InputCard>
           {errors && (
-            <p className="text-red-600 text-sm mt-1">
+            <p className="text-danger text-sm mt-1">
               {typeof errors?.amount?.message === "string" &&
                 errors.amount.message}
             </p>

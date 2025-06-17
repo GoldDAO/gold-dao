@@ -25,17 +25,17 @@ const TxStatus = ({ status }: { status: string }) => {
   switch (status) {
     case "Success":
       return (
-        <Badge className="bg-green-700/10">
-          <CheckCircleIcon className="h-6 w-6 text-green-700" />
-          <div className="text-green-700 font-semibold text-xs">Success</div>
+        <Badge className="bg-success/10">
+          <CheckCircleIcon className="h-6 w-6 text-success" />
+          <div className="text-success font-semibold text-xs">Success</div>
         </Badge>
       );
     case "Failed":
     case "Bid Fail":
       return (
-        <Badge className="bg-red-700/10">
-          <XCircleIcon className="h-6 w-6 text-red-700" />
-          <div className="text-red-700 font-semibold text-xs">Failed</div>
+        <Badge className="bg-danger/10">
+          <XCircleIcon className="h-6 w-6 text-danger" />
+          <div className="text-danger font-semibold text-xs">Failed</div>
         </Badge>
       );
     case "Opening Sale":

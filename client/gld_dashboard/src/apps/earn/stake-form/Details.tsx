@@ -77,7 +77,7 @@ const Details = () => {
       {(approve.isError || createStakePosition.isError) && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-amber-700">Create stake error</div>
+            <div className="text-xl text-warning">Create stake error</div>
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
@@ -93,7 +93,7 @@ const Details = () => {
       {approve.isSuccess && createStakePosition.isSuccess && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-green-700">Create stake success</div>
+            <div className="text-xl text-success">Create stake success</div>
             <div>You successfully created a stake position.</div>
           </div>
           <BtnPrimary onClick={() => dispatch({ type: "RESET" })} size="sm">

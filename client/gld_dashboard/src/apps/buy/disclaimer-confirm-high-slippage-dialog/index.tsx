@@ -20,7 +20,7 @@ const DisclaimerConfirmHighSlippageDialog = ({
     <Dialog open={open} handleOnClose={handleClose}>
       <div className="flex justify-center">
         <div className="flex items-center font-semibold text-lg mt-2 mb-4 gap-2">
-          <Warning2 size={32} className="text-amber-500" variant="Bold" />
+          <Warning2 size={32} className="text-warning" variant="Bold" />
           <div>High slippage</div>
         </div>
       </div>
@@ -29,7 +29,7 @@ const DisclaimerConfirmHighSlippageDialog = ({
         <br />
         <div className="inline-block max-w-md mx-auto">
           The current slippage is{" "}
-          <span className="text-amber-500 font-semibold">
+          <span className="text-warning font-semibold">
             <NumberToLocaleString value={slippage} />%
           </span>{" "}
           , which exceeds the maximum recommended slippage of {maxSlippage}%.

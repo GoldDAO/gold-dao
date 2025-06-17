@@ -136,7 +136,7 @@ const TxHistory = () => {
           </div>
         )}
         {history.isError && (
-          <div className="flex justify-center items-center p-4 text-red-500">
+          <div className="flex justify-center items-center p-4 text-danger">
             <div>Fetching history error.</div>
           </div>
         )}
