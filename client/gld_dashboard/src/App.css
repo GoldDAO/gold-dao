@@ -6,7 +6,7 @@
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 :root {
   font-family: "polymath", system-ui, sans-serif;
@@ -14,18 +14,7 @@
   font-style: normal;
 }
 
-.dark {
-  --color-background: oklch(19.57% 0 0);
-  --color-surface-primary: oklch(23.08% 0 0);
-  --color-surface-secondary: oklch(28.09% 0 0);
-  --color-content: oklch(100% 0 0);
-  --color-border: oklch(26.03% 0 0);
-  --color-primary: oklch(28% 0 0);
-  --color-gold: oklch(0.7905 0.0944 89.09);
-  --color-copper: oklch(0.7313 0.1059 78.87);
-}
-
-.light {
+@theme {
   --color-background: oklch(99.16% 0.0017 67.8);
   --color-surface-primary: oklch(100% 0 0);
   --color-surface-secondary: oklch(98.26% 0.0017 67.8);
@@ -36,15 +25,13 @@
   --color-copper: oklch(0.7313 0.1059 78.87);
 }
 
-@theme {
-  --color-background: var(--color-background);
-  --color-surface-primary: var(--color-surface-primary);
-  --color-surface-secondary: var(--color-surface-secondary);
-  --color-content: var(--color-content);
-  --color-border: var(--color-border);
-  --color-accent: var(--color-accent);
-  --color-primary: var(--color-primary);
-  --color-gold: var(--color-gold);
-  --color-copper: var(--color-copper);
-  --color-secondary: var(--color-secondary);
+@layer base {
+  [data-theme='dark'] {
+    --color-background: oklch(19.57% 0 0);
+    --color-surface-primary: oklch(23.08% 0 0);
+    --color-surface-secondary: oklch(28.09% 0 0);
+    --color-content: oklch(100% 0 0);
+    --color-border: oklch(26.03% 0 0);
+    --color-primary: oklch(28% 0 0);
+  }
 }
