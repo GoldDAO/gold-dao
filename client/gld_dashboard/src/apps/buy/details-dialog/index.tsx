@@ -108,7 +108,7 @@ const DetailsDialog = ({
         {(approve.isError || swap.isError) && (
           <div className="flex flex-col items-center gap-8">
             <div className="grid grid-cols-1 gap-2 text-center">
-              <div className="text-xl text-amber-600">
+              <div className="text-xl text-warning">
                 Buy {receiveToken.token.name} error
               </div>
               <div>Something went wrong, please retry.</div>

@@ -30,7 +30,7 @@ const RewardItem = ({ name }: { name: string }) => {
         "p-4 border border-border rounded-xl",
         `${
           reward.is_selected
-            ? "bg-green-700/10 border-green-700 hover:bg-green-700/15"
+            ? "bg-success/10 border-success hover:bg-success/15"
             : "bg-surface hover:bg-surface-secondary"
         }`,
         `${reward.is_claimable ? "cursor-pointer " : "cursor-not-allowed"}`

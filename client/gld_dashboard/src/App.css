@@ -23,6 +23,11 @@
   --color-primary: oklch(0 0 0);
   --color-gold: oklch(0.7905 0.0944 89.09);
   --color-copper: oklch(0.7313 0.1059 78.87);
+
+  --color-success: oklch(0.6342 0.1283 156.2);
+  --color-danger: oklch(0.6137 0.2039 25.56);
+  --color-warning: oklch(0.6342 0.1283 72.97);
+  --color-info: oklch(0.6342 0.1283 237.59);
 }
 
 @layer base {

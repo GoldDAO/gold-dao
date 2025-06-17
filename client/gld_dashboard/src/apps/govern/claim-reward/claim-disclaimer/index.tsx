@@ -72,9 +72,9 @@ const ClaimRewardDisclaimer = () => {
       if (isSuccess) {
         if (enableClaimAll) {
           return (
-            <div className="border border-green-700 bg-surface-primary rounded-xl">
-              <div className="rounded-[inherit] p-4 bg-green-700/10">
-                <div className="text-green-700 text-center xl:text-left">
+            <div className="border border-success bg-surface-primary rounded-xl">
+              <div className="rounded-[inherit] p-4 bg-success/10">
+                <div className="text-success text-center xl:text-left">
                   Unclaimed rewards available
                 </div>
                 <div className="flex flex-col xl:flex-row justify-between items-center mt-2 gap-4">
@@ -92,7 +92,7 @@ const ClaimRewardDisclaimer = () => {
                   <button
                     type="button"
                     className={clsx(
-                      "bg-green-700 text-white border border-green-700 rounded-xl",
+                      "bg-success text-white border border-success rounded-xl",
                       "px-4 py-4 text-sm font-semibold shrink-0 cursor-pointer",
                       "disabled:cursor-not-allowed disabled:opacity-50"
                     )}

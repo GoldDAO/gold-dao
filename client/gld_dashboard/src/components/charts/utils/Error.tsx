@@ -12,7 +12,7 @@ const ChartError = ({
     <div className="flex items-center justify-center h-72">
       <div className="flex flex-col items-center">
         <h3 className="mb-6 text-lg font-semibold">{children}</h3>
-        <button className="border border-red-400 text-red-400 rounded-full px-6 py-2 font-semibold">
+        <button className="border border-danger text-danger rounded-full px-6 py-2 font-semibold">
           Show Error
         </button>
       </div>

@@ -18,8 +18,8 @@ const InsufficientGLDTDisclaimer = ({
   const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
 
   return (
-    <div className="border border-amber-500 bg-amber-500/5 p-4 flex flex-col justify-center items-center rounded-xl text-center">
-      <div className="mb-6 text-amber-500">
+    <div className="border border-warning bg-warning/5 p-4 flex flex-col justify-center items-center rounded-xl text-center">
+      <div className="mb-6 text-warning">
         <div className="font-semibold mb-2">
           You don't have enough GLDT to process.
         </div>

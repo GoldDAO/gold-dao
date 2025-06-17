@@ -53,7 +53,7 @@ const DetailsDissolve = () => {
       {dissolve.isError && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-amber-700">Unlock stake error</div>
+            <div className="text-xl text-warning">Unlock stake error</div>
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
@@ -69,7 +69,7 @@ const DetailsDissolve = () => {
       {dissolve.isSuccess && (
         <div className="grid grid-cols-1 gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-green-700">Unlock stake success</div>
+            <div className="text-xl text-success">Unlock stake success</div>
             <div>You successfully unlocked your stake.</div>
           </div>
           <div className="grid grid-cols-1 gap-4 text-center">

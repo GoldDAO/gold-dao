@@ -113,7 +113,7 @@ const Confirm = () => {
             <div
               className={clsx(
                 "p-4 border rounded-lg",
-                "bg-amber-100/10 dark:bg-surface-primary border-amber-700/60 text-amber-700"
+                "bg-warning/10 dark:bg-surface-primary border-warning/60 text-warning"
               )}
             >
               You will be charged 50 GLDT and will only receive 950 GLDT.

@@ -37,7 +37,7 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
     if (!decimals.isSuccess) return <div>Loading...</div>;
     if (tx.is_credit) {
       return (
-        <div className="text-green-500">
+        <div className="text-success">
           +
           <E8sToLocaleString
             value={amount as bigint}
@@ -48,7 +48,7 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
       );
     } else {
       return (
-        <div className="text-red-500">
+        <div className="text-danger">
           -
           <E8sToLocaleString
             value={amount as bigint}

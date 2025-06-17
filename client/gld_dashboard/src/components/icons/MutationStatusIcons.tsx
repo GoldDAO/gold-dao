@@ -18,12 +18,8 @@ const MutationStatusIcons = ({
         {status === "pending" && (
           <div className="border-4 h-full w-full border-gold/20 border-t-gold animate-spin rounded-full" />
         )}
-        {status === "error" && (
-          <XCircleIcon className="text-error text-orange-600" />
-        )}
-        {status === "success" && (
-          <CheckCircleIcon className="text-success text-green-600" />
-        )}
+        {status === "error" && <XCircleIcon className="text-danger" />}
+        {status === "success" && <CheckCircleIcon className="text-success" />}
       </div>
     </div>
   );

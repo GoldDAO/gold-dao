@@ -127,7 +127,7 @@ const ConfirmDialog = ({
                 {slippage > maxSlippage && (
                   <Warning2
                     size={20}
-                    className="text-amber-500"
+                    className="text-warning"
                     variant="Bold"
                     data-tooltip-id="tooltip"
                     data-tooltip-html={
