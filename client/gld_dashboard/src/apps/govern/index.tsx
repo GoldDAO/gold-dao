@@ -1,3 +1,4 @@
+import { useState } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
@@ -6,11 +7,10 @@ import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import NeuronsOverview from "./neuron-overview";
 import NeuronsList from "./neuron-list";
 import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";
-import { AddNeuronStateReducerAtom } from "./add-neuron/atoms";
 import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
 import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
 import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
-import AddNeuron from "./add-neuron";
+import AddNeuronDialog from "./add-neuron";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
@@ -19,9 +19,7 @@ const Govern = () => {
   const [claimRewardState, dispatchClaimReward] = useAtom(
     ClaimRewardStateReducerAtom
   );
-  const [addNeuronState, dispatchAddNeuron] = useAtom(
-    AddNeuronStateReducerAtom
-  );
+  const [openAddNeuronDialog, setOpenAddNeuronDialog] = useState(false);
 
   return (
     <InnerAppLayout>
@@ -57,7 +55,7 @@ const Govern = () => {
               <div>My GOLDAO neurons</div>
               <BtnPrimary
                 shape="round"
-                onClick={() => dispatchAddNeuron({ type: "OPEN_DIALOG" })}
+                onClick={() => setOpenAddNeuronDialog(true)}
                 disabled={!isConnected}
               >
                 Add neuron
@@ -85,12 +83,10 @@ const Govern = () => {
         </Dialog>
 
         {/* ADD NEURON DIALOG */}
-        <Dialog
-          open={addNeuronState.is_open}
-          handleOnClose={() => dispatchAddNeuron({ type: "RESET" })}
-        >
-          <AddNeuron />
-        </Dialog>
+        <AddNeuronDialog
+          open={openAddNeuronDialog}
+          handleClose={() => setOpenAddNeuronDialog(false)}
+        />
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>
   );
