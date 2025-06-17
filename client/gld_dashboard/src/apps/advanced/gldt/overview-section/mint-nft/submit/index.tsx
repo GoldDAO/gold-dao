@@ -20,7 +20,7 @@ const Submit = () => {
   };
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+    <>
       <div className="rounded-xl p-4 border border-border">
         <div className="text-copper text-sm font-semibold mb-2">From</div>
         <div className="flex flex-col gap-2">
@@ -46,7 +46,7 @@ const Submit = () => {
           Submit
         </BtnPrimary>
       </div>
-    </div>
+    </>
   );
 };
 

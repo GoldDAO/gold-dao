@@ -46,7 +46,7 @@ const ConfirmDialog = ({
 }) => {
   return (
     <Dialog open={open} handleOnClose={handleClose} title="Confirm Purchase">
-      <div className="flex flex-col gap-4 mt-4 max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+      <div className="flex flex-col gap-4 mt-4">
         <div className="rounded-xl bg-surface-secondary border border-border">
           <div className="p-4 xl:p-6 border-b border-border">
             <div className="text-sm mb-4 text-content/60">You pay</div>

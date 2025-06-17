@@ -38,7 +38,7 @@ const AddNeuron = () => {
         <Card step={1}>
           <Card.Title>Copy you principal from the Gold DAO dApp</Card.Title>
           <Card.Text>
-            <Address size="lg">{principalId}</Address>
+            <Address size="auto">{principalId}</Address>
           </Card.Text>
         </Card>
         <Card step={2}>

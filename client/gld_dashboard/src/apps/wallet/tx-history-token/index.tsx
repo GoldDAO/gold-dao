@@ -30,7 +30,7 @@ const ListItem = ({ tx }: { tx: Transaction }) => {
   });
 
   const renderAddress = (address: string | undefined) => {
-    return address ? <Address size="sm">{address}</Address> : "N/A";
+    return address ? <Address>{address}</Address> : "N/A";
   };
 
   const renderAmount = (amount: bigint | undefined) => {

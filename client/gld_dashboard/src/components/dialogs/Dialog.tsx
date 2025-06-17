@@ -96,7 +96,9 @@ const Dialog = ({
               </div>
             )}
           </DialogTitle>
-          {children}
+          <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+            {children}
+          </div>
         </DialogPanel>
       </div>
     </HUIDialog>
