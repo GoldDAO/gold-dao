@@ -19,7 +19,7 @@ const CountCollectionNFT = ({
           {count}
         </div>
         <div className="w-[64px] flex justify-center items-center">
-          <img className="flex-none h-12" src={`/gold-bars/${name}.svg`} />
+          <img className="flex-none h-12" src={`/gold-bars/${name}.png`} />
         </div>
         <div>{name}</div>
       </div>
