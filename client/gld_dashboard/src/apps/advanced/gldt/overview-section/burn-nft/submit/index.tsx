@@ -56,7 +56,7 @@ const Submit = () => {
   };
 
   return balance.isSuccess ? (
-    <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+    <>
       <div className="rounded-xl p-4 border border-border">
         <div className="text-copper text-sm font-semibold mb-2">From</div>
         {!canBurnNFT ? (
@@ -103,7 +103,7 @@ const Submit = () => {
           Submit
         </BtnPrimary>
       </div>
-    </div>
+    </>
   ) : (
     <div className="flex flex-col justify-center items-center gap-4 px-4 py-8">
       <LoaderSpin />

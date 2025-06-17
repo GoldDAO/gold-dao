@@ -65,10 +65,10 @@ const TransferNFTDialog = () => {
       <div className="mt-8">
         {transfer_tab === "receive" && <ReceiveAddress />}
         {transfer_tab === "send" && (
-          <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+          <>
             {is_step_send_form && <SendForm />}
             {is_step_send_confirm && <SendConfirm />}
-          </div>
+          </>
         )}
       </div>
     </Dialog>
