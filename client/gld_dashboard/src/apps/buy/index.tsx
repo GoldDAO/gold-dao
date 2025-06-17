@@ -309,7 +309,10 @@ const Buy = () => {
                   </div>
                   <div className="p-4">
                     {!isConnected && (
-                      <form className="flex justify-center items-center gap-2">
+                      <form
+                        className="flex justify-center items-center gap-2"
+                        onSubmit={(e) => e.preventDefault()}
+                      >
                         <input
                           id="amount"
                           type="number"
@@ -341,7 +344,10 @@ const Buy = () => {
                     )}
                     {isConnected &&
                       (isDataFetched ? (
-                        <form className="flex justify-center items-center gap-2">
+                        <form
+                          className="flex justify-center items-center gap-2"
+                          onSubmit={(e) => e.preventDefault()}
+                        >
                           <input
                             id="amount"
                             type="number"

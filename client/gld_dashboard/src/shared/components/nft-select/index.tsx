@@ -31,7 +31,7 @@ const BtnSelect = ({
 
 const NFTSelectTitle = ({ name, label }: { name: string; label: string }) => (
   <div className="flex items-center justify-start gap-2">
-    <img className="flex-none h-10" src={`/gold-bars/${name}.svg`} />
+    <img className="flex-none h-10" src={`/gold-bars/${name}.png`} />
     <div className="flex-grow font-semibold">{label}</div>
   </div>
 );
