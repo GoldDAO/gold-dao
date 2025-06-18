@@ -6,12 +6,12 @@ import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 const AdvancedLeftPanel = () => {
   const { isConnected } = useAuth();
   return (
-    <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow px-4 xl:px-8">
-      <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4">
-        <div className="font-semibold text-gold/90">Advanced</div>
+    <>
+      <div className="text-4xl xl:text-6xl flex flex-col justify-center items-center xl:items-start">
+        <div className="font-semibold text-gold">Advanced</div>
         <div className="font-light">features</div>
       </div>
-      <div className="text-content/60 my-3">
+      <div className="text-content/60 text-center xl:text-left my-3">
         Dive into advanced features of the Gold DAO such as minting and burning
         of GLDT, and more to come.
       </div>
@@ -22,7 +22,7 @@ const AdvancedLeftPanel = () => {
         </div>
       </div>
       {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
-    </div>
+    </>
   );
 };
 

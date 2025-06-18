@@ -161,10 +161,12 @@ const TxHistory = () => {
                             )?.className ?? "justify-center"
                           }`}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          <div className="flex shrink-0">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </div>
                         </div>
                       )}
                     </th>

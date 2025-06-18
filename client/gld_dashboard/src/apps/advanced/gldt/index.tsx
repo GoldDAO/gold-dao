@@ -11,12 +11,10 @@ const AdvancedGLDT = () => {
         <SideNav />
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="flex flex-col xl:flex-grow xl:overflow-y-auto">
-          <OverviewSection />
-          <div className="p-4 xl:p-8">
-            <UserNFTsSection className="mt-4 xl:mt-8" />
-            <TxSection className="mt-8" />
-          </div>
+        <OverviewSection />
+        <div className="p-4 xl:p-8">
+          <UserNFTsSection className="mt-4 xl:mt-8" />
+          <TxSection className="mt-8" />
         </div>
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>

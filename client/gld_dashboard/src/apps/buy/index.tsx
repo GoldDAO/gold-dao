@@ -250,13 +250,10 @@ const Buy = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center gap-4 xl:gap-8 text-center xl:text-left xl:items-start h-full px-4 xl:px-8">
-          <div className="text-5xl xl:text-6xl flex flex-col">
-            <div className="font-semibold text-gold/90">Buy</div>
-            <div className="flex xl:flex-col gap-2 xl:gap-0 font-light">
-              <div>Tokenized</div>
-              <div>Gold</div>
-            </div>
+        <div className="flex flex-col items-center gap-4 xl:gap-8 text-center xl:text-left xl:items-start">
+          <div className="text-4xl xl:text-6xl flex flex-col justify-center items-center xl:items-start">
+            <div className="font-semibold text-gold">Buy</div>
+            <div>Tokenized Gold</div>
           </div>
 
           <div className="hidden xl:flex xl:justify-center w-full">
@@ -302,8 +299,8 @@ const Buy = () => {
                 <Logo name="gldt" className="h-5 w-5 mr-1" />
                 100 GLDT = 1 gram of physical gold
               </div>
-              <div className="flex flex-col xl:flex-row gap-4 mt-8">
-                <div className="flex items-center border border-border rounded-md grow bg-surface-secondary">
+              <div className="grid grid-cols-1 xl:grid-cols-7 gap-4 mt-8">
+                <div className="xl:col-span-4 flex items-center border border-border rounded-md grow bg-surface-secondary">
                   <div className="p-4 border-r border-border text-copper font-semibold">
                     Pay with
                   </div>
@@ -400,11 +397,13 @@ const Buy = () => {
                   </div>
                 </div>
 
-                <SelectToken
-                  tokens={TOKEN_LIST_AVAILABLE}
-                  value={pay_token.token}
-                  handleOnChange={handleOnChangePayToken}
-                />
+                <div className="xl:col-span-3">
+                  <SelectToken
+                    tokens={TOKEN_LIST_AVAILABLE}
+                    value={pay_token.token}
+                    handleOnChange={handleOnChangePayToken}
+                  />
+                </div>
               </div>
             </div>
 

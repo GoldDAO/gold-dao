@@ -24,45 +24,41 @@ const Govern = () => {
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow px-4 xl:px-8">
-          <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4">
-            <div className="font-semibold text-gold/90">Govern</div>
-            <div className="font-light">the DAO</div>
-          </div>
-          <div className="text-content/60 my-3">
-            Stake GOLDAO tokens to participate in the Gold DAO governance and
-            earn rewards yielding up to 30% APY.
-          </div>
-          {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
+        <div className="text-4xl xl:text-6xl flex flex-col justify-center items-center xl:items-start">
+          <div className="font-semibold text-gold">Govern</div>
+          <div className="font-light">the DAO</div>
         </div>
+        <div className="text-content/60 text-center xl:text-left my-3">
+          Stake GOLDAO tokens to participate in the Gold DAO governance and earn
+          rewards yielding up to 30% APY.
+        </div>
+        {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="flex flex-col xl:flex-grow xl:overflow-y-auto">
-          <NeuronsOverview />
-          <div className="relative w-full px-4 xl:pb-16 pb-32">
-            <div
-              className={clsx(
-                "my-4",
-                "absolute -top-26 xl:-top-16 left-1/2 xl:my-0 -translate-x-1/2 w-full xl:w-xl px-4"
-              )}
-            >
-              <ClaimRewardDisclaimer />
-            </div>
+        <NeuronsOverview />
+        <div className="relative w-full px-4 xl:pb-16 pb-32">
+          <div
+            className={clsx(
+              "my-4",
+              "absolute -top-26 xl:-top-16 left-1/2 xl:my-0 -translate-x-1/2 w-full xl:w-xl px-4"
+            )}
+          >
+            <ClaimRewardDisclaimer />
           </div>
+        </div>
 
-          <div className="p-4 xl:p-8">
-            <div className="flex items-center justify-between mb-4 xl:mb-8">
-              <div>My GOLDAO neurons</div>
-              <BtnPrimary
-                shape="round"
-                onClick={() => setOpenAddNeuronDialog(true)}
-                disabled={!isConnected}
-              >
-                Add neuron
-              </BtnPrimary>
-            </div>
-            <NeuronsList />
+        <div className="p-4 xl:p-8">
+          <div className="flex items-center justify-between mb-4 xl:mb-8">
+            <div>My GOLDAO neurons</div>
+            <BtnPrimary
+              shape="round"
+              onClick={() => setOpenAddNeuronDialog(true)}
+              disabled={!isConnected}
+            >
+              Add neuron
+            </BtnPrimary>
           </div>
+          <NeuronsList />
         </div>
 
         {/* CLAIM REWARDS DIALOGS */}
