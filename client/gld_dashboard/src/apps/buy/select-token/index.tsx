@@ -93,7 +93,7 @@ const SelectToken = ({
       <Listbox value={selected} onChange={handleChange}>
         <ListboxButton
           className={clsx(
-            "min-w-[300px] rounded-md border border-border p-4",
+            "rounded-md border border-border p-4 w-full",
             "text-sm/6 cursor-pointer"
           )}
         >
@@ -102,7 +102,7 @@ const SelectToken = ({
               <Logo name={selected.id} className="w-6 h-6" />
               {isConnected ? renderBalance() : <div>{selected.name}</div>}
             </div>
-            <ChevronDownIcon className="h-6 w-6" />
+            <ChevronDownIcon className="ml-4 h-6 w-6" />
           </div>
         </ListboxButton>
         <ListboxOptions
