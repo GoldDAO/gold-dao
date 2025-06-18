@@ -96,7 +96,7 @@ const Dialog = ({
               </div>
             )}
           </DialogTitle>
-          <div className="max-h-[80vh] overflow-y-auto pr-2 xl:pr-0">
+          <div className="max-h-[70vh] overflow-y-auto pr-2 xl:pr-0">
             {children}
           </div>
         </DialogPanel>
