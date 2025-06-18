@@ -40,7 +40,6 @@ const useFetchUserNFTMetrics = (
   return useQuery({
     queryKey: ["FETCH_USER_NFT_METRICS", owner],
     queryFn: async () => {
-      // Préparer l'actor pour le swap une seule fois
       const actorSwap = Actor.createActor(idlFactorySwap, {
         agent,
         canisterId: SWAP_CANISTER_ID,
