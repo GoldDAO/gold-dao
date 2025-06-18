@@ -1,7 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
-import { NFTCollections } from "@shared/utils/nfts";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import { Logo } from "@components/index";
@@ -9,23 +8,23 @@ import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import TotalCountToken from "@shared/components/total-count-token";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
-import useFetchNFTUserMetrics from "@shared/hooks/useFetchNFTUserMetrics";
+import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 
 const Token = ({ className }: { className?: string }) => {
-  const { unauthenticatedAgent, isConnected } = useAuth();
+  const { unauthenticatedAgent } = useAuth();
   const token = useAtomValue(TokenSelectedAtom);
   const { id, name, label } = token;
 
   const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
     ledger: id,
-    enabled: !!unauthenticatedAgent && isConnected,
+    enabled: !!unauthenticatedAgent,
   });
 
   const tokenPriceOne = useFetchTokenPrice(unauthenticatedAgent, {
     from: name,
     from_canister_id: token.canisterId,
     amount: BigInt(1 * 10 ** (decimals.data ?? 0)),
-    enabled: !!unauthenticatedAgent && isConnected && decimals.isSuccess,
+    enabled: !!unauthenticatedAgent && decimals.isSuccess,
   });
 
   return (
@@ -46,7 +45,7 @@ const Token = ({ className }: { className?: string }) => {
                 <NumberToLocaleString value={tokenPriceOne.data.amount_usd} />
               </>
             ) : (
-              <span>Loading...</span>
+              <div>Loading...</div>
             )}
           </div>
         </div>
@@ -59,12 +58,11 @@ const Token = ({ className }: { className?: string }) => {
 };
 
 const NFT = ({ className }: { className?: string }) => {
-  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
-  const nfts = useFetchNFTUserMetrics(unauthenticatedAgent, {
-    owner: principalId,
-    nft_collections: NFTCollections,
-    enabled: !!unauthenticatedAgent && isConnected,
+  const { unauthenticatedAgent } = useAuth();
+  const priceGold = useFetchPriceGold({
+    enabled: !!unauthenticatedAgent,
   });
+
   return (
     <div className={className}>
       <div className="flex flex-col items-center">
@@ -77,10 +75,10 @@ const NFT = ({ className }: { className?: string }) => {
             </div>
           </div>
           <div className="text-sm text-content/60">
-            {nfts.isSuccess ? (
+            {priceGold.isSuccess ? (
               <>
                 1 gram Gold ≈ $
-                <NumberToLocaleString value={nfts.data.priceGramUSD} />
+                <NumberToLocaleString value={priceGold.data} />
               </>
             ) : (
               <span>Loading...</span>
