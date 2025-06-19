@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { SNS_REWARDS_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
@@ -60,6 +61,12 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
 const Details = () => {
   const [, dispatch] = useAtom(ClaimRewardStateReducerAtom);
   const [selectedRewards] = useAtom(SelectedRewardsAtom);
+  const navigate = useNavigate();
+
+  const handleOnClickViewBalance = () => {
+    dispatch({ type: "RESET" });
+    navigate("/wallet");
+  };
 
   return (
     <>
@@ -68,11 +75,8 @@ const Details = () => {
           <TokenItem key={reward.id} reward={reward} />
         ))}
       </div>
-      <BtnPrimary
-        className="w-full"
-        onClick={() => dispatch({ type: "RESET" })}
-      >
-        Go to govern view
+      <BtnPrimary className="w-full" onClick={handleOnClickViewBalance}>
+        View balance
       </BtnPrimary>
     </>
   );
