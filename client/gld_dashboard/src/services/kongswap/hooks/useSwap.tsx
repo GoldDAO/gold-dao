@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { Ledger } from "@services/ledger/utils/interfaces";
+// import { Ledger } from "@services/ledger/utils/interfaces";
 import { idlFactory } from "../idlFactory";
 import { SwapResult, SwapReply } from "../interfaces";
 
 const swap = async (
   actor: ActorSubclass,
   swapArgs: {
-    receive_token: Ledger;
-    pay_token: Ledger;
+    receive_token: string;
+    pay_token: string;
     pay_amount: bigint;
     receive_address: string;
     max_slippage: number;
@@ -24,13 +24,13 @@ const swap = async (
   } = swapArgs;
 
   const result = (await actor.swap({
-    receive_token: receive_token.toUpperCase(),
+    receive_token: receive_token,
     max_slippage: [max_slippage],
     pay_amount,
     referred_by: [],
     receive_amount: [],
     receive_address: [receive_address],
-    pay_token: pay_token.toUpperCase(),
+    pay_token: pay_token,
     pay_tx_id: [],
   })) as SwapResult;
 
@@ -43,8 +43,8 @@ const useSwap = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: {
-    pay_token: Ledger;
-    receive_token: Ledger;
+    pay_token: string;
+    receive_token: string;
   }
 ) => {
   const queryClient = useQueryClient();
@@ -79,16 +79,11 @@ const useSwap = (
       }
     },
     onSuccess: () => {
-      // console.log(res);
       queryClient.invalidateQueries({
-        queryKey: ["FETCH_LEDGER_BALANCE", { ledger: pay_token }],
+        queryKey: ["FETCH_LEDGER_BALANCE", pay_token],
       });
       queryClient.invalidateQueries({
-        queryKey: ["FETCH_LEDGER_BALANCE", { ledger: receive_token }],
-      });
-      //! TODO Add receive_token
-      queryClient.invalidateQueries({
-        queryKey: ["FETCH_LEDGER_BALANCE_V2"],
+        queryKey: ["FETCH_LEDGER_BALANCE", receive_token],
       });
     },
   });

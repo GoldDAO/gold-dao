@@ -3,10 +3,8 @@ import { useAtom } from "jotai";
 import { GLDTToken } from "../utils";
 import { Logo } from "@components/index";
 import Dialog from "@components/dialogs/Dialog";
-import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
-import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useFetchTransferFee from "@services/ledger/hooks/useFetchTransferFee";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { MIN_STAKE_AMOUNT } from "./utils";
 import Form from "./Form";
 import Confirm from "./Confirm";
@@ -18,36 +16,17 @@ const StakeForm = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [stakeState, dispatchStake] = useAtom(StakeStateReducerAtom);
 
-  const balance = useFetchUserBalance(
+  const balance = useFetchLedgerBalance(
     GLDTToken.canisterId,
     unauthenticatedAgent,
     {
-      ledger: GLDTToken.id,
+      ledger: GLDTToken.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );
 
-  const fee = useFetchTransferFee(GLDTToken.canisterId, unauthenticatedAgent, {
-    ledger: GLDTToken.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const decimals = useFetchDecimals(
-    GLDTToken.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: GLDTToken.id,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  if (
-    !isConnected ||
-    !decimals.isSuccess ||
-    !balance.isSuccess ||
-    !fee.isSuccess
-  ) {
+  if (!isConnected || !balance.isSuccess) {
     return (
       <div className="relative">
         <div
@@ -97,18 +76,14 @@ const StakeForm = () => {
     <>
       <Form
         className="p-4 bg-surface-primary border border-border rounded-xl"
-        balance={balance.data}
-        fee={fee.data}
-        decimals={decimals.data}
+        balance={balance.data.balance_e8s}
+        fee={balance.data.fee_e8s}
+        decimals={balance.data.decimals}
       />
       <div className="mt-4 flex justify-center">
         <div className="px-2 py-1 flex items-center gap-2 border border-border rounded-md bg-surface-secondary">
           <div className="text-content/60 text-sm">
-            Your balance:{" "}
-            <E8sToLocaleString
-              value={balance.data}
-              tokenDecimals={decimals.data}
-            />{" "}
+            Your balance: <NumberToLocaleString value={balance.data.balance} />{" "}
             GLDT
           </div>
           <Logo name="gldt" className="w-4 h-4" />

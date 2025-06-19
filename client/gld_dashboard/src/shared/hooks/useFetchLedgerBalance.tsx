@@ -24,6 +24,7 @@ const useFetchLedgerBalance = (
       fee: number;
       fee_usd: number;
       fee_e8s: bigint;
+      price_usd: number;
     }>,
     "queryKey" | "queryFn"
   > & {
@@ -40,7 +41,7 @@ const useFetchLedgerBalance = (
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_LEDGER_BALANCE_V2", ledger, owner],
+    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner],
     queryFn: async () => {
       const actorLedger = Actor.createActor(idlFactoryLedger, {
         agent,
@@ -74,7 +75,8 @@ const useFetchLedgerBalance = (
         decimals,
         fee,
         fee_e8s,
-        fee_usd: fee * price.price,
+        fee_usd: fee * price.mid_price,
+        price_usd: price.mid_price,
       };
     },
     placeholderData,

@@ -6,7 +6,7 @@ import Dialog from "@components/dialogs/Dialog";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useSwap from "@services/kongswap/hooks/useSwap";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
-import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { PayToken, ReceiveToken } from "@buy/shared/utils";
 import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
@@ -27,11 +27,11 @@ const DetailsDialog = ({
   const { authenticatedAgent, principalId, unauthenticatedAgent, isConnected } =
     useAuth();
 
-  const balance = useFetchUserBalance(
+  const balance = useFetchLedgerBalance(
     receiveToken.token.canisterId,
     unauthenticatedAgent,
     {
-      ledger: receiveToken.token.id,
+      ledger: receiveToken.token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent && isConnected,
     }
@@ -39,8 +39,8 @@ const DetailsDialog = ({
 
   const approve = useApprove(payToken.token.canisterId, authenticatedAgent);
   const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent, {
-    pay_token: payToken.token.id,
-    receive_token: receiveToken.token.id,
+    pay_token: payToken.token.name,
+    receive_token: receiveToken.token.name,
   });
 
   const handleSwap = () => {
@@ -191,10 +191,7 @@ const DetailsDialog = ({
               <div className="flex items-center gap-1 px-2 py-1 bg-surface-secondary text-content/60 rounded-md text-sm mt-4">
                 <div>Your balance:</div>
                 {balance.isSuccess ? (
-                  <E8sToLocaleString
-                    value={balance.data}
-                    tokenDecimals={receiveToken.decimals as number}
-                  />
+                  <NumberToLocaleString value={balance.data.balance} />
                 ) : (
                   <div>Loading...</div>
                 )}

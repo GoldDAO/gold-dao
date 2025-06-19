@@ -23,7 +23,7 @@ const Confirm = ({ className }: { className?: string }) => {
   const { amount, receive_account, is_principal_standard } = sendState;
 
   const transfer = useTransfer(token.canisterId, authenticatedAgent, {
-    ledger: token.id,
+    ledger: token.name,
     is_principal_standard,
   });
 

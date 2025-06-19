@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
@@ -121,33 +121,37 @@ const List = () => {
   const { ref, inView } = useInView();
   const token = useAtomValue(TokenSelectedAtom);
 
-  const { status, data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useFetchAccountTransactions(
-      token.canister_id_ledger_index,
-      unauthenticatedAgent,
-      {
-        account: principalId, // "4lxgi-y7rlh-onvu4-jtszk-z67wq-ldekw-rfsp3-yxrjy-dgwsl-zn6tl-eqe"
-        enabled: !!unauthenticatedAgent && isConnected,
-        ledger: token.id,
-      }
-    );
+  const txs = useFetchAccountTransactions(
+    token.canister_id_ledger_index,
+    unauthenticatedAgent,
+    {
+      account: principalId,
+      enabled: !!unauthenticatedAgent && isConnected,
+      ledger: token.name,
+    }
+  );
+
+  const data = useMemo<Transaction[]>(
+    () => (txs.data ? txs.data.pages.flatMap((page) => page.data) : []),
+    [txs]
+  );
 
   useEffect(() => {
     if (inView) {
-      fetchNextPage();
+      txs.fetchNextPage();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
-  if (status === "pending") {
+  if (txs.isPending) {
     return <div>Loading...</div>;
   }
 
-  if (status === "error") {
+  if (txs.isError) {
     return <div>Error</div>;
   }
 
-  if (status === "success" && data?.pages[0]?.data.length === 0) {
+  if (txs.isSuccess && data.length === 0) {
     return (
       <div className="p-4 bg-surface-primary flex justify-center border border-border rounded-xl">
         <div>No transactions found</div>
@@ -157,21 +161,17 @@ const List = () => {
 
   return (
     <div className="flex flex-col xl:flex-grow xl:h-full gap-2 xl:overflow-y-auto xl:pr-4">
-      {data?.pages.map((page) => (
-        <Fragment key={page.cursor_index}>
-          {page.data.map((tx) => (
-            <Fragment key={tx.index}>
-              <ListItem tx={tx} />
-            </Fragment>
-          ))}
+      {data.map((tx) => (
+        <Fragment key={tx.index}>
+          <ListItem tx={tx} />
         </Fragment>
       ))}
       <div ref={ref}></div>
       <div className="p-4 flex justify-center">
-        {isFetchingNextPage ? (
+        {txs.isFetchingNextPage ? (
           <div>Loading...</div>
         ) : (
-          <div>{!hasNextPage && <div>No more transactions found</div>}</div>
+          <div>{!txs.hasNextPage && <div>No more transactions found</div>}</div>
         )}
       </div>
     </div>
