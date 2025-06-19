@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { UnlockStateReducerAtom } from "./atoms";
@@ -9,25 +8,13 @@ import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const DetailsDissolve = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
   const [unlockState, dispatch] = useAtom(UnlockStateReducerAtom);
   const dissolve = useDissolveStake(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
   const handleDissolve = () => {
-    dissolve.mutate(
-      {
-        id: unlockState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("dissolved");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-        },
-      }
-    );
+    dissolve.mutate({
+      id: unlockState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {

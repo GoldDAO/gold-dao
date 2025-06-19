@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
@@ -11,28 +10,14 @@ import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
 const DetailsUnstake = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
+
   const [unstakeState, dispatch] = useAtom(UnstakeStateReducerAtom);
   const unstake = useUnstake(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
   const handleOnUnstake = () => {
-    unstake.mutate(
-      {
-        id: unstakeState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("unstaked");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    unstake.mutate({
+      id: unstakeState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {

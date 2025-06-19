@@ -1,8 +1,5 @@
 import { useAtom } from "jotai";
 import { useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { Principal } from "@dfinity/principal";
-import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { useAuth } from "@auth/index";
 import { Dialog } from "@components/index";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
@@ -12,78 +9,41 @@ import {
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
 import useApprove from "@services/ledger/hooks/useApprove";
-import { TransferResult } from "@services/gld_nft/interfaces";
+import useTransferNFT from "@shared/hooks/useTransferNFT";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
 import useFetchTransferFeeNFT from "@services/gld_nft/hooks/useFetchTransferFee";
 import useFetchTransferFeeLedger from "@services/ledger/hooks/useFetchTransferFee";
 import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 
-const useTransferNFT = (
-  canisterId: string,
-  agent: Agent | HttpAgent | undefined
-) => {
-  return useMutation({
-    mutationFn: async ({ to, token_id }: { to: string; token_id: bigint }) => {
-      try {
-        const actor = Actor.createActor(idlFactoryNFT, {
-          agent,
-          canisterId,
-        });
-
-        const result = (await actor.icrc7_transfer([
-          {
-            to: {
-              owner: Principal.fromText(to),
-              subaccount: [],
-            },
-            token_id,
-            memo: [],
-            from_subaccount: [],
-            created_at_time: [],
-          },
-        ])) as TransferResult;
-        return result;
-      } catch (err) {
-        console.error(err);
-        throw new Error(`Transfer NFT error! Please retry later.`);
-      }
-    },
-  });
-};
-
 const NFTItem = ({
   nft,
   nftCollectionCanisterId,
+  nftCollectionName,
   approveStatus,
 }: {
   nft: IdNFT;
   nftCollectionCanisterId: string;
+  nftCollectionName: string;
   approveStatus: "pending" | "error" | "success" | "idle";
 }) => {
   const { authenticatedAgent } = useAuth();
   const [transferNFTState] = useAtom(TransferNFTStateReducerAtom);
-  const transfer = useTransferNFT(nftCollectionCanisterId, authenticatedAgent);
+  const transfer = useTransferNFT(
+    nftCollectionCanisterId,
+    nftCollectionName,
+    authenticatedAgent
+  );
 
   const handleTransfer = () => {
-    transfer.mutate(
-      {
-        to: transferNFTState.send_receive_address,
-        token_id: nft.id_bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("transfered");
-          console.log(res);
-        },
-      }
-    );
+    transfer.mutate({
+      to: transferNFTState.send_receive_address,
+      token_id: nft.id_bigint,
+    });
   };
 
   useEffect(() => {
     if (approveStatus === "success") {
-      console.log("transfer idle");
       handleTransfer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,6 +155,7 @@ const NFTCollection = ({ collection }: { collection: CollectionNFT }) => {
             key={nft.id_string}
             nft={nft}
             nftCollectionCanisterId={collection.canister_id}
+            nftCollectionName={collection.name}
             approveStatus={approve.status}
           />
         ))}

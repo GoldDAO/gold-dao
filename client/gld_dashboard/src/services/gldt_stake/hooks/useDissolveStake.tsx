@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
@@ -26,6 +26,7 @@ const useDissolveStake = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined
 ) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id }: { id: bigint }) => {
       try {
@@ -42,6 +43,11 @@ const useDissolveStake = (
         console.error(err);
         throw new Error(`start_dissolving error! Please retry later.`);
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["USER_POSITIONS"],
+      });
     },
   });
 };

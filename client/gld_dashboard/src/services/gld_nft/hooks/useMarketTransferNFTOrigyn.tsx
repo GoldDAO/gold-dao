@@ -99,7 +99,7 @@ const useMarketTransferNFTOrigyn = (
         queryKey: ["FETCH_USER_NFT", collection_name],
       });
       queryClient.invalidateQueries({
-        queryKey: [`FETCH_LEDGER_BALANCE_GLDT`],
+        queryKey: [`FETCH_LEDGER_BALANCE`, "GLDT"],
       });
     },
   });

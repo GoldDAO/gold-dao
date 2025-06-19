@@ -3,12 +3,10 @@ import { useAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { TokensList, Token, GLDT_INDEX } from "@wallet/shared/utils";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import useFetchUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
-import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { NFTCollections } from "@shared/utils/nfts";
 
@@ -18,18 +16,15 @@ const TokenItem = ({ token }: { token: Token }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedToken, setSelectedToken] = useAtom(TokenSelectedAtom);
 
-  const balance = useFetchUserBalance(token.canisterId, unauthenticatedAgent, {
-    ledger: id,
-    owner: principalId,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const tokenPrice = useFetchTokenPrice(unauthenticatedAgent, {
-    from: name,
-    from_canister_id: token.canisterId,
-    amount: balance.data ?? 0n,
-    enabled: !!unauthenticatedAgent && isConnected && balance.isSuccess,
-  });
+  const balance = useFetchLedgerBalance(
+    token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: name,
+      owner: principalId,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   const onClickToken = () => {
     setSelectedToken(token);
@@ -60,20 +55,17 @@ const TokenItem = ({ token }: { token: Token }) => {
         </div>
         <div className="text-end">
           <div>
-            {tokenPrice.isSuccess ? (
-              <E8sToLocaleString
-                value={tokenPrice.data.amount}
-                tokenDecimals={tokenPrice.data.decimals}
-              />
+            {balance.isSuccess ? (
+              <NumberToLocaleString value={balance.data.balance} />
             ) : (
               <div>Loading...</div>
             )}
           </div>
           <div className="text-content/60 text-sm">
-            {tokenPrice.isSuccess ? (
+            {balance.isSuccess ? (
               <>
                 $
-                <NumberToLocaleString value={tokenPrice.data.amount_usd} />
+                <NumberToLocaleString value={balance.data.balance_usd} />
               </>
             ) : (
               <div>Loading...</div>
