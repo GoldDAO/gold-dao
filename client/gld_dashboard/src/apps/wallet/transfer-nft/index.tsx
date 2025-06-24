@@ -1,77 +1,50 @@
 import { useAtom } from "jotai";
-import clsx from "clsx";
-import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import Dialog from "@components/dialogs/Dialog";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
-import SendForm from "./Form";
-import SendConfirm from "./Confirm";
+import Form from "./Form";
+import Confirm from "./Confirm";
 import ReceiveAddress from "@wallet/shared/components/transfer-receive-address";
-import Switch from "@shared/components/ui/switch/SwitchWithLabel";
+import SwitchTransfer from "./Switch";
+import Details from "./Details";
 
 const TransferNFTDialog = () => {
   const [transferState, dispatchTransferState] = useAtom(
     TransferNFTStateReducerAtom
   );
   const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
-  const {
-    is_open_transfer_dialog,
-    transfer_tab,
-    is_step_send_form,
-    is_step_send_confirm,
-  } = transferState;
+  const { is_open_receive_dialog, transfer_tab } = transferState;
 
   const handleOnClose = () => {
     dispatchTransferState({ type: "RESET" });
     dispatchSelectNFTState({ type: "RESET" });
   };
 
+  const handleChangeTab = (value: "send" | "receive") => {
+    dispatchTransferState({ type: "SET_TAB", value });
+  };
+
   return (
-    <Dialog
-      open={is_open_transfer_dialog}
-      handleOnClose={handleOnClose}
-      size={transfer_tab === "receive" ? "md" : "xl"}
-      title={
-        is_step_send_confirm && (
-          <div
-            className={clsx(
-              "p-1 rounded-full cursor-pointer",
-              "hover:bg-primary hover:text-white"
-            )}
-            onClick={() =>
-              dispatchTransferState({ type: "CANCEL_SEND_CONFIRM" })
-            }
-          >
-            <ChevronLeftIcon className="h-6 w-6" />
-          </div>
-        )
-      }
-    >
-      {is_step_send_form && (
-        <div className="flex justify-center mb-12">
-          <Switch
-            value={transfer_tab}
-            labelLeft="Send"
-            labelRight="Receive"
-            handleClickLeft={() =>
-              dispatchTransferState({ type: "SET_TAB", value: "send" })
-            }
-            handleClickRight={() =>
-              dispatchTransferState({ type: "SET_TAB", value: "receive" })
-            }
-          />
+    <>
+      <Dialog
+        open={is_open_receive_dialog}
+        handleOnClose={handleOnClose}
+        size="md"
+      >
+        <SwitchTransfer
+          className="flex justify-center mb-12"
+          value={transfer_tab}
+          handleChange={handleChangeTab}
+        />
+        <div className="mt-8">
+          <ReceiveAddress />
         </div>
-      )}
-      <div className="mt-8">
-        {transfer_tab === "receive" && <ReceiveAddress />}
-        {transfer_tab === "send" && (
-          <>
-            {is_step_send_form && <SendForm />}
-            {is_step_send_confirm && <SendConfirm />}
-          </>
-        )}
-      </div>
-    </Dialog>
+      </Dialog>
+
+      <Form />
+      <Confirm />
+      <Details />
+    </>
   );
 };
 

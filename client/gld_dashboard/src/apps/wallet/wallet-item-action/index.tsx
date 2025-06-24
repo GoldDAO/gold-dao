@@ -17,8 +17,6 @@ import {
 } from "@wallet/shared/atoms/TransferTokenAtom";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import TransferDialogToken from "@wallet/transfer-token";
-import TransferDialogNFT from "@wallet/transfer-nft";
-import SendDialogNFTDetails from "@wallet/transfer-nft/Details";
 import MintNFT from "@advanced/gldt/overview-section/mint-nft";
 import BurnNFT from "@advanced/gldt/overview-section/burn-nft";
 
@@ -200,8 +198,6 @@ const WalletItemAction = ({ className }: { className?: string }) => {
         </div>
       </div>
       <TransferDialogToken />
-      <TransferDialogNFT />
-      <SendDialogNFTDetails />
       <MintNFT />
       <BurnNFT />
     </>

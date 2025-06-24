@@ -176,16 +176,6 @@ const reducer = (
 
 export const SelectNFTStateReducerAtom = atomWithReducer(initialState, reducer);
 
-export const IsOneOrMoreSelectedNFTAtom = atom((get) => {
-  const state = get(SelectNFTStateReducerAtom);
-  return (
-    state["1G"].total_count_selected ||
-    state["10G"].total_count_selected ||
-    state["100G"].total_count_selected ||
-    state["1KG"].total_count_selected
-  );
-});
-
 export const TotalGLDTSelectedAtom = atom((get) => {
   const state = get(SelectNFTStateReducerAtom);
   return (
@@ -221,4 +211,18 @@ export const CollectionSelectedAtom = atom((get) => {
   return [state["1G"], state["10G"], state["100G"], state["1KG"]].filter(
     (collection) => collection.total_count_selected > 0
   );
+});
+
+export const RandomSelectedNFTIdAtom = atom((get) => {
+  const state = get(SelectNFTStateReducerAtom);
+  const selectedCollection = Object.values(state).find(
+    (collection) => collection.nfts_selected.length > 0
+  );
+  if (selectedCollection && selectedCollection.nfts_selected[0]) {
+    return {
+      canister: selectedCollection.canister_id,
+      tokenId: selectedCollection.nfts_selected[0],
+    };
+  }
+  return null;
 });

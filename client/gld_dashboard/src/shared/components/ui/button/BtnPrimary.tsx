@@ -40,12 +40,14 @@ const BtnPrimary = ({
   className,
   ...props
 }: BtnPrimaryProps) => {
+  const shapeClass =
+    size === "sm" && shape === "square" ? "rounded-md" : shapeClasses[shape];
   return (
     <Button
       className={clsx(
         sizeClasses[size],
         variantClasses[variant],
-        shapeClasses[shape],
+        shapeClass,
         className
       )}
       {...props}

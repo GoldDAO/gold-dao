@@ -2,7 +2,6 @@ import "@nfid/identitykit/react/styles.css";
 import "./App.css";
 import { useEffect } from "react";
 import { Tooltip } from "@components/index";
-
 import Router from "./router.tsx";
 
 function App() {
