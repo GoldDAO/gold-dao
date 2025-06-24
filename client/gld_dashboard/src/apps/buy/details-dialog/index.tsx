@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 import { useAuth } from "@auth/index";
 import { LoaderSpin, Logo } from "@components/index";
@@ -26,6 +27,7 @@ const DetailsDialog = ({
 }) => {
   const { authenticatedAgent, principalId, unauthenticatedAgent, isConnected } =
     useAuth();
+  const navigate = useNavigate();
 
   const balance = useFetchLedgerBalance(
     receiveToken.token.canisterId,
@@ -80,6 +82,11 @@ const DetailsDialog = ({
       swap.reset();
       handleSwap();
     }
+  };
+
+  const handleOnClickGoToBalance = () => {
+    handleClose();
+    navigate("/wallet");
   };
 
   return (
@@ -185,8 +192,8 @@ const DetailsDialog = ({
             </div>
 
             <div className="flex flex-col items-center w-full">
-              <BtnPrimary onClick={handleClose} className="w-full">
-                Go to Balance
+              <BtnPrimary onClick={handleOnClickGoToBalance} className="w-full">
+                Go to Wallet
               </BtnPrimary>
               <div className="flex items-center gap-1 px-2 py-1 bg-surface-secondary text-content/60 rounded-md text-sm mt-4">
                 <div>Your balance:</div>
