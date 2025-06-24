@@ -65,7 +65,7 @@ const Dialog = ({
         <DialogPanel
           className={clsx(
             `container ${SIZES[size]}`,
-            "bg-surface-primary rounded-xl p-4"
+            "bg-surface-primary rounded-xl p-4 xl:p-8"
           )}
         >
           <DialogTitle className={"flex items-center"}>
@@ -96,9 +96,7 @@ const Dialog = ({
               </div>
             )}
           </DialogTitle>
-          <div className="max-h-[70vh] overflow-y-auto pr-2 xl:pr-0">
-            {children}
-          </div>
+          <div className="max-h-[70vh] overflow-y-auto pr-4">{children}</div>
         </DialogPanel>
       </div>
     </HUIDialog>

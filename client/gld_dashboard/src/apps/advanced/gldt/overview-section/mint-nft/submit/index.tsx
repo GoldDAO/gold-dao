@@ -2,8 +2,8 @@ import { useAtom, useAtomValue } from "jotai";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
 import { NFTCollections } from "@shared/utils/nfts";
 import {
-  IsOneOrMoreSelectedNFTAtom,
   TotalGLDTSelectedAtom,
+  TotalNFTSelectedAtom,
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
@@ -12,7 +12,7 @@ import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
 const Submit = () => {
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
   const [selectNFTState] = useAtom(SelectNFTStateReducerAtom);
-  const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
+  const totalNFTSelected = useAtomValue(TotalNFTSelectedAtom);
   const totalGLDTSelected = useAtomValue(TotalGLDTSelectedAtom);
 
   const handleSubmit = () => {
@@ -40,7 +40,7 @@ const Submit = () => {
       <div className="mt-8">
         <BtnPrimary
           onClick={handleSubmit}
-          disabled={!IsOneOrMoreSelectedNFT}
+          disabled={totalNFTSelected === 0}
           className="w-full"
         >
           Submit

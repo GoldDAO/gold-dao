@@ -6,7 +6,6 @@ import { LoaderSpin } from "@components/index";
 import AvailableNFTSelect from "@shared/components/nft-select/AvailableNFTSelect";
 import { NFTCollections } from "@shared/utils/nfts";
 import {
-  IsOneOrMoreSelectedNFTAtom,
   TotalGLDTSelectedAtom,
   SelectNFTStateReducerAtom,
   TotalNFTSelectedAtom,
@@ -20,7 +19,6 @@ const Submit = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
   const [selectNFTState] = useAtom(SelectNFTStateReducerAtom);
-  const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
   const totalGLDTSelected = useAtomValue(TotalGLDTSelectedAtom);
   const totalNFTSelected = useAtomValue(TotalNFTSelectedAtom);
   const [canBurnNFT, setCanBurnNFT] = useState(false);
@@ -97,7 +95,7 @@ const Submit = () => {
       <div className="mt-8">
         <BtnPrimary
           onClick={handleSubmit}
-          disabled={!IsOneOrMoreSelectedNFT || !canBurnNFT}
+          disabled={!canBurnNFT || totalNFTSelected === 0}
           className="w-full"
         >
           Submit
