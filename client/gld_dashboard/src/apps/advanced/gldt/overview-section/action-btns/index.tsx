@@ -20,8 +20,8 @@ const Btn = ({
   const { isConnected } = useAuth();
 
   const actions: Record<Action, { icon: ReactNode; text: string }> = {
-    "mint-nft": { icon: <BuyCrypto />, text: "Mint" },
-    "burn-nft": { icon: <HuobiToken />, text: "Burn" },
+    "mint-nft": { icon: <BuyCrypto />, text: "Mint GLDT" },
+    "burn-nft": { icon: <HuobiToken />, text: "Burn GLDT" },
     "buy-on-bity": {
       icon: <img src={BuyOnBity} alt="Buy on BITY" />,
       text: "Buy on BITY",

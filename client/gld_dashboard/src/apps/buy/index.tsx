@@ -267,8 +267,8 @@ const Buy = () => {
 
             <div className="mt-2 flex flex-col gap-3 text-content/60">
               <div>
-                GLDT removes the complexity of owning gold. Each gold token
-                (GLDT) represents real, physical gold secured in a Swiss vault.
+                Each gold token (GLDT) represents real, physical gold secured in
+                a Swiss vault.
               </div>
               <div className="flex items-center justify-center xl:justify-start">
                 <Logo name="gldt" className="h-6 w-6 mr-2" />
