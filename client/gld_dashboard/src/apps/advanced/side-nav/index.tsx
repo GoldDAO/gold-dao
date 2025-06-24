@@ -17,7 +17,7 @@ const AdvancedLeftPanel = () => {
       </div>
       <div className="mt-8 w-full">
         <div className="flex justify-between items-center py-3 px-4 border border-border rounded-xl bg-surface-secondary hover:bg-gold/20 cursor-pointer">
-          <div>GLDT</div>
+          <div>GLDT Mint & Burn</div>
           <ChevronRightIcon className={clsx("w-5 h-5")} />
         </div>
       </div>
