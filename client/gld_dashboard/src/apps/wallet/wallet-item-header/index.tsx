@@ -13,7 +13,7 @@ import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 const Token = ({ className }: { className?: string }) => {
   const { unauthenticatedAgent } = useAuth();
   const token = useAtomValue(TokenSelectedAtom);
-  const { id, name, label } = token;
+  const { id, name } = token;
 
   const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
     ledger: id,
@@ -30,15 +30,12 @@ const Token = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
       <div className="flex flex-col items-center">
-        <div className="flex flex-col gap-2 items-center">
-          <div className="flex items-center gap-2">
-            <Logo name={id} className="h-10 w-10" />
-            <div>
-              <div>{name}</div>
-              <div className="text-content/60 text-sm">{label}</div>
-            </div>
+        <div className="flex flex-col items-center">
+          <div className="flex items-center gap-1">
+            <Logo name={id} className="h-6 w-6" />
+            <div className="font-semibold text-xl">{name}</div>
           </div>
-          <div className="text-sm text-content/60">
+          <div className="text-xs xl:text-sm text-content/60">
             {tokenPriceOne.isSuccess ? (
               <>
                 1 {name} ≈ $
@@ -49,7 +46,7 @@ const Token = ({ className }: { className?: string }) => {
             )}
           </div>
         </div>
-        <div className="py-8 xl:py-12">
+        <div className="mt-8 xl:mt-12">
           <TotalCountToken token={token} />
         </div>
       </div>
@@ -66,15 +63,12 @@ const NFT = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
       <div className="flex flex-col items-center">
-        <div className="flex flex-col gap-2 items-center">
-          <div className="flex items-center gap-2">
-            <Logo name="gld_nft" className="h-10 w-10" />
-            <div>
-              <div>GLD NFT</div>
-              <div className="text-content/60 text-sm">GLD NFT</div>
-            </div>
+        <div className="flex flex-col items-center">
+          <div className="flex items-center gap-1">
+            <Logo name="gld_nft" className="h-6 w-6" />
+            <div className="font-semibold text-xl">GLD NFT</div>
           </div>
-          <div className="text-sm text-content/60">
+          <div className="text-xs xl:text-sm text-content/60">
             {priceGold.isSuccess ? (
               <>
                 1 gram Gold ≈ $
@@ -85,7 +79,7 @@ const NFT = ({ className }: { className?: string }) => {
             )}
           </div>
         </div>
-        <div className="py-8 xl:py-12">
+        <div className="mt-8 xl:mt-12">
           <TotalCountUserNFTs />
         </div>
       </div>

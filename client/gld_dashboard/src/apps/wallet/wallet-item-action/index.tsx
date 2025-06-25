@@ -59,21 +59,20 @@ const ButtonAction = ({
       <button
         onClick={handleOnClick}
         className={clsx(
-          "relative rounded-xl shrink-0 cursor-pointer disabled:cursor-default w-full",
+          "relative rounded-xl shrink-0 cursor-pointer disabled:cursor-default",
           "bg-primary text-white hover:bg-primary/80 disabled:bg-primary/60",
-          "xl:w-[140px] xl:rounded-xl"
+          "w-[72px] xl:w-[140px]"
         )}
         disabled={!isConnected}
       >
         <div
           className={clsx(
-            "flex justify-center items-center gap-2",
-            "xl:flex-col xl:gap-1",
+            "flex flex-col justify-center items-center gap-1",
             "px-1 py-3"
           )}
         >
           {actions[action].icon}
-          <div>{actions[action].text}</div>
+          <div className="text-xs xl:text-base">{actions[action].text}</div>
         </div>
         {!isConnected && (
           <div className="absolute rounded-[inherit] top-0 w-full h-full bg-white/30" />
@@ -188,12 +187,7 @@ const WalletItemAction = ({ className }: { className?: string }) => {
   return (
     <>
       <div className={className}>
-        <div
-          className={clsx(
-            "flex flex-col justify-center gap-2",
-            "xl:flex-row xl:gap-4"
-          )}
-        >
+        <div className={clsx("flex justify-center gap-2")}>
           {renderTokenAction()}
         </div>
       </div>
