@@ -16,7 +16,7 @@ const Balance = ({
 }) => {
   return (
     <div className={className}>
-      <div className={clsx("flex items-center gap-2", "text-2xl xl:text-4xl")}>
+      <div className={clsx("flex items-center gap-2", "text-3xl xl:text-4xl")}>
         <div className="font-semibold">
           <NumberToLocaleString value={balance} />
         </div>
@@ -43,25 +43,25 @@ const PriceToken = ({
         return (
           <>
             <NumberToLocaleString value={balance / GLDT_VALUE_1G_NFT} /> grams
-            of Gold (
-            <>
-              $<NumberToLocaleString value={balanceUSD} />
-            </>
-            )
+            of Gold{" "}
+            <span className="text-content/60">
+              ($
+              <NumberToLocaleString value={balanceUSD} />)
+            </span>
           </>
         );
       default:
         return (
-          <>
+          <div className="text-content/60">
             $<NumberToLocaleString value={balanceUSD} />
-          </>
+          </div>
         );
     }
   };
 
   return (
     <div className={className}>
-      <div className="text-sm text-content/60">{renderPrice()}</div>
+      <div className="text-lg">{renderPrice()}</div>
     </div>
   );
 };
@@ -115,7 +115,7 @@ const TotalCountToken = ({ token }: { token: Token }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center">
       {renderBalance()}
       {renderPrice()}
     </div>

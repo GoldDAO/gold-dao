@@ -13,7 +13,7 @@ const CountNFT = ({
 }) => {
   return (
     <div className={className}>
-      <div className={clsx("flex items-center gap-2", "text-2xl xl:text-4xl")}>
+      <div className={clsx("flex items-center gap-2", "text-3xl xl:text-4xl")}>
         <div className="font-semibold">{count}</div>
         <div className="text-content/60 font-normal">NFTs</div>
       </div>
@@ -32,9 +32,12 @@ const PriceNFT = ({
 }) => {
   return (
     <div className={className}>
-      <div className="text-sm text-content/60">
-        {grams} grams of Gold ($
-        <NumberToLocaleString value={priceUSD} />)
+      <div className="text-lg">
+        <span>{grams} grams of Gold </span>
+        <span className="text-content/60">
+          ($
+          <NumberToLocaleString value={priceUSD} />)
+        </span>
       </div>
     </div>
   );
@@ -72,7 +75,7 @@ const TotalCountUserNFTs = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center">
       {renderCount()}
       {renderGrams()}
     </div>
