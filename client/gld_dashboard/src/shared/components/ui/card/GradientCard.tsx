@@ -10,7 +10,7 @@ const GradientCard = ({
 }) => (
   <div
     className={clsx(
-      "bg-linear-to-t from-neutral-100 to-background dark:from-neutral-900 dark:to-neutral-800",
+      "xl:bg-linear-to-t xl:from-neutral-100 xl:to-background xl:dark:from-neutral-900 xl:dark:to-neutral-800",
       className
     )}
   >

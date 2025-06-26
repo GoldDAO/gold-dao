@@ -22,6 +22,7 @@ const TriggerBaseBtn = ({
   children: ReactNode;
   handleOnClick: () => void;
 }) => {
+  const { isConnected } = useAuth();
   return (
     <button
       className={clsx(
@@ -33,6 +34,7 @@ const TriggerBaseBtn = ({
         "dark:shadow-surface-secondary/10 shadow-md",
         "min-w-[240px]"
       )}
+      disabled={!isConnected}
       onClick={handleOnClick}
     >
       {children}

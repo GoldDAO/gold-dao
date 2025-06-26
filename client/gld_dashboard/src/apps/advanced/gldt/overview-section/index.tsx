@@ -10,19 +10,20 @@ const OverviewSection = () => {
   return (
     <GradientCard className="p-4 xl:p-8 relative">
       <div className="flex flex-col items-center">
-        <div className="flex flex-col gap-2 items-center">
-          <div className="flex items-center gap-2">
-            <Logo name="gldt" className="h-10 w-10" />
-            <div>
-              <div>GLDT</div>
-              <div className="text-content/60 text-sm">Mint & Burn</div>
+        <div className="pb-16">
+          <div className="flex flex-col gap-2 items-center mb-8 xl:mb-12">
+            <div className="flex items-center gap-2">
+              <Logo name="gldt" className="h-10 w-10" />
+              <div>
+                <div>GLDT</div>
+                <div className="text-content/60 text-sm">Mint & Burn</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="py-8 xl:py-12">
-          <div className="flex items-stretch gap-4 xl:gap-8 justify-center">
+
+          <div className="flex flex-col xl:flex-row xl:items-stretch gap-2 xl:gap-8 justify-center items-center">
             <TotalCountUserNFTs />
-            <div className="border-l border-border h-auto my-2" />
+            <div className="xl:border-l border-border h-auto my-2" />
             <TotalCountToken token={TokensList[GLDT_INDEX]} />
           </div>
         </div>

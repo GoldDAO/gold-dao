@@ -17,7 +17,7 @@ const OverviewSection = () => {
   return (
     <GradientCard className="p-4 xl:p-8 relative">
       <div className="flex flex-col items-center">
-        <div className="pb-8 xl:pb-12">
+        <div className="pb-8 xl:pb-16">
           <div className="flex flex-col items-center">
             {searchParams.get("token") === "nft" ? (
               <>
