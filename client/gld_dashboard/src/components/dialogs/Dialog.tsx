@@ -33,6 +33,7 @@ const Dialog = ({
   open = false,
   handleOnClose = () => null,
   closeEnabled = true,
+  closeIcon = true,
   title = undefined,
   children,
   size = "xl",
@@ -43,6 +44,7 @@ const Dialog = ({
   handleOnClose?: () => void;
   children?: ReactNode;
   closeEnabled?: boolean;
+  closeIcon?: boolean;
   size?: keyof typeof SIZES;
   handlePreviousStep?: () => void;
 }) => {
@@ -65,7 +67,7 @@ const Dialog = ({
         <DialogPanel
           className={clsx(
             `container ${SIZES[size]}`,
-            "bg-surface-primary rounded-xl p-4 xl:p-8"
+            "bg-surface-primary rounded-xl p-4 xl:p-8 max-h-[70vh] overflow-y-auto"
           )}
         >
           <DialogTitle className={"flex items-center"}>
@@ -81,7 +83,7 @@ const Dialog = ({
                 )}
               </div>
             )}
-            {closeEnabled && (
+            {closeEnabled && closeIcon && (
               <div className="w-full text-end">
                 <button onClick={handleOnClose}>
                   <div
@@ -96,7 +98,7 @@ const Dialog = ({
               </div>
             )}
           </DialogTitle>
-          <div className="max-h-[70vh] overflow-y-auto pr-4">{children}</div>
+          {children}
         </DialogPanel>
       </div>
     </HUIDialog>

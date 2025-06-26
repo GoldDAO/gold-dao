@@ -41,7 +41,7 @@ const TxSection = ({ className }: { className?: string }) => {
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between mb-4 xl:mb-8">
+      <div className="flex items-center justify-between mb-4">
         <div>My transactions</div>
       </div>
       {isConnected ? (

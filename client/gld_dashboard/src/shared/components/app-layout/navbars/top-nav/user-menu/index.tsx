@@ -10,11 +10,10 @@ import {
   ClipboardDocumentIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
-
 import { useAuth } from "@auth/index";
-
 import { Tile } from "@components/index";
 import { User } from "iconsax-react";
+import Address from "@components/strings/Address";
 
 const DropdownUserMenu = () => {
   const { principalId, disconnect } = useAuth();
@@ -46,11 +45,28 @@ const DropdownUserMenu = () => {
             />
             <div className="relative">
               <MenuButton className="inline-flex items-center gap-2 rounded-lg bg-surface-primary py-1.5 px-3 text-sm/6 font-semibold cursor-pointer">
-                <div className="max-w-32 xl:max-w-48 flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Tile className="rounded-full h-6 w-6 bg-accent/60">
                     <User className="p-1" />
                   </Tile>
-                  <div className="truncate">{principalId}</div>
+                  <div className="hidden xl:block">
+                    <Address
+                      size="lg"
+                      enableTooltip={false}
+                      enableCopyToClipboard={false}
+                    >
+                      {principalId}
+                    </Address>
+                  </div>
+                  <div className="block xl:hidden">
+                    <Address
+                      size="sm"
+                      enableTooltip={false}
+                      enableCopyToClipboard={false}
+                    >
+                      {principalId}
+                    </Address>
+                  </div>
                 </div>
                 <ChevronDownIcon className="size-4 fill-content/60" />
               </MenuButton>

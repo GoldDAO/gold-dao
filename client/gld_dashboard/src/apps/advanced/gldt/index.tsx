@@ -12,9 +12,9 @@ const AdvancedGLDT = () => {
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <OverviewSection />
-        <div className="p-4 xl:p-8">
-          <UserNFTsSection className="mt-4 xl:mt-8" />
-          <TxSection className="mt-8" />
+        <div className="p-4 xl:p-8 mt-12">
+          <UserNFTsSection className="mb-8" />
+          <TxSection />
         </div>
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>

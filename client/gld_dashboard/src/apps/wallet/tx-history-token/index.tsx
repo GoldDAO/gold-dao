@@ -1,120 +1,12 @@
 import { Fragment, useEffect, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import { useAtomValue } from "jotai";
-import clsx from "clsx";
-import { ArrowRight } from "iconsax-react";
 import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAccountTransactions";
-import Address from "@components/strings/Address";
-import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
-import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-
-const ListItem = ({ tx }: { tx: Transaction }) => {
-  const { unauthenticatedAgent, isConnected } = useAuth();
-  const token = useAtomValue(TokenSelectedAtom);
-
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
-    ledger: token.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const price = useFetchTokenPrice(unauthenticatedAgent, {
-    from: token.name,
-    from_canister_id: token.canisterId,
-    amount: tx.amount ?? 0n,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const renderAddress = (address: string | undefined) => {
-    return address ? <Address>{address}</Address> : "N/A";
-  };
-
-  const renderAmount = (amount: bigint | undefined) => {
-    if (!decimals.isSuccess) return <div>Loading...</div>;
-    if (tx.is_credit) {
-      return (
-        <div className="text-success">
-          +
-          <E8sToLocaleString
-            value={amount as bigint}
-            tokenDecimals={decimals.data}
-          />{" "}
-          {token.name}
-        </div>
-      );
-    } else {
-      return (
-        <div className="text-danger">
-          -
-          <E8sToLocaleString
-            value={amount as bigint}
-            tokenDecimals={decimals.data}
-          />{" "}
-          {token.name}
-        </div>
-      );
-    }
-  };
-
-  return (
-    <div
-      className={clsx(
-        "p-2 lg:p-4 border border-border rounded-xl",
-        "flex items-start justify-between"
-      )}
-    >
-      <div className="flex items-start lg:items-center gap-4">
-        <div className="w-24 flex justify-center px-4 py-3 border border-gold/5 bg-gold/10 text-copper text-sm font-semibold rounded-xl">
-          {tx.kind}
-        </div>
-        <div className="text-sm">
-          <div className="inline-flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-2">
-            <div className="flex gap-2 items-center lg:hidden">
-              <div className="text-lg">{renderAmount(tx.amount)}</div>
-              <div className="text-content/60 text-sm">
-                {price.isSuccess ? (
-                  <>
-                    $
-                    <NumberToLocaleString value={price.data.amount_usd} />
-                  </>
-                ) : (
-                  <div>Loading...</div>
-                )}
-              </div>
-            </div>
-            <div className="text-center mb-2 lg:mb-0">
-              {renderAddress(tx.from)}
-            </div>
-            <div className="flex justify-center">
-              <ArrowRight size={12} className="rotate-90 lg:rotate-0" />
-            </div>
-            <div className="text-center">{renderAddress(tx.to)}</div>
-          </div>
-          <div className="text-content/60 text-sm mt-2 lg:mt-0">
-            {tx.timestamp}
-          </div>
-        </div>
-      </div>
-      <div className="hidden lg:block">
-        <div className="text-right text-lg">{renderAmount(tx.amount)}</div>
-        <div className="text-content/60 text-sm text-right">
-          {price.isSuccess ? (
-            <>
-              $
-              <NumberToLocaleString value={price.data.amount_usd} />
-            </>
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+import ListItem from "@wallet/tx-history-token/list-item";
+import ListItemMobile from "@wallet/tx-history-token/list-item-mobile";
 
 const List = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -160,10 +52,11 @@ const List = () => {
   }
 
   return (
-    <div className="flex flex-col xl:flex-grow xl:h-full gap-2 xl:overflow-y-auto xl:pr-4">
+    <div className="flex flex-col gap-2">
       {data.map((tx) => (
         <Fragment key={tx.index}>
-          <ListItem tx={tx} />
+          <ListItem className="hidden xl:block" tx={tx} />
+          <ListItemMobile className="block xl:hidden" tx={tx} />
         </Fragment>
       ))}
       <div ref={ref}></div>
