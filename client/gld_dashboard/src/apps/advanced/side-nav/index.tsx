@@ -15,13 +15,15 @@ const AdvancedLeftPanel = () => {
         Dive into advanced features of the Gold DAO such as minting and burning
         of GLDT, and more to come.
       </div>
-      <div className="mt-8 w-full">
+      <div className="hidden xl:block mt-8 w-full">
         <div className="flex justify-between items-center py-3 px-4 border border-border rounded-xl bg-surface-secondary hover:bg-gold/20 cursor-pointer">
           <div>GLDT Mint & Burn</div>
           <ChevronRightIcon className={clsx("w-5 h-5")} />
         </div>
       </div>
-      {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
+      {!isConnected && (
+        <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
+      )}
     </>
   );
 };

@@ -32,7 +32,9 @@ const Govern = () => {
           Stake GOLDAO tokens to participate in the Gold DAO governance and earn
           rewards yielding up to 30% APY.
         </div>
-        {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
+        {!isConnected && (
+          <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
+        )}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <NeuronsOverview />

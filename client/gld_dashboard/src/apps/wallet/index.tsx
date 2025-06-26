@@ -51,7 +51,9 @@ const Wallet = () => {
           </div>
         </div>
 
-        {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
+        {!isConnected && (
+          <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
+        )}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <OverviewSection />
