@@ -43,7 +43,7 @@ const PriceNFT = ({
   );
 };
 
-const TotalCountUserNFTs = () => {
+const TotalCountUserNFTs = ({ className }: { className?: string }) => {
   const { isConnected, authenticatedAgent, principalId } = useAuth();
 
   const nfts = useFetchNFTUserMetrics(authenticatedAgent, {
@@ -75,9 +75,11 @@ const TotalCountUserNFTs = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {renderCount()}
-      {renderGrams()}
+    <div className={className}>
+      <div className="flex flex-col items-center">
+        {renderCount()}
+        {renderGrams()}
+      </div>
     </div>
   );
 };

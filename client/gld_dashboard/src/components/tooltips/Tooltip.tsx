@@ -47,7 +47,8 @@ const Tooltip = ({
   place = "bottom",
   clickable = false,
   ...restProps
-}: TooltipProps) => {
+}: TooltipProps &
+  Omit<ComponentProps<typeof StyledTooltip>, keyof TooltipProps>) => {
   return (
     <StyledTooltip
       className={`${className}`}

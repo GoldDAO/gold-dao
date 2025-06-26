@@ -71,7 +71,7 @@ const CollectionItem = ({ collection }: { collection: NFTCollection }) => {
 const UserNFTsSection = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
-      <div className="flex items-center justify-between mb-4 xl:mb-8">
+      <div className="flex items-center justify-between mb-4">
         <div>My NFTs</div>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">

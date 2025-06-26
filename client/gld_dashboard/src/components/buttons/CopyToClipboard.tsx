@@ -12,16 +12,14 @@ const CopyToClipboard = ({ value = "" }: { value?: string }) => {
     toast.success("That's copied!");
   }, []);
 
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  // const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  // };
 
   return (
     <ReactCopyToClipboard onCopy={onCopy} text={valueCopied}>
-      <button onClick={(e) => handleClick(e)} className="cursor-pointer">
-        <Copy size={16} className="text-content/60" />
-      </button>
+      <Copy size={16} className="text-content/60 cursor-pointer" />
     </ReactCopyToClipboard>
   );
 };

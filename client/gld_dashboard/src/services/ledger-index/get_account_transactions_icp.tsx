@@ -62,6 +62,7 @@ const get_account_transactions_icp = async (
         kind = "burn";
       } else if ("Approve" in operation) {
         from = operation.Approve.from;
+        to = operation.Approve.spender;
         kind = "approve";
         amount = operation.Approve.allowance.e8s;
       }

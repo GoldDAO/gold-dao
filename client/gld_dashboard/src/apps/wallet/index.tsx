@@ -1,21 +1,17 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import WalletList from "@wallet/wallet-list";
 import WalletListDisconnected from "@wallet/wallet-list-disconnected";
-import WalletItemHeader from "@wallet/wallet-item-header";
-import WalletItemAction from "@wallet/wallet-item-action";
 import TxHistoryToken from "@wallet/tx-history-token";
 import TxHistoryNFT from "@wallet/tx-history-nft";
 import TxHistoryDisconnected from "@wallet/tx-history-disconnected";
 import { TokensList, TokensWhitelist, GLDT_INDEX } from "@wallet/shared/utils";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import GradientCard from "@shared/components/ui/card/GradientCard";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
-import WalletListMobile from "@wallet/wallet-list-mobile";
+import OverviewSection from "@wallet/overview-section";
 
 const Wallet = () => {
   const { isConnected } = useAuth();
@@ -58,20 +54,7 @@ const Wallet = () => {
         {!isConnected && <BtnConnectWallet className="mt-auto w-full" />}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <GradientCard className="rounded-tr-[inherit]">
-          <div className="pt-2 xl:pt-12 px-4 xl:px-12 pb-20">
-            <WalletItemHeader />
-            <WalletListMobile className="flex justify-center xl:hidden mt-4" />
-          </div>
-        </GradientCard>
-        <div className="relative px-4">
-          <WalletItemAction
-            className={clsx(
-              "my-4",
-              "absolute -top-13 left-1/2 my-0 -translate-x-1/2"
-            )}
-          />
-        </div>
+        <OverviewSection />
         <div className="p-4 xl:p-8 mt-12">
           <div className="mb-4">Transactions</div>
           {isConnected ? (

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Logo } from "@components/index";
 import GradientCard from "@shared/components/ui/card/GradientCard";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
-import ActionBtns from "@advanced/gldt/overview-section/action-btns";
+import FeaturesBtn from "@advanced/gldt/overview-section/features-btn";
 import TotalCountToken from "@shared/components/total-count-token";
 import { TokensList, GLDT_INDEX } from "@wallet/shared/utils";
 
@@ -27,13 +27,8 @@ const OverviewSection = () => {
           </div>
         </div>
       </div>
-      <div
-        className={clsx(
-          "my-4",
-          "xl:absolute xl:-bottom-9 xl:left-1/2 xl:my-0 xl:-translate-x-1/2"
-        )}
-      >
-        <ActionBtns />
+      <div className={clsx("absolute -bottom-9 left-1/2 -translate-x-1/2")}>
+        <FeaturesBtn />
       </div>
     </GradientCard>
   );

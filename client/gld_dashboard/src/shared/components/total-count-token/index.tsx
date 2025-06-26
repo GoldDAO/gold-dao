@@ -66,7 +66,13 @@ const PriceToken = ({
   );
 };
 
-const TotalCountToken = ({ token }: { token: Token }) => {
+const TotalCountToken = ({
+  token,
+  className,
+}: {
+  token: Token;
+  className?: string;
+}) => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
 
   const balance = useFetchLedgerBalance(
@@ -115,9 +121,11 @@ const TotalCountToken = ({ token }: { token: Token }) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {renderBalance()}
-      {renderPrice()}
+    <div className={className}>
+      <div className="flex flex-col items-center">
+        {renderBalance()}
+        {renderPrice()}
+      </div>
     </div>
   );
 };
