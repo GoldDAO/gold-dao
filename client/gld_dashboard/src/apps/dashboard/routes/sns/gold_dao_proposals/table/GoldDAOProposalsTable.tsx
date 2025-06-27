@@ -1,12 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-
 import { Table, LoaderSpin } from "@components/index";
 import { BadgeProposalStatus } from "@components/badges/BadgeProposalStatus";
 import { TableProps } from "@shared/utils/table/useTable";
-
 import useFetchAllProposals, {
   ProposalData,
 } from "@services/sns_governance/hooks/useFetchAllProposals";
@@ -116,11 +113,11 @@ export const GoldDAOProposalsTable = ({
                 }}
                 className="cursor-pointer mr-2"
               >
-                {row.getIsExpanded() ? (
+                {/* {row.getIsExpanded() ? (
                   <ChevronUpIcon className="h-5 w-5" />
                 ) : (
                   <ChevronDownIcon className="h-5 w-5" />
-                )}
+                )} */}
               </button>
               <div className="flex items-center max-w-sm">
                 <button

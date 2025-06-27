@@ -1,10 +1,6 @@
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-  PauseCircleIcon,
-} from "@heroicons/react/20/solid";
+import Icon from "@shared/ui/icons";
 
-const MutationStatusIcons = ({
+const MutationStatusIcon = ({
   status,
   className,
 }: {
@@ -14,15 +10,19 @@ const MutationStatusIcons = ({
   return (
     <div className={className}>
       <div className="flex justify-center h-8 w-8">
-        {status === "idle" && <PauseCircleIcon className="" />}
+        {status === "idle" && <Icon.PauseCircle width={24} />}
         {status === "pending" && (
           <div className="border-4 h-full w-full border-gold/20 border-t-gold animate-spin rounded-full" />
         )}
-        {status === "error" && <XCircleIcon className="text-danger" />}
-        {status === "success" && <CheckCircleIcon className="text-success" />}
+        {status === "error" && (
+          <Icon.ErrorCircle width={24} className="text-danger" />
+        )}
+        {status === "success" && (
+          <Icon.SuccessCircle width={24} className="text-success" />
+        )}
       </div>
     </div>
   );
 };
 
-export default MutationStatusIcons;
+export default MutationStatusIcon;

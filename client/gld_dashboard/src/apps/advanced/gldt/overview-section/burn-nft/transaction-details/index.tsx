@@ -4,7 +4,6 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import {
   TotalGLDTSelectedAtom,
   TotalGramSelectedAtom,
@@ -12,6 +11,7 @@ import {
   CollectionSelectedAtom,
 } from "@shared/atoms/NFTStateAtom";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import Icon from "@shared/ui/icons";
 
 const TransactionDetails = ({
   className = "",
@@ -35,7 +35,11 @@ const TransactionDetails = ({
             </div>
           </div>
           <DisclosureButton className="group">
-            <ChevronDownIcon className="size-5 group-data-[hover]:fill-content/50 group-data-[open]:rotate-180" />
+            <Icon.Chevron
+              width={16}
+              height={16}
+              className="group-data-[hover]:fill-content/50 group-data-[open]:rotate-180"
+            />
           </DisclosureButton>
         </div>
         <DisclosurePanel className="bg-surface text-sm/5 mt-4">

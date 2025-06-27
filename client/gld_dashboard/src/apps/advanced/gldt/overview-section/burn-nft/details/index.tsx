@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import { LoaderSpin } from "@components/index";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import Collection from "./Collection";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Details = () => {
   const [swapNFT, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);

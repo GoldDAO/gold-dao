@@ -1,11 +1,10 @@
-// src/components/ThemeToggle.tsx
 import { useTheme, Theme } from "@shared/hooks/useTheme";
-import { Sun1, Moon, Monitor } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 
 const themes: { label: Theme; Icon: React.ElementType }[] = [
-  { label: "light", Icon: Sun1 },
-  { label: "dark", Icon: Moon },
-  { label: "system", Icon: Monitor },
+  { label: "light", Icon: Icon.Sun },
+  { label: "dark", Icon: Icon.Moon },
+  { label: "system", Icon: Icon.Monitor },
 ];
 
 export const ThemeToggle = () => {

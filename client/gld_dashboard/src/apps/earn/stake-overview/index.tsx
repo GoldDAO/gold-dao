@@ -1,6 +1,6 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { InfoCircle } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 import {
   GLDT_VALUE_1G_NFT,
   GLDT_LEDGER_CANISTER_ID,
@@ -8,14 +8,14 @@ import {
 } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchUserTotalStaked from "@services/gldt_stake/hooks/useFetchUserTotalStaked";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchStakeAPY from "@services/gldt_stake/hooks/useFetchStakeAPY";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import GradientCard from "@shared/components/ui/card/GradientCard";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import GradientCard from "@shared/ui/card/GradientCard";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const StakeOverview = () => {
   const { authenticatedAgent, unauthenticatedAgent, isConnected } = useAuth();
@@ -124,8 +124,8 @@ const StakeOverview = () => {
                     "Loading..."
                   )}
                 </span>
-                <InfoCircle
-                  size={16}
+                <Icon.InfoCircle
+                  width={16}
                   className="inline cursor-pointer ml-2"
                   onClick={() => setIsOpenInfoAPYDialog(true)}
                 />

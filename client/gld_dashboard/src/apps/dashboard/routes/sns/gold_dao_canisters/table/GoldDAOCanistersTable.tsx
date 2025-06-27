@@ -2,8 +2,6 @@ import { useMemo } from "react";
 // import { useNavigate } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { Table, LoaderSpin } from "@components/index";
-
-// import CopyToClipboard from "@components/buttons/CopyToClipboard";
 import {
   BadgeCanisterType,
   CanisterType,
@@ -13,11 +11,9 @@ import {
   CanisterStatus,
 } from "@components/badges/BadgeCanisterStatus";
 import { TableProps } from "@shared/utils/table/useTable";
-
 import useFetchAllCanisters, {
   SNSCanistersSummaryData,
 } from "@services/sns_root/hooks/useFetchAllCanisters";
-
 import { useAuth } from "@auth/index";
 import { SNS_ROOT_CANISTER_ID } from "@constants";
 

@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import {
   SendTokenStateAtom,
@@ -12,7 +12,7 @@ import {
 } from "@wallet/shared/atoms/TransferTokenAtom";
 import useTransfer from "@services/ledger/hooks/useTransfer";
 import useFetchTokenData from "@shared/hooks/useFetchTokenData";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Confirm = ({ className }: { className?: string }) => {
   const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =
@@ -160,7 +160,7 @@ const Confirm = ({ className }: { className?: string }) => {
         <>
           {transfer.isPending && (
             <div className="flex flex-col gap-1 items-center text-4xl pb-12">
-              <MutationStatusIcons status={transfer.status} className="mb-4" />
+              <MutationStatusIcon status={transfer.status} className="mb-4" />
               <div>Transfer</div>
               <div className="text-gold">in progress...</div>
             </div>
@@ -169,10 +169,7 @@ const Confirm = ({ className }: { className?: string }) => {
           {transfer.isError && (
             <div className="flex flex-col items-center gap-12 pb-8">
               <div className="flex flex-col gap-1 items-center text-4xl">
-                <MutationStatusIcons
-                  status={transfer.status}
-                  className="mb-4"
-                />
+                <MutationStatusIcon status={transfer.status} className="mb-4" />
                 <div>Transfer has</div>
                 <div className="text-gold">failed</div>
               </div>
@@ -190,10 +187,7 @@ const Confirm = ({ className }: { className?: string }) => {
           {transfer.isSuccess && (
             <div className="flex flex-col items-center gap-12 pb-8">
               <div className="flex flex-col gap-1 items-center text-4xl">
-                <MutationStatusIcons
-                  status={transfer.status}
-                  className="mb-4"
-                />
+                <MutationStatusIcon status={transfer.status} className="mb-4" />
                 <div>Transfer has been</div>
                 <div className="text-gold">completed</div>
               </div>

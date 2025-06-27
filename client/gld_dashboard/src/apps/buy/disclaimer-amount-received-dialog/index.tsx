@@ -1,5 +1,5 @@
-import Dialog from "@components/dialogs/Dialog";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import Dialog from "@shared/ui/dialog/Dialog";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DisclaimerAmountReceivedDialog = ({
   open,

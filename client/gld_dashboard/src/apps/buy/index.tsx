@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useForm, useWatch } from "react-hook-form";
-import { InfoCircle } from "iconsax-react";
 import {
   KONGSWAP_CANISTER_ID_IC,
   GLDT_LEDGER_CANISTER_ID,
@@ -23,7 +22,7 @@ import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
-import GradientCard from "@shared/components/ui/card/GradientCard";
+import GradientCard from "@shared/ui/card/GradientCard";
 import { Token, TOKEN_LIST_AVAILABLE } from "@buy/shared/utils";
 import SelectToken from "@buy/select-token";
 import ConfirmDialog from "@buy/confirm-dialog";
@@ -31,7 +30,8 @@ import DetailsDialog from "@buy/details-dialog";
 import DisclaimerAmountReceivedDialog from "@buy/disclaimer-amount-received-dialog";
 import DisclaimerConfirmHighSlippageDialog from "./disclaimer-confirm-high-slippage-dialog";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import Icon from "@shared/ui/icons";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -426,8 +426,8 @@ const Buy = () => {
                         decimals={5}
                       />{" "}
                       GLDT
-                      <InfoCircle
-                        size={16}
+                      <Icon.InfoCircle
+                        width={18}
                         className="cursor-pointer"
                         onClick={() =>
                           setOpenDisclaimerAmountReceivedDialog(true)

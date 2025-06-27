@@ -1,7 +1,7 @@
-import Dialog from "@components/dialogs/Dialog";
-import { Warning2 } from "iconsax-react";
+import Dialog from "@shared/ui/dialog/Dialog";
+import Icon from "@shared/ui/icons";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DisclaimerConfirmHighSlippageDialog = ({
   open,
@@ -20,7 +20,7 @@ const DisclaimerConfirmHighSlippageDialog = ({
     <Dialog open={open} handleOnClose={handleClose}>
       <div className="flex justify-center">
         <div className="flex items-center font-semibold text-lg mt-2 mb-4 gap-2">
-          <Warning2 size={32} className="text-warning" variant="Bold" />
+          <Icon.Warning width={32} className="text-warning" />
           <div>High slippage</div>
         </div>
       </div>

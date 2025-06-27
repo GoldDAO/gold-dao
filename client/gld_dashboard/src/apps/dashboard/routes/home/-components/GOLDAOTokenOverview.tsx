@@ -1,13 +1,8 @@
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
-
 import { LoaderSpin, Logo } from "@components/index";
-
 import useFetchTotalSupply from "@services/ledger/hooks/useFetchTotalSupply";
 import useFetchTokenPrice from "@services/icpswap/hooks/useFetchTokenPrice";
-
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-
 import { GOLDAO_LEDGER_CANISTER_ID_IC, ICPSWAP_CANISTER_ID } from "@constants";
 import { divideBy1e8 } from "@shared/utils/numbers";
 import { useAuth } from "@auth/index";
@@ -40,11 +35,11 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
               <div className="font-light text-content/60">
                 {t("total_gldgov_supply.title")}
               </div>
-              <InformationCircleIcon
+              {/* <InformationCircleIcon
                 className="size-5 text-accent/60"
                 data-tooltip-id="tooltip"
                 data-tooltip-content={t("total_gldgov_supply.tooltip")}
-              />
+              /> */}
             </div>
 
             {totalSupply.isSuccess && (
@@ -66,11 +61,11 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
               <div className="font-light text-content/60">
                 {t("gldgov_price.title")}
               </div>
-              <InformationCircleIcon
+              {/* <InformationCircleIcon
                 className="size-5 text-accent/60"
                 data-tooltip-id="tooltip"
                 data-tooltip-content={t("gldgov_price.tooltip")}
-              />
+              /> */}
             </div>
 
             {price.isSuccess && (
@@ -94,11 +89,11 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
               <div className="font-light text-content/60">
                 {t("gldgov_marketcap.title")}
               </div>
-              <InformationCircleIcon
+              {/* <InformationCircleIcon
                 className="size-5 text-accent/60"
                 data-tooltip-id="tooltip"
                 data-tooltip-content={t("gldgov_marketcap.tooltip")}
-              />
+              /> */}
             </div>
 
             {totalSupply.isSuccess && price.isSuccess && (

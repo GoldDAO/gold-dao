@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { Logo } from "@components/index";
-import GradientCard from "@shared/components/ui/card/GradientCard";
+import GradientCard from "@shared/ui/card/GradientCard";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
 import FeaturesBtn from "@advanced/gldt/overview-section/features-btn";
 import TotalCountToken from "@shared/components/total-count-token";

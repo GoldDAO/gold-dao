@@ -1,11 +1,7 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
-import { BuyCrypto, ArrangeVertical, Refresh, HuobiToken } from "iconsax-react";
 import { useAuth } from "@auth/index";
-import Redeem from "@assets/icons/redeem.svg";
-import Govern from "@assets/icons/govern.svg";
-import Earn from "@assets/icons/earn.svg";
-import BuyOnBity from "@assets/icons/bity_white.svg";
+import Icon from "@shared/ui/icons";
 
 type Feature =
   | "buy-gldt"
@@ -27,18 +23,30 @@ const AppFeatureBtn = ({
 }) => {
   const { isConnected } = useAuth();
   const actions: Record<Feature, { icon: ReactNode; text: string }> = {
-    "buy-gldt": { icon: <BuyCrypto />, text: "Buy GLDT" },
-    transfer: { icon: <ArrangeVertical />, text: "Transfer" },
-    swap: { icon: <Refresh />, text: "Swap" },
-    earn: { icon: <img src={Earn} alt="Earn" />, text: "Earn" },
+    "buy-gldt": {
+      icon: <Icon.BuyCrypto width={24} aria-label="Buy GLDT" />,
+      text: "Buy GLDT",
+    },
+    transfer: {
+      icon: <Icon.Transfer width={24} aria-label="Transfer" />,
+      text: "Transfer",
+    },
+    swap: { icon: <Icon.Swap width={24} aria-label="Swap" />, text: "Swap" },
+    earn: { icon: <Icon.Earn aria-label="Earn" />, text: "Earn" },
     "buy-on-bity": {
-      icon: <img src={BuyOnBity} alt="Buy on BITY" />,
+      icon: <Icon.BuyOnBity aria-label="Buy on BITY" />,
       text: "Buy on BITY",
     },
-    redeem: { icon: <img src={Redeem} alt="Redeem" />, text: "Redeem" },
-    govern: { icon: <img src={Govern} alt="Govern" />, text: "Govern" },
-    "mint-nft": { icon: <BuyCrypto />, text: "Mint" },
-    "burn-nft": { icon: <HuobiToken />, text: "Burn" },
+    redeem: { icon: <Icon.Redeem aria-label="Redeem" />, text: "Redeem" },
+    govern: { icon: <Icon.Govern aria-label="Govern" />, text: "Govern" },
+    "mint-nft": {
+      icon: <Icon.Mint width={24} aria-label="Mint" />,
+      text: "Mint",
+    },
+    "burn-nft": {
+      icon: <Icon.Burn width={24} aria-label="Burn" />,
+      text: "Burn",
+    },
   };
 
   const renderBtn = () => {

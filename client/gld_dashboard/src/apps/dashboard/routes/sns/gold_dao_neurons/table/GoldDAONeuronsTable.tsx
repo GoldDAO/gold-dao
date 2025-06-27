@@ -1,20 +1,14 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-
 import { useAuth } from "@auth/index";
 import {
   SNS_GOVERNANCE_CANISTER_ID_IC,
   SNS_ROOT_CANISTER_ID,
 } from "@constants";
-
 import { Table, LoaderSpin } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
-import CopyToClipboard from "@components/buttons/CopyToClipboard";
-
 import { TableProps } from "@shared/utils/table/useTable";
-
 import { NeuronPartial } from "@services/sns_governance/hooks/interfaces";
 import useFetchAllNeurons from "@services/sns_governance/hooks/useFetchAllNeurons";
 
@@ -79,11 +73,11 @@ export const GoldDAONeuronsTable = ({
                 }}
                 className="cursor-pointer mr-2"
               >
-                {row.getIsExpanded() ? (
+                {/* {row.getIsExpanded() ? (
                   <ChevronUpIcon className="h-5 w-5" />
                 ) : (
                   <ChevronDownIcon className="h-5 w-5" />
-                )}
+                )} */}
               </button>
               <div className="flex items-center max-w-sm text-accent">
                 <button
@@ -94,7 +88,6 @@ export const GoldDAONeuronsTable = ({
                 >
                   {getValue() as string}
                 </button>
-                <CopyToClipboard value={getValue() as string} />
               </div>
             </div>
           ) : (

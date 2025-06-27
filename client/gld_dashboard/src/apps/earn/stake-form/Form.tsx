@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { InfoCircle } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { StakeStateReducerAtom } from "./atoms";
 import { Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { MIN_STAKE_AMOUNT } from "./utils";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Form = ({
   balance,
@@ -126,8 +126,8 @@ const Form = ({
           </div>
           <div className="flex items-center gap-2 px-2 py-1 bg-surface-secondary rounded-md">
             <div className="text-content/60 text-sm">Unlock Delay: 1 week</div>
-            <InfoCircle
-              size={16}
+            <Icon.InfoCircle
+              width={16}
               className="cursor-pointer"
               onClick={() => setIsOpenInfoUnlockDelayDialog(true)}
             />

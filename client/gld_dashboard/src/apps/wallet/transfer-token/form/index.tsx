@@ -5,14 +5,14 @@ import { FieldValues, useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useAuth } from "@auth/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import { Logo, Button } from "@components/index";
+import { Logo } from "@components/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { SendTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import ICRCAccount from "./form-input/ICRCAccount";
 import PrincipalAndSubaccount from "./form-input/PrincipalAndSubaccount";
 import ICRCAccountOrAccountId from "./form-input/ICRCAccountOrAccountId";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const InputCard = ({ children }: { children: ReactNode }) => {
   return (
@@ -165,14 +165,14 @@ const Form = ({ className }: { className?: string }) => {
               </div>
             )}
             <div className="shrink-0">
-              <Button
+              <button
                 onClick={handleSwitchAddress}
                 className="w-full px-6 py-3 border border-gold bg-gold/10 font-semibold text-gold text-base rounded-xl"
               >
                 {!is_use_icrc_account
                   ? "Use ICRC Account"
                   : "Use Principal & Subaccount"}
-              </Button>
+              </button>
             </div>
           </div>
           <ErrorMessage

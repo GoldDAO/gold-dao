@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { SNS_REWARDS_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
 import { Reward } from "../../utils";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();
@@ -43,7 +43,7 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
     <div className="p-4 border border-border rounded-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <MutationStatusIcons status={claim.status} />
+          <MutationStatusIcon status={claim.status} />
           <div>Claiming {reward.name} reward</div>
         </div>
         {claim.isError && (

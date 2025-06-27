@@ -1,4 +1,4 @@
-import { Logo } from "@components/logos";
+import { Logo } from "@shared/ui/logos";
 
 const RenderValueGLDT = ({ value }: { value: number }) => {
   return (

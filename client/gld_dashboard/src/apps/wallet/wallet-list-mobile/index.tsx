@@ -10,10 +10,10 @@ import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { TokensList, GLDT_INDEX, Token } from "@wallet/shared/utils";
 import ListItemToken from "@wallet/wallet-list/list-item-token";
 import ListItemNFT from "@wallet/wallet-list/list-item-nft";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { Logo } from "@components/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import { ArrowDown2 } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 
 const TriggerBaseBtn = ({
   children,
@@ -38,7 +38,7 @@ const TriggerBaseBtn = ({
       onClick={handleOnClick}
     >
       {children}
-      <ArrowDown2 size="16" className="" />
+      <Icon.Chevron width={16} />
     </button>
   );
 };

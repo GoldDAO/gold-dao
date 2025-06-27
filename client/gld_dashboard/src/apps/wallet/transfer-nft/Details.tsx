@@ -1,19 +1,19 @@
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { useAuth } from "@auth/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { IdNFT } from "@services/gld_nft/utils/interfaces";
 import {
   CollectionNFT,
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useTransferNFT from "@shared/hooks/useTransferNFT";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
 import useFetchNFTTransferFee from "@shared/hooks/useFetchNFTTransferFee";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const NFTItem = ({
   nft,
@@ -87,7 +87,7 @@ const NFTItem = ({
       <div className="flex justify-between items-center">
         {(approve.isIdle || approve.isPending) && (
           <div className="flex items-center gap-4">
-            <MutationStatusIcons status={approve.status} />
+            <MutationStatusIcon status={approve.status} />
             <div>Approve {nft.id_string} NFT</div>
           </div>
         )}
@@ -100,7 +100,7 @@ const NFTItem = ({
         )}
         {approve.isSuccess && (
           <div className="flex items-center gap-4">
-            <MutationStatusIcons status={transfer.status} />
+            <MutationStatusIcon status={transfer.status} />
             <div>Transfer {nft.id_string} NFT</div>
           </div>
         )}
@@ -141,7 +141,7 @@ const NFTCollection = ({ collection }: { collection: CollectionNFT }) => {
             >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                  <MutationStatusIcons status="pending" />
+                  <MutationStatusIcon status="pending" />
                   <div>Fetching NFT and Ledger fees..</div>
                 </div>
               </div>

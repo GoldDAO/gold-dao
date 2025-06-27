@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const DisclaimerInsufficientOGYFunds = ({

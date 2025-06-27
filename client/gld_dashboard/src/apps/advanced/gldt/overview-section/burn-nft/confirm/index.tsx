@@ -7,9 +7,9 @@ import {
 } from "@shared/atoms/NFTStateAtom";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import TransactionDetails from "@advanced/gldt/overview-section/burn-nft/transaction-details";
-import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import Icon from "@shared/ui/icons";
 
 const Confirm = () => {
   const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
@@ -60,7 +60,11 @@ const Confirm = () => {
               <div className="border-t border-border w-full"></div>
               <div className="absolute inset-x-0 top-0 flex justify-center transform -translate-y-1/2">
                 <button className="bg-content text-background rounded-full p-2 cursor-default">
-                  <ArrowDownIcon height={24} width={24} className="text-gold" />
+                  <Icon.ArrowDown
+                    height={24}
+                    width={24}
+                    className="text-gold"
+                  />
                 </button>
               </div>
             </div>

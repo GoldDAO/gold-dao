@@ -1,10 +1,10 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { Clock } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button, Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import { Logo } from "@components/index";
+import Dialog from "@shared/ui/dialog/Dialog";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import useFetchUserPositions from "@services/gldt_stake/hooks/useFetchUserPositions";
@@ -124,9 +124,9 @@ const StakeList = () => {
   ) => {
     const enabled = !!rewards_fee && enableClaimRewards(rewards, rewards_fee);
     return (
-      <Button
+      <button
         className={clsx(
-          "px-2 py-1 rounded-md shrink-0",
+          "px-2 py-1 rounded-md shrink-0 cursor-pointer",
           "bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm"
         )}
         disabled={!enabled}
@@ -149,7 +149,7 @@ const StakeList = () => {
         ) : (
           "Loading..."
         )}
-      </Button>
+      </button>
     );
   };
 
@@ -171,15 +171,15 @@ const StakeList = () => {
                 GLDT
               </div>
               <div className="flex gap-1 items-center text-content/60">
-                <Clock size={16} />
+                <Icon.Clock width={16} />
                 Age Bonus{" "}
                 <NumberToLocaleString value={stake.age_bonus_multiplier} />
               </div>
             </div>
             <div className="flex flex-row gap-2 mt-4 @xl:mt-0">
               {stake.is_unlockable && (
-                <Button
-                  className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
+                <button
+                  className="cursor-pointer shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
                   onClick={() =>
                     dispatchUnlock({
                       type: "OPEN_DIALOG_CONFIRM",
@@ -188,11 +188,11 @@ const StakeList = () => {
                   }
                 >
                   Unlock
-                </Button>
+                </button>
               )}
               {stake.is_unstakable && (
-                <Button
-                  className="shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
+                <button
+                  className="cursor-pointer shrink-0 px-2 py-1 bg-surface-secondary dark:bg-transparent border border-border text-black dark:text-white text-sm rounded-md"
                   onClick={() =>
                     dispatchUnstake({
                       type: "OPEN_DIALOG_CONFIRM",
@@ -201,7 +201,7 @@ const StakeList = () => {
                   }
                 >
                   Unstake
-                </Button>
+                </button>
               )}
               {renderClaimRewardsButton(
                 stake.id,

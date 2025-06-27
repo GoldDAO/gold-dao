@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { UnstakeStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useUnstake from "@services/gldt_stake/hooks/useUnstake";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsUnstake = () => {
   const { authenticatedAgent } = useAuth();
@@ -37,7 +37,7 @@ const DetailsUnstake = () => {
       <div className="grid grid-cols-1 gap-4 my-8">
         <div className="p-4 border border-border rounded-md">
           <div className="flex items-center gap-4">
-            <MutationStatusIcons status={unstake.status} />
+            <MutationStatusIcon status={unstake.status} />
             <div>Unstake stake</div>
           </div>
         </div>

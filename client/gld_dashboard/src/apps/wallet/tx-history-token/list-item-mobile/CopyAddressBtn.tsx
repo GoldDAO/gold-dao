@@ -1,16 +1,11 @@
 import { useState } from "react";
-import { Copy } from "iconsax-react";
-import Dialog from "@components/dialogs/Dialog";
-import CopyToClipboard from "@components/buttons/CopyToClipboard";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import Dialog from "@shared/ui/dialog/Dialog";
+import Icon from "@shared/ui/icons";
+import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
-const CopyAddressBtn = ({
-  from,
-  to,
-}: {
-  from: string | undefined;
-  to: string | undefined;
-}) => {
+const CopyAddressBtn = ({ from, to }: { from: string; to: string }) => {
+  const { copyToClipboard } = useCopyToClipboard();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -19,7 +14,7 @@ const CopyAddressBtn = ({
         data-tooltip-id="copy-address-tooltip"
         onClick={() => setIsOpen(true)}
       >
-        <Copy size={16} className="text-content/60" />
+        <Icon.Copy width={16} height={16} className="text-content/60" />
       </button>
       <Dialog
         open={isOpen}
@@ -33,9 +28,11 @@ const CopyAddressBtn = ({
                 <div className="p-2 text-base">From</div>
               </div>
               <div className="flex justify-between items-center gap-4 p-2 break-all whitespace-pre-line">
-                <div>{from ?? "N/A"}</div>
+                <div>{from}</div>
                 <div onClick={() => setIsOpen(false)}>
-                  <CopyToClipboard value={from} />
+                  <button onClick={() => copyToClipboard(from)}>
+                    <Icon.Copy width={16} height={16} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -44,9 +41,11 @@ const CopyAddressBtn = ({
                 <div className="p-2 text-base">To</div>
               </div>
               <div className="flex justify-between items-center gap-4 p-2 break-all whitespace-pre-line">
-                <div>{to ?? "N/A"}</div>
+                <div>{to}</div>
                 <div onClick={() => setIsOpen(false)}>
-                  <CopyToClipboard value={to} />
+                  <button onClick={() => copyToClipboard(to)}>
+                    <Icon.Copy width={16} height={16} />
+                  </button>
                 </div>
               </div>
             </div>

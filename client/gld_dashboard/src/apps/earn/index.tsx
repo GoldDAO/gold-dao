@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { ExportSquare } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 import { useAuth } from "@auth/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import StakeForm from "./stake-form";
 import StakeOverview from "./stake-overview";
@@ -41,7 +41,7 @@ const Earn = () => {
                 LEARN MORE
               </div>
               <div className="px-4 py-1 border border-border rounded-full">
-                <ExportSquare size={16} />
+                <Icon.ExternalLink width={16} />
               </div>
             </a>
           </div>

@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useAuth } from "@auth/index";
 import useSwapNFTForTokens from "@shared/hooks/useSwapNFTForTokens";
 import useMarketTransferNFTOrigyn from "@services/gld_nft/hooks/useMarketTransferNFTOrigyn";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { CollectionNameNFT, IdNFT } from "@services/gld_nft/utils/interfaces";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const CollectionItem = ({
   nft,
@@ -76,13 +76,13 @@ const CollectionItem = ({
         <div className="flex items-center gap-4">
           {swapNFTForTokens.status !== "success" && (
             <>
-              <MutationStatusIcons status={swapNFTForTokens.status} />
+              <MutationStatusIcon status={swapNFTForTokens.status} />
               <div>{nft.id_string} - Swap NFT for token</div>
             </>
           )}
           {swapNFTForTokens.status === "success" && (
             <>
-              <MutationStatusIcons status={marketTransferNFT.status} />
+              <MutationStatusIcon status={marketTransferNFT.status} />
               <div>{nft.id_string} - Market transfer NFT</div>
             </>
           )}

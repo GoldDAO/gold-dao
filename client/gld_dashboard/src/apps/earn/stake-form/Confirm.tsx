@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { StakeStateReducerAtom } from "./atoms";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Confirm = () => {
   const [stakeState, dispatch] = useAtom(StakeStateReducerAtom);

@@ -4,7 +4,7 @@ import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
 import { useAuth } from "@auth/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { NFTCollections } from "@shared/utils/nfts";
 import useFetchNFTTransferFee from "@shared/hooks/useFetchNFTTransferFee";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
@@ -14,13 +14,13 @@ import {
   TotalNFTSelectedAtom,
   RandomSelectedNFTIdAtom,
 } from "@shared/atoms/NFTStateAtom";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
-import SwitchTransfer from "./Switch";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import SwitchTransfer from "@shared/components/switch/SwitchTransfer";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
 import Balance from "@shared/components/Balance";
 import DisclaimerInsufficientOGYFunds from "./disclaimer-insufficient-ogy-funds";
-import { Logo } from "@components/logos";
+import { Logo } from "@shared/ui/logos";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const Form = () => {

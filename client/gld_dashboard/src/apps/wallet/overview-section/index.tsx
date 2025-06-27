@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import GradientCard from "@shared/components/ui/card/GradientCard";
+import GradientCard from "@shared/ui/card/GradientCard";
 import WalletListMobile from "@wallet/wallet-list-mobile";
 import FeaturesBtn from "@wallet/overview-section/FeaturesBtn";
 import HeaderNFT from "@wallet/overview-section/HeaderNFT";

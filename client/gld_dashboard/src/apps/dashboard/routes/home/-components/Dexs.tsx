@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@components/index";
-import { Logo } from "@components/logos";
+import { Logo } from "@shared/ui/logos";
 import { useTranslation, Trans } from "react-i18next";
 
 const Dexs = ({ className }: { className?: string }) => {
@@ -65,10 +64,10 @@ const Dexs = ({ className }: { className?: string }) => {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <Button className="flex items-center gap-2 px-4">
+                          <button className="flex items-center gap-2 px-4">
                             {dex.logo}
                             <div>{dex.name}</div>
-                          </Button>
+                          </button>
                         </Link>
                       </div>
                     ))}
