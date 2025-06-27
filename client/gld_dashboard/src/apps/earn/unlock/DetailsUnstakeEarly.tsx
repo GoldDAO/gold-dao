@@ -5,7 +5,7 @@ import { useAuth } from "@auth/index";
 import { UnlockStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsUnstakeEarly = () => {
   const { authenticatedAgent } = useAuth();

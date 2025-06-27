@@ -11,7 +11,7 @@ import { useAuth } from "@auth/index";
 import useFetchUserNeuronsList from "@services/sns_governance/hooks/useFetchUserNeuronsList";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import { NeuronUser } from "@services/sns_governance/utils/interfaces";
-import { Button, Logo } from "@components/index";
+import { Logo } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import {
@@ -22,7 +22,7 @@ import Address from "@components/strings/Address";
 import useGetOneNeuronRewards from "../utils/useGetOneNeuronRewards";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import ClaimRewardsConfirm from "../claim-reward/claim-one/Confirm";
 import ClaimRewardsDetails from "../claim-reward/claim-one/Details";
 
@@ -57,9 +57,9 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
   }, [rewards.data, rewards.isSuccess, rewardsFee.data, rewardsFee.isSuccess]);
 
   return (
-    <Button
+    <button
       className={clsx(
-        "px-2 py-1 rounded-md shrink-0",
+        "px-2 py-1 rounded-md shrink-0 cursor-pointer",
         "border border-border text-black dark:text-white text-sm"
       )}
       disabled={!enableClaim}
@@ -82,7 +82,7 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
       ) : (
         "Loading..."
       )}
-    </Button>
+    </button>
   );
 };
 

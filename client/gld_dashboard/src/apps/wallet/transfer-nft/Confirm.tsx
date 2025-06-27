@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
 import clsx from "clsx";
-import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { useAuth } from "@auth/index";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
+import Icon from "@shared/ui/icons";
 // import { SelectNFTStateReducerAtom } from "@atoms/NFTState";
 
 const Confirm = () => {
@@ -101,7 +101,7 @@ const Confirm = () => {
             dispatchTransferNFTState({ type: "CANCEL_SEND_CONFIRM" })
           }
         >
-          <ChevronLeftIcon className="h-6 w-6" />
+          <Icon.Chevron width={18} height={18} className="rotate-90" />
         </div>
       }
     >

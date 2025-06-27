@@ -7,7 +7,7 @@ import {
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Submit = () => {
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);

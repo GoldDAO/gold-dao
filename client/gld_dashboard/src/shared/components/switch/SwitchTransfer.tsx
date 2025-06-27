@@ -1,5 +1,3 @@
-import { Button } from "@components/index";
-
 type SwitchValue = "send" | "receive";
 
 const BtnSwitch = ({
@@ -13,16 +11,16 @@ const BtnSwitch = ({
   selected: boolean;
   handleOnClick: (value: SwitchValue) => void;
 }) => (
-  <Button
+  <button
     onClick={() => handleOnClick(value)}
-    className={`rounded-full px-6 py-3 font-medium ${
+    className={`cursor-pointer hover:opacity-80 rounded-full px-6 py-3 font-medium ${
       selected
         ? "bg-primary text-white"
         : "bg-surface-secondary text-content/60"
     }`}
   >
     {label}
-  </Button>
+  </button>
 );
 
 const SwitchTransfer = ({

@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import Form from "./Form";
 import Confirm from "./Confirm";
 import ReceiveAddress from "@wallet/shared/components/transfer-receive-address";
-import SwitchTransfer from "./Switch";
+import SwitchTransfer from "@shared/components/switch/SwitchTransfer";
 import Details from "./Details";
 
 const TransferNFTDialog = () => {

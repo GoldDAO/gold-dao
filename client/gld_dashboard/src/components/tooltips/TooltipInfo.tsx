@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import Tooltip from "./Tooltip";
+import Icon from "@shared/ui/icons";
 
 interface TooltipInfoProps extends PropsWithChildren {
   className?: string;
@@ -16,8 +16,10 @@ const TooltipInfo = ({
 }: TooltipInfoProps) => {
   return (
     <div>
-      <InformationCircleIcon
-        className="h-6 w-6 text-content/60 cursor-pointer"
+      <Icon.InfoCircle
+        width={18}
+        height={18}
+        className="text-content/60 cursor-pointer"
         data-tooltip-id={id}
       />
       <Tooltip id={id} clickable={clickable} className="max-w-64">

@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
 import { useAuth } from "@auth/index";
-import { ExternalLink } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import Address from "@components/strings/Address";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import Icon from "@shared/ui/icons";
 
 const Card = ({ step, children }: { step: number; children: ReactNode }) => {
   return (
@@ -43,12 +43,15 @@ const AddNeuron = ({
           <div className="text-content/60 text-center">
             In order to add a neuron to the Gold DAO dApp, you need to own a
             GOLDAO neuron. Follow the steps described in{" "}
-            <ExternalLink
+            <a
               href="https://docs.gold-dao.org/how-to/stake-the-goldao-tokens"
-              className="text-copper"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center hover:underline text-copper"
             >
               this guide
-            </ExternalLink>{" "}
+              <Icon.ExternalLink width={16} height={16} className="ml-2" />
+            </a>{" "}
             in order to obtain GOLDAO tokens and stake them in a GOLDAO neuron.
           </div>
         </div>
@@ -64,9 +67,15 @@ const AddNeuron = ({
             <Card.Title>
               Login to the{" "}
               <span>
-                <ExternalLink href="https://nns.ic0.app/neurons/?u=tw2vt-hqaaa-aaaaq-aab6a-cai">
+                <a
+                  href="https://nns.ic0.app/neurons/?u=tw2vt-hqaaa-aaaaq-aab6a-cai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center hover:underline"
+                >
                   NNS dApp
-                </ExternalLink>
+                  <Icon.ExternalLink width={16} height={16} className="ml-2" />
+                </a>
               </span>
             </Card.Title>
             <Card.Text>to manage your Gold DAO neurons</Card.Text>

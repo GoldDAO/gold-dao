@@ -1,7 +1,6 @@
-import clsx from "clsx";
-import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@auth/index";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import Icon from "@shared/ui/icons";
 
 const AdvancedLeftPanel = () => {
   const { isConnected } = useAuth();
@@ -18,7 +17,7 @@ const AdvancedLeftPanel = () => {
       <div className="hidden xl:block mt-8 w-full">
         <div className="flex justify-between items-center py-3 px-4 border border-border rounded-xl bg-surface-secondary hover:bg-gold/20 cursor-pointer">
           <div>GLDT Mint & Burn</div>
-          <ChevronRightIcon className={clsx("w-5 h-5")} />
+          <Icon.Chevron width={16} height={16} className="-rotate-90" />
         </div>
       </div>
       {!isConnected && (

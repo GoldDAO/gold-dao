@@ -1,5 +1,4 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { Button } from "@components/index";
 import clsx from "clsx";
 
 type Size = "sm" | "md" | "lg";
@@ -43,8 +42,9 @@ const BtnPrimary = ({
   const shapeClass =
     size === "sm" && shape === "square" ? "rounded-md" : shapeClasses[shape];
   return (
-    <Button
+    <button
       className={clsx(
+        "cursor-pointer",
         sizeClasses[size],
         variantClasses[variant],
         shapeClass,
@@ -53,7 +53,7 @@ const BtnPrimary = ({
       {...props}
     >
       {children}
-    </Button>
+    </button>
   );
 };
 

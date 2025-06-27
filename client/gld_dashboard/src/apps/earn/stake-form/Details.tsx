@@ -5,7 +5,7 @@ import { useAuth } from "@auth/index";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useCreateStake from "@services/gldt_stake/hooks/useCreateStake";
 import { StakeStateReducerAtom } from "./atoms";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Details = () => {
   const { authenticatedAgent } = useAuth();

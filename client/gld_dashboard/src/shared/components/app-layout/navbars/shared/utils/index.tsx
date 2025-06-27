@@ -1,8 +1,5 @@
 import { ReactNode } from "react";
-import { Wallet, Speedometer } from "iconsax-react";
-import Earn from "@components/icons/Earn";
-import Govern from "@components/icons/Govern";
-import Redeem from "@components/icons/Redeem";
+import Icon from "@shared/ui/icons";
 
 const navItems: {
   title: string;
@@ -13,21 +10,25 @@ const navItems: {
   {
     title: "Buy",
     url: "/buy",
-    icon: <Redeem />,
+    icon: <Icon.Redeem />,
   },
   {
     title: "Earn",
     subtitle: "Coming Soon",
     url: "/earn",
-    icon: <Earn />,
+    icon: <Icon.Earn />,
   },
   {
     title: "Govern",
     url: "/govern",
-    icon: <Govern />,
+    icon: <Icon.Govern />,
   },
-  { title: "Wallet", url: "/wallet", icon: <Wallet /> },
-  { title: "Advanced", url: "/advanced/gldt", icon: <Speedometer /> },
+  { title: "Wallet", url: "/wallet", icon: <Icon.Wallet width={24} /> },
+  {
+    title: "Advanced",
+    url: "/advanced/gldt",
+    icon: <Icon.Speedometer width={24} />,
+  },
 ];
 
 export default navItems;

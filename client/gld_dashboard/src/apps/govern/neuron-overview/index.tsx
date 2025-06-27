@@ -6,7 +6,7 @@ import useGetAllNeuronsTotalStakedAmount from "../utils/useGetAllNeuronsTotalSta
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import GradientCard from "@shared/components/ui/card/GradientCard";
+import GradientCard from "@shared/ui/card/GradientCard";
 
 const NeuronOverview = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();

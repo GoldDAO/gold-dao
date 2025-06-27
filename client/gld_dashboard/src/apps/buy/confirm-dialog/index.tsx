@@ -1,10 +1,10 @@
-import { InfoCircle, ExportSquare, Warning2 } from "iconsax-react";
 import { Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { PayToken, ReceiveToken } from "@buy/shared/utils";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import Icon from "@shared/ui/icons";
 
 const AmountUSD = ({
   className,
@@ -82,8 +82,8 @@ const ConfirmDialog = ({
                 You receive approximately
               </div>
 
-              <InfoCircle
-                size={16}
+              <Icon.InfoCircle
+                width={16}
                 data-tooltip-id="tooltip"
                 data-tooltip-content={`The exact amount of ${receiveToken.token.name} received will vary due to market
                     fluctuations and slippage.`}
@@ -125,10 +125,9 @@ const ConfirmDialog = ({
               <div className="text-content/60">Slippage</div>
               <div className="flex items-center gap-1">
                 {slippage > maxSlippage && (
-                  <Warning2
-                    size={20}
+                  <Icon.Warning
+                    width={20}
                     className="text-warning"
-                    variant="Bold"
                     data-tooltip-id="tooltip"
                     data-tooltip-html={
                       "Warning: Current slippage is large than the recommended limit of 5%. The price impact of your purchase is quite significant."
@@ -143,8 +142,8 @@ const ConfirmDialog = ({
             <div className="flex justify-between items-center px-2">
               <div className="flex items-center gap-1">
                 <div className="text-content/60">Max slippage</div>
-                <InfoCircle
-                  size={16}
+                <Icon.InfoCircle
+                  width={16}
                   data-tooltip-id="tooltip"
                   data-tooltip-html={
                     "Slippage is the difference between the expected price of a trade and the price at which it's executed.<br />The system will allow slippages up to 5% and will ask you for confirmation if the slippage is higher."
@@ -222,7 +221,7 @@ const ConfirmDialog = ({
               className={`flex items-center text-content hover:text-gold`}
             >
               <div>KongSwap</div>
-              <ExportSquare className="ml-2 h-4 w-4" />
+              <Icon.ExternalLink width={16} className="ml-2" />
             </a>
           </div>
         </div>

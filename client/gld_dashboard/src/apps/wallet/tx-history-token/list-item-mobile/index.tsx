@@ -87,7 +87,7 @@ const ListItemMobile = ({
               <div className="text-sm">
                 {tx.is_credit ? renderAddress(tx.from) : renderAddress(tx.to)}
               </div>
-              <CopyAddressBtn from={tx.from} to={tx.to} />
+              <CopyAddressBtn from={tx.from ?? "N/A"} to={tx.to ?? "N/A"} />
             </div>
             <div className="text-content/60 text-xs">{tx.timestamp}</div>
           </div>

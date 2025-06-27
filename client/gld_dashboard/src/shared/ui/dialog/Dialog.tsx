@@ -6,8 +6,7 @@ import {
   DialogTitle,
   DialogBackdrop,
 } from "@headlessui/react";
-import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@shared/ui/icons";
 
 const SIZES = {
   xs: "max-w-xs",
@@ -24,7 +23,7 @@ const BackIcon = ({ handleOnClick }: { handleOnClick: () => void }) => {
       className="p-1 rounded-full cursor-pointer hover:bg-primary hover:text-white"
       onClick={handleOnClick}
     >
-      <ChevronLeftIcon className="h-6 w-6" />
+      <Icon.Chevron className="rotate-90" />
     </div>
   );
 };
@@ -92,7 +91,7 @@ const Dialog = ({
                       "hover:bg-primary hover:text-white"
                     )}
                   >
-                    <XMarkIcon className="h-6 w-6" />
+                    <Icon.Close width={18} height={18} className="" />
                   </div>
                 </button>
               </div>

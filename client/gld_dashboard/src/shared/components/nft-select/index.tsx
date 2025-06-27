@@ -1,8 +1,8 @@
 import { useAtom } from "jotai";
 import clsx from "clsx";
-import { PlusIcon, MinusIcon } from "@heroicons/react/20/solid";
 import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
+import Icon from "@shared/ui/icons";
 
 const BtnSelect = ({
   handleOnClick,
@@ -21,9 +21,9 @@ const BtnSelect = ({
       disabled={disabled}
     >
       {action === "+" ? (
-        <PlusIcon className="h-6 w-6" />
+        <Icon.Plus width={18} height={18} />
       ) : (
-        <MinusIcon className="h-6 w-6" />
+        <Icon.Minus width={18} height={18} />
       )}
     </button>
   );

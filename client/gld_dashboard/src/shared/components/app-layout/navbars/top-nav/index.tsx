@@ -2,12 +2,12 @@ import { useState } from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { useAuth } from "@auth/index";
 import DropdownUserMenu from "@shared/components/app-layout/navbars/top-nav/user-menu";
-import { Logo } from "@components/logos";
+import { Logo } from "@shared/ui/logos";
 import navItems from "@shared/components/app-layout/navbars/shared/utils";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import Icon from "@shared/ui/icons";
 
 const TopNav = ({ className }: { className?: string }) => {
   const { isConnected } = useAuth();
@@ -44,7 +44,7 @@ const TopNav = ({ className }: { className?: string }) => {
               className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-secondary focus:outline-none"
             >
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" />
+              <Icon.Menu width={24} />
             </button>
           </div>
         </div>
@@ -80,7 +80,7 @@ const TopNav = ({ className }: { className?: string }) => {
                         className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-secondary focus:outline-none"
                       >
                         <span className="sr-only">Open main menu</span>
-                        <XMarkIcon className="h-6 w-6" />
+                        <Icon.Close width={18} height={18} />
                       </button>
                     </div>
 

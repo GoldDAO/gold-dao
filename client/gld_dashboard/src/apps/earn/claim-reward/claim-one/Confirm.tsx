@@ -11,7 +11,7 @@ import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeB
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();

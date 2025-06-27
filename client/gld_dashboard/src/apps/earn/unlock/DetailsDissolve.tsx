@@ -4,7 +4,7 @@ import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { UnlockStateReducerAtom } from "./atoms";
 import useDissolveStake from "@services/gldt_stake/hooks/useDissolveStake";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsDissolve = () => {
   const { authenticatedAgent } = useAuth();

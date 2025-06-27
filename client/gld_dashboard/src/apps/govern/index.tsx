@@ -2,7 +2,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import NeuronsOverview from "./neuron-overview";
 import NeuronsList from "./neuron-list";
@@ -12,7 +12,7 @@ import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
 import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
 import AddNeuronDialog from "./add-neuron";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Govern = () => {
   const { isConnected } = useAuth();

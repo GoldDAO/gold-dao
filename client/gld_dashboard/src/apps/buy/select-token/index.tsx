@@ -5,13 +5,13 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { Token } from "@buy/shared/utils";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import Icon from "@shared/ui/icons";
 
 const ListboxTokenOption = ({ id, name, label, canisterId }: Token) => {
   const { unauthenticatedAgent, principalId, isConnected } = useAuth();
@@ -102,7 +102,7 @@ const SelectToken = ({
               <Logo name={selected.id} className="w-6 h-6" />
               {isConnected ? renderBalance() : <div>{selected.name}</div>}
             </div>
-            <ChevronDownIcon className="ml-4 h-6 w-6" />
+            <Icon.Chevron width={18} height={18} className="ml-4" />
           </div>
         </ListboxButton>
         <ListboxOptions

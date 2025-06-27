@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "@auth/index";
 import { TransferTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
 import Address from "@components/strings/Address";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const ReceiveAddress = () => {
   const { principalId } = useAuth();

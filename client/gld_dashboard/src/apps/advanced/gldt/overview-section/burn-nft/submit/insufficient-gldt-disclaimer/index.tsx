@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const InsufficientGLDTDisclaimer = ({
   totalGLDTSelected,

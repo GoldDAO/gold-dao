@@ -4,7 +4,7 @@ import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { UnstakeStateReducerAtom } from "./atoms";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 
 const Confirm = () => {

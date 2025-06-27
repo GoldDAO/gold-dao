@@ -2,7 +2,7 @@ import { useAuth } from "@auth/index";
 import { useAtom } from "jotai";
 import { GLDTToken } from "../utils";
 import { Logo } from "@components/index";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { MIN_STAKE_AMOUNT } from "./utils";
@@ -10,7 +10,7 @@ import Form from "./Form";
 import Confirm from "./Confirm";
 import Details from "./Details";
 import { StakeStateReducerAtom } from "./atoms";
-import BtnPrimary from "@shared/components/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const StakeForm = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();

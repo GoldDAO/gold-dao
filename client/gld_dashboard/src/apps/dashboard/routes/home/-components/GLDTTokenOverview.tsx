@@ -1,6 +1,4 @@
-// import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
-
 import useFetchTotalSupply from "@services/ledger/hooks/useFetchTotalSupply";
 import useFetchTokenPrice from "@services/icpswap/hooks/useFetchTokenPrice";
 import useFetchLockedGLDNFT from "@services/gld_nft/hooks/useFetchLockedGLDNFT";

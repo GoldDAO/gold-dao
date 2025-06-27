@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
-import { ArrowRight } from "iconsax-react";
+import Icon from "@shared/ui/icons";
 import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
@@ -81,7 +81,7 @@ const ListItem = ({
                 {renderAddress(tx.from)}
               </div>
               <div className="flex justify-center">
-                <ArrowRight size={12} />
+                <Icon.Arrow width={12} className="-rotate-90" />
               </div>
               <div className="text-center">{renderAddress(tx.to)}</div>
             </div>

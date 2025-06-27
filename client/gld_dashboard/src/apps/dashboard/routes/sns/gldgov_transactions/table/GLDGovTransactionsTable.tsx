@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
-
 import { GOLDAO_LEDGER_CANISTER_ID_IC } from "@constants";
-
 import { Table, LoaderSpin } from "@components/index";
-import CopyToClipboard from "@components/buttons/CopyToClipboard";
+import Icon from "@shared/ui/icons";
+import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
 import { BadgeTransactionKind } from "@components/badges/BadgeTransactionKind";
 
 import { TableProps } from "@shared/utils/table/useTable";
@@ -24,6 +23,7 @@ export const GLDGovTransactionsTable = ({
   setSorting,
 }: TableProps) => {
   const navigate = useNavigate();
+  const { copyToClipboard } = useCopyToClipboard();
 
   const columns = useMemo<ColumnDef<Transaction>[]>(
     () => [
@@ -83,7 +83,12 @@ export const GLDGovTransactionsTable = ({
                 >
                   {getValue() as string}
                 </button>
-                <CopyToClipboard value={getValue() as string} />
+                <button
+                  className="cursor-pointer"
+                  onClick={() => copyToClipboard(getValue() as string)}
+                >
+                  <Icon.Copy width={16} height={16} />
+                </button>
               </>
             )}
           </div>
@@ -109,7 +114,12 @@ export const GLDGovTransactionsTable = ({
                 >
                   {getValue() as string}
                 </button>
-                <CopyToClipboard value={getValue() as string} />
+                <button
+                  className="cursor-pointer"
+                  onClick={() => copyToClipboard(getValue() as string)}
+                >
+                  <Icon.Copy width={16} height={16} />
+                </button>
               </>
             )}
           </div>

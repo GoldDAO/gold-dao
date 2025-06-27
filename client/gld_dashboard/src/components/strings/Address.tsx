@@ -1,4 +1,5 @@
-import CopyToClipboard from "@components/buttons/CopyToClipboard";
+import Icon from "@shared/ui/icons";
+import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
 
 const Address = ({
   enableCopyToClipboard = true,
@@ -13,6 +14,7 @@ const Address = ({
   size?: "xs" | "sm" | "md" | "lg" | "auto";
   children: string;
 }) => {
+  const { copyToClipboard } = useCopyToClipboard();
   const getSize = (size?: string) => {
     switch (size) {
       case "xs":
@@ -56,7 +58,11 @@ const Address = ({
         <span className="flex-shrink-0">…</span>
         <span className="truncate text-right">{endStr}</span>
       </div>
-      {enableCopyToClipboard && <CopyToClipboard value={children} />}
+      {enableCopyToClipboard && (
+        <button onClick={() => copyToClipboard(children)}>
+          <Icon.Copy width={16} height={16} />
+        </button>
+      )}
     </div>
   );
 };

@@ -4,10 +4,10 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@auth/index";
 import PastTxHistory from "@advanced/gldt/tx-section/past-tx-history";
 import OngoingTxHistory from "@advanced/gldt/tx-section/ongoing-tx-history";
+import Icon from "@shared/ui/icons";
 
 const TxSection = ({ className }: { className?: string }) => {
   const { isConnected } = useAuth();
@@ -56,9 +56,11 @@ const TxSection = ({ className }: { className?: string }) => {
                   )}
                 >
                   <div>Ongoing</div>
-                  <ChevronUpIcon
+                  <Icon.Chevron
+                    width={16}
+                    height={16}
                     className={clsx(
-                      "w-5 h-5 transition-transform",
+                      "transition-transform",
                       open ? "rotate-180" : "rotate-0"
                     )}
                   />
@@ -81,9 +83,11 @@ const TxSection = ({ className }: { className?: string }) => {
                   )}
                 >
                   <div>Past</div>
-                  <ChevronUpIcon
+                  <Icon.Chevron
+                    width={16}
+                    height={16}
                     className={clsx(
-                      "w-5 h-5 transition-transform",
+                      "transition-transform",
                       open ? "rotate-180" : "rotate-0"
                     )}
                   />
