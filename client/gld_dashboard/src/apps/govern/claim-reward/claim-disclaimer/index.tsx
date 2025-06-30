@@ -86,7 +86,7 @@ const ClaimRewardDisclaimer = () => {
                       </span>
                     </div>
                     <div className="text-sm text-content/60">
-                      dispatched in GOLDAO, ICP and OGY
+                      dispatched in GOLDAO, ICP, OGY and WTN
                     </div>
                   </div>
                   <button
