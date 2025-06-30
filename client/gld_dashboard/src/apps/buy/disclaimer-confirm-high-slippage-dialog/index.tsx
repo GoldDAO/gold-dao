@@ -7,13 +7,13 @@ const DisclaimerConfirmHighSlippageDialog = ({
   open,
   handleConfirm,
   handleClose,
-  slippage,
+  slippage_with_tx_fee,
   maxSlippage,
 }: {
   open: boolean;
   handleConfirm: () => void;
   handleClose: () => void;
-  slippage: number;
+  slippage_with_tx_fee: number;
   maxSlippage: number;
 }) => {
   return (
@@ -30,13 +30,13 @@ const DisclaimerConfirmHighSlippageDialog = ({
         <div className="inline-block max-w-md mx-auto">
           The current slippage is{" "}
           <span className="text-warning font-semibold">
-            <NumberToLocaleString value={slippage} />%
+            <NumberToLocaleString value={slippage_with_tx_fee} />%
           </span>{" "}
           , which exceeds the maximum recommended slippage of {maxSlippage}%.
         </div>
         <br />
         <div className="mt-2">
-          Please confirm or consider purchasing a smaller amount.
+          Please confirm or consider purchasing another amount.
         </div>
       </div>
       <div className="flex justify-center gap-2">

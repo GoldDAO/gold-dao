@@ -39,7 +39,8 @@ const Buy = () => {
   const {
     pay_token,
     receive_token,
-    slippage,
+    slippage_without_tx_fee,
+    slippage_with_tx_fee,
     network_fee,
     max_slippage,
     lp_fee,
@@ -134,6 +135,7 @@ const Buy = () => {
 
   useEffect(() => {
     if (price.isSuccess && receiveTokenPrice.isSuccess && amount > 0) {
+      console.log(price.data);
       dispatch({
         type: "SET_PRICE_DATA",
         value: {
@@ -535,7 +537,7 @@ const Buy = () => {
                     open={is_open_confirm_dialog}
                     handleClose={() => dispatch({ type: "CANCEL" })}
                     handleConfirm={
-                      slippage <= max_slippage
+                      slippage_with_tx_fee <= max_slippage
                         ? () => dispatch({ type: "CONFIRM" })
                         : () =>
                             dispatch({
@@ -544,7 +546,8 @@ const Buy = () => {
                     }
                     payToken={pay_token}
                     receiveToken={receive_token}
-                    slippage={slippage}
+                    slippage_without_tx_fee={slippage_without_tx_fee}
+                    slippage_with_tx_fee={slippage_with_tx_fee}
                     maxSlippage={max_slippage}
                     networkFee={network_fee}
                     lpFee={lp_fee}
@@ -556,10 +559,10 @@ const Buy = () => {
                     handleConfirm={() =>
                       dispatch({
                         type: "CONFIRM_HIGH_SLIPPAGE",
-                        value: { slippage },
+                        value: { slippage_with_tx_fee },
                       })
                     }
-                    slippage={slippage}
+                    slippage_with_tx_fee={slippage_with_tx_fee}
                     maxSlippage={max_slippage}
                   />
 
