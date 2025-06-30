@@ -29,7 +29,8 @@ const ConfirmDialog = ({
   handleConfirm,
   payToken,
   receiveToken,
-  slippage,
+  slippage_without_tx_fee,
+  slippage_with_tx_fee,
   maxSlippage,
   networkFee,
   lpFee,
@@ -39,7 +40,8 @@ const ConfirmDialog = ({
   handleConfirm: () => void;
   payToken: PayToken;
   receiveToken: ReceiveToken;
-  slippage: number;
+  slippage_without_tx_fee: number;
+  slippage_with_tx_fee: number;
   maxSlippage: number;
   networkFee: bigint;
   lpFee: bigint;
@@ -123,8 +125,14 @@ const ConfirmDialog = ({
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center px-2">
               <div className="text-content/60">Slippage</div>
+              <div className="text-content/60">
+                <NumberToLocaleString value={slippage_without_tx_fee} />%
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <div className="text-content/60">Slippage incl. TX fee</div>
               <div className="flex items-center gap-1">
-                {slippage > maxSlippage && (
+                {slippage_with_tx_fee > maxSlippage && (
                   <Icon.Warning
                     width={20}
                     className="text-warning"
@@ -135,7 +143,7 @@ const ConfirmDialog = ({
                   />
                 )}
                 <div className="text-content/60">
-                  <NumberToLocaleString value={slippage} />%
+                  <NumberToLocaleString value={slippage_with_tx_fee} />%
                 </div>
               </div>
             </div>

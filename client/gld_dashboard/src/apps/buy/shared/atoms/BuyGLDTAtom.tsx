@@ -10,7 +10,8 @@ import { Token, PayToken, ReceiveToken } from "@buy/shared/utils";
 type BuyGLDTState = {
   pay_token: PayToken;
   receive_token: ReceiveToken;
-  slippage: number;
+  slippage_without_tx_fee: number;
+  slippage_with_tx_fee: number;
   max_slippage: number;
   network_fee: bigint;
   lp_fee: bigint;
@@ -46,7 +47,8 @@ const initialState: BuyGLDTState = {
     decimals: null,
     fee: null,
   },
-  slippage: 0,
+  slippage_without_tx_fee: 0,
+  slippage_with_tx_fee: 0,
   max_slippage: MAX_SWAP_SLIPPAGE,
   network_fee: 0n,
   lp_fee: 0n,
@@ -94,7 +96,7 @@ const reducer = (
     | { type: "OPEN_CONFIRM_HIGH_SLIPPAGE" }
     | { type: "OPEN_DIALOG_DETAILS" }
     | { type: "CONFIRM" }
-    | { type: "CONFIRM_HIGH_SLIPPAGE"; value: { slippage: number } }
+    | { type: "CONFIRM_HIGH_SLIPPAGE"; value: { slippage_with_tx_fee: number } }
     | { type: "CANCEL" }
     | { type: "RESET" }
 ) => {
@@ -122,7 +124,8 @@ const reducer = (
 
       return {
         ...prev,
-        slippage: slippage_without_tx_fee,
+        slippage_without_tx_fee,
+        slippage_with_tx_fee: slippage,
         network_fee,
         lp_fee,
       };
@@ -172,13 +175,13 @@ const reducer = (
         is_open_details_dialog: true,
       };
     case "CONFIRM_HIGH_SLIPPAGE": {
-      const { slippage } = action.value;
+      const { slippage_with_tx_fee } = action.value;
       return {
         ...prev,
         is_open_confirm_dialog: false,
         is_open_disclaimer_confirm_high_slippage_dialog: false,
         is_open_details_dialog: true,
-        max_slippage: Math.ceil(slippage),
+        max_slippage: Math.ceil(slippage_with_tx_fee),
       };
     }
     case "RESET":
