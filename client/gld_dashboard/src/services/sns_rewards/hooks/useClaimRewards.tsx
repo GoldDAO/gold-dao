@@ -19,7 +19,7 @@ const useClaimRewards = (
     mutationFn: async ({
       tokens,
     }: {
-      tokens: ("OGY" | "ICP" | "GLDGov")[];
+      tokens: ("OGY" | "ICP" | "GLDGov" | "WTN")[];
     }) => {
       try {
         const actor = Actor.createActor(idlFactory, {
