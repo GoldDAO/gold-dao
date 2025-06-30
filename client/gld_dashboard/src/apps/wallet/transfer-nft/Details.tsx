@@ -1,136 +1,114 @@
 import { useAtom } from "jotai";
-import clsx from "clsx";
+import { useEffect } from "react";
 import { useAuth } from "@auth/index";
-import { Button, Dialog } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import Dialog from "@shared/ui/dialog/Dialog";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import { IdNFT } from "@services/gld_nft/utils/interfaces";
 import {
   CollectionNFT,
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-import { useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
-
-import { Principal } from "@dfinity/principal";
-import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import useApprove from "@services/ledger/hooks/useApprove";
-import { TransferResult } from "@services/gld_nft/interfaces";
+import useTransferNFT from "@shared/hooks/useTransferNFT";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
-import useFetchTransferFeeNFT from "@services/gld_nft/hooks/useFetchTransferFee";
-import useFetchTransferFeeLedger from "@services/ledger/hooks/useFetchTransferFee";
-
-const useTransferNFT = (
-  canisterId: string,
-  agent: Agent | HttpAgent | undefined
-) => {
-  return useMutation({
-    mutationFn: async ({ to, token_id }: { to: string; token_id: bigint }) => {
-      try {
-        const actor = Actor.createActor(idlFactoryNFT, {
-          agent,
-          canisterId,
-        });
-
-        const result = (await actor.icrc7_transfer([
-          {
-            to: {
-              owner: Principal.fromText(to),
-              subaccount: [],
-            },
-            token_id,
-            memo: [],
-            from_subaccount: [],
-            created_at_time: [],
-          },
-        ])) as TransferResult;
-        return result;
-      } catch (err) {
-        console.error(err);
-        throw new Error(`Transfer NFT error! Please retry later.`);
-      }
-    },
-  });
-};
+import useFetchNFTTransferFee from "@shared/hooks/useFetchNFTTransferFee";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const NFTItem = ({
   nft,
-  nftCollectionCanisterId,
-  approveStatus,
+  collection,
+  txFee,
 }: {
   nft: IdNFT;
-  nftCollectionCanisterId: string;
-  approveStatus: "pending" | "error" | "success" | "idle";
+  collection: CollectionNFT;
+  txFee: bigint;
 }) => {
   const { authenticatedAgent } = useAuth();
   const [transferNFTState] = useAtom(TransferNFTStateReducerAtom);
-  const transfer = useTransferNFT(nftCollectionCanisterId, authenticatedAgent);
+  const approve = useApprove(OGY_LEDGER_CANISTER_ID, authenticatedAgent);
 
-  const handleTransfer = () => {
-    transfer.mutate(
+  const transfer = useTransferNFT(
+    collection.canister_id,
+    collection.name,
+    authenticatedAgent
+  );
+
+  const handleApprove = () => {
+    approve.mutate(
       {
-        to: transferNFTState.send_receive_address,
-        token_id: nft.id_bigint,
+        amount: BigInt(collection.nfts_selected.length) * txFee,
+        spender: {
+          owner: collection.canister_id,
+        },
       },
       {
-        onSuccess: (res) => {
-          console.log("transfered");
-          console.log(res);
+        onSuccess: () => {
+          handleTransfer();
         },
       }
     );
   };
 
+  const handleTransfer = () => {
+    transfer.mutate({
+      to: transferNFTState.send_receive_address,
+      token_id: nft.id_bigint,
+    });
+  };
+
   useEffect(() => {
-    if (approveStatus === "success") {
-      console.log("transfer idle");
-      handleTransfer();
+    if (approve.isIdle) {
+      handleApprove();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [approveStatus]);
+  }, [approve.isIdle]);
 
   useEffect(() => {
     return () => {
+      approve.reset();
       transfer.reset();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleOnRetry = () => {
+  const handleOnRetryApprove = () => {
+    approve.reset();
+    handleApprove();
+  };
+  const handleOnRetryTransfer = () => {
+    approve.reset();
     transfer.reset();
-    handleTransfer();
+    handleApprove();
   };
 
   return (
     <div className="p-4 border border-border rounded-md">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          {approveStatus !== "success" && (
-            <>
-              <MutationStatusIcons status={approveStatus} />
-              <div>Approve {nft.id_string} NFT transfer amount</div>
-            </>
-          )}
-          {approveStatus === "success" && (
-            <>
-              <MutationStatusIcons status={transfer.status} />
-              <div>Transfer {nft.id_string} NFT</div>
-            </>
-          )}
-        </div>
+        {(approve.isIdle || approve.isPending) && (
+          <div className="flex items-center gap-4">
+            <MutationStatusIcon status={approve.status} />
+            <div>Approve {nft.id_string} NFT</div>
+          </div>
+        )}
+        {approve.isError && (
+          <div>
+            <BtnPrimary size="sm" onClick={handleOnRetryApprove}>
+              Retry
+            </BtnPrimary>
+          </div>
+        )}
+        {approve.isSuccess && (
+          <div className="flex items-center gap-4">
+            <MutationStatusIcon status={transfer.status} />
+            <div>Transfer {nft.id_string} NFT</div>
+          </div>
+        )}
         {transfer.isError && (
           <div>
-            <Button
-              className={clsx(
-                "px-2 py-1 rounded-md",
-                "bg-secondary text-white text-sm"
-              )}
-              onClick={handleOnRetry}
-            >
+            <BtnPrimary size="sm" onClick={handleOnRetryTransfer}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>
@@ -139,10 +117,9 @@ const NFTItem = ({
 };
 
 const NFTCollection = ({ collection }: { collection: CollectionNFT }) => {
-  const { authenticatedAgent, isConnected, unauthenticatedAgent } = useAuth();
-  const approve = useApprove(OGY_LEDGER_CANISTER_ID, authenticatedAgent);
+  const { isConnected, unauthenticatedAgent } = useAuth();
 
-  const nftTransferFee = useFetchTransferFeeNFT(
+  const txFeeNFT = useFetchNFTTransferFee(
     collection.canister_id,
     unauthenticatedAgent,
     {
@@ -152,78 +129,56 @@ const NFTCollection = ({ collection }: { collection: CollectionNFT }) => {
     }
   );
 
-  const ledgerTransferFee = useFetchTransferFeeLedger(
-    OGY_LEDGER_CANISTER_ID,
-    unauthenticatedAgent,
-    {
-      ledger: "ogy",
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  useEffect(() => {
-    if (nftTransferFee.isSuccess && ledgerTransferFee.isSuccess) {
-      approve.mutate(
-        {
-          amount:
-            BigInt(collection.nfts_selected.length) *
-            (nftTransferFee.data + ledgerTransferFee.data),
-          spender: {
-            owner: collection.canister_id,
-          },
-        },
-        {
-          onSuccess: (res) => {
-            console.log("approved");
-            console.log(res);
-          },
-        }
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    nftTransferFee.isSuccess,
-    ledgerTransferFee.isSuccess,
-    collection.canister_id,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      approve.reset();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div className="p-4 border border-border rounded-md">
       <div className="text-xl p-2 mb-3">{collection.label} collection</div>
       <div className="flex flex-col gap-2">
-        {collection.nfts_selected.map((nft) => (
-          <NFTItem
-            key={nft.id_string}
-            nft={nft}
-            nftCollectionCanisterId={collection.canister_id}
-            approveStatus={approve.status}
-          />
-        ))}
+        {collection.nfts_selected.map((nft) =>
+          !txFeeNFT.isSuccess ? (
+            <div
+              key={nft.id_string}
+              className="p-4 border border-border rounded-md"
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <MutationStatusIcon status="pending" />
+                  <div>Fetching NFT and Ledger fees..</div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <NFTItem
+              key={nft.id_string}
+              nft={nft}
+              collection={collection}
+              txFee={txFeeNFT.data.amount_e8s}
+            />
+          )
+        )}
       </div>
     </div>
   );
 };
 
-const SendNFTDetails = () => {
-  const [, dispatchTransferNFTState] = useAtom(TransferNFTStateReducerAtom);
+const Details = () => {
+  const [transferNFTState, dispatchTransferNFTState] = useAtom(
+    TransferNFTStateReducerAtom
+  );
   const [selectNFTState, dispatchSelectNFTState] = useAtom(
     SelectNFTStateReducerAtom
   );
 
-  const handleOnClose = () => {
+  const handleClose = () => {
     dispatchSelectNFTState({ type: "RESET" });
     dispatchTransferNFTState({ type: "RESET" });
   };
 
   return (
-    <>
+    <Dialog
+      open={transferNFTState.is_open_send_dialog_details}
+      handleOnClose={handleClose}
+      title="Send NFT details"
+    >
       <div className="grid grid-cols-1 gap-4 my-8">
         {[
           selectNFTState["1G"],
@@ -236,39 +191,9 @@ const SendNFTDetails = () => {
             <NFTCollection key={collection.name} collection={collection} />
           ))}
       </div>
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
-        onClick={handleOnClose}
-      >
-        Go to wallet view
-      </Button>
-    </>
-  );
-};
-
-const Details = () => {
-  const [transferNFTState, dispatchTransferNFTState] = useAtom(
-    TransferNFTStateReducerAtom
-  );
-  const [, dispatchSelectNFTState] = useAtom(SelectNFTStateReducerAtom);
-
-  const { is_open_send_dialog_details } = transferNFTState;
-
-  const handleOnClose = () => {
-    dispatchSelectNFTState({ type: "RESET" });
-    dispatchTransferNFTState({ type: "RESET" });
-  };
-
-  return (
-    <Dialog
-      open={is_open_send_dialog_details}
-      handleOnClose={handleOnClose}
-      title="Send NFT details"
-    >
-      <SendNFTDetails />
+      <BtnPrimary className="w-full" onClick={handleClose}>
+        Close
+      </BtnPrimary>
     </Dialog>
   );
 };

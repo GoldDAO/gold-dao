@@ -51,7 +51,7 @@ const useCreateStake = (
     onSuccess: () => {
       // console.log(res);
       queryClient.invalidateQueries({
-        queryKey: ["FETCH_LEDGER_BALANCE", { ledger: "gldt" }],
+        queryKey: ["FETCH_LEDGER_BALANCE", "GLDT"],
       });
       queryClient.invalidateQueries({
         queryKey: ["USER_POSITIONS"],

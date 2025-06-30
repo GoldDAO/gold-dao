@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.22.0@sha256:11730bea35bb5b41aaec9c600a6b7ac837188d21d8d9ce97f781a7b74ad1fd01
+  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.27.0@sha256:dbbe973060737fb4e515ddd44565940d96c6e5137339a43a30a18332f53999a9
   interruptible: true
   before_script:
     - dfx --version
@@ -194,7 +194,6 @@ rust lint:
   extends: .rust template
   script:
     - cargo clippy
-
 ################################################################################
 # Unit tests
 ################################################################################

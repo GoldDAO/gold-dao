@@ -2,13 +2,7 @@ spec:
   inputs:
     src-folder:
       description: The frontend project folder name. Must be located in the /client/ folder
-      options:
-        [
-          "gld_dashboard",
-          "gldt_swap_app",
-          "gld_landing_page",
-          "usdg"
-        ]
+      options: ["gld_dashboard", "gldt_swap_app", "gld_landing_page", "usdg"]
 ---
 # Frontend builds
 
@@ -88,7 +82,7 @@ $[[ inputs.src-folder ]] production build:
     ENV: "prod"
   script:
     - VERSION_STRING="${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}"
-    - ENV=$ENV VERSION=$VERSION_STRING npm run build:production --workspace $[[ inputs.src-folder ]]
+    - ENV=$ENV VITE_VERSION=$VERSION_STRING npm run build:production --workspace $[[ inputs.src-folder ]]
     - PRODUCTION_URL=$(CAN=$CANISTER_NAME NET=$NETWORK node -e 'const ids=require("./canister_ids.json"); console.log(`https://${ids[process.env.CAN][process.env.NET]}.icp0.io`);')
     - echo "$(echo '$[[ inputs.src-folder ]]' | tr '[:lower:]' '[:upper:]')_URL=$PRODUCTION_URL" > $[[ inputs.src-folder ]]_deploy.env
   artifacts:

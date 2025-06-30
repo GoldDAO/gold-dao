@@ -20,7 +20,7 @@ const useFetchUserNeuronsList = (
   const {
     enabled = true,
     placeholderData = keepPreviousData,
-    limit = 20,
+    limit = 200,
     owner,
   } = args;
 

@@ -6,11 +6,11 @@ import {
   SWAP_CANISTER_ID,
 } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useSwapTokensForNFT from "@shared/hooks/useSwapTokensForNFT";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { CollectionNameNFT, IdNFT } from "@services/gld_nft/utils/interfaces";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const CollectionItem = ({
   nft,
@@ -82,35 +82,29 @@ const CollectionItem = ({
         <div className="flex items-center gap-4">
           {approve.status !== "success" && (
             <>
-              <MutationStatusIcons status={approve.status} />
+              <MutationStatusIcon status={approve.status} />
               <div>{nft.id_string} - Ledger approve</div>
             </>
           )}
           {approve.status === "success" && (
             <>
-              <MutationStatusIcons status={swapTokensForNFT.status} />
+              <MutationStatusIcon status={swapTokensForNFT.status} />
               <div>{nft.id_string} - Swap Token for NFT</div>
             </>
           )}
         </div>
         {approve.isError && (
           <div>
-            <Button
-              className="px-2 py-1 rounded-md bg-secondary text-white text-sm"
-              onClick={handleRetryApprove}
-            >
+            <BtnPrimary size="sm" onClick={handleRetryApprove}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
         {swapTokensForNFT.isError && (
           <div>
-            <Button
-              className="px-2 py-1 rounded-md bg-secondary text-white text-sm"
-              onClick={handleRetrySwapToken}
-            >
+            <BtnPrimary size="sm" onClick={handleRetrySwapToken}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>

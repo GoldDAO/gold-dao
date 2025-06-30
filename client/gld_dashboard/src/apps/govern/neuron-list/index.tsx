@@ -1,14 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { useAtom } from "jotai";
+import { useEffect, useMemo, useState, Fragment } from "react";
+import {
+  ColumnDef,
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 import clsx from "clsx";
+import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import useFetchUserNeuronsList from "@services/sns_governance/hooks/useFetchUserNeuronsList";
 import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import { NeuronUser } from "@services/sns_governance/utils/interfaces";
-import { Button, Logo, Table } from "@components/index";
+import { Logo } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import {
   GOLDAO_LEDGER_CANISTER_ID,
   SNS_GOVERNANCE_CANISTER_ID,
@@ -17,7 +22,7 @@ import Address from "@components/strings/Address";
 import useGetOneNeuronRewards from "../utils/useGetOneNeuronRewards";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import ClaimRewardsConfirm from "../claim-reward/claim-one/Confirm";
 import ClaimRewardsDetails from "../claim-reward/claim-one/Details";
 
@@ -52,9 +57,9 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
   }, [rewards.data, rewards.isSuccess, rewardsFee.data, rewardsFee.isSuccess]);
 
   return (
-    <Button
+    <button
       className={clsx(
-        "px-2 py-1 rounded-md shrink-0",
+        "px-2 py-1 rounded-md shrink-0 cursor-pointer",
         "border border-border text-black dark:text-white text-sm"
       )}
       disabled={!enableClaim}
@@ -66,18 +71,23 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
       }
     >
       {isSuccess ? (
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Logo name="goldao" className="h-4 w-4" />
-            <Logo name="icp" className="h-4 w-4" />
-            <Logo name="ogy" className="h-4 w-4" />
+        enableClaim ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Logo name="goldao" className="h-4 w-4" />
+              <Logo name="icp" className="h-4 w-4" />
+              <Logo name="ogy" className="h-4 w-4" />
+              <Logo name="wtn" className="h-4 w-4" />
+            </div>
+            Claim rewards
           </div>
-          Claim rewards
-        </div>
+        ) : (
+          <div>No rewards available</div>
+        )
       ) : (
         "Loading..."
       )}
-    </Button>
+    </button>
   );
 };
 
@@ -87,7 +97,7 @@ const List = () => {
     ClaimRewardStateReducerAtom
   );
 
-  const { status, data } = useFetchUserNeuronsList(
+  const neurons = useFetchUserNeuronsList(
     SNS_GOVERNANCE_CANISTER_ID,
     unauthenticatedAgent,
     {
@@ -126,7 +136,7 @@ const List = () => {
             ) : (
               <>
                 <Logo name="goldao" className="h-4" />
-                <TokenValueToLocaleString
+                <E8sToLocaleString
                   value={getValue() as bigint}
                   tokenDecimals={decimals.data}
                 />
@@ -185,6 +195,12 @@ const List = () => {
     [decimals.isSuccess, decimals.data]
   );
 
+  const table = useReactTable({
+    data: neurons.data ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   const renderDisconnectedPlaceholder = () => {
     return (
       <div className="flex flex-col gap-4 relative">
@@ -216,9 +232,9 @@ const List = () => {
     return renderDisconnectedPlaceholder();
   }
 
-  if (status === "success" && data?.length === 0) {
+  if (neurons.isSuccess && neurons.data?.length === 0) {
     return (
-      <div className="p-4 flex justify-center border border-border rounded-lg">
+      <div className="p-4 flex justify-center border bg-surface-primary border-border rounded-xl">
         <div>No neurons found</div>
       </div>
     );
@@ -226,24 +242,75 @@ const List = () => {
 
   return (
     <>
-      <div className="bg-surface-primary rounded-xl p-2 border border-border">
-        {status === "success" ? (
-          <Table
-            columns={columns}
-            data={data}
-            pagination={{
-              pageIndex: 0,
-              pageSize: 100,
-            }}
-            serverSide={false}
-          />
+      <div className="bg-surface-primary rounded-xl p-2 border border-border overflow-x-auto w-full">
+        {neurons.isSuccess ? (
+          <table className="table-auto w-full">
+            <thead className="text-content/60">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="py-4 px-8 font-normal text-sm"
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={`flex items-center ${
+                            (
+                              header.column.columnDef.meta as {
+                                className?: string;
+                              }
+                            )?.className ?? "justify-center"
+                          }`}
+                        >
+                          <div className="flex shrink-0">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <Fragment key={row.id}>
+                  <tr className="border-b last:border-none border-border text-sm">
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={`px-8 py-4 overflow-hidden text-ellipsis whitespace-nowrap ${
+                          (
+                            cell.column.columnDef.meta as {
+                              className?: string;
+                            }
+                          )?.className ?? "text-center"
+                        }`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <div className="flex justify-center items-center p-4 xl:p-8">
-            {status === "pending" && <div>Loading...</div>}
-            {status === "error" && <div>Error</div>}
+            {neurons.isPending && <div>Loading...</div>}
+            {neurons.isError && <div>Error</div>}
           </div>
         )}
       </div>
+
       {/* CLAIM REWARDS DIALOGS */}
       <Dialog
         open={claimRewardState.is_open_claim_dialog_confirm}

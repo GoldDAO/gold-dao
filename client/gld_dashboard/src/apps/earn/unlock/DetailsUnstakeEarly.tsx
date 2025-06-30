@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
 import { UnlockStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsUnstakeEarly = () => {
   const { authenticatedAgent } = useAuth();
@@ -46,29 +44,23 @@ const DetailsUnstakeEarly = () => {
       {unstakeEarly.isError && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-amber-700">Unstake error</div>
+            <div className="text-xl text-warning">Unstake error</div>
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
-            <Button
-              onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            <BtnPrimary onClick={handleRetry} variant="outlined">
               Retry
-            </Button>
-            <Button
-              onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            </BtnPrimary>
+            <BtnPrimary onClick={() => dispatch({ type: "RESET" })}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       )}
       {unstakeEarly.isSuccess && (
         <div className="grid grid-cols-1 gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-green-700">Unstake success</div>
+            <div className="text-xl text-success">Unstake success</div>
             <div>You successfully unstaked your stake.</div>
           </div>
           <div className="grid grid-cols-1 gap-4 text-center">
@@ -76,15 +68,12 @@ const DetailsUnstakeEarly = () => {
               You will be charged of (todo) GLDT.
             </div>
           </div>
-          <Button
-            className={clsx(
-              "px-4 py-3 rounded-md",
-              "bg-secondary text-white w-full"
-            )}
+          <BtnPrimary
+            className="w-full"
             onClick={() => dispatch({ type: "RESET" })}
           >
             Close
-          </Button>
+          </BtnPrimary>
         </div>
       )}
     </div>

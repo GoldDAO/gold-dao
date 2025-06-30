@@ -24,7 +24,7 @@ export const LoaderSpin = ({
   return (
     <div className={`${className}`}>
       <div
-        className={`border-primary/20 border-t-primary animate-spin rounded-full ${getSize(
+        className={`border-gold/20 border-t-gold animate-spin rounded-full ${getSize(
           size
         )}`}
       />

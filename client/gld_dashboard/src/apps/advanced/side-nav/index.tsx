@@ -1,24 +1,29 @@
-import clsx from "clsx";
-import { ChevronRightIcon } from "@heroicons/react/24/solid";
+import { useAuth } from "@auth/index";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import Icon from "@shared/ui/icons";
 
 const AdvancedLeftPanel = () => {
+  const { isConnected } = useAuth();
   return (
-    <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow px-4 xl:px-8">
-      <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4">
-        <div className="font-semibold text-primary/90">Advanced</div>
+    <>
+      <div className="text-4xl xl:text-6xl flex flex-col justify-center items-center xl:items-start">
+        <div className="font-semibold text-gold">Advanced</div>
         <div className="font-light">features</div>
       </div>
-      <div className="text-content/60 my-3">
+      <div className="text-content/60 text-center xl:text-left my-3">
         Dive into advanced features of the Gold DAO such as minting and burning
         of GLDT, and more to come.
       </div>
-      <div className="mt-8 w-full">
-        <div className="flex justify-between items-center py-3 px-4 border border-border rounded-xl bg-surface-secondary hover:bg-primary/20 transition-colors cursor-pointer">
-          <div>GLDT</div>
-          <ChevronRightIcon className={clsx("w-5 h-5")} />
+      <div className="hidden xl:block mt-8 w-full">
+        <div className="flex justify-between items-center py-3 px-4 border border-border rounded-xl bg-surface-secondary hover:bg-gold/20 cursor-pointer">
+          <div>GLDT Mint & Burn</div>
+          <Icon.Chevron width={16} height={16} className="-rotate-90" />
         </div>
       </div>
-    </div>
+      {!isConnected && (
+        <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
+      )}
+    </>
   );
 };
 

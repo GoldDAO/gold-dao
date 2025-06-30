@@ -12,9 +12,6 @@ import GoldDAOProposalDetails from "./sns/gold_dao_proposal_details/GoldDAOPropo
 import GoldDAONeurons from "./sns/gold_dao_neurons/GoldDAONeurons";
 import GoldDAONeuronDetails from "./sns/gold_dao_neuron_details/GoldDAONeuronDetails";
 import GLDGovAccount from "./sns/gldgov_account/GLDGovAccount";
-import AccountTransfer from "./account.transfer/AccountTransfer";
-
-import Account from "./account/Account";
 
 const routes: RouteObject[] = [
   {
@@ -86,19 +83,6 @@ const routes: RouteObject[] = [
           {
             path: "accounts/:id",
             element: <GLDGovAccount />,
-          },
-        ],
-      },
-      {
-        path: "account",
-        children: [
-          {
-            index: true,
-            element: <Account />,
-          },
-          {
-            path: "transfer",
-            element: <AccountTransfer />,
           },
         ],
       },

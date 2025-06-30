@@ -1,15 +1,14 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
+// import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
 import { Reward } from "../../utils";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const TokenItem = ({ reward }: { reward: Reward }) => {
   const { authenticatedAgent } = useAuth();
@@ -43,20 +42,14 @@ const TokenItem = ({ reward }: { reward: Reward }) => {
     <div className="p-4 border border-border rounded-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <MutationStatusIcons status={claim.status} />
+          <MutationStatusIcon status={claim.status} />
           <div>Claiming {reward.name} reward</div>
         </div>
         {claim.isError && (
           <div>
-            <Button
-              className={clsx(
-                "px-2 py-1 rounded-md",
-                "bg-secondary text-white text-sm"
-              )}
-              onClick={handleOnRetry}
-            >
+            <BtnPrimary size="sm" onClick={handleOnRetry}>
               Retry
-            </Button>
+            </BtnPrimary>
           </div>
         )}
       </div>
@@ -75,15 +68,12 @@ const Details = () => {
           <TokenItem key={reward.id} reward={reward} />
         ))}
       </div>
-      <Button
-        className={clsx(
-          "px-4 py-3 rounded-md w-full",
-          "bg-secondary text-white"
-        )}
+      <BtnPrimary
+        className="w-full"
         onClick={() => dispatch({ type: "RESET" })}
       >
         Go to earn view
-      </Button>
+      </BtnPrimary>
     </>
   );
 };

@@ -1,35 +1,20 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
 import { UnlockStateReducerAtom } from "./atoms";
 import useDissolveStake from "@services/gldt_stake/hooks/useDissolveStake";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsDissolve = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
   const [unlockState, dispatch] = useAtom(UnlockStateReducerAtom);
   const dissolve = useDissolveStake(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
   const handleDissolve = () => {
-    dissolve.mutate(
-      {
-        id: unlockState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("dissolved");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-        },
-      }
-    );
+    dissolve.mutate({
+      id: unlockState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {
@@ -55,29 +40,23 @@ const DetailsDissolve = () => {
       {dissolve.isError && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-amber-700">Unlock stake error</div>
+            <div className="text-xl text-warning">Unlock stake error</div>
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
-            <Button
-              onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            <BtnPrimary onClick={handleRetry} variant="outlined">
               Retry
-            </Button>
-            <Button
-              onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            </BtnPrimary>
+            <BtnPrimary onClick={() => dispatch({ type: "RESET" })}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       )}
       {dissolve.isSuccess && (
         <div className="grid grid-cols-1 gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-green-700">Unlock stake success</div>
+            <div className="text-xl text-success">Unlock stake success</div>
             <div>You successfully unlocked your stake.</div>
           </div>
           <div className="grid grid-cols-1 gap-4 text-center">
@@ -87,15 +66,12 @@ const DetailsDissolve = () => {
               During this time, you are not receiving any new rewards.
             </div>
           </div>
-          <Button
-            className={clsx(
-              "px-4 py-3 rounded-md",
-              "bg-secondary text-white w-full"
-            )}
+          <BtnPrimary
+            className="w-full"
             onClick={() => dispatch({ type: "RESET" })}
           >
             Close
-          </Button>
+          </BtnPrimary>
         </div>
       )}
     </div>

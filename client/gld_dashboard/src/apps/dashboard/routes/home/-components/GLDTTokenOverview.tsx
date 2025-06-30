@@ -1,6 +1,4 @@
-// import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
-
 import useFetchTotalSupply from "@services/ledger/hooks/useFetchTotalSupply";
 import useFetchTokenPrice from "@services/icpswap/hooks/useFetchTokenPrice";
 import useFetchLockedGLDNFT from "@services/gld_nft/hooks/useFetchLockedGLDNFT";
@@ -15,7 +13,7 @@ import {
   GLD_NFT_100G_CANISTER_ID,
   GLD_NFT_1000G_CANISTER_ID,
 } from "@constants";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { divideBy1e8 } from "@shared/utils/numbers";
 import { useAuth } from "@auth/index";
 

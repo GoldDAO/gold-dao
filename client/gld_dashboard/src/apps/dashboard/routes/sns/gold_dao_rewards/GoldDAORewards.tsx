@@ -1,8 +1,4 @@
-// import { InformationCircleIcon } from "@heroicons/react/20/solid";
-import { Button } from "@components/index";
 import { useTranslation } from "react-i18next";
-
-// import { LoaderSpin, Logo } from "@components/index";
 
 const GoldDAORewards = ({ className }: { className?: string }) => {
   const { t } = useTranslation("sns/sns_rewards");
@@ -13,7 +9,7 @@ const GoldDAORewards = ({ className }: { className?: string }) => {
         <div className="">
           <div>{t("description")}</div>
           <div className="mt-6">
-            <Button>Learn More</Button>
+            <button>Learn More</button>
           </div>
         </div>
         <div className="">Slider</div>

@@ -4,16 +4,15 @@ import clsx from "clsx";
 import { FieldValues, useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { useAuth } from "@auth/index";
-import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
-import { Logo, Button } from "@components/index";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import { Logo } from "@components/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { SendTokenStateAtom } from "@wallet/shared/atoms/TransferTokenAtom";
-import useFetchUserBalance from "@services/ledger/hooks/useFetchUserBalance";
-import useFetchTokenData from "@shared/hooks/useFetchTokenData";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import ICRCAccount from "./form-input/ICRCAccount";
 import PrincipalAndSubaccount from "./form-input/PrincipalAndSubaccount";
 import ICRCAccountOrAccountId from "./form-input/ICRCAccountOrAccountId";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const InputCard = ({ children }: { children: ReactNode }) => {
   return (
@@ -55,17 +54,15 @@ const Form = ({ className }: { className?: string }) => {
     defaultValue: "",
   });
 
-  const balance = useFetchUserBalance(token.canisterId, unauthenticatedAgent, {
-    ledger: token.id,
-    owner: principalId,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
-
-  const tokenData = useFetchTokenData(unauthenticatedAgent, {
-    token: token.id,
-    token_canister_id: token.canisterId,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
+  const balance = useFetchLedgerBalance(
+    token.canisterId,
+    unauthenticatedAgent,
+    {
+      ledger: token.name,
+      owner: principalId,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   useEffect(() => {
     if (amount_input !== "") {
@@ -76,7 +73,7 @@ const Form = ({ className }: { className?: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!balance.isSuccess || !tokenData.isSuccess) {
+  if (!balance.isSuccess) {
     return (
       <div className="flex justify-center items-center px-4 py-16 xl:py-32">
         Loading...
@@ -90,35 +87,35 @@ const Form = ({ className }: { className?: string }) => {
       return 0n;
     } else {
       const amountValue = BigInt(
-        Math.round(value * 10 ** tokenData.data.decimals)
+        Math.round(value * 10 ** balance.data.decimals)
       );
-      if (amountValue + tokenData.data.fee_e8s !== balance.data)
-        return amountValue - tokenData.data.fee_e8s;
+      if (amountValue + balance.data.fee_e8s !== balance.data.balance_e8s)
+        return amountValue - balance.data.fee_e8s;
       else return amountValue;
     }
   };
 
   const isAmountBelowBalance = (value: string) => {
     const amount =
-      BigInt(Math.round(parseFloat(value) * 10 ** tokenData.data.decimals)) +
-      tokenData.data.fee_e8s;
-    if (amount > balance.data) return false;
+      BigInt(Math.round(parseFloat(value) * 10 ** balance.data.decimals)) +
+      balance.data.fee_e8s;
+    if (amount > balance.data.balance_e8s) return false;
     return true;
   };
 
   const isAmountAboveFee = (value: string) => {
     const amount = BigInt(
-      Math.round(parseFloat(value) * 10 ** tokenData.data.decimals)
+      Math.round(parseFloat(value) * 10 ** balance.data.decimals)
     );
-    if (amount <= tokenData.data.fee_e8s) return false;
+    if (amount <= balance.data.fee_e8s) return false;
     return true;
   };
 
   const handleOnClickMaxBalance = () => {
-    const amount = balance.data - tokenData.data.fee_e8s;
+    const amount = balance.data.balance_e8s - balance.data.fee_e8s;
     setValue(
       "amount",
-      amount > 0 ? Number(amount) / 10 ** tokenData.data.decimals : 0,
+      amount > 0 ? Number(amount) / 10 ** balance.data.decimals : 0,
       {
         shouldValidate: true,
       }
@@ -148,7 +145,7 @@ const Form = ({ className }: { className?: string }) => {
     <form onSubmit={handleSubmit(handleOnSubmit)} className={className}>
       <div className="flex justify-center mb-8">
         <div className="text-4xl">
-          Send <span className="font-semibold text-primary">{token.name}</span>
+          Send <span className="font-semibold text-gold">{token.name}</span>
         </div>
       </div>
       <div className="flex flex-col gap-4 mt-4">
@@ -168,25 +165,25 @@ const Form = ({ className }: { className?: string }) => {
               </div>
             )}
             <div className="shrink-0">
-              <Button
+              <button
                 onClick={handleSwitchAddress}
-                className="w-full px-4 py-4 border border-primary bg-primary/10 text-primary font-medium rounded-md"
+                className="w-full px-6 py-3 border border-gold bg-gold/10 font-semibold text-gold text-base rounded-xl"
               >
                 {!is_use_icrc_account
                   ? "Use ICRC Account"
                   : "Use Principal & Subaccount"}
-              </Button>
+              </button>
             </div>
           </div>
           <ErrorMessage
             errors={error_message_receive_address}
             name="principal"
             as="div"
-            className="text-red-600 text-sm mt-1"
+            className="text-danger text-sm mt-1"
           />
         </div>
         <div>
-          <div className="text-primary text-sm mb-2">Amount</div>
+          <div className="text-copper text-sm font-semibold mb-2">Amount</div>
           <InputCard>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -229,12 +226,12 @@ const Form = ({ className }: { className?: string }) => {
             <div className="text-content/40 text-sm mt-2 ml-1">
               $
               <NumberToLocaleString
-                value={Number(watchedAmount * tokenData.data.price_usd)}
+                value={Number(watchedAmount * balance.data.price_usd)}
               />
             </div>
           </InputCard>
           {errors && (
-            <p className="text-red-600 text-sm mt-1">
+            <p className="text-danger text-sm mt-1">
               {typeof errors?.amount?.message === "string" &&
                 errors.amount.message}
             </p>
@@ -243,32 +240,29 @@ const Form = ({ className }: { className?: string }) => {
         <div className="flex items-center justify-between">
           <div className="inline-flex text-content/60 items-center gap-1 text-sm bg-surface-secondary rounded-md px-2 py-1">
             <div className="text-content/40">Available:</div>
-            <TokenValueToLocaleString
-              value={balance.data}
-              tokenDecimals={tokenData.data.decimals}
-            />
+            <NumberToLocaleString value={balance.data.balance} />
             <div>{token.name}</div>
           </div>
           <div className="inline-flex text-content/60 items-center gap-1 text-sm">
             <div className="text-content/40">Fee:</div>
-            <NumberToLocaleString value={tokenData.data.fee} />
+            <NumberToLocaleString value={balance.data.fee} />
             <div>{token.name}</div>
             <div className="text-content/40">
               ≈ $
-              <NumberToLocaleString value={tokenData.data.fee_usd} />
+              <NumberToLocaleString value={balance.data.fee_usd} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           type="submit"
           disabled={!isValid || !is_valid_receive_address}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
+          className="w-full"
         >
           Transfer
-        </Button>
+        </BtnPrimary>
       </div>
     </form>
   );

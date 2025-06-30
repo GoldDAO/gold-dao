@@ -19,7 +19,7 @@ const RenderValueNFT = ({ value }: { value: number }) => {
       <div className="w-[32px] flex justify-center items-center">
         <img
           className="flex-none h-8"
-          src={`/gold-bars/${getCollectionNameByValue(value)}.svg`}
+          src={`/gold-bars/${getCollectionNameByValue(value)}.png`}
         />
       </div>
       <div className="text-left">

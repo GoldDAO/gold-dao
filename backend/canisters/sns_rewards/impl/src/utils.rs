@@ -8,9 +8,7 @@ use icrc_ledger_types::icrc1::{
 };
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{Neuron, NeuronId};
-use time;
-use time::macros::datetime;
-use time::{error::ComponentRange, Weekday};
+use time::Weekday;
 use tracing::debug;
 use types::{TimestampMillis, TokenSymbol};
 
@@ -57,7 +55,10 @@ impl TimeInterval {
             let weekday = match Weekday::from_str(weekday_str) {
                 Ok(w) => w,
                 Err(e) => {
-                    debug!("Invalid Weekday set for distribution reward interval");
+                    debug!(
+                        "Invalid Weekday set for distribution reward interval: {}",
+                        e
+                    );
                     return false;
                 } // Invalid weekday index
             };
@@ -109,7 +110,7 @@ pub async fn transfer_token(
             to: to_account,
             fee: None,
             created_at_time: None,
-            amount: amount,
+            amount,
             memo: None,
         }),
     )
@@ -151,7 +152,6 @@ pub async fn fetch_neuron_data_by_id(neuron_id: &NeuronId) -> FetchNeuronDataByI
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AuthenticateByHotkeyResponse {
-    NeuronHotKeyAbsent,
     Ok(bool),
     NeuronHotKeyInvalid,
 }
@@ -177,7 +177,7 @@ pub fn authenticate_by_hotkey(
 pub fn validate_set_reserve_transfer_amounts_payload(
     args: &HashMap<TokenSymbol, Nat>,
 ) -> Result<(), String> {
-    if args.len() < (1 as usize) {
+    if args.is_empty() {
         return Err("Should contain at least 1 token symbol and amount to update".to_string());
     }
 
@@ -193,27 +193,18 @@ pub fn validate_set_reserve_transfer_amounts_payload(
     Ok(())
 }
 
-pub fn validate_set_daily_gldgov_burn_rate_payload(amount: &Nat) -> Result<(), String> {
+pub fn validate_set_daily_goldao_burn_rate_payload(amount: &Nat) -> Result<(), String> {
     if amount == &Nat::from(0u64) {
-        return Err(format!(
-            "ERROR : The amount for burning must be more than 0"
-        ));
+        return Err("ERROR : The amount for burning must be more than 0".to_string());
     }
 
     Ok(())
-}
-
-pub fn tracer(msg: &str) {
-    unsafe {
-        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use candid::Principal;
     use sns_governance_canister::types::{Neuron, NeuronId, NeuronPermission};
-    use types::TimestampMillis;
 
     use super::authenticate_by_hotkey;
     use crate::utils::{AuthenticateByHotkeyResponse, TimeInterval};

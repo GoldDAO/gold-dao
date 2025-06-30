@@ -1,4 +1,4 @@
-import NumberToLocaleString from "@components/numbers/NumberToLocaleString";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const BurnInfos = ({
   totalGLDTSelected,
@@ -10,17 +10,17 @@ const BurnInfos = ({
   return (
     <div className="text-sm">
       You are burning{" "}
-      <span className="font-semibold text-primary">
+      <span className="text-copper font-semibold">
         <NumberToLocaleString value={totalGLDTSelected} /> GLDT
       </span>{" "}
       and will receive{" "}
-      <span className="font-semibold text-primary">
+      <span className="text-copper font-semibold">
         {totalNFTSelected} GLD NFTs
       </span>
       .
       <br />
       For this, you are charged a fee of{" "}
-      <span className="font-semibold text-primary">
+      <span className="text-copper font-semibold">
         {totalNFTSelected} x 1 GLDT
       </span>{" "}
       which will go to the Gold DAO treasury.

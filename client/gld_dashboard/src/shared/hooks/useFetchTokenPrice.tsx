@@ -58,22 +58,22 @@ const useFetchTokenPrice = (
           agent,
           canisterId: KONGSWAP_CANISTER_ID_IC,
         });
-        const feeToken = await icrc1_fee(actorTokenLedger);
-        const decimalsToken = await icrc1_decimals(actorTokenLedger);
+        const fee = await icrc1_fee(actorTokenLedger);
+        const decimals = await icrc1_decimals(actorTokenLedger);
 
         const price = await swap_amounts(actorKongswap, {
           from: from,
           to: "ckUSDC",
-          amount,
+          amount: 1n,
         });
 
         return {
           from: from,
           to: "ckUSDC",
           amount,
-          decimals: decimalsToken,
-          fee: feeToken,
-          amount_usd: (amount_number / 10 ** decimalsToken) * price.mid_price,
+          decimals,
+          fee,
+          amount_usd: (amount_number / 10 ** decimals) * price.mid_price,
         };
       } catch (err) {
         console.log(err);

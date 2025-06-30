@@ -1,15 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
-
 import { useAuth } from "@auth/index";
-
 import { LoaderSpin, Logo } from "@components/index";
-
 import {
   SNS_NEURONS_ICP_CANISTER_ID,
   SNS_NEURONS_OGY_CANISTER_ID,
 } from "@constants";
-
 import useFetchSNSNeuronsICP from "@services/sns_neurons/hooks/useFetchSNSNeuronsICP";
 import useFetchSNSNeuronsOGY from "@services/sns_neurons/hooks/useFetchSNSNeuronsOGY";
 import useFetchSNSNeuronsWTN from "@services/sns_neurons/hooks/useFetchSNSNeuronsWTN";
@@ -47,11 +42,11 @@ const GoldDAOOwnedNeuronsOverview = ({ className }: { className?: string }) => {
                   <div className="font-light text-content/60">
                     {t("icp_neurons.title")}
                   </div>
-                  <InformationCircleIcon
+                  {/* <InformationCircleIcon
                     className="size-5 text-accent/60"
                     data-tooltip-id="tooltip"
                     data-tooltip-content={t("icp_neurons.tooltip")}
-                  />
+                  /> */}
                 </div>
 
                 {neuronsICP.isSuccess && (
@@ -74,11 +69,11 @@ const GoldDAOOwnedNeuronsOverview = ({ className }: { className?: string }) => {
                   <div className="font-light text-content/60">
                     {t("ogy_neurons.title")}
                   </div>
-                  <InformationCircleIcon
+                  {/* <InformationCircleIcon
                     className="size-5 text-accent/60"
                     data-tooltip-id="tooltip"
                     data-tooltip-content={t("ogy_neurons.tooltip")}
-                  />
+                  /> */}
                 </div>
 
                 {neuronsOGY.isSuccess && (
@@ -101,11 +96,11 @@ const GoldDAOOwnedNeuronsOverview = ({ className }: { className?: string }) => {
                   <div className="font-light text-content/60">
                     {t("wtn_neurons.title")}
                   </div>
-                  <InformationCircleIcon
+                  {/* <InformationCircleIcon
                     className="size-5 text-accent/60"
                     data-tooltip-id="tooltip"
                     data-tooltip-content={t("wtn_neurons.tooltip")}
-                  />
+                  /> */}
                 </div>
 
                 {neuronsWTN.isSuccess && (

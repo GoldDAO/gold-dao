@@ -5,3 +5,9 @@ export type IdNFT = {
 };
 
 export type CollectionNameNFT = "1G" | "10G" | "100G" | "1KG";
+
+export type NFTCollection = {
+  canisterId: string;
+  grams: number;
+  name: CollectionNameNFT;
+};

@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
-import Dialog from "@components/dialogs/Dialog";
+import Dialog from "@shared/ui/dialog/Dialog";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import MintSubmit from "@advanced/gldt/overview-section/mint-nft/submit";
 import MintConfirm from "@advanced/gldt/overview-section/mint-nft/confirm";
 import MintDetails from "@advanced/gldt/overview-section/mint-nft/details";
-import Switch from "@shared/components/ui/switch/SwitchWithLabel";
+import SwitchMintBurn from "@shared/components/switch/SwitchMintBurn";
 
 const MintNFT = () => {
   const [swapNFT, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
@@ -16,6 +16,15 @@ const MintNFT = () => {
     dispatchSwapNFT({ type: "RESET" });
   };
 
+  const handleChangeTab = (value: "mint" | "burn") => {
+    dispatchSelectNFTState({ type: "RESET" });
+    if (value === "mint") {
+      dispatchSwapNFT({ type: "INIT_MINT_MODE" });
+    } else {
+      dispatchSwapNFT({ type: "INIT_BURN_MODE" });
+    }
+  };
+
   return (
     <>
       <Dialog
@@ -23,23 +32,11 @@ const MintNFT = () => {
         handleOnClose={handleCloseSwapNFTDialog}
       >
         <div className="flex justify-center mb-8">
-          <Switch
-            value={swapNFT.mode}
-            labelLeft="Mint"
-            labelRight="Burn"
-            handleClickLeft={() => {
-              dispatchSelectNFTState({ type: "RESET" });
-              dispatchSwapNFT({ type: "INIT_MINT_MODE" });
-            }}
-            handleClickRight={() => {
-              dispatchSelectNFTState({ type: "RESET" });
-              dispatchSwapNFT({ type: "INIT_BURN_MODE" });
-            }}
-          />
+          <SwitchMintBurn value={swapNFT.mode} handleChange={handleChangeTab} />
         </div>
-
         <MintSubmit />
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "mint" && swapNFT.step === "confirm"}
         handleOnClose={handleCloseSwapNFTDialog}
@@ -51,6 +48,7 @@ const MintNFT = () => {
           <MintConfirm />
         </div>
       </Dialog>
+
       <Dialog
         open={swapNFT.mode === "mint" && swapNFT.step === "details"}
         handleOnClose={handleCloseSwapNFTDialog}

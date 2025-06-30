@@ -1,6 +1,6 @@
 import { useGetUserNftsMetrics } from "@shared/hooks/gld_nft";
 import { LoaderSpin } from "@components/index";
-import { LogoGLDT } from "@components/logos";
+import { LogoGLDT } from "@shared/ui/logos";
 
 const TotalSwappedGLDT = ({ className }: { className?: string }) => {
   const { data, isSuccess, isLoading, isError } = useGetUserNftsMetrics();

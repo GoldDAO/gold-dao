@@ -8,7 +8,6 @@ use crate::utils::random_principal;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
-use canister_time::DAY_IN_MS;
 use gldt_stake_api_canister::Args;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
@@ -16,7 +15,6 @@ use sns_governance_canister::types::Neuron;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::time::Duration;
 use std::time::SystemTime;
 use types::BuildVersion;
 use types::CanisterId;
@@ -172,7 +170,9 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)); // Friday 6 Dec 2024, 12:01:00
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
+        ); // Friday 6 Dec 2024, 12:01:00
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
             test_mode: true,
@@ -308,7 +308,9 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)); // Friday 6 Dec 2024, 12:01:00
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
+        ); // Friday 6 Dec 2024, 12:01:00
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
             test_mode: true,

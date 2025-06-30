@@ -51,8 +51,8 @@ impl RuntimeState {
                 .map(|(token, val)| format!("{:?} - {}", token, val))
                 .collect(),
             last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
-            last_daily_gldgov_burn_time: self.data.last_daily_gldgov_burn.clone(),
-            daily_gldgov_burn_amount: self.data.daily_gldgov_burn_rate.clone(),
+            last_daily_goldao_burn_time: self.data.last_daily_goldao_burn,
+            daily_goldao_burn_amount: self.data.daily_goldao_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
             neuron_sync_interval: self.data.neuron_sync_interval.clone(),
             registered_tokens: self
@@ -92,8 +92,8 @@ pub struct Metrics {
     pub authorized_principals: Vec<Principal>,
     pub daily_reserve_transfer: Vec<String>,
     pub last_daily_reserve_transfer_time: TimestampMillis,
-    pub last_daily_gldgov_burn_time: Option<TimestampMillis>,
-    pub daily_gldgov_burn_amount: Option<Nat>,
+    pub last_daily_goldao_burn_time: Option<TimestampMillis>,
+    pub daily_goldao_burn_amount: Option<Nat>,
     pub reward_distribution_interval: Option<TimeInterval>,
     pub neuron_sync_interval: Option<TimeInterval>,
     pub registered_tokens: Vec<String>,
@@ -138,10 +138,10 @@ pub struct Data {
     pub daily_reserve_transfer: ReserveTokenAmounts,
     /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
     pub last_daily_reserve_transfer_time: TimestampMillis,
-    /// The daily burn rate of GLDGov - settable via a proposal
-    pub daily_gldgov_burn_rate: Option<Nat>,
-    /// The last time a burn of GLDGov was done
-    pub last_daily_gldgov_burn: Option<TimestampMillis>,
+    /// The daily burn rate of GOLDAO - settable via a proposal
+    pub daily_goldao_burn_rate: Option<Nat>,
+    /// The last time a burn of GOLDAO was done
+    pub last_daily_goldao_burn: Option<TimestampMillis>,
     /// The weekly interval for which a reward distribution occurs
     pub reward_distribution_interval: Option<TimeInterval>,
     /// An internal check if the distribution is running
@@ -163,8 +163,8 @@ impl Default for Data {
             is_synchronizing_neurons: false,
             daily_reserve_transfer: HashMap::new(),
             last_daily_reserve_transfer_time: TimestampMillis::default(),
-            daily_gldgov_burn_rate: None,
-            last_daily_gldgov_burn: None,
+            daily_goldao_burn_rate: None,
+            last_daily_goldao_burn: None,
             reward_distribution_interval: Some(TimeInterval::default()),
             reward_distribution_in_progress: Some(false),
             neuron_sync_interval: Some(TimeInterval {

@@ -31,7 +31,7 @@ pub async fn set_reserve_transfer_amounts_validate(
 pub fn validate_set_reserve_transfer_amounts_payload(
     args: &HashMap<TokenSymbol, Nat>,
 ) -> Result<(), String> {
-    if args.len() < (1 as usize) {
+    if args.is_empty() {
         return Err("Should contain at least 1 token symbol and amount to update".to_string());
     }
 

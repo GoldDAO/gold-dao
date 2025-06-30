@@ -11,7 +11,6 @@ import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { Ledger } from "@services/ledger/utils/interfaces";
 
 const useFetchLedgerBalance = (
   canisterId: string,
@@ -25,10 +24,11 @@ const useFetchLedgerBalance = (
       fee: number;
       fee_usd: number;
       fee_e8s: bigint;
+      price_usd: number;
     }>,
     "queryKey" | "queryFn"
   > & {
-    ledger: Ledger;
+    ledger: string;
     owner: string;
   }
 ) => {
@@ -41,7 +41,7 @@ const useFetchLedgerBalance = (
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_LEDGER_BALANCE_V2", ledger, owner],
+    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner],
     queryFn: async () => {
       const actorLedger = Actor.createActor(idlFactoryLedger, {
         agent,
@@ -56,25 +56,27 @@ const useFetchLedgerBalance = (
         agent,
         canisterId: KONGSWAP_CANISTER_ID_IC,
       });
-      const fee = await icrc1_fee(actorLedger);
+      const fee_e8s = await icrc1_fee(actorLedger);
       const decimals = await icrc1_decimals(actorLedger);
 
       const price = await swap_amounts(actorKongswap, {
-        from: ledger.toLocaleUpperCase(),
-        to: "ckUSDC",
-        amount: 1n,
+        from: ledger,
+        to: "ckUSDT",
+        amount: BigInt(1 * 10 ** decimals),
       });
-
-      const balance_usd = price.mid_price;
+      const fee = Number(fee_e8s) / 10 ** decimals;
+      const balance = Number(balance_e8s) / 10 ** decimals;
+      const balance_usd = balance * price.mid_price;
 
       return {
-        balance: Number(balance_e8s) / 10 ** decimals,
+        balance,
         balance_e8s,
         balance_usd,
         decimals,
-        fee: Number(fee) / 10 ** decimals,
-        fee_e8s: fee,
-        fee_usd: (Number(fee) / 10 ** decimals) * balance_usd,
+        fee,
+        fee_e8s,
+        fee_usd: fee * price.mid_price,
+        price_usd: price.mid_price,
       };
     },
     placeholderData,

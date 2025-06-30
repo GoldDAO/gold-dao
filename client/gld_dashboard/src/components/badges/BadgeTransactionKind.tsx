@@ -1,9 +1,4 @@
-import {
-  CheckIcon,
-  ArrowsRightLeftIcon,
-  FireIcon,
-  CursorArrowRaysIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@shared/ui/icons";
 
 export const BadgeTransactionKind = ({
   kind,
@@ -16,22 +11,22 @@ export const BadgeTransactionKind = ({
     mint: {
       label: "Mint",
       bgClassName: "bg-teal-100",
-      icon: <CheckIcon className="h-4 w-4" />,
+      icon: <Icon.Mint width={16} height={16} />,
     },
     approve: {
       label: "Approve",
       bgClassName: "bg-amber-100",
-      icon: <CursorArrowRaysIcon className="h-4 w-4" />,
+      icon: <Icon.Check width={16} height={16} />,
     },
     burn: {
       label: "Burn",
       bgClassName: "bg-orange-100",
-      icon: <FireIcon className="h-4 w-4" />,
+      icon: <Icon.Burn width={16} height={16} />,
     },
     transfer: {
       label: "Transfer",
       bgClassName: "bg-indigo-100",
-      icon: <ArrowsRightLeftIcon className="h-4 w-4" />,
+      icon: <Icon.Transfer width={16} height={16} />,
     },
   };
   const k = txKinds[kind];

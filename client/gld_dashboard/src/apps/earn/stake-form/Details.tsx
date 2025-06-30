@@ -2,12 +2,10 @@ import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { GLDT_LEDGER_CANISTER_ID, GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
-import { Button } from "@components/index";
 import useApprove from "@services/ledger/hooks/useApprove";
 import useCreateStake from "@services/gldt_stake/hooks/useCreateStake";
-
 import { StakeStateReducerAtom } from "./atoms";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Details = () => {
   const { authenticatedAgent } = useAuth();
@@ -79,38 +77,28 @@ const Details = () => {
       {(approve.isError || createStakePosition.isError) && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-amber-700">Create stake error</div>
+            <div className="text-xl text-warning">Create stake error</div>
             <div>Something went wrong, please retry.</div>
           </div>
           <div className="flex justify-center items-center gap-2">
-            <Button
-              onClick={handleRetry}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            <BtnPrimary onClick={handleRetry} variant="outlined">
               Retry
-            </Button>
-            <Button
-              onClick={() => dispatch({ type: "RESET" })}
-              className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-            >
+            </BtnPrimary>
+            <BtnPrimary onClick={() => dispatch({ type: "RESET" })}>
               Close
-            </Button>
+            </BtnPrimary>
           </div>
         </div>
       )}
       {approve.isSuccess && createStakePosition.isSuccess && (
         <div className="flex flex-col items-center gap-8">
           <div className="grid grid-cols-1 gap-2 text-center">
-            <div className="text-xl text-green-700">Create stake success</div>
+            <div className="text-xl text-success">Create stake success</div>
             <div>You successfully created a stake position.</div>
           </div>
-
-          <Button
-            onClick={() => dispatch({ type: "RESET" })}
-            className="px-6 py-2 bg-secondary text-white xl:text-lg font-medium rounded-md"
-          >
+          <BtnPrimary onClick={() => dispatch({ type: "RESET" })} size="sm">
             Close
-          </Button>
+          </BtnPrimary>
         </div>
       )}
     </div>

@@ -1,18 +1,18 @@
 import { useAtom, useAtomValue } from "jotai";
-import { Button } from "@components/index";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
-import { NFTCollectionNames } from "@shared/utils/nfts";
+import { NFTCollections } from "@shared/utils/nfts";
 import {
-  IsOneOrMoreSelectedNFTAtom,
   TotalGLDTSelectedAtom,
+  TotalNFTSelectedAtom,
   SelectNFTStateReducerAtom,
 } from "@shared/atoms/NFTStateAtom";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const Submit = () => {
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
   const [selectNFTState] = useAtom(SelectNFTStateReducerAtom);
-  const IsOneOrMoreSelectedNFT = useAtomValue(IsOneOrMoreSelectedNFTAtom);
+  const totalNFTSelected = useAtomValue(TotalNFTSelectedAtom);
   const totalGLDTSelected = useAtomValue(TotalGLDTSelectedAtom);
 
   const handleSubmit = () => {
@@ -20,33 +20,33 @@ const Submit = () => {
   };
 
   return (
-    <div>
+    <>
       <div className="rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">From</div>
+        <div className="text-copper text-sm font-semibold mb-2">From</div>
         <div className="flex flex-col gap-2">
-          {NFTCollectionNames.map((collection) => (
-            <UserNFTSelect key={collection} collection={collection} />
+          {NFTCollections.map((collection) => (
+            <UserNFTSelect key={collection.name} collection={collection.name} />
           ))}
         </div>
       </div>
 
-      <div className="mt-8 rounded-xl p-4 border border-border">
-        <div className="text-primary mb-4">To</div>
+      <div className="mt-4 rounded-xl p-4 border border-border">
+        <div className="text-copper text-sm font-semibold mb-2">To</div>
         <div className="flex justify-center items-center p-4 border border-border rounded-xl bg-surface-secondary">
           <div>{totalGLDTSelected} GLDT</div>
         </div>
       </div>
 
       <div className="mt-8">
-        <Button
+        <BtnPrimary
           onClick={handleSubmit}
-          disabled={!IsOneOrMoreSelectedNFT}
-          className="w-full px-6 py-3 bg-secondary text-white font-medium rounded-md"
+          disabled={totalNFTSelected === 0}
+          className="w-full"
         >
           Submit
-        </Button>
+        </BtnPrimary>
       </div>
-    </div>
+    </>
   );
 };
 

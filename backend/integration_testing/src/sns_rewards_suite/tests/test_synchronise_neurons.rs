@@ -1,7 +1,4 @@
-use candid::{CandidType, Deserialize};
 use canister_time::{DAY_IN_MS, HOUR_IN_MS};
-use serde::Serialize;
-use sns_governance_canister::types::NeuronId;
 use std::time::{Duration, SystemTime};
 
 use crate::{
@@ -10,17 +7,12 @@ use crate::{
     utils::{random_principal, tick_n_blocks},
 };
 
-#[derive(Deserialize, CandidType, Serialize)]
-pub struct GetNeuronRequest {
-    neuron_id: NeuronId,
-}
-
 #[test]
 fn test_synchronise_neurons_happy_path() {
     let mut test_env = default_test_setup();
-    test_env
-        .pic
-        .set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)); // Wednesday Jun 19, 2024, 6:00:00 AM
+    test_env.pic.set_time(
+        (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)).into(),
+    ); // Wednesday Jun 19, 2024, 6:00:00 AM
 
     test_env
         .pic

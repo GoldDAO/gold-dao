@@ -14,15 +14,8 @@ import {
   SortingState,
   Row,
 } from "@tanstack/react-table";
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ChevronDoubleRightIcon,
-  ChevronDoubleLeftIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/20/solid";
 import SelectPagination from "@components/tables/SelectPagination";
+import Icon from "@shared/ui/icons";
 
 interface ReactTableProps<T extends object> {
   data: T[];
@@ -184,8 +177,20 @@ const Table = <T extends object>({
                             header.getContext()
                           )}
                           {{
-                            asc: <ArrowUpIcon className="h-5 w-5 ml-2" />,
-                            desc: <ArrowDownIcon className="h-5 w-5 ml-2" />,
+                            asc: (
+                              <Icon.Arrow
+                                width={18}
+                                height={18}
+                                className="rotate-180 ml-2"
+                              />
+                            ),
+                            desc: (
+                              <Icon.Arrow
+                                width={18}
+                                height={18}
+                                className="ml-2"
+                              />
+                            ),
                           }[header.column.getIsSorted() as string] ?? null}
                         </div>
                       )}
@@ -250,28 +255,40 @@ const Table = <T extends object>({
                 onClick={handleOnClickFirstPage}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronDoubleLeftIcon className="h-5 w-5" />
+                <Icon.ChevronDouble
+                  width={18}
+                  height={18}
+                  className="rotate-90"
+                />
               </button>
               <button
                 className="p-1"
                 onClick={handleOnClickPreviousPage}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronLeftIcon className="h-5 w-5" />
+                <Icon.Chevron width={18} height={18} className="-rotate-90" />
               </button>
               <button
                 className="p-1"
                 onClick={handleOnClickNextPage}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronRightIcon className="h-5 w-5" />
+                <Icon.ChevronDouble
+                  width={18}
+                  height={18}
+                  className="rotate-90"
+                />
               </button>
               <button
                 className="p-1"
                 onClick={handleOnClickLastPage}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronDoubleRightIcon className="h-5 w-5" />
+                <Icon.ChevronDouble
+                  width={18}
+                  height={18}
+                  className="-rotate-90"
+                />
               </button>
               <span className="flex items-center gap-1">
                 <div>Page</div>

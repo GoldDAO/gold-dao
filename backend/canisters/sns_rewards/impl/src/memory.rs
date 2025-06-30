@@ -5,7 +5,7 @@ use ic_stable_structures::{
 
 const UPGRADES: MemoryId = MemoryId::new(0);
 const MATURITY_HISTORY: MemoryId = MemoryId::new(1);
-const PAYMENT_ROUND_HISTORY: MemoryId = MemoryId::new(2);
+const PAYMENT_ROUND_HISTORY: MemoryId = MemoryId::new(3);
 
 // const EVENT_LOGS_INDEX_MEM_ID: MemoryId = MemoryId::new(1);
 // const EVENT_LOGS_DATA_MEM_ID: MemoryId = MemoryId::new(2);

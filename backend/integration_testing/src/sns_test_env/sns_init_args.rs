@@ -34,40 +34,40 @@ impl SnsInitArgs {
             proposals: BTreeMap::new(),
             parameters: Some(NervousSystemParameters {
                 default_followees: Some(DefaultFollowees {
-                    followees: BTreeMap::new(),
-                }),
-                reject_cost_e8s: Some(100_000_000_000_u64),
-                neuron_minimum_stake_e8s: Some(10_000_000_000u64),
-                transaction_fee_e8s: Some(100_000u64),
+                                followees: BTreeMap::new(),
+                            }),
+                reject_cost_e8s: Some(100_000_000_000),
+                neuron_minimum_stake_e8s: Some(88_800_000_000),
+                transaction_fee_e8s: Some(200_000),
                 max_proposals_to_keep_per_action: Some(100),
                 initial_voting_period_seconds: Some(345_600),
                 wait_for_quiet_deadline_increase_seconds: Some(86_400),
-                max_number_of_neurons: Some(200_000u64),
-                neuron_minimum_dissolve_delay_to_vote_seconds: Some(7_890_048_u64),
+                max_number_of_neurons: Some(200_000),
+                neuron_minimum_dissolve_delay_to_vote_seconds: Some(31_560_192),
                 max_followees_per_function: Some(15),
-                max_dissolve_delay_seconds: Some(63_115_200_u64),
-                max_neuron_age_for_age_bonus: Some(63_115_200),
-                max_number_of_proposals_with_ballots: Some(700_u64),
+                max_dissolve_delay_seconds: Some(157_788_000),
+                max_neuron_age_for_age_bonus: Some(31_557_600),
+                max_number_of_proposals_with_ballots: Some(700),
                 neuron_claimer_permissions: Some(NeuronPermissionList {
-                    permissions: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    permissions: (0..=10).collect(),
                 }),
                 neuron_grantable_permissions: Some(NeuronPermissionList {
-                    permissions: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    permissions: (0..=10).collect(),
                 }),
                 max_number_of_principals_per_neuron: Some(5),
                 voting_rewards_parameters: Some(VotingRewardsParameters {
                     round_duration_seconds: Some(86_400),
-                    reward_rate_transition_duration_seconds: Some(0),
-                    initial_reward_rate_basis_points: Some(10),
-                    final_reward_rate_basis_points: Some(10),
+                    reward_rate_transition_duration_seconds: Some(86_400),
+                    initial_reward_rate_basis_points: Some(1),
+                    final_reward_rate_basis_points: Some(1),
                 }),
-                max_dissolve_delay_bonus_percentage: Some(100_u64),
-                max_age_bonus_percentage: Some(50_u64),
+                max_dissolve_delay_bonus_percentage: Some(100),
+                max_age_bonus_percentage: Some(0),
                 maturity_modulation_disabled: Some(false),
             }),
             latest_reward_event: None,
             in_flight_commands: BTreeMap::new(),
-            genesis_timestamp_seconds: 1713271942u64,
+            genesis_timestamp_seconds: 1713271942,
             metrics: None,
             ledger_canister_id: Some(canister_ids.ledger_id.clone()),
             root_canister_id: Some(canister_ids.root_id.clone()),
@@ -76,9 +76,9 @@ impl SnsInitArgs {
             swap_canister_id: Some(canister_ids.swap_id.clone()),
             sns_metadata: Some(SnsMetadata {
                 logo: None,
-                url: Some("https://simgov.simgov".to_string()),
-                name: Some("Simulation Gov".to_string()),
-                description: Some("Simulation Gov desc".to_string()),
+                url: Some("https://www.origyn.com/".to_string()),
+                name: Some("ORIGYN".to_string()),
+                description: Some("The ORIGYN Protocol has been made possible thanks to the major contribution of the ORIGYN Foundation and embodies its vision of becoming the universal digital standard for certification, traceability, and authentication.".to_string()),
             }),
             sns_initialization_parameters: "".to_string(),
             pending_version: None,
@@ -86,10 +86,9 @@ impl SnsInitArgs {
             maturity_modulation: None,
         };
 
-        // FIXME: replace with better args
         let ledger_args = sns_ledger_canister::types::InitArgs {
             decimals: Some(8),
-            token_symbol: "GOLD_TEST".to_string(),
+            token_symbol: "OGY".to_string(),
             transfer_fee: Nat::from(200_000_u64),
             metadata: vec![],
             minting_account: Account {
@@ -100,16 +99,16 @@ impl SnsInitArgs {
             fee_collector_account: None,
             archive_options: sns_ledger_canister::types::ArchiveOptions {
                 num_blocks_to_archive: 1000,
-                max_transactions_per_response: Some(1000),
-                trigger_threshold: 2000,
+                max_transactions_per_response: None,
+                trigger_threshold: 1_000,
                 more_controller_ids: None,
-                max_message_size_bytes: Some(2 * 1024 * 1024), // 2 MB
-                cycles_for_archive_creation: Some(1_000_000_000_000),
-                node_max_memory_size_bytes: Some(4 * 1024 * 1024 * 1024), // 4 GB
+                max_message_size_bytes: None,
+                cycles_for_archive_creation: None,
+                node_max_memory_size_bytes: None,
                 controller_id: controller.clone(),
             },
-            max_memo_length: None,
-            token_name: "Test Token".to_string(),
+            max_memo_length: Some(32),
+            token_name: "ORIGYN".to_string(),
             feature_flags: None,
         };
 
@@ -184,30 +183,29 @@ impl SnsInitArgs {
             canister_ids.swap_id,
         );
 
-        // FIXME: replace with better args
         let ledger_args = sns_ledger_canister::types::InitArgs {
             decimals: Some(8),
-            token_symbol: "GOLD_TEST".to_string(),
-            transfer_fee: Nat::from(200_000_u64),
+            token_symbol: "GOLDAO".to_string(),
+            transfer_fee: Nat::from(100_000_u64),
             metadata: vec![],
             minting_account: Account {
                 owner: canister_ids.governance_id.clone(),
                 subaccount: None,
             },
             initial_balances: Vec::new(),
-            fee_collector_account: None,
+            fee_collector_account: None, // where the fees are going?
             archive_options: sns_ledger_canister::types::ArchiveOptions {
                 num_blocks_to_archive: 1000,
-                max_transactions_per_response: Some(1000),
-                trigger_threshold: 2000,
+                max_transactions_per_response: None,
+                trigger_threshold: 1_000,
                 more_controller_ids: None,
-                max_message_size_bytes: Some(2 * 1024 * 1024), // 2 MB
-                cycles_for_archive_creation: Some(1_000_000_000_000),
-                node_max_memory_size_bytes: Some(4 * 1024 * 1024 * 1024), // 4 GB
+                max_message_size_bytes: None,
+                cycles_for_archive_creation: None,
+                node_max_memory_size_bytes: None,
                 controller_id: controller.clone(),
             },
-            max_memo_length: None,
-            token_name: "Test Token".to_string(),
+            max_memo_length: Some(32),
+            token_name: "GOLDAO".to_string(),
             feature_flags: None,
         };
 
@@ -284,6 +282,7 @@ impl SnsInitArgs {
                 )
             }) // Convert usize keys to String
             .collect();
+        // NOTE: Old params
         let governance_args = Governance {
             deployed_version: None,
             neurons: neuron_data_with_neuron_keys,
@@ -292,34 +291,34 @@ impl SnsInitArgs {
                 default_followees: Some(DefaultFollowees {
                     followees: BTreeMap::new(),
                 }),
-                reject_cost_e8s: Some(10000u64),
-                neuron_minimum_stake_e8s: Some(20000u64),
-                transaction_fee_e8s: Some(10000u64),
-                max_proposals_to_keep_per_action: Some(10),
-                initial_voting_period_seconds: Some(2591000),
-                wait_for_quiet_deadline_increase_seconds: Some(1295500),
-                max_number_of_neurons: Some(1000u64),
-                neuron_minimum_dissolve_delay_to_vote_seconds: Some(10u64),
-                max_followees_per_function: Some(10),
-                max_dissolve_delay_seconds: Some(10000000u64),
-                max_neuron_age_for_age_bonus: Some(10000000),
-                max_number_of_proposals_with_ballots: Some(100u64),
+                reject_cost_e8s: Some(10_000_000_000u64),
+                neuron_minimum_stake_e8s: Some(10_000_000_000u64),
+                transaction_fee_e8s: Some(1_000_000u64),
+                max_proposals_to_keep_per_action: Some(100),
+                initial_voting_period_seconds: Some(345_600),
+                wait_for_quiet_deadline_increase_seconds: Some(86_400),
+                max_number_of_neurons: Some(200_000u64),
+                neuron_minimum_dissolve_delay_to_vote_seconds: Some(7_890_048u64),
+                max_followees_per_function: Some(15),
+                max_dissolve_delay_seconds: Some(94_672_800u64),
+                max_neuron_age_for_age_bonus: Some(94_672_800),
+                max_number_of_proposals_with_ballots: Some(700u64),
                 neuron_claimer_permissions: Some(NeuronPermissionList {
-                    permissions: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    permissions: (0..=10).collect(),
                 }),
                 neuron_grantable_permissions: Some(NeuronPermissionList {
-                    permissions: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    permissions: (0..=10).collect(),
                 }),
-                max_number_of_principals_per_neuron: Some(10),
-                voting_rewards_parameters: Some(VotingRewardsParameters {
-                    round_duration_seconds: Some(1000),
-                    reward_rate_transition_duration_seconds: Some(100),
-                    initial_reward_rate_basis_points: Some(5),
-                    final_reward_rate_basis_points: Some(5),
+                max_number_of_principals_per_neuron: Some(5),
+                    voting_rewards_parameters: Some(VotingRewardsParameters {
+                    round_duration_seconds: Some(86_400),
+                    reward_rate_transition_duration_seconds: Some(31_557_600),
+                    initial_reward_rate_basis_points: Some(300),
+                    final_reward_rate_basis_points: Some(300),
                 }),
-                max_dissolve_delay_bonus_percentage: Some(10u64),
-                max_age_bonus_percentage: Some(10u64),
-                maturity_modulation_disabled: Some(true),
+                max_dissolve_delay_bonus_percentage: Some(100u64),
+                max_age_bonus_percentage: Some(100u64),
+                maturity_modulation_disabled: Some(true), // NOTE: in real WTN - the modulation is used
             }),
             latest_reward_event: None,
             in_flight_commands: BTreeMap::new(),
@@ -330,23 +329,22 @@ impl SnsInitArgs {
             id_to_nervous_system_functions: BTreeMap::new(),
             mode: 1,
             swap_canister_id: Some(canister_ids.swap_id.clone()),
-            sns_metadata: Some(SnsMetadata {
-                logo: None,
-                url: Some("https://simgov.simgov".to_string()),
-                name: Some("Simulation Gov".to_string()),
-                description: Some("Simulation Gov desc".to_string()),
-            }),
+        sns_metadata: Some(SnsMetadata {
+            logo: None,
+            url: Some("https://waterneuron.fi/".to_string()),
+            name: Some("WaterNeuron".to_string()),
+            description: Some("WaterNeuron is a liquid staking protocol designed for the Internet Computer network.".to_string()),
+        }),
             sns_initialization_parameters: "".to_string(),
             pending_version: None,
             is_finalizing_disburse_maturity: None,
             maturity_modulation: None,
         };
 
-        // FIXME: replace with better args
         let ledger_args = sns_ledger_canister::types::InitArgs {
             decimals: Some(8),
-            token_symbol: "GOLD_TEST".to_string(),
-            transfer_fee: Nat::from(200_000_u64),
+            token_symbol: "WTN".to_string(),
+            transfer_fee: Nat::from(1_000_000_u64),
             metadata: vec![],
             minting_account: Account {
                 owner: canister_ids.governance_id.clone(),
@@ -356,16 +354,16 @@ impl SnsInitArgs {
             fee_collector_account: None,
             archive_options: sns_ledger_canister::types::ArchiveOptions {
                 num_blocks_to_archive: 1000,
-                max_transactions_per_response: Some(1000),
-                trigger_threshold: 2000,
+                max_transactions_per_response: None,
+                trigger_threshold: 1_000,
                 more_controller_ids: None,
-                max_message_size_bytes: Some(2 * 1024 * 1024), // 2 MB
-                cycles_for_archive_creation: Some(1_000_000_000_000),
-                node_max_memory_size_bytes: Some(4 * 1024 * 1024 * 1024), // 4 GB
+                max_message_size_bytes: None,
+                cycles_for_archive_creation: None,
+                node_max_memory_size_bytes: None,
                 controller_id: controller.clone(),
             },
-            max_memo_length: None,
-            token_name: "Test Token".to_string(),
+            max_memo_length: Some(32),
+            token_name: "WaterNeuron".to_string(),
             feature_flags: None,
         };
 
@@ -468,31 +466,38 @@ pub fn generate_sns_init_args(
             default_followees: Some(DefaultFollowees {
                 followees: BTreeMap::new(),
             }),
-            reject_cost_e8s: Some(10000u64),
-            neuron_minimum_stake_e8s: Some(20000u64),
-            transaction_fee_e8s: Some(10000u64),
-            max_proposals_to_keep_per_action: Some(10),
-            initial_voting_period_seconds: Some(2591000),
-            wait_for_quiet_deadline_increase_seconds: Some(1295500),
-            max_number_of_neurons: Some(1000u64),
-            neuron_minimum_dissolve_delay_to_vote_seconds: Some(10u64),
-            max_followees_per_function: Some(10),
-            max_dissolve_delay_seconds: Some(10000000u64),
-            max_neuron_age_for_age_bonus: Some(10000000),
-            max_number_of_proposals_with_ballots: Some(100u64),
+            reject_cost_e8s: Some(100_000_000_000_u64),
+            neuron_minimum_stake_e8s: Some(10_000_000_000u64),
+            transaction_fee_e8s: Some(100_000u64),
+            max_proposals_to_keep_per_action: Some(100),
+
+            // NOTE: those ones are mocked
+              initial_voting_period_seconds: Some(2591000),
+              wait_for_quiet_deadline_increase_seconds: Some(1295500),
+
+            // initial_voting_period_seconds: Some(345_600),
+            // wait_for_quiet_deadline_increase_seconds: Some(86_400),
+        
+
+            max_number_of_neurons: Some(200_000u64),
+            neuron_minimum_dissolve_delay_to_vote_seconds: Some(7_890_048_u64),
+            max_followees_per_function: Some(15),
+            max_dissolve_delay_seconds: Some(63_115_200_u64),
+            max_neuron_age_for_age_bonus: Some(63_115_200),
+            max_number_of_proposals_with_ballots: Some(700_u64),
             neuron_claimer_permissions: Some(NeuronPermissionList {
                 permissions: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
             }),
             neuron_grantable_permissions: Some(NeuronPermissionList {
                 permissions: vec![1, 2, 3, 4, 5, 6, 7, 8, 9],
             }),
-            max_number_of_principals_per_neuron: Some(10),
+            max_number_of_principals_per_neuron: Some(5),
             voting_rewards_parameters: Some(VotingRewardsParameters {
-                round_duration_seconds: Some(1000),
-                reward_rate_transition_duration_seconds: Some(100),
-                initial_reward_rate_basis_points: Some(5),
-                final_reward_rate_basis_points: Some(5),
-            }),
+                            round_duration_seconds: Some(86_400),
+                            reward_rate_transition_duration_seconds: Some(0),
+                            initial_reward_rate_basis_points: Some(10),
+                            final_reward_rate_basis_points: Some(10),
+                        }),
             max_dissolve_delay_bonus_percentage: Some(10u64),
             max_age_bonus_percentage: Some(10u64),
             maturity_modulation_disabled: Some(true),
@@ -508,74 +513,15 @@ pub fn generate_sns_init_args(
         swap_canister_id: Some(sns_swap_canister_id.clone()),
         sns_metadata: Some(SnsMetadata {
             logo: None,
-            url: Some("https://simgov.simgov".to_string()),
-            name: Some("Simulation Gov".to_string()),
-            description: Some("Simulation Gov desc".to_string()),
+            url: Some("https://www.gold-dao.org".to_string()),
+            name: Some("Gold DAO".to_string()),
+            description: Some("The Gold DAO project represents a groundbreaking fusion of traditional gold and modern blockchain technology, allowing anyone in the world to access  physical gold instantaneously, with no dependence upon the banking system.".to_string()),
         }),
         sns_initialization_parameters: "".to_string(),
         pending_version: None,
         is_finalizing_disburse_maturity: None,
         maturity_modulation: None,
     }
-
-    // NOTE: Real GOLDDAO parameters
-    // Governance {
-    //     deployed_version: None,
-    //     neurons: neuron_data_with_neuron_keys,
-    //     proposals: BTreeMap::new(),
-    //     parameters: Some(NervousSystemParameters {
-    //         default_followees: Some(DefaultFollowees {
-    //             followees: BTreeMap::new(),
-    //         }),
-    //         reject_cost_e8s: Some(100_000_000_000_u64),
-    //         neuron_minimum_stake_e8s: Some(10_000_000_000u64),
-    //         transaction_fee_e8s: Some(100_000u64),
-    //         max_proposals_to_keep_per_action: Some(100),
-    //         initial_voting_period_seconds: Some(345_600),
-    //         wait_for_quiet_deadline_increase_seconds: Some(86_400),
-    //         max_number_of_neurons: Some(200_000u64),
-    //         neuron_minimum_dissolve_delay_to_vote_seconds: Some(7_890_048_u64),
-    //         max_followees_per_function: Some(15),
-    //         max_dissolve_delay_seconds: Some(63_115_200_u64),
-    //         max_neuron_age_for_age_bonus: Some(63_115_200),
-    //         max_number_of_proposals_with_ballots: Some(700_u64),
-    //         neuron_claimer_permissions: Some(NeuronPermissionList {
-    //             permissions: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    //         }),
-    //         neuron_grantable_permissions: Some(NeuronPermissionList {
-    //             permissions: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    //         }),
-    //         max_number_of_principals_per_neuron: Some(5),
-    //         voting_rewards_parameters: Some(VotingRewardsParameters {
-    //             round_duration_seconds: Some(86_400),
-    //             reward_rate_transition_duration_seconds: Some(0),
-    //             initial_reward_rate_basis_points: Some(10),
-    //             final_reward_rate_basis_points: Some(10),
-    //         }),
-    //         max_dissolve_delay_bonus_percentage: Some(100_u64),
-    //         max_age_bonus_percentage: Some(50_u64),
-    //         maturity_modulation_disabled: Some(false),
-    //     }),
-    //     latest_reward_event: None,
-    //     in_flight_commands: BTreeMap::new(),
-    //     genesis_timestamp_seconds: 1713271942u64,
-    //     metrics: None,
-    //     ledger_canister_id: Some(sns_ledger_canister_id.clone()),
-    //     root_canister_id: Some(sns_root_canister_id.clone()),
-    //     id_to_nervous_system_functions: BTreeMap::new(),
-    //     mode: 1,
-    //     swap_canister_id: Some(sns_swap_canister_id.clone()),
-    //     sns_metadata: Some(SnsMetadata {
-    //         logo: None,
-    //         url: Some("https://simgov.simgov".to_string()),
-    //         name: Some("Simulation Gov".to_string()),
-    //         description: Some("Simulation Gov desc".to_string()),
-    //     }),
-    //     sns_initialization_parameters: "".to_string(),
-    //     pending_version: None,
-    //     is_finalizing_disburse_maturity: None,
-    //     maturity_modulation: None,
-    // }
 }
 
 pub fn neuron_id_from_number(n: usize) -> NeuronId {

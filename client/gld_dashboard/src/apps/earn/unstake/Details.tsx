@@ -1,41 +1,23 @@
 import { useEffect } from "react";
-import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import { Button } from "@components/index";
-import MutationStatusIcons from "@components/icons/MutationStatusIcons";
-// import TokenValueToLocaleString from "@components/numbers/TokenValueToLocaleString";
+import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { UnstakeStateReducerAtom } from "./atoms";
 // import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useUnstake from "@services/gldt_stake/hooks/useUnstake";
+import BtnPrimary from "@shared/ui/button/BtnPrimary";
 
 const DetailsUnstake = () => {
   const { authenticatedAgent } = useAuth();
-  const queryClient = useQueryClient();
+
   const [unstakeState, dispatch] = useAtom(UnstakeStateReducerAtom);
   const unstake = useUnstake(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
   const handleOnUnstake = () => {
-    unstake.mutate(
-      {
-        id: unstakeState.stake_id as bigint,
-      },
-      {
-        onSuccess: (res) => {
-          console.log("unstaked");
-          console.log(res);
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS"],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["USER_POSITIONS_TOTAL_STAKED_AMOUNT"],
-          });
-        },
-      }
-    );
+    unstake.mutate({
+      id: unstakeState.stake_id as bigint,
+    });
   };
 
   useEffect(() => {
@@ -55,37 +37,28 @@ const DetailsUnstake = () => {
       <div className="grid grid-cols-1 gap-4 my-8">
         <div className="p-4 border border-border rounded-md">
           <div className="flex items-center gap-4">
-            <MutationStatusIcons status={unstake.status} />
+            <MutationStatusIcon status={unstake.status} />
             <div>Unstake stake</div>
           </div>
         </div>
       </div>
       {unstake.isError && (
         <div className="flex justify-center items-center gap-4">
-          <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-            onClick={handleOnRetry}
-          >
+          <BtnPrimary variant="outlined" onClick={handleOnRetry}>
             Retry
-          </Button>
-          <Button
-            className={clsx("px-4 py-3 rounded-md", "bg-secondary text-white")}
-            onClick={() => dispatch({ type: "RESET" })}
-          >
+          </BtnPrimary>
+          <BtnPrimary onClick={() => dispatch({ type: "RESET" })}>
             Close
-          </Button>
+          </BtnPrimary>
         </div>
       )}
       {unstake.isSuccess && (
-        <Button
-          className={clsx(
-            "px-4 py-3 rounded-md",
-            "bg-secondary text-white w-full"
-          )}
+        <BtnPrimary
+          className="w-full"
           onClick={() => dispatch({ type: "RESET" })}
         >
           Close
-        </Button>
+        </BtnPrimary>
       )}
     </>
   );

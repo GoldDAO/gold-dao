@@ -92,7 +92,7 @@ const ICRCAccountOrAccountId = () => {
 
   return (
     <>
-      <div className="text-primary text-sm mb-2">
+      <div className="text-copper text-sm font-semibold mb-2">
         Principal ID or Account ID (or ICRC Account)
       </div>
       <InputCard>

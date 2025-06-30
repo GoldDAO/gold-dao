@@ -2,15 +2,15 @@ import { useState } from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { useAuth } from "@auth/index";
 import DropdownUserMenu from "@shared/components/app-layout/navbars/top-nav/user-menu";
-import { Button } from "@components/index";
-import { Logo } from "@components/logos";
+import { Logo } from "@shared/ui/logos";
 import navItems from "@shared/components/app-layout/navbars/shared/utils";
+import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import Icon from "@shared/ui/icons";
 
 const TopNav = ({ className }: { className?: string }) => {
-  const { isConnected, connect } = useAuth();
+  const { isConnected } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleOnHideMenu = () => setShowMenu(false);
@@ -30,17 +30,7 @@ const TopNav = ({ className }: { className?: string }) => {
 
         {/* Menu */}
         <div className="flex justify-self-end items-center">
-          {!isConnected && (
-            <Button
-              className={clsx(
-                "px-4 py-2 rounded-xl w-full",
-                "bg-secondary text-white"
-              )}
-              onClick={connect}
-            >
-              Connect Wallet
-            </Button>
-          )}
+          {!isConnected && <BtnConnectWallet />}
 
           {isConnected && (
             <div className="flex items-center gap-2 bg-surface-primary border border-border rounded-lg">
@@ -54,7 +44,7 @@ const TopNav = ({ className }: { className?: string }) => {
               className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-secondary focus:outline-none"
             >
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" />
+              <Icon.Menu width={24} />
             </button>
           </div>
         </div>
@@ -90,20 +80,35 @@ const TopNav = ({ className }: { className?: string }) => {
                         className="inline-flex items-center justify-center p-2 rounded-full hover:bg-surface-secondary focus:outline-none"
                       >
                         <span className="sr-only">Open main menu</span>
-                        <XMarkIcon className="h-6 w-6" />
+                        <Icon.Close width={18} height={18} />
                       </button>
                     </div>
 
-                    {navItems.map(({ title, url }, i) => (
-                      <Link
-                        onClick={handleOnHideMenu}
-                        to={url}
-                        className="font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md"
-                        key={i}
-                      >
-                        {title}
-                      </Link>
-                    ))}
+                    {navItems.map(({ title, url, subtitle }, i) => {
+                      const isDisabled = url === "/earn";
+                      return (
+                        <Link
+                          onClick={isDisabled ? undefined : handleOnHideMenu}
+                          to={isDisabled ? "#" : url}
+                          className={clsx(
+                            "font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md w-full text-center",
+                            {
+                              "pointer-events-none opacity-50 cursor-not-allowed":
+                                isDisabled,
+                            }
+                          )}
+                          aria-disabled={isDisabled}
+                          key={i}
+                        >
+                          {title}
+                          {isDisabled && (
+                            <span className="block text-xs text-content/40 mt-1">
+                              {subtitle ? subtitle : "Coming Soon"}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

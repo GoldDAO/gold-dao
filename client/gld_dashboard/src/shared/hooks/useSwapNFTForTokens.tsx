@@ -35,8 +35,15 @@ const useSwapNFTForTokens = (
       }
     },
     onSuccess: () => {
+      console.log("NFT swapped for tokens successfully");
       queryClient.invalidateQueries({
         queryKey: ["FETCH_USER_NFT", collection.name],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_USER_NFT_METRICS"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["FETCH_LEDGER_BALANCE", "GLDT"],
       });
     },
   });
