@@ -3,7 +3,7 @@
 
 - fn distribute_reserve_pool
 transfers tokens from reserve pool to the reward pool on a daily basis.
-- currently this only happens for GLDGov
+- currently this only happens for GOLDAO
 - the daily amount to be transferred is decided via a proposal
 
 */
@@ -38,35 +38,27 @@ pub async fn handle_burn_job() {
 }
 
 async fn handle_burn_job_impl() {
-    // check GLDGov is a valid token type
-    let token = match TokenSymbol::parse("GLDGov") {
-        Ok(t) => t,
-        Err(e) => {
-            error!("ERROR : failed to parse GLDGov token. error : {:?}", e);
-            return;
-        }
-    };
-    // get the gldgov ledger id
-    let gldgov_token_info = match read_state(|s| s.data.tokens.get(&token).copied()) {
+    // get the goldao ledger id
+    let goldao_token_info = match read_state(|s| s.data.tokens.get(&TokenSymbol::GOLDAO).copied()) {
         Some(token_info) => token_info,
         None => {
             error!(
                 "ERROR : failed to get token information and ledger id for token {:?}",
-                &token
+                &TokenSymbol::GOLDAO
             );
             return;
         }
     };
     // get the daily burn rate
-    let amount_to_burn = match read_state(|s| s.data.daily_gldgov_burn_rate.clone()) {
+    let amount_to_burn = match read_state(|s| s.data.daily_goldao_burn_rate.clone()) {
         Some(amount) => amount,
         None => {
-            debug!("WARNING: daily_gldgov_burn_rate is not set - terminating early.");
+            debug!("WARNING: daily_goldao_burn_rate is not set - terminating early.");
             return;
         }
     };
-    // check we're more than 1 day since the last burn. The last_daily_gldgov_burn will be 0 on the first burn because in state it's initialized with ::default() // 0
-    let previous_time_ms = read_state(|s| s.data.last_daily_gldgov_burn.unwrap_or(0));
+    // check we're more than 1 day since the last burn. The last_daily_goldao_burn will be 0 on the first burn because in state it's initialized with ::default() // 0
+    let previous_time_ms = read_state(|s| s.data.last_daily_goldao_burn.unwrap_or(0));
     let current_time_ms = now_millis();
 
     if !is_interval_more_than_1_day(previous_time_ms, current_time_ms) {
@@ -74,16 +66,16 @@ async fn handle_burn_job_impl() {
         return;
     }
 
-    // check the reserve pool has enough GLDGov to correctly transfer ( burn )
-    match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await
+    // check the reserve pool has enough GOLDAO to correctly transfer ( burn )
+    match fetch_balance_of_sub_account(goldao_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await
     {
         Ok(balance) => {
-            if balance < amount_to_burn.clone() + gldgov_token_info.fee {
+            if balance < amount_to_burn.clone() + goldao_token_info.fee {
                 debug!(
                     "Balance of reserve pool : {} is too low to make a burn of {} plus a fee of {} ",
                     balance,
                     amount_to_burn,
-                    gldgov_token_info.fee
+                    goldao_token_info.fee
                 );
                 return;
             }
@@ -102,23 +94,23 @@ async fn handle_burn_job_impl() {
     match transfer_token(
         RESERVE_POOL_SUB_ACCOUNT,
         minting_account,
-        gldgov_token_info.ledger_id,
+        goldao_token_info.ledger_id,
         amount_to_burn.clone(),
     )
     .await
     {
         Ok(_) => {
             info!(
-                "SUCCESS : {:?} GLDGov tokens burned from reserve pool",
+                "SUCCESS : {:?} GOLDAO tokens burned from reserve pool",
                 amount_to_burn
             );
             mutate_state(|s| {
-                s.data.last_daily_gldgov_burn = Some(current_time_ms);
+                s.data.last_daily_goldao_burn = Some(current_time_ms);
             })
         }
         Err(e) => {
             error!(
-                "ERROR : GLDGov failed to transfer from reserve pool to GLDGov minting account with error : {:?}",
+                "ERROR : GOLDAO failed to transfer from reserve pool to GOLDAO minting account with error : {:?}",
                 e
             );
         }

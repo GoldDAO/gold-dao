@@ -118,7 +118,7 @@ fn install_canisters(pic: &mut PocketIc, controller: Principal, user: Principal)
         gldt_ledger_init_args,
     );
 
-    pic.set_time(SystemTime::now());
+    pic.set_time(SystemTime::now().into());
 
     CanisterIds {
         gldt_ledger,

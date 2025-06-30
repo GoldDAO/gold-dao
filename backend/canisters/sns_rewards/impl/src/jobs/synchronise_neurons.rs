@@ -7,21 +7,12 @@ is stored in the canister and is used to determine the rewards that a neuron
 is eligible for.
 */
 
-use canister_time::{
-    now_millis, run_interval, start_job_daily_at, timestamp_millis, DAY_IN_MS, HOUR_IN_MS,
-};
+use crate::state::{mutate_state, read_state, RuntimeState};
+use canister_time::{start_job_daily_at, timestamp_millis};
 use sns_governance_canister::types::{Neuron, NeuronId};
-use std::{
-    collections::{btree_map, HashMap},
-    time::Duration,
-};
+use std::collections::{btree_map, HashMap};
 use tracing::{debug, error, info, warn};
-use types::{Maturity, Milliseconds, NeuronInfo};
-
-use crate::{
-    state::{mutate_state, read_state, RuntimeState},
-    utils::tracer,
-};
+use types::{Maturity, NeuronInfo};
 
 pub fn start_job() {
     start_job_daily_at(9, run);
@@ -36,8 +27,7 @@ async fn run_async() {
 }
 
 pub async fn synchronise_neuron_data() {
-    let is_synchronizing_neurons = read_state(|s| s.data.is_synchronizing_neurons);
-    if is_synchronizing_neurons {
+    if read_state(|s| s.get_is_synchronizing_neurons()) {
         return;
     }
     let canister_id = read_state(|state| state.data.sns_governance_canister);
@@ -82,7 +72,7 @@ pub async fn synchronise_neuron_data() {
                         },
                         |n| {
                             continue_scanning = true;
-                            if is_test_mode && number_of_scanned_neurons == 400 {
+                            if is_test_mode && number_of_scanned_neurons >= 400 {
                                 continue_scanning = false;
                             }
                             n.id.clone()

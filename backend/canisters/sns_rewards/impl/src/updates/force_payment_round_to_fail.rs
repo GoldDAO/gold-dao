@@ -1,14 +1,14 @@
-use ic_cdk::update;
+use crate::{jobs::distribute_rewards::create_new_payment_rounds, state::mutate_state};
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::updates::force_payment_round_to_fail::{
-    Args as ForcePaymentRoundToFailArgs, Response as ForcePaymentRoundToFailResponse,
-};
-
 use sns_rewards_api_canister::payment_round::PaymentStatus;
 
-use crate::{
-    guards::caller_is_governance_principal, jobs::distribute_rewards::create_new_payment_rounds,
-    state::mutate_state,
+#[cfg(feature = "inttest")]
+use crate::guards::caller_is_governance_principal;
+#[cfg(feature = "inttest")]
+use ic_cdk::update;
+#[cfg(feature = "inttest")]
+use sns_rewards_api_canister::updates::force_payment_round_to_fail::{
+    Args as ForcePaymentRoundToFailArgs, Response as ForcePaymentRoundToFailResponse,
 };
 
 // only to be used for integration testing

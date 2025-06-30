@@ -102,16 +102,6 @@ impl SnsTestEnvBuilder {
         self
     }
 
-    pub fn with_goldao_mock_init_args(mut self, neuron_data: &HashMap<usize, Neuron>) -> Self {
-        let controller = self.controller;
-        let canister_ids = self.canister_ids.clone().unwrap();
-        // TODO: replace with default value
-        let sns_init_args = SnsInitArgs::ogy(&canister_ids, neuron_data, controller);
-
-        self.init_args = Some(sns_init_args);
-        self
-    }
-
     pub fn with_goldao_init_args(mut self, neuron_data: &HashMap<usize, Neuron>) -> Self {
         let controller = self.controller;
         let canister_ids = self.canister_ids.clone().unwrap();
@@ -201,6 +191,19 @@ pub struct SnsTestEnv {
     pub index_id: Principal,
     pub swap_id: Principal,
     pub dapp_canisters: HashMap<String, Principal>,
+}
+impl std::fmt::Debug for SnsTestEnv {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("SnsTestEnv")
+            .field("controller", &self.controller)
+            .field("governance_id", &self.governance_id)
+            .field("root_id", &self.root_id)
+            .field("ledger_id", &self.ledger_id)
+            .field("index_id", &self.index_id)
+            .field("swap_id", &self.swap_id)
+            .field("dapp_canisters", &self.dapp_canisters)
+            .finish()
+    }
 }
 
 impl SnsTestEnv {
@@ -446,5 +449,35 @@ impl SnsTestEnv {
             .unwrap();
 
         pic.tick();
+    }
+
+    pub fn goldao(
+        pic: &Rc<RefCell<PocketIc>>,
+        controller: Principal,
+        neurons: &HashMap<usize, Neuron>,
+    ) -> Self {
+        let mut builder = SnsTestEnvBuilder::new(pic, controller);
+        builder.generate_ids();
+        builder.with_goldao_init_args(neurons).build()
+    }
+
+    pub fn wtn(
+        pic: &Rc<RefCell<PocketIc>>,
+        controller: Principal,
+        neurons: &HashMap<usize, Neuron>,
+    ) -> Self {
+        let mut builder = SnsTestEnvBuilder::new(pic, controller);
+        builder.generate_ids();
+        builder.with_wtn_init_args(neurons).build()
+    }
+
+    pub fn ogy(
+        pic: &Rc<RefCell<PocketIc>>,
+        controller: Principal,
+        neurons: &HashMap<usize, Neuron>,
+    ) -> Self {
+        let mut builder = SnsTestEnvBuilder::new(pic, controller);
+        builder.generate_ids();
+        builder.with_ogy_init_args(neurons).build()
     }
 }

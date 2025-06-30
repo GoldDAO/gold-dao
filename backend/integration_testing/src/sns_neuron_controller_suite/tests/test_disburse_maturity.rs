@@ -56,13 +56,7 @@ fn test_disburse_maturity() {
         .advance_time(Duration::from_secs(9 * 24 * 60 * 60));
     tick_n_blocks(&test_env.get_pic(), 100);
 
-    // FIXME
-    test_env
-        .get_pic()
-        .advance_time(Duration::from_secs(100 * 24 * 60 * 60));
-    tick_n_blocks(&test_env.get_pic(), 100);
-
-    // println!("time: {:?}", test_env.get_pic().get_time());
+    println!("time: {:?}", test_env.get_pic().get_time());
 
     let neurons = crate::client::sns_governance::list_neurons(
         &test_env.get_pic(),
@@ -74,7 +68,6 @@ fn test_disburse_maturity() {
             of_principal: Some(test_env.sns_neuron_controller_id),
         },
     );
-    println!("neurons {:?}", neurons);
 
     let neuron_after_disbursement = neurons.neurons.first().unwrap();
 
@@ -94,5 +87,5 @@ fn test_disburse_maturity() {
         },
     );
     println!("rewards_account_balance: {:?}", rewards_account_balance);
-    assert_eq!(Nat::from(1000000_u64), rewards_account_balance);
+    assert_eq!(Nat::from(1000000000_u64), rewards_account_balance);
 }

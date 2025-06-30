@@ -459,7 +459,7 @@ mod tests {
                 .unwrap();
 
         let mut neuron_1_rewarded = HashMap::new();
-        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
+        let icp_symbol = TokenSymbol::ICP;
         neuron_1_rewarded.insert(icp_symbol.clone(), 0);
 
         let neuron_info_1 = NeuronInfo {
@@ -491,7 +491,7 @@ mod tests {
     #[test]
     fn test_calculate_neuron_maturity_for_interval_all_zeros() {
         let mut neurons = BTreeMap::new();
-        let icp_symbol = TokenSymbol::parse("ICP").unwrap();
+        let icp_symbol = TokenSymbol::ICP;
 
         // neuron 1
         let neuron_id_1 =

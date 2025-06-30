@@ -142,22 +142,13 @@ impl SNCTestEnvBuilder {
             // (neuron_data, _) = generate_neuron_data(0, 20, 1, &vec![self.controller]);
 
             (wtn_neuron_data, _) =
-                generate_neuron_data(0, 1, 1000000, &vec![self.sns_neuron_controller_id]);
+                generate_neuron_data(0, 1, 1000000000, &vec![self.sns_neuron_controller_id]);
             pic.advance_time(Duration::from_secs(100));
             tick_n_blocks(&pic, 50);
         }
 
-        let mut ogy_sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
-        ogy_sns_test_env_builder.generate_ids();
-        let ogy_sns_test_env = ogy_sns_test_env_builder
-            .with_ogy_init_args(&ogy_neuron_data)
-            .build();
-
-        let mut wtn_sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
-        wtn_sns_test_env_builder.generate_ids();
-        let wtn_sns_test_env = wtn_sns_test_env_builder
-            .with_wtn_init_args(&wtn_neuron_data)
-            .build();
+        let ogy_sns_test_env = SnsTestEnv::ogy(&pic_ref, self.controller, &ogy_neuron_data);
+        let wtn_sns_test_env = SnsTestEnv::wtn(&pic_ref, self.controller, &wtn_neuron_data);
 
         let ogy_sns_ledger_canister_id = ogy_sns_test_env.ledger_id;
 

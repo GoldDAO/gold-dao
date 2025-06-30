@@ -1,4 +1,4 @@
-POCKET_IC_SERVER_VERSION="7.0.0"
+POCKET_IC_SERVER_VERSION="9.0.1"
 
 if [[ $OSTYPE == "linux-gnu"* ]]
 then

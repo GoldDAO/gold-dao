@@ -1,5 +1,4 @@
 use ic_cdk::export_candid;
-// use sns_governance_canister::get_metadata::*;
 
 mod guards;
 mod jobs;
@@ -12,7 +11,6 @@ pub mod state;
 pub mod types;
 pub mod updates;
 mod utils;
-// use ::types::{ HttpRequest, HttpResponse };
 
 use lifecycle::*;
 use queries::*;
