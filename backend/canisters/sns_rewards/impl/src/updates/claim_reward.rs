@@ -62,9 +62,6 @@ pub async fn claim_reward_impl(
 
     // check the neuron contains the hotkey of the callers principal
     match authenticate_by_hotkey(&neuron, &caller) {
-        AuthenticateByHotkeyResponse::NeuronHotKeyAbsent => {
-            return ClaimRewardResponse::NeuronHotKeyAbsent;
-        }
         AuthenticateByHotkeyResponse::NeuronHotKeyInvalid => {
             return ClaimRewardResponse::NeuronHotKeyInvalid;
         }

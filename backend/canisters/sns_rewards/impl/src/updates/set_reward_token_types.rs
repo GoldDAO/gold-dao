@@ -16,15 +16,11 @@ pub async fn set_reward_token_types(args: SetRewardTokenTypesArgs) -> SetRewardT
 }
 
 pub(crate) fn set_reward_token_types_impl(
-    token_list: Vec<(String, TokenInfo)>,
+    token_list: Vec<(TokenSymbol, TokenInfo)>,
 ) -> Result<(), String> {
     mutate_state(|s| -> Result<(), String> {
-        for (token_string, token_info) in token_list {
-            if let Ok(valid_token) = TokenSymbol::parse(&token_string) {
-                s.data.tokens.insert(valid_token, token_info);
-            } else {
-                return Err(format!("Invalid token string passed : {}", token_string));
-            }
+        for (token_symbol, token_info) in token_list {
+            s.data.tokens.insert(token_symbol, token_info);
         }
         Ok(())
     })

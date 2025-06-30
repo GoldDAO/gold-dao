@@ -1,8 +1,10 @@
 use candid::Principal;
 use canister_time::DAY_IN_MS;
+use canister_time::HOUR_IN_MS;
 use lazy_static::lazy_static;
 use pocket_ic::PocketIc;
 use rand::{thread_rng, RngCore};
+use std::time::Duration;
 use types::Cycles;
 use types::TimestampMillis;
 
@@ -22,6 +24,13 @@ pub fn tick_n_blocks(pic: &PocketIc, times: u32) {
     }
 }
 pub const T: Cycles = 1_000_000_000_000;
+
+pub fn wait_1_day(pic: &PocketIc) {
+    for _ in 0..24 {
+        pic.advance_time(Duration::from_millis(HOUR_IN_MS)); // advance by 1 hour
+        tick_n_blocks(pic, 10);
+    }
+}
 
 pub fn is_interval_more_than_7_days(
     previous_time: TimestampMillis,

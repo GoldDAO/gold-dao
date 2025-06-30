@@ -67,7 +67,7 @@ pub struct RewardsTestEnv {
 
 impl RewardsTestEnv {
     /// simulate neurons voting by reinstalling the sns gov canister with an increase in maturity
-    /// each neuton's initial maturity is multiplied
+    /// each neuron's initial maturity is multiplied
     pub fn simulate_neuron_voting(&mut self, multiplier: u64) {
         let (neuron_data, _) =
             generate_neuron_data(0, self.neuron_data.len(), multiplier, &self.users);
@@ -89,8 +89,8 @@ impl RewardsTestEnv {
             .clone();
         let sns_ledger_canister_id = self
             .token_ledgers
-            .get("gldgov_ledger_canister_id")
-            .expect("couldn't find ledger with 'gldgov_ledger_canister_id'")
+            .get("goldao_ledger_canister_id")
+            .expect("couldn't find ledger with 'goldao_ledger_canister_id'")
             .clone();
         let ogy_ledger_canister_id = self
             .token_ledgers
@@ -183,7 +183,9 @@ impl RewardsTestEnvBuilder {
             .with_sns_subnet()
             .with_application_subnet()
             .build();
-        pic.set_time(SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718697600000)); // 18 June 2024 08:00
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718697600000)).into(),
+        ); // 18 June 2024 08:00
 
         // set the date
         // Wednesday Jun 19, 2024, 7:00:00 AM

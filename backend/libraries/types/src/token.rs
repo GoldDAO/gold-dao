@@ -1,15 +1,115 @@
 use std::{borrow::Cow, fmt::Display};
 
-use candid::{CandidType, Decode, Encode, Principal};
+use candid::{CandidType, Principal};
 use ic_stable_structures::{storable::Bound, Storable};
+
 use serde::{Deserialize, Serialize};
 
+/// Compact enum for token identity (for keys, matching, etc.)
 #[derive(
-    Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    CandidType,
+    minicbor::Encode,
+    minicbor::Decode,
 )]
-pub struct TokenSymbol(String);
+pub enum TokenSymbol {
+    #[n(0)]
+    ICP,
+    #[n(1)]
+    OGY,
+    #[n(2)]
+    GOLDAO,
+    #[n(3)]
+    WTN,
+    #[n(4)]
+    GLDT,
+}
 
-#[derive(Debug)]
+impl std::fmt::Display for TokenSymbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let symbol = match self {
+            TokenSymbol::ICP => "ICP",
+            TokenSymbol::OGY => "OGY",
+            TokenSymbol::GOLDAO => "GOLDAO",
+            TokenSymbol::WTN => "WTN",
+            TokenSymbol::GLDT => "GLDT",
+        };
+        write!(f, "{symbol}")
+    }
+}
+
+impl TokenSymbol {
+    /// Return the display symbol for a token (can be renamed here)
+    pub fn symbol(&self) -> &'static str {
+        match self {
+            TokenSymbol::ICP => "ICP",
+            TokenSymbol::OGY => "OGY",
+            TokenSymbol::GOLDAO => "GOLDAO",
+            TokenSymbol::WTN => "WTN",
+            TokenSymbol::GLDT => "GLDT",
+        }
+    }
+
+    pub fn parse(symbol: &str) -> Result<Self, TokenSymbolParseError> {
+        match symbol {
+            "ICP" => Ok(TokenSymbol::ICP),
+            "OGY" => Ok(TokenSymbol::OGY),
+            "GOLDAO" | "GLDGov" => Ok(TokenSymbol::GOLDAO),
+            "WTN" => Ok(TokenSymbol::WTN),
+            _ => Err(TokenSymbolParseError::InvalidTokenSymbol),
+        }
+    }
+
+    pub fn get_token_info(self) -> TokenInfo {
+        match self {
+            TokenSymbol::ICP => TokenInfo {
+                fee: 10_000,
+                decimals: 8,
+                ledger_id: Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai")
+                    .expect("Invalid ICP ledger principal"),
+            },
+            TokenSymbol::OGY => TokenInfo {
+                fee: 200_000,
+                decimals: 8,
+                ledger_id: Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")
+                    .expect("Invalid OGY ledger principal"),
+            },
+            TokenSymbol::GOLDAO => TokenInfo {
+                fee: 100_000,
+                decimals: 8,
+                ledger_id: Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai")
+                    .expect("Invalid GLDGov ledger principal"),
+            },
+            TokenSymbol::WTN => TokenInfo {
+                fee: 1_000_000,
+                decimals: 8,
+                ledger_id: Principal::from_text("jcmow-hyaaa-aaaaq-aadlq-cai")
+                    .expect("Invalid WTN ledger principal"),
+            },
+            TokenSymbol::GLDT => TokenInfo {
+                fee: 10_000_000,
+                decimals: 8,
+                ledger_id: Principal::from_text("6c7su-kiaaa-aaaar-qaira-cai")
+                    .expect("Invalid GLDT ledger principal"),
+            },
+        }
+    }
+
+    pub fn is_valid(symbol: &str) -> bool {
+        TokenSymbol::parse(symbol).is_ok()
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub enum TokenSymbolParseError {
     InvalidTokenSymbol,
 }
@@ -22,27 +122,24 @@ impl Display for TokenSymbolParseError {
     }
 }
 
-const MAX_VALUE_SIZE: u32 = 12;
-impl TokenSymbol {
-    pub fn parse(symbol: &str) -> Result<TokenSymbol, TokenSymbolParseError> {
-        const ALLOWED_TOKENS: [&str; 3] = ["ICP", "OGY", "GLDGov"];
-
-        let valid_token = ALLOWED_TOKENS.contains(&symbol);
-        if valid_token {
-            Ok(TokenSymbol(symbol.to_string()))
-        } else {
-            Err(TokenSymbolParseError::InvalidTokenSymbol)
-        }
-    }
-}
+const MAX_VALUE_SIZE: u32 = 20;
 
 impl Storable for TokenSymbol {
     fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+        let mut buf = vec![];
+        minicbor::encode(self, &mut buf).expect("token symbol encoding should always succeed");
+        Cow::Owned(buf)
     }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
+        minicbor::decode(bytes.as_ref()).unwrap_or_else(|e| {
+            panic!(
+                "failed to decode token symbol bytes {}: {e}",
+                hex::encode(bytes)
+            )
+        })
     }
+
     const BOUND: Bound = Bound::Bounded {
         max_size: MAX_VALUE_SIZE,
         is_fixed_size: false,
@@ -54,4 +151,79 @@ pub struct TokenInfo {
     pub ledger_id: Principal,
     pub fee: u64,
     pub decimals: u64,
+}
+
+impl TokenInfo {
+    pub fn validate(self) -> Result<(), String> {
+        if self.ledger_id == Principal::anonymous() {
+            return Err("Invalid ledger_id: cannot be anonymous".to_string());
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::token::MAX_VALUE_SIZE;
+    use crate::TokenSymbol;
+    use ic_stable_structures::Storable;
+
+    #[test]
+    fn test_token_symbol_encode_decode() {
+        let symbols = [
+            TokenSymbol::ICP,
+            TokenSymbol::OGY,
+            TokenSymbol::GOLDAO,
+            TokenSymbol::WTN,
+        ];
+        for &symbol in &symbols {
+            let mut buf = Vec::new();
+            minicbor::encode(&symbol, &mut buf).unwrap();
+            println!("Encoded {:?} to bytes: {:?}", symbol, buf);
+
+            let decoded: TokenSymbol = minicbor::decode(&buf).unwrap();
+            assert_eq!(decoded, symbol);
+        }
+    }
+
+    #[test]
+    fn test_token_symbol_encoded_size_within_limit() {
+        let symbols = [
+            TokenSymbol::ICP,
+            TokenSymbol::OGY,
+            TokenSymbol::GOLDAO,
+            TokenSymbol::WTN,
+        ];
+        for &symbol in &symbols {
+            let encoded = symbol.to_bytes();
+            let size = encoded.len() as u32;
+            println!("Encoded size for {:?}: {}", symbol, size);
+            assert!(
+                size <= MAX_VALUE_SIZE,
+                "Encoded size of {:?} ({}) exceeds MAX_VALUE_SIZE ({})",
+                symbol,
+                size,
+                MAX_VALUE_SIZE
+            );
+        }
+    }
+
+    #[test]
+    fn test_token_symbol_parse() {
+        use crate::TokenSymbol;
+
+        // Valid symbols
+        assert_eq!(TokenSymbol::parse("ICP"), Ok(TokenSymbol::ICP));
+        assert_eq!(TokenSymbol::parse("OGY"), Ok(TokenSymbol::OGY));
+        assert_eq!(TokenSymbol::parse("GOLDAO"), Ok(TokenSymbol::GOLDAO));
+        assert_eq!(TokenSymbol::parse("GLDGov"), Ok(TokenSymbol::GOLDAO)); // alias
+        assert_eq!(TokenSymbol::parse("WTN"), Ok(TokenSymbol::WTN));
+
+        // Invalid symbols
+        assert!(TokenSymbol::parse("icp").is_err()); // case-sensitive
+        assert!(TokenSymbol::parse("goldao").is_err());
+        assert!(TokenSymbol::parse("GLD").is_err());
+        assert!(TokenSymbol::parse("").is_err());
+        assert!(TokenSymbol::parse("UNKNOWN").is_err());
+    }
 }

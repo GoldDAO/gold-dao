@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.7] - 2025-06-11
+
+#### Added
+
+- **WTN token support** - Added full support for the WTN token in the system, including serialization, parsing, and validation logic. This allows the system to properly handle WTN-related transactions and metadata.
+
+#### Fixed
+
+- **Payment rounds bug** - A serialization issue caused historical payment round data to be incorrectly serialized &deserialized or stored in memory. As a result, the internal index tracking the progression of payment rounds became corrupted. Despite this, rewards were still distributed correctly - they simply occurred under a different index than expected.
+
 ### [1.0.6] - 2025-04-07
 
 #### Improved
@@ -24,11 +34,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 #### Changed
 
-- let any principal in permission list claim rewards to enable actual owners of neurons to also claim rewards
+- let any principal in permission list claim rewards to enable actual owners of neurons to also claim rewards.
 
 ### [1.0.3] - 2024-09-25
 
-#### New
+#### Added
 
 - **State**: Include versioning and commit info in state.
 
@@ -47,7 +57,7 @@ This includes fixes and improvements
 #### Added
 
 - **Consistent distribution times across upgrades** : Upgrading a canister would mean a distribution timer would get reset and so this could result in an almost 2 week delay depending on the time of the upgrade. This new feature allows the distribution to always start at a specific time of UTC 14 - 16.
-- sns_rewards canister ugprade via SNS proposal
+- sns_rewards canister ugprade via SNS proposal.
 
 #### Fixed
 
@@ -57,11 +67,11 @@ This includes fixes and improvements
 
 #### Description
 
-This marks the initial release of SNS Rewards (sns_rewards canister). SNS Rewards calculates the contribution of each GLDGov neuron as a percentage of the total over a specified period. Subsequently, it transfers the DAO's treasury neuron rewards based on these percentages.
+This marks the initial release of SNS Rewards (sns_rewards canister). SNS Rewards calculates the contribution of each GOLDAO neuron as a percentage of the total over a specified period. Subsequently, it transfers the DAO's treasury neuron rewards based on these percentages.
 
 #### Added
 
-- **Daily GLDGov Neuron Synchronization** : Keeps track of each GLDGov neuron's maturity gains on a daily basis.
+- **Daily GOLDAO Neuron Synchronization** : Keeps track of each GOLDAO neuron's maturity gains on a daily basis.
 - **Weekly Reward Distribution** : Calculate and distribute rewards weekly based on the proportional accumulated maturity of each neuron for that week.
-- **Daily Reserve Pool Transfer** : Transfers GLDGov tokens to a dedicated reward pool within the canister daily, ensuring a consistent payout amount each week for the weekly reward distribution of GLDGov tokens.
+- **Daily Reserve Pool Transfer** : Transfers GOLDAO tokens to a dedicated reward pool within the canister daily, ensuring a consistent payout amount each week for the weekly reward distribution of GOLDAO tokens.
 - **Neuron Ownership & Reward Claims** : Easily claim ownership of a neuron via hotkeys and subsequently claim any distributed rewards.

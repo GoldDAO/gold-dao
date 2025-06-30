@@ -233,7 +233,7 @@ fn install_canisters(
             authorized_principals: vec![controller.clone()],
         });
 
-    pic.set_time(SystemTime::now());
+    pic.set_time(SystemTime::now().into());
 
     install_canister(
         pic,

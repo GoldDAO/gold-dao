@@ -62,19 +62,19 @@ futures = "0.3.29"
 # Enable `custom` feature of k256's getrandom dependency. See icp_neuron/impl/src/ecdsa.rs for more details.
 getrandom = { version = "0.2.12", features = ["custom"] }
 hex = "0.4.3"
-ic-cdk = "0.16.0"
-ic-cdk-macros = "0.13.2"
-ic-cdk-timers = "0.7.0"
-ic-ledger-types = "0.10.0"
+ic-cdk = "0.17.1"
+ic-cdk-macros = "0.17.1"
+ic-cdk-timers = "0.11.0"
+ic-ledger-types = "0.14.0"
 ic-metrics-encoder = "1.1.1"
 ic-stable-structures = "0.6.4"
-ic-transport-types = "0.34.0"
+ic-transport-types = "0.39.3"
 ic-xrc-types = "1.2.0"
 ic0 = "0.23.0"
 icrc-ledger-types = "0.1.6"
 k256 = "0.13.1"
-minicbor = { version = "0.19.1", features = ["alloc", "derive"] }
-minicbor-derive = "0.13.0"
+minicbor = { version = "1.0.0", features = ["alloc", "derive"] }
+
 proc-macro2 = "1.0.78"
 quote = "1.0.33"
 rmp-serde = "1.1.2"
@@ -99,8 +99,15 @@ time = { version = "0.3.36", features = [
   "parsing",
   "formatting",
 ] }
-pocket-ic = "6.0.0"
+pocket-ic = "9.0.1"
 async-trait = "0.1.81"
 enum_dispatch = "0.3.13"
 typetag = "0.2.18"
 num-traits = "0.2.19"
+thiserror = "2.0.12"
+
+bity-ic-icrc3 = { version =  "0.2.4" } #  features = [  "debug-logs",]
+bity-ic-icrc3-macros = "0.2.0"
+bity-ic-canister-time = "0.1.0"
+bity-ic-serializer = "0.1.0"
+lazy_static = "1.4.0"

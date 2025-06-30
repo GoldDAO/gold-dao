@@ -1,29 +1,20 @@
-use std::{
-    time::{Duration, SystemTime},
-    u64::MIN,
-};
-
 use candid::{Nat, Principal};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS, WEEK_IN_MS};
+use canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS};
 use icrc_ledger_types::icrc1::account::Account;
-use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{
     get_historic_payment_round::{self, Args as GetHistoricPaymentRoundArgs},
-    payment_round::PaymentStatus,
     subaccounts::REWARD_POOL_SUB_ACCOUNT,
 };
+use std::time::Duration;
 use types::TokenSymbol;
 
 use crate::{
     client::{
         icrc1::client::{balance_of, transfer},
-        rewards::{
-            force_payment_round_to_fail, get_active_payment_rounds, get_historic_payment_round,
-            get_neuron_by_id,
-        },
+        rewards::{get_active_payment_rounds, get_historic_payment_round, get_neuron_by_id},
     },
     sns_rewards_suite::setup::{default_test_setup, setup::setup_reward_pools},
-    utils::{is_interval_more_than_7_days, tick_n_blocks, HOURS_IN_WEEK},
+    utils::{is_interval_more_than_7_days, tick_n_blocks},
 };
 
 #[test]
@@ -38,9 +29,9 @@ fn test_distribute_rewards_happy_path() {
     let controller = test_env.controller;
     let rewards_canister_id = test_env.rewards_canister_id;
 
-    let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    let icp_token = TokenSymbol::ICP;
+    let ogy_token = TokenSymbol::OGY;
+    let goldao_token = TokenSymbol::GOLDAO;
 
     let neuron_id_1 = test_env
         .neuron_data
@@ -62,7 +53,7 @@ fn test_distribute_rewards_happy_path() {
     tick_n_blocks(&test_env.pic, 20);
     test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 9:00am Wednesday 19th June
 
-    tick_n_blocks(&test_env.pic, 20);
+    tick_n_blocks(&test_env.pic, 100);
 
     // TRIGGER - distribution
     test_env
@@ -137,10 +128,10 @@ fn test_distribute_rewards_happy_path() {
         get_neuron_by_id(&test_env.pic, controller, rewards_canister_id, &neuron_id_1).unwrap();
     let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token).unwrap();
     let rewarded_mat_ogy = single_neuron.rewarded_maturity.get(&ogy_token).unwrap();
-    let rewarded_mat_gldgov = single_neuron.rewarded_maturity.get(&gldgov_token).unwrap();
+    let rewarded_mat_goldao = single_neuron.rewarded_maturity.get(&goldao_token).unwrap();
     assert_eq!(rewarded_mat_icp, &200_000u64);
     assert_eq!(rewarded_mat_ogy, &200_000u64);
-    assert_eq!(rewarded_mat_gldgov, &200_000u64);
+    assert_eq!(rewarded_mat_goldao, &200_000u64);
 }
 
 // if there are no rewards in the reward pool then it should not distribute for that token. other's with rewards should carry on.
@@ -163,8 +154,8 @@ fn test_distribute_rewards_with_no_rewards() {
         .unwrap();
 
     let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    let ogy_token = TokenSymbol::OGY;
+    let goldao_token = TokenSymbol::GOLDAO;
 
     let reward_pool = Account {
         owner: rewards_canister_id,
@@ -237,11 +228,11 @@ fn test_distribute_rewards_with_no_rewards() {
     .unwrap();
     let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token.clone());
     let rewarded_mat_ogy = single_neuron.rewarded_maturity.get(&ogy_token).unwrap();
-    let rewarded_mat_gldgov = single_neuron.rewarded_maturity.get(&gldgov_token).unwrap();
+    let rewarded_mat_goldao = single_neuron.rewarded_maturity.get(&goldao_token).unwrap();
 
     assert_eq!(rewarded_mat_icp, None);
     assert_eq!(rewarded_mat_ogy, &100_000u64);
-    assert_eq!(rewarded_mat_gldgov, &100_000u64);
+    assert_eq!(rewarded_mat_goldao, &100_000u64);
 
     // ********************************
     // 3. Distribute rewards - week 3 - ALL THREE now have rewards to distribute
@@ -287,10 +278,10 @@ fn test_distribute_rewards_with_no_rewards() {
     .unwrap();
     let rewarded_mat_icp = single_neuron.rewarded_maturity.get(&icp_token).unwrap();
     let rewarded_mat_ogy = single_neuron.rewarded_maturity.get(&ogy_token).unwrap();
-    let rewarded_mat_gldgov = single_neuron.rewarded_maturity.get(&gldgov_token).unwrap();
+    let rewarded_mat_goldao = single_neuron.rewarded_maturity.get(&goldao_token).unwrap();
     assert_eq!(rewarded_mat_icp, &200_000u64);
     assert_eq!(rewarded_mat_ogy, &200_000u64);
-    assert_eq!(rewarded_mat_gldgov, &200_000u64);
+    assert_eq!(rewarded_mat_goldao, &200_000u64);
 }
 
 // if 1 reward pool doesn't have enough rewards it should be skipped
@@ -308,16 +299,16 @@ fn test_distribute_rewards_with_not_enough_rewards() {
         .get("ogy_ledger_canister_id")
         .unwrap()
         .clone();
-    let gldgov_ledger_id = test_env
+    let goldao_ledger_id = test_env
         .token_ledgers
-        .get("gldgov_ledger_canister_id")
+        .get("goldao_ledger_canister_id")
         .unwrap()
         .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    let ogy_token = TokenSymbol::OGY;
+    let goldao_token = TokenSymbol::GOLDAO;
 
     // ********************************
     // 1. Give ICP reward pool balance less than the total in fees
@@ -352,8 +343,8 @@ fn test_distribute_rewards_with_not_enough_rewards() {
     let ogy_reward_pool_balance = balance_of(&test_env.pic, ogy_ledger_id, reward_pool);
     assert_eq!(ogy_reward_pool_balance, Nat::from(100_000_000_000u64));
 
-    let gldgov_reward_pool_balance = balance_of(&test_env.pic, gldgov_ledger_id, reward_pool);
-    assert_eq!(gldgov_reward_pool_balance, Nat::from(100_000_000_000u64));
+    let goldao_reward_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reward_pool);
+    assert_eq!(goldao_reward_pool_balance, Nat::from(100_000_000_000u64));
 
     // ********************************
     // 2. Distribute rewards
@@ -408,7 +399,7 @@ fn test_distribute_rewards_with_not_enough_rewards() {
         Principal::anonymous(),
         rewards_canister_id,
         &(get_historic_payment_round::Args {
-            token: gldgov_token,
+            token: goldao_token,
             round_id: 1,
         }),
     );
@@ -434,8 +425,8 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     let rewards_canister_id = test_env.rewards_canister_id;
     tick_n_blocks(&test_env.pic, 10);
     let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::parse("OGY").unwrap();
-    let gldgov_token = TokenSymbol::parse("GLDGov").unwrap();
+    let ogy_token = TokenSymbol::OGY;
+    let goldao_token = TokenSymbol::GOLDAO;
 
     let neuron_id_1 = test_env
         .neuron_data

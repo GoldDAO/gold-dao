@@ -25,38 +25,34 @@ fn init(args: Args) {
             if init_args.test_mode {
                 let icp_ledger_canister_id = init_args.icp_ledger_canister_id;
                 let ogy_ledger_canister_id = init_args.ogy_ledger_canister_id;
-                let gldgov_ledger_canister_id = init_args.sns_ledger_canister_id;
+                let goldao_ledger_canister_id = init_args.sns_ledger_canister_id;
 
-                if let Ok(token) = TokenSymbol::parse("ICP") {
-                    data.tokens.insert(
-                        token,
-                        TokenInfo {
-                            ledger_id: icp_ledger_canister_id,
-                            fee: 10_000u64,
-                            decimals: 8u64,
-                        },
-                    );
-                }
-                if let Ok(token) = TokenSymbol::parse("OGY") {
-                    data.tokens.insert(
-                        token,
-                        TokenInfo {
-                            ledger_id: ogy_ledger_canister_id,
-                            fee: 200_000u64,
-                            decimals: 8u64,
-                        },
-                    );
-                }
-                if let Ok(token) = TokenSymbol::parse("GLDGov") {
-                    data.tokens.insert(
-                        token.clone(),
-                        TokenInfo {
-                            ledger_id: gldgov_ledger_canister_id,
-                            fee: 100_000u64,
-                            decimals: 8u64,
-                        },
-                    );
-                }
+                data.tokens.insert(
+                    TokenSymbol::ICP,
+                    TokenInfo {
+                        ledger_id: icp_ledger_canister_id,
+                        fee: 10_000u64,
+                        decimals: 8u64,
+                    },
+                );
+
+                data.tokens.insert(
+                    TokenSymbol::OGY,
+                    TokenInfo {
+                        ledger_id: ogy_ledger_canister_id,
+                        fee: 200_000u64,
+                        decimals: 8u64,
+                    },
+                );
+
+                data.tokens.insert(
+                    TokenSymbol::GOLDAO,
+                    TokenInfo {
+                        ledger_id: goldao_ledger_canister_id,
+                        fee: 100_000u64,
+                        decimals: 8u64,
+                    },
+                );
 
                 data.authorized_principals = vec![init_args.sns_gov_canister_id];
                 data.sns_governance_canister = init_args.sns_gov_canister_id;

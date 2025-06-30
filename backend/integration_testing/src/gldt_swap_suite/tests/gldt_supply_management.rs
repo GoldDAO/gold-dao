@@ -5,7 +5,7 @@ use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 use candid::{Nat, Principal};
-use canister_time::timestamp_millis;
+use canister_time::NANOS_PER_MILLISECOND;
 use gldt_swap_common::gldt::GLDT_TX_FEE;
 use gldt_swap_common::swap::NotificationError;
 use gldt_swap_common::swap::MANAGE_GLDT_SUPPLY_INTERVAL;
@@ -164,12 +164,7 @@ mod tests {
         pic.advance_time(Duration::from_millis(MANAGE_GLDT_SUPPLY_INTERVAL)); // advance to when the gldt supply job starts
 
         // time of insert is 59 mins - after 3~ minutes it is considererd a stale swap and will be removed
-        let swap_insert_time = pic
-            .get_time()
-            .duration_since(UNIX_EPOCH)
-            .ok()
-            .map(|duration| duration.as_millis())
-            .unwrap();
+        let swap_insert_time = pic.get_time().as_nanos_since_unix_epoch() / NANOS_PER_MILLISECOND;
         // insert a fake swap
         insert_fake_swap(
             pic,

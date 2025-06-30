@@ -13,6 +13,11 @@ integration tests trigger:
 
 integration tests:
   stage: integration_testing
+  variables:
+    KUBERNETES_MEMORY_LIMIT: "5Gi"
+    KUBERNETES_MEMORY_REQUEST: "5Gi"
+    KUBERNETES_CPU_LIMIT: "2"
+    KUBERNETES_CPU_REQUEST: "1"
   rules:
     - if: >
         $CI_COMMIT_REF_NAME == "master" &&
@@ -39,15 +44,8 @@ integration tests:
       "usdg_minter integration-test build",
     ]
   extends: .rust template
-  tags:
-    - dind
-  services:
-    - docker:dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_SECURITY_OPT: "--security-opt seccomp=unconfined"
   script:
-    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/7.0.0/pocket-ic-x86_64-linux.gz
+    - wget -O pocket-ic.gz https://github.com/dfinity/pocketic/releases/download/9.0.1/pocket-ic-x86_64-linux.gz
     - gzip -d pocket-ic.gz
     - chmod +x ./pocket-ic
     - mv ./pocket-ic ./backend/integration_testing/pocket-ic

@@ -3,7 +3,7 @@
 
 - fn distribute_reserve_pool
 transfers tokens from reserve pool to the reward pool on a daily basis.
-- currently this only happens for GLDGov
+- currently this only happens for GOLDAO
 - the daily amount to be transferred is decided via a proposal
 
 */
@@ -36,21 +36,14 @@ async fn run_async() {
 
 pub async fn distribute_reserve_pool() {
     debug!("RESERVE POOL DISTRIBUTION - START");
-    handle_gldgov_distribution().await;
+    handle_goldao_distribution().await;
     debug!("RESERVE POOL DISTRIBUTION - FINISH");
 }
 
-async fn handle_gldgov_distribution() {
-    // chceck GLDGov is a valid token string
-    let token = match TokenSymbol::parse("GLDGov") {
-        Ok(t) => t,
-        Err(e) => {
-            error!("ERROR : failed to parse GLDGov token. error : {:?}", e);
-            return;
-        }
-    };
-    // get the gldgov ledger id
-    let gldgov_token_info = match read_state(|s| s.data.tokens.get(&token).copied()) {
+async fn handle_goldao_distribution() {
+    let token = TokenSymbol::GOLDAO;
+    // get the goldao ledger id
+    let goldao_token_info = match read_state(|s| s.data.tokens.get(&token).copied()) {
         Some(token_info) => token_info,
         None => {
             error!(
@@ -60,7 +53,7 @@ async fn handle_gldgov_distribution() {
             return;
         }
     };
-    // get the daily transfer amount of gldgov
+    // get the daily transfer amount of goldao
     let amount_to_transfer =
         match read_state(|s| s.data.daily_reserve_transfer.get(&token).cloned()) {
             Some(amount) => amount,
@@ -83,16 +76,16 @@ async fn handle_gldgov_distribution() {
         return;
     }
 
-    // check the reserve pool has enough GLDGov to correctly transfer
-    match fetch_balance_of_sub_account(gldgov_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await
+    // check the reserve pool has enough GOLDAO to correctly transfer
+    match fetch_balance_of_sub_account(goldao_token_info.ledger_id, RESERVE_POOL_SUB_ACCOUNT).await
     {
         Ok(balance) => {
-            if balance < amount_to_transfer.clone() + gldgov_token_info.fee {
+            if balance < amount_to_transfer.clone() + goldao_token_info.fee {
                 debug!(
                     "Balance of reserve pool : {} is too low to make a transfer of {} plus a fee of {} ",
                     balance,
                     amount_to_transfer,
-                    gldgov_token_info.fee
+                    goldao_token_info.fee
                 );
                 return;
             }
@@ -111,14 +104,14 @@ async fn handle_gldgov_distribution() {
     match transfer_token(
         RESERVE_POOL_SUB_ACCOUNT,
         reward_pool_account,
-        gldgov_token_info.ledger_id,
+        goldao_token_info.ledger_id,
         amount_to_transfer.clone(),
     )
     .await
     {
         Ok(_) => {
             info!(
-                "SUCCESS : {:?} GLDGov tokens transferred to reward pool successfully",
+                "SUCCESS : {:?} GOLDAO tokens transferred to reward pool successfully",
                 amount_to_transfer
             );
             mutate_state(|s| {
@@ -128,7 +121,7 @@ async fn handle_gldgov_distribution() {
         Err(e) => {
             // TODO - should we update the last_daily_reserve_transfer_time here even though it didn't succeed. If we see a failure we'd still want to correct it, upgrade and let the transfer run instead of stopping because it previously failed.
             error!(
-                "ERROR : GLDGov failed to transfer from reserve pool to reward pool with error : {:?}",
+                "ERROR : GOLDAO failed to transfer from reserve pool to reward pool with error : {:?}",
                 e
             );
         }
