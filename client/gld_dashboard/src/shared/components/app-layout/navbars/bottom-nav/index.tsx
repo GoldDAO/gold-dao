@@ -1,4 +1,4 @@
-import { VERSION_DAPP } from "@constants";
+// import { VERSION_DAPP } from "@constants";
 import Icon from "@shared/ui/icons";
 import { ThemeToggle } from "@shared/components/theme-toggle";
 
@@ -18,7 +18,7 @@ const BottomNav = () => {
           Docs
           <Icon.ExternalLink width={16} height={16} className="ml-2" />
         </a>
-        <div>Version {VERSION_DAPP ?? "undefined"}</div>
+        {/* <div>Version {VERSION_DAPP ?? "undefined"}</div> */}
       </div>
     </div>
   );
