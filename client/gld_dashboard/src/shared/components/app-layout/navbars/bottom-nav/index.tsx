@@ -18,7 +18,7 @@ const BottomNav = () => {
           Docs
           <Icon.ExternalLink width={16} height={16} className="ml-2" />
         </a>
-        {/* <div>Version {VERSION_DAPP ?? "undefined"}</div> */}
+        {/* <div> Version {VERSION_DAPP ?? "undefined"}</div> */}
       </div>
     </div>
   );
