@@ -42,11 +42,7 @@ const Confirm = () => {
               <div className="border-t border-border w-full"></div>
               <div className="absolute inset-x-0 top-0 flex justify-center transform -translate-y-1/2">
                 <button className="bg-content text-background rounded-full p-2 cursor-default">
-                  <Icon.ArrowDown
-                    height={24}
-                    width={24}
-                    className="text-gold"
-                  />
+                  <Icon.Arrow height={24} width={24} className="text-gold" />
                 </button>
               </div>
             </div>
