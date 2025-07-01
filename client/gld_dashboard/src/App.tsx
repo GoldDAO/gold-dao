@@ -5,7 +5,7 @@ import { Tooltip } from "@components/index";
 import Router from "./router.tsx";
 
 function App() {
-  //! FIX Hide PLUG element from NFID IdentityKit
+  //! FIX Hide  PLUG element from NFID IdentityKit
   useEffect(() => {
     const hideElement = () => {
       const el = document.getElementById(
