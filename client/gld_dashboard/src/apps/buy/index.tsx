@@ -135,7 +135,6 @@ const Buy = () => {
 
   useEffect(() => {
     if (price.isSuccess && receiveTokenPrice.isSuccess && amount > 0) {
-      console.log(price.data);
       dispatch({
         type: "SET_PRICE_DATA",
         value: {
@@ -496,15 +495,7 @@ const Buy = () => {
                       disabled={!isBuyEnabled}
                     >
                       {isReceiveTokenPriceIsFetched ? (
-                        <>
-                          Buy ≈{" "}
-                          <E8sToLocaleString
-                            value={receiveTokenPrice.data.amount}
-                            tokenDecimals={receiveTokenPrice.data.decimals}
-                            decimals={5}
-                          />{" "}
-                          GLDT
-                        </>
+                        <div>Buy GLDT</div>
                       ) : (
                         <div>Loading...</div>
                       )}

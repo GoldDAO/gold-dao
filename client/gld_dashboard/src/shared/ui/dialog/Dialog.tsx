@@ -66,7 +66,7 @@ const Dialog = ({
         <DialogPanel
           className={clsx(
             `container ${SIZES[size]}`,
-            "bg-surface-primary rounded-xl p-4 xl:p-8 max-h-[70vh] overflow-y-auto"
+            "bg-surface-primary rounded-xl p-4 xl:p-8 max-h-[70vh] md:max-h-[90vh] overflow-y-auto"
           )}
         >
           <DialogTitle className={"flex items-center"}>
