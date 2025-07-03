@@ -20,7 +20,6 @@ integration tests:
     KUBERNETES_CPU_REQUEST: "1"
   rules:
     - if: >
-        $CI_COMMIT_REF_NAME == "master" &&
         $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+(-reinstall)?$/' &&
         $CI_COMMIT_TAG !~ '/gld_dashboard|gld_landing_page|gld_swap_app/'
       when: always
