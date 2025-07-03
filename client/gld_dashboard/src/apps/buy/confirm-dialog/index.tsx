@@ -211,13 +211,7 @@ const ConfirmDialog = ({
           </div>
         </div>
         <BtnPrimary onClick={handleConfirm} className="w-full">
-          Buy ≈{" "}
-          <E8sToLocaleString
-            value={receiveToken.amount}
-            tokenDecimals={receiveToken.decimals as number}
-            decimals={5}
-          />{" "}
-          {receiveToken.token.name}
+          Confirm GLDT purchase {receiveToken.token.name}
         </BtnPrimary>
         <div className="flex justify-center">
           <div className="flex items-center gap-1 text-content/60 text-sm">

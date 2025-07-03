@@ -48,13 +48,13 @@ const Default = () => {
         </div>
         <div className="flex justify-self-end items-center">
           <Link
-            to="/swap"
+            to="https://app.gldt.org"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center"
           >
             <Button className="bg-content rounded-full py-1 px-1">
-              Swap app
+              Launch App
             </Button>
           </Link>
 

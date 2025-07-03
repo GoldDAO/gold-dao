@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.4] - 2025-07-03
+
+### Changed
+
+- Links now redirect to the new Gold DAO dApp
+
 ### [1.1.3] - 2025-02-24
 
 #### Changed

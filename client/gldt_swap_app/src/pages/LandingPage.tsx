@@ -56,9 +56,13 @@ export const LandingPage = () => {
                   The future of owning physical gold
                 </div>
                 <div className="mt-4 mb-8 sm:my-8">
-                  <Link to="/swap" target="_blank" rel="noopener noreferrer">
+                  <Link
+                    to="https://app.gldt.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Button className="rounded-xl px-4 xl:px-6 xl:py-4 xl:text-lg">
-                      Start swapping
+                      Get started
                     </Button>
                   </Link>
                 </div>
