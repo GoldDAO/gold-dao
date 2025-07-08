@@ -4,7 +4,7 @@ import GradientCard from "@shared/ui/card/GradientCard";
 import TotalCountUserNFTs from "@shared/components/total-count-user-nfts";
 import FeaturesBtn from "@advanced/gldt/overview-section/features-btn";
 import TotalCountToken from "@shared/components/total-count-token";
-import { TokensList, GLDT_INDEX } from "@wallet/shared/utils";
+import { TOKEN_GLDT } from "@shared/utils/tokens";
 
 const OverviewSection = () => {
   return (
@@ -24,7 +24,7 @@ const OverviewSection = () => {
           <div className="flex flex-col xl:flex-row xl:items-stretch gap-2 xl:gap-8 justify-center items-center">
             <TotalCountUserNFTs />
             <div className="xl:border-l border-border h-auto my-2" />
-            <TotalCountToken token={TokensList[GLDT_INDEX]} />
+            <TotalCountToken token={TOKEN_GLDT} />
           </div>
         </div>
       </div>

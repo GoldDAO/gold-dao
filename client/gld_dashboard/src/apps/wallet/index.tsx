@@ -8,7 +8,7 @@ import WalletListDisconnected from "@wallet/wallet-list-disconnected";
 import TxHistoryToken from "@wallet/tx-history-token";
 import TxHistoryNFT from "@wallet/tx-history-nft";
 import TxHistoryDisconnected from "@wallet/tx-history-disconnected";
-import { TokensList, TokensWhitelist, GLDT_INDEX } from "@wallet/shared/utils";
+import { TOKENS, TOKEN_WHITELIST, TOKEN_GLDT } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import OverviewSection from "@wallet/overview-section";
@@ -21,15 +21,15 @@ const Wallet = () => {
   useEffect(() => {
     if (
       !searchParams.get("token") ||
-      !TokensWhitelist.includes(searchParams.get("token")!)
+      !TOKEN_WHITELIST.includes(searchParams.get("token")!)
     ) {
-      searchParams.set("token", TokensList[GLDT_INDEX].id);
-      setSelectedToken(TokensList[GLDT_INDEX]);
+      searchParams.set("token", TOKEN_GLDT.id);
+      setSelectedToken(TOKEN_GLDT);
       setSearchParams(searchParams);
     } else {
-      if (searchParams.get("token") !== "nft") {
+      if (searchParams.get("token") !== "gldnft") {
         setSelectedToken(
-          TokensList.find((t) => t.id === searchParams.get("token"))!
+          TOKENS.find((t) => t.id === searchParams.get("token"))!
         );
       }
     }
@@ -60,7 +60,7 @@ const Wallet = () => {
         <div className="p-4 xl:p-8 mt-12">
           <div className="mb-4">Transactions</div>
           {isConnected ? (
-            searchParams.get("token") === "nft" ? (
+            searchParams.get("token") === "gldnft" ? (
               <TxHistoryNFT />
             ) : (
               <TxHistoryToken />

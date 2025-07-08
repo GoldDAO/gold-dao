@@ -55,7 +55,7 @@ const Form = ({ className }: { className?: string }) => {
   });
 
   const balance = useFetchLedgerBalance(
-    token.canisterId,
+    token.canister_id,
     unauthenticatedAgent,
     {
       ledger: token.name,

@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import { Token } from "@wallet/shared/utils";
+import { Token } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
@@ -15,7 +15,7 @@ const ListItemToken = ({ token }: { token: Token }) => {
   const [selectedToken, setSelectedToken] = useAtom(TokenSelectedAtom);
 
   const balance = useFetchLedgerBalance(
-    token.canisterId,
+    token.canister_id,
     unauthenticatedAgent,
     {
       ledger: name,
@@ -36,7 +36,7 @@ const ListItemToken = ({ token }: { token: Token }) => {
         "shrink-0",
         "rounded-xl border border-border p-2 cursor-pointer",
         `${
-          searchParams.get("token") !== "nft" && selectedToken.id === id
+          searchParams.get("token") !== "gldnft" && selectedToken.id === id
             ? "border-gold bg-gold/10"
             : ""
         }`

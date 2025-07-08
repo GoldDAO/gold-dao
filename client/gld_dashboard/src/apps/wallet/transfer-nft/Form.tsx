@@ -53,6 +53,10 @@ const Form = () => {
       enabled: isConnected && !!unauthenticatedAgent && !!randomSelectedNFTId,
       nft_id: randomSelectedNFTId?.tokenId.id_bigint as bigint,
       nft_id_string: randomSelectedNFTId?.tokenId.id_string as string,
+      placeholderData: {
+        amount: 0,
+        amount_e8s: 0n,
+      },
     }
   );
 

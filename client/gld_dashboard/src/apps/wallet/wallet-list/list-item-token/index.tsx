@@ -3,22 +3,21 @@ import { useAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
-import { Token } from "@wallet/shared/utils";
+import { Token } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ListItemToken = ({ token }: { token: Token }) => {
-  const { id, name, label } = token;
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedToken, setSelectedToken] = useAtom(TokenSelectedAtom);
 
   const balance = useFetchLedgerBalance(
-    token.canisterId,
+    token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: name,
+      ledger: token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent && isConnected,
     }
@@ -37,7 +36,8 @@ const ListItemToken = ({ token }: { token: Token }) => {
         "rounded-xl border border-border p-2 cursor-pointer",
         "hover:border-gold hover:bg-gold/10",
         `${
-          searchParams.get("token") !== "nft" && selectedToken.id === id
+          searchParams.get("token") !== "gldnft" &&
+          selectedToken.id === token.id
             ? "border-gold bg-gold/10"
             : ""
         }`
@@ -46,10 +46,12 @@ const ListItemToken = ({ token }: { token: Token }) => {
     >
       <div className="flex justify-between items-center p-2 font-semibold">
         <div className="flex items-center gap-2">
-          <Logo name={id} className="h-9 w-9" />
+          <Logo name={token.id} className="h-9 w-9" />
           <div className="text-left">
-            <div>{name}</div>
-            <div className="text-content/60 text-sm font-normal">{label}</div>
+            <div>{token.name}</div>
+            <div className="text-content/60 text-sm font-normal">
+              {token.label}
+            </div>
           </div>
         </div>
         <div className="text-end">

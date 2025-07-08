@@ -40,3 +40,7 @@ export const numberToLocaleString = ({
     maximumFractionDigits: decimals,
   });
 };
+
+export const isNumeric = (x: number | string) => {
+  return ((typeof x === 'number' || typeof x === 'string') && !isNaN(Number(x)));
+}
