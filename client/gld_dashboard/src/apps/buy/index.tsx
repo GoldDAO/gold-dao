@@ -19,8 +19,7 @@ import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
-import useFetchSwapAmount from "@services/kongswap/hooks/useFetchSwapAmount";
+import useFetchSwapAmount from "@shared/hooks/useFetchSwapAmount";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import GradientCard from "@shared/ui/card/GradientCard";
 import { Token, TOKEN_LIST_AVAILABLE } from "@buy/shared/utils";
@@ -79,24 +78,14 @@ const Buy = () => {
     }
   );
 
-  const payTokenDecimals = useFetchDecimals(
-    pay_token.token.canisterId,
-    unauthenticatedAgent,
-    {
-      ledger: pay_token.token.id,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
-
   const price = useFetchSwapAmount(
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
       from: pay_token.token.name,
+      from_canister_id: pay_token.token.canisterId,
       to: "GLDT",
-      amount: amount
-        ? BigInt(Math.round(amount * 10 ** (payTokenDecimals?.data ?? 0)))
-        : 0n,
+      amount,
       enabled: !!unauthenticatedAgent,
     }
   );
@@ -106,8 +95,9 @@ const Buy = () => {
     unauthenticatedAgent,
     {
       from: pay_token.token.name,
+      from_canister_id: pay_token.token.canisterId,
       to: "GLDT",
-      amount: BigInt(10 ** (payTokenDecimals?.data ?? 0)),
+      amount: 1,
       enabled: !!unauthenticatedAgent,
     }
   );

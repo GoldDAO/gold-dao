@@ -3,7 +3,7 @@ import { GLDT_VALUE_1G_NFT } from "@constants";
 import { useAuth } from "@auth/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import { Token } from "@wallet/shared/utils";
+import { Token } from "@shared/utils/tokens";
 
 const Balance = ({
   balance = 0,
@@ -76,7 +76,7 @@ const TotalCountToken = ({
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
 
   const balance = useFetchLedgerBalance(
-    token.canisterId,
+    token.canister_id,
     unauthenticatedAgent,
     {
       ledger: token.name,

@@ -3,7 +3,7 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import { Logo } from "@components/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import { Token } from "@wallet/shared/utils";
+import { Token } from "@shared/utils/tokens";
 
 const HeaderToken = ({
   token,
@@ -14,14 +14,14 @@ const HeaderToken = ({
 }) => {
   const { unauthenticatedAgent } = useAuth();
 
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
+  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
     ledger: token.id,
     enabled: !!unauthenticatedAgent,
   });
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,
-    from_canister_id: token.canisterId,
+    from_canister_id: token.canister_id,
     amount: BigInt(1 * 10 ** (decimals.data ?? 0)),
     enabled: !!unauthenticatedAgent && decimals.isSuccess,
   });
