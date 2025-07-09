@@ -20,14 +20,14 @@ const ListItemMobile = ({
   const { unauthenticatedAgent, isConnected } = useAuth();
   const token = useAtomValue(TokenSelectedAtom);
 
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
+  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
     ledger: token.id,
     enabled: !!unauthenticatedAgent && isConnected,
   });
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,
-    from_canister_id: token.canisterId,
+    from_canister_id: token.canister_id,
     amount: tx.amount ?? 0n,
     enabled: !!unauthenticatedAgent && isConnected,
   });

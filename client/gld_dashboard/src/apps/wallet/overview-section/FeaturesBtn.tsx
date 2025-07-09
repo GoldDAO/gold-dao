@@ -9,10 +9,12 @@ import {
   SendTokenStateAtom,
 } from "@wallet/shared/atoms/TransferTokenAtom";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
+import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import TransferDialogToken from "@wallet/transfer-token";
 import MintNFT from "@advanced/gldt/overview-section/mint-nft";
 import BurnNFT from "@advanced/gldt/overview-section/burn-nft";
 import AppFeatureBtn from "@shared/components/app-feature-btn";
+import Swap from "@wallet/swap";
 
 const FeaturesBtn = () => {
   const [searchParams] = useSearchParams();
@@ -21,8 +23,7 @@ const FeaturesBtn = () => {
   const setTransferTokenState = useSetAtom(TransferTokenStateAtom);
   const setSendTokenState = useSetAtom(SendTokenStateAtom);
   const [, dispatchTransferNFT] = useAtom(TransferNFTStateReducerAtom);
-
-  const { id } = token;
+  const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
   const handleOpenTransferTokenDialog = () => {
     setSendTokenState(RESET);
@@ -32,8 +33,16 @@ const FeaturesBtn = () => {
     }));
   };
 
+  const onOpenSwap = () => {
+    dispatchSwapState({ type: "RESET" });
+    dispatchSwapState({
+      type: "OPEN_DIALOG_FORM",
+      value: { token_from: token },
+    });
+  };
+
   const renderTokenAction = () => {
-    if (searchParams.get("token") === "nft") {
+    if (searchParams.get("token") === "gldnft") {
       return (
         <>
           <AppFeatureBtn
@@ -51,7 +60,7 @@ const FeaturesBtn = () => {
         </>
       );
     } else {
-      if (id === "gldt") {
+      if (token.id === "gldt") {
         return (
           <>
             <AppFeatureBtn
@@ -62,7 +71,7 @@ const FeaturesBtn = () => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
             <AppFeatureBtn
               action="burn-nft"
               handleOnClick={() => navigate("/advanced/gldt")}
@@ -73,14 +82,14 @@ const FeaturesBtn = () => {
             /> */}
           </>
         );
-      } else if (id === "goldao") {
+      } else if (token.id === "goldao") {
         return (
           <>
             <AppFeatureBtn
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
             <AppFeatureBtn
               action="govern"
               handleOnClick={() => navigate("/govern")}
@@ -94,7 +103,7 @@ const FeaturesBtn = () => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
           </>
         );
       }
@@ -110,6 +119,8 @@ const FeaturesBtn = () => {
       <TransferDialogToken />
       <MintNFT />
       <BurnNFT />
+
+      <Swap />
     </>
   );
 };

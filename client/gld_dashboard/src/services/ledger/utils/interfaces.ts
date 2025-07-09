@@ -1,5 +1,4 @@
 export type Ledger = "ogy" | "gldt" | "icp" | "goldao" | "ckusdt" | "ckusdc" | "wtn";
-// export type Ledger = "OGY" | "GLDT" | "ICP" | "GOLDAO" | "ckUSDT" | "ckUSDC" | "WTN";
 
 export interface Transaction {
   index: number;

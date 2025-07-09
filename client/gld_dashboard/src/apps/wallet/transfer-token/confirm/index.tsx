@@ -22,14 +22,14 @@ const Confirm = ({ className }: { className?: string }) => {
   const setTransferState = useSetAtom(TransferTokenStateAtom);
   const { amount, receive_account, is_principal_standard } = sendState;
 
-  const transfer = useTransfer(token.canisterId, authenticatedAgent, {
+  const transfer = useTransfer(token.canister_id, authenticatedAgent, {
     ledger: token.name,
     is_principal_standard,
   });
 
   const tokenData = useFetchTokenData(unauthenticatedAgent, {
-    token: token.id,
-    token_canister_id: token.canisterId,
+    token: token.name,
+    token_canister_id: token.canister_id,
     enabled: !!unauthenticatedAgent && isConnected,
   });
 

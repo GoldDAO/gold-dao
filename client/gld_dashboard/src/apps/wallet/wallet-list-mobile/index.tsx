@@ -7,7 +7,7 @@ import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import { TokensList, GLDT_INDEX, Token } from "@wallet/shared/utils";
+import { TOKENS, TOKEN_GLDT, Token } from "@shared/utils/tokens";
 import ListItemToken from "@wallet/wallet-list/list-item-token";
 import ListItemNFT from "@wallet/wallet-list/list-item-nft";
 import Dialog from "@shared/ui/dialog/Dialog";
@@ -80,14 +80,14 @@ const TriggerToken = ({
 }) => {
   const { unauthenticatedAgent } = useAuth();
 
-  const decimals = useFetchDecimals(token.canisterId, unauthenticatedAgent, {
+  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
     ledger: token.id,
     enabled: !!unauthenticatedAgent,
   });
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,
-    from_canister_id: token.canisterId,
+    from_canister_id: token.canister_id,
     amount: BigInt(1 * 10 ** (decimals.data ?? 0)),
     enabled: !!unauthenticatedAgent && decimals.isSuccess,
   });
@@ -125,7 +125,7 @@ const WalletListMobile = ({ className }: { className?: string }) => {
 
   return (
     <div className={className}>
-      {searchParams.get("token") === "nft" ? (
+      {searchParams.get("token") === "gldnft" ? (
         <TriggerNFT handleOnClick={() => setIsOpen(!isOpen)} />
       ) : (
         <TriggerToken token={token} handleOnClick={() => setIsOpen(!isOpen)} />
@@ -133,15 +133,12 @@ const WalletListMobile = ({ className }: { className?: string }) => {
       <Dialog open={isOpen} handleOnClose={handleOnClose} closeEnabled={false}>
         <div className="flex flex-col gap-2 pb-4">
           <button onClick={handleOnClose}>
-            <ListItemToken
-              token={TokensList[GLDT_INDEX]}
-              key={TokensList[GLDT_INDEX].id}
-            />
+            <ListItemToken token={TOKEN_GLDT} key={TOKEN_GLDT.id} />
           </button>
           <button onClick={handleOnClose}>
             <ListItemNFT />
           </button>
-          {TokensList.slice(1).map((token) => (
+          {TOKENS.slice(1).map((token) => (
             <button onClick={handleOnClose} key={token.id}>
               <ListItemToken token={token} />
             </button>

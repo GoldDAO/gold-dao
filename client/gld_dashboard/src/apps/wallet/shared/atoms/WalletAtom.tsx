@@ -1,5 +1,4 @@
 import { atom } from "jotai";
+import { TOKEN_GLDT, Token } from "@shared/utils/tokens";
 
-import { TokensList, Token } from "../utils";
-
-export const TokenSelectedAtom = atom<Token>(TokensList[0]); // default to GLDT
+export const TokenSelectedAtom = atom<Token>(TOKEN_GLDT);

@@ -10,7 +10,7 @@ import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory"
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { Ledger } from "@services/ledger/utils/interfaces";
+import { TokenName } from "@shared/utils/tokens";
 
 const useFetchTokenData = (
   agent: Agent | HttpAgent | undefined,
@@ -24,7 +24,7 @@ const useFetchTokenData = (
     }>,
     "queryKey" | "queryFn"
   > & {
-    token: Ledger;
+    token: TokenName;
     token_canister_id: string;
   }
 ) => {
@@ -52,7 +52,7 @@ const useFetchTokenData = (
         const decimals = await icrc1_decimals(actorTokenLedger);
 
         const price = await swap_amounts(actorKongswap, {
-          from: token.toLocaleUpperCase(),
+          from: token,
           to: "ckUSDC",
           amount: 1n,
         });
