@@ -20,7 +20,7 @@ const ListboxOptionToken = ({
     {
       ledger: value.name,
       owner: principalId,
-      enabled: !!unauthenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent,
     }
   );
 

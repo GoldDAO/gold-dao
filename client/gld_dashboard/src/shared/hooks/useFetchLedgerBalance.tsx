@@ -43,6 +43,11 @@ const useFetchLedgerBalance = (
     placeholderData = undefined,
     ledger,
     owner,
+    staleTime = 60 * 1000,
+    refetchOnMount = true,
+    refetchOnWindowFocus = false,
+    refetchOnReconnect = true,
+    ...queryOptions
   } = options;
 
   return useQuery<LedgerBalanceData>({
@@ -87,6 +92,11 @@ const useFetchLedgerBalance = (
     placeholderData,
     enabled,
     refetchInterval,
+    staleTime,
+    refetchOnMount,
+    refetchOnWindowFocus,
+    refetchOnReconnect,
+    ...queryOptions,
   });
 };
 

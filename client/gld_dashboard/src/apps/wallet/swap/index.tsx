@@ -23,16 +23,19 @@ const SwapToken = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, isSwap]);
 
-  const onClose = () => {
-    dispatchSwapState({ type: "RESET" });
-  };
-
   return (
     <>
-      <FormDialog open={swapState.is_open_form_dialog} onClose={onClose} />
+      <FormDialog
+        open={swapState.is_open_form_dialog}
+        onClose={() => {
+          dispatchSwapState({ type: "CLOSE_DIALOG_FORM" });
+        }}
+      />
       <ConfirmDialog
         open={swapState.is_open_confirm_dialog}
-        onClose={onClose}
+        onClose={() => {
+          dispatchSwapState({ type: "CLOSE_DIALOG_CONFIRM" });
+        }}
       />
     </>
   );

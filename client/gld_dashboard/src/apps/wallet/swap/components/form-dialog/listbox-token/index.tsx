@@ -36,10 +36,11 @@ const ListboxToken = ({
           </div>
         </ListboxButton>
         <ListboxOptions
-          anchor="left"
+          anchor="bottom end"
           transition
           className={clsx(
-            "w-md z-50 mt-1",
+            "[--anchor-padding:32px] xl:--anchor-padding:0px",
+            "w-md h-[30vh] z-50 mt-1",
             "rounded-xl border border-border bg-surface-primary shadow-lg",
             "text-sm/6 focus:outline-none",
             "transition duration-100 ease-out",

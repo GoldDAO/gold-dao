@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
-import useFetchAccountTransactions from "@services/ledger-index/hooks/useFetchAccountTransactions";
+import useFetchAccountTransactions from "@shared/hooks/useFetchAccountTransactions";
 import ListItem from "@wallet/tx-history-token/list-item";
 import ListItemMobile from "@wallet/tx-history-token/list-item-mobile";
 
