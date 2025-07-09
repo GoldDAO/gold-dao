@@ -1,15 +1,25 @@
+import { useAtom } from "jotai";
+import { useAuth } from "@auth/index";
+import { SwapStateReducerAtom } from "@wallet/swap/atoms";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import Icon from "@shared/ui/icons";
-import { UseFetchLedgerBalanceResult } from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Token } from "@shared/utils/tokens";
 
-const BalanceAvailable = ({
-  token,
-  balance,
-}: {
-  token: Token;
-  balance: UseFetchLedgerBalanceResult;
-}) => {
+const BalanceAvailable = ({ token }: { token: Token }) => {
+  const { unauthenticatedAgent, principalId } = useAuth();
+  const [swapState] = useAtom(SwapStateReducerAtom);
+
+  const balance = useFetchLedgerBalance(
+    swapState.token_from.token.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: swapState.token_from.token.name,
+      owner: principalId,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
+
   const renderBalance = () => {
     if (balance.isSuccess) {
       return <NumberToLocaleString value={balance.data.balance} />;

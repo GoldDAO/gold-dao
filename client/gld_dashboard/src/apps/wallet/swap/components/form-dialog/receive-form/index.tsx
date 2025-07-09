@@ -31,7 +31,7 @@ const ReceiveForm = () => {
       from_canister_id: swapState.token_from.token.canister_id,
       to: swapState.token_to.token.name,
       amount: Number(swapState.send_amount_input),
-      enabled: !!unauthenticatedAgent && !!Number(swapState.send_amount_input),
+      enabled: !!unauthenticatedAgent,
     }
   );
 
@@ -46,10 +46,12 @@ const ReceiveForm = () => {
         <div>
           <div className="text-2xl">
             {swapAmount.isSuccess && balance.isSuccess ? (
-              <div>
-                {Number(swapAmount.data.receive_amount) /
-                  10 ** balance.data.decimals}
-              </div>
+              <NumberToLocaleString
+                value={
+                  Number(swapAmount.data.receive_amount) /
+                  10 ** balance.data.decimals
+                }
+              />
             ) : (
               <div className="animate-pulse">0</div>
             )}
@@ -82,7 +84,7 @@ const ReceiveForm = () => {
           ></ListboxToken>
         </div>
       </div>
-      <BalanceAvailable token={swapState.token_to.token} balance={balance} />
+      <BalanceAvailable token={swapState.token_to.token} />
     </div>
   );
 };

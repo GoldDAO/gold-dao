@@ -4,7 +4,6 @@ import { Token, TOKENS } from "@shared/utils/tokens";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import ListboxToken from "@wallet/swap/components/form-dialog/listbox-token";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import useFetchTokenData from "@shared/hooks/useFetchTokenData";
 import BalanceAvailable from "../balance-available";
 import SendAmountInput from "./send-amount-input";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
@@ -23,12 +22,6 @@ const SendForm = () => {
     }
   );
 
-  const sendTokenData = useFetchTokenData(unauthenticatedAgent, {
-    token: swapState.token_from.token.name,
-    token_canister_id: swapState.token_from.token.canister_id,
-    enabled: !!unauthenticatedAgent,
-  });
-
   const onChangeToken = (selectedToken: Token) => {
     dispatchSwapState({ type: "SET_TOKEN_FROM", value: selectedToken });
   };
@@ -39,25 +32,15 @@ const SendForm = () => {
       <div className="flex justify-between items-start">
         <div>
           <div className="text-2xl">
-            {balance.isSuccess && sendTokenData.isSuccess ? (
-              <SendAmountInput
-                initialValue=""
-                balance={balance.data.balance_e8s}
-                fee={sendTokenData.data.fee_e8s}
-                decimals={sendTokenData.data.decimals}
-              />
-            ) : (
-              <div className="animate-pulse cursor-not-allowed">0.00</div>
-            )}
+            <SendAmountInput initialValue={swapState.send_amount_input} />
           </div>
           <div className="text-xs text-content/60">
-            {sendTokenData.isSuccess ? (
+            {balance.isSuccess ? (
               <div>
                 ≈$
                 <NumberToLocaleString
                   value={
-                    Number(swapState.send_amount_input) *
-                    sendTokenData.data.price_usd
+                    Number(swapState.send_amount_input) * balance.data.price_usd
                   }
                 />
               </div>
@@ -78,10 +61,7 @@ const SendForm = () => {
         </div>
       </div>
       <div className="flex justify-between items-center">
-        <BalanceAvailable
-          token={swapState.token_from.token}
-          balance={balance}
-        />
+        <BalanceAvailable token={swapState.token_from.token} />
         <div className="">Max btn</div>
       </div>
       {/* <div className="flex items-center justify-between">

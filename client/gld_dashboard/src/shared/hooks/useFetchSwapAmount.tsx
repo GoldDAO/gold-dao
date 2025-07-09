@@ -28,6 +28,11 @@ const useFetchSwapAmount = (
     to,
     amount,
     from_canister_id,
+    staleTime = 60 * 1000,
+    refetchOnMount = true,
+    refetchOnWindowFocus = false,
+    refetchOnReconnect = true,
+    ...queryOptions
   } = options;
 
   return useQuery({
@@ -62,6 +67,11 @@ const useFetchSwapAmount = (
     placeholderData,
     enabled,
     refetchInterval,
+    staleTime,
+    refetchOnMount,
+    refetchOnWindowFocus,
+    refetchOnReconnect,
+    ...queryOptions,
   });
 };
 

@@ -36,6 +36,11 @@ const useFetchTokenPrice = (
     from,
     from_canister_id,
     amount = 0n,
+    staleTime = 60 * 1000,
+    refetchOnMount = true,
+    refetchOnWindowFocus = false,
+    refetchOnReconnect = true,
+    ...queryOptions
   } = options;
 
   const from_token = from.toLocaleUpperCase();
@@ -83,6 +88,11 @@ const useFetchTokenPrice = (
     placeholderData,
     enabled,
     refetchInterval,
+    staleTime,
+    refetchOnMount,
+    refetchOnWindowFocus,
+    refetchOnReconnect,
+    ...queryOptions,
   });
 };
 
