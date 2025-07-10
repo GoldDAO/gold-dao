@@ -1,8 +1,9 @@
-use crate::sns_test_env::sns_init_args::generate_sns_init_args;
 use crate::sns_test_env::sns_init_args::CanisterIds;
 use crate::sns_test_env::sns_init_args::SnsInitArgs;
+use crate::sns_test_env::utils::neuron_id_from_number;
 use crate::utils::tick_n_blocks;
 use crate::{client, wasms};
+use candid::Nat;
 use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::manage_neuron::Command;
@@ -10,7 +11,9 @@ use sns_governance_canister::types::proposal::Action;
 use sns_governance_canister::types::Motion;
 use sns_governance_canister::types::ProposalData;
 use sns_governance_canister::types::{Neuron, NeuronId};
+use sns_ledger_canister::types::Account;
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -93,28 +96,55 @@ impl SnsTestEnvBuilder {
         self
     }
 
-    pub fn with_ogy_init_args(mut self, neuron_data: &HashMap<usize, Neuron>) -> Self {
+    pub fn with_ogy_init_args(
+        mut self,
+        neuron_data: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
+    ) -> Self {
         let controller = self.controller;
         let canister_ids = self.canister_ids.clone().unwrap();
-        let sns_init_args = SnsInitArgs::ogy(&canister_ids, neuron_data, controller);
+        let sns_init_args = SnsProject::Ogy.default_init_args(
+            controller,
+            &canister_ids,
+            neuron_data,
+            initial_balances,
+        );
 
         self.init_args = Some(sns_init_args);
         self
     }
 
-    pub fn with_goldao_init_args(mut self, neuron_data: &HashMap<usize, Neuron>) -> Self {
+    pub fn with_goldao_init_args(
+        mut self,
+        neuron_data: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
+    ) -> Self {
         let controller = self.controller;
         let canister_ids = self.canister_ids.clone().unwrap();
-        let sns_init_args = SnsInitArgs::goldao(&canister_ids, neuron_data, controller);
+        let sns_init_args = SnsProject::GoldDao.default_init_args(
+            controller,
+            &canister_ids,
+            neuron_data,
+            initial_balances,
+        );
 
         self.init_args = Some(sns_init_args);
         self
     }
 
-    pub fn with_wtn_init_args(mut self, neuron_data: &HashMap<usize, Neuron>) -> Self {
+    pub fn with_wtn_init_args(
+        mut self,
+        neuron_data: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
+    ) -> Self {
         let controller = self.controller;
         let canister_ids = self.canister_ids.clone().unwrap();
-        let sns_init_args = SnsInitArgs::wtn(&canister_ids, neuron_data, controller);
+        let sns_init_args = SnsProject::Wtn.default_init_args(
+            controller,
+            &canister_ids,
+            neuron_data,
+            initial_balances,
+        );
 
         self.init_args = Some(sns_init_args);
         self
@@ -131,20 +161,20 @@ impl SnsTestEnvBuilder {
             pic.install_canister(
                 canister_ids.governance_id,
                 wasms::SNS_GOVERNANCE.clone(),
-                encode_one(init_args.governance_args).unwrap(),
+                encode_one(init_args.governance_args.clone()).unwrap(),
                 Some(controller.clone()),
             );
             pic.install_canister(
                 canister_ids.root_id,
                 wasms::SNS_ROOT.clone(),
-                encode_one(init_args.root_args).unwrap(),
+                encode_one(init_args.root_args.clone()).unwrap(),
                 Some(controller.clone()),
             );
             pic.install_canister(
                 canister_ids.ledger_id,
                 wasms::SNS_LEDGER.clone(),
                 encode_one(sns_ledger_canister::types::LedgerArgument::Init(
-                    init_args.ledger_args,
+                    init_args.ledger_args.clone(),
                 ))
                 .unwrap(),
                 Some(controller.clone()),
@@ -153,7 +183,7 @@ impl SnsTestEnvBuilder {
                 canister_ids.index_id,
                 wasms::SNS_INDEX.clone(),
                 encode_one(sns_index_canister::types::IndexArg::Init(
-                    init_args.index_args,
+                    init_args.index_args.clone(),
                 ))
                 .unwrap(),
                 Some(controller.clone()),
@@ -161,7 +191,7 @@ impl SnsTestEnvBuilder {
             pic.install_canister(
                 canister_ids.swap_id,
                 wasms::SNS_SWAP.clone(),
-                encode_one(init_args.swap_args).unwrap(),
+                encode_one(init_args.swap_args.clone()).unwrap(),
                 Some(controller.clone()),
             );
         }
@@ -172,6 +202,7 @@ impl SnsTestEnvBuilder {
         SnsTestEnv {
             pic,
             controller: self.controller,
+            init_args,
             governance_id: canister_ids.governance_id,
             root_id: canister_ids.root_id,
             ledger_id: canister_ids.ledger_id,
@@ -185,6 +216,7 @@ impl SnsTestEnvBuilder {
 pub struct SnsTestEnv {
     pub pic: Rc<RefCell<PocketIc>>,
     pub controller: Principal,
+    pub init_args: SnsInitArgs,
     pub governance_id: Principal,
     pub root_id: Principal,
     pub ledger_id: Principal,
@@ -192,6 +224,7 @@ pub struct SnsTestEnv {
     pub swap_id: Principal,
     pub dapp_canisters: HashMap<String, Principal>,
 }
+
 impl std::fmt::Debug for SnsTestEnv {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_struct("SnsTestEnv")
@@ -428,10 +461,19 @@ impl SnsTestEnv {
         tick_n_blocks(&pic, 50);
     }
 
-    pub fn reinstall_sns_with_data(&self, neuron_data: &HashMap<usize, Neuron>) {
+    pub fn reinstall_governance_with_neuron_data(&self, neuron_data: &HashMap<usize, Neuron>) {
         let pic = self.pic.borrow();
-        let sns_init_args =
-            generate_sns_init_args(neuron_data, self.ledger_id, self.root_id, self.swap_id);
+        let neuron_data_with_neuron_keys: BTreeMap<String, Neuron> = neuron_data
+            .iter() // Iterate over the entries of the original map
+            .map(|(key, value)| {
+                (
+                    neuron_id_from_number(key.clone()).to_string(),
+                    value.clone(),
+                )
+            }) // Convert usize keys to String
+            .collect();
+        let mut governance_canister_init_args = self.init_args.governance_args.clone();
+        governance_canister_init_args.neurons = neuron_data_with_neuron_keys;
 
         let sns_gov_wasm = wasms::SNS_GOVERNANCE.clone();
         pic.stop_canister(self.governance_id.clone(), Some(self.controller.clone()))
@@ -440,7 +482,7 @@ impl SnsTestEnv {
         pic.reinstall_canister(
             self.governance_id.clone(),
             sns_gov_wasm,
-            encode_one(sns_init_args.clone()).unwrap(),
+            encode_one(governance_canister_init_args).unwrap(),
             Some(self.controller.clone()),
         )
         .unwrap();
@@ -455,29 +497,38 @@ impl SnsTestEnv {
         pic: &Rc<RefCell<PocketIc>>,
         controller: Principal,
         neurons: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
     ) -> Self {
         let mut builder = SnsTestEnvBuilder::new(pic, controller);
         builder.generate_ids();
-        builder.with_goldao_init_args(neurons).build()
+        builder
+            .with_goldao_init_args(neurons, initial_balances)
+            .build()
     }
 
     pub fn wtn(
         pic: &Rc<RefCell<PocketIc>>,
         controller: Principal,
         neurons: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
     ) -> Self {
         let mut builder = SnsTestEnvBuilder::new(pic, controller);
         builder.generate_ids();
-        builder.with_wtn_init_args(neurons).build()
+        builder
+            .with_wtn_init_args(neurons, initial_balances)
+            .build()
     }
 
     pub fn ogy(
         pic: &Rc<RefCell<PocketIc>>,
         controller: Principal,
         neurons: &HashMap<usize, Neuron>,
+        initial_balances: Option<Vec<(Account, Nat)>>,
     ) -> Self {
         let mut builder = SnsTestEnvBuilder::new(pic, controller);
         builder.generate_ids();
-        builder.with_ogy_init_args(neurons).build()
+        builder
+            .with_ogy_init_args(neurons, initial_balances)
+            .build()
     }
 }

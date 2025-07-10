@@ -1,3 +1,4 @@
+pub mod migration;
 pub mod test_distribute_rewards;
 pub mod test_goldao_burn;
 pub mod test_reserve_pool_distribution;

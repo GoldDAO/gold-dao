@@ -9,18 +9,15 @@ use crate::{
 
 #[test]
 fn test_synchronise_neurons_happy_path() {
-    let mut test_env = default_test_setup();
-    test_env.pic.set_time(
-        (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)).into(),
-    ); // Wednesday Jun 19, 2024, 6:00:00 AM
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
+    pic.set_time((SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)).into()); // Wednesday Jun 19, 2024, 6:00:00 AM
 
-    test_env
-        .pic
-        .advance_time(Duration::from_millis(HOUR_IN_MS * 3));
-    tick_n_blocks(&test_env.pic, 10);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3));
+    tick_n_blocks(&pic, 10);
 
     let all_neurons = get_all_neurons(
-        &test_env.pic,
+        &pic,
         random_principal(),
         test_env.rewards_canister_id.clone(),
         &(),
@@ -35,7 +32,7 @@ fn test_synchronise_neurons_happy_path() {
         .id
         .unwrap();
     let single_neuron = get_neuron_by_id(
-        &test_env.pic,
+        &pic,
         random_principal(),
         test_env.rewards_canister_id.clone(),
         &neuron_id_1,
@@ -45,26 +42,26 @@ fn test_synchronise_neurons_happy_path() {
 
     // day 1
     test_env.simulate_neuron_voting(2);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
-    tick_n_blocks(&test_env.pic, 50);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
+    tick_n_blocks(&pic, 50);
 
     let single_neuron = get_neuron_by_id(
-        &test_env.pic,
+        &pic,
         random_principal(),
         test_env.rewards_canister_id.clone(),
         &neuron_id_1,
     )
     .unwrap();
     assert_eq!(single_neuron.accumulated_maturity, 100_000);
-    tick_n_blocks(&test_env.pic, 2);
+    tick_n_blocks(&pic, 2);
 
     // day 2
     test_env.simulate_neuron_voting(3);
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
-    tick_n_blocks(&test_env.pic, 50);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 25 hours
+    tick_n_blocks(&pic, 50);
 
     let single_neuron = get_neuron_by_id(
-        &test_env.pic,
+        &pic,
         random_principal(),
         test_env.rewards_canister_id.clone(),
         &neuron_id_1,

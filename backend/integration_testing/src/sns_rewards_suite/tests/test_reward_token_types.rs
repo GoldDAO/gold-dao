@@ -26,7 +26,8 @@ fn is_fail_enum(value: &SetRewardTokenTypesResponse) -> bool {
     expected = "FATAL ERROR: PocketIC returned a rejection error: reject code CanisterReject, reject message Caller is not a governance principal, error code CanisterRejectedMessage"
 )]
 fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
-    let mut test_env = default_test_setup();
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
 
@@ -45,7 +46,7 @@ fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
     };
 
     let res = set_reward_token_types(
-        &mut test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args,
@@ -56,7 +57,8 @@ fn test_set_reward_token_types_when_not_sns_goverenance_principal() {
 
 #[test]
 fn test_set_reward_token_types_when_caller_is_governance_principal() {
-    let mut test_env = default_test_setup();
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
     let sns_gov_id = test_env.sns_gov_canister_id;
@@ -71,12 +73,7 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
     )];
     let reserve_args = SetRewardTokenTypesArgs { token_list };
 
-    let res = set_reward_token_types(
-        &mut test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res = set_reward_token_types(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
 
     assert_eq!(res, SetRewardTokenTypesResponse::Success);
 }
@@ -86,8 +83,8 @@ fn test_set_reward_token_types_when_caller_is_governance_principal() {
     expected = "FATAL ERROR: PocketIC returned a rejection error: reject code CanisterReject, reject message Caller is not a governance principal, error code CanisterRejectedMessage"
 )]
 fn test_set_reward_token_validate_when_not_governance_canister() {
-    let mut test_env = default_test_setup();
-
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let token_list = vec![(
@@ -101,7 +98,7 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
     let reserve_args = SetRewardTokenTypesValidateArgs { token_list };
 
     set_reward_token_types_validate(
-        &mut test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args,
@@ -111,8 +108,8 @@ fn test_set_reward_token_validate_when_not_governance_canister() {
 
 #[test]
 fn test_set_reward_token_validate() {
-    let mut test_env = default_test_setup();
-
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
     let rewards_canister_id = test_env.rewards_canister_id;
     let sns_gov_id = test_env.sns_gov_canister_id;
 
@@ -126,12 +123,7 @@ fn test_set_reward_token_validate() {
     )];
     let reserve_args = SetRewardTokenTypesValidateArgs { token_list };
 
-    let res = set_reward_token_types_validate(
-        &mut test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res = set_reward_token_types_validate(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
     println!("res: {:?}", res);
 
     assert!(matches!(res, SetRewardTokenTypesValidateResponse::Ok(_)));

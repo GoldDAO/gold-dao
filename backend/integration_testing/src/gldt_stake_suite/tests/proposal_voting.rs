@@ -13,13 +13,12 @@ fn test_voting() {
         controller,
         gld_sns_test_env,
         gldt_stake_canister_id,
-        neuron_data,
         ..
     } = test_env;
     let pic_borrowed = &pic.borrow();
 
     // Create a proposal using controller's neuron
-    let neuron_id = crate::sns_test_env::sns_test_env::neuron_id_from_number(2);
+    let neuron_id = crate::sns_test_env::utils::neuron_id_from_number(2);
     let result = gld_sns_test_env.submit_mock_proposal(controller, &neuron_id);
 
     match gld_sns_test_env.get_proposal(result).result {
@@ -61,8 +60,8 @@ fn test_voting() {
     pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
     tick_n_blocks(pic_borrowed, 5);
 
-    let neuron_id_0 = crate::sns_test_env::sns_test_env::neuron_id_from_number(0);
-    let neuron_id_1 = crate::sns_test_env::sns_test_env::neuron_id_from_number(1);
+    let neuron_id_0 = crate::sns_test_env::utils::neuron_id_from_number(0);
+    let neuron_id_1 = crate::sns_test_env::utils::neuron_id_from_number(1);
     let res1 = get_proposal_votes_of_neuron(
         &pic_borrowed,
         controller,

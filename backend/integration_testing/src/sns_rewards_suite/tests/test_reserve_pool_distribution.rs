@@ -33,7 +33,8 @@ fn is_set_reserve_pool_distribution_fail(value: &SetReserveTransferAmountsRespon
 
 #[test]
 fn test_reserve_pool_distribution_happy_path() {
-    let mut test_env = default_test_setup();
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
 
     let goldao_ledger_id = test_env
         .token_ledgers
@@ -53,7 +54,7 @@ fn test_reserve_pool_distribution_happy_path() {
     };
 
     // setup always gives a starting amount to reward pools
-    let goldao_reward_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reward_pool);
+    let goldao_reward_pool_balance = balance_of(&pic, goldao_ledger_id, reward_pool);
     assert_eq!(goldao_reward_pool_balance, Nat::from(100_000_000_000u64));
 
     // set the daily reserve transfer amount
@@ -62,7 +63,7 @@ fn test_reserve_pool_distribution_happy_path() {
     amounts.insert(goldao_token, Nat::from(500_000_000u64));
 
     let res = set_reserve_transfer_amounts(
-        &mut test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id,
         rewards_canister_id,
         &(SetReserveTransferAmountsArgs {
@@ -70,19 +71,19 @@ fn test_reserve_pool_distribution_happy_path() {
         }),
     );
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
-    tick_n_blocks(&test_env.pic, 50);
+    tick_n_blocks(&pic, 50);
 
     // TRIGGER - reserve_pool_distribution cron job
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
 
     // reward pool should be the same since there was nothing in the reserve pool to transfer
-    let goldao_reward_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reward_pool);
+    let goldao_reward_pool_balance = balance_of(&pic, goldao_ledger_id, reward_pool);
     assert_eq!(goldao_reward_pool_balance, Nat::from(100_000_000_000u64));
 
     // transfer some goldao to the reserve pool
     transfer(
-        &mut test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id.clone(),
         goldao_ledger_id,
         None,
@@ -90,16 +91,14 @@ fn test_reserve_pool_distribution_happy_path() {
         (100_000_000_000u64).into(),
     )
     .unwrap();
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&pic, 100);
 
     // TRIGGER - reserve_pool_distribution cron job
-    test_env
-        .pic
-        .advance_time(Duration::from_millis(DAY_IN_MS) + Duration::from_secs(10));
-    tick_n_blocks(&test_env.pic, 100);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS) + Duration::from_secs(10));
+    tick_n_blocks(&pic, 100);
 
     // reward pool should now have the same as the intial + 1 x reserve pool transfer
-    let goldao_reward_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reward_pool);
+    let goldao_reward_pool_balance = balance_of(&pic, goldao_ledger_id, reward_pool);
     let expected_balance_reward_pool = Nat::from(100_000_000_000u64 + 500_000_000u64); // reward pool starts with 100_000_000_000 in test_env
     assert_eq!(goldao_reward_pool_balance, expected_balance_reward_pool);
 }
@@ -109,8 +108,8 @@ fn test_reserve_pool_distribution_happy_path() {
     expected = "FATAL ERROR: PocketIC returned a rejection error: reject code CanisterReject, reject message Caller is not a governance principal, error code CanisterRejectedMessage"
 )]
 fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
-    let mut test_env = default_test_setup();
-
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::ICP;
@@ -122,7 +121,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
 
     // should fail - caller is not the governance principal
     let res = set_reserve_transfer_amounts(
-        &mut test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args,
@@ -133,9 +132,9 @@ fn test_set_reserve_transfer_amounts_when_caller_is_not_governance_principal() {
 
 #[test]
 fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
-    let mut test_env = default_test_setup();
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
     let sns_gov_id = test_env.sns_gov_canister_id;
-
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::ICP;
@@ -146,22 +145,12 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
     };
 
     // should succeed
-    let res = set_reserve_transfer_amounts(
-        &mut test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res = set_reserve_transfer_amounts(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
-    let res = get_reserve_transfer_amounts(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(),
-    );
+    let res = get_reserve_transfer_amounts(&pic, Principal::anonymous(), rewards_canister_id, &());
     assert_eq!(res, amounts);
 }
 
@@ -171,7 +160,7 @@ fn test_set_reserve_transfer_amounts_when_caller_is_governance_principal() {
 )]
 fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_principal() {
     let test_env = default_test_setup();
-
+    let pic = test_env.pic.borrow();
     let rewards_canister_id = test_env.rewards_canister_id;
 
     let icp_token = TokenSymbol::ICP;
@@ -183,7 +172,7 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
 
     // should panic
     set_reserve_transfer_amounts_validate(
-        &test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &reserve_args,
@@ -194,7 +183,7 @@ fn test_set_reserve_transfer_amounts_validate_when_caller_is_not_governance_prin
 #[test]
 fn test_set_reserve_transfer_amounts_validate() {
     let test_env = default_test_setup();
-
+    let pic = test_env.pic.borrow();
     let sns_gov_id = test_env.sns_gov_canister_id;
     let rewards_canister_id = test_env.rewards_canister_id;
 
@@ -206,12 +195,8 @@ fn test_set_reserve_transfer_amounts_validate() {
     };
 
     // should succeed
-    let res = set_reserve_transfer_amounts_validate(
-        &test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res =
+        set_reserve_transfer_amounts_validate(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
     assert!(matches!(
         res,
         SetReserveTransferAmountsValidateResponse::Ok(_)
@@ -220,8 +205,8 @@ fn test_set_reserve_transfer_amounts_validate() {
 
 #[test]
 fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
-    let mut test_env = default_test_setup();
-
+    let test_env = default_test_setup();
+    let pic = test_env.pic.borrow();
     let sns_gov_id = test_env.sns_gov_canister_id;
     let rewards_canister_id = test_env.rewards_canister_id;
 
@@ -234,22 +219,12 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
     };
 
     // should succeed - caller is root nns key
-    let res = set_reserve_transfer_amounts(
-        &mut test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res = set_reserve_transfer_amounts(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
-    let res = get_reserve_transfer_amounts(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(),
-    );
+    let res = get_reserve_transfer_amounts(&pic, Principal::anonymous(), rewards_canister_id, &());
     assert_eq!(res, amounts);
 
     // only insert ogy
@@ -259,21 +234,11 @@ fn test_set_reserve_transfer_amounts_should_overwrite_previous_state() {
         transfer_amounts: amounts.clone(),
     };
 
-    let res = set_reserve_transfer_amounts(
-        &mut test_env.pic,
-        sns_gov_id,
-        rewards_canister_id,
-        &reserve_args,
-    );
+    let res = set_reserve_transfer_amounts(&pic, sns_gov_id, rewards_canister_id, &reserve_args);
 
     assert_eq!(res, SetReserveTransferAmountsResponse::Success);
 
     // verify the correct reserve amounts have been set
-    let res = get_reserve_transfer_amounts(
-        &test_env.pic,
-        Principal::anonymous(),
-        rewards_canister_id,
-        &(),
-    );
+    let res = get_reserve_transfer_amounts(&pic, Principal::anonymous(), rewards_canister_id, &());
     assert_eq!(res, amounts);
 }
