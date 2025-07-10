@@ -1,5 +1,3 @@
-use candid::Nat;
-
 use self::setup::{TestEnv, TestEnvBuilder};
 
 pub mod setup;

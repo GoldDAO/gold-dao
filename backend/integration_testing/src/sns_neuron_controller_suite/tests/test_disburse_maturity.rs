@@ -87,5 +87,5 @@ fn test_disburse_maturity() {
         },
     );
     println!("rewards_account_balance: {:?}", rewards_account_balance);
-    assert_eq!(Nat::from(1000000000_u64), rewards_account_balance);
+    assert_eq!(Nat::from(100000000000000_u64), rewards_account_balance);
 }

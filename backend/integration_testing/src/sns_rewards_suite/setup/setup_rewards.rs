@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 
-use candid::{encode_one, CandidType, Principal};
+use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
-use serde::Deserialize;
 use sns_rewards_api_canister::init::InitArgs;
+use sns_rewards_api_canister::post_upgrade::UpgradeArgs;
 use sns_rewards_api_canister::Args;
 use types::BuildVersion;
 
 use crate::wasms;
 
 pub fn setup_rewards_canister(
-    pic: &mut PocketIc,
+    pic: &PocketIc,
     token_ledgers: &HashMap<String, Principal>,
     sns_canister_id: &Principal,
     controller: &Principal,
@@ -58,4 +58,27 @@ pub fn setup_rewards_canister(
         Some(controller.clone()),
     );
     rewards_canister
+}
+
+use pocket_ic::RejectResponse;
+pub fn upgrade_rewards_canister(
+    pic: &PocketIc,
+    canister_id: Principal,
+    controller: &Principal,
+) -> std::result::Result<(), RejectResponse> {
+    let rewards_wasm = wasms::REWARDS.clone();
+
+    let upgrade_args = Args::Upgrade(UpgradeArgs {
+        version: BuildVersion::min(),
+        commit_hash: "Test".to_string(),
+    });
+
+    let encoded_args = encode_one(upgrade_args).expect("Failed to encode upgrade args");
+
+    pic.upgrade_canister(
+        canister_id,
+        rewards_wasm,
+        encoded_args,
+        Some(controller.clone()),
+    )
 }

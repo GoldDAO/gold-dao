@@ -5,8 +5,13 @@ use types::TokenSymbol;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct Args {
-    pub neuron_id: Vec<NeuronId>,
-    pub tokens: Vec<TokenSymbol>,
+    pub claim_reward_args: Vec<ClaimRewardArgs>,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub struct ClaimRewardArgs {
+    pub neuron_id: NeuronId,
+    pub token: TokenSymbol,
 }
 
 pub type Response = Result<(), Vec<ClaimRewardError>>;

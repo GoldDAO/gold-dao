@@ -5,7 +5,6 @@ use self::setup::{RewardsTestEnv, RewardsTestEnvBuilder};
 pub mod setup;
 pub mod setup_ledger;
 pub mod setup_rewards;
-pub mod setup_sns;
 
 pub fn default_test_setup() -> RewardsTestEnv {
     let users = vec![

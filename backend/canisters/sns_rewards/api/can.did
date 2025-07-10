@@ -1,11 +1,16 @@
-type Args = record { tokens : vec TokenSymbol; neuron_id : NeuronId };
-type Args_1 = record { transfer_amounts : vec record { TokenSymbol; nat } };
-type Args_2 = record { token_list : vec record { TokenSymbol; TokenInfo } };
-type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args = record { token : text; neuron_id : NeuronId };
+type Args_1 = record { tokens : vec TokenSymbol; neuron_id : vec NeuronId };
+type Args_2 = record { transfer_amounts : vec record { TokenSymbol; nat } };
+type Args_3 = record { token_list : vec record { TokenSymbol; TokenInfo } };
+type Args_4 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
-type ClaimRewardError = variant {
-  NeuronHotKeyAbsent;
-  TokenSymbolInvalid : text;
+type ClaimRewardError = record {
+  token : opt TokenSymbol;
+  error : ClaimRewardErrorType;
+  neuron_id : NeuronId;
+};
+type ClaimRewardErrorType = variant {
+  TokenSymbolInvalid : TokenSymbol;
   NeuronNotClaimed;
   NeuronOwnerInvalid : opt principal;
   NeuronHotKeyInvalid;
@@ -23,19 +28,30 @@ type InitArgs = record {
   commit_hash : text;
 };
 type NeuronId = record { id : blob };
-type Response = variant { Success; InternalError : text };
+type Response = variant {
+  Ok : bool;
+  TokenSymbolInvalid : text;
+  NeuronNotClaimed;
+  NeuronOwnerInvalid : opt principal;
+  NeuronHotKeyInvalid;
+  TransferFailed : text;
+  NeuronDoesNotExist;
+  InternalError : text;
+};
 type Response_1 = variant { Success; InternalError : text };
+type Response_2 = variant { Success; InternalError : text };
 type Result = variant { Ok; Err : vec ClaimRewardError };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
   ledger_id : principal;
 };
-type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO };
+type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
-service : (Args_3) -> {
-  claim_reward : (Args) -> (Result);
-  set_daily_goldao_burn_rate : (nat) -> (Response);
-  set_reserve_transfer_amounts : (Args_1) -> (Response);
-  set_reward_token_types : (Args_2) -> (Response_1);
+service : (Args_4) -> {
+  claim_reward : (Args) -> (Response);
+  claim_rewards_batch : (Args_1) -> (Result);
+  set_daily_goldao_burn_rate : (nat) -> (Response_1);
+  set_reserve_transfer_amounts : (Args_2) -> (Response_1);
+  set_reward_token_types : (Args_3) -> (Response_2);
 }

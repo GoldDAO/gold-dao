@@ -15,7 +15,8 @@ use std::time::Duration;
 
 #[test]
 fn test_goldao_burn_rate_happy_path() {
-    let mut test_env = test_setup_with_no_reward_pool_mint();
+    let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let goldao_ledger_id = test_env
         .token_ledgers
@@ -29,25 +30,24 @@ fn test_goldao_burn_rate_happy_path() {
         subaccount: Some(RESERVE_POOL_SUB_ACCOUNT),
     };
     let default_total_supply = Nat::from(1_000_000_000_000_000u64);
-    let total_supply =
-        icrc1_total_supply(&test_env.pic, Principal::anonymous(), goldao_ledger_id, &());
+    let total_supply = icrc1_total_supply(&pic, Principal::anonymous(), goldao_ledger_id, &());
     assert_eq!(total_supply, default_total_supply);
 
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(500_000_000u64);
     let res = set_daily_goldao_burn_rate(
-        &mut test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id,
         rewards_canister_id,
         &burn_rate,
     );
     assert!(matches!(res, SetDailyGOLDAOBurnRateResponse::Success));
-    tick_n_blocks(&test_env.pic, 5);
+    tick_n_blocks(&pic, 5);
 
     // Mint some GOLDAO to the reserve pool - note - this increases the total supply
     let amount_for_reserve_pool = 100_000_000_000u64;
     transfer(
-        &mut test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id.clone(),
         goldao_ledger_id,
         None,
@@ -55,22 +55,21 @@ fn test_goldao_burn_rate_happy_path() {
         amount_for_reserve_pool.into(),
     )
     .unwrap();
-    tick_n_blocks(&test_env.pic, 100);
+    tick_n_blocks(&pic, 100);
 
     // TRIGGER - goldao burn cron job
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
 
     // Note - burns don't require fees
     // Reserve pool should have less tokens in it - Note : We did not enable the reserve pool distribution to ensure we're only calculating what happens when a burn occurs
-    let reserve_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reserve_pool_account);
+    let reserve_pool_balance = balance_of(&pic, goldao_ledger_id, reserve_pool_account);
     assert_eq!(
         reserve_pool_balance,
         Nat::from(100_000_000_000u64) - burn_rate.clone()
     );
 
-    let total_supply =
-        icrc1_total_supply(&test_env.pic, Principal::anonymous(), goldao_ledger_id, &());
+    let total_supply = icrc1_total_supply(&pic, Principal::anonymous(), goldao_ledger_id, &());
     let expected_supply = default_total_supply + amount_for_reserve_pool - burn_rate;
     assert_eq!(total_supply, expected_supply)
 
@@ -79,7 +78,8 @@ fn test_goldao_burn_rate_happy_path() {
 
 #[test]
 fn test_goldao_burn_rate_when_reserve_pool_balance_is_zero() {
-    let mut test_env = test_setup_with_no_reward_pool_mint();
+    let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let goldao_ledger_id = test_env
         .token_ledgers
@@ -96,26 +96,25 @@ fn test_goldao_burn_rate_when_reserve_pool_balance_is_zero() {
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(500_000_000u64);
     let res = set_daily_goldao_burn_rate(
-        &mut test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id,
         rewards_canister_id,
         &burn_rate,
     );
     assert!(matches!(res, SetDailyGOLDAOBurnRateResponse::Success));
-    tick_n_blocks(&test_env.pic, 5);
+    tick_n_blocks(&pic, 5);
 
     // TRIGGER - goldao burn cron job - NOTE THAT WE SKIP ADDING TOKENS TO THE RESERVE POOL
-    test_env.pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(&test_env.pic, 100);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS));
+    tick_n_blocks(&pic, 100);
 
     // test that reserve pool is still 0
-    let reserve_pool_balance = balance_of(&test_env.pic, goldao_ledger_id, reserve_pool_account);
+    let reserve_pool_balance = balance_of(&pic, goldao_ledger_id, reserve_pool_account);
     assert_eq!(reserve_pool_balance, Nat::from(0u64));
 
     // total supply should be the same as the default ( see setup_ledger.rs )
     let default_total_supply = Nat::from(1_000_000_000_000_000u64);
-    let total_supply =
-        icrc1_total_supply(&test_env.pic, Principal::anonymous(), goldao_ledger_id, &());
+    let total_supply = icrc1_total_supply(&pic, Principal::anonymous(), goldao_ledger_id, &());
     assert_eq!(total_supply, default_total_supply);
 }
 
@@ -124,14 +123,15 @@ fn test_goldao_burn_rate_when_reserve_pool_balance_is_zero() {
     expected = "FATAL ERROR: PocketIC returned a rejection error: reject code CanisterReject, reject message Caller is not a governance principal, error code CanisterRejectedMessage"
 )]
 fn test_set_daily_goldao_burn_rate_when_caller_is_not_governance_principal() {
-    let mut test_env = test_setup_with_no_reward_pool_mint();
+    let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
 
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(500_000_000u64);
     set_daily_goldao_burn_rate(
-        &mut test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &burn_rate,
@@ -144,13 +144,14 @@ fn test_set_daily_goldao_burn_rate_when_caller_is_not_governance_principal() {
 )]
 fn test_set_daily_goldao_burn_rate_validate_when_caller_is_not_governance_principal() {
     let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
 
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(500_000_000u64);
     set_daily_goldao_burn_rate_validate(
-        &test_env.pic,
+        &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &burn_rate,
@@ -161,13 +162,14 @@ fn test_set_daily_goldao_burn_rate_validate_when_caller_is_not_governance_princi
 #[test]
 fn test_set_reserve_transfer_amounts_validate() {
     let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
 
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(500_000_000u64);
     let res = set_daily_goldao_burn_rate_validate(
-        &test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id,
         rewards_canister_id,
         &burn_rate,
@@ -178,13 +180,14 @@ fn test_set_reserve_transfer_amounts_validate() {
 #[test]
 fn test_set_reserve_transfer_amounts_validate_with_0_transfer_amount() {
     let test_env = test_setup_with_no_reward_pool_mint();
+    let pic = test_env.pic.borrow();
 
     let rewards_canister_id = test_env.rewards_canister_id;
 
     // Set the daily burn rate for GOLDAO
     let burn_rate = Nat::from(0u64);
     let res = set_daily_goldao_burn_rate_validate(
-        &test_env.pic,
+        &pic,
         test_env.sns_gov_canister_id,
         rewards_canister_id,
         &burn_rate,

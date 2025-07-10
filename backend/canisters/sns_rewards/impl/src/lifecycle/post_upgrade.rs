@@ -40,7 +40,6 @@ fn post_upgrade(args: Args) {
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             // Migrations
-
             if state.data.reward_distribution_interval.is_none() {
                 state.data.reward_distribution_interval = Some(TimeInterval::default());
             }

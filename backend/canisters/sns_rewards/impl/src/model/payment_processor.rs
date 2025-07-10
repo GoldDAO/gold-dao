@@ -17,9 +17,9 @@ use crate::memory::{get_payment_round_history_memory, VM};
 pub struct PaymentProcessor {
     /// Holds only PaymentRounds that are FULLY completed.
     #[serde(skip, default = "init_map")]
-    round_history: StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM>,
+    pub round_history: StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM>,
     /// Holds active PaymentRounds that are being processed
-    active_rounds: BTreeMap<TokenSymbol, PaymentRound>,
+    pub active_rounds: BTreeMap<TokenSymbol, PaymentRound>,
 }
 
 fn init_map() -> StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM> {
