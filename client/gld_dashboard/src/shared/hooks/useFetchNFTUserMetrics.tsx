@@ -35,6 +35,11 @@ const useFetchUserNFTMetrics = (
     enabled = true,
     refetchInterval = false,
     placeholderData = keepPreviousData,
+    staleTime = 60 * 1000,
+    refetchOnMount = true,
+    refetchOnWindowFocus = false,
+    refetchOnReconnect = true,
+    ...queryOptions
   } = options;
 
   return useQuery({
@@ -90,6 +95,11 @@ const useFetchUserNFTMetrics = (
     placeholderData,
     enabled,
     refetchInterval,
+    staleTime,
+    refetchOnMount,
+    refetchOnWindowFocus,
+    refetchOnReconnect,
+    ...queryOptions,
   });
 };
 

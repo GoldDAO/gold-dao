@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 #### Fix
 
 - Gold USD price not fetched from API
+- Range error on Buy GLDT amount input
 
 ### [2.0.2] - 2025-07-03
 

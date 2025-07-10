@@ -1,3 +1,5 @@
+use crate::memory::get_payment_round_history_memory;
+use crate::memory::VM;
 use crate::state::Data;
 use crate::state::SyncInfo;
 use crate::{
@@ -5,10 +7,16 @@ use crate::{
     utils::TimeInterval,
 };
 use candid::{Nat, Principal};
+use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
+use sns_rewards_api_canister::payment_round::PaymentRound;
 use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
 use std::collections::BTreeMap;
+use std::collections::HashMap;
+use std::convert::TryFrom;
+use types::TokenInfo;
+use types::TokenSymbol;
 use types::{NeuronInfo, TimestampMillis};
 use utils::env::CanisterEnv;
 
@@ -28,7 +36,7 @@ pub struct DataV0 {
     pub tokens: TokenRewardTypesV0,
     pub authorized_principals: Vec<Principal>,
     pub is_synchronizing_neurons: bool,
-    pub daily_reserve_transfer: ReserveTokenAmounts,
+    pub daily_reserve_transfer: ReserveTokenAmountsV0,
     pub last_daily_reserve_transfer_time: TimestampMillis,
     pub daily_gldgov_burn_rate: Option<Nat>,
     pub last_daily_gldgov_burn: Option<TimestampMillis>,
@@ -37,20 +45,9 @@ pub struct DataV0 {
     pub neuron_sync_interval: Option<TimeInterval>,
 }
 
-use std::collections::HashMap;
-use types::TokenInfo;
-pub type TokenRewardTypesV0 = HashMap<TokenSymbolV0, TokenInfo>;
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct TokenSymbolV0(pub String);
-use std::convert::TryFrom;
-use types::TokenSymbol;
-
-impl TryFrom<DataV0> for Data {
-    type Error = String;
-
-    fn try_from(v0: DataV0) -> Result<Self, Self::Error> {
+impl From<DataV0> for Data {
+    fn from(v0: DataV0) -> Self {
         let mut tokens: TokenRewardTypes = TokenRewardTypes::new();
-        let mut errors = Vec::new();
 
         for (symbol_v0, info) in v0.tokens {
             match TokenSymbol::parse(&symbol_v0.0) {
@@ -58,10 +55,7 @@ impl TryFrom<DataV0> for Data {
                     tokens.insert(symbol, info);
                 }
                 Err(e) => {
-                    errors.push(format!(
-                        "Failed to parse token symbol '{}': {:?}",
-                        symbol_v0.0, e
-                    ));
+                    panic!("Failed to parse token symbol '{}': {:?}", symbol_v0.0, e);
                 }
             }
         }
@@ -69,27 +63,82 @@ impl TryFrom<DataV0> for Data {
         // NOTE: add support of WTN
         tokens.insert(TokenSymbol::WTN, TokenSymbol::WTN.get_token_info());
 
-        if !errors.is_empty() {
-            // Return all errors as a single error string, or handle as needed
-            return Err(errors.join("; "));
+        // Convert daily_reserve_transfer keys from TokenIdentifierV0 -> TokenSymbol
+        let mut daily_reserve_transfer: ReserveTokenAmounts = HashMap::new();
+
+        for (symbol_v0, amount) in v0.daily_reserve_transfer {
+            match TokenSymbol::parse(&symbol_v0.0) {
+                Ok(symbol) => {
+                    daily_reserve_transfer.insert(symbol, amount);
+                }
+                Err(e) => {
+                    panic!(
+                        "Failed to parse token symbol in daily_reserve_transfer '{}': {:?}",
+                        symbol_v0.0, e
+                    );
+                }
+            }
         }
 
-        Ok(Data {
+        Data {
             sns_governance_canister: v0.sns_governance_canister,
             neuron_maturity: v0.neuron_maturity,
             sync_info: v0.sync_info,
             maturity_history: v0.maturity_history,
-            payment_processor: v0.payment_processor,
+            payment_processor: PaymentProcessor::from(v0.payment_processor),
             tokens,
             authorized_principals: v0.authorized_principals,
             is_synchronizing_neurons: v0.is_synchronizing_neurons,
-            daily_reserve_transfer: v0.daily_reserve_transfer,
+            daily_reserve_transfer,
             last_daily_reserve_transfer_time: v0.last_daily_reserve_transfer_time,
             daily_goldao_burn_rate: v0.daily_gldgov_burn_rate,
             last_daily_goldao_burn: v0.last_daily_gldgov_burn,
             reward_distribution_interval: v0.reward_distribution_interval,
             reward_distribution_in_progress: v0.reward_distribution_in_progress,
             neuron_sync_interval: v0.neuron_sync_interval,
-        })
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct TokenSymbolV0(pub String);
+
+pub type ReserveTokenAmountsV0 = HashMap<TokenSymbolV0, Nat>;
+pub type TokenRewardTypesV0 = HashMap<TokenSymbolV0, TokenInfo>;
+
+#[derive(Serialize, Deserialize)]
+pub struct PaymentProcessorV0 {
+    #[serde(skip, default = "init_map")]
+    round_history: StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM>,
+    active_rounds: BTreeMap<TokenSymbolV0, PaymentRound>,
+}
+
+fn init_map() -> StableBTreeMap<(TokenSymbol, u16), PaymentRound, VM> {
+    let memory = get_payment_round_history_memory();
+    StableBTreeMap::init(memory)
+}
+
+impl From<PaymentProcessorV0> for PaymentProcessor {
+    fn from(v0: PaymentProcessorV0) -> Self {
+        let mut active_rounds: BTreeMap<TokenSymbol, PaymentRound> = BTreeMap::new();
+
+        for (symbol_v0, round) in v0.active_rounds {
+            match TokenSymbol::parse(&symbol_v0.0) {
+                Ok(symbol) => {
+                    active_rounds.insert(symbol, round);
+                }
+                Err(e) => {
+                    panic!(
+                        "Failed to parse token symbol in active_rounds '{}': {:?}",
+                        symbol_v0.0, e
+                    );
+                }
+            }
+        }
+
+        PaymentProcessor {
+            round_history: v0.round_history,
+            active_rounds,
+        }
     }
 }

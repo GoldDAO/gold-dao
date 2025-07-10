@@ -2,9 +2,8 @@ use crate::sns_neuron_controller_suite::setup::setup_ledger::setup_ledgers;
 use crate::sns_neuron_controller_suite::setup::setup_rewards::setup_rewards_canister;
 use crate::sns_neuron_controller_suite::setup::setup_sns_neuron_controller::setup_sns_neuron_controller_canister;
 use crate::sns_neuron_controller_suite::setup::*;
-use crate::sns_test_env::sns_test_env::generate_neuron_data;
 use crate::sns_test_env::sns_test_env::SnsTestEnv;
-use crate::sns_test_env::sns_test_env::SnsTestEnvBuilder;
+use crate::sns_test_env::utils::generate_neuron_data;
 use crate::utils::random_principal;
 use crate::utils::tick_n_blocks;
 use candid::CandidType;
@@ -147,8 +146,8 @@ impl SNCTestEnvBuilder {
             tick_n_blocks(&pic, 50);
         }
 
-        let ogy_sns_test_env = SnsTestEnv::ogy(&pic_ref, self.controller, &ogy_neuron_data);
-        let wtn_sns_test_env = SnsTestEnv::wtn(&pic_ref, self.controller, &wtn_neuron_data);
+        let ogy_sns_test_env = SnsTestEnv::ogy(&pic_ref, self.controller, &ogy_neuron_data, None);
+        let wtn_sns_test_env = SnsTestEnv::wtn(&pic_ref, self.controller, &wtn_neuron_data, None);
 
         let ogy_sns_ledger_canister_id = ogy_sns_test_env.ledger_id;
 

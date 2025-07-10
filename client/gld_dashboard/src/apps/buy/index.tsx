@@ -31,6 +31,10 @@ import DisclaimerConfirmHighSlippageDialog from "./disclaimer-confirm-high-slipp
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
 import Icon from "@shared/ui/icons";
+import { isNumeric } from "@shared/utils/numbers";
+import isInsufficientFunds from "@shared/utils/validators/isInsufficientFunds";
+import isAmountGreaterThanZero from "@shared/utils/validators/isAmountGreaterThanZero";
+import isAmountGreaterThanFee from "@shared/utils/validators/isAmountGreaterThanFee";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -85,7 +89,7 @@ const Buy = () => {
       from: pay_token.token.name,
       from_canister_id: pay_token.token.canisterId,
       to: "GLDT",
-      amount,
+      amount: isNumeric(amount) ? amount : 0,
       enabled: !!unauthenticatedAgent,
     }
   );
@@ -195,27 +199,6 @@ const Buy = () => {
     dispatch({ type: "SET_PAY_TOKEN", value: token });
   };
 
-  const isInsufficientFunds = (
-    value: number,
-    balance: bigint,
-    fee: bigint,
-    decimals: number
-  ) => {
-    if (value === 0) return true;
-    return BigInt(Math.round(value * 10 ** decimals)) + fee <= balance;
-  };
-
-  const isAmountGreaterThanFee = (
-    value: number,
-    fee: bigint,
-    decimals: number
-  ) => {
-    if (value === 0) return true;
-    return BigInt(Math.round(value * 10 ** decimals)) >= fee;
-  };
-
-  const isAmountGreaterThanZero = (value: number) => value > 0;
-
   const isDataFetched =
     balance.isSuccess &&
     price.isSuccess &&
@@ -306,6 +289,7 @@ const Buy = () => {
                           type="number"
                           autoComplete="off"
                           placeholder="0.00"
+                          min="0"
                           className={clsx(
                             "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
                             "placeholder:text-content/40",
@@ -317,11 +301,6 @@ const Buy = () => {
                           }}
                           {...register("amount", {
                             pattern: /[0-9.]/,
-                            required: "",
-                            validate: {
-                              isAmountGreaterThanZero: (v: string) =>
-                                isAmountGreaterThanZero(Number(v)) || "",
-                            },
                           })}
                         />
                         <div>{pay_token.token.name}</div>
@@ -341,6 +320,7 @@ const Buy = () => {
                             type="number"
                             autoComplete="off"
                             placeholder="0.00"
+                            min="0"
                             className={clsx(
                               "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
                               "placeholder:text-content/40",
@@ -354,13 +334,16 @@ const Buy = () => {
                               pattern: /[0-9.]/,
                               required: "",
                               validate: {
+                                isNumericAmount: (v: string) => isNumeric(v),
+                                isAmountGreaterThanZero: (v: string) =>
+                                  isAmountGreaterThanZero(Number(v)),
                                 isInsufficientFunds: (v: string) => {
                                   return (
                                     isInsufficientFunds(
                                       Number(v),
                                       balance.data.balance_e8s,
-                                      payTokenPrice.data.fee,
-                                      payTokenPrice.data.decimals
+                                      balance.data.fee_e8s,
+                                      balance.data.decimals
                                     ) ||
                                     "Amount must not exceed your balance minus network fees"
                                   );
@@ -368,12 +351,10 @@ const Buy = () => {
                                 isAmountGreaterThanFee: (v: string) =>
                                   isAmountGreaterThanFee(
                                     Number(v),
-                                    payTokenPrice.data.fee,
-                                    payTokenPrice.data.decimals
+                                    balance.data.fee_e8s,
+                                    balance.data.decimals
                                   ) ||
                                   "Amount must not be less or equal than transaction fee",
-                                isAmountGreaterThanZero: (v: string) =>
-                                  isAmountGreaterThanZero(Number(v)) || "",
                               },
                             })}
                           />
@@ -465,6 +446,7 @@ const Buy = () => {
                       <E8sToLocaleString
                         value={payTokenPriceExchangeRate.data.amount}
                         tokenDecimals={payTokenPriceExchangeRate.data.decimals}
+                        decimals={2}
                       />
                       <div>{receive_token.token.name}</div>
                       <Logo name={receive_token.token.id} className="h-4 w-4" />

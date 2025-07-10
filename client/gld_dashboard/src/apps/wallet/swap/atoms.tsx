@@ -3,12 +3,18 @@ import { MAX_SWAP_SLIPPAGE } from "@constants";
 import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 import { Token, TOKEN_GLDT, TOKEN_ICP } from "@shared/utils/tokens";
 import { TokenSwapData } from "@wallet/swap/utils";
+import { FieldErrors, FieldValues } from "react-hook-form";
 
 type SwapState = {
   token_from: TokenSwapData;
   token_to: TokenSwapData;
 
   send_amount_input: string;
+
+  form_state: {
+    errors: FieldErrors<FieldValues>;
+    isValid: boolean;
+  };
 
   slippage_without_tx_fee: number;
   slippage_with_tx_fee: number;
@@ -41,6 +47,10 @@ const initialState: SwapState = {
   },
 
   send_amount_input: "",
+  form_state: {
+    errors: {},
+    isValid: false,
+  },
 
   slippage_without_tx_fee: 0,
   slippage_with_tx_fee: 0,
@@ -98,10 +108,22 @@ const reducer = (
         };
       }
     | {
+        type: "SET_FORM_STATE";
+        value: {
+          errors: FieldErrors<FieldValues>;
+          isValid: boolean;
+        };
+      }
+    | {
         type: "OPEN_DIALOG_FORM";
         value: { token_from: Token; token_to?: Token };
       }
+    | {
+        type: "CLOSE_DIALOG_FORM";
+      }
     | { type: "OPEN_DIALOG_CONFIRM" }
+    | { type: "BACK_DIALOG_CONFIRM" }
+    | { type: "CLOSE_DIALOG_CONFIRM" }
     | { type: "OPEN_DIALOG_CONFIRM_HIGH_SLIPPAGE" }
     | { type: "OPEN_DIALOG_DETAILS" }
     | { type: "CONFIRM" }
@@ -173,9 +195,18 @@ const reducer = (
       };
     }
 
-    case "OPEN_DIALOG_FORM":
+    case "SET_FORM_STATE":
       return {
         ...prev,
+        form_state: {
+          errors: action.value.errors,
+          isValid: action.value.isValid,
+        },
+      };
+
+    case "OPEN_DIALOG_FORM":
+      return {
+        ...initialState,
         is_open_form_dialog: true,
         token_from: {
           ...prev.token_from,
@@ -191,10 +222,30 @@ const reducer = (
         },
       };
 
+    case "CLOSE_DIALOG_FORM":
+      return {
+        ...prev,
+        is_open_form_dialog: false,
+      };
+
     case "OPEN_DIALOG_CONFIRM":
       return {
         ...prev,
+        is_open_form_dialog: false,
         is_open_confirm_dialog: true,
+      };
+
+    case "BACK_DIALOG_CONFIRM":
+      return {
+        ...prev,
+        is_open_confirm_dialog: false,
+        is_open_form_dialog: true,
+      };
+
+    case "CLOSE_DIALOG_CONFIRM":
+      return {
+        ...prev,
+        is_open_confirm_dialog: false,
       };
 
     case "OPEN_DIALOG_CONFIRM_HIGH_SLIPPAGE":

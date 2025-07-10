@@ -1,13 +1,9 @@
-use candid::{CandidType, Deserialize};
-use serde::Serialize;
-use sns_governance_canister::types::NeuronId;
-use std::time::Duration;
-
 use crate::{buyback_burn_suite::setup::default_test_setup, utils::tick_n_blocks};
+use std::time::Duration;
 
 #[test]
 fn test_run_job_at() {
-    let mut test_env = default_test_setup();
+    let test_env = default_test_setup();
 
     test_env
         .pic

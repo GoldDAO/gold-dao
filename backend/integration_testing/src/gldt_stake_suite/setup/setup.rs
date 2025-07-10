@@ -4,6 +4,7 @@ use crate::gldt_stake_suite::setup::setup_rewards::setup_rewards_canister;
 use crate::gldt_stake_suite::setup::*;
 use crate::sns_test_env::sns_test_env::SnsTestEnv;
 use crate::sns_test_env::sns_test_env::SnsTestEnvBuilder;
+use crate::sns_test_env::utils::generate_neuron_data;
 use crate::utils::random_principal;
 use candid::CandidType;
 use candid::Deserialize;
@@ -30,7 +31,6 @@ pub struct GldtStakeTestEnv {
     pub neuron_data: HashMap<usize, Neuron>,
     pub token_ledgers: HashMap<String, Principal>,
     pub gldt_stake_canister_id: CanisterId,
-    pub sns_governance_id: CanisterId,
     pub gld_rewards_canister_id: CanisterId, // could be mocked
     pub pic: Rc<RefCell<PocketIc>>,
     pub ledger_fees: HashMap<String, Nat>,
@@ -40,7 +40,6 @@ pub struct GldtStakeTestEnvBuilder {
     controller: Principal,
     token_symbols: Vec<String>,
     // Canister ids parameters
-    sns_neuron_controller_id: CanisterId,
     sns_governance_id: CanisterId,
     gld_rewards_canister_id: CanisterId, // could be mocked
     // Ledger parameters
@@ -52,7 +51,6 @@ impl Default for GldtStakeTestEnvBuilder {
     fn default() -> Self {
         Self {
             controller: random_principal(),
-            sns_neuron_controller_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             sns_governance_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             gld_rewards_canister_id: Principal::from_slice(&[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
             token_symbols: vec![],
@@ -105,17 +103,12 @@ impl GldtStakeTestEnvBuilder {
 
         // NOTE: Neuron Permissions should be granted to the controller
         let (gldt_stake_neuron_data, _) =
-            crate::gldt_stake_suite::setup::setup_sns::generate_neuron_data(
-                0,
-                2,
-                1,
-                &vec![gldt_stake_canister_id],
-            );
+            generate_neuron_data(0, 2, 1, &vec![gldt_stake_canister_id]);
 
         let mut sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
         sns_test_env_builder.generate_ids();
         let gld_sns_test_env = sns_test_env_builder
-            .with_goldao_init_args(&gldt_stake_neuron_data)
+            .with_goldao_init_args(&gldt_stake_neuron_data, None)
             .build();
         let sns_gov_canister_id = gld_sns_test_env.governance_id;
 
@@ -207,7 +200,6 @@ impl GldtStakeTestEnvBuilder {
             neuron_data: gldt_stake_neuron_data,
             token_ledgers,
             gldt_stake_canister_id: gldt_stake_canister_id,
-            sns_governance_id: self.sns_governance_id,
             gld_rewards_canister_id: self.gld_rewards_canister_id,
             pic: Rc::clone(&pic_ref),
             ledger_fees: self.ledger_fees.clone(),
@@ -234,26 +226,17 @@ impl GldtStakeTestEnvBuilder {
             pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
 
         // NOTE: Neuron Permissions should be granted to the controller
-        let (gldt_stake_neuron_data, _) = crate::sns_test_env::sns_test_env::generate_neuron_data(
-            0,
-            2,
-            1,
-            &vec![gldt_stake_canister_id],
-        );
+        let (gldt_stake_neuron_data, _) =
+            generate_neuron_data(0, 2, 1, &vec![gldt_stake_canister_id]);
 
-        let (controller_neuron_data, _) = crate::sns_test_env::sns_test_env::generate_neuron_data(
-            2,
-            3,
-            1,
-            &vec![self.controller],
-        );
+        let (controller_neuron_data, _) = generate_neuron_data(2, 3, 1, &vec![self.controller]);
 
         let mut neuron_data = gldt_stake_neuron_data.clone();
         neuron_data.extend(controller_neuron_data);
         let mut sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
         sns_test_env_builder.generate_ids();
         let gld_sns_test_env = sns_test_env_builder
-            .with_goldao_init_args(&neuron_data)
+            .with_goldao_init_args(&neuron_data, None)
             .build();
         let sns_gov_canister_id = gld_sns_test_env.governance_id;
 
@@ -337,15 +320,12 @@ impl GldtStakeTestEnvBuilder {
             self.controller,
         );
 
-        // pic.set_time(SystemTime::now());
-
         GldtStakeTestEnv {
             controller: self.controller,
             gld_sns_test_env: gld_sns_test_env,
             neuron_data: gldt_stake_neuron_data,
             token_ledgers,
             gldt_stake_canister_id: gldt_stake_canister_id,
-            sns_governance_id: self.sns_governance_id,
             gld_rewards_canister_id: self.gld_rewards_canister_id,
             pic: Rc::clone(&pic_ref),
             ledger_fees: self.ledger_fees.clone(),

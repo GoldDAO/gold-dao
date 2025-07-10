@@ -12,10 +12,9 @@ const sizeClasses: Record<Size, string> = {
 };
 
 const variantClasses: Record<Variant, string> = {
-  filled:
-    "bg-primary text-white font-semibold hover:bg-primary/80 disabled:bg-primary/60",
+  filled: "bg-primary text-white hover:bg-primary/80 disabled:bg-primary/60",
   outlined:
-    "bg-transparent border-1 border-primary text-primary font-semibold hover:bg-primary/10 disabled:border-primary/60 disabled:text-primary/60",
+    "bg-transparent border-1 border-primary text-primary hover:bg-primary/10 disabled:border-primary/60 disabled:text-primary/60",
 };
 
 const shapeClasses: Record<Shape, string> = {

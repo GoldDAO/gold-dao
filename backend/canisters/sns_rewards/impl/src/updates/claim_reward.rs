@@ -66,7 +66,7 @@ pub async fn claim_reward_impl(
             return ClaimRewardResponse::NeuronHotKeyInvalid;
         }
         AuthenticateByHotkeyResponse::Ok(_) => {
-            match transfer_rewards(&neuron_id, caller, &token_info).await {
+            match transfer_rewards(neuron_id, caller, token_info).await {
                 Ok(amount) => ClaimRewardResponse::Ok(amount),
                 Err(e) => ClaimRewardResponse::TransferFailed(e),
             }
@@ -75,12 +75,12 @@ pub async fn claim_reward_impl(
 }
 
 pub async fn transfer_rewards(
-    neuron_id: &NeuronId,
+    neuron_id: NeuronId,
     user_id: Principal,
-    token_info: &TokenInfo,
+    token_info: TokenInfo,
 ) -> Result<bool, String> {
     // get the balance of the sub account ( NeuronId is the sub account id )
-    let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, neuron_id).await?;
+    let balance_of_neuron_id = fetch_balance_of_neuron_id(token_info.ledger_id, &neuron_id).await?;
     if balance_of_neuron_id <= Nat::from(token_info.fee) {
         return Err(format!(
             "Your balance must be higher than the transfer fee of {}",

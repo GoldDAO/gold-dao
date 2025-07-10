@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
+import { useAuth } from "@auth/index";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import clsx from "clsx";
 import { useForm, useWatch } from "react-hook-form";
@@ -7,37 +9,34 @@ import {
   onKeyDownPreventNoDigits,
   onPastePreventNoDigits,
 } from "@shared/utils/form/input";
-import useSendAmountInputValidation from "@wallet/swap/components/form-dialog/send-form/send-amount-input/hooks/useSendAmountInputValidation";
+import isInsufficientFunds from "@shared/utils/validators/isInsufficientFunds";
+import isAmountGreaterThanZero from "@shared/utils/validators/isAmountGreaterThanZero";
+import isAmountGreaterThanFee from "@shared/utils/validators/isAmountGreaterThanFee";
 import { isNumeric } from "@shared/utils/numbers";
 
-const SendAmountInput = ({
-  initialValue = "",
-  balance,
-  fee,
-  decimals,
-}: {
-  balance: bigint;
-  fee: bigint;
-  decimals: number;
-  initialValue: string;
-}) => {
-  const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
+const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
+  const { unauthenticatedAgent, principalId } = useAuth();
+  const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
   const {
     register,
-    reset,
     control,
-    // formState: { errors, isValid },
+    formState: { errors, isValid },
+    setValue,
   } = useForm({
     mode: "onChange",
     shouldUnregister: true,
     shouldFocusError: false,
   });
 
-  const {
-    isInsufficientFunds,
-    isAmountGreaterThanFee,
-    isAmountGreaterThanZero,
-  } = useSendAmountInputValidation(balance, fee, decimals);
+  const balance = useFetchLedgerBalance(
+    swapState.token_from.token.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: swapState.token_from.token.name,
+      owner: principalId,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   const amount = useWatch({
     control,
@@ -45,10 +44,12 @@ const SendAmountInput = ({
   }) as string;
 
   useEffect(() => {
-    reset({
-      amount: initialValue,
+    setValue("amount", initialValue, {
+      shouldValidate: true,
+      shouldDirty: true,
     });
-  }, [reset, initialValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatchSwapState({
@@ -58,12 +59,34 @@ const SendAmountInput = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
+  useEffect(() => {
+    dispatchSwapState({
+      type: "SET_FORM_STATE",
+      value: {
+        errors,
+        isValid,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isValid, errors]);
+
+  if (!balance.isSuccess) {
+    return (
+      <input
+        className="animate-pulse cursor-not-allowed"
+        value="0.00"
+        readOnly
+      />
+    );
+  }
+
   return (
     <input
       id="amount"
       type="number"
       autoComplete="off"
       placeholder="0.00"
+      min="0"
       className={clsx(
         "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
         "placeholder:text-content/40",
@@ -77,17 +100,25 @@ const SendAmountInput = ({
         pattern: /[0-9.]/,
         required: "",
         validate: {
+          isNumericAmount: (v: string) => isNumeric(v),
+          isAmountGreaterThanZero: (v: string) =>
+            isAmountGreaterThanZero(Number(v)),
           isInsufficientFunds: (v: string) => {
             return (
-              isInsufficientFunds(Number(v)) ||
-              "Amount must not exceed your balance minus network fees"
+              isInsufficientFunds(
+                Number(v),
+                balance.data.balance_e8s,
+                balance.data.fee_e8s,
+                balance.data.decimals
+              ) || "Amount must not exceed your balance minus network fees"
             );
           },
           isAmountGreaterThanFee: (v: string) =>
-            isAmountGreaterThanFee(Number(v)) ||
-            "Amount must not be less or equal than transaction fee",
-          isAmountGreaterThanZero: (v: string) =>
-            isAmountGreaterThanZero(Number(v)) || "",
+            isAmountGreaterThanFee(
+              Number(v),
+              balance.data.fee_e8s,
+              balance.data.decimals
+            ) || "Amount must not be less or equal than transaction fee",
         },
       })}
     />

@@ -67,10 +67,11 @@ const Dialog = ({
     <HeadlessUIDialog
       open={open}
       onClose={onClose}
+      unmount={true}
       transition
       className={clsx(
         "relative z-50",
-        "transition duration-200 ease-in-out data-[closed]:opacity-0"
+        "transition duration-300 ease-in-out data-[closed]:opacity-0"
       )}
     >
       <DialogBackdrop className="fixed inset-0 bg-black/60 backdrop-blur-[2px]" />
@@ -88,7 +89,7 @@ const Dialog = ({
             "max-h-[70vh] md:max-h-[90vh] overflow-y-auto"
           )}
         >
-          {open ? children : null}
+          {children}
         </DialogPanel>
       </div>
     </HeadlessUIDialog>

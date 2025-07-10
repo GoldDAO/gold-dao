@@ -6,7 +6,6 @@ pub mod setup;
 pub mod setup_gldt_stake;
 pub mod setup_ledger;
 pub mod setup_rewards;
-pub mod setup_sns;
 
 pub fn default_test_setup() -> GldtStakeTestEnv {
     GldtStakeTestEnvBuilder::new()
