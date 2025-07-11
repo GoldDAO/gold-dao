@@ -6,12 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.0.6] - 2025-07-11
+
+#### Changed
+
+- Separate calls for fetching GLD NFT's and gold price in USD
+
 ### [2.0.5] - 2025-07-11
 
 #### Changed
 
 - Update request headers in ic-assets.json5
-- Separate calls for fetching GLD NFT's and gold price in USD
 
 ### [2.0.4] - 2025-07-11
 
