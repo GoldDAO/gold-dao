@@ -3,8 +3,30 @@ import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import useFetchUserNFTMetrics from "@shared/hooks/useFetchNFTUserMetrics";
+import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { NFTCollections } from "@shared/utils/nfts";
+
+const PriceNFT = ({ grams = 0 }: { grams: number }) => {
+  const { unauthenticatedAgent, isConnected } = useAuth();
+
+  const priceGold = useFetchPriceGold({
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
+
+  return (
+    <span className="text-content/60">
+      {priceGold.isSuccess ? (
+        <>
+          $
+          <NumberToLocaleString value={grams * priceGold.data} />
+        </>
+      ) : (
+        <span className="animate-pulse">($0)</span>
+      )}
+    </span>
+  );
+};
 
 const ListItemNFT = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,8 +69,8 @@ const ListItemNFT = () => {
           <div className="text-content/60 text-sm flex items-center justify-end gap-1">
             {nfts.isSuccess ? (
               <div>
-                {nfts.data.totalGrams} grams - $
-                <NumberToLocaleString value={nfts.data.totalUSD} />
+                {nfts.data.totalGrams} grams -{" "}
+                <PriceNFT grams={nfts.data.totalGrams} />
               </div>
             ) : (
               <div>Loading...</div>

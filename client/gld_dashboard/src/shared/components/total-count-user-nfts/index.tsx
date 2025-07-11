@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { NFTCollections } from "@shared/utils/nfts";
 import useFetchNFTUserMetrics from "@shared/hooks/useFetchNFTUserMetrics";
+import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const CountNFT = ({
@@ -23,20 +24,30 @@ const CountNFT = ({
 
 const PriceNFT = ({
   grams = 0,
-  priceUSD = 0,
   className,
 }: {
   grams: number;
-  priceUSD: number;
   className?: string;
 }) => {
+  const { unauthenticatedAgent, isConnected } = useAuth();
+
+  const priceGold = useFetchPriceGold({
+    enabled: !!unauthenticatedAgent && isConnected,
+  });
+
   return (
     <div className={className}>
       <div className="text-lg">
         <span>{grams} grams of Gold </span>
         <span className="text-content/60">
-          ($
-          <NumberToLocaleString value={priceUSD} />)
+          {priceGold.isSuccess ? (
+            <>
+              ($
+              <NumberToLocaleString value={grams * priceGold.data} />)
+            </>
+          ) : (
+            <span className="animate-pulse">($0)</span>
+          )}
         </span>
       </div>
     </div>
@@ -64,14 +75,12 @@ const TotalCountUserNFTs = ({ className }: { className?: string }) => {
 
   const renderGrams = () => {
     if (!isConnected) {
-      return <PriceNFT grams={0} priceUSD={0} />;
+      return <PriceNFT grams={0} />;
     }
     if (nfts.isSuccess) {
-      return (
-        <PriceNFT grams={nfts.data.totalGrams} priceUSD={nfts.data.totalUSD} />
-      );
+      return <PriceNFT grams={nfts.data.totalGrams} />;
     }
-    return <PriceNFT className="animate-pulse" grams={0} priceUSD={0} />;
+    return <PriceNFT className="animate-pulse" grams={0} />;
   };
 
   return (

@@ -17,14 +17,17 @@ const HeaderNFT = ({ className }: { className?: string }) => {
           <div className="font-semibold text-xl">GLD NFT</div>
         </div>
         <div className="text-xs xl:text-sm text-content/60">
-          {priceGold.isSuccess ? (
-            <>
-              1 gram Gold ≈ $
-              <NumberToLocaleString value={priceGold.data} />
-            </>
-          ) : (
-            <span>Loading...</span>
-          )}
+          1 gram Gold ≈{" "}
+          <span>
+            {priceGold.isSuccess ? (
+              <>
+                $
+                <NumberToLocaleString value={priceGold.data} />
+              </>
+            ) : (
+              <span className="animate-pulse">($0)</span>
+            )}
+          </span>
         </div>
       </div>
     </div>
