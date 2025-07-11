@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.8] - 2025-07-11
+
+#### Fixed
+
+- **Migration issue** - Fixed a deserialization bug that caused canister upgrades to fail when migrating the canister state. The updated logic now correctly handles legacy data formats to ensure smooth migration.
+
 ### [1.0.7] - 2025-06-11
 
 #### Added
