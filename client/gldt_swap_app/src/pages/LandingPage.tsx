@@ -128,11 +128,11 @@ export const LandingPage = () => {
             <div className="">
               <div className="mb-8">
                 <p className="font-semibold text-lg mb-2">
-                  Partner With Gold DAO
+                  Partner with Gold DAO
                 </p>
                 <p>
-                  Gold DAO welcomes partnership opportunities with trusted
-                  entities around the world.
+                  Gold DAO welcomes partnerships with trusted entities around
+                  the world.
                 </p>
               </div>
               <p>We are actively seeking:</p>
@@ -155,12 +155,13 @@ export const LandingPage = () => {
               </div>
 
               <p className="mb-4">
-                We are open to collaboration in any jurisdiction where partners
+                We are open to collaborations in any jurisdiction where partners
                 can demonstrate valid regulatory accreditation in their
                 respective field.
               </p>
               <p>
-                If you're interested in partnering with us, please reach out at{" "}
+                If you are interested in partnering with Gold DAO, please reach
+                us at{" "}
                 <a
                   className="text-gold font-semibold"
                   href="mailto:info@gold-dao.org"
