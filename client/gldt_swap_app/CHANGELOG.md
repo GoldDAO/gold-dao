@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.7] - 2025-07-11
+
+### Changed
+
+- Partners section on landing page
+
 ### [1.1.6] - 2025-07-09
 
 ### Fix
