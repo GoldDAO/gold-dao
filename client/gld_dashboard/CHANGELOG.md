@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.0.4] - 2025-07-11
+
+#### Fix
+
+- CORS Removing header Access-Control-Allow-Origin
+
 ### [2.0.3] - 2025-07-09
 
 #### Fix
