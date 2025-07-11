@@ -14,7 +14,6 @@ use sns_rewards_api_canister::payment_round::PaymentRound;
 use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use types::TokenInfo;
 use types::TokenSymbol;
 use types::{NeuronInfo, TimestampMillis};
@@ -29,7 +28,7 @@ pub struct RuntimeStateV0 {
 #[derive(Serialize, Deserialize)]
 pub struct DataV0 {
     pub sns_governance_canister: Principal,
-    pub neuron_maturity: BTreeMap<NeuronId, NeuronInfo>,
+    pub neuron_maturity: BTreeMap<NeuronId, NeuronInfoV0>,
     pub sync_info: SyncInfo,
     pub maturity_history: MaturityHistory,
     pub payment_processor: PaymentProcessor,
@@ -82,7 +81,11 @@ impl From<DataV0> for Data {
 
         Data {
             sns_governance_canister: v0.sns_governance_canister,
-            neuron_maturity: v0.neuron_maturity,
+            neuron_maturity: v0
+                .neuron_maturity
+                .into_iter()
+                .map(|(k, v)| (k, NeuronInfo::from(v)))
+                .collect(),
             sync_info: v0.sync_info,
             maturity_history: v0.maturity_history,
             payment_processor: PaymentProcessor::from(v0.payment_processor),
@@ -96,6 +99,41 @@ impl From<DataV0> for Data {
             reward_distribution_interval: v0.reward_distribution_interval,
             reward_distribution_in_progress: v0.reward_distribution_in_progress,
             neuron_sync_interval: v0.neuron_sync_interval,
+        }
+    }
+}
+
+#[derive(Serialize, Clone, Deserialize, Debug, PartialEq, Eq)]
+pub struct NeuronInfoV0 {
+    pub last_synced_maturity: u64,
+    pub accumulated_maturity: u64,
+    pub rewarded_maturity: HashMap<TokenSymbolV0, u64>,
+    pub last_disburse_event_considered: Option<TimestampMillis>,
+}
+
+impl From<NeuronInfoV0> for NeuronInfo {
+    fn from(v0: NeuronInfoV0) -> Self {
+        let mut rewarded_maturity: HashMap<TokenSymbol, u64> = HashMap::new();
+
+        for (symbol_v0, amount) in v0.rewarded_maturity {
+            match TokenSymbol::parse(&symbol_v0.0) {
+                Ok(symbol) => {
+                    rewarded_maturity.insert(symbol, amount);
+                }
+                Err(e) => {
+                    panic!(
+                        "Failed to parse token symbol in rewarded_maturity '{}': {:?}",
+                        symbol_v0.0, e
+                    );
+                }
+            }
+        }
+
+        NeuronInfo {
+            last_synced_maturity: v0.last_synced_maturity,
+            accumulated_maturity: v0.accumulated_maturity,
+            rewarded_maturity,
+            last_disburse_event_considered: v0.last_disburse_event_considered,
         }
     }
 }
