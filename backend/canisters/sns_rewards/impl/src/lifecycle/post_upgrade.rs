@@ -34,7 +34,7 @@ fn post_upgrade(args: Args) {
                 Vec<LogEntry>,
                 Vec<LogEntry>,
             ) = serializer::deserialize(reader).unwrap();
-            let mut state = RuntimeState::try_from(runtime_state_v0).unwrap();
+            let mut state = RuntimeState::from(runtime_state_v0);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
