@@ -113,9 +113,9 @@ export const LandingPage = () => {
             </div>
           </div>
         </section>
-        <section className="border-b border-gold/60 p-16">
+        <section className="border-b border-gold/60 px-8 py-8 xl:py-16">
           <div className="text-center text-lg font-semibold text-content/60 mb-6">
-            POWERED BY
+            PARTNERS
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6">
             {logos.map(({ name, alt }) => (
@@ -123,6 +123,53 @@ export const LandingPage = () => {
                 <Logo name={name} alt={alt} />
               </div>
             ))}
+          </div>
+          <div className="flex justify-center text-center mt-8 xl:mt-16">
+            <div className="">
+              <div className="mb-8">
+                <p className="font-semibold text-lg mb-2">
+                  Partner With Gold DAO
+                </p>
+                <p>
+                  Gold DAO welcomes partnership opportunities with trusted
+                  entities around the world.
+                </p>
+              </div>
+              <p>We are actively seeking:</p>
+              <div className="flex justify-center">
+                <ul className="flex flex-col gap-4 mt-4 mb-6 xl:mb-8">
+                  <li className="shadow-md shadow-gold/10 rounded-xl bg-surface-1 px-4 py-4 xl:px-8">
+                    <span className="font-semibold">Regulated brokers</span>{" "}
+                    licensed to trade physical gold bars
+                  </li>
+                  <li className="shadow-md shadow-gold/10 rounded-xl bg-surface-1 px-4 py-4 xl:px-8">
+                    <span className="font-semibold">Regulated custodians</span>{" "}
+                    authorized to securely hold gold in custody
+                  </li>
+                  <li className="shadow-md shadow-gold/10 rounded-xl bg-surface-1 px-4 py-4 xl:px-8">
+                    <span className="font-semibold">Gold owners</span>
+                    —individuals or institutions—interested in tokenizing their
+                    physical gold
+                  </li>
+                </ul>
+              </div>
+
+              <p className="mb-4">
+                We are open to collaboration in any jurisdiction where partners
+                can demonstrate valid regulatory accreditation in their
+                respective field.
+              </p>
+              <p>
+                If you're interested in partnering with us, please reach out at{" "}
+                <a
+                  className="text-gold font-semibold"
+                  href="mailto:info@gold-dao.org"
+                >
+                  info@gold-dao.org
+                </a>
+                .
+              </p>
+            </div>
           </div>
         </section>
         <section className="border-b border-gold/60">
