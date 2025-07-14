@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [1.1.8] - 2025-07-14
+
+### Changed
+
+- Update text in partners section
+
 ### [1.1.7] - 2025-07-11
 
 ### Changed
