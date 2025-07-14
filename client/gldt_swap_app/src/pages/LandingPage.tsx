@@ -131,11 +131,11 @@ export const LandingPage = () => {
                   Partner with Gold DAO
                 </p>
                 <p>
-                  Gold DAO welcomes partnerships with trusted entities around
-                  the world.
+                  Gold DAO is expanding its partnerships worldwide and is
+                  looking for trusted entities.
                 </p>
               </div>
-              <p>We are actively seeking:</p>
+              <p>We welcome in our ecosystem:</p>
               <div className="flex justify-center">
                 <ul className="flex flex-col gap-4 mt-4 mb-6 xl:mb-8">
                   <li className="shadow-md shadow-gold/10 rounded-xl bg-surface-1 px-4 py-4 xl:px-8">
