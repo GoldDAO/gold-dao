@@ -29,16 +29,22 @@ const MaxButtonUI = ({
 const MaxButton = ({
   balance,
   fee,
+  decimals,
   handleOnClick,
 }: {
-  balance: number | undefined;
-  fee: number | undefined;
+  balance: bigint | undefined;
+  fee: bigint | undefined;
+  decimals: number | undefined;
   handleOnClick: (amount: string) => void;
 }) => {
-  const isEnabled = balance !== undefined && fee !== undefined && balance > fee;
+  const isEnabled =
+    balance !== undefined &&
+    fee !== undefined &&
+    decimals !== undefined &&
+    balance >= fee;
 
-  const handleClick = (balance: number, fee: number) => {
-    const maxAmount = balance - fee;
+  const handleClick = (balance: bigint, fee: bigint, decimals: number) => {
+    const maxAmount = Number(balance - fee) / 10 ** decimals;
     handleOnClick(maxAmount.toString());
   };
 
@@ -46,7 +52,9 @@ const MaxButton = ({
     return <MaxButtonUI disabled />;
   }
 
-  return <MaxButtonUI handleOnClick={() => handleClick(balance, fee)} />;
+  return (
+    <MaxButtonUI handleOnClick={() => handleClick(balance, fee, decimals)} />
+  );
 };
 
 export default MaxButton;

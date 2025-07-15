@@ -74,8 +74,9 @@ const SendForm = () => {
           balance={balance.data?.balance}
         />
         <MaxButton
-          balance={balance.data?.balance}
-          fee={balance.data?.fee}
+          balance={balance.data?.balance_e8s}
+          fee={balance.data?.fee_e8s}
+          decimals={balance.data?.decimals}
           handleOnClick={(amount) => onClickMaxBalance(amount)}
         />
       </div>

@@ -374,8 +374,9 @@ const Buy = () => {
                             </div>
                           </form>
                           <MaxButton
-                            balance={balance.data?.balance}
-                            fee={balance.data?.fee}
+                            balance={balance.data?.balance_e8s}
+                            fee={balance.data?.fee_e8s}
+                            decimals={balance.data?.decimals}
                             handleOnClick={(amount) =>
                               onClickMaxBalance(amount)
                             }
@@ -413,7 +414,6 @@ const Buy = () => {
                       <E8sToLocaleString
                         value={receiveTokenPrice.data.amount}
                         tokenDecimals={receiveTokenPrice.data.decimals}
-                        decimals={5}
                       />{" "}
                       GLDT
                       <Icon.InfoCircle
@@ -437,7 +437,6 @@ const Buy = () => {
                           BigInt(GLDT_VALUE_1G_NFT)
                         }
                         tokenDecimals={receiveTokenPrice.data.decimals}
-                        decimals={5}
                       />
                       g of gold{" "}
                       <span className="text-content/60 font-normal">
@@ -464,7 +463,6 @@ const Buy = () => {
                       <E8sToLocaleString
                         value={payTokenPriceExchangeRate.data.amount}
                         tokenDecimals={payTokenPriceExchangeRate.data.decimals}
-                        decimals={2}
                       />
                       <div>{receive_token.token.name}</div>
                       <Logo name={receive_token.token.id} className="h-4 w-4" />
