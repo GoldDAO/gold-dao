@@ -6,7 +6,7 @@ import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import useFetchSwapAmount from "@shared/hooks/useFetchSwapAmount";
 import ListboxToken from "@wallet/swap/components/form-dialog/listbox-token";
-import BalanceAvailable from "../balance-available";
+import BalanceAvailable from "../../../../../../shared/components/BalanceAvailable";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ReceiveForm = () => {
@@ -84,7 +84,10 @@ const ReceiveForm = () => {
           ></ListboxToken>
         </div>
       </div>
-      <BalanceAvailable token={swapState.token_to.token} />
+      <BalanceAvailable
+        token={swapState.token_to.token.name}
+        balance={balance.data?.balance}
+      />
     </div>
   );
 };
