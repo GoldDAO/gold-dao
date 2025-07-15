@@ -23,7 +23,7 @@ const AmountUSD = ({
     <div className={className}>
       <div className="text-content/60 text-sm xl:text-base">
         ≈ $
-        <NumberToLocaleString value={amount} />
+        <NumberToLocaleString value={amount} decimals={5} />
       </div>
     </div>
   );
@@ -116,6 +116,7 @@ const ConfirmDialog = () => {
                           tokenDecimals={
                             balanceTokenFrom.data.decimals as number
                           }
+                          decimals={5}
                         />
                         <div>{swapState.token_from.token.name}</div>
                       </div>
@@ -163,6 +164,7 @@ const ConfirmDialog = () => {
                         <E8sToLocaleString
                           value={swapAmount.data.receive_amount}
                           tokenDecimals={balanceTokenTo.data.decimals as number}
+                          decimals={5}
                         />
                         <div>{swapState.token_to.token.name}</div>
                       </div>

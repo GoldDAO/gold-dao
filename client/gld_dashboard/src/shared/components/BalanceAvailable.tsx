@@ -10,7 +10,7 @@ const BalanceAvailable = ({
 }) => {
   const renderBalance = () => {
     if (balance !== undefined) {
-      return <NumberToLocaleString value={balance} />;
+      return <NumberToLocaleString value={balance} decimals={5} />;
     }
     return (
       <div className="animate-pulse">
