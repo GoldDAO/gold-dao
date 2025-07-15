@@ -14,18 +14,21 @@ import isAmountGreaterThanZero from "@shared/utils/validators/isAmountGreaterTha
 import isAmountGreaterThanFee from "@shared/utils/validators/isAmountGreaterThanFee";
 import { isNumeric } from "@shared/utils/numbers";
 
-const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
+const SendAmountInput = () => {
   const { unauthenticatedAgent, principalId } = useAuth();
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
   const {
     register,
     control,
-    formState: { errors, isValid },
     setValue,
+    formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
     shouldUnregister: true,
     shouldFocusError: false,
+    defaultValues: {
+      amount: swapState.send_amount_input || "",
+    },
   });
 
   const balance = useFetchLedgerBalance(
@@ -44,20 +47,21 @@ const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
   }) as string;
 
   useEffect(() => {
-    setValue("amount", initialValue, {
+    dispatchSwapState({
+      type: "SET_SEND_AMOUNT",
+      value: isNumeric(amount) ? amount : "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount]);
+
+  useEffect(() => {
+    if (swapState.send_amount_input === "") return;
+    setValue("amount", swapState.send_amount_input, {
       shouldValidate: true,
       shouldDirty: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    dispatchSwapState({
-      type: "SET_SEND_AMOUNT",
-      value: isNumeric(amount) ? amount : "0",
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount]);
+  }, [swapState.send_amount_input, swapState.token_from.token]);
 
   useEffect(() => {
     dispatchSwapState({
@@ -70,16 +74,6 @@ const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isValid, errors]);
 
-  if (!balance.isSuccess) {
-    return (
-      <input
-        className="animate-pulse cursor-not-allowed"
-        value="0.00"
-        readOnly
-      />
-    );
-  }
-
   return (
     <input
       id="amount"
@@ -87,7 +81,11 @@ const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
       autoComplete="off"
       placeholder="0.00"
       min="0"
+      readOnly={!balance.isSuccess}
       className={clsx(
+        {
+          "animate-pulse cursor-not-allowed": !balance.isSuccess,
+        },
         "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
         "placeholder:text-content/40",
         "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -104,6 +102,7 @@ const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
           isAmountGreaterThanZero: (v: string) =>
             isAmountGreaterThanZero(Number(v)),
           isInsufficientFunds: (v: string) => {
+            if (!balance.isSuccess) return true;
             return (
               isInsufficientFunds(
                 Number(v),
@@ -113,12 +112,16 @@ const SendAmountInput = ({ initialValue = "" }: { initialValue: string }) => {
               ) || "Amount must not exceed your balance minus network fees"
             );
           },
-          isAmountGreaterThanFee: (v: string) =>
-            isAmountGreaterThanFee(
-              Number(v),
-              balance.data.fee_e8s,
-              balance.data.decimals
-            ) || "Amount must not be less or equal than transaction fee",
+          isAmountGreaterThanFee: (v: string) => {
+            if (!balance.isSuccess) return true;
+            return (
+              isAmountGreaterThanFee(
+                Number(v),
+                balance.data.fee_e8s,
+                balance.data.decimals
+              ) || "Amount must not be less or equal than transaction fee"
+            );
+          },
         },
       })}
     />

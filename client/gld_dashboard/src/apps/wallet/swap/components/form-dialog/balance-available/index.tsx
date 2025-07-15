@@ -1,6 +1,4 @@
-import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import Icon from "@shared/ui/icons";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
@@ -8,13 +6,12 @@ import { Token } from "@shared/utils/tokens";
 
 const BalanceAvailable = ({ token }: { token: Token }) => {
   const { unauthenticatedAgent, principalId } = useAuth();
-  const [swapState] = useAtom(SwapStateReducerAtom);
 
   const balance = useFetchLedgerBalance(
-    swapState.token_from.token.canister_id,
+    token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_from.token.name,
+      ledger: token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent,
     }

@@ -5,10 +5,12 @@ import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import useSwapTokensSearchParams from "@wallet/swap/hooks/useSwapTokensSearchParams";
 import FormDialog from "@wallet/swap/components/form-dialog";
 import ConfirmDialog from "@wallet/swap/components/confirm-dialog";
+import DisclaimerConfirmHighSlippageDialog from "@wallet/swap/components/disclaimer-confirm-high-slippage-dialog";
+import DetailsDialog from "@wallet/swap/components/details-dialog";
 
 const SwapToken = () => {
   const { isConnected } = useAuth();
-  const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
+  const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
   const { isSwap, tokenFrom, tokenTo, deleteSwapTokensSearchParams } =
     useSwapTokensSearchParams();
 
@@ -25,18 +27,10 @@ const SwapToken = () => {
 
   return (
     <>
-      <FormDialog
-        open={swapState.is_open_form_dialog}
-        onClose={() => {
-          dispatchSwapState({ type: "CLOSE_DIALOG_FORM" });
-        }}
-      />
-      <ConfirmDialog
-        open={swapState.is_open_confirm_dialog}
-        onClose={() => {
-          dispatchSwapState({ type: "CLOSE_DIALOG_CONFIRM" });
-        }}
-      />
+      <FormDialog />
+      <ConfirmDialog />
+      <DisclaimerConfirmHighSlippageDialog />
+      <DetailsDialog />
     </>
   );
 };

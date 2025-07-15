@@ -26,13 +26,22 @@ const SendForm = () => {
     dispatchSwapState({ type: "SET_TOKEN_FROM", value: selectedToken });
   };
 
+  const onClickMaxBalance = () => {
+    if (balance.isSuccess && balance.data.balance > balance.data.fee) {
+      dispatchSwapState({
+        type: "SET_SEND_AMOUNT",
+        value: (balance.data.balance - balance.data.fee).toString(),
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 border border-border rounded-xl bg-surface-secondary">
       <div className="text-copper font-semibold">Send</div>
       <div className="flex justify-between items-start">
         <div>
           <div className="text-2xl">
-            <SendAmountInput initialValue={swapState.send_amount_input} />
+            <SendAmountInput />
           </div>
           <div className="text-xs text-content/60">
             {balance.isSuccess ? (
@@ -62,52 +71,19 @@ const SendForm = () => {
       </div>
       <div className="flex justify-between items-center">
         <BalanceAvailable token={swapState.token_from.token} />
-        <div className="">Max btn</div>
-      </div>
-      {/* <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center rounded-full bg-surface-secondary h-6 w-6 shrink-0 aspect-square">
-            <Logo name={token.id} />
-          </div>
-          <input
-            id="amount"
-            type="text"
-            autoComplete="off"
-            placeholder={`0 ${token.name}`}
-            className={clsx(
-              "w-full outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
-              "placeholder:text-content/40"
-            )}
-            {...register("amount", {
-              pattern: /[0-9.]/,
-              required: "Amount is required",
-              validate: {
-                isAmountBelowBalance: (v: string) =>
-                  isAmountBelowBalance(v) ||
-                  "Amount must not exceed your balance minus network fees",
-                isAmountAboveFee: (v: string) =>
-                  isAmountAboveFee(v) ||
-                  "Amount must not be less or equal than transaction fee",
-              },
-            })}
-          />
-        </div>
         <button
-          onClick={handleOnClickMaxBalance}
+          onClick={onClickMaxBalance}
           type="button"
           className="rounded-md py-1 px-2 bg-surface-primary text-content/60 border border-border text-xs disabled:cursor-not-allowed cursor-pointer"
           data-tooltip-id="tooltip"
           data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
+          disabled={
+            !balance.isSuccess || balance.data.balance <= balance.data.fee
+          }
         >
           Max
         </button>
       </div>
-      <div className="text-content/40 text-sm mt-2 ml-1">
-        $
-        <NumberToLocaleString
-          value={Number(watchedAmount * balance.data.price_usd)}
-        />
-      </div> */}
     </div>
   );
 };

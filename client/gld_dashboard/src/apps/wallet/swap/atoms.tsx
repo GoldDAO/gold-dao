@@ -125,7 +125,6 @@ const reducer = (
     | { type: "BACK_DIALOG_CONFIRM" }
     | { type: "CLOSE_DIALOG_CONFIRM" }
     | { type: "OPEN_DIALOG_CONFIRM_HIGH_SLIPPAGE" }
-    | { type: "OPEN_DIALOG_DETAILS" }
     | { type: "CONFIRM" }
     | { type: "CONFIRM_HIGH_SLIPPAGE"; value: { slippage_with_tx_fee: number } }
     | { type: "CANCEL" }
@@ -255,24 +254,19 @@ const reducer = (
         is_open_disclaimer_confirm_high_slippage_dialog: true,
       };
 
-    case "OPEN_DIALOG_DETAILS":
-      return {
-        ...prev,
-        is_open_confirm_dialog: true,
-      };
-
-    case "CANCEL":
-      return {
-        ...prev,
-        is_open_confirm_dialog: false,
-        is_open_disclaimer_confirm_high_slippage_dialog: false,
-      };
-
     case "CONFIRM":
       return {
         ...prev,
         is_open_confirm_dialog: false,
         is_open_details_dialog: true,
+      };
+
+    case "CANCEL":
+      return {
+        ...prev,
+        is_open_form_dialog: true,
+        is_open_confirm_dialog: false,
+        is_open_disclaimer_confirm_high_slippage_dialog: false,
       };
 
     case "CONFIRM_HIGH_SLIPPAGE": {

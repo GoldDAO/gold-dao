@@ -1,23 +1,24 @@
 import { useAtom } from "jotai";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import Dialog from "@shared/ui/dialog/DialogV2";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
-
+import BtnForm from "@shared/ui/button/BtnPrimary";
 import SendForm from "./send-form";
 import ReceiveForm from "./receive-form";
-import { ErrorMessage } from "@hookform/error-message";
+import ErrorMessageBtnForm from "./error-message-btn-form";
 
-const FormDialog = ({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) => {
+const FormDialog = () => {
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
+  const onSubmit = () => {
+    dispatchSwapState({ type: "OPEN_DIALOG_CONFIRM" });
+  };
+
+  const onClose = () => {
+    dispatchSwapState({ type: "RESET" });
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={swapState.is_open_form_dialog} onClose={onClose}>
       <div className="flex items-center justify-between mb-8">
         <div>Swap</div>
         <Dialog.CloseBtn onClick={onClose} />
@@ -25,27 +26,13 @@ const FormDialog = ({
       <div className="flex flex-col gap-4">
         <SendForm />
         <ReceiveForm />
-        <BtnPrimary
+        <BtnForm
           size="lg"
-          onClick={() => dispatchSwapState({ type: "OPEN_DIALOG_CONFIRM" })}
+          onClick={onSubmit}
           disabled={!swapState.form_state.isValid}
         >
-          {swapState.form_state.isValid ? (
-            "Swap"
-          ) : swapState.form_state.errors.amount?.type === "required" ||
-            swapState.form_state.errors.amount?.type ===
-              "isAmountGreaterThanZero" ? (
-            "Swap"
-          ) : (
-            <ErrorMessage
-              errors={swapState.form_state.errors}
-              name="amount"
-              render={({ message }) => (
-                <div className="text-sm font-normal">{message}</div>
-              )}
-            />
-          )}
-        </BtnPrimary>
+          {swapState.form_state.isValid ? "Swap" : <ErrorMessageBtnForm />}
+        </BtnForm>
       </div>
     </Dialog>
   );

@@ -67,14 +67,13 @@ const Dialog = ({
     <HeadlessUIDialog
       open={open}
       onClose={onClose}
-      unmount={true}
       transition
       className={clsx(
         "relative z-50",
         "transition duration-300 ease-in-out data-[closed]:opacity-0"
       )}
     >
-      <DialogBackdrop className="fixed inset-0 bg-black/60 backdrop-blur-[2px]" />
+      <DialogBackdrop className="fixed inset-0 bg-black/60" />
       <div
         className={clsx(
           "fixed inset-0",

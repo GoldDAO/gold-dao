@@ -132,9 +132,10 @@ const Buy = () => {
       dispatch({
         type: "SET_PRICE_DATA",
         value: {
-          slippage: price.data.slippage,
-          txs: price.data.txs,
-          receive_token_amount: price.data.receive_amount,
+          slippage_with_tx_fee: price.data.slippage_with_tx_fee,
+          slippage_without_tx_fee: price.data.slippage_without_tx_fee,
+          network_fee: price.data.network_fee,
+          lp_fee: price.data.lp_fee,
         },
       });
     }
