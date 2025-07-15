@@ -4,7 +4,6 @@ import {
   GLDT_LEDGER_CANISTER_ID_IC,
   MAX_SWAP_SLIPPAGE,
 } from "@constants";
-import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 import { Token, PayToken, ReceiveToken } from "@buy/shared/utils";
 
 type BuyGLDTState = {
@@ -67,9 +66,10 @@ const reducer = (
     | {
         type: "SET_PRICE_DATA";
         value: {
-          slippage: number;
-          txs: Array<SwapAmountsTxReply>;
-          receive_token_amount: bigint;
+          slippage_without_tx_fee: number;
+          slippage_with_tx_fee: number;
+          network_fee: bigint;
+          lp_fee: bigint;
         };
       }
     | {
@@ -110,22 +110,16 @@ const reducer = (
         },
       };
     case "SET_PRICE_DATA": {
-      const { txs, receive_token_amount, slippage } = action.value;
-      const network_fee = txs.reduce((acc, tx) => acc + tx.gas_fee, 0n);
-      const lp_fee = txs.reduce((acc, tx) => acc + tx.lp_fee, 0n);
-
-      const ideal_amount = Number(receive_token_amount) / (1 - slippage / 100);
-      const real_amount_of_gldt_without_tx_fee = Number(
-        receive_token_amount + network_fee
-      );
-      const slippage_without_tx_fee =
-        ((ideal_amount - real_amount_of_gldt_without_tx_fee) / ideal_amount) *
-        100;
-
+      const {
+        network_fee,
+        lp_fee,
+        slippage_with_tx_fee,
+        slippage_without_tx_fee,
+      } = action.value;
       return {
         ...prev,
         slippage_without_tx_fee,
-        slippage_with_tx_fee: slippage,
+        slippage_with_tx_fee,
         network_fee,
         lp_fee,
       };

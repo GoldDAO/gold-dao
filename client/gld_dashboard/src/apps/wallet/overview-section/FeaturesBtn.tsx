@@ -9,7 +9,7 @@ import {
   SendTokenStateAtom,
 } from "@wallet/shared/atoms/TransferTokenAtom";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
-// import { SwapStateReducerAtom } from "@wallet/swap/atoms";
+import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import TransferDialogToken from "@wallet/transfer-token";
 import MintNFT from "@advanced/gldt/overview-section/mint-nft";
 import BurnNFT from "@advanced/gldt/overview-section/burn-nft";
@@ -23,7 +23,7 @@ const FeaturesBtn = () => {
   const setTransferTokenState = useSetAtom(TransferTokenStateAtom);
   const setSendTokenState = useSetAtom(SendTokenStateAtom);
   const [, dispatchTransferNFT] = useAtom(TransferNFTStateReducerAtom);
-  // const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
+  const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
   const handleOpenTransferTokenDialog = () => {
     setSendTokenState(RESET);
@@ -33,12 +33,12 @@ const FeaturesBtn = () => {
     }));
   };
 
-  // const onOpenSwap = () => {
-  //   dispatchSwapState({
-  //     type: "OPEN_DIALOG_FORM",
-  //     value: { token_from: token },
-  //   });
-  // };
+  const onOpenSwap = () => {
+    dispatchSwapState({
+      type: "OPEN_DIALOG_FORM",
+      value: { token_from: token },
+    });
+  };
 
   const renderTokenAction = () => {
     if (searchParams.get("token") === "gldnft") {
@@ -70,7 +70,7 @@ const FeaturesBtn = () => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
             <AppFeatureBtn
               action="burn-nft"
               handleOnClick={() => navigate("/advanced/gldt")}
@@ -88,7 +88,7 @@ const FeaturesBtn = () => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
             <AppFeatureBtn
               action="govern"
               handleOnClick={() => navigate("/govern")}
@@ -102,7 +102,7 @@ const FeaturesBtn = () => {
               action="transfer"
               handleOnClick={handleOpenTransferTokenDialog}
             />
-            {/* <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} /> */}
+            <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
           </>
         );
       }
