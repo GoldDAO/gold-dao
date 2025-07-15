@@ -4,9 +4,10 @@ import { Token, TOKENS } from "@shared/utils/tokens";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import ListboxToken from "@wallet/swap/components/form-dialog/listbox-token";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import BalanceAvailable from "../balance-available";
+import BalanceAvailable from "../../../../../../shared/components/BalanceAvailable";
 import SendAmountInput from "./send-amount-input";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import MaxButton from "@shared/components/MaxButton";
 
 const SendForm = () => {
   const { unauthenticatedAgent, principalId } = useAuth();
@@ -26,13 +27,11 @@ const SendForm = () => {
     dispatchSwapState({ type: "SET_TOKEN_FROM", value: selectedToken });
   };
 
-  const onClickMaxBalance = () => {
-    if (balance.isSuccess && balance.data.balance > balance.data.fee) {
-      dispatchSwapState({
-        type: "SET_SEND_AMOUNT",
-        value: (balance.data.balance - balance.data.fee).toString(),
-      });
-    }
+  const onClickMaxBalance = (amount: string) => {
+    dispatchSwapState({
+      type: "SET_SEND_AMOUNT",
+      value: amount,
+    });
   };
 
   return (
@@ -70,19 +69,15 @@ const SendForm = () => {
         </div>
       </div>
       <div className="flex justify-between items-center">
-        <BalanceAvailable token={swapState.token_from.token} />
-        <button
-          onClick={onClickMaxBalance}
-          type="button"
-          className="rounded-md py-1 px-2 bg-surface-primary text-content/60 border border-border text-xs disabled:cursor-not-allowed cursor-pointer"
-          data-tooltip-id="tooltip"
-          data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
-          disabled={
-            !balance.isSuccess || balance.data.balance <= balance.data.fee
-          }
-        >
-          Max
-        </button>
+        <BalanceAvailable
+          token={swapState.token_from.token.name}
+          balance={balance.data?.balance}
+        />
+        <MaxButton
+          balance={balance.data?.balance}
+          fee={balance.data?.fee}
+          handleOnClick={(amount) => onClickMaxBalance(amount)}
+        />
       </div>
     </div>
   );

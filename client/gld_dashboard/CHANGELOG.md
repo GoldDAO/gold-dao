@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.0.7] - 2025-07-15
+
+#### Added
+
+- Swap tokens feature on wallet view
+- Set max balance button on Buy GLDT view
+
+#### Changed
+
+- Minor UI fix & improvements
+
 ### [2.0.6] - 2025-07-11
 
 #### Changed
