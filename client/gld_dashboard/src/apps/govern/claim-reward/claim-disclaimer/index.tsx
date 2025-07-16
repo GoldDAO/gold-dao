@@ -82,7 +82,11 @@ const ClaimRewardDisclaimer = () => {
                     <div className="font-semibold text-xl">
                       Total of:{" "}
                       <span>
-                        <NumberToLocaleString value={totalRewards} />$
+                        <NumberToLocaleString
+                          value={totalRewards}
+                          decimals={5}
+                        />
+                        $
                       </span>
                     </div>
                     <div className="text-sm text-content/60">

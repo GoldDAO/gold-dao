@@ -1,50 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { Buffer } from "buffer";
-import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { useQueryClient } from "@tanstack/react-query";
-
 import { idlFactory } from "../idlFactory";
-
-import { Response } from "../interfaces";
-
-type RewardArgs = { token: string; neuron_id: string };
-type RewardsArgs = { token: string; neuron_ids: string[] };
-
-const claim_reward = async (
-  actor: ActorSubclass,
-  args: RewardArgs
-): Promise<boolean> => {
-  const { neuron_id, token } = args;
-
-  const result = (await actor.claim_reward({
-    token: token,
-    neuron_id: { id: [...Uint8Array.from(Buffer.from(neuron_id, "hex"))] },
-  })) as Response;
-
-  if ("Ok" in result) {
-    return result.Ok;
-  } else {
-    if ("NeuronHotKeyAbsent" in result) {
-      throw new Error("NeuronHotKeyAbsent");
-    } else if ("TokenSymbolInvalid" in result) {
-      throw new Error(`TokenSymbolInvalid! ${result.TokenSymbolInvalid}`);
-    } else if ("NeuronNotClaimed" in result) {
-      throw new Error("NeuronNotClaimed");
-    } else if ("NeuronOwnerInvalid" in result) {
-      throw new Error("NeuronOwnerInvalid");
-    } else if ("NeuronHotKeyInvalid" in result) {
-      throw new Error("NeuronHotKeyInvalid");
-    } else if ("TransferFailed" in result) {
-      throw new Error(`TransferFailed! ${result.TransferFailed}`);
-    } else if ("NeuronDoesNotExist" in result) {
-      throw "NeuronDoesNotExist";
-    } else if ("InternalError" in result) {
-      throw new Error(`InternalError! ${result.InternalError}`);
-    }
-    throw new Error("Unexpected error");
-  }
-};
+import claim_rewards_batch from "../claim_rewards_batch";
 
 const useClaimReward = (
   canisterId: string,
@@ -52,24 +11,29 @@ const useClaimReward = (
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ neuron_ids, token }: RewardsArgs) => {
+    mutationFn: async ({
+      claim_reward_args,
+    }: {
+      claim_reward_args: { neuron_id: string; token: string }[];
+    }) => {
       try {
         const actor = Actor.createActor(idlFactory, {
           agent,
           canisterId,
         });
 
-        await Promise.all(
-          neuron_ids.map(async (neuron_id) => {
-            return claim_reward(actor, {
-              neuron_id,
-              token,
-            });
-          })
+        await claim_rewards_batch(
+          actor,
+          claim_reward_args.map(({ neuron_id, token }) => ({
+            neuron_id: {
+              id: [...Uint8Array.from(Buffer.from(neuron_id, "hex"))],
+            },
+            token,
+          }))
         );
       } catch (err) {
         console.error(err);
-        throw new Error(`Claim reward error! Please retry later.`);
+        throw new Error(`Claim rewards error! Please retry later.`);
       }
     },
     onError: (err) => {

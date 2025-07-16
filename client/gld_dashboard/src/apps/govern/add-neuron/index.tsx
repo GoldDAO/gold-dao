@@ -7,7 +7,7 @@ import Icon from "@shared/ui/icons";
 
 const Card = ({ step, children }: { step: number; children: ReactNode }) => {
   return (
-    <div className="flex items-center gap-4 bg-surface-secondary border border-border rounded-md p-4">
+    <div className="flex items-center gap-4 bg-surface-secondary border border-border rounded-xl p-4">
       <div className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-primary text-gold border border-gold shrink-0">
         {step}
       </div>
@@ -35,7 +35,7 @@ const AddNeuron = ({
 
   return (
     <Dialog open={open} handleOnClose={handleClose}>
-      <div className="mt-4 mb-6 px-4 xl:px-8">
+      <div className="mb-6">
         <div className="text-center mb-2 text-4xl xl:text-5xl">
           Add <span className="font-semibold text-gold">Neuron</span>
         </div>
