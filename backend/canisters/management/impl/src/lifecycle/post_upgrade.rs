@@ -5,9 +5,8 @@ pub use management_api_canister::Args;
 use stable_memory::get_reader;
 use tracing::info;
 
-use crate::{
-    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
-};
+use crate::{memory::get_upgrades_memory, state::RuntimeState};
+// use crate::migrations::types::state::RuntimeStateV0;
 
 use super::init_canister;
 

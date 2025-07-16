@@ -1,23 +1,29 @@
-use candid::{Encode, Nat, Principal};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
-use gldt_stake_api_canister::claim_reward;
-use gldt_stake_common::stake_position::ClaimRewardErrors;
-use icrc_ledger_types::icrc1::account::Account;
-use std::time::Duration;
-
-use crate::client::gldt_stake::{claim_reward, get_active_user_positions};
+use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::get_position;
+use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::*;
 use crate::client::pocket::unwrap_response;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
+use crate::utils::wait_1_day;
 use crate::{
     client::icrc1::client::balance_of, gldt_stake_suite::setup::default_test_setup,
     utils::tick_n_blocks,
 };
+use assert_matches::assert_matches;
+use candid::{Encode, Nat, Principal};
+use canister_time::HOUR_IN_MS;
+use gldt_stake_api_canister::manage_stake_position;
+use gldt_stake_common::manage_stake_position_interface::GeneralError;
+use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;
+use icrc_ledger_types::icrc1::account::Account;
+use std::time::Duration;
+use types::TokenSymbol;
 
 #[test]
 fn test_can_claim_gldt_stake_rewards() {
+    // --- Setup test environment ---
     let mut test_env = default_test_setup();
-
     let GldtStakeTestEnv {
         ref mut pic,
         controller,
@@ -28,25 +34,22 @@ fn test_can_claim_gldt_stake_rewards() {
         ledger_fees,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
+    let goldao_ledger = token_ledgers.get("goldao_ledger_canister_id").unwrap();
+    let goldao_tx_fee = ledger_fees.get("GOLDAO").unwrap();
 
-    // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user_0, stake_position) = create_stake_position_util(
-        pic_borrowed,
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
 
-    // ---------------------------------------
-    //              W E E K   0
-    // ---------------------------------------
-    // wait for reward allocation to process
-    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
-
+    // --- Add rewards to neurons ---
     add_rewards_to_neurons(
-        pic_borrowed,
+        pic,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -54,152 +57,124 @@ fn test_can_claim_gldt_stake_rewards() {
         gldt_stake_canister_id,
         ledger_fees.clone(),
     );
+    wait_1_day(pic);
+    wait_1_day(pic);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 100);
 
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
+    let unallocated_rewards =
+        unallocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Unallocated rewards balance: {:?}", unallocated_rewards);
 
-    let user_0_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    user_0_positions
-        .get(0)
-        .unwrap()
+    let processing_rewards =
+        processing_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Processing rewards balance: {:?}", processing_rewards);
+
+    let allocated_rewards =
+        allocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Allocated rewards balance: {:?}", allocated_rewards);
+
+    // --- Check that the rewards are available for the user ---
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let rewards = &user_position.claimable_rewards;
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+
+    pic.advance_time(Duration::from_secs(2));
+    tick_n_blocks(pic, 50);
+
+    // --- Claim rewards ---
+    let expected_reward = user_position
         .claimable_rewards
-        .iter()
-        .for_each(|(_, reward)| {
-            assert_eq!(reward, &Nat::from(1_000_000_000_000u64)); // 10,000 of each token type
-        });
-    let position_id = user_0_positions.get(0).unwrap().id;
-
-    // claim rewards
-    let goldao_ledger = token_ledgers.get("goldao_ledger_canister_id").unwrap();
-    let goldao_tx_fee = ledger_fees.get("GOLDAO").unwrap();
-    let expected_reward = user_0_positions
-        .get(0)
-        .unwrap()
-        .claimable_rewards
-        .get("GOLDAO")
+        .get(&TokenSymbol::GOLDAO)
         .unwrap()
         .clone()
         - goldao_tx_fee.clone();
-
-    let res = claim_reward(
-        pic_borrowed,
-        user_0,
-        gldt_stake_canister_id,
-        &gldt_stake_api_canister::claim_reward::Args {
-            id: position_id,
-            token: "GOLDAO".to_string(),
+    let res = manage_stake_position(
+        pic,
+        user,
+        gldt_stake_canister_id.clone(),
+        &manage_stake_position::Args::ClaimRewards {
+            tokens: vec![TokenSymbol::GOLDAO],
         },
     )
     .unwrap();
 
+    // --- Check result of claim rewards ---
     assert_eq!(
-        res.claimable_rewards.get("GOLDAO").unwrap(),
+        res.claimable_rewards.get(&TokenSymbol::GOLDAO).unwrap(),
         &Nat::from(0u64)
     );
     let user_goldao_balance = balance_of(
-        pic_borrowed,
+        pic,
         goldao_ledger.clone(),
         Account {
-            owner: user_0,
+            owner: user,
             subaccount: None,
         },
     );
     assert_eq!(user_goldao_balance, expected_reward);
 
-    // get user position to double check it was saved to state
-    let position = get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None)
-        .get(0)
+    // --- Doublecheck that the state contains the updated stake position ---
+    let position = get_position(pic, user, gldt_stake_canister_id, &())
         .unwrap()
         .clone();
     assert_eq!(
-        position.claimable_rewards.get("GOLDAO").unwrap().clone(),
+        position
+            .claimable_rewards
+            .get(&TokenSymbol::GOLDAO)
+            .unwrap()
+            .clone(),
         Nat::from(0u64)
     );
+
+    let total_allocated_rewards =
+        get_total_allocated_rewards(pic, user, gldt_stake_canister_id, &());
+    println!("total_allocated_rewards: {:?}", total_allocated_rewards);
 }
 
 #[test]
 fn test_claim_rewards_guards_as_anonymous_principal() {
+    // --- Setup test environment ---
     let mut test_env = default_test_setup();
-
     let GldtStakeTestEnv {
         ref mut pic,
         controller,
-        token_ledgers,
         gldt_stake_canister_id,
-        gld_rewards_canister_id,
-        neuron_data,
-        ledger_fees,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
-    // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user_0, stake_position) = create_stake_position_util(
-        pic_borrowed,
+    let _ = _add_whitelisted_principal(
+        pic,
         controller,
-        &token_ledgers,
         gldt_stake_canister_id,
-        1_000_000_000u128,
+        &vec![Principal::anonymous()],
     );
 
-    // ---------------------------------------
-    //              W E E K   0
-    // ---------------------------------------
-    // wait for reward allocation to process
-    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
-
-    add_rewards_to_neurons(
-        pic_borrowed,
-        neuron_data.clone(),
-        controller,
-        &token_ledgers,
-        gld_rewards_canister_id,
-        gldt_stake_canister_id,
-        ledger_fees.clone(),
-    );
-
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
-
-    let user_0_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    user_0_positions
-        .get(0)
-        .unwrap()
-        .claimable_rewards
-        .iter()
-        .for_each(|(_, reward)| {
-            assert_eq!(reward, &Nat::from(1_000_000_000_000u64)); // 10,000 of each token type
-        });
-    let position_id = user_0_positions.get(0).unwrap().id;
-
-    // test annoymous principal - should error
-    let res = claim_reward(
-        pic_borrowed,
+    // --- Check that calls with anonymous callers are rejected ---
+    let res = manage_stake_position(
+        pic,
         Principal::anonymous(),
-        gldt_stake_canister_id,
-        &gldt_stake_api_canister::claim_reward::Args {
-            id: position_id,
-            token: "GOLDAO".to_string(),
+        gldt_stake_canister_id.clone(),
+        &manage_stake_position::Args::ClaimRewards {
+            tokens: vec![TokenSymbol::GOLDAO],
         },
     );
 
-    assert_eq!(
-        matches!(res, Err(ClaimRewardErrors::InvalidPrincipal(_))),
-        true
+    assert_matches!(
+        res,
+        Err(ManageStakePositionError::GeneralError(
+            GeneralError::InvalidPrincipal(_)
+        ))
     );
 }
 
 #[test]
-// #[should_panic]
-fn test_claim_rewards_after_successful_claim() {
+fn test_claim_rewards_twice() {
+    // --- Setup test environment ---
     let mut test_env = default_test_setup();
-
     let GldtStakeTestEnv {
         ref mut pic,
         controller,
@@ -210,25 +185,19 @@ fn test_claim_rewards_after_successful_claim() {
         ledger_fees,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
-    // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user_0, stake_position) = create_stake_position_util(
-        pic_borrowed,
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
-        1_000_000_000u128,
+        1_000_000_000_u128,
     );
 
-    // ---------------------------------------
-    //              W E E K   0
-    // ---------------------------------------
-    // wait for reward allocation to process
-    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
-
     add_rewards_to_neurons(
-        pic_borrowed,
+        pic,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -237,53 +206,41 @@ fn test_claim_rewards_after_successful_claim() {
         ledger_fees.clone(),
     );
 
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
+    wait_1_day(pic);
+    wait_1_day(pic);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 10);
 
-    let user_0_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    user_0_positions
-        .get(0)
-        .unwrap()
-        .claimable_rewards
-        .iter()
-        .for_each(|(_, reward)| {
-            assert_eq!(reward, &Nat::from(1_000_000_000_000u64)); // 10,000 of each token type
-        });
-    let position_id = user_0_positions.get(0).unwrap().id;
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let rewards = &user_position.claimable_rewards;
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
 
-    let _ = claim_reward(
-        pic_borrowed,
-        user_0,
+    let _res = manage_stake_position(
+        pic,
+        user,
         gldt_stake_canister_id,
-        &gldt_stake_api_canister::claim_reward::Args {
-            id: position_id,
-            token: "GOLDAO".to_string(),
+        &manage_stake_position::Args::ClaimRewards {
+            tokens: vec![TokenSymbol::GOLDAO],
         },
     );
-    let res = claim_reward(
-        pic_borrowed,
-        user_0,
+    let res = manage_stake_position(
+        pic,
+        user,
         gldt_stake_canister_id,
-        &gldt_stake_api_canister::claim_reward::Args {
-            id: position_id,
-            token: "GOLDAO".to_string(),
+        &manage_stake_position::Args::ClaimRewards {
+            tokens: vec![TokenSymbol::GOLDAO],
         },
     );
 
-    assert_eq!(
-        matches!(res, Err(ClaimRewardErrors::TokenImbalance(_))),
-        true
-    );
+    assert_matches!(res, Err(ManageStakePositionError::ClaimRewardError(_)));
 }
 
 #[test]
-// #[should_panic]
-fn test_claim_rewards_duplicate_calls_should_fail() {
+fn test_claim_rewards_concurrent_calls_should_fail() {
+    // --- Setup test environment ---
     let mut test_env = default_test_setup();
-
     let GldtStakeTestEnv {
         ref mut pic,
         controller,
@@ -294,25 +251,19 @@ fn test_claim_rewards_duplicate_calls_should_fail() {
         ledger_fees,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
-    // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user_0, stake_position) = create_stake_position_util(
-        pic_borrowed,
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
         1_000_000_000u128,
     );
 
-    // ---------------------------------------
-    //              W E E K   0
-    // ---------------------------------------
-    // wait for reward allocation to process
-    // 10,000 GOLDAO, OGY and ICP will be given to user_0 because that is the only position available to allocate rewards to.
-
     add_rewards_to_neurons(
-        pic_borrowed,
+        pic,
         neuron_data.clone(),
         controller,
         &token_ledgers,
@@ -321,62 +272,70 @@ fn test_claim_rewards_duplicate_calls_should_fail() {
         ledger_fees.clone(),
     );
 
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
+    wait_1_day(pic);
+    wait_1_day(pic);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 10);
 
-    let user_0_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    user_0_positions
-        .get(0)
-        .unwrap()
-        .claimable_rewards
-        .iter()
-        .for_each(|(_, reward)| {
-            assert_eq!(reward, &Nat::from(1_000_000_000_000u64)); // 10,000 of each token type
-        });
-    let position_id = user_0_positions.get(0).unwrap().id;
+    let unallocated_rewards =
+        unallocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Unallocated rewards balance: {:?}", unallocated_rewards);
 
-    let message_id_1 = pic_borrowed
+    let processing_rewards =
+        processing_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Processing rewards balance: {:?}", processing_rewards);
+
+    let allocated_rewards =
+        allocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Allocated rewards balance: {:?}", allocated_rewards);
+
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let rewards = &user_position.claimable_rewards;
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+
+    // --- Create two parallel calls for one position ---
+    let message_id_1 = pic
         .submit_call(
             gldt_stake_canister_id,
-            user_0,
-            "claim_reward",
-            Encode!(&gldt_stake_api_canister::claim_reward::Args {
-                id: position_id,
-                token: "GOLDAO".to_string(),
+            user,
+            "manage_stake_position",
+            Encode!(&manage_stake_position::Args::ClaimRewards {
+                tokens: vec![TokenSymbol::GOLDAO],
             })
             .unwrap(),
         )
         .unwrap();
-    let message_id_2 = pic_borrowed
+    let message_id_2 = pic
         .submit_call(
             gldt_stake_canister_id,
-            user_0,
-            "claim_reward",
-            Encode!(&gldt_stake_api_canister::claim_reward::Args {
-                id: position_id,
-                token: "GOLDAO".to_string(),
+            user,
+            "manage_stake_position",
+            Encode!(&manage_stake_position::Args::ClaimRewards {
+                tokens: vec![TokenSymbol::GOLDAO],
             })
             .unwrap(),
         )
         .unwrap();
 
-    let res_1 = pic_borrowed.await_call(message_id_1);
-    let res_1: claim_reward::Response = unwrap_response(res_1);
+    let res_1 = pic.await_call(message_id_1);
+    let res_1: manage_stake_position::Response = unwrap_response(res_1);
 
-    let res_2 = pic_borrowed.await_call(message_id_2);
-    let res_2: claim_reward::Response = unwrap_response(res_2);
+    let res_2 = pic.await_call(message_id_2);
+    let res_2: manage_stake_position::Response = unwrap_response(res_2);
 
     println!("{res_1:?}");
     println!("{res_2:?}");
 
+    // --- Check that one of the calls is rejected ---
     match res_1 {
         Ok(_) => {
-            assert_eq!(
-                matches!(res_2, Err(ClaimRewardErrors::AlreadyProcessing(_))),
-                true
+            assert_matches!(
+                res_2,
+                Err(ManageStakePositionError::GeneralError(
+                    GeneralError::AlreadyProcessing(_)
+                ))
             );
         }
         Err(_) => {

@@ -5,6 +5,7 @@ pub use buyback_burn_api::update_config::Response as UpdateConfigResponse;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::{query, update};
 use std::time::Duration;
+use utils::numeric::Percentage;
 
 #[query(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
@@ -20,11 +21,10 @@ fn update_config(args: UpdateConfigArgs) -> UpdateConfigResponse {
 
 fn update_config_impl(args: UpdateConfigArgs, state: &mut RuntimeState) -> UpdateConfigResponse {
     if let Some(burn_rate) = args.burn_rate {
-        if burn_rate > 100 {
-            return UpdateConfigResponse::InvalidBurnRate;
-        } else {
-            state.data.burn_config.burn_rate = burn_rate;
-        }
+        state.data.burn_config.burn_percentage = match Percentage::new(burn_rate) {
+            Ok(percentage) => percentage,
+            Err(_) => return UpdateConfigResponse::InvalidBurnRate,
+        };
     }
     if let Some(min_burn_amount) = args.min_burn_amount {
         state.data.burn_config.min_burn_amount = min_burn_amount;

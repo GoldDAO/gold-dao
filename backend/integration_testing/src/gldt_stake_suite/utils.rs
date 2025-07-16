@@ -1,25 +1,103 @@
 use std::{collections::HashMap, time::Duration};
 
+use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::manage_stake_position;
 use assert_matches::assert_matches;
 use candid::{Nat, Principal};
 use canister_time::MINUTE_IN_MS;
-use gldt_stake_api_canister::create_stake_position;
-use gldt_stake_common::{
-    ledgers::GLDT_TX_FEE,
-    stake_position::{StakePositionId, StakePositionResponse},
-};
+use gldt_stake_api_canister::manage_stake_position;
+use gldt_stake_common::ledgers::GLDT_TX_FEE;
+use gldt_stake_common::stake_position_response::StakePositionResponse;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::Neuron;
 
 use crate::{
     client::{
-        gldt_stake::{create_stake_position, unstake_early},
         icrc1::client::{balance_of, transfer},
         icrc1_icrc2_token::icrc2_approve,
     },
     utils::{random_principal, tick_n_blocks},
 };
+
+// Helper function to create a user, whitelist, and fund account
+pub fn create_whitelisted_user_with_funds(
+    pic: &PocketIc,
+    controller: candid::Principal,
+    gldt_stake_canister_id: candid::Principal,
+    gldt_ledger_id: &candid::Principal,
+    amount: u128,
+) -> candid::Principal {
+    let user = random_principal();
+    let user_account = Account {
+        owner: user,
+        subaccount: None,
+    };
+
+    _add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user])
+        .expect("Failed to add whitelisted principal");
+
+    let _ = transfer(
+        pic,
+        controller,
+        gldt_ledger_id.clone(),
+        None,
+        user_account,
+        amount,
+    );
+
+    let balance = balance_of(pic, gldt_ledger_id.clone(), user_account);
+    assert_eq!(balance, Nat::from(amount));
+
+    user
+}
+
+/// Approves the given amount + TX fee and calls manage_stake_position::AddStake
+pub fn add_stake(
+    pic: &PocketIc,
+    user: Principal,
+    gldt_ledger_id: &Principal,
+    gldt_stake_canister_id: Principal,
+    amount: u128,
+) -> manage_stake_position::Response {
+    // --- Approve stake amount for spender (gldt_stake_canister) ---
+    let total_approval = amount + GLDT_TX_FEE as u128;
+    let approval_result = icrc2_approve(
+        pic,
+        user,
+        gldt_ledger_id.clone(),
+        &icrc2_approve::Args {
+            from_subaccount: None,
+            spender: Account {
+                owner: gldt_stake_canister_id,
+                subaccount: None,
+            },
+            amount: Nat::from(total_approval),
+            expected_allowance: Some(Nat::from(0u64)),
+            expires_at: None,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+        },
+    );
+    println!("Approval result: {:?} for user: {}", approval_result, user);
+    assert!(matches!(approval_result, icrc2_approve::Response::Ok(_)));
+
+    // Advance blocks after approval
+    tick_n_blocks(pic, 2);
+
+    // --- Perform stake operation ---
+    let response = manage_stake_position(
+        pic,
+        user,
+        gldt_stake_canister_id,
+        &manage_stake_position::Args::AddStake {
+            amount: Nat::from(total_approval),
+        },
+    );
+
+    response
+}
 
 pub fn create_stake_position_util(
     pic: &PocketIc,
@@ -31,6 +109,9 @@ pub fn create_stake_position_util(
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     let user_1 = random_principal();
+
+    _add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user_1])
+        .expect("Failed to add whitelisted principal");
 
     let _ = transfer(
         pic,
@@ -78,11 +159,11 @@ pub fn create_stake_position_util(
     tick_n_blocks(pic, 3);
 
     // create the stake position
-    let res = create_stake_position(
+    let res = manage_stake_position(
         pic,
         user_1,
         gldt_stake_canister_id.clone(),
-        &create_stake_position::Args {
+        &manage_stake_position::Args::AddStake {
             amount: Nat::from(stake_amount + GLDT_TX_FEE as u128),
         },
     )
@@ -149,37 +230,35 @@ pub fn create_stake_position_util_for_user(
     tick_n_blocks(pic, 3);
 
     // create the stake position
-    let res = create_stake_position(
+    let res = manage_stake_position(
         pic,
         user_1,
         gldt_stake_canister_id.clone(),
-        &create_stake_position::Args {
+        &manage_stake_position::Args::AddStake {
             amount: Nat::from(stake_amount + GLDT_TX_FEE as u128),
         },
     )
     .unwrap();
-    assert_eq!(res.staked, Nat::from(stake_amount));
-    assert_eq!(res.age_bonus_multiplier, 1.0);
     tick_n_blocks(pic, 1);
 
     (user_1, res)
 }
 
-pub fn create_multiple_early_unstaked_positions(
+pub fn create_multiple_instantly_dissolved_positions(
     pic: &PocketIc,
     controller: Principal,
     token_ledgers: &HashMap<String, Principal>,
     gldt_stake_canister_id: Principal,
     num_users: usize,
     num_positions_per_user: usize,
-) -> Vec<(Principal, Vec<StakePositionId>)> {
+) -> Vec<(Principal, Vec<StakePositionResponse>)> {
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let mut return_data: Vec<(Principal, Vec<StakePositionId>)> = vec![];
+    let mut return_data: Vec<(Principal, Vec<StakePositionResponse>)> = vec![];
 
     for user_index in 0..num_users {
         let user_principal = random_principal();
         println!("user prin : {user_principal}");
-        let mut positions: Vec<StakePositionId> = vec![];
+        let mut user_positions: Vec<StakePositionResponse> = vec![];
         for position_index in 0..num_positions_per_user {
             let (user, stake_position) = create_stake_position_util_for_user(
                 pic,
@@ -189,15 +268,19 @@ pub fn create_multiple_early_unstaked_positions(
                 1_000_000_000u128,
                 user_principal,
             );
-            let position_id = stake_position.id;
 
-            let res = unstake_early(pic, user_principal, gldt_stake_canister_id, &position_id);
+            let res = manage_stake_position(
+                pic,
+                user_principal,
+                gldt_stake_canister_id.clone(),
+                &manage_stake_position::Args::DissolveInstantly { fraction: 100 },
+            );
             tick_n_blocks(pic, 5);
             assert_matches!(res, Ok(_));
-            positions.push(position_id);
+            user_positions.push(res.unwrap());
             pic.advance_time(Duration::from_millis(MINUTE_IN_MS));
         }
-        return_data.push((user_principal, positions));
+        return_data.push((user_principal, user_positions));
     }
     return_data
 }
@@ -294,8 +377,98 @@ pub fn add_rewards_to_neurons(
         );
     });
 
-    // 2 neurons each with 5000 of each token meaning a total reward of 10,000 tokens per reward token type
-    // 10k ICP,
-    // 10k ogy
-    // 10K GOLDAO
+    pic.advance_time(Duration::from_secs(60));
+    tick_n_blocks(pic, 100);
 }
+
+use crate::client::icrc1::icrc1_transfer;
+pub fn add_custom_rewards_to_processing_pool(
+    pic: &PocketIc,
+    controller: Principal,
+    token_ledgers: &HashMap<String, Principal>,
+    gldt_stake_canister_id: Principal,
+    ledger_fees: HashMap<String, Nat>,
+    per_token_amount: u128,
+) {
+    let goldao_ledger = token_ledgers
+        .get("goldao_ledger_canister_id")
+        .unwrap()
+        .clone();
+    let icp_ledger = token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    let ogy_ledger = token_ledgers.get("ogy_ledger_canister_id").unwrap().clone();
+
+    let goldao_fee: u128 = ledger_fees
+        .get("GOLDAO")
+        .unwrap()
+        .clone()
+        .0
+        .try_into()
+        .unwrap();
+    let icp_fee: u128 = ledger_fees
+        .get("ICP")
+        .unwrap()
+        .clone()
+        .0
+        .try_into()
+        .unwrap();
+    let ogy_fee: u128 = ledger_fees
+        .get("OGY")
+        .unwrap()
+        .clone()
+        .0
+        .try_into()
+        .unwrap();
+
+    let _ = icrc1_transfer(
+        pic,
+        controller,
+        goldao_ledger,
+        &(icrc1_transfer::Args {
+            from_subaccount: None,
+            to: Account {
+                owner: gldt_stake_canister_id,
+                subaccount: Some(PROCESSING_REWARDS_POOL),
+            },
+            fee: None,
+            created_at_time: None,
+            memo: None,
+            amount: (per_token_amount + goldao_fee).into(),
+        }),
+    );
+
+    let _ = icrc1_transfer(
+        pic,
+        controller,
+        icp_ledger,
+        &(icrc1_transfer::Args {
+            from_subaccount: None,
+            to: Account {
+                owner: gldt_stake_canister_id,
+                subaccount: Some(PROCESSING_REWARDS_POOL),
+            },
+            fee: None,
+            created_at_time: None,
+            memo: None,
+            amount: (per_token_amount + icp_fee).into(),
+        }),
+    );
+
+    let _ = icrc1_transfer(
+        pic,
+        controller,
+        ogy_ledger,
+        &(icrc1_transfer::Args {
+            from_subaccount: None,
+            to: Account {
+                owner: gldt_stake_canister_id,
+                subaccount: Some(PROCESSING_REWARDS_POOL),
+            },
+            fee: None,
+            created_at_time: None,
+            memo: None,
+            amount: (per_token_amount + ogy_fee).into(),
+        }),
+    );
+}
+
+use gldt_stake_common::accounts::PROCESSING_REWARDS_POOL;

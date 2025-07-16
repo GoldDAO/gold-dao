@@ -8,11 +8,11 @@ use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use tracing::error;
 use types::BuildVersion;
 use types::{Cycles, TimestampMillis, TokenInfo};
 use utils::env::{CanisterEnv, Environment};
 use utils::memory::MemorySize;
+use utils::numeric::Percentage;
 
 canister_state!(RuntimeState);
 
@@ -33,7 +33,7 @@ impl RuntimeState {
 
     pub fn get_config(&self) -> GetConfigResponse {
         GetConfigResponse {
-            burn_rate: self.data.burn_config.burn_rate,
+            burn_percentage: self.data.burn_config.burn_percentage,
             min_burn_amount: self.data.burn_config.min_burn_amount,
         }
     }
@@ -72,7 +72,7 @@ pub struct Data {
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct BurnConfig {
-    pub burn_rate: u8,
+    pub burn_percentage: Percentage,
     pub min_burn_amount: Tokens,
 }
 
@@ -80,18 +80,9 @@ impl BurnConfig {
     pub fn new(burn_rate: u8, min_burn_amount: Tokens) -> Self {
         BurnConfig {
             // Check if the burn rate is valid. Otherwise set 0
-            burn_rate: if burn_rate > 100 {
-                error!("Burn rate must be between 0 and 100");
-                0
-            } else {
-                burn_rate
-            },
+            burn_percentage: Percentage::new(burn_rate).unwrap_or(Percentage::default()),
             min_burn_amount,
         }
-    }
-
-    pub fn validate_burn_rate(&self) -> bool {
-        self.burn_rate > 0 && self.burn_rate <= 100
     }
 }
 
@@ -144,41 +135,4 @@ pub struct CanisterInfo {
     pub commit_hash: String,
     pub memory_used: MemorySize,
     pub cycles_balance: Cycles,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // Get the 100% of the min_burn_amount to know what the balance should be after swap (to have enough funds)
-    fn get_min_after_swap_amount(burn_config: BurnConfig) -> u128 {
-        let min_burn_amount = burn_config.min_burn_amount.e8s() as u128;
-        (min_burn_amount * 100) / (burn_config.burn_rate as u128)
-    }
-
-    #[test]
-    fn test_validate_burn_rate() {
-        let valid_burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
-        let invalid_burn_config_zero = BurnConfig::new(0, Tokens::from_e8s(100));
-        let invalid_burn_config_above_100 = BurnConfig::new(150, Tokens::from_e8s(100));
-
-        assert!(valid_burn_config.validate_burn_rate());
-        assert!(!invalid_burn_config_zero.validate_burn_rate());
-        assert!(!invalid_burn_config_above_100.validate_burn_rate());
-    }
-
-    #[test]
-    fn test_get_after_swap_amount() {
-        let burn_config = BurnConfig::new(50, Tokens::from_e8s(100));
-        assert_eq!(get_min_after_swap_amount(burn_config), 200);
-
-        let burn_config = BurnConfig::new(90, Tokens::from_e8s(900));
-        assert_eq!(get_min_after_swap_amount(burn_config), 1000);
-
-        let burn_config = BurnConfig::new(1, Tokens::from_e8s(1));
-        assert_eq!(get_min_after_swap_amount(burn_config), 100);
-
-        let burn_config = BurnConfig::new(33, Tokens::from_e8s(100));
-        assert_eq!(get_min_after_swap_amount(burn_config), 303);
-    }
 }

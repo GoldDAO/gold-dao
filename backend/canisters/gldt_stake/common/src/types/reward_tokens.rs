@@ -1,9 +1,6 @@
-use candid::{Nat, Principal};
+use candid::Nat;
 use std::collections::HashMap;
+use types::TokenSymbol;
 
-pub type RewardTokens = HashMap<String, Nat>;
-
-pub type TokenSymbol = String;
-pub type LedgerId = Principal;
-pub type LedgerFee = Nat;
-pub type RewardTypes = HashMap<TokenSymbol, (LedgerId, LedgerFee)>; // e.g GOLDAO -> (ledger_id, fee)
+pub type AllowedRewardTypes = Vec<TokenSymbol>;
+pub type RewardTokens = HashMap<TokenSymbol, Nat>;

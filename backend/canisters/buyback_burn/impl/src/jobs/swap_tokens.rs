@@ -1,8 +1,6 @@
 use crate::state::{mutate_state, read_state};
 use crate::types::{SwapClient, SwapClientEnum, TokenSwap};
-use crate::utils::{
-    calculate_percentage_of_amount, get_token_balance, retry_with_attempts, RETRY_DELAY,
-};
+use crate::utils::{get_token_balance, retry_with_attempts, RETRY_DELAY};
 use canister_time::{run_now_then_interval, NANOS_PER_MILLISECOND, WEEK_IN_MS};
 use canister_tracing_macros::trace;
 use futures::future::join_all;
@@ -18,11 +16,7 @@ pub const MEMO_SWAP: [u8; 7] = [0x4f, 0x43, 0x5f, 0x53, 0x57, 0x41, 0x50]; // OC
 
 pub fn start_job() {
     let buyback_interval = read_state(|s| s.data.buyback_interval);
-    if read_state(|s| s.data.burn_config.validate_burn_rate()) {
-        run_now_then_interval(buyback_interval, run);
-    } else {
-        error!("Burn rate is invalid. The job wouldn't start");
-    }
+    run_now_then_interval(buyback_interval, run);
 }
 
 pub fn run() {
@@ -338,8 +332,11 @@ fn extract_result<T>(subtask: &Option<Result<T, String>>) -> Option<&T> {
 
 pub async fn burn_amount_per_interval(input_token: TokenInfo) -> Result<u128, String> {
     if let Ok(available_amount) = get_token_balance(input_token.ledger_id).await {
-        let burn_rate = read_state(|s| s.data.burn_config.burn_rate);
-        let amount_per_week = calculate_percentage_of_amount(available_amount, burn_rate);
+        let burn_percentage = read_state(|s| s.data.burn_config.burn_percentage);
+        let burn_amount = burn_percentage.apply_to(&available_amount);
+
+        let amount_per_week = u128::try_from(burn_amount.0.clone())
+            .map_err(|_| "Burn amount too large to fit in u128".to_string())?;
         debug!("amount_per_week: {}", amount_per_week);
 
         let buyback_interval = read_state(|s| s.data.buyback_interval);

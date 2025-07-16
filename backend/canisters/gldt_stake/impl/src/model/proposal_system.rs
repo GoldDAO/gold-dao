@@ -1,18 +1,14 @@
-use std::collections::HashMap;
-
 use crate::state::{mutate_state, read_state};
 use canister_time::{timestamp_seconds, DAY_IN_SECONDS};
 use gldt_stake_common::proposals::VoteType;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{
     manage_neuron::{Command as ManageNeuronCommand, RegisterVote},
-    ListProposals, ManageNeuron, ProposalData, ProposalId,
+    manage_neuron_response::Command as ManageNeuronResponseCommand,
+    ListProposals, ManageNeuron, NeuronId, ProposalData, ProposalId,
 };
-use sns_governance_canister::types::{
-    manage_neuron_response::Command as ManageNeuronResponseCommand, NeuronId,
-};
-use tracing::{debug, info};
-use tracing::{error, warn};
+use std::collections::HashMap;
+use tracing::{debug, error, info, warn};
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct ProposalSystem {
@@ -94,82 +90,53 @@ async fn fetch_actionable_proposals() -> HashMap<NeuronId, Vec<ProposalData>> {
             .await
         {
             Ok(response) => {
-                ic_cdk::println!(
-                    "Received {} proposals from SNS governance canister",
-                    response.proposals.len()
-                );
-                ic_cdk::println!(
-                    "Proposals {:?} proposals from SNS governance canister",
-                    response.proposals
-                );
-
                 let number_of_received_proposals = response.proposals.len();
                 if (number_of_received_proposals as u32) == limit {
                     args.before_proposal = response.proposals.last().map_or_else(
                         || {
-                            ic_cdk::println!(
-                                "Last proposal not found to continue iterating. Stopping loop."
+                            error!(
+                                "PROCESS PROPOSALS :: last proposal not found to continue iterating.
+                                This should not be possible as the limits are checked. Stopping loop here."
                             );
                             None
                         },
                         |p| {
                             continue_scanning = true;
                             p.id
-                        },
+                        }
                     );
                 }
-
+                // pick out any proposal which hasn't been voted on by each controlled neuron
                 for p in response.proposals.iter() {
+                    // response.proposals.iter().for_each(|p| {
                     let p_id = match p.id {
                         Some(id) => id.id,
                         None => {
-                            ic_cdk::println!("Proposal ID not found for a proposal. Skipping.");
+                            error!("PROCESS PROPOSALS :: proposal id not found");
                             continue;
                         }
                     };
-
-                    ic_cdk::println!("Processing proposal ID: {:?}", p_id);
-                    ic_cdk::println!("Proposal ID {:?} has {} ballots", p_id, p.ballots.len());
-
+                    debug!("PROCESS PROPOSALS :: proposal id : {:?}", p_id);
                     p.ballots.iter().for_each(|(neuron_id_as_string, ballot)| {
                         if let Some(neuron_id) = NeuronId::new(neuron_id_as_string) {
                             if ballot.vote == 0 {
-                                ic_cdk::println!(
-                                    "Neuron ID {:?} has NOT voted on proposal ID {:?}",
-                                    neuron_id,
-                                    p_id
-                                );
-
                                 if !actionable_proposals_per_neuron.contains_key(&neuron_id) {
-                                    ic_cdk::println!(
-                                        "Neuron ID {:?} not in actionable list yet. Initializing entry.",
-                                        neuron_id
-                                    );
-                                    actionable_proposals_per_neuron.insert(neuron_id.clone(), vec![]);
+                                    actionable_proposals_per_neuron
+                                        .insert(neuron_id.clone(), vec![]);
                                 }
-
                                 if let Some(proposals) =
                                     actionable_proposals_per_neuron.get_mut(&neuron_id)
                                 {
-                                    ic_cdk::println!(
-                                        "Adding proposal ID {:?} to actionable list for neuron ID {:?}",
-                                        p_id,
-                                        neuron_id
-                                    );
                                     proposals.push(p.clone());
-                                } else {
-                                    ic_cdk::println!(
-                                        "Failed to get mutable proposals list for neuron ID {:?}",
-                                        neuron_id
-                                    );
                                 }
                             } else {
-                                ic_cdk::println!(
-                                    "Neuron ID {:?} has already voted on proposal ID {:?}",
-                                    neuron_id,
-                                    p.id
+                                // if we have already voted, we check if we already tracked the vote
+                                debug!(
+                                    "PROCESS PROPOSALS :: neuron id : {:?} has already voted on proposal id : {:?}",
+                                    neuron_id, p.id
                                 );
                                 if read_state(|s| s.data.proposal_system.get_neuron_vote_on_specific_proposal(&neuron_id, &p_id)).is_none() {
+                                    // if we have already voted on the proposal but we don't have it in our state, it means that we voted through an followee and we need to update our state accordingly
                                     mutate_state(|s| {
                                         s.data.proposal_system.insert_proposal(
                                             &neuron_id,
@@ -178,11 +145,9 @@ async fn fetch_actionable_proposals() -> HashMap<NeuronId, Vec<ProposalData>> {
                                             &VoteType::FolloweeVote,
                                         );
                                     });
-                                    ic_cdk::println!(
-                                        "Neuron ID {:?} has already voted on proposal ID {:?} with vote {:?} through followee.",
-                                        neuron_id,
-                                        p_id,
-                                        ballot.vote
+                                    info!(
+                                        "PROCESS PROPOSALS :: neuron id : {:?} has already voted on proposal id : {:?} with vote : {:?} through followee.",
+                                        neuron_id, p_id, ballot.vote
                                     );
                                 }
                             }
@@ -191,19 +156,13 @@ async fn fetch_actionable_proposals() -> HashMap<NeuronId, Vec<ProposalData>> {
                 }
             }
             Err(e) => {
-                ic_cdk::println!(
-                    "Failed to obtain all proposals data from SNS governance canister: {:?}",
+                error!(
+                    "SYNC proposals :: ERROR :: Failed to obtain all proposals data {:?}",
                     e
                 );
             }
         }
     }
-
-    ic_cdk::println!(
-        "Completed fetching actionable proposals. Total neurons with actionable proposals: {}",
-        actionable_proposals_per_neuron.len()
-    );
-
     actionable_proposals_per_neuron
 }
 
@@ -211,9 +170,9 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
     let sns_governance_canister_id = read_state(|s| s.data.goldao_sns_governance_canister_id);
 
     for (neuron_id, proposal_list) in actionable_proposals.iter() {
-        ic_cdk::println!("PROCESS PROPOSALS :: neuron id : {:?}", neuron_id);
+        debug!("PROCESS PROPOSALS :: neuron id : {:?}", neuron_id);
         for proposal_data in proposal_list.iter() {
-            ic_cdk::println!("PROCESS PROPOSALS :: proposal id : {:?}", proposal_data.id);
+            debug!("PROCESS PROPOSALS :: proposal id : {:?}", proposal_data.id);
 
             // is already time to vote?
             // we vote within the last day of the initial voting period
@@ -236,10 +195,11 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
             }
 
             // send the vote if we made it this far
-            ic_cdk::println!(
+            info!(
                 "PROCESS PROPOSALS, SENDING VOTE :: neuron id : {:?} proposal id : {:?} vote : {:?}",
                 neuron_id, proposal_data.id, vote
             );
+
             match sns_governance_canister_c2c_client::manage_neuron(
                 sns_governance_canister_id,
                 ManageNeuron {
@@ -256,7 +216,7 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
                     if let Some(command) = response.command {
                         match command {
                             ManageNeuronResponseCommand::RegisterVote(_) => {
-                                ic_cdk::println!("PROCESS PROPOSALS :: successfully voted :: neuron id : {:?} proposal id : {:?} vote : {:?}", neuron_id, proposal_data.id, vote);
+                                info!("PROCESS PROPOSALS :: successfully voted :: neuron id : {:?} proposal id : {:?} vote : {:?}", neuron_id, proposal_data.id, vote);
                                 mutate_state(|s| {
                                     s.data.proposal_system.insert_proposal(
                                         neuron_id,
@@ -267,13 +227,13 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
                                 });
                             }
                             ManageNeuronResponseCommand::Error(err) => {
-                                ic_cdk::println!(
+                                warn!(
                                     "PROCESS PROPOSALS :: Failed to vote on proposal {:?} with governance error {:?}",
                                     proposal_data.id, err
                                 );
                             }
                             _ => {
-                                ic_cdk::println!(
+                                error!(
                                     "PROCESS PROPOSALS :: unexpected error :: Failed to vote on proposal {:?} with error {:?}",
                                     proposal_data.id, command
                                 );
@@ -282,10 +242,9 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
                     }
                 }
                 Err(e) => {
-                    ic_cdk::println!(
+                    error!(
                         "PROCESS PROPOSALS :: Failed to vote on proposal {:?} with error {:?}",
-                        proposal_data.id,
-                        e
+                        proposal_data.id, e
                     );
                 }
             }
@@ -294,15 +253,11 @@ async fn vote_if_eligible(actionable_proposals: HashMap<NeuronId, Vec<ProposalDa
 }
 
 pub async fn process_proposals() {
-    ic_cdk::println!("PROCESS PROPOSALS :: start");
+    info!("PROCESS PROPOSALS :: start");
 
     let actionable_proposals = fetch_actionable_proposals().await;
-    ic_cdk::println!(
-        "PROCESS PROPOSALS :: actionable proposals : {:?}",
-        actionable_proposals
-    );
 
     vote_if_eligible(actionable_proposals).await;
 
-    ic_cdk::println!("PROCESS PROPOSALS :: proposals successfully processed");
+    info!("PROCESS PROPOSALS :: proposals successfully processed");
 }

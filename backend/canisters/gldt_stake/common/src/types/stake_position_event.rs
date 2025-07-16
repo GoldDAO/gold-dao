@@ -1,7 +1,17 @@
+use crate::manage_stake_position_interface::WithdrawErrors;
 use candid::CandidType;
+use candid::Nat;
 use serde::{Deserialize, Serialize};
+use types::TimestampMillis;
+use utils::numeric::Percentage;
 
-use super::stake_position::UnstakeErrors;
+#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+pub struct DissolveStakeEvent {
+    pub percentage: Percentage,
+    pub amount: Nat,
+    pub dissolved_date: TimestampMillis,
+    pub completed: bool,
+}
 
 // -------------------
 // Claim Reward Event
@@ -15,94 +25,63 @@ pub enum ClaimRewardStatus {
 }
 
 // -------------------
-// Unstake Event
+// Withdraw Event
 // -------------------
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, CandidType)]
-pub enum UnstakeStatus {
+pub enum NormalWithdrawStatus {
     None,
     InProgress,
     Failed(String),
-    Unstaked,
-}
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, CandidType)]
-pub enum NormalUnstakeStatus {
-    None,
-    InProgress,
-    Failed(String),
-    Unstaked,
+    Withdrawn,
 }
 
 // -------------------
-// Unstake Early Event
+// Withdraw Early Event
 // -------------------
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, CandidType)]
-pub enum UnstakeEarlyStatus {
+pub enum DissolveInstantlyStatus {
     None,
     InProgress,
     Failed(String),
-    UnstakedEarly,
+    DissolvedInstantly,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, CandidType)]
-pub enum UnstakeState {
+pub enum WithdrawState {
     None,
-    NormalUnstake(NormalUnstakeStatus),
-    EarlyUnstake(UnstakeEarlyStatus),
+    NormalWithdraw(NormalWithdrawStatus),
+    EarlyWithdraw(DissolveInstantlyStatus),
 }
 
-impl UnstakeState {
-    pub fn is_normal_unstake_event(&self) -> bool {
+impl WithdrawState {
+    pub fn is_valid_state_to_withdraw(&self) -> Result<(), WithdrawErrors> {
         match self {
-            Self::None => false,
-            Self::NormalUnstake(_) => true,
-            Self::EarlyUnstake(_) => false,
-        }
-    }
-
-    pub fn is_early_unstake_event(&self) -> bool {
-        match self {
-            Self::None => false,
-            Self::NormalUnstake(_) => false,
-            Self::EarlyUnstake(_) => true,
-        }
-    }
-    pub fn is_unstaked(&self) -> bool {
-        match self {
-            Self::None => false,
-            Self::NormalUnstake(_) => true,
-            Self::EarlyUnstake(_) => true,
-        }
-    }
-    pub fn is_valid_state_to_unstake(&self) -> Result<(), UnstakeErrors> {
-        match self {
-            UnstakeState::None => Ok(()),
-            UnstakeState::NormalUnstake(normal_unstake_status) => match normal_unstake_status {
-                NormalUnstakeStatus::None => Ok(()),
-                NormalUnstakeStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(
-                    "unstake procedure is already in progress".to_string(),
+            WithdrawState::None => Ok(()),
+            WithdrawState::NormalWithdraw(normal_withdraw_status) => match normal_withdraw_status {
+                NormalWithdrawStatus::None => Ok(()),
+                NormalWithdrawStatus::Withdrawn => Ok(()),
+                NormalWithdrawStatus::InProgress => Err(WithdrawErrors::AlreadyProcessing(
+                    "withdraw procedure is already in progress".to_string(),
                 )),
-                NormalUnstakeStatus::Failed(_) => Ok(()),
-                NormalUnstakeStatus::Unstaked => Err(UnstakeErrors::AlreadyUnstaked(
-                    "position already is already unstaked".to_string(),
-                )),
+                NormalWithdrawStatus::Failed(_) => Ok(()),
             },
-            UnstakeState::EarlyUnstake(unstake_early_status) => match unstake_early_status {
-                UnstakeEarlyStatus::None => Ok(()),
-                UnstakeEarlyStatus::InProgress => Err(UnstakeErrors::AlreadyProcessing(
-                    "early unstake procedure is already in progress".to_string(),
-                )),
-                UnstakeEarlyStatus::Failed(_) => Ok(()),
-                UnstakeEarlyStatus::UnstakedEarly => Err(UnstakeErrors::AlreadyUnstaked(
-                    "position already is already unstaked early".to_string(),
-                )),
-            },
+            WithdrawState::EarlyWithdraw(dissolve_instantly_status) => {
+                match dissolve_instantly_status {
+                    DissolveInstantlyStatus::None => Ok(()),
+                    DissolveInstantlyStatus::DissolvedInstantly => Ok(()),
+                    DissolveInstantlyStatus::InProgress => Err(WithdrawErrors::AlreadyProcessing(
+                        "instant dissolve procedure is already in progress".to_string(),
+                    )),
+                    DissolveInstantlyStatus::Failed(_) => Ok(()),
+                }
+            }
         }
     }
 }
 
-impl Default for UnstakeState {
+impl Default for WithdrawState {
     fn default() -> Self {
         Self::None
     }

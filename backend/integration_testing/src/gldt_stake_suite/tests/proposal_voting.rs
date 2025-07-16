@@ -15,7 +15,7 @@ fn test_voting() {
         gldt_stake_canister_id,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
     // Create a proposal using controller's neuron
     let neuron_id = crate::sns_test_env::utils::neuron_id_from_number(2);
@@ -35,10 +35,10 @@ fn test_voting() {
         }
     }
 
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
+    tick_n_blocks(pic, 10);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 10);
 
     match gld_sns_test_env.get_proposal(result).result {
         Some(proposal) => match proposal {
@@ -55,15 +55,15 @@ fn test_voting() {
     }
 
     // NOTE: wait till the last day of voting
-    pic_borrowed.advance_time(Duration::from_millis(DAY_IN_MS * 23));
-    tick_n_blocks(pic_borrowed, 5);
-    pic_borrowed.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic_borrowed, 5);
+    pic.advance_time(Duration::from_millis(DAY_IN_MS * 23));
+    tick_n_blocks(pic, 10);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+    tick_n_blocks(pic, 10);
 
     let neuron_id_0 = crate::sns_test_env::utils::neuron_id_from_number(0);
     let neuron_id_1 = crate::sns_test_env::utils::neuron_id_from_number(1);
     let res1 = get_proposal_votes_of_neuron(
-        &pic_borrowed,
+        &pic,
         controller,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::get_proposal_votes_of_neuron::Args {
@@ -83,7 +83,7 @@ fn test_voting() {
     }
 
     let res2 = get_proposal_votes_of_neuron(
-        &pic_borrowed,
+        &pic,
         controller,
         gldt_stake_canister_id,
         &gldt_stake_api_canister::get_proposal_votes_of_neuron::Args {

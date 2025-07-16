@@ -1,26 +1,11 @@
-use crate::state::{mutate_state, read_state};
-use candid::CandidType;
-use gldt_stake_common::{
-    stake_position::{StakePosition, StakePositionId},
-    stake_position_event::UnstakeState,
-};
+use crate::state::mutate_state;
+use candid::{CandidType, Principal};
+use gldt_stake_common::{stake_position::StakePosition, stake_position_event::WithdrawState};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use time::Weekday;
 use tracing::debug;
 use types::TimestampMillis;
-use utils::env::Environment;
-
-pub fn trace(msg: &str) {
-    unsafe {
-        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
-    }
-}
-
-pub async fn commit_changes() {
-    let this_canister_id = read_state(|s| s.env.canister_id());
-    let _ = ic_cdk::call::<(), ()>(this_canister_id, "commit", ()).await;
-}
 
 // specifies a range that the reward interval can occur. e.g on a certain weekday and between a start hour and end hour
 #[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
@@ -98,16 +83,16 @@ impl TimeInterval {
     }
 }
 
-pub fn set_unstake_state_of_position(
-    stake_position_id: &StakePositionId,
+pub fn set_withdraw_state_of_position(
+    principal: Principal,
     stake_position: &StakePosition,
-    new_state: UnstakeState,
+    new_state: WithdrawState,
 ) {
     let mut updated_position = stake_position.clone();
-    updated_position.unstake_state = new_state;
+    updated_position.withdraw_state = new_state;
     mutate_state(|s| {
         s.data
             .stake_system
-            .update_stake_position(stake_position_id, updated_position)
+            .upsert_stake_position(principal, updated_position)
     });
 }

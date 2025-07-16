@@ -66,7 +66,7 @@ fn init_nft_with_premint_nft(
 mod tests {
     use std::time::UNIX_EPOCH;
 
-    use canister_time::{HOUR_IN_MS, MINUTE_IN_MS};
+    use canister_time::{HOUR_IN_MS, MINUTE_IN_MS, NANOS_PER_MILLISECOND};
 
     use super::*;
     #[test]

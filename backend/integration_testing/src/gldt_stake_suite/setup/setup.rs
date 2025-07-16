@@ -6,19 +6,24 @@ use crate::sns_test_env::sns_test_env::SnsTestEnv;
 use crate::sns_test_env::sns_test_env::SnsTestEnvBuilder;
 use crate::sns_test_env::utils::generate_neuron_data;
 use crate::utils::random_principal;
+use bity_ic_icrc3::config::ICRC3Config;
+use bity_ic_icrc3::config::ICRC3Properties;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
 use gldt_stake_api_canister::Args;
 use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::icrc3::blocks::SupportedBlockType;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::time::Duration;
 use std::time::SystemTime;
 use types::BuildVersion;
 use types::CanisterId;
+use types::TokenSymbol;
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct RegisterDappCanisterRequest {
@@ -34,6 +39,20 @@ pub struct GldtStakeTestEnv {
     pub gld_rewards_canister_id: CanisterId, // could be mocked
     pub pic: Rc<RefCell<PocketIc>>,
     pub ledger_fees: HashMap<String, Nat>,
+}
+
+impl std::fmt::Debug for GldtStakeTestEnv {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("GldtStakeTestEnv")
+            .field("controller", &self.controller)
+            .field("gld_sns_test_env", &self.gld_sns_test_env)
+            .field("neuron_data", &self.neuron_data)
+            .field("token_ledgers", &self.token_ledgers)
+            .field("gldt_stake_canister_id", &self.gldt_stake_canister_id)
+            .field("gld_rewards_canister_id", &self.gld_rewards_canister_id)
+            .field("ledger_fees", &self.ledger_fees)
+            .finish()
+    }
 }
 
 pub struct GldtStakeTestEnvBuilder {
@@ -83,7 +102,7 @@ impl GldtStakeTestEnvBuilder {
     }
 
     pub fn build(&mut self) -> GldtStakeTestEnv {
-        let pic_ref = Rc::new(RefCell::new(
+        let pic_ref: Rc<RefCell<PocketIc>> = Rc::new(RefCell::new(
             PocketIcBuilder::new()
                 .with_sns_subnet()
                 .with_application_subnet()
@@ -105,11 +124,8 @@ impl GldtStakeTestEnvBuilder {
         let (gldt_stake_neuron_data, _) =
             generate_neuron_data(0, 2, 1, &vec![gldt_stake_canister_id]);
 
-        let mut sns_test_env_builder = SnsTestEnvBuilder::new(&pic_ref, self.controller);
-        sns_test_env_builder.generate_ids();
-        let gld_sns_test_env = sns_test_env_builder
-            .with_goldao_init_args(&gldt_stake_neuron_data, None)
-            .build();
+        let gld_sns_test_env =
+            SnsTestEnv::goldao(&pic_ref, self.controller, &gldt_stake_neuron_data, None);
         let sns_gov_canister_id = gld_sns_test_env.governance_id;
 
         self.sns_governance_id = sns_gov_canister_id;
@@ -136,8 +152,6 @@ impl GldtStakeTestEnvBuilder {
             &self.controller,
         );
 
-        // let token_ledger_ids: Vec<Principal> =
-        //     token_ledgers.iter().map(|(_, id)| id.clone()).collect();
         let mut reward_types = HashMap::new();
         reward_types.insert(
             "GOLDAO".to_string(),
@@ -167,11 +181,22 @@ impl GldtStakeTestEnvBuilder {
             (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
         ); // Friday 6 Dec 2024, 12:01:00
 
+        // INIT ICRC3
+        let mut constants = ICRC3Properties::default();
+        // constants.max_memory_size_bytes = 1000;
+        constants.max_memory_size_bytes = 60000;
+        constants.tx_window = Duration::from_millis(500);
+        constants.max_transactions_in_window = 10;
+        constants.max_blocks_per_response = 100;
+        constants.max_transactions_to_purge = 5;
+        // INIT ICRC3
+
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
             test_mode: true,
             version: BuildVersion::min(),
             commit_hash: "integration_testing".to_string(),
             authorized_principals: vec![self.controller],
+            whitelist: vec![self.controller],
             gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
             gld_sns_governance_canister_id: self.sns_governance_id,
             goldao_ledger_id: token_ledgers
@@ -182,7 +207,26 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            reward_types: reward_types,
+            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+            icrc3_config: ICRC3Config {
+                supported_blocks: vec![SupportedBlockType {
+                    block_type: "add_stake".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "claim_rewards".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "start_dissolving".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "dissolve_instantly".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "withdraw".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },],
+                constants,
+            },
         });
 
         setup_gldt_stake_canister(
@@ -294,11 +338,25 @@ impl GldtStakeTestEnvBuilder {
         pic.set_time(
             (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
         ); // Friday 6 Dec 2024, 12:01:00
+           // pic.set_time(
+           //     (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(17333890470000)).into(),
+           // ); // Thu Dec 05 2024 08:57:27
+
+        // INIT ICRC3
+        let mut constants = ICRC3Properties::default();
+        // constants.max_memory_size_bytes = 1000;
+        constants.max_memory_size_bytes = 60000;
+        constants.tx_window = Duration::from_millis(500);
+        constants.max_transactions_in_window = 10;
+        constants.max_blocks_per_response = 100;
+        constants.max_transactions_to_purge = 5;
+        // INIT ICRC3
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
             test_mode: true,
             version: BuildVersion::min(),
             commit_hash: "integration_testing".to_string(),
+            whitelist: vec![],
             authorized_principals: vec![self.controller],
             gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
             gld_sns_governance_canister_id: self.sns_governance_id,
@@ -310,7 +368,14 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            reward_types: reward_types,
+            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+            icrc3_config: ICRC3Config {
+            supported_blocks: vec![SupportedBlockType {
+                    block_type: "event".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                }],
+                constants,
+            },
         });
 
         setup_gldt_stake_canister(

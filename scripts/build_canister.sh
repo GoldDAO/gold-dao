@@ -66,11 +66,14 @@ if [[ -v $WASMONLY ]]; then
   rm -f $BASE_CANISTER_PATH/$1/api/can.did
 	echo "$1 wasm file created and ready for did generation"
 else
-	ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm shrink
-	ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm optimize --inline-functions-with-loops O3
-	gzip --no-name -9 -v -c $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm > $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz &&
-	gzip -v -t $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz &&
-	echo "$1 successfully built, optimized and compressed"
+  ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
+    -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm shrink
+  ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
+    -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
+    optimize --inline-functions-with-loops O3
+  gzip --no-name -9 -v -c $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
+    > $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz
+  gzip -v -t $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz
 fi
 
 

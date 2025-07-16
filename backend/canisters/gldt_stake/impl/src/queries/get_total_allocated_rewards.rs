@@ -17,6 +17,5 @@ fn get_total_allocated_rewards(
 fn get_total_allocated_rewards_impl(
     _: GetTotalAllocatedRewardsArgs,
 ) -> GetTotalAllocatedRewardsResponse {
-    // 1. check user isn't anon
-    read_state(|s| s.data.reward_system.reward_history.clone())
+    read_state(|s| s.data.allocated_rewards_pool.reward_history.clone())
 }

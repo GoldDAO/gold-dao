@@ -9,7 +9,7 @@ pub use super_stats_v3_api::{
 fn add_authorised(principal_id: String) -> String {
     RUNTIME_STATE.with(|state| {
         let mut s = state.borrow_mut();
-        s.data.check_admin(ic_cdk::caller().to_text());
+        s.data.check_admin(ic_cdk::api::msg_caller().to_text());
         s.data.add_authorised(principal_id)
     })
 }
@@ -18,7 +18,7 @@ fn add_authorised(principal_id: String) -> String {
 fn remove_authorised(principal_id: String) -> String {
     RUNTIME_STATE.with(|state| {
         let mut s = state.borrow_mut();
-        s.data.check_admin(ic_cdk::caller().to_text());
+        s.data.check_admin(ic_cdk::api::msg_caller().to_text());
         s.data.remove_authorised(principal_id)
     })
 }
@@ -27,7 +27,7 @@ fn remove_authorised(principal_id: String) -> String {
 fn get_all_authorised() -> Vec<String> {
     RUNTIME_STATE.with(|state| {
         let s = state.borrow();
-        s.data.check_admin(ic_cdk::caller().to_text());
+        s.data.check_admin(ic_cdk::api::msg_caller().to_text());
         s.data.get_all_authorised()
     })
 }
@@ -37,7 +37,7 @@ fn get_logs() -> Option<Vec<LogEntry>> {
     // Is authorised?
     RUNTIME_STATE.with(|state| {
         let s = state.borrow();
-        s.data.check_admin(ic_cdk::caller().to_text())
+        s.data.check_admin(ic_cdk::api::msg_caller().to_text())
     });
     RUNTIME_STATE.with(|state| state.borrow().data.get_logs())
 }
@@ -48,11 +48,11 @@ fn get_memory_stats() -> MemoryData {
     // Is authorised?
     RUNTIME_STATE.with(|state| {
         let s = state.borrow();
-        s.data.check_admin(ic_cdk::caller().to_text())
+        s.data.check_admin(ic_cdk::api::msg_caller().to_text())
     });
 
     let wasm_page_size: u64 = 65536;
-    let m: u64 = (ic_cdk::api::stable::stable64_size() as u64) * wasm_page_size
+    let m: u64 = (ic_cdk::stable::stable_size() as u64) * wasm_page_size
         + (core::arch::wasm32::memory_size(0) as u64) * wasm_page_size;
     let m2: u64 = (core::arch::wasm32::memory_size(0) as u64) * wasm_page_size;
     let ret = MemoryData {
