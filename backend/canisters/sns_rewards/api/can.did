@@ -1,9 +1,10 @@
 type Args = record { token : text; neuron_id : NeuronId };
-type Args_1 = record { tokens : vec TokenSymbol; neuron_id : vec NeuronId };
+type Args_1 = record { claim_reward_args : vec ClaimRewardArgs };
 type Args_2 = record { transfer_amounts : vec record { TokenSymbol; nat } };
 type Args_3 = record { token_list : vec record { TokenSymbol; TokenInfo } };
 type Args_4 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type ClaimRewardArgs = record { token : TokenSymbol; neuron_id : NeuronId };
 type ClaimRewardError = record {
   token : opt TokenSymbol;
   error : ClaimRewardErrorType;

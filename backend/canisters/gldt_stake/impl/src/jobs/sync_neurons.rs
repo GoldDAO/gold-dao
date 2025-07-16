@@ -7,7 +7,7 @@ pub fn start_job() {
 }
 
 pub fn sync_neurons_job() {
-    ic_cdk::spawn(sync_neurons_impl())
+    ic_cdk::futures::spawn(sync_neurons_impl())
 }
 
 async fn sync_neurons_impl() {

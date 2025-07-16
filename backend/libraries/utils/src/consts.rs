@@ -37,6 +37,8 @@ pub const GOLD_100G_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 96, 17, 146, 1, 1]);
 pub const GOLD_1000G_CANISTER_ID: CanisterId =
     Principal::from_slice(&[0, 0, 0, 0, 1, 128, 10, 88, 1, 1]);
+pub const ICPSWAP_TOKEN_CANISTER_ID: CanisterId =
+    Principal::from_slice(&[0, 0, 0, 0, 0, 208, 18, 203, 1, 1]);
 
 pub const E8S_PER_OGY: u64 = 100_000_000;
 pub const E8S_FEE_OGY: u64 = 200_000;
@@ -176,6 +178,14 @@ mod tests {
         assert_eq!(
             GOLD_1000G_CANISTER_ID,
             Principal::from_text("7i7jl-6qaaa-aaaam-abjma-cai").unwrap()
+        );
+    }
+
+    #[test]
+    fn icpswap_token_canister_id() {
+        assert_eq!(
+            ICPSWAP_TOKEN_CANISTER_ID,
+            Principal::from_text("moe7a-tiaaa-aaaag-qclfq-cai").unwrap()
         );
     }
 }

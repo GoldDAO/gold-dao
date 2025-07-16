@@ -9,6 +9,3 @@ edition = "2021"
 [dependencies]
 canister_client = { path = "../../../libraries/canister_client" }
 gldt_stake_api_archive = { path = "../../../canisters/gldt_stake/api_archive" }
-gldt_stake_common = { path = "../../../canisters/gldt_stake/common" }
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

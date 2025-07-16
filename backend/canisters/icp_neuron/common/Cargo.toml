@@ -17,6 +17,5 @@ ledger_utils = { path = "../../../libraries/ledger_utils" }
 nns_governance_canister = { path = "../../../external_canisters/nns_governance/api" }
 serde = { workspace = true }
 serde_with = { workspace = true }
-serde_bytes = { workspace = true }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }

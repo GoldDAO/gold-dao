@@ -1,14 +1,12 @@
+use super::init_canister;
+use crate::state::init_icrc3;
+use crate::state::start_default_archive_job;
+use crate::state::{Data, RuntimeState};
 use candid::Nat;
-use gldt_stake_common::stake_position::MAX_STAKE_POSITION_SIZE;
+pub use gldt_stake_api_canister::Args;
 use ic_cdk_macros::init;
 use tracing::info;
 use utils::env::CanisterEnv;
-
-pub use gldt_stake_api_canister::Args;
-
-use crate::state::{Data, RuntimeState};
-
-use super::init_canister;
 
 #[init]
 fn init(args: Args) {
@@ -30,27 +28,26 @@ fn init(args: Args) {
                 gldt_ledger_id: init_args.gldt_ledger_id,
                 goldao_ledger_id: init_args.goldao_ledger_id,
                 authorized_principals: init_args.authorized_principals,
+                whitelist: init_args.whitelist,
                 goldao_sns_rewards_canister_id: init_args.gld_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: init_args.gld_sns_governance_canister_id,
                 ..Default::default()
             };
-            data.stake_system.reward_types = init_args.reward_types.clone();
+            data.stake_system.reward_types =
+                init_args.allowed_reward_tokens.iter().cloned().collect();
 
-            init_args.reward_types.iter().for_each(|(token_symbol, _)| {
-                data.reward_system
-                    .add_to_reward_history(token_symbol, Nat::from(0u64));
-            });
-
-            if init_args.test_mode {
-                info!("INIT :: settingg max threshold to 32mb");
-                data.archive_system.max_canister_archive_threshold = 32 * 1024 * 1024_u128;
-            }
-
-            info!("INIT  :: MAX position size {MAX_STAKE_POSITION_SIZE}");
+            init_args
+                .allowed_reward_tokens
+                .iter()
+                .for_each(|token_symbol| {
+                    data.allocated_rewards_pool
+                        .add_to_reward_history(token_symbol, Nat::from(0u64));
+                });
 
             let runtime_state = RuntimeState::new(env, data);
 
             init_canister(runtime_state);
+            init_icrc3(init_args.icrc3_config);
 
             info!("Init complete.")
         }

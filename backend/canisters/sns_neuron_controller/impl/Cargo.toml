@@ -38,6 +38,5 @@ tracing = { workspace = true }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
 async-trait = { workspace = true }
-typetag = { workspace = true }
 futures = { workspace = true }
 enum_dispatch = { workspace = true }

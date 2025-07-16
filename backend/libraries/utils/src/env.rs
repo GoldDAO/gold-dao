@@ -21,8 +21,8 @@ pub trait Environment {
         self.now_nanos() / 1_000_000
     }
 
-    fn cycles_balance_in_tc(&self) -> f64 {
-        (self.cycles_balance() as f64) / 1_000_000_000_000.0
+    fn cycles_balance_in_tc(&self) -> u128 {
+        (self.cycles_balance() as u128) / 1_000_000_000_000u128
     }
 }
 
@@ -81,7 +81,7 @@ impl Environment for CanisterEnv {
 
     #[cfg(target_arch = "wasm32")]
     fn cycles_balance(&self) -> Cycles {
-        ic_cdk::api::canister_balance().into()
+        ic_cdk::api::canister_cycle_balance().into()
     }
     #[cfg(not(target_arch = "wasm32"))]
     fn cycles_balance(&self) -> Cycles {
