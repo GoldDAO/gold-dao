@@ -1,7 +1,7 @@
 import { atomWithReducer } from "jotai/utils";
 import { MAX_SWAP_SLIPPAGE } from "@constants";
 import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
-import { Token, TOKEN_GLDT, TOKEN_ICP } from "@shared/utils/tokens";
+import { Token, TOKEN_GLDT, TOKEN_GOLDAO } from "@shared/utils/tokens";
 import { TokenSwapData } from "@wallet/swap/utils";
 import { FieldErrors, FieldValues } from "react-hook-form";
 
@@ -38,7 +38,7 @@ const initialState: SwapState = {
     fee: 0n,
   },
   token_to: {
-    token: TOKEN_ICP,
+    token: TOKEN_GOLDAO,
     amount_e8s: 0n,
     amount_usd: 0,
     user_balance: 0n,
@@ -215,9 +215,9 @@ const reducer = (
           ...prev.token_to,
           token: action.value.token_to
             ? action.value.token_to
-            : action.value.token_from.id === "icp"
-            ? TOKEN_GLDT
-            : TOKEN_ICP,
+            : action.value.token_from.id === "gldt"
+            ? TOKEN_GOLDAO
+            : TOKEN_GLDT,
         },
       };
 

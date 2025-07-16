@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
+import useFetchSwapAmount from "@shared/hooks/useFetchSwapAmount";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import clsx from "clsx";
 import { useForm, useWatch } from "react-hook-form";
@@ -12,7 +13,9 @@ import {
 import isInsufficientFunds from "@shared/utils/validators/isInsufficientFunds";
 import isAmountGreaterThanZero from "@shared/utils/validators/isAmountGreaterThanZero";
 import isAmountGreaterThanFee from "@shared/utils/validators/isAmountGreaterThanFee";
+import isReceiveAmountGreaterThanZero from "@shared/utils/validators/isReceiveAmountGreaterThanZero";
 import { isNumeric } from "@shared/utils/numbers";
+import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 
 const SendAmountInput = () => {
   const { unauthenticatedAgent, principalId } = useAuth();
@@ -24,8 +27,10 @@ const SendAmountInput = () => {
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
+    reValidateMode: "onChange",
     shouldUnregister: true,
     shouldFocusError: false,
+
     defaultValues: {
       amount: swapState.send_amount_input || "",
     },
@@ -45,6 +50,18 @@ const SendAmountInput = () => {
     control,
     name: "amount",
   }) as string;
+
+  const swapAmount = useFetchSwapAmount(
+    KONGSWAP_CANISTER_ID_IC,
+    unauthenticatedAgent,
+    {
+      from: swapState.token_from.token.name,
+      from_canister_id: swapState.token_from.token.canister_id,
+      to: swapState.token_to.token.name,
+      amount: Number(amount),
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   useEffect(() => {
     dispatchSwapState({
@@ -120,6 +137,13 @@ const SendAmountInput = () => {
                 balance.data.fee_e8s,
                 balance.data.decimals
               ) || "Amount must not be less or equal than transaction fee"
+            );
+          },
+          isReceiveAmountGreaterThanZero: () => {
+            if (!swapAmount.isSuccess) return true;
+            return (
+              isReceiveAmountGreaterThanZero(swapAmount.data.receive_amount) ||
+              "Receive amount is zero, please increase the send amount."
             );
           },
         },

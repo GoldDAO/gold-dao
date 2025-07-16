@@ -69,10 +69,12 @@ const SendForm = () => {
         </div>
       </div>
       <div className="flex justify-between items-center">
-        <BalanceAvailable
-          token={swapState.token_from.token.name}
-          balance={balance.data?.balance}
-        />
+        <div className="text-sm text-content/80">
+          <BalanceAvailable
+            token={swapState.token_from.token.name}
+            balance={balance.data?.balance}
+          />
+        </div>
         <MaxButton
           balance={balance.data?.balance_e8s}
           fee={balance.data?.fee_e8s}

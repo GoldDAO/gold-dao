@@ -8,6 +8,8 @@ const ErrorMessageBtnForm = () => {
   const renderErrorMessage = () => {
     if (
       swapState.form_state.errors.amount?.type === "isInsufficientFunds" ||
+      swapState.form_state.errors.amount?.type ===
+        "isReceiveAmountGreaterThanZero" ||
       swapState.form_state.errors.amount?.type === "isAmountGreaterThanFee"
     ) {
       return (
