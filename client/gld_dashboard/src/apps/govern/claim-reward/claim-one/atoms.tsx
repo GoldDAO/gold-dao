@@ -97,10 +97,15 @@ const claimRewardReducer = (
           ? (reward.amount as bigint) >= found.fee
           : false;
 
+        const neurons_claimable = found
+          ? reward.neurons.filter((neuron) => neuron.reward >= found.fee)
+          : [];
+
         return {
           ...reward,
           is_selected: is_claimable,
           is_claimable,
+          neurons: neurons_claimable,
         };
       });
       const merged = _.values(

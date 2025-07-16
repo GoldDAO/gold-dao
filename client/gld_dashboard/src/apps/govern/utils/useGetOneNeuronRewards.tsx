@@ -73,7 +73,14 @@ const useGetOneNeuronRewards = (
               id: token.id,
               amount: reward,
               amount_usd: price.mid_price * (Number(reward) / 10 ** decimals),
-              neurons: [],
+              neurons: [
+                {
+                  id: neuronId,
+                  reward: reward,
+                  reward_usd:
+                    price.mid_price * (Number(reward) / 10 ** decimals),
+                },
+              ],
             };
           })
         );

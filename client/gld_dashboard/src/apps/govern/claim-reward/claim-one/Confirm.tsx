@@ -54,13 +54,14 @@ const RewardItem = ({ name }: { name: string }) => {
               <E8sToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
+                decimals={5}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
           <div className="text-content/60 text-sm">
-            $<NumberToLocaleString value={reward.amount_usd} />
+            $<NumberToLocaleString value={reward.amount_usd} decimals={5} />
           </div>
         </div>
       </div>
