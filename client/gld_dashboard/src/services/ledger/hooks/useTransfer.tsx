@@ -5,7 +5,6 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../idlFactory";
 import { idlFactory as idlFactoryICP } from "../idlFactoryICP";
 import { Result } from "../interfaces/ledger";
-// import { Ledger } from "../utils/interfaces";
 
 const icrc1_transfer = async (
   actor: ActorSubclass,

@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@auth/index";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import useFetchPriceGold from "@shared/hooks/useFetchPriceGold";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
@@ -80,10 +80,14 @@ const TriggerToken = ({
 }) => {
   const { unauthenticatedAgent } = useAuth();
 
-  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
-    ledger: token.id,
-    enabled: !!unauthenticatedAgent,
-  });
+  const decimals = useFetchLedgerDecimals(
+    token.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: token.name,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,
@@ -97,7 +101,7 @@ const TriggerToken = ({
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1">
           <Logo name={token.id} className="h-6 w-6" />
-          <div className="font-semibold text-lg">{token.name}</div>
+          <div className="font-semibold text-lg">{token.display_name}</div>
         </div>
         <div className="text-sm text-content/60">
           {price.isSuccess ? (
@@ -125,7 +129,7 @@ const WalletListMobile = ({ className }: { className?: string }) => {
 
   return (
     <div className={className}>
-      {searchParams.get("token") === "gldnft" ? (
+      {searchParams.get("token") === "GLDNFT" ? (
         <TriggerNFT handleOnClick={() => setIsOpen(!isOpen)} />
       ) : (
         <TriggerToken token={token} handleOnClick={() => setIsOpen(!isOpen)} />
@@ -133,13 +137,13 @@ const WalletListMobile = ({ className }: { className?: string }) => {
       <Dialog open={isOpen} handleOnClose={handleOnClose} closeEnabled={false}>
         <div className="flex flex-col gap-2 pb-4">
           <button onClick={handleOnClose}>
-            <ListItemToken token={TOKEN_GLDT} key={TOKEN_GLDT.id} />
+            <ListItemToken token={TOKEN_GLDT} />
           </button>
           <button onClick={handleOnClose}>
             <ListItemNFT />
           </button>
           {TOKENS.slice(1).map((token) => (
-            <button onClick={handleOnClose} key={token.id}>
+            <button onClick={handleOnClose} key={token.display_name}>
               <ListItemToken token={token} />
             </button>
           ))}

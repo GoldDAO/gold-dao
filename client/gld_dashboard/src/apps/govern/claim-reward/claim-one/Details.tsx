@@ -5,7 +5,7 @@ import { SNS_REWARDS_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+// import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
 import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
 import Button from "@shared/ui/button/BtnPrimary";
 

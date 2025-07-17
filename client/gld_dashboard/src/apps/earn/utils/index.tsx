@@ -1,5 +1,3 @@
-import { Ledger } from "@services/ledger/utils/interfaces";
-
 import {
   GLDT_LEDGER_CANISTER_ID,
   GOLDAO_LEDGER_CANISTER_ID,
@@ -8,7 +6,7 @@ import {
 } from "@constants";
 
 export interface Token {
-  id: Ledger;
+  id: string;
   name: string;
   label: string;
   canisterId: string;
@@ -34,7 +32,7 @@ export interface PositionRewards {
 }
 
 export interface Reward {
-  id: Ledger;
+  id: string;
   name: string;
   label: string;
   canister_id: string;

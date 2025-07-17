@@ -41,7 +41,7 @@ const FeaturesBtn = () => {
   };
 
   const renderTokenAction = () => {
-    if (searchParams.get("token") === "gldnft") {
+    if (searchParams.get("token") === "GLDNFT") {
       return (
         <>
           <AppFeatureBtn

@@ -43,7 +43,7 @@ const ListboxOptionToken = ({
           <div className="flex items-center gap-2">
             <Logo name={value.id} className="h-10 w-10" />
             <div>
-              <div>{value.name}</div>
+              <div>{value.display_name}</div>
               <div className="text-content/60">{value.label}</div>
             </div>
           </div>

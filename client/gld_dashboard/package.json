@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode dev",
+    "dev": "vite --mode staging",
     "dev:preprod": "vite --mode preprod",
     "build": "",
     "build:staging": "npm run lint && tsc && vite build --mode staging",

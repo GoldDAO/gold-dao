@@ -51,7 +51,7 @@ const useFetchLedgerBalance = (
   } = options;
 
   return useQuery<LedgerBalanceData>({
-    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner],
+    queryKey: ["FETCH_LEDGER_BALANCE", ledger, owner, canisterId],
     queryFn: async (): Promise<LedgerBalanceData> => {
       const actorLedger = Actor.createActor(idlFactoryLedger, {
         agent,

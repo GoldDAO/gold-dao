@@ -4,9 +4,7 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-
 import { idlFactory } from "../idlFactory";
-import { Ledger } from "../utils/interfaces";
 
 import icrc1_total_supply from "../icrc1_total_supply";
 
@@ -14,7 +12,7 @@ const useFetchTotalSupply = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<bigint>, "queryKey" | "queryFn"> & {
-    ledger: Ledger;
+    ledger: string;
   }
 ) => {
   const {
@@ -24,7 +22,7 @@ const useFetchTotalSupply = (
     ledger,
   } = options;
   return useQuery({
-    queryKey: [`FETCH_TOTAL_SUPPLY_${ledger.toLocaleUpperCase()}`],
+    queryKey: ["FETCH_TOTAL_SUPPLY", ledger],
     queryFn: async () => {
       const actor = Actor.createActor(idlFactory, {
         agent,

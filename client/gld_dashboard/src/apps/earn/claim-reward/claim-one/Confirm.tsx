@@ -8,7 +8,7 @@ import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "../../utils";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
@@ -20,10 +20,14 @@ const RewardItem = ({ name }: { name: string }) => {
     (r) => r.name === name
   ) as Reward;
 
-  const decimals = useFetchDecimals(reward.canister_id, unauthenticatedAgent, {
-    ledger: reward.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
+  const decimals = useFetchLedgerDecimals(
+    reward.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: reward.name,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   return (
     <button

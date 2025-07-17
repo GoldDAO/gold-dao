@@ -4,17 +4,14 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-
 import { idlFactory } from "../idlFactory";
-
-import { Ledger } from "../utils/interfaces";
 import icrc1_fee from "../icrc1_fee";
 
 const useFetchTransferFee = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<bigint>, "queryKey" | "queryFn"> & {
-    ledger: Ledger;
+    ledger: string;
   }
 ) => {
   const {
