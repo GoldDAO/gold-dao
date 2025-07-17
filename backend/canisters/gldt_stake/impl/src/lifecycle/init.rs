@@ -48,6 +48,7 @@ fn init(args: Args) {
 
             init_canister(runtime_state);
             init_icrc3(init_args.icrc3_config);
+            start_default_archive_job();
 
             info!("Init complete.")
         }

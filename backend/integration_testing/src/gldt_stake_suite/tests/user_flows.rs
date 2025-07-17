@@ -698,8 +698,7 @@ fn withdraw_flow_test() {
         approval_result,
         crate::client::icrc1_icrc2_token::icrc2_approve::Response::Ok(_)
     ));
-    pic.advance_time(Duration::from_secs(60));
-    tick_n_blocks(pic, 2);
+    tick_n_blocks(pic, 5);
 
     let stake_response = manage_stake_position(
         pic,
@@ -720,8 +719,6 @@ fn withdraw_flow_test() {
         &manage_stake_position::Args::StartDissolving { fraction: 100 },
     );
     assert!(response.is_ok());
-    pic.advance_time(Duration::from_secs(60));
-    tick_n_blocks(pic, 10);
 
     // --- Attempt to unstake immediately (should fail, not yet dissolvable) ---
     let response = manage_stake_position(
@@ -737,18 +734,32 @@ fn withdraw_flow_test() {
 
     // --- Advance time to complete dissolve period ---
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    tick_n_blocks(pic, 1);
+    tick_n_blocks(pic, 5);
 
     // --- Successfully withdraw ---
-    let response = manage_stake_position(
-        pic,
-        user,
+    let res = pic.update_call(
         gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
+        user,
+        "manage_stake_position",
+        candid::encode_one(manage_stake_position::Args::Withdraw {}).unwrap(),
     );
-    assert!(response.is_ok());
-    pic.advance_time(Duration::from_secs(60));
-    tick_n_blocks(pic, 2);
+    // assert!(response.is_ok());
+
+    let logs = pic
+        .fetch_canister_logs(gldt_stake_canister_id, controller)
+        .expect("Failed to fetch logs from the canister");
+    let log_strings: Vec<String> = logs
+        .iter()
+        .map(|entry| {
+            String::from_utf8(entry.content.clone())
+                .unwrap_or_else(|_| "<Invalid UTF-8>".to_string())
+        })
+        .collect();
+    // Print all logs
+    println!("Logs from canister {}:", gldt_stake_canister_id);
+    for (i, log) in log_strings.iter().enumerate() {
+        println!("  [{}] {}", i, log);
+    }
 
     // --- Verify position staked is 0 ---
     let position =

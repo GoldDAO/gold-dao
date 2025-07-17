@@ -358,20 +358,20 @@ fn test_invalid_withdraw_states_failed() {
     }];
     let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
     println!("blocks: {blocks:?}");
-    assert_eq!(blocks.blocks.len(), 3);
-    // let archived_blocks_amount = u128::try_from(
-    //     &blocks
-    //         .archived_blocks
-    //         .first()
-    //         .unwrap()
-    //         .args
-    //         .first()
-    //         .unwrap()
-    //         .length
-    //         .0,
-    // )
-    // .unwrap();
-    // assert_eq!(blocks.blocks.len() as u128 + archived_blocks_amount, 3);
+    assert_eq!(blocks.blocks.len(), 1);
+    let archived_blocks_amount = u128::try_from(
+        &blocks
+            .archived_blocks
+            .first()
+            .unwrap()
+            .args
+            .first()
+            .unwrap()
+            .length
+            .0,
+    )
+    .unwrap();
+    assert_eq!(blocks.blocks.len() as u128 + archived_blocks_amount, 3);
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &());
     println!("user_position: {user_position:?}");

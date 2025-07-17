@@ -44,7 +44,6 @@ fn post_upgrade(args: Args) {
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
             replace_icrc3(icrc3);
-
             start_default_archive_job();
 
             info!(version = %upgrade_args.version, "Post-upgrade complete");

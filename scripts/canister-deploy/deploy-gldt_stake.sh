@@ -5,6 +5,36 @@ DEPLOYMENT_VIA="direct"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh gldt_stake $NETWORK
 
+# Shared config
+ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
+OGY_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
+GOLDAO_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
+GOLDAO_SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
+GOLDAO_SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
+ALLOWED_REWARD_TOKENS="vec { variant { GOLDAO }; variant { ICP }; variant { OGY }; variant { WTN } }"
+ICRC3_SUPPORTED_BLOCKS="vec {
+  record { block_type = \"add_stake\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
+  record { block_type = \"claim_rewards\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
+  record { block_type = \"start_dissolving\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
+  record { block_type = \"dissolve_instantly\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
+  record { block_type = \"withdraw\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
+}"
+ICRC3_CONSTANTS="record {
+  tx_window = record { secs = 86400 : nat64; nanos = 0 : nat32; };
+  max_transactions_in_window = 1000 : nat;
+  max_memory_size_bytes = 1073741824 : nat;
+  max_blocks_per_response = 100 : nat;
+  initial_cycles = 100_000_000_000_000 : nat;
+  reserved_cycles = 10_000_000_000_000 : nat;
+  max_transactions_to_purge = 500 : nat;
+  ttl_for_non_archived_transactions = record { secs = 120 : nat64; nanos = 0 : nat32; };
+  max_unarchived_transactions = 1000 : nat;
+}"
+ICRC3_CONFIG="record {
+  supported_blocks = $ICRC3_SUPPORTED_BLOCKS;
+  constants = $ICRC3_CONSTANTS;
+}"
+
 if [[ $REINSTALL == "reinstall" ]]; then
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
     TESTMODE=true
@@ -16,75 +46,16 @@ if [[ $REINSTALL == "reinstall" ]]; then
       principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\";
             principal \"$(dfx canister id --network $NETWORK sns_governance)\"
     }"
-    ICP_LEDGER_CANISTER_ID=ete3q-rqaaa-aaaal-qdlva-cai
-    OGY_LEDGER_CANISTER_ID=j5naj-nqaaa-aaaal-ajc7q-cai
-    GOLDAO_LEDGER_CANISTER_ID=irhm6-5yaaa-aaaap-ab24q-cai
-    GOLDAO_SNS_GOVERNANCE_CANISTER_ID=j3ioe-7iaaa-aaaap-ab23q-cai
-    GOLDAO_SNS_REWARDS_CANISTER_ID=rbv23-fqaaa-aaaam-qbfma-cai
     GLDT_LEDGER_ID=6uad6-fqaaa-aaaam-abovq-cai
-    ALLOWED_REWARD_TOKENS="vec { variant { GOLDAO }; variant { ICP }; variant { OGY } }"
-    ICRC3_CONFIG="record {
-        supported_blocks = vec {
-            record {
-                block_type = \"transfer\";
-                url = \"https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-3/transfer.md\";
-            };
-            record {
-                block_type = \"mint\";
-                url = \"https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-3/mint.md\";
-            };
-        };
-        constants = record {
-            tx_window = record { secs = 86400 : nat64; nanos = 0 : nat32; };
-            max_transactions_in_window = 1000 : nat;
-            max_memory_size_bytes = 1073741824 : nat;
-            max_blocks_per_response = 100 : nat;
-            initial_cycles = 100_000_000_000_000 : nat;
-            reserved_cycles = 10_000_000_000_000 : nat;
-            max_transactions_to_purge = 500 : nat;
-            ttl_for_non_archived_transactions = record { secs = 120 : nat64; nanos = 0 : nat32; };
-            max_unarchived_transactions = 1000 : nat;
-        };
-    }"
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
     AUTHORIZED_PRINCIPALS="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\" }"
     WHITELIST="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\" }"
-    ICP_LEDGER_CANISTER_ID=ryjl3-tyaaa-aaaaa-aaaba-cai
-    OGY_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
-    GOLDAO_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
-    GOLDAO_SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
-    GOLDAO_SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
     GLDT_LEDGER_ID=6c7su-kiaaa-aaaar-qaira-cai
-    ALLOWED_REWARD_TOKENS="vec { variant { GOLDAO }; variant { ICP }; variant { OGY } }"
-    ICRC3_CONFIG="record {
-        supported_blocks = vec {
-            record {
-                block_type = \"transfer\";
-                url = \"https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-3/transfer.md\";
-            };
-            record {
-                block_type = \"mint\";
-                url = \"https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-3/mint.md\";
-            };
-        };
-        constants = record {
-            tx_window = record { secs = 86400 : nat64; nanos = 0 : nat32; };
-            max_transactions_in_window = 1000 : nat;
-            max_memory_size_bytes = 1073741824 : nat;
-            max_blocks_per_response = 100 : nat;
-            initial_cycles = 100_000_000_000_000 : nat;
-            reserved_cycles = 10_000_000_000_000 : nat;
-            max_transactions_to_purge = 500 : nat;
-            ttl_for_non_archived_transactions = record { secs = 120 : nat64; nanos = 0 : nat32; };
-            max_unarchived_transactions = 1000 : nat;
-        };
-    }"
   else
     echo "Error: unknown network for deployment. Found $NETWORK."
     exit 2
   fi
-
   ARGUMENTS="(variant { Init = record {
     test_mode = $TESTMODE;
     commit_hash = \"$COMMIT_SHA\";
