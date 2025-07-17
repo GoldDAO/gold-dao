@@ -13,147 +13,147 @@ use gldt_stake_api_canister::manage_stake_position;
 use icrc_ledger_types::icrc3::blocks::GetBlocksRequest;
 use std::time::Duration;
 
-// #[test]
-// fn icrc3_works() {
-//     // --- Setup test environment ---
-//     let mut test_env = default_test_setup();
-//     println!("test_env: {:?}", test_env.gldt_stake_canister_id);
+#[test]
+fn icrc3_works() {
+    // --- Setup test environment ---
+    let mut test_env = default_test_setup();
+    println!("test_env: {:?}", test_env.gldt_stake_canister_id);
 
-//     let GldtStakeTestEnv {
-//         ref mut pic,
-//         controller,
-//         token_ledgers,
-//         gldt_stake_canister_id,
-//         ..
-//     } = test_env;
-//     let pic = &pic.borrow();
-//     let gldt_ledger_id = token_ledgers
-//         .get("gldt_ledger_canister_id")
-//         .expect("Missing GLDT ledger canister ID");
+    let GldtStakeTestEnv {
+        ref mut pic,
+        controller,
+        token_ledgers,
+        gldt_stake_canister_id,
+        ..
+    } = test_env;
+    let pic = &pic.borrow();
+    let gldt_ledger_id = token_ledgers
+        .get("gldt_ledger_canister_id")
+        .expect("Missing GLDT ledger canister ID");
 
-//     let user = create_whitelisted_user_with_funds(
-//         pic,
-//         controller,
-//         gldt_stake_canister_id,
-//         gldt_ledger_id,
-//         2_000_000_000u128,
-//     );
+    let user = create_whitelisted_user_with_funds(
+        pic,
+        controller,
+        gldt_stake_canister_id,
+        gldt_ledger_id,
+        2_000_000_000u128,
+    );
 
-//     // --- Create stake position and add stake to it 9 more times ---
-//     for _ in 0..10 {
-//         let _ = create_stake_position_util_for_user(
-//             pic,
-//             controller,
-//             &token_ledgers,
-//             gldt_stake_canister_id,
-//             5_000_000_000u128,
-//             user,
-//         );
-//         tick_n_blocks(pic, 20);
-//         pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 30));
-//     }
+    // --- Create stake position and add stake to it 9 more times ---
+    for _ in 0..10 {
+        let _ = create_stake_position_util_for_user(
+            pic,
+            controller,
+            &token_ledgers,
+            gldt_stake_canister_id,
+            5_000_000_000u128,
+            user,
+        );
+        tick_n_blocks(pic, 20);
+        pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 30));
+    }
 
-//     let get_blocks_args = vec![GetBlocksRequest {
-//         start: Nat::from(0u64),
-//         length: Nat::from(100u64),
-//     }];
-//     let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
-//     println!("blocks: {blocks:?}");
-//     println!("blocks len: {:?}", blocks.blocks.len());
-//     assert_eq!(blocks.blocks.len(), 1);
-//     assert_eq!(blocks.archived_blocks.len(), 1);
-//     assert_eq!(blocks.archived_blocks[0].args.len(), 1);
-//     assert_eq!(
-//         blocks.archived_blocks[0].args[0],
-//         GetBlocksRequest {
-//             start: Nat::from(0u64),
-//             length: Nat::from(9u64),
-//         }
-//     );
+    let get_blocks_args = vec![GetBlocksRequest {
+        start: Nat::from(0u64),
+        length: Nat::from(100u64),
+    }];
+    let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
+    println!("blocks: {blocks:?}");
+    println!("blocks len: {:?}", blocks.blocks.len());
+    assert_eq!(blocks.blocks.len(), 1);
+    assert_eq!(blocks.archived_blocks.len(), 1);
+    assert_eq!(blocks.archived_blocks[0].args.len(), 1);
+    assert_eq!(
+        blocks.archived_blocks[0].args[0],
+        GetBlocksRequest {
+            start: Nat::from(0u64),
+            length: Nat::from(9u64),
+        }
+    );
 
-//     let archived_blocks = icrc3_get_blocks(
-//         pic,
-//         controller,
-//         blocks.archived_blocks[0].callback.canister_id,
-//         &vec![GetBlocksRequest {
-//             start: Nat::from(0u64),
-//             length: Nat::from(9u64),
-//         }],
-//     );
+    let archived_blocks = icrc3_get_blocks(
+        pic,
+        controller,
+        blocks.archived_blocks[0].callback.canister_id,
+        &vec![GetBlocksRequest {
+            start: Nat::from(0u64),
+            length: Nat::from(9u64),
+        }],
+    );
 
-//     for i in 0..9 {
-//         match &archived_blocks.blocks[i].block {
-//             icrc_ledger_types::icrc::generic_value::ICRC3Value::Map(map) => {
-//                 assert_eq!(
-//                     map.get("btype"),
-//                     Some(&icrc_ledger_types::icrc::generic_value::ICRC3Value::Text(
-//                         "add_stake".to_string()
-//                     )),
-//                     "Block {} is not a mint transaction",
-//                     i
-//                 );
-//             }
-//             _ => panic!("Block is not a map"),
-//         }
-//     }
+    for i in 0..9 {
+        match &archived_blocks.blocks[i].block {
+            icrc_ledger_types::icrc::generic_value::ICRC3Value::Map(map) => {
+                assert_eq!(
+                    map.get("btype"),
+                    Some(&icrc_ledger_types::icrc::generic_value::ICRC3Value::Text(
+                        "add_stake".to_string()
+                    )),
+                    "Block {} is not a mint transaction",
+                    i
+                );
+            }
+            _ => panic!("Block is not a map"),
+        }
+    }
 
-//     // --- Create 5 legit dissolvements ---
-//     for _ in 0..=4 {
-//         let response = manage_stake_position(
-//             pic,
-//             user,
-//             gldt_stake_canister_id,
-//             &manage_stake_position::Args::StartDissolving { fraction: 20 },
-//         );
+    // --- Create 5 legit dissolvements ---
+    for _ in 0..=4 {
+        let response = manage_stake_position(
+            pic,
+            user,
+            gldt_stake_canister_id,
+            &manage_stake_position::Args::StartDissolving { fraction: 20 },
+        );
 
-//         assert!(response.is_ok());
-//     }
+        assert!(response.is_ok());
+    }
 
-//     tick_n_blocks(pic, 1);
+    tick_n_blocks(pic, 1);
 
-//     let get_blocks_args = vec![GetBlocksRequest {
-//         start: Nat::from(0u64),
-//         length: Nat::from(100u64),
-//     }];
-//     let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
-//     println!("blocks: {blocks:?}");
-//     println!("blocks len: {:?}", blocks.blocks.len());
-//     assert_eq!(blocks.blocks.len(), 3);
-//     assert_eq!(blocks.archived_blocks.len(), 1);
-//     assert_eq!(blocks.archived_blocks[0].args.len(), 1);
-//     assert_eq!(
-//         blocks.archived_blocks[0].args[0],
-//         GetBlocksRequest {
-//             start: Nat::from(0u64),
-//             length: Nat::from(12u64),
-//         }
-//     );
-//     let archived_blocks = icrc3_get_blocks(
-//         pic,
-//         controller,
-//         blocks.archived_blocks[0].callback.canister_id,
-//         &vec![GetBlocksRequest {
-//             start: Nat::from(10u64),
-//             length: Nat::from(12u64),
-//         }],
-//     );
+    let get_blocks_args = vec![GetBlocksRequest {
+        start: Nat::from(0u64),
+        length: Nat::from(100u64),
+    }];
+    let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
+    println!("blocks: {blocks:?}");
+    println!("blocks len: {:?}", blocks.blocks.len());
+    assert_eq!(blocks.blocks.len(), 3);
+    assert_eq!(blocks.archived_blocks.len(), 1);
+    assert_eq!(blocks.archived_blocks[0].args.len(), 1);
+    assert_eq!(
+        blocks.archived_blocks[0].args[0],
+        GetBlocksRequest {
+            start: Nat::from(0u64),
+            length: Nat::from(12u64),
+        }
+    );
+    let archived_blocks = icrc3_get_blocks(
+        pic,
+        controller,
+        blocks.archived_blocks[0].callback.canister_id,
+        &vec![GetBlocksRequest {
+            start: Nat::from(10u64),
+            length: Nat::from(12u64),
+        }],
+    );
 
-//     for i in 0..2 {
-//         match &archived_blocks.blocks[i].block {
-//             icrc_ledger_types::icrc::generic_value::ICRC3Value::Map(map) => {
-//                 assert_eq!(
-//                     map.get("btype"),
-//                     Some(&icrc_ledger_types::icrc::generic_value::ICRC3Value::Text(
-//                         "start_dissolving".to_string()
-//                     )),
-//                     "Block {} is not a mint transaction",
-//                     i
-//                 );
-//             }
-//             _ => panic!("Block is not a map"),
-//         }
-//     }
-// }
+    for i in 0..2 {
+        match &archived_blocks.blocks[i].block {
+            icrc_ledger_types::icrc::generic_value::ICRC3Value::Map(map) => {
+                assert_eq!(
+                    map.get("btype"),
+                    Some(&icrc_ledger_types::icrc::generic_value::ICRC3Value::Text(
+                        "start_dissolving".to_string()
+                    )),
+                    "Block {} is not a mint transaction",
+                    i
+                );
+            }
+            _ => panic!("Block is not a map"),
+        }
+    }
+}
 
 #[test]
 fn test_icrc3_get_tip_certificate() {

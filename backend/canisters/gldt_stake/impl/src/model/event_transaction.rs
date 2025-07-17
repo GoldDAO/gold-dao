@@ -1,4 +1,4 @@
-use bity_ic_canister_time::timestamp_millis;
+use bity_ic_canister_time::timestamp_seconds;
 use bity_ic_icrc3::transaction::TransactionType;
 use candid::CandidType;
 use candid::Nat;
@@ -28,7 +28,7 @@ impl EventTransaction {
             StakePositionStateChange::DissolveInstantly { .. } => "dissolve_instantly",
             StakePositionStateChange::Withdraw { .. } => "withdraw",
         };
-        let timestamp = timestamp_millis();
+        let timestamp = timestamp_seconds();
         Self {
             btype: op.to_string(),
             timestamp,

@@ -67,10 +67,11 @@ if [[ -v $WASMONLY ]]; then
 	echo "$1 wasm file created and ready for did generation"
 else
   ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
-    -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm shrink
+  -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm \
+  shrink --keep-name-section
   ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
-    -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
-    optimize --inline-functions-with-loops O3
+  -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
+  optimize --inline-functions-with-loops O3 --keep-name-section
   gzip --no-name -9 -v -c $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
     > $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz
   gzip -v -t $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz
