@@ -8,7 +8,7 @@ import Dialog from "@shared/ui/dialog/Dialog";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import useFetchUserPositions from "@services/gldt_stake/hooks/useFetchUserPositions";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import { ClaimRewardStateReducerAtom } from "../claim-reward/claim-one/atoms";
 import { UnlockStateReducerAtom } from "../unlock/atoms";
 import { UnstakeStateReducerAtom } from "../unstake/atoms";
@@ -34,11 +34,11 @@ const StakeList = () => {
     enabled: isConnected && !!unauthenticatedAgent,
   });
 
-  const decimals = useFetchDecimals(
+  const decimals = useFetchLedgerDecimals(
     GLDT_LEDGER_CANISTER_ID,
     unauthenticatedAgent,
     {
-      ledger: "gldt",
+      ledger: "GLDT",
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );

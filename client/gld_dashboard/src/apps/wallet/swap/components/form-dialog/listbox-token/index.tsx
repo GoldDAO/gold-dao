@@ -50,7 +50,7 @@ const ListboxToken = ({
           {options.map((token) => (
             <ListboxOptionToken
               value={token}
-              key={token.name}
+              key={token.display_name}
               disabled={optionsDisabled.includes(token)}
             />
           ))}

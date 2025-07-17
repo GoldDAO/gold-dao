@@ -370,7 +370,10 @@ const Buy = () => {
                             />
                             <div>{pay_token.token.name}</div>
                             <div className="flex items-center justify-center rounded-full h-6 w-6 shrink-0 aspect-square">
-                              <Logo name={pay_token.token.id} className="p-1" />
+                              <Logo
+                                name={pay_token.token.name}
+                                className="p-1"
+                              />
                             </div>
                           </form>
                           <MaxButton

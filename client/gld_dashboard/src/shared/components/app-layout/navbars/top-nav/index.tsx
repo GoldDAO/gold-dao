@@ -21,7 +21,7 @@ const TopNav = ({ className }: { className?: string }) => {
         {/* Brand */}
         <div className="flex-shrink-0">
           <Link to="/" className="flex items-center space-x-2">
-            <Logo name="gold_dao" />
+            <Logo name="goldao" />
             <span className="self-center text-xl font-semibold whitespace-nowrap hidden sm:block">
               Gold DAO
             </span>
@@ -69,7 +69,7 @@ const TopNav = ({ className }: { className?: string }) => {
                   <div className="flex flex-col items-center px-2 pt-2 pb-3 space-y-1 sm:px-3">
                     <div className="flex items-center justify-between w-full mb-4">
                       <Link to="/" className="flex items-center pr-4">
-                        <Logo name="gold_dao" />
+                        <Logo name="goldao" />
                         <span className="self-center text-xl font-semibold whitespace-nowrap ml-2">
                           Gold DAO
                         </span>

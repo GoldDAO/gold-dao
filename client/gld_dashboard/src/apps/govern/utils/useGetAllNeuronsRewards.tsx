@@ -9,7 +9,6 @@ import {
   SNS_GOVERNANCE_CANISTER_ID,
   KONGSWAP_CANISTER_ID_IC,
 } from "@constants";
-
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryGovernance } from "@services/sns_governance/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
@@ -17,12 +16,11 @@ import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { TokensList } from "./index";
-import { Ledger } from "@services/ledger/utils/interfaces";
+import { TOKENS } from "@shared/utils/tokens";
 import { Neuron } from "./index";
 
 export type TokensRewards = {
-  id: Ledger;
+  id: string;
   amount: bigint;
   amount_usd: number;
   neurons: Neuron[];
@@ -66,10 +64,12 @@ const useGetAllNeuronsRewards = (
         });
 
         const data = await Promise.all(
-          TokensList.map(async (token) => {
+          TOKENS.filter((token) =>
+            ["OGY", "ICP", "GOLDAO", "WTN"].includes(token.name)
+          ).map(async (token) => {
             const actorLedger = Actor.createActor(idlFactoryLedger, {
               agent,
-              canisterId: token.canisterId,
+              canisterId: token.canister_id,
             });
             const decimals = await icrc1_decimals(actorLedger);
             const neuronData = await Promise.all(

@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import { Transaction } from "@services/ledger-index/utils/interfaces";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import Address from "@components/strings/Address";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
@@ -20,10 +20,14 @@ const ListItemMobile = ({
   const { unauthenticatedAgent, isConnected } = useAuth();
   const token = useAtomValue(TokenSelectedAtom);
 
-  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
-    ledger: token.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
+  const decimals = useFetchLedgerDecimals(
+    token.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: token.name,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,

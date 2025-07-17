@@ -4,7 +4,7 @@ import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { UnstakeStateReducerAtom } from "./atoms";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+// import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
 import useUnstake from "@services/gldt_stake/hooks/useUnstake";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
 

@@ -25,7 +25,7 @@ const GLDTTokenOverview = ({ className }: { className?: string }) => {
     GLDT_LEDGER_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
-      ledger: "gldt",
+      ledger: "GLDT",
       enabled: !!unauthenticatedAgent,
     }
   );

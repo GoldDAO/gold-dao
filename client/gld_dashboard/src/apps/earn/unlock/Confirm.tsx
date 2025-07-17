@@ -5,7 +5,7 @@ import { useAuth } from "@auth/index";
 import { UnlockStateReducerAtom } from "./atoms";
 import useFetchUserStakeById from "@services/gldt_stake/hooks/useFetchUserStakeById";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+// import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
 
 const Confirm = () => {
   const { authenticatedAgent, isConnected } = useAuth();

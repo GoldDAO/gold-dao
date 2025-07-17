@@ -4,17 +4,14 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { idlFactory } from "../../services/ledger/idlFactory";
+import icrc1_decimals from "../../services/ledger/icrc1_decimals";
 
-import { idlFactory } from "../idlFactory";
-
-import { Ledger } from "../utils/interfaces";
-import icrc1_decimals from "../icrc1_decimals";
-
-const useFetchDecimals = (
+const useFetchLedgerDecimals = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
   options: Omit<UseQueryOptions<number>, "queryKey" | "queryFn"> & {
-    ledger: Ledger;
+    ledger: string;
   }
 ) => {
   const {
@@ -25,7 +22,7 @@ const useFetchDecimals = (
   } = options;
 
   return useQuery({
-    queryKey: [`FETCH_LEDGER_DECIMALS_${ledger.toLocaleUpperCase()}`, ledger],
+    queryKey: ["FETCH_LEDGER_DECIMALS", ledger],
     queryFn: async () => {
       try {
         const actor = Actor.createActor(idlFactory, {
@@ -45,4 +42,4 @@ const useFetchDecimals = (
   });
 };
 
-export default useFetchDecimals;
+export default useFetchLedgerDecimals;

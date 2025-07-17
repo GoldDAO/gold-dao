@@ -19,7 +19,7 @@ const OverviewSection = () => {
       <div className="flex flex-col items-center">
         <div className="pb-8 xl:pb-16">
           <div className="flex flex-col items-center">
-            {searchParams.get("token") === "gldnft" ? (
+            {searchParams.get("token") === "GLDNFT" ? (
               <>
                 <HeaderNFT className="hidden xl:block mb-8 xl:mb-12" />
                 <TotalCountUserNFTs />

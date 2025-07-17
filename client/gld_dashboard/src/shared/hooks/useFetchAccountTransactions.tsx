@@ -12,7 +12,6 @@ import { idlFactory as idlFactoryICP } from "@services/ledger-index/idlFactory_i
 import get_account_transactions from "@services/ledger-index/get_account_transactions";
 import get_account_transactions_icp from "@services/ledger-index/get_account_transactions_icp";
 import { Transactions } from "@services/ledger-index/utils/interfaces";
-// import { Ledger } from "@services/ledger/utils/interfaces";
 
 const useFetchAccountTransactions = (
   canisterId: string,

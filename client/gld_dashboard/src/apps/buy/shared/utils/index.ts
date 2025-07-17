@@ -1,8 +1,7 @@
 import { ICP_LEDGER_CANISTER_ID, CKUSDT_LEDGER_CANISTER_ID } from "@constants";
-import { Ledger } from "@services/ledger/utils/interfaces";
 
 export interface Token {
-  id: Ledger;
+  id: string;
   name: string;
   label: string;
   canisterId: string;

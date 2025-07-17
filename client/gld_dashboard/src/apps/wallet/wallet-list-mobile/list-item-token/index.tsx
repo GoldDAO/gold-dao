@@ -9,7 +9,7 @@ import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ListItemToken = ({ token }: { token: Token }) => {
-  const { id, name, label } = token;
+  const { id, name, label, display_name } = token;
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedToken, setSelectedToken] = useAtom(TokenSelectedAtom);
@@ -26,7 +26,7 @@ const ListItemToken = ({ token }: { token: Token }) => {
 
   const onClickToken = () => {
     setSelectedToken(token);
-    searchParams.set("token", token.id);
+    searchParams.set("token", token.display_name);
     setSearchParams(searchParams);
   };
 
@@ -36,7 +36,8 @@ const ListItemToken = ({ token }: { token: Token }) => {
         "shrink-0",
         "rounded-xl border border-border p-2 cursor-pointer",
         `${
-          searchParams.get("token") !== "gldnft" && selectedToken.id === id
+          searchParams.get("token") !== "GLDNFT" &&
+          selectedToken.display_name === display_name
             ? "border-gold bg-gold/10"
             : ""
         }`

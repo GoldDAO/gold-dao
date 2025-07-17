@@ -5,10 +5,10 @@ import ListItemNFT from "@wallet/wallet-list/list-item-nft";
 const WalletList = () => {
   return (
     <div className="flex flex-col gap-2">
-      <ListItemToken token={TOKEN_GLDT} key={TOKEN_GLDT.id} />
+      <ListItemToken token={TOKEN_GLDT} />
       <ListItemNFT />
       {TOKENS.slice(1).map((token) => (
-        <ListItemToken token={token} key={token.id} />
+        <ListItemToken token={token} key={token.display_name} />
       ))}
     </div>
   );

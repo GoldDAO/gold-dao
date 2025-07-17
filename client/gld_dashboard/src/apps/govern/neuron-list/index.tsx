@@ -9,7 +9,7 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import useFetchUserNeuronsList from "@services/sns_governance/hooks/useFetchUserNeuronsList";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import { NeuronUser } from "@services/sns_governance/utils/interfaces";
 import { Logo } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
@@ -106,11 +106,11 @@ const List = () => {
     }
   );
 
-  const decimals = useFetchDecimals(
+  const decimals = useFetchLedgerDecimals(
     GOLDAO_LEDGER_CANISTER_ID,
     unauthenticatedAgent,
     {
-      ledger: "goldao",
+      ledger: "GOLDAO",
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );

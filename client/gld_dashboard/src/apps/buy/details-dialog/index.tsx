@@ -173,7 +173,10 @@ const DetailsDialog = ({
                   </div>
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-1">
-                      <Logo name={receiveToken.token.id} className="h-4 w-4" />
+                      <Logo
+                        name={receiveToken.token.name}
+                        className="h-4 w-4"
+                      />
                       <E8sToLocaleString
                         value={receiveToken.amount as bigint}
                         tokenDecimals={receiveToken.decimals as number}

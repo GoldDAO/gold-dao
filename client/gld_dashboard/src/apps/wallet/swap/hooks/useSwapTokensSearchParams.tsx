@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Token,
-  TokenID,
-  getTokenById,
+  TokenName,
+  getTokenByDisplayName,
   TOKEN_SWAP_WHITELIST,
 } from "@shared/utils/tokens";
 
@@ -45,8 +45,8 @@ const useSwapTokensSearchParams = (): SwapModeResult => {
       return false;
     }
 
-    const tokenFromObj = getTokenById(token as TokenID);
-    const tokenToObj = getTokenById(tokenSwapTo as TokenID);
+    const tokenFromObj = getTokenByDisplayName(token as TokenName);
+    const tokenToObj = getTokenByDisplayName(tokenSwapTo as TokenName);
     return tokenFromObj !== null && tokenToObj !== null;
   };
 
@@ -63,8 +63,12 @@ const useSwapTokensSearchParams = (): SwapModeResult => {
   };
 
   const setValidSwapState = () => {
-    setTokenFrom(getTokenById(getParam("token") as TokenID) as Token);
-    setTokenTo(getTokenById(getParam("token_to") as TokenID) as Token);
+    setTokenFrom(
+      getTokenByDisplayName(getParam("token") as TokenName) as Token
+    );
+    setTokenTo(
+      getTokenByDisplayName(getParam("token_to") as TokenName) as Token
+    );
     setIsSwap(true);
   };
 
