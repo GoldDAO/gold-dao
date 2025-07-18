@@ -49,6 +49,8 @@ impl RuntimeState {
                 commit_hash: self.env.commit_hash().to_string(),
             },
             authorized_principals: self.data.authorized_principals.clone(),
+            whitelist: self.data.whitelist.clone(),
+
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
             total_active_stake_positions: self.data.stake_system.active_stake_positions(),
             token_usd_values: self.data.stake_system.token_usd_values.clone(),
@@ -56,6 +58,14 @@ impl RuntimeState {
             // reward_types: self.data.stake_system.reward_types.clone(),
             reward_history: self.data.allocated_rewards_pool.reward_history.clone(),
             neurons: self.data.neuron_system.neurons.clone(),
+
+            gldt_ledger_id: self.data.gldt_ledger_id,
+            goldao_ledger_id: self.data.goldao_ledger_id,
+            goldao_sns_rewards_canister_id: self.data.goldao_sns_rewards_canister_id,
+            goldao_sns_governance_canister_id: self.data.goldao_sns_governance_canister_id,
+            unallocated_rewards_pool: self.data.unallocated_rewards_pool.clone(),
+            processing_rewards_pool: self.data.processing_rewards_pool.clone(),
+            allocated_rewards_pool: self.data.allocated_rewards_pool.clone(),
         }
     }
 
@@ -88,12 +98,24 @@ impl RuntimeState {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
+    pub whitelist: Vec<Principal>,
     pub total_staked: String,
     pub total_active_stake_positions: usize,
     pub token_usd_values: HashMap<TokenSymbol, f64>,
     pub genesis_datetime: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>,
     pub neurons: Vec<Neuron>,
+
+    // ledgers and canister ids
+    pub gldt_ledger_id: Principal,
+    pub goldao_ledger_id: Principal,
+    pub goldao_sns_rewards_canister_id: Principal,
+    pub goldao_sns_governance_canister_id: Principal,
+
+    // rewards pools
+    pub unallocated_rewards_pool: UnallocatedRewardsPool,
+    pub processing_rewards_pool: ProcessingRewardsPool,
+    pub allocated_rewards_pool: AllocatedRewardsPool,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
