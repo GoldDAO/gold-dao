@@ -1,6 +1,7 @@
 use crate::model::allocated_rewards_pool::AllocatedRewards;
 use crate::model::allocated_rewards_pool::AllocatedRewardsPool;
 use crate::model::allocated_rewards_pool::ALLOCATE_REWARDS_THRESHOLD;
+use candid::CandidType;
 use candid::Nat;
 use candid::Principal;
 use gldt_stake_common::accounts::PROCESSING_REWARDS_POOL;
@@ -75,7 +76,7 @@ pub trait ProcessingRewards {
 
 impl ProcessingRewards for ProcessingRewardsPool {}
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, CandidType)]
 pub struct ProcessingRewardsPool {
     pub state: ProcessingRewardsState,
 }
@@ -116,7 +117,7 @@ impl ProcessingRewardsPool {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, CandidType)]
 pub enum ProcessingRewardsState {
     #[default]
     Awaiting,

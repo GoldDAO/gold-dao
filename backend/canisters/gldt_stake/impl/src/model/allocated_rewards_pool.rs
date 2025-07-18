@@ -1,3 +1,4 @@
+use candid::CandidType;
 use candid::Nat;
 use candid::Principal;
 use canister_time::timestamp_millis;
@@ -34,7 +35,7 @@ pub trait AllocatedRewards {
 
 impl AllocatedRewards for AllocatedRewardsPool {}
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, CandidType)]
 pub struct AllocatedRewardsPool {
     pub state: AllocatedRewardsState,
     pub last_allocation_time: TimestampMillis,
@@ -95,7 +96,7 @@ impl AllocatedRewardsPool {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, CandidType)]
 pub enum AllocatedRewardsState {
     #[default]
     Awaiting,

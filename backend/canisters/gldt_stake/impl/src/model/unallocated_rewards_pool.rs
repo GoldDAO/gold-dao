@@ -1,6 +1,7 @@
 use crate::model::processing_rewards_pool::ProcessingRewards;
 use crate::model::processing_rewards_pool::ProcessingRewardsPool;
 use crate::model::processing_rewards_pool::PROCESS_REWARDS_THRESHOLD;
+use candid::CandidType;
 use candid::Nat;
 use candid::Principal;
 use gldt_stake_common::accounts::UNALLOCATED_REWARDS_POOL;
@@ -12,7 +13,7 @@ use utils::numeric::Percentage;
 
 const REWARDS_PERCENTAGE: u8 = 33;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct UnallocatedRewardsPool {
     pub state: UnallocatedRewardsState,
 }
@@ -113,7 +114,7 @@ pub trait UnallocatedRewards {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, CandidType)]
 pub enum UnallocatedRewardsState {
     #[default]
     Awaiting,
