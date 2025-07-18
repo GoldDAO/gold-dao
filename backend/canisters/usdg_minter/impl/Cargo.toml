@@ -31,6 +31,7 @@ scopeguard = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 usdg_minter_api = { path = "../api" }
+utils = { path = "../../../libraries/utils" }
 
 [dev-dependencies]
 proptest = "1.5.0"
