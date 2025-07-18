@@ -1,25 +1,5 @@
 use candid::{self, CandidType, Deserialize};
-use ic_cdk::{query, update};
-
-#[derive(CandidType, Deserialize, Eq, PartialEq, Debug)]
-pub struct SupportedStandard {
-    pub url: String,
-    pub name: String,
-}
-
-#[query]
-fn icrc10_supported_standards() -> Vec<SupportedStandard> {
-    vec![
-        SupportedStandard {
-            url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-10/ICRC-10.md".to_string(),
-            name: "ICRC-10".to_string(),
-        },
-        SupportedStandard {
-            url: "https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_28_trusted_origins.md".to_string(),
-            name: "ICRC-28".to_string(),
-        },
-    ]
-}
+use ic_cdk::update;
 
 #[derive(Clone, Debug, CandidType, Deserialize)]
 pub struct Icrc28TrustedOriginsResponse {

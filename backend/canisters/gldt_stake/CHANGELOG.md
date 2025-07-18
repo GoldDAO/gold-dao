@@ -18,6 +18,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - A maximum of 5 concurrent dissolve events per stake position ensures the system remains robust and spam-resistant.
 - To reduce APY volatility and smooth out fluctuations in GOLDAO and ICP rewards, only 33% of the available rewards are distributed each week. This creates a more stable and predictable reward experience for users.
 
+#### Added
+
+- **Support of ICRC10 standard**: ICRC-10 is a standard aimed at simplifying the discovery of supported standards by canisters on the Internet Computer. By providing a unified method, icrc10_supported_standards, canisters can easily expose the standards they implement, enhancing interoperability and easing integration efforts across the ecosystem.
+- **Support of ICRC21 standard**: Added support for retrieving human-readable consent messages from canisters before executing calls. This enables wallet signers (such as OISY) to prompt users with clear, canister-defined explanations of requested actions, improving transparency and user trust.
+
 ### [1.0.2] - 2025-04-23
 
 #### Add

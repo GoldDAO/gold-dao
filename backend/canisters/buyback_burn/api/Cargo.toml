@@ -15,4 +15,4 @@ types = { path = "../../../libraries/types" }
 # sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 icrc-ledger-types = { workspace = true }
 ic-stable-structures = { workspace = true }
-utils = { path = "../../../libraries/utils" }
+utils = { path = '../../../libraries/utils' }

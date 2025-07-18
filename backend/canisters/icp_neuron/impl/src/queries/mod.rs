@@ -1,9 +1,11 @@
 use ic_cdk::query;
 
 mod http_request;
+pub mod icrc10;
 pub mod list_neurons;
 mod transform_http_response;
 
+pub use icrc10::*;
 pub use list_neurons::*;
 
 #[query(hidden = true)]

@@ -15,3 +15,4 @@ serde = { workspace = true, features = ["derive"] }
 origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api' }
 types = { path = '../../../libraries/types' }
 gldt_swap_common = { path = "../common", features = []}
+utils = { path = '../../../libraries/utils' }

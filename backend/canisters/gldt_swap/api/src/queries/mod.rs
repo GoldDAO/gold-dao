@@ -5,3 +5,5 @@ pub mod get_active_swaps_by_user;
 pub mod get_archive_canisters;
 pub mod get_owned_nfts;
 pub mod http_request;
+pub mod icrc10;
+pub mod icrc21;

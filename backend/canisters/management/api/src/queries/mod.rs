@@ -1,2 +1,3 @@
 pub mod dex_transfer_position_validate;
 pub mod get_gld_dashboard_maintenance_mode;
+pub mod icrc10;
