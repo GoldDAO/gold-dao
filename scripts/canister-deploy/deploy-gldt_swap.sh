@@ -2,7 +2,7 @@
 
 NETWORK=$1
 
-DEPLOYMENT_VIA="direct"
+DEPLOYMENT_VIA="proposal"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh gldt_swap $NETWORK
 
