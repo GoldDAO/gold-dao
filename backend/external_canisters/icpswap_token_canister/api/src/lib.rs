@@ -1,6 +1,6 @@
 // This is an experimental feature to generate Rust binding from Candid.
 // You may want to manually adjust some of the types.
-#![allow(dead_code, unused_imports)]
+#![allow(dead_code, unused_imports, non_snake_case)]
 use candid::{self, CandidType, Decode, Deserialize, Encode, Principal};
 
 #[derive(CandidType, Deserialize)]

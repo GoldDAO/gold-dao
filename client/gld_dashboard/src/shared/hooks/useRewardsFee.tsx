@@ -13,10 +13,9 @@ import {
 
 import { idlFactory } from "@services/ledger/idlFactory";
 import icrc1_fee from "@services/ledger/icrc1_fee";
-import { Ledger } from "@services/ledger/utils/interfaces";
 
 export interface RewardFeeData {
-  id: Ledger;
+  id: string;
   name: string;
   canister_id: string;
   fee: bigint;

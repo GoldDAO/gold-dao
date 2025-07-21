@@ -1,180 +1,149 @@
-use candid::Nat;
+use crate::state::read_state;
+use candid::{Nat, Principal};
 use canister_time::{run_interval, timestamp_millis, HOUR_IN_MS};
-use gldt_stake_common::reward_tokens::{LedgerFee, LedgerId, TokenSymbol};
-use ic_cdk::spawn;
+use futures::future::join_all;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::claim_reward::Response as ClaimResponse;
+use sns_rewards_api_canister::claim_rewards_batch::{
+    Args as BatchClaimArgs, Response as ClaimResponse,
+};
 use std::time::Duration;
 use tracing::{error, info};
 use types::TimestampMillis;
 
-use crate::state::{mutate_state, read_state};
+const CLAIM_REWARDS_THRESHOLD: u64 = 10_000_000_u64;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(HOUR_IN_MS), spawn_rewards_job);
+    run_interval(Duration::from_millis(HOUR_IN_MS), spawn_claim_rewards_job);
 }
 
-fn spawn_rewards_job() {
-    ic_cdk::spawn(process_rewards_impl())
+fn spawn_claim_rewards_job() {
+    ic_cdk::futures::spawn(claim_rewards_impl());
 }
 
-async fn process_rewards_impl() {
+async fn claim_rewards_impl() {
     let now = timestamp_millis();
     info!("CLAIM_NEURON_REWARDS :: start");
 
     if !is_allowed_to_run(now) {
         return;
     }
-    mutate_state(|s| {
-        s.data.is_reward_claim_in_progress = true;
-    });
 
     let neurons = read_state(|s| s.data.neuron_system.get_neurons());
     let neuron_ids: Vec<NeuronId> = neurons.iter().filter_map(|n| n.id.clone()).collect();
     let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
-    neuron_ids.into_iter().for_each(|neuron_id| {
-        reward_types
-            .clone()
-            .into_iter()
-            .for_each(|(token_symbol, (token_ledger, ledger_fee))| {
-                let neuron_id = neuron_id.clone();
-                spawn(async move {
-                    let _ =
-                        spawn_claim_procedure(neuron_id, token_symbol, token_ledger, ledger_fee)
-                            .await;
-                });
-            })
-    });
-    mutate_state(|s| {
-        s.data.is_reward_claim_in_progress = false;
-    });
+
+    let mut futures = Vec::new();
+    let mut neuron_token_pairs = Vec::new();
+    for neuron_id in &neuron_ids {
+        for token_symbol in &reward_types {
+            let token_symbol = *token_symbol;
+            let token_ledger = token_symbol.get_token_info().ledger_id;
+            futures.push(fetch_neuron_reward_balance(neuron_id, token_ledger));
+            neuron_token_pairs.push((neuron_id.clone(), token_symbol));
+        }
+    }
+
+    let results = join_all(futures).await;
+
+    let mut claim_reward_args = Vec::new();
+
+    for (idx, result) in results.into_iter().enumerate() {
+        let (neuron_id, token_symbol) = &neuron_token_pairs[idx];
+        match result {
+            Ok(balance) => {
+                if balance >= CLAIM_REWARDS_THRESHOLD {
+                    claim_reward_args.push(
+                        sns_rewards_api_canister::claim_rewards_batch::ClaimRewardArgs {
+                            neuron_id: neuron_id.clone(),
+                            token: *token_symbol,
+                        },
+                    );
+                } else {
+                    info!(
+                        "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: balance below threshold: {}",
+                        neuron_id, token_symbol, balance
+                    );
+                }
+            }
+            Err(e) => {
+                error!(
+                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: error: {}",
+                    neuron_id, token_symbol, e
+                );
+            }
+        }
+    }
+
+    if claim_reward_args.is_empty() {
+        info!("CLAIM_NEURON_REWARDS :: no eligible neurons found for claiming rewards.");
+        return;
+    }
+
+    let claim_reward_args_len = claim_reward_args.len();
+    let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
+    let args = BatchClaimArgs {
+        claim_reward_args: claim_reward_args,
+    };
+
+    match sns_rewards_c2c_client::claim_rewards_batch(sns_rewards_canister_id, args).await {
+        Ok(ClaimResponse::Ok(())) => {
+            info!(
+                "CLAIM_NEURON_REWARDS :: successfully claimed rewards for {} entries",
+                claim_reward_args_len
+            );
+        }
+        Ok(ClaimResponse::Err(errors)) => {
+            for error in errors {
+                error!(
+                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: error - {:?}",
+                    error.neuron_id, error.token, error.error
+                );
+            }
+        }
+        Err(e) => {
+            error!("CLAIM_NEURON_REWARDS :: batch claim failed: {:?}", e);
+        }
+    }
+
     info!("CLAIM_NEURON_REWARDS :: finished");
 }
 
 fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
-    let distribution_in_progress = read_state(|s| s.data.is_reward_claim_in_progress);
+    let is_awaiting = read_state(|s| s.data.unallocated_rewards_pool.is_awaiting());
     let distribution_interval = match read_state(|s| s.data.reward_claim_interval.clone()) {
         Some(interval) => interval,
         None => {
-            info!("CLAIM_NEURON_REWARDS :: not correct time to run, finishing early");
+            info!("CLAIM_NEURON_REWARDS :: no claim interval set, aborting");
             return false;
         }
     };
-    let is_distribution_time_valid =
-        distribution_interval.is_within_weekly_interval(initial_run_time);
 
-    // in_progress
-    if distribution_in_progress {
-        info!("CLAIM_NEURON_REWARDS :: reward claim alread in progress");
+    let is_distribution_time_valid =
+        distribution_interval.is_within_daily_interval(initial_run_time);
+
+    if !is_awaiting {
+        info!("CLAIM_NEURON_REWARDS :: claim already in progress");
         return false;
     }
-    if is_distribution_time_valid {
-        return true;
-    }
 
-    false
-}
-
-async fn spawn_claim_procedure(
-    neuron_id: NeuronId,
-    token_symbol: TokenSymbol,
-    token_ledger: LedgerId,
-    ledger_fee: LedgerFee,
-) -> Result<(), String> {
-    info!(
-        "CLAIM_NEURON_REWARDS :: neuron id - {} :: claim procedure started",
-        neuron_id
-    );
-    let reward_balance = fetch_neuron_reward_balance(&neuron_id, &token_ledger).await?;
-    // if there are more than 10 of any token type then claim the rewards
-    info!(
-        "CLAIM_NEURON_REWARDS :: neuron id - {} :: found rewards of {} {}",
-        neuron_id, reward_balance, token_symbol
-    );
-    if reward_balance < Nat::from(10_000_000u64) {
-        info!(
-            "CLAIM_NEURON_REWARDS :: neuron id - {} :: reward of {} {} is less than the threshold of 1_000_000_000",
-            neuron_id, reward_balance, token_symbol
-        );
-        return Err("Not enough rewards to process this neuron".to_string());
-    };
-    claim_reward(neuron_id.clone(), &token_symbol).await?;
-
-    let reward = reward_balance - ledger_fee;
-    mutate_state(|s| {
-        s.data.reward_system.add_reward_round(
-            reward.clone(),
-            token_symbol.clone(),
-            timestamp_millis(),
-        )
-    });
-    info!(
-        "CLAIM_NEURON_REWARDS :: neuron id - {} :: {} {} claim procedure finished successfully",
-        neuron_id, reward, token_symbol
-    );
-    Ok(())
+    is_distribution_time_valid
 }
 
 async fn fetch_neuron_reward_balance(
     neuron_id: &NeuronId,
-    token_ledger: &LedgerId,
+    token_ledger: Principal,
 ) -> Result<Nat, String> {
     let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
-    match icrc1_balance_of(
-        *token_ledger,
+
+    icrc1_balance_of(
+        token_ledger,
         Account {
             owner: sns_rewards_canister_id,
             subaccount: Some(neuron_id.clone().into()),
         },
     )
     .await
-    {
-        Ok(balance) => Ok(balance),
-        Err(e) => Err(format!("fetch_neuron_reward_balance error: {e:?}")),
-    }
-}
-
-async fn claim_reward(neuron_id: NeuronId, token_symbol: &TokenSymbol) -> Result<(), String> {
-    info!(
-        "CLAIM_NEURON_REWARDS :: neuron id - {} :: attempting to claim {} reward",
-        neuron_id, token_symbol
-    );
-    let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
-
-    let mut args = sns_rewards_api_canister::claim_reward::Args {
-        neuron_id: neuron_id.clone(),
-        token: token_symbol.clone(),
-    };
-
-    if token_symbol == "GOLDAO" {
-        args.token = "GLDGov".to_string()
-    }
-
-    match sns_rewards_c2c_client::claim_reward(sns_rewards_canister_id, args).await {
-        Ok(response) => match response {
-            ClaimResponse::Ok(_) => {
-                info!(
-                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: {} rewards claimed successful",
-                    neuron_id, token_symbol
-                );
-                Ok(())
-            }
-            other_response => {
-                error!(
-                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: {} rewards claimed failed with error - {other_response:?}",
-                    neuron_id, token_symbol
-                );
-                Err(format!("{other_response:?}"))
-            }
-        },
-        Err(err) => {
-            error!(
-                "CLAIM_NEURON_REWARDS :: neuron id - {} :: {} rewards claimed failed with error - {err:?}",
-                neuron_id, token_symbol
-            );
-            Err(format!("{err:?}"))
-        }
-    }
+    .map_err(|e| format!("fetch balance error: {:?}", e))
 }

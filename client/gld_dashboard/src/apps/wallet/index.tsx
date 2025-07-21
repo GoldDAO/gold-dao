@@ -23,13 +23,13 @@ const Wallet = () => {
       !searchParams.get("token") ||
       !TOKEN_WHITELIST.includes(searchParams.get("token")!)
     ) {
-      searchParams.set("token", TOKEN_GLDT.id);
+      searchParams.set("token", TOKEN_GLDT.display_name);
       setSelectedToken(TOKEN_GLDT);
       setSearchParams(searchParams);
     } else {
-      if (searchParams.get("token") !== "gldnft") {
+      if (searchParams.get("token") !== "GLDNFT") {
         setSelectedToken(
-          TOKENS.find((t) => t.id === searchParams.get("token"))!
+          TOKENS.find((t) => t.display_name === searchParams.get("token"))!
         );
       }
     }
@@ -60,7 +60,7 @@ const Wallet = () => {
         <div className="p-4 xl:p-8 mt-12">
           <div className="mb-4">Transactions</div>
           {isConnected ? (
-            searchParams.get("token") === "gldnft" ? (
+            searchParams.get("token") === "GLDNFT" ? (
               <TxHistoryNFT />
             ) : (
               <TxHistoryToken />

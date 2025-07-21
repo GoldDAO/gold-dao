@@ -5,18 +5,16 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { SNS_REWARDS_CANISTER_ID, KONGSWAP_CANISTER_ID_IC } from "@constants";
-
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import swap_amounts from "@services/kongswap/swap_amounts";
-import { TokensList } from "./index";
-import { Ledger } from "@services/ledger/utils/interfaces";
+import { TOKENS } from "@shared/utils/tokens";
 import { Neuron } from "./index";
 
 export type TokensRewards = {
-  id: Ledger;
+  id: string;
   amount: bigint;
   amount_usd: number;
   neurons: Neuron[];
@@ -51,10 +49,12 @@ const useGetOneNeuronRewards = (
         });
 
         const data = await Promise.all(
-          TokensList.map(async (token) => {
+          TOKENS.filter((token) =>
+            ["OGY", "ICP", "GOLDAO", "WTN"].includes(token.name)
+          ).map(async (token) => {
             const actorLedger = Actor.createActor(idlFactoryLedger, {
               agent,
-              canisterId: token.canisterId,
+              canisterId: token.canister_id,
             });
             const decimals = await icrc1_decimals(actorLedger);
 
@@ -73,7 +73,14 @@ const useGetOneNeuronRewards = (
               id: token.id,
               amount: reward,
               amount_usd: price.mid_price * (Number(reward) / 10 ** decimals),
-              neurons: [],
+              neurons: [
+                {
+                  id: neuronId,
+                  reward: reward,
+                  reward_usd:
+                    price.mid_price * (Number(reward) / 10 ** decimals),
+                },
+              ],
             };
           })
         );

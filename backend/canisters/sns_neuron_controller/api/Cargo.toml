@@ -12,3 +12,4 @@ candid = { workspace = true }
 serde = { workspace = true }
 types = { path = "../../../libraries/types" }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
+utils = { path = '../../../libraries/utils' }

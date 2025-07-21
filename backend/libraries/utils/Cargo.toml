@@ -18,3 +18,4 @@ tracing = { workspace = true }
 tokio = { version = "1.39.2", features = ["macros", "rt"] }
 num-bigint = {workspace = true}
 thiserror = {workspace = true}
+strum = { workspace = true }

@@ -108,7 +108,7 @@ const GoldDAOOwnedNeuronsOverview = ({ className }: { className?: string }) => {
                     <div className="font-semibold text-4xl">
                       {neuronsWTN.data.totalStakedAmount.string}
                     </div>
-                    <Logo className="flex-none h-8" name="waterneuron" />
+                    <Logo className="flex-none h-8" name="WTN" />
                   </div>
                 )}
                 {(neuronsWTN.isLoading || neuronsWTN.isError) && (

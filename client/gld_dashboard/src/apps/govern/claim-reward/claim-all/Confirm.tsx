@@ -7,7 +7,7 @@ import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import { ClaimRewardStateReducerAtom, ConfirmClaimEnableAtom } from "./atoms";
 import { Reward } from "../../utils";
 import useGetAllNeuronsRewards from "../../utils/useGetAllNeuronsRewards";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
@@ -19,10 +19,14 @@ const RewardItem = ({ name }: { name: string }) => {
     (r) => r.name === name
   ) as Reward;
 
-  const decimals = useFetchDecimals(reward.canister_id, unauthenticatedAgent, {
-    ledger: reward.id,
-    enabled: !!unauthenticatedAgent && isConnected,
-  });
+  const decimals = useFetchLedgerDecimals(
+    reward.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: reward.name,
+      enabled: !!unauthenticatedAgent && isConnected,
+    }
+  );
 
   return (
     <button
@@ -54,13 +58,14 @@ const RewardItem = ({ name }: { name: string }) => {
               <E8sToLocaleString
                 value={reward.amount as bigint}
                 tokenDecimals={decimals.data}
+                decimals={5}
               />
             ) : (
               <div>Loading...</div>
             )}
           </div>
           <div className="text-content/60 text-sm">
-            $<NumberToLocaleString value={reward.amount_usd} />
+            $<NumberToLocaleString value={reward.amount_usd} decimals={5} />
           </div>
         </div>
       </div>

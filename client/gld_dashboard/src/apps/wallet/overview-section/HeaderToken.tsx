@@ -1,5 +1,5 @@
 import { useAuth } from "@auth/index";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useFetchTokenPrice from "@shared/hooks/useFetchTokenPrice";
 import { Logo } from "@components/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
@@ -14,10 +14,14 @@ const HeaderToken = ({
 }) => {
   const { unauthenticatedAgent } = useAuth();
 
-  const decimals = useFetchDecimals(token.canister_id, unauthenticatedAgent, {
-    ledger: token.id,
-    enabled: !!unauthenticatedAgent,
-  });
+  const decimals = useFetchLedgerDecimals(
+    token.canister_id,
+    unauthenticatedAgent,
+    {
+      ledger: token.name,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   const price = useFetchTokenPrice(unauthenticatedAgent, {
     from: token.name,
@@ -31,7 +35,7 @@ const HeaderToken = ({
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-1">
           <Logo name={token.id} className="h-6 w-6" />
-          <div className="font-semibold text-xl">{token.name}</div>
+          <div className="font-semibold text-xl">{token.display_name}</div>
         </div>
         <div className="text-xs xl:text-sm text-content/60">
           {price.isSuccess ? (

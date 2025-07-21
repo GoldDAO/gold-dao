@@ -6,7 +6,7 @@ import { useAuth } from "@auth/index";
 import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 // import E8sToLocaleString from "@components/numbers/E8sToLocaleString";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+// import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
 import useClaimReward from "@services/gldt_stake/hooks/useClaimReward";
 import { Reward } from "../../utils";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
@@ -22,7 +22,7 @@ const TokenItem = ({
 
   const claim = useClaimReward(GLDT_STAKE_CANISTER_ID, authenticatedAgent);
 
-  // const decimals = useFetchDecimals(reward.canisterId, unauthenticatedAgent, {
+  // const decimals = useFetchLedgerDecimals(reward.canisterId, unauthenticatedAgent, {
   //   ledger: reward.id,
   //   enabled: !!unauthenticatedAgent && isConnected,
   // });

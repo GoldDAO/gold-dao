@@ -1,14 +1,18 @@
-use gldt_stake_common::stake_position::DissolveState;
-
-use crate::client::gldt_stake::{get_active_user_positions, start_dissolving};
+use crate::client::gldt_stake::get_position;
+use crate::client::gldt_stake::manage_stake_position;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
+use assert_matches::assert_matches;
+use candid::Nat;
+use gldt_stake_api_canister::manage_stake_position;
+use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;
+use gldt_stake_common::manage_stake_position_interface::StartDissolvingErrors;
 
 #[test]
 fn test_start_dissolving() {
+    // --- Setup test environment ---
     let mut test_env = default_test_setup();
-
     let GldtStakeTestEnv {
         ref mut pic,
         controller,
@@ -16,34 +20,118 @@ fn test_start_dissolving() {
         gldt_stake_canister_id,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
-    // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user_0, _) = create_stake_position_util(
-        pic_borrowed,
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
         controller,
         &token_ledgers,
         gldt_stake_canister_id,
-        1_000_000_000u128,
+        5_000_000_000u128,
     );
 
-    let user_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    assert_eq!(user_positions.len(), 1);
+    let response = manage_stake_position(
+        pic,
+        user,
+        gldt_stake_canister_id,
+        &manage_stake_position::Args::StartDissolving { fraction: 100 },
+    );
+    assert!(matches!(response, Result::Ok(_)));
 
-    let position = user_positions.get(0).unwrap();
+    tick_n_blocks(pic, 1);
 
-    let response =
-        start_dissolving(pic_borrowed, user_0, gldt_stake_canister_id, &position.id).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    assert_eq!(user_position.staked, Nat::from(0_u64));
+}
 
-    assert_eq!(response.dissolve_state, DissolveState::Dissolving);
+#[test]
+fn test_start_dissolving_partial() {
+    // --- Setup test environment ---
+    let mut test_env = default_test_setup();
+    let GldtStakeTestEnv {
+        ref mut pic,
+        controller,
+        token_ledgers,
+        gldt_stake_canister_id,
+        ..
+    } = test_env;
+    let pic = &pic.borrow();
 
-    tick_n_blocks(pic_borrowed, 1);
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
+        controller,
+        &token_ledgers,
+        gldt_stake_canister_id,
+        100_000_000_000_u128,
+    );
 
-    let user_positions =
-        get_active_user_positions(pic_borrowed, user_0, gldt_stake_canister_id, &None);
-    assert_eq!(user_positions.len(), 1);
+    let response = manage_stake_position(
+        pic,
+        user,
+        gldt_stake_canister_id,
+        &manage_stake_position::Args::StartDissolving { fraction: 50 },
+    );
+    assert!(matches!(response, Result::Ok(_)));
 
-    let position = user_positions.get(0).unwrap();
-    assert_eq!(position.dissolve_state, DissolveState::Dissolving);
+    tick_n_blocks(pic, 1);
+
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    assert_eq!(user_position.staked, Nat::from(50_000_000_000_u128));
+}
+
+#[test]
+fn test_start_dissolving_limit() {
+    // --- Setup test environment ---
+    let mut test_env = default_test_setup();
+    let GldtStakeTestEnv {
+        ref mut pic,
+        controller,
+        token_ledgers,
+        gldt_stake_canister_id,
+        ..
+    } = test_env;
+    let pic = &pic.borrow();
+
+    // --- Create stake position ---
+    let (user, _) = create_stake_position_util(
+        pic,
+        controller,
+        &token_ledgers,
+        gldt_stake_canister_id,
+        100_000_000_000u128,
+    );
+
+    // --- Create 5 legit dissolvements ---
+    for _ in 0..=4 {
+        let response = manage_stake_position(
+            pic,
+            user,
+            gldt_stake_canister_id,
+            &manage_stake_position::Args::StartDissolving { fraction: 20 },
+        );
+
+        assert!(response.is_ok());
+    }
+
+    tick_n_blocks(pic, 1);
+
+    // --- Create the 6th not legit dissolvements ---
+    let response = manage_stake_position(
+        pic,
+        user,
+        gldt_stake_canister_id,
+        &manage_stake_position::Args::StartDissolving { fraction: 10 },
+    );
+
+    assert_matches!(
+        response,
+        Err(ManageStakePositionError::StartDissolvingError(
+            StartDissolvingErrors::DissolvementsLimitReached(_)
+        ))
+    );
+
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    assert_eq!(user_position.staked, Nat::from(32_768_000_000_u128));
 }

@@ -8,11 +8,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.3] - 2025-06-05
+
+#### Changed
+
+- Simplified staking model: GLDT staking now enforces a single stake position per user:
+    - Users can now increase their stake via the increase_stake endpoint.
+    - Users can also initiate partial dissolves of their stake by specifying a dissolve fraction.
+    - A maximum of 5 concurrent dissolve events per stake position ensures the system remains robust and spam-resistant.
+- To reduce APY volatility and smooth out fluctuations in GOLDAO and ICP rewards, only 33% of the available rewards are distributed each week. This creates a more stable and predictable reward experience for users.
+
+#### Added
+
+- **Support of ICRC10 standard**: ICRC-10 is a standard aimed at simplifying the discovery of supported standards by canisters on the Internet Computer. By providing a unified method, icrc10_supported_standards, canisters can easily expose the standards they implement, enhancing interoperability and easing integration efforts across the ecosystem.
+- **Support of ICRC21 standard**: Added support for retrieving human-readable consent messages from canisters before executing calls. This enables wallet signers (such as OISY) to prompt users with clear, canister-defined explanations of requested actions, improving transparency and user trust.
+
 ### [1.0.2] - 2025-04-23
 
 #### Add
 
 - Add the feature to vote with neurons based on the majority of the public's vote at the end of the voting period.
+- Feature to increase stake of a position
 - Add a method 'manual_token_transfer' to enable to let the DAO transfer funds from the canister in case needed.
 
 #### Fix

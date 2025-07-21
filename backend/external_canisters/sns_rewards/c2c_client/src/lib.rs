@@ -5,3 +5,4 @@ use sns_rewards_api_canister::*;
 
 // Updates
 generate_candid_c2c_call!(claim_reward);
+generate_candid_c2c_call!(claim_rewards_batch);

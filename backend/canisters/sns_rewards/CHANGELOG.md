@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.9] - 2025-07-18
+
+#### Added
+
+- **Support of ICRC10 standard**: ICRC-10 is a standard aimed at simplifying the discovery of supported standards by canisters on the Internet Computer. By providing a unified method, icrc10_supported_standards, canisters can easily expose the standards they implement, enhancing interoperability and easing integration efforts across the ecosystem.
+- **Support of ICRC21 standard**: Added support for retrieving human-readable consent messages from canisters before executing calls. This enables wallet signers (such as OISY) to prompt users with clear, canister-defined explanations of requested actions, improving transparency and user trust.
+
 ### [1.0.8] - 2025-07-11
 
 #### Fixed

@@ -12,3 +12,4 @@ inttest = []
 candid = { workspace = true }
 icrc-ledger-types = { git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
 serde = { workspace = true }
+utils = { path = '../../../libraries/utils' }

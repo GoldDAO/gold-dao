@@ -87,15 +87,15 @@ impl SnsInitArgsBuilder {
         self
     }
 
-    pub fn build(self) -> SnsInitArgs {
-        SnsInitArgs::new(
-            self.project.expect("project required"),
-            &self.canister_ids.expect("canister_ids required"),
-            &self.neuron_data.expect("neuron_data required"),
-            self.controller.expect("controller required"),
-            self.initial_balances,
-        )
-    }
+    // pub fn build(self) -> SnsInitArgs {
+    //     SnsInitArgs::new(
+    //         self.project.expect("project required"),
+    //         &self.canister_ids.expect("canister_ids required"),
+    //         &self.neuron_data.expect("neuron_data required"),
+    //         self.controller.expect("controller required"),
+    //         self.initial_balances,
+    //     )
+    // }
 }
 
 #[derive(Clone)]
@@ -108,16 +108,6 @@ pub struct SnsInitArgs {
 }
 
 impl SnsInitArgs {
-    pub fn new(
-        project: SnsProject,
-        canister_ids: &CanisterIds,
-        neuron_data: &HashMap<usize, Neuron>,
-        controller: Principal,
-        initial_balances: Option<Vec<(Account, Nat)>>,
-    ) -> SnsInitArgs {
-        project.default_init_args(controller, canister_ids, neuron_data, initial_balances)
-    }
-
     pub fn ogy(canister_ids: &CanisterIds, controller: Principal) -> SnsInitArgs {
         let governance_args = Governance {
         deployed_version: Some(Version {

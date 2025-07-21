@@ -55,7 +55,7 @@ const ConfirmDialog = ({
             <div className="flex flex-row justify-between items-center xl:items-end">
               <div className="flex items-center gap-2">
                 <Logo
-                  name={payToken.token.id}
+                  name={payToken.token.name}
                   className="h-10 w-10 shrink-0 aspect-square"
                 />
                 <div>
@@ -95,7 +95,7 @@ const ConfirmDialog = ({
             <div className="flex flex-row justify-between items-center xl:items-end">
               <div className="flex items-center gap-2">
                 <Logo
-                  name={receiveToken.token.id}
+                  name={receiveToken.token.name}
                   className="h-10 w-10 shrink-0 aspect-square"
                 />
                 <div>
@@ -211,7 +211,7 @@ const ConfirmDialog = ({
           </div>
         </div>
         <BtnPrimary onClick={handleConfirm} className="w-full">
-          Confirm GLDT purchase {receiveToken.token.name}
+          Confirm {receiveToken.token.name} purchase
         </BtnPrimary>
         <div className="flex justify-center">
           <div className="flex items-center gap-1 text-content/60 text-sm">

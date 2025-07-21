@@ -25,7 +25,7 @@ const ListItemToken = ({ token }: { token: Token }) => {
 
   const onClickToken = () => {
     setSelectedToken(token);
-    searchParams.set("token", token.id);
+    searchParams.set("token", token.display_name);
     setSearchParams(searchParams);
   };
 
@@ -36,8 +36,8 @@ const ListItemToken = ({ token }: { token: Token }) => {
         "rounded-xl border border-border p-2 cursor-pointer",
         "hover:border-gold hover:bg-gold/10",
         `${
-          searchParams.get("token") !== "gldnft" &&
-          selectedToken.id === token.id
+          searchParams.get("token") !== "GLDNFT" &&
+          selectedToken.display_name === token.display_name
             ? "border-gold bg-gold/10"
             : ""
         }`
@@ -48,7 +48,7 @@ const ListItemToken = ({ token }: { token: Token }) => {
         <div className="flex items-center gap-2">
           <Logo name={token.id} className="h-9 w-9" />
           <div className="text-left">
-            <div>{token.name}</div>
+            <div>{token.display_name}</div>
             <div className="text-content/60 text-sm font-normal">
               {token.label}
             </div>

@@ -13,6 +13,8 @@ import ICRCAccount from "./form-input/ICRCAccount";
 import PrincipalAndSubaccount from "./form-input/PrincipalAndSubaccount";
 import ICRCAccountOrAccountId from "./form-input/ICRCAccountOrAccountId";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import MaxButton from "@shared/components/MaxButton";
+import BalanceAvailable from "@shared/components/BalanceAvailable";
 
 const InputCard = ({ children }: { children: ReactNode }) => {
   return (
@@ -111,15 +113,10 @@ const Form = ({ className }: { className?: string }) => {
     return true;
   };
 
-  const handleOnClickMaxBalance = () => {
-    const amount = balance.data.balance_e8s - balance.data.fee_e8s;
-    setValue(
-      "amount",
-      amount > 0 ? Number(amount) / 10 ** balance.data.decimals : 0,
-      {
-        shouldValidate: true,
-      }
-    );
+  const onClickMaxBalance = (amount: string) => {
+    setValue("amount", amount, {
+      shouldValidate: true,
+    });
     setFocus("principal");
   };
 
@@ -213,15 +210,12 @@ const Form = ({ className }: { className?: string }) => {
                   })}
                 />
               </div>
-              <button
-                onClick={handleOnClickMaxBalance}
-                type="button"
-                className="rounded-md py-1 px-2 bg-surface-primary text-content/60 border border-border text-xs disabled:cursor-not-allowed cursor-pointer"
-                data-tooltip-id="tooltip"
-                data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
-              >
-                Max
-              </button>
+              <MaxButton
+                balance={balance.data?.balance_e8s}
+                fee={balance.data?.fee_e8s}
+                decimals={balance.data?.decimals}
+                handleOnClick={(amount) => onClickMaxBalance(amount)}
+              />
             </div>
             <div className="text-content/40 text-sm mt-2 ml-1">
               $
@@ -238,10 +232,11 @@ const Form = ({ className }: { className?: string }) => {
           )}
         </div>
         <div className="flex items-center justify-between">
-          <div className="inline-flex text-content/60 items-center gap-1 text-sm bg-surface-secondary rounded-md px-2 py-1">
-            <div className="text-content/40">Available:</div>
-            <NumberToLocaleString value={balance.data.balance} />
-            <div>{token.name}</div>
+          <div className="text-content/60 text-sm bg-surface-secondary rounded-md px-4 py-1">
+            <BalanceAvailable
+              token={token.name}
+              balance={balance.data?.balance}
+            />
           </div>
           <div className="inline-flex text-content/60 items-center gap-1 text-sm">
             <div className="text-content/40">Fee:</div>

@@ -33,7 +33,7 @@ const ListItemNFT = () => {
   const { isConnected, authenticatedAgent, principalId } = useAuth();
 
   const onClickToken = () => {
-    searchParams.set("token", "gldnft");
+    searchParams.set("token", "GLDNFT");
     setSearchParams(searchParams);
   };
 
@@ -49,7 +49,7 @@ const ListItemNFT = () => {
         "shrink-0",
         "rounded-xl border border-border p-2 cursor-pointer",
         `${
-          searchParams.get("token") === "gldnft" ? "border-gold bg-gold/10" : ""
+          searchParams.get("token") === "GLDNFT" ? "border-gold bg-gold/10" : ""
         }`
       )}
       onClick={onClickToken}

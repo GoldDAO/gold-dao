@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ActorSubclass } from "@dfinity/agent";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-// import { Ledger } from "@services/ledger/utils/interfaces";
 import { idlFactory } from "../idlFactory";
 import { SwapResult, SwapReply } from "../interfaces";
 

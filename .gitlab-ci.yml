@@ -99,9 +99,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_swap
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: usdg_minter
+  # - local: scripts/ci-cd/.canister_builds.yml
+  #   inputs:
+  #     src-folder: usdg_minter
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_stake

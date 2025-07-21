@@ -29,6 +29,8 @@ pub mod updates;
 pub mod vault;
 pub mod xrc;
 
+use queries::*;
+
 pub const E8S: u64 = 100_000_000;
 
 /// Time constants

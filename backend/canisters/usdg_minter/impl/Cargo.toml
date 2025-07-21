@@ -27,11 +27,11 @@ ic-metrics-encoder = { workspace = true }
 ic-stable-structures = { workspace = true }
 minicbor = { workspace = true }
 rust_decimal = { workspace = true }
-rust_decimal_macros = "1.36.0"
 scopeguard = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 usdg_minter_api = { path = "../api" }
+utils = { path = "../../../libraries/utils" }
 
 [dev-dependencies]
 proptest = "1.5.0"

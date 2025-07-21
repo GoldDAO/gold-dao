@@ -39,7 +39,7 @@ async fn handle_archive_canister_cycles() {
     };
 
     let swap_canister_required_base: Cycles =
-        archive_canister_threshold * ((archive_canisters.len() as u64) + 1); // all archive canisters plus this canister
+        archive_canister_threshold * ((archive_canisters.len() as u128) + 1); // all archive canisters plus this canister
 
     mutate_state(|s| {
         s.data.required_cycle_balance = Nat::from(swap_canister_required_base);
@@ -59,7 +59,7 @@ async fn handle_archive_canister_cycles() {
             async move {
                 match get_cycles_balance(archive_canister_id).await {
                     Ok(archive_cycle_balance) => {
-                        if archive_cycle_balance < archive_canister_threshold {
+                        if (archive_cycle_balance as u128) < archive_canister_threshold {
                             match
                                 deposit_cycles(
                                     archive_canister_id,

@@ -16,3 +16,4 @@ serde = { workspace = true, features = ["derive"] }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 types = { path = '../../../libraries/types' }
 num-bigint = {workspace = true}
+utils = { path = '../../../libraries/utils' }

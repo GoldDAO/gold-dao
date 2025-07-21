@@ -58,14 +58,14 @@ const GLDGovTransactionDetails = () => {
             <Card title="To">{data.to_account}</Card>
             <Card title="Amount">
               <div className="flex items-center gap-2">
-                <Logo name="gldgov" className="h-4 w-4" />
+                <Logo name="goldao" className="h-4 w-4" />
                 <div className="font-semibold">{data.amount}</div>
                 <div className="text-content/60">GLDGov</div>
               </div>
             </Card>
             <Card title="Fee" className="">
               <div className="flex items-center gap-2">
-                <Logo name="gldgov" className="h-4 w-4" />
+                <Logo name="goldao" className="h-4 w-4" />
                 <div className="font-semibold">{data.fee}</div>
                 <div className="text-content/60">GLDGov</div>
               </div>

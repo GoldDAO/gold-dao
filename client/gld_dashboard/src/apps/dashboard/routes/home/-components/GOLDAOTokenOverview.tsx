@@ -15,7 +15,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
     GOLDAO_LEDGER_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
-      ledger: "gldgov",
+      ledger: "GOLDAO",
       enabled: !!unauthenticatedAgent,
     }
   );
@@ -44,7 +44,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
 
             {totalSupply.isSuccess && (
               <div className="flex items-center justify-center xl:justify-start gap-4">
-                <Logo className="flex-none h-8" name="gldgov" />
+                <Logo className="flex-none h-8" name="GOLDAO" />
                 <div className="font-semibold text-4xl">0</div>
               </div>
             )}
@@ -70,7 +70,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
 
             {price.isSuccess && (
               <div className="flex items-center justify-center xl:justify-start gap-4">
-                <Logo className="flex-none h-8" name="gldgov" />
+                <Logo className="flex-none h-8" name="GOLDAO" />
                 <div className="font-semibold text-4xl">
                   $<NumberToLocaleString value={price.data} />
                 </div>
@@ -98,7 +98,7 @@ const GOLDAOTokenOverview = ({ className }: { className?: string }) => {
 
             {totalSupply.isSuccess && price.isSuccess && (
               <div className="flex items-center justify-center xl:justify-start gap-4">
-                <Logo className="flex-none h-8" name="gldgov" />
+                <Logo className="flex-none h-8" name="GOLDAO" />
                 <div className="font-semibold text-4xl">
                   $
                   <NumberToLocaleString

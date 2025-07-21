@@ -18,10 +18,10 @@ import BtnPrimary from "@shared/ui/button/BtnPrimary";
 import SwitchTransfer from "@shared/components/switch/SwitchTransfer";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
-import Balance from "@shared/components/Balance";
 import DisclaimerInsufficientOGYFunds from "./disclaimer-insufficient-ogy-funds";
 import { Logo } from "@shared/ui/logos";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import BalanceAvailable from "@shared/components/BalanceAvailable";
 
 const Form = () => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -146,8 +146,8 @@ const Form = () => {
           </p>
         )}
 
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-8 mx-2">
-          <div className="inline-flex justify-start items-center text-content/60 text-sm rounded-lg mb-2 sm:mb-0">
+        <div className="flex justify-between items-center mt-8 mx-2">
+          <div className="flex justify-start items-center text-content/60 text-sm rounded-lg">
             <div>Fee: </div>
             {txFeeNFT.isSuccess ? (
               <div className="flex items-center">
@@ -163,6 +163,10 @@ const Form = () => {
             ) : (
               <div>Fetching NFT fee...</div>
             )}
+          </div>
+
+          <div className="px-4 py-1 bg-surface-secondary text-content/60 text-xs rounded-md">
+            <BalanceAvailable token="OGY" balance={balanceOGY.data?.balance} />
           </div>
         </div>
 
@@ -187,14 +191,6 @@ const Form = () => {
         >
           Transfer
         </BtnPrimary>
-
-        <div className="flex justify-center mt-4">
-          {balanceOGY.isSuccess ? (
-            <Balance ledger="OGY" balance={balanceOGY.data.balance} />
-          ) : (
-            <div>Fetching balance OGY...</div>
-          )}
-        </div>
       </form>
     </>
   );

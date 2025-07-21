@@ -1,83 +1,147 @@
-use candid::{CandidType, Decode, Encode, Nat, Principal};
+use super::stake_position_event::{ClaimRewardStatus, WithdrawState};
+use super::{ledgers::GLDT_TX_FEE, reward_tokens::RewardTokens};
+use crate::manage_stake_position_interface::AddStakePositionErrors;
+use crate::manage_stake_position_interface::GeneralError;
+use crate::manage_stake_position_interface::RemoveRewardErrors;
+use crate::manage_stake_position_interface::StartDissolvingErrors;
+use crate::manage_stake_position_interface::WithdrawErrors;
+use crate::stake_position_event::DissolveStakeEvent;
+use candid::{CandidType, Nat, Principal};
 use canister_time::{timestamp_millis, DAY_IN_MS};
-use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::time::Duration;
-use std::{borrow::Cow, collections::HashMap};
-use types::TimestampMillis;
+use types::{TimestampMillis, TokenSymbol};
+use utils::numeric::{Percentage, ScaledArithmetic};
 
-use super::reward_tokens::TokenSymbol;
-use super::stake_position_event::{ClaimRewardStatus, UnstakeState};
-use super::{ledgers::GLDT_TX_FEE, numeric::ScaledArithmetic, reward_tokens::RewardTokens};
-
-pub type StakePositionId = u64;
-
-pub const GLDT_STAKE_MAX_ACTIVE_STAKE_POSITIONS_PER_USER: usize = 10;
 pub const GLDT_STAKE_DISSOLVE_DELAY_MS: u64 = DAY_IN_MS * 7;
 pub const GLDT_STAKE_EARLY_UNSTAKE_FEE_PERCENTAGE: f64 = 0.05;
-pub const MINIMUM_STAKE_AMOUNT: u64 = 1_000_000_000;
+pub const MINIMUM_STAKE_AMOUNT: u64 = 1_000_000_000; // 10 GLDT
 pub const MINIMUM_STAKE_AMOUNT_WITH_FEE: u64 = MINIMUM_STAKE_AMOUNT + GLDT_TX_FEE;
+pub const MAXIMUM_STAKE_AMOUNT: u64 = 100_000_000_000_000; // 1 million GLDT
+pub const MAX_ACTIVE_EVENTS_PER_POSITION: usize = 5;
 pub const DAYS_IN_A_YEAR: f64 = 365.25; // Account for leap years
 pub const BONUS_INCREMENT: f64 = 1.0 / DAYS_IN_A_YEAR; // Daily increment
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
 pub struct StakePosition {
-    /// The user who owns the stake position
     pub owned_by: Principal,
-    /// The amount initially staked by the user
     pub staked: Nat,
-    /// The timestamp when the position was created
     pub created_at: TimestampMillis,
-    /// Rewards that can be claimed    
+    pub age_bonus_timestamp: TimestampMillis,
     pub claimable_rewards: RewardTokens,
-    /// The dissolve status of the stake position
-    pub dissolve_state: DissolveState,
-    /// the delay in millisecnds that must be waited until a position can be unstaked
     pub dissolve_delay: Duration,
-    /// if set, the datetime in milliseconds when the stake position will be fully dissolved and ready to be unstaked
-    pub dissolved_date: Option<TimestampMillis>,
-    /// status for claim reward procedure
     pub claim_reward_status: ClaimRewardStatus,
-    /// status of unstaked ( both normal and early unstaking )
-    pub unstake_state: UnstakeState,
-}
-
-#[cfg(feature = "inttest")]
-pub const MAX_STAKE_POSITION_SIZE: u32 = 90_000;
-
-#[cfg(not(feature = "inttest"))]
-pub const MAX_STAKE_POSITION_SIZE: u32 = 400;
-
-impl Storable for StakePosition {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
-    }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_STAKE_POSITION_SIZE,
-        is_fixed_size: false,
-    };
+    pub withdraw_state: WithdrawState,
+    pub dissolve_events: Vec<DissolveStakeEvent>,
 }
 
 impl StakePosition {
-    pub fn new(owner: Principal, initial_stake_amount: Nat) -> Self {
+    pub fn try_new(
+        owner: Principal,
+        initial_stake_amount: Nat,
+    ) -> Result<Self, AddStakePositionErrors> {
+        Self::validate_stake_amount(&initial_stake_amount)?;
+
         let mut claimable_rewards = HashMap::new();
-        claimable_rewards.insert("ICP".to_string(), Nat::from(0u64));
-        claimable_rewards.insert("OGY".to_string(), Nat::from(0u64));
-        claimable_rewards.insert("GOLDAO".to_string(), Nat::from(0u64));
-        Self {
+        claimable_rewards.insert(TokenSymbol::ICP, Nat::from(0u64));
+        claimable_rewards.insert(TokenSymbol::OGY, Nat::from(0u64));
+        claimable_rewards.insert(TokenSymbol::GOLDAO, Nat::from(0u64));
+
+        let now = timestamp_millis();
+        Ok(Self {
             owned_by: owner,
             staked: initial_stake_amount,
-            created_at: timestamp_millis(),
+            created_at: now,
+            age_bonus_timestamp: now,
             claimable_rewards,
-            dissolve_state: DissolveState::default(),
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
+        })
+    }
+
+    pub fn validate_stake_amount(amount: &Nat) -> Result<(), AddStakePositionErrors> {
+        if *amount < MINIMUM_STAKE_AMOUNT {
+            return Err(AddStakePositionErrors::InvalidStakeAmount(format!(
+                "Initial stake amount {} is less than minimum {}.",
+                amount, MINIMUM_STAKE_AMOUNT
+            )));
         }
+        if *amount > MAXIMUM_STAKE_AMOUNT {
+            return Err(AddStakePositionErrors::InvalidStakeAmount(format!(
+                "Initial stake amount {} exceeds maximum {}.",
+                amount, MAXIMUM_STAKE_AMOUNT
+            )));
+        }
+        Ok(())
+    }
+
+    pub fn change_stake(&mut self, amount: Nat, change: StakeChange) -> Result<(), GeneralError> {
+        match change {
+            StakeChange::Increase => {
+                let new_stake = self.staked.clone() + amount.clone();
+
+                if new_stake < MINIMUM_STAKE_AMOUNT {
+                    return Err(GeneralError::ModifyStakeError(format!(
+                    "Cannot increase stake by {}. Minimum stake is {} and currently staked is {}.",
+                    amount, MINIMUM_STAKE_AMOUNT, self.staked
+                )));
+                }
+
+                if new_stake > MAXIMUM_STAKE_AMOUNT {
+                    return Err(GeneralError::ModifyStakeError(format!(
+                    "Cannot increase stake by {}. Maximum stake is {} and currently staked is {}.",
+                    amount, MAXIMUM_STAKE_AMOUNT, self.staked
+                )));
+                }
+
+                self.update_age_bonus_timestamp(amount.clone());
+                self.staked = new_stake;
+            }
+
+            StakeChange::Decrease(decrease_type) => {
+                if amount > self.staked {
+                    return Err(GeneralError::ModifyStakeError(format!(
+                        "Cannot decrease stake by {}. Current stake is only {}.",
+                        amount, self.staked
+                    )));
+                }
+
+                let new_stake = self.staked.clone() - amount.clone();
+
+                if matches!(decrease_type, DecreaseType::Fractional)
+                    && new_stake < MINIMUM_STAKE_AMOUNT
+                {
+                    return Err(GeneralError::ModifyStakeError(format!(
+                    "Stake would drop below minimum stake amount {} (current: {}, decrease: {}).",
+                    MINIMUM_STAKE_AMOUNT, self.staked, amount
+                )));
+                }
+
+                // NOTE: age bonus timestamp is not reset on decrease
+                self.staked = new_stake;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn insert_event(&mut self, payload: DissolveStakeEvent) {
+        self.dissolve_events.push(payload)
+    }
+
+    pub fn cleanup_completed_dissolve_events(&mut self) -> Vec<DissolveStakeEvent> {
+        let now = timestamp_millis();
+
+        let (completed, remaining): (Vec<_>, Vec<_>) = self
+            .dissolve_events
+            .drain(..)
+            .partition(|event| !event.completed && event.dissolved_date <= now);
+
+        self.dissolve_events = remaining;
+        completed
     }
 
     pub fn calculate_weighted_stake(&self, age_bonus_multiplier: f64) -> Nat {
@@ -95,16 +159,12 @@ impl StakePosition {
         let age_bonus_multiplier = self.calculate_age_bonus_multiplier(current_timestamp);
         let position_weighted_stake = self.calculate_weighted_stake(age_bonus_multiplier);
         let percentage_scaled = position_weighted_stake.scaled_e8s_div(total_weighted_stake_pool);
-        let reward = (reward_pool_amount.clone() * percentage_scaled).scale_e8s_down();
-        reward
+        (reward_pool_amount.clone() * percentage_scaled).scale_e8s_down()
     }
 
     pub fn calculate_age_bonus_multiplier(&self, current_timestamp: TimestampMillis) -> f64 {
-        // Handle when dissolve state is dissolving - it should not increase, otherwise calculate from the current date
-        let age_in_millis = match self.dissolved_date {
-            Some(_) => return 0.0,
-            None => current_timestamp.saturating_sub(self.created_at),
-        };
+        // NOTE: dosn't depend on dissolvance anymore
+        let age_in_millis = current_timestamp.saturating_sub(self.age_bonus_timestamp);
 
         // Convert age in milliseconds to age in days
         let age_in_days = age_in_millis as f64 / DAY_IN_MS as f64;
@@ -113,54 +173,45 @@ impl StakePosition {
         let raw_bonus = age_in_days * BONUS_INCREMENT;
 
         // If less than 1 full day has passed, the multiplier should stay at 1.0
-        let final_bonus = if age_in_days >= 1.0 {
+        if age_in_days >= 1.0 {
             // If we've passed at least one full day, apply the raw bonus increment
             1.0 + raw_bonus
         } else {
             // Otherwise, return the base multiplier (1.0)
             1.0
-        };
-
-        final_bonus
-    }
-
-    pub fn can_start_dissolving(&self) -> Result<(), StakePositionError> {
-        if self.dissolve_state != DissolveState::NotDissolving {
-            return Err(StakePositionError::StartDissolvingError(format!(
-                "stake position state must be NotDissolving but was found to be {:?}",
-                self.dissolve_state
-            )));
         }
-        Ok(())
     }
 
-    pub fn prepare_start_dissolving(&mut self) -> Result<(), StakePositionError> {
-        if self.dissolve_state != DissolveState::NotDissolving {
-            return Err(StakePositionError::StartDissolvingError(format!(
-                "stake position state must be NotDissolving but was found to be {:?}",
-                self.dissolve_state
-            )));
+    pub fn can_allocate_reward(&self) -> Result<(), GeneralError> {
+        // Find the latest dissolve event (by timestamp + event_id)
+        let last_dissolve = self.dissolve_events.last().map(|event| {
+            let DissolveStakeEvent {
+                percentage,
+                completed,
+                ..
+            } = event;
+            (*percentage, *completed)
+        });
+
+        // Check that the full stake wasn't dissolved
+        if matches!(last_dissolve, Some((Percentage::MAX, false))) {
+            Err(GeneralError::CannotAddReward(
+                "Full stake is dissolved, cannot allocate new rewards".to_string(),
+            ))
+        } else {
+            Ok(())
         }
-        self.dissolve_state = DissolveState::Dissolving;
-        self.dissolved_date = Some(timestamp_millis() + self.dissolve_delay.as_millis() as u64);
-        Ok(())
     }
 
-    pub fn can_add_reward(&mut self) -> Result<(), StakePositionError> {
-        if self.dissolve_state != DissolveState::NotDissolving {
-            return Err(StakePositionError::AddRewardError(format!(
-                "Can't add to position because dissolve state is {:?}",
-                self.dissolve_state
-            )));
-        }
-        Ok(())
-    }
-
-    pub fn can_claim_reward(&self, token: &String, amount: &Nat) -> Result<(), RemoveRewardErrors> {
+    pub fn can_claim_reward(
+        &self,
+        token: &TokenSymbol,
+        amount: &Nat,
+    ) -> Result<(), RemoveRewardErrors> {
         if let Some(current_rewards) = self.claimable_rewards.get(token) {
             if amount > current_rewards || current_rewards == &Nat::from(0u64) {
                 Err(RemoveRewardErrors::InsufficientBalance(format!(
-                    "cant deduct a reward of {} {} because balance is {} {}",
+                    "cant deduct a reward of {} {:?} because balance is {} {:?}",
                     amount, token, current_rewards, token
                 )))
             } else {
@@ -168,62 +219,110 @@ impl StakePosition {
             }
         } else {
             Err(RemoveRewardErrors::RewardTokenTypeDoesNotExist(format!(
-                "Token of type '{}' does not exist in the rewards map",
+                "Token of type '{:?}' does not exist in the rewards map",
                 token
             )))
         }
     }
 
-    pub fn can_unstake_early(&self) -> Result<(), UnstakeErrors> {
-        if self.dissolve_state != DissolveState::NotDissolving {
-            return Err(UnstakeErrors::InvalidDissolveState(format!(
-                "The stake position has dissolve state of {:?} but needs to be {:?}",
-                self.dissolve_state,
-                DissolveState::NotDissolving
-            )));
+    pub fn can_start_dissolving(&self) -> Result<(), StartDissolvingErrors> {
+        if self.staked == 0u64 {
+            return Err(StartDissolvingErrors::InvalidDissolveAmount(
+                "Cannot start dissolving on a position with zero stake.".to_string(),
+            ));
         }
-        self.unstake_state.is_valid_state_to_unstake()?;
-        if self.has_rewards() {
-            return Err(UnstakeErrors::CantUnstakeWithRewardsBalance("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking".to_string()));
+
+        let active_dissolves = self
+            .dissolve_events
+            .iter()
+            .filter(|event| !event.completed)
+            .count();
+
+        if active_dissolves >= MAX_ACTIVE_EVENTS_PER_POSITION {
+            Err(StartDissolvingErrors::DissolvementsLimitReached(format!(
+                "You already have {} active dissolve dissolve_events. Complete some before starting a new one.",
+                MAX_ACTIVE_EVENTS_PER_POSITION
+            )))
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn can_dissolve_instantly(&self, percentage: Percentage) -> Result<(), WithdrawErrors> {
+        self.withdraw_state.is_valid_state_to_withdraw()?;
+
+        if percentage == 100 {
+            // Must not have rewards
+            if self.has_rewards() {
+                return Err(WithdrawErrors::CantWithdrawWithRewardsBalance(
+                    "This stake position has rewards available to claim.".to_string(),
+                ));
+            }
         }
 
         Ok(())
     }
 
-    pub fn calculate_unstake_early_fee(&self) -> Nat {
-        self.staked
+    pub fn can_withdraw(&self) -> Result<(), WithdrawErrors> {
+        // First ensure the current withdraw state allows unstaking
+        self.withdraw_state.is_valid_state_to_withdraw()?;
+
+        // Now check if there's at least one dissolve event ready
+        let now = timestamp_millis();
+
+        let has_ready_dissolve_event = self.dissolve_events.iter().any(|event| {
+            matches!(&event,
+                 DissolveStakeEvent { dissolved_date, .. }
+                if now >= *dissolved_date
+            )
+        });
+
+        if !has_ready_dissolve_event {
+            return Err(WithdrawErrors::NoValidDissolveEvents(
+                "No tokens are currently eligible for unstaking.".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub fn calculate_dissolve_instantly_fee(&self, amount_to_dissolve: Nat) -> Nat {
+        amount_to_dissolve
             .scale_e8s_mul_f64(GLDT_STAKE_EARLY_UNSTAKE_FEE_PERCENTAGE)
             .scale_e8s_down()
     }
 
-    pub fn can_unstake(&self) -> Result<(), UnstakeErrors> {
+    pub fn amount_available_for_withdraw(&self) -> Nat {
         let now = timestamp_millis();
 
-        if self.dissolve_state != DissolveState::Dissolving {
-            return Err(UnstakeErrors::InvalidDissolveState(format!(
-                "The stake position has dissolve state of {:?} but needs to be {:?}",
-                self.dissolve_state,
-                DissolveState::Dissolving
-            )));
-        }
+        self.dissolve_events
+            .iter()
+            .filter_map(|event| match &event {
+                DissolveStakeEvent {
+                    amount,
+                    dissolved_date,
+                    completed,
+                    ..
+                } if !completed && *dissolved_date <= now => Some(amount.clone()),
+                _ => None,
+            })
+            .fold(Nat::from(0u32), |acc, amount| acc + amount)
+    }
 
-        self.unstake_state.is_valid_state_to_unstake()?;
+    pub fn completed_dissolve_events(&self) -> Vec<DissolveStakeEvent> {
+        let now = timestamp_millis();
 
-        match self.dissolved_date {
-            Some(dissolve_date) => {
-                if now >= dissolve_date {
-                    if self.has_rewards() {
-                        return Err(UnstakeErrors::CantUnstakeWithRewardsBalance("This stake position has rewards available to claim. The stake position must claim all rewards before unstaking".to_string()));
-                    }
-                    Ok(())
-                } else {
-                    Err(UnstakeErrors::DissolveDateNotSatisfied(format!("The stake position has a dissolve date of {} and this is less than the current time {}", dissolve_date, now)))
-                }
-            }
-            None => Err(UnstakeErrors::NoDissolveDateSet(
-                "The stake position has no dissolve date".to_string(),
-            )),
-        }
+        self.dissolve_events
+            .iter()
+            .filter_map(|event| match event {
+                DissolveStakeEvent {
+                    dissolved_date,
+                    completed,
+                    ..
+                } if !completed && *dissolved_date <= now => Some(event.clone()),
+                _ => None,
+            })
+            .collect()
     }
 
     pub fn has_rewards(&self) -> bool {
@@ -239,148 +338,30 @@ impl StakePosition {
             .unwrap_or(Nat::from(0u64))
     }
 
-    pub fn eligible_for_reward_allocation(&self) -> bool {
-        self.dissolve_state == DissolveState::NotDissolving
+    fn update_age_bonus_timestamp(&mut self, amount_added: Nat) {
+        let old_timestamp = self.age_bonus_timestamp;
+        let denominator = self.staked.clone() + amount_added.clone();
+        let numerator = self.staked.scaled_e8s_mul(old_timestamp)
+            + amount_added.scaled_e8s_mul(timestamp_millis());
+        self.age_bonus_timestamp = u64::try_from(
+            &numerator
+                .scaled_e8s_div(&denominator)
+                .scale_e8s_down()
+                .0
+                .clone(),
+        )
+        .unwrap();
     }
 }
 
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DissolveState {
-    NotDissolving,
-    Dissolving,
-    Dissolved,
+pub enum StakeChange {
+    Increase,
+    Decrease(DecreaseType),
 }
 
-impl Default for DissolveState {
-    fn default() -> Self {
-        Self::NotDissolving
-    }
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum StakePositionError {
-    AddRewardError(String),
-    StartDissolvingError(String),
-    UnStakeError(UnstakeErrors),
-    RemoveRewardError(RemoveRewardErrors),
-    AddStakePositionError(AddStakePositionErrors),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum UnstakeErrors {
-    CantUnstakeWithRewardsBalance(String),
-    InvalidDissolveState(String),
-    DissolveDateNotSatisfied(String),
-    NoDissolveDateSet(String),
-    AlreadyProcessing(String),
-    AlreadyUnstaked(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum RemoveRewardErrors {
-    InsufficientBalance(String),
-    RewardTokenTypeDoesNotExist(String),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum AddStakePositionErrors {
-    CanisterAtCapacity(String),
-    MaxActiveStakePositions(String),
-    InvalidPrincipal(String),
-    InvalidStakeAmount(String),
-    TransferError(String),
-    CallError(String),
-    AlreadyProcessing(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum StartDissolvingErrors {
-    InvalidPrincipal(String),
-    NotAuthorized(String),
-    StakePositionError(StakePositionError),
-    NotFound(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum ClaimRewardErrors {
-    AlreadyProcessing(String),
-    InvalidPrincipal(String),
-    NotAuthorized(String),
-    TokenImbalance(String),
-    NotFound(String),
-    InvalidRewardToken(String),
-    TransferError(String),
-    CallError(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum UnstakeRequestErrors {
-    InvalidPrincipal(String),
-    NotAuthorized(String),
-    UnstakeErrors(UnstakeErrors),
-    NotFound(String),
-    TransferError(String),
-    CallError(String),
-    AlreadyUnstaked(String),
-    InvalidState(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum UnstakeEarlyRequestErrors {
-    InvalidPrincipal(String),
-    NotAuthorized(String),
-    UnstakeErrors(UnstakeErrors),
-    NotFound(String),
-    TransferError(String),
-    CallError(String),
-    AlreadyProcessing(String),
-    AlreadyUnstakedEarly(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug)]
-pub struct StakePositionResponse {
-    /// Id of the neuron
-    pub id: StakePositionId,
-    /// The user who owns the stake position
-    pub owned_by: Principal,
-    /// The amount initially staked by the user
-    pub staked: Nat,
-    /// The timestamp when the position was created
-    pub created_at: TimestampMillis,
-    /// An age bonus starting at 1 and increasing linearly by 1 year year
-    pub age_bonus_multiplier: f64,
-    /// The weighted stake considering the bonus multiplier
-    pub weighted_stake: Nat,
-    /// Rewards that can be claimed    
-    pub claimable_rewards: HashMap<String, Nat>,
-    /// The dissolve status of the stake position
-    pub dissolve_state: DissolveState,
-    /// the delay in millisecnds that must be waited until a position can be unstaked
-    pub dissolve_delay: Duration,
-    /// if set, the datetime in milliseconds when the stake position will be fully dissolved and ready to be unstaked
-    pub dissolved_date: Option<TimestampMillis>,
-    /// the fee associated with performing an early unstake instead of dissolving
-    pub early_unstake_fee: Nat,
-}
-
-impl From<(StakePosition, TimestampMillis, StakePositionId)> for StakePositionResponse {
-    fn from((position, timestamp, id): (StakePosition, TimestampMillis, StakePositionId)) -> Self {
-        let age_bonus_multiplier = position.calculate_age_bonus_multiplier(timestamp);
-        let weighted_stake = position.calculate_weighted_stake(age_bonus_multiplier);
-        let early_unstake_fee = position.calculate_unstake_early_fee();
-        StakePositionResponse {
-            id,
-            owned_by: position.owned_by,
-            staked: position.staked,
-            created_at: position.created_at,
-            claimable_rewards: position.claimable_rewards,
-            dissolve_state: position.dissolve_state,
-            dissolve_delay: position.dissolve_delay,
-            dissolved_date: position.dissolved_date,
-            age_bonus_multiplier,
-            weighted_stake,
-            early_unstake_fee,
-        }
-    }
+pub enum DecreaseType {
+    Fractional,
+    Full,
 }
 
 #[cfg(test)]
@@ -399,12 +380,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - one_year_in_ms,
+            age_bonus_timestamp: (now - one_year_in_ms).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -417,12 +398,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - ((365.25 * DAY_IN_MS as f64) as u64 / 2),
+            age_bonus_timestamp: (now - ((365.25 * DAY_IN_MS as f64) as u64 / 2)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -436,12 +417,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - (DAY_IN_MS / 2),
+            age_bonus_timestamp: (now - (DAY_IN_MS / 2)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -454,12 +435,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - (DAY_IN_MS * 14),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 14)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -477,12 +458,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - nine_years,
+            age_bonus_timestamp: (now - nine_years).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -505,13 +486,12 @@ mod tests {
                 owned_by: Principal::anonymous(),
                 staked: Nat::from(1_000u64),
                 created_at: now - (DAY_IN_MS * day), // Position created 'day' days ago
+                age_bonus_timestamp: (now - (DAY_IN_MS * day)).into(), // Position created 'day' days ago
                 claimable_rewards: HashMap::new(),
-                dissolve_state: DissolveState::NotDissolving,
                 dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-                dissolved_date: None,
                 claim_reward_status: ClaimRewardStatus::None,
-
-                unstake_state: UnstakeState::None,
+                withdraw_state: WithdrawState::None,
+                dissolve_events: Vec::default(),
             };
 
             let multiplier = position.calculate_age_bonus_multiplier(now);
@@ -532,106 +512,119 @@ mod tests {
 
     #[test]
     fn calculate_age_bonus_multiplier_for_dissolving_position() {
-        // once the position starts to dissolve, the bonus multiplier should not increase
+        const DAY_IN_MS: u64 = 86_400_000; // Milliseconds in a day
+        const DAYS_IN_A_YEAR: f64 = 365.25; // Account for leap years
+        const BONUS_INCREMENT: f64 = 1.0 / DAYS_IN_A_YEAR; // Daily increment
         let now: TimestampMillis = timestamp_millis();
-        let one_year = (365.25 * DAY_IN_MS as f64) as u64;
 
-        // Create a position that was created 1 year ago
-        let mut position = StakePosition {
-            owned_by: Principal::anonymous(),
-            staked: Nat::from(1_000u64),
-            created_at: now - one_year,
-            claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
-            dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
-            claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
-        };
+        // Iterate over each day of the year (1 to 365)
+        for day in 1..=365 {
+            let mut position = StakePosition {
+                owned_by: Principal::anonymous(),
+                staked: Nat::from(1_000u64),
+                created_at: now - (DAY_IN_MS * day), // Position created 'day' days ago
+                age_bonus_timestamp: (now - (DAY_IN_MS * day)).into(), // Position created 'day' days ago
+                claimable_rewards: HashMap::new(),
+                dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
+                claim_reward_status: ClaimRewardStatus::None,
+                withdraw_state: WithdrawState::None,
+                dissolve_events: Vec::default(),
+            };
+            let _ = position.insert_event(DissolveStakeEvent {
+                percentage: Percentage::new(99).unwrap(),
+                amount: Nat::from(100_u64),
+                dissolved_date: timestamp_millis() + DAY_IN_MS * 7,
+                completed: false,
+            });
 
-        let _ = position.prepare_start_dissolving();
+            let multiplier = position.calculate_age_bonus_multiplier(now);
 
-        let multiplier = position.calculate_age_bonus_multiplier(now);
-        assert_eq!(multiplier, 0.0);
-        let weighted_stake = position.calculate_weighted_stake(multiplier);
-        assert_eq!(weighted_stake, Nat::from(0u64));
+            // Calculate the expected multiplier for the current day
+            let expected_multiplier = 1.0 + BONUS_INCREMENT * (day as f64);
+            if expected_multiplier != multiplier {
+                println!("val: {multiplier} expected: {expected_multiplier}");
+            }
 
-        // in 7 days it should still be 2.0
-        let now_later = now + (DAY_IN_MS * 3);
-
-        let multiplier = position.calculate_age_bonus_multiplier(now_later);
-        assert_eq!(multiplier, 0.0);
-        let weighted_stake = position.calculate_weighted_stake(multiplier);
-        assert_eq!(weighted_stake, Nat::from(0u64));
-
-        // in 30 days it should still be 2.0
-        let now_later = now + (DAY_IN_MS * 30);
-
-        let multiplier = position.calculate_age_bonus_multiplier(now_later);
-        assert_eq!(multiplier, 0.0);
-        let weighted_stake = position.calculate_weighted_stake(multiplier);
-        assert_eq!(weighted_stake, Nat::from(0u64));
-
-        // in 180 days it should still be 2.0
-        let now_later = now + (DAY_IN_MS * 180);
-
-        let multiplier = position.calculate_age_bonus_multiplier(now_later);
-        assert_eq!(multiplier, 0.0);
-        let weighted_stake = position.calculate_weighted_stake(multiplier);
-        assert_eq!(weighted_stake, Nat::from(0u64));
+            // Ensure the calculated multiplier is within an acceptable range
+            assert!(
+                (multiplier - expected_multiplier).abs() < 0.0001,
+                "Day {day} failed: expected {expected_multiplier}, got {multiplier}"
+            );
+        }
     }
 
     #[test]
     fn can_claim_reward() {
         // Create a position that was created 1 year ago
-        let mut position = StakePosition::new(Principal::anonymous(), Nat::from(1000u64));
+        let mut position =
+            StakePosition::try_new(Principal::anonymous(), Nat::from(1_000_000_000_u64)).unwrap();
 
         position
             .claimable_rewards
-            .insert(format!("GOLDAO"), Nat::from(1000u64));
+            .insert(TokenSymbol::GOLDAO, Nat::from(1000u64));
         position
             .claimable_rewards
-            .insert(format!("ICP"), Nat::from(1000u64));
+            .insert(TokenSymbol::ICP, Nat::from(1000u64));
         position
             .claimable_rewards
-            .insert(format!("OGY"), Nat::from(1000u64));
+            .insert(TokenSymbol::OGY, Nat::from(1000u64));
 
         assert_eq!(
-            position.claimable_rewards.get("GOLDAO"),
+            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
             Some(&Nat::from(1000u64))
         );
         assert_eq!(
-            position.claimable_rewards.get("ICP"),
+            position.claimable_rewards.get(&TokenSymbol::ICP),
             Some(&Nat::from(1000u64))
         );
         assert_eq!(
-            position.claimable_rewards.get("OGY"),
+            position.claimable_rewards.get(&TokenSymbol::OGY),
             Some(&Nat::from(1000u64))
         );
 
-        let res = position.can_claim_reward(&"GOLDAO".to_string(), &Nat::from(1000u64));
+        let res = position.can_claim_reward(&TokenSymbol::GOLDAO, &Nat::from(1000u64));
         assert_matches!(res, Ok(_));
 
-        let res = position.can_claim_reward(&"GOLDAO".to_string(), &Nat::from(1001u64));
+        let res = position.can_claim_reward(&TokenSymbol::GOLDAO, &Nat::from(1001u64));
         matches!(res, Err(RemoveRewardErrors::InsufficientBalance(_)));
     }
 
     #[test]
     fn adding_rewards_should_fail_if_position_is_dissolving() {
         // Create a position that was created 1 year ago
-        let mut position = StakePosition::new(Principal::anonymous(), Nat::from(1000u64));
-        let _ = position.prepare_start_dissolving();
+        let position =
+            StakePosition::try_new(Principal::anonymous(), Nat::from(1_000_000_000_u64)).unwrap();
 
         assert_eq!(
-            position.claimable_rewards.get("GOLDAO"),
+            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
             Some(&Nat::from(0u64))
         );
 
-        let res = position.can_add_reward();
-        matches!(res, Err(StakePositionError::StartDissolvingError(_)));
+        let res = position.can_allocate_reward();
+        matches!(res, Err(GeneralError::CannotAddReward(_)));
 
         assert_eq!(
-            position.claimable_rewards.get("GOLDAO"),
+            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
+            Some(&Nat::from(0u64))
+        );
+    }
+
+    #[test]
+    fn try_new_with_too_low_stake() {
+        // Create a position that was created 1 year ago
+        let position =
+            StakePosition::try_new(Principal::anonymous(), Nat::from(1_000_u64)).unwrap();
+
+        assert_eq!(
+            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
+            Some(&Nat::from(0u64))
+        );
+
+        let res = position.can_allocate_reward();
+        matches!(res, Err(GeneralError::CannotAddReward(_)));
+
+        assert_eq!(
+            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
             Some(&Nat::from(0u64))
         );
     }
@@ -648,12 +641,12 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - one_year,
+            age_bonus_timestamp: (now - one_year).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
         let expected_reward = Nat::from(2000u64); // bonus modidier with a one year stake time should be 2.0
 
@@ -667,69 +660,177 @@ mod tests {
     }
 
     #[test]
-    fn test_calculate_early_unstake_fee() {
+    fn test_calculate_instant_dissolve_fee() {
         let now: TimestampMillis = timestamp_millis();
         // Create a position that was created 1 year ago
         let position = StakePosition {
             owned_by: Principal::anonymous(),
-            staked: Nat::from(1_000u64),
+            staked: Nat::from(5_000u64),
             created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
+
+        let amount_to_dissolve = Nat::from(1_000u64);
         let expected_fee = Nat::from(50u64); // 5% of the initial stake
-        assert_eq!(position.calculate_unstake_early_fee(), expected_fee)
+        assert_eq!(
+            position.calculate_dissolve_instantly_fee(amount_to_dissolve),
+            expected_fee
+        )
     }
 
     #[test]
-    fn test_can_unstake() {
+    fn test_can_withdraw() {
         let now: TimestampMillis = timestamp_millis();
 
-        // Create a position that was created 1 year ago
+        // Create a stake position from 1 year ago
         let mut position = StakePosition {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
-        matches!(
-            position.can_unstake(),
-            Err(UnstakeErrors::InvalidDissolveState(_))
-        );
+        // Case 1: No dissolve dissolve_events => cannot withdraw
+        assert!(matches!(
+            position.can_withdraw(),
+            Err(WithdrawErrors::NoValidDissolveEvents(_))
+        ));
 
-        // add some rewards
-        let _ = position
+        // Add some rewards
+        position
             .claimable_rewards
-            .insert(format!("ICP"), Nat::from(1000u64));
+            .insert(TokenSymbol::ICP, Nat::from(1000u64));
 
-        // start dissolving
-        let _ = position.prepare_start_dissolving();
-        assert_eq!(position.dissolve_state, DissolveState::Dissolving);
-        matches!(
-            position.can_unstake(),
-            Err(UnstakeErrors::DissolveDateNotSatisfied(_))
-        ); // we still have rewards so we cant unstake yet
+        // Add a dissolve event but simulate it's not yet matured
+        let dissolved_date = now + DAY_IN_MS; // 1 day in the future
+        let _ = position.dissolve_events.push(DissolveStakeEvent {
+            percentage: Percentage::new(100).unwrap(),
+            dissolved_date,
+            completed: true,
+            amount: Nat::from(1000_u64),
+        });
 
-        // simulate 7 days apssing
-        position.dissolved_date = Some(now - GLDT_STAKE_DISSOLVE_DELAY_MS);
-        matches!(
-            position.can_unstake(),
-            Err(UnstakeErrors::CantUnstakeWithRewardsBalance(_))
-        ); // we still have rewards so we cant unstake yet
+        // Remove rewards
+        position.claimable_rewards.remove(&TokenSymbol::ICP);
 
-        let _ = position.claimable_rewards.remove("ICP");
+        // Case 2: Dissolve event not matured yet => still cannot withdraw
+        assert!(matches!(
+            position.can_withdraw(),
+            Err(WithdrawErrors::NoValidDissolveEvents(_))
+        ));
 
-        assert_eq!(position.can_unstake(), Ok(())); //
+        // Simulate time after dissolve has matured by replacing with a past event
+        let past_dissolve_date = now - DAY_IN_MS;
+        let _ = position.dissolve_events.pop();
+        let _ = position.dissolve_events.push(DissolveStakeEvent {
+            percentage: Percentage::new(100).unwrap(),
+            dissolved_date: past_dissolve_date,
+            completed: true,
+            amount: Nat::from(1000_u64),
+        });
+
+        // Case 3: Valid dissolve and no rewards => can withdraw
+        assert_eq!(position.can_withdraw(), Ok(()));
+    }
+
+    #[test]
+    pub fn test_dissolve_instantly() {
+        let now: TimestampMillis = timestamp_millis();
+
+        // Step 1: Create a stake position
+        let mut position = StakePosition {
+            owned_by: Principal::anonymous(),
+            staked: Nat::from(1_000u64),
+            created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
+            claimable_rewards: HashMap::new(),
+            dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
+            claim_reward_status: ClaimRewardStatus::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
+        };
+
+        // Step 2: Add rewards — early withdraw should fail
+        position
+            .claimable_rewards
+            .insert(TokenSymbol::ICP, Nat::from(1000u64));
+
+        assert!(matches!(
+            position.can_dissolve_instantly(Percentage::new(100).unwrap()),
+            Err(WithdrawErrors::CantWithdrawWithRewardsBalance(_))
+        ));
+
+        // Step 3: Remove rewards — still cannot early withdraw, no event
+        position.claimable_rewards.remove(&TokenSymbol::ICP);
+
+        // Step 4: Add an incomplete dissolve event — still cannot early withdraw
+        let past_dissolve_date = now - DAY_IN_MS;
+        let _ = position.dissolve_events.push(DissolveStakeEvent {
+            percentage: Percentage::new(50).unwrap(),
+            dissolved_date: past_dissolve_date, // in future
+            completed: false,                   // not completed yet
+            amount: Nat::from(500u64),
+        });
+
+        // Step 5: Replace with completed dissolve event
+        let _ = position.dissolve_events.pop();
+        let _event_id = position.dissolve_events.push(DissolveStakeEvent {
+            percentage: Percentage::new(50).unwrap(),
+            dissolved_date: now + DAY_IN_MS,
+            completed: true,
+            amount: Nat::from(500u64),
+        });
+
+        // Now early withdraw should succeed
+        assert_eq!(
+            position.can_dissolve_instantly(Percentage::new(100).unwrap()),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn test_cleanup_completed_dissolve_events() {
+        let mut position = StakePosition::try_new(
+            Principal::anonymous(),
+            Nat::from(MINIMUM_STAKE_AMOUNT_WITH_FEE + 1_000_000),
+        )
+        .unwrap();
+
+        let now = timestamp_millis();
+        println!("now: {:?}", now);
+
+        let mut dissolve_events = vec![
+            DissolveStakeEvent {
+                percentage: Percentage::new(50).unwrap(),
+                amount: Nat::from(MINIMUM_STAKE_AMOUNT_WITH_FEE + 1_000_000),
+                dissolved_date: now - 1000, // already passed
+                completed: false,
+            },
+            DissolveStakeEvent {
+                percentage: Percentage::new(50).unwrap(),
+                amount: Nat::from(MINIMUM_STAKE_AMOUNT_WITH_FEE + 1_000_000),
+                dissolved_date: now + 1000, // in future
+                completed: false,
+            },
+        ];
+
+        for payload in dissolve_events.drain(..) {
+            position.insert_event(payload);
+        }
+
+        // Only one of the dissolve_events should be marked completed
+        position.cleanup_completed_dissolve_events();
+        assert_eq!(position.dissolve_events.len(), 1);
     }
 
     #[test]
@@ -741,51 +842,128 @@ mod tests {
             owned_by: Principal::anonymous(),
             staked: Nat::from(1_000u64),
             created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
         assert_eq!(position.has_rewards(), false);
         let _ = position
             .claimable_rewards
-            .insert(format!("ICP"), Nat::from(1000u64));
+            .insert(TokenSymbol::ICP, Nat::from(1000u64));
         assert_eq!(position.has_rewards(), true);
 
-        let _ = position.claimable_rewards.remove("ICP");
+        let _ = position.claimable_rewards.remove(&TokenSymbol::ICP);
         assert_eq!(position.has_rewards(), false);
     }
 
     #[test]
-    pub fn test_unstake_early() {
+    pub fn test_update_age_bonus_timestamp() {
         let now: TimestampMillis = timestamp_millis();
+
+        let staked = Nat::from(100_000_000_000_000u64); // 1'000'000 GLDT
 
         // Create a position that was created 1 year ago
         let mut position = StakePosition {
             owned_by: Principal::anonymous(),
-            staked: Nat::from(1_000u64),
+            staked: staked.clone(),
             created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
             claimable_rewards: HashMap::new(),
-            dissolve_state: DissolveState::NotDissolving,
             dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
-            dissolved_date: None,
             claim_reward_status: ClaimRewardStatus::None,
-            unstake_state: UnstakeState::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
         };
 
-        // add some rewards
-        let _ = position
-            .claimable_rewards
-            .insert(format!("ICP"), Nat::from(1000u64));
+        assert_eq!(position.age_bonus_timestamp, now - (DAY_IN_MS * 365));
 
-        matches!(
-            position.can_unstake_early(),
-            Err(UnstakeErrors::CantUnstakeWithRewardsBalance(_))
-        ); // we still have rewards so we cant unstake yet
+        let factor = 3u64;
 
-        let _ = position.claimable_rewards.remove("ICP");
+        position.update_age_bonus_timestamp(factor.clone() * staked);
+
+        println!(
+            "age_bonus_timestamp after: {:?}",
+            position.age_bonus_timestamp
+        );
+        assert!(position.age_bonus_timestamp < now);
+
+        let expected_timestamp = (now - (DAY_IN_MS * 365) + factor.clone() * now) / (factor + 1u64);
+        assert_eq!(position.age_bonus_timestamp, expected_timestamp);
+    }
+
+    #[test]
+    pub fn test_increase_stake() {
+        let now: TimestampMillis = timestamp_millis();
+
+        let staked = Nat::from(100_000_000_000u64); // 1'000 GLDT
+
+        // Create a position that was created 1 year ago
+        let mut position = StakePosition {
+            owned_by: Principal::anonymous(),
+            staked: staked.clone(),
+            created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
+            claimable_rewards: HashMap::new(),
+            dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
+            claim_reward_status: ClaimRewardStatus::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
+        };
+        println!(
+            "age_bonus_timestamp before: {:?}",
+            position.age_bonus_timestamp
+        );
+
+        let factor = 3u64;
+        position
+            .change_stake(factor.clone() * staked.clone(), StakeChange::Increase)
+            .unwrap();
+
+        assert_eq!(position.staked, staked.clone() * (1u64 + factor));
+
+        println!(
+            "age_bonus_timestamp after: {:?}",
+            position.age_bonus_timestamp
+        );
+
+        let expected_timestamp = (now - (DAY_IN_MS * 365) + factor.clone() * now) / (factor + 1u64);
+        assert_eq!(position.age_bonus_timestamp, expected_timestamp);
+    }
+
+    #[test]
+    pub fn test_stake_position_size() {
+        let now: TimestampMillis = timestamp_millis();
+
+        let staked = Nat::from(100_000_000_000u64);
+
+        let mut position = StakePosition {
+            owned_by: Principal::anonymous(),
+            staked: staked.clone(),
+            created_at: now - (DAY_IN_MS * 365),
+            age_bonus_timestamp: (now - (DAY_IN_MS * 365)).into(),
+            claimable_rewards: HashMap::new(),
+            dissolve_delay: Duration::from_millis(GLDT_STAKE_DISSOLVE_DELAY_MS),
+            claim_reward_status: ClaimRewardStatus::None,
+            withdraw_state: WithdrawState::None,
+            dissolve_events: Vec::default(),
+        };
+
+        position.insert_event(DissolveStakeEvent {
+            percentage: Percentage::new(50).unwrap(),
+            amount: Nat::from(50_000_000_000u64),
+            dissolved_date: now + DAY_IN_MS,
+            completed: false,
+        });
+
+        // Check the size of the position
+        let size = std::mem::size_of_val(&position);
+        println!("Size of StakePosition: {} bytes", size);
+
+        // Ensure the size is within a reasonable range
+        assert!(size > 0 && size < 1024); // Example range, adjust as needed
     }
 }

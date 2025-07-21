@@ -35,6 +35,7 @@ import { isNumeric } from "@shared/utils/numbers";
 import isInsufficientFunds from "@shared/utils/validators/isInsufficientFunds";
 import isAmountGreaterThanZero from "@shared/utils/validators/isAmountGreaterThanZero";
 import isAmountGreaterThanFee from "@shared/utils/validators/isAmountGreaterThanFee";
+import MaxButton from "@shared/components/MaxButton";
 
 const Buy = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();
@@ -60,6 +61,7 @@ const Buy = () => {
     register,
     reset,
     control,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -132,9 +134,10 @@ const Buy = () => {
       dispatch({
         type: "SET_PRICE_DATA",
         value: {
-          slippage: price.data.slippage,
-          txs: price.data.txs,
-          receive_token_amount: price.data.receive_amount,
+          slippage_with_tx_fee: price.data.slippage_with_tx_fee,
+          slippage_without_tx_fee: price.data.slippage_without_tx_fee,
+          network_fee: price.data.network_fee,
+          lp_fee: price.data.lp_fee,
         },
       });
     }
@@ -197,6 +200,12 @@ const Buy = () => {
   const handleOnChangePayToken = (token: Token) => {
     dispatch({ type: "RESET" });
     dispatch({ type: "SET_PAY_TOKEN", value: token });
+  };
+
+  const onClickMaxBalance = (amount: string) => {
+    setValue("amount", amount, {
+      shouldValidate: true,
+    });
   };
 
   const isDataFetched =
@@ -275,10 +284,10 @@ const Buy = () => {
               </div>
               <div className="grid grid-cols-1 xl:grid-cols-7 gap-4 mt-8">
                 <div className="xl:col-span-4 flex items-center border border-border rounded-md grow bg-surface-secondary">
-                  <div className="p-4 border-r border-border text-copper font-semibold">
+                  <div className="p-4 border-r border-border text-copper font-semibold shrink-0">
                     Pay with
                   </div>
-                  <div className="p-4">
+                  <div className="w-full p-4">
                     {!isConnected && (
                       <form
                         className="flex justify-center items-center gap-2"
@@ -311,60 +320,73 @@ const Buy = () => {
                     )}
                     {isConnected &&
                       (isDataFetched ? (
-                        <form
-                          className="flex justify-center items-center gap-2"
-                          onSubmit={(e) => e.preventDefault()}
-                        >
-                          <input
-                            id="amount"
-                            type="number"
-                            autoComplete="off"
-                            placeholder="0.00"
-                            min="0"
-                            className={clsx(
-                              "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
-                              "placeholder:text-content/40",
-                              "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            )}
-                            onPaste={onPastePreventNoDigits}
-                            onKeyDown={(e) => {
-                              onKeyDownPreventNoDigits(e);
-                            }}
-                            {...register("amount", {
-                              pattern: /[0-9.]/,
-                              required: "",
-                              validate: {
-                                isNumericAmount: (v: string) => isNumeric(v),
-                                isAmountGreaterThanZero: (v: string) =>
-                                  isAmountGreaterThanZero(Number(v)),
-                                isInsufficientFunds: (v: string) => {
-                                  return (
-                                    isInsufficientFunds(
+                        <div className="w-full flex items-center justify-between">
+                          <form
+                            className="flex justify-center items-center gap-2"
+                            onSubmit={(e) => e.preventDefault()}
+                          >
+                            <input
+                              id="amount"
+                              type="number"
+                              autoComplete="off"
+                              placeholder="0.00"
+                              min="0"
+                              className={clsx(
+                                "field-sizing-content max-w-42 text-left outline-none focus:outline-none focus:border-none focus:ring-0 bg-surface-secondary",
+                                "placeholder:text-content/40",
+                                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              )}
+                              onPaste={onPastePreventNoDigits}
+                              onKeyDown={(e) => {
+                                onKeyDownPreventNoDigits(e);
+                              }}
+                              {...register("amount", {
+                                pattern: /[0-9.]/,
+                                required: "",
+                                validate: {
+                                  isNumericAmount: (v: string) => isNumeric(v),
+                                  isAmountGreaterThanZero: (v: string) =>
+                                    isAmountGreaterThanZero(Number(v)),
+                                  isInsufficientFunds: (v: string) => {
+                                    return (
+                                      isInsufficientFunds(
+                                        Number(v),
+                                        balance.data.balance_e8s,
+                                        balance.data.fee_e8s,
+                                        balance.data.decimals
+                                      ) ||
+                                      "Amount must not exceed your balance minus network fees"
+                                    );
+                                  },
+                                  isAmountGreaterThanFee: (v: string) =>
+                                    isAmountGreaterThanFee(
                                       Number(v),
-                                      balance.data.balance_e8s,
                                       balance.data.fee_e8s,
                                       balance.data.decimals
                                     ) ||
-                                    "Amount must not exceed your balance minus network fees"
-                                  );
+                                    "Amount must not be less or equal than transaction fee",
                                 },
-                                isAmountGreaterThanFee: (v: string) =>
-                                  isAmountGreaterThanFee(
-                                    Number(v),
-                                    balance.data.fee_e8s,
-                                    balance.data.decimals
-                                  ) ||
-                                  "Amount must not be less or equal than transaction fee",
-                              },
-                            })}
+                              })}
+                            />
+                            <div>{pay_token.token.name}</div>
+                            <div className="flex items-center justify-center rounded-full h-6 w-6 shrink-0 aspect-square">
+                              <Logo
+                                name={pay_token.token.name}
+                                className="p-1"
+                              />
+                            </div>
+                          </form>
+                          <MaxButton
+                            balance={balance.data?.balance_e8s}
+                            fee={balance.data?.fee_e8s}
+                            decimals={balance.data?.decimals}
+                            handleOnClick={(amount) =>
+                              onClickMaxBalance(amount)
+                            }
                           />
-                          <div>{pay_token.token.name}</div>
-                          <div className="flex items-center justify-center rounded-full h-6 w-6 shrink-0 aspect-square">
-                            <Logo name={pay_token.token.id} className="p-1" />
-                          </div>
-                        </form>
+                        </div>
                       ) : (
-                        <div>Loading...</div>
+                        <div className="flex justify-start">Loading...</div>
                       ))}
                   </div>
                 </div>
@@ -395,7 +417,6 @@ const Buy = () => {
                       <E8sToLocaleString
                         value={receiveTokenPrice.data.amount}
                         tokenDecimals={receiveTokenPrice.data.decimals}
-                        decimals={5}
                       />{" "}
                       GLDT
                       <Icon.InfoCircle
@@ -419,7 +440,6 @@ const Buy = () => {
                           BigInt(GLDT_VALUE_1G_NFT)
                         }
                         tokenDecimals={receiveTokenPrice.data.decimals}
-                        decimals={5}
                       />
                       g of gold{" "}
                       <span className="text-content/60 font-normal">
@@ -446,7 +466,6 @@ const Buy = () => {
                       <E8sToLocaleString
                         value={payTokenPriceExchangeRate.data.amount}
                         tokenDecimals={payTokenPriceExchangeRate.data.decimals}
-                        decimals={2}
                       />
                       <div>{receive_token.token.name}</div>
                       <Logo name={receive_token.token.id} className="h-4 w-4" />

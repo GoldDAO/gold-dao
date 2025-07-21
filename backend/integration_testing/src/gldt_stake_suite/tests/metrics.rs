@@ -15,10 +15,10 @@ pub fn gldt_stake_metrics_endpoint_is_valid_json() {
         gldt_stake_canister_id,
         ..
     } = test_env;
-    let pic_borrowed = &pic.borrow();
+    let pic = &pic.borrow();
 
     let res = http_request(
-        pic_borrowed,
+        pic,
         Principal::anonymous(),
         gldt_stake_canister_id,
         &(HttpRequest {

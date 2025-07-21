@@ -1,5 +1,3 @@
-export type Ledger = "ogy" | "gldt" | "icp" | "goldao" | "ckusdt" | "ckusdc" | "wtn";
-
 export interface Transaction {
   index: number;
   timestamp: string;

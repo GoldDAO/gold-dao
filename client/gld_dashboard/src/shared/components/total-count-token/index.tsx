@@ -87,13 +87,22 @@ const TotalCountToken = ({
 
   const renderBalance = () => {
     if (!isConnected) {
-      return <Balance tokenName={token.name} balance={0} />;
+      return <Balance tokenName={token.display_name} balance={0} />;
     }
     if (balance.isSuccess) {
-      return <Balance tokenName={token.name} balance={balance.data.balance} />;
+      return (
+        <Balance
+          tokenName={token.display_name}
+          balance={balance.data.balance}
+        />
+      );
     }
     return (
-      <Balance tokenName={token.name} className="animate-pulse" balance={0} />
+      <Balance
+        tokenName={token.display_name}
+        className="animate-pulse"
+        balance={0}
+      />
     );
   };
 

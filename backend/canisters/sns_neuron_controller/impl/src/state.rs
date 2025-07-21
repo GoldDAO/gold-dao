@@ -104,7 +104,7 @@ pub struct CanisterInfo {
     pub version: BuildVersion,
     pub commit_hash: String,
     pub memory_used: MemorySize,
-    pub cycles_balance_in_tc: f64,
+    pub cycles_balance_in_tc: u128,
 }
 
 #[derive(Serialize, Deserialize)]

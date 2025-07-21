@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { UnlockStateReducerAtom } from "./atoms";
-// import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+// import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
 import useUnstakeEarly from "@services/gldt_stake/hooks/useUnstakeEarly";
 import BtnPrimary from "@shared/ui/button/BtnPrimary";
 

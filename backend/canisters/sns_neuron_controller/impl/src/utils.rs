@@ -126,7 +126,6 @@ impl ClaimRewardResult {
     }
 }
 
-// TODO: think of outstanding payments struct in this context
 pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(), String> {
     let sns_rewards_canister_id = read_state(|state| state.data.sns_rewards_canister_id);
 

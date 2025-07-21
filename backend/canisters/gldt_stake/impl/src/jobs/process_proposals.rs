@@ -7,7 +7,7 @@ pub fn start_job() {
 }
 
 pub fn process_proposals_job() {
-    ic_cdk::spawn(process_proposals_impl())
+    ic_cdk::futures::spawn(process_proposals_impl())
 }
 
 async fn process_proposals_impl() {

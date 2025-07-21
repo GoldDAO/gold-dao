@@ -1,12 +1,10 @@
 import { useAtom } from "jotai";
-import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 import { useAuth } from "@auth/index";
 import { Token, TOKENS } from "@shared/utils/tokens";
 import { SwapStateReducerAtom } from "@wallet/swap/atoms";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import useFetchSwapAmount from "@shared/hooks/useFetchSwapAmount";
 import ListboxToken from "@wallet/swap/components/form-dialog/listbox-token";
-import BalanceAvailable from "../balance-available";
+import BalanceAvailable from "@shared/components/BalanceAvailable";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const ReceiveForm = () => {
@@ -14,23 +12,11 @@ const ReceiveForm = () => {
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
   const balance = useFetchLedgerBalance(
-    swapState.token_to.token.canister_id,
+    swapState.receive_token.token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_to.token.name,
+      ledger: swapState.receive_token.token.name,
       owner: principalId,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
-
-  const swapAmount = useFetchSwapAmount(
-    KONGSWAP_CANISTER_ID_IC,
-    unauthenticatedAgent,
-    {
-      from: swapState.token_from.token.name,
-      from_canister_id: swapState.token_from.token.canister_id,
-      to: swapState.token_to.token.name,
-      amount: Number(swapState.send_amount_input),
       enabled: !!unauthenticatedAgent,
     }
   );
@@ -45,27 +31,28 @@ const ReceiveForm = () => {
       <div className="flex justify-between items-start">
         <div>
           <div className="text-2xl">
-            {swapAmount.isSuccess && balance.isSuccess ? (
+            {swapState.receive_amount !== undefined && balance.isSuccess ? (
               <NumberToLocaleString
                 value={
-                  Number(swapAmount.data.receive_amount) /
-                  10 ** balance.data.decimals
+                  Number(swapState.receive_amount) / 10 ** balance.data.decimals
                 }
+                decimals={5}
               />
             ) : (
               <div className="animate-pulse">0</div>
             )}
           </div>
           <div className="text-xs">
-            {swapAmount.isSuccess && balance.isSuccess ? (
+            {swapState.receive_amount !== undefined && balance.isSuccess ? (
               <div>
                 ≈$
                 <NumberToLocaleString
                   value={
-                    (Number(swapAmount.data.receive_amount) /
+                    (Number(swapState.receive_amount) /
                       10 ** balance.data.decimals) *
                     balance.data.price_usd
                   }
+                  decimals={5}
                 />
               </div>
             ) : (
@@ -75,16 +62,21 @@ const ReceiveForm = () => {
         </div>
         <div className="">
           <ListboxToken
-            value={swapState.token_to.token}
+            value={swapState.receive_token.token}
             options={TOKENS}
             optionsDisabled={TOKENS.filter(
-              (t) => t.id === swapState.token_from.token.id
+              (t) => t.id === swapState.send_token.token.id
             )}
             onChange={onChangeToken}
           ></ListboxToken>
         </div>
       </div>
-      <BalanceAvailable token={swapState.token_to.token} />
+      <div className="text-sm text-content/80">
+        <BalanceAvailable
+          token={swapState.receive_token.token.name}
+          balance={balance.data?.balance}
+        />
+      </div>
     </div>
   );
 };

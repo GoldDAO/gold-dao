@@ -9,7 +9,7 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
 import useFetchUserNeuronsList from "@services/sns_governance/hooks/useFetchUserNeuronsList";
-import useFetchDecimals from "@services/ledger/hooks/useFetchDecimals";
+import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import { NeuronUser } from "@services/sns_governance/utils/interfaces";
 import { Logo } from "@components/index";
 import { BadgeNeuronState } from "@components/badges/BadgeNeuronState";
@@ -59,8 +59,8 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
   return (
     <button
       className={clsx(
-        "px-2 py-1 rounded-md shrink-0 cursor-pointer",
-        "border border-border text-black dark:text-white text-sm"
+        "px-2 py-1 rounded-md shrink-0 cursor-pointer disabled:cursor-not-allowed",
+        "border border-border text-black dark:text-white text-sm disabled:opacity-60"
       )}
       disabled={!enableClaim}
       onClick={() =>
@@ -106,11 +106,11 @@ const List = () => {
     }
   );
 
-  const decimals = useFetchDecimals(
+  const decimals = useFetchLedgerDecimals(
     GOLDAO_LEDGER_CANISTER_ID,
     unauthenticatedAgent,
     {
-      ledger: "goldao",
+      ledger: "GOLDAO",
       enabled: !!unauthenticatedAgent && isConnected,
     }
   );

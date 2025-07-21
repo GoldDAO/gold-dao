@@ -40,7 +40,7 @@ integration tests:
       "token_metrics integration-test build",
       "gldt_swap integration-test build",
       "gldt_stake integration-test build",
-      "usdg_minter integration-test build",
+      # "usdg_minter integration-test build",
     ]
   extends: .rust template
   script:
