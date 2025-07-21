@@ -34,20 +34,20 @@ const ConfirmDialog = () => {
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
   const balanceTokenFrom = useFetchLedgerBalance(
-    swapState.token_from.token.canister_id,
+    swapState.send_token.token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_from.token.name,
+      ledger: swapState.send_token.token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent,
     }
   );
 
   const balanceTokenTo = useFetchLedgerBalance(
-    swapState.token_to.token.canister_id,
+    swapState.receive_token.token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_to.token.name,
+      ledger: swapState.receive_token.token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent,
     }
@@ -57,9 +57,9 @@ const ConfirmDialog = () => {
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
-      from: swapState.token_from.token.name,
-      from_canister_id: swapState.token_from.token.canister_id,
-      to: swapState.token_to.token.name,
+      from: swapState.send_token.token.name,
+      from_canister_id: swapState.send_token.token.canister_id,
+      to: swapState.receive_token.token.name,
       amount: Number(swapState.send_amount_input),
       enabled: !!unauthenticatedAgent,
     }
@@ -106,7 +106,7 @@ const ConfirmDialog = () => {
                 <div className="flex flex-row justify-between items-center xl:items-end">
                   <div className="flex items-center gap-2">
                     <Logo
-                      name={swapState.token_from.token.id}
+                      name={swapState.send_token.token.id}
                       className="h-10 w-10 shrink-0 aspect-square"
                     />
                     <div>
@@ -118,7 +118,7 @@ const ConfirmDialog = () => {
                           }
                           decimals={5}
                         />
-                        <div>{swapState.token_from.token.name}</div>
+                        <div>{swapState.send_token.token.name}</div>
                       </div>
                       <AmountUSD
                         amount={
@@ -148,7 +148,7 @@ const ConfirmDialog = () => {
                   <Icon.InfoCircle
                     width={16}
                     data-tooltip-id="tooltip"
-                    data-tooltip-content={`The exact amount of ${swapState.token_to.token.name} received will vary due to market
+                    data-tooltip-content={`The exact amount of ${swapState.receive_token.token.name} received will vary due to market
                     fluctuations and slippage.`}
                   />
                 </div>
@@ -156,7 +156,7 @@ const ConfirmDialog = () => {
                 <div className="flex flex-row justify-between items-center xl:items-end">
                   <div className="flex items-center gap-2">
                     <Logo
-                      name={swapState.token_to.token.id}
+                      name={swapState.receive_token.token.id}
                       className="h-10 w-10 shrink-0 aspect-square"
                     />
                     <div>
@@ -166,7 +166,7 @@ const ConfirmDialog = () => {
                           tokenDecimals={balanceTokenTo.data.decimals as number}
                           decimals={5}
                         />
-                        <div>{swapState.token_to.token.name}</div>
+                        <div>{swapState.receive_token.token.name}</div>
                       </div>
                       <AmountUSD
                         amount={
@@ -254,7 +254,7 @@ const ConfirmDialog = () => {
                           tokenDecimals={balanceTokenTo.data.decimals}
                           decimals={5}
                         />{" "}
-                        {swapState.token_to.token.name}
+                        {swapState.receive_token.token.name}
                       </>
                     ) : (
                       <div>Loading...</div>
@@ -271,7 +271,7 @@ const ConfirmDialog = () => {
                             tokenDecimals={balanceTokenTo.data.decimals}
                             decimals={5}
                           />{" "}
-                          {swapState.token_to.token.name}
+                          {swapState.receive_token.token.name}
                         </>
                       ) : (
                         <div>Loading...</div>
@@ -288,7 +288,7 @@ const ConfirmDialog = () => {
                             tokenDecimals={balanceTokenTo.data.decimals}
                             decimals={5}
                           />{" "}
-                          {swapState.token_to.token.name}
+                          {swapState.receive_token.token.name}
                         </>
                       ) : (
                         <div>Loading...</div>
@@ -308,7 +308,7 @@ const ConfirmDialog = () => {
               className="w-full"
               size="lg"
             >
-              Confirm {swapState.token_to.token.name} purchase
+              Confirm {swapState.receive_token.token.name} purchase
             </BtnPrimary>
             <div className="flex justify-center">
               <div className="flex items-center gap-1 text-content/60 text-sm">

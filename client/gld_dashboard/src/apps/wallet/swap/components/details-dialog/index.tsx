@@ -18,20 +18,20 @@ const DetailsDialog = () => {
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
 
   const balanceTokenFrom = useFetchLedgerBalance(
-    swapState.token_from.token.canister_id,
+    swapState.send_token.token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_from.token.name,
+      ledger: swapState.send_token.token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent,
     }
   );
 
   const balanceTokenTo = useFetchLedgerBalance(
-    swapState.token_to.token.canister_id,
+    swapState.receive_token.token.canister_id,
     unauthenticatedAgent,
     {
-      ledger: swapState.token_to.token.name,
+      ledger: swapState.receive_token.token.name,
       owner: principalId,
       enabled: !!unauthenticatedAgent,
     }
@@ -41,21 +41,21 @@ const DetailsDialog = () => {
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
-      from: swapState.token_from.token.name,
-      from_canister_id: swapState.token_from.token.canister_id,
-      to: swapState.token_to.token.name,
+      from: swapState.send_token.token.name,
+      from_canister_id: swapState.send_token.token.canister_id,
+      to: swapState.receive_token.token.name,
       amount: Number(swapState.send_amount_input),
       enabled: !!unauthenticatedAgent,
     }
   );
 
   const approve = useApprove(
-    swapState.token_from.token.canister_id,
+    swapState.send_token.token.canister_id,
     authenticatedAgent
   );
   const swap = useSwap(KONGSWAP_CANISTER_ID_IC, authenticatedAgent, {
-    pay_token: swapState.token_from.token.name,
-    receive_token: swapState.token_to.token.name,
+    pay_token: swapState.send_token.token.name,
+    receive_token: swapState.receive_token.token.name,
   });
 
   const handleSwap = (pay_amount: bigint) => {
@@ -73,6 +73,14 @@ const DetailsDialog = () => {
       swapAmount.isSuccess &&
       balanceTokenFrom.isSuccess
     ) {
+      // console.log(swapAmount.data);
+      // console.log("pay_amount", swapAmount.data.pay_amount);
+      // console.log("balance_e8s", balanceTokenFrom.data.balance_e8s);
+      // console.log("fee_e8s", balanceTokenFrom.data.fee_e8s);
+      // console.log(
+      //   "amount",
+      //   swapAmount.data.pay_amount + balanceTokenFrom.data.fee_e8s
+      // );
       approve.mutate(
         {
           amount: swapAmount.data.pay_amount + balanceTokenFrom.data.fee_e8s,
@@ -133,7 +141,7 @@ const DetailsDialog = () => {
                 )}
                 {swap.isPending && (
                   <div className="mt-2 text-lg">
-                    Buying {swapState.token_to.token.name}...
+                    Buying {swapState.receive_token.token.name}...
                   </div>
                 )}
               </div>
@@ -143,7 +151,7 @@ const DetailsDialog = () => {
             <div className="flex flex-col items-center gap-8">
               <div className="grid grid-cols-1 gap-2 text-center">
                 <div className="text-xl text-warning">
-                  Buy {swapState.token_to.token.name} error
+                  Buy {swapState.receive_token.token.name} error
                 </div>
                 <div>Something went wrong, please retry.</div>
               </div>
@@ -164,14 +172,14 @@ const DetailsDialog = () => {
                 <div>You successfully bought</div>
                 <div className="flex items-center gap-2 font-semibold">
                   <Logo
-                    name={swapState.token_to.token.id}
+                    name={swapState.receive_token.token.id}
                     className="h-12 w-12"
                   />
                   <E8sToLocaleString
                     value={swapAmount.data.receive_amount}
                     tokenDecimals={balanceTokenTo.data.decimals as number}
                   />
-                  <div>{swapState.token_to.token.name}</div>
+                  <div>{swapState.receive_token.token.name}</div>
                 </div>
               </div>
 
@@ -185,14 +193,14 @@ const DetailsDialog = () => {
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1">
                         <Logo
-                          name={swapState.token_from.token.id}
+                          name={swapState.send_token.token.id}
                           className="h-4 w-4"
                         />
                         <E8sToLocaleString
                           value={swapAmount.data.pay_amount}
                           tokenDecimals={balanceTokenFrom.data.decimals}
                         />
-                        <div>{swapState.token_from.token.name}</div>
+                        <div>{swapState.send_token.token.name}</div>
                       </div>
                       <div className="text-content/60 text-sm">
                         ≈$
@@ -214,14 +222,14 @@ const DetailsDialog = () => {
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1">
                         <Logo
-                          name={swapState.token_to.token.id}
+                          name={swapState.receive_token.token.id}
                           className="h-4 w-4"
                         />
                         <E8sToLocaleString
                           value={swapAmount.data.receive_amount}
                           tokenDecimals={balanceTokenTo.data.decimals}
                         />
-                        <div>{swapState.token_to.token.name}</div>
+                        <div>{swapState.receive_token.token.name}</div>
                       </div>
                       <div className="text-content/60 text-sm">
                         ≈$
@@ -249,9 +257,9 @@ const DetailsDialog = () => {
                   ) : (
                     <div>Loading...</div>
                   )}
-                  <div>{swapState.token_to.token.name}</div>
+                  <div>{swapState.receive_token.token.name}</div>
                   <Logo
-                    name={swapState.token_to.token.id}
+                    name={swapState.receive_token.token.id}
                     className="h-4 w-4"
                   />
                 </div>

@@ -1,13 +1,14 @@
 import { useAtom } from "jotai";
-import { SwapStateReducerAtom } from "@wallet/swap/atoms";
+import { SwapStateReducerAtom, FormIsValidAtom } from "@wallet/swap/atoms";
 import Dialog from "@shared/ui/dialog/DialogV2";
 import BtnForm from "@shared/ui/button/BtnPrimary";
 import SendForm from "./send-form";
 import ReceiveForm from "./receive-form";
-import ErrorMessageBtnForm from "./error-message-btn-form";
+import BtnFormText from "./btn-form-text";
 
 const FormDialog = () => {
   const [swapState, dispatchSwapState] = useAtom(SwapStateReducerAtom);
+  const [formIsValid] = useAtom(FormIsValidAtom);
 
   const onSubmit = () => {
     dispatchSwapState({ type: "OPEN_DIALOG_CONFIRM" });
@@ -26,12 +27,8 @@ const FormDialog = () => {
       <div className="flex flex-col gap-4">
         <SendForm />
         <ReceiveForm />
-        <BtnForm
-          size="lg"
-          onClick={onSubmit}
-          disabled={!swapState.form_state.isValid}
-        >
-          {swapState.form_state.isValid ? "Swap" : <ErrorMessageBtnForm />}
+        <BtnForm size="lg" onClick={onSubmit} disabled={!formIsValid}>
+          <BtnFormText />
         </BtnForm>
       </div>
     </Dialog>

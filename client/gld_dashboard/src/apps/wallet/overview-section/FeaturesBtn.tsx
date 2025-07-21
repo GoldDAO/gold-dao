@@ -36,7 +36,7 @@ const FeaturesBtn = () => {
   const onOpenSwap = () => {
     dispatchSwapState({
       type: "OPEN_DIALOG_FORM",
-      value: { token_from: token },
+      value: { send_token: token },
     });
   };
 
