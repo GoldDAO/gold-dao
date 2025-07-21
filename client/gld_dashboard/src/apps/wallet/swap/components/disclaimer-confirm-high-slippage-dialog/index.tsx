@@ -16,9 +16,9 @@ const DisclaimerConfirmHighSlippageDialog = () => {
     KONGSWAP_CANISTER_ID_IC,
     unauthenticatedAgent,
     {
-      from: swapState.token_from.token.name,
-      from_canister_id: swapState.token_from.token.canister_id,
-      to: swapState.token_to.token.name,
+      from: swapState.send_token.token.name,
+      from_canister_id: swapState.send_token.token.canister_id,
+      to: swapState.receive_token.token.name,
       amount: Number(swapState.send_amount_input),
       enabled: !!unauthenticatedAgent,
     }

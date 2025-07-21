@@ -44,7 +44,7 @@ const MaxButton = ({
     balance >= fee;
 
   const handleClick = (balance: bigint, fee: bigint, decimals: number) => {
-    const maxAmount = Number(balance - fee) / 10 ** decimals;
+    const maxAmount = Number(balance - 2n * fee) / 10 ** decimals;
     handleOnClick(maxAmount.toString());
   };
 

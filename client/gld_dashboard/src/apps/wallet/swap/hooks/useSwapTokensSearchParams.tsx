@@ -32,7 +32,7 @@ const useSwapTokensSearchParams = (): SwapModeResult => {
   const isValidSwapState = () => {
     const swap = getParam("swap");
     const token = getParam("token");
-    const tokenSwapTo = getParam("token_to");
+    const tokenSwapTo = getParam("receive_token");
 
     if (swap !== "true" || !token || !tokenSwapTo || token === tokenSwapTo) {
       return false;
@@ -52,7 +52,7 @@ const useSwapTokensSearchParams = (): SwapModeResult => {
 
   const clearSwapParams = () => {
     searchParams.delete("swap");
-    searchParams.delete("token_to");
+    searchParams.delete("receive_token");
     setSearchParams(searchParams);
   };
 
@@ -67,14 +67,14 @@ const useSwapTokensSearchParams = (): SwapModeResult => {
       getTokenByDisplayName(getParam("token") as TokenName) as Token
     );
     setTokenTo(
-      getTokenByDisplayName(getParam("token_to") as TokenName) as Token
+      getTokenByDisplayName(getParam("receive_token") as TokenName) as Token
     );
     setIsSwap(true);
   };
 
   const deleteSwapTokensSearchParams = () => {
     searchParams.delete("swap");
-    searchParams.delete("token_to");
+    searchParams.delete("receive_token");
     setSearchParams(searchParams);
   };
 

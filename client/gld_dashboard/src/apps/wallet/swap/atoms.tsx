@@ -1,26 +1,27 @@
+import { atom } from "jotai";
 import { atomWithReducer } from "jotai/utils";
 import { MAX_SWAP_SLIPPAGE } from "@constants";
-import { SwapAmountsTxReply } from "@services/kongswap/interfaces";
 import { Token, TOKEN_GLDT, TOKEN_GOLDAO } from "@shared/utils/tokens";
 import { TokenSwapData } from "@wallet/swap/utils";
 import { FieldErrors, FieldValues } from "react-hook-form";
 
 type SwapState = {
-  token_from: TokenSwapData;
-  token_to: TokenSwapData;
+  send_token: TokenSwapData;
+  receive_token: TokenSwapData;
 
   send_amount_input: string;
-
   form_state: {
     errors: FieldErrors<FieldValues>;
     isValid: boolean;
   };
 
+  receive_amount: bigint | undefined;
   slippage_without_tx_fee: number;
   slippage_with_tx_fee: number;
-  max_slippage: number;
   network_fee: bigint;
   lp_fee: bigint;
+
+  max_slippage: number;
 
   is_open_form_dialog: boolean;
   is_open_confirm_dialog: boolean;
@@ -29,7 +30,7 @@ type SwapState = {
 };
 
 const initialState: SwapState = {
-  token_from: {
+  send_token: {
     token: TOKEN_GLDT,
     amount_e8s: 0n,
     amount_usd: 0,
@@ -37,7 +38,7 @@ const initialState: SwapState = {
     decimals: 0,
     fee: 0n,
   },
-  token_to: {
+  receive_token: {
     token: TOKEN_GOLDAO,
     amount_e8s: 0n,
     amount_usd: 0,
@@ -52,11 +53,14 @@ const initialState: SwapState = {
     isValid: false,
   },
 
+  receive_amount: undefined,
   slippage_without_tx_fee: 0,
   slippage_with_tx_fee: 0,
-  max_slippage: MAX_SWAP_SLIPPAGE,
+
   network_fee: 0n,
   lp_fee: 0n,
+
+  max_slippage: MAX_SWAP_SLIPPAGE,
 
   is_open_form_dialog: false,
   is_open_confirm_dialog: false,
@@ -72,7 +76,7 @@ const reducer = (
         value: Token;
       }
     | {
-        type: "SET_TOKEN_FROM_DATA";
+        type: "SET_SEND_TOKEN_DATA";
         value: {
           amount_e8s: bigint;
           amount_usd: number;
@@ -86,7 +90,7 @@ const reducer = (
         value: Token;
       }
     | {
-        type: "SET_TOKEN_TO_DATA";
+        type: "SET_RECEIVE_TOKEN_DATA";
         value: {
           amount_e8s: bigint;
           amount_usd: number;
@@ -102,9 +106,11 @@ const reducer = (
     | {
         type: "SET_TX_DATA";
         value: {
-          slippage: number;
-          txs: Array<SwapAmountsTxReply>;
-          receive_token_amount: bigint;
+          receive_amount: bigint;
+          slippage_without_tx_fee: number;
+          slippage_with_tx_fee: number;
+          network_fee: bigint;
+          lp_fee: bigint;
         };
       }
     | {
@@ -116,7 +122,7 @@ const reducer = (
       }
     | {
         type: "OPEN_DIALOG_FORM";
-        value: { token_from: Token; token_to?: Token };
+        value: { send_token: Token; receive_token?: Token };
       }
     | {
         type: "CLOSE_DIALOG_FORM";
@@ -134,16 +140,16 @@ const reducer = (
     case "SET_TOKEN_FROM":
       return {
         ...prev,
-        token_from: {
-          ...prev.token_from,
+        send_token: {
+          ...prev.send_token,
           token: action.value,
         },
       };
-    case "SET_TOKEN_FROM_DATA":
+    case "SET_SEND_TOKEN_DATA":
       return {
         ...prev,
-        token_from: {
-          ...prev.token_from,
+        send_token: {
+          ...prev.send_token,
           ...action.value,
         },
       };
@@ -151,17 +157,17 @@ const reducer = (
     case "SET_TOKEN_TO":
       return {
         ...prev,
-        token_to: {
-          ...prev.token_to,
+        receive_token: {
+          ...prev.receive_token,
           token: action.value,
         },
       };
 
-    case "SET_TOKEN_TO_DATA":
+    case "SET_RECEIVE_TOKEN_DATA":
       return {
         ...prev,
-        token_to: {
-          ...prev.token_to,
+        receive_token: {
+          ...prev.receive_token,
           ...action.value,
         },
       };
@@ -173,22 +179,18 @@ const reducer = (
       };
 
     case "SET_TX_DATA": {
-      const { txs, receive_token_amount, slippage } = action.value;
-      const network_fee = txs.reduce((acc, tx) => acc + tx.gas_fee, 0n);
-      const lp_fee = txs.reduce((acc, tx) => acc + tx.lp_fee, 0n);
-
-      const ideal_amount = Number(receive_token_amount) / (1 - slippage / 100);
-      const real_amount_of_gldt_without_tx_fee = Number(
-        receive_token_amount + network_fee
-      );
-      const slippage_without_tx_fee =
-        ((ideal_amount - real_amount_of_gldt_without_tx_fee) / ideal_amount) *
-        100;
-
+      const {
+        receive_amount,
+        slippage_without_tx_fee,
+        slippage_with_tx_fee,
+        network_fee,
+        lp_fee,
+      } = action.value;
       return {
         ...prev,
+        receive_amount,
         slippage_without_tx_fee,
-        slippage_with_tx_fee: slippage,
+        slippage_with_tx_fee,
         network_fee,
         lp_fee,
       };
@@ -207,15 +209,15 @@ const reducer = (
       return {
         ...initialState,
         is_open_form_dialog: true,
-        token_from: {
-          ...prev.token_from,
-          token: action.value.token_from,
+        send_token: {
+          ...prev.send_token,
+          token: action.value.send_token,
         },
-        token_to: {
-          ...prev.token_to,
-          token: action.value.token_to
-            ? action.value.token_to
-            : action.value.token_from.id === "gldt"
+        receive_token: {
+          ...prev.receive_token,
+          token: action.value.receive_token
+            ? action.value.receive_token
+            : action.value.send_token.id === "gldt"
             ? TOKEN_GOLDAO
             : TOKEN_GLDT,
         },
@@ -288,4 +290,21 @@ const reducer = (
 
 export const SwapStateReducerAtom = atomWithReducer(initialState, reducer);
 
-export default SwapStateReducerAtom;
+export const IsReceiveAmountValidAtom = atom((get) => {
+  const state = get(SwapStateReducerAtom);
+  const { isValid } = state.form_state;
+  const { receive_amount, send_amount_input } = state;
+  return !(
+    isValid &&
+    Number(send_amount_input) > 0 &&
+    receive_amount !== undefined &&
+    receive_amount <= 0n
+  );
+});
+
+export const FormIsValidAtom = atom((get) => {
+  const state = get(SwapStateReducerAtom);
+  const isReceiveAmountValid = get(IsReceiveAmountValidAtom);
+  const { isValid } = state.form_state;
+  return isValid && isReceiveAmountValid;
+});

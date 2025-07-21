@@ -29,6 +29,7 @@ const useFetchSwapAmount = (
     from_canister_id: string;
     to: string;
     amount: number;
+    key?: string;
   }
 ) => {
   const {
@@ -38,6 +39,7 @@ const useFetchSwapAmount = (
     from,
     to,
     amount,
+    key,
     from_canister_id,
     staleTime = 60 * 1000,
     refetchOnMount = true,
@@ -47,7 +49,7 @@ const useFetchSwapAmount = (
   } = options;
 
   return useQuery({
-    queryKey: [`FETCH_SWAP_AMOUNT`, from, to, amount],
+    queryKey: [`FETCH_SWAP_AMOUNT`, from, to, amount, { ...(key && { key }) }],
     queryFn: async () => {
       try {
         const actorLedger = Actor.createActor(idlFactoryLedger, {

@@ -18,7 +18,7 @@ const SwapToken = () => {
     if (isConnected && isSwap) {
       dispatchSwapState({
         type: "OPEN_DIALOG_FORM",
-        value: { token_from: tokenFrom, token_to: tokenTo },
+        value: { send_token: tokenFrom, receive_token: tokenTo },
       });
       deleteSwapTokensSearchParams();
     }
