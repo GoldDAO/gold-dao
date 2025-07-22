@@ -80,9 +80,9 @@ fn test_dissolve_instantly_full() {
     // --- Check that the rewards are available ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     let position_stake_amount = user_position.staked.clone();
     let position_instant_dissolve_fee = user_position.instant_dissolve_fee.clone();
@@ -219,9 +219,9 @@ fn test_dissolve_instantly_partial() {
     // --- Check that the rewards are available ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     let position_stake_amount = user_position.staked.clone();
 
