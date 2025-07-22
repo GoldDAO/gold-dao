@@ -1,4 +1,4 @@
-use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_total_staked;
 use crate::gldt_stake_suite::utils::add_stake;
 use crate::gldt_stake_suite::utils::create_whitelisted_user_with_funds;
@@ -172,7 +172,7 @@ fn increase_stake_position_invalid_caller() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let _ = _add_whitelisted_principal(
+    let _ = add_whitelisted_principal(
         pic,
         controller,
         gldt_stake_canister_id,

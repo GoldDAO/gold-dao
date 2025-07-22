@@ -42,6 +42,7 @@ type Response = variant {
 type Response_1 = variant { Success; InternalError : text };
 type Response_2 = variant { Success; InternalError : text };
 type Result = variant { Ok; Err : vec ClaimRewardError };
+type SupportedStandard = record { url : text; name : text };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
@@ -49,9 +50,51 @@ type TokenInfo = record {
 };
 type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
+type icrc21_consent_info = record {
+  metadata : icrc21_consent_message_metadata;
+  consent_message : icrc21_consent_message;
+};
+type icrc21_consent_message = record {
+  generic_display_message : text;
+  fields_display_message : icrc21_field_display_message;
+};
+type icrc21_consent_message_metadata = record {
+  utc_offset_minutes : opt int16;
+  language : text;
+};
+type icrc21_consent_message_request = record {
+  arg : blob;
+  method : text;
+  user_preferences : icrc21_consent_message_spec;
+};
+type icrc21_consent_message_response = variant {
+  Ok : icrc21_consent_info;
+  Err : icrc21_error;
+};
+type icrc21_consent_message_spec = record {
+  metadata : icrc21_consent_message_metadata;
+  device_spec : opt icrc21_device_spec;
+};
+type icrc21_device_spec = variant { GenericDisplay; FieldsDisplay };
+type icrc21_error = variant {
+  GenericError : icrc21_error_info;
+  InsufficientPayment : icrc21_generic_error;
+  UnsupportedCanisterCall : icrc21_error_info;
+  ConsentMessageUnavailable : icrc21_error_info;
+};
+type icrc21_error_info = record { description : text };
+type icrc21_field_display_message = record {
+  fields : vec record { text; text };
+  intent : text;
+};
+type icrc21_generic_error = record { description : text; error_code : nat64 };
 service : (Args_4) -> {
   claim_reward : (Args) -> (Response);
   claim_rewards_batch : (Args_1) -> (Result);
+  icrc10_supported_standards : () -> (vec SupportedStandard) query;
+  icrc21_canister_call_consent_message : (icrc21_consent_message_request) -> (
+      icrc21_consent_message_response,
+    ) query;
   set_daily_goldao_burn_rate : (nat) -> (Response_1);
   set_reserve_transfer_amounts : (Args_2) -> (Response_1);
   set_reward_token_types : (Args_3) -> (Response_2);

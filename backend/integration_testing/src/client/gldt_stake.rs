@@ -20,7 +20,7 @@ generate_pocket_query_call!(icrc3_get_archives);
 generate_pocket_update_call!(create_neuron);
 generate_pocket_update_call!(manage_sns_neuron);
 generate_pocket_update_call!(manage_stake_position);
-generate_pocket_update_call!(_add_whitelisted_principal);
+generate_pocket_update_call!(add_whitelisted_principal);
 generate_pocket_update_call!(get_apy_overall);
 generate_pocket_update_call!(_set_position_withdraw_state);
 generate_pocket_update_call!(_set_token_usd_values);
