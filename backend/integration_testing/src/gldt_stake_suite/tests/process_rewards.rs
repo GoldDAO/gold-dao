@@ -105,9 +105,9 @@ fn test_process_staking_rewards() {
     for user in users {
         let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
         let rewards = &position.claimable_rewards;
-        assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(13_698_346_875_u64));
-        assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(13_698_326_403_u64));
-        assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(13_698_365_299_u64));
+        assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(13_698_246_875_u64));
+        assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(13_698_126_403_u64));
+        assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(13_698_355_299_u64));
     }
 
     pic.advance_time(Duration::from_millis(DAY_IN_MS));

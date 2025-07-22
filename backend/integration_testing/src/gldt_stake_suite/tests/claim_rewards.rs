@@ -77,9 +77,9 @@ fn test_can_claim_gldt_stake_rewards() {
     // --- Check that the rewards are available for the user ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     pic.advance_time(Duration::from_secs(2));
     tick_n_blocks(pic, 50);
@@ -89,8 +89,7 @@ fn test_can_claim_gldt_stake_rewards() {
         .claimable_rewards
         .get(&TokenSymbol::GOLDAO)
         .unwrap()
-        .clone()
-        - goldao_tx_fee.clone();
+        .clone();
     let res = manage_stake_position(
         pic,
         user,
@@ -102,10 +101,7 @@ fn test_can_claim_gldt_stake_rewards() {
     .unwrap();
 
     // --- Check result of claim rewards ---
-    assert_eq!(
-        res.claimable_rewards.get(&TokenSymbol::GOLDAO).unwrap(),
-        &Nat::from(0u64)
-    );
+    assert!(res.claimable_rewards.get(&TokenSymbol::GOLDAO).is_none());
     let user_goldao_balance = balance_of(
         pic,
         goldao_ledger.clone(),
@@ -120,14 +116,10 @@ fn test_can_claim_gldt_stake_rewards() {
     let position = get_position(pic, user, gldt_stake_canister_id, &())
         .unwrap()
         .clone();
-    assert_eq!(
-        position
-            .claimable_rewards
-            .get(&TokenSymbol::GOLDAO)
-            .unwrap()
-            .clone(),
-        Nat::from(0u64)
-    );
+    assert!(position
+        .claimable_rewards
+        .get(&TokenSymbol::GOLDAO)
+        .is_none());
 
     let total_allocated_rewards =
         get_total_allocated_rewards(pic, user, gldt_stake_canister_id, &());
@@ -213,9 +205,9 @@ fn test_claim_rewards_twice() {
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     let _res = manage_stake_position(
         pic,
@@ -291,9 +283,9 @@ fn test_claim_rewards_concurrent_calls_should_fail() {
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     // --- Create two parallel calls for one position ---
     let message_id_1 = pic
