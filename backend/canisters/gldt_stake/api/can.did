@@ -399,7 +399,7 @@ type WithdrawState = variant {
 };
 service : (Args_5) -> {
   _add_reward_round : (vec record { text; nat }) -> (Result);
-  _add_whitelisted_principal : (vec principal) -> (Result);
+  add_whitelisted_principal : (vec principal) -> (Result);
   _get_state_snapshot : (null) -> (StateSnapshot) query;
   _set_position_withdraw_state : (Args) -> (Result_1);
   _set_token_usd_values : (vec record { text; float64 }) -> (null);

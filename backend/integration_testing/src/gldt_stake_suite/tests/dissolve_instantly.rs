@@ -1,4 +1,4 @@
-use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::get_total_staked;
 use crate::client::gldt_stake::manage_stake_position;
@@ -449,7 +449,7 @@ fn test_dissolve_instantly_as_anonymous_should_fail() {
     } = test_env;
     let pic = &pic.borrow();
 
-    _add_whitelisted_principal(
+    add_whitelisted_principal(
         pic,
         controller,
         gldt_stake_canister_id,

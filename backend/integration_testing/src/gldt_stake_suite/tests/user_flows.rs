@@ -1,5 +1,5 @@
 use crate::client::gldt_stake::{
-    _add_whitelisted_principal, get_position, get_total_staked, manage_stake_position,
+    add_whitelisted_principal, get_position, get_total_staked, manage_stake_position,
 };
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
@@ -266,7 +266,7 @@ fn full_user_flow_test() {
     }
 
     // --- Try to dissolve as anonymous ---
-    _add_whitelisted_principal(
+    add_whitelisted_principal(
         pic,
         controller,
         gldt_stake_canister_id,
