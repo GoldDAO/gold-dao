@@ -53,11 +53,21 @@ pub async fn withdraw_impl(
         amount_withdrawn: amount_to_withdraw.clone(),
         dissolved_events,
     });
-    let prepared_tx = icrc3_prepare_transaction(transaction.clone()).map_err(|err| {
-        ManageStakePositionError::GeneralError(GeneralError::TransactionPreparationError(
-            err.to_string(),
-        ))
-    })?;
+    let prepared_tx = match icrc3_prepare_transaction(transaction.clone()) {
+        Ok(tx) => tx,
+        Err(err) => {
+            set_withdraw_state_of_position(
+                caller,
+                &position,
+                WithdrawState::NormalWithdraw(NormalWithdrawStatus::Failed(format!(
+                    "Transaction preparation failed: {err}"
+                ))),
+            );
+            return Err(ManageStakePositionError::GeneralError(
+                GeneralError::TransactionPreparationError(err.to_string()),
+            ));
+        }
+    };
 
     // 3. perform transfer to user
     let stake_position = transfer_stake_to_user(amount_to_withdraw, caller, position).await?;
