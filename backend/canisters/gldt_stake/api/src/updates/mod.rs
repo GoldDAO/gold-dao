@@ -1,6 +1,6 @@
-pub mod _add_whitelisted_principal;
 pub mod _set_position_withdraw_state;
 pub mod _set_token_usd_values;
+pub mod add_whitelisted_principal;
 pub mod allocated_rewards_balance;
 pub mod create_neuron;
 pub mod manage_sns_neuron;

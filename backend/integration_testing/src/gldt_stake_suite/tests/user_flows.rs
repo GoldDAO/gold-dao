@@ -1,5 +1,5 @@
 use crate::client::gldt_stake::{
-    _add_whitelisted_principal, get_position, get_total_staked, manage_stake_position,
+    add_whitelisted_principal, get_position, get_total_staked, manage_stake_position,
 };
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
@@ -266,7 +266,7 @@ fn full_user_flow_test() {
     }
 
     // --- Try to dissolve as anonymous ---
-    _add_whitelisted_principal(
+    add_whitelisted_principal(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -439,9 +439,9 @@ fn test_can_claim_gldt_stake_rewards() {
     // --- Check that the rewards are available for the user ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(4_714_275_714_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(4_714_265_714_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(4_714_284_714_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(4_714_175_714_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(4_714_065_714_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(4_714_274_714_u64));
     println!("User position: {:?}", user_position);
 
     pic.advance_time(Duration::from_secs(2));

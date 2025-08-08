@@ -1,4 +1,4 @@
-use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::get_total_staked;
 use crate::client::gldt_stake::manage_stake_position;
@@ -80,9 +80,9 @@ fn test_dissolve_instantly_full() {
     // --- Check that the rewards are available ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     let position_stake_amount = user_position.staked.clone();
     let position_instant_dissolve_fee = user_position.instant_dissolve_fee.clone();
@@ -219,9 +219,9 @@ fn test_dissolve_instantly_partial() {
     // --- Check that the rewards are available ---
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_757_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_847_142_u64));
+    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
+    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
+    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
 
     let position_stake_amount = user_position.staked.clone();
 
@@ -449,7 +449,7 @@ fn test_dissolve_instantly_as_anonymous_should_fail() {
     } = test_env;
     let pic = &pic.borrow();
 
-    _add_whitelisted_principal(
+    add_whitelisted_principal(
         pic,
         controller,
         gldt_stake_canister_id,

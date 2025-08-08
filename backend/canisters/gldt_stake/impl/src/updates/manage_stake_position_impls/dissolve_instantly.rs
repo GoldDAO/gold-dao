@@ -68,12 +68,29 @@ pub async fn dissolve_instantly_impl(
     // 4. check if the position is fully dissolved
     if percentage != 100 {
         // not a full dissolve - just decrease stake
-        position.change_stake(
+        if let Err(e) = position.change_stake(
             proportional_amount_to_withdraw.clone(),
             StakeChange::Decrease(DecreaseType::Fractional),
-        )?;
+        ) {
+            set_withdraw_state_of_position(
+                caller,
+                position,
+                WithdrawState::EarlyWithdraw(DissolveInstantlyStatus::Failed(format!(
+                    "Stake change failed: {:?}",
+                    e
+                ))),
+            );
+            return Err(e.into());
+        }
     } else if position.has_rewards() {
         // full position dissolve with rewards - return error that rewards must be claimed first
+        set_withdraw_state_of_position(
+            caller,
+            position,
+            WithdrawState::EarlyWithdraw(DissolveInstantlyStatus::Failed(
+                "Stake has unclaimed rewards".to_string(),
+            )),
+        );
         return Err(ManageStakePositionError::DissolveInstantlyError(
             DissolveInstantlyRequestErrors::WithdrawErrors(
                 WithdrawErrors::InvalidDissolveInstantlyAmount(format!(
@@ -84,10 +101,20 @@ pub async fn dissolve_instantly_impl(
         ));
     } else {
         // full position dissolve without rewards - set stake to zero
-        position.change_stake(
+        if let Err(e) = position.change_stake(
             proportional_amount_to_withdraw.clone(),
             StakeChange::Decrease(DecreaseType::Full),
-        )?;
+        ) {
+            set_withdraw_state_of_position(
+                caller,
+                position,
+                WithdrawState::EarlyWithdraw(DissolveInstantlyStatus::Failed(format!(
+                    "Stake change failed: {:?}",
+                    e
+                ))),
+            );
+            return Err(e.into());
+        }
     }
 
     // 5. prepare ICRC3 transaction
@@ -96,12 +123,22 @@ pub async fn dissolve_instantly_impl(
         amount_dissolved: amount_to_user.clone(),
         result_staked: position.staked.clone(),
     });
-    let prepared_tx = icrc3_prepare_transaction(transaction.clone()).map_err(|err| {
-        error!("icrc3_prepare_transaction error: {:?}", err);
-        ManageStakePositionError::GeneralError(GeneralError::TransactionPreparationError(
-            err.to_string(),
-        ))
-    })?;
+    let prepared_tx = match icrc3_prepare_transaction(transaction.clone()) {
+        Ok(tx) => tx,
+        Err(err) => {
+            error!("icrc3_prepare_transaction error: {:?}", err);
+            set_withdraw_state_of_position(
+                caller,
+                position,
+                WithdrawState::EarlyWithdraw(DissolveInstantlyStatus::Failed(format!(
+                    "Transaction preparation failed: {err}"
+                ))),
+            );
+            return Err(ManageStakePositionError::GeneralError(
+                GeneralError::TransactionPreparationError(err.to_string()),
+            ));
+        }
+    };
 
     // 6. perform transfer to user
     let stake_position = transfer_stake_to_user(

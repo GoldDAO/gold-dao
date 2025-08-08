@@ -1,6 +1,6 @@
 use std::{collections::HashMap, time::Duration};
 
-use crate::client::gldt_stake::_add_whitelisted_principal;
+use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::manage_stake_position;
 use assert_matches::assert_matches;
 use candid::{Nat, Principal};
@@ -34,7 +34,7 @@ pub fn create_whitelisted_user_with_funds(
         subaccount: None,
     };
 
-    _add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user])
+    add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user])
         .expect("Failed to add whitelisted principal");
 
     let _ = transfer(
@@ -110,7 +110,7 @@ pub fn create_stake_position_util(
 
     let user_1 = random_principal();
 
-    _add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user_1])
+    add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user_1])
         .expect("Failed to add whitelisted principal");
 
     let _ = transfer(
