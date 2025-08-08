@@ -240,11 +240,11 @@ const Form = ({ className }: { className?: string }) => {
           </div>
           <div className="inline-flex text-content/60 items-center gap-1 text-sm">
             <div className="text-content/40">Fee:</div>
-            <NumberToLocaleString value={balance.data.fee} />
+            <NumberToLocaleString value={balance.data.fee} decimals={8} />
             <div>{token.name}</div>
             <div className="text-content/40">
               ≈ $
-              <NumberToLocaleString value={balance.data.fee_usd} />
+              <NumberToLocaleString value={balance.data.fee_usd} decimals={8} />
             </div>
           </div>
         </div>
