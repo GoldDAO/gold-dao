@@ -104,7 +104,7 @@ thiserror = "2.0.12"
 strum = { version = "0.27.1", features = ["derive"] }
 strum_macros = "0.27.1"
 
-bity-ic-icrc3 = { version =  "0.4.4", features = ["debug-logs"] } # , 
+bity-ic-icrc3 = { version =  "0.4.4" } # , 
 bity-ic-icrc3-macros = "0.3.2"
 bity-ic-canister-time = "0.2.0"
 bity-ic-serializer = "0.1.0"

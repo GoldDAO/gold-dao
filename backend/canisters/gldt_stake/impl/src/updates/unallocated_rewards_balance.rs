@@ -26,8 +26,8 @@ async fn unallocated_rewards_balance(
                 result.insert(reward_token, Ok(balance));
             }
             Err(err) => {
-                error!("Failed to get balance for {:?}: {}", reward_token, err);
-                result.insert(reward_token, Err(err.to_string()));
+                error!("Failed to get balance for {:?}: {:?}", reward_token, err);
+                result.insert(reward_token, Err(err));
             }
         }
     }

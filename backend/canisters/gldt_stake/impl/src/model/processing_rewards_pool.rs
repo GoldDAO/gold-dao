@@ -57,7 +57,7 @@ pub trait ProcessingRewards {
         match icrc1_transfer(
             token_ledger,
             &TransferArg {
-                from_subaccount: None,
+                from_subaccount: ProcessingRewardsPool::account().subaccount,
                 to: AllocatedRewardsPool::account(),
                 fee: None,
                 created_at_time: None,

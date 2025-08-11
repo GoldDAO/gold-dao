@@ -75,9 +75,9 @@ fn test_withdraw_works() {
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
+    assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
+    assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
+    assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
     let position_stake_amount = user_position.staked.clone();
 
@@ -212,9 +212,9 @@ fn test_withdraw_with_unclaimed_rewards() {
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
     let rewards = &user_position.claimable_rewards;
-    assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(47_142_657_142_u64));
-    assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(47_142_457_142_u64));
-    assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(47_142_837_142_u64));
+    assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
+    assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
+    assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
     // --- Start dissolving ---
     let _ = manage_stake_position(

@@ -177,6 +177,13 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
+        reward_types.insert(
+            "WTN".to_string(),
+            (
+                token_ledgers.get("icp_ledger_canister_id").unwrap().clone(),
+                self.ledger_fees.get("ICP").unwrap().clone(),
+            ),
+        );
         pic.set_time(
             (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
         ); // Friday 6 Dec 2024, 12:01:00

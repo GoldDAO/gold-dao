@@ -95,6 +95,9 @@ pub enum GeneralError {
     InvalidPercentage(String),
     TransactionPreparationError(String),
     TransactionAddError(String),
+    BalanceIsLowerThanFee(String),
+    BalanceIsLowerThanThreshold(String),
+    BalanceIsZero(String),
 }
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]

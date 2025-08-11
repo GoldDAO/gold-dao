@@ -55,7 +55,7 @@ impl RuntimeState {
             total_active_stake_positions: self.data.stake_system.active_stake_positions(),
             token_usd_values: self.data.stake_system.token_usd_values.clone(),
             genesis_datetime: self.data.stake_system.genesis_datetime,
-            // reward_types: self.data.stake_system.reward_types.clone(),
+            reward_types: self.data.stake_system.reward_types.clone(),
             reward_history: self.data.allocated_rewards_pool.reward_history.clone(),
             neurons: self.data.neuron_system.neurons.clone(),
 
@@ -105,6 +105,7 @@ pub struct Metrics {
     pub genesis_datetime: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>,
     pub neurons: Vec<Neuron>,
+    pub reward_types: BTreeSet<TokenSymbol>,
 
     // ledgers and canister ids
     pub gldt_ledger_id: Principal,

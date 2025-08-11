@@ -9,7 +9,8 @@ use crate::gldt_stake_suite::utils::add_custom_rewards_to_processing_pool;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
 use crate::utils::wait_1_day;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
-use candid::{Nat, Principal};
+use candid::Nat;
+use candid::Principal;
 use canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use std::time::Duration;
 use types::TokenSymbol;
@@ -105,9 +106,18 @@ fn test_process_staking_rewards() {
     for user in users {
         let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
         let rewards = &position.claimable_rewards;
-        assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(13_698_246_875_u64));
-        assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(13_698_126_403_u64));
-        assert_eq!(rewards[&TokenSymbol::ICP], Nat::from(13_698_355_299_u64));
+        assert_eq!(
+            rewards[&TokenSymbol::GOLDAO].clone() - TokenSymbol::GOLDAO.get_token_info().fee,
+            Nat::from(9_206_206_058_u64)
+        );
+        assert_eq!(
+            rewards[&TokenSymbol::OGY].clone() - TokenSymbol::OGY.get_token_info().fee,
+            Nat::from(9_206_085_587_u64)
+        );
+        assert_eq!(
+            rewards[&TokenSymbol::ICP].clone() - TokenSymbol::OGY.get_token_info().fee,
+            Nat::from(9_206_124_483_u64)
+        );
     }
 
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
@@ -118,7 +128,7 @@ fn test_process_staking_rewards() {
         Principal::anonymous(),
         gldt_stake_canister_id,
         &gldt_stake_api_canister::get_apy_timeseries::Args {
-            starting_week: 0,
+            starting_day: 0,
             limit: None,
         },
     );
