@@ -11,12 +11,12 @@ fn get_apy_timeseries(args: GetApyTimeseriesArgs) -> GetApyTimeseriesResponse {
     let daily_apy_history: Vec<(TimestampMillis, f64)> =
         read_state(|s| s.data.stake_system.daily_apy_history.iter().collect());
     let limit = args.limit.unwrap_or(usize::MAX);
-    let starting_week = args.starting_week;
-    get_weekly_series(starting_week, limit, &daily_apy_history)
+    let starting_day = args.starting_day;
+    get_daily_series(starting_day, limit, &daily_apy_history)
 }
 
-fn get_weekly_series(
-    starting_week: u64,
+fn get_daily_series(
+    starting_day: u64,
     limit: usize,
     daily_apy_history: &[(TimestampMillis, f64)],
 ) -> Vec<(TimestampMillis, f64)> {
@@ -24,7 +24,7 @@ fn get_weekly_series(
         .iter()
         .rev()
         .enumerate()
-        .filter(|(week, _)| *week as u64 >= starting_week)
+        .filter(|(day, _)| *day as u64 >= starting_day)
         .map(|(_, data)| data)
         .take(limit)
         .cloned()
@@ -36,7 +36,7 @@ mod tests {
     use canister_time::{timestamp_millis, WEEK_IN_MS};
     use types::TimestampMillis;
 
-    use super::get_weekly_series;
+    use super::get_daily_series;
 
     #[test]
     fn test_get_daily_series_paginated() {
@@ -50,20 +50,20 @@ mod tests {
             daily_history.push((timestamp + WEEK_IN_MS, i as f64))
         }
 
-        let res = get_weekly_series(0, 250, &daily_history);
+        let res = get_daily_series(0, 250, &daily_history);
         assert_eq!(res.len(), 250);
 
-        let res = get_weekly_series(0, 100, &daily_history);
+        let res = get_daily_series(0, 100, &daily_history);
         assert_eq!(res.len(), 100);
         assert_eq!(res[0].1, 249.0);
         assert_eq!(res[99].1, 150.0);
 
-        let res = get_weekly_series(100, 100, &daily_history);
+        let res = get_daily_series(100, 100, &daily_history);
         assert_eq!(res.len(), 100);
         assert_eq!(res[0].1, 149.0);
         assert_eq!(res[99].1, 50.0);
 
-        let res = get_weekly_series(200, 100, &daily_history);
+        let res = get_daily_series(200, 100, &daily_history);
         assert_eq!(res.len(), 50);
         assert_eq!(res[0].1, 49.0);
         assert_eq!(res.last().unwrap().1, 0.0);

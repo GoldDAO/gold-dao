@@ -7,6 +7,7 @@ pub use gldt_stake_api_canister::get_apy_overall::{
     Args as GetApyArgs, Response as GetApyResponse,
 };
 use ic_cdk::query;
+use std::collections::BTreeMap;
 use tracing::info;
 use types::TimestampMillis;
 use types::TokenSymbol;
@@ -30,7 +31,7 @@ fn get_apy_overall(_: GetApyArgs) -> GetApyResponse {
 
 fn get_apy_impl(
     daily_weighted_stake: HashMap<TimestampMillis, Nat>,
-    daily_rewards: HashMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
+    daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
     token_usd_values: HashMap<TokenSymbol, f64>,
 ) -> GetApyResponse {
     let total_weighted_stake = daily_weighted_stake
@@ -49,7 +50,7 @@ fn get_apy_impl(
 }
 
 fn calculate_total_rewards_per_token(
-    daily_rewards: HashMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
+    daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
 ) -> HashMap<TokenSymbol, Nat> {
     let mut total_rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
 
@@ -164,9 +165,9 @@ pub fn calculate_weighted_stake_usd(
 #[cfg(test)]
 mod tests {
 
-    use std::collections::HashMap;
-
     use candid::Nat;
+    use std::collections::BTreeMap;
+    use std::collections::HashMap;
     use time::{Duration, OffsetDateTime};
     use types::{TimestampMillis, TokenSymbol};
 
@@ -189,12 +190,13 @@ mod tests {
         token_prices_usd.insert(TokenSymbol::ICP, 1.0);
         token_prices_usd.insert(TokenSymbol::GLDT, 10.0);
 
-        let mut dayly_rewards: HashMap<TimestampMillis, HashMap<TokenSymbol, Nat>> = HashMap::new();
+        let mut daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>> =
+            BTreeMap::new();
         let mut rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
         rewards.insert(TokenSymbol::GOLDAO, Nat::from(400u64));
         rewards.insert(TokenSymbol::OGY, Nat::from(400u64));
         rewards.insert(TokenSymbol::ICP, Nat::from(400u64));
-        dayly_rewards.insert(one_day_ago, rewards);
+        daily_rewards.insert(one_day_ago, rewards);
 
         let mut dayly_weighted_stake = HashMap::new();
         dayly_weighted_stake.insert(one_day_ago, Nat::from(100_00u64));
@@ -210,7 +212,7 @@ mod tests {
         assert_eq!(
             get_apy_impl(
                 dayly_weighted_stake.clone(),
-                dayly_rewards.clone(),
+                daily_rewards.clone(),
                 token_prices_usd.clone()
             ),
             62.4
@@ -223,12 +225,12 @@ mod tests {
         rewards.insert(TokenSymbol::GOLDAO, Nat::from(0u64));
         rewards.insert(TokenSymbol::OGY, Nat::from(0u64));
         rewards.insert(TokenSymbol::ICP, Nat::from(0u64));
-        dayly_rewards.insert(now, rewards);
+        daily_rewards.insert(now, rewards);
 
         dayly_weighted_stake.insert(now, Nat::from(100_00u64));
 
         assert_eq!(
-            get_apy_impl(dayly_weighted_stake, dayly_rewards, token_prices_usd),
+            get_apy_impl(dayly_weighted_stake, daily_rewards, token_prices_usd),
             31.2
         );
     }

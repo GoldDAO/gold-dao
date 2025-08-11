@@ -63,6 +63,7 @@ impl TimeInterval {
 
         false
     }
+
     pub fn is_within_daily_interval(&self, timestamp_millis: TimestampMillis) -> bool {
         let timestamp_secs = timestamp_millis / 1000; // Convert milliseconds to seconds
                                                       // Create a DateTime equivalent using time crate

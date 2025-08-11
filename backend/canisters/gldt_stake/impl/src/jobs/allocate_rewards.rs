@@ -1,3 +1,5 @@
+use crate::jobs::process_rewards::batch_rewards_transfer;
+use crate::jobs::process_rewards::process_rewards_impl;
 use crate::model::processing_rewards_pool::ProcessingRewards;
 use crate::{
     queries::{
@@ -10,9 +12,12 @@ use candid::Nat;
 use canister_time::{run_interval, timestamp_millis, DAY_IN_MS, HOUR_IN_MS};
 use futures::future::join_all;
 use gldt_stake_api_canister::TimestampMillis;
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::time::Duration;
 use tracing::error;
 use tracing::info;
+const MAX_RETRY_ATTEMPTS: u8 = 3;
 
 pub fn start_job() {
     run_interval(
@@ -20,12 +25,11 @@ pub fn start_job() {
         spawn_reward_allocation_job,
     );
 }
-
 fn spawn_reward_allocation_job() {
-    ic_cdk::futures::spawn(process_rewards_allocation_job_impl())
+    ic_cdk::futures::spawn(handle_process_and_allocation())
 }
 
-async fn process_rewards_allocation_job_impl() {
+async fn handle_process_and_allocation() {
     info!("PROCESS REWARD ALLOCATION :: start");
 
     let now = timestamp_millis();
@@ -33,6 +37,95 @@ async fn process_rewards_allocation_job_impl() {
         return;
     }
 
+    match process_rewards_impl().await {
+        Ok(_) => {
+            process_rewards_allocation_job_impl().await;
+        }
+        Err(failed_tokens) => {
+            let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
+
+            // If not all tokens failed → run allocation now
+            if failed_tokens.len() < reward_types.len() {
+                info!(
+                    "PROCESS REWARD ALLOCATION :: some tokens succeeded ({} of {}), running allocation before retry",
+                    reward_types.len() - failed_tokens.len(),
+                    reward_types.len()
+                );
+                process_rewards_allocation_job_impl().await;
+            }
+
+            handle_process_rewards_retry(
+                failed_tokens.into_iter().map(|token| (token, 0)).collect(),
+            )
+            .await
+        }
+    }
+}
+
+pub async fn handle_process_rewards_retry(retry_counts: BTreeMap<TokenSymbol, u8>) {
+    info!("PROCESS_REWARDS_RETRY :: starting retry attempt");
+
+    let retry_tokens: BTreeSet<TokenSymbol> = retry_counts.keys().cloned().collect();
+    let unallocated_rewards_pool = read_state(|s| s.data.unallocated_rewards_pool.clone());
+
+    let results = batch_rewards_transfer(retry_tokens, unallocated_rewards_pool).await;
+
+    let mut still_failing = BTreeMap::new();
+    let mut succeeded_any = false;
+
+    for (token_symbol, result) in results.into_iter() {
+        match result {
+            Ok(_) => {
+                for (symbol, count) in &still_failing {
+                    info!(
+                        "PROCESS_REWARDS_RETRY :: scheduling retry for token: {}, retry count: {}",
+                        symbol, count
+                    );
+                }
+                succeeded_any = true;
+            }
+            Err(err) => {
+                let count = retry_counts.get(&token_symbol).copied().unwrap_or(0) + 1;
+
+                if count >= MAX_RETRY_ATTEMPTS {
+                    error!(
+                        "PROCESS_REWARDS_RETRY :: giving up on token: {} after {} attempts. Last error: {:?}",
+                        token_symbol, count, err
+                    );
+                    // Optional: notify or audit log
+                } else {
+                    error!(
+                        "PROCESS_REWARDS_RETRY :: retry failed for token: {}, attempt: {}, error: {:?}",
+                        token_symbol, count, err
+                    );
+                    still_failing.insert(token_symbol, count);
+                }
+            }
+        }
+    }
+
+    // If at least some tokens succeeded, run reward allocation
+    if succeeded_any {
+        info!("PROCESS_REWARDS_RETRY :: some tokens succeeded, running allocation");
+        process_rewards_allocation_job_impl().await;
+    }
+
+    if !still_failing.is_empty() {
+        info!(
+            "PROCESS_REWARDS_RETRY :: scheduling retry for tokens: {:?}",
+            still_failing.keys()
+        );
+
+        ic_cdk_timers::set_timer(Duration::from_secs(60 * 5), move || {
+            ic_cdk::futures::spawn(handle_process_rewards_retry(still_failing));
+        });
+    } else {
+        info!("PROCESS_REWARDS_RETRY :: all tokens succeeded or max retries reached");
+    }
+}
+
+async fn process_rewards_allocation_job_impl() {
+    info!("PROCESS REWARD ALLOCATION :: start");
     if read_state(|s| !s.data.allocated_rewards_pool.is_awaiting()) {
         info!("PROCESS REWARD ALLOCATION :: already in progress, exiting early");
         return;
@@ -55,6 +148,7 @@ pub async fn allocate_rewards() -> Result<(), String> {
     let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
     let processing_rewards_pool = read_state(|s| s.data.processing_rewards_pool.clone());
     let mut transfer_futures = Vec::new();
+    let mut successful_reward_types = Vec::new();
 
     for reward_type in &reward_types {
         let token_ledger_id = reward_type.get_token_info().ledger_id;
@@ -76,15 +170,16 @@ pub async fn allocate_rewards() -> Result<(), String> {
 
         let rewards_to_allocate = balance.clone() - token_fee;
 
-        let future =
-            processing_rewards_pool.transfer_rewards(token_ledger_id, rewards_to_allocate.clone());
-
+        let future = processing_rewards_pool.transfer_rewards(token_ledger_id, rewards_to_allocate);
+        successful_reward_types.push(*reward_type);
         transfer_futures.push(future);
     }
 
     let results = join_all(transfer_futures).await;
 
-    for (reward_type, transfer_result) in reward_types.into_iter().zip(results.into_iter()) {
+    for (reward_type, transfer_result) in
+        successful_reward_types.into_iter().zip(results.into_iter())
+    {
         match transfer_result {
             Ok(rewards_to_allocate) => {
                 info!(

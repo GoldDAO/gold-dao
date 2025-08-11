@@ -4,7 +4,7 @@ use types::TimestampMillis;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct Args {
-    pub starting_week: u64,
+    pub starting_day: u64,
     pub limit: Option<usize>,
 }
 

@@ -14,6 +14,5 @@ pub(crate) fn start() {
     transfer_instant_dissolve_fees::start_job();
     process_proposals::start_job();
     allocate_rewards::start_job();
-    process_rewards::start_job();
     sync_token_usd_values::start_job();
 }
