@@ -33,11 +33,11 @@ fn test_migration_happy_path() {
     println!("Canister status before migration: {:?}", status);
 
     upgrade_rewards_canister(&pic, sns_rewards_id, &test_env.sns_gov_canister_id).unwrap();
-    tick_n_blocks(&pic, 100);
+    tick_n_blocks(&pic, 20);
 
     let neurons = get_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 100);
     // println!("Neurons after migration: {:?}", neurons);
-    tick_n_blocks(&pic, 100);
+    tick_n_blocks(&pic, 20);
 
     for neuron_maturity_history in neurons {
         assert!(
