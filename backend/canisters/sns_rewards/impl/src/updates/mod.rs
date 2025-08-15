@@ -5,6 +5,7 @@ pub mod insert_mock_neuron_info;
 pub mod set_daily_goldao_burn_rate;
 pub mod set_reserve_transfer_amounts;
 pub mod set_reward_token_types;
+pub mod trigger_sync_neurons;
 
 pub use claim_reward::*;
 pub use claim_rewards_batch::*;
@@ -13,3 +14,4 @@ pub use insert_mock_neuron_info::*;
 pub use set_daily_goldao_burn_rate::*;
 pub use set_reserve_transfer_amounts::*;
 pub use set_reward_token_types::*;
+pub use trigger_sync_neurons::*;

@@ -1,8 +1,10 @@
 type Args = record { token : text; neuron_id : NeuronId };
 type Args_1 = record { claim_reward_args : vec ClaimRewardArgs };
-type Args_2 = record { transfer_amounts : vec record { TokenSymbol; nat } };
-type Args_3 = record { token_list : vec record { TokenSymbol; TokenInfo } };
-type Args_4 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_2 = record { size : opt nat64; neuron_id : NeuronId };
+type Args_3 = record { neuron_info : NeuronInfo; neuron_id : NeuronId };
+type Args_4 = record { transfer_amounts : vec record { TokenSymbol; nat } };
+type Args_5 = record { token_list : vec record { TokenSymbol; TokenInfo } };
+type Args_6 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ClaimRewardArgs = record { token : TokenSymbol; neuron_id : NeuronId };
 type ClaimRewardError = record {
@@ -29,6 +31,12 @@ type InitArgs = record {
   commit_hash : text;
 };
 type NeuronId = record { id : blob };
+type NeuronInfo = record {
+  rewarded_maturity : vec record { TokenSymbol; nat64 };
+  accumulated_maturity : nat64;
+  last_synced_maturity : nat64;
+  last_disburse_event_considered : opt nat64;
+};
 type Response = variant {
   Ok : bool;
   TokenSymbolInvalid : text;
@@ -42,13 +50,14 @@ type Response = variant {
 type Response_1 = variant { Success; InternalError : text };
 type Response_2 = variant { Success; InternalError : text };
 type Result = variant { Ok; Err : vec ClaimRewardError };
+type Result_1 = variant { Ok; Err : text };
 type SupportedStandard = record { url : text; name : text };
 type TokenInfo = record {
   fee : nat64;
   decimals : nat64;
   ledger_id : principal;
 };
-type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
+type TokenSymbol = variant { ICP; OGY; QWE; RTY; WTN; GOLDAO; GLDT };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
 type icrc21_consent_info = record {
   metadata : icrc21_consent_message_metadata;
@@ -88,14 +97,20 @@ type icrc21_field_display_message = record {
   intent : text;
 };
 type icrc21_generic_error = record { description : text; error_code : nat64 };
-service : (Args_4) -> {
+service : (Args_6) -> {
   claim_reward : (Args) -> (Response);
   claim_rewards_batch : (Args_1) -> (Result);
+  get_maturity_history_of_neuron : (Args_2) -> (
+      vec record { nat64; NeuronInfo },
+    ) query;
+  get_neuron_by_id : (NeuronId) -> (opt NeuronInfo) query;
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
   icrc21_canister_call_consent_message : (icrc21_consent_message_request) -> (
       icrc21_consent_message_response,
     ) query;
+  insert_mock_neuron : (Args_3) -> (Result_1);
   set_daily_goldao_burn_rate : (nat) -> (Response_1);
-  set_reserve_transfer_amounts : (Args_2) -> (Response_1);
-  set_reward_token_types : (Args_3) -> (Response_2);
+  set_reserve_transfer_amounts : (Args_4) -> (Response_1);
+  set_reward_token_types : (Args_5) -> (Response_2);
+  synchronise_neurons : () -> ();
 }

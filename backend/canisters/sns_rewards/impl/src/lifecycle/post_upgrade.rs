@@ -1,3 +1,4 @@
+use candid::Principal;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
@@ -27,6 +28,9 @@ fn post_upgrade(args: Args) {
             let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = serializer
                 ::deserialize(reader)
                 .unwrap();
+
+            // NOTE: migrate all the data from the old memory to the new memory
+            state.data.maturity_history.migrate();
 
             // uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces): (
