@@ -6,7 +6,7 @@ use utils::env::CanisterEnv;
 
 use crate::state::{Data, RuntimeState};
 
-use super::init_canister;
+use super::init_canister_init;
 
 #[init]
 fn init(args: Args) {
@@ -20,6 +20,7 @@ fn init(args: Args) {
                 init_args.commit_hash,
             );
             let mut data = Data::default();
+            data.migration_finished = Some(0);
 
             // use staging canister ids
             if init_args.test_mode {
@@ -60,7 +61,7 @@ fn init(args: Args) {
 
             let runtime_state = RuntimeState::new(env, data);
 
-            init_canister(runtime_state);
+            init_canister_init(runtime_state);
 
             info!("Init complete.")
         }

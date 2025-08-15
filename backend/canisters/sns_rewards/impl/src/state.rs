@@ -181,3 +181,29 @@ impl Default for Data {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn now_millis() -> TimestampMillis {
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis() as u64
+    }
+
+    #[test]
+    fn test_get_is_migrating() {
+        // Case 1: migration_finished = None → should return false
+        let mut state = RuntimeState::new(CanisterEnv::default(), Data::default());
+        assert_eq!(state.get_is_migrating(), false);
+
+        // Case 2: migration_finished = Some(timestamp) → should return true
+        let mut data = Data::default();
+        data.migration_finished = Some(now_millis());
+        let state = RuntimeState::new(CanisterEnv::default(), data);
+        assert_eq!(state.get_is_migrating(), true);
+    }
+}
