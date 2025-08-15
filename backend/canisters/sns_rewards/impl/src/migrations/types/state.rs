@@ -59,6 +59,7 @@ impl From<DataV0> for Data {
             reward_distribution_interval: v0.reward_distribution_interval,
             reward_distribution_in_progress: v0.reward_distribution_in_progress,
             neuron_sync_interval: v0.neuron_sync_interval,
+            migration_finished: None,
         }
     }
 }

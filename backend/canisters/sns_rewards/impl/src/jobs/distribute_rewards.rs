@@ -51,6 +51,10 @@ async fn run_async() {
 }
 
 pub fn run_distribution(initial_run_time: TimestampMillis) {
+    if read_state(|s| s.get_is_migrating()) {
+        return;
+    }
+
     if read_state(|s| s.get_is_synchronizing_neurons()) {
         schedule_retry(initial_run_time, Duration::from_secs(60 * 5));
         return;

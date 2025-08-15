@@ -30,6 +30,9 @@ pub async fn synchronise_neuron_data() {
     if read_state(|s| s.get_is_synchronizing_neurons()) {
         return;
     }
+    if read_state(|s| s.get_is_synchronizing_neurons()) {
+        return;
+    }
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let is_test_mode = read_state(|s| s.env.is_test_mode());
     mutate_state(|state| {
