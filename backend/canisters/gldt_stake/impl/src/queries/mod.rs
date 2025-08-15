@@ -1,6 +1,8 @@
 pub mod _get_state_snapshot;
 
 pub mod candid;
+pub mod get_all_rewards_history;
+pub mod get_all_stake_positions;
 pub mod get_apy_overall;
 pub mod get_apy_timeseries;
 pub mod get_neurons;
@@ -19,6 +21,8 @@ pub mod icrc3_supported_block_types;
 pub mod list_all_positions;
 
 pub use _get_state_snapshot::*;
+pub use get_all_rewards_history::*;
+pub use get_all_stake_positions::*;
 pub use get_apy_overall::*;
 pub use get_apy_timeseries::*;
 pub use get_neurons::*;

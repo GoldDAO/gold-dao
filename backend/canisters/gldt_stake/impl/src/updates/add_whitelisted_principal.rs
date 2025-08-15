@@ -5,7 +5,7 @@ pub use gldt_stake_api_canister::add_whitelisted_principal::{
 };
 use ic_cdk::update;
 
-#[update(guard = "caller_is_whitelisted", hidden = true)]
+#[update(guard = "caller_is_whitelisted")]
 async fn add_whitelisted_principal(
     args: AddWhitelistPrincipalArgs,
 ) -> AddWhitelistPrincipalResponse {
