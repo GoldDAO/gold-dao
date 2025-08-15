@@ -7,7 +7,7 @@ const UPGRADES: MemoryId = MemoryId::new(0);
 const MATURITY_HISTORY: MemoryId = MemoryId::new(1);
 const MATURITY_HISTORY_NEW: MemoryId = MemoryId::new(4);
 
-// NOTE: The mamory with id 2 is reserved for the old payment round history
+// NOTE: The memory with id 2 was reserved for the old payment round history
 const PAYMENT_ROUND_HISTORY: MemoryId = MemoryId::new(3);
 
 pub type VM = VirtualMemory<DefaultMemoryImpl>;

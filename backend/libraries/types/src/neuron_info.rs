@@ -6,10 +6,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{token::TokenSymbol, TimestampMillis};
 
-const MAX_VALUE_SIZE: u32 = 130;
+const MAX_VALUE_SIZE: u32 = 160;
 
 /// The maturity information about a neuron
-#[derive(Serialize, Clone, Deserialize, CandidType, Debug, PartialEq, Eq)]
+#[derive(Serialize, Clone, Deserialize, CandidType, Debug, PartialEq, Eq, Default)]
 pub struct NeuronInfo {
     pub last_synced_maturity: u64,
     pub accumulated_maturity: u64,
