@@ -13,7 +13,7 @@ use crate::memory::{get_maturity_history_memory, VM};
 pub struct MaturityHistory {
     #[serde(skip, default = "init_map")]
     history: StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM>,
-    #[serde(skip, default = "init_map")]
+    #[serde(skip, default = "init_new_map")]
     history_new: StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM>,
 }
 
@@ -38,11 +38,18 @@ impl Default for MaturityHistory {
 
 impl MaturityHistory {
     pub fn migrate(&mut self) {
+        let old_history: Vec<_> = self.history.iter().collect();
+        let new_history: Vec<_> = self.history_new.iter().collect();
+        ic_cdk::println!("old_history: {:?}", old_history);
+        ic_cdk::println!("new_history: {:?}", new_history);
         // Migrate old history to new history
         for (key, value) in self.history.iter() {
             info!("Migrating key: {:?}, value: {:?}", key, value);
+            ic_cdk::println!("Migrating key: {:?}, value: {:?}", key, value);
             self.history_new.insert(key.clone(), value.clone());
         }
+        ic_cdk::println!("old_history: {:?}", old_history);
+        ic_cdk::println!("new_history: {:?}", new_history);
     }
 
     pub fn insert(&mut self, key: (NeuronId, TimestampMillis), val: NeuronInfo) {

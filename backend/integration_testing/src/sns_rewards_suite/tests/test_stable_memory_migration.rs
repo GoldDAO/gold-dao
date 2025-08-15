@@ -1,16 +1,14 @@
 use crate::client::rewards::_insert_mock_neuron;
-use crate::client::rewards::get_neuron_by_id;
+use crate::client::rewards::get_maturity_history_of_neuron;
 use crate::sns_rewards_suite::setup::setup_rewards::upgrade_rewards_canister;
 use crate::wasms;
 use crate::{sns_rewards_suite::setup::default_test_setup, utils::tick_n_blocks};
 use candid::{encode_one, Principal};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::init::InitArgs;
 use sns_rewards_api_canister::Args;
 use std::collections::HashMap;
-use std::time::Duration;
 use types::BuildVersion;
 use types::NeuronInfo;
 
@@ -26,33 +24,36 @@ fn test_migration_happy_path() {
         test_env.sns_gov_canister_id,
         &test_env.controller,
     );
-
-    // ********************************
-    // 1. Distribute rewards
-    // ********************************
-    let n = pic.get_time();
-    println!("now is : {n:?}");
-    // TRIGGER - neuron vote & Maturity sync
-    test_env.simulate_neuron_voting(2);
-    tick_n_blocks(&pic, 20);
-    pic.advance_time(Duration::from_millis(DAY_IN_MS)); // 9:00am Wednesday 19th June
-
     tick_n_blocks(&pic, 100);
 
-    // TRIGGER - distribution
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 14:00
-    tick_n_blocks(&pic, 40);
+    let _ = insert_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 100);
+    tick_n_blocks(&pic, 100);
 
-    let _ = insert_mock_neurons(&pic, test_env.controller, sns_rewards_id, 100);
+    let status = pic.canister_status(sns_rewards_id, Some(test_env.sns_gov_canister_id));
+    println!("Canister status before migration: {:?}", status);
 
     upgrade_rewards_canister(&pic, sns_rewards_id, &test_env.sns_gov_canister_id).unwrap();
+    tick_n_blocks(&pic, 100);
 
     let neurons = get_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 100);
+    // println!("Neurons after migration: {:?}", neurons);
+    tick_n_blocks(&pic, 100);
 
-    for neuron in neurons {
-        assert!(neuron.is_some(), "Neuron should exist after migration");
-        let n = neuron.unwrap();
+    for neuron_maturity_history in neurons {
+        assert!(
+            neuron_maturity_history.len() == 1,
+            "Neuron should've been migrated"
+        );
+        assert!(
+            neuron_maturity_history.first().unwrap().1
+                == NeuronInfo {
+                    ..Default::default()
+                }
+        )
     }
+
+    let status = pic.canister_status(sns_rewards_id, Some(test_env.sns_gov_canister_id));
+    println!("Canister status after migration: {:?}", status);
 }
 
 fn insert_mock_neurons(
@@ -82,7 +83,7 @@ fn get_mock_neurons(
     controller: Principal,
     sns_rewards_id: Principal,
     amount: u64,
-) -> Vec<Option<NeuronInfo>> {
+) -> std::vec::Vec<std::vec::Vec<(u64, NeuronInfo)>> {
     let mut neurons = Vec::with_capacity(amount as usize);
 
     for i in 1..=amount {
@@ -91,7 +92,15 @@ fn get_mock_neurons(
         let neuron_id = NeuronId::new(&hex_id).unwrap();
 
         // Fetch neuron info and push to list
-        let neuron = get_neuron_by_id(pic, controller, sns_rewards_id, &neuron_id);
+        let neuron = get_maturity_history_of_neuron(
+            pic,
+            controller,
+            sns_rewards_id,
+            &sns_rewards_api_canister::get_maturity_history_of_neuron::Args {
+                neuron_id: neuron_id,
+                size: Some(1),
+            },
+        );
         neurons.push(neuron);
     }
 
@@ -110,7 +119,7 @@ pub fn setup_old_rewards_canister(
     pic.set_controllers(
         sns_rewards_id,
         Some(controller.clone()),
-        vec![controller.clone()],
+        vec![controller.clone(), sns_canister_id],
     )
     .unwrap();
     pic.tick();
