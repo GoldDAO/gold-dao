@@ -41,14 +41,10 @@ impl From<DataV0> for Data {
     fn from(v0: DataV0) -> Self {
         Data {
             sns_governance_canister: v0.sns_governance_canister,
-            neuron_maturity: v0
-                .neuron_maturity
-                .into_iter()
-                .map(|(k, v)| (k, NeuronInfo::from(v)))
-                .collect(),
+            neuron_maturity: v0.neuron_maturity,
             sync_info: v0.sync_info,
-            maturity_history: v0.maturity_history,
-            payment_processor: PaymentProcessor::from(v0.payment_processor),
+            maturity_history: MaturityHistory::default(),
+            payment_processor: v0.payment_processor,
             tokens: v0.tokens,
             authorized_principals: v0.authorized_principals,
             is_synchronizing_neurons: v0.is_synchronizing_neurons,
