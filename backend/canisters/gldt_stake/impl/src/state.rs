@@ -1,4 +1,5 @@
 use crate::model::allocated_rewards_pool::AllocatedRewardsPool;
+use crate::model::allocated_rewards_pool::AllocatedRewardsPoolMetrics;
 use crate::model::processing_rewards_pool::ProcessingRewardsPool;
 use crate::model::unallocated_rewards_pool::*;
 use bity_ic_icrc3::transaction::TransactionType;
@@ -38,6 +39,7 @@ impl RuntimeState {
     pub fn new(env: CanisterEnv, data: Data) -> Self {
         Self { env, data }
     }
+
     pub fn metrics(&self) -> Metrics {
         Metrics {
             canister_info: CanisterInfo {
@@ -52,6 +54,8 @@ impl RuntimeState {
             whitelist: self.data.whitelist.clone(),
 
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
+            daily_weighted_staked_gldt: self.data.stake_system.daily_weighted_staked_gldt.clone(),
+            daily_apy_timestamp: self.data.stake_system.daily_apy_timestamp,
             total_active_stake_positions: self.data.stake_system.active_stake_positions(),
             token_usd_values: self.data.stake_system.token_usd_values.clone(),
             genesis_datetime: self.data.stake_system.genesis_datetime,
@@ -65,7 +69,7 @@ impl RuntimeState {
             goldao_sns_governance_canister_id: self.data.goldao_sns_governance_canister_id,
             unallocated_rewards_pool: self.data.unallocated_rewards_pool.clone(),
             processing_rewards_pool: self.data.processing_rewards_pool.clone(),
-            allocated_rewards_pool: self.data.allocated_rewards_pool.clone(),
+            allocated_rewards_pool: self.data.allocated_rewards_pool.clone().into(),
         }
     }
 
@@ -101,6 +105,8 @@ pub struct Metrics {
     pub whitelist: Vec<Principal>,
     pub total_staked: String,
     pub total_active_stake_positions: usize,
+    pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+    pub daily_apy_timestamp: TimestampMillis,
     pub token_usd_values: HashMap<TokenSymbol, f64>,
     pub genesis_datetime: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>,
@@ -116,7 +122,7 @@ pub struct Metrics {
     // rewards pools
     pub unallocated_rewards_pool: UnallocatedRewardsPool,
     pub processing_rewards_pool: ProcessingRewardsPool,
-    pub allocated_rewards_pool: AllocatedRewardsPool,
+    pub allocated_rewards_pool: AllocatedRewardsPoolMetrics,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
@@ -152,8 +158,8 @@ pub struct Data {
     pub allocated_rewards_pool: AllocatedRewardsPool,
 
     // cron job related
-    /// the weekly interval that governs when neuron rewards are claimed from the sns_rewards canister
     pub reward_claim_interval: Option<TimeInterval>,
+    pub allocate_rewards_interval: Option<TimeInterval>,
 }
 
 impl Default for Data {
@@ -172,6 +178,11 @@ impl Default for Data {
                 weekday: Some("Thursday".to_string()),
                 start_hour: 12,
                 end_hour: 13,
+            }),
+            allocate_rewards_interval: Some(TimeInterval {
+                weekday: Some("Thursday".to_string()),
+                start_hour: 11,
+                end_hour: 12,
             }),
             unallocated_rewards_pool: UnallocatedRewardsPool::new_unallocated(),
             processing_rewards_pool: ProcessingRewardsPool::new_processing(),

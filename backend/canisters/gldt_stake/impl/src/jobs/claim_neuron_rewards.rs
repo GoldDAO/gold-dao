@@ -1,6 +1,6 @@
 use crate::state::read_state;
 use candid::{Nat, Principal};
-use canister_time::{run_interval, timestamp_millis, HOUR_IN_MS};
+use canister_time::{run_now_then_interval, timestamp_millis, HOUR_IN_MS};
 use futures::future::join_all;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;
@@ -15,7 +15,7 @@ use types::TimestampMillis;
 const CLAIM_REWARDS_THRESHOLD: u64 = 10_000_000_u64;
 
 pub fn start_job() {
-    run_interval(Duration::from_millis(HOUR_IN_MS), spawn_claim_rewards_job);
+    run_now_then_interval(Duration::from_millis(HOUR_IN_MS), spawn_claim_rewards_job);
 }
 
 fn spawn_claim_rewards_job() {
@@ -112,7 +112,7 @@ async fn claim_rewards_impl() {
 
 fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
     let is_awaiting = read_state(|s| s.data.unallocated_rewards_pool.is_awaiting());
-    let distribution_interval = match read_state(|s| s.data.reward_claim_interval.clone()) {
+    let reward_claim_interval = match read_state(|s| s.data.reward_claim_interval.clone()) {
         Some(interval) => interval,
         None => {
             info!("CLAIM_NEURON_REWARDS :: no claim interval set, aborting");
@@ -120,15 +120,14 @@ fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
         }
     };
 
-    let is_distribution_time_valid =
-        distribution_interval.is_within_daily_interval(initial_run_time);
+    let is_time_valid = reward_claim_interval.is_within_daily_interval(initial_run_time);
 
     if !is_awaiting {
         info!("CLAIM_NEURON_REWARDS :: claim already in progress");
         return false;
     }
 
-    is_distribution_time_valid
+    is_time_valid
 }
 
 async fn fetch_neuron_reward_balance(

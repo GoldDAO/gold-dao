@@ -8,4 +8,5 @@ pub mod manage_stake_position;
 pub mod manual_sync_neurons;
 pub mod manual_token_transfer;
 pub mod processing_rewards_balance;
+pub mod set_dissolve_event_time;
 pub mod unallocated_rewards_balance;

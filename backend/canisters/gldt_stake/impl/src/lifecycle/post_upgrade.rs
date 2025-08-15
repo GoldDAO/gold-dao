@@ -1,9 +1,7 @@
 use crate::state::replace_icrc3;
 use crate::state::start_default_archive_job;
 use crate::{
-    memory::get_upgrades_memory,
-    // migrations::types::state::RuntimeStateV0,
-    state::RuntimeState,
+    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
 };
 use bity_ic_icrc3::icrc3::ICRC3;
 use canister_logger::LogEntry;
