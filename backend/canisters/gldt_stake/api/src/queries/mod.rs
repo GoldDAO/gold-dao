@@ -1,4 +1,6 @@
 pub mod _get_state_snapshot;
+pub mod get_all_rewards_history;
+pub mod get_all_stake_positions;
 pub mod get_apy_overall;
 pub mod get_apy_timeseries;
 pub mod get_neurons;

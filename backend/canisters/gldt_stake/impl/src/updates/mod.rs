@@ -1,6 +1,7 @@
 pub mod _set_position_withdraw_state;
 pub mod _set_token_usd_values;
 pub mod add_whitelisted_principal;
+pub mod set_dissolve_event_time;
 
 pub mod allocated_rewards_balance;
 pub mod processing_rewards_balance;
@@ -17,6 +18,7 @@ pub mod manual_token_transfer;
 pub use _set_position_withdraw_state::*;
 pub use _set_token_usd_values::*;
 pub use add_whitelisted_principal::*;
+pub use set_dissolve_event_time::*;
 
 pub use allocated_rewards_balance::*;
 pub use processing_rewards_balance::*;
