@@ -10,7 +10,7 @@ use crate::guards::caller_is_governance_principal;
 #[cfg(feature = "inttest")]
 use ic_cdk::update;
 
-#[update(guard = "caller_is_governance_principal")]
+#[update(guard = "caller_is_governance_principal", hidden = true)]
 #[cfg(feature = "inttest")]
 async fn _insert_mock_neuron(args: InsertMockNeuronArgs) -> InsertMockNeuronResponse {
     insert_mock_neuron_impl(args.neuron_id, args.neuron_info).await

@@ -11,6 +11,7 @@ use sns_rewards_api_canister::Args;
 use std::collections::HashMap;
 use types::BuildVersion;
 use types::NeuronInfo;
+use types::TokenSymbol;
 
 #[test]
 fn test_migration_happy_path() {
@@ -26,7 +27,7 @@ fn test_migration_happy_path() {
     );
     tick_n_blocks(&pic, 100);
 
-    let _ = insert_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 100);
+    let _ = insert_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 30000);
     tick_n_blocks(&pic, 100);
 
     let status = pic.canister_status(sns_rewards_id, Some(test_env.sns_gov_canister_id));
@@ -62,6 +63,19 @@ fn insert_mock_neurons(
     sns_rewards_id: Principal,
     amount: u64,
 ) {
+    let mut rewarded_maturity = HashMap::new();
+    rewarded_maturity.insert(TokenSymbol::GLDT, 12345678121234567812);
+    rewarded_maturity.insert(TokenSymbol::OGY, 12345678121234567812);
+    rewarded_maturity.insert(TokenSymbol::WTN, 12345678121234567812);
+    // rewarded_maturity.insert(TokenSymbol::GOLDAO, 12345678121234567812);
+    // rewarded_maturity.insert(TokenSymbol::ICP, 12345678121234567812);
+
+    let neuron_info = NeuronInfo {
+        last_synced_maturity: 12345678121234567812,
+        accumulated_maturity: 12345678121234567812,
+        rewarded_maturity,
+        last_disburse_event_considered: Some(12345678121234567812),
+    };
     for i in 1..=amount {
         // Generate neuron ID from index
         let hex_id = format!("{:064x}", i);
@@ -69,9 +83,7 @@ fn insert_mock_neurons(
 
         let args = sns_rewards_api_canister::_insert_mock_neuron::Args {
             neuron_id,
-            neuron_info: NeuronInfo {
-                ..Default::default()
-            },
+            neuron_info: neuron_info.clone(),
         };
 
         let _ = _insert_mock_neuron(pic, controller, sns_rewards_id, &args);
