@@ -1,6 +1,6 @@
 use crate::state::mutate_state;
 use sns_governance_canister::types::NeuronId;
-pub use sns_rewards_api_canister::_insert_mock_neuron_info::{
+pub use sns_rewards_api_canister::_insert_mock_neuron::{
     Args as InsertMockNeuronArgs, Response as InsertMockNeuronResponse,
 };
 use types::NeuronInfo;
@@ -12,7 +12,7 @@ use ic_cdk::update;
 
 #[update(guard = "caller_is_governance_principal")]
 #[cfg(feature = "inttest")]
-async fn insert_mock_neuron(args: InsertMockNeuronArgs) -> InsertMockNeuronResponse {
+async fn _insert_mock_neuron(args: InsertMockNeuronArgs) -> InsertMockNeuronResponse {
     insert_mock_neuron_impl(args.neuron_id, args.neuron_info).await
 }
 

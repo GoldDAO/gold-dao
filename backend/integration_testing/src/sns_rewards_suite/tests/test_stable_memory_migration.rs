@@ -1,4 +1,4 @@
-use crate::client::rewards::_insert_mock_neuron_info;
+use crate::client::rewards::_insert_mock_neuron;
 use crate::client::rewards::get_neuron_by_id;
 use crate::sns_rewards_suite::setup::setup_rewards::upgrade_rewards_canister;
 use crate::wasms;
@@ -45,9 +45,9 @@ fn test_migration_happy_path() {
 
     let _ = insert_mock_neurons(&pic, test_env.controller, sns_rewards_id, 100);
 
-    upgrade_rewards_canister(&pic, sns_rewards_id, &test_env.controller).unwrap();
+    upgrade_rewards_canister(&pic, sns_rewards_id, &test_env.sns_gov_canister_id).unwrap();
 
-    let neurons = get_mock_neurons(&pic, test_env.controller, sns_rewards_id, 100);
+    let neurons = get_mock_neurons(&pic, test_env.sns_gov_canister_id, sns_rewards_id, 100);
 
     for neuron in neurons {
         assert!(neuron.is_some(), "Neuron should exist after migration");
@@ -66,14 +66,14 @@ fn insert_mock_neurons(
         let hex_id = format!("{:064x}", i);
         let neuron_id = NeuronId::new(&hex_id).unwrap();
 
-        let args = sns_rewards_api_canister::_insert_mock_neuron_info::Args {
+        let args = sns_rewards_api_canister::_insert_mock_neuron::Args {
             neuron_id,
             neuron_info: NeuronInfo {
                 ..Default::default()
             },
         };
 
-        let _ = _insert_mock_neuron_info(pic, controller, sns_rewards_id, &args);
+        let _ = _insert_mock_neuron(pic, controller, sns_rewards_id, &args);
     }
 }
 
