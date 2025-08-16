@@ -27,7 +27,7 @@ async fn run_async() {
 }
 
 pub async fn synchronise_neuron_data() {
-    if read_state(|s| s.get_is_synchronizing_neurons()) {
+    if read_state(|s| s.get_is_migrating()) {
         return;
     }
     if read_state(|s| s.get_is_synchronizing_neurons()) {

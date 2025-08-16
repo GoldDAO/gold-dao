@@ -83,7 +83,7 @@ impl RuntimeState {
     }
 
     pub fn get_is_migrating(&self) -> bool {
-        self.data.migration_finished.is_some()
+        self.data.migration_finished.is_none()
     }
 }
 
@@ -197,13 +197,13 @@ mod tests {
     #[test]
     fn test_get_is_migrating() {
         // Case 1: migration_finished = None → should return false
-        let mut state = RuntimeState::new(CanisterEnv::default(), Data::default());
-        assert_eq!(state.get_is_migrating(), false);
+        let state = RuntimeState::new(CanisterEnv::default(), Data::default());
+        assert_eq!(state.get_is_migrating(), true);
 
         // Case 2: migration_finished = Some(timestamp) → should return true
         let mut data = Data::default();
         data.migration_finished = Some(now_millis());
         let state = RuntimeState::new(CanisterEnv::default(), data);
-        assert_eq!(state.get_is_migrating(), true);
+        assert_eq!(state.get_is_migrating(), false);
     }
 }
