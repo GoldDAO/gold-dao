@@ -6,7 +6,7 @@ use utils::env::CanisterEnv;
 
 use crate::state::{Data, RuntimeState};
 
-use super::init_canister_init;
+use super::init_canister;
 
 #[init]
 fn init(args: Args) {
@@ -61,7 +61,7 @@ fn init(args: Args) {
 
             let runtime_state = RuntimeState::new(env, data);
 
-            init_canister_init(runtime_state);
+            init_canister(runtime_state);
 
             info!("Init complete.")
         }

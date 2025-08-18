@@ -1,4 +1,3 @@
-use candid::Principal;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 use ic_cdk_macros::post_upgrade;
@@ -10,7 +9,7 @@ use crate::migrations::types::state::RuntimeStateV0;
 
 use crate::{memory::get_upgrades_memory, state::RuntimeState, utils::TimeInterval};
 
-use super::init_canister_upgrade;
+use super::init_canister;
 
 #[post_upgrade]
 #[trace]
@@ -59,7 +58,8 @@ fn post_upgrade(args: Args) {
 
             // End migrations
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
-            init_canister_upgrade(state);
+            init_canister(state);
+            crate::migrations::jobs::migrate_maturity_history::start_job();
 
             info!(version = %upgrade_args.version, "Post-upgrade complete");
         }

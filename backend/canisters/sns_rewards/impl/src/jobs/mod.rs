@@ -1,18 +1,9 @@
 pub mod burn_job;
 pub mod distribute_rewards;
-pub mod migration;
 pub mod reserve_pool_distribution;
 pub mod synchronise_neurons;
 
 pub(crate) fn start_init() {
-    synchronise_neurons::start_job();
-    distribute_rewards::start_job();
-    reserve_pool_distribution::start_job();
-    burn_job::start_job();
-}
-
-pub(crate) fn start_upgrade() {
-    migration::start_job();
     synchronise_neurons::start_job();
     distribute_rewards::start_job();
     reserve_pool_distribution::start_job();
