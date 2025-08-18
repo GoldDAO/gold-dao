@@ -10,7 +10,7 @@ import useGetOneNeuronRewards from "../../utils/useGetOneNeuronRewards";
 import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import useRewardsFee from "@shared/hooks/useRewardsFee";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const RewardItem = ({ name }: { name: string }) => {
   const { unauthenticatedAgent, isConnected } = useAuth();

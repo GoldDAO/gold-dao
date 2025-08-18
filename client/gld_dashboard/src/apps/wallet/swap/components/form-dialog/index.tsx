@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { SwapStateReducerAtom, FormIsValidAtom } from "@wallet/swap/atoms";
 import Dialog from "@shared/ui/dialog/DialogV2";
-import BtnForm from "@shared/ui/button/BtnPrimary";
+import BtnForm from "@shared/ui/button/HorizontalButton";
 import SendForm from "./send-form";
 import ReceiveForm from "./receive-form";
 import BtnFormText from "./btn-form-text";

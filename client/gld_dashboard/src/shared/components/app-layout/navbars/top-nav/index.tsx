@@ -84,7 +84,7 @@ const TopNav = ({ className }: { className?: string }) => {
                       </button>
                     </div>
 
-                    {navItems.map(({ title, url, subtitle }, i) => {
+                    {navItems.map(({ title, url }, i) => {
                       const isDisabled = url === "/earn";
                       return (
                         <Link
@@ -101,11 +101,6 @@ const TopNav = ({ className }: { className?: string }) => {
                           key={i}
                         >
                           {title}
-                          {isDisabled && (
-                            <span className="block text-xs text-content/40 mt-1">
-                              {subtitle ? subtitle : "Coming Soon"}
-                            </span>
-                          )}
                         </Link>
                       );
                     })}

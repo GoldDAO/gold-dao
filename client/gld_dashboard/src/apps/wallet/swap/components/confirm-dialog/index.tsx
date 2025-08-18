@@ -9,7 +9,7 @@ import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import Dialog from "@shared/ui/dialog/DialogV2";
 import Icon from "@shared/ui/icons";
 import { LoaderSpin, Logo } from "@components/index";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 
 const AmountUSD = ({

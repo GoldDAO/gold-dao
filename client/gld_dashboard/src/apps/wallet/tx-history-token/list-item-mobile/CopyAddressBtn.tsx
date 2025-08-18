@@ -2,7 +2,7 @@ import { useState } from "react";
 import Dialog from "@shared/ui/dialog/Dialog";
 import Icon from "@shared/ui/icons";
 import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const CopyAddressBtn = ({ from, to }: { from: string; to: string }) => {
   const { copyToClipboard } = useCopyToClipboard();

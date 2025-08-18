@@ -9,7 +9,7 @@ import useSwap from "@services/kongswap/hooks/useSwap";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { PayToken, ReceiveToken } from "@buy/shared/utils";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const DetailsDialog = ({

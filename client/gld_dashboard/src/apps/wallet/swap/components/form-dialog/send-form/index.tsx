@@ -27,10 +27,14 @@ const SendForm = () => {
     dispatchSwapState({ type: "SET_TOKEN_FROM", value: selectedToken });
   };
 
-  const onClickMaxBalance = (amount: string) => {
+  const onClickMaxBalance = () => {
+    if (!balance.isSuccess) return;
+    const amount =
+      Number(balance.data.balance_e8s - 2n * balance.data.fee_e8s) /
+      10 ** balance.data.decimals;
     dispatchSwapState({
       type: "SET_SEND_AMOUNT",
-      value: amount,
+      value: amount.toString(),
     });
   };
 
@@ -75,11 +79,15 @@ const SendForm = () => {
             balance={balance.data?.balance}
           />
         </div>
+
         <MaxButton
-          balance={balance.data?.balance_e8s}
-          fee={balance.data?.fee_e8s}
-          decimals={balance.data?.decimals}
-          handleOnClick={(amount) => onClickMaxBalance(amount)}
+          disabled={
+            !balance.isSuccess ||
+            balance.data.balance_e8s < balance.data.fee_e8s
+          }
+          handleOnClick={onClickMaxBalance}
+          data-tooltip-id="tooltip"
+          data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
         />
       </div>
     </div>

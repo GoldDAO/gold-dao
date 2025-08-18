@@ -7,7 +7,7 @@ import {
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import TransactionDetails from "@advanced/gldt/overview-section/mint-nft/transaction-details";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import Icon from "@shared/ui/icons";
 
 const Confirm = () => {
