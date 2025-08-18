@@ -3,6 +3,9 @@
     "ic": "atslz-hiaaa-aaaam-acq6q-cai",
     "staging": "y4bmn-taaaa-aaaak-qillq-cai"
   },
+  "internal_dashboard": {
+    "staging": "7qzkd-uaaaa-aaaap-ahxaq-cai"
+  },
   "gld_dashboard": {
     "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
     "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai",
@@ -10,8 +13,7 @@
   },
   "gld_landing_page": {
     "ic": "o4yaf-3yaaa-aaaap-abr2a-cai",
-    "staging": "o6ihl-oyaaa-aaaal-ac5oa-cai",
-    "preprod": "7qzkd-uaaaa-aaaap-ahxaq-cai"
+    "staging": "o6ihl-oyaaa-aaaal-ac5oa-cai"
   },
   "gldt_ledger": {
     "ic": "6c7su-kiaaa-aaaar-qaira-cai",

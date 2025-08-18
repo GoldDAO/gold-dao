@@ -43,6 +43,9 @@ include:
   - local: scripts/ci-cd/.frontend_linter.yml
     inputs:
       src-folder: gld_dashboard
+  # - local: scripts/ci-cd/.frontend_linter.yml
+  #   inputs:
+  #     src-folder: internal_dashboard
   # Unit tests
   - local: scripts/ci-cd/.libraries_unit_test_coverage.yml
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
@@ -115,6 +118,9 @@ include:
   - local: scripts/ci-cd/.frontend_builds.yml
     inputs:
       src-folder: gld_dashboard
+  - local: scripts/ci-cd/.frontend_builds.yml
+    inputs:
+      src-folder: internal_dashboard
   # Backend deployments
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
@@ -155,6 +161,10 @@ include:
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
       src-folder: gld_landing_page
+      sns-controlled: "false"
+  - local: scripts/ci-cd/.frontend_deploys.yml
+    inputs:
+      src-folder: internal_dashboard
       sns-controlled: "false"
 
 ################################################################################
