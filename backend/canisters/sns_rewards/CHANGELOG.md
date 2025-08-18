@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.10] - 2025-08-18
+
+#### Fixed
+
+- **Neuron maturity history**: The introduction of WTN rewards increased the storage space required for NeuronInfo. Since StableBTreeMap does not support in-place upgrades of value size, the migration was implemented and updated the maximum allowed value size for NeuronInfo.
+
 ### [1.0.9] - 2025-07-18
 
 #### Added
