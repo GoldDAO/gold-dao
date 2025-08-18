@@ -20,6 +20,7 @@ fn init(args: Args) {
                 init_args.commit_hash,
             );
             let mut data = Data::default();
+            data.migration_finished = Some(0);
 
             // use staging canister ids
             if init_args.test_mode {

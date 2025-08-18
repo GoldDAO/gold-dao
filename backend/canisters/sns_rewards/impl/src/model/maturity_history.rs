@@ -1,6 +1,9 @@
+use crate::memory::get_maturity_history_new_memory;
 use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
+use tracing::info;
+use types::NeuronInfoV0;
 use types::{NeuronInfo, TimestampMillis};
 
 use crate::memory::{get_maturity_history_memory, VM};
@@ -10,26 +13,44 @@ use crate::memory::{get_maturity_history_memory, VM};
 #[derive(Serialize, Deserialize)]
 pub struct MaturityHistory {
     #[serde(skip, default = "init_map")]
+    history_old: StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfoV0, VM>,
+    #[serde(skip, default = "init_new_map")]
     history: StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM>,
 }
 
-fn init_map() -> StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM> {
+fn init_map() -> StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfoV0, VM> {
     let memory = get_maturity_history_memory();
+    StableBTreeMap::init(memory)
+}
 
+fn init_new_map() -> StableBTreeMap<(NeuronId, TimestampMillis), NeuronInfo, VM> {
+    let memory = get_maturity_history_new_memory();
     StableBTreeMap::init(memory)
 }
 
 impl Default for MaturityHistory {
     fn default() -> Self {
         Self {
-            history: init_map(),
+            history_old: init_map(),
+            history: init_new_map(),
         }
     }
 }
 
 impl MaturityHistory {
+    pub fn migrate(&mut self) {
+        // Migrate old history to new history
+        for (key, value) in self.history_old.iter() {
+            self.history.insert(key.clone(), value.into());
+        }
+        info!(
+            "{:?} neurons had been succesfully migrated",
+            self.history_old.len()
+        );
+    }
+
     pub fn insert(&mut self, key: (NeuronId, TimestampMillis), val: NeuronInfo) {
-        self.history.insert(key, val);
+        info!("result of insert: {:?}", self.history.insert(key, val));
     }
 
     pub fn _insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {
