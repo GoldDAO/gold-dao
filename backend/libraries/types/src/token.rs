@@ -3,6 +3,7 @@ use std::{borrow::Cow, fmt::Display};
 use candid::{CandidType, Principal};
 use ic_stable_structures::{storable::Bound, Storable};
 
+use candid::Decode;
 use serde::{Deserialize, Serialize};
 
 /// Compact enum for token identity (for keys, matching, etc.)
@@ -132,12 +133,26 @@ impl Storable for TokenSymbol {
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        minicbor::decode(bytes.as_ref()).unwrap_or_else(|e| {
-            panic!(
-                "failed to decode token symbol bytes {}: {e}",
-                hex::encode(bytes)
-            )
-        })
+        // First, try decoding as new format (enum)
+        if let Ok(sym) = minicbor::decode::<TokenSymbol>(bytes.as_ref()) {
+            return sym;
+        }
+
+        // Fallback: try candid decoding from old format (string)
+        if let Ok(s) = Decode!(&bytes, String) {
+            return TokenSymbol::parse(&s)
+                .unwrap_or_else(|err| panic!("Unknown token symbol string: {err}"));
+        }
+
+        // Fallback: maybe also try candid decoding into enum form (if you stored that at some point)
+        if let Ok(sym) = Decode!(&bytes, TokenSymbol) {
+            return sym;
+        }
+
+        panic!(
+            "Failed to decode TokenSymbol from bytes: {}",
+            hex::encode(bytes.as_ref())
+        );
     }
 
     const BOUND: Bound = Bound::Bounded {

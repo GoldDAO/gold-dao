@@ -1,8 +1,9 @@
 type Args = record { token : text; neuron_id : NeuronId };
 type Args_1 = record { claim_reward_args : vec ClaimRewardArgs };
-type Args_2 = record { transfer_amounts : vec record { TokenSymbol; nat } };
-type Args_3 = record { token_list : vec record { TokenSymbol; TokenInfo } };
-type Args_4 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_2 = record { size : opt nat64; neuron_id : NeuronId };
+type Args_3 = record { transfer_amounts : vec record { TokenSymbol; nat } };
+type Args_4 = record { token_list : vec record { TokenSymbol; TokenInfo } };
+type Args_5 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ClaimRewardArgs = record { token : TokenSymbol; neuron_id : NeuronId };
 type ClaimRewardError = record {
@@ -29,6 +30,12 @@ type InitArgs = record {
   commit_hash : text;
 };
 type NeuronId = record { id : blob };
+type NeuronInfo = record {
+  rewarded_maturity : vec record { TokenSymbol; nat64 };
+  accumulated_maturity : nat64;
+  last_synced_maturity : nat64;
+  last_disburse_event_considered : opt nat64;
+};
 type Response = variant {
   Ok : bool;
   TokenSymbolInvalid : text;
@@ -88,14 +95,17 @@ type icrc21_field_display_message = record {
   intent : text;
 };
 type icrc21_generic_error = record { description : text; error_code : nat64 };
-service : (Args_4) -> {
+service : (Args_5) -> {
   claim_reward : (Args) -> (Response);
   claim_rewards_batch : (Args_1) -> (Result);
+  get_maturity_history_of_neuron : (Args_2) -> (
+      vec record { nat64; NeuronInfo },
+    ) query;
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
   icrc21_canister_call_consent_message : (icrc21_consent_message_request) -> (
       icrc21_consent_message_response,
     ) query;
   set_daily_goldao_burn_rate : (nat) -> (Response_1);
-  set_reserve_transfer_amounts : (Args_2) -> (Response_1);
-  set_reward_token_types : (Args_3) -> (Response_2);
+  set_reserve_transfer_amounts : (Args_3) -> (Response_1);
+  set_reward_token_types : (Args_4) -> (Response_2);
 }
