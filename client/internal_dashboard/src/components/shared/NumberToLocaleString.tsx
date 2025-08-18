@@ -1,0 +1,12 @@
+const NumberToLocaleString = ({ value, decimals = 2, locale = "en-US" }) => {
+  const result =
+    value !== 0
+      ? value.toLocaleString(locale, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: decimals,
+        })
+      : "0";
+  return result;
+};
+
+export default NumberToLocaleString;
