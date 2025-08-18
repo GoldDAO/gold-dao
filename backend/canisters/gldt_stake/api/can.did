@@ -34,10 +34,20 @@ type ArchivedBlocks = record {
 };
 type Args = record { "principal" : principal; state : WithdrawState };
 type Args_1 = record { amount : nat64 };
-type Args_2 = record { limit : opt nat64; starting_week : nat64 };
+type Args_2 = record { starting_day : nat64; limit : opt nat64 };
 type Args_3 = record { skip : nat64; limit : nat64; neuron_id : text };
-type Args_4 = record { command : Command; neuron_id : blob };
-type Args_5 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_4 = record {
+  of_principal : opt principal;
+  skip : nat64;
+  limit : nat64;
+};
+type Args_5 = record { command : Command; neuron_id : blob };
+type Args_6 = record {
+  dissovle_event_id : nat8;
+  stake_position_user : principal;
+  new_dissolve_timestamp : nat64;
+};
+type Args_7 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BlockWithId = record { id : nat; block : ICRC3Value };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type By = variant {
@@ -135,10 +145,13 @@ type GeneralError = variant {
   TransactionPreparationError : text;
   CannotAddReward : text;
   InvalidPrincipal : text;
+  BalanceIsLowerThanFee : text;
   NotAuthorized : text;
+  BalanceIsLowerThanThreshold : text;
   CallError : text;
   ModifyStakeError : text;
   StakePositionNotFound : text;
+  BalanceIsZero : text;
   InvalidPercentage : text;
 };
 type GenericNervousSystemFunction = record {
@@ -301,12 +314,14 @@ type RemoveNeuronPermissions = record {
 };
 type Response = variant { Success : text; InternalError : text };
 type Result = variant { Ok; Err : text };
-type Result_1 = variant { Ok : nat; Err : text };
-type Result_2 = variant { Ok : blob; Err : CreateNeuronError };
-type Result_3 = variant {
+type Result_1 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : nat; Err : text };
+type Result_3 = variant { Ok : blob; Err : CreateNeuronError };
+type Result_4 = variant {
   Ok : StakePositionResponse;
   Err : ManageStakePositionError;
 };
+type Result_5 = variant { Ok : nat; Err : GeneralError };
 type SetDissolveTimestamp = record { dissolve_timestamp_seconds : nat64 };
 type Split = record { memo : nat64; amount_e8s : nat64 };
 type StakeMaturity = record { percentage_to_stake : opt nat32 };
@@ -430,15 +445,20 @@ type icrc21_field_display_message = record {
   intent : text;
 };
 type icrc21_generic_error = record { description : text; error_code : nat64 };
-service : (Args_5) -> {
-  _add_reward_round : (vec record { text; nat }) -> (Result);
-  add_whitelisted_principal : (vec principal) -> (Result);
+service : (Args_7) -> {
   _get_state_snapshot : (null) -> (StateSnapshot) query;
   _set_position_withdraw_state : (Args) -> (Result);
   _set_token_usd_values : (vec record { TokenSymbol; float64 }) -> (null);
-  allocated_rewards_balance : (null) -> (vec record { TokenSymbol; Result_1 });
+  add_whitelisted_principal : (vec principal) -> (Result_1);
+  allocated_rewards_balance : (null) -> (vec record { TokenSymbol; Result_2 });
   commit : () -> ();
-  create_neuron : (Args_1) -> (Result_2);
+  create_neuron : (Args_1) -> (Result_3);
+  get_all_rewards_history : () -> (
+      vec record { nat64; vec record { TokenSymbol; nat } },
+    ) query;
+  get_all_stake_positions : () -> (
+      vec record { principal; StakePosition },
+    ) query;
   get_apy_overall : (null) -> (float64) query;
   get_apy_timeseries : (Args_2) -> (vec record { nat64; float64 }) query;
   get_neurons : (null) -> (vec Neuron) query;
@@ -459,11 +479,13 @@ service : (Args_5) -> {
   icrc3_get_properties : (null) -> (ICRC3Properties) query;
   icrc3_get_tip_certificate : (null) -> (ICRC3DataCertificate) query;
   icrc3_supported_block_types : (null) -> (vec SupportedBlockType) query;
-  manage_sns_neuron : (Args_4) -> (Response);
-  manage_stake_position : (ManageStakePositionArgs) -> (Result_3);
+  list_all_positions : (Args_4) -> (vec StakePositionResponse) query;
+  manage_sns_neuron : (Args_5) -> (Response);
+  manage_stake_position : (ManageStakePositionArgs) -> (Result_4);
   manual_sync_neurons : (null) -> (Result);
-  processing_rewards_balance : (null) -> (vec record { TokenSymbol; Result_1 });
+  processing_rewards_balance : (null) -> (vec record { TokenSymbol; Result_2 });
+  set_dissolve_event_time : (Args_6) -> (Result);
   unallocated_rewards_balance : (null) -> (
-      vec record { TokenSymbol; Result_1 },
+      vec record { TokenSymbol; Result_5 },
     );
 }

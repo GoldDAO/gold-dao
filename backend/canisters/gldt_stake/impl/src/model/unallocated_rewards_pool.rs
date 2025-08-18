@@ -5,6 +5,7 @@ use candid::CandidType;
 use candid::Nat;
 use candid::Principal;
 use gldt_stake_common::accounts::UNALLOCATED_REWARDS_POOL;
+use gldt_stake_common::manage_stake_position_interface::GeneralError;
 use icrc_ledger_canister_c2c_client::{icrc1_balance_of, icrc1_transfer};
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use icrc_ledger_types::icrc1::transfer::TransferArg;
@@ -43,10 +44,12 @@ pub trait UnallocatedRewards {
         }
     }
 
-    async fn balance(&self, token_ledger: Principal) -> Result<Nat, String> {
+    async fn balance(&self, token_ledger: Principal) -> Result<Nat, GeneralError> {
         match icrc1_balance_of(token_ledger, Self::account()).await {
             Ok(balance) => Ok(balance),
-            Err(e) => Err(format!("RewardPool : fetch_pool_balance error: {e:?}")),
+            Err(e) => Err(GeneralError::CallError(format!(
+                "RewardPool : fetch_pool_balance error: {e:?}"
+            ))),
         }
     }
 
@@ -54,11 +57,11 @@ pub trait UnallocatedRewards {
         &self,
         token_ledger: Principal,
         fee: Nat,
-    ) -> Result<Nat, String> {
+    ) -> Result<Nat, GeneralError> {
         let pool_balance = self.balance(token_ledger).await?;
 
-        let percentage =
-            Percentage::new(REWARDS_PERCENTAGE).map_err(|e| format!("Invalid percentage: {e}"))?;
+        let percentage = Percentage::new(REWARDS_PERCENTAGE)
+            .map_err(|e| GeneralError::InvalidPercentage(format!("Invalid percentage: {e}")))?;
 
         let amount_to_transfer = percentage.apply_to(&pool_balance) / 7_u64;
 
@@ -67,7 +70,7 @@ pub trait UnallocatedRewards {
             "Calculated transfer amount is zero (pool_balance: {}, REWARDS_PERCENTAGE: {}). Skipping transfer.",
             pool_balance, REWARDS_PERCENTAGE
         );
-            return Err(msg);
+            return Err(GeneralError::BalanceIsZero(msg));
         }
 
         if fee > pool_balance {
@@ -75,7 +78,7 @@ pub trait UnallocatedRewards {
             "Calculated transfer amount is less than fee (pool_balance: {}, fee: {}). Skipping transfer.",
             pool_balance, fee
         );
-            return Err(msg);
+            return Err(GeneralError::BalanceIsLowerThanFee(msg));
         }
 
         if PROCESS_REWARDS_THRESHOLD > pool_balance {
@@ -83,7 +86,7 @@ pub trait UnallocatedRewards {
             "Calculated transfer amount is less than the threshold (pool_balance: {}, threshold: {}). Skipping transfer.",
             pool_balance, PROCESS_REWARDS_THRESHOLD
         );
-            return Err(msg);
+            return Err(GeneralError::BalanceIsLowerThanFee(msg));
         }
 
         let result = match icrc1_transfer(
@@ -102,16 +105,23 @@ pub trait UnallocatedRewards {
             Ok(Ok(_)) => Ok(amount_to_transfer),
             Ok(Err(e)) => {
                 let err_msg = format!("Transfer error: {:?}", e);
-                Err(err_msg)
+                Err(GeneralError::TransferError(err_msg))
             }
             Err(e) => {
                 let err_msg = format!("Transfer call failed: {:?}", e);
-                Err(err_msg)
+                Err(GeneralError::TransferError(err_msg))
             }
         };
 
         result
     }
+}
+
+pub enum ProcessRewardsTransferError {
+    InvalidPercentage,
+    BalanceIsZero,
+    BalanceIsLowerThanFee,
+    UnexpectedError(String),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, CandidType)]

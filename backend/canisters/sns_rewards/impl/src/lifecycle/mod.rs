@@ -8,5 +8,5 @@ use crate::state::{init_state, RuntimeState};
 
 pub fn init_canister(runtime_state: RuntimeState) {
     init_state(runtime_state);
-    crate::jobs::start();
+    crate::jobs::start_init();
 }

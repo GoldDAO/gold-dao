@@ -1,40 +1,71 @@
 use crate::model::unallocated_rewards_pool::UnallocatedRewards;
+use crate::model::unallocated_rewards_pool::UnallocatedRewardsPool;
 use crate::state::{mutate_state, read_state};
 use candid::Nat;
-use canister_time::start_job_daily_at;
 use futures::future::join_all;
-use std::time::Duration;
+use gldt_stake_common::manage_stake_position_interface::GeneralError;
+use std::collections::BTreeSet;
+use tracing::debug;
 use tracing::error;
 use tracing::info;
+use types::TokenSymbol;
 
-pub fn start_job() {
-    start_job_daily_at(15, spawn_rewards_job);
-}
-
-fn spawn_rewards_job() {
-    ic_cdk::futures::spawn(process_rewards_impl())
-}
-
-async fn process_rewards_impl() {
+pub async fn process_rewards_impl() -> Result<(), BTreeSet<TokenSymbol>> {
     info!("PROCESS_REWARDS :: start");
 
-    if !is_allowed_to_run() {
-        schedule_retry(Duration::from_secs(60 * 5));
-        return;
+    let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
+    let unallocated_rewards_pool = read_state(|s| s.data.unallocated_rewards_pool.clone());
+
+    let results = batch_rewards_transfer(reward_types, unallocated_rewards_pool).await;
+
+    let mut errors = BTreeSet::new();
+
+    for (token_symbol, transfer_result) in results.into_iter() {
+        match transfer_result {
+            Ok(rewards_to_allocate) => {
+                info!(
+                    "PROCESS_REWARDS :: transfer successful for token: {}, rewards to allocate: {}",
+                    token_symbol, rewards_to_allocate
+                );
+            }
+            Err(err) => match &err {
+                GeneralError::CallError(err) | GeneralError::TransferError(err) => {
+                    error!(
+                        "PROCESS_REWARDS :: transfer failed for token: {}, error: {}",
+                        token_symbol, err
+                    );
+                    errors.insert(token_symbol);
+                }
+                _ => {
+                    debug!(
+                        "PROCESS_REWARDS :: ignoring non-transfer error for token: {}, error: {:?}",
+                        token_symbol, err
+                    );
+                }
+            },
+        }
     }
 
+    info!("PROCESS_REWARDS :: finished");
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
+}
+
+pub async fn batch_rewards_transfer(
+    reward_types: BTreeSet<TokenSymbol>,
+    unallocated_rewards_pool: UnallocatedRewardsPool,
+) -> Vec<(TokenSymbol, Result<Nat, GeneralError>)> {
     mutate_state(|s| {
         s.data.unallocated_rewards_pool.transition_to_transferring();
     });
-
-    let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
-
-    let unallocated_rewards_pool = read_state(|s| s.data.unallocated_rewards_pool.clone());
-
     let mut transfer_futures = Vec::new();
     let mut token_symbols = Vec::new();
 
-    for reward_type in reward_types.clone().into_iter() {
+    for reward_type in reward_types {
         let token_ledger = reward_type.get_token_info().ledger_id;
         let ledger_fee = reward_type.get_token_info().fee;
 
@@ -46,43 +77,12 @@ async fn process_rewards_impl() {
 
     let results = join_all(transfer_futures).await;
 
-    for (token_symbol, transfer_result) in token_symbols.into_iter().zip(results.into_iter()) {
-        match transfer_result {
-            Ok(rewards_to_allocate) => {
-                info!(
-                    "PROCESS_REWARDS :: transfer successful for token: {}, rewards to allocate: {}",
-                    token_symbol, rewards_to_allocate
-                );
-            }
-            Err(err) => {
-                error!(
-                    "PROCESS_REWARDS :: transfer failed for token: {}, error: {}",
-                    token_symbol, err
-                );
-            }
-        }
-    }
-
     mutate_state(|s| {
         s.data.unallocated_rewards_pool.transition_to_awaiting();
     });
 
-    info!("PROCESS_REWARDS :: finished");
-}
-
-fn is_allowed_to_run() -> bool {
-    let is_awaiting = read_state(|s| s.data.unallocated_rewards_pool.is_awaiting());
-
-    if is_awaiting {
-        info!("PROCESS_REWARDS :: reward claim already in progress");
-        return true;
-    }
-
-    false
-}
-
-fn schedule_retry(delay: Duration) {
-    ic_cdk_timers::set_timer(delay, || {
-        ic_cdk::futures::spawn(process_rewards_impl());
-    });
+    token_symbols
+        .into_iter()
+        .zip(results.into_iter().map(|r| r.map_err(|e| e)))
+        .collect()
 }

@@ -6,6 +6,7 @@
     "client/gldt_swap_app",
     "client/gld_dashboard",
     "client/gld_landing_page",
+    "client/internal_dashboard",
     "client/usdg"
   ],
   "license": "AGPL-3.0-only",
@@ -21,6 +22,7 @@
     "build:gldt_swap_app": "npm run --workspace gldt_swap_app build",
     "build:gld_landing_page": "npm run --workspace gld_landing_page build",
     "build:gld_dashboard": "npm run --workspace gld_dashboard build",
+    "build:internal_dashboard": "npm run --workspace internal_dashboard build",
     "build:usdg": "npm run --workspace usdg build",
     "build:back": "scripts/build_canister.sh gldt_swap && scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
     "build:backdid": "scripts/build_canister.sh --wasmonly gldt_swap && scripts/build_canister.sh --wasmonly sns_rewards && npm run build:candid && npm run build:declarations && npm run build:back",
@@ -32,6 +34,7 @@
     "lint:gldt_swap_app": "npm run --workspace gldt_swap_app lint",
     "lint:gld_landing_page": "npm run --workspace gld_landing_page lint",
     "lint:gld_dashboard": "npm run --workspace gld_dashboard lint",
+    "lint:internal_dashboard": "npm run --workspace internal_dashboard lint",
     "lint:usdg": "npm run --workspace usdg lint",
     "start": "dfx stop && dfx start --background --clean && npm run deploy",
     "stop": "dfx stop",

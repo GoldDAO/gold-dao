@@ -4,19 +4,19 @@ use canister_time::{timestamp_millis, DAY_IN_MS};
 use gldt_stake_common::stake_position::StakePosition;
 use ic_stable_structures::BTreeMap as StableBTreeMap;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeSet;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use tracing::error;
 use types::TimestampMillis;
 use types::TokenSymbol;
 
 #[derive(Serialize, Deserialize)]
 pub struct StakeSystem {
-    stakes: HashMap<Principal, StakePosition>,
+    pub stakes: HashMap<Principal, StakePosition>,
     pub total_staked: Nat,
     pub cached_total_weighted_stake: Nat,
     pub stake_positions_quantity_limit: usize,
-    pub reward_types: HashSet<TokenSymbol>,
+    pub reward_types: BTreeSet<TokenSymbol>,
     // available to transfer to fee account
     pub pending_fee_transfer_amount: Nat,
     // the date time that the canister went live set in init - used for APY calculations - calculating an average of weekly rewards based on the number of weeks that has passed
@@ -42,7 +42,7 @@ impl Default for StakeSystem {
             total_staked: Nat::from(0u64),
             cached_total_weighted_stake: Nat::from(0u64),
             stake_positions_quantity_limit: 100_000,
-            reward_types: HashSet::new(),
+            reward_types: BTreeSet::new(),
             pending_fee_transfer_amount: Nat::from(0u64),
             genesis_datetime: now,
             token_usd_values: HashMap::new(),

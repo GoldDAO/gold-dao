@@ -24,8 +24,8 @@ ICRC3_CONSTANTS="record {
   max_transactions_in_window = 1000 : nat;
   max_memory_size_bytes = 1073741824 : nat;
   max_blocks_per_response = 100 : nat;
-  initial_cycles = 100_000_000_000_000 : nat;
-  reserved_cycles = 10_000_000_000_000 : nat;
+  initial_cycles = 5_000_000_000_000 : nat;
+  reserved_cycles = 2_000_000_000_000 : nat;
   max_transactions_to_purge = 500 : nat;
   ttl_for_non_archived_transactions = record { secs = 120 : nat64; nanos = 0 : nat32; };
   max_unarchived_transactions = 1000 : nat;
