@@ -5,6 +5,7 @@ use crate::state::RuntimeState;
 
 use self::types::state::RuntimeStateV0;
 
+pub mod jobs;
 pub mod types;
 
 use crate::state::Data;

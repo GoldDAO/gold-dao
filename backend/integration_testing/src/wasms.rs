@@ -20,7 +20,7 @@ lazy_static! {
 
     // Wasms in particular canister folder
     pub static ref REWARDS: CanisterWasm = get_canister_wasm_from_bin("sns_rewards");
-    pub static ref REWARDS_OLD: CanisterWasm = get_canister_wasm_gz("sns_rewards_old");
+    pub static ref REWARDS_OLD: CanisterWasm = get_canister_wasm_gz("sns_rewards");
     pub static ref CYCLES_MANAGER: CanisterWasm = get_canister_wasm_from_bin("cycles_manager");
     pub static ref GLDT_SWAP: CanisterWasm = get_canister_wasm_from_bin("gldt_swap");
     pub static ref ORIGYN_NFT: CanisterWasm = get_canister_wasm_gz("origyn_nft_reference");
