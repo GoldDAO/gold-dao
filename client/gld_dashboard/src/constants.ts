@@ -75,6 +75,10 @@ export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
 export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
 export const MAX_SWAP_SLIPPAGE = 5;
+export const MIN_STAKE_AMOUNT = 10;
+export const MAX_STAKE_AMOUNT = 1000000;
+export const MAX_DISSOLVE_EVENTS = 5
+export const INSTANT_DISSOLVE_FEE_PERCENTAGE = 5
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);

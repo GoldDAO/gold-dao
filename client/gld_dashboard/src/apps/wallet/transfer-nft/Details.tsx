@@ -13,7 +13,7 @@ import useApprove from "@services/ledger/hooks/useApprove";
 import useTransferNFT from "@shared/hooks/useTransferNFT";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";
 import useFetchNFTTransferFee from "@shared/hooks/useFetchNFTTransferFee";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const NFTItem = ({
   nft,

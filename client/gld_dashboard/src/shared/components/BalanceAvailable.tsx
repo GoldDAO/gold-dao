@@ -1,12 +1,15 @@
 import Icon from "@shared/ui/icons";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import { ReactNode } from "react";
 
 const BalanceAvailable = ({
   token,
   balance,
+  icon = <Icon.Wallet size={14} />,
 }: {
   token: string;
   balance: number | undefined;
+  icon?: ReactNode;
 }) => {
   const renderBalance = () => {
     if (balance !== undefined) {
@@ -21,7 +24,7 @@ const BalanceAvailable = ({
 
   return (
     <div className="flex items-center gap-1">
-      <Icon.Wallet size={14} />
+      {icon}
       <div>{renderBalance()}</div>
       <div>{token}</div>
     </div>

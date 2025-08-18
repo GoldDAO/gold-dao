@@ -3,7 +3,7 @@ import Dialog from "@shared/ui/dialog/Dialog";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { PayToken, ReceiveToken } from "@buy/shared/utils";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import Icon from "@shared/ui/icons";
 
 const AmountUSD = ({

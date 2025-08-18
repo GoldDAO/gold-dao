@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useAuth } from "@auth/index";
 import Dialog from "@shared/ui/dialog/Dialog";
 import Address from "@components/strings/Address";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import Icon from "@shared/ui/icons";
 
 const Card = ({ step, children }: { step: number; children: ReactNode }) => {

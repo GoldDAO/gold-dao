@@ -6,7 +6,6 @@
     "client/gldt_swap_app",
     "client/gld_dashboard",
     "client/gld_landing_page",
-    "client/internal_dashboard",
     "client/usdg"
   ],
   "license": "AGPL-3.0-only",
@@ -45,7 +44,7 @@
     "eslint": "8.40.0"
   },
   "engines": {
-    "node": "^20.15.1",
-    "npm": "^10.7.0"
+    "node": "^24.5.0",
+    "npm": "^11.5.1"
   }
 }

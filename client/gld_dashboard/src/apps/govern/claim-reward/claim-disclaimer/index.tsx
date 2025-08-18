@@ -58,7 +58,7 @@ const ClaimRewardDisclaimer = () => {
                 </span>
               </div>
               <div className="text-sm text-content/60">
-                dispatched in GOLDAO, ICP and OGY
+                dispatched in GOLDAO, ICP, OGY and WTN
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ const ClaimRewardDisclaimer = () => {
                     type="button"
                     className={clsx(
                       "bg-success text-white border border-success rounded-xl",
-                      "px-4 py-4 text-sm font-semibold shrink-0 cursor-pointer",
+                      "px-6 py-3 text-sm shrink-0 cursor-pointer",
                       "disabled:cursor-not-allowed disabled:opacity-50"
                     )}
                     onClick={() =>

@@ -6,8 +6,8 @@ import { useAuth } from "@auth/index";
 import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { ClaimRewardStateReducerAtom, SelectedRewardsAtom } from "./atoms";
 // import useFetchLedgerDecimals from "@services/ledger/hooks/useFetchLedgerDecimals";
-import useClaimReward from "@services/sns_rewards/hooks/useClaimReward";
-import Button from "@shared/ui/button/BtnPrimary";
+import useClaimReward from "@govern/claim-reward/hooks/useClaimReward";
+import Button from "@shared/ui/button/HorizontalButton";
 
 const Details = () => {
   const navigate = useNavigate();

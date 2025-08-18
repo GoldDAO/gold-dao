@@ -5,7 +5,6 @@ const navItems: {
   title: string;
   url: string;
   icon: ReactNode;
-  subtitle?: string;
 }[] = [
   {
     title: "Buy",
@@ -14,7 +13,6 @@ const navItems: {
   },
   {
     title: "Earn",
-    subtitle: "Coming Soon",
     url: "/earn",
     icon: <Icon.Earn />,
   },

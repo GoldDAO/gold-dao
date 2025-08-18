@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Dialog from "@shared/ui/dialog/Dialog";
 import { useAuth } from "@auth/index";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import Icon from "@shared/ui/icons";
 // import { SelectNFTStateReducerAtom } from "@atoms/NFTState";

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import Icon from "@shared/ui/icons";
+import VerticalButton from "@shared/ui/button/VerticalButton";
 
 type Feature =
   | "buy-gldt"
@@ -51,28 +51,13 @@ const AppFeatureBtn = ({
 
   const renderBtn = () => {
     return (
-      <button
+      <VerticalButton
         onClick={handleOnClick}
-        className={clsx(
-          "relative rounded-xl shrink-0 cursor-pointer disabled:cursor-default",
-          "bg-primary text-white hover:bg-primary/80 disabled:bg-primary/60",
-          "w-[72px] xl:w-[140px]"
-        )}
         disabled={!isConnected}
+        icon={actions[action].icon}
       >
-        <div
-          className={clsx(
-            "flex flex-col justify-center items-center gap-1",
-            "px-1 py-3"
-          )}
-        >
-          {actions[action].icon}
-          <div className="text-xs xl:text-base">{actions[action].text}</div>
-        </div>
-        {!isConnected && (
-          <div className="absolute rounded-[inherit] top-0 w-full h-full bg-white/30" />
-        )}
-      </button>
+        {actions[action].text}
+      </VerticalButton>
     );
   };
 
