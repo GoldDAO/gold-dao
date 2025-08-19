@@ -5,12 +5,15 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "@services/gldt_stake/interfaces/idlFactory";
-import get_apy_overall from "@services/gldt_stake/get_apy_overall";
+import get_apy_timeseries from "@services/gldt_stake/get_apy_timeseries";
 
 const useFetchStakeAPY = (
   canisterId: string,
   agent: Agent | HttpAgent | undefined,
-  options: Omit<UseQueryOptions<number, Error>, "queryKey" | "queryFn">
+  options: Omit<UseQueryOptions<number, Error>, "queryKey" | "queryFn"> & {
+    starting_day?: number;
+    limit?: number;
+  }
 ) => {
   const {
     enabled = true,
@@ -20,6 +23,8 @@ const useFetchStakeAPY = (
     refetchOnMount = true,
     refetchOnWindowFocus = false,
     refetchOnReconnect = true,
+    starting_day = 0,
+    limit = 1,
     ...queryOptions
   } = options;
 
@@ -32,9 +37,9 @@ const useFetchStakeAPY = (
           canisterId,
         });
 
-        const res = await get_apy_overall(actor);
+        const res = await get_apy_timeseries(actor, starting_day, limit);
 
-        return res;
+        return res[0][1];
       } catch (err) {
         console.log(err);
         throw new Error("Fetch stake APY error! Please retry later.");
