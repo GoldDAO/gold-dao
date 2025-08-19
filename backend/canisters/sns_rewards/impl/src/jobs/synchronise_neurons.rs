@@ -244,6 +244,8 @@ mod tests {
                 .maturity_history
                 .get_maturity_history(neuron_id.clone(), limit)
         });
+        println!("result_history: {:?}", result_history);
+        println!("expected_result_history: {:?}", expected_result_history);
 
         assert_eq!(result_history, expected_result_history);
 

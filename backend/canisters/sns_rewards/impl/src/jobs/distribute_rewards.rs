@@ -498,10 +498,10 @@ mod tests {
         };
 
         let result = log_payment_round_metrics(&round);
-
+        println!("result : {}", result);
         assert_eq!(
             result,
-            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : TokenSymbol(\"ICP\"), total : 5, successful : 4, maturity distributed : 4, round maturity : 5, retries : 0, tokens_to_distribute : 94_000"
+            "PAYMENT ROUND METRICS || round id : 1, round status : CompletedPartial, token : ICP, total : 5, successful : 4, maturity distributed : 4, round maturity : 5, retries : 0, tokens_to_distribute : 94_000"
         );
     }
 
