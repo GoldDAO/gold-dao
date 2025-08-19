@@ -32,7 +32,14 @@ $[[ inputs.src-folder ]] unit tests:
   script:
     # - cargo tarpaulin -p $[[ inputs.src-folder ]] -j 2 --lib --no-fail-fast -o Xml
     # - cargo test -p $[[ inputs.src-folder ]]
-    - find backend/canisters/$[[inputs.src-folder]] -name Cargo.toml -execdir cargo test \;
+  - |
+    set -e
+    status=0
+    for crate in $(find backend/canisters/$[[inputs.src-folder]] -name Cargo.toml -exec dirname {} \;); do
+      echo "📦 Running tests in $crate"
+      (cd "$crate" && cargo test) || status=1
+    done
+    exit $status
   # coverage: /^\d+.\d+% coverage/
   # artifacts:
   #   reports:
