@@ -12,7 +12,7 @@ import {
 } from "@wallet/shared/atoms/TransferTokenAtom";
 import useTransfer from "@services/ledger/hooks/useTransfer";
 import useFetchTokenData from "@shared/hooks/useFetchTokenData";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const Confirm = ({ className }: { className?: string }) => {
   const { principalId, authenticatedAgent, unauthenticatedAgent, isConnected } =

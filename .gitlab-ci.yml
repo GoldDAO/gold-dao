@@ -175,12 +175,14 @@ node cache:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - "./frontend/**/*.{js,json,jsx,md,mdx,css,html,svg}"
+        - "client/**/*.{js,ts,json,jsx,tsx,md,mdx,css,html,svg}"
+        - "client/**/pnpm-lock.yaml"
+        - "pnpm-workspace.yaml"
   extends: .node template
   script:
-    - npm pkg get name description author license workspaces engines
+    - pnpm pkg get name description author license workspaces engines
     - node --version
-    - npm --version
+    - pnpm --version
 
 ################################################################################
 # Linters

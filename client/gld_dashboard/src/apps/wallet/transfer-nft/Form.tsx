@@ -14,7 +14,7 @@ import {
   TotalNFTSelectedAtom,
   RandomSelectedNFTIdAtom,
 } from "@shared/atoms/NFTStateAtom";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import SwitchTransfer from "@shared/components/switch/SwitchTransfer";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import { OGY_LEDGER_CANISTER_ID } from "@constants";

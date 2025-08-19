@@ -2,50 +2,21 @@
   "name": "gldt-monorepo",
   "description": "GLDT frontend app and GLDT canister",
   "author": "GoldDAO",
-  "workspaces": [
-    "client/gldt_swap_app",
-    "client/gld_dashboard",
-    "client/gld_landing_page",
-    "client/internal_dashboard",
-    "client/usdg"
-  ],
   "license": "AGPL-3.0-only",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev:gldt_swap_app": "npm run --workspace gldt_swap_app develop",
-    "dev:gld_landing_page": "npm run --workspace gld_landing_page develop",
-    "dev:gld_dashboard": "npm run --workspace gld_dashboard develop",
-    "dev:usdg": "npm run --workspace usdg develop",
-    "build": "npm run build:backdid && npm run build:back && npm run build:frontends",
-    "build:frontends": "npm run build:gldt_swap_app && npm run build:gld_dashboard",
-    "build:gldt_swap_app": "npm run --workspace gldt_swap_app build",
-    "build:gld_landing_page": "npm run --workspace gld_landing_page build",
-    "build:gld_dashboard": "npm run --workspace gld_dashboard build",
-    "build:internal_dashboard": "npm run --workspace internal_dashboard build",
-    "build:usdg": "npm run --workspace usdg build",
+    "build": "pnpm run build:backdid && pnpm run build:back",
     "build:back": "scripts/build_canister.sh gldt_swap && scripts/build_canister.sh icp_neuron && scripts/build_canister.sh sns_rewards",
-    "build:backdid": "scripts/build_canister.sh --wasmonly gldt_swap && scripts/build_canister.sh --wasmonly sns_rewards && npm run build:candid && npm run build:declarations && npm run build:back",
+    "build:backdid": "scripts/build_canister.sh --wasmonly gldt_swap && scripts/build_canister.sh --wasmonly sns_rewards && pnpm run build:candid && pnpm run build:declarations && pnpm run build:back",
     "build:candid": "scripts/generate_did.sh gldt_swap && scripts/generate_did.sh sns_rewards",
     "build:declarations": "dfx generate && scripts/refactor_nft_declarations.sh",
-    "lint": "npm run lint:back && npm run lint:frontends",
+    "lint": "pnpm run lint:back",
     "lint:back": "cargo clippy",
-    "lint:frontends": "npm run lint:gldt_swap_app && npm run lint:gld_landing_page && npm run lint:gld_dashboard && npm run lint:usdg",
-    "lint:gldt_swap_app": "npm run --workspace gldt_swap_app lint",
-    "lint:gld_landing_page": "npm run --workspace gld_landing_page lint",
-    "lint:gld_dashboard": "npm run --workspace gld_dashboard lint",
-    "lint:internal_dashboard": "npm run --workspace internal_dashboard lint",
-    "lint:usdg": "npm run --workspace usdg lint",
-    "start": "dfx stop && dfx start --background --clean && npm run deploy",
+    "start": "dfx stop && dfx start --background --clean && pnpm run deploy",
     "stop": "dfx stop",
-    "test": "npm run build:backdid && cargo tarpaulin --count -o html",
-    "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'"
-  },
-  "devDependencies": {
-    "eslint": "8.40.0"
-  },
-  "engines": {
-    "node": "^20.15.1",
-    "npm": "^10.7.0"
+    "test": "pnpm run build:backdid && cargo tarpaulin --count -o html",
+    "postinstall": "rustup update; rustup component add clippy; echo 'If installing locally, you should also ensure that ic-wasm is installed (cargo install ic-wasm), as well as wasmtime (see https://wasmtime.dev ).'",
+    "clean:client": "rm -rf client/*/pnpm-lock.yaml client/*/node_modules client/*/.next client/*/dist client/*/next-env.d.ts .pnpm-store"
   }
 }

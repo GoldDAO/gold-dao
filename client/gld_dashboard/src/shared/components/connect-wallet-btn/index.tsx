@@ -1,5 +1,5 @@
 import { useAuth } from "@auth/index";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const ConnectWalletBtn = ({
   className,

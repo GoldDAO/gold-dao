@@ -13,7 +13,7 @@ import {
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import SwapNFTReducerAtom from "@advanced/gldt/overview-section/shared/atoms/SwapNFTAtom";
 import InsufficientGLDTDisclaimer from "./insufficient-gldt-disclaimer";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const Submit = () => {
   const { principalId, unauthenticatedAgent, isConnected } = useAuth();

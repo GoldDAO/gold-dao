@@ -1,9 +1,9 @@
 use crate::memory::get_maturity_history_new_memory;
+use crate::migrations::types::state::NeuronInfoV0;
 use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use tracing::info;
-use types::NeuronInfoV0;
 use types::{NeuronInfo, TimestampMillis};
 
 use crate::memory::{get_maturity_history_memory, VM};
@@ -50,7 +50,7 @@ impl MaturityHistory {
     }
 
     pub fn insert(&mut self, key: (NeuronId, TimestampMillis), val: NeuronInfo) {
-        info!("result of insert: {:?}", self.history.insert(key, val));
+        self.history.insert(key, val);
     }
 
     pub fn _insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {

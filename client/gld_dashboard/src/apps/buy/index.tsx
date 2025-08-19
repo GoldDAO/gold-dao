@@ -29,7 +29,7 @@ import DetailsDialog from "@buy/details-dialog";
 import DisclaimerAmountReceivedDialog from "@buy/disclaimer-amount-received-dialog";
 import DisclaimerConfirmHighSlippageDialog from "./disclaimer-confirm-high-slippage-dialog";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import Icon from "@shared/ui/icons";
 import { isNumeric } from "@shared/utils/numbers";
 import isInsufficientFunds from "@shared/utils/validators/isInsufficientFunds";
@@ -202,7 +202,11 @@ const Buy = () => {
     dispatch({ type: "SET_PAY_TOKEN", value: token });
   };
 
-  const onClickMaxBalance = (amount: string) => {
+  const onClickMaxBalance = () => {
+    if (!balance.isSuccess) return;
+    const amount =
+      Number(balance.data.balance_e8s - 2n * balance.data.fee_e8s) /
+      10 ** balance.data.decimals;
     setValue("amount", amount, {
       shouldValidate: true,
     });
@@ -377,12 +381,12 @@ const Buy = () => {
                             </div>
                           </form>
                           <MaxButton
-                            balance={balance.data?.balance_e8s}
-                            fee={balance.data?.fee_e8s}
-                            decimals={balance.data?.decimals}
-                            handleOnClick={(amount) =>
-                              onClickMaxBalance(amount)
+                            disabled={
+                              balance.data.balance_e8s < balance.data.fee_e8s
                             }
+                            handleOnClick={onClickMaxBalance}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
                           />
                         </div>
                       ) : (

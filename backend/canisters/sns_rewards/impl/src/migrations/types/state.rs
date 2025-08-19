@@ -4,11 +4,18 @@ use crate::{
     model::{maturity_history::MaturityHistory, payment_processor::PaymentProcessor},
     utils::TimeInterval,
 };
+use candid::CandidType;
+use candid::Decode;
+use candid::Encode;
 use candid::{Nat, Principal};
+use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
+use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::collections::HashMap;
+use types::TokenSymbol;
 use types::{NeuronInfo, TimestampMillis};
 use utils::env::CanisterEnv;
 
@@ -56,6 +63,89 @@ impl From<DataV0> for Data {
             reward_distribution_in_progress: v0.reward_distribution_in_progress,
             neuron_sync_interval: v0.neuron_sync_interval,
             migration_finished: None,
+        }
+    }
+}
+
+const MAX_VALUE_SIZE_V0: u32 = 130;
+
+#[derive(Serialize, Clone, Deserialize, CandidType, Debug, PartialEq, Eq, Default)]
+pub struct NeuronInfoV0 {
+    pub last_synced_maturity: u64,
+    pub accumulated_maturity: u64,
+    pub rewarded_maturity: HashMap<TokenSymbol, u64>,
+    pub last_disburse_event_considered: Option<TimestampMillis>,
+}
+
+#[derive(Serialize, Clone, Deserialize, CandidType, Debug, PartialEq, Eq, Default)]
+pub struct NeuronInfoLegacy {
+    pub last_synced_maturity: u64,
+    pub accumulated_maturity: u64,
+    pub rewarded_maturity: HashMap<TokenSymbolLegacy, u64>,
+    pub last_disburse_event_considered: Option<TimestampMillis>,
+}
+
+#[derive(
+    Debug, Serialize, Clone, Deserialize, CandidType, PartialEq, Eq, Hash, PartialOrd, Ord,
+)]
+pub struct TokenSymbolLegacy(String);
+
+impl Storable for NeuronInfoV0 {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        // Try decoding in new format (TokenSymbol enum)
+        if let Ok(val) = Decode!(&bytes, NeuronInfo) {
+            return NeuronInfoV0 {
+                last_synced_maturity: val.last_synced_maturity,
+                accumulated_maturity: val.accumulated_maturity,
+                rewarded_maturity: val.rewarded_maturity,
+                last_disburse_event_considered: val.last_disburse_event_considered,
+            };
+        }
+
+        // Fallback: decode legacy format with string keys
+        if let Ok(legacy) = Decode!(&bytes, NeuronInfoLegacy) {
+            let rewarded_maturity = legacy
+                .rewarded_maturity
+                .into_iter()
+                .map(|(k, v)| {
+                    let symbol = TokenSymbol::parse(&k.0).unwrap_or_else(|err| {
+                        panic!("Unknown token symbol string '{}': {err}", k.0)
+                    });
+                    (symbol, v)
+                })
+                .collect();
+
+            return NeuronInfoV0 {
+                last_synced_maturity: legacy.last_synced_maturity,
+                accumulated_maturity: legacy.accumulated_maturity,
+                rewarded_maturity,
+                last_disburse_event_considered: legacy.last_disburse_event_considered,
+            };
+        }
+
+        panic!(
+            "Failed to decode NeuronInfoV0 from bytes: {:?}",
+            bytes.as_ref()
+        );
+    }
+
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE_V0,
+        is_fixed_size: false,
+    };
+}
+
+impl From<NeuronInfoV0> for NeuronInfo {
+    fn from(v0: NeuronInfoV0) -> Self {
+        NeuronInfo {
+            last_synced_maturity: v0.last_synced_maturity,
+            accumulated_maturity: v0.accumulated_maturity,
+            rewarded_maturity: v0.rewarded_maturity,
+            last_disburse_event_considered: v0.last_disburse_event_considered,
         }
     }
 }

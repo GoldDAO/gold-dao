@@ -12,7 +12,7 @@ import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import ICRCAccount from "./form-input/ICRCAccount";
 import PrincipalAndSubaccount from "./form-input/PrincipalAndSubaccount";
 import ICRCAccountOrAccountId from "./form-input/ICRCAccountOrAccountId";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import MaxButton from "@shared/components/MaxButton";
 import BalanceAvailable from "@shared/components/BalanceAvailable";
 
@@ -113,7 +113,10 @@ const Form = ({ className }: { className?: string }) => {
     return true;
   };
 
-  const onClickMaxBalance = (amount: string) => {
+  const onClickMaxBalance = () => {
+    const amount =
+      Number(balance.data.balance_e8s - balance.data.fee_e8s) /
+      10 ** balance.data.decimals;
     setValue("amount", amount, {
       shouldValidate: true,
     });
@@ -211,10 +214,10 @@ const Form = ({ className }: { className?: string }) => {
                 />
               </div>
               <MaxButton
-                balance={balance.data?.balance_e8s}
-                fee={balance.data?.fee_e8s}
-                decimals={balance.data?.decimals}
-                handleOnClick={(amount) => onClickMaxBalance(amount)}
+                disabled={balance.data.balance_e8s < balance.data.fee_e8s}
+                handleOnClick={onClickMaxBalance}
+                data-tooltip-id="tooltip"
+                data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
               />
             </div>
             <div className="text-content/40 text-sm mt-2 ml-1">

@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+
+### [1.0.11] - 2025-08-19
+
+#### Fixed
+
+- **Neuron maturity history**: Fixed a deserialization issue in the migration logic that prevented MaturityHistory from being upgraded correctly. The migration now properly handles deserialization of NeuronInfo values, ensuring stable persistence after the introduction of WTN rewards.
+
 ### [1.0.10] - 2025-08-18
 
 #### Fixed

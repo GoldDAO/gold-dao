@@ -1,114 +1,111 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
 import Icon from "@shared/ui/icons";
+import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
-import Dialog from "@shared/ui/dialog/Dialog";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
-import StakeForm from "./stake-form";
-import StakeOverview from "./stake-overview";
-import StakeList from "./stake-list";
-import { ClaimRewardStateReducerAtom } from "./claim-reward/claim-all/atoms";
-import ClaimRewardDisclaimer from "./claim-reward/claim-disclaimer";
-import ClaimRewardsConfirm from "./claim-reward/claim-all/Confirm";
-import ClaimRewardsDetails from "./claim-reward/claim-all/Details";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
+import GradientCard from "@shared/ui/card/GradientCard";
+import { TOKEN_GLDT } from "@shared/utils/tokens";
+import IncreaseStake from "./components/increase-stake";
+import DecreaseStake from "./components/decrease-stake";
+import ClaimRewardsDisclaimer from "./components/claim-rewards-disclaimer";
+import TokenHeaderPrice from "@shared/components/token-header-price";
+import UserTotalStakedAmount from "./components/user-total-staked-amount";
+import DissolveEventsList from "./components/dissolve-events-list";
+import useFetchUserPosition from "@earn/hooks/useFetchUserPosition";
+import Withdraw from "./components/withdraw";
+import StakeAPY from "./components/stake-apy";
+import TotalStakedAmount from "./components/total-staked-amount";
+import DissolveEventsListDisconnected from "./components/dissolve-events-list-disconnected";
 
 const Earn = () => {
-  const { isConnected } = useAuth();
-  const [claimRewardState, dispatchClaimReward] = useAtom(
-    ClaimRewardStateReducerAtom
+  const { isConnected, authenticatedAgent, unauthenticatedAgent } = useAuth();
+
+  const position = useFetchUserPosition(
+    GLDT_STAKE_CANISTER_ID,
+    authenticatedAgent,
+    unauthenticatedAgent,
+    {
+      enabled: isConnected && !!authenticatedAgent && !!unauthenticatedAgent,
+    }
   );
 
   return (
     <InnerAppLayout>
       <InnerAppLayout.LeftPanel>
-        <div className="flex flex-col items-center text-center xl:text-left xl:items-start xl:flex-grow">
-          <div className="text-5xl xl:text-6xl flex flex-col justify-center items-center xl:items-start font-semibold mt-4 px-4 xl:px-8">
-            <div className="font-semibold text-gold/90">Earn</div>
-            <div className="font-light">with gold</div>
-          </div>
-          <div className="text-content/60 my-3 px-4 xl:px-8">
+        <div className="text-4xl xl:text-6xl flex flex-col justify-center items-center xl:items-start">
+          <div className="font-semibold text-gold/90">Earn</div>
+          <div className="font-light">with gold</div>
+        </div>
+        <div className="flex flex-col items-center xl:items-start text-content/60 my-3">
+          <div className="text-center xl:text-left">
             Stake your GLDT to{" "}
             <span className="font-semibold">earn weekly rewards</span> in
             governance tokens, unlocking passive income from your gold holdings.
+          </div>
+          <div className="mt-4">
             <a
               href="https://docs.gold-dao.org/resources/gldt-staking/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 mt-4"
+              className="flex items-center gap-1"
             >
-              <div className="text-sm font-semibold tracking-widest">
-                LEARN MORE
-              </div>
-              <div className="px-4 py-1 border border-border rounded-full">
+              <div className="text-sm tracking-widest">LEARN MORE</div>
+              <div className="mb-0.5">
                 <Icon.ExternalLink width={16} />
               </div>
             </a>
           </div>
-
-          <div className="xl:hidden mt-8 w-full">
-            <StakeOverview />
-            <div className="relative w-full px-4 xl:pb-16 pb-32">
-              <div
-                className={clsx(
-                  "my-4",
-                  "absolute -top-26 xl:-top-16 left-1/2 xl:my-0 -translate-x-1/2 w-full xl:w-xl px-4"
-                )}
-              >
-                <ClaimRewardDisclaimer />
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 w-full px-4 xl:px-8">
-            <StakeForm />
-          </div>
-          {!isConnected && (
-            <div className="px-4 xl:px-8 mt-auto w-full">
-              <div className="my-4 text-center">
-                Connect a wallet and start staking GLDT
-              </div>
-              <BtnConnectWallet className="w-full" />
-            </div>
-          )}
         </div>
+
+        <div className="mt-4 xl:mt-6 flex flex-col gap-4 w-full">
+          <StakeAPY />
+          <TotalStakedAmount />
+        </div>
+
+        {!isConnected && (
+          <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
+        )}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <div className="flex flex-col xl:flex-grow xl:overflow-y-auto">
-          <div className="hidden xl:block">
-            <StakeOverview />
-            <div className="relative w-full px-4 xl:pb-16 pb-32">
-              <div
-                className={clsx(
-                  "my-4",
-                  "absolute -top-26 xl:-top-16 left-1/2 xl:my-0 -translate-x-1/2 w-full xl:w-xl px-4"
+        <div>
+          <GradientCard
+            className={clsx(
+              "px-4 xl:px-8 pt-4 xl:pt-8 pb-24",
+              "rounded-tr-[inherit]",
+              "relative"
+            )}
+          >
+            <TokenHeaderPrice
+              className="hidden xl:block mb-8 xl:mb-12"
+              token={TOKEN_GLDT}
+            />
+
+            <UserTotalStakedAmount position={position} />
+
+            <div className="flex justify-center gap-2 absolute -bottom-9 left-1/2 -translate-x-1/2">
+              <IncreaseStake position={position} />
+              <DecreaseStake position={position} />
+            </div>
+          </GradientCard>
+
+          <div className="flex flex-col gap-4 xl:gap-8 pt-16 px-4 pb-4 xl:px-8 xl:pb-8">
+            <ClaimRewardsDisclaimer position={position} />
+            <div>
+              <div className="flex justify-between gap-4 items-center mt-8">
+                <h2>Unlocking tokens</h2>
+                <Withdraw position={position} />
+              </div>
+              <div className="mt-4">
+                {isConnected ? (
+                  <DissolveEventsList position={position} />
+                ) : (
+                  <DissolveEventsListDisconnected />
                 )}
-              >
-                <ClaimRewardDisclaimer />
               </div>
             </div>
           </div>
-
-          <div className="p-4 xl:p-8">
-            <div className="mb-4 xl:mb-8">My Stakes</div>
-            <StakeList />
-          </div>
         </div>
-
-        <Dialog
-          open={claimRewardState.is_open_claim_dialog_confirm}
-          handleOnClose={() => dispatchClaimReward({ type: "CANCEL" })}
-          title="Claim rewards"
-        >
-          <ClaimRewardsConfirm />
-        </Dialog>
-
-        <Dialog
-          open={claimRewardState.is_open_claim_dialog_details}
-          handleOnClose={() => dispatchClaimReward({ type: "RESET" })}
-          title="Claim details"
-        >
-          <ClaimRewardsDetails />
-        </Dialog>
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>
   );
