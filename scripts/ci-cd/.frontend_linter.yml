@@ -8,7 +8,7 @@ spec:
           "gld_dashboard",
           "gld_landing_page",
           "internal_dashboard",
-          "usdg"
+          "usdg",
         ]
 ---
 # Front-end (NextJS) linter job template
@@ -20,12 +20,16 @@ $[[ inputs.src-folder ]] linter:
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - "pnpm-lock.yaml"
+        - "pnpm-workspace.yaml"
     - if: $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_REF_NAME == "develop"
       changes:
         - "client/$[[ inputs.src-folder ]]/*.{js,json}"
         - "client/$[[ inputs.src-folder ]]/**/*.{js,jsx,ts,tsx,md,mdx,css,html,svg}"
+        - "client/$[[ inputs.src-folder ]]/**/pnpm-lock.yaml"
+        - "pnpm-workspace.yaml"
   extends: .node template
   script:
-    - npm run lint:$[[ inputs.src-folder ]]
+    - pnpm --filter $[[ inputs.src-folder ]] run lint

@@ -1,14 +1,13 @@
 # NodeJS & NextJS job template
 
 .node template:
-  image: node:18
+  image: node:current-alpine3.22
   cache:
-    - key: 'node-$CI_COMMIT_REF_SLUG'
+    - key: "node-$CI_COMMIT_REF_SLUG"
       paths:
-        - .npm/
+        - .pnpm-store/
         - node_modules/
         - client/**/.next/
-        - client/**/.npm/
         - client/**/node_modules/
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - npm install -g pnpm@latest-10
