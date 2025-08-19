@@ -27,9 +27,6 @@ async fn run_async() {
 }
 
 pub async fn synchronise_neuron_data() {
-    if read_state(|s| s.get_is_migrating()) {
-        return;
-    }
     if read_state(|s| s.get_is_synchronizing_neurons()) {
         return;
     }
@@ -244,8 +241,6 @@ mod tests {
                 .maturity_history
                 .get_maturity_history(neuron_id.clone(), limit)
         });
-        println!("result_history: {:?}", result_history);
-        println!("expected_result_history: {:?}", expected_result_history);
 
         assert_eq!(result_history, expected_result_history);
 

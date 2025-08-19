@@ -81,10 +81,6 @@ impl RuntimeState {
     pub fn get_is_synchronizing_neurons(&self) -> bool {
         self.data.is_synchronizing_neurons
     }
-
-    pub fn get_is_migrating(&self) -> bool {
-        self.data.migration_finished.is_none()
-    }
 }
 
 #[derive(CandidType, Serialize)]
@@ -152,7 +148,6 @@ pub struct Data {
     pub reward_distribution_in_progress: Option<bool>,
     /// The daily interval for which a neuron sync occurs
     pub neuron_sync_interval: Option<TimeInterval>,
-    pub migration_finished: Option<TimestampMillis>,
 }
 
 impl Default for Data {
@@ -177,33 +172,6 @@ impl Default for Data {
                 start_hour: 9,
                 end_hour: 11,
             }),
-            migration_finished: None,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::time::{SystemTime, UNIX_EPOCH};
-
-    fn now_millis() -> TimestampMillis {
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis() as u64
-    }
-
-    #[test]
-    fn test_get_is_migrating() {
-        // Case 1: migration_finished = None → should return false
-        let state = RuntimeState::new(CanisterEnv::default(), Data::default());
-        assert_eq!(state.get_is_migrating(), true);
-
-        // Case 2: migration_finished = Some(timestamp) → should return true
-        let mut data = Data::default();
-        data.migration_finished = Some(now_millis());
-        let state = RuntimeState::new(CanisterEnv::default(), data);
-        assert_eq!(state.get_is_migrating(), false);
     }
 }
