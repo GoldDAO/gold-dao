@@ -612,21 +612,8 @@ mod tests {
     #[test]
     fn try_new_with_too_low_stake() {
         // Create a position that was created 1 year ago
-        let position =
-            StakePosition::try_new(Principal::anonymous(), Nat::from(1_000_u64)).unwrap();
-
-        assert_eq!(
-            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
-            Some(&Nat::from(0u64))
-        );
-
-        let res = position.can_allocate_reward();
-        matches!(res, Err(GeneralError::CannotAddReward(_)));
-
-        assert_eq!(
-            position.claimable_rewards.get(&TokenSymbol::GOLDAO),
-            Some(&Nat::from(0u64))
-        );
+        let position_res = StakePosition::try_new(Principal::anonymous(), Nat::from(1_000_u64));
+        assert!(position_res.is_err())
     }
 
     #[test]
