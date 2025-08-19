@@ -50,7 +50,7 @@ impl MaturityHistory {
     }
 
     pub fn insert(&mut self, key: (NeuronId, TimestampMillis), val: NeuronInfo) {
-        info!("result of insert: {:?}", self.history.insert(key, val));
+        self.history.insert(key, val);
     }
 
     pub fn _insert_multiple(&mut self, events: Vec<(NeuronId, TimestampMillis, NeuronInfo)>) {
