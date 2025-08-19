@@ -9,32 +9,27 @@ import { useAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   IdentityKitProvider,
-  // useIdentity,
   useAuth,
   useIsInitializing,
   useAgent,
 } from "@nfid/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
-// import { isMobile } from "react-device-detect";
 
 import authStateAtom from "./atoms";
 
-// const ICP_API_HOST = "https://icp-api.io/";
+// const InternetIdentity2 = {
+//   ...InternetIdentity,
+//   providerUrl: "https://id.ai/",
+// };
 
 const AuthProviderInit = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  // const identity = useIdentity();
   const isInitializing = useIsInitializing();
   const [state, setState] = useAtom(authStateAtom);
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<
     HttpAgent | Agent | undefined
   >();
   const authenticatedAgent = useAgent({ host: "https://ic0.app" });
-
-  // const authenticatedAgent = HttpAgent.createSync({
-  //   host: "https://ic0.app",
-  //   identity: identity,
-  // });
 
   useEffect(() => {
     HttpAgent.create({ host: "https://ic0.app" }).then(setUnauthenticatedAgent);
