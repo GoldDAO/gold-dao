@@ -3,5 +3,4 @@ pub mod test_goldao_burn;
 pub mod test_reserve_pool_distribution;
 pub mod test_reward_claim;
 pub mod test_reward_token_types;
-pub mod test_stable_memory_migration;
 pub mod test_synchronise_neurons;
