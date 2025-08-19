@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NETWORK=$1
-DEPLOYMENT_VIA="proposal"
+DEPLOYMENT_VIA="direct"
 
 . ./scripts/extract_commit_tag_data_and_commit_sha.sh sns_rewards $NETWORK
 
