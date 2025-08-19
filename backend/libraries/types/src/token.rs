@@ -3,6 +3,7 @@ use std::{borrow::Cow, fmt::Display};
 use candid::{CandidType, Principal};
 use ic_stable_structures::{storable::Bound, Storable};
 
+use candid::Decode;
 use serde::{Deserialize, Serialize};
 
 /// Compact enum for token identity (for keys, matching, etc.)
