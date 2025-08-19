@@ -32,4 +32,5 @@ $[[ inputs.src-folder ]] linter:
         - "pnpm-workspace.yaml"
   extends: .node template
   script:
+    - pnpm --filter $[[ inputs.src-folder ]] install
     - pnpm --filter $[[ inputs.src-folder ]] run lint
