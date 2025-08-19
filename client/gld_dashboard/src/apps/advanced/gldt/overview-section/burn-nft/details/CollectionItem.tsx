@@ -10,7 +10,7 @@ import useApprove from "@services/ledger/hooks/useApprove";
 import useSwapTokensForNFT from "@shared/hooks/useSwapTokensForNFT";
 import MutationStatusIcon from "@shared/components/MutationStatusIcon";
 import { CollectionNameNFT, IdNFT } from "@services/gld_nft/utils/interfaces";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const CollectionItem = ({
   nft,

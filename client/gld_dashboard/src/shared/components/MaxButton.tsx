@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-const MaxButtonUI = ({
+const MaxButton = ({
   handleOnClick,
   disabled = false,
 }: {
@@ -17,43 +17,10 @@ const MaxButtonUI = ({
           "disabled:cursor-not-allowed": disabled,
         }
       )}
-      data-tooltip-id="tooltip"
-      data-tooltip-html="Max selects your balance minus network fees,<br>ensuring your transaction completes successfully."
       disabled={disabled}
     >
       Max
     </button>
-  );
-};
-
-const MaxButton = ({
-  balance,
-  fee,
-  decimals,
-  handleOnClick,
-}: {
-  balance: bigint | undefined;
-  fee: bigint | undefined;
-  decimals: number | undefined;
-  handleOnClick: (amount: string) => void;
-}) => {
-  const isEnabled =
-    balance !== undefined &&
-    fee !== undefined &&
-    decimals !== undefined &&
-    balance >= fee;
-
-  const handleClick = (balance: bigint, fee: bigint, decimals: number) => {
-    const maxAmount = Number(balance - 2n * fee) / 10 ** decimals;
-    handleOnClick(maxAmount.toString());
-  };
-
-  if (!isEnabled) {
-    return <MaxButtonUI disabled />;
-  }
-
-  return (
-    <MaxButtonUI handleOnClick={() => handleClick(balance, fee, decimals)} />
   );
 };
 

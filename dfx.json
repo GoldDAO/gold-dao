@@ -84,6 +84,15 @@
       ],
       "type": "assets"
     },
+    "internal_dashboard": {
+      "declarations": {
+        "bindings": [],
+        "env_override": null,
+        "output": null
+      },
+      "source": ["client/internal_dashboard/dist"],
+      "type": "assets"
+    },
     "gld_dashboard": {
       "declarations": {
         "bindings": [],

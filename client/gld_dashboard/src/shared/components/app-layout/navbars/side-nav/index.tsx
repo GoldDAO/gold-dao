@@ -5,14 +5,12 @@ import navItems from "@shared/components/app-layout/navbars/shared/utils";
 
 const NavLink = ({
   title,
-  subtitle,
   url,
   icon,
   isActive,
   isDisabled = false,
 }: {
   title: string;
-  subtitle?: string;
   url: string;
   icon: ReactNode;
   isActive: boolean;
@@ -37,10 +35,7 @@ const NavLink = ({
       aria-disabled={isDisabled}
     >
       <div className="h-5">{icon}</div>
-      <div className="mt-1 w-full text-center">
-        {title}
-        {subtitle && <div className="text-xs">{subtitle}</div>}
-      </div>
+      <div className="mt-1 w-full text-center">{title}</div>
     </Link>
   );
 };
@@ -52,15 +47,13 @@ const SideNav = ({ className }: { className?: string }) => {
   return (
     <nav className={className}>
       <div className="h-full flex flex-col items-center justify-center gap-4 text-content/60">
-        {navItems.map(({ title, subtitle, url, icon }, i) => (
+        {navItems.map(({ title, url, icon }, i) => (
           <NavLink
             key={i}
             title={title}
-            subtitle={subtitle}
             url={url}
             icon={icon}
             isActive={active.startsWith(url)}
-            isDisabled={"/earn".startsWith(url)} // You can set this based on your logic
           />
         ))}
       </div>

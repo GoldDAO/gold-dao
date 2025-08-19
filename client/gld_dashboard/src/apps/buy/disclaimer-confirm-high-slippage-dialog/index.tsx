@@ -1,7 +1,7 @@
 import Dialog from "@shared/ui/dialog/Dialog";
 import Icon from "@shared/ui/icons";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BtnPrimary from "@shared/ui/button/BtnPrimary";
+import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 const DisclaimerConfirmHighSlippageDialog = ({
   open,

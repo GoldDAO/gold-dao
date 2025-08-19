@@ -1,7 +1,5 @@
 import clsx from "clsx";
 import { GLDT_VALUE_1G_NFT } from "@constants";
-import { useAuth } from "@auth/index";
-import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Token } from "@shared/utils/tokens";
 
@@ -68,72 +66,43 @@ const PriceToken = ({
 
 const TotalCountToken = ({
   token,
+  amount,
+  amountUSD,
   className,
+  isFetching = false,
 }: {
   token: Token;
+  amount: number;
+  amountUSD: number;
+  isFetching?: boolean;
   className?: string;
 }) => {
-  const { principalId, unauthenticatedAgent, isConnected } = useAuth();
-
-  const balance = useFetchLedgerBalance(
-    token.canister_id,
-    unauthenticatedAgent,
-    {
-      ledger: token.name,
-      owner: principalId,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  const renderBalance = () => {
-    if (!isConnected) {
-      return <Balance tokenName={token.display_name} balance={0} />;
-    }
-    if (balance.isSuccess) {
-      return (
-        <Balance
-          tokenName={token.display_name}
-          balance={balance.data.balance}
-        />
-      );
-    }
-    return (
-      <Balance
-        tokenName={token.display_name}
-        className="animate-pulse"
-        balance={0}
-      />
-    );
-  };
-
-  const renderPrice = () => {
-    if (!isConnected) {
-      return <PriceToken tokenName={token.name} balance={0} balanceUSD={0} />;
-    }
-    if (balance.isSuccess) {
-      return (
-        <PriceToken
-          tokenName={token.name}
-          balance={balance.data.balance}
-          balanceUSD={balance.data.balance_usd}
-        />
-      );
-    }
-    return (
-      <PriceToken
-        tokenName={token.name}
-        balance={0}
-        balanceUSD={0}
-        className="animate-pulse"
-      />
-    );
-  };
-
   return (
     <div className={className}>
       <div className="flex flex-col items-center">
-        {renderBalance()}
-        {renderPrice()}
+        {!isFetching ? (
+          <Balance tokenName={token.display_name} balance={amount} />
+        ) : (
+          <Balance
+            tokenName={token.display_name}
+            className="animate-pulse"
+            balance={0}
+          />
+        )}
+        {!isFetching ? (
+          <PriceToken
+            tokenName={token.name}
+            balance={amount}
+            balanceUSD={amountUSD}
+          />
+        ) : (
+          <PriceToken
+            tokenName={token.name}
+            className="animate-pulse"
+            balance={0}
+            balanceUSD={0}
+          />
+        )}
       </div>
     </div>
   );
