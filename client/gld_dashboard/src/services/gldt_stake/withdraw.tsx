@@ -1,7 +1,7 @@
 import { ActorSubclass } from "@dfinity/agent";
 import {
   ManageStakePositionArgs,
-  Result_2,
+  Result_4,
   StakePositionResponse,
   ManageStakePositionError,
 } from "@services/gldt_stake/interfaces/idlFactory";
@@ -25,7 +25,7 @@ const withdraw = async (
     Withdraw: {},
   };
 
-  const result = (await actor.manage_stake_position(args)) as Result_2;
+  const result = (await actor.manage_stake_position(args)) as Result_4;
 
   if ("Ok" in result) {
     return result.Ok;
