@@ -214,7 +214,7 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+            allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
             icrc3_config: ICRC3Config {
                 supported_blocks: vec![SupportedBlockType {
                     block_type: "add_stake".to_string(),
@@ -375,7 +375,7 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+           allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
             icrc3_config: ICRC3Config {
             supported_blocks: vec![SupportedBlockType {
                     block_type: "event".to_string(),

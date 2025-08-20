@@ -6,6 +6,7 @@ use candid::Nat;
 pub use gldt_stake_api_canister::Args;
 use ic_cdk_macros::init;
 use tracing::info;
+use types::TokenSymbol;
 use utils::env::CanisterEnv;
 
 #[init]
@@ -33,11 +34,17 @@ fn init(args: Args) {
                 goldao_sns_governance_canister_id: init_args.gld_sns_governance_canister_id,
                 ..Default::default()
             };
-            data.stake_system.reward_types =
-                init_args.allowed_reward_tokens.iter().cloned().collect();
-
-            init_args
+            data.stake_system.reward_types = init_args
                 .allowed_reward_tokens
+                .iter()
+                .map(|token_symbol| {
+                    TokenSymbol::parse(token_symbol)
+                        .expect("Invalid token symbol in allowed rewards")
+                })
+                .collect();
+
+            data.stake_system
+                .reward_types
                 .iter()
                 .for_each(|token_symbol| {
                     data.allocated_rewards_pool

@@ -11,7 +11,7 @@ OGY_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
 GOLDAO_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
 GOLDAO_SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
 GOLDAO_SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
-ALLOWED_REWARD_TOKENS="vec { variant { GOLDAO }; variant { ICP }; variant { OGY }; variant { WTN } }"
+ALLOWED_REWARD_TOKENS="vec { \"ICP\"; \"OGY\"; \"GOLDAO\"; \"WTN\"}"
 ICRC3_SUPPORTED_BLOCKS="vec {
   record { block_type = \"add_stake\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
   record { block_type = \"claim_rewards\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
@@ -39,12 +39,10 @@ if [[ $REINSTALL == "reinstall" ]]; then
   if [[ $NETWORK =~ ^(local|staging)$ ]]; then
     TESTMODE=true
     AUTHORIZED_PRINCIPALS="vec {
-      principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\";
-            principal \"$(dfx canister id --network $NETWORK sns_governance)\"
+      principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\"
     }"
     WHITELIST="vec {
-      principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\";
-            principal \"$(dfx canister id --network $NETWORK sns_governance)\"
+      principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\"
     }"
     GLDT_LEDGER_ID=6uad6-fqaaa-aaaam-abovq-cai
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
