@@ -58,7 +58,9 @@ const DetailsDialogContent = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center justify-center gap-2">
             <div className="mb-2">Withdrawing error</div>
-            <div className="text-content/60">{withdraw.error.message}</div>
+            <div className="text-content/60 text-center">
+              {withdraw.error.message}
+            </div>
           </div>
           <div className="mt-4 flex items-center gap-2 w-full">
             <Button onClick={onRetry} className="w-full">
