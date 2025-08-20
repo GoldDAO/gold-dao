@@ -199,7 +199,7 @@ type IncreaseDissolveDelay = record {
   additional_dissolve_delay_seconds : nat32;
 };
 type InitArgs = record {
-  allowed_reward_tokens : vec TokenSymbol;
+  allowed_reward_tokens : vec text;
   whitelist : vec principal;
   test_mode : bool;
   authorized_principals : vec principal;

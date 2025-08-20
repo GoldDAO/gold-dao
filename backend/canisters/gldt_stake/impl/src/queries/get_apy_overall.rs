@@ -94,7 +94,7 @@ pub fn calculate_apy(total_daily_rewards_as_usd: f64, total_weighted_stake_as_us
         return 0.0;
     }
 
-    (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 52.0 * 100.0
+    (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 365.0 * 100.0
 }
 
 pub fn calculate_days_since_genesis(genesis_datetime: TimestampMillis) -> u64 {
@@ -208,14 +208,14 @@ mod tests {
         // total value of GLDT = 1000 USD
         // total value of rewards = 400 + 400 + 400 = 1200 USD
 
-        // (1200 USD / 100_000 USD) * 52.0 * 100.0 = 62.4;
+        // (1200 USD / 100_000 USD) * 365.0 * 100.0 = 438.4;
         assert_eq!(
             get_apy_impl(
                 dayly_weighted_stake.clone(),
                 daily_rewards.clone(),
                 token_prices_usd.clone()
             ),
-            62.4
+            438.0
         );
 
         // second day with no rewards, we expect that the apy should be half
@@ -231,7 +231,7 @@ mod tests {
 
         assert_eq!(
             get_apy_impl(dayly_weighted_stake, daily_rewards, token_prices_usd),
-            31.2
+            219.0
         );
     }
 }
