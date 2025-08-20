@@ -87,11 +87,11 @@ export const ClaimRewardsStateReducerAtom = atomWithReducer(
   claimRewardsReducer
 );
 
-export const TotalSelectedAmountAtom = atom((get) => {
+export const TotalSelectedAmountUSDAtom = atom((get) => {
   const state = get(ClaimRewardsStateReducerAtom);
   return state.rewards
     .filter((reward) => reward.is_selected)
-    .reduce((total, reward) => total + reward.amount_e8s, 0n);
+    .reduce((total, reward) => total + reward.amount_usd, 0);
 });
 
 export const IsDisabledClaimingRewardsAtom = atom((get) => {
