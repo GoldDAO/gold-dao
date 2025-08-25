@@ -1,4 +1,5 @@
 pub mod accounts;
+pub mod daily_analytics;
 pub mod ledgers;
 pub mod manage_stake_position_interface;
 pub mod proposals;

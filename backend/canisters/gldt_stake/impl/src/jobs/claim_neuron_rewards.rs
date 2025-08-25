@@ -21,14 +21,15 @@ pub fn start_job() {
 fn spawn_claim_rewards_job() {
     ic_cdk::futures::spawn(claim_rewards_impl());
 }
-
 async fn claim_rewards_impl() {
+    let _span = tracing::info_span!("CLAIM_NEURON_REWARDS").entered();
     let now = timestamp_millis();
-    info!("CLAIM_NEURON_REWARDS :: start");
 
     if !is_allowed_to_run(now) {
         return;
     }
+
+    info!("start");
 
     let neurons = read_state(|s| s.data.neuron_system.get_neurons());
     let neuron_ids: Vec<NeuronId> = neurons.iter().filter_map(|n| n.id.clone()).collect();
@@ -52,24 +53,23 @@ async fn claim_rewards_impl() {
     for (idx, result) in results.into_iter().enumerate() {
         let (neuron_id, token_symbol) = &neuron_token_pairs[idx];
         match result {
+            Ok(balance) if balance >= CLAIM_REWARDS_THRESHOLD => {
+                claim_reward_args.push(
+                    sns_rewards_api_canister::claim_rewards_batch::ClaimRewardArgs {
+                        neuron_id: neuron_id.clone(),
+                        token: *token_symbol,
+                    },
+                );
+            }
             Ok(balance) => {
-                if balance >= CLAIM_REWARDS_THRESHOLD {
-                    claim_reward_args.push(
-                        sns_rewards_api_canister::claim_rewards_batch::ClaimRewardArgs {
-                            neuron_id: neuron_id.clone(),
-                            token: *token_symbol,
-                        },
-                    );
-                } else {
-                    info!(
-                        "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: balance below threshold: {}",
-                        neuron_id, token_symbol, balance
-                    );
-                }
+                info!(
+                    "neuron id - {} :: token - {:?} :: balance below threshold: {}",
+                    neuron_id, token_symbol, balance
+                );
             }
             Err(e) => {
                 error!(
-                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: error: {}",
+                    "neuron id - {} :: token - {:?} :: error: {}",
                     neuron_id, token_symbol, e
                 );
             }
@@ -77,45 +77,43 @@ async fn claim_rewards_impl() {
     }
 
     if claim_reward_args.is_empty() {
-        info!("CLAIM_NEURON_REWARDS :: no eligible neurons found for claiming rewards.");
+        info!("no eligible neurons found for claiming rewards.");
         return;
     }
 
     let claim_reward_args_len = claim_reward_args.len();
     let sns_rewards_canister_id = read_state(|s| s.data.goldao_sns_rewards_canister_id);
-    let args = BatchClaimArgs {
-        claim_reward_args: claim_reward_args,
-    };
+    let args = BatchClaimArgs { claim_reward_args };
 
     match sns_rewards_c2c_client::claim_rewards_batch(sns_rewards_canister_id, args).await {
         Ok(ClaimResponse::Ok(())) => {
             info!(
-                "CLAIM_NEURON_REWARDS :: successfully claimed rewards for {} entries",
+                "successfully claimed rewards for {} entries",
                 claim_reward_args_len
             );
         }
         Ok(ClaimResponse::Err(errors)) => {
             for error in errors {
                 error!(
-                    "CLAIM_NEURON_REWARDS :: neuron id - {} :: token - {:?} :: error - {:?}",
+                    "neuron id - {} :: token - {:?} :: error - {:?}",
                     error.neuron_id, error.token, error.error
                 );
             }
         }
-        Err(e) => {
-            error!("CLAIM_NEURON_REWARDS :: batch claim failed: {:?}", e);
-        }
+        Err(e) => error!("batch claim failed: {:?}", e),
     }
 
-    info!("CLAIM_NEURON_REWARDS :: finished");
+    info!("finished");
 }
 
 fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
+    let _span = tracing::info_span!("IS_ALLOWED_TO_RUN").entered();
+
     let is_awaiting = read_state(|s| s.data.unallocated_rewards_pool.is_awaiting());
     let reward_claim_interval = match read_state(|s| s.data.reward_claim_interval.clone()) {
         Some(interval) => interval,
         None => {
-            info!("CLAIM_NEURON_REWARDS :: no claim interval set, aborting");
+            info!("no claim interval set, aborting");
             return false;
         }
     };
@@ -123,7 +121,7 @@ fn is_allowed_to_run(initial_run_time: TimestampMillis) -> bool {
     let is_time_valid = reward_claim_interval.is_within_daily_interval(initial_run_time);
 
     if !is_awaiting {
-        info!("CLAIM_NEURON_REWARDS :: claim already in progress");
+        info!("claim already in progress");
         return false;
     }
 

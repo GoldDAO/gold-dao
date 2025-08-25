@@ -2,6 +2,7 @@ use std::{collections::HashMap, time::Duration};
 
 use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use assert_matches::assert_matches;
 use candid::{Nat, Principal};
 use canister_time::MINUTE_IN_MS;
@@ -227,10 +228,10 @@ pub fn create_stake_position_util_for_user(
         }),
     );
     assert_eq!(matches!(res, icrc2_approve::Response::Ok(_)), true);
-    tick_n_blocks(pic, 3);
+    tick_n_blocks(pic, 10);
 
     // create the stake position
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user_1,
         gldt_stake_canister_id.clone(),
@@ -239,7 +240,7 @@ pub fn create_stake_position_util_for_user(
         },
     )
     .unwrap();
-    tick_n_blocks(pic, 1);
+    tick_n_blocks(pic, 10);
 
     (user_1, res)
 }

@@ -6,7 +6,6 @@ use gldt_stake_common::accounts::ALLOCATED_REWARDS_POOL;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use std::collections::HashMap;
 use types::TimestampMillis;
 use types::TokenSymbol;
@@ -41,7 +40,8 @@ pub struct AllocatedRewardsPool {
     pub state: AllocatedRewardsState,
     pub last_allocation_time: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>, // all the previous rewards added together when a transfer from processing pool has been processed. useful for APY calculations
-    pub daily_allocated_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // daily reward history - keeps track of the total rewards for each week that have been allocated for each token
+    // pub daily_allocated_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // daily reward history - keeps track of the total rewards for each week that have been allocated for each token
+    pub cached_rewards: HashMap<TokenSymbol, Nat>,
 }
 
 impl AllocatedRewardsPool {
@@ -50,17 +50,20 @@ impl AllocatedRewardsPool {
             state: AllocatedRewardsState::default(),
             last_allocation_time: 0,
             reward_history: HashMap::default(),
-            daily_allocated_rewards: BTreeMap::default(),
+            // daily_allocated_rewards: BTreeMap::default(),
+            cached_rewards: HashMap::new(),
         }
     }
 
-    pub fn add_reward(&mut self, timestamp: TimestampMillis, token: TokenSymbol, amount: Nat) {
-        self.daily_allocated_rewards
-            .entry(timestamp) // Get or insert the inner HashMap
-            .or_default()
-            .entry(token) // Get or insert the Nat value
-            .and_modify(|existing| *existing += amount.clone())
+    pub fn add_to_cached_rewards(&mut self, token: TokenSymbol, amount: Nat) {
+        self.cached_rewards
+            .entry(token)
+            .and_modify(|existing: &mut Nat| *existing += amount.clone())
             .or_insert(amount);
+    }
+
+    pub fn clear_cached_rewards(&mut self) {
+        self.cached_rewards.clear();
     }
 
     pub fn add_to_reward_history(&mut self, token_symbol: &TokenSymbol, rewards: Nat) {
@@ -117,79 +120,33 @@ pub fn calculate_total_weighted_stake(stake_positions: &[(Principal, StakePositi
         })
 }
 
-impl std::fmt::Display for AllocatedRewardsPool {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        fn write_line<T: std::fmt::Display>(
-            f: &mut std::fmt::Formatter<'_>,
-            indent: usize,
-            content: T,
-        ) -> std::fmt::Result {
-            for _ in 0..indent {
-                write!(f, "  ")?; // 4 spaces per indent level
-            }
-            writeln!(f, "{content}")
-        }
-
-        write_line(f, 0, "{")?;
-        write_line(f, 1, format!("state: {:?}", self.state))?;
-        write_line(
-            f,
-            1,
-            format!("last_allocation_time: {}", self.last_allocation_time),
-        )?;
-
-        write_line(f, 1, "reward_history:")?;
-        for (token, nat) in &self.reward_history {
-            let amount = u128::try_from(nat.0.clone()).unwrap();
-            write_line(f, 2, format!("{token}: {amount}"))?;
-        }
-
-        write_line(f, 1, "daily_allocated_rewards:")?;
-        for (timestamp, rewards) in &self.daily_allocated_rewards {
-            write_line(f, 2, format!("{timestamp}:"))?;
-            for (token, nat) in rewards {
-                let amount = u128::try_from(nat.0.clone()).unwrap();
-                write_line(f, 3, format!("{token}: {amount}"))?;
-            }
-        }
-
-        write_line(f, 0, "}")
-    }
-}
-
 #[derive(CandidType, Debug, Clone, Serialize, Deserialize)]
 pub struct AllocatedRewardsPoolMetrics {
     pub state: AllocatedRewardsState,
     pub last_allocation_time: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, u128>,
-    pub daily_allocated_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, u128>>,
+    pub cached_rewards: HashMap<TokenSymbol, u128>,
 }
 
-impl Into<AllocatedRewardsPoolMetrics> for AllocatedRewardsPool {
-    fn into(self) -> AllocatedRewardsPoolMetrics {
-        let reward_history = self
+impl From<AllocatedRewardsPool> for AllocatedRewardsPoolMetrics {
+    fn from(pool: AllocatedRewardsPool) -> Self {
+        let reward_history = pool
             .reward_history
             .iter()
-            .map(|(k, v)| (k.clone(), u128::try_from(v.0.clone()).unwrap()))
+            .map(|(k, v)| (*k, u128::try_from(v.0.clone()).unwrap()))
             .collect();
 
-        let daily_allocated_rewards = self
-            .daily_allocated_rewards
+        let cached_rewards = pool
+            .cached_rewards
             .iter()
-            .map(|(ts, map)| {
-                let converted_map = map
-                    .iter()
-                    .map(|(k, v)| (k.clone(), u128::try_from(v.0.clone()).unwrap()))
-                    .collect();
-                (*ts, converted_map)
-            })
+            .map(|(k, v)| (*k, u128::try_from(v.0.clone()).unwrap()))
             .collect();
 
         AllocatedRewardsPoolMetrics {
-            state: self.state.clone(),
-            last_allocation_time: self.last_allocation_time,
+            state: pool.state.clone(),
+            last_allocation_time: pool.last_allocation_time,
             reward_history,
-            daily_allocated_rewards,
+            cached_rewards,
         }
     }
 }

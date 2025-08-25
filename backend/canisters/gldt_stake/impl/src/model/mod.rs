@@ -1,4 +1,5 @@
 pub mod allocated_rewards_pool;
+pub mod analytics_system;
 pub mod event_transaction;
 pub mod neuron_system;
 pub mod processing_rewards_pool;

@@ -16,53 +16,55 @@ pub fn sync_token_usd_values_job() {
 }
 
 async fn sync_token_usd_values_impl() {
-    trace!("Starting sync_token_usd_values_impl");
+    let _span = tracing::info_span!("TRANSFER_INSTANT_DISSOLVE_FEES").entered();
+
+    info!("start");
 
     let mut tokens = read_state(|s| s.data.stake_system.reward_types.clone());
-    trace!("Loaded reward_types: {:?}", tokens);
+    trace!("loaded reward_types: {:?}", tokens);
 
     tokens.insert(TokenSymbol::GLDT);
     trace!(
-        "Added GLDT token to token set. Tokens to process: {:?}",
+        "added GLDT token to token set. Tokens to process: {:?}",
         tokens
     );
 
     let mut new_price_map: HashMap<TokenSymbol, f64> = HashMap::new();
     let current_price_map = read_state(|s| s.data.stake_system.token_usd_values.clone());
-    trace!("Current token_usd_values: {:?}", current_price_map);
+    trace!("current token_usd_values: {:?}", current_price_map);
 
     for token_symbol in tokens {
         let ledger_id = token_symbol.get_token_info().ledger_id;
         info!(
-            "Fetching USD value for token: {:?}, ledger_id: {:?}",
+            "fetching USD value for token: {:?}, ledger_id: {:?}",
             token_symbol, ledger_id
         );
 
         match getToken(ICPSWAP_TOKEN_CANISTER_ID, &(ledger_id.to_string())).await {
             Ok(token_info) => {
                 info!(
-                    "Fetched price for {:?}: ${}",
+                    "fetched price for {:?}: ${}",
                     token_symbol, token_info.priceUSD
                 );
                 new_price_map.insert(token_symbol, token_info.priceUSD);
             }
             Err(e) => {
                 error!(
-                    "Error fetching {:?} USD value: {:?}. Falling back to current or 0.",
+                    "error fetching {:?} USD value: {:?}. Falling back to current or 0.",
                     token_symbol, e
                 );
                 let current_token_price = current_price_map.get(&token_symbol).unwrap_or(&0f64);
                 new_price_map.insert(token_symbol, *current_token_price);
                 debug!(
-                    "Fallback price used for {:?}: {}",
+                    "fallback price used for {:?}: {}",
                     token_symbol, current_token_price
                 );
             }
         }
     }
 
-    trace!("New token_usd_values to be saved: {:?}", new_price_map);
+    trace!("new token_usd_values to be saved: {:?}", new_price_map);
     mutate_state(|s| s.data.stake_system.set_token_usd_values(new_price_map));
 
-    info!("Finished syncing token USD values");
+    info!("finished");
 }

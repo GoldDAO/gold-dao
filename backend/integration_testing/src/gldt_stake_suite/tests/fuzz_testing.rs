@@ -1,5 +1,5 @@
 use crate::client::gldt_stake::_get_state_snapshot;
-use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::default_test_setup;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
@@ -163,7 +163,7 @@ fn fuzz_test_manage_stake_position() {
 
         println!("Action {}: {:?}", i, action);
 
-        let response = manage_stake_position(pic, user, gldt_stake_canister_id, &action);
+        let response = manage_stake_position_with_tick(pic, user, gldt_stake_canister_id, &action);
         println!("Response {}: {:?}", i, response);
         tick_n_blocks(pic, 1);
 

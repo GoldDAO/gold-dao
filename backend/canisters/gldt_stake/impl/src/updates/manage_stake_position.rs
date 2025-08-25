@@ -24,7 +24,7 @@ async fn manage_stake_position(args: ManageStakePositionArgs) -> ManageStakePosi
         .map_err(|e| ManageStakePositionError::GeneralError(GeneralError::AlreadyProcessing(e)))?;
 
     // 1. match the operation over position and call the appropriate implementation
-    let response = match args {
+    match args {
         ManageStakePositionArgs::AddStake { amount } => add_stake_impl(caller, amount).await,
 
         other_args => {
@@ -57,9 +57,7 @@ async fn manage_stake_position(args: ManageStakePositionArgs) -> ManageStakePosi
                 ManageStakePositionArgs::AddStake { .. } => unreachable!(),
             }
         }
-    };
-
-    response
+    }
 }
 
 fn load_stake_position(caller: Principal) -> Result<StakePosition, ManageStakePositionError> {

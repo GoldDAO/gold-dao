@@ -3,6 +3,8 @@ pub mod get_all_rewards_history;
 pub mod get_all_stake_positions;
 pub mod get_apy_overall;
 pub mod get_apy_timeseries;
+pub mod get_daily_analytics;
+pub mod get_gldt_staked_history;
 pub mod get_neurons;
 pub mod get_position;
 pub mod get_proposal_votes_of_neuron;

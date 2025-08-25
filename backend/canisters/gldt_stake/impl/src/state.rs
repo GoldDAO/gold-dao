@@ -1,5 +1,6 @@
 use crate::model::allocated_rewards_pool::AllocatedRewardsPool;
 use crate::model::allocated_rewards_pool::AllocatedRewardsPoolMetrics;
+use crate::model::analytics_system::AnalyticsSystem;
 use crate::model::processing_rewards_pool::ProcessingRewardsPool;
 use crate::model::unallocated_rewards_pool::*;
 use bity_ic_icrc3::transaction::TransactionType;
@@ -54,14 +55,15 @@ impl RuntimeState {
             whitelist: self.data.whitelist.clone(),
 
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
-            daily_weighted_staked_gldt: self.data.stake_system.daily_weighted_staked_gldt.clone(),
-            daily_apy_timestamp: self.data.stake_system.daily_apy_timestamp,
+            // daily_weighted_staked_gldt: self.data.stake_system.daily_weighted_staked_gldt.clone(),
+            daily_apy_timestamp: self.data.stake_system.cached_daily_timestamp,
             total_active_stake_positions: self.data.stake_system.active_stake_positions(),
             token_usd_values: self.data.stake_system.token_usd_values.clone(),
             genesis_datetime: self.data.stake_system.genesis_datetime,
             reward_types: self.data.stake_system.reward_types.clone(),
             reward_history: self.data.allocated_rewards_pool.reward_history.clone(),
             neurons: self.data.neuron_system.neurons.clone(),
+            pending_fee_transfer_amount: self.data.stake_system.pending_fee_transfer_amount.clone(),
 
             gldt_ledger_id: self.data.gldt_ledger_id,
             goldao_ledger_id: self.data.goldao_ledger_id,
@@ -105,13 +107,14 @@ pub struct Metrics {
     pub whitelist: Vec<Principal>,
     pub total_staked: String,
     pub total_active_stake_positions: usize,
-    pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+    // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
     pub daily_apy_timestamp: TimestampMillis,
     pub token_usd_values: HashMap<TokenSymbol, f64>,
     pub genesis_datetime: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>,
     pub neurons: Vec<Neuron>,
     pub reward_types: BTreeSet<TokenSymbol>,
+    pub pending_fee_transfer_amount: Nat,
 
     // ledgers and canister ids
     pub gldt_ledger_id: Principal,
@@ -151,6 +154,7 @@ pub struct Data {
     pub stake_system: StakeSystem,
     pub neuron_system: NeuronSystem,
     pub proposal_system: ProposalSystem,
+    pub analytics_system: AnalyticsSystem,
 
     // rewards pools
     pub unallocated_rewards_pool: UnallocatedRewardsPool,
@@ -173,7 +177,6 @@ impl Default for Data {
             goldao_sns_rewards_canister_id: Principal::anonymous(),
             goldao_sns_governance_canister_id: Principal::anonymous(),
             neuron_system: NeuronSystem::default(),
-            // reward_system: RewardSystem::default(),
             reward_claim_interval: Some(TimeInterval {
                 weekday: Some("Thursday".to_string()),
                 start_hour: 12,
@@ -189,6 +192,7 @@ impl Default for Data {
             allocated_rewards_pool: AllocatedRewardsPool::new_allocated(),
             principal_guards: BTreeSet::new(),
             proposal_system: ProposalSystem::default(),
+            analytics_system: AnalyticsSystem::default(),
         }
     }
 }

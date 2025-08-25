@@ -18,6 +18,9 @@ utils = { path = '../../../libraries/utils' }
 ic0 = "0.23.0"
 time = {workspace = true}
 ic-cdk = { workspace = true }
+hex = { workspace = true }
+minicbor = { workspace = true }
+ic-stable-structures = { workspace = true }
 
 [dev-dependencies]
 assert_matches = { workspace = true }

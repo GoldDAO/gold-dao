@@ -23,13 +23,15 @@ pub struct StakeSystem {
     pub genesis_datetime: TimestampMillis,
     // usd price of reward tokens + gldt - used for APY calculations
     pub token_usd_values: HashMap<TokenSymbol, f64>,
+
     #[serde(skip, default = "init_daily_apy_history")]
     pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
-    pub daily_apy_timestamp: TimestampMillis,
-    pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+    pub cached_daily_timestamp: TimestampMillis,
+    // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+    // pub daily_staked_gldt: HashMap<TimestampMillis, Nat>,
 }
 
-fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
+pub fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
     let memory = get_daily_apy_memory();
     StableBTreeMap::init(memory)
 }
@@ -47,8 +49,9 @@ impl Default for StakeSystem {
             genesis_datetime: now,
             token_usd_values: HashMap::new(),
             daily_apy_history: init_daily_apy_history(),
-            daily_apy_timestamp: now,
-            daily_weighted_staked_gldt: HashMap::new(),
+            cached_daily_timestamp: now,
+            // daily_weighted_staked_gldt: HashMap::new(),
+            // daily_staked_gldt: HashMap::new(),
         }
     }
 }
@@ -144,6 +147,6 @@ impl StakeSystem {
     }
 
     pub fn bump_daily_timestamp(&mut self) {
-        self.daily_apy_timestamp += DAY_IN_MS;
+        self.cached_daily_timestamp += DAY_IN_MS;
     }
 }

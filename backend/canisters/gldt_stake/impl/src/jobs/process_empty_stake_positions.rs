@@ -16,10 +16,11 @@ fn spawn_process_empty_stake_positions_job() {
 }
 
 async fn process_empty_stake_positions_impl() {
-    info!("PROCESS_EMPTY_STAKE_POSITIONS :: start");
+    let _span = tracing::info_span!("PROCESS_EMPTY_STAKE_POSITIONS").entered();
+    info!("start");
 
     let _removed_stake_positions =
         mutate_state(|s| s.data.stake_system.remove_all_empty_stake_positions());
 
-    info!("PROCESS_EMPTY_STAKE_POSITIONS :: finished");
+    info!("finished");
 }

@@ -1,9 +1,9 @@
-use candid::CandidType;
-use candid::Nat;
-use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use std::collections::HashMap;
-use types::TokenSymbol;
+
+use candid::CandidType;
+use gldt_stake_common::daily_analytics::DailyAnalytics;
+use serde::{Deserialize, Serialize};
+use types::TimestampMillis;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct Args {
@@ -11,4 +11,4 @@ pub struct Args {
     pub limit: Option<usize>,
 }
 
-pub type Response = BTreeMap<u64, HashMap<TokenSymbol, Nat>>;
+pub type Response = BTreeMap<TimestampMillis, DailyAnalytics>;

@@ -11,7 +11,9 @@ use tracing::info;
 use types::TokenSymbol;
 
 pub async fn process_rewards_impl() -> Result<(), BTreeSet<TokenSymbol>> {
-    info!("PROCESS_REWARDS :: start");
+    let _span = tracing::info_span!("PROCESS_REWARDS").entered();
+
+    info!("start");
 
     let reward_types = read_state(|s| s.data.stake_system.reward_types.clone());
     let unallocated_rewards_pool = read_state(|s| s.data.unallocated_rewards_pool.clone());
@@ -24,21 +26,21 @@ pub async fn process_rewards_impl() -> Result<(), BTreeSet<TokenSymbol>> {
         match transfer_result {
             Ok(rewards_to_allocate) => {
                 info!(
-                    "PROCESS_REWARDS :: transfer successful for token: {}, rewards to allocate: {}",
+                    "transfer successful for token: {}, rewards to allocate: {}",
                     token_symbol, rewards_to_allocate
                 );
             }
             Err(err) => match &err {
                 GeneralError::CallError(err) | GeneralError::TransferError(err) => {
                     error!(
-                        "PROCESS_REWARDS :: transfer failed for token: {}, error: {}",
+                        "transfer failed for token: {}, error: {}",
                         token_symbol, err
                     );
                     errors.insert(token_symbol);
                 }
                 _ => {
                     debug!(
-                        "PROCESS_REWARDS :: ignoring non-transfer error for token: {}, error: {:?}",
+                        "ignoring non-transfer error for token: {}, error: {:?}",
                         token_symbol, err
                     );
                 }
@@ -46,7 +48,7 @@ pub async fn process_rewards_impl() -> Result<(), BTreeSet<TokenSymbol>> {
         }
     }
 
-    info!("PROCESS_REWARDS :: finished");
+    info!("finished");
 
     if errors.is_empty() {
         Ok(())
@@ -81,8 +83,5 @@ pub async fn batch_rewards_transfer(
         s.data.unallocated_rewards_pool.transition_to_awaiting();
     });
 
-    token_symbols
-        .into_iter()
-        .zip(results.into_iter().map(|r| r.map_err(|e| e)))
-        .collect()
+    token_symbols.into_iter().zip(results.into_iter()).collect()
 }
