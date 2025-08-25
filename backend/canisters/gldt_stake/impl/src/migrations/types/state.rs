@@ -33,7 +33,7 @@ pub struct DataV0 {
     pub allocate_rewards_interval: Option<TimeInterval>,
 }
 
-use crate::memory::get_daily_apy_memory;
+// use crate::memory::get_daily_apy_memory;
 use crate::memory::VM;
 use candid::Nat;
 use gldt_stake_common::stake_position::StakePosition;
@@ -52,15 +52,10 @@ pub struct StakeSystemV0 {
     pub pending_fee_transfer_amount: Nat,
     pub genesis_datetime: TimestampMillis,
     pub token_usd_values: HashMap<TokenSymbol, f64>,
-    #[serde(skip, default = "init_daily_apy_history")]
-    pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
+    // #[serde(skip, default = "init_daily_apy_history")]
+    // pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
     pub daily_apy_timestamp: TimestampMillis,
     pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
-}
-
-fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
-    let memory = get_daily_apy_memory();
-    StableBTreeMap::init(memory)
 }
 
 use crate::model::allocated_rewards_pool::AllocatedRewardsState;

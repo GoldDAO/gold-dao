@@ -214,10 +214,6 @@ fn calculate_daily_variables() {
     );
 
     mutate_state(|s| {
-        let ts = timestamp_millis();
-
-        s.data.stake_system.daily_apy_history.insert(ts, apy);
-
         s.data.analytics_system.insert_daily_analytics(
             apy,
             s.data.stake_system.total_staked.clone(),
