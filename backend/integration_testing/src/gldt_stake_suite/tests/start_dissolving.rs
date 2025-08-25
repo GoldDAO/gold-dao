@@ -1,5 +1,5 @@
 use crate::client::gldt_stake::get_position;
-use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
@@ -31,7 +31,7 @@ fn test_start_dissolving() {
         5_000_000_000u128,
     );
 
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -67,7 +67,7 @@ fn test_start_dissolving_partial() {
         100_000_000_000_u128,
     );
 
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -105,7 +105,7 @@ fn test_start_dissolving_limit() {
 
     // --- Create 5 legit dissolvements ---
     for _ in 0..=4 {
-        let response = manage_stake_position(
+        let response = manage_stake_position_with_tick(
             pic,
             user,
             gldt_stake_canister_id,
@@ -118,7 +118,7 @@ fn test_start_dissolving_limit() {
     tick_n_blocks(pic, 1);
 
     // --- Create the 6th not legit dissolvements ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,

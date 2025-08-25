@@ -1,12 +1,10 @@
 use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_total_staked;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::utils::add_stake;
 use crate::gldt_stake_suite::utils::create_whitelisted_user_with_funds;
 use crate::{
-    client::{
-        gldt_stake::{get_position, manage_stake_position},
-        icrc1_icrc2_token::icrc2_approve,
-    },
+    client::{gldt_stake::get_position, icrc1_icrc2_token::icrc2_approve},
     gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv},
     utils::tick_n_blocks,
 };
@@ -71,7 +69,7 @@ fn add_stake_new_position_works() {
     tick_n_blocks(pic, 2);
 
     // --- Perform stake operation ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id.clone(),
@@ -181,7 +179,7 @@ fn increase_stake_position_invalid_caller() {
 
     // --- Stake with anonymous caller ---
     let amount_to_add = 10_000_000_000;
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
         gldt_stake_canister_id,
@@ -400,7 +398,7 @@ fn add_stake_new_position_without_allowance() {
     // --- Perform stake operation ---
     let stake_amount = 1_000_000_000u128;
     let total_approval = stake_amount + GLDT_TX_FEE as u128;
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id.clone(),
@@ -475,7 +473,7 @@ fn add_stake_new_position_after_dissolving() {
     tick_n_blocks(pic, 2);
 
     // --- Perform stake operation ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id.clone(),
@@ -489,7 +487,7 @@ fn add_stake_new_position_after_dissolving() {
     assert_eq!(response.age_bonus_multiplier, 1.0);
 
     // --- Dissolve position ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -518,7 +516,7 @@ fn add_stake_new_position_after_dissolving() {
         },
     );
 
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id.clone(),

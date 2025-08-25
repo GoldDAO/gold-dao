@@ -90,7 +90,7 @@ fn test_can_claim_gldt_stake_rewards() {
         .get(&TokenSymbol::GOLDAO)
         .unwrap()
         .clone();
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id.clone(),
@@ -136,7 +136,7 @@ fn test_claim_rewards_guards_as_anonymous_principal() {
     );
 
     // --- Check that calls with anonymous callers are rejected ---
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
         gldt_stake_canister_id.clone(),
@@ -199,7 +199,7 @@ fn test_claim_rewards_twice() {
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
-    let _res = manage_stake_position(
+    let _res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -207,7 +207,7 @@ fn test_claim_rewards_twice() {
             tokens: vec![TokenSymbol::GOLDAO],
         },
     );
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -265,14 +265,14 @@ fn test_claim_rewards_empty() {
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
-    let _res = manage_stake_position(
+    let _res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
         &manage_stake_position::Args::ClaimRewards { tokens: vec![] },
     );
     println!("_res: {:?}", _res);
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,

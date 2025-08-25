@@ -8,15 +8,14 @@ use crate::state::read_state;
 
 #[query]
 #[trace]
-fn get_all_rewards_history() -> GetAllRewardsHistoryResponse {
-    get_all_rewards_history_impl()
+fn get_all_rewards_history(args: GetAllRewardsHistoryArgs) -> GetAllRewardsHistoryResponse {
+    get_all_rewards_history_impl(args)
 }
 
-fn get_all_rewards_history_impl() -> GetAllRewardsHistoryResponse {
+fn get_all_rewards_history_impl(args: GetAllRewardsHistoryArgs) -> GetAllRewardsHistoryResponse {
     read_state(|s| {
         s.data
-            .allocated_rewards_pool
-            .daily_allocated_rewards
-            .clone()
+            .analytics_system
+            .get_rewards(args.starting_day, args.limit)
     })
 }

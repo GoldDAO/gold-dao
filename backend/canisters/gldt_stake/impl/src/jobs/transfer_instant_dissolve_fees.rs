@@ -22,25 +22,26 @@ pub fn transfer_instant_dissolve_fees_job() {
 }
 
 async fn transfer_instant_dissolve_fees_impl() {
-    info!("TRANSFER INSTANT DISSOLVE FEES :: start");
+    let _span = tracing::info_span!("TRANSFER_INSTANT_DISSOLVE_FEES").entered();
+
+    info!("start");
+
     let fees_available = read_state(|s| s.data.stake_system.pending_fee_transfer_amount.clone());
     if fees_available <= GLDT_TX_FEE {
-        info!("TRANSFER INSTANT DISSOLVE FEES :: Not enough GLDT early withdraw fees to transfer at this moment");
+        info!("Not enough GLDT early withdraw fees to transfer at this moment");
         return;
     }
     let amount_to_transfer = fees_available.clone() - Nat::from(GLDT_TX_FEE);
     match transfer_to_fee_account(amount_to_transfer.clone()).await {
         Ok(_) => {
             mutate_state(|s| s.data.stake_system.pending_fee_transfer_amount -= fees_available);
-            info!(
-                "TRANSFER INSTANT DISSOLVE FEES :: {amount_to_transfer:?} transferred to fee account"
-            );
+            info!("{amount_to_transfer:?} transferred to fee account");
         }
         Err(e) => {
-            error!("TRANSFER INSTANT DISSOLVE FEES :: failed to transfer to fee account {e:?}")
+            error!("failed to transfer to fee account {e:?}")
         }
     }
-    info!("TRANSFER INSTANT DISSOLVE FEES :: finished");
+    info!("finished");
 }
 
 async fn transfer_to_fee_account(amount_for_early_withdraw: Nat) -> Result<(), String> {
