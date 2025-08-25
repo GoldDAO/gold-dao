@@ -19,7 +19,7 @@ const StakeInformations = ({ className }: { className?: string }) => {
 
   const infos: Array<{ title: string; subtitle: string; icon: ReactNode }> = [
     {
-      title: "Minimum Stake of 10 GLDT",
+      title: "Staking rewards will be paid in tokens GOLDAO, ICP and OGY.",
       subtitle: "",
       icon: <Logo name="gldt" className="w-8" />,
     },
