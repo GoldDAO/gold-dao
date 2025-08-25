@@ -10,13 +10,6 @@ export const idlFactory = ({ IDL }) => {
     version: BuildVersion,
     commit_hash: IDL.Text,
   });
-  const TokenSymbol = IDL.Variant({
-    ICP: IDL.Null,
-    OGY: IDL.Null,
-    WTN: IDL.Null,
-    GOLDAO: IDL.Null,
-    GLDT: IDL.Null,
-  });
   const Duration = IDL.Record({ secs: IDL.Nat64, nanos: IDL.Nat32 });
   const ICRC3Properties = IDL.Record({
     max_blocks_per_response: IDL.Nat,
@@ -38,7 +31,7 @@ export const idlFactory = ({ IDL }) => {
     supported_blocks: IDL.Vec(SupportedBlockType),
   });
   const InitArgs = IDL.Record({
-    allowed_reward_tokens: IDL.Vec(TokenSymbol),
+    allowed_reward_tokens: IDL.Vec(IDL.Text),
     whitelist: IDL.Vec(IDL.Principal),
     test_mode: IDL.Bool,
     authorized_principals: IDL.Vec(IDL.Principal),
@@ -51,6 +44,28 @@ export const idlFactory = ({ IDL }) => {
     gld_sns_rewards_canister_id: IDL.Principal,
   });
   const Args_7 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  const Result = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
+  const TokenSymbol = IDL.Variant({
+    ICP: IDL.Null,
+    OGY: IDL.Null,
+    WTN: IDL.Null,
+    GOLDAO: IDL.Null,
+    GLDT: IDL.Null,
+  });
+  const Result_1 = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
+  const Args = IDL.Record({ amount: IDL.Nat64 });
+  const CreateNeuronError = IDL.Variant({
+    TransferError: IDL.Text,
+    InternalError: IDL.Text,
+  });
+  const Result_2 = IDL.Variant({
+    Ok: IDL.Vec(IDL.Nat8),
+    Err: CreateNeuronError,
+  });
+  const Args_1 = IDL.Record({
+    starting_day: IDL.Nat64,
+    limit: IDL.Opt(IDL.Nat64),
+  });
   const ClaimRewardStatus = IDL.Variant({
     Failed: IDL.Text,
     None: IDL.Null,
@@ -90,29 +105,15 @@ export const idlFactory = ({ IDL }) => {
     dissolve_events: IDL.Vec(DissolveStakeEvent),
     withdraw_state: WithdrawState,
   });
-  const StateSnapshot = IDL.Record({
-    total_staked: IDL.Nat,
-    position: IDL.Opt(StakePosition),
-  });
-  const Args = IDL.Record({
-    principal: IDL.Principal,
-    state: WithdrawState,
-  });
-  const Result = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
-  const Result_1 = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
-  const Result_2 = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
-  const Args_1 = IDL.Record({ amount: IDL.Nat64 });
-  const CreateNeuronError = IDL.Variant({
-    TransferError: IDL.Text,
-    InternalError: IDL.Text,
-  });
-  const Result_3 = IDL.Variant({
-    Ok: IDL.Vec(IDL.Nat8),
-    Err: CreateNeuronError,
-  });
   const Args_2 = IDL.Record({
     starting_day: IDL.Nat64,
     limit: IDL.Opt(IDL.Nat64),
+  });
+  const DailyAnalytics = IDL.Record({
+    apy: IDL.Float64,
+    staked_gldt: IDL.Nat,
+    rewards: IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Nat)),
+    weighted_stake: IDL.Nat,
   });
   const NeuronId = IDL.Record({ id: IDL.Vec(IDL.Nat8) });
   const NeuronPermission = IDL.Record({
@@ -528,10 +529,11 @@ export const idlFactory = ({ IDL }) => {
     WithdrawError: WithdrawRequestErrors,
     ClaimRewardError: IDL.Vec(ClaimRewardErrors),
   });
-  const Result_4 = IDL.Variant({
+  const Result_3 = IDL.Variant({
     Ok: StakePositionResponse,
     Err: ManageStakePositionError,
   });
+  const Result_4 = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
   const Args_6 = IDL.Record({
     dissovle_event_id: IDL.Nat8,
     stake_position_user: IDL.Principal,
@@ -539,27 +541,21 @@ export const idlFactory = ({ IDL }) => {
   });
   const Result_5 = IDL.Variant({ Ok: IDL.Nat, Err: GeneralError });
   return IDL.Service({
-    _get_state_snapshot: IDL.Func([IDL.Null], [StateSnapshot], ["query"]),
-    _set_position_withdraw_state: IDL.Func([Args], [Result], []),
-    _set_token_usd_values: IDL.Func(
-      [IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Float64))],
+    add_whitelisted_principal: IDL.Func([IDL.Vec(IDL.Principal)], [Result], []),
+    allocated_rewards_balance: IDL.Func(
       [IDL.Null],
-      []
-    ),
-    add_whitelisted_principal: IDL.Func(
-      [IDL.Vec(IDL.Principal)],
-      [Result_1],
-      []
-    ),
-    allocated_rewards_balance_inner_: IDL.Func(
-      [IDL.Null],
-      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_2))],
+      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_1))],
       []
     ),
     commit: IDL.Func([], [], []),
-    create_neuron: IDL.Func([Args_1], [Result_3], []),
+    create_neuron: IDL.Func([Args], [Result_2], []),
+    get_all_gldt_staked_history: IDL.Func(
+      [Args_1],
+      [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Nat))],
+      ["query"]
+    ),
     get_all_rewards_history: IDL.Func(
-      [],
+      [Args_1],
       [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Nat))))],
       ["query"]
     ),
@@ -572,6 +568,11 @@ export const idlFactory = ({ IDL }) => {
     get_apy_timeseries: IDL.Func(
       [Args_2],
       [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Float64))],
+      ["query"]
+    ),
+    get_daily_analytics: IDL.Func(
+      [Args_2],
+      [IDL.Vec(IDL.Tuple(IDL.Nat64, DailyAnalytics))],
       ["query"]
     ),
     get_neurons: IDL.Func([IDL.Null], [IDL.Vec(Neuron)], ["query"]),
@@ -624,15 +625,15 @@ export const idlFactory = ({ IDL }) => {
       ["query"]
     ),
     manage_sns_neuron: IDL.Func([Args_5], [Response], []),
-    manage_stake_position: IDL.Func([ManageStakePositionArgs], [Result_4], []),
-    manual_sync_neurons: IDL.Func([IDL.Null], [Result], []),
-    processing_rewards_balance_inner_: IDL.Func(
+    manage_stake_position: IDL.Func([ManageStakePositionArgs], [Result_3], []),
+    manual_sync_neurons: IDL.Func([IDL.Null], [Result_4], []),
+    processing_rewards_balance: IDL.Func(
       [IDL.Null],
-      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_2))],
+      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_1))],
       []
     ),
-    set_dissolve_event_time: IDL.Func([Args_6], [Result], []),
-    unallocated_rewards_balance_inner_: IDL.Func(
+    set_dissolve_event_time: IDL.Func([Args_6], [Result_4], []),
+    unallocated_rewards_balance: IDL.Func(
       [IDL.Null],
       [IDL.Vec(IDL.Tuple(TokenSymbol, Result_5))],
       []
@@ -648,13 +649,6 @@ export const init = ({ IDL }) => {
   const UpgradeArgs = IDL.Record({
     version: BuildVersion,
     commit_hash: IDL.Text,
-  });
-  const TokenSymbol = IDL.Variant({
-    ICP: IDL.Null,
-    OGY: IDL.Null,
-    WTN: IDL.Null,
-    GOLDAO: IDL.Null,
-    GLDT: IDL.Null,
   });
   const Duration = IDL.Record({ secs: IDL.Nat64, nanos: IDL.Nat32 });
   const ICRC3Properties = IDL.Record({
@@ -677,7 +671,7 @@ export const init = ({ IDL }) => {
     supported_blocks: IDL.Vec(SupportedBlockType),
   });
   const InitArgs = IDL.Record({
-    allowed_reward_tokens: IDL.Vec(TokenSymbol),
+    allowed_reward_tokens: IDL.Vec(IDL.Text),
     whitelist: IDL.Vec(IDL.Principal),
     test_mode: IDL.Bool,
     authorized_principals: IDL.Vec(IDL.Principal),
