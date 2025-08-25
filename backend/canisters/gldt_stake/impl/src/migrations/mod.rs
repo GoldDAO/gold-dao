@@ -38,7 +38,7 @@ impl From<RuntimeStateV0> for RuntimeState {
                     genesis_datetime: old_state.data.stake_system.genesis_datetime,
                     token_usd_values: old_state.data.stake_system.token_usd_values,
                     cached_daily_timestamp: old_state.data.stake_system.daily_apy_timestamp,
-                    daily_apy_history: old_state.data.stake_system.daily_apy_history,
+                    // daily_apy_history: old_state.data.stake_system.daily_apy_history,
                 },
                 goldao_sns_rewards_canister_id: old_state.data.goldao_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: old_state.data.goldao_sns_governance_canister_id,

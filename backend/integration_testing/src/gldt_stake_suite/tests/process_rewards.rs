@@ -131,7 +131,7 @@ fn test_process_staking_rewards() {
     );
     println!("apy_history {:?}", apy_history);
     assert_eq!(apy_history.len(), 2);
-    assert!(apy_history[1].1 > 0.0);
+    assert!(apy_history.first_key_value().unwrap().1 > &0.0);
 
     let daily_analytics = get_daily_analytics(
         pic,
