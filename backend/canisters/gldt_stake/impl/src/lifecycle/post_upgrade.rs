@@ -31,7 +31,7 @@ fn post_upgrade(args: Args) {
                 .unwrap();
 
             // uncomment these lines if you want to do an upgrade with migration
-            // let ( runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
+            // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
             //     ::deserialize(reader)
             //     .unwrap();
             // let mut state = RuntimeState::from(runtime_state_v0);

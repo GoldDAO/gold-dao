@@ -1,8 +1,6 @@
-use crate::client::gldt_stake::allocated_rewards_balance;
-use crate::client::gldt_stake::processing_rewards_balance;
-use crate::client::gldt_stake::unallocated_rewards_balance;
 use crate::client::gldt_stake::{
-    _set_token_usd_values, get_apy_overall, get_apy_timeseries, get_position,
+    _set_token_usd_values, allocated_rewards_balance, get_apy_overall, get_apy_timeseries,
+    get_daily_analytics, get_position, processing_rewards_balance, unallocated_rewards_balance,
 };
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::add_custom_rewards_to_processing_pool;
@@ -89,7 +87,6 @@ fn test_process_staking_rewards() {
     wait_1_day(pic);
     wait_1_day(pic);
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-    tick_n_blocks(pic, 10);
 
     let unallocated_rewards =
         unallocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
@@ -133,8 +130,23 @@ fn test_process_staking_rewards() {
         },
     );
     println!("apy_history {:?}", apy_history);
-    assert_eq!(apy_history.len(), 3);
-    assert!(apy_history[1].1 > 0.0);
+    assert_eq!(apy_history.len(), 2);
+    assert!(apy_history.first_key_value().unwrap().1 > &0.0);
+
+    let daily_analytics = get_daily_analytics(
+        pic,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &gldt_stake_api_canister::get_daily_analytics::Args {
+            starting_day: 0,
+            limit: None,
+        },
+    );
+
+    println!("daily_analytics {:?}", daily_analytics);
+
+    // Make sure we have entries
+    assert!(!daily_analytics.is_empty());
 }
 
 // NOTE: this test transfers rewards to the processing pool (to support the same tokens amount) and then checks that APY is increasing

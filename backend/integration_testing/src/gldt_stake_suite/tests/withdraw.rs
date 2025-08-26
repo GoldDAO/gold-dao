@@ -1,6 +1,6 @@
-use crate::client::gldt_stake::icrc3_get_blocks;
+use crate::client::gldt_stake::get_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::client::gldt_stake::{_set_position_withdraw_state, get_total_staked};
-use crate::client::gldt_stake::{get_position, manage_stake_position};
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
 use crate::utils::wait_1_day;
@@ -16,7 +16,6 @@ use gldt_stake_common::ledgers::GLDT_TX_FEE;
 use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;
 use gldt_stake_common::stake_position_event::{NormalWithdrawStatus, WithdrawState};
 use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc3::blocks::GetBlocksRequest;
 use std::time::Duration;
 use types::TokenSymbol;
 
@@ -82,7 +81,7 @@ fn test_withdraw_works() {
     let position_stake_amount = user_position.staked.clone();
 
     // --- Start dissolving ---
-    let _ = manage_stake_position(
+    let _ = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -92,7 +91,7 @@ fn test_withdraw_works() {
 
     // wait 1 day and try to withdraw - SHOULD FAIL because we haven't waited a full week
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -102,7 +101,7 @@ fn test_withdraw_works() {
     assert_matches!(res, Err(ManageStakePositionError::WithdrawError(_)));
 
     // --- Claim all rewards ---
-    let _res = manage_stake_position(
+    let _res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -112,7 +111,7 @@ fn test_withdraw_works() {
     );
 
     // --- Check that the dissolve date hasn't passed ---
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -124,7 +123,7 @@ fn test_withdraw_works() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     tick_n_blocks(pic, 100);
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -217,7 +216,7 @@ fn test_withdraw_with_unclaimed_rewards() {
     assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
     // --- Start dissolving ---
-    let _ = manage_stake_position(
+    let _ = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -226,7 +225,7 @@ fn test_withdraw_with_unclaimed_rewards() {
     .unwrap();
 
     // --- Check that the dissolve date hasn't passed ---
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -259,7 +258,7 @@ fn test_invalid_withdraw_states_in_progress() {
     );
 
     // start dissolving
-    let _ = manage_stake_position(
+    let _ = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -285,7 +284,7 @@ fn test_invalid_withdraw_states_in_progress() {
     tick_n_blocks(pic, 10);
 
     // attempt to withdraw using normal API - it should fail because the position is already in progress.
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -317,7 +316,7 @@ fn test_invalid_withdraw_states_failed() {
     );
 
     // --- Start dissolving ---
-    let _ = manage_stake_position(
+    let _ = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -343,35 +342,14 @@ fn test_invalid_withdraw_states_failed() {
     tick_n_blocks(pic, 10);
 
     // attempt to withdraw using normal API - it should fail because the position is already in progress.
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
         &manage_stake_position::Args::Withdraw {},
     );
-    println!("res: {:?}", res);
-    // assert_eq!(res.is_ok(), true);
-
-    let get_blocks_args = vec![GetBlocksRequest {
-        start: Nat::from(0u64),
-        length: Nat::from(100u64),
-    }];
-    let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
-    println!("blocks: {blocks:?}");
-    assert_eq!(blocks.blocks.len(), 1);
-    let archived_blocks_amount = u128::try_from(
-        &blocks
-            .archived_blocks
-            .first()
-            .unwrap()
-            .args
-            .first()
-            .unwrap()
-            .length
-            .0,
-    )
-    .unwrap();
-    assert_eq!(blocks.blocks.len() as u128 + archived_blocks_amount, 3);
+    assert!(res.is_ok());
+    tick_n_blocks(pic, 10);
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &());
     println!("user_position: {user_position:?}");

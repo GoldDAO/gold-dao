@@ -1,4 +1,4 @@
-use crate::memory::{get_daily_apy_memory, VM};
+// use crate::memory::{get_daily_apy_memory, VM};
 use candid::{Nat, Principal};
 use canister_time::{timestamp_millis, DAY_IN_MS};
 use gldt_stake_common::stake_position::StakePosition;
@@ -23,16 +23,18 @@ pub struct StakeSystem {
     pub genesis_datetime: TimestampMillis,
     // usd price of reward tokens + gldt - used for APY calculations
     pub token_usd_values: HashMap<TokenSymbol, f64>,
-    #[serde(skip, default = "init_daily_apy_history")]
-    pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
-    pub daily_apy_timestamp: TimestampMillis,
-    pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+
+    // #[serde(skip, default = "init_daily_apy_history")]
+    // pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
+    pub cached_daily_timestamp: TimestampMillis,
+    // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
+    // pub daily_staked_gldt: HashMap<TimestampMillis, Nat>,
 }
 
-fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
-    let memory = get_daily_apy_memory();
-    StableBTreeMap::init(memory)
-}
+// pub fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
+//     let memory = get_daily_apy_memory();
+//     StableBTreeMap::init(memory)
+// }
 
 impl Default for StakeSystem {
     fn default() -> Self {
@@ -46,9 +48,10 @@ impl Default for StakeSystem {
             pending_fee_transfer_amount: Nat::from(0u64),
             genesis_datetime: now,
             token_usd_values: HashMap::new(),
-            daily_apy_history: init_daily_apy_history(),
-            daily_apy_timestamp: now,
-            daily_weighted_staked_gldt: HashMap::new(),
+            // daily_apy_history: init_daily_apy_history(),
+            cached_daily_timestamp: now,
+            // daily_weighted_staked_gldt: HashMap::new(),
+            // daily_staked_gldt: HashMap::new(),
         }
     }
 }
@@ -144,6 +147,6 @@ impl StakeSystem {
     }
 
     pub fn bump_daily_timestamp(&mut self) {
-        self.daily_apy_timestamp += DAY_IN_MS;
+        self.cached_daily_timestamp += DAY_IN_MS;
     }
 }

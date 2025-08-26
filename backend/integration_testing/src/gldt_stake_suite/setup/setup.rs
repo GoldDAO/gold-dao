@@ -196,6 +196,8 @@ impl GldtStakeTestEnvBuilder {
         constants.max_transactions_in_window = 10;
         constants.max_blocks_per_response = 100;
         constants.max_transactions_to_purge = 5;
+        constants.initial_cycles = 5_000_000_000_000;
+        constants.reserved_cycles = 5_000_000_000_000;
         // INIT ICRC3
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
@@ -214,7 +216,7 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+            allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
             icrc3_config: ICRC3Config {
                 supported_blocks: vec![SupportedBlockType {
                     block_type: "add_stake".to_string(),
@@ -357,6 +359,8 @@ impl GldtStakeTestEnvBuilder {
         constants.max_transactions_in_window = 10;
         constants.max_blocks_per_response = 100;
         constants.max_transactions_to_purge = 5;
+        constants.initial_cycles = 5_000_000_000_000;
+        constants.reserved_cycles = 5_000_000_000_000;
         // INIT ICRC3
 
         let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
@@ -375,7 +379,7 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-            allowed_reward_tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::ICP, TokenSymbol::OGY],
+           allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
             icrc3_config: ICRC3Config {
             supported_blocks: vec![SupportedBlockType {
                     block_type: "event".to_string(),

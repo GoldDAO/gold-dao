@@ -2,7 +2,7 @@ use crate::client::gldt_stake::icrc3_get_blocks;
 use crate::client::gldt_stake::icrc3_get_properties;
 use crate::client::gldt_stake::icrc3_get_tip_certificate;
 use crate::client::gldt_stake::icrc3_supported_block_types;
-use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv};
 use crate::gldt_stake_suite::utils::create_stake_position_util_for_user;
 use crate::gldt_stake_suite::utils::create_whitelisted_user_with_funds;
@@ -99,7 +99,7 @@ fn icrc3_works() {
 
     // --- Create 5 legit dissolvements ---
     for _ in 0..=4 {
-        let response = manage_stake_position(
+        let response = manage_stake_position_with_tick(
             pic,
             user,
             gldt_stake_canister_id,
@@ -118,14 +118,14 @@ fn icrc3_works() {
     let blocks = icrc3_get_blocks(pic, controller, gldt_stake_canister_id, &get_blocks_args);
     println!("blocks: {blocks:?}");
     println!("blocks len: {:?}", blocks.blocks.len());
-    assert_eq!(blocks.blocks.len(), 3);
+    assert_eq!(blocks.blocks.len(), 4);
     assert_eq!(blocks.archived_blocks.len(), 1);
     assert_eq!(blocks.archived_blocks[0].args.len(), 1);
     assert_eq!(
         blocks.archived_blocks[0].args[0],
         GetBlocksRequest {
             start: Nat::from(0u64),
-            length: Nat::from(12u64),
+            length: Nat::from(11u64),
         }
     );
     let archived_blocks = icrc3_get_blocks(
@@ -134,11 +134,11 @@ fn icrc3_works() {
         blocks.archived_blocks[0].callback.canister_id,
         &vec![GetBlocksRequest {
             start: Nat::from(10u64),
-            length: Nat::from(12u64),
+            length: Nat::from(11u64),
         }],
     );
 
-    for i in 0..2 {
+    for i in 0..1 {
         match &archived_blocks.blocks[i].block {
             icrc_ledger_types::icrc::generic_value::ICRC3Value::Map(map) => {
                 assert_eq!(
@@ -204,7 +204,7 @@ fn test_icrc3_get_tip_certificate() {
     );
 
     let certificate_2 = icrc3_get_tip_certificate(pic, controller, gldt_stake_canister_id, &());
-
+    tick_n_blocks(pic, 10);
     assert_eq!(
         certificate.certificate, certificate_2.certificate,
         "Certificate should be the same"

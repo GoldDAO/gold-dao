@@ -85,19 +85,13 @@ const TopNav = ({ className }: { className?: string }) => {
                     </div>
 
                     {navItems.map(({ title, url }, i) => {
-                      const isDisabled = url === "/earn";
                       return (
                         <Link
-                          onClick={isDisabled ? undefined : handleOnHideMenu}
-                          to={isDisabled ? "#" : url}
+                          onClick={handleOnHideMenu}
+                          to={url}
                           className={clsx(
-                            "font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md w-full text-center",
-                            {
-                              "pointer-events-none opacity-50 cursor-not-allowed":
-                                isDisabled,
-                            }
+                            "font-semibold text-content/60 hover:text-content px-3 py-2 rounded-md w-full text-center"
                           )}
-                          aria-disabled={isDisabled}
                           key={i}
                         >
                           {title}

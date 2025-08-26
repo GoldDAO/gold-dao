@@ -11,5 +11,6 @@ pub fn process_proposals_job() {
 }
 
 async fn process_proposals_impl() {
+    let _span = tracing::info_span!("PROCESS_PROPOSALS").entered();
     let _ = process_proposals().await;
 }

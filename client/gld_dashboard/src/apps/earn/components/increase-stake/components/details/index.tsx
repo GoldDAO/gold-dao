@@ -20,12 +20,18 @@ const DetailsDialogContent = () => {
 
   const handleAddStake = () => {
     if (!stakeState.user_balance_gldt) return;
+    const stakeAmount = BigInt(
+      Number(stakeState.stake_amount) *
+        10 ** stakeState.user_balance_gldt.decimals
+    );
+    const isAmountMaxBalance =
+      stakeAmount + stakeState.user_balance_gldt.fee_e8s >=
+      stakeState.user_balance_gldt.balance_e8s;
+    const amount = isAmountMaxBalance
+      ? stakeAmount
+      : stakeAmount + stakeState.user_balance_gldt.fee_e8s;
     addStake.mutate({
-      amount:
-        BigInt(
-          Number(stakeState.stake_amount) *
-            10 ** stakeState.user_balance_gldt.decimals
-        ) + stakeState.user_balance_gldt.fee_e8s,
+      amount,
     });
   };
 
@@ -69,7 +75,9 @@ const DetailsDialogContent = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center justify-center gap-2">
             <div className="mb-2">Add stake error</div>
-            <div className="text-content/60">{addStake.error.message}</div>
+            <div className="text-content/60 text-center">
+              {addStake.error.message}
+            </div>
           </div>
           <div className="mt-4 flex items-center gap-2 w-full">
             <Button onClick={onRetry} className="w-full">

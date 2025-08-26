@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,81 +7,39 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { Tooltip } from "react-tooltip";
-import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline";
-import useGetAllStakePositions, {
-  Position,
-} from "../../hooks/useGetAllStakePositions";
+import useGetRewardAllocations, {
+  DailyAnalytic,
+} from "../../hooks/useGetRewardAllocations";
 import { getCanister } from "../../utils/getCanister";
 import NumberToLocaleString from "../shared/NumberToLocaleString";
 import Card from "../shared/ui/Card";
 
-const columnHelper = createColumnHelper<Position>();
+const columnHelper = createColumnHelper<DailyAnalytic>();
 
-const StakePositions = ({ env }: { env: string }) => {
-  const [copiedPrincipal, setCopiedPrincipal] = useState<string | null>(null);
-
-  const stake_positions = useGetAllStakePositions(
+const RewardAllocations = ({ env }: { env: string }) => {
+  const reward_allocations = useGetRewardAllocations(
     getCanister(env).GLDT_STAKE_CANISTER_ID
   );
 
-  const handleCopyPrincipal = async (principal: string) => {
-    try {
-      await navigator.clipboard.writeText(principal);
-      setCopiedPrincipal(principal);
-      setTimeout(() => setCopiedPrincipal(null), 1500);
-    } catch (error) {
-      console.error("Failed to copy principal:", error);
-    }
-  };
-
   const columns = useMemo(
     () => [
-      columnHelper.accessor("principal", {
-        header: "Principal",
-        cell: (info) => (
-          <div className="flex items-center gap-2">
-            <div
-              className="font-mono text-sm"
-              data-tooltip-id="principal-tooltip"
-              data-tooltip-content={info.getValue()}
-            >
-              {info.getValue().slice(0, 20)}...
-            </div>
-            <button
-              onClick={() => handleCopyPrincipal(info.getValue())}
-              className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors cursor-pointer"
-              title="Copy principal"
-            >
-              {copiedPrincipal === info.getValue() ? (
-                <CheckIcon className="h-4 w-4 text-yellow-500" />
-              ) : (
-                <ClipboardDocumentIcon className="h-4 w-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300" />
-              )}
-            </button>
-          </div>
-        ),
+      columnHelper.accessor("date", {
+        header: "Date",
+        cell: (info) => {
+          const date = new Date(Number(info.getValue()));
+          return <div className="text-sm">{date.toLocaleDateString()}</div>;
+        },
       }),
-      columnHelper.accessor("staked_amount", {
-        header: "GLDT Staked",
+      columnHelper.accessor("staked_gldt", {
+        header: "Total GLDT Staked",
         cell: (info) => (
           <div className="text-center font-medium">
             <NumberToLocaleString value={info.getValue()} />
           </div>
         ),
       }),
-      columnHelper.accessor("created_at", {
-        header: "Created At",
-        cell: (info) => {
-          const date = new Date(Number(info.getValue()));
-          return (
-            <div className="text-center text-sm">
-              {date.toLocaleDateString()}
-            </div>
-          );
-        },
-      }),
       columnHelper.group({
-        header: "Unclaimed Rewards",
+        header: "Allocated Rewards",
         columns: [
           columnHelper.accessor("rewards", {
             header: "GOLDAO",
@@ -123,39 +81,12 @@ const StakePositions = ({ env }: { env: string }) => {
           }),
         ],
       }),
-      columnHelper.accessor("dissolve_events", {
-        header: "Dissolving Events",
-        cell: (info) => {
-          const events = info.getValue();
-          return (
-            <div className="text-sm">
-              {events.map((event, index) => (
-                <div key={index} className="mb-1">
-                  <div className="font-medium">
-                    <NumberToLocaleString value={event.amount} /> GLDT
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    {event.is_withdrawable
-                      ? "Withdrawable now"
-                      : `${Math.ceil(
-                          event.remaining_time / (1000 * 60 * 60 * 24)
-                        )} days left`}
-                  </div>
-                </div>
-              ))}
-              {events.length === 0 && (
-                <div className="text-neutral-400 text-xs">No events</div>
-              )}
-            </div>
-          );
-        },
-      }),
     ],
-    [copiedPrincipal]
+    []
   );
 
   const table = useReactTable({
-    data: stake_positions.data ?? [],
+    data: reward_allocations.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -166,10 +97,10 @@ const StakePositions = ({ env }: { env: string }) => {
     },
   });
 
-  if (stake_positions.isLoading) {
+  if (reward_allocations.isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <div className="">Fetching stake positions...</div>
+        <div className="">Fetching reward allocations...</div>
       </div>
     );
   }
@@ -191,8 +122,7 @@ const StakePositions = ({ env }: { env: string }) => {
                     colSpan={header.colSpan}
                     className={`px-6 py-3 text-xs font-medium text-neutral-900/60 dark:text-neutral-50/60 uppercase tracking-wider ${
                       header.subHeaders?.length ||
-                      header.id === "staked_amount" ||
-                      header.id === "created_at" ||
+                      header.id === "staked_gldt" ||
                       header.id === "goldao_rewards" ||
                       header.id === "icp_rewards" ||
                       header.id === "ogy_rewards"
@@ -322,4 +252,4 @@ const StakePositions = ({ env }: { env: string }) => {
   );
 };
 
-export default StakePositions;
+export default RewardAllocations;

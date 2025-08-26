@@ -1,6 +1,5 @@
-use crate::client::gldt_stake::{
-    add_whitelisted_principal, get_position, get_total_staked, manage_stake_position,
-};
+use crate::client::gldt_stake::manage_stake_position_with_tick;
+use crate::client::gldt_stake::{add_whitelisted_principal, get_position, get_total_staked};
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
 use crate::gldt_stake_suite::utils::{
@@ -77,7 +76,7 @@ fn full_user_flow_test() {
     ));
     tick_n_blocks(pic, 2);
 
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -148,7 +147,7 @@ fn full_user_flow_test() {
     // --- Try to stake zero ---
     // let response = add_stake(pic, user, gldt_ledger_id, gldt_stake_canister_id, 0u128);
     // assert!(response.is_ok()); // Depending on your business logic, this may be Ok or Err
-    let _response = manage_stake_position(
+    let _response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -165,7 +164,7 @@ fn full_user_flow_test() {
         gldt_ledger_id,
         2_000_000_000u128,
     );
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user2,
         gldt_stake_canister_id,
@@ -193,7 +192,7 @@ fn full_user_flow_test() {
     wait_1_day(pic);
 
     // --- Start dissolving with zero fraction ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -207,7 +206,7 @@ fn full_user_flow_test() {
     ));
 
     // --- Start dissolving with over 100 fraction ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -221,7 +220,7 @@ fn full_user_flow_test() {
     ));
 
     // --- Start dissolving with 20% fraction ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -233,7 +232,7 @@ fn full_user_flow_test() {
     assert!(position.staked > Nat::from(0u64));
 
     // --- Start dissolving with 100% fraction ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -244,7 +243,7 @@ fn full_user_flow_test() {
     assert_eq!(position.staked, Nat::from(0u64));
 
     // --- Try to dissolve again (already dissolved) ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -273,7 +272,7 @@ fn full_user_flow_test() {
         &vec![Principal::anonymous()],
     )
     .expect("Failed to add whitelisted principal");
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
         gldt_stake_canister_id,
@@ -287,7 +286,7 @@ fn full_user_flow_test() {
     ));
 
     // --- Try to withdraw before dissolve period ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -300,7 +299,7 @@ fn full_user_flow_test() {
 
     // --- Wait for dissolve period and withdraw ---
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -309,7 +308,7 @@ fn full_user_flow_test() {
     assert!(response.is_ok());
 
     // --- Try to withdraw again (should fail) ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -325,7 +324,7 @@ fn full_user_flow_test() {
     ));
 
     // --- Try to withdraw as anonymous ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
         gldt_stake_canister_id,
@@ -353,7 +352,7 @@ fn full_user_flow_test() {
         gldt_ledger_id,
         1_000u128,
     );
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user3,
         gldt_stake_canister_id,
@@ -367,7 +366,7 @@ fn full_user_flow_test() {
         ))
     ));
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -448,7 +447,7 @@ fn test_can_claim_gldt_stake_rewards() {
     tick_n_blocks(pic, 50);
 
     // --- Start dissolving 50% of stake ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -593,7 +592,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
     tick_n_blocks(pic, 50);
 
     // --- Start dissolving 50% of stake ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -610,7 +609,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
     tick_n_blocks(pic, 10);
 
     // --- Start dissolving 50% of stake ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -620,10 +619,10 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
 
     // --- Advance time to complete dissolve period ---
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    tick_n_blocks(pic, 1);
+    tick_n_blocks(pic, 10);
 
     // --- Successfully withdraw ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -638,7 +637,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
     assert_eq!(position.staked, Nat::from(0_u64));
 
     // --- Try to withdraw again (should fail, nothing to withdraw) ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -698,9 +697,9 @@ fn withdraw_flow_test() {
         approval_result,
         crate::client::icrc1_icrc2_token::icrc2_approve::Response::Ok(_)
     ));
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic, 10);
 
-    let stake_response = manage_stake_position(
+    let stake_response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -712,7 +711,7 @@ fn withdraw_flow_test() {
     assert_eq!(stake_response.staked, Nat::from(stake_amount));
 
     // --- Start dissolving full stake ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -721,7 +720,7 @@ fn withdraw_flow_test() {
     assert!(response.is_ok());
 
     // --- Attempt to unstake immediately (should fail, not yet dissolvable) ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -734,16 +733,16 @@ fn withdraw_flow_test() {
 
     // --- Advance time to complete dissolve period ---
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic, 10);
 
     // --- Successfully withdraw ---
-    let res = pic.update_call(
-        gldt_stake_canister_id,
+    let response = manage_stake_position_with_tick(
+        pic,
         user,
-        "manage_stake_position",
-        candid::encode_one(manage_stake_position::Args::Withdraw {}).unwrap(),
+        gldt_stake_canister_id,
+        &manage_stake_position::Args::Withdraw {},
     );
-    // assert!(response.is_ok());
+    assert!(response.is_ok());
 
     let logs = pic
         .fetch_canister_logs(gldt_stake_canister_id, controller)
@@ -767,12 +766,13 @@ fn withdraw_flow_test() {
     assert_eq!(position.staked, Nat::from(0_u64));
 
     // --- Try to withdraw again (should fail, nothing to withdraw) ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
         &manage_stake_position::Args::Withdraw {},
     );
+    println!("Withdraw response: {:?}", response);
     assert!(matches!(
         response,
         Err(ManageStakePositionError::WithdrawError(_))
@@ -801,10 +801,10 @@ fn partial_then_full_dissolve_flow_test() {
         100_000_000_000_u128,
     );
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(pic, 5);
+    tick_n_blocks(pic, 10);
 
     // --- Start dissolving 50% ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -816,7 +816,7 @@ fn partial_then_full_dissolve_flow_test() {
 
     // Advance time to allow partial dissolve withdrawal
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -825,7 +825,7 @@ fn partial_then_full_dissolve_flow_test() {
     assert!(response.is_ok());
 
     // --- Start dissolving remaining 50% ---
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -837,7 +837,7 @@ fn partial_then_full_dissolve_flow_test() {
 
     // Advance time and withdraw remaining
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position(
+    let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,

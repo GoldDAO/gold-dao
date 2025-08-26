@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.4] - 2025-08-25
+
+#### Added
+- **Daily Analytics Tracking**:  
+  The `gldt_stake` canister now stores historical analytics on a **per-day basis**, including:
+  - APYs
+  - Staked GLDT amounts
+  - Rewards per token
+
+#### Fixed
+- **APY Calculation**: APY is now calculated correctly on a **daily** basis (previously was still using weekly logic).
+- **Funds Flow**: All fund movements between pools are now tracked and executed correctly.
+- **General Stability**: Multiple bugs fixed, improving efficiency and reliability of the canister.
 
 ### [1.0.3] - 2025-06-05
 

@@ -12,7 +12,7 @@ pub struct InitArgs {
     // NOTE: added for testing purposes
     pub whitelist: Vec<Principal>,
     pub goldao_ledger_id: Principal,
-    pub allowed_reward_tokens: Vec<TokenSymbol>,
+    pub allowed_reward_tokens: Vec<String>,
     pub gldt_ledger_id: Principal,
     pub gld_sns_rewards_canister_id: Principal,
     pub gld_sns_governance_canister_id: Principal,

@@ -18,10 +18,10 @@ use crate::state::read_state;
 fn get_apy_overall(_: GetApyArgs) -> GetApyResponse {
     let (daily_weighted_stake, daily_rewards, token_usd_values) = read_state(|s| {
         let stake_system = &s.data.stake_system;
-        let allocated_rewards_pool = &s.data.allocated_rewards_pool;
+        let analytics_system = &s.data.analytics_system;
         (
-            stake_system.daily_weighted_staked_gldt.clone(),
-            allocated_rewards_pool.daily_allocated_rewards.clone(),
+            analytics_system.get_weighted_gldt_staked(0, None),
+            analytics_system.get_rewards(0, None),
             stake_system.token_usd_values.clone(),
         )
     });
@@ -30,7 +30,7 @@ fn get_apy_overall(_: GetApyArgs) -> GetApyResponse {
 }
 
 fn get_apy_impl(
-    daily_weighted_stake: HashMap<TimestampMillis, Nat>,
+    daily_weighted_stake: BTreeMap<TimestampMillis, Nat>,
     daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
     token_usd_values: HashMap<TokenSymbol, f64>,
 ) -> GetApyResponse {
@@ -94,7 +94,7 @@ pub fn calculate_apy(total_daily_rewards_as_usd: f64, total_weighted_stake_as_us
         return 0.0;
     }
 
-    (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 52.0 * 100.0
+    (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 365.0 * 100.0
 }
 
 pub fn calculate_days_since_genesis(genesis_datetime: TimestampMillis) -> u64 {
@@ -198,7 +198,7 @@ mod tests {
         rewards.insert(TokenSymbol::ICP, Nat::from(400u64));
         daily_rewards.insert(one_day_ago, rewards);
 
-        let mut dayly_weighted_stake = HashMap::new();
+        let mut dayly_weighted_stake = BTreeMap::new();
         dayly_weighted_stake.insert(one_day_ago, Nat::from(100_00u64));
         // state
         // - with token pricing
@@ -208,14 +208,14 @@ mod tests {
         // total value of GLDT = 1000 USD
         // total value of rewards = 400 + 400 + 400 = 1200 USD
 
-        // (1200 USD / 100_000 USD) * 52.0 * 100.0 = 62.4;
+        // (1200 USD / 100_000 USD) * 365.0 * 100.0 = 438.4;
         assert_eq!(
             get_apy_impl(
                 dayly_weighted_stake.clone(),
                 daily_rewards.clone(),
                 token_prices_usd.clone()
             ),
-            62.4
+            438.0
         );
 
         // second day with no rewards, we expect that the apy should be half
@@ -231,7 +231,7 @@ mod tests {
 
         assert_eq!(
             get_apy_impl(dayly_weighted_stake, daily_rewards, token_prices_usd),
-            31.2
+            219.0
         );
     }
 }

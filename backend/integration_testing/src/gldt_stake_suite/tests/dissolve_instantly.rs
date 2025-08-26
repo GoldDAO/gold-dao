@@ -1,7 +1,7 @@
 use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::get_total_staked;
-use crate::client::gldt_stake::manage_stake_position;
+use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
 use crate::utils::wait_1_day;
@@ -90,7 +90,7 @@ fn test_dissolve_instantly_full() {
     wait_1_day(pic);
 
     // --- Claim all rewards ---
-    let _res = manage_stake_position(
+    let _res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -99,7 +99,7 @@ fn test_dissolve_instantly_full() {
         },
     );
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -228,7 +228,7 @@ fn test_dissolve_instantly_partial() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
 
     // --- Claim all rewards ---
-    let _res = manage_stake_position(
+    let _res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -237,7 +237,7 @@ fn test_dissolve_instantly_partial() {
         },
     );
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -311,7 +311,7 @@ fn test_dissolve_instantly_zero_fraction_should_fail() {
         100_000_000_000u128,
     );
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -346,7 +346,7 @@ fn test_dissolve_instantly_over_100_should_fail() {
         100_000_000_000u128,
     );
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -381,7 +381,7 @@ fn test_dissolve_instantly_99_percent_leaves_1_percent() {
         100_000_000_000u128,
     );
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -415,7 +415,7 @@ fn test_dissolve_instantly_when_already_dissolved_should_fail() {
     );
 
     // Dissolve fully
-    let _ = manage_stake_position(
+    let _ = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -423,7 +423,7 @@ fn test_dissolve_instantly_when_already_dissolved_should_fail() {
     );
 
     // Try to dissolve again
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
@@ -457,7 +457,7 @@ fn test_dissolve_instantly_as_anonymous_should_fail() {
     )
     .expect("Failed to add whitelisted principal");
 
-    let res = manage_stake_position(
+    let res = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
         gldt_stake_canister_id,
