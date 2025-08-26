@@ -1,10 +1,8 @@
 use crate::client::gldt_stake::manage_stake_position_with_tick;
-use crate::client::gldt_stake::{add_whitelisted_principal, get_position, get_total_staked};
+use crate::client::gldt_stake::{get_position, get_total_staked};
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::create_stake_position_util;
-use crate::gldt_stake_suite::utils::{
-    add_rewards_to_neurons, add_stake, create_whitelisted_user_with_funds,
-};
+use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, add_stake, create_user_with_funds};
 use crate::utils::wait_1_day;
 use crate::{
     client::icrc1_icrc2_token::icrc2_approve, gldt_stake_suite::setup::default_test_setup,
@@ -41,7 +39,7 @@ fn full_user_flow_test() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -157,7 +155,7 @@ fn full_user_flow_test() {
     );
 
     // --- Try to stake without allowance ---
-    let user2 = create_whitelisted_user_with_funds(
+    let user2 = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -265,13 +263,6 @@ fn full_user_flow_test() {
     }
 
     // --- Try to dissolve as anonymous ---
-    add_whitelisted_principal(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        &vec![Principal::anonymous()],
-    )
-    .expect("Failed to add whitelisted principal");
     let response = manage_stake_position_with_tick(
         pic,
         Principal::anonymous(),
@@ -345,7 +336,7 @@ fn full_user_flow_test() {
     }
 
     // --- Try to withdraw with insufficient balance ---
-    let user3 = create_whitelisted_user_with_funds(
+    let user3 = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -664,7 +655,7 @@ fn withdraw_flow_test() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,

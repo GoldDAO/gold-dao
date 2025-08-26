@@ -1,6 +1,5 @@
-use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_position;
-use crate::client::gldt_stake::manage_stake_position;
+
 use crate::client::gldt_stake::*;
 use crate::client::pocket::unwrap_response;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
@@ -127,13 +126,6 @@ fn test_claim_rewards_guards_as_anonymous_principal() {
         ..
     } = test_env;
     let pic = &pic.borrow();
-
-    let _ = add_whitelisted_principal(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        &vec![Principal::anonymous()],
-    );
 
     // --- Check that calls with anonymous callers are rejected ---
     let res = manage_stake_position_with_tick(

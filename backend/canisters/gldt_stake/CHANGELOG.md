@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.5] - 2025-08-26
+
+#### Removed
+- **Whitelist**: remove the whitelist guard from manage_stake_position method
+
 ### [1.0.4] - 2025-08-25
 
 #### Added

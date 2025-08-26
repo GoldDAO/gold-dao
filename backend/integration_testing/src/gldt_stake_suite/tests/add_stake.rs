@@ -1,8 +1,7 @@
-use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::get_total_staked;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::utils::add_stake;
-use crate::gldt_stake_suite::utils::create_whitelisted_user_with_funds;
+use crate::gldt_stake_suite::utils::create_user_with_funds;
 use crate::{
     client::{gldt_stake::get_position, icrc1_icrc2_token::icrc2_approve},
     gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv},
@@ -34,7 +33,7 @@ fn add_stake_new_position_works() {
         .expect("Missing GLDT ledger canister ID");
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -102,7 +101,7 @@ fn add_stake_existing_position_works() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -170,13 +169,6 @@ fn increase_stake_position_invalid_caller() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let _ = add_whitelisted_principal(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        &vec![Principal::anonymous()],
-    );
-
     // --- Stake with anonymous caller ---
     let amount_to_add = 10_000_000_000;
     let res = manage_stake_position_with_tick(
@@ -215,7 +207,7 @@ fn increase_stake_position_position_guard() {
         .get("gldt_ledger_canister_id")
         .expect("Missing GLDT ledger canister ID");
 
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -295,7 +287,7 @@ fn add_stake_too_low_amount() {
     let amount_to_add = 1_000_u128;
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -342,7 +334,7 @@ fn add_stake_too_high_amount() {
     let amount_to_add = 10_000_000_000_000_000_u128;
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -387,7 +379,7 @@ fn add_stake_new_position_without_allowance() {
         .expect("Missing GLDT ledger canister ID");
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -438,7 +430,7 @@ fn add_stake_new_position_after_dissolving() {
         .expect("Missing GLDT ledger canister ID");
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -550,7 +542,7 @@ fn add_stake_new_position_zero() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -615,7 +607,7 @@ fn add_stake_new_position_small_amount() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create user and fund it ---
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,

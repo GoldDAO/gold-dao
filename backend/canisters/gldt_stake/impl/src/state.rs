@@ -52,7 +52,6 @@ impl RuntimeState {
                 commit_hash: self.env.commit_hash().to_string(),
             },
             authorized_principals: self.data.authorized_principals.clone(),
-            whitelist: self.data.whitelist.clone(),
 
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
             // daily_weighted_staked_gldt: self.data.stake_system.daily_weighted_staked_gldt.clone(),
@@ -93,18 +92,12 @@ impl RuntimeState {
         let caller = self.env.caller();
         self.data.authorized_principals.contains(&caller)
     }
-
-    pub fn is_caller_whitelisted(&self) -> bool {
-        let caller = self.env.caller();
-        self.data.whitelist.contains(&caller)
-    }
 }
 
 #[derive(CandidType, Serialize)]
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
-    pub whitelist: Vec<Principal>,
     pub total_staked: String,
     pub total_active_stake_positions: usize,
     // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
@@ -148,7 +141,6 @@ pub struct Data {
 
     // authorized callers
     pub authorized_principals: Vec<Principal>,
-    pub whitelist: Vec<Principal>,
     // storage for principals guard see guards.rs
     pub principal_guards: BTreeSet<Principal>,
     pub stake_system: StakeSystem,
@@ -172,7 +164,6 @@ impl Default for Data {
             gldt_ledger_id: Principal::anonymous(),
             goldao_ledger_id: Principal::anonymous(),
             authorized_principals: vec![],
-            whitelist: vec![],
             stake_system: StakeSystem::default(),
             goldao_sns_rewards_canister_id: Principal::anonymous(),
             goldao_sns_governance_canister_id: Principal::anonymous(),

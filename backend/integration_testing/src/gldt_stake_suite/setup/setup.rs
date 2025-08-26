@@ -205,7 +205,6 @@ impl GldtStakeTestEnvBuilder {
             version: BuildVersion::min(),
             commit_hash: "integration_testing".to_string(),
             authorized_principals: vec![self.controller],
-            whitelist: vec![self.controller],
             gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
             gld_sns_governance_canister_id: self.sns_governance_id,
             goldao_ledger_id: token_ledgers
@@ -367,7 +366,6 @@ impl GldtStakeTestEnvBuilder {
             test_mode: true,
             version: BuildVersion::min(),
             commit_hash: "integration_testing".to_string(),
-            whitelist: vec![],
             authorized_principals: vec![self.controller],
             gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
             gld_sns_governance_canister_id: self.sns_governance_id,

@@ -5,7 +5,7 @@ use crate::client::gldt_stake::icrc3_supported_block_types;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv};
 use crate::gldt_stake_suite::utils::create_stake_position_util_for_user;
-use crate::gldt_stake_suite::utils::create_whitelisted_user_with_funds;
+use crate::gldt_stake_suite::utils::create_user_with_funds;
 use crate::utils::tick_n_blocks;
 use candid::Nat;
 use canister_time::MINUTE_IN_MS;
@@ -31,7 +31,7 @@ fn icrc3_works() {
         .get("gldt_ledger_canister_id")
         .expect("Missing GLDT ledger canister ID");
 
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,
@@ -173,7 +173,7 @@ fn test_icrc3_get_tip_certificate() {
         .get("gldt_ledger_canister_id")
         .expect("Missing GLDT ledger canister ID");
 
-    let user = create_whitelisted_user_with_funds(
+    let user = create_user_with_funds(
         pic,
         controller,
         gldt_stake_canister_id,

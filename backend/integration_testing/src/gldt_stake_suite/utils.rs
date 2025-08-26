@@ -1,6 +1,3 @@
-use std::{collections::HashMap, time::Duration};
-
-use crate::client::gldt_stake::add_whitelisted_principal;
 use crate::client::gldt_stake::manage_stake_position;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use assert_matches::assert_matches;
@@ -12,6 +9,7 @@ use gldt_stake_common::stake_position_response::StakePositionResponse;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::PocketIc;
 use sns_governance_canister::types::Neuron;
+use std::{collections::HashMap, time::Duration};
 
 use crate::{
     client::{
@@ -22,7 +20,7 @@ use crate::{
 };
 
 // Helper function to create a user, whitelist, and fund account
-pub fn create_whitelisted_user_with_funds(
+pub fn create_user_with_funds(
     pic: &PocketIc,
     controller: candid::Principal,
     gldt_stake_canister_id: candid::Principal,
@@ -34,9 +32,6 @@ pub fn create_whitelisted_user_with_funds(
         owner: user,
         subaccount: None,
     };
-
-    add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user])
-        .expect("Failed to add whitelisted principal");
 
     let _ = transfer(
         pic,
@@ -110,9 +105,6 @@ pub fn create_stake_position_util(
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     let user_1 = random_principal();
-
-    add_whitelisted_principal(pic, controller, gldt_stake_canister_id, &vec![user_1])
-        .expect("Failed to add whitelisted principal");
 
     let _ = transfer(
         pic,

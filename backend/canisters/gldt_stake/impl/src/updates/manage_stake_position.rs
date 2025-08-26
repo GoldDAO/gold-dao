@@ -1,4 +1,3 @@
-use crate::guards::caller_is_whitelisted;
 use crate::guards::GuardPrincipal;
 use crate::manage_stake_position_impls::*;
 use crate::{guards::reject_anonymous_caller, state::read_state};
@@ -13,7 +12,7 @@ use gldt_stake_common::stake_position::StakePosition;
 use ic_cdk::api::msg_caller;
 use ic_cdk::update;
 
-#[update(guard = "caller_is_whitelisted")]
+#[update]
 #[trace]
 async fn manage_stake_position(args: ManageStakePositionArgs) -> ManageStakePositionResponse {
     // 0. validate the caller and concurrent position processing
