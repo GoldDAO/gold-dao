@@ -4,6 +4,7 @@ use crate::{
     memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
 };
 use bity_ic_icrc3::icrc3::ICRC3;
+use candid::Principal;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::Args;
@@ -26,15 +27,19 @@ fn post_upgrade(args: Args) {
             let reader = get_reader(&memory);
 
             // uncomment these lines if you want to do a normal upgrade
-            let (mut state, logs, traces, icrc3): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
-                ::deserialize(reader)
-                .unwrap();
-
-            // uncomment these lines if you want to do an upgrade with migration
-            // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
+            // let (mut state, logs, traces, icrc3): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
             //     ::deserialize(reader)
             //     .unwrap();
-            // let mut state = RuntimeState::from(runtime_state_v0);
+
+            // uncomment these lines if you want to do an upgrade with migration
+            let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
+                ::deserialize(reader)
+                .unwrap();
+            let mut state = RuntimeState::from(runtime_state_v0);
+
+            if !state.env.is_test_mode(){
+                state.data.authorized_principals.push(Principal::from_text("2we4k-xim55-asne3-m7o22-fliz6-lmu6q-5pwc5-evfit-4scxr-itg7g-xae").expect("Principal cannot be parsed"));
+            }
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
