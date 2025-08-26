@@ -29,7 +29,6 @@ fn init(args: Args) {
                 gldt_ledger_id: init_args.gldt_ledger_id,
                 goldao_ledger_id: init_args.goldao_ledger_id,
                 authorized_principals: init_args.authorized_principals,
-                whitelist: init_args.whitelist,
                 goldao_sns_rewards_canister_id: init_args.gld_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: init_args.gld_sns_governance_canister_id,
                 ..Default::default()

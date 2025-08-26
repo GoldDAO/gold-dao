@@ -47,8 +47,8 @@ if [[ $REINSTALL == "reinstall" ]]; then
     GLDT_LEDGER_ID=6uad6-fqaaa-aaaam-abovq-cai
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
-    AUTHORIZED_PRINCIPALS="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\" }"
-    WHITELIST="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\" }"
+    AUTHORIZED_PRINCIPALS="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\"; principal \"2we4k-xim55-asne3-m7o22-fliz6-lmu6q-5pwc5-evfit-4scxr-itg7g-xae\" }"
+    WHITELIST="vec { principal \"tr3th-kiaaa-aaaaq-aab6q-cai\"; principal \"2we4k-xim55-asne3-m7o22-fliz6-lmu6q-5pwc5-evfit-4scxr-itg7g-xae\" }"
     GLDT_LEDGER_ID=6c7su-kiaaa-aaaar-qaira-cai
   else
     echo "Error: unknown network for deployment. Found $NETWORK."

@@ -17,7 +17,6 @@ impl From<RuntimeStateV0> for RuntimeState {
                 gldt_ledger_id: old_state.data.gldt_ledger_id,
                 goldao_ledger_id: old_state.data.goldao_ledger_id,
                 authorized_principals: old_state.data.authorized_principals,
-                whitelist: old_state.data.whitelist,
                 analytics_system: AnalyticsSystem::default(),
                 stake_system: StakeSystem {
                     stakes: old_state.data.stake_system.stakes,
@@ -37,8 +36,7 @@ impl From<RuntimeStateV0> for RuntimeState {
                         .pending_fee_transfer_amount,
                     genesis_datetime: old_state.data.stake_system.genesis_datetime,
                     token_usd_values: old_state.data.stake_system.token_usd_values,
-                    cached_daily_timestamp: old_state.data.stake_system.daily_apy_timestamp,
-                    // daily_apy_history: old_state.data.stake_system.daily_apy_history,
+                    cached_daily_timestamp: old_state.data.stake_system.cached_daily_timestamp,
                 },
                 goldao_sns_rewards_canister_id: old_state.data.goldao_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: old_state.data.goldao_sns_governance_canister_id,

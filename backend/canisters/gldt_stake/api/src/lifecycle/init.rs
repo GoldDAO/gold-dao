@@ -9,8 +9,6 @@ pub struct InitArgs {
     pub version: BuildVersion,
     pub commit_hash: String,
     pub authorized_principals: Vec<Principal>,
-    // NOTE: added for testing purposes
-    pub whitelist: Vec<Principal>,
     pub goldao_ledger_id: Principal,
     pub allowed_reward_tokens: Vec<String>,
     pub gldt_ledger_id: Principal,

@@ -48,14 +48,6 @@ pub fn caller_is_governance_principal() -> Result<(), String> {
     }
 }
 
-pub fn caller_is_whitelisted() -> Result<(), String> {
-    if read_state(|state| state.is_caller_whitelisted()) {
-        Ok(())
-    } else {
-        Err("Caller is not whitelisted".to_string())
-    }
-}
-
 pub fn reject_anonymous_caller() -> Result<(), String> {
     if ic_cdk::api::msg_caller() == Principal::anonymous() {
         return Err("You may not use an anonymous principal".to_string());
