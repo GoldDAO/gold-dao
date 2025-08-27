@@ -8,14 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.6] - 2025-08-27
+
+#### Modified
+
+- **Authorized principals**: Adjust the list of authorized principals
+
 ### [1.0.5] - 2025-08-26
 
 #### Removed
+
 - **Whitelist**: remove the whitelist guard from manage_stake_position method
 
 ### [1.0.4] - 2025-08-25
 
 #### Added
+
 - **Daily Analytics Tracking**:  
   The `gldt_stake` canister now stores historical analytics on a **per-day basis**, including:
   - APYs
@@ -23,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Rewards per token
 
 #### Fixed
+
 - **APY Calculation**: APY is now calculated correctly on a **daily** basis (previously was still using weekly logic).
 - **Funds Flow**: All fund movements between pools are now tracked and executed correctly.
 - **General Stability**: Multiple bugs fixed, improving efficiency and reliability of the canister.
@@ -32,9 +41,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 #### Changed
 
 - Simplified staking model: GLDT staking now enforces a single stake position per user:
-    - Users can now increase their stake via the increase_stake endpoint.
-    - Users can also initiate partial dissolves of their stake by specifying a dissolve fraction.
-    - A maximum of 5 concurrent dissolve events per stake position ensures the system remains robust and spam-resistant.
+  - Users can now increase their stake via the increase_stake endpoint.
+  - Users can also initiate partial dissolves of their stake by specifying a dissolve fraction.
+  - A maximum of 5 concurrent dissolve events per stake position ensures the system remains robust and spam-resistant.
 - To reduce APY volatility and smooth out fluctuations in GOLDAO and ICP rewards, only 33% of the available rewards are distributed each week. This creates a more stable and predictable reward experience for users.
 
 #### Added
