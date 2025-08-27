@@ -2,9 +2,6 @@ import { ReactNode } from "react";
 import Icon from "@shared/ui/icons";
 import clsx from "clsx";
 import { INSTANT_DISSOLVE_FEE_PERCENTAGE } from "@constants";
-import { useAtom } from "jotai";
-import { DecreaseStakeStateReducerAtom } from "@earn/components/decrease-stake/atoms";
-import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 
 const DissolveInstantlyInformations = ({
   className,
@@ -13,7 +10,6 @@ const DissolveInstantlyInformations = ({
   className?: string;
   checked?: boolean;
 }) => {
-  const [state] = useAtom(DecreaseStakeStateReducerAtom);
   const infos: Array<{ title: string; subtitle: string; icon: ReactNode }> = [
     {
       title: `When unlocking immediately, you will receive your GLDT immediately but are charged a ${INSTANT_DISSOLVE_FEE_PERCENTAGE}% fee on the GLDT tokens you are unlocking.`,
@@ -45,24 +41,6 @@ const DissolveInstantlyInformations = ({
             </div>
           </div>
         ))}
-        <div className="flex justify-center border rounded-lg p-4 border-danger/30 bg-danger/5 text-danger font-semibold text-sm">
-          You will be charged{" "}
-          <NumberToLocaleString
-            value={
-              Number(state.unlock_amount) *
-              (INSTANT_DISSOLVE_FEE_PERCENTAGE / 100)
-            }
-          />{" "}
-          GLDT and will only receive{" "}
-          <NumberToLocaleString
-            value={
-              Number(state.unlock_amount) -
-              Number(state.unlock_amount) *
-                (INSTANT_DISSOLVE_FEE_PERCENTAGE / 100)
-            }
-          />{" "}
-          GLDT.
-        </div>
       </div>
     </div>
   );
