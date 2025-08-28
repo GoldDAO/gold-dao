@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Listbox,
   ListboxButton,
@@ -10,8 +10,8 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const SelectEnv = ({ handleOnChange, className }) => {
   const [selected, setSelected] = useState({
-    id: "staging",
-    label: "Staging",
+    id: "production",
+    label: "Production",
   });
 
   const envs = [
@@ -25,8 +25,34 @@ const SelectEnv = ({ handleOnChange, className }) => {
     },
   ];
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const envFromUrl = urlParams.get("env");
+
+    if (envFromUrl) {
+      const foundEnv = envs.find((env) => env.id === envFromUrl);
+      if (foundEnv) {
+        setSelected(foundEnv);
+        handleOnChange(foundEnv.id);
+      }
+    } else {
+      const url = new URL(window.location);
+      url.searchParams.set("env", "production");
+      window.history.replaceState({}, "", url);
+
+      const productionEnv = envs.find((env) => env.id === "production");
+      setSelected(productionEnv);
+      handleOnChange(productionEnv.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleChange = (canister) => {
     setSelected(canister);
+    const url = new URL(window.location);
+    url.searchParams.set("env", canister.id);
+    window.history.replaceState({}, "", url);
+
     handleOnChange(canister.id);
   };
 

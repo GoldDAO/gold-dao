@@ -32,7 +32,9 @@ const useGetCurrentAPY = (canister_id_gldt_stake, options = {}) => {
           starting_day,
           limit
         );
-
+        if (apy_timeseries.length === 0) {
+          return 0;
+        }
         return apy_timeseries[0][1];
       } catch (err) {
         console.log(err);

@@ -73,7 +73,7 @@ const useGetAllStakePositions = (
   } = options || {};
 
   return useQuery({
-    queryKey: ["FETCH_STAKED_USER_POSITION"],
+    queryKey: ["FETCH_STAKED_USER_POSITION", canister_id],
     queryFn: async (): Promise<Position[]> => {
       try {
         const agent = await HttpAgent.create({ host: "https://ic0.app" });

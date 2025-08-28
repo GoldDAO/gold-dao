@@ -3,6 +3,7 @@ import useGetNeuronSize from "../../hooks/useGetNeuronSize";
 import useGetNumberOfStakers from "../../hooks/useGetNumberOfStakers";
 import useGetCurrentAPY from "../../hooks/useGetCurrentAPY";
 import { getCanister } from "../../utils/getCanister";
+import { getNeuron } from "../../utils/getNeuron";
 import NumberToLocaleString from "../shared/NumberToLocaleString";
 import Card from "../shared/ui/Card";
 
@@ -22,7 +23,6 @@ const Summary = ({ env }) => {
     GLDT_STAKE_CANISTER_ID,
     GOLDAO_LEDGER_CANISTER_ID
   );
-
   const numberOfStakers = useGetNumberOfStakers(GLDT_STAKE_CANISTER_ID);
 
   const currentAPY = useGetCurrentAPY(GLDT_STAKE_CANISTER_ID);
@@ -33,7 +33,9 @@ const Summary = ({ env }) => {
         <Card.Header>
           <Card.Title>Total staked</Card.Title>
           <Card.Link
-            href={`https://ic.house/address/6uad6-fqaaa-aaaam-abovq-cai/whvny-7yaaa-aaaap-anupa-cai.0300000000000000000000000000000000000000000000000000000000000000`}
+            href={`https://ic.house/address/6uad6-fqaaa-aaaam-abovq-cai/${
+              getCanister(env).GLDT_STAKE_CANISTER_ID
+            }.0300000000000000000000000000000000000000000000000000000000000000`}
           />
         </Card.Header>
         <div>
@@ -55,7 +57,9 @@ const Summary = ({ env }) => {
         <Card.Header>
           <Card.Title>Neuron size</Card.Title>
           <Card.Link
-            href={`https://dashboard.internetcomputer.org/sns/tw2vt-hqaaa-aaaaq-aab6a-cai/neuron/a50e496c29610d5cf74ead73482695b02075c30b5b93651b67027838a3e04503`}
+            href={`https://dashboard.internetcomputer.org/sns/tw2vt-hqaaa-aaaaq-aab6a-cai/neuron/${
+              getNeuron(env).GLDT_STAKE_SOURCE_NEURON_ID
+            }`}
           />
         </Card.Header>
         <div>
