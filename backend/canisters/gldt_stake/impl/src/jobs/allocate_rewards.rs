@@ -23,7 +23,7 @@ pub fn start_job() {
     );
 }
 
-fn spawn_reward_allocation_job() {
+pub fn spawn_reward_allocation_job() {
     ic_cdk::futures::spawn(handle_process_and_allocation())
 }
 
