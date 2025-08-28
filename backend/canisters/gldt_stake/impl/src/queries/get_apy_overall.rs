@@ -17,12 +17,11 @@ use crate::state::read_state;
 #[query]
 fn get_apy_overall(_: GetApyArgs) -> GetApyResponse {
     let (daily_weighted_stake, daily_rewards, token_usd_values) = read_state(|s| {
-        let stake_system = &s.data.stake_system;
         let analytics_system = &s.data.analytics_system;
         (
             analytics_system.get_weighted_gldt_staked(0, None),
             analytics_system.get_rewards(0, None),
-            stake_system.token_usd_values.clone(),
+            analytics_system.token_usd_values.clone(),
         )
     });
 

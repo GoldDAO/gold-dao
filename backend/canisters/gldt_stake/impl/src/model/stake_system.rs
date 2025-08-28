@@ -1,8 +1,6 @@
-// use crate::memory::{get_daily_apy_memory, VM};
 use candid::{Nat, Principal};
-use canister_time::{timestamp_millis, DAY_IN_MS};
+use canister_time::timestamp_millis;
 use gldt_stake_common::stake_position::StakePosition;
-use ic_stable_structures::BTreeMap as StableBTreeMap;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::collections::HashMap;
@@ -21,20 +19,7 @@ pub struct StakeSystem {
     pub pending_fee_transfer_amount: Nat,
     // the date time that the canister went live set in init - used for APY calculations - calculating an average of weekly rewards based on the number of weeks that has passed
     pub genesis_datetime: TimestampMillis,
-    // usd price of reward tokens + gldt - used for APY calculations
-    pub token_usd_values: HashMap<TokenSymbol, f64>,
-
-    // #[serde(skip, default = "init_daily_apy_history")]
-    // pub daily_apy_history: StableBTreeMap<TimestampMillis, f64, VM>,
-    pub cached_daily_timestamp: TimestampMillis,
-    // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
-    // pub daily_staked_gldt: HashMap<TimestampMillis, Nat>,
 }
-
-// pub fn init_daily_apy_history() -> StableBTreeMap<TimestampMillis, f64, VM> {
-//     let memory = get_daily_apy_memory();
-//     StableBTreeMap::init(memory)
-// }
 
 impl Default for StakeSystem {
     fn default() -> Self {
@@ -47,11 +32,6 @@ impl Default for StakeSystem {
             reward_types: BTreeSet::new(),
             pending_fee_transfer_amount: Nat::from(0u64),
             genesis_datetime: now,
-            token_usd_values: HashMap::new(),
-            // daily_apy_history: init_daily_apy_history(),
-            cached_daily_timestamp: now,
-            // daily_weighted_staked_gldt: HashMap::new(),
-            // daily_staked_gldt: HashMap::new(),
         }
     }
 }
@@ -140,13 +120,5 @@ impl StakeSystem {
         updated_position: StakePosition,
     ) -> Option<StakePosition> {
         self.stakes.insert(user, updated_position)
-    }
-
-    pub fn set_token_usd_values(&mut self, values: HashMap<TokenSymbol, f64>) {
-        self.token_usd_values = values;
-    }
-
-    pub fn bump_daily_timestamp(&mut self) {
-        self.cached_daily_timestamp += DAY_IN_MS;
     }
 }
