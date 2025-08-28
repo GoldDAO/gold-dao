@@ -117,9 +117,6 @@ fn test_process_staking_rewards() {
         );
     }
 
-    pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(pic, 10);
-
     let apy_history = get_apy_timeseries(
         pic,
         Principal::anonymous(),
@@ -130,8 +127,25 @@ fn test_process_staking_rewards() {
         },
     );
     println!("apy_history {:?}", apy_history);
-    assert_eq!(apy_history.len(), 2);
-    assert!(apy_history.first_key_value().unwrap().1 > &0.0);
+    assert_eq!(apy_history.len(), 3);
+
+    // the first day should have APY == 0.0 (genesis day, no rewards yet)
+    let (first_day, first_apy) = apy_history.first_key_value().unwrap();
+    assert_eq!(
+        *first_apy, 0.0,
+        "First day {} should have APY 0.0",
+        first_day
+    );
+
+    // all subsequent days must have APY > 0.0
+    for (ts, apy) in apy_history.iter().skip(1) {
+        assert!(
+            *apy > 0.0,
+            "Day {} should have positive APY, but got {}",
+            ts,
+            apy
+        );
+    }
 
     let daily_analytics = get_daily_analytics(
         pic,
@@ -190,7 +204,7 @@ fn test_apy_changes_with_usd_fluctuations() {
     let target_unallocated_pool: u128 = 10_000_000_000; // e.g. 100,000 GLDT
     let mut overall_apyies = Vec::new();
 
-    for i in 0..5 {
+    for i in 0..10 {
         let unallocated_rewards_map =
             unallocated_rewards_balance(pic, controller, gldt_stake_canister_id, &());
 
@@ -215,10 +229,7 @@ fn test_apy_changes_with_usd_fluctuations() {
             );
         }
 
-        pic.advance_time(Duration::from_millis(DAY_IN_MS));
-        tick_n_blocks(pic, 15);
-        pic.advance_time(Duration::from_millis(HOUR_IN_MS));
-        tick_n_blocks(pic, 15);
+        wait_1_day(pic);
 
         let usd_values = vec![
             TokenSymbol::GOLDAO,

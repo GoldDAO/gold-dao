@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SelectEnv from "./components/SelectEnv";
 import Summary from "./components/summary/Summary";
 import RewardsPool from "./components/reward-pools/RewardPools";
@@ -8,7 +8,24 @@ import ApyHistory from "./components/apy-history/ApyHistory";
 // import { getCanister } from "./utils/getCanister";
 
 function App() {
-  const [env, setEnv] = useState("staging");
+  const [env, setEnv] = useState("production");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const envFromUrl = urlParams.get("env");
+
+    if (
+      envFromUrl &&
+      (envFromUrl === "staging" || envFromUrl === "production")
+    ) {
+      setEnv(envFromUrl);
+    } else {
+      const url = new URL(window.location);
+      url.searchParams.set("env", "production");
+      window.history.replaceState({}, "", url);
+      setEnv("production");
+    }
+  }, []);
 
   return (
     <div className="xl:container mx-4 xl:mx-auto my-16">

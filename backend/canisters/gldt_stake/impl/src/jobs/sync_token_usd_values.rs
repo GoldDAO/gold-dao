@@ -30,7 +30,7 @@ async fn sync_token_usd_values_impl() {
     );
 
     let mut new_price_map: HashMap<TokenSymbol, f64> = HashMap::new();
-    let current_price_map = read_state(|s| s.data.stake_system.token_usd_values.clone());
+    let current_price_map = read_state(|s| s.data.analytics_system.token_usd_values.clone());
     trace!("current token_usd_values: {:?}", current_price_map);
 
     for token_symbol in tokens {
@@ -64,7 +64,7 @@ async fn sync_token_usd_values_impl() {
     }
 
     trace!("new token_usd_values to be saved: {:?}", new_price_map);
-    mutate_state(|s| s.data.stake_system.set_token_usd_values(new_price_map));
+    mutate_state(|s| s.data.analytics_system.set_token_usd_values(new_price_map));
 
     info!("finished");
 }

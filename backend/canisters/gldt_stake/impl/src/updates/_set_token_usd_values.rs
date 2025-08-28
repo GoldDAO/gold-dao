@@ -16,6 +16,6 @@ fn _set_token_usd_values(args: SetTokenUsdValuesArgs) -> SetTokenUsdValuesRespon
 
 fn _set_token_usd_values_impl(args: SetTokenUsdValuesArgs) -> SetTokenUsdValuesResponse {
     mutate_state(|s| {
-        s.data.stake_system.set_token_usd_values(args);
+        s.data.analytics_system.set_token_usd_values(args);
     });
 }

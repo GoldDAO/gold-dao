@@ -5,7 +5,6 @@ use crate::{
     state::{Data, RuntimeState},
     utils::TimeInterval,
 };
-use std::collections::HashMap;
 pub mod types;
 use crate::model::allocated_rewards_pool::AllocatedRewardsPool;
 
@@ -35,8 +34,6 @@ impl From<RuntimeStateV0> for RuntimeState {
                         .stake_system
                         .pending_fee_transfer_amount,
                     genesis_datetime: old_state.data.stake_system.genesis_datetime,
-                    token_usd_values: old_state.data.stake_system.token_usd_values,
-                    cached_daily_timestamp: old_state.data.stake_system.cached_daily_timestamp,
                 },
                 goldao_sns_rewards_canister_id: old_state.data.goldao_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: old_state.data.goldao_sns_governance_canister_id,
@@ -50,7 +47,6 @@ impl From<RuntimeStateV0> for RuntimeState {
                 processing_rewards_pool: old_state.data.processing_rewards_pool,
                 allocated_rewards_pool: AllocatedRewardsPool {
                     state: old_state.data.allocated_rewards_pool.state,
-                    cached_rewards: HashMap::new(),
                     last_allocation_time: old_state
                         .data
                         .allocated_rewards_pool
