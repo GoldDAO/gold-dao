@@ -12,8 +12,7 @@ use ic_cdk::update;
 async fn manual_sync_neurons_validate(_args: ManualSyncNeuronsArgs) -> Result<String, String> {
     serde_json::to_string_pretty(&_args).map_err(|_| "invalid payload".to_string())
 }
-
-#[update(guard = "caller_is_governance_principal")]
+#[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 async fn manual_sync_neurons(_args: ManualSyncNeuronsArgs) -> ManualSyncNeuronsResponse {
     sync_neurons().await
