@@ -5,6 +5,8 @@ pub mod allocated_rewards_balance;
 pub mod create_neuron;
 pub mod manage_sns_neuron;
 pub mod manage_stake_position;
+pub mod manual_allocate_rewards;
+pub mod manual_claim_rewards;
 pub mod manual_sync_neurons;
 pub mod manual_token_transfer;
 pub mod processing_rewards_balance;

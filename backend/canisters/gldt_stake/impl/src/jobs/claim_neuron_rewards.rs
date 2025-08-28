@@ -18,7 +18,7 @@ pub fn start_job() {
     run_now_then_interval(Duration::from_millis(HOUR_IN_MS), spawn_claim_rewards_job);
 }
 
-fn spawn_claim_rewards_job() {
+pub fn spawn_claim_rewards_job() {
     ic_cdk::futures::spawn(claim_rewards_impl());
 }
 async fn claim_rewards_impl() {
