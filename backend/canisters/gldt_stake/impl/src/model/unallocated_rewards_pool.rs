@@ -67,24 +67,24 @@ pub trait UnallocatedRewards {
 
         if amount_to_transfer == 0_u64 {
             let msg = format!(
-            "Calculated transfer amount is zero (pool_balance: {}, REWARDS_PERCENTAGE: {}). Skipping transfer.",
+            "Calculated transfer amount is zero (amount_to_transfer: {}, REWARDS_PERCENTAGE: {}). Skipping transfer.",
             pool_balance, REWARDS_PERCENTAGE
         );
             return Err(GeneralError::BalanceIsZero(msg));
         }
 
-        if fee > pool_balance {
+        if fee > amount_to_transfer {
             let msg = format!(
-            "Calculated transfer amount is less than fee (pool_balance: {}, fee: {}). Skipping transfer.",
-            pool_balance, fee
+            "Calculated transfer amount is less than fee (amount_to_transfer: {}, fee: {}). Skipping transfer.",
+            amount_to_transfer, fee
         );
             return Err(GeneralError::BalanceIsLowerThanFee(msg));
         }
 
-        if PROCESS_REWARDS_THRESHOLD > pool_balance {
+        if PROCESS_REWARDS_THRESHOLD > amount_to_transfer {
             let msg = format!(
-            "Calculated transfer amount is less than the threshold (pool_balance: {}, threshold: {}). Skipping transfer.",
-            pool_balance, PROCESS_REWARDS_THRESHOLD
+            "Calculated transfer amount is less than the threshold (amount_to_transfer: {}, threshold: {}). Skipping transfer.",
+            amount_to_transfer, PROCESS_REWARDS_THRESHOLD
         );
             return Err(GeneralError::BalanceIsLowerThanFee(msg));
         }

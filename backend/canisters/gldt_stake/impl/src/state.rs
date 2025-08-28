@@ -54,13 +54,15 @@ impl RuntimeState {
             authorized_principals: self.data.authorized_principals.clone(),
 
             total_staked: format!("{:?}", self.data.stake_system.total_staked.0.clone()),
-            // daily_weighted_staked_gldt: self.data.stake_system.daily_weighted_staked_gldt.clone(),
-            daily_apy_timestamp: self.data.stake_system.cached_daily_timestamp,
+            cached_total_weighted_stake: format!(
+                "{:?}",
+                self.data.stake_system.cached_total_weighted_stake.0.clone()
+            ),
             total_active_stake_positions: self.data.stake_system.active_stake_positions(),
-            token_usd_values: self.data.stake_system.token_usd_values.clone(),
+            last_analytics_updated_timestamp: self.data.analytics_system.last_updated_timestamp,
+            token_usd_values: self.data.analytics_system.token_usd_values.clone(),
             genesis_datetime: self.data.stake_system.genesis_datetime,
             reward_types: self.data.stake_system.reward_types.clone(),
-            reward_history: self.data.allocated_rewards_pool.reward_history.clone(),
             neurons: self.data.neuron_system.neurons.clone(),
             pending_fee_transfer_amount: self.data.stake_system.pending_fee_transfer_amount.clone(),
 
@@ -98,16 +100,17 @@ impl RuntimeState {
 pub struct Metrics {
     pub canister_info: CanisterInfo,
     pub authorized_principals: Vec<Principal>,
-    pub total_staked: String,
-    pub total_active_stake_positions: usize,
-    // pub daily_weighted_staked_gldt: HashMap<TimestampMillis, Nat>,
-    pub daily_apy_timestamp: TimestampMillis,
-    pub token_usd_values: HashMap<TokenSymbol, f64>,
-    pub genesis_datetime: TimestampMillis,
-    pub reward_history: HashMap<TokenSymbol, Nat>,
     pub neurons: Vec<Neuron>,
+
+    // stake system metrics
+    pub total_staked: String,
+    pub cached_total_weighted_stake: String,
+    pub total_active_stake_positions: usize,
+    pub genesis_datetime: TimestampMillis,
     pub reward_types: BTreeSet<TokenSymbol>,
     pub pending_fee_transfer_amount: Nat,
+    pub last_analytics_updated_timestamp: TimestampMillis,
+    pub token_usd_values: HashMap<TokenSymbol, f64>,
 
     // ledgers and canister ids
     pub gldt_ledger_id: Principal,

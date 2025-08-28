@@ -112,6 +112,9 @@ impl GldtStakeTestEnvBuilder {
                 .build(),
         ));
         let pic = pic_ref.borrow();
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)).into(),
+        ); // Wednesday Jun 19, 2024, 6:00:00 AM
 
         let sns_subnet = pic.topology().get_sns().unwrap();
 
@@ -184,9 +187,9 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
-        pic.set_time(
-            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
-        ); // Friday 6 Dec 2024, 12:01:00
+        // pic.set_time(
+        //     (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
+        // ); // Friday 6 Dec 2024, 12:01:00
 
         // INIT ICRC3
         let mut constants = ICRC3Properties::default();
@@ -343,12 +346,12 @@ impl GldtStakeTestEnvBuilder {
                 self.ledger_fees.get("ICP").unwrap().clone(),
             ),
         );
-        pic.set_time(
-            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
-        ); // Friday 6 Dec 2024, 12:01:00
-           // pic.set_time(
-           //     (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(17333890470000)).into(),
-           // ); // Thu Dec 05 2024 08:57:27
+        // pic.set_time(
+        //     (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
+        // ); // Friday 6 Dec 2024, 12:01:00
+        //    // pic.set_time(
+        //    //     (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(17333890470000)).into(),
+        //    // ); // Thu Dec 05 2024 08:57:27
 
         // INIT ICRC3
         let mut constants = ICRC3Properties::default();

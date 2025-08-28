@@ -40,8 +40,7 @@ pub struct AllocatedRewardsPool {
     pub state: AllocatedRewardsState,
     pub last_allocation_time: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, Nat>, // all the previous rewards added together when a transfer from processing pool has been processed. useful for APY calculations
-    // pub daily_allocated_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // daily reward history - keeps track of the total rewards for each week that have been allocated for each token
-    pub cached_rewards: HashMap<TokenSymbol, Nat>,
+                                                   // pub daily_allocated_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>, // daily reward history - keeps track of the total rewards for each week that have been allocated for each token
 }
 
 impl AllocatedRewardsPool {
@@ -51,19 +50,7 @@ impl AllocatedRewardsPool {
             last_allocation_time: 0,
             reward_history: HashMap::default(),
             // daily_allocated_rewards: BTreeMap::default(),
-            cached_rewards: HashMap::new(),
         }
-    }
-
-    pub fn add_to_cached_rewards(&mut self, token: TokenSymbol, amount: Nat) {
-        self.cached_rewards
-            .entry(token)
-            .and_modify(|existing: &mut Nat| *existing += amount.clone())
-            .or_insert(amount);
-    }
-
-    pub fn clear_cached_rewards(&mut self) {
-        self.cached_rewards.clear();
     }
 
     pub fn add_to_reward_history(&mut self, token_symbol: &TokenSymbol, rewards: Nat) {
@@ -125,7 +112,6 @@ pub struct AllocatedRewardsPoolMetrics {
     pub state: AllocatedRewardsState,
     pub last_allocation_time: TimestampMillis,
     pub reward_history: HashMap<TokenSymbol, u128>,
-    pub cached_rewards: HashMap<TokenSymbol, u128>,
 }
 
 impl From<AllocatedRewardsPool> for AllocatedRewardsPoolMetrics {
@@ -136,17 +122,10 @@ impl From<AllocatedRewardsPool> for AllocatedRewardsPoolMetrics {
             .map(|(k, v)| (*k, u128::try_from(v.0.clone()).unwrap()))
             .collect();
 
-        let cached_rewards = pool
-            .cached_rewards
-            .iter()
-            .map(|(k, v)| (*k, u128::try_from(v.0.clone()).unwrap()))
-            .collect();
-
         AllocatedRewardsPoolMetrics {
             state: pool.state.clone(),
             last_allocation_time: pool.last_allocation_time,
             reward_history,
-            cached_rewards,
         }
     }
 }

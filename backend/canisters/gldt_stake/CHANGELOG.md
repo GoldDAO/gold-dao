@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.7] - 2025-08-28
+
+#### Modified
+
+- **DailyAnalyticsSystem**:
+  - Daily analytics are now updated instantly (removed 24h delay)
+  - Metrics adjusted for improved accuracy
+- **Processing rewards transfer**: Adjust the transfer amount threshold
+
 ### [1.0.6] - 2025-08-27
 
 #### Modified
