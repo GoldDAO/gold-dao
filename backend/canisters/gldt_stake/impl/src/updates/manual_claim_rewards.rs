@@ -1,5 +1,5 @@
 use crate::guards::caller_is_governance_principal;
-use crate::jobs::claim_neuron_rewards::spawn_claim_rewards_job;
+use crate::jobs::claim_neuron_rewards::claim_rewards;
 use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_claim_rewards::{
     Args as ManualClaimRewardsArgs, Response as ManualClaimRewardsResponse,
@@ -15,5 +15,5 @@ async fn manual_claim_rewards_validate(_args: ManualClaimRewardsArgs) -> Result<
 #[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 async fn manual_claim_rewards(_args: ManualClaimRewardsArgs) -> ManualClaimRewardsResponse {
-    spawn_claim_rewards_job()
+    ic_cdk::futures::spawn(claim_rewards());
 }

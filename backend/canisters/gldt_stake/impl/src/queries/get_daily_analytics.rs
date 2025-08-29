@@ -10,6 +10,6 @@ fn get_daily_analytics(args: GetDailyAnalyticsArgs) -> GetDailyAnalyticsResponse
     read_state(|s| {
         s.data
             .analytics_system
-            .get_analytics(args.starting_day, args.limit)
+            .get_analytics_rev(args.starting_day, args.limit)
     })
 }

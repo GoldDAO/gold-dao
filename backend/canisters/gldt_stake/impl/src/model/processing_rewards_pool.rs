@@ -11,7 +11,7 @@ use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use serde::{Deserialize, Serialize};
 
-pub const PROCESS_REWARDS_THRESHOLD: u64 = 100_000_000_u64;
+pub const PROCESS_REWARDS_THRESHOLD: u64 = 10_000_000_u64;
 
 #[allow(async_fn_in_trait)]
 pub trait ProcessingRewards {

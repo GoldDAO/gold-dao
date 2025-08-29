@@ -1,5 +1,5 @@
 use crate::guards::caller_is_governance_principal;
-use crate::jobs::allocate_rewards::spawn_reward_allocation_job;
+use crate::jobs::allocate_rewards::handle_process_and_allocation;
 use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_allocate_rewards::{
     Args as ManualAllocateRewardsArgs, Response as ManualAllocateRewardsResponse,
@@ -19,5 +19,5 @@ async fn manual_allocate_rewards_validate(
 async fn manual_allocate_rewards(
     _args: ManualAllocateRewardsArgs,
 ) -> ManualAllocateRewardsResponse {
-    spawn_reward_allocation_job()
+    ic_cdk::futures::spawn(handle_process_and_allocation());
 }
