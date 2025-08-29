@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.9] - 2025-08-29
+
+#### Changed
+
+- Lower the rewards transfer threshold
+- Adjust the daily analytics to be returned reversed
+
 ### [1.0.8] - 2025-08-28
 
 #### Added

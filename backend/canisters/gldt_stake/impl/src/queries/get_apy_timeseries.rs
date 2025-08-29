@@ -15,6 +15,6 @@ fn get_daily_series(args: GetApyTimeseriesArgs) -> GetApyTimeseriesResponse {
     read_state(|s| {
         s.data
             .analytics_system
-            .get_apys(args.starting_day, args.limit)
+            .get_apys_rev(args.starting_day, args.limit)
     })
 }

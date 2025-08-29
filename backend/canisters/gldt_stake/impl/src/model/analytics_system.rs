@@ -97,27 +97,33 @@ impl AnalyticsSystem {
         self.last_updated_timestamp = now;
     }
 
-    pub fn get_analytics(
+    pub fn get_analytics_rev(
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
     ) -> BTreeMap<TimestampMillis, DailyAnalytics> {
         self.daily_analytics
-            .range(starting_day..)
+            .iter()
+            .rev()
+            .enumerate()
+            .filter(|(day, _)| *day as u64 >= starting_day)
             .take(limit.unwrap_or(usize::MAX))
-            .map(|(ts, analytics)| (ts, analytics.clone()))
+            .map(|(_, (timestamp, analytics))| (timestamp, analytics))
             .collect()
     }
 
-    pub fn get_apys(
+    pub fn get_apys_rev(
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
     ) -> BTreeMap<TimestampMillis, f64> {
         self.daily_analytics
-            .range(starting_day..)
+            .iter()
+            .rev()
+            .enumerate()
+            .filter(|(day, _)| *day as u64 >= starting_day)
             .take(limit.unwrap_or(usize::MAX))
-            .map(|(ts, analytics)| (ts, analytics.apy))
+            .map(|(_, (timestamp, analytics))| (timestamp, analytics.apy))
             .collect()
     }
 
@@ -201,5 +207,180 @@ fn calculate_daily_apy(
     } else {
         info!("no rewards found");
         0.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    impl AnalyticsSystem {
+        /// Construct a mock system with `num_days` entries.
+        /// - APY increases by `0.01` each day.
+        /// - Weighted stake increases by `100` each day.
+        /// - Timestamp increments by `DAY_IN_MS`.
+        pub fn mock(num_days: usize, start_ts: TimestampMillis) -> Self {
+            let mut system = AnalyticsSystem::default();
+            for i in 0..num_days {
+                let ts = start_ts + i as u64 * DAY_IN_MS;
+                system.daily_analytics.insert(
+                    ts,
+                    DailyAnalytics {
+                        apy: 0.01 * (i as f64 + 1.0),
+                        staked_gldt: Nat::from((i + 1) as u64 * 10),
+                        weighted_stake: Nat::from((i + 1) as u64 * 100),
+                        rewards: HashMap::new(),
+                    },
+                );
+            }
+            system
+        }
+    }
+
+    #[test]
+    fn test_get_apys() {
+        let system = AnalyticsSystem::mock(10, 1756339200000);
+
+        // Case 1: No limit, starting from 0 → should return all in reverse (latest first)
+        let apys = system.get_apys_rev(0, None);
+        assert_eq!(
+            apys,
+            BTreeMap::from([
+                (1756339200000, 0.01),
+                (1756425600000, 0.02),
+                (1756512000000, 0.03),
+                (1756598400000, 0.04),
+                (1756684800000, 0.05),
+                (1756771200000, 0.06),
+                (1756857600000, 0.07),
+                (1756944000000, 0.08),
+                (1757030400000, 0.09),
+                (1757116800000, 0.10)
+            ])
+        );
+
+        // Case 2: Limit = 2 → should return the last 2 (3000 and 2000)
+        let apys = system.get_apys_rev(0, Some(2));
+        assert_eq!(
+            apys,
+            BTreeMap::from([(1757030400000, 0.09), (1757116800000, 0.10)])
+        );
+
+        // Case 3: Starting day = 2500 → should only return 3000
+        let apys = system.get_apys_rev(0, Some(1));
+        assert_eq!(apys, BTreeMap::from([(1757116800000, 0.10)]));
+
+        // Case 4: Starting day > latest → should return empty
+        let apys = system.get_apys_rev(4000, None);
+        assert!(apys.is_empty());
+    }
+
+    #[test]
+    fn test_get_analytics_rev() {
+        let system = AnalyticsSystem::mock(10, 1756339200000);
+
+        // Case 1: No limit, starting from 0 → should return all
+        let analytics = system.get_analytics_rev(0, None);
+        assert_eq!(
+            analytics.keys().cloned().collect::<Vec<_>>(),
+            vec![
+                1756339200000,
+                1756425600000,
+                1756512000000,
+                1756598400000,
+                1756684800000,
+                1756771200000,
+                1756857600000,
+                1756944000000,
+                1757030400000,
+                1757116800000,
+            ]
+        );
+        assert_eq!(analytics[&1756339200000].apy, 0.01);
+        assert_eq!(analytics[&1756684800000].apy, 0.05);
+        assert_eq!(analytics[&1757116800000].apy, 0.10);
+        assert_eq!(analytics[&1757116800000].weighted_stake, Nat::from(1000u64));
+
+        // Case 2: Limit = 2 → should return the last 2 (but sorted ascending in BTreeMap)
+        let analytics = system.get_analytics_rev(0, Some(2));
+        assert_eq!(analytics.len(), 2);
+        assert_eq!(analytics[&1757030400000].apy, 0.09);
+        assert_eq!(analytics[&1757116800000].apy, 0.10);
+
+        // Case 3: Limit = 1 → should only return the very latest
+        let analytics = system.get_analytics_rev(0, Some(1));
+        assert_eq!(analytics.len(), 1);
+        assert_eq!(analytics[&1757116800000].apy, 0.10);
+
+        // Case 4: Too big starting day
+        let analytics = system.get_analytics_rev(20, None);
+        assert!(analytics.is_empty());
+    }
+
+    #[test]
+    fn test_empty_rewards_returns_zero() {
+        let rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
+        let prices: HashMap<TokenSymbol, f64> = HashMap::new();
+        let apy = calculate_daily_apy(Nat::from(100u64), rewards, &prices);
+        assert_eq!(apy, 0.0);
+    }
+
+    #[test]
+    fn test_single_token_simple_case() {
+        let mut rewards = HashMap::new();
+        let mut prices = HashMap::new();
+
+        let gldt = TokenSymbol::GLDT;
+        let goldao = TokenSymbol::GOLDAO;
+        rewards.insert(goldao.clone(), Nat::from(5_000_000_000_u64));
+        prices.insert(gldt.clone(), 1.12940407616124);
+        prices.insert(goldao.clone(), 0.01839565874165977);
+
+        let apy = calculate_daily_apy(Nat::from(178_585_860_745_u64), rewards, &prices);
+        assert_eq!(apy, 16.644923021770992);
+    }
+
+    #[test]
+    fn test_all_rewards_calculation() {
+        let mut rewards = HashMap::new();
+        let mut prices = HashMap::new();
+
+        // token_usd_values for all tokens
+        prices.insert(TokenSymbol::OGY, 0.0020897925827264275);
+        prices.insert(TokenSymbol::WTN, 0.12425300335520276);
+        prices.insert(TokenSymbol::GLDT, 1.12940407616124);
+        prices.insert(TokenSymbol::ICP, 4.903953021499477);
+        prices.insert(TokenSymbol::GOLDAO, 0.01839565874165977);
+
+        // realistic rewards (exclude GLDT as per business logic)
+        rewards.insert(TokenSymbol::OGY, Nat::from(10_000_000_000u64)); // 20897925.8273 USD
+        rewards.insert(TokenSymbol::WTN, Nat::from(2_500_000u64)); // 310632.508388 USD
+        rewards.insert(TokenSymbol::GOLDAO, Nat::from(5_000_000_000u64)); // 91978293.7083 USD
+        rewards.insert(TokenSymbol::ICP, Nat::from(1_000_000u64)); // 4903953.0215 USD
+
+        // weighted stake
+        let total_weighted_stake = Nat::from(178_585_860_745u64); // 201695599070 USD
+
+        let apy = calculate_daily_apy(total_weighted_stake, rewards, &prices);
+
+        // Total rewards - 118090805.065 USD
+        // daily rewards 0.00058549024
+        // APY - 0.2137039376 * 100
+        assert_eq!(apy, 21.370393824951332);
+    }
+
+    #[test]
+    fn test_zero_stake_returns_zero() {
+        let mut rewards = HashMap::new();
+        let mut prices = HashMap::new();
+
+        let gldt = TokenSymbol::GLDT;
+        rewards.insert(gldt.clone(), Nat::from(10u64));
+        prices.insert(gldt.clone(), 2.0);
+
+        let apy = calculate_daily_apy(Nat::from(0u64), rewards, &prices);
+
+        assert_eq!(apy, 0.0);
     }
 }
