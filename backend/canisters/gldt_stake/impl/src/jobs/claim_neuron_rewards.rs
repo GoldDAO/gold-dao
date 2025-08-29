@@ -18,16 +18,22 @@ pub fn start_job() {
     run_now_then_interval(Duration::from_millis(HOUR_IN_MS), spawn_claim_rewards_job);
 }
 
-pub fn spawn_claim_rewards_job() {
+fn spawn_claim_rewards_job() {
     ic_cdk::futures::spawn(claim_rewards_impl());
 }
+
 async fn claim_rewards_impl() {
-    let _span = tracing::info_span!("CLAIM_NEURON_REWARDS").entered();
     let now = timestamp_millis();
 
     if !is_allowed_to_run(now) {
         return;
     }
+
+    claim_rewards().await
+}
+
+pub async fn claim_rewards() {
+    let _span = tracing::info_span!("CLAIM_NEURON_REWARDS").entered();
 
     info!("start");
 

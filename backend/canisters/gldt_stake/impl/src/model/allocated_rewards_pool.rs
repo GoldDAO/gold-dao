@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use types::TimestampMillis;
 use types::TokenSymbol;
 
-pub const ALLOCATE_REWARDS_THRESHOLD: u64 = 100_000_000_u64;
+pub const ALLOCATE_REWARDS_THRESHOLD: u64 = 10_000_000_u64;
 
 #[allow(async_fn_in_trait)]
 pub trait AllocatedRewards {

@@ -23,18 +23,22 @@ pub fn start_job() {
     );
 }
 
-pub fn spawn_reward_allocation_job() {
-    ic_cdk::futures::spawn(handle_process_and_allocation())
+fn spawn_reward_allocation_job() {
+    ic_cdk::futures::spawn(handle_process_and_allocation_impl())
 }
 
-async fn handle_process_and_allocation() {
-    let _span = tracing::info_span!("HANDLE_PROCESS_AND_ALLOCATION").entered();
-
+async fn handle_process_and_allocation_impl() {
     let now = timestamp_millis();
 
     if !is_allowed_to_run(now) {
         return;
     }
+
+    handle_process_and_allocation().await
+}
+
+pub async fn handle_process_and_allocation() {
+    let _span = tracing::info_span!("HANDLE_PROCESS_AND_ALLOCATION").entered();
 
     info!("start");
 
