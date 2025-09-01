@@ -136,8 +136,9 @@ const useFetchUserPosition = (
             const price = await swap_amounts(actorKongswap, {
               from: token.name,
               to: "ckUSDT",
-              amount: 1n,
+              amount: BigInt(1 * 10 ** decimals),
             });
+
             const amount = Number(token_reward.amount) / 10 ** decimals;
 
             return {
