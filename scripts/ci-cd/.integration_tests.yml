@@ -1,7 +1,9 @@
 integration tests trigger:
   stage: integration_testing
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop"
+    # This will run on any MR to develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" &&
+          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
@@ -23,7 +25,9 @@ integration tests:
         $CI_COMMIT_TAG =~ '/^[a-zA-Z0-9_]+-v\d+\.\d+\.\d+(-reinstall)?$/' &&
         $CI_COMMIT_TAG !~ '/gld_dashboard|gld_landing_page|gldt_swap_app/'
       when: always
-    - if: $CI_COMMIT_REF_NAME == "develop" || $CI_PIPELINE_SOURCE == "merge_request_event"
+    # This will run on any MR to develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" &&
+          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
       changes:
         - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
         - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
