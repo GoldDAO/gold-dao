@@ -133,7 +133,7 @@ const useGetRewardAllocations = (
           })
         );
 
-        return analytics.sort((a, b) => a.date - b.date);
+        return analytics;
       } catch (err) {
         console.log(err);
         throw new Error("Fetch daily analytics error! Please retry later.");
