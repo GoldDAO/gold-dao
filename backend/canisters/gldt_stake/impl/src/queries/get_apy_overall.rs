@@ -29,13 +29,13 @@ fn get_apy_overall(_: GetApyArgs) -> GetApyResponse {
 }
 
 fn get_apy_impl(
-    daily_weighted_stake: BTreeMap<TimestampMillis, Nat>,
-    daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
+    daily_weighted_stake: Vec<(TimestampMillis, Nat)>,
+    daily_rewards: Vec<(TimestampMillis, HashMap<TokenSymbol, Nat>)>,
     token_usd_values: HashMap<TokenSymbol, f64>,
 ) -> GetApyResponse {
     let total_weighted_stake = daily_weighted_stake
-        .values()
-        .fold(Nat::from(0u64), |acc, n| acc + n.clone());
+        .iter()
+        .fold(Nat::from(0u64), |acc, (_, n)| acc + n.clone());
 
     let total_rewards_per_token = calculate_total_rewards_per_token(daily_rewards);
     let total_rewards_usd = sum_usd_rewards(convert_rewards_to_usd(
@@ -49,14 +49,14 @@ fn get_apy_impl(
 }
 
 fn calculate_total_rewards_per_token(
-    daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>>,
+    daily_rewards: Vec<(TimestampMillis, HashMap<TokenSymbol, Nat>)>,
 ) -> HashMap<TokenSymbol, Nat> {
     let mut total_rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
 
-    for rewards_per_timestamp in daily_rewards.values() {
+    for (_ts, rewards_per_timestamp) in daily_rewards.iter() {
         for (token, amount) in rewards_per_timestamp {
             total_rewards
-                .entry(*token)
+                .entry(token.clone())
                 .and_modify(|existing| *existing += amount.clone())
                 .or_insert(amount.clone());
         }
@@ -80,6 +80,7 @@ fn convert_rewards_to_usd(
             usd_rewards.insert(token, 0.0);
         }
     }
+
     usd_rewards
 }
 
@@ -165,7 +166,6 @@ pub fn calculate_weighted_stake_usd(
 mod tests {
 
     use candid::Nat;
-    use std::collections::BTreeMap;
     use std::collections::HashMap;
     use time::{Duration, OffsetDateTime};
     use types::{TimestampMillis, TokenSymbol};
@@ -189,16 +189,15 @@ mod tests {
         token_prices_usd.insert(TokenSymbol::ICP, 1.0);
         token_prices_usd.insert(TokenSymbol::GLDT, 10.0);
 
-        let mut daily_rewards: BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>> =
-            BTreeMap::new();
+        let mut daily_rewards: Vec<(TimestampMillis, HashMap<TokenSymbol, Nat>)> = Vec::new();
         let mut rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
         rewards.insert(TokenSymbol::GOLDAO, Nat::from(400u64));
         rewards.insert(TokenSymbol::OGY, Nat::from(400u64));
         rewards.insert(TokenSymbol::ICP, Nat::from(400u64));
-        daily_rewards.insert(one_day_ago, rewards);
+        daily_rewards.push((one_day_ago, rewards));
 
-        let mut dayly_weighted_stake = BTreeMap::new();
-        dayly_weighted_stake.insert(one_day_ago, Nat::from(100_00u64));
+        let mut dayly_weighted_stake = Vec::new();
+        dayly_weighted_stake.push((one_day_ago, Nat::from(100_00u64)));
         // state
         // - with token pricing
         // - 1 days passed
@@ -224,9 +223,9 @@ mod tests {
         rewards.insert(TokenSymbol::GOLDAO, Nat::from(0u64));
         rewards.insert(TokenSymbol::OGY, Nat::from(0u64));
         rewards.insert(TokenSymbol::ICP, Nat::from(0u64));
-        daily_rewards.insert(now, rewards);
+        daily_rewards.push((now, rewards));
 
-        dayly_weighted_stake.insert(now, Nat::from(100_00u64));
+        dayly_weighted_stake.push((now, Nat::from(100_00u64)));
 
         assert_eq!(
             get_apy_impl(dayly_weighted_stake, daily_rewards, token_prices_usd),

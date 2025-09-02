@@ -10,6 +10,7 @@ pub use gldt_stake_api_canister::Args;
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
+use types::TokenSymbol;
 
 use super::init_canister;
 
@@ -29,6 +30,10 @@ fn post_upgrade(args: Args) {
             let (mut state, logs, traces, icrc3): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
                 ::deserialize(reader)
                 .unwrap();
+
+            state.data.stake_system.reward_types.remove(&TokenSymbol::ICP);
+            state.data.stake_system.reward_types.remove(&TokenSymbol::WTN);
+            state.data.stake_system.reward_types.remove(&TokenSymbol::OGY);
 
             // uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer

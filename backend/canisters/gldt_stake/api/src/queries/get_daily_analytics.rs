@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use candid::CandidType;
 use gldt_stake_common::daily_analytics::DailyAnalytics;
 use serde::{Deserialize, Serialize};
@@ -11,4 +9,4 @@ pub struct Args {
     pub limit: Option<usize>,
 }
 
-pub type Response = BTreeMap<TimestampMillis, DailyAnalytics>;
+pub type Response = Vec<(TimestampMillis, DailyAnalytics)>;

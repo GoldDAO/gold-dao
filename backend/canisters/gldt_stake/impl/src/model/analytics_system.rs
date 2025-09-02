@@ -101,7 +101,7 @@ impl AnalyticsSystem {
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
-    ) -> BTreeMap<TimestampMillis, DailyAnalytics> {
+    ) -> Vec<(TimestampMillis, DailyAnalytics)> {
         self.daily_analytics
             .iter()
             .rev()
@@ -116,7 +116,7 @@ impl AnalyticsSystem {
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
-    ) -> BTreeMap<TimestampMillis, f64> {
+    ) -> Vec<(TimestampMillis, f64)> {
         self.daily_analytics
             .iter()
             .rev()
@@ -131,7 +131,7 @@ impl AnalyticsSystem {
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
-    ) -> BTreeMap<TimestampMillis, Nat> {
+    ) -> Vec<(TimestampMillis, Nat)> {
         self.daily_analytics
             .range(starting_day..)
             .take(limit.unwrap_or(usize::MAX))
@@ -143,7 +143,7 @@ impl AnalyticsSystem {
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
-    ) -> BTreeMap<TimestampMillis, Nat> {
+    ) -> Vec<(TimestampMillis, Nat)> {
         self.daily_analytics
             .range(starting_day..)
             .take(limit.unwrap_or(usize::MAX))
@@ -155,7 +155,7 @@ impl AnalyticsSystem {
         &self,
         starting_day: TimestampMillis,
         limit: Option<usize>,
-    ) -> BTreeMap<TimestampMillis, HashMap<TokenSymbol, Nat>> {
+    ) -> Vec<(TimestampMillis, HashMap<TokenSymbol, Nat>)> {
         self.daily_analytics
             .range(starting_day..)
             .take(limit.unwrap_or(usize::MAX))
@@ -246,17 +246,17 @@ mod tests {
         let apys = system.get_apys_rev(0, None);
         assert_eq!(
             apys,
-            BTreeMap::from([
-                (1756339200000, 0.01),
-                (1756425600000, 0.02),
-                (1756512000000, 0.03),
-                (1756598400000, 0.04),
-                (1756684800000, 0.05),
-                (1756771200000, 0.06),
-                (1756857600000, 0.07),
-                (1756944000000, 0.08),
+            Vec::from([
+                (1757116800000, 0.10),
                 (1757030400000, 0.09),
-                (1757116800000, 0.10)
+                (1756944000000, 0.08),
+                (1756857600000, 0.07),
+                (1756771200000, 0.06),
+                (1756684800000, 0.05),
+                (1756598400000, 0.04),
+                (1756512000000, 0.03),
+                (1756425600000, 0.02),
+                (1756339200000, 0.01),
             ])
         );
 
@@ -264,12 +264,12 @@ mod tests {
         let apys = system.get_apys_rev(0, Some(2));
         assert_eq!(
             apys,
-            BTreeMap::from([(1757030400000, 0.09), (1757116800000, 0.10)])
+            Vec::from([(1757116800000, 0.10), (1757030400000, 0.09),])
         );
 
         // Case 3: Starting day = 2500 → should only return 3000
         let apys = system.get_apys_rev(0, Some(1));
-        assert_eq!(apys, BTreeMap::from([(1757116800000, 0.10)]));
+        assert_eq!(apys, Vec::from([(1757116800000, 0.10)]));
 
         // Case 4: Starting day > latest → should return empty
         let apys = system.get_apys_rev(4000, None);
@@ -282,36 +282,40 @@ mod tests {
 
         // Case 1: No limit, starting from 0 → should return all
         let analytics = system.get_analytics_rev(0, None);
+        let keys: Vec<u64> = analytics.iter().map(|(ts, _)| *ts).collect();
         assert_eq!(
-            analytics.keys().cloned().collect::<Vec<_>>(),
+            keys,
             vec![
-                1756339200000,
-                1756425600000,
-                1756512000000,
-                1756598400000,
-                1756684800000,
-                1756771200000,
-                1756857600000,
-                1756944000000,
-                1757030400000,
                 1757116800000,
+                1757030400000,
+                1756944000000,
+                1756857600000,
+                1756771200000,
+                1756684800000,
+                1756598400000,
+                1756512000000,
+                1756425600000,
+                1756339200000,
             ]
         );
-        assert_eq!(analytics[&1756339200000].apy, 0.01);
-        assert_eq!(analytics[&1756684800000].apy, 0.05);
-        assert_eq!(analytics[&1757116800000].apy, 0.10);
-        assert_eq!(analytics[&1757116800000].weighted_stake, Nat::from(1000u64));
 
-        // Case 2: Limit = 2 → should return the last 2 (but sorted ascending in BTreeMap)
+        assert_eq!(analytics[9].1.apy, 0.01); // earliest
+        assert_eq!(analytics[5].1.apy, 0.05);
+        assert_eq!(analytics[0].1.apy, 0.10); // latest
+        assert_eq!(analytics[0].1.weighted_stake, Nat::from(1000u64));
+        println!("analytics {:?}", analytics);
+
+        // Case 2: Limit = 2 → should return the last 2 (latest first)
         let analytics = system.get_analytics_rev(0, Some(2));
         assert_eq!(analytics.len(), 2);
-        assert_eq!(analytics[&1757030400000].apy, 0.09);
-        assert_eq!(analytics[&1757116800000].apy, 0.10);
+        assert_eq!(analytics[1].1.apy, 0.09);
+        assert_eq!(analytics[0].1.apy, 0.10);
+        println!("analytics {:?}", analytics);
 
         // Case 3: Limit = 1 → should only return the very latest
         let analytics = system.get_analytics_rev(0, Some(1));
         assert_eq!(analytics.len(), 1);
-        assert_eq!(analytics[&1757116800000].apy, 0.10);
+        assert_eq!(analytics[0].1.apy, 0.10);
 
         // Case 4: Too big starting day
         let analytics = system.get_analytics_rev(20, None);
