@@ -1,7 +1,6 @@
 use candid::CandidType;
 use candid::Nat;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use std::collections::HashMap;
 use types::TokenSymbol;
 
@@ -11,4 +10,4 @@ pub struct Args {
     pub limit: Option<usize>,
 }
 
-pub type Response = BTreeMap<u64, HashMap<TokenSymbol, Nat>>;
+pub type Response = Vec<(u64, HashMap<TokenSymbol, Nat>)>;

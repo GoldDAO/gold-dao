@@ -16,5 +16,5 @@ serde = { workspace = true, features = ["derive"] }
 sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 types = { path = '../../../libraries/types' }
 gldt_stake_common = { path = "../common", features = []}
-bity-ic-icrc3 = {workspace = true }
+bity-ic-icrc3 = { workspace = true }
 utils = { path = '../../../libraries/utils' }
