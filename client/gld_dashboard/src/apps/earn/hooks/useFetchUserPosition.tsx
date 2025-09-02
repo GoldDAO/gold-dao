@@ -14,8 +14,8 @@ import {
 import {
   TOKEN_GLDT,
   TOKEN_GOLDAO_IC,
-  TOKEN_ICP_IC,
-  TOKEN_OGY_IC,
+  // TOKEN_ICP_IC,
+  // TOKEN_OGY_IC,
 } from "@shared/utils/tokens";
 import { idlFactory as idlFactoryStake } from "@services/gldt_stake/interfaces/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
@@ -103,7 +103,7 @@ const useFetchUserPosition = (
         );
 
         const rewards: Reward[] = await Promise.all(
-          [TOKEN_GOLDAO_IC, TOKEN_ICP_IC, TOKEN_OGY_IC].map(async (token) => {
+          [TOKEN_GOLDAO_IC].map(async (token) => {
             const res = {
               ...token,
               is_selected: false,

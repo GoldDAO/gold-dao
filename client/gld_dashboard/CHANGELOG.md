@@ -6,13 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
-### [2.0.9] - 2025-08-20
+### [2.0.9] - 2025-09-20
 
 #### Fix
 
 - Earn view - Stake amount on click max button
 - Earn menu disabled on mobile view
 - Minor UI
+
+#### Added
+
+- Enable PLUG wallet
+
+#### Changed
+
+- Disable OGY, ICP rewards on GLDT stake
 
 ### [2.0.8] - 2025-08-08
 
