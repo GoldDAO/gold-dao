@@ -110,7 +110,7 @@ impl Storable for DailyAnalytics {
 mod tests {
     use super::*;
     use candid::Nat;
-    use std::collections::{BTreeMap, HashMap};
+    use std::collections::HashMap;
     use types::TokenSymbol;
 
     fn sample_daily_analytics() -> DailyAnalytics {
@@ -183,11 +183,11 @@ mod tests {
     fn test_daily_analytics_encode_decode_max_case() {
         // Build a max DailyAnalytics instance
         let mut rewards = HashMap::new();
-        // rewards.insert(TokenSymbol::ICP, Nat::from(1_000_000u64));
-        // rewards.insert(TokenSymbol::OGY, Nat::from(2_000_000u64));
-        // rewards.insert(TokenSymbol::GOLDAO, Nat::from(3_000_000u64));
-        // rewards.insert(TokenSymbol::WTN, Nat::from(4_000_000u64));
-        // rewards.insert(TokenSymbol::GLDT, Nat::from(5_000_000u64));
+        rewards.insert(TokenSymbol::ICP, Nat::from(1_000_000u64));
+        rewards.insert(TokenSymbol::OGY, Nat::from(2_000_000u64));
+        rewards.insert(TokenSymbol::GOLDAO, Nat::from(3_000_000u64));
+        rewards.insert(TokenSymbol::WTN, Nat::from(4_000_000u64));
+        rewards.insert(TokenSymbol::GLDT, Nat::from(5_000_000u64));
 
         let analytics = DailyAnalytics {
             apy: 12.34,

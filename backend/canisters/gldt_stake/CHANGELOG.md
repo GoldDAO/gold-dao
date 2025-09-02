@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.9] - 2025-09-02
+
+#### Changed
+
+- Change the list of rewards
+- Deactivate automatic reward claiming
+- Daily analytics are now returned in reverse chronological order (newest → oldest). Previously they were returned oldest → newest due to StableBTreeMap iteration order. Also adjusted other analytics endpoints
+
 ### [1.0.9] - 2025-08-29
 
 #### Changed

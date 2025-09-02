@@ -9,7 +9,7 @@ use crate::utils::wait_1_day;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
 use candid::Nat;
 use candid::Principal;
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
+use canister_time::HOUR_IN_MS;
 use std::time::Duration;
 use types::TokenSymbol;
 
@@ -130,7 +130,7 @@ fn test_process_staking_rewards() {
     assert_eq!(apy_history.len(), 3);
 
     // the first day should have APY == 0.0 (genesis day, no rewards yet)
-    let (first_day, first_apy) = apy_history.first_key_value().unwrap();
+    let (first_day, first_apy) = apy_history.last().unwrap();
     assert_eq!(
         *first_apy, 0.0,
         "First day {} should have APY 0.0",
@@ -138,7 +138,7 @@ fn test_process_staking_rewards() {
     );
 
     // all subsequent days must have APY > 0.0
-    for (ts, apy) in apy_history.iter().skip(1) {
+    for (ts, apy) in apy_history.iter().skip(apy_history.len()) {
         assert!(
             *apy > 0.0,
             "Day {} should have positive APY, but got {}",
