@@ -2,6 +2,7 @@ use candid::Nat;
 use num_bigint::BigUint;
 const SCALE_FACTOR: u64 = 100_000_000_000_000u64;
 use candid::CandidType;
+use icrc_ledger_types::icrc::generic_value::ICRC3Value;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt;
@@ -49,6 +50,12 @@ pub enum PercentageError {
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, CandidType, Serialize, Deserialize, Default,
 )]
 pub struct Percentage(u8);
+
+impl Into<ICRC3Value> for Percentage {
+    fn into(self) -> ICRC3Value {
+        ICRC3Value::Nat(Nat::from(self.0))
+    }
+}
 
 impl fmt::Display for Percentage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

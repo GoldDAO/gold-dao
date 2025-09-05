@@ -2,7 +2,6 @@ pub use gldt_stake_api_canister::get_apy_timeseries::{
     Args as GetApyTimeseriesArgs, Response as GetApyTimeseriesResponse,
 };
 use ic_cdk::query;
-use types::TimestampMillis;
 
 use crate::state::read_state;
 

@@ -1,4 +1,4 @@
-use bity_ic_canister_time::{run_interval, WEEK_IN_MS};
+use bity_ic_canister_time::{run_now_then_interval, WEEK_IN_MS};
 use candid::Nat;
 use gldt_stake_common::accounts::USER_STAKES_POOL;
 use gldt_stake_common::{accounts::INSTANT_DISSOLVEMENT_FEE_ACCOUNT, ledgers::GLDT_TX_FEE};
@@ -11,7 +11,7 @@ use utils::env::Environment;
 use crate::state::{mutate_state, read_state};
 
 pub fn start_job() {
-    run_interval(
+    run_now_then_interval(
         Duration::from_millis(WEEK_IN_MS),
         transfer_instant_dissolve_fees_job,
     );

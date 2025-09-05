@@ -54,7 +54,7 @@ impl From<RuntimeStateV0> for RuntimeState {
                     reward_history: old_state.data.allocated_rewards_pool.reward_history,
                 },
                 reward_claim_interval: Some(TimeInterval {
-                    weekday: Some("Thursday".to_string()),
+                    weekday: None,
                     start_hour: 10,
                     end_hour: 11,
                 }),

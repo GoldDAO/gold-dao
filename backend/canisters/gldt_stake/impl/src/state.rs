@@ -172,12 +172,12 @@ impl Default for Data {
             goldao_sns_governance_canister_id: Principal::anonymous(),
             neuron_system: NeuronSystem::default(),
             reward_claim_interval: Some(TimeInterval {
-                weekday: Some("Thursday".to_string()),
+                weekday: None,
                 start_hour: 12,
                 end_hour: 13,
             }),
             allocate_rewards_interval: Some(TimeInterval {
-                weekday: Some("Thursday".to_string()),
+                weekday: None,
                 start_hour: 11,
                 end_hour: 12,
             }),
