@@ -6,7 +6,7 @@ pub use gldt_stake_api_canister::set_dissolve_event_time::Args as SetDissolveEve
 pub use gldt_stake_api_canister::set_dissolve_event_time::Response as SetDissolveEventTimeResponse;
 use ic_cdk::update;
 
-#[update(guard = "caller_is_governance_principal")]
+#[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 async fn set_dissolve_event_time(args: SetDissolveEventTimeArgs) -> SetDissolveEventTimeResponse {
     let mut new_stake_position = mutate_state(|s: &mut RuntimeState| {

@@ -1,8 +1,8 @@
 use crate::state::replace_icrc3;
 use crate::state::start_default_archive_job;
-use crate::{
-    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
-};
+use crate::utils::TimeInterval;
+use crate::{memory::get_upgrades_memory, state::RuntimeState};
+// use crate::migrations::types::state::RuntimeStateV0;
 use bity_ic_icrc3::icrc3::ICRC3;
 use canister_logger::LogEntry;
 use canister_tracing_macros::trace;
@@ -10,7 +10,6 @@ pub use gldt_stake_api_canister::Args;
 use ic_cdk_macros::post_upgrade;
 use stable_memory::get_reader;
 use tracing::info;
-use types::TokenSymbol;
 
 use super::init_canister;
 
@@ -31,9 +30,11 @@ fn post_upgrade(args: Args) {
                 ::deserialize(reader)
                 .unwrap();
 
-            state.data.stake_system.reward_types.remove(&TokenSymbol::ICP);
-            state.data.stake_system.reward_types.remove(&TokenSymbol::WTN);
-            state.data.stake_system.reward_types.remove(&TokenSymbol::OGY);
+            state.data.allocate_rewards_interval = Some(TimeInterval {
+                    weekday: None,
+                    start_hour: 11,
+                    end_hour: 12,
+                });
 
             // uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
