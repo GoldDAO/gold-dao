@@ -294,7 +294,7 @@ const Buy = () => {
                   <div className="w-full p-4">
                     {!isConnected && (
                       <form
-                        className="flex justify-center items-center gap-2"
+                        className="flex justify-left items-center gap-2"
                         onSubmit={(e) => e.preventDefault()}
                       >
                         <input
