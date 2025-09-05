@@ -30,9 +30,7 @@ const RewardsAvailable = ({
                 <NumberToLocaleString value={amount} />$
               </span>
             </div>
-            <div className={styles.description}>
-              dispatched in GOLDAO, ICP and OGY
-            </div>
+            <div className={styles.description}>dispatched in GOLDAO</div>
           </div>
           {claimRewardsButton}
         </div>

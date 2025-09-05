@@ -34,6 +34,9 @@ const useGetAPYHistory = (canister_id_gldt_stake, options = {}) => {
         );
         const res = apy_timeseries
           .map(([timestamp, percentage]) => {
+            if (timestamp < 1_756_425_600_000) {
+              percentage = 0;
+            }
             return {
               date: new Date(Number(timestamp)).toISOString().split("T")[0],
               value: Number(percentage.toFixed(2)),

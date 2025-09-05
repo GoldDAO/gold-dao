@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { GLDT_STAKE_CANISTER_ID } from "@constants";
+import {
+  GLDT_STAKE_CANISTER_ID,
+  INSTANT_DISSOLVE_FEE_PERCENTAGE,
+} from "@constants";
 import { DecreaseStakeStateReducerAtom } from "../../atoms";
 import Button from "@shared/ui/button/HorizontalButton";
 import useDissolving from "./hooks/useDissolvingInstantly";
@@ -84,7 +87,13 @@ const Details = () => {
 
             <div className="flex items-center gap-1 font-semibold text-4xl">
               <Logo name="gldt" className="w-8" />
-              <NumberToLocaleString value={Number(state.unlock_amount)} />
+              <NumberToLocaleString
+                value={
+                  Number(state.unlock_amount) -
+                  Number(state.unlock_amount) *
+                    (INSTANT_DISSOLVE_FEE_PERCENTAGE / 100)
+                }
+              />
               <div>GLDT</div>
             </div>
           </div>

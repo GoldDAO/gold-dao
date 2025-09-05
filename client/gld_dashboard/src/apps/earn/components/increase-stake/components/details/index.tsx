@@ -20,16 +20,18 @@ const DetailsDialogContent = () => {
 
   const handleAddStake = () => {
     if (!stakeState.user_balance_gldt) return;
-    const stakeAmount = BigInt(
-      Number(stakeState.stake_amount) *
-        10 ** stakeState.user_balance_gldt.decimals
+    const stakeAmountE8s = BigInt(
+      Math.round(
+        Number(stakeState.stake_amount) *
+          10 ** stakeState.user_balance_gldt.decimals
+      )
     );
     const isAmountMaxBalance =
-      stakeAmount + stakeState.user_balance_gldt.fee_e8s >=
+      stakeAmountE8s + stakeState.user_balance_gldt.fee_e8s >=
       stakeState.user_balance_gldt.balance_e8s;
     const amount = isAmountMaxBalance
-      ? stakeAmount
-      : stakeAmount + stakeState.user_balance_gldt.fee_e8s;
+      ? stakeAmountE8s
+      : stakeAmountE8s + stakeState.user_balance_gldt.fee_e8s;
     addStake.mutate({
       amount,
     });
