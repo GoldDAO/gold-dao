@@ -6,7 +6,6 @@ use canister_time::timestamp_millis;
 use gldt_stake_common::daily_analytics::DailyAnalytics;
 use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use std::collections::HashMap;
 use types::TimestampMillis;
 use types::TokenSymbol;

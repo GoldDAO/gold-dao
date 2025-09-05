@@ -1,7 +1,9 @@
 use crate::manage_stake_position_interface::WithdrawErrors;
 use candid::CandidType;
 use candid::Nat;
+use icrc_ledger_types::icrc::generic_value::ICRC3Value;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use types::TimestampMillis;
 use utils::numeric::Percentage;
 
@@ -11,6 +13,23 @@ pub struct DissolveStakeEvent {
     pub amount: Nat,
     pub dissolved_date: TimestampMillis,
     pub completed: bool,
+}
+
+impl Into<ICRC3Value> for DissolveStakeEvent {
+    fn into(self) -> ICRC3Value {
+        let mut map = BTreeMap::new();
+        map.insert("percentage".to_string(), self.percentage.into());
+        map.insert("amount".to_string(), ICRC3Value::Nat(self.amount));
+        map.insert(
+            "dissolved_date".to_string(),
+            ICRC3Value::Nat(self.dissolved_date.into()),
+        );
+        map.insert(
+            "completed".to_string(),
+            ICRC3Value::Nat(Nat::from(self.completed as u8)),
+        );
+        ICRC3Value::Map(map)
+    }
 }
 
 // -------------------

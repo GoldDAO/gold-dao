@@ -11,7 +11,7 @@ OGY_LEDGER_CANISTER_ID=lkwrt-vyaaa-aaaaq-aadhq-cai
 GOLDAO_LEDGER_CANISTER_ID=tyyy3-4aaaa-aaaaq-aab7a-cai
 GOLDAO_SNS_GOVERNANCE_CANISTER_ID=tr3th-kiaaa-aaaaq-aab6q-cai
 GOLDAO_SNS_REWARDS_CANISTER_ID=iyehc-lqaaa-aaaap-ab25a-cai
-ALLOWED_REWARD_TOKENS="vec { \"ICP\"; \"OGY\"; \"GOLDAO\"; \"WTN\"}"
+ALLOWED_REWARD_TOKENS="vec { \"GOLDAO\" }"
 ICRC3_SUPPORTED_BLOCKS="vec {
   record { block_type = \"add_stake\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };
   record { block_type = \"claim_rewards\"; url = \"https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types\"; };

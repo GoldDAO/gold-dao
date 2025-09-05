@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.11] - 2025-09-05
+
+#### Changed
+
+- Add additional field to ICRC3 transaction
+- Run instant_dissolve_fees at each upgrade
+- Hide testing endpoints
+
 ### [1.0.10] - 2025-09-02
 
 #### Changed
