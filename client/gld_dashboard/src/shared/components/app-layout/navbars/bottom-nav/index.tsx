@@ -9,7 +9,7 @@ const BottomNav = ({ className }: { className?: string }) => {
         <div>
           <ThemeToggle />
         </div>
-        <div className="flex flex-col xl:flex-row items-center gap-2 xl:gap-6 text-content/60 text-xs">
+        <div className="flex flex-col xl:flex-row items-center gap-2 xl:gap-6 text-content/60 text-sm">
           <a
             href="https://docs.gold-dao.org"
             target="_blank"
@@ -17,6 +17,15 @@ const BottomNav = ({ className }: { className?: string }) => {
             className="inline-flex items-center hover:underline"
           >
             Docs
+            <Icon.ExternalLink width={16} height={16} className="ml-2" />
+          </a>
+          <a
+            href="https://docs.gold-dao.org/legal/terms-of-service"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center hover:underline"
+          >
+            Terms of Service
             <Icon.ExternalLink width={16} height={16} className="ml-2" />
           </a>
           {/* <div>Version {VERSION_DAPP ?? "undefined"}</div> */}
