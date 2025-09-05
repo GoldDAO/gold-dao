@@ -19,20 +19,20 @@ const StakeInformations = ({ className }: { className?: string }) => {
 
   const infos: Array<{ title: string; subtitle: string; icon: ReactNode }> = [
     {
-      title: "Staking rewards will be paid in tokens GOLDAO, ICP and OGY.",
+      title: "Staking reward are being paid in GOLDAO tokens.",
       subtitle: "",
       icon: <Logo name="gldt" className="w-8" />,
     },
     {
       title: "Current APY",
       subtitle:
-        "Based on last weeks APY. You will be part of next round of payment.",
+        "Based on the latest rewards. The effective APY depends on the amount of GLDT staked in total each day.",
       icon: <Icon.Insights size={32} />,
     },
     {
       title: "Unlock delay of 1 week",
       subtitle:
-        "When unlocking GLDT from staking, the tokens are locked for 1 week without rewards before they can be withdrawn.",
+        "When unlocking GLDT from staking, the tokens are locked for 1 week without receiving any further rewards, before they can be withdrawn. You can pay a 5% fee on your stake to unlock immediately.",
       icon: <Icon.Clock width={32} />,
     },
     {
