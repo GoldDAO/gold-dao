@@ -12,7 +12,10 @@ const Summary = ({ env }) => {
     GLDT_STAKE_CANISTER_ID,
     GLDT_LEDGER_CANISTER_ID,
     GOLDAO_LEDGER_CANISTER_ID,
+    SNS_ROOT_CANISTER_ID,
   } = getCanister(env);
+
+  const { GLDT_STAKE_SOURCE_NEURON_ID } = getNeuron(env);
 
   const totalStaked = useGetTotalStaked(
     GLDT_STAKE_CANISTER_ID,
@@ -33,9 +36,7 @@ const Summary = ({ env }) => {
         <Card.Header>
           <Card.Title>Total staked</Card.Title>
           <Card.Link
-            href={`https://ic.house/address/6uad6-fqaaa-aaaam-abovq-cai/${
-              getCanister(env).GLDT_STAKE_CANISTER_ID
-            }.0300000000000000000000000000000000000000000000000000000000000000`}
+            href={`https://ic.house/address/${GLDT_LEDGER_CANISTER_ID}/${GLDT_STAKE_CANISTER_ID}.0300000000000000000000000000000000000000000000000000000000000000`}
           />
         </Card.Header>
         <div>
@@ -57,9 +58,7 @@ const Summary = ({ env }) => {
         <Card.Header>
           <Card.Title>Neuron size</Card.Title>
           <Card.Link
-            href={`https://dashboard.internetcomputer.org/sns/tw2vt-hqaaa-aaaaq-aab6a-cai/neuron/${
-              getNeuron(env).GLDT_STAKE_SOURCE_NEURON_ID
-            }`}
+            href={`https://dashboard.internetcomputer.org/sns/${SNS_ROOT_CANISTER_ID}/neuron/${GLDT_STAKE_SOURCE_NEURON_ID}`}
           />
         </Card.Header>
         <div>
