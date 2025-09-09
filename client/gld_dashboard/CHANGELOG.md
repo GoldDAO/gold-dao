@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.1.1] - 2025-09-09
+
+#### Changed
+
+- Fix affected qix package versions
+
 ### [2.1.0] - 2025-09-05
 
 #### Added
