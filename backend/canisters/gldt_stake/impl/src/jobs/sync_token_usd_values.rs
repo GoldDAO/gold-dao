@@ -1,9 +1,15 @@
-use canister_time::{run_now_then_interval, HOUR_IN_MS};
-use icpswap_token_canister_c2c_client::getToken;
+use bity_ic_canister_time::{run_now_then_interval, HOUR_IN_MS};
 use std::{collections::HashMap, time::Duration};
 use tracing::{debug, error, info, trace};
 use types::TokenSymbol;
-use utils::consts::ICPSWAP_TOKEN_CANISTER_ID;
+
+use ic_cdk::{
+    api::canister_self,
+    management_canister::{
+        http_request, HttpHeader, HttpMethod, HttpRequestArgs, HttpRequestResult, TransformArgs,
+        TransformContext, TransformFunc,
+    },
+};
 
 use crate::state::{mutate_state, read_state};
 
@@ -16,7 +22,7 @@ pub fn sync_token_usd_values_job() {
 }
 
 async fn sync_token_usd_values_impl() {
-    let _span = tracing::info_span!("TRANSFER_INSTANT_DISSOLVE_FEES").entered();
+    let _span = tracing::info_span!("SYNC_TOKEN_USD_VALUES").entered();
 
     info!("start");
 
@@ -40,13 +46,47 @@ async fn sync_token_usd_values_impl() {
             token_symbol, ledger_id
         );
 
-        match getToken(ICPSWAP_TOKEN_CANISTER_ID, &(ledger_id.to_string())).await {
-            Ok(token_info) => {
-                info!(
-                    "fetched price for {:?}: ${}",
-                    token_symbol, token_info.priceUSD
-                );
-                new_price_map.insert(token_symbol, token_info.priceUSD);
+        // Setup the URL and its query parameters
+        let url = format!(
+            "https://api.gldt.org/v1/tokens/{}/price/latest",
+            token_symbol.symbol()
+        );
+
+        let request = HttpRequestArgs {
+            url: url.to_string(),
+            method: HttpMethod::GET,
+            body: None,               //optional for request
+            max_response_bytes: None, //optional for request
+            transform: Some(TransformContext {
+                function: TransformFunc::new(canister_self(), "transform".to_string()),
+                context: vec![],
+            }),
+            headers: vec![],
+        };
+
+        //3. MAKE HTTPS REQUEST AND WAIT FOR RESPONSE
+
+        //Note: in Rust, `http_request()` already sends the cycles needed
+        //so no need for explicit Cycles.add() as in Motoko
+        match http_request(&request).await {
+            //4. DECODE AND RETURN THE RESPONSE
+
+            //See: https://docs.rs/ic-cdk/latest/ic_cdk/management_canister/struct.HttpRequestResult.html
+            Ok(response) => {
+                let str_body = String::from_utf8(response.body)
+                    .expect("Transformed response is not UTF-8 encoded.");
+                match str_body.trim().parse::<f64>() {
+                    Ok(price) => {
+                        new_price_map.insert(token_symbol.clone(), price);
+                        info!("Parsed price for {:?}: {}", token_symbol, price);
+                    }
+                    Err(e) => {
+                        error!(
+                            "Failed to parse price for {:?}: {} (body: {:?})",
+                            token_symbol, e, str_body
+                        );
+                    }
+                }
             }
             Err(e) => {
                 error!(
@@ -63,8 +103,57 @@ async fn sync_token_usd_values_impl() {
         }
     }
 
-    trace!("new token_usd_values to be saved: {:?}", new_price_map);
+    ic_cdk::println!("new token_usd_values to be saved: {:?}", new_price_map);
     mutate_state(|s| s.data.analytics_system.set_token_usd_values(new_price_map));
 
     info!("finished");
+}
+
+// Strips all data that is not needed from the original response.
+// Read more here https://internetcomputer.org/docs/references/ic-interface-spec#ic-http_request
+#[ic_cdk::query(hidden = true)]
+fn transform(raw: TransformArgs) -> HttpRequestResult {
+    let headers = vec![
+        HttpHeader {
+            name: "Content-Security-Policy".to_string(),
+            value: "default-src 'self'".to_string(),
+        },
+        HttpHeader {
+            name: "Referrer-Policy".to_string(),
+            value: "strict-origin".to_string(),
+        },
+        HttpHeader {
+            name: "Permissions-Policy".to_string(),
+            value: "geolocation=(self)".to_string(),
+        },
+        HttpHeader {
+            name: "Strict-Transport-Security".to_string(),
+            value: "max-age=63072000".to_string(),
+        },
+        HttpHeader {
+            name: "X-Frame-Options".to_string(),
+            value: "DENY".to_string(),
+        },
+        HttpHeader {
+            name: "X-Content-Type-Options".to_string(),
+            value: "nosniff".to_string(),
+        },
+    ];
+
+    let mut res = HttpRequestResult {
+        status: raw.response.status.clone(),
+        body: raw.response.body.clone(),
+        headers,
+        ..Default::default()
+    };
+
+    if res.status == 200u8 {
+        res.body = raw.response.body;
+    } else {
+        ic_cdk::api::debug_print(format!(
+            "Received an error from price source: err = {:?}",
+            raw
+        ));
+    }
+    res
 }
