@@ -30,12 +30,6 @@ fn post_upgrade(args: Args) {
                 ::deserialize(reader)
                 .unwrap();
 
-            state.data.allocate_rewards_interval = Some(TimeInterval {
-                    weekday: None,
-                    start_hour: 11,
-                    end_hour: 12,
-                });
-
             // uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
             //     ::deserialize(reader)

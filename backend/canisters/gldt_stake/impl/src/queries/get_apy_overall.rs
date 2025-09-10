@@ -7,7 +7,6 @@ pub use gldt_stake_api_canister::get_apy_overall::{
     Args as GetApyArgs, Response as GetApyResponse,
 };
 use ic_cdk::query;
-use std::collections::BTreeMap;
 use tracing::info;
 use types::TimestampMillis;
 use types::TokenSymbol;
