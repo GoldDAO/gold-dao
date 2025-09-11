@@ -12,14 +12,14 @@ const VerticalButton = ({ icon, children, ...props }: ButtonProps) => {
       className={clsx(
         "rounded-xl shrink-0 cursor-pointer disabled:cursor-default",
         "bg-primary",
-        "w-[72px] xl:w-[140px]"
+        "w-[64px] xl:w-[140px]"
       )}
       {...props}
     >
       <div
         className={clsx(
           "flex flex-col justify-center items-center gap-1",
-          "px-1 py-3 rounded-[inherit]",
+          "px-1 py-2 md:py-3 rounded-[inherit]",
           "bg-primary text-white",
           {
             "bg-primary/60": props.disabled,
