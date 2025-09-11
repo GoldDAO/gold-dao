@@ -40,6 +40,9 @@ const useAddStake = (
       queryClient.invalidateQueries({
         queryKey: ["FETCH_STAKED_USER_POSITION"],
       });
+      queryClient.invalidateQueries({
+        queryKey: [`FETCH_LEDGER_BALANCE`, "GLDT"],
+      });
     },
   });
 };
