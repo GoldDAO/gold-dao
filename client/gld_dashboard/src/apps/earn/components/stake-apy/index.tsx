@@ -32,7 +32,7 @@ const StakeAPY = () => {
         <div className="text-2xl font-semibold">
           {stakeAPY.isSuccess ? (
             <>
-              <NumberToLocaleString value={stakeAPY.data} />%
+              <NumberToLocaleString value={stakeAPY.data} decimals={1} />%
             </>
           ) : (
             <div className="animate-pulse">0%</div>
