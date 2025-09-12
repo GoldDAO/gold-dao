@@ -17,6 +17,7 @@ use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_error_inf
 #[derive(PartialEq, Debug, EnumString, EnumIter, Display)]
 #[strum(serialize_all = "snake_case")]
 pub enum Icrc21Function {
+    GetPosition,
     ManageStakePosition,
 }
 
@@ -34,6 +35,7 @@ pub fn icrc21_canister_call_consent_message(args: Icrc21Args) -> Icrc21Response 
     }
 
     let message = match args.method.parse::<Icrc21Function>() {
+        Ok(Icrc21Function::GetPosition) => handle_get_position_consent(args),
         Ok(Icrc21Function::ManageStakePosition) => handle_manage_stake_position_consent(args),
         Err(err) => {
             return icrc21_consent_message_response::Err(icrc21_error::UnsupportedCanisterCall(
@@ -45,6 +47,18 @@ pub fn icrc21_canister_call_consent_message(args: Icrc21Args) -> Icrc21Response 
     };
 
     message
+}
+
+fn handle_get_position_consent(args: Icrc21Args) -> Icrc21Response {
+    create_consent_info(
+        "You are fetching your stake position.".to_string(),
+        "Get Position".to_string(),
+        vec![
+            ("Action".to_string(), "Get Stake Position".to_string()),
+            ("Method".to_string(), args.method.clone()),
+        ],
+        args.user_preferences.metadata,
+    )
 }
 
 fn handle_manage_stake_position_consent(args: Icrc21Args) -> Icrc21Response {
