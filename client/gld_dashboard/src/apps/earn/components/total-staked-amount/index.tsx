@@ -19,20 +19,37 @@ const TotalStakedAmount = () => {
     <div className="border rounded-xl p-4 border-border">
       <div className="flex flex-col items-center xl:items-start gap-1">
         <div className="text-content/60">Total GLDT staked</div>
-
-        <div className="text-2xl font-semibold">
-          <div
-            className={`flex items-center gap-1 ${
-              !totalStakedAmount.isSuccess ? "animate-pulse" : ""
-            }`}
-          >
-            <Logo name="gldt" className="w-6" />
-            <NumberToLocaleString
-              value={
-                totalStakedAmount.isSuccess ? totalStakedAmount.data.amount : 0
-              }
-            />
-            <div>GLDT</div>
+        <div
+          className={`flex items-start gap-2 ${
+            !totalStakedAmount.isSuccess ? "animate-pulse" : ""
+          }`}
+        >
+          <div className="rounded-full p-1 bg-background">
+            <Logo name="gldt" className="w-10" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1 text-2xl font-semibold">
+              <NumberToLocaleString
+                value={
+                  totalStakedAmount.isSuccess
+                    ? totalStakedAmount.data.amount
+                    : 0
+                }
+                decimals={0}
+              />
+              <div>GLDT</div>
+            </div>
+            <div className="text-content/60 text-sm">
+              $
+              <NumberToLocaleString
+                value={
+                  totalStakedAmount.isSuccess
+                    ? totalStakedAmount.data.amount_usd
+                    : 0
+                }
+                decimals={0}
+              />
+            </div>
           </div>
         </div>
       </div>

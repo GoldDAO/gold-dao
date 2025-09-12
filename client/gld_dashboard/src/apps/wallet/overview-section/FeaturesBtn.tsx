@@ -63,8 +63,12 @@ const FeaturesBtn = () => {
         return (
           <>
             <AppFeatureBtn
-              action="buy-gldt"
+              action="buy"
               handleOnClick={() => navigate("/buy")}
+            />
+            <AppFeatureBtn
+              action="earn"
+              handleOnClick={() => navigate("/earn")}
             />
             <AppFeatureBtn
               action="transfer"
@@ -75,10 +79,6 @@ const FeaturesBtn = () => {
               action="burn-nft"
               handleOnClick={() => navigate("/advanced/gldt")}
             />
-            {/* <AppFeatureBtn
-              action="earn"
-              handleOnClick={() => navigate("/earn")}
-            /> */}
           </>
         );
       } else if (token.id === "goldao") {

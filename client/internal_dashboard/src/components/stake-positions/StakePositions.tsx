@@ -5,6 +5,8 @@ import {
   getPaginationRowModel,
   createColumnHelper,
   flexRender,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import { Tooltip } from "react-tooltip";
 import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline";
@@ -19,6 +21,7 @@ const columnHelper = createColumnHelper<Position>();
 
 const StakePositions = ({ env }: { env: string }) => {
   const [copiedPrincipal, setCopiedPrincipal] = useState<string | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const stake_positions = useGetAllStakePositions(
     getCanister(env).GLDT_STAKE_CANISTER_ID
@@ -62,15 +65,26 @@ const StakePositions = ({ env }: { env: string }) => {
         ),
       }),
       columnHelper.accessor("staked_amount", {
-        header: "GLDT Staked",
+        header: () => (
+          <span className="cursor-pointer select-none">
+            GLDT Staked
+            <span className="ml-1">&#8597;</span>
+          </span>
+        ),
         cell: (info) => (
           <div className="text-center font-medium">
             <NumberToLocaleString value={info.getValue()} />
           </div>
         ),
+        sortingFn: "basic",
       }),
       columnHelper.accessor("created_at", {
-        header: "Created At",
+        header: () => (
+          <span className="cursor-pointer select-none">
+            Created At
+            <span className="ml-1">&#8597;</span>
+          </span>
+        ),
         cell: (info) => {
           const date = new Date(Number(info.getValue()));
           return (
@@ -79,6 +93,7 @@ const StakePositions = ({ env }: { env: string }) => {
             </div>
           );
         },
+        sortingFn: "basic",
       }),
       columnHelper.group({
         header: "Unclaimed Rewards",
@@ -159,6 +174,11 @@ const StakePositions = ({ env }: { env: string }) => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
     initialState: {
       pagination: {
         pageSize: 10,
@@ -185,29 +205,48 @@ const StakePositions = ({ env }: { env: string }) => {
                 key={headerGroup.id}
                 className="border-b border-neutral-200 dark:border-neutral-700"
               >
-                {headerGroup.headers.map((header, index) => (
-                  <th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={`px-6 py-3 text-xs font-medium text-neutral-900/60 dark:text-neutral-50/60 uppercase tracking-wider ${
-                      header.subHeaders?.length ||
-                      header.id === "staked_amount" ||
-                      header.id === "created_at" ||
-                      header.id === "goldao_rewards" ||
-                      header.id === "icp_rewards" ||
-                      header.id === "ogy_rewards"
-                        ? "text-center"
-                        : "text-left"
-                    }`}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header, index) => {
+                  const isLeafColumn =
+                    !header.subHeaders || header.subHeaders.length === 0;
+                  return (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={`px-6 py-3 text-xs font-medium text-neutral-900/60 dark:text-neutral-50/60 uppercase tracking-wider ${
+                        header.subHeaders?.length ||
+                        header.id === "staked_amount" ||
+                        header.id === "created_at" ||
+                        header.id === "goldao_rewards" ||
+                        header.id === "icp_rewards" ||
+                        header.id === "ogy_rewards"
+                          ? "text-center"
+                          : "text-left"
+                      }`}
+                      {...(isLeafColumn && header.column.getCanSort()
+                        ? {
+                            onClick: header.column.getToggleSortingHandler(),
+                            style: { cursor: "pointer" },
+                          }
+                        : {})}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      {isLeafColumn && header.column.getCanSort() && (
+                        <span>
+                          {header.column.getIsSorted() === "asc"
+                            ? " ▲"
+                            : header.column.getIsSorted() === "desc"
+                            ? " ▼"
+                            : ""}
+                        </span>
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>
