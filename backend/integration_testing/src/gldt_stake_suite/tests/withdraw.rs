@@ -72,7 +72,7 @@ fn test_withdraw_works() {
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));
     tick_n_blocks(pic, 100);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -130,7 +130,7 @@ fn test_withdraw_works() {
         &manage_stake_position::Args::Withdraw {},
     );
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(user_position.is_some());
 
     tick_n_blocks(pic, 10);
@@ -162,7 +162,7 @@ fn test_withdraw_works() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 8));
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 8));
     tick_n_blocks(pic, 10);
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(user_position.is_none());
 }
 
@@ -209,7 +209,7 @@ fn test_withdraw_with_unclaimed_rewards() {
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -351,6 +351,6 @@ fn test_invalid_withdraw_states_failed() {
     assert!(res.is_ok());
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     println!("user_position: {user_position:?}");
 }

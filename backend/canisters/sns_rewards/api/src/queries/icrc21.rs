@@ -1,5 +1,6 @@
-use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_consent_message_request;
-use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_consent_message_response;
+use icrc_ledger_types::icrc21::errors::Icrc21Error;
+use icrc_ledger_types::icrc21::requests::ConsentMessageRequest;
+use icrc_ledger_types::icrc21::responses::ConsentInfo;
 
-pub type Args = icrc21_consent_message_request;
-pub type Response = icrc21_consent_message_response;
+pub type Args = ConsentMessageRequest;
+pub type Response = Result<ConsentInfo, Icrc21Error>;

@@ -9,12 +9,11 @@ use crate::state::read_state;
 
 #[query]
 #[trace]
-fn get_position() -> GetPositionByIdResponse {
-    get_position_impl()
+fn get_position(args: GetPositionByIdArgs) -> GetPositionByIdResponse {
+    get_position_impl(args)
 }
 
-fn get_position_impl() -> GetPositionByIdResponse {
+fn get_position_impl(args: GetPositionByIdArgs) -> GetPositionByIdResponse {
     let now = timestamp_millis();
-    let caller = ic_cdk::api::msg_caller();
-    read_state(|s| s.data.stake_system.get_stake_position(&caller)).map(|p| (p, now).into())
+    read_state(|s| s.data.stake_system.get_stake_position(&args)).map(|p| (p, now).into())
 }
