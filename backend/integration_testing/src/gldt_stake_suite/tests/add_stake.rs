@@ -82,7 +82,7 @@ fn add_stake_new_position_works() {
     assert_eq!(response.age_bonus_multiplier, 1.0);
 
     // --- Verify that stake position was created ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &());
+    let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_some(), "Stake position should exist");
 }
 
@@ -409,7 +409,7 @@ fn add_stake_new_position_without_allowance() {
     }
 
     // --- Verify that stake position was created ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &());
+    let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_none());
 }
 
@@ -523,7 +523,7 @@ fn add_stake_new_position_after_dissolving() {
     assert_eq!(response.age_bonus_multiplier, 1.0);
 
     // --- Verify that stake position was created ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &());
+    let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_some(), "Stake position should exist");
 }
 

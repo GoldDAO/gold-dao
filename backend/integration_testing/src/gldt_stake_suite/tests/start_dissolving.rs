@@ -41,7 +41,7 @@ fn test_start_dissolving() {
 
     tick_n_blocks(pic, 1);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert_eq!(user_position.staked, Nat::from(0_u64));
 }
 
@@ -77,7 +77,7 @@ fn test_start_dissolving_partial() {
 
     tick_n_blocks(pic, 1);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert_eq!(user_position.staked, Nat::from(50_000_000_000_u128));
 }
 
@@ -132,6 +132,6 @@ fn test_start_dissolving_limit() {
         ))
     );
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert_eq!(user_position.staked, Nat::from(32_768_000_000_u128));
 }

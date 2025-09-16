@@ -226,7 +226,7 @@ fn full_user_flow_test() {
     );
     println!("Start dissolving response: {:?}", response);
     assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert!(position.staked > Nat::from(0u64));
 
     // --- Start dissolving with 100% fraction ---
@@ -237,7 +237,7 @@ fn full_user_flow_test() {
         &manage_stake_position::Args::StartDissolving { fraction: 100 },
     );
     assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert_eq!(position.staked, Nat::from(0u64));
 
     // --- Try to dissolve again (already dissolved) ---
@@ -372,7 +372,7 @@ fn full_user_flow_test() {
     ));
 
     // --- Final state checks ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &());
+    let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_none());
     let total_staked = get_total_staked(pic, user, gldt_stake_canister_id, &());
     assert!(total_staked >= Nat::from(0u64));
@@ -427,7 +427,7 @@ fn test_can_claim_gldt_stake_rewards() {
     tick_n_blocks(pic, 100);
 
     // --- Check that the rewards are available for the user ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_eq!(rewards[&TokenSymbol::GOLDAO], Nat::from(4_714_275_714_u64));
     assert_eq!(rewards[&TokenSymbol::OGY], Nat::from(4_714_265_714_u64));
@@ -451,9 +451,9 @@ fn test_can_claim_gldt_stake_rewards() {
     wait_1_day(pic);
 
     // --- Check that the user who dissolved his stake has less claimable rewards over time ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     println!("User position: {:?}", user_position);
-    let user1_position = get_position(pic, user1, gldt_stake_canister_id, &());
+    let user1_position = get_position(pic, user1, gldt_stake_canister_id, &user1);
     println!("User 1 position: {:?}", user1_position);
 
     let user_total: candid::Nat = user_position
@@ -491,7 +491,12 @@ fn test_can_claim_gldt_stake_rewards() {
     let mut total_claimable_per_token: HashMap<TokenSymbol, candid::Nat> = HashMap::new();
 
     for user_principal in users {
-        let user_position = get_position(pic, user_principal, gldt_stake_canister_id.clone(), &());
+        let user_position = get_position(
+            pic,
+            user_principal,
+            gldt_stake_canister_id.clone(),
+            &user_principal,
+        );
 
         if let Some(pos) = user_position {
             for (token_symbol, amount) in pos.claimable_rewards.iter() {
@@ -594,7 +599,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     println!("User position: {:?}", user_position);
     pic.advance_time(Duration::from_secs(60));
     tick_n_blocks(pic, 10);
@@ -624,7 +629,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
 
     // --- Verify position staked is 0 ---
     let position =
-        get_position(pic, user, gldt_stake_canister_id, &()).expect("Position should exist");
+        get_position(pic, user, gldt_stake_canister_id, &user).expect("Position should exist");
     assert_eq!(position.staked, Nat::from(0_u64));
 
     // --- Try to withdraw again (should fail, nothing to withdraw) ---
@@ -753,7 +758,7 @@ fn withdraw_flow_test() {
 
     // --- Verify position staked is 0 ---
     let position =
-        get_position(pic, user, gldt_stake_canister_id, &()).expect("Position should exist");
+        get_position(pic, user, gldt_stake_canister_id, &user).expect("Position should exist");
     assert_eq!(position.staked, Nat::from(0_u64));
 
     // --- Try to withdraw again (should fail, nothing to withdraw) ---
@@ -802,7 +807,7 @@ fn partial_then_full_dissolve_flow_test() {
         &manage_stake_position::Args::StartDissolving { fraction: 50 },
     );
     assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert!(position.staked > Nat::from(0u64));
 
     // Advance time to allow partial dissolve withdrawal
@@ -823,7 +828,7 @@ fn partial_then_full_dissolve_flow_test() {
         &manage_stake_position::Args::StartDissolving { fraction: 100 },
     );
     assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     assert_eq!(position.staked, Nat::from(0u64));
 
     // Advance time and withdraw remaining
@@ -839,7 +844,7 @@ fn partial_then_full_dissolve_flow_test() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
     tick_n_blocks(pic, 5);
     // --- Final state check: position shouldn't exist ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &());
+    let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_none());
 }
 
