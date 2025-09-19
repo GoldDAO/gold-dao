@@ -77,7 +77,7 @@ fn test_dissolve_instantly_full() {
     tick_n_blocks(pic, 10);
 
     // --- Check that the rewards are available ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -131,7 +131,7 @@ fn test_dissolve_instantly_full() {
     );
 
     // --- Check the position is not yet removed ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(user_position.is_some());
 
     // --- Check the instant dissolvement fee account ---
@@ -155,7 +155,7 @@ fn test_dissolve_instantly_full() {
     // Check that the user position is deleted
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 8));
     tick_n_blocks(pic, 10);
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(user_position.is_none());
 }
 
@@ -216,7 +216,7 @@ fn test_dissolve_instantly_partial() {
     tick_n_blocks(pic, 10);
 
     // --- Check that the rewards are available ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -286,7 +286,7 @@ fn test_dissolve_instantly_partial() {
 
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(user_position.is_some());
 }
 

@@ -101,7 +101,7 @@ fn test_process_staking_rewards() {
     println!("Allocated rewards balance: {:?}", allocated_rewards);
 
     for user in users {
-        let position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+        let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
         let rewards = &position.claimable_rewards;
         assert_eq!(
             rewards[&TokenSymbol::GOLDAO].clone() - TokenSymbol::GOLDAO.get_token_info().fee,
@@ -330,7 +330,7 @@ fn test_apy_stability_over_three_weeks() {
         let apy_overall = get_apy_overall(pic, Principal::anonymous(), gldt_stake_canister_id, &());
         apy_values.push(apy_overall);
 
-        let user_position = get_position(pic, user, gldt_stake_canister_id, &());
+        let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
         println!("User position: {:?}", user_position);
     }
 

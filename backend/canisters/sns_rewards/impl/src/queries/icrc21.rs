@@ -1,5 +1,7 @@
 use candid::Decode;
 use ic_cdk::query;
+use icrc_ledger_types::icrc21::errors::ErrorInfo;
+use icrc_ledger_types::icrc21::errors::Icrc21Error;
 use icrc_ledger_types::icrc21::lib::MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES;
 pub use sns_rewards_api_canister::icrc21::Args as Icrc21Args;
 pub use sns_rewards_api_canister::icrc21::Response as Icrc21Response;
@@ -9,9 +11,6 @@ use strum_macros::EnumString;
 pub use utils::icrcs::icrc21;
 use utils::icrcs::icrc21::create_consent_info;
 use utils::icrcs::icrc21::create_error_response;
-use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_consent_message_response;
-use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_error;
-use utils::icrcs::icrc21::icrc21_canister_call_consent_message::icrc21_error_info;
 
 #[derive(PartialEq, Debug, EnumString, EnumIter, Display)]
 #[strum(serialize_all = "snake_case")]
@@ -23,14 +22,12 @@ pub enum Icrc21Function {
 #[query]
 pub fn icrc21_canister_call_consent_message(args: Icrc21Args) -> Icrc21Response {
     if args.arg.len() > MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES as usize {
-        return icrc21_consent_message_response::Err(icrc21_error::UnsupportedCanisterCall(
-            icrc21_error_info {
-                description: format!(
-                    "The argument size is too large. The maximum allowed size is {} bytes.",
-                    MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES
-                ),
-            },
-        ));
+        return Err(Icrc21Error::UnsupportedCanisterCall(ErrorInfo {
+            description: format!(
+                "The argument size is too large. The maximum allowed size is {} bytes.",
+                MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES
+            ),
+        }));
     }
 
     match args.method.parse::<Icrc21Function>() {
@@ -51,7 +48,7 @@ fn handle_claim_rewards_consent(args: Icrc21Args) -> Icrc21Response {
             ];
 
             let generic_message = format!(
-                "You are about to claim rewards for neuron ID `{}` using token `{}`.",
+                "You are about to claim rewards for neuron ID `{}` using token `{}`",
                 claim_args.neuron_id, claim_args.token
             );
 
@@ -90,7 +87,7 @@ fn handle_claim_rewards_batch_consent(args: Icrc21Args) -> Icrc21Response {
             ];
 
             let generic_message = format!(
-                "You are about to claim rewards for the following neurons and tokens: {}.",
+                "You are about to claim rewards for the following neurons and tokens: {}",
                 neuron_token_pairs.join("; ")
             );
 

@@ -74,7 +74,7 @@ fn test_can_claim_gldt_stake_rewards() {
     println!("Allocated rewards balance: {:?}", allocated_rewards);
 
     // --- Check that the rewards are available for the user ---
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -185,7 +185,7 @@ fn test_claim_rewards_twice() {
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));
@@ -251,7 +251,7 @@ fn test_claim_rewards_empty() {
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));
     tick_n_blocks(pic, 10);
 
-    let user_position = get_position(pic, user, gldt_stake_canister_id, &()).unwrap();
+    let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
     let rewards = &user_position.claimable_rewards;
     assert_ne!(rewards[&TokenSymbol::GOLDAO], Nat::from(0_u64));
     assert_ne!(rewards[&TokenSymbol::OGY], Nat::from(0_u64));

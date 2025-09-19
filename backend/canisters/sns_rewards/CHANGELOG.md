@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.13] - 2025-09-16
+
+#### Changed
+
+- **Updated ICRC21 types**: Aligned `Icrc21Args` and `Icrc21Response` with the latest spec, ensuring correct parsing and validation of consent messages
 
 ### [1.0.12] - 2025-08-19
 
