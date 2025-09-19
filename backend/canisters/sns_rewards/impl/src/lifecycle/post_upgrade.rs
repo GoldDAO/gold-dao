@@ -40,21 +40,21 @@ fn post_upgrade(args: Args) {
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             // Migrations
-            if state.data.reward_distribution_interval.is_none() {
-                state.data.reward_distribution_interval = Some(TimeInterval::default());
-            }
+            // if state.data.reward_distribution_interval.is_none() {
+            //     state.data.reward_distribution_interval = Some(TimeInterval::default());
+            // }
 
-            if state.data.reward_distribution_in_progress.is_none() {
-                state.data.reward_distribution_in_progress = Some(false);
-            }
+            // if state.data.reward_distribution_in_progress.is_none() {
+            //     state.data.reward_distribution_in_progress = Some(false);
+            // }
 
-            if state.data.neuron_sync_interval.is_none() {
-                state.data.neuron_sync_interval = Some(TimeInterval {
-                    weekday: None,
-                    start_hour: 9,
-                    end_hour: 11,
-                });
-            }
+            // if state.data.neuron_sync_interval.is_none() {
+            //     state.data.neuron_sync_interval = Some(TimeInterval {
+            //         weekday: None,
+            //         start_hour: 9,
+            //         end_hour: 11,
+            //     });
+            // }
 
             // End migrations
             canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
