@@ -5,7 +5,7 @@ import { LoaderSpin } from "@components/ui";
 import { BadgeTransactionType } from "@components/shared/badge/TransactionType";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
-import NavbarHome from "@components/shared/navbars/Home";
+import NavbarHome from "@components/shared/navbars/NavbarTop";
 
 import { useFetchLedgerOneAccountTransaction } from "@hooks/gldt_ledger_indexer/useFetchLedgerOneAccountTransaction";
 import { LogoGLDT } from "@components/shared/logos";

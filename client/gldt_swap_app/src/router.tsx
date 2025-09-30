@@ -10,17 +10,17 @@ import NotFound from "@components/shared/routes/NotFound";
 import { SwapAppProvider } from "@context/index";
 import { TransactionDetailsProvider } from "@context/index";
 
+import Home from "features/home";
+
 import {
-  LandingPage,
   SwapTransfer,
   Account,
   TransactionDetails,
   TransactionHistoryList,
-  Faqs,
   Explorer,
   AccountOverview,
   AccountTransactionDetails,
-} from "@pages/index";
+} from "features/index";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +29,28 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LandingPage />,
+        element: <Home />,
+      },
+      {
+        path: "explorer",
+        children: [
+          {
+            index: true,
+            element: <Explorer />,
+          },
+          {
+            path: "transactions/account",
+            element: <AccountOverview />,
+          },
+          {
+            path: "top_holders/account",
+            element: <AccountOverview />,
+          },
+          {
+            path: "transaction/:index",
+            element: <AccountTransactionDetails />,
+          },
+        ],
       },
       {
         path: "swap",
@@ -68,36 +89,6 @@ const router = createBrowserRouter([
                 ],
               },
             ],
-          },
-        ],
-      },
-      {
-        path: "faqs",
-        children: [
-          {
-            index: true,
-            element: <Faqs />,
-          },
-        ],
-      },
-      {
-        path: "explorer",
-        children: [
-          {
-            index: true,
-            element: <Explorer />,
-          },
-          {
-            path: "transactions/account",
-            element: <AccountOverview />,
-          },
-          {
-            path: "top_holders/account",
-            element: <AccountOverview />,
-          },
-          {
-            path: "transaction/:index",
-            element: <AccountTransactionDetails />,
           },
         ],
       },

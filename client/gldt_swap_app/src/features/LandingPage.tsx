@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import NavbarHome from "@components/shared/navbars/Home";
+import NavbarHome from "@components/shared/navbars/NavbarTop";
 import { Button, Skeleton } from "@components/ui";
 import { FrequentlyAskedQuestions } from "@components/landing-page";
 import { useLedgerMetadata } from "@hooks/ledger";

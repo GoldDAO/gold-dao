@@ -8,7 +8,7 @@ import { BadgeTransactionType } from "@components/shared/badge/TransactionType";
 import { usePagination } from "@utils/table/useTable";
 import CopyToClipboard from "@components/shared/button/CopyToClipboard";
 
-import NavbarHome from "@components/shared/navbars/Home";
+import NavbarHome from "@components/shared/navbars/NavbarTop";
 import { AccountBalanceGLDT } from "@components/explorer/card/AccountBalanceGLDT";
 import { FullAccount } from "@components/explorer/card/FullAccount";
 import { OwnerSubaccounts } from "@components/explorer/card/OwnerSubaccounts";
