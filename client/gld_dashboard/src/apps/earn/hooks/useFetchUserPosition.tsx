@@ -101,7 +101,7 @@ const useFetchUserPosition = (
         );
 
         const rewards: Reward[] = await Promise.all(
-          [TOKEN_GOLDAO_IC].map(async (token) => {
+          [TOKEN_GOLDAO_IC, TOKEN_ICP_IC, TOKEN_OGY_IC].map(async (token) => {
             const res = {
               ...token,
               is_selected: false,
