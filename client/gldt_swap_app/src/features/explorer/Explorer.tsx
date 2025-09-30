@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 
-import NavbarHome from "@components/shared/navbars/Home";
+import NavbarHome from "@components/shared/navbars/NavbarTop";
 import { ExplorerTable } from "@components/explorer/ExplorerTable";
 import { TopHoldersTable } from "@components/explorer/TopHoldersTable";
 import { ExplorerInfo } from "@components/explorer/Info";

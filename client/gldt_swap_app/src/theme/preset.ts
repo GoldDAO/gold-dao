@@ -1,6 +1,7 @@
 export const colors = {
   background: "rgb(var(--color-background))",
   content: "rgb(var(--color-content))",
+  "content-invert": "rgb(var(--color-content-invert))",
   surface: {
     1: "rgb(var(--color-surface-1))",
     2: "rgb(var(--color-surface-2))",
@@ -11,11 +12,13 @@ export const colors = {
   accent: "rgb(var(--color-accent))",
   charcoal: "rgb(var(--color-charcoal))",
   jade: "rgb(var(--color-jade))",
-  "dark-orange": "rgb(var(--color-dark-orange))"
+  "dark-orange": "rgb(var(--color-dark-orange))",
+  burgundy: "rgb(var(--color-burgundy))",
+  "surface-invert": "rgb(var(--color-surface-invert))",
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const tailwindcssColors = (colors:any) => {
+const tailwindcssColors = (colors: any) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updatedColors: any = {};
   Object.keys(colors).forEach(key => {
@@ -34,7 +37,7 @@ export default {
     extend: {
       colors: tailwindcssColors(colors),
       fontFamily: {
-        sans: ["Inter", "Montserrat", "system-ui", "sans-serif"],
+        sans: ["Polymath", "system-ui", "sans-serif"],
       },
       backgroundImage: {
         'cover-img': "url('/src/assets/bg-cover.png')",

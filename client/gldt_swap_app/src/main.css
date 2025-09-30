@@ -1,0 +1,19 @@
+@import "./theme/preset.css";
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+@import url('https://use.typekit.net/chv2tas.css');
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  font-family: "polymath", system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
