@@ -1,3 +1,7 @@
+import GldnftCard from "@assets/cards/gldnft.jpg";
+import UsdgCard from "@assets/cards/usdg.jpg";
+import GoldaoCard from "@assets/cards/goldao.jpg";
+
 const Card = ({
   badge,
   title,
@@ -44,7 +48,7 @@ const Ecosystem = ({
           className="w-6 h-6"
         />
       ),
-      img: "/cards/goldao.jpg",
+      img: GoldaoCard,
     },
     {
       badge: "NFT",
@@ -57,7 +61,7 @@ const Ecosystem = ({
           className="w-6 h-6"
         />
       ),
-      img: "/cards/gldnft.jpg",
+      img: GldnftCard,
     },
     {
       badge: "Stablecoin",
@@ -70,7 +74,7 @@ const Ecosystem = ({
           className="w-6 h-6"
         />
       ),
-      img: "/cards/usdg.jpg",
+      img: UsdgCard,
     },
   ];
 

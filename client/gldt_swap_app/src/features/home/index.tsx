@@ -25,7 +25,11 @@ const Home = () => {
       <header className="bg-gold/15 sticky top-0 z-10 min-h-[100vh] flex flex-col overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
-          src={isDark ? "/bg-hero-dark.mov" : "/bg-hero-video.mov"}
+          src={
+            isDark
+              ? "https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/bg_hero_dark.mov"
+              : "https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/bg_hero_light.mov"
+          }
           autoPlay
           loop
           muted

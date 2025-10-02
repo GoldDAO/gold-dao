@@ -40,6 +40,7 @@
       "@canisters/*": ["canisters/*"],
       "@auth/*": ["auth/*"],
       "@atoms/*": ["atoms/*"],
+      "@assets/*": ["assets/*"],
     }
   },
   "include": ["src"],

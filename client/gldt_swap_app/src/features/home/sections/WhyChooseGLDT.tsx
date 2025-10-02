@@ -34,7 +34,7 @@ const WhyChooseGLDT = ({
             />
           </svg>
           <video
-            src="/video.mp4"
+            src="https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/texture_fluid_gold.mp4"
             autoPlay
             loop
             muted
