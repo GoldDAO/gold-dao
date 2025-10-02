@@ -140,14 +140,14 @@ const WhatIsGLDT = ({
 
           <div>
             <video
-              src="/video_gldt.mp4"
+              src="https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/video_gldt.mp4"
               autoPlay
               loop
               muted
               playsInline
               controls
               className="w-full h-auto rounded-xl object-cover"
-              aria-label="Présentation GLDT"
+              aria-label="Preview GLDT"
             />
           </div>
         </div>

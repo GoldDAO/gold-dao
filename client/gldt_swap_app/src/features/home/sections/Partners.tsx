@@ -1,4 +1,10 @@
 import Slider from "react-slick";
+import OrigynLogo from "@assets/partners-logos/ORIGYN.svg";
+import MetalorLogo from "@assets/partners-logos/METALOR.svg";
+import KPMGLogo from "@assets/partners-logos/KPMG.svg";
+import LoomisLogo from "@assets/partners-logos/LOOMIS.svg";
+import ICPLogo from "@assets/partners-logos/ICP.svg";
+import BityLogo from "@assets/partners-logos/BITY.svg";
 
 const Partners = ({
   className,
@@ -27,12 +33,12 @@ const Partners = ({
   };
 
   const PARTNERS_LOGOS = [
-    { name: "METALOR", alt: "Metalor brand logo" },
-    { name: "ORIGYN", alt: "Origyn brand logo" },
-    { name: "KPMG", alt: "KPMG brand logo" },
-    { name: "LOOMIS", alt: "Loomis brand logo" },
-    { name: "ICP", alt: "ICP brand logo" },
-    { name: "BITY", alt: "BITY brand logo" },
+    { name: "METALOR", alt: "Metalor brand logo", logo: MetalorLogo },
+    { name: "ORIGYN", alt: "Origyn brand logo", logo: OrigynLogo },
+    { name: "KPMG", alt: "KPMG brand logo", logo: KPMGLogo },
+    { name: "LOOMIS", alt: "Loomis brand logo", logo: LoomisLogo },
+    { name: "ICP", alt: "ICP brand logo", logo: ICPLogo },
+    { name: "BITY", alt: "BITY brand logo", logo: BityLogo },
   ];
   return (
     <div className={className} {...restProps}>
@@ -52,16 +58,12 @@ const Partners = ({
           <div className="absolute left-0 top-0 h-full w-16 pointer-events-none z-10 bg-gradient-to-r from-surface-invert to-transparent" />
           <div className="absolute right-0 top-0 h-full w-16 pointer-events-none z-10 bg-gradient-to-l from-surface-invert to-transparent" />
           <Slider {...settings}>
-            {PARTNERS_LOGOS.map(({ name, alt }) => (
+            {PARTNERS_LOGOS.map(({ name, alt, logo }) => (
               <div
                 className="flex justify-center items-center mx-8 md:mx-12"
                 key={name}
               >
-                <img
-                  className=""
-                  src={`/landing-page-assets/powered-by-logos/${name}.svg`}
-                  alt={alt}
-                />
+                <img src={logo} alt={alt} />
               </div>
             ))}
           </Slider>
