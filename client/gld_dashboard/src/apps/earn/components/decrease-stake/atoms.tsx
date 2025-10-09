@@ -1,6 +1,7 @@
 import { atomWithReducer } from "jotai/utils";
 import { UserStakedData } from "@earn/interfaces";
 import { DissolveMode } from "./interfaces";
+import { LedgerBalanceData } from "@shared/hooks/useFetchLedgerBalance";
 
 interface StakedData extends UserStakedData {
   instant_dissolve_fee: number;
@@ -21,6 +22,7 @@ type DecreaseStakeState = {
   is_open_dialog: boolean;
   step: Step;
 
+  user_balance_gldt: LedgerBalanceData;
   user_staked_data: StakedData;
 };
 
@@ -39,6 +41,16 @@ const initialState: DecreaseStakeState = {
     staked_amount_usd: 0,
     instant_dissolve_fee: 0,
   },
+  user_balance_gldt: {
+    balance: 0,
+    balance_e8s: 0n,
+    balance_usd: 0,
+    decimals: 0,
+    fee: 0,
+    fee_usd: 0,
+    fee_e8s: 0n,
+    price_usd: 0,
+  },
 };
 
 const reducer = (
@@ -55,6 +67,10 @@ const reducer = (
     | {
         type: "SET_USER_STAKED_DATA";
         value: StakedData;
+      }
+    | {
+        type: "SET_USER_BALANCE_GLDT";
+        value: LedgerBalanceData;
       }
     | {
         type: "SET_IS_OPEN_DIALOG";
@@ -89,6 +105,12 @@ const reducer = (
       return {
         ...prev,
         user_staked_data: action.value,
+      };
+
+    case "SET_USER_BALANCE_GLDT":
+      return {
+        ...prev,
+        user_balance_gldt: action.value,
       };
 
     case "SET_IS_OPEN_DIALOG":

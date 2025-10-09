@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/interfaces/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
 import claim_rewards from "@services/gldt_stake/claim_rewards";
 
 const useClaimRewards = (

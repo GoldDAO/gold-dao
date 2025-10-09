@@ -10,13 +10,6 @@ export const idlFactory = ({ IDL }) => {
     version: BuildVersion,
     commit_hash: IDL.Text,
   });
-  const TokenSymbol = IDL.Variant({
-    ICP: IDL.Null,
-    OGY: IDL.Null,
-    WTN: IDL.Null,
-    GOLDAO: IDL.Null,
-    GLDT: IDL.Null,
-  });
   const Duration = IDL.Record({ secs: IDL.Nat64, nanos: IDL.Nat32 });
   const ICRC3Properties = IDL.Record({
     max_blocks_per_response: IDL.Nat,
@@ -38,8 +31,7 @@ export const idlFactory = ({ IDL }) => {
     supported_blocks: IDL.Vec(SupportedBlockType),
   });
   const InitArgs = IDL.Record({
-    allowed_reward_tokens: IDL.Vec(TokenSymbol),
-    whitelist: IDL.Vec(IDL.Principal),
+    allowed_reward_tokens: IDL.Vec(IDL.Text),
     test_mode: IDL.Bool,
     authorized_principals: IDL.Vec(IDL.Principal),
     version: BuildVersion,
@@ -50,7 +42,28 @@ export const idlFactory = ({ IDL }) => {
     commit_hash: IDL.Text,
     gld_sns_rewards_canister_id: IDL.Principal,
   });
-  const Args_7 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  const Args_6 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  const TokenSymbol = IDL.Variant({
+    ICP: IDL.Null,
+    OGY: IDL.Null,
+    WTN: IDL.Null,
+    GOLDAO: IDL.Null,
+    GLDT: IDL.Null,
+  });
+  const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
+  const Args = IDL.Record({ amount: IDL.Nat64 });
+  const CreateNeuronError = IDL.Variant({
+    TransferError: IDL.Text,
+    InternalError: IDL.Text,
+  });
+  const Result_1 = IDL.Variant({
+    Ok: IDL.Vec(IDL.Nat8),
+    Err: CreateNeuronError,
+  });
+  const Args_1 = IDL.Record({
+    starting_day: IDL.Nat64,
+    limit: IDL.Opt(IDL.Nat64),
+  });
   const ClaimRewardStatus = IDL.Variant({
     Failed: IDL.Text,
     None: IDL.Null,
@@ -90,29 +103,15 @@ export const idlFactory = ({ IDL }) => {
     dissolve_events: IDL.Vec(DissolveStakeEvent),
     withdraw_state: WithdrawState,
   });
-  const StateSnapshot = IDL.Record({
-    total_staked: IDL.Nat,
-    position: IDL.Opt(StakePosition),
-  });
-  const Args = IDL.Record({
-    principal: IDL.Principal,
-    state: WithdrawState,
-  });
-  const Result = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
-  const Result_1 = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
-  const Result_2 = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
-  const Args_1 = IDL.Record({ amount: IDL.Nat64 });
-  const CreateNeuronError = IDL.Variant({
-    TransferError: IDL.Text,
-    InternalError: IDL.Text,
-  });
-  const Result_3 = IDL.Variant({
-    Ok: IDL.Vec(IDL.Nat8),
-    Err: CreateNeuronError,
-  });
   const Args_2 = IDL.Record({
     starting_day: IDL.Nat64,
     limit: IDL.Opt(IDL.Nat64),
+  });
+  const DailyAnalytics = IDL.Record({
+    apy: IDL.Float64,
+    staked_gldt: IDL.Nat,
+    rewards: IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Nat)),
+    weighted_stake: IDL.Nat,
   });
   const NeuronId = IDL.Record({ id: IDL.Vec(IDL.Nat8) });
   const NeuronPermission = IDL.Record({
@@ -173,50 +172,46 @@ export const idlFactory = ({ IDL }) => {
     FolloweeVote: IDL.Null,
   });
   const SupportedStandard = IDL.Record({ url: IDL.Text, name: IDL.Text });
-  const icrc21_consent_message_metadata = IDL.Record({
+  const ConsentMessageMetadata = IDL.Record({
     utc_offset_minutes: IDL.Opt(IDL.Int16),
     language: IDL.Text,
   });
-  const icrc21_device_spec = IDL.Variant({
+  const DisplayMessageType = IDL.Variant({
     GenericDisplay: IDL.Null,
-    FieldsDisplay: IDL.Null,
+    LineDisplay: IDL.Record({
+      characters_per_line: IDL.Nat16,
+      lines_per_page: IDL.Nat16,
+    }),
   });
-  const icrc21_consent_message_spec = IDL.Record({
-    metadata: icrc21_consent_message_metadata,
-    device_spec: IDL.Opt(icrc21_device_spec),
+  const ConsentMessageSpec = IDL.Record({
+    metadata: ConsentMessageMetadata,
+    device_spec: IDL.Opt(DisplayMessageType),
   });
-  const icrc21_consent_message_request = IDL.Record({
+  const ConsentMessageRequest = IDL.Record({
     arg: IDL.Vec(IDL.Nat8),
     method: IDL.Text,
-    user_preferences: icrc21_consent_message_spec,
+    user_preferences: ConsentMessageSpec,
   });
-  const icrc21_field_display_message = IDL.Record({
-    fields: IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text)),
-    intent: IDL.Text,
+  const LineDisplayPage = IDL.Record({ lines: IDL.Vec(IDL.Text) });
+  const ConsentMessage = IDL.Variant({
+    LineDisplayMessage: IDL.Record({ pages: IDL.Vec(LineDisplayPage) }),
+    GenericDisplayMessage: IDL.Text,
   });
-  const icrc21_consent_message = IDL.Record({
-    generic_display_message: IDL.Text,
-    fields_display_message: icrc21_field_display_message,
+  const ConsentInfo = IDL.Record({
+    metadata: ConsentMessageMetadata,
+    consent_message: ConsentMessage,
   });
-  const icrc21_consent_info = IDL.Record({
-    metadata: icrc21_consent_message_metadata,
-    consent_message: icrc21_consent_message,
+  const ErrorInfo = IDL.Record({ description: IDL.Text });
+  const Icrc21Error = IDL.Variant({
+    GenericError: IDL.Record({
+      description: IDL.Text,
+      error_code: IDL.Nat,
+    }),
+    InsufficientPayment: ErrorInfo,
+    UnsupportedCanisterCall: ErrorInfo,
+    ConsentMessageUnavailable: ErrorInfo,
   });
-  const icrc21_error_info = IDL.Record({ description: IDL.Text });
-  const icrc21_generic_error = IDL.Record({
-    description: IDL.Text,
-    error_code: IDL.Nat64,
-  });
-  const icrc21_error = IDL.Variant({
-    GenericError: icrc21_error_info,
-    InsufficientPayment: icrc21_generic_error,
-    UnsupportedCanisterCall: icrc21_error_info,
-    ConsentMessageUnavailable: icrc21_error_info,
-  });
-  const icrc21_consent_message_response = IDL.Variant({
-    Ok: icrc21_consent_info,
-    Err: icrc21_error,
-  });
+  const Result_2 = IDL.Variant({ Ok: ConsentInfo, Err: Icrc21Error });
   const ICRC3ArchiveInfo = IDL.Record({
     end: IDL.Nat,
     canister_id: IDL.Principal,
@@ -528,36 +523,29 @@ export const idlFactory = ({ IDL }) => {
     WithdrawError: WithdrawRequestErrors,
     ClaimRewardError: IDL.Vec(ClaimRewardErrors),
   });
-  const Result_4 = IDL.Variant({
+  const Result_3 = IDL.Variant({
     Ok: StakePositionResponse,
     Err: ManageStakePositionError,
   });
-  const Args_6 = IDL.Record({
-    dissovle_event_id: IDL.Nat8,
-    stake_position_user: IDL.Principal,
-    new_dissolve_timestamp: IDL.Nat64,
-  });
-  const Result_5 = IDL.Variant({ Ok: IDL.Nat, Err: GeneralError });
+  const Result_4 = IDL.Variant({ Ok: IDL.Nat, Err: GeneralError });
   return IDL.Service({
-    _get_state_snapshot: IDL.Func([IDL.Null], [StateSnapshot], ["query"]),
-    _set_position_withdraw_state: IDL.Func([Args], [Result], []),
-    _set_token_usd_values: IDL.Func(
-      [IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Float64))],
-      [IDL.Null],
-      []
-    ),
-    add_whitelisted_principal: IDL.Func(
-      [IDL.Vec(IDL.Principal)],
-      [Result_1],
-      []
-    ),
     allocated_rewards_balance: IDL.Func(
       [IDL.Null],
-      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_2))],
+      [IDL.Vec(IDL.Tuple(TokenSymbol, Result))],
       []
     ),
     commit: IDL.Func([], [], []),
-    create_neuron: IDL.Func([Args_1], [Result_3], []),
+    create_neuron: IDL.Func([Args], [Result_1], []),
+    get_all_gldt_staked_history: IDL.Func(
+      [Args_1],
+      [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Nat))],
+      ["query"]
+    ),
+    get_all_rewards_history: IDL.Func(
+      [Args_1],
+      [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Vec(IDL.Tuple(TokenSymbol, IDL.Nat))))],
+      ["query"]
+    ),
     get_all_stake_positions: IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Principal, StakePosition))],
@@ -569,8 +557,17 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Float64))],
       ["query"]
     ),
+    get_daily_analytics: IDL.Func(
+      [Args_2],
+      [IDL.Vec(IDL.Tuple(IDL.Nat64, DailyAnalytics))],
+      ["query"]
+    ),
     get_neurons: IDL.Func([IDL.Null], [IDL.Vec(Neuron)], ["query"]),
-    get_position: IDL.Func([], [IDL.Opt(StakePositionResponse)], ["query"]),
+    get_position: IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(StakePositionResponse)],
+      ["query"]
+    ),
     get_proposal_votes_of_neuron: IDL.Func(
       [Args_3],
       [IDL.Vec(IDL.Tuple(ProposalId, IDL.Int32, VoteType))],
@@ -588,8 +585,8 @@ export const idlFactory = ({ IDL }) => {
       ["query"]
     ),
     icrc21_canister_call_consent_message: IDL.Func(
-      [icrc21_consent_message_request],
-      [icrc21_consent_message_response],
+      [ConsentMessageRequest],
+      [Result_2],
       ["query"]
     ),
     icrc3_get_archives: IDL.Func(
@@ -619,17 +616,15 @@ export const idlFactory = ({ IDL }) => {
       ["query"]
     ),
     manage_sns_neuron: IDL.Func([Args_5], [Response], []),
-    manage_stake_position: IDL.Func([ManageStakePositionArgs], [Result_4], []),
-    manual_sync_neurons: IDL.Func([IDL.Null], [Result], []),
+    manage_stake_position: IDL.Func([ManageStakePositionArgs], [Result_3], []),
     processing_rewards_balance: IDL.Func(
       [IDL.Null],
-      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_2))],
+      [IDL.Vec(IDL.Tuple(TokenSymbol, Result))],
       []
     ),
-    set_dissolve_event_time: IDL.Func([Args_6], [Result], []),
     unallocated_rewards_balance: IDL.Func(
       [IDL.Null],
-      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_5))],
+      [IDL.Vec(IDL.Tuple(TokenSymbol, Result_4))],
       []
     ),
   });
@@ -643,13 +638,6 @@ export const init = ({ IDL }) => {
   const UpgradeArgs = IDL.Record({
     version: BuildVersion,
     commit_hash: IDL.Text,
-  });
-  const TokenSymbol = IDL.Variant({
-    ICP: IDL.Null,
-    OGY: IDL.Null,
-    WTN: IDL.Null,
-    GOLDAO: IDL.Null,
-    GLDT: IDL.Null,
   });
   const Duration = IDL.Record({ secs: IDL.Nat64, nanos: IDL.Nat32 });
   const ICRC3Properties = IDL.Record({
@@ -672,8 +660,7 @@ export const init = ({ IDL }) => {
     supported_blocks: IDL.Vec(SupportedBlockType),
   });
   const InitArgs = IDL.Record({
-    allowed_reward_tokens: IDL.Vec(TokenSymbol),
-    whitelist: IDL.Vec(IDL.Principal),
+    allowed_reward_tokens: IDL.Vec(IDL.Text),
     test_mode: IDL.Bool,
     authorized_principals: IDL.Vec(IDL.Principal),
     version: BuildVersion,
@@ -684,6 +671,6 @@ export const init = ({ IDL }) => {
     commit_hash: IDL.Text,
     gld_sns_rewards_canister_id: IDL.Principal,
   });
-  const Args_7 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
-  return [Args_7];
+  const Args_6 = IDL.Variant({ Upgrade: UpgradeArgs, Init: InitArgs });
+  return [Args_6];
 };

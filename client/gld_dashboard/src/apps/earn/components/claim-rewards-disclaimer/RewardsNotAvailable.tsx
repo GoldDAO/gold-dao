@@ -10,7 +10,9 @@ const RewardsNotAvailable = () => {
             <div className="font-semibold text-xl text-content/60">
               Total of: <span>0$</span>
             </div>
-            <div className="text-sm text-content/60">dispatched in GOLDAO</div>
+            <div className="text-sm text-content/60">
+              dispatched in GOLDAO, ICP and OGY
+            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,11 @@
 import { ActorSubclass } from "@dfinity/agent";
 import {
   ManageStakePositionArgs,
-  Result_4,
+  Result_3,
   StakePositionResponse,
   ManageStakePositionError,
   TokenSymbol,
-} from "@services/gldt_stake/interfaces/idlFactory";
+} from "@services/gldt_stake/idlFactory";
 import {
   parseClaimRewardsErrors,
   parseGeneralError,
@@ -19,18 +19,17 @@ const parseErrors = (error: ManageStakePositionError): string => {
   return JSON.stringify(error);
 };
 
-const add_stake = async (
+const claim_rewards = async (
   actor: ActorSubclass,
   tokens: string[]
 ): Promise<StakePositionResponse> => {
-  console.log(tokens);
   const args: ManageStakePositionArgs = {
     ClaimRewards: {
       tokens: tokens.map((token) => ({ [token]: null })) as TokenSymbol[],
     },
   };
 
-  const result = (await actor.manage_stake_position(args)) as Result_4;
+  const result = (await actor.manage_stake_position(args)) as Result_3;
 
   if ("Ok" in result) {
     return result.Ok;
@@ -41,4 +40,4 @@ const add_stake = async (
   }
 };
 
-export default add_stake;
+export default claim_rewards;

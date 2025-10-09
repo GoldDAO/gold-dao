@@ -27,10 +27,12 @@ const RewardsAvailable = ({
             <div className={styles.totalAmount}>
               Total of:{" "}
               <span>
-                <NumberToLocaleString value={amount} />$
+                <NumberToLocaleString value={amount} decimals={5} />$
               </span>
             </div>
-            <div className={styles.description}>dispatched in GOLDAO</div>
+            <div className={styles.description}>
+              dispatched in GOLDAO, ICP and OGY
+            </div>
           </div>
           {claimRewardsButton}
         </div>

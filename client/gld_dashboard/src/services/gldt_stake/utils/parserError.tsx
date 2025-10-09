@@ -6,7 +6,7 @@ import {
   ClaimRewardErrors,
   WithdrawRequestErrors,
   WithdrawErrors,
-} from "@services/gldt_stake/interfaces/idlFactory";
+} from "@services/gldt_stake/idlFactory";
 
 const extractDeepMessage = (value: string | object): string => {
   if (typeof value === "string") {

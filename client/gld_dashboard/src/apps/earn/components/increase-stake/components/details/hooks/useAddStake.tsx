@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/interfaces/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import add_stake from "@services/gldt_stake/add_stake";
 import icrc2_approve from "@services/ledger/icrc2_approve";
@@ -39,9 +39,6 @@ const useAddStake = (
       });
       queryClient.invalidateQueries({
         queryKey: ["FETCH_STAKED_USER_POSITION"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [`FETCH_LEDGER_BALANCE`, "GLDT"],
       });
     },
   });
