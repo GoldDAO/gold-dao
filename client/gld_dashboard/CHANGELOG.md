@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.1.2] - 2025-10-09
+
+#### Fix
+
+- Fetching stake user positions
+- Incorrect stake fee amount
+- Minor UI
+
 ### [2.1.1] - 2025-09-09
 
 #### Changed

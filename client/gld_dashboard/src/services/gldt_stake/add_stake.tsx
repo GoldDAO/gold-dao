@@ -1,10 +1,10 @@
 import { ActorSubclass } from "@dfinity/agent";
 import {
   ManageStakePositionArgs,
-  Result_4,
+  Result_3,
   StakePositionResponse,
   ManageStakePositionError,
-} from "@services/gldt_stake/interfaces/idlFactory";
+} from "@services/gldt_stake/idlFactory";
 import {
   parseAddStakePositionError,
   parseGeneralError,
@@ -26,7 +26,7 @@ const add_stake = async (
     AddStake: { amount },
   };
 
-  const result = (await actor.manage_stake_position(args)) as Result_4;
+  const result = (await actor.manage_stake_position(args)) as Result_3;
 
   if ("Ok" in result) {
     return result.Ok;

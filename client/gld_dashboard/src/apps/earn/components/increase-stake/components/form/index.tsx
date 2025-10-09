@@ -16,7 +16,7 @@ const FormDialogContent = () => {
 
   const onClickMaxBalance = () => {
     const value =
-      Number(user_balance_gldt.balance_e8s - user_balance_gldt.fee_e8s) /
+      Number(user_balance_gldt.balance_e8s - 2n * user_balance_gldt.fee_e8s) /
       10 ** user_balance_gldt.decimals;
     dispatchStakeState({
       type: "SET_STAKE_AMOUNT",
@@ -63,7 +63,7 @@ const FormDialogContent = () => {
             </div>
             <MaxButton
               disabled={
-                user_balance_gldt.balance_e8s < user_balance_gldt.fee_e8s
+                user_balance_gldt.balance_e8s < 2n * user_balance_gldt.fee_e8s
               }
               handleOnClick={onClickMaxBalance}
             />

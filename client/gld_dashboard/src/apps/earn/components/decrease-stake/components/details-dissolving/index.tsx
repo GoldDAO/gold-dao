@@ -8,7 +8,7 @@ import useDissolving from "./hooks/useDissolving";
 import { LoaderSpin } from "@components/loaders";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Logo } from "@shared/ui/logos";
-import DissolveInformations from "../confirm/components/DissolveInformations";
+import DissolveInfos from "../_shared/DissolveInfos";
 
 const Details = () => {
   const { authenticatedAgent } = useAuth();
@@ -88,7 +88,7 @@ const Details = () => {
               <div>GLDT</div>
             </div>
           </div>
-          <DissolveInformations className="mt-4" />
+          <DissolveInfos className="mt-4" />
           <Button size="lg" onClick={onClose} className="mt-4 w-full">
             Close
           </Button>

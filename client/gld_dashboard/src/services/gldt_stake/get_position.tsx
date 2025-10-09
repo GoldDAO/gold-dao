@@ -1,11 +1,15 @@
 import { ActorSubclass } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 
-import { StakePositionResponse } from "@services/gldt_stake/interfaces/idlFactory";
+import { StakePositionResponse } from "@services/gldt_stake/idlFactory";
 
 const get_position = async (
-  actor: ActorSubclass
+  actor: ActorSubclass,
+  owner: string
 ): Promise<StakePositionResponse[]> => {
-  const result = (await actor.get_position([])) as StakePositionResponse[];
+  const result = (await actor.get_position(
+    Principal.fromText(owner)
+  )) as StakePositionResponse[];
   return result;
 };
 
