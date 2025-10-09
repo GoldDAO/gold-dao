@@ -12,6 +12,8 @@ import DetailsDissolving from "./components/details-dissolving";
 import DetailsDissolvingInstantly from "./components/details-dissolving-instantly";
 import Icon from "@shared/ui/icons";
 import { Position } from "@earn/interfaces";
+import { GLDT_LEDGER_CANISTER_ID } from "@constants";
+import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
 
 interface DecreaseStakeProps
   extends PropsWithChildren<HTMLAttributes<HTMLDivElement>> {
@@ -19,8 +21,18 @@ interface DecreaseStakeProps
 }
 
 const DecreaseStake = ({ position, ...props }: DecreaseStakeProps) => {
-  const { isConnected } = useAuth();
+  const { isConnected, unauthenticatedAgent, principalId } = useAuth();
   const [state, dispatch] = useAtom(DecreaseStakeStateReducerAtom);
+
+  const balance = useFetchLedgerBalance(
+    GLDT_LEDGER_CANISTER_ID,
+    unauthenticatedAgent,
+    {
+      ledger: "GLDT",
+      owner: principalId,
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   useEffect(() => {
     if (!state.is_open_dialog) {
@@ -36,7 +48,11 @@ const DecreaseStake = ({ position, ...props }: DecreaseStakeProps) => {
   }, [state.is_open_dialog]);
 
   useEffect(() => {
-    if (position.isSuccess) {
+    if (balance.isSuccess && position.isSuccess) {
+      dispatch({
+        type: "SET_USER_BALANCE_GLDT",
+        value: balance.data,
+      });
       dispatch({
         type: "SET_USER_STAKED_DATA",
         value: {
@@ -54,7 +70,13 @@ const DecreaseStake = ({ position, ...props }: DecreaseStakeProps) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [position.data, position.isSuccess, state.step]);
+  }, [
+    position.data,
+    position.isSuccess,
+    state.step,
+    balance.data,
+    balance.isSuccess,
+  ]);
 
   const onOpenDialog = () => {
     dispatch({

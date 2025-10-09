@@ -234,7 +234,7 @@ const Form = ({ className }: { className?: string }) => {
             </p>
           )}
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-2 xl:gap-0">
           <div className="text-content/60 text-sm bg-surface-secondary rounded-md px-4 py-1">
             <BalanceAvailable
               token={token.name}

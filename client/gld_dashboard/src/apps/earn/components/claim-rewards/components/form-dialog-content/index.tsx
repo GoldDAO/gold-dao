@@ -71,18 +71,15 @@ const RewardItem = ({
 };
 
 const Confirm = () => {
-  const { isConnected, authenticatedAgent, unauthenticatedAgent } = useAuth();
+  const { isConnected, unauthenticatedAgent, principalId } = useAuth();
   const [claimRewardsState, dispatch] = useAtom(ClaimRewardsStateReducerAtom);
   const [isDisabledClaimingRewards] = useAtom(IsDisabledClaimingRewardsAtom);
 
-  const position = useFetchUserPosition(
-    GLDT_STAKE_CANISTER_ID,
-    authenticatedAgent,
-    unauthenticatedAgent,
-    {
-      enabled: isConnected && !!authenticatedAgent && !!unauthenticatedAgent,
-    }
-  );
+  const position = useFetchUserPosition(GLDT_STAKE_CANISTER_ID, {
+    enabled: isConnected && !!unauthenticatedAgent && !!principalId,
+    agent: unauthenticatedAgent,
+    owner: principalId,
+  });
 
   useEffect(() => {
     if (position.isSuccess && position.data) {

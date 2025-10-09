@@ -18,6 +18,7 @@ export const GLDT_SUPER_STATS_V3_CANISTER_ID = import.meta.env
   .VITE_GLDT_SUPER_STATS_V3_CANISTER_ID;
 export const ICP_SWAP_CANISTER_ID = import.meta.env.VITE_ICP_SWAP_CANISTER_ID;
 export const GOLD_API_BASE_URL = import.meta.env.VITE_GOLD_API_BASE_URL;
+export const GLDT_STAKE_CANISTER_ID = import.meta.env.VITE_GLDT_STAKE_CANISTER_ID;
 
 export const API_OGY_BASE_URL = "https://api.origyn.com"
 

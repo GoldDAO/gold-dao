@@ -122,8 +122,9 @@ const ConfirmDialog = () => {
                       </div>
                       <AmountUSD
                         amount={
-                          Number(swapAmount.data.pay_amount) /
-                          10 ** balanceTokenFrom.data.decimals
+                          (Number(swapAmount.data.pay_amount) /
+                            10 ** balanceTokenFrom.data.decimals) *
+                          balanceTokenFrom.data.price_usd
                         }
                         className="block xl:hidden"
                       />

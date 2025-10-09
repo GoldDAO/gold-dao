@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { KONGSWAP_CANISTER_ID_IC, GLDT_LEDGER_CANISTER_ID } from "@constants";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/interfaces/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
 import get_total_staked from "@services/gldt_stake/get_total_staked";

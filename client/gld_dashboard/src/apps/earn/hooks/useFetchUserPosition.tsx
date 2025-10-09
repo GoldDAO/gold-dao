@@ -14,10 +14,10 @@ import {
 import {
   TOKEN_GLDT,
   TOKEN_GOLDAO_IC,
-  // TOKEN_ICP_IC,
-  // TOKEN_OGY_IC,
+  TOKEN_ICP_IC,
+  TOKEN_OGY_IC,
 } from "@shared/utils/tokens";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/interfaces/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
 import get_position from "@services/gldt_stake/get_position";
@@ -28,9 +28,10 @@ import { Position, Reward } from "@earn/interfaces";
 
 const useFetchUserPosition = (
   canister_id: string,
-  authenticatedAgent: Agent | HttpAgent | undefined,
-  unauthenticatedAgent: Agent | HttpAgent | undefined,
-  options: Omit<UseQueryOptions<Position, Error>, "queryKey" | "queryFn">
+  options: Omit<UseQueryOptions<Position, Error>, "queryKey" | "queryFn"> & {
+    agent: Agent | HttpAgent | undefined;
+    owner: string;
+  }
 ) => {
   const {
     enabled = true,
@@ -40,26 +41,28 @@ const useFetchUserPosition = (
     refetchOnMount = true,
     refetchOnWindowFocus = false,
     refetchOnReconnect = true,
+    agent,
+    owner,
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_STAKED_USER_POSITION"],
+    queryKey: ["FETCH_STAKED_USER_POSITION", owner],
     queryFn: async (): Promise<Position> => {
       try {
         const actorStake = Actor.createActor(idlFactoryStake, {
-          agent: authenticatedAgent,
+          agent: agent,
           canisterId: canister_id,
         });
         const actorKongswap = Actor.createActor(idlFactoryKongswap, {
-          agent: unauthenticatedAgent,
+          agent: agent,
           canisterId: KONGSWAP_CANISTER_ID_IC,
         });
         const actorLedgerGLDT = Actor.createActor(idlFactoryLedger, {
-          agent: unauthenticatedAgent,
+          agent: agent,
           canisterId: GLDT_LEDGER_CANISTER_ID,
         });
 
-        const result_arr = await get_position(actorStake);
+        const result_arr = await get_position(actorStake, owner);
 
         if (!result_arr.length && !result_arr[0])
           return {
@@ -103,7 +106,7 @@ const useFetchUserPosition = (
         );
 
         const rewards: Reward[] = await Promise.all(
-          [TOKEN_GOLDAO_IC].map(async (token) => {
+          [TOKEN_GOLDAO_IC, TOKEN_ICP_IC, TOKEN_OGY_IC].map(async (token) => {
             const res = {
               ...token,
               is_selected: false,
@@ -121,7 +124,7 @@ const useFetchUserPosition = (
             if (!token_reward) return res;
 
             const actorLedger = Actor.createActor(idlFactoryLedger, {
-              agent: unauthenticatedAgent,
+              agent: agent,
               canisterId: token.canister_id,
             });
             const decimals = await icrc1_decimals(actorLedger);
@@ -136,9 +139,8 @@ const useFetchUserPosition = (
             const price = await swap_amounts(actorKongswap, {
               from: token.name,
               to: "ckUSDT",
-              amount: BigInt(1 * 10 ** decimals),
+              amount: 1n,
             });
-
             const amount = Number(token_reward.amount) / 10 ** decimals;
 
             return {

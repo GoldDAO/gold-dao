@@ -3,7 +3,6 @@ import { DecreaseStakeStateReducerAtom } from "../../atoms";
 import BalanceAvailable from "@shared/components/BalanceAvailable";
 import FormButton from "@shared/ui/button/HorizontalButton";
 import ErrorMessage from "./components/ErrorMessage";
-// import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import UnlockAmountSlider from "./components/AmountSlider";
 import UnlockAmount from "./components/Amount";
 import Icon from "@shared/ui/icons";

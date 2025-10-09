@@ -1,13 +1,12 @@
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
-
+import { Tooltip } from "@components/ui";
 import "@nfid/identitykit/react/styles.css";
-
+import "./main.css";
 import { APP_MODE } from "@constants";
 import { colors as themeColors } from "@theme/preset";
-import App from "./App";
-
+import Router from "./router";
 import { AuthProvider } from "./auth";
 
 import {
@@ -21,6 +20,7 @@ import {
   GLDT_SUPER_STATS_V3_CANISTER_ID,
   SWAP_CANISTER_ID,
   ICP_SWAP_CANISTER_ID,
+  GLDT_STAKE_CANISTER_ID,
 } from "@constants";
 
 import { idlFactory as gld_nft_idl } from "@canisters/gld_nft/did";
@@ -29,6 +29,7 @@ import { idlFactory as ledger_idl } from "@canisters/ledger/did";
 import { idlFactory as icp_swap_idl } from "@canisters/icp_swap/did";
 import { idlFactory as gldt_ledger_indexer_idl } from "@canisters/gldt_ledger_indexer/interface";
 import { idlFactory as gldt_super_stats_v3_idl } from "@canisters/gldt_super_stats_v3/interface";
+import { idlFactory as gldt_stake_idl } from "@canisters/stake/idlFactory";
 
 const queryClient = new QueryClient();
 
@@ -112,9 +113,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             canisterId: ICP_SWAP_CANISTER_ID,
             idlFactory: icp_swap_idl,
           },
+          gldt_stake: {
+            canisterId: GLDT_STAKE_CANISTER_ID,
+            idlFactory: gldt_stake_idl,
+          },
         }}
       >
-        <App />
+        <Router />
+        <Tooltip id="tooltip" />
       </AuthProvider>
     </QueryClientProvider>
   </>

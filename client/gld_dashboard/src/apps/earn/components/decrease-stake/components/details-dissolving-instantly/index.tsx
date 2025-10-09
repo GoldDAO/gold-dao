@@ -1,17 +1,14 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import {
-  GLDT_STAKE_CANISTER_ID,
-  INSTANT_DISSOLVE_FEE_PERCENTAGE,
-} from "@constants";
+import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { DecreaseStakeStateReducerAtom } from "../../atoms";
 import Button from "@shared/ui/button/HorizontalButton";
 import useDissolving from "./hooks/useDissolvingInstantly";
 import { LoaderSpin } from "@components/loaders";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Logo } from "@shared/ui/logos";
-import TransactionDetails from "./components/TransactionDetails";
+import DissolveInstantlyInfos from "../_shared/DissolveInstantlyInfos";
 
 const Details = () => {
   const { authenticatedAgent } = useAuth();
@@ -87,17 +84,11 @@ const Details = () => {
 
             <div className="flex items-center gap-1 font-semibold text-4xl">
               <Logo name="gldt" className="w-8" />
-              <NumberToLocaleString
-                value={
-                  Number(state.unlock_amount) -
-                  Number(state.unlock_amount) *
-                    (INSTANT_DISSOLVE_FEE_PERCENTAGE / 100)
-                }
-              />
+              <NumberToLocaleString value={Number(state.unlock_amount)} />
               <div>GLDT</div>
             </div>
           </div>
-          <TransactionDetails className="mt-4" />
+          <DissolveInstantlyInfos className="mt-4" />
           <Button size="lg" onClick={onClose} className="mt-4 w-full">
             Close
           </Button>

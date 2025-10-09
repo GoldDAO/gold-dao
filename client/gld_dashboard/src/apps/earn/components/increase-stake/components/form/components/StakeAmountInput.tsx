@@ -68,7 +68,7 @@ const StakeAmountInput = () => {
 
   const isAmountGreaterThanMinStakeAmount = (value: string) => {
     if (user_staked_data.staked_amount > 0) {
-      return true; // If already staked, no minimum amount required
+      return true;
     }
     return (
       Number(value) >= MIN_STAKE_AMOUNT ||
@@ -87,7 +87,7 @@ const StakeAmountInput = () => {
   return (
     <input
       id="amount"
-      type="number"
+      type="text"
       autoComplete="off"
       placeholder="10.00"
       min="10.00"
@@ -117,7 +117,7 @@ const StakeAmountInput = () => {
               isInsufficientFunds(
                 Number(v),
                 user_balance_gldt.balance_e8s,
-                user_balance_gldt.fee_e8s,
+                2n * user_balance_gldt.fee_e8s,
                 user_balance_gldt.decimals
               ) || "Amount must not exceed your balance minus network fees"
             );

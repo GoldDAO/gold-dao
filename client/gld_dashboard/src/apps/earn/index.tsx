@@ -19,16 +19,13 @@ import TotalStakedAmount from "./components/total-staked-amount";
 import DissolveEventsListDisconnected from "./components/dissolve-events-list-disconnected";
 
 const Earn = () => {
-  const { isConnected, authenticatedAgent, unauthenticatedAgent } = useAuth();
+  const { isConnected, unauthenticatedAgent, principalId } = useAuth();
 
-  const position = useFetchUserPosition(
-    GLDT_STAKE_CANISTER_ID,
-    authenticatedAgent,
-    unauthenticatedAgent,
-    {
-      enabled: isConnected && !!authenticatedAgent && !!unauthenticatedAgent,
-    }
-  );
+  const position = useFetchUserPosition(GLDT_STAKE_CANISTER_ID, {
+    enabled: isConnected && !!unauthenticatedAgent && !!principalId,
+    agent: unauthenticatedAgent,
+    owner: principalId,
+  });
 
   return (
     <InnerAppLayout>
