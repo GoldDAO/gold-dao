@@ -5,6 +5,7 @@ export const colors = {
   surface: {
     1: "rgb(var(--color-surface-1))",
     2: "rgb(var(--color-surface-2))",
+    3: "rgb(var(--color-surface-3))",
     DEFAULT: "rgb(var(--color-surface-1))",
   },
   border: "rgb(var(--color-border))",
@@ -21,10 +22,10 @@ export const colors = {
 const tailwindcssColors = (colors: any) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updatedColors: any = {};
-  Object.keys(colors).forEach(key => {
-    if (typeof colors[key] === 'object') {
+  Object.keys(colors).forEach((key) => {
+    if (typeof colors[key] === "object") {
       updatedColors[key] = tailwindcssColors(colors[key]);
-    } else if (typeof colors[key] === 'string') {
+    } else if (typeof colors[key] === "string") {
       updatedColors[key] = colors[key].replace(/\)$/, " / <alpha-value>)");
     }
   });
@@ -40,15 +41,15 @@ export default {
         sans: ["Polymath", "system-ui", "sans-serif"],
       },
       backgroundImage: {
-        'cover-img': "url('/src/assets/bg-cover.png')",
+        "cover-img": "url('/src/assets/bg-cover.png')",
       },
       animation: {
-        beat: 'beat 1s ease-in-out infinite',
+        beat: "beat 1s ease-in-out infinite",
       },
       keyframes: {
         beat: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.3)' },
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.3)" },
         },
       },
     },
@@ -56,6 +57,6 @@ export default {
   plugins: [
     import("@tailwindcss/typography"),
     import("@tailwindcss/aspect-ratio"),
-    import("@tailwindcss/line-clamp")
+    import("@tailwindcss/line-clamp"),
   ],
 };

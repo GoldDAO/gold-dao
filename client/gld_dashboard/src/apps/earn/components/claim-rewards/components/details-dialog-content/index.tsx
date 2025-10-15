@@ -31,7 +31,7 @@ const RewardItem = ({ reward }: { reward: Reward }) => {
           </div>
 
           <div className="text-content/60 text-sm">
-            $<NumberToLocaleString value={reward.amount_usd} />
+            $<NumberToLocaleString value={reward.amount_usd} decimals={5} />
           </div>
         </div>
       </div>
@@ -129,7 +129,11 @@ const DetailsDialogContent = () => {
           <div className="flex justify-between items-center w-full px-2 mt-4">
             <div>Total redeemed</div>
             <div className="text-content/60">
-              $<NumberToLocaleString value={totalSelectedAmountUSD} />
+              $
+              <NumberToLocaleString
+                value={totalSelectedAmountUSD}
+                decimals={5}
+              />
             </div>
           </div>
           <Button size="lg" onClick={onClose} className="mt-4 w-full">
