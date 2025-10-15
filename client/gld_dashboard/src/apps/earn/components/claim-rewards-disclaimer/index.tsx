@@ -39,25 +39,23 @@ const ClaimRewardsDisclaimer = ({
     <>
       {!position.isSuccess && <RewardsLoading />}
       {position.isSuccess && position.data.is_enable_claiming_rewards && (
-        <>
-          <RewardsAvailable
-            amount={position.data.total_rewards_amount_usd}
-            claimRewardsButton={
-              <button
-                type="button"
-                className={styles.buttonClaim}
-                onClick={onOpen}
-              >
-                Claim rewards
-              </button>
-            }
-          />
-          <ClaimRewards />
-        </>
+        <RewardsAvailable
+          amount={position.data.total_rewards_amount_usd}
+          claimRewardsButton={
+            <button
+              type="button"
+              className={styles.buttonClaim}
+              onClick={onOpen}
+            >
+              Claim rewards
+            </button>
+          }
+        />
       )}
       {position.isSuccess && !position.data.is_enable_claiming_rewards && (
         <RewardsNotAvailable />
       )}
+      {position.isSuccess && <ClaimRewards />}
     </>
   );
 };
