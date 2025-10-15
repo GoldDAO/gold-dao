@@ -11,12 +11,7 @@ import {
   MAX_DISSOLVE_EVENTS,
   INSTANT_DISSOLVE_FEE_PERCENTAGE,
 } from "@constants";
-import {
-  TOKEN_GLDT,
-  TOKEN_GOLDAO_IC,
-  TOKEN_ICP_IC,
-  TOKEN_OGY_IC,
-} from "@shared/utils/tokens";
+import { TOKEN_GLDT, TOKEN_GOLDAO_IC } from "@shared/utils/tokens";
 import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
@@ -106,7 +101,7 @@ const useFetchUserPosition = (
         );
 
         const rewards: Reward[] = await Promise.all(
-          [TOKEN_GOLDAO_IC, TOKEN_ICP_IC, TOKEN_OGY_IC].map(async (token) => {
+          [TOKEN_GOLDAO_IC].map(async (token) => {
             const res = {
               ...token,
               is_selected: false,

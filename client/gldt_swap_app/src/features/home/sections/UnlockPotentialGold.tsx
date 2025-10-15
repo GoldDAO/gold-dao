@@ -39,9 +39,9 @@ const UnlockPotentialGold = ({
                   <h3 className="text-gold font-semibold">audited Gold bars</h3>
                 </div>
                 <div className="max-w-96 text-content/80">
-                  Each token is backed by physical gold bar , produced and
+                  Each token is backed by a physical gold bar, produced and
                   securely stored in Switzerland. Our vault is audited every 4
-                  months with full transparency. Zero storage fees for holders
+                  months with full transparency. Zero storage fees for holders.
                 </div>
               </div>
               <div className="mx-auto order-0 md:order-1 max-w-48 md:max-w-full overflow-hidden">
@@ -59,12 +59,10 @@ const UnlockPotentialGold = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl bg-burgundy text-white p-4 md:p-8">
                 <div>
-                  {/* <div className="flex justify-end">
-                    <div className="bg-white/10 py-4 px-8 rounded-full">
-                      todo
-                    </div>
-                  </div> */}
-                  <div className="text-xl md:text-3xl mb-4">
+                  <div className="flex justify-end">
+                    <img src="/flower.svg" alt="Flower" className="w-32" />
+                  </div>
+                  <div className="text-xl md:text-3xl mt-16 mb-4">
                     <h3>Earn interest</h3>
                     <h3 className="text-gold font-semibold">while holding</h3>
                   </div>
@@ -76,18 +74,26 @@ const UnlockPotentialGold = ({
               </div>
               <div className="rounded-xl bg-surface-invert text-content-invert p-4 md:p-8">
                 <div>
-                  {/* <div className="flex justify-end">
-                    <div className="bg-black/10 py-4 px-8 rounded-full">
-                      todo
-                    </div>
-                  </div> */}
-                  <div className="text-xl md:text-3xl mb-4">
+                  <div className="flex justify-end">
+                    <img
+                      src={
+                        window.matchMedia &&
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                          .matches
+                          ? "/globe_dark.svg"
+                          : "/globe_light.svg"
+                      }
+                      alt="Globe"
+                      className="w-32"
+                    />
+                  </div>
+                  <div className="text-xl md:text-3xl mt-16 mb-4">
                     <h3>Use</h3>
                     <h3 className="text-gold font-semibold">anywhere</h3>
                   </div>
                   <div className="">
-                    GLDT is blockchain agnostic. Use it on ICP, Base, Ethereum,
-                    Arbitrum and many more.
+                    GLDT is blockchain agnostic and borderless. Use it on ICP,
+                    Base, Ethereum, Arbitrum and many more.
                   </div>
                 </div>
               </div>

@@ -30,19 +30,6 @@ const Transparency = ({
                       className="mx-auto w-6 h-6 align-center"
                     />
                   </div>
-                  <div className="text-left md:text-left">
-                    Sourced from <SpanBold>Metalor</SpanBold>, one of the
-                    world’s leading refineries
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="flex-shrink-0 flex items-start h-6 md:h-8 pt-1">
-                    <img
-                      src="/check.svg"
-                      alt="check icon"
-                      className="mx-auto w-6 h-6 align-center"
-                    />
-                  </div>
                   <div>
                     Sourced from <SpanBold>Metalor</SpanBold>, one of the
                     world’s leading refineries

@@ -16,8 +16,6 @@ const RewardsAvailable = ({
   amount: number;
   claimRewardsButton: ReactNode;
 }) => {
-  // const [, dispatchClaimReward] = useAtom(ClaimRewardStateReducerAtom);
-
   return (
     <div className={styles.container}>
       <div className="rounded-[inherit] p-4 bg-success/10">
@@ -30,9 +28,7 @@ const RewardsAvailable = ({
                 <NumberToLocaleString value={amount} decimals={5} />$
               </span>
             </div>
-            <div className={styles.description}>
-              dispatched in GOLDAO, ICP and OGY
-            </div>
+            <div className={styles.description}>dispatched in GOLDAO</div>
           </div>
           {claimRewardsButton}
         </div>

@@ -7,6 +7,7 @@ const Card = ({
   title,
   subtitle,
   img,
+  icon,
 }: {
   badge: string;
   title: string;
@@ -16,12 +17,18 @@ const Card = ({
 }) => (
   <div className="bg-surface rounded-xl shadow-md h-full flex flex-col">
     <div className="border-x border-t border-border p-8 rounded-xl">
-      <div className="inline-flex rounded-full bg-gold text-black text-sm px-2">
-        {badge}
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="inline-flex rounded-full bg-gold text-black text-sm px-2">
+            {badge}
+          </div>
+          <h4 className="text-3xl font-semibold mt-2 mb-2">{title}</h4>
+          <p className="text-sm flex-grow text-content/80">{subtitle}</p>
+        </div>
+        <div>{icon}</div>
       </div>
-      <h4 className="text-3xl font-semibold mt-2 mb-2">{title}</h4>
-      <p className="text-sm flex-grow text-content/80">{subtitle}</p>
     </div>
+
     <div>
       <img
         src={img}
@@ -42,11 +49,7 @@ const Ecosystem = ({
       title: "GOLDAO",
       subtitle: "Shape decisions through governance",
       icon: (
-        <img
-          src="/governance-icon.svg"
-          alt="Governance icon"
-          className="w-6 h-6"
-        />
+        <img src="/gold_dao.svg" alt="Governance icon" className="w-8 h-8" />
       ),
       img: GoldaoCard,
     },
@@ -55,11 +58,7 @@ const Ecosystem = ({
       title: "GLD NFTs",
       subtitle: "Trackable Gold ownership",
       icon: (
-        <img
-          src="/marketplace-icon.svg"
-          alt="Marketplace icon"
-          className="w-6 h-6"
-        />
+        <img src="/gold_nugget.svg" alt="NFT gold icon" className="w-8 h-8" />
       ),
       img: GldnftCard,
     },
@@ -67,13 +66,7 @@ const Ecosystem = ({
       badge: "Stablecoin",
       title: "USDG",
       subtitle: "A Gold-backed stablecoin",
-      icon: (
-        <img
-          src="/stablecoin-icon.svg"
-          alt="Stablecoin icon"
-          className="w-6 h-6"
-        />
-      ),
+      icon: <div className="px-4 rounded-full bg-surface-3">Coming soon</div>,
       img: UsdgCard,
     },
   ];
