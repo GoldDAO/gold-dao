@@ -1,7 +1,9 @@
+use crate::client::gldt_stake::set_apy_limit;
 use crate::client::gldt_stake::{
     _set_token_usd_values, allocated_rewards_balance, get_apy_overall, get_apy_timeseries,
     get_daily_analytics, get_position, processing_rewards_balance, unallocated_rewards_balance,
 };
+use crate::gldt_stake_suite::setup::default_test_setup_with_apy_limit;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::add_custom_rewards_to_processing_pool;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
@@ -10,6 +12,7 @@ use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
 use candid::Nat;
 use candid::Principal;
 use canister_time::HOUR_IN_MS;
+use gldt_stake_api_canister::set_apy_limit;
 use std::time::Duration;
 use types::TokenSymbol;
 
@@ -36,15 +39,13 @@ fn test_process_staking_rewards() {
     );
     tick_n_blocks(pic, 10);
 
-    let usd_values = vec![
-        TokenSymbol::GLDT,
-        TokenSymbol::GOLDAO,
-        TokenSymbol::OGY,
-        TokenSymbol::ICP,
-    ]
-    .into_iter()
-    .map(|sym| (sym, 1.0))
-    .collect();
+    let mut usd_values: std::collections::HashMap<TokenSymbol, f64> =
+        vec![TokenSymbol::GOLDAO, TokenSymbol::OGY, TokenSymbol::ICP]
+            .into_iter()
+            .map(|sym| (sym, 0.0000001))
+            .collect();
+    usd_values.insert(TokenSymbol::GLDT, 1.0);
+
     _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
 
     // --- Create 10 stake positions ---
@@ -142,6 +143,141 @@ fn test_process_staking_rewards() {
         assert!(
             *apy > 0.0,
             "Day {} should have positive APY, but got {}",
+            ts,
+            apy
+        );
+    }
+
+    let daily_analytics = get_daily_analytics(
+        pic,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &gldt_stake_api_canister::get_daily_analytics::Args {
+            starting_day: 0,
+            limit: None,
+        },
+    );
+
+    println!("daily_analytics {:?}", daily_analytics);
+
+    // Make sure we have entries
+    assert!(!daily_analytics.is_empty());
+}
+
+#[test]
+fn test_process_staking_rewards_with_limited_apy() {
+    let mut test_env = default_test_setup_with_apy_limit();
+
+    let GldtStakeTestEnv {
+        ref mut pic,
+        controller,
+        token_ledgers,
+        gldt_stake_canister_id,
+        gld_rewards_canister_id,
+        neuron_data,
+        ledger_fees,
+        ..
+    } = test_env;
+    let pic = &pic.borrow();
+
+    let icp_ledger = token_ledgers.get("icp_ledger_canister_id").unwrap().clone();
+    assert_eq!(
+        icp_ledger,
+        Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap()
+    );
+    tick_n_blocks(pic, 10);
+
+    let mut usd_values: std::collections::HashMap<TokenSymbol, f64> =
+        vec![TokenSymbol::GOLDAO, TokenSymbol::OGY, TokenSymbol::ICP]
+            .into_iter()
+            .map(|sym| (sym, 0.02))
+            .collect();
+    usd_values.insert(TokenSymbol::GLDT, 1.0);
+
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    let _ = set_apy_limit(
+        pic,
+        controller,
+        gldt_stake_canister_id,
+        &Some(20), // 20% APY limit
+    );
+
+    // --- Create 10 stake positions ---
+    let users: Vec<_> = (0..10)
+        .map(|_| {
+            create_stake_position_util(
+                pic,
+                controller,
+                &token_ledgers,
+                gldt_stake_canister_id,
+                1_000_000_000u128,
+            )
+            .0
+        })
+        .collect();
+
+    add_rewards_to_neurons(
+        pic,
+        neuron_data.clone(),
+        controller,
+        &token_ledgers,
+        gld_rewards_canister_id,
+        gldt_stake_canister_id,
+        ledger_fees.clone(),
+    );
+
+    let unallocated_rewards =
+        unallocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Unallocated rewards balance: {:?}", unallocated_rewards);
+
+    let processing_rewards =
+        processing_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Processing rewards balance: {:?}", processing_rewards);
+
+    let allocated_rewards =
+        allocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Allocated rewards balance: {:?}", allocated_rewards);
+
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    wait_1_day(pic);
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    wait_1_day(pic);
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    wait_1_day(pic);
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    wait_1_day(pic);
+    _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+
+    let unallocated_rewards =
+        unallocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Unallocated rewards balance: {:?}", unallocated_rewards);
+
+    let processing_rewards =
+        processing_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Processing rewards balance: {:?}", processing_rewards);
+
+    let allocated_rewards =
+        allocated_rewards_balance(pic, controller, gldt_stake_canister_id.clone(), &());
+    println!("Allocated rewards balance: {:?}", allocated_rewards);
+
+    let apy_history = get_apy_timeseries(
+        pic,
+        Principal::anonymous(),
+        gldt_stake_canister_id,
+        &gldt_stake_api_canister::get_apy_timeseries::Args {
+            starting_day: 0,
+            limit: None,
+        },
+    );
+    println!("apy_history {:?}", apy_history);
+    assert_eq!(apy_history.len(), 4);
+
+    // all subsequent days must have APY < 20.0
+    for (ts, apy) in apy_history.iter() {
+        assert!(
+            *apy < 20.0,
+            "Day {} should be lower than set APY, but got {}",
             ts,
             apy
         );

@@ -219,6 +219,175 @@ impl GldtStakeTestEnvBuilder {
                 .unwrap()
                 .clone(),
             allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
+            apy_limit: None,
+            icrc3_config: ICRC3Config {
+                supported_blocks: vec![SupportedBlockType {
+                    block_type: "add_stake".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "claim_rewards".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "start_dissolving".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "dissolve_instantly".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },SupportedBlockType {
+                    block_type: "withdraw".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                },],
+                constants,
+            },
+        });
+
+        setup_gldt_stake_canister(
+            &pic,
+            gldt_stake_canister_id,
+            gldt_stake_init_args,
+            self.controller,
+        );
+
+        // pic.set_time(SystemTime::now());
+
+        let mut usd_values: std::collections::HashMap<TokenSymbol, f64> =
+            vec![TokenSymbol::GOLDAO, TokenSymbol::OGY, TokenSymbol::ICP]
+                .into_iter()
+                .map(|sym| (sym, 0.0000001))
+                .collect();
+        usd_values.insert(TokenSymbol::GLDT, 1.0);
+
+        GldtStakeTestEnv {
+            controller: self.controller,
+            gld_sns_test_env: gld_sns_test_env,
+            neuron_data: gldt_stake_neuron_data,
+            token_ledgers,
+            gldt_stake_canister_id: gldt_stake_canister_id,
+            gld_rewards_canister_id: self.gld_rewards_canister_id,
+            pic: Rc::clone(&pic_ref),
+            ledger_fees: self.ledger_fees.clone(),
+        }
+    }
+
+    pub fn build_with_limited_apy(&mut self) -> GldtStakeTestEnv {
+        let pic_ref: Rc<RefCell<PocketIc>> = Rc::new(RefCell::new(
+            PocketIcBuilder::new()
+                .with_sns_subnet()
+                .with_application_subnet()
+                .with_fiduciary_subnet()
+                .with_nns_subnet()
+                .with_system_subnet()
+                .build(),
+        ));
+        let pic = pic_ref.borrow();
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1718776800000)).into(),
+        ); // Wednesday Jun 19, 2024, 6:00:00 AM
+
+        let sns_subnet = pic.topology().get_sns().unwrap();
+
+        self.gld_rewards_canister_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+        let gldt_stake_canister_id =
+            pic.create_canister_on_subnet(Some(self.controller.clone()), None, sns_subnet);
+
+        // NOTE: Neuron Permissions should be granted to the controller
+        let (gldt_stake_neuron_data, _) =
+            generate_neuron_data(0, 2, 1, &vec![gldt_stake_canister_id]);
+
+        let gld_sns_test_env =
+            SnsTestEnv::goldao(&pic_ref, self.controller, &gldt_stake_neuron_data, None);
+        let sns_gov_canister_id = gld_sns_test_env.governance_id;
+
+        self.sns_governance_id = sns_gov_canister_id;
+        println!("sns_governance_id : {}", sns_gov_canister_id);
+
+        let mut token_ledgers = setup_ledgers(
+            &pic,
+            self.controller.clone(),
+            self.token_symbols.clone(),
+            self.initial_ledger_accounts.clone(),
+            self.ledger_fees.clone(),
+        );
+        let goldao_sns_ledger_canister_id = gld_sns_test_env.ledger_id;
+        token_ledgers.insert(
+            "gldgov_ledger_canister_id".to_string(),
+            goldao_sns_ledger_canister_id,
+        );
+
+        let gld_sns_rewards_canister_id = setup_rewards_canister(
+            &pic,
+            self.gld_rewards_canister_id,
+            &token_ledgers,
+            sns_gov_canister_id,
+            &self.controller,
+        );
+
+        let mut reward_types = HashMap::new();
+        reward_types.insert(
+            "GOLDAO".to_string(),
+            (
+                token_ledgers
+                    .get("goldao_ledger_canister_id")
+                    .unwrap()
+                    .clone(),
+                self.ledger_fees.get("GOLDAO").unwrap().clone(),
+            ),
+        );
+        reward_types.insert(
+            "OGY".to_string(),
+            (
+                token_ledgers.get("ogy_ledger_canister_id").unwrap().clone(),
+                self.ledger_fees.get("OGY").unwrap().clone(),
+            ),
+        );
+        reward_types.insert(
+            "ICP".to_string(),
+            (
+                token_ledgers.get("icp_ledger_canister_id").unwrap().clone(),
+                self.ledger_fees.get("ICP").unwrap().clone(),
+            ),
+        );
+        reward_types.insert(
+            "WTN".to_string(),
+            (
+                token_ledgers.get("icp_ledger_canister_id").unwrap().clone(),
+                self.ledger_fees.get("ICP").unwrap().clone(),
+            ),
+        );
+        pic.set_time(
+            (SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(1733486460000)).into(),
+        ); // Friday 6 Dec 2024, 12:01:00
+
+        // INIT ICRC3
+        let mut constants = ICRC3Properties::default();
+        // constants.max_memory_size_bytes = 1000;
+        constants.max_memory_size_bytes = 60000;
+        constants.tx_window = Duration::from_millis(500);
+        constants.max_transactions_in_window = 10;
+        constants.max_blocks_per_response = 100;
+        constants.max_transactions_to_purge = 5;
+        constants.initial_cycles = 5_000_000_000_000;
+        constants.reserved_cycles = 5_000_000_000_000;
+        // INIT ICRC3
+
+        let gldt_stake_init_args = Args::Init(gldt_stake_api_canister::init::InitArgs {
+            test_mode: true,
+            version: BuildVersion::min(),
+            commit_hash: "integration_testing".to_string(),
+            authorized_principals: vec![self.controller],
+            gld_sns_rewards_canister_id: gld_sns_rewards_canister_id,
+            gld_sns_governance_canister_id: self.sns_governance_id,
+            goldao_ledger_id: token_ledgers
+                .get("goldao_ledger_canister_id")
+                .unwrap()
+                .clone(),
+            gldt_ledger_id: token_ledgers
+                .get("gldt_ledger_canister_id")
+                .unwrap()
+                .clone(),
+            allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
+            apy_limit: Some(20),
             icrc3_config: ICRC3Config {
                 supported_blocks: vec![SupportedBlockType {
                     block_type: "add_stake".to_string(),
@@ -380,9 +549,10 @@ impl GldtStakeTestEnvBuilder {
                 .get("gldt_ledger_canister_id")
                 .unwrap()
                 .clone(),
-           allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
+            allowed_reward_tokens: vec!["GOLDAO".to_string(), "ICP".to_string(), "OGY".to_string()],
+            apy_limit: None,
             icrc3_config: ICRC3Config {
-            supported_blocks: vec![SupportedBlockType {
+                supported_blocks: vec![SupportedBlockType {
                     block_type: "event".to_string(),
                     url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
                 }],

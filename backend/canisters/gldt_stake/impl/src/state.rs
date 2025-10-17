@@ -12,6 +12,7 @@ use sns_governance_canister::types::Neuron;
 use std::collections::{BTreeSet, HashMap};
 use types::TokenSymbol;
 use types::{BuildVersion, TimestampMillis};
+use utils::numeric::Percentage;
 use utils::{
     env::{CanisterEnv, Environment},
     memory::MemorySize,
@@ -73,6 +74,7 @@ impl RuntimeState {
             unallocated_rewards_pool: self.data.unallocated_rewards_pool.clone(),
             processing_rewards_pool: self.data.processing_rewards_pool.clone(),
             allocated_rewards_pool: self.data.allocated_rewards_pool.clone().into(),
+            apy_limit: self.data.stake_system.apy_limit,
         }
     }
 
@@ -111,6 +113,7 @@ pub struct Metrics {
     pub pending_fee_transfer_amount: Nat,
     pub last_analytics_updated_timestamp: TimestampMillis,
     pub token_usd_values: HashMap<TokenSymbol, f64>,
+    pub apy_limit: Option<Percentage>,
 
     // ledgers and canister ids
     pub gldt_ledger_id: Principal,

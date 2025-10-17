@@ -55,7 +55,7 @@ fn calculate_total_rewards_per_token(
     for (_ts, rewards_per_timestamp) in daily_rewards.iter() {
         for (token, amount) in rewards_per_timestamp {
             total_rewards
-                .entry(token.clone())
+                .entry(*token)
                 .and_modify(|existing| *existing += amount.clone())
                 .or_insert(amount.clone());
         }
@@ -92,8 +92,15 @@ pub fn calculate_apy(total_daily_rewards_as_usd: f64, total_weighted_stake_as_us
         );
         return 0.0;
     }
+    ic_cdk::println!(
+        "Calculating APY: total_daily_rewards_as_usd = {}, total_weighted_stake_as_usd = {}",
+        total_daily_rewards_as_usd,
+        total_weighted_stake_as_usd
+    );
 
-    (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 365.0 * 100.0
+    let apy = (total_daily_rewards_as_usd / total_weighted_stake_as_usd) * 365.0 * 100.0;
+    ic_cdk::println!("Calculated APY: {}", apy);
+    apy
 }
 
 pub fn calculate_days_since_genesis(genesis_datetime: TimestampMillis) -> u64 {
