@@ -2,6 +2,7 @@ use crate::state::{mutate_state, read_state};
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
 use candid::Nat;
 use canister_time::{run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS};
+use ic_ledger_types::AccountIdentifier;
 use icp_ledger_canister::account_balance::Args as AccountBalanceArgs;
 
 use icp_ledger_canister_c2c_client::account_balance;
@@ -12,7 +13,7 @@ use nns_governance_canister::types::{
     manage_neuron::{disburse::Amount, Command, Disburse, Spawn},
     Neuron,
 };
-use nns_governance_canister::types::{AccountIdentifier as NNSAccountIdendifier, ListNeurons};
+use nns_governance_canister::types::{AccountIdentifier as NNSAccountIdentifier, ListNeurons};
 use std::time::Duration;
 use tracing::{error, info, warn};
 use types::Milliseconds;
@@ -128,16 +129,24 @@ async fn spawn_neurons(neuron_ids: Vec<u64>) {
 async fn disburse_neurons(mut neurons: Vec<Neuron>) {
     let rewards_recipients = read_state(|state| state.data.rewards_recipients.clone());
 
-    match fetch_cycle_management_icp_balance().await {
-        Ok(amount) => {
-            if amount < Nat::from(100_000_000_000u64) {
-                let result = disburse_to_cycle_management_account(neurons.pop()).await;
-                info!("{result:?}");
+    let cycle_management_accounts = read_state(|state| state.data.cycle_management_account.clone());
+    if cycle_management_accounts.is_empty() {
+        warn!("No cycle management account defined, skipping disbursement to cycle management account and disbursing normally.");
+    } else {
+        for account in cycle_management_accounts {
+            match fetch_cycle_management_icp_balance(account.clone()).await {
+                Ok(amount) => {
+                    if amount < Nat::from(100_000_000_000u64) {
+                        let result =
+                            disburse_to_cycle_management_account(neurons.pop(), account.clone())
+                                .await;
+                        info!("{result:?}");
+                    }
+                }
+                Err(e) => info!(e),
             }
         }
-        Err(e) => info!(e),
     }
-
     if rewards_recipients.is_empty() {
         warn!("Skipping disbursement of neurons because no reward recipients are defined.");
         return;
@@ -242,12 +251,14 @@ async fn disburse_neurons(mut neurons: Vec<Neuron>) {
     }
 }
 
-async fn fetch_cycle_management_icp_balance() -> Result<Nat, String> {
+async fn fetch_cycle_management_icp_balance(
+    cycle_management_account: AccountIdentifier,
+) -> Result<Nat, String> {
     let icp_ledger = read_state(|s| s.data.icp_ledger_canister_id);
-    let cycle_management_account = read_state(|s| s.data.cycle_management_account)
-        .ok_or_else(|| {
-            format!("WARNING :: fetch_cycle_management_icp_balance :: can't find cycle management account")
-        })?;
+    // let cycle_management_account = read_state(|s| s.data.cycle_management_account)
+    //     .ok_or_else(|| {
+    //         format!("WARNING :: fetch_cycle_management_icp_balance :: can't find cycle management account")
+    //     })?;
 
     match account_balance(
         icp_ledger,
@@ -261,18 +272,21 @@ async fn fetch_cycle_management_icp_balance() -> Result<Nat, String> {
     }
 }
 
-async fn disburse_to_cycle_management_account(neuron: Option<Neuron>) -> Result<(), String> {
+async fn disburse_to_cycle_management_account(
+    neuron: Option<Neuron>,
+    cycle_management_account: AccountIdentifier,
+) -> Result<(), String> {
     let neuron = neuron.ok_or_else(|| {
         "WARNING :: disburse_to_cycle_management_account :: neuron is a none value"
     })?;
 
-    let cycle_management_account = read_state(|s| s.data.cycle_management_account)
-        .ok_or_else(|| {
-            format!(
-                "WARNING :: disburse_to_cycle_management_account :: can't convert account into hex"
-            )
-        })?
-        .to_hex();
+    // let cycle_management_account = read_state(|s| s.data.cycle_management_account)
+    //     .ok_or_else(|| {
+    //         format!(
+    //             "WARNING :: disburse_to_cycle_management_account :: can't convert account into hex"
+    //         )
+    //     })?
+    //     .to_hex();
     let cycle_management_account = hex::decode(cycle_management_account).map_err(|e| format!("ERROR :: disburse_to_cycle_management_account :: failed to decode hex with error - {e:?}"))?;
 
     let neuron_id = neuron
@@ -285,7 +299,7 @@ async fn disburse_to_cycle_management_account(neuron: Option<Neuron>) -> Result<
     match manage_nns_neuron_impl(
         neuron_id,
         Command::Disburse(Disburse {
-            to_account: Some(NNSAccountIdendifier {
+            to_account: Some(NNSAccountIdentifier {
                 hash: cycle_management_account,
             }),
             amount: Some(Amount {
