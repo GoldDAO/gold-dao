@@ -119,7 +119,7 @@ pub struct Metrics {
     pub rewards_recipients: RewardsRecipientList,
     pub neurons: NeuronList,
     pub outstanding_payments: OutstandingPaymentsList,
-    pub cycle_management_account: String,
+    pub cycle_management_account: Vec<String>,
 }
 
 #[derive(CandidType, Deserialize, Serialize)]
