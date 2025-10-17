@@ -21,8 +21,8 @@ pub(crate) async fn manage_cycle_management_account_impl(
     args: ManageCycleManagementRequest,
 ) -> Result<(), String> {
     match validate_manage_cycle_management_account(&args) {
-        Ok(valid_account) => {
-            mutate_state(|s| s.data.cycle_management_account = Some(valid_account));
+        Ok(valid_accounts) => {
+            mutate_state(|s| s.data.cycle_management_account = valid_accounts);
             Ok(())
         }
         Err(e) => Err(e),
@@ -40,8 +40,9 @@ async fn manage_cycle_management_account_validate(
 
 fn validate_manage_cycle_management_account(
     args: &ManageCycleManagementRequest,
-) -> Result<AccountIdentifier, String> {
-    AccountIdentifier::from_hex(&args.account_identifier).map_err(|e| {
-        format!("ERROR :: post_upgrade.rs :: cycle_management_account was not a valid hex string :: err - {e:?}")
-    })
+) -> Result<Vec<AccountIdentifier>, String> {
+    args.account_identifier
+        .iter()
+        .map(|id| AccountIdentifier::from_hex(id))
+        .collect()
 }

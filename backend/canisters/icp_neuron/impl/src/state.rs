@@ -67,7 +67,9 @@ impl RuntimeState {
             cycle_management_account: self
                 .data
                 .cycle_management_account
-                .map_or("".to_string(), |s| s.to_hex()),
+                .iter()
+                .map(|s| s.to_hex())
+                .collect(),
         }
     }
 
@@ -139,7 +141,7 @@ pub struct Data {
     pub icp_ledger_canister_id: Principal,
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
-    pub cycle_management_account: Option<AccountIdentifier>,
+    pub cycle_management_account: Vec<AccountIdentifier>,
 }
 
 impl Data {
@@ -152,7 +154,7 @@ impl Data {
             nns_governance_canister_id: NNS_GOVERNANCE_CANISTER_ID,
             icp_ledger_canister_id: ICP_LEDGER_CANISTER_ID,
             outstanding_payments: OutstandingPaymentsList::default(),
-            cycle_management_account: None,
+            cycle_management_account: Vec::new(),
         }
     }
 
