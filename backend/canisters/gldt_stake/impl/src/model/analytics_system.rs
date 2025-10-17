@@ -53,6 +53,12 @@ impl AnalyticsSystem {
         let day_start = now - (now % DAY_IN_MS);
 
         let updated_analytics = if let Some(existing) = self.daily_analytics.get(&day_start) {
+            ic_cdk::println!(
+                "Found existing daily analytics for day_start {}: {:?}",
+                day_start,
+                existing
+            );
+
             // Clone existing record
             let mut analytics = existing.clone();
 
@@ -72,13 +78,15 @@ impl AnalyticsSystem {
                 &self.token_usd_values,
             );
 
+            ic_cdk::println!("Recalculated APY: {}", analytics.apy);
+
             analytics.staked_gldt = total_staked.clone();
             analytics.weighted_stake = total_weighted_stake.clone();
 
             analytics
         } else {
             // First record for today
-            DailyAnalytics {
+            let apy = DailyAnalytics {
                 apy: calculate_daily_apy(
                     total_weighted_stake.clone(),
                     rewards.clone(),
@@ -87,8 +95,20 @@ impl AnalyticsSystem {
                 staked_gldt: total_staked.clone(),
                 weighted_stake: total_weighted_stake.clone(),
                 rewards,
-            }
+            };
+            ic_cdk::println!(
+                "No existing record for day_start {}. Creating new: {:?}",
+                day_start,
+                apy
+            );
+            apy
         };
+
+        ic_cdk::println!(
+            "Inserting/Updating daily analytics for day_start {}: {:?}",
+            day_start,
+            updated_analytics
+        );
 
         // Insert back (overwrite or insert)
         self.daily_analytics.insert(day_start, updated_analytics);
@@ -167,12 +187,12 @@ impl AnalyticsSystem {
     }
 }
 
-use crate::calculate_apy;
-use crate::calculate_daily_reward_per_token_in_usd;
-use crate::calculate_weighted_stake_usd;
-use crate::sum_usd_rewards;
+use crate::{
+    calculate_apy, calculate_daily_reward_per_token_in_usd, calculate_weighted_stake_usd,
+    sum_usd_rewards,
+};
 use tracing::info;
-fn calculate_daily_apy(
+pub fn calculate_daily_apy(
     total_weighted_stake: Nat,
     rewards: HashMap<TokenSymbol, Nat>,
     token_usd_values: &HashMap<TokenSymbol, f64>,
@@ -186,17 +206,28 @@ fn calculate_daily_apy(
         rewards.len(),
         token_usd_values
     );
+    ic_cdk::println!(
+        "total_weighted_stake = {:?}, rewards size = {}, token_usd_values = {:?}",
+        total_weighted_stake,
+        rewards.len(),
+        token_usd_values
+    );
 
     if !rewards.is_empty() {
         info!("rewards = {:?}", rewards);
 
         let daily_reward_per_token_usd =
             calculate_daily_reward_per_token_in_usd(rewards.clone(), 1, token_usd_values);
+        ic_cdk::println!(
+            "daily_reward_per_token_usd = {:?}",
+            daily_reward_per_token_usd
+        );
 
         let total_rewards_usd = sum_usd_rewards(daily_reward_per_token_usd.clone());
+        ic_cdk::println!("total_rewards_usd = {}", total_rewards_usd);
         let weighted_stake_usd =
             calculate_weighted_stake_usd(total_weighted_stake.clone(), token_usd_values);
-
+        ic_cdk::println!("weighted_stake_usd = {}", weighted_stake_usd);
         info!(
             "total_rewards_usd = {}, weighted_stake_usd = {}",
             total_rewards_usd, weighted_stake_usd

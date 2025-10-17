@@ -98,6 +98,7 @@ pub enum GeneralError {
     BalanceIsLowerThanFee(String),
     BalanceIsLowerThanThreshold(String),
     BalanceIsZero(String),
+    ZeroAPY(String),
 }
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]

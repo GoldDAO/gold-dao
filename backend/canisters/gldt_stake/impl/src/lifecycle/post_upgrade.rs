@@ -1,6 +1,5 @@
 use crate::state::replace_icrc3;
 use crate::state::start_default_archive_job;
-use crate::utils::TimeInterval;
 use crate::{memory::get_upgrades_memory, state::RuntimeState};
 // use crate::migrations::types::state::RuntimeStateV0;
 use bity_ic_icrc3::icrc3::ICRC3;

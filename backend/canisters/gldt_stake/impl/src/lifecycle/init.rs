@@ -8,6 +8,7 @@ use ic_cdk_macros::init;
 use tracing::info;
 use types::TokenSymbol;
 use utils::env::CanisterEnv;
+use utils::numeric::Percentage;
 
 #[init]
 fn init(args: Args) {
@@ -32,6 +33,12 @@ fn init(args: Args) {
                 goldao_sns_rewards_canister_id: init_args.gld_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: init_args.gld_sns_governance_canister_id,
                 ..Default::default()
+            };
+            data.stake_system.apy_limit = match init_args.apy_limit {
+                Some(value) => Some(Percentage::new(value).expect(
+                    "Invalid APY limit in init args. It should be an integer between 0 and 100.",
+                )),
+                None => None,
             };
             data.stake_system.reward_types = init_args
                 .allowed_reward_tokens

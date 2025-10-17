@@ -111,8 +111,36 @@ impl Percentage {
         self.0 == Self::MAX
     }
 
+    // e.g. 0.32 = 32%
+    pub fn as_fraction(self) -> f64 {
+        self.0 as f64 / 100.0
+    }
+
+    // e.g. 32% = 32.0
+    pub fn as_float(self) -> f64 {
+        self.0 as f64
+    }
+
     pub fn apply_to(&self, amount: &Nat) -> Nat {
         Nat::from((&amount.0 * BigUint::from(self.0)) / BigUint::from(100_u8))
+    }
+}
+
+use std::ops::Mul;
+impl Mul<f64> for Percentage {
+    type Output = f64;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        self.as_fraction() * rhs
+    }
+}
+
+use std::ops::Div;
+impl Div<f64> for Percentage {
+    type Output = f64;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        self.as_fraction() / rhs
     }
 }
 
@@ -208,5 +236,88 @@ mod tests {
             p,
             Err(PercentageError::PercentageOutOfBounds(120))
         ));
+    }
+
+    // --- Integration & Cross-Type Tests ---
+
+    #[test]
+    fn test_scale_e8s_down_rounding_and_zero() {
+        let small_value = Nat::from(SCALE_FACTOR - 1);
+        let big_value = Nat::from(SCALE_FACTOR * 5);
+
+        let down_small = small_value.scale_e8s_down();
+        let down_big = big_value.scale_e8s_down();
+
+        assert_eq!(down_small, Nat::from(0u64)); // should floor down
+        assert_eq!(down_big, Nat::from(5u64));
+    }
+
+    #[test]
+    fn test_scaled_e8s_mul_basic() {
+        let base = Nat::from(2u64);
+        let factor = 5u64;
+        let result = base.scaled_e8s_mul(factor);
+        assert_eq!(result, Nat::from(10u64));
+    }
+
+    #[test]
+    fn test_percentage_mul_and_div_with_f64() {
+        let p = Percentage::new(50).unwrap();
+        let x = 200.0;
+        assert_eq!(p * x, 100.0);
+        assert_eq!(p / 0.5, 1.0);
+    }
+
+    #[test]
+    fn test_e8s_mul_basic() {
+        let base = 2.0;
+        let factor = Percentage::new(50).unwrap();
+        assert_eq!(factor * base, 1.0);
+    }
+
+    #[test]
+    fn test_e8s_div_basic() {
+        let base = 2.0;
+        let factor = Percentage::new(100).unwrap();
+        assert_eq!(factor / base, 0.5);
+    }
+
+    #[test]
+    fn test_partial_ord_and_eq_with_u8() {
+        let p = Percentage::new(30).unwrap();
+        assert!(p > 20u8);
+        assert!(p < 40u8);
+        assert_eq!(p, 30u8);
+    }
+
+    #[test]
+    fn test_percentage_apply_to_large_nat() {
+        let big_amount = Nat(BigUint::from(10u128.pow(20)));
+        let p = Percentage::new(1).unwrap();
+        let result = p.apply_to(&big_amount);
+        // 1% of 10^20 = 10^18
+        assert_eq!(result, Nat(BigUint::from(10u128.pow(18))));
+    }
+
+    #[test]
+    fn test_combined_scaling_pipeline() {
+        let base = Nat(BigUint::from(50_000_000u64)); // scaled 0.5
+        let multiplier = 2.0;
+        let percentage = Percentage::new(50).unwrap(); // 50%
+
+        let scaled = base.scale_e8s_mul_f64(multiplier);
+        let partial = percentage.apply_to(&scaled);
+        let downscaled = partial.scale_e8s_down();
+
+        println!("Combined scaling result: {}", downscaled);
+        assert!(downscaled > Nat::from(0u64));
+    }
+
+    #[test]
+    fn test_scaled_e8s_div_by_zero_panics() {
+        let a = Nat::from(100u64);
+        let b = Nat::from(0u64);
+        let result = std::panic::catch_unwind(|| a.scaled_e8s_div(&b));
+        assert!(result.is_err(), "Division by zero should panic");
     }
 }

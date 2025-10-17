@@ -12,9 +12,9 @@ pub mod manage_sns_neuron;
 pub mod manage_stake_position;
 pub mod manage_stake_position_impls;
 pub mod manual_allocate_rewards;
-
 pub mod manual_sync_neurons;
 pub mod manual_token_transfer;
+pub mod set_apy_limit;
 
 pub use _set_position_withdraw_state::*;
 pub use _set_token_usd_values::*;
@@ -28,9 +28,9 @@ pub use create_neuron::{StakeSnsNeuronArgs, StakeSnsNeuronResponse};
 pub use manage_sns_neuron::*;
 pub use manage_stake_position::*;
 pub use manual_allocate_rewards::*;
-
 pub use manual_sync_neurons::*;
 pub use manual_token_transfer::*;
+pub use set_apy_limit::*;
 
 #[cfg(feature = "inttest")]
 pub mod manual_claim_rewards;

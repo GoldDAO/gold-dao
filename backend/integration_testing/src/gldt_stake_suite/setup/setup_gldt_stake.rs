@@ -9,7 +9,7 @@ pub fn setup_gldt_stake_canister(
     args: gldt_stake_api_canister::Args,
     controller: Principal,
 ) -> Principal {
-    let sns_neuron_controller_wasm = GLDT_STAKE.clone();
+    let gldt_stake_wasm = GLDT_STAKE.clone();
     pic.add_cycles(canister_id, 100_000_000_000_000_000_000);
 
     pic.set_controllers(
@@ -23,7 +23,7 @@ pub fn setup_gldt_stake_canister(
 
     pic.install_canister(
         canister_id,
-        sns_neuron_controller_wasm,
+        gldt_stake_wasm,
         encode_one(args).unwrap(),
         Some(controller.clone()),
     );
