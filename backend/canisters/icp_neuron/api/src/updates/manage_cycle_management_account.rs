@@ -9,5 +9,5 @@ pub enum ManageCycleManagementAccountResponse {
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct ManageCycleManagementRequest {
-    pub account_identifier: String,
+    pub account_identifier: Vec<String>,
 }
