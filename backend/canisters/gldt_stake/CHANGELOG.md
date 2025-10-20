@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 #### Changed
 
-- **Add APY limit**: Introduce APY limitation on rewards processing in order to stabilize rewards
+- **Add APY limit**: Introduce APY limitation on rewards processing in order to stabilize the rewards
 
 ### [1.0.14] - 2025-09-16
 

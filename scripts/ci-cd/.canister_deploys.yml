@@ -67,3 +67,78 @@ $[[ inputs.src-folder ]] production deploy:
     name: $[[ inputs.src-folder ]]
     deployment_tier: production
     action: start
+
+$[[ inputs.src-folder ]] github release:
+  stage: deploy
+  resource_group: github_release
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/^$[[ inputs.src-folder ]]-v\d+\.\d+\.\d+(-reinstall)?$/'
+      changes:
+        - "backend/libraries/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/external_canisters/**/*.{rs,toml,lock,md,did,wasm,gz}"
+        - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
+      when: manual
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME != "develop" # FOR TESTING ONLY, REMOVE AFTERWARDS!!!!
+    #   changes:
+    #     - "backend/canisters/$[[ inputs.src-folder ]]/**/*.{rs,toml,lock,md,did,wasm,gz}"
+    #   when: manual
+  needs: ["$[[ inputs.src-folder ]] production build"]
+  variables:
+    GITHUB_TOKEN: ${GITHUB_TOKEN}
+    GITHUB_REPO: ${GITHUB_REPO}
+  before_script:
+    - apt-get update && apt-get install -y curl jq
+  script:
+    - |
+      SRC_FOLDER="$[[ inputs.src-folder ]]"
+      WASM_PATH="backend/canisters/${SRC_FOLDER}/target/wasm32-unknown-unknown/release/${SRC_FOLDER}_canister.wasm.gz"
+      DID_PATH="backend/canisters/${SRC_FOLDER}/api/can.did"
+
+      if [ ! -f "$WASM_PATH" ]; then
+        echo "Wasm file not found: $WASM_PATH"
+        exit 1
+      fi
+
+      if [ ! -f "$DID_PATH" ]; then
+        echo "DID file not found: $DID_PATH — skipping DID upload"
+        HAS_DID=false
+      else
+        HAS_DID=true
+      fi
+
+      RELEASE_TAG="${SRC_FOLDER}-v$(date +'%Y.%m.%d')-$(echo $CI_COMMIT_SHA | cut -c1-7)"
+      RELEASE_NAME="Release $RELEASE_TAG"
+
+      RELEASE_RESPONSE=$(curl -s -X POST \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/$GITHUB_REPO/releases" \
+        -d "{
+          \"tag_name\": \"$RELEASE_TAG\",
+          \"name\": \"$RELEASE_NAME\",
+          \"body\": \"Release automatic from GitLab CI\",
+          \"draft\": false,
+          \"prerelease\": false
+        }")
+
+      UPLOAD_URL=$(echo $RELEASE_RESPONSE | jq -r '.upload_url' | sed 's/{?name,label}//')
+
+      echo "Uploading $WASM_PATH..."
+      curl -s -X POST \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/octet-stream" \
+        --data-binary @"$WASM_PATH" \
+        "$UPLOAD_URL?name=${SRC_FOLDER}_canister.wasm.gz"
+
+      if [ "$HAS_DID" = true ]; then
+        echo "Uploading $DID_PATH..."
+        curl -s -X POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Content-Type: application/octet-stream" \
+          --data-binary @"$DID_PATH" \
+          "$UPLOAD_URL?name=can.did"
+      fi
+  environment:
+    name: github_release
+    deployment_tier: production
+    action: start
