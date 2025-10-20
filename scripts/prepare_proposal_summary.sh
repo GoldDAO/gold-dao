@@ -41,7 +41,7 @@ echo "
   ** EVIDENCE: $EVIDENCE
 "
 
-export DETAILS_URL="https://github.com/GoldDAO/gldt-swap/commit/${COMMIT_SHA}"
+export DETAILS_URL="https://github.com/GoldDAO/gold-dao/commit/${COMMIT_SHA}"
 sed "s/<<VERSIONTAG>>/${VERSION}/g" proposal_${CANISTER_TYPE}_template.md > $PROPOSAL_SUMMARY_FILE
 
 if [[ "$(uname -s)" == "Darwin" ]]; then

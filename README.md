@@ -34,7 +34,7 @@ The frontend canisters of the project are included in the folder [`client`](clie
 ### Clone this repository
 
 ```sh
-git clone git@github.com:GoldDAO/gldt-swap.git
+git clone git@github.com:GoldDAO/gold-dao.git
 ```
 
 (Or from the DAOlink internal Gitlab url, from which this Github repo is automatically mirrored)
@@ -133,7 +133,7 @@ export CANISTER_NAME=gldt_swap
 Build the canister
 
 ```sh
-docker run -v /tmp/lima/:/builds/gldt/gldt-swap/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ -e CANISTER_NAME=$CANISTER_NAME gld_reproducible_build
+docker run -v /tmp/lima/:/builds/gldt/gold-dao/backend/canisters/$CANISTER_NAME/target/wasm32-unknown-unknown/release/ -e CANISTER_NAME=$CANISTER_NAME gld_reproducible_build
 ```
 
 ### Generated WASM Files
