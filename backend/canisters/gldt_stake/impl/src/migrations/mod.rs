@@ -1,3 +1,5 @@
+use utils::numeric::Percentage;
+
 use self::types::state::RuntimeStateV0;
 use crate::model::analytics_system::AnalyticsSystem;
 use crate::model::stake_system::StakeSystem;
@@ -34,6 +36,8 @@ impl From<RuntimeStateV0> for RuntimeState {
                         .stake_system
                         .pending_fee_transfer_amount,
                     genesis_datetime: old_state.data.stake_system.genesis_datetime,
+                    // NOTE: set APY to 6%
+                    apy_limit: Some(Percentage::new(6).unwrap()),
                 },
                 goldao_sns_rewards_canister_id: old_state.data.goldao_sns_rewards_canister_id,
                 goldao_sns_governance_canister_id: old_state.data.goldao_sns_governance_canister_id,

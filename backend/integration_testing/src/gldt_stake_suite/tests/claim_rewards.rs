@@ -310,6 +310,13 @@ fn test_claim_rewards_concurrent_calls_should_fail() {
         ledger_fees.clone(),
     );
 
+    let mut usd_values: std::collections::HashMap<TokenSymbol, f64> =
+        vec![TokenSymbol::GOLDAO, TokenSymbol::OGY, TokenSymbol::ICP]
+            .into_iter()
+            .map(|sym| (sym, 0.0000001))
+            .collect();
+    usd_values.insert(TokenSymbol::GLDT, 1.0);
+
     wait_1_day(pic);
     wait_1_day(pic);
     pic.advance_time(Duration::from_millis(HOUR_IN_MS));

@@ -2,6 +2,6 @@ This proposal is about upgrading the canister <<CANISTER>> to version <<VERSIONT
 
 ## Wasm verification
 
-To verify the canister wasm, go to https://github.com/GoldDAO/gldt-swap and follow the steps for the reproducible build.
+To verify the canister wasm, go to https://github.com/GoldDAO/gold-dao and follow the steps for the reproducible build.
 
 ## Changelog

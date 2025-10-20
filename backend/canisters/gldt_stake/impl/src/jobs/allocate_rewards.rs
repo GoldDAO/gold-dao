@@ -1,5 +1,6 @@
-use crate::jobs::process_rewards::batch_rewards_transfer;
-use crate::jobs::process_rewards::process_rewards_impl;
+use crate::jobs::process_rewards::{
+    batch_rewards_transfer_unlimited, batch_rewards_transfer_with_limit, process_rewards_impl,
+};
 use crate::model::allocated_rewards_pool::calculate_total_weighted_stake;
 use crate::model::processing_rewards_pool::ProcessingRewards;
 use crate::state::{mutate_state, read_state};
@@ -75,7 +76,12 @@ pub async fn handle_process_rewards_retry(retry_counts: BTreeMap<TokenSymbol, u8
     let retry_tokens: BTreeSet<TokenSymbol> = retry_counts.keys().cloned().collect();
     let unallocated_rewards_pool = read_state(|s| s.data.unallocated_rewards_pool.clone());
 
-    let results = batch_rewards_transfer(retry_tokens.clone(), unallocated_rewards_pool).await;
+    let apy_limit_opt = read_state(|s| s.data.stake_system.apy_limit);
+    let results = if let Some(apy_limit) = apy_limit_opt {
+        batch_rewards_transfer_with_limit(apy_limit, retry_tokens, unallocated_rewards_pool).await
+    } else {
+        batch_rewards_transfer_unlimited(retry_tokens, unallocated_rewards_pool).await
+    };
 
     let mut still_failing = BTreeMap::new();
     let mut succeeded = Vec::new();
@@ -179,6 +185,7 @@ pub async fn allocate_rewards() -> Result<(), String> {
         }
     }
 
+    ic_cdk::println!("Allocated rewards: {:?}", allocated_rewards);
     mutate_state(|s| {
         s.data.analytics_system.insert_daily_analytics(
             allocated_rewards,

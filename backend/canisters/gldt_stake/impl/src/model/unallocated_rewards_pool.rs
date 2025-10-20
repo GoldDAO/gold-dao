@@ -1,9 +1,7 @@
 use crate::model::processing_rewards_pool::ProcessingRewards;
 use crate::model::processing_rewards_pool::ProcessingRewardsPool;
 use crate::model::processing_rewards_pool::PROCESS_REWARDS_THRESHOLD;
-use candid::CandidType;
-use candid::Nat;
-use candid::Principal;
+use candid::{CandidType, Nat, Principal};
 use gldt_stake_common::accounts::UNALLOCATED_REWARDS_POOL;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;
 use icrc_ledger_canister_c2c_client::{icrc1_balance_of, icrc1_transfer};
@@ -12,7 +10,7 @@ use icrc_ledger_types::icrc1::transfer::TransferArg;
 use serde::{Deserialize, Serialize};
 use utils::numeric::Percentage;
 
-const REWARDS_PERCENTAGE: u8 = 33;
+pub const REWARDS_PERCENTAGE: u8 = 33;
 
 #[derive(CandidType, Serialize, Deserialize, Clone)]
 pub struct UnallocatedRewardsPool {
@@ -57,13 +55,29 @@ pub trait UnallocatedRewards {
         &self,
         token_ledger: Principal,
         fee: Nat,
+        apy_limited_amount: Option<Nat>,
     ) -> Result<Nat, GeneralError> {
+        ic_cdk::println!(
+        "[transfer_part_of_rewards] Starting transfer for ledger: {}, fee: {}, apy_limited_amount: {:?}",
+        token_ledger,
+        fee,
+        apy_limited_amount
+    );
+
         let pool_balance = self.balance(token_ledger).await?;
 
-        let percentage = Percentage::new(REWARDS_PERCENTAGE)
-            .map_err(|e| GeneralError::InvalidPercentage(format!("Invalid percentage: {e}")))?;
+        let percentage = Percentage::new(REWARDS_PERCENTAGE).map_err(|e| {
+            let msg = format!("Invalid percentage: {e}");
+            GeneralError::InvalidPercentage(msg)
+        })?;
 
-        let amount_to_transfer = percentage.apply_to(&pool_balance) / 7_u64;
+        let percentage_based_amount = percentage.apply_to(&pool_balance) / 7_u64;
+
+        let amount_to_transfer = if let Some(apy_limited_amount) = apy_limited_amount {
+            std::cmp::min(percentage_based_amount.clone(), apy_limited_amount.clone())
+        } else {
+            percentage_based_amount
+        };
 
         if amount_to_transfer == 0_u64 {
             let msg = format!(

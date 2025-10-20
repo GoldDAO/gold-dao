@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use tracing::error;
 use types::TimestampMillis;
 use types::TokenSymbol;
+use utils::numeric::Percentage;
 
 #[derive(Serialize, Deserialize)]
 pub struct StakeSystem {
@@ -19,6 +20,7 @@ pub struct StakeSystem {
     pub pending_fee_transfer_amount: Nat,
     // the date time that the canister went live set in init - used for APY calculations - calculating an average of weekly rewards based on the number of weeks that has passed
     pub genesis_datetime: TimestampMillis,
+    pub apy_limit: Option<Percentage>,
 }
 
 impl Default for StakeSystem {
@@ -32,6 +34,7 @@ impl Default for StakeSystem {
             reward_types: BTreeSet::new(),
             pending_fee_transfer_amount: Nat::from(0u64),
             genesis_datetime: now,
+            apy_limit: None,
         }
     }
 }
