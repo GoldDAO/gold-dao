@@ -24,7 +24,7 @@ const IC_URL: &str = "https://icp-api.io";
 
 canister_state!(RuntimeState);
 
-#[derive(Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct RuntimeState {
     /// Runtime environment
     pub env: CanisterEnv,
@@ -142,6 +142,12 @@ pub struct Data {
     pub rewards_recipients: RewardsRecipientList,
     pub outstanding_payments: OutstandingPaymentsList,
     pub cycle_management_account: Vec<AccountIdentifier>,
+}
+
+impl Default for Data {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Data {
