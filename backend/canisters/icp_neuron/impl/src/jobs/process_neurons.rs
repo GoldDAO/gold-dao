@@ -134,6 +134,9 @@ async fn disburse_neurons(mut neurons: Vec<Neuron>) {
         warn!("No cycle management account defined, skipping disbursement to cycle management account and disbursing normally.");
     } else {
         for account in cycle_management_accounts {
+            if neurons.is_empty() {
+                break;
+            }
             match fetch_cycle_management_icp_balance(account.clone()).await {
                 Ok(amount) => {
                     if amount < Nat::from(100_000_000_000u64) {
@@ -255,10 +258,6 @@ async fn fetch_cycle_management_icp_balance(
     cycle_management_account: AccountIdentifier,
 ) -> Result<Nat, String> {
     let icp_ledger = read_state(|s| s.data.icp_ledger_canister_id);
-    // let cycle_management_account = read_state(|s| s.data.cycle_management_account)
-    //     .ok_or_else(|| {
-    //         format!("WARNING :: fetch_cycle_management_icp_balance :: can't find cycle management account")
-    //     })?;
 
     match account_balance(
         icp_ledger,
@@ -280,14 +279,7 @@ async fn disburse_to_cycle_management_account(
         "WARNING :: disburse_to_cycle_management_account :: neuron is a none value"
     })?;
 
-    // let cycle_management_account = read_state(|s| s.data.cycle_management_account)
-    //     .ok_or_else(|| {
-    //         format!(
-    //             "WARNING :: disburse_to_cycle_management_account :: can't convert account into hex"
-    //         )
-    //     })?
-    //     .to_hex();
-    let cycle_management_account = hex::decode(cycle_management_account).map_err(|e| format!("ERROR :: disburse_to_cycle_management_account :: failed to decode hex with error - {e:?}"))?;
+    let cycle_management_account: Vec<u8> = cycle_management_account.as_bytes().try_into().map_err(|e| format!("ERROR :: disburse_to_cycle_management_account :: failed to convert account into hex with error - {e:?}"))?;
 
     let neuron_id = neuron
         .id
@@ -313,5 +305,46 @@ async fn disburse_to_cycle_management_account(
         Err(e) => Err(format!(
             "ERROR :: disburse_to_cycle_management_account :: error disbursing neuron :: {e:?}"
         )),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ic_ledger_types::AccountIdentifier;
+
+    use crate::state::{init_state, mutate_state, read_state, RuntimeState};
+
+    fn init_runtime_state() {
+        init_state(RuntimeState::default());
+    }
+
+    #[test]
+    fn test_multiple_cycles_management_accounts() {
+        init_runtime_state();
+
+        let account1 = AccountIdentifier::from_hex(
+            "a51ceabd4d86c16c94936db0422d9b814b4f20e58fa013aeace0053af2305e8c",
+        )
+        .unwrap();
+        let account2 = AccountIdentifier::from_hex(
+            "8fab530a08fc70fd40140c5b4896fca7a8b8dab1e7ff2f3d60aa21f248a256e9",
+        )
+        .unwrap();
+
+        mutate_state(|s| {
+            s.data.cycle_management_account.push(account1.clone());
+            s.data.cycle_management_account.push(account2.clone());
+        });
+
+        let accounts = read_state(|s| s.data.cycle_management_account.clone());
+        assert_eq!(accounts.len(), 2);
+
+        let cycle_management_account: Result<Vec<u8>, _> = accounts.first().unwrap().as_bytes().try_into().map_err(|e| format!("ERROR :: disburse_to_cycle_management_account :: failed to convert account into hex with error - {e:?}"));
+        assert!(cycle_management_account.is_ok());
+
+        assert_eq!(
+            cycle_management_account.clone().unwrap(),
+            account1.as_bytes()
+        );
     }
 }

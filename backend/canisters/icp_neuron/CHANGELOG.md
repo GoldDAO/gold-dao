@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.4] - 2025-10-22
+
+- Fix in cycles account conversion
+
 ### [1.1.3] - 2025-10-17
 
 #### Updated
