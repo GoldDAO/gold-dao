@@ -1,5 +1,5 @@
 import Slider from "react-slick";
-import OrigynLogo from "@assets/partners-logos/ORIGYN.svg";
+import OrigynLogo from "@assets/partners-logos/ORIGYN.png";
 import MetalorLogo from "@assets/partners-logos/METALOR.svg";
 import KPMGLogo from "@assets/partners-logos/KPMG.svg";
 import LoomisLogo from "@assets/partners-logos/LOOMIS.svg";

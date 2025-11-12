@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
-### [1.1.9] - 2025-09-30
+### [1.1.9] - 2025-11-12
 
 ### Changed
 
-- Landing page
+- New Landing page & redirect to new swap app https://app.gldt.org/advanced/gldt
 
 ### [1.1.8] - 2025-07-14
 

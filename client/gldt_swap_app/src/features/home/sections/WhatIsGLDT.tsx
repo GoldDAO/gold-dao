@@ -7,7 +7,7 @@ const SpanBold = ({ children }: { children: React.ReactNode }) => (
 const Badge = ({
   className,
   title,
-  subtitle,
+  // subtitle,
   icon,
 }: {
   className?: string;
@@ -23,7 +23,7 @@ const Badge = ({
         </div>
         <div className="text-left">
           <div className="">{title}</div>
-          <div className="text-sm">{subtitle}</div>
+          {/* <div className="text-sm">{subtitle}</div> */}
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@ const WhatIsGLDT = ({
           Backed by NFT <span className="text-gold font-semibold">per bar</span>
         </>
       ),
-      subtitle: <>Counter to PAXG or Tether Gold</>,
+      subtitle: "",
     },
     {
       icon: (
@@ -71,7 +71,7 @@ const WhatIsGLDT = ({
           <span className="text-gold font-semibold">Low</span> transaction fees
         </>
       ),
-      subtitle: <>Counter to PAXG or Tether Gold</>,
+      subtitle: "",
     },
     {
       icon: (
@@ -88,7 +88,7 @@ const WhatIsGLDT = ({
           Storage <span className="text-gold font-semibold">transparency</span>
         </>
       ),
-      subtitle: <>Counter to PAXG or Tether Gold</>,
+      subtitle: "",
     },
     {
       icon: (
@@ -105,7 +105,7 @@ const WhatIsGLDT = ({
           <span className="text-gold font-semibold">No KYC</span> required
         </>
       ),
-      subtitle: <>Counter to PAXG or Tether Gold</>,
+      subtitle: "",
     },
   ];
 
@@ -141,8 +141,6 @@ const WhatIsGLDT = ({
           <div>
             <video
               src="https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/video_gldt.mp4"
-              autoPlay
-              loop
               muted
               playsInline
               controls
