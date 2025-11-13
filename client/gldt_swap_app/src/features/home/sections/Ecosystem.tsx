@@ -63,10 +63,10 @@ const Ecosystem = ({
       img: GldnftCard,
     },
     {
-      badge: "Stablecoin",
-      title: "USDG",
-      subtitle: "A Gold-backed stablecoin",
-      icon: <div className="px-4 rounded-full bg-surface-3">Coming soon</div>,
+      badge: "Gold Token",
+      title: "GLDT",
+      subtitle: "Own real physical gold and unlock its potential in DeFi",
+      icon: <img src="/gldt_logo.svg" alt="GLDT icon" className="w-8 h-8" />,
       img: UsdgCard,
     },
   ];
