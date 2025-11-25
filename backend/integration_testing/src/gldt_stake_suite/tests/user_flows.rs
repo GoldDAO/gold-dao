@@ -8,9 +8,9 @@ use crate::{
     client::icrc1_icrc2_token::icrc2_approve, gldt_stake_suite::setup::default_test_setup,
     utils::tick_n_blocks,
 };
+use bity_ic_canister_time::DAY_IN_MS;
+use bity_ic_canister_time::HOUR_IN_MS;
 use candid::{Nat, Principal};
-use canister_time::DAY_IN_MS;
-use canister_time::HOUR_IN_MS;
 use gldt_stake_api_canister::manage_stake_position;
 use gldt_stake_common::ledgers::GLDT_TX_FEE;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;

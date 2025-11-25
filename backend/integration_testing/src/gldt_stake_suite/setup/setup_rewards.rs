@@ -1,9 +1,9 @@
+use bity_ic_types::BuildVersion;
 use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
 use sns_rewards_api_canister::init::InitArgs;
 use sns_rewards_api_canister::Args;
 use std::collections::HashMap;
-use types::BuildVersion;
 
 use crate::wasms;
 

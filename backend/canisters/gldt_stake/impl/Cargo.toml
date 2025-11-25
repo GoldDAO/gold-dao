@@ -14,21 +14,20 @@ inttest = ["gldt_stake_common/inttest", "gldt_stake_api_canister/inttest", ]
 
 [dependencies]
 candid = { workspace = true }
-canister_logger = { path = '../../../libraries/canister_logger' }
-canister_state_macros = { path = '../../../libraries/canister_state_macros' }
-canister_time = { path = '../../../libraries/canister_time' }
-canister_tracing_macros = { path = '../../../libraries/canister_tracing_macros' }
+bity-ic-canister-logger = { workspace = true }
+bity-ic-canister-state-macros = { workspace = true }
+bity-ic-canister-time = { workspace = true }
+bity-ic-canister-tracing-macros = { workspace = true }
 http_request = { path = '../../../libraries/http_request' }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-serializer = { path = '../../../libraries/serializer' }
 icrc_ledger_canister_c2c_client = { path = "../../../external_canisters/icrc_ledger/c2c_client" }
 serde_json = { workspace =  true }
 icrc_ledger_canister = { path = "../../../external_canisters/icrc_ledger/api" }
-stable_memory = { path = '../../../libraries/stable_memory' }
+bity-ic-stable-memory = { workspace = true }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 tracing = { workspace = true }
@@ -36,14 +35,13 @@ gldt_stake_api_canister = { path = "../api"}
 gldt_stake_common = { path = "../common"}
 sns_governance_canister = { path = "../../../external_canisters/sns_governance/api" }
 sns_governance_canister_c2c_client = { path = "../../../external_canisters/sns_governance/c2c_client" }
-ledger_utils = { path = "../../../libraries/ledger_utils" }
+bity-ic-ledger-utils = { workspace = true }
 time = { workspace = true }
 sns_rewards_api_canister = {path = "../../sns_rewards/api"}
 sns_rewards_c2c_client = {path = "../../../external_canisters/sns_rewards/c2c_client"}
 icpswap_token_canister_c2c_client = { path = "../../../external_canisters/icpswap_token_canister/c2c_client" }
 bity-ic-icrc3 = { workspace = true }
 bity-ic-icrc3-macros = { workspace = true }
-bity-ic-canister-time = { workspace = true }
 lazy_static = { workspace = true }
 sha2 = { workspace = true }
 bity-ic-serializer = { workspace = true }
@@ -51,3 +49,4 @@ futures = { workspace = true }
 ic-cdk-timers = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
+bity-ic-types = { workspace = true }

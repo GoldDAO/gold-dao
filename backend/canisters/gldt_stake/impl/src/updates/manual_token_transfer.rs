@@ -1,5 +1,5 @@
 use crate::guards::caller_is_governance_principal;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_token_transfer::Args as ManualTokenTransferArgs;
 pub use gldt_stake_api_canister::manual_token_transfer::Response as ManualTokenTransferResponse;
 use ic_cdk::query;
@@ -15,5 +15,7 @@ async fn manual_token_transfer_validate(args: ManualTokenTransferArgs) -> Result
 #[update(guard = "caller_is_governance_principal", hidden = true)]
 #[trace]
 async fn manual_token_transfer(args: ManualTokenTransferArgs) -> ManualTokenTransferResponse {
-    icrc1_transfer(args.ledger_id, &args.transfer_args).await
+    icrc1_transfer(args.ledger_id, &args.transfer_args)
+        .await
+        .map_err(|err| err.to_string())
 }

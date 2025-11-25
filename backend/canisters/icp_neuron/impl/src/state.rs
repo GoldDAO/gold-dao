@@ -1,7 +1,9 @@
-use canister_time::{MINUTE_IN_MS, NANOS_PER_MILLISECOND};
+use bity_ic_canister_time::{MINUTE_IN_MS, NANOS_PER_MILLISECOND};
 
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_ledger_utils::principal_to_legacy_account_id;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
-use canister_state_macros::canister_state;
 use ic_ledger_types::AccountIdentifier;
 use ic_transport_types::EnvelopeContent;
 use icp_neuron_common::{
@@ -9,9 +11,8 @@ use icp_neuron_common::{
     outstanding_payments::OutstandingPaymentsList,
 };
 use k256::{pkcs8::EncodePublicKey, PublicKey};
-use ledger_utils::principal_to_legacy_account_id;
 use serde::{Deserialize, Serialize};
-use types::{BuildVersion, CanisterId, RewardsRecipientList, TimestampMillis};
+use types::{CanisterId, RewardsRecipientList, TimestampMillis};
 use utils::{
     consts::{ICP_LEDGER_CANISTER_ID, NNS_GOVERNANCE_CANISTER_ID, SNS_GOVERNANCE_CANISTER_ID},
     env::{CanisterEnv, Environment},

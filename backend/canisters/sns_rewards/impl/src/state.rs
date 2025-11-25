@@ -1,10 +1,11 @@
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Nat, Principal};
-use canister_state_macros::canister_state;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
 use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
 use std::collections::{BTreeMap, HashMap};
-use types::{BuildVersion, NeuronInfo, TimestampMillis};
+use types::{NeuronInfo, TimestampMillis};
 use utils::{
     consts::SNS_GOVERNANCE_CANISTER_ID,
     env::{CanisterEnv, Environment},

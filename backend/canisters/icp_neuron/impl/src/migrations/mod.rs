@@ -1,4 +1,4 @@
-use ::types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use ic_ledger_types::AccountIdentifier;
 use utils::env::CanisterEnv;
 

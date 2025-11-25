@@ -7,12 +7,13 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-# candid_gen = { path = "../../../libraries/candid_gen" }
+# bity-ic-candid-gen = { workspace = true }
 ic-ledger-types = { workspace = true }
 serde = { workspace = true }
 types = { path = "../../../libraries/types" }
-# canister_logger = { path = '../../../libraries/canister_logger' }
+# bity-ic-canister-logger = { workspace = true }
 # sns_governance_canister = { path = '../../../external_canisters/sns_governance/api' }
 icrc-ledger-types = { workspace = true }
 ic-stable-structures = { workspace = true }
 utils = { path = '../../../libraries/utils' }
+bity-ic-types = { workspace = true }

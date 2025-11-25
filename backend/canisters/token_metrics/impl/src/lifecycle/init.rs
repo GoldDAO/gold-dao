@@ -18,7 +18,7 @@ use super::init_canister;
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             let gold_nft_canister: Vec<(Principal, u128)> = if init_args.test_mode {
                 vec![

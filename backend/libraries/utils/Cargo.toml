@@ -7,15 +7,16 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-canister_time = { path = "../canister_time" }
+bity-ic-canister-time = { workspace = true }
 icrc-ledger-types = { workspace = true }
 ic-cdk = { workspace = true }
 hex = { workspace = true }
 serde = { workspace = true }
-stable_memory = { path = "../stable_memory" }
+bity-ic-stable-memory = { workspace = true }
 types = { path = "../types" }
 tracing = { workspace = true }
 tokio = { version = "1.39.2", features = ["macros", "rt"] }
-num-bigint = {workspace = true}
-thiserror = {workspace = true}
+num-bigint = { workspace = true }
+thiserror = { workspace = true }
 strum = { workspace = true }
+bity-ic-types = { workspace = true }

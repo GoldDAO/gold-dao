@@ -1,7 +1,7 @@
 use crate::{
     guards::caller_is_governance_principal, utils::validate_set_daily_goldao_burn_rate_payload,
 };
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk::query;
 
 pub use sns_rewards_api_canister::set_daily_goldao_burn_rate_validate::{

@@ -91,6 +91,12 @@ impl Storable for DailyAnalytics {
         Cow::Owned(buf)
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     let mut buf = vec![];
+    //     minicbor::encode(self, &mut buf).expect("DailyAnalytics encoding should always succeed");
+    //     buf
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         minicbor::decode(bytes.as_ref()).unwrap_or_else(|e| {
             panic!(

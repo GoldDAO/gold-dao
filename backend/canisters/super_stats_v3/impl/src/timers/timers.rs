@@ -27,11 +27,11 @@ use super::state::TIMER_STATE;
 pub fn start_processing_time_impl(secs: u64) {
     let is_test_mode = RUNTIME_STATE.with(|s| s.borrow().data.test_mode);
     if is_test_mode {
-        ic_cdk::spawn(schedule_data_processing());
+        ic_cdk::futures::spawn(schedule_data_processing());
     } else {
         let secs = Duration::from_secs(secs);
         let timer_id =
-            ic_cdk_timers::set_timer_interval(secs, || ic_cdk::spawn(schedule_data_processing()));
+            ic_cdk_timers::set_timer_interval(secs, || ic_cdk::futures::spawn(schedule_data_processing()));
         TIMER_STATE.with(|timer_ids| timer_ids.borrow_mut().push(timer_id));
     }
 }

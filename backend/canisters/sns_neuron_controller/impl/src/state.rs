@@ -3,14 +3,14 @@ use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::NeuronManagerEnum;
 use crate::types::neuron_metrics::NeuronWithMetric;
 use crate::types::{OgyManager, WtnManager};
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
-use canister_state_macros::canister_state;
 use serde::{Deserialize, Serialize};
 use sns_neuron_controller_api_canister::init::OgyManagerConfig;
 use sns_neuron_controller_api_canister::init::WtnManagerConfig;
 use sns_neuron_controller_api_canister::list_neurons_type::NeuronList;
 use sns_neuron_controller_api_canister::neuron_type::NeuronType;
-use types::BuildVersion;
 use types::CanisterId;
 use types::TimestampMillis;
 use utils::{

@@ -1,5 +1,5 @@
 use candid::{Nat, Principal};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS};
+use bity_ic_canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS};
 use icrc_ledger_types::icrc1::account::Account;
 use sns_rewards_api_canister::{
     get_historic_payment_round::{self, Args as GetHistoricPaymentRoundArgs},

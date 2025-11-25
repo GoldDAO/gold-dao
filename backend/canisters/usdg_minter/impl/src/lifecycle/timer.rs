@@ -54,7 +54,7 @@ fn timer() {
     if let Some(task) = pop_if_ready() {
         let task_type = task.task_type;
         match task_type {
-            TaskType::ProcessLogic => ic_cdk::spawn(async {
+            TaskType::ProcessLogic => ic_cdk::futures::spawn(async {
                 let _guard = match TimerGuard::new(task_type) {
                     Ok(guard) => guard,
                     Err(_) => {
@@ -73,7 +73,7 @@ fn timer() {
                 scopeguard::ScopeGuard::into_inner(_enqueue_followup_guard);
             }),
             TaskType::FetchGoldPrice => {
-                ic_cdk::spawn(async {
+                ic_cdk::futures::spawn(async {
                     let _guard = match TimerGuard::new(task_type) {
                         Ok(guard) => guard,
                         Err(_) => {
@@ -91,7 +91,7 @@ fn timer() {
                 });
             }
             TaskType::ProcessPendingTransfer => {
-                ic_cdk::spawn(async {
+                ic_cdk::futures::spawn(async {
                     let _guard = match TimerGuard::new(task_type) {
                         Ok(guard) => guard,
                         Err(_) => {
@@ -106,7 +106,7 @@ fn timer() {
                 });
             }
             TaskType::ChargeFees => {
-                ic_cdk::spawn(async {
+                ic_cdk::futures::spawn(async {
                     let _guard = match TimerGuard::new(task_type) {
                         Ok(guard) => guard,
                         Err(_) => {

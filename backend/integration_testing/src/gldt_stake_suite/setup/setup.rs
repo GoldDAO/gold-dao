@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::time::Duration;
 use std::time::SystemTime;
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use types::CanisterId;
 use types::TokenSymbol;
 

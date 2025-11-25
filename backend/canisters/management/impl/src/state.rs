@@ -1,7 +1,8 @@
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
-use canister_state_macros::canister_state;
 use serde::{Deserialize, Serialize};
-use types::{BuildVersion, TimestampMillis};
+use types::TimestampMillis;
 use utils::{
     env::{CanisterEnv, Environment},
     memory::MemorySize,

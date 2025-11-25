@@ -1,5 +1,5 @@
 use crate::state::{mutate_state, read_state};
-use canister_time::{run_now_then_interval, DAY_IN_MS};
+use bity_ic_canister_time::{run_now_then_interval, DAY_IN_MS};
 use std::time::Duration;
 use tracing::{error, info};
 use types::Milliseconds;
@@ -11,7 +11,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 async fn run_async() {
@@ -21,7 +21,7 @@ async fn run_async() {
     let mut total_grams: u128 = 0;
 
     for (gold_nft_canister_id, weight) in gold_nft_canisters {
-        let total_supply: u128 = match canister_client::make_c2c_call(
+        let total_supply: u128 = match bity_ic_canister_client::make_c2c_call(
             gold_nft_canister_id,
             "dip721_total_supply",
             {},

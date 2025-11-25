@@ -3,15 +3,16 @@ use crate::model::allocated_rewards_pool::AllocatedRewardsPoolMetrics;
 use crate::model::analytics_system::AnalyticsSystem;
 use crate::model::processing_rewards_pool::ProcessingRewardsPool;
 use crate::model::unallocated_rewards_pool::*;
+use bity_ic_canister_state_macros::canister_state;
 use bity_ic_icrc3::transaction::TransactionType;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Nat, Principal};
-use canister_state_macros::canister_state;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::Neuron;
 use std::collections::{BTreeSet, HashMap};
+use types::TimestampMillis;
 use types::TokenSymbol;
-use types::{BuildVersion, TimestampMillis};
 use utils::numeric::Percentage;
 use utils::{
     env::{CanisterEnv, Environment},

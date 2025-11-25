@@ -44,7 +44,7 @@
       "remote": {
         "id": {
           "ic": "sy3ra-iqaaa-aaaao-aixda-cai",
-          "staging": "xyo2o-gyaaa-aaaal-qb55a-cai"
+          "staging": "qwf5l-cqaaa-aaaad-aapma-cai"
         }
       },
       "type": "custom",
@@ -60,7 +60,7 @@
       "remote": {
         "id": {
           "ic": "io7gn-vyaaa-aaaak-qcbiq-cai",
-          "staging": "obapm-2iaaa-aaaak-qcgca-cai"
+          "staging": "g6yny-dyaaa-aaaab-qb2kq-cai"
         }
       },
       "type": "custom",
@@ -247,8 +247,29 @@
         "env_override": null,
         "output": "backend/canisters/gldt_swap/api/declarations"
       },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
       "type": "custom",
       "wasm": "backend/canisters/gldt_swap/target/wasm32-unknown-unknown/release/gldt_swap_canister.wasm.gz"
+    },
+    "gldt_swap_index": {
+      "build": ["./scripts/build_canister.sh gldt_swap_index"],
+      "candid": "backend/canisters/gldt_swap_index/api/can.did",
+      "declarations": {
+        "bindings": ["ts", "js", "did"],
+        "env_override": null,
+        "output": "backend/canisters/gldt_swap_index/api/declarations"
+      },
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ],
+      "type": "custom",
+      "wasm": "backend/canisters/gldt_swap_index/target/wasm32-unknown-unknown/release/gldt_swap_index_canister.wasm.gz"
     },
     "gldt_stake": {
       "build": ["./scripts/build_canister.sh gldt_stake"],
@@ -260,17 +281,6 @@
       },
       "type": "custom",
       "wasm": "backend/canisters/gldt_stake/target/wasm32-unknown-unknown/release/gldt_stake_canister.wasm.gz"
-    },
-    "gldt_swap_archive": {
-      "build": [""],
-      "candid": "backend/canisters/gldt_swap/api_archive/can.did",
-      "declarations": {
-        "bindings": ["ts", "js", "did"],
-        "env_override": null,
-        "output": "backend/canisters/gldt_swap/api_archive/declarations"
-      },
-      "type": "custom",
-      "wasm": "backend/canisters/gldt_swap_archive/target/wasm32-unknown-unknown/release/gldt_swap_archive_canister.wasm.gz"
     },
     "management": {
       "build": ["./scripts/build_canister.sh management"],

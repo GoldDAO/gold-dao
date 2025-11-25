@@ -11,7 +11,7 @@ impl MemorySize {
     pub fn used() -> Self {
         Self {
             heap: wasm_memory_size(),
-            stable: stable_memory::used(),
+            stable: bity_ic_stable_memory::used(),
         }
     }
 }

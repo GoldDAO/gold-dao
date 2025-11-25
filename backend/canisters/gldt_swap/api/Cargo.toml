@@ -12,7 +12,9 @@ inttest = []
 candid = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api' }
 types = { path = '../../../libraries/types' }
 gldt_swap_common = { path = "../common", features = []}
 utils = { path = '../../../libraries/utils' }
+bity-ic-icrc3 = { workspace = true }
+bity-ic-types = { workspace = true }
+gldt_swap_api_archive = { path = "../../../external_canisters/gldt_swap_archive/api" }

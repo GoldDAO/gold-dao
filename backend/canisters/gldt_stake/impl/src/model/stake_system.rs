@@ -1,5 +1,5 @@
+use bity_ic_canister_time::{timestamp_millis, DAY_IN_MS};
 use candid::{Nat, Principal};
-use canister_time::timestamp_millis;
 use gldt_stake_common::stake_position::StakePosition;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;

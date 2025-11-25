@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [2.0.0] - 2025-11-25
+
+#### Change
+
+- Update swap canister to run with new NFT release
+
 ### [1.1.6] - 2025-07-18
 
 #### Added

@@ -1,6 +1,6 @@
+use bity_ic_ledger_utils::icrc_account_to_legacy_account_id;
 use candid::CandidType;
 use icrc_ledger_types::icrc1::account::Account;
-use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{neuron::DissolveState, Neuron};
 use serde::Serialize;
 use utils::consts::NNS_GOVERNANCE_CANISTER_ID;

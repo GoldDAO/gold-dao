@@ -1,7 +1,8 @@
 use crate::{
     guards::caller_is_governance_principal, model::neuron_system::sync_neurons, state::read_state,
 };
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
+use bity_ic_ledger_utils::compute_neuron_staking_subaccount_bytes;
 use gldt_stake_api_canister::create_neuron::CreateNeuronError;
 pub use gldt_stake_api_canister::create_neuron::{
     Args as StakeSnsNeuronArgs, Response as StakeSnsNeuronResponse,
@@ -9,7 +10,6 @@ pub use gldt_stake_api_canister::create_neuron::{
 use gldt_stake_common::accounts::NEURON_CREATION_POOL;
 use ic_cdk::{query, update};
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
-use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use sns_governance_canister::types::{
     manage_neuron::{
         claim_or_refresh::{By, MemoAndController},

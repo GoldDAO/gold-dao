@@ -31,5 +31,5 @@ fn icrc28_trusted_origins() -> Icrc28TrustedOriginsResponse {
         String::from("https://oj7ri-2qaaa-aaaap-abrzq-cai.icp-api.io"),
     ];
 
-    return Icrc28TrustedOriginsResponse { trusted_origins };
+    Icrc28TrustedOriginsResponse { trusted_origins }
 }

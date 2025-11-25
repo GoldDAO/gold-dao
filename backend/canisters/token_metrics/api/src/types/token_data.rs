@@ -23,6 +23,10 @@ impl Storable for TokenSupplyData {
         Cow::Owned(Encode!(self).unwrap())
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -44,6 +48,10 @@ impl Storable for PrincipalBalance {
         Cow::Owned(Encode!(self).unwrap())
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -61,6 +69,10 @@ impl Storable for WalletEntry {
         Cow::Owned(Encode!(self).unwrap())
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -76,6 +88,10 @@ impl Storable for GovHistoryEntry {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
@@ -99,6 +115,10 @@ impl Storable for WalletOverview {
         Cow::Owned(Encode!(self).unwrap())
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -120,6 +140,10 @@ impl Storable for GovernanceStats {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
@@ -153,6 +177,10 @@ impl Storable for VotingHistoryCalculations {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
@@ -208,6 +236,10 @@ impl Storable for DailyVotingMetrics {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()

@@ -22,7 +22,7 @@ lazy_static! {
     pub static ref REWARDS: CanisterWasm = get_canister_wasm_from_bin("sns_rewards");
     pub static ref CYCLES_MANAGER: CanisterWasm = get_canister_wasm_from_bin("cycles_manager");
     pub static ref GLDT_SWAP: CanisterWasm = get_canister_wasm_from_bin("gldt_swap");
-    pub static ref ORIGYN_NFT: CanisterWasm = get_canister_wasm_gz("origyn_nft_reference");
+    pub static ref GLDT_SWAP_INDEX: CanisterWasm = get_canister_wasm_from_bin("gldt_swap_index");
     pub static ref SNS_NEURON_CONTROLLER: CanisterWasm =
         get_canister_wasm_from_bin("sns_neuron_controller");
     pub static ref BUYBACK_BURN: CanisterWasm = get_canister_wasm_from_bin("buyback_burn");
@@ -32,6 +32,7 @@ lazy_static! {
     pub static ref TOKEN_METRICS: CanisterWasm = get_canister_wasm_from_bin("token_metrics");
     pub static ref USDG_MINTER: CanisterWasm = get_canister_wasm_from_bin("usdg_minter");
     pub static ref GLDT_STAKE: CanisterWasm = get_canister_wasm_from_bin("gldt_stake");
+    pub static ref ORIGYN_NFT: CanisterWasm = get_canister_wasm_gz("origyn_nft");
 }
 
 fn get_canister_wasm_from_bin(canister_name: &str) -> CanisterWasm {

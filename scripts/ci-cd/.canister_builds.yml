@@ -6,6 +6,7 @@ spec:
         [
           "buyback_burn",
           "gldt_swap",
+          "gldt_swap_index",
           "icp_neuron",
           # "usdg_minter",
           "management",

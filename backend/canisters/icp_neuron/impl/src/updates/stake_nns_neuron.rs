@@ -1,12 +1,12 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{read_state, RuntimeState};
+use bity_ic_ledger_utils::compute_neuron_staking_subaccount_bytes;
 use candid::Principal;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk::{query, update};
 pub use icp_neuron_api_canister::stake_nns_neuron::StakeNnsNeuronResponse;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
-use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use nns_governance_canister::types::manage_neuron::claim_or_refresh::{By, MemoAndController};
 use nns_governance_canister::types::manage_neuron::{ClaimOrRefresh, Command};
 use nns_governance_canister::types::{manage_neuron_response, ManageNeuron};

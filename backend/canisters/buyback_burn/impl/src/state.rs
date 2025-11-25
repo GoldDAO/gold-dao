@@ -1,14 +1,14 @@
 use crate::types::token_swaps::TokenSwaps;
 use crate::types::token_swaps::TokenSwapsMetrics;
 use crate::types::SwapClients;
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_types::BuildVersion;
 use buyback_burn_api::get_config::Response as GetConfigResponse;
 use buyback_burn_api::init::TokenAndPool;
 use candid::{CandidType, Principal};
-use canister_state_macros::canister_state;
 use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use types::BuildVersion;
 use types::{Cycles, TimestampMillis, TokenInfo};
 use utils::env::{CanisterEnv, Environment};
 use utils::memory::MemorySize;

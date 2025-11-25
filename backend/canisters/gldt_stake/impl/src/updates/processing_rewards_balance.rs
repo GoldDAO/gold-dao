@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::model::processing_rewards_pool::ProcessingRewards;
 use crate::state::read_state;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::processing_rewards_balance::{
     Args as ProcessingRewardsBalanceArgs, Response as ProcessingRewardsBalanceResponse,
 };

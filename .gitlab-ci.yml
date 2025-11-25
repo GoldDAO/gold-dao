@@ -74,6 +74,9 @@ include:
       src-folder: gldt_swap
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
+      src-folder: gldt_swap_index
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
       src-folder: gldt_stake
   # Integration tests
   - local: scripts/ci-cd/.integration_tests.yml
@@ -102,6 +105,9 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_swap_index
   # - local: scripts/ci-cd/.canister_builds.yml
   #   inputs:
   #     src-folder: usdg_minter
@@ -125,6 +131,9 @@ include:
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_swap_index
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: buyback_burn
@@ -206,7 +215,6 @@ rust lint:
   extends: .rust template
   script:
     - cargo clippy
-
 ################################################################################
 # Unit tests
 ################################################################################

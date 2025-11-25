@@ -2,7 +2,7 @@ use crate::{
     memory::VM,
     state::{mutate_state, read_state},
 };
-use canister_time::run_now_then_interval;
+use bity_ic_canister_time::run_now_then_interval;
 use ic_stable_structures::{DefaultMemoryImpl, Vec as SVec};
 use std::time::Duration;
 use super_stats_v3_api::{
@@ -22,7 +22,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(sync_governance_history())
+    ic_cdk::futures::spawn(sync_governance_history())
 }
 
 pub async fn sync_governance_history() {

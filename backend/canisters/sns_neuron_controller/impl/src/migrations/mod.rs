@@ -1,4 +1,4 @@
-use ::types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use candid::Nat;
 use utils::env::CanisterEnv;
 

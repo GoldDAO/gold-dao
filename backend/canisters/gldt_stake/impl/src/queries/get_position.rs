@@ -1,5 +1,5 @@
-use canister_time::timestamp_millis;
-use canister_tracing_macros::trace;
+use bity_ic_canister_time::timestamp_millis;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::get_position::{
     Args as GetPositionByIdArgs, Response as GetPositionByIdResponse,
 };

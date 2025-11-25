@@ -1,9 +1,7 @@
-use ::types::BuildVersion;
-use utils::env::CanisterEnv;
-
-use crate::state::RuntimeState;
-
 use self::types::state::RuntimeStateV0;
+use crate::state::RuntimeState;
+use bity_ic_types::BuildVersion;
+use utils::env::CanisterEnv;
 
 pub mod types;
 

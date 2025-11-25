@@ -136,7 +136,7 @@ pub async fn distribute_rewards(sns_ledger_canister_id: Principal) -> Result<(),
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         sns_ledger_canister_id,
         &(Account {
-            owner: ic_cdk::api::id(),
+            owner: ic_cdk::api::canister_self(),
             subaccount: None,
         }),
     )

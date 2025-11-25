@@ -2,7 +2,7 @@ use crate::memory::get_daily_analytics_memory;
 use crate::memory::VM;
 use bity_ic_canister_time::DAY_IN_MS;
 use candid::Nat;
-use canister_time::timestamp_millis;
+use bity_ic_canister_time::timestamp_millis;
 use gldt_stake_common::daily_analytics::DailyAnalytics;
 use ic_stable_structures::StableBTreeMap;
 use serde::{Deserialize, Serialize};

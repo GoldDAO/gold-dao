@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-canister_client = { path = "../../../libraries/canister_client" }
+bity-ic-canister-client = { workspace = true }
 sns_root_canister = { path = "../api" }

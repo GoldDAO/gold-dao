@@ -14,7 +14,7 @@ use utils::numeric::Percentage;
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             if init_args.test_mode {
                 info!("INIT :: in test mode.");

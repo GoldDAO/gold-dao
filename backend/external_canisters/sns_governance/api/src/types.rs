@@ -38,6 +38,9 @@ impl Storable for NeuronId {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(self.id.clone())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     self.id.clone()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Self {
             id: bytes.into_owned(),
@@ -117,6 +120,10 @@ impl Storable for VecNeurons {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(&self.0).unwrap())
     }
+
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self.0).unwrap()
+    // }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         let neurons: Vec<NeuronId> = Decode!(&bytes, Vec<NeuronId>).unwrap();
@@ -1947,6 +1954,10 @@ impl Storable for Account {
         Cow::Owned(Encode!(self).unwrap())
     }
 
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
+
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -2311,7 +2322,7 @@ impl TryFrom<ProposalData> for types::SnsProposal {
     type Error = &'static str;
 
     fn try_from(p: ProposalData) -> Result<Self, Self::Error> {
-        let now = canister_time::timestamp_millis();
+        let now = bity_ic_canister_time::timestamp_millis();
         let now_seconds = now / 1000;
         let status = p.status();
         let reward_status = p.reward_status(now_seconds);

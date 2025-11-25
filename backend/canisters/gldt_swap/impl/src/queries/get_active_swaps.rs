@@ -7,5 +7,5 @@ use crate::state::read_state;
 
 #[query]
 async fn get_active_swaps(_: GetActiveSwapsArgs) -> GetActiveSwapsResponse {
-    read_state(|s| s.data.swaps.get_active_swaps())
+    read_state(|s| s.data.swap_system.get_all_swaps())
 }

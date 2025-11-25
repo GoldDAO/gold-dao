@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::read_state;
 use crate::types::neuron_manager::NeuronConfig;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk::query;
 use ic_cdk::update;
 use sns_governance_canister::types::{manage_neuron::Command, ManageNeuron};

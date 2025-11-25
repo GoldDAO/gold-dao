@@ -1,4 +1,4 @@
-use candid_gen::generate_candid_method;
+use bity_ic_candid_gen::generate_candid_method;
 
 #[allow(deprecated)]
 fn main() {

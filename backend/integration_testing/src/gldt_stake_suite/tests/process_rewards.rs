@@ -9,10 +9,9 @@ use crate::gldt_stake_suite::utils::add_custom_rewards_to_processing_pool;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
 use crate::utils::wait_1_day;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
+use bity_ic_canister_time::HOUR_IN_MS;
 use candid::Nat;
 use candid::Principal;
-use canister_time::HOUR_IN_MS;
-use gldt_stake_api_canister::set_apy_limit;
 use std::time::Duration;
 use types::TokenSymbol;
 

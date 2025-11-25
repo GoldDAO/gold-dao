@@ -8,7 +8,7 @@ is eligible for.
 */
 
 use crate::state::{mutate_state, read_state, RuntimeState};
-use canister_time::{start_job_daily_at, timestamp_millis};
+use bity_ic_canister_time::{start_job_daily_at, timestamp_millis};
 use sns_governance_canister::types::{Neuron, NeuronId};
 use std::collections::{btree_map, HashMap};
 use tracing::{debug, error, info, warn};
@@ -19,7 +19,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 async fn run_async() {

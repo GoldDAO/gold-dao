@@ -1,6 +1,7 @@
+use bity_ic_types::BuildVersion;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use types::{BuildVersion, CanisterId};
+use types::CanisterId;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {

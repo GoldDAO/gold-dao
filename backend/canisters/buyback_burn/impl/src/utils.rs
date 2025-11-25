@@ -10,7 +10,7 @@ pub async fn get_token_balance(ledger_id: Principal) -> Result<Nat, String> {
     icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_id,
         &(Account {
-            owner: ic_cdk::api::id(),
+            owner: ic_cdk::api::canister_self(),
             subaccount: None,
         }),
     )
