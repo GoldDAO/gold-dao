@@ -55,12 +55,13 @@ if [[ $DEPLOYMENT_VIA == "direct" || $NETWORK != "ic" ]]; then
 
 elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
 
+  INSTALL_MODE="upgrade"
+
   if [[ $REINSTALL == "reinstall" ]]; then
-    echo "Error: Cannot reinstall canister which is controlled by SNS. Aborting here."
-    exit 2
+    INSTALL_MODE="reinstall"
   fi
 
-  echo "Deploying $CANISTER via SNS proposal on $NETWORK."
+  echo "Deploying $CANISTER via SNS proposal on $NETWORK to $INSTALL_MODE the canister."
 
   PROPOSER=$SNS_PROPOSER_NEURON_ID_PRODUCTION
 
@@ -94,7 +95,7 @@ elif [[ $DEPLOYMENT_VIA == "proposal" ]]; then
   quill sns --canister-ids-file sns_canister_ids.json make-upgrade-canister-proposal $PROPOSER \
     --pem-file $PEM_FILE \
     --canister-upgrade-arg "$ARGUMENTS" \
-    --mode upgrade \
+    --mode $INSTALL_MODE \
     --target-canister-id $(cat canister_ids.json | jq -r .$CANISTER.$NETWORK) \
     --wasm-path backend/canisters/$CANISTER/target/wasm32-unknown-unknown/release/${CANISTER}_canister.wasm.gz \
     --title "Upgrade $CANISTER to version $VERSION" \
