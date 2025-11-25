@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import clsx from "clsx";
-import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
+import { CollectionNameNFT } from "@services/nft/utils/interfaces";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import Icon from "@shared/ui/icons";
 

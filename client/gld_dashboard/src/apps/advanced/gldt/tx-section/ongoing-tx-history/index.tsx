@@ -8,7 +8,7 @@ import {
 import { SWAP_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import useFetchNFTOnGoingTxs from "@shared/hooks/useFetchNFTUserOnGoingTxs";
-import { SwapData } from "@services/gldt_swap/utils/interfaces";
+import { SwapData } from "@services/swap/utils/interfaces";
 import TxStatus from "@advanced/gldt/tx-section/shared/tx-history-table-cell/TxStatus";
 import RenderValueNFT from "@advanced/gldt/tx-section/shared/tx-history-table-cell/ValueNFT";
 import RenderValueGLDT from "@advanced/gldt/tx-section/shared/tx-history-table-cell/ValueGLDT";

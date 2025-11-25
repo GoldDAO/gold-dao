@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { useAuth } from "@auth/index";
-import { CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
+import { CollectionNameNFT } from "@services/nft/utils/interfaces";
 import useFetchNFTAvailable from "@shared/hooks/useFetchNFTAvailable";
 import { SelectNFTStateReducerAtom } from "@shared/atoms/NFTStateAtom";
 import NFTSelect from ".";
@@ -11,17 +11,16 @@ const AvailableNFTSelect = ({
 }: {
   collection: CollectionNameNFT;
 }) => {
-  const { authenticatedAgent, isConnected } = useAuth();
+  const { unauthenticatedAgent, isConnected } = useAuth();
   const [selectNFTState, dispatchSelectNFTState] = useAtom(
     SelectNFTStateReducerAtom
   );
 
   const fetchCollection = useFetchNFTAvailable(
     selectNFTState[collection].canister_id,
-    authenticatedAgent,
     {
-      collection_name: selectNFTState[collection].name,
-      enabled: !!authenticatedAgent && isConnected,
+      enabled: !!unauthenticatedAgent && isConnected,
+      agent: unauthenticatedAgent,
     }
   );
 

@@ -4,8 +4,8 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory } from "@services/gldt_stake/idlFactory";
-import get_apy_timeseries from "@services/gldt_stake/get_apy_timeseries";
+import { idlFactory } from "@services/stake/idlFactory";
+import get_apy_timeseries from "@services/stake/get_apy_timeseries";
 
 const useFetchStakeAPY = (
   canisterId: string,

@@ -7,11 +7,11 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
-import { idlFactory } from "@services/ledger-index/idlFactory";
-import { idlFactory as idlFactoryICP } from "@services/ledger-index/idlFactory_icp";
-import get_account_transactions from "@services/ledger-index/get_account_transactions";
-import get_account_transactions_icp from "@services/ledger-index/get_account_transactions_icp";
-import { Transactions } from "@services/ledger-index/utils/interfaces";
+import { idlFactory } from "@services/ledger_indexer/idlFactory";
+import { idlFactory as idlFactoryICP } from "@services/ledger_indexer/idlFactory_icp";
+import get_account_transactions from "@services/ledger_indexer/get_account_transactions";
+import get_account_transactions_icp from "@services/ledger_indexer/get_account_transactions_icp";
+import { Transactions } from "@services/ledger_indexer/utils/interfaces";
 
 const useFetchAccountTransactions = (
   canisterId: string,

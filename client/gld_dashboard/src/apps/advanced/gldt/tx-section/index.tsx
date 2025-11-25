@@ -5,7 +5,7 @@ import {
   DisclosurePanel,
 } from "@headlessui/react";
 import { useAuth } from "@auth/index";
-import PastTxHistory from "@advanced/gldt/tx-section/past-tx-history";
+// import PastTxHistory from "@advanced/gldt/tx-section/past-tx-history";
 import OngoingTxHistory from "@advanced/gldt/tx-section/ongoing-tx-history";
 import Icon from "@shared/ui/icons";
 
@@ -73,7 +73,7 @@ const TxSection = ({ className }: { className?: string }) => {
               </div>
             )}
           </Disclosure>
-          <Disclosure defaultOpen={true}>
+          {/* <Disclosure defaultOpen={true}>
             {({ open }) => (
               <div>
                 <DisclosureButton
@@ -99,7 +99,7 @@ const TxSection = ({ className }: { className?: string }) => {
                 </DisclosurePanel>
               </div>
             )}
-          </Disclosure>
+          </Disclosure> */}
         </div>
       ) : (
         renderDisconnectedPlaceholder()

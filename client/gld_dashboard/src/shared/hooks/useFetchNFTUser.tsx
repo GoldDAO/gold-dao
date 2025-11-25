@@ -5,21 +5,20 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { SWAP_CANISTER_ID } from "@constants";
-import { bigIntTo32ByteArray } from "@services/gld_nft/utils";
-import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
-import { IdNFT, CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
-import unlisted_tokens_of from "@services/gld_nft/fn/unlisted_tokens_of";
-import get_nat_as_token_id_origyn from "@services/gld_nft/fn/get_nat_as_token_id_origyn";
-import get_active_swaps_by_user from "@services/gldt_swap/fn/get_active_swaps_by_user";
-import { idlFactory as idlFactorySwap } from "@services/gldt_swap/idlFactory";
+import { idlFactory as idlFactoryNFT } from "@services/nft/idlFactory";
+import { NFT } from "@services/nft/utils/interfaces";
+import icrc7_tokens_of from "@services/nft/icrc7_tokens_of";
+import get_active_swaps_by_user from "@services/swap/get_active_swaps_by_user";
+import icrc7_token_metadata from "@services/nft/icrc7_token_metadata";
+import { idlFactory as idlFactorySwap } from "@services/swap/idlFactory";
+import { parseMetadata } from "@services/nft/utils/index";
 
 const useFetchUserNft = (
-  canisterId: string,
-  agent: Agent | HttpAgent | undefined,
-  options: Omit<UseQueryOptions<IdNFT[]>, "queryKey" | "queryFn"> & {
+  canister_id: string,
+  options: Omit<UseQueryOptions<NFT[]>, "queryKey" | "queryFn"> & {
+    agent: Agent | HttpAgent | undefined;
     owner: string;
     subaccount?: string[];
-    collection_name: CollectionNameNFT;
   }
 ) => {
   const {
@@ -28,16 +27,16 @@ const useFetchUserNft = (
     placeholderData = keepPreviousData,
     owner,
     subaccount,
-    collection_name,
+    agent,
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_USER_NFT", collection_name, owner, subaccount],
+    queryKey: ["FETCH_USER_NFT", canister_id, owner, subaccount],
     queryFn: async () => {
       try {
         const actorNFT = Actor.createActor(idlFactoryNFT, {
           agent,
-          canisterId,
+          canisterId: canister_id,
         });
         const actorSwap = Actor.createActor(idlFactorySwap, {
           agent,
@@ -45,42 +44,36 @@ const useFetchUserNft = (
         });
 
         const activeSwaps = await get_active_swaps_by_user(actorSwap, owner);
-        const activeSwapSet = new Set(
-          activeSwaps.map((swap) => swap.nft_id_string)
-        );
 
-        const unlisted_tokens_of_result = await unlisted_tokens_of(actorNFT, {
+        const icrc7_tokens_of_results = await icrc7_tokens_of(actorNFT, {
           owner,
           subaccount,
         });
 
         const nfts = await Promise.all(
-          unlisted_tokens_of_result.map(
-            async (tokenId: bigint): Promise<IdNFT> => {
-              const result = (await get_nat_as_token_id_origyn(actorNFT, {
-                tokenId,
-              })) as string;
+          icrc7_tokens_of_results.map(
+            async (token_id: bigint): Promise<NFT> => {
+              const result = await icrc7_token_metadata(actorNFT, {
+                token_id,
+              });
+              const metadata = await parseMetadata(result);
 
               return {
-                id_string: result,
-                id_bigint: tokenId,
-                id_byte_array: bigIntTo32ByteArray(tokenId),
+                id: token_id,
+                ...metadata,
               };
             }
           )
         );
 
         //? Filter out NFT's that are currently being swapped
-        const filtered = nfts.filter(
-          (nft) => !activeSwapSet.has(nft.id_string)
-        );
+        const activeSwapSet = new Set(activeSwaps.map((swap) => swap.nft_id));
+        const filtered = nfts.filter((nft) => !activeSwapSet.has(nft.id));
 
         return filtered;
       } catch (err) {
         console.error(err);
-        throw new Error(
-          `Fetch user ${collection_name} NFTs error! Please retry later.`
-        );
+        throw new Error(`Fetch NFT's collection error! Please retry later.`);
       }
     },
     placeholderData,

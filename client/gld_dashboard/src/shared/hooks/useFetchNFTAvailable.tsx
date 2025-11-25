@@ -5,20 +5,19 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import { SWAP_CANISTER_ID } from "@constants";
-import { bigIntTo32ByteArray } from "@services/gld_nft/utils";
-import { idlFactory as idlFactoryNFT } from "@services/gld_nft/idlFactory";
-import { IdNFT, CollectionNameNFT } from "@services/gld_nft/utils/interfaces";
-import icrc7_tokens_of from "@services/gld_nft/fn/icrc7_tokens_of";
-import get_nat_as_token_id_origyn from "@services/gld_nft/fn/get_nat_as_token_id_origyn";
-import get_active_swaps from "@services/gldt_swap/fn/get_active_swaps";
-import { idlFactory as idlFactorySwap } from "@services/gldt_swap/idlFactory";
+import { idlFactory as idlFactoryNFT } from "@services/nft/idlFactory";
+import { NFT } from "@services/nft/utils/interfaces";
+import icrc7_tokens_of from "@services/nft/icrc7_tokens_of";
+import get_active_swaps from "@services/swap/get_active_swaps";
+import { idlFactory as idlFactorySwap } from "@services/swap/idlFactory";
+import icrc7_token_metadata from "@services/nft/icrc7_token_metadata";
+import { parseMetadata } from "@services/nft/utils";
 
-const useFetchAvailableNFT = (
+const useFetchNFTAvailable = (
   canisterId: string,
-  agent: Agent | HttpAgent | undefined,
-  options: Omit<UseQueryOptions<IdNFT[]>, "queryKey" | "queryFn"> & {
+  options: Omit<UseQueryOptions<NFT[]>, "queryKey" | "queryFn"> & {
     subaccount?: string[];
-    collection_name: CollectionNameNFT;
+    agent: Agent | HttpAgent | undefined;
   }
 ) => {
   const {
@@ -26,38 +25,38 @@ const useFetchAvailableNFT = (
     refetchInterval = false,
     placeholderData = keepPreviousData,
     subaccount,
-    collection_name,
+    agent,
   } = options;
 
   return useQuery({
-    queryKey: ["FETCH_AVAILABLE_NFT", collection_name, subaccount],
+    queryKey: ["FETCH_AVAILABLE_NFT", canisterId, subaccount],
     queryFn: async () => {
       try {
         const actorNFT = Actor.createActor(idlFactoryNFT, {
-          agent,
+          agent: agent,
           canisterId,
         });
         const actorSwap = Actor.createActor(idlFactorySwap, {
-          agent,
+          agent: agent,
           canisterId: SWAP_CANISTER_ID,
         });
 
-        const icrc7_tokens_of_result = await icrc7_tokens_of(actorNFT, {
+        const icrc7_tokens_of_results = await icrc7_tokens_of(actorNFT, {
           owner: SWAP_CANISTER_ID,
           subaccount,
         });
 
-        const result_user_nft = await Promise.all(
-          icrc7_tokens_of_result.map(
-            async (tokenId: bigint): Promise<IdNFT> => {
-              const result = (await get_nat_as_token_id_origyn(actorNFT, {
-                tokenId,
-              })) as string;
+        const nfts = await Promise.all(
+          icrc7_tokens_of_results.map(
+            async (token_id: bigint): Promise<NFT> => {
+              const result = await icrc7_token_metadata(actorNFT, {
+                token_id,
+              });
+              const metadata = await parseMetadata(result);
 
               return {
-                id_string: result,
-                id_bigint: tokenId,
-                id_byte_array: bigIntTo32ByteArray(tokenId),
+                id: token_id,
+                ...metadata,
               };
             }
           )
@@ -65,16 +64,14 @@ const useFetchAvailableNFT = (
 
         // ? Filter out NFT's that are currently being swapped
         const data = await get_active_swaps(actorSwap);
-        const activeSwapSet = new Set(data.map((swap) => swap.nft_id_string));
-        const result = result_user_nft.filter(
-          (nft) => !activeSwapSet.has(nft.id_string)
-        );
+        const activeSwapSet = new Set(data.map((swap) => swap.nft_id));
+        const result = nfts.filter((nft) => !activeSwapSet.has(nft.id));
 
         return result ?? [];
       } catch (err) {
         console.error(err);
         throw new Error(
-          `Fetch ${collection_name} NFTs error! Please retry later.`
+          `Fetch available NFT's collection error! Please retry later.`
         );
       }
     },
@@ -84,4 +81,4 @@ const useFetchAvailableNFT = (
   });
 };
 
-export default useFetchAvailableNFT;
+export default useFetchNFTAvailable;

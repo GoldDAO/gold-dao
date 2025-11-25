@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import clsx from "clsx";
 import { useAuth } from "@auth/index";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
-import { Transaction } from "@services/ledger-index/utils/interfaces";
+import { Transaction } from "@services/ledger_indexer/utils/interfaces";
 import useFetchLedgerDecimals from "@shared/hooks/useFetchLedgerDecimals";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import Address from "@components/strings/Address";

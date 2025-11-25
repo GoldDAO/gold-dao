@@ -8,17 +8,18 @@ import { NFTCollections } from "@shared/utils/nfts";
 
 const ListItemNFT = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isConnected, authenticatedAgent, principalId } = useAuth();
+  const { isConnected, unauthenticatedAgent, principalId } = useAuth();
 
   const onClickToken = () => {
     searchParams.set("token", "GLDNFT");
     setSearchParams(searchParams);
   };
 
-  const nfts = useFetchUserNFTMetrics(authenticatedAgent, {
+  const nfts = useFetchUserNFTMetrics({
     owner: principalId,
     nft_collections: NFTCollections,
-    enabled: !!authenticatedAgent && isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
+    agent: unauthenticatedAgent,
   });
 
   return (

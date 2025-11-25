@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
-import dissolve_instantly from "@services/gldt_stake/dissolve_instantly";
+import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
+import dissolve_instantly from "@services/stake/dissolve_instantly";
 
 const useDissolvingInstantly = (
   canisterId: string,

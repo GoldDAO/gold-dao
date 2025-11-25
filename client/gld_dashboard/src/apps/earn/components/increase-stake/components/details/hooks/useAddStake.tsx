@@ -1,8 +1,8 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import add_stake from "@services/gldt_stake/add_stake";
+import add_stake from "@services/stake/add_stake";
 import icrc2_approve from "@services/ledger/icrc2_approve";
 import { GLDT_LEDGER_CANISTER_ID } from "@constants";
 
