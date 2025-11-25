@@ -3,33 +3,22 @@ import { decodeIcrcAccount } from "@dfinity/ledger-icrc";
 import { useAtom, useAtomValue } from "jotai";
 import clsx from "clsx";
 import { FieldValues, useForm } from "react-hook-form";
-import { useAuth } from "@auth/index";
 import Dialog from "@shared/ui/dialog/Dialog";
 import { NFTCollections } from "@shared/utils/nfts";
-import useFetchNFTTransferFee from "@shared/hooks/useFetchNFTTransferFee";
 import UserNFTSelect from "@shared/components/nft-select/UserNFTSelect";
 import { TransferNFTStateReducerAtom } from "@wallet/shared/atoms/TransferNFTAtom";
 import {
   SelectNFTStateReducerAtom,
   TotalNFTSelectedAtom,
-  RandomSelectedNFTIdAtom,
 } from "@shared/atoms/NFTStateAtom";
 import BtnPrimary from "@shared/ui/button/HorizontalButton";
 import SwitchTransfer from "@shared/components/switch/SwitchTransfer";
-import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";
-import { OGY_LEDGER_CANISTER_ID } from "@constants";
-import DisclaimerInsufficientOGYFunds from "./disclaimer-insufficient-ogy-funds";
-import { Logo } from "@shared/ui/logos";
-import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
-import BalanceAvailable from "@shared/components/BalanceAvailable";
 
 const Form = () => {
-  const { unauthenticatedAgent, isConnected, principalId } = useAuth();
   const [transferNFTState, dispatchTransferNFTState] = useAtom(
     TransferNFTStateReducerAtom
   );
   const totalNFTSelected = useAtomValue(TotalNFTSelectedAtom);
-  const randomSelectedNFTId = useAtomValue(RandomSelectedNFTIdAtom) || null;
 
   const {
     register,
@@ -45,35 +34,6 @@ const Form = () => {
       recipient_address: "",
     },
   });
-
-  const txFeeNFT = useFetchNFTTransferFee(
-    randomSelectedNFTId?.canister as string,
-    unauthenticatedAgent,
-    {
-      enabled: isConnected && !!unauthenticatedAgent && !!randomSelectedNFTId,
-      nft_id: randomSelectedNFTId?.tokenId.id_bigint as bigint,
-      nft_id_string: randomSelectedNFTId?.tokenId.id_string as string,
-      placeholderData: {
-        amount: 0,
-        amount_e8s: 0n,
-      },
-    }
-  );
-
-  const balanceOGY = useFetchLedgerBalance(
-    OGY_LEDGER_CANISTER_ID,
-    unauthenticatedAgent,
-    {
-      ledger: "OGY",
-      owner: principalId,
-      enabled: !!unauthenticatedAgent && isConnected,
-    }
-  );
-
-  const insufficientOGYFunds =
-    balanceOGY.isSuccess &&
-    txFeeNFT.isSuccess &&
-    balanceOGY.data.balance < txFeeNFT.data.amount * totalNFTSelected;
 
   useEffect(() => {
     if (transferNFTState.send_receive_address !== "") {
@@ -146,47 +106,9 @@ const Form = () => {
           </p>
         )}
 
-        <div className="flex justify-between items-center mt-8 mx-2">
-          <div className="flex justify-start items-center text-content/60 text-sm rounded-lg">
-            <div>Fee: </div>
-            {txFeeNFT.isSuccess ? (
-              <div className="flex items-center">
-                <Logo name="ogy" className="mx-2 h-4 w-4" />
-                <span>
-                  <NumberToLocaleString
-                    value={txFeeNFT.data.amount * totalNFTSelected}
-                    decimals={3}
-                  />{" "}
-                  OGY
-                </span>
-              </div>
-            ) : (
-              <div>Fetching NFT fee...</div>
-            )}
-          </div>
-
-          <div className="px-4 py-1 bg-surface-secondary text-content/60 text-xs rounded-md">
-            <BalanceAvailable token="OGY" balance={balanceOGY.data?.balance} />
-          </div>
-        </div>
-
-        {insufficientOGYFunds && (
-          <DisclaimerInsufficientOGYFunds
-            totalNFTSelected={totalNFTSelected}
-            txFee={txFeeNFT.data.amount}
-            balanceOGY={balanceOGY.data.balance}
-            className="mt-8"
-          />
-        )}
-
         <BtnPrimary
           type="submit"
-          disabled={
-            !isValid ||
-            totalNFTSelected === 0 ||
-            !balanceOGY.isSuccess ||
-            insufficientOGYFunds
-          }
+          disabled={!isValid || totalNFTSelected === 0}
           className="mt-8 w-full"
         >
           Transfer

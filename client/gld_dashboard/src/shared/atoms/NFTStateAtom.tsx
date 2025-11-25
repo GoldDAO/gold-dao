@@ -1,6 +1,6 @@
 import { atomWithReducer } from "jotai/utils";
 import { atom } from "jotai";
-import { CollectionNameNFT, IdNFT } from "@services/gld_nft/utils/interfaces";
+import { CollectionNameNFT, NFT } from "@services/nft/utils/interfaces";
 import {
   GLD_NFT_1G_CANISTER_ID,
   GLD_NFT_10G_CANISTER_ID,
@@ -14,8 +14,8 @@ export interface CollectionNFT {
   label: string;
   value: number;
   index: number;
-  nfts: IdNFT[];
-  nfts_selected: IdNFT[];
+  nfts: NFT[];
+  nfts_selected: NFT[];
   is_empty: boolean;
   is_initialized: boolean;
   canister_id: string;
@@ -100,7 +100,7 @@ const reducer = (
   action:
     | {
         type: "SET_COLLECTION_NFT";
-        value: { name: CollectionNameNFT; nfts: IdNFT[] };
+        value: { name: CollectionNameNFT; nfts: NFT[] };
       }
     | {
         type: "SET_ADD_NFT";
@@ -131,7 +131,7 @@ const reducer = (
     case "SET_ADD_NFT": {
       const name = action.value;
       const nfts = prev[name].nfts;
-      const nft = nfts.shift() as IdNFT;
+      const nft = nfts.shift() as NFT;
       const nfts_selected = [...prev[name].nfts_selected, nft];
       const total_count_selected = nfts_selected.length;
       const total_grams_selected = total_count_selected * prev[name].value;
@@ -151,7 +151,7 @@ const reducer = (
     case "SET_REMOVE_NFT": {
       const name = action.value;
       const nfts_selected = prev[name].nfts_selected;
-      const nft = nfts_selected.pop() as IdNFT;
+      const nft = nfts_selected.pop() as NFT;
       const nfts = [...prev[name].nfts, nft];
       const total_count_selected = nfts_selected.length;
       const total_grams_selected = total_count_selected * prev[name].value;

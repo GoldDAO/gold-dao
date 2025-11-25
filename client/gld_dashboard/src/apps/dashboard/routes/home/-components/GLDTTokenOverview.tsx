@@ -1,18 +1,9 @@
 import { useTranslation } from "react-i18next";
 import useFetchTotalSupply from "@services/ledger/hooks/useFetchTotalSupply";
 import useFetchTokenPrice from "@services/icpswap/hooks/useFetchTokenPrice";
-import useFetchLockedGLDNFT from "@services/gld_nft/hooks/useFetchLockedGLDNFT";
 
 // import { LoaderSpin, Logo } from "@components/index";
-import {
-  GLDT_LEDGER_CANISTER_ID_IC,
-  ICPSWAP_CANISTER_ID,
-  SWAP_CANISTER_ID,
-  GLD_NFT_1G_CANISTER_ID,
-  GLD_NFT_10G_CANISTER_ID,
-  GLD_NFT_100G_CANISTER_ID,
-  GLD_NFT_1000G_CANISTER_ID,
-} from "@constants";
+import { GLDT_LEDGER_CANISTER_ID_IC, ICPSWAP_CANISTER_ID } from "@constants";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { divideBy1e8 } from "@shared/utils/numbers";
 import { useAuth } from "@auth/index";
@@ -36,18 +27,6 @@ const GLDTTokenOverview = ({ className }: { className?: string }) => {
     enabled: !!unauthenticatedAgent,
   });
 
-  const lockedGLDNFT = useFetchLockedGLDNFT(
-    GLD_NFT_1G_CANISTER_ID,
-    GLD_NFT_10G_CANISTER_ID,
-    GLD_NFT_100G_CANISTER_ID,
-    GLD_NFT_1000G_CANISTER_ID,
-    unauthenticatedAgent,
-    {
-      owner: SWAP_CANISTER_ID,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
-
   return (
     <div className={className}>
       <div className="border border-border rounded-xl bg-surface-primary">
@@ -59,15 +38,6 @@ const GLDTTokenOverview = ({ className }: { className?: string }) => {
             </div>
             <div>
               <div className="flex flex-col items-center xl:items-start">
-                {/* Locked GLD NFT */}
-                <div className="mb-2">
-                  {lockedGLDNFT.isSuccess && (
-                    <div className="flex gap-3">
-                      <div>{t("total_weight_locked_in_canister_in_kg")}</div>
-                      <div>{lockedGLDNFT.data} Kg</div>
-                    </div>
-                  )}
-                </div>
                 {/* Number of swaps */}
                 <div className="mb-2">
                   <div className="flex gap-3">

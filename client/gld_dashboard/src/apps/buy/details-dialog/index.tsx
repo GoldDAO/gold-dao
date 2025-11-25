@@ -4,7 +4,7 @@ import { KONGSWAP_CANISTER_ID_IC } from "@constants";
 import { useAuth } from "@auth/index";
 import { LoaderSpin, Logo } from "@components/index";
 import Dialog from "@shared/ui/dialog/Dialog";
-import useApprove from "@services/ledger/hooks/useApprove";
+import useApprove from "@shared/hooks/useApproveLedger";
 import useSwap from "@services/kongswap/hooks/useSwap";
 import E8sToLocaleString from "@shared/components/numbers/E8sToLocaleString";
 import useFetchLedgerBalance from "@shared/hooks/useFetchLedgerBalance";

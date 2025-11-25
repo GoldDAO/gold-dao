@@ -55,12 +55,13 @@ const PriceNFT = ({
 };
 
 const TotalCountUserNFTs = ({ className }: { className?: string }) => {
-  const { isConnected, authenticatedAgent, principalId } = useAuth();
+  const { isConnected, unauthenticatedAgent, principalId } = useAuth();
 
-  const nfts = useFetchNFTUserMetrics(authenticatedAgent, {
+  const nfts = useFetchNFTUserMetrics({
     owner: principalId,
     nft_collections: NFTCollections,
-    enabled: !!authenticatedAgent && isConnected,
+    enabled: !!unauthenticatedAgent && isConnected,
+    agent: unauthenticatedAgent,
   });
 
   const renderCount = () => {

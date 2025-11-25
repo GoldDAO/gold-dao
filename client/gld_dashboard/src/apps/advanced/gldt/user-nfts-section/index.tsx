@@ -1,4 +1,4 @@
-import { NFTCollection } from "@services/gld_nft/utils/interfaces";
+import { NFTCollection } from "@services/nft/utils/interfaces";
 import useFetchUserNFT from "@shared/hooks/useFetchNFTUser";
 import { NFTCollections } from "@shared/utils/nfts";
 import { useAuth } from "@auth/index";
@@ -15,7 +15,7 @@ const CountCollectionNFT = ({
   return (
     <div className={className}>
       <div className="flex items-center justify-center xl:justify-start gap-2">
-        <div className="px-2 bg-gold text-white flex items-center justify-center rounded">
+        <div className="px-2 border border-border flex items-center justify-center rounded">
           {count}
         </div>
         <div className="w-[64px] flex justify-center items-center">
@@ -28,17 +28,13 @@ const CountCollectionNFT = ({
 };
 
 const CollectionItem = ({ collection }: { collection: NFTCollection }) => {
-  const { authenticatedAgent, principalId, isConnected } = useAuth();
+  const { unauthenticatedAgent, principalId, isConnected } = useAuth();
 
-  const fetchCollection = useFetchUserNFT(
-    collection.canisterId,
-    authenticatedAgent,
-    {
-      owner: principalId,
-      collection_name: collection.name,
-      enabled: !!authenticatedAgent && isConnected,
-    }
-  );
+  const fetchCollection = useFetchUserNFT(collection.canisterId, {
+    owner: principalId,
+    enabled: !!unauthenticatedAgent && isConnected,
+    agent: unauthenticatedAgent,
+  });
 
   const renderCountCollectionNFT = () => {
     if (!isConnected) {

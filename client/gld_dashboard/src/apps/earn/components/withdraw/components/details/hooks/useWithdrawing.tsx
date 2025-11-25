@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
-import withdraw from "@services/gldt_stake/withdraw";
+import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
+import withdraw from "@services/stake/withdraw";
 
 const useWithdrawing = (
   canisterId: string,

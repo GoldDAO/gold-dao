@@ -12,10 +12,10 @@ import {
   INSTANT_DISSOLVE_FEE_PERCENTAGE,
 } from "@constants";
 import { TOKEN_GLDT, TOKEN_GOLDAO_IC } from "@shared/utils/tokens";
-import { idlFactory as idlFactoryStake } from "@services/gldt_stake/idlFactory";
+import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
-import get_position from "@services/gldt_stake/get_position";
+import get_position from "@services/stake/get_position";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import swap_amounts from "@services/kongswap/swap_amounts";

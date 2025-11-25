@@ -19,19 +19,19 @@ const Details = () => {
     );
   }
 
+  const collections = [
+    swapNFT.collections["1G"],
+    swapNFT.collections["10G"],
+    swapNFT.collections["100G"],
+    swapNFT.collections["1KG"],
+  ].filter((collection) => collection.total_count_selected > 0);
+
   return (
     <div>
       <div className="grid grid-cols-1 gap-4 my-8">
-        {[
-          swapNFT.collections["1G"],
-          swapNFT.collections["10G"],
-          swapNFT.collections["100G"],
-          swapNFT.collections["1KG"],
-        ]
-          .filter((collection) => collection.total_count_selected > 0)
-          .map((collection) => (
-            <Collection key={collection.name} collection={collection} />
-          ))}
+        {collections.map((collection) => (
+          <Collection key={collection.name} collection={collection} />
+        ))}
       </div>
 
       <BtnPrimary onClick={handleClose} className="w-full">
