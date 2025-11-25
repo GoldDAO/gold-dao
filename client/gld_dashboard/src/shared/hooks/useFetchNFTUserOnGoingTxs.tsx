@@ -4,9 +4,9 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { idlFactory } from "@services/gldt_swap/idlFactory";
-import get_active_swaps_by_user from "@services/gldt_swap/fn/get_active_swaps_by_user";
-import { SwapData } from "@services/gldt_swap/utils";
+import { idlFactory } from "@services/swap/idlFactory";
+import get_active_swaps_by_user from "@services/swap/get_active_swaps_by_user";
+import { SwapData } from "@services/swap/utils/interfaces";
 
 const useFetchNFTOnGoingTxs = (
   canisterId: string,

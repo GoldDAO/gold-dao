@@ -1,0 +1,39 @@
+import { ActorSubclass } from "@dfinity/agent";
+import {
+  ManageStakePositionArgs,
+  Result_3,
+  StakePositionResponse,
+  ManageStakePositionError,
+} from "@services/stake/idlFactory";
+import {
+  parseWithdrawRequestErrors,
+  parseGeneralError,
+} from "@services/stake/utils/parserError";
+
+const parseErrors = (error: ManageStakePositionError): string => {
+  if ("WithdrawError" in error)
+    return parseWithdrawRequestErrors(error.WithdrawError);
+  if ("GeneralError" in error) return parseGeneralError(error.GeneralError);
+
+  return JSON.stringify(error);
+};
+
+const withdraw = async (
+  actor: ActorSubclass
+): Promise<StakePositionResponse> => {
+  const args: ManageStakePositionArgs = {
+    Withdraw: {},
+  };
+
+  const result = (await actor.manage_stake_position(args)) as Result_3;
+
+  if ("Ok" in result) {
+    return result.Ok;
+  } else {
+    console.error(result.Err);
+    const errorMessage = parseErrors(result.Err);
+    throw new Error(errorMessage);
+  }
+};
+
+export default withdraw;

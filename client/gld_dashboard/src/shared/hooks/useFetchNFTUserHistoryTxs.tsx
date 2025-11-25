@@ -4,10 +4,10 @@ import {
   UseInfiniteQueryOptions,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { idlFactory } from "@services/gldt_swap/idlFactory";
-import { SwapData } from "@services/gldt_swap/utils/index";
-import get_historic_swaps_by_user from "@services/gldt_swap/fn/get_historic_swaps_by_user";
-import get_history_total from "@services/gldt_swap/fn/get_history_total";
+import { idlFactory } from "@services/swap/idlFactory";
+import { SwapData } from "@services/swap/utils/interfaces";
+import get_historic_swaps_by_user from "@services/swap/get_historic_swaps_by_user";
+import get_history_total from "@services/swap/get_history_total";
 
 export interface FetchNFTUserHistoryTxsParams {
   data: SwapData[];

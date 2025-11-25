@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
 import { useAtomValue } from "jotai";
-import { useAuth as useAuthIK } from "@nfid/identitykit/react";
+import { useAuth as useAuthIK } from "@amerej/identitykit/react";
 
 import authStateAtom from "./atoms";
 

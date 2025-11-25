@@ -1,10 +1,10 @@
 import { ReactNode, useEffect, useState } from "react";
 import {
-  IdentityKitAuthType,
+  // IdentityKitAuthType,
   NFIDW,
   InternetIdentity,
-  IdentityKitSignerConfig,
-} from "@nfid/identitykit";
+  OISY,
+} from "@amerej/identitykit";
 import { useAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -12,9 +12,13 @@ import {
   useAuth,
   useIsInitializing,
   useAgent,
-} from "@nfid/identitykit/react";
+} from "@amerej/identitykit/react";
 import { Agent, HttpAgent } from "@dfinity/agent";
-
+import {
+  APP_MODE,
+  GLDT_STAKE_CANISTER_ID,
+  SWAP_CANISTER_ID,
+} from "@constants";
 import authStateAtom from "./atoms";
 
 // const InternetIdentity2 = {
@@ -74,31 +78,21 @@ const AuthProviderInit = ({ children }: { children: ReactNode }) => {
   } else return children;
 };
 
-const AuthProvider = ({
-  children,
-  targets = [],
-  signers = [NFIDW, InternetIdentity],
-  derivationOrigin = undefined,
-  maxTimeToLive = 604800000000000n, // ? one week
-}: {
-  children: ReactNode;
-  targets?: string[];
-  signers?: IdentityKitSignerConfig[];
-  derivationOrigin?: string | undefined;
-  maxTimeToLive?: bigint;
-}) => {
-  // const setState = useSetAtom(authStateAtom);
+const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
   return (
     <IdentityKitProvider
-      // signers={isMobile ? [NFIDW, InternetIdentity] : signers}
-      signers={signers}
-      authType={IdentityKitAuthType.DELEGATION}
+      signers={[NFIDW, InternetIdentity, OISY]}
       signerClientOptions={{
-        targets,
-        maxTimeToLive,
-        derivationOrigin,
+        targets: [
+          SWAP_CANISTER_ID,
+          GLDT_STAKE_CANISTER_ID,
+        ],
+        maxTimeToLive: 604800000000000n,
+        derivationOrigin: ["preprod", "production"].includes(APP_MODE)
+          ? "https://rbsh4-yyaaa-aaaal-qdigq-cai.icp0.io"
+          : undefined,
         idleOptions: {
           disableIdle: false,
         },

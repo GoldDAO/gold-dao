@@ -12,9 +12,19 @@ import { TOKENS, TOKEN_WHITELIST, TOKEN_GLDT } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import OverviewSection from "@wallet/overview-section";
+import NFTMaintenanceMode from "@shared/components/nft-maintenance-mode";
+import useGetGLDDashboardMaintenanceMode from "@shared/hooks/useGetGLDDashboardMaintenanceMode";
+import { GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID } from "@constants";
 
 const Wallet = () => {
-  const { isConnected } = useAuth();
+  const { isConnected, unauthenticatedAgent } = useAuth();
+  const { data: maintenanceMode } = useGetGLDDashboardMaintenanceMode(
+    GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID,
+    unauthenticatedAgent,
+    {
+      enabled: !!unauthenticatedAgent,
+    }
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const setSelectedToken = useSetAtom(TokenSelectedAtom);
 
@@ -56,19 +66,35 @@ const Wallet = () => {
         )}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        <OverviewSection />
-        <div className="p-4 xl:p-8 mt-12">
-          <div className="mb-4">Transactions</div>
-          {isConnected ? (
-            searchParams.get("token") === "GLDNFT" ? (
-              <TxHistoryNFT />
-            ) : (
-              <TxHistoryToken />
-            )
+        {!isConnected ? (
+          <>
+            <OverviewSection />
+            <div className="p-4 xl:p-8 mt-12">
+              <div className="mb-4">Transactions</div>
+              <TxHistoryDisconnected />
+            </div>
+          </>
+        ) : searchParams.get("token") === "GLDNFT" ? (
+          maintenanceMode ? (
+            <NFTMaintenanceMode />
           ) : (
-            <TxHistoryDisconnected />
-          )}
-        </div>
+            <>
+              <OverviewSection />
+              <div className="p-4 xl:p-8 mt-12">
+                <div className="mb-4">Transactions</div>
+                <TxHistoryNFT />
+              </div>
+            </>
+          )
+        ) : (
+          <>
+            <OverviewSection />
+            <div className="p-4 xl:p-8 mt-12">
+              <div className="mb-4">Transactions</div>
+              <TxHistoryToken />
+            </div>
+          </>
+        )}
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>
   );

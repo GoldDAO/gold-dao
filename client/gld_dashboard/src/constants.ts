@@ -2,12 +2,20 @@ export const APP_MODE = import.meta.env.MODE;
 
 export const GLD_NFT_1G_CANISTER_ID = import.meta.env
   .VITE_GLD_NFT_1G_CANISTER_ID;
+export const GLD_NFT_1G_INDEXER_CANISTER_ID = import.meta.env
+  .VITE_GLD_NFT_1G_INDEXER_CANISTER_ID;
 export const GLD_NFT_10G_CANISTER_ID = import.meta.env
   .VITE_GLD_NFT_10G_CANISTER_ID;
+export const GLD_NFT_10G_INDEXER_CANISTER_ID = import.meta.env
+  .VITE_GLD_NFT_10G_INDEXER_CANISTER_ID;
 export const GLD_NFT_100G_CANISTER_ID = import.meta.env
   .VITE_GLD_NFT_100G_CANISTER_ID;
+export const GLD_NFT_100G_INDEXER_CANISTER_ID = import.meta.env
+  .VITE_GLD_NFT_10G_INDEXER_CANISTER_ID;
 export const GLD_NFT_1000G_CANISTER_ID = import.meta.env
   .VITE_GLD_NFT_1000G_CANISTER_ID;
+export const GLD_NFT_1000G_INDEXER_CANISTER_ID = import.meta.env
+  .VITE_GLD_NFT_10G_INDEXER_CANISTER_ID;
 
 export const GOLDAO_LEDGER_CANISTER_ID = import.meta.env
   .VITE_GOLDAO_LEDGER_CANISTER_ID;
@@ -37,12 +45,13 @@ export const CKUSDT_LEDGER_INDEX_CANISTER_ID = import.meta.env
   .VITE_CKUSDT_LEDGER_INDEX_CANISTER_ID;
 
 export const SWAP_CANISTER_ID = import.meta.env.VITE_SWAP_CANISTER_ID;
+export const SWAP_INDEXER_CANISTER_ID = import.meta.env
+  .VITE_SWAP_INDEXER_CANISTER_ID;
 export const SNS_NEURONS_ICP_CANISTER_ID = import.meta.env
   .VITE_SNS_NEURONS_ICP_CANISTER_ID;
 export const SNS_NEURONS_OGY_CANISTER_ID = import.meta.env
   .VITE_SNS_NEURONS_OGY_CANISTER_ID;
-export const SNS_ROOT_CANISTER_ID = import.meta.env
-  .VITE_SNS_ROOT_CANISTER_ID;
+export const SNS_ROOT_CANISTER_ID = import.meta.env.VITE_SNS_ROOT_CANISTER_ID;
 export const SNS_GOVERNANCE_CANISTER_ID = import.meta.env
   .VITE_SNS_GOVERNANCE_CANISTER_ID;
 export const SNS_REWARDS_CANISTER_ID = import.meta.env
@@ -54,31 +63,37 @@ export const GLDT_STAKE_CANISTER_ID = import.meta.env
 
 export const VERSION_DAPP = import.meta.env.VITE_VERSION;
 
-export const BITY_GOLD_API_BASE_URL = import.meta.env.VITE_BITY_GOLD_API_BASE_URL;
+export const BITY_GOLD_API_BASE_URL = import.meta.env
+  .VITE_BITY_GOLD_API_BASE_URL;
 
-export const ICP_ICRC_API_BASE_URL = "https://icrc-api.internetcomputer.org/api/v1"
-export const OGY_API_BASE_URL = "https://api.origyn.com"
-export const IC_EXPLORER_API_BASE_URL = "https://api.icexplorer.io/api"
+export const ICP_ICRC_API_BASE_URL =
+  "https://icrc-api.internetcomputer.org/api/v1";
+export const OGY_API_BASE_URL = "https://api.origyn.com";
+export const IC_EXPLORER_API_BASE_URL = "https://api.icexplorer.io/api";
 
-export const GOLDAO_LEDGER_CANISTER_ID_IC = "tyyy3-4aaaa-aaaaq-aab7a-cai"
-export const GLDT_LEDGER_CANISTER_ID_IC = "6c7su-kiaaa-aaaar-qaira-cai"
-export const ICP_LEDGER_CANISTER_ID_IC = "ryjl3-tyaaa-aaaaa-aaaba-cai"
-export const OGY_LEDGER_CANISTER_ID_IC = "lkwrt-vyaaa-aaaaq-aadhq-cai"
-export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai"
-export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai"
-export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai"
-export const ROOT_ACCOUNT_GLDGOV = "tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8"
+export const GOLDAO_LEDGER_CANISTER_ID_IC = "tyyy3-4aaaa-aaaaq-aab7a-cai";
+export const GLDT_LEDGER_CANISTER_ID_IC = "6c7su-kiaaa-aaaar-qaira-cai";
+export const ICP_LEDGER_CANISTER_ID_IC = "ryjl3-tyaaa-aaaaa-aaaba-cai";
+export const OGY_LEDGER_CANISTER_ID_IC = "lkwrt-vyaaa-aaaaq-aadhq-cai";
+export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai";
+export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai";
+export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai";
+export const ROOT_ACCOUNT_GLDGOV =
+  "tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8";
 export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
 export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
+
+export const GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID =
+  "g5je6-yaaaa-aaaap-ahkza-cai";
 
 export const REVERSE_GLDT_TX_FEE = 100000000;
 export const GLDT_VALUE_1G_NFT = 100;
 export const MAX_SWAP_SLIPPAGE = 5;
 export const MIN_STAKE_AMOUNT = 10;
 export const MAX_STAKE_AMOUNT = 1000000;
-export const MAX_DISSOLVE_EVENTS = 5
-export const INSTANT_DISSOLVE_FEE_PERCENTAGE = 5
+export const MAX_DISSOLVE_EVENTS = 5;
+export const INSTANT_DISSOLVE_FEE_PERCENTAGE = 5;
 
 if (!(APP_MODE === "production")) {
   console.log(`APP_MODE=${APP_MODE}`);
