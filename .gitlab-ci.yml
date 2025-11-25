@@ -69,9 +69,12 @@ include:
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: sns_neuron_controller
-  # - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-  #   inputs:
-  #     src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
+    inputs:
+      src-folder: gldt_swap_index
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
       src-folder: gldt_stake
@@ -99,9 +102,12 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: token_metrics
-  # - local: scripts/ci-cd/.canister_builds.yml
-  #   inputs:
-  #     src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_builds.yml
+    inputs:
+      src-folder: gldt_swap_index
   # - local: scripts/ci-cd/.canister_builds.yml
   #   inputs:
   #     src-folder: usdg_minter
@@ -122,9 +128,12 @@ include:
     inputs:
       src-folder: internal_dashboard
   # Backend deployments
-  # - local: scripts/ci-cd/.canister_deploys.yml
-  #   inputs:
-  #     src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_swap
+  - local: scripts/ci-cd/.canister_deploys.yml
+    inputs:
+      src-folder: gldt_swap_index
   - local: scripts/ci-cd/.canister_deploys.yml
     inputs:
       src-folder: buyback_burn
@@ -206,7 +215,6 @@ rust lint:
   extends: .rust template
   script:
     - cargo clippy
-
 ################################################################################
 # Unit tests
 ################################################################################

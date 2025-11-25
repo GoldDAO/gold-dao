@@ -2,9 +2,11 @@
 members = [
   "backend/canisters/buyback_burn/impl",
   "backend/canisters/buyback_burn/api",
-  #"backend/canisters/gldt_swap/common",
-  #"backend/canisters/gldt_swap/impl",
-  #"backend/canisters/gldt_swap/api",
+  "backend/canisters/gldt_swap_index/api",
+  "backend/canisters/gldt_swap_index/impl",
+  "backend/canisters/gldt_swap/common",
+  "backend/canisters/gldt_swap/impl",
+  "backend/canisters/gldt_swap/api",
   "backend/canisters/gldt_stake/common",
   "backend/canisters/gldt_stake/impl",
   "backend/canisters/gldt_stake/api",
@@ -20,15 +22,17 @@ members = [
   "backend/canisters/icp_neuron/impl",
   "backend/canisters/sns_neuron_controller/impl",
   "backend/canisters/token_metrics/impl",
+# "backend/canisters/usdg_minter/impl",
+# "backend/canisters/usdg_minter/api",
   "backend/external_canisters/sns_governance/api",
   "backend/external_canisters/sns_governance/c2c_client",
-  "backend/external_canisters/origyn_nft_reference/api",
-  "backend/external_canisters/origyn_nft_reference/c2c_client",
-  #"backend/libraries/canister_client",
-  #"backend/libraries/canister_client_macros",
+  "backend/external_canisters/origyn_nft/api",
+  "backend/external_canisters/origyn_nft/c2c_client",
+  "backend/external_canisters/gldt_swap_archive/c2c_client",
   "backend/libraries/icpswap_client",
   "backend/libraries/http_request",
   "backend/libraries/types",
+  "backend/libraries/cbor",
   "backend/libraries/utils",
   "backend/integration_testing",
 ]
@@ -52,9 +56,9 @@ ic-cdk-timers = "0.12.2"
 ic-ledger-types = "0.15.0"
 ic-metrics-encoder = "1.1.1"
 ic-stable-structures = "0.6.9"
-ic-transport-types = "0.44.2"
+ic-transport-types = "0.41.0"
 ic-xrc-types = "1.2.0"
-ic0 = "1.0.1"
+ic0 = "1.0.0"
 icrc-ledger-types = "0.1.6"
 k256 = "0.13.1"
 minicbor = { version = "1.0.0", features = ["alloc", "derive"] }
@@ -76,7 +80,7 @@ syn = { version = "2.0.99", features = ["full"] }
 tracing = "0.1.40"
 tracing-attributes = "0.1.27"
 tracing-subscriber = "0.3.18"
-num-bigint = "0.4.4"
+num-bigint = { version = "0.4.4"}
 time = { version = "0.3.36", features = [
   "macros",
   "serde",
@@ -95,7 +99,7 @@ lazy_static = "1.4.0"
 anyhow = "1.0.99"
 
 # Bity crates
-bity-ic-icrc3 = { version =  "0.5.0", features = ["debug-logs"] } # , 
+bity-ic-icrc3 = { version =  "0.5.0" } # , features = ["debug-logs"]
 bity-ic-icrc3-macros = "0.3.3"
 bity-ic-canister-time = "0.2.1"
 bity-ic-serializer = "0.1.0"
@@ -111,5 +115,4 @@ bity-ic-icrc3-archive-api = "0.3.0"
 bity-ic-icrc3-archive-c2c-client = "0.3.0"
 bity-ic-candid-gen = "0.1.0"
 bity-ic-ledger-utils = "0.2.1"
-bity-ic-storage-canister-api = "0.2.0"
-
+bity-ic-icrc3-c2c-client = "0.1.0"

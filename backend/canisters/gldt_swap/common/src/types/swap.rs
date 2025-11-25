@@ -1,35 +1,18 @@
-use std::borrow::Cow;
-
+use crate::nft::Nft;
+use crate::swap_canister_config::GeneralFractionalizationConfig;
 use bity_ic_canister_time::{timestamp_millis, HOUR_IN_MS, MINUTE_IN_MS};
-use candid::{CandidType, Decode, Encode, Nat, Principal};
-use ic_ledger_types::{AccountIdentifier, TransferError};
-use ic_stable_structures::{storable::Bound, Storable};
+use candid::{CandidType, Nat};
 use icrc_ledger_types::{
-    icrc1::{
-        account::{Account, Subaccount},
-        transfer::TransferError as TransferErrorIcrc,
-    },
-    icrc2::{approve::ApproveError, transfer_from::TransferFromError},
+    icrc::generic_value::ICRC3Value,
+    icrc1::{account::Account, transfer::TransferError as TransferErrorIcrc},
+    icrc2::transfer_from::TransferFromError,
 };
+use minicbor::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use tracing::debug;
+use std::collections::BTreeMap;
 use types::{Milliseconds, TimestampMillis};
 
-use crate::{
-    gldt::{GldtNumTokens, GLDT_TX_FEE},
-    nft::NftID,
-};
-
-#[cfg(feature = "inttest")]
-pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
-
-#[cfg(not(feature = "inttest"))]
-pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 2000;
-
-const MAX_SWAP_TYPE_BYTES_SIZE: u32 = 100;
-const MAX_SWAP_ID_BYTES_SIZE: u32 = 100;
 pub const STALE_SWAP_TIME_THRESHOLD_MINUTES: u64 = 3;
-
 // ----------------------
 //     CRON JOB INTERVALS & Retrys & delays
 // ----------------------
@@ -41,167 +24,238 @@ pub const MANAGE_OGY_FEE_ACCOUNTS_INTERVAL: Milliseconds = MINUTE_IN_MS;
 pub const MANAGE_SERVICE_STATUS_INTERVAL: Milliseconds = MINUTE_IN_MS;
 pub const MANAGE_STALE_SWAPS_INTERVAL: Milliseconds = MINUTE_IN_MS;
 
-// -----------------
-//     Shared
-// -----------------
-
 pub type SwapIndex = Nat;
 
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct SwapId(pub NftID, pub SwapIndex);
-
-impl Storable for SwapId {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-    // fn into_bytes(self) -> std::vec::Vec<u8> {
-    //     Encode!(&self).unwrap()
-    // }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
-    }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_SWAP_ID_BYTES_SIZE,
-        is_fixed_size: false,
-    };
-}
-
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapInfo {
-    Forward(SwapDetailForward),
-    Reverse(SwapDetailReverse),
-}
+pub struct SwapInfo {
+    pub index: SwapIndex,
 
-pub fn trace(msg: &str) {
-    unsafe {
-        ic0::debug_print(msg.as_ptr() as i32, msg.len() as i32);
-    }
+    pub status: SwapStatus,
+    pub created_at: TimestampMillis,
+    pub swap_type: SwapType,
+    pub user_account: Account,
+
+    pub nft: Nft,
+    pub tokens_amount: GeneralFractionalizationConfig,
 }
 
 impl SwapInfo {
-    pub fn new(swap_type: SwapType) -> Self {
-        debug!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}");
-        trace(&format!(
-            "//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"
-        ));
-        match swap_type {
-            SwapType::Forward => Self::Forward(SwapDetailForward::default()),
-            SwapType::Reverse => Self::Reverse(SwapDetailReverse::default()),
-        }
-    }
-
-    pub fn get_status(&self) -> SwapStatus {
-        match &self {
-            SwapInfo::Forward(deets) => SwapStatus::Forward(deets.status.clone()),
-            SwapInfo::Reverse(deets) => SwapStatus::Reverse(deets.status.clone()),
-        }
-    }
-
-    pub fn get_user_principal(&self) -> Principal {
-        match &self {
-            SwapInfo::Forward(deets) => deets.gldt_receiver.owner,
-            SwapInfo::Reverse(deets) => deets.user,
-        }
-    }
-
-    pub fn get_nft_id(&self) -> NftID {
-        match &self {
-            SwapInfo::Forward(details) => details.nft_id.clone(),
-            SwapInfo::Reverse(details) => details.nft_id.clone(),
-        }
-    }
-
-    pub fn get_nft_canister(&self) -> Principal {
-        match &self {
-            SwapInfo::Forward(details) => details.nft_canister.clone(),
-            SwapInfo::Reverse(details) => details.nft_canister.clone(),
+    pub fn new(
+        index: SwapIndex,
+        swap_type: SwapType,
+        caller_account: Account,
+        nft: Nft,
+        tokens_to_burn: GeneralFractionalizationConfig,
+    ) -> Self {
+        SwapInfo {
+            index,
+            status: SwapStatus::Init,
+            created_at: timestamp_millis(),
+            swap_type,
+            user_account: caller_account,
+            nft,
+            tokens_amount: tokens_to_burn,
         }
     }
 
     pub fn is_swap_over_time_threshold(&self) -> bool {
         let now = timestamp_millis();
-
-        match self {
-            // although a swap can be technically stuck in our system. we will never re-process a stuck forward swap
-            // because the nft canister will release funds and cancel sale after 1 minute
-            SwapInfo::Forward(details) => {
-                let threshold =
-                    details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
-                let is_old = now > threshold;
-
-                return is_old;
-            }
-            SwapInfo::Reverse(details) => {
-                let threshold =
-                    details.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
-                let is_old = now > threshold;
-
-                return is_old;
-            }
-        }
+        let threshold = self.created_at + MINUTE_IN_MS * STALE_SWAP_TIME_THRESHOLD_MINUTES;
+        now > threshold
     }
 
-    pub fn get_swap_id(&self) -> SwapId {
-        match &self {
-            SwapInfo::Forward(deets) => SwapId(deets.nft_id.clone(), deets.index.clone()),
-            SwapInfo::Reverse(deets) => SwapId(deets.nft_id.clone(), deets.index.clone()),
+    pub fn update_status(&mut self, new_status: SwapStatus) -> Result<(), String> {
+        use SwapStatus::*;
+        use SwapType::*;
+
+        match (self.swap_type, &self.status, &new_status) {
+            // ========================
+            // Forward swap transitions
+            // ========================
+            (Forward, Init, NftTransferredFrom)
+            | (Forward, Init, NftTransferFromFailed(_))
+            | (Forward, NftTransferredFrom, Minted)
+            | (Forward, NftTransferredFrom, MintFailed(_))
+            | (Forward, MintFailed(_), Reimbursed)
+            | (Forward, MintFailed(_), ReimburseFailed(_))
+            | (Forward, ReimburseFailed(_), Reimbursed)
+            | (Forward, Minted, Complete) => {
+                self.status = new_status;
+                Ok(())
+            }
+
+            // ========================
+            // Reverse swap transitions
+            // ========================
+            (Reverse, Init, Burned)
+            | (Reverse, Init, BurnFailed(_))
+            | (Reverse, Burned, NftTransferred)
+            | (Reverse, Burned, NftTransferFailed(_))
+            | (Reverse, NftTransferFailed(_), Reimbursed)
+            | (Reverse, NftTransferFailed(_), ReimburseFailed(_))
+            | (Reverse, ReimburseFailed(_), Reimbursed)
+            | (Reverse, NftTransferred, Complete) => {
+                self.status = new_status;
+                Ok(())
+            }
+
+            // ========================
+            // Allow Complete/Reimbursed to stay the same
+            // ========================
+            (_, Complete, Complete) | (_, Reimbursed, Reimbursed) => Ok(()),
+
+            // ========================
+            // Catch-all for invalid transitions
+            // ========================
+            _ => Err(format!(
+                "Invalid transition for {:?} swap from {:?} to {:?}",
+                self.swap_type, self.status, new_status
+            )),
         }
     }
 }
 
-impl Storable for SwapInfo {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-    // fn into_bytes(self) -> std::vec::Vec<u8> {
-    //     Encode!(&self).unwrap()
-    // }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
-    }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_SWAP_INFO_BYTES_SIZE,
-        is_fixed_size: false,
-    };
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, CandidType, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SwapType {
     Forward,
     Reverse,
 }
 
-impl Storable for SwapType {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+impl std::fmt::Display for SwapType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            SwapType::Forward => "forward_swap",
+            SwapType::Reverse => "reverse_swap",
+        };
+        write!(f, "{}", s)
     }
-    // fn into_bytes(self) -> std::vec::Vec<u8> {
-    //     Encode!(&self).unwrap()
-    // }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(&bytes, Self).unwrap()
+}
+
+#[derive(
+    Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode,
+)]
+pub enum SwapStatus {
+    #[n(0)]
+    Init,
+    #[n(1)]
+    Minted,
+    #[n(2)]
+    MintFailed(#[n(0)] String),
+    #[n(3)]
+    Burned,
+    #[n(4)]
+    BurnFailed(#[n(0)] String),
+    #[n(5)]
+    NftTransferred,
+    #[n(6)]
+    NftTransferFailed(#[n(0)] String),
+    #[n(7)]
+    NftTransferredFrom,
+    #[n(8)]
+    NftTransferFromFailed(#[n(0)] String),
+    #[n(9)]
+    Complete,
+    #[n(10)]
+    Failed(#[n(0)] String),
+    #[n(11)]
+    Reimbursed,
+    #[n(12)]
+    ReimburseFailed(#[n(0)] String),
+}
+impl From<SwapStatus> for ICRC3Value {
+    fn from(val: SwapStatus) -> Self {
+        match val {
+            SwapStatus::Init => ICRC3Value::Text("Init".into()),
+            SwapStatus::Minted => ICRC3Value::Text("Minted".into()),
+            SwapStatus::MintFailed(s) => ICRC3Value::Text(format!("MintFailed:{}", s)),
+            SwapStatus::Burned => ICRC3Value::Text("Burned".into()),
+            SwapStatus::BurnFailed(s) => ICRC3Value::Text(format!("BurnFailed:{}", s)),
+            SwapStatus::NftTransferred => ICRC3Value::Text("NftTransferred".into()),
+            SwapStatus::NftTransferFailed(s) => {
+                ICRC3Value::Text(format!("NftTransferFailed:{}", s))
+            }
+            SwapStatus::NftTransferredFrom => ICRC3Value::Text("NftTransferredFrom".into()),
+            SwapStatus::NftTransferFromFailed(s) => {
+                ICRC3Value::Text(format!("NftTransferFromFailed:{}", s))
+            }
+            SwapStatus::Complete => ICRC3Value::Text("Complete".into()),
+            SwapStatus::Failed(s) => ICRC3Value::Text(format!("Failed:{}", s)),
+            SwapStatus::Reimbursed => ICRC3Value::Text("Reimbursed".into()),
+            SwapStatus::ReimburseFailed(s) => ICRC3Value::Text(format!("ReimburseFailed:{}", s)),
+        }
     }
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_SWAP_TYPE_BYTES_SIZE,
-        is_fixed_size: false,
-    };
+}
+
+impl TryFrom<&ICRC3Value> for SwapStatus {
+    type Error = String;
+
+    fn try_from(value: &ICRC3Value) -> Result<Self, Self::Error> {
+        match value {
+            ICRC3Value::Text(s) => {
+                match s.as_str() {
+                    "Init" => Ok(SwapStatus::Init),
+                    "Minted" => Ok(SwapStatus::Minted),
+                    "Burned" => Ok(SwapStatus::Burned),
+                    "NftTransferred" => Ok(SwapStatus::NftTransferred),
+                    "NftTransferredFrom" => Ok(SwapStatus::NftTransferredFrom),
+                    "Complete" => Ok(SwapStatus::Complete),
+                    "Reimbursed" => Ok(SwapStatus::Reimbursed),
+                    other => {
+                        // Handle variants with extra info like "MintFailed:<reason>"
+                        if let Some(stripped) = other.strip_prefix("MintFailed:") {
+                            Ok(SwapStatus::MintFailed(stripped.to_string()))
+                        } else if let Some(stripped) = other.strip_prefix("BurnFailed:") {
+                            Ok(SwapStatus::BurnFailed(stripped.to_string()))
+                        } else if let Some(stripped) = other.strip_prefix("NftTransferFailed:") {
+                            Ok(SwapStatus::NftTransferFailed(stripped.to_string()))
+                        } else if let Some(stripped) = other.strip_prefix("NftTransferFromFailed:")
+                        {
+                            Ok(SwapStatus::NftTransferFromFailed(stripped.to_string()))
+                        } else if let Some(stripped) = other.strip_prefix("Failed:") {
+                            Ok(SwapStatus::Failed(stripped.to_string()))
+                        } else if let Some(stripped) = other.strip_prefix("ReimburseFailed:") {
+                            Ok(SwapStatus::ReimburseFailed(stripped.to_string()))
+                        } else {
+                            Err(format!("Unknown SwapStatus string: {}", s))
+                        }
+                    }
+                }
+            }
+            _ => Err("ICRC3Value is not a Text variant".to_string()),
+        }
+    }
+}
+impl From<SwapInfo> for ICRC3Value {
+    fn from(val: SwapInfo) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert("index".to_string(), ICRC3Value::Nat(Nat::from(val.index.0)));
+        map.insert("status".to_string(), val.status.into());
+        map.insert(
+            "created_at".to_string(),
+            ICRC3Value::Nat(Nat::from(val.created_at)),
+        );
+        map.insert(
+            "swap_type".to_string(),
+            ICRC3Value::Text(match val.swap_type {
+                SwapType::Forward => "Forward".into(),
+                SwapType::Reverse => "Reverse".into(),
+            }),
+        );
+        map.insert(
+            "user_account".to_string(),
+            ICRC3Value::Text(val.user_account.owner.to_text()), // could later be expanded into a map if needed
+        );
+        map.insert("nft".to_string(), val.nft.into());
+        map.insert("tokens_amount".to_string(), val.tokens_amount.into());
+
+        ICRC3Value::Map(map)
+    }
 }
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum BlockFailReason {
-    InvalidOperation,
-    NotFound,
-    QueryRequestFailed,
-    ReceiverNotCorrectAccountId(Subaccount),
-    SenderNotPrincipalDefaultSubaccount(AccountIdentifier),
-    AmountTooSmall,
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum BurnFailReason {
-    TransferError(TransferError),
-    CallError(String),
-    TokenBalanceAndSwapRequestDontMatch,
+pub enum MintError {
+    TransferFailed(TransferFailReason),
+    UnexpectedError(ImpossibleErrorReason),
 }
 
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
@@ -216,290 +270,4 @@ pub enum ImpossibleErrorReason {
     PrincipalNotFound,
     AmountNotFound,
     NFTResponseInvalid,
-}
-
-// -----------------
-//     Forward swap
-// -----------------
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub struct SwapDetailForward {
-    pub sale_id: String,
-    pub index: Nat,
-    pub nft_id: NftID,
-    pub nft_id_string: String,
-    pub status: SwapStatusForward,
-    pub created_at: TimestampMillis,
-    pub tokens_to_mint: GldtNumTokens,
-    pub escrow_sub_account: Subaccount,
-    pub gldt_receiver: Account,
-    pub nft_canister: Principal,
-}
-
-impl Default for SwapDetailForward {
-    fn default() -> Self {
-        Self {
-            sale_id: Default::default(),
-            index: SwapIndex::default(),
-            nft_id: Default::default(),
-            nft_id_string: String::default(),
-            status: SwapStatusForward::Init,
-            created_at: Default::default(),
-            tokens_to_mint: Default::default(),
-            escrow_sub_account: Default::default(),
-            gldt_receiver: Account {
-                owner: Principal::anonymous(),
-                subaccount: None,
-            },
-            nft_canister: Principal::anonymous(),
-        }
-    }
-}
-
-impl SwapDetailForward {
-    pub fn update_escrow_account(&mut self, subaccount: Subaccount) {
-        self.escrow_sub_account = subaccount;
-    }
-
-    pub fn update_sale_id(&mut self, sale_id: String) {
-        self.sale_id = sale_id;
-    }
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapStatusForward {
-    Init,
-    NotificationInProgress,
-    NotificationFailed(NotificationError),
-    MintRequest,
-    MintInProgress,
-    MintFailed(MintError),
-    BidRequest,
-    BidInProgress,
-    BidFail(BidFailError),
-    BurnFeesRequest,
-    BurnFeesInProgress,
-    BurnFeesFailed(BurnFeesError),
-    DepositRecoveryRequest(Box<SwapStatusForward>),
-    DepositRecoveryInProgress(Box<SwapStatusForward>),
-    DepositRecoveryFailed(Box<SwapStatusForward>, DepositRecoveryError),
-    Complete,
-    Failed(SwapErrorForward),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum MintError {
-    TransferFailed(TransferFailReason),
-    UnexpectedError(ImpossibleErrorReason),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum BurnFeesError {
-    TransferFailed(TransferFailReason),
-    UnexpectedError(ImpossibleErrorReason),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum BidFailError {
-    TransferFailed(String),
-    CallError(String),
-    UnexpectedError(String),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum DepositRecoveryError {
-    CantRecover(String),
-    CallError(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapErrorForward {
-    NotificationFailed(NotificationError),
-    MintFailed(MintError),
-    BidFailed(BidFailError),
-    UnexpectedError(ImpossibleErrorReason),
-    DepositRecoveryFailed(DepositRecoveryError),
-    Expired(Box<SwapStatusForward>),
-}
-
-#[derive(Serialize, Deserialize, Debug, CandidType, Clone, PartialEq, Eq)]
-pub enum NotificationError {
-    OrigynStringIdDoesNotMatch(String),
-    CollectionDoesNotMatch(String),
-    SellerAndReceiverDoesNotMatch(String),
-    InvalidEscrowSubaccount(String),
-    InvalidTokenSpec,
-    InvalidTokenAmount,
-    InvalidSaleSubaccount,
-    SellerIsNotPrincipalOrAccount(String),
-    TooManyPrincipalsInAllowList,
-    AllowListDoesNotContainCorrectPrincipal,
-    InvalidCustomAskFeature,
-    InvalidPricingConfig,
-    TimeoutInvalid(String),
-    SaleIDStringTooLong(String),
-}
-// -----------------
-//     Reverse swap
-// -----------------
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub struct SwapDetailReverse {
-    pub index: Nat,
-    pub nft_id: NftID,
-    pub nft_id_string: String,
-    pub nft_canister: Principal,
-    pub status: SwapStatusReverse,
-    pub created_at: TimestampMillis,
-    pub tokens_to_receive: GldtNumTokens,
-    pub swap_fee: Nat,
-    pub transfer_fees: Nat,
-    pub user: Principal,
-}
-
-impl Default for SwapDetailReverse {
-    fn default() -> Self {
-        Self {
-            index: SwapIndex::default(),
-            nft_id: Default::default(),
-            nft_id_string: String::default(),
-            nft_canister: Principal::anonymous(),
-            status: SwapStatusReverse::Init,
-            created_at: Default::default(),
-            tokens_to_receive: GldtNumTokens::default(),
-            swap_fee: Nat::from(100_000_000u64),
-            user: Principal::anonymous(),
-            transfer_fees: Nat::from(GLDT_TX_FEE * 2),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapStatusReverse {
-    Init,
-    EscrowRequest,
-    EscrowRequestInProgress,
-    EscrowFailed(EscrowError),
-    NftTransferRequest,
-    NftTransferRequestInProgress,
-    NftTransferFailed(NftTransferError),
-    RefundRequest,
-    RefundRequestInProgress,
-    RefundFailed(RefundError),
-    BurnRequest,
-    BurnRequestInProgress,
-    BurnFailed(BurnError),
-    FeeTransferRequest,
-    FeeTransferRequestInProgress,
-    FeeTransferFailed(FeeTransferError),
-    Complete,
-    Failed(SwapErrorReverse),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapErrorReverse {
-    NftValidationFailed(Vec<NftValidationError>),
-    LockFailed(LockError),
-    EscrowFailed(EscrowError),
-    NftTransferFailed(NftTransferError),
-    BurnFailed(BurnError),
-    FeeTransferFailed(FeeTransferError),
-    Refunded(Box<SwapStatusReverse>),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum FeeTransferError {
-    TransferError(TransferErrorIcrc),
-    CallError(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum EscrowError {
-    ApproveError(ApproveError),
-    RequestFailed(String),
-    TransferFailed(TransferFailReason),
-    UnexpectedError(ImpossibleErrorReason),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum LockError {
-    NftAlreadyLocked(Vec<NftID>),
-    NftNotLocked,
-    UnexpectedError(),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum NftValidationError {
-    InvalidNftWeight,
-    WeightParseError,
-    CanisterInvalid,
-    InvalidGldtTokensFromWeight,
-    CantGetOrigynID(String),
-    NotOwnedBySwapCanister,
-    CantVerifySwapCanisterOwnsNft,
-    NftIdStringTooLong(String),
-    UserDoesNotHaveTheRequiredGLDT(String),
-    CantValidateUserBalanceOfGLDT(String),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum NftTransferError {
-    InvalidFee(String),
-    ApprovalError(ApproveError),
-    ApprovalCallError(String),
-    TransferFailed(String),
-    UnexpectedError(ImpossibleErrorReason),
-    FailedToGetOgyFeeAllowance(String),
-    CallError(String),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum BurnError {
-    CallError(String),
-}
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum RefundError {
-    TransferFailed(TransferErrorIcrc),
-    CallError(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
-pub enum SwapStatus {
-    Forward(SwapStatusForward),
-    Reverse(SwapStatusReverse),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ServiceStatus {
-    Up,
-    Down(ServiceDownReason),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ServiceDownReason {
-    Initializing,
-    ArchiveRelated(ArchiveDownReason),
-    ActiveSwapCapacityFull,
-    LowOrigynToken(String),
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ArchiveStatus {
-    Up,
-    Down(ArchiveDownReason),
-    Upgrading,
-    Initializing,
-}
-
-#[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ArchiveDownReason {
-    NewArchiveError(NewArchiveError), //
-    Upgrading,                        //
-    UpgradingArchivesFailed(String),  //
-    ActiveSwapCapacityFull,
-    NoArchiveCanisters(String), //
-    LowOrigynToken(String),
-}
-
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Ord, PartialOrd)]
-pub enum NewArchiveError {
-    FailedToSerializeInitArgs(String),
-    CreateCanisterError(String),
-    InstallCodeError(String),
-    CantFindControllers(String),
 }

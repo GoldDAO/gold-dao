@@ -1,0 +1,20 @@
+[package]
+name = "cbor"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bity-ic-canister-logger = { workspace = true }
+serde = { workspace = true }
+minicbor = { workspace = true }
+candid = { workspace = true }
+types = { path = "../types" }
+icrc-ledger-types = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
+
+[dev-dependencies]
+proptest = "1.5.0"
+assert_matches = { workspace = true }

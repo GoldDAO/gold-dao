@@ -237,7 +237,16 @@ version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0700ddab506f33b20a03b13996eccd309a48e5ff77d0d95926aa0210fb4e95f1"
 dependencies = [
- "bit-vec",
+ "bit-vec 0.6.3",
+]
+
+[[package]]
+name = "bit-set"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
+dependencies = [
+ "bit-vec 0.8.0",
 ]
 
 [[package]]
@@ -245,6 +254,12 @@ name = "bit-vec"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "349f9b6a179ed607305526ca489b34ad0a41aed5f7980fa90eb03160b69598fb"
+
+[[package]]
+name = "bit-vec"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
 
 [[package]]
 name = "bitflags"
@@ -322,6 +337,38 @@ dependencies = [
 
 [[package]]
 name = "bity-ic-icrc3"
+version = "0.4.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d2d9396f8017bf1995fdc1f40bf39b2417941cfdabc2055ee7d9ca542e174d8"
+dependencies = [
+ "anyhow",
+ "bity-ic-canister-time",
+ "bity-ic-icrc3-archive-api",
+ "bity-ic-icrc3-archive-c2c-client",
+ "bity-ic-subcanister-manager",
+ "bity-ic-types",
+ "bity-ic-utils",
+ "candid 0.10.17",
+ "canfund",
+ "futures",
+ "hex",
+ "ic-cdk 0.18.7",
+ "ic-certification",
+ "ic-ledger-types",
+ "ic-stable-structures",
+ "ic0 0.25.1",
+ "icrc-ledger-types",
+ "leb128",
+ "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "sha2 0.10.9",
+ "syn 2.0.106",
+ "tracing",
+]
+
+[[package]]
+name = "bity-ic-icrc3"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "80ade27a31cf3ad3c046936db719e12e92b63fd945fc58521b7b1c9124fd3243"
@@ -385,6 +432,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bity-ic-icrc3-c2c-client"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41a45f55237824b29fc4fb5b52e5b1a4f4d32fc6a02dc3ee2d1d0f73fc31e981"
+dependencies = [
+ "bity-ic-canister-client",
+ "bity-ic-icrc3 0.4.9",
+ "bity-ic-types",
+ "candid 0.10.17",
+ "ic-cdk 0.18.7",
+ "serde",
+]
+
+[[package]]
 name = "bity-ic-icrc3-macros"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -428,39 +489,6 @@ checksum = "f11395e2adca8925e1cc80c00701df5829b4c99bec6ad597785109562b3b21ed"
 dependencies = [
  "ic-cdk 0.18.7",
  "ic-stable-structures",
-]
-
-[[package]]
-name = "bity-ic-storage-canister-api"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32ee16b4f9a5f161cf841d05c0bbd589342d5d14c1177f7bb0132b28ac221776"
-dependencies = [
- "async-trait",
- "bity-ic-canister-logger",
- "bity-ic-canister-state-macros",
- "bity-ic-canister-time",
- "bity-ic-canister-tracing-macros",
- "bity-ic-serializer",
- "bity-ic-stable-memory",
- "bity-ic-types",
- "bity-ic-utils",
- "candid 0.10.17",
- "enum_dispatch",
- "futures",
- "hex",
- "ic-cdk 0.18.7",
- "ic-cdk-macros 0.18.7",
- "ic-cdk-timers",
- "ic-http-certification",
- "ic-ledger-types",
- "ic-stable-structures",
- "icrc-ledger-types",
- "serde",
- "serde_bytes",
- "serde_json",
- "sha2 0.10.9",
- "tracing",
 ]
 
 [[package]]
@@ -732,6 +760,22 @@ dependencies = [
  "serde",
  "serde_bytes",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "cbor"
+version = "0.1.0"
+dependencies = [
+ "assert_matches",
+ "bity-ic-canister-logger",
+ "candid 0.10.17",
+ "icrc-ledger-types",
+ "minicbor 1.1.0",
+ "num-bigint",
+ "num-traits",
+ "proptest",
+ "serde",
+ "types",
 ]
 
 [[package]]
@@ -1326,7 +1370,7 @@ dependencies = [
  "bity-ic-canister-state-macros",
  "bity-ic-canister-time",
  "bity-ic-canister-tracing-macros",
- "bity-ic-icrc3",
+ "bity-ic-icrc3 0.5.0",
  "bity-ic-icrc3-macros",
  "bity-ic-ledger-utils",
  "bity-ic-serializer",
@@ -1365,7 +1409,7 @@ dependencies = [
 name = "gldt_stake_api_canister"
 version = "0.1.0"
 dependencies = [
- "bity-ic-icrc3",
+ "bity-ic-icrc3 0.5.0",
  "bity-ic-types",
  "candid 0.10.17",
  "gldt_stake_common",
@@ -1383,7 +1427,7 @@ version = "0.1.0"
 dependencies = [
  "assert_matches",
  "bity-ic-canister-time",
- "bity-ic-icrc3",
+ "bity-ic-icrc3 0.5.0",
  "bity-ic-icrc3-macros",
  "candid 0.10.17",
  "hex",
@@ -1400,13 +1444,55 @@ dependencies = [
 ]
 
 [[package]]
+name = "gldt_swap"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bity-ic-canister-logger",
+ "bity-ic-canister-state-macros",
+ "bity-ic-canister-time",
+ "bity-ic-canister-tracing-macros",
+ "bity-ic-icrc3 0.5.0",
+ "bity-ic-icrc3-macros",
+ "bity-ic-serializer",
+ "bity-ic-stable-memory",
+ "bity-ic-types",
+ "candid 0.10.17",
+ "futures",
+ "gldt_swap_api_archive",
+ "gldt_swap_api_canister",
+ "gldt_swap_archive_c2c_client",
+ "gldt_swap_common",
+ "http_request",
+ "ic-cdk 0.18.7",
+ "ic-cdk-macros 0.18.7",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "icrc_ledger_canister",
+ "icrc_ledger_canister_c2c_client",
+ "lazy_static",
+ "origyn_nft_canister",
+ "origyn_nft_canister_c2c_client",
+ "serde",
+ "serde_json",
+ "strum 0.27.2",
+ "strum_macros 0.27.2",
+ "tracing",
+ "types",
+ "utils",
+]
+
+[[package]]
 name = "gldt_swap_api_archive"
 version = "0.1.0"
 dependencies = [
+ "bity-ic-canister-time",
  "bity-ic-types",
  "candid 0.10.17",
- "gldt_swap_common",
+ "ic-ledger-types",
+ "icrc-ledger-types",
  "serde",
+ "thiserror 2.0.16",
  "types",
 ]
 
@@ -1414,14 +1500,23 @@ dependencies = [
 name = "gldt_swap_api_canister"
 version = "0.1.0"
 dependencies = [
+ "bity-ic-icrc3 0.5.0",
  "bity-ic-types",
  "candid 0.10.17",
+ "gldt_swap_api_archive",
  "gldt_swap_common",
  "icrc-ledger-types",
- "origyn_nft_reference",
  "serde",
  "types",
  "utils",
+]
+
+[[package]]
+name = "gldt_swap_archive_c2c_client"
+version = "0.1.0"
+dependencies = [
+ "bity-ic-canister-client",
+ "gldt_swap_api_archive",
 ]
 
 [[package]]
@@ -1430,14 +1525,72 @@ version = "0.1.0"
 dependencies = [
  "bity-ic-canister-time",
  "candid 0.10.17",
+ "cbor",
+ "icrc-ledger-types",
+ "minicbor 1.1.0",
+ "origyn_nft_canister_c2c_client",
+ "serde",
+ "types",
+]
+
+[[package]]
+name = "gldt_swap_index"
+version = "0.1.0"
+dependencies = [
+ "bity-ic-canister-logger",
+ "bity-ic-canister-state-macros",
+ "bity-ic-canister-time",
+ "bity-ic-canister-tracing-macros",
+ "bity-ic-icrc3-archive-c2c-client",
+ "bity-ic-icrc3-c2c-client",
+ "bity-ic-serializer",
+ "bity-ic-stable-memory",
+ "bity-ic-types",
+ "bity-ic-utils",
+ "candid 0.10.17",
+ "futures",
+ "gldt_swap_common",
+ "gldt_swap_index_api_canister",
+ "hex",
+ "http_request",
+ "ic-cdk 0.18.7",
+ "ic-cdk-macros 0.18.7",
+ "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "ic0 0.23.0",
+ "ic0 1.0.0",
  "icrc-ledger-types",
- "origyn_nft_reference",
+ "lazy_static",
+ "minicbor 1.1.0",
+ "num-bigint",
+ "rmp-serde",
  "serde",
+ "serde_bytes",
+ "serde_json",
+ "sha2 0.10.9",
+ "time",
  "tracing",
+ "tracing-attributes",
+ "tracing-subscriber",
  "types",
+]
+
+[[package]]
+name = "gldt_swap_index_api_canister"
+version = "0.1.0"
+dependencies = [
+ "bity-ic-icrc3 0.5.0",
+ "bity-ic-types",
+ "candid 0.10.17",
+ "cbor",
+ "gldt_swap_common",
+ "ic-stable-structures",
+ "icrc-ledger-types",
+ "minicbor 1.1.0",
+ "serde",
+ "serde_bytes",
+ "types",
+ "utils",
 ]
 
 [[package]]
@@ -1752,7 +1905,7 @@ dependencies = [
  "ic-cdk-macros 0.18.7",
  "ic-error-types",
  "ic-management-canister-types",
- "ic0 1.0.1",
+ "ic0 1.0.0",
  "serde",
  "serde_bytes",
  "slotmap",
@@ -1765,7 +1918,7 @@ version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99f4ee8930fd2e491177e2eb7fff53ee1c407c13b9582bdc7d6920cf83109a2d"
 dependencies = [
- "ic0 1.0.1",
+ "ic0 1.0.0",
  "slotmap",
 ]
 
@@ -1805,7 +1958,7 @@ dependencies = [
  "candid 0.10.17",
  "futures",
  "ic-cdk 0.18.7",
- "ic0 1.0.1",
+ "ic0 1.0.0",
  "serde",
  "serde_bytes",
  "slotmap",
@@ -2005,9 +2158,9 @@ dependencies = [
 
 [[package]]
 name = "ic-transport-types"
-version = "0.44.2"
+version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "827e8e1da3e75382137f552b088c124618e770974e670fc4f40add86858a4743"
+checksum = "5527e1eed0407cf4aa8ced1bc22181c2ae09f8385a00d270f146310b9379c6ad"
 dependencies = [
  "candid 0.10.17",
  "hex",
@@ -2077,9 +2230,9 @@ checksum = "39a4ced1c92f952a12e554742ffa7d21752a02450930c3b76bea78a2f1b7ab16"
 
 [[package]]
 name = "ic0"
-version = "1.0.1"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1499d08fd5be8f790d477e1865d63bab6a8d748300e141270c4296e6d5fdd6bc"
+checksum = "8877193e1921b5fd16accb0305eb46016868cd1935b05c05eca0ec007b943272"
 
 [[package]]
 name = "ic_bls12_381"
@@ -2147,7 +2300,7 @@ dependencies = [
  "ic-cdk-timers",
  "ic-ledger-types",
  "ic-stable-structures",
- "ic-transport-types 0.44.2",
+ "ic-transport-types 0.41.0",
  "icp_ledger_canister",
  "icp_ledger_canister_c2c_client",
  "icp_neuron_api_canister",
@@ -2448,8 +2601,7 @@ version = "0.1.0"
 dependencies = [
  "assert_matches",
  "bity-ic-canister-time",
- "bity-ic-icrc3",
- "bity-ic-storage-canister-api",
+ "bity-ic-icrc3 0.5.0",
  "bity-ic-types",
  "buyback_burn_api",
  "bytes",
@@ -2459,6 +2611,7 @@ dependencies = [
  "gldt_swap_api_archive",
  "gldt_swap_api_canister",
  "gldt_swap_common",
+ "gldt_swap_index_api_canister",
  "hex",
  "http",
  "http-body-util",
@@ -2468,7 +2621,7 @@ dependencies = [
  "icrc-ledger-types",
  "icrc_ledger_canister",
  "lazy_static",
- "origyn_nft_reference",
+ "origyn_nft_canister",
  "pocket-ic",
  "rand 0.9.2",
  "serde",
@@ -2582,7 +2735,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0a1cbf952127589f2851ab2046af368fd20645491bb4b376f04b7f94d7a9837b"
 dependencies = [
  "ascii-canvas",
- "bit-set",
+ "bit-set 0.5.3",
  "diff",
  "ena",
  "is-terminal",
@@ -2980,23 +3133,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
 
 [[package]]
-name = "origyn_nft_reference"
+name = "origyn_nft_canister"
 version = "0.1.0"
 dependencies = [
+ "bity-ic-canister-time",
+ "bity-ic-icrc3 0.5.0",
+ "bity-ic-types",
  "candid 0.10.17",
- "ic-cdk 0.18.7",
+ "hex",
+ "ic-stable-structures",
+ "icrc-ledger-types",
  "serde",
  "serde_bytes",
+ "types",
 ]
 
 [[package]]
-name = "origyn_nft_reference_c2c_client"
+name = "origyn_nft_canister_c2c_client"
 version = "0.1.0"
 dependencies = [
  "bity-ic-canister-client",
  "candid 0.10.17",
- "icrc-ledger-types",
- "origyn_nft_reference",
+ "ic-cdk 0.18.7",
+ "origyn_nft_canister",
+ "types",
 ]
 
 [[package]]
@@ -3240,6 +3400,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "proptest"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fcdab19deb5195a31cf7726a210015ff1496ba1464fd42cb4f537b8b01b471f"
+dependencies = [
+ "bit-set 0.8.0",
+ "bit-vec 0.8.0",
+ "bitflags",
+ "lazy_static",
+ "num-traits",
+ "rand 0.9.2",
+ "rand_chacha 0.9.0",
+ "rand_xorshift",
+ "regex-syntax 0.8.6",
+ "rusty-fork",
+ "tempfile",
+ "unarray",
+]
+
+[[package]]
 name = "psm"
 version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3247,6 +3427,12 @@ checksum = "6e944464ec8536cd1beb0bbfd96987eb5e3b72f2ecdafdc5c769a37f1fa2ae1f"
 dependencies = [
  "cc",
 ]
+
+[[package]]
+name = "quick-error"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quinn"
@@ -3375,6 +3561,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99d9a13982dcf210057a8a78572b2217b667c3beacbf3a0d8b454f6f82837d38"
 dependencies = [
  "getrandom 0.3.3",
+]
+
+[[package]]
+name = "rand_xorshift"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "513962919efc330f829edb2535844d1b912b0fbe2ca165d613e4e8788bb05a5a"
+dependencies = [
+ "rand_core 0.9.3",
 ]
 
 [[package]]
@@ -3635,6 +3830,18 @@ name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
+
+[[package]]
+name = "rusty-fork"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb3dcc6e454c328bb824492db107ab7c0ae8fcffe4ad210136ef014458c1bc4f"
+dependencies = [
+ "fnv",
+ "quick-error",
+ "tempfile",
+ "wait-timeout",
+]
 
 [[package]]
 name = "ryu"
@@ -4096,7 +4303,7 @@ dependencies = [
  "ic-cdk-macros 0.18.7",
  "ic-cdk-timers",
  "ic-stable-structures",
- "ic0 1.0.1",
+ "ic0 1.0.0",
  "icrc-ledger-types",
  "icrc_ledger_canister_c2c_client",
  "serde",
@@ -4802,6 +5009,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "unarray"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eaea85b334db583fe3274d12b4cd1880032beab409c0d774be044d4480ab9a94"
+
+[[package]]
 name = "unicase"
 version = "2.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4886,6 +5099,15 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "wait-timeout"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09ac3b126d3914f9849036f826e054cbabdc8519970b8998ddaf3b5bd3c65f11"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "want"

@@ -1,0 +1,50 @@
+type ArchiveConfig = record {
+  max_blocks_per_response : nat64;
+  block_offset : nat64;
+  max_memory_size_bytes : nat;
+};
+type ArchivedBlocks = record {
+  args : vec GetBlocksRequest;
+  callback : func (vec GetBlocksRequest) -> (GetBlocksResult) query;
+};
+type Args = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type BlockType = variant { ICRC1; Default };
+type BlockWithId = record { id : nat; block : ICRC3Value };
+type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
+type EncodedBlock = record { block : blob };
+type GetBlocksRequest = record { start : nat; length : nat };
+type GetBlocksResult = record {
+  log_length : nat;
+  blocks : vec BlockWithId;
+  archived_blocks : vec ArchivedBlocks;
+};
+type ICRC3Value = variant {
+  Int : int;
+  Map : vec record { text; ICRC3Value };
+  Nat : nat;
+  Blob : blob;
+  Text : text;
+  Array : vec ICRC3Value;
+};
+type InitArgs = record {
+  master_canister_id : principal;
+  test_mode : bool;
+  block_type : BlockType;
+  archive_config : ArchiveConfig;
+  authorized_principals : vec principal;
+  version : BuildVersion;
+  commit_hash : text;
+};
+type Response = variant { Error : text; Success };
+type UpgradeArgs = record {
+  block_type : BlockType;
+  version : BuildVersion;
+  commit_hash : text;
+};
+service : (Args) -> {
+  get_version : (null) -> (BuildVersion) query;
+  icrc3_get_blocks : (vec GetBlocksRequest) -> (GetBlocksResult) query;
+  insert_blocks : (vec EncodedBlock) -> (Response);
+  remaining_capacity : (null) -> (nat) query;
+  total_transactions : (null) -> (nat64) query;
+}
