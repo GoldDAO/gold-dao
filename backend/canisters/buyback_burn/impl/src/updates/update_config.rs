@@ -2,7 +2,7 @@ use crate::guards::caller_is_governance_principal;
 use crate::state::{mutate_state, RuntimeState};
 pub use buyback_burn_api::update_config::Args as UpdateConfigArgs;
 pub use buyback_burn_api::update_config::Response as UpdateConfigResponse;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk_macros::{query, update};
 use std::time::Duration;
 use utils::numeric::Percentage;

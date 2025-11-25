@@ -1,6 +1,6 @@
 use crate::state::{mutate_state, read_state};
+use bity_ic_canister_time::run_now_then_interval;
 use candid::Nat;
-use canister_time::run_now_then_interval;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::account::Account;
 use std::time::Duration;
@@ -17,7 +17,7 @@ pub fn _start_job_if_not_started() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(sync_supply_data())
+    ic_cdk::futures::spawn(sync_supply_data())
 }
 
 pub async fn sync_supply_data() {

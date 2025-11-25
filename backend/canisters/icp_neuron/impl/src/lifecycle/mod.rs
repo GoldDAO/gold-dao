@@ -20,7 +20,7 @@ pub fn init_canister(runtime_state: RuntimeState) {
 }
 
 fn init_public_key() {
-    ic_cdk::spawn(init_public_key_inner());
+    ic_cdk::futures::spawn(init_public_key_inner());
 
     async fn init_public_key_inner() {
         let key_id = get_key_id(false);

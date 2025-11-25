@@ -5,7 +5,7 @@ use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 use candid::{Nat, Principal};
-use canister_time::MINUTE_IN_MS;
+use bity_ic_canister_time::MINUTE_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use origyn_nft_reference::origyn_nft_reference_canister::Account as OrigynAccount;
 use origyn_nft_reference::origyn_nft_reference_canister::{

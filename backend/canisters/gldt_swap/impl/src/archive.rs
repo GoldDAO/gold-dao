@@ -61,7 +61,7 @@ pub async fn create_archive_canister() -> Result<Principal, NewArchiveError> {
     let this_canister_id = read_state(|s| s.env.canister_id());
     let test_mode = read_state(|s| s.env.is_test_mode());
     let mut controllers = get_canister_controllers(this_canister_id).await?;
-    controllers.push(ic_cdk::api::id());
+    controllers.push(ic_cdk::api::canister_self());
 
     let initial_cycles = if test_mode {
         2_000_000_000_000u64 // 2 Trillion cycles

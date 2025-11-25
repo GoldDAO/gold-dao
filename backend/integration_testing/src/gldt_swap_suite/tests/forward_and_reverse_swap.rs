@@ -68,7 +68,7 @@ fn init_nft_with_premint_nft(
 
 #[cfg(test)]
 mod tests {
-    use canister_time::{timestamp_nanos, HOUR_IN_MS, SECOND_IN_MS};
+    use bity_ic_canister_time::{timestamp_nanos, HOUR_IN_MS, SECOND_IN_MS};
     use gldt_swap_common::{
         gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE},
         swap::{SwapStatusReverse, MANAGE_GLDT_SUPPLY_INTERVAL},

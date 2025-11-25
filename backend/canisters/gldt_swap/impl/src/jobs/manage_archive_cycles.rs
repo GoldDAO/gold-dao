@@ -1,6 +1,6 @@
 use crate::state::{mutate_state, read_state};
+use bity_ic_canister_time::run_now_then_interval;
 use candid::Nat;
-use canister_time::run_now_then_interval;
 use futures::future::join_all;
 use gldt_swap_common::swap::MANAGE_ARCHIVE_CYCLE_INTERVAL;
 use std::time::Duration;
@@ -19,7 +19,7 @@ pub fn start_job() {
 }
 
 pub fn spawn_transfer_job() {
-    ic_cdk::spawn(handle_archive_canister_cycles())
+    ic_cdk::futures::spawn(handle_archive_canister_cycles())
 }
 
 async fn handle_archive_canister_cycles() {

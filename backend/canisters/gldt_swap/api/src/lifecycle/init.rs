@@ -2,7 +2,7 @@ use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
 
 use gldt_swap_common::nft::NftCanisterConf;
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 
 #[derive(Deserialize, Serialize, CandidType, Debug)]
 pub struct InitArgs {

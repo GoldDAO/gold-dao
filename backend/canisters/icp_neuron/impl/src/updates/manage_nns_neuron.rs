@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::{ecdsa::make_canister_call_via_ecdsa, state::read_state};
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk::{query, update};
 pub use icp_neuron_api_canister::manage_nns_neuron::{
     ManageNnsNeuronRequest, ManageNnsNeuronResponse,

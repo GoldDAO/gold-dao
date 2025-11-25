@@ -142,10 +142,10 @@ pub async fn fetch_neuron_data_by_id(neuron_id: &NeuronId) -> FetchNeuronDataByI
         },
         Err(e) => {
             debug!(
-                "Error fetching neuron with id : {:?}, error code : {:?}, message : {:?}",
-                neuron_id, e.0, e.1
+                "Error fetching neuron with id : {:?}, message : {:?}",
+                neuron_id, e,
             );
-            FetchNeuronDataByIdResponse::InternalError(e.1)
+            FetchNeuronDataByIdResponse::InternalError(e.to_string())
         }
     }
 }

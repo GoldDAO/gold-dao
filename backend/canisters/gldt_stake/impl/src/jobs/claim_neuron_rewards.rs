@@ -1,6 +1,6 @@
 use crate::state::read_state;
+use bity_ic_canister_time::{run_now_then_interval, timestamp_millis, HOUR_IN_MS};
 use candid::{Nat, Principal};
-use canister_time::{run_now_then_interval, timestamp_millis, HOUR_IN_MS};
 use futures::future::join_all;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::Account;

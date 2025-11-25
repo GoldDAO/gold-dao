@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::mutate_state;
 use crate::state::RuntimeState;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::set_apy_limit::{
     Args as SetAPYLimitArgs, Response as SetAPYLimitResponse,
 };

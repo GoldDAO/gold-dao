@@ -1,4 +1,4 @@
-use canister_time::timestamp_nanos;
+use bity_ic_canister_time::timestamp_nanos;
 
 pub fn get_current_day() -> u64 {
     timestamp_nanos() / 86400 / 1_000_000_000

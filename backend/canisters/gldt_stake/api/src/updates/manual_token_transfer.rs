@@ -1,5 +1,4 @@
 use candid::CandidType;
-use ic_cdk::api::call::RejectionCode;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
 use serde::{Deserialize, Serialize};
 use types::CanisterId;
@@ -10,4 +9,4 @@ pub struct Args {
     pub transfer_args: TransferArg,
 }
 
-pub type Response = Result<Result<BlockIndex, TransferError>, (RejectionCode, String)>;
+pub type Response = Result<Result<BlockIndex, TransferError>, String>;

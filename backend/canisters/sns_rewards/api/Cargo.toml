@@ -9,7 +9,7 @@ inttest = []
 
 [dependencies]
 candid = { workspace = true }
-canister_time = { path = '../../../libraries/canister_time' }
+bity-ic-canister-time = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
@@ -17,3 +17,4 @@ sns_governance_canister = { path = '../../../external_canisters/sns_governance/a
 types = { path = '../../../libraries/types' }
 num-bigint = {workspace = true}
 utils = { path = '../../../libraries/utils' }
+bity-ic-types = { workspace = true }

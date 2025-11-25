@@ -6,7 +6,7 @@ use crate::{
     utils::tick_n_blocks,
 };
 use candid::{Nat, Principal};
-use canister_time::DAY_IN_MS;
+use bity_ic_canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use sns_rewards_api_canister::set_daily_goldao_burn_rate::Response as SetDailyGOLDAOBurnRateResponse;
 use sns_rewards_api_canister::set_daily_goldao_burn_rate_validate::Response as SetDailyGOLDAOBurnRateValidateResponse;

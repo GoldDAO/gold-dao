@@ -16,3 +16,4 @@ serde = { workspace = true, features = ["derive"] }
 super_stats_v3_api = { path = "../../../canisters/super_stats_v3/api" }
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
+bity-ic-types = { workspace = true }

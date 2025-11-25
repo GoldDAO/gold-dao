@@ -119,16 +119,16 @@ async fn fetch_balance_of_neuron_id(
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
         &(Account {
-            owner: ic_cdk::api::id(),
+            owner: ic_cdk::api::canister_self(),
             subaccount: Some(neuron_id.into()),
         }),
     )
     .await
     {
         Ok(t) => Ok(t),
-        Err((rejection_code, message)) => {
-            error!("Fail - to neuron rewards: {:?}", message);
-            Err(format!("{rejection_code:?} : {message}"))
+        Err(error) => {
+            error!("Fail - to neuron rewards: {:?}", error);
+            Err(format!("{error}"))
         }
     }
 }

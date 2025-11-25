@@ -1,5 +1,5 @@
+use bity_ic_canister_time::timestamp_millis;
 use candid::{Nat, Principal};
-use canister_time::timestamp_millis;
 use gldt_swap_common::{
     gldt::{GldtNumTokens, GLDT_PRICE_RATIO, GLDT_SUBDIVIDABLE_BY},
     nft::{NftCanisterConf, NftID, NftWeight},
@@ -88,8 +88,8 @@ impl SwapBuilder<SwapDetailForward> {
             Ok(id) => {
                 return Ok(id);
             }
-            Err((rejection_code, msg)) => {
-                let msg = format!("{rejection_code:?}. {msg}");
+            Err(msg) => {
+                let msg = format!("{msg}");
                 return Err(NftInvalidError::CantGetOrigynID(format!(
                     "Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}"
                 )));
@@ -130,9 +130,9 @@ impl SwapBuilder<SwapDetailForward> {
                     )));
                 }
             },
-            Err((rejection_code, msg)) => {
+            Err(msg) => {
                 return Err(NftInvalidError::InvalidNftOwner(format!(
-                    "can't verify NFT ownership. call failed. {rejection_code:?} - msg = {msg}"
+                    "can't verify NFT ownership. call failed. msg = {msg}"
                 )));
             }
         };
@@ -271,8 +271,8 @@ impl SwapBuilder<SwapDetailReverse> {
             Ok(id) => {
                 return Ok(id);
             }
-            Err((rejection_code, msg)) => {
-                let msg = format!("{rejection_code:?}. {msg}");
+            Err(msg) => {
+                let msg = format!("{msg}");
                 return Err(NftValidationError::CantGetOrigynID(format!(
                     "Can't get origyn ID for NFT nat : {nft_id:?}. error = {msg}"
                 )));

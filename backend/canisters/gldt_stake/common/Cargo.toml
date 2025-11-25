@@ -10,7 +10,7 @@ inttest = []
 
 [dependencies]
 candid = { workspace = true }
-canister_time = { path = '../../../libraries/canister_time' }
+bity-ic-canister-time = { workspace = true }
 icrc-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 types = { path = '../../../libraries/types' }
@@ -18,9 +18,9 @@ utils = { path = '../../../libraries/utils' }
 ic0 = "0.23.0"
 time = {workspace = true}
 ic-cdk = { workspace = true }
-hex = { workspace = true }
 minicbor = { workspace = true }
 ic-stable-structures = { workspace = true }
+hex = { workspace = true }
 
 [dev-dependencies]
 assert_matches = { workspace = true }

@@ -137,9 +137,8 @@ mod tests {
     use std::collections::BTreeMap;
 
     use candid::{Nat, Principal};
-    use sns_governance_canister::types::NeuronId;
     use sns_rewards_api_canister::payment_round::PaymentRound;
-    use types::{TimestampMillis, TokenSymbol};
+    use types::TokenSymbol;
 
     use crate::state::{init_state, mutate_state, read_state, RuntimeState};
 

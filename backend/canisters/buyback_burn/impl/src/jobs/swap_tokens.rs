@@ -1,8 +1,8 @@
 use crate::state::{mutate_state, read_state};
 use crate::types::{SwapClient, SwapClientEnum, TokenSwap};
 use crate::utils::{get_token_balance, retry_with_attempts, RETRY_DELAY};
-use canister_time::{run_now_then_interval, NANOS_PER_MILLISECOND, WEEK_IN_MS};
-use canister_tracing_macros::trace;
+use bity_ic_canister_time::{run_now_then_interval, NANOS_PER_MILLISECOND, WEEK_IN_MS};
+use bity_ic_canister_tracing_macros::trace;
 use futures::future::join_all;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{debug, error, info};
@@ -20,11 +20,11 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async_with_rand_delay());
+    ic_cdk::futures::spawn(run_async_with_rand_delay());
 }
 
 pub fn run_now() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 #[trace]
@@ -33,7 +33,7 @@ async fn run_async_with_rand_delay() {
 
     match generate_random_delay(buyback_interval).await {
         Ok(random_delay) => {
-            ic_cdk_timers::set_timer(random_delay, || ic_cdk::spawn(run_async()));
+            ic_cdk_timers::set_timer(random_delay, || ic_cdk::futures::spawn(run_async()));
         }
         Err(e) => {
             error!("Failed to generate random delay: {}", e);

@@ -5,7 +5,6 @@ use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 use candid::{Nat, Principal};
-use canister_time::NANOS_PER_MILLISECOND;
 use gldt_swap_common::gldt::GLDT_TX_FEE;
 use gldt_swap_common::swap::NotificationError;
 use gldt_swap_common::swap::MANAGE_GLDT_SUPPLY_INTERVAL;
@@ -66,7 +65,7 @@ fn init_nft_with_premint_nft(
 mod tests {
     use std::time::UNIX_EPOCH;
 
-    use canister_time::{HOUR_IN_MS, MINUTE_IN_MS, NANOS_PER_MILLISECOND};
+    use bity_ic_canister_time::{HOUR_IN_MS, MINUTE_IN_MS, NANOS_PER_MILLISECOND};
 
     use super::*;
     #[test]

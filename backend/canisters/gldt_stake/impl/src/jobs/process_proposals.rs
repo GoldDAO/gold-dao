@@ -1,5 +1,5 @@
 use crate::model::proposal_system::process_proposals;
-use canister_time::{run_now_then_interval, HOUR_IN_MS};
+use bity_ic_canister_time::{run_now_then_interval, HOUR_IN_MS};
 use std::time::Duration;
 
 pub fn start_job() {

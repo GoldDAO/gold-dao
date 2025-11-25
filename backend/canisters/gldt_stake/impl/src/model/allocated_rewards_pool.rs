@@ -1,7 +1,7 @@
 use candid::CandidType;
 use candid::Nat;
 use candid::Principal;
-use canister_time::timestamp_millis;
+use bity_ic_canister_time::timestamp_millis;
 use gldt_stake_common::accounts::ALLOCATED_REWARDS_POOL;
 use icrc_ledger_canister_c2c_client::icrc1_balance_of;
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};

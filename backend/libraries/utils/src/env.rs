@@ -1,7 +1,7 @@
+use bity_ic_canister_time::now_nanos;
+use bity_ic_types::BuildVersion;
 use candid::Principal;
-use canister_time::now_nanos;
 use serde::{Deserialize, Serialize};
-use types::BuildVersion;
 use types::{CanisterId, Cycles, TimestampMillis, TimestampNanos};
 
 #[derive(Default, Serialize, Deserialize, Clone)]

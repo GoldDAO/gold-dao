@@ -1,6 +1,6 @@
 use crate::state::mutate_state;
 use crate::types::gold_price_types::YumiApiResponse;
-use canister_time::{run_now_then_interval, DAY_IN_MS};
+use bity_ic_canister_time::{run_now_then_interval, DAY_IN_MS};
 use ic_cdk::api::management_canister::http_request::{
     http_request, CanisterHttpRequestArgument, HttpMethod, TransformContext,
 };
@@ -17,7 +17,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 fn timestamp_to_date_string(nanoseconds: u64) -> (String, String) {

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bity_ic_canister_time::DAY_IN_MS;
 use candid::Nat;
-use canister_time::timestamp_millis;
+use bity_ic_canister_time::timestamp_millis;
 pub use gldt_stake_api_canister::get_apy_overall::{
     Args as GetApyArgs, Response as GetApyResponse,
 };

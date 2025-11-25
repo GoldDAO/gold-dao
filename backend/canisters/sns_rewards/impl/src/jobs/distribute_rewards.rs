@@ -20,8 +20,8 @@ use crate::{
     state::{mutate_state, read_state},
     utils::transfer_token,
 };
+use bity_ic_canister_time::{start_job_weekly_at, timestamp_millis};
 use candid::{Nat, Principal};
-use canister_time::{start_job_weekly_at, timestamp_millis};
 use futures::{
     future::{err, join_all},
     Future, FutureExt,
@@ -43,7 +43,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 async fn run_async() {
@@ -67,7 +67,7 @@ pub fn run_distribution(initial_run_time: TimestampMillis) {
         s.data.reward_distribution_in_progress = Some(true);
     });
 
-    ic_cdk::spawn(distribute_rewards(0).then(move |_| {
+    ic_cdk::futures::spawn(distribute_rewards(0).then(move |_| {
         mutate_state(|s| {
             s.data.reward_distribution_in_progress = Some(false);
         });
@@ -112,7 +112,7 @@ pub async fn distribute_rewards(retry_attempt: u8) {
     let processed_payment_rounds =
         read_state(|state| state.data.payment_processor.get_active_rounds());
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
-        ic_cdk::spawn(distribute_rewards(retry_attempt + 1));
+        ic_cdk::futures::spawn(distribute_rewards(retry_attempt + 1));
     } else {
         finalize_distribution(processed_payment_rounds);
     }
@@ -255,7 +255,7 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
 
     let from_sub_account = REWARD_POOL_SUB_ACCOUNT;
     let account = Account {
-        owner: ic_cdk::api::id(),
+        owner: ic_cdk::api::canister_self(),
         subaccount: Some(round_pool_subaccount),
     };
 
@@ -290,7 +290,7 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
         &(Account {
-            owner: ic_cdk::api::id(),
+            owner: ic_cdk::api::canister_self(),
             subaccount: Some(REWARD_POOL_SUB_ACCOUNT),
         }),
     )
@@ -300,7 +300,7 @@ async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
         Err(e) => {
             error!(
                 "Fail - to fetch token balance of ledger canister id {ledger_canister_id} with ERROR_CODE : {} . MESSAGE",
-                e.1
+                e
             );
             Nat::from(0u64)
         }
@@ -368,7 +368,7 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
             .map(|(neuron_id, (reward, _, _))| {
                 let n_id = *neuron_id;
                 let account = Account {
-                    owner: ic_cdk::api::id(),
+                    owner: ic_cdk::api::canister_self(),
                     subaccount: Some(n_id.into()),
                 };
                 mutate_state(|state| {
@@ -430,8 +430,8 @@ fn always_fail_future() -> impl Future<Output = Result<(), String>> {
 mod tests {
     use std::collections::{BTreeMap, HashMap};
 
+    use bity_ic_canister_time::timestamp_millis;
     use candid::{Nat, Principal};
-    use canister_time::timestamp_millis;
     use sns_governance_canister::types::NeuronId;
     use sns_rewards_api_canister::payment_round::{PaymentRound, PaymentStatus};
     use types::{NeuronInfo, TokenSymbol};

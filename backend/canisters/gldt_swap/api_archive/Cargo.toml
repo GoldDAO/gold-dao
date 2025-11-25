@@ -13,3 +13,4 @@ candid = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 types = { path = '../../../libraries/types' }
 gldt_swap_common = { path = "../common", features = []}
+bity-ic-types = { workspace = true }

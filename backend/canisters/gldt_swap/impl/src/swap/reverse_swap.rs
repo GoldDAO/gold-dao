@@ -100,8 +100,8 @@ pub async fn transfer_to_escrow(swap_id: &SwapId) {
                     );
             }
         },
-        Err((rejection_code, msg)) => {
-            let error_message = format!("ERROR : {rejection_code:?}. message : {msg}");
+        Err(msg) => {
+            let error_message = format!("ERROR : message : {msg}");
             swap.update_status(SwapStatus::Reverse(SwapStatusReverse::Failed(
                 SwapErrorReverse::EscrowFailed(EscrowError::TransferFailed(
                     TransferFailReason::CallError(error_message.clone()),

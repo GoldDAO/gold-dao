@@ -1,12 +1,12 @@
 use crate::buyback_burn_suite::setup::setup_buyback_burn::setup_buyback_burn_canister;
 use crate::utils::random_principal;
+use bity_ic_types::BuildVersion;
 use buyback_burn_api::Args;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
 use ic_ledger_types::Tokens;
 use pocket_ic::{PocketIc, PocketIcBuilder};
-use types::BuildVersion;
 use types::CanisterId;
 use types::TokenInfo;
 

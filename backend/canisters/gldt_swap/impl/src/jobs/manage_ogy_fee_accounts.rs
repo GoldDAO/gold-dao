@@ -3,7 +3,7 @@ use crate::{
     utils::trace,
 };
 use candid::{Nat, Principal};
-use canister_time::run_now_then_interval;
+use bity_ic_canister_time::run_now_then_interval;
 use gldt_swap_common::{
     gldt::OGYTokenSpec, nft::NftCanisterConf, swap::MANAGE_OGY_FEE_ACCOUNTS_INTERVAL,
 };
@@ -26,7 +26,7 @@ pub fn start_job() {
 }
 
 pub fn spawn_transfer_job() {
-    ic_cdk::spawn(manage_fee_accounts())
+    ic_cdk::futures::spawn(manage_fee_accounts())
 }
 
 async fn manage_fee_accounts() {

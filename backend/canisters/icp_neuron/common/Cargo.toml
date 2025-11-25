@@ -13,7 +13,7 @@ inttest = []
 [dependencies]
 candid = { workspace = true }
 icrc-ledger-types = { workspace = true }
-ledger_utils = { path = "../../../libraries/ledger_utils" }
+bity-ic-ledger-utils = { workspace = true }
 nns_governance_canister = { path = "../../../external_canisters/nns_governance/api" }
 serde = { workspace = true }
 serde_with = { workspace = true }

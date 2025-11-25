@@ -5,8 +5,8 @@ use crate::{
     state::{mutate_state, read_state},
     utils::transfer_token,
 };
+use bity_ic_canister_time::timestamp_nanos;
 use candid::{Nat, Principal};
-use canister_time::timestamp_nanos;
 pub use gldt_swap_api_canister::notify_sale_nft_origyn::Args as SubscriberNotification;
 use gldt_swap_common::{
     gldt::{GldtNumTokens, GldtTokenSpec, GLDT_LEDGER_FEE_ACCOUNT, GLDT_TX_FEE},
@@ -403,11 +403,11 @@ pub async fn forward_swap_perform_mint_to_escrow(swap_id: &SwapId) {
                 )),
             )));
         }
-        Err((_, msg)) => {
+        Err(msg) => {
             debug!("FORWARD SWAP :: NFT ID = {nft_id:?} :: mint :: error :: {msg}");
             swap.update_status(SwapStatus::Forward(SwapStatusForward::Failed(
                 SwapErrorForward::MintFailed(MintError::TransferFailed(
-                    TransferFailReason::CallError(msg.clone()),
+                    TransferFailReason::CallError(msg.to_string()),
                 )),
             )));
         }

@@ -1,4 +1,4 @@
-use ::types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use utils::env::CanisterEnv;
 
 use crate::state::RuntimeState;

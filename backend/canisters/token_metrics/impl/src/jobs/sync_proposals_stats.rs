@@ -1,4 +1,4 @@
-use canister_time::run_now_then_interval;
+use bity_ic_canister_time::run_now_then_interval;
 use sns_governance_canister::types::{get_proposal_response, ProposalData, ProposalId};
 use std::time::Duration;
 use token_metrics_api::token_data::VotingHistoryCalculations;
@@ -19,8 +19,8 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(sync_proposals_metrics_data());
-    ic_cdk::spawn(recheck_ongoing_proposals());
+    ic_cdk::futures::spawn(sync_proposals_metrics_data());
+    ic_cdk::futures::spawn(recheck_ongoing_proposals());
 }
 
 pub async fn sync_proposals_metrics_data() {
@@ -242,11 +242,11 @@ fn update_voting_history(state: &mut RuntimeState, proposal: &ProposalData, part
 mod tests {
     use std::collections::HashMap;
 
-    use canister_time::timestamp_seconds;
+    use bity_ic_canister_time::timestamp_seconds;
+    use bity_ic_types::BuildVersion;
     use sns_governance_canister::types::{
         neuron::DissolveState, Neuron, NeuronId, ProposalData, ProposalId, Tally,
     };
-    use types::BuildVersion;
     use types::{CanisterId, NeuronInfo};
     use utils::env::CanisterEnv;
 

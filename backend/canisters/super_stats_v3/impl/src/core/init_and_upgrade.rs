@@ -26,7 +26,7 @@ fn init(args: InitArgs) {
     let mut data = Data::default();
     data.add_admin(args.admin.clone());
     data.add_authorised(args.admin);
-    data.set_self_id(ic_cdk::api::id());
+    data.set_self_id(ic_cdk::api::canister_self());
     data.max_return_length = STATS_RETURN_LENGTH;
     data.test_mode = args.test_mode;
     let stats = WorkingStats::default();

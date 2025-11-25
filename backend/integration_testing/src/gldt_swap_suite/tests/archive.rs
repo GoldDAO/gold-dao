@@ -6,7 +6,7 @@ use crate::utils::tick_n_blocks;
 
 use candid::Encode;
 use candid::{Nat, Principal};
-use canister_time::{timestamp_millis, MINUTE_IN_MS, WEEK_IN_MS};
+use bity_ic_canister_time::{timestamp_millis, MINUTE_IN_MS, WEEK_IN_MS};
 use gldt_swap_common::gldt::GldtNumTokens;
 use gldt_swap_common::nft::NftID;
 use gldt_swap_common::swap::{
@@ -30,7 +30,7 @@ use gldt_swap_api_canister::{
     lifecycle::Args as GldtSwapCanisterArgs,
     post_upgrade::UpgradeArgs as GldtSwapCanisterUpgradeArgs,
 };
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 
 fn insert_bulk_fake_swaps(
     pic: &mut PocketIc,

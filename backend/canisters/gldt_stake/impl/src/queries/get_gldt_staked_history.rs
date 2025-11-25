@@ -1,4 +1,4 @@
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::get_gldt_staked_history::{
     Args as GetGldtStakedHistoryArgs, Response as GetGldtStakedHistoryResponse,
 };

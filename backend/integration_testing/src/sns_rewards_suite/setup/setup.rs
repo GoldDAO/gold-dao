@@ -6,7 +6,7 @@ use crate::{
     utils::random_principal, wasms,
 };
 use candid::{encode_one, Nat, Principal};
-use canister_time::HOUR_IN_MS;
+use bity_ic_canister_time::HOUR_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;

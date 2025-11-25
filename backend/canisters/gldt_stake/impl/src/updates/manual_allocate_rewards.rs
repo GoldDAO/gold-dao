@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::jobs::allocate_rewards::handle_process_and_allocation;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_allocate_rewards::{
     Args as ManualAllocateRewardsArgs, Response as ManualAllocateRewardsResponse,
 };

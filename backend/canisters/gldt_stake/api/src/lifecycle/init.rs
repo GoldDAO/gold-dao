@@ -1,7 +1,8 @@
 use bity_ic_icrc3::config::ICRC3Config;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
-use types::BuildVersion;
+use types::TokenSymbol;
 
 #[derive(Deserialize, Serialize, CandidType, Debug)]
 pub struct InitArgs {

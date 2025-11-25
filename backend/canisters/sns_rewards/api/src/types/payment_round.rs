@@ -1,5 +1,5 @@
+use bity_ic_canister_time::now_millis;
 use candid::{CandidType, Decode, Encode, Nat, Principal};
-use canister_time::now_millis;
 use ic_stable_structures::{storable::Bound, Storable};
 use icrc_ledger_types::icrc1::account::Subaccount;
 use num_bigint::BigUint;
@@ -225,6 +225,9 @@ impl Storable for PaymentRound {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }

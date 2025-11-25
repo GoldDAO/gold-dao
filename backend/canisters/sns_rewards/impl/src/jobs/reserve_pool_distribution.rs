@@ -12,8 +12,8 @@ use crate::{
     state::{mutate_state, read_state},
     utils::transfer_token,
 };
+use bity_ic_canister_time::{now_millis, start_job_daily_at, DAY_IN_MS};
 use candid::{Nat, Principal};
-use canister_time::{now_millis, start_job_daily_at, DAY_IN_MS};
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use sns_rewards_api_canister::subaccounts::{RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT};
 use tracing::{debug, error, info};
@@ -27,7 +27,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 async fn run_async() {
@@ -142,7 +142,7 @@ async fn fetch_balance_of_sub_account(
     .await
     {
         Ok(t) => Ok(t),
-        Err(e) => Err(format!("ERROR: {:?}", e.1)),
+        Err(e) => Err(format!("ERROR: {:?}", e)),
     }
 }
 

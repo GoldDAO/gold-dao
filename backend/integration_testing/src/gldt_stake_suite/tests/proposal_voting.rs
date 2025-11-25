@@ -1,7 +1,7 @@
 use crate::client::gldt_stake::get_proposal_votes_of_neuron;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::{gldt_stake_suite::setup::proposal_vote_test_setup, utils::tick_n_blocks};
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
+use bity_ic_canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use std::time::Duration;
 
 #[test]

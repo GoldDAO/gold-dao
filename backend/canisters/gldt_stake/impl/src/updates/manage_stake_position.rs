@@ -1,9 +1,9 @@
 use crate::guards::GuardPrincipal;
 use crate::manage_stake_position_impls::*;
 use crate::{guards::reject_anonymous_caller, state::read_state};
+use bity_ic_canister_time::timestamp_millis;
+use bity_ic_canister_tracing_macros::trace;
 use candid::Principal;
-use canister_time::timestamp_millis;
-use canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manage_stake_position::Response as ManageStakePositionResponse;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;
 pub use gldt_stake_common::manage_stake_position_interface::ManageStakePositionArgs;

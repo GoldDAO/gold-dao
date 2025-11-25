@@ -1,7 +1,7 @@
 use crate::service_status::check_service_status;
 use crate::swap::swap_info::SwapInfoTrait;
 use candid::Principal;
-use canister_time::SECOND_IN_MS;
+use bity_ic_canister_time::SECOND_IN_MS;
 pub use gldt_swap_api_canister::swap_tokens_for_nft::{
     Args as SwapTokensForNftArgs, Response as SwapTokensForNftResponse,
 };
@@ -83,7 +83,7 @@ async fn swap_tokens_for_nft(args: SwapTokensForNftArgs) -> SwapTokensForNftResp
     // 6. perform the swap and return the swap_id instantly
     if let Some(swap_info) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {
         swap_info.update_status(SwapStatus::Reverse(SwapStatusReverse::EscrowRequest));
-        ic_cdk::spawn(async move {
+        ic_cdk::futures::spawn(async move {
             let swap_id = &swap_info.get_swap_id();
             transfer_to_escrow(&swap_id).await;
             transfer_nft(swap_id).await;
