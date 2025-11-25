@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::model::neuron_system::sync_neurons;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_sync_neurons::{
     Args as ManualSyncNeuronsArgs, Response as ManualSyncNeuronsResponse,
 };

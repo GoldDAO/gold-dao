@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
 use crate::model::swaps::Swaps;
+use bity_ic_canister_state_macros::canister_state;
 use candid::{CandidType, Nat, Principal};
-use canister_state_macros::canister_state;
 use gldt_swap_common::{
     archive::ArchiveCanister,
     nft::NftCanisterConf,

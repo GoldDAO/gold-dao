@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-canister_client = { path = "../../../libraries/canister_client" }
+bity-ic-canister-client = { workspace = true }
 origyn_nft_reference = { path = "../api" }
 icrc-ledger-types = { workspace = true }

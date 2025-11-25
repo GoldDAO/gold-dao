@@ -1,8 +1,8 @@
 use crate::client::gldt_stake::manage_stake_position;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use assert_matches::assert_matches;
+use bity_ic_canister_time::MINUTE_IN_MS;
 use candid::{Nat, Principal};
-use canister_time::MINUTE_IN_MS;
 use gldt_stake_api_canister::manage_stake_position;
 use gldt_stake_common::ledgers::GLDT_TX_FEE;
 use gldt_stake_common::stake_position_response::StakePositionResponse;

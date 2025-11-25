@@ -10,8 +10,8 @@ fn pre_upgrade() {
 
     let runtime_state = take_state();
 
-    let logs = canister_logger::export_logs();
-    let traces = canister_logger::export_traces();
+    let logs = bity_ic_canister_logger::export_logs();
+    let traces = bity_ic_canister_logger::export_traces();
 
     let stable_state = (runtime_state, logs, traces);
 

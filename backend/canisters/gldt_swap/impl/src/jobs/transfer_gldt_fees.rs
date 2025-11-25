@@ -1,5 +1,5 @@
 use candid::Nat;
-use canister_time::{run_interval, HOUR_IN_MS};
+use bity_ic_canister_time::{run_interval, HOUR_IN_MS};
 use gldt_swap_common::gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE};
 use icrc_ledger_canister_c2c_client::{icrc1_balance_of, icrc1_transfer};
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
@@ -18,7 +18,7 @@ pub fn start_job() {
 
 pub fn transfer_gldt_fees_job() {
     info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: start");
-    ic_cdk::spawn(transfer_gldt_fees_job_impl());
+    ic_cdk::futures::spawn(transfer_gldt_fees_job_impl());
     info!("TRANSFER GLDT FEES FOR BUY BACK BURN :: finished");
 }
 

@@ -4,7 +4,7 @@ use crate::{
     swap::forward_swap::{forward_swap_perform_burn_fees, forward_swap_perform_deposit_recovery},
     utils::is_nft_in_sale_state,
 };
-use canister_time::run_interval;
+use bity_ic_canister_time::run_interval;
 use futures::{
     future::{join_all, BoxFuture},
     FutureExt,
@@ -20,7 +20,7 @@ pub fn start_job() {
         if is_running {
             return;
         }
-        ic_cdk::spawn(handle_remove_stale_swap());
+        ic_cdk::futures::spawn(handle_remove_stale_swap());
     });
 }
 

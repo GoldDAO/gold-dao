@@ -1,5 +1,5 @@
 use candid::{Nat, Principal};
-use canister_time::timestamp_nanos;
+use bity_ic_canister_time::timestamp_nanos;
 use futures::future::join_all;
 use gldt_swap_api_canister::get_historic_swaps_by_user::GetHistoricSwapsByUserError;
 use gldt_swap_archive_c2c_client::{get_archive_swap, get_swap_indexes_for_user};

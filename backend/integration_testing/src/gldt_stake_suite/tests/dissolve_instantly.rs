@@ -9,10 +9,10 @@ use crate::{
     utils::tick_n_blocks,
 };
 use assert_matches::assert_matches;
+use bity_ic_canister_time::WEEK_IN_MS;
+use bity_ic_canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use candid::Nat;
 use candid::Principal;
-use canister_time::WEEK_IN_MS;
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use gldt_stake_api_canister::manage_stake_position;
 use gldt_stake_common::accounts::INSTANT_DISSOLVEMENT_FEE_ACCOUNT;
 use gldt_stake_common::ledgers::GLDT_TX_FEE;

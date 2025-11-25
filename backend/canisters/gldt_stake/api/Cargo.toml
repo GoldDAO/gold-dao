@@ -18,3 +18,4 @@ types = { path = '../../../libraries/types' }
 gldt_stake_common = { path = "../common", features = []}
 bity-ic-icrc3 = { workspace = true }
 utils = { path = '../../../libraries/utils' }
+bity-ic-types = { workspace = true }

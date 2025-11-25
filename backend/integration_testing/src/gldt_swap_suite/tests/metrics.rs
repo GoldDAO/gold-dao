@@ -6,7 +6,7 @@ use candid::Principal;
 mod tests {
     use std::time::Duration;
 
-    use canister_time::HOUR_IN_MS;
+    use bity_ic_canister_time::HOUR_IN_MS;
     use serde_bytes::ByteBuf;
     use serde_json::{from_slice, Value};
     use types::HttpRequest;

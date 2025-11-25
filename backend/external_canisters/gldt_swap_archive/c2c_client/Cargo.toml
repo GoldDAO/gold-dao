@@ -7,6 +7,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-canister_client = { path = "../../../libraries/canister_client" }
+bity-ic-canister-client = { workspace = true }
 gldt_swap_api_archive = { path = "../../../canisters/gldt_swap/api_archive" }
 gldt_swap_common = { path = "../../../canisters/gldt_swap/common" }

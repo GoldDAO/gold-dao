@@ -1,6 +1,6 @@
 use ic_cdk_macros::init;
 use tracing::info;
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use utils::env::CanisterEnv;
 
 use crate::state::{Data, RuntimeState};
@@ -12,7 +12,7 @@ pub use gldt_swap_api_archive::lifecycle::Args;
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             let env = CanisterEnv::new(
                 init_args.test_mode,

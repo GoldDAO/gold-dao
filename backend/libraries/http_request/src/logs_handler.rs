@@ -1,5 +1,5 @@
 use crate::build_response;
-use canister_logger::LogEntry;
+use bity_ic_canister_logger::LogEntry;
 use std::io::Write;
 use types::{HttpResponse, TimestampMillis};
 

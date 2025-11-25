@@ -3,8 +3,8 @@ use crate::types::neuron_manager::NeuronManager;
 use crate::types::neuron_manager::NeuronRewardsManager;
 use crate::types::OgyManager;
 use crate::utils::retry_with_attempts;
-use canister_time::{run_now_then_interval, DAY_IN_MS};
-use canister_tracing_macros::trace;
+use bity_ic_canister_time::{run_now_then_interval, DAY_IN_MS};
+use bity_ic_canister_tracing_macros::trace;
 use std::time::Duration;
 use tracing::error;
 use types::Milliseconds;
@@ -19,7 +19,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 #[trace]

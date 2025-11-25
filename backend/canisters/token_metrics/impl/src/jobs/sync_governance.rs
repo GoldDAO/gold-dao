@@ -1,5 +1,5 @@
+use bity_ic_canister_time::{now_millis, run_now_then_interval, timestamp_seconds, DAY_IN_MS};
 use candid::{Nat, Principal};
-use canister_time::{now_millis, run_now_then_interval, timestamp_seconds, DAY_IN_MS};
 use futures::future::join_all;
 use ic_cdk::api::call::RejectionCode;
 use icrc_ledger_types::icrc1::account::{Account, Subaccount};
@@ -25,7 +25,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(sync_neurons_data())
+    ic_cdk::futures::spawn(sync_neurons_data())
 }
 
 pub async fn commit_changes() {
@@ -306,7 +306,7 @@ async fn get_total_from_sns_rewards_canister() -> Nat {
 async fn get_super_stats_balance_of(account: String, is_subaccount: bool) -> Nat {
     let super_stats_canister_id = read_state(|state| state.data.super_stats_canister);
 
-    fn log_error(acc: String, err: (RejectionCode, String)) {
+    fn log_error(acc: String, err: String) {
         let error_message = format!("{err:?}");
         info!(
             ?error_message,
@@ -320,7 +320,7 @@ async fn get_super_stats_balance_of(account: String, is_subaccount: bool) -> Nat
         {
             Ok(response) => response,
             Err(err) => {
-                log_error(account.clone(), err);
+                log_error(account.clone(), err.to_string());
                 None
             }
         }
@@ -330,7 +330,7 @@ async fn get_super_stats_balance_of(account: String, is_subaccount: bool) -> Nat
         {
             Ok(response) => response,
             Err(err) => {
-                log_error(account.clone(), err);
+                log_error(account.clone(), err.to_string());
                 None
             }
         }
@@ -344,7 +344,7 @@ async fn get_super_stats_balance_of(account: String, is_subaccount: bool) -> Nat
 mod tests {
     use std::collections::HashMap;
 
-    use canister_time::timestamp_seconds;
+    use bity_ic_canister_time::timestamp_seconds;
     use sns_governance_canister::types::{neuron::DissolveState, Neuron, NeuronId};
     use super_stats_v3_api::stats::constants::SECONDS_IN_ONE_YEAR;
     use token_metrics_api::token_data::LockedNeuronsAmount;

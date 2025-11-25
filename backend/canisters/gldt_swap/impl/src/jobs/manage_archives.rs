@@ -6,7 +6,7 @@ use crate::{
     update_archive_canisters,
 };
 use candid::Nat;
-use canister_time::{run_interval, run_once};
+use bity_ic_canister_time::{run_interval, run_once};
 use gldt_swap_common::{
     archive::ArchiveCanister,
     swap::{ArchiveDownReason, ArchiveStatus, MANAGE_NEW_ARCHIVES_INTERVAL},
@@ -23,7 +23,7 @@ pub fn start_job() {
 }
 
 pub fn spawn_archive_on_init() {
-    ic_cdk::spawn(archive_on_init())
+    ic_cdk::futures::spawn(archive_on_init())
 }
 
 async fn archive_on_init() {
@@ -78,7 +78,7 @@ pub fn spawn_manage_archives() {
     if is_running {
         return;
     }
-    ic_cdk::spawn(manage_archives())
+    ic_cdk::futures::spawn(manage_archives())
 }
 
 pub async fn manage_archives() {

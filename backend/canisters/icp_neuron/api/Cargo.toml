@@ -15,3 +15,4 @@ types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
 icp_neuron_common = { path = "../common" }
 nns_governance_canister = { path = "../../../external_canisters/nns_governance/api" }
+bity-ic-types = { workspace = true }

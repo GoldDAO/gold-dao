@@ -1,6 +1,6 @@
 use crate::{guards::caller_is_authorized, state::mutate_state};
 use candid::Principal;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_swap_api_canister::set_buy_back_canister::{
     Args as SetBuyBackCanisterArgs, Response as SetBuyBackCanisterResponse,
 };

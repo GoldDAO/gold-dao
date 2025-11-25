@@ -1,13 +1,13 @@
 use crate::state::{mutate_state, read_state};
 use candid::{Nat, Principal};
-use canister_time::{run_interval, timestamp_nanos};
+use bity_ic_canister_time::{run_interval, timestamp_nanos};
 use futures::future::join_all;
 use gldt_swap_common::{
     gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_PRICE_RATIO, GLDT_SUBDIVIDABLE_BY},
     nft::NftCanisterConf,
     swap::{trace, MANAGE_GLDT_SUPPLY_INTERVAL, MANAGE_GLDT_SUPPLY_RETRY_DELAY},
 };
-use ic_cdk::spawn;
+use ic_cdk::futures::spawn;
 use ic_cdk_timers::set_timer;
 use icrc_ledger_canister_c2c_client::{icrc1_total_supply, icrc1_transfer};
 use icrc_ledger_types::icrc1::{
@@ -32,7 +32,7 @@ pub fn spawn_gldt_supply_balancer() {
         trace("MANAGE GLDT SUPPLY :: 0 already running");
         return;
     } else {
-        ic_cdk::spawn(gldt_supply_balancer(1))
+        ic_cdk::futures::spawn(gldt_supply_balancer(1))
     }
 }
 

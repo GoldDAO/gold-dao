@@ -126,13 +126,13 @@ impl SwapInfoTrait for SwapInfo {
             });
         }
 
-        ic_cdk::spawn(async move {
+        ic_cdk::futures::spawn(async move {
             commit_changes().await;
         });
 
         if should_move_to_history {
             if let Some(swap) = read_state(|s| s.data.swaps.get_active_swap(&swap_id).cloned()) {
-                ic_cdk::spawn(async move {
+                ic_cdk::futures::spawn(async move {
                     let _ = swap.move_swap_to_history().await;
                 });
             }

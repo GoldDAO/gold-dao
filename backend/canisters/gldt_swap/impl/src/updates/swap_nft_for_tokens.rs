@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use candid::{Nat, Principal};
-use canister_time::{timestamp_millis, SECOND_IN_MS};
+use bity_ic_canister_time::{timestamp_millis, SECOND_IN_MS};
 use futures::future::join_all;
 use gldt_swap_api_canister::{
     swap_nft_for_tokens::{NftInvalidError, SwapNftForTokensErrors},

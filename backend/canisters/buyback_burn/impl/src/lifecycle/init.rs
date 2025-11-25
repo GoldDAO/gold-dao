@@ -1,7 +1,7 @@
 use crate::lifecycle::init_canister;
 use crate::state::{Data, RuntimeState};
+use bity_ic_canister_tracing_macros::trace;
 pub use buyback_burn_api::Args;
-use canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 use tracing::info;
 use utils::consts::SNS_GOVERNANCE_CANISTER_ID_STAGING;
@@ -12,7 +12,7 @@ use utils::env::{CanisterEnv, Environment};
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             let env = CanisterEnv::new(
                 init_args.test_mode,

@@ -12,3 +12,4 @@ candid = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 types = { path = "../../../libraries/types" }
 utils = { path = "../../../libraries/utils" }
+bity-ic-types = { workspace = true }

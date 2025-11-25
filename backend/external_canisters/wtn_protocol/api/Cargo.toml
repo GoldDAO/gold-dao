@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
-candid_gen = { path = "../../../libraries/candid_gen" }
-canister_time = { path = "../../../libraries/canister_time" }
+bity-ic-candid-gen = { workspace = true }
+bity-ic-canister-time = { workspace = true }
 hex = { workspace = true }
 ic-stable-structures = { workspace = true }
 serde = { workspace = true }

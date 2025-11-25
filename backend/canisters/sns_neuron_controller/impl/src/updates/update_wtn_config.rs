@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::state::{mutate_state, RuntimeState};
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk_macros::{query, update};
 pub use sns_neuron_controller_api_canister::update_wtn_config::Args as UpdateWtnConfigArgs;
 pub use sns_neuron_controller_api_canister::update_wtn_config::Response as UpdateWtnConfigResponse;

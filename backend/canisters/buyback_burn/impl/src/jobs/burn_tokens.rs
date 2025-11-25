@@ -1,9 +1,9 @@
 use crate::state::read_state;
 use crate::utils::retry_with_attempts;
 use crate::utils::{get_token_balance, RETRY_DELAY};
+use bity_ic_canister_time::start_job_daily_at;
+use bity_ic_canister_tracing_macros::trace;
 use candid::{Nat, Principal};
-use canister_time::start_job_daily_at;
-use canister_tracing_macros::trace;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{error, info};
@@ -16,7 +16,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 #[trace]

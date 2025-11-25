@@ -6,37 +6,58 @@ edition = "2021"
 
 [dependencies]
 assert_matches = { workspace = true}
-pocket-ic = { workspace = true}
-candid = { workspace = true }
+bytes = "1.10.1"
 serde = { workspace = true, features = ["derive"] }
-types = { path = "../libraries/types" }
-utils = { path = '../libraries/utils' }
-canister_time = { path = '../libraries/canister_time' }
-icrc-ledger-types = { workspace = true }
-icrc-ledger-types-ic-main-repo =  { package = "icrc-ledger-types", git = "https://github.com/dfinity/ic.git", rev = "1488a310043f6a0907f4a84ba7af00e3d90d16eb" }
-ic-ledger-types = { workspace = true }
-icrc_ledger_canister = { path = "../external_canisters/icrc_ledger/api" }
+serde_bytes = { workspace = true }
+serde_json = { workspace = true }
 rand = "0.9.1"
 lazy_static = "1.4.0"
 hex = "0.4"
 sha2 = "0.10.8"
-bity-ic-icrc3 = {workspace = true }
-sns_rewards_api_canister = { path = "../canisters/sns_rewards/api" }
-gldt_swap_api_canister = { path = "../canisters/gldt_swap/api"}
-gldt_swap_api_archive = { path = "../canisters/gldt_swap/api_archive"}
-gldt_swap_common = { path = "../canisters/gldt_swap/common"}
-gldt_stake_api_canister = { path = "../canisters/gldt_stake/api"}
-gldt_stake_common = { path = "../canisters/gldt_stake/common"}
-#usdg_minter_api = { path = "../canisters/usdg_minter/api"}
-origyn_nft_reference = { path = '../external_canisters/origyn_nft_reference/api' }
-serde_bytes = { workspace = true }
-serde_json = { workspace = true }
-sns_neuron_controller_api_canister = { path = "../canisters/sns_neuron_controller/api" }
-buyback_burn_api = { path = "../canisters/buyback_burn/api" }
+tempfile = "3.20.0"
+http = "1.3.1"
+url = "2.5.4"
+http-body-util = "0.1.3"
+tokio = { version = "1.45.1", features = ["full"] }
 
-# SNS
+# IC Crates
+pocket-ic = { workspace = true}
+candid = { workspace = true }
+icrc-ledger-types = { workspace = true }
+ic-ledger-types = { workspace = true }
+ic-agent = { version = "0.40.1" }
+ic-http-gateway = { version = "0.3.0" }
+
+# SNS API
 sns_governance_canister = { path = '../external_canisters/sns_governance/api' }
 sns_root_canister = { path = '../external_canisters/sns_root/api' }
 sns_ledger_canister = { path = '../external_canisters/sns_ledger/api' }
 sns_swap_canister = { path = '../external_canisters/sns_swap/api' }
 sns_index_canister = { path = '../external_canisters/sns_index/api' }
+
+# Canisters API
+buyback_burn_api = { path = "../canisters/buyback_burn/api" }
+gldt_stake_api_canister = { path = "../canisters/gldt_stake/api"}
+gldt_stake_common = { path = "../canisters/gldt_stake/common"}
+
+gldt_swap_api_canister = { path = "../canisters/gldt_swap/api"}
+gldt_swap_api_archive = { path = "../canisters/gldt_swap/api_archive"}
+gldt_swap_common = { path = "../canisters/gldt_swap/common"}
+
+sns_neuron_controller_api_canister = { path = "../canisters/sns_neuron_controller/api" }
+sns_rewards_api_canister = { path = "../canisters/sns_rewards/api" }
+#usdg_minter_api = { path = "../canisters/usdg_minter/api"}
+
+# External Canisters API
+origyn_nft_reference = { path = "../external_canisters/origyn_nft_reference/api" }
+icrc_ledger_canister = { path = "../external_canisters/icrc_ledger/api" }
+
+# Libraries
+types = { path = "../libraries/types" }
+utils = { path = '../libraries/utils' }
+
+# Bity crates
+bity-ic-canister-time = { workspace = true }
+bity-ic-icrc3 = { workspace = true }
+bity-ic-types = { workspace = true }
+bity-ic-storage-canister-api = { workspace = true }

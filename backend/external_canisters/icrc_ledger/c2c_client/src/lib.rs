@@ -1,4 +1,4 @@
-use canister_client::{generate_candid_c2c_call, generate_candid_c2c_call_no_args};
+use bity_ic_canister_client::{generate_candid_c2c_call, generate_candid_c2c_call_no_args};
 use icrc_ledger_canister::*;
 
 // Queries
@@ -19,10 +19,20 @@ generate_candid_c2c_call!(icrc2_transfer_from);
 pub async fn icrc1_transfer(
     canister_id: ::types::CanisterId,
     args: &icrc1_transfer::Args,
-) -> ::ic_cdk::api::call::CallResult<icrc1_transfer::Response> {
+) -> ::ic_cdk::call::CallResult<icrc1_transfer::Response> {
     let method_name = "icrc1_transfer";
-    canister_client::make_c2c_call(canister_id, method_name, &args, ::candid::encode_one, |r| {
-        ::candid::decode_one(r)
-    })
+    bity_ic_canister_client::make_c2c_call(
+        canister_id,
+        method_name,
+        &args,
+        ::candid::encode_one,
+        |r| ::candid::decode_one(r),
+    )
     .await
+    .map_err(|e| {
+        ::ic_cdk::call::Error::CallRejected(::ic_cdk::call::CallRejected::with_rejection(
+            0,
+            format!("{e:?}"),
+        ))
+    })
 }

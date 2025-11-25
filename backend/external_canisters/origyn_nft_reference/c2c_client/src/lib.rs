@@ -1,4 +1,4 @@
-use canister_client::generate_candid_c2c_call;
+use bity_ic_canister_client::generate_candid_c2c_call;
 
 use origyn_nft_reference::origyn_nft_reference_canister::Account3;
 use origyn_nft_reference::origyn_nft_reference_canister::NftInfoResult;

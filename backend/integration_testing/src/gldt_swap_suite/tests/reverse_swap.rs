@@ -11,7 +11,7 @@ use crate::gldt_swap_suite::nft_utils;
 use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 
-use canister_time::{timestamp_millis, timestamp_nanos, MINUTE_IN_MS, SECOND_IN_MS};
+use bity_ic_canister_time::{timestamp_millis, timestamp_nanos, MINUTE_IN_MS, SECOND_IN_MS};
 use gldt_swap_api_canister::swap_tokens_for_nft::Args;
 use gldt_swap_common::gldt::{GldtNumTokens, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE};
 

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, time::Duration};
 
 use candid::{Nat, Principal};
-use canister_time::DAY_IN_MS;
+use bity_ic_canister_time::DAY_IN_MS;
 use icrc_ledger_types::icrc1::account::Account;
 
 use sns_rewards_api_canister::subaccounts::{RESERVE_POOL_SUB_ACCOUNT, REWARD_POOL_SUB_ACCOUNT};

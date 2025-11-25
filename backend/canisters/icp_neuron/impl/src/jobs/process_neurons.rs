@@ -1,14 +1,14 @@
 use crate::state::{mutate_state, read_state};
 use crate::updates::manage_nns_neuron::manage_nns_neuron_impl;
+use bity_ic_canister_time::{run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS};
 use candid::Nat;
-use canister_time::{run_now_then_interval, DAY_IN_MS, MINUTE_IN_MS};
-use ic_ledger_types::AccountIdentifier;
 use icp_ledger_canister::account_balance::Args as AccountBalanceArgs;
 
+use bity_ic_ledger_utils::icrc_account_to_legacy_account_id;
+use ic_ledger_types::AccountIdentifier;
 use icp_ledger_canister_c2c_client::account_balance;
 use icp_neuron_common::neurons::Neurons;
 use icp_neuron_common::outstanding_payments::{PaymentStatus, PaymentsList};
-use ledger_utils::icrc_account_to_legacy_account_id;
 use nns_governance_canister::types::{
     manage_neuron::{disburse::Amount, Command, Disburse, Spawn},
     Neuron,
@@ -29,7 +29,7 @@ pub fn start_job() {
 }
 
 pub fn run() {
-    ic_cdk::spawn(run_async());
+    ic_cdk::futures::spawn(run_async());
 }
 
 async fn run_async() {
@@ -106,7 +106,7 @@ async fn run_async() {
                 // Refresh the neurons again given that they've been updated (spawned neurons and disbursed neurons)
                 // Add a delay of 5 minutes to give enough time for transactions to pass
                 ic_cdk_timers::set_timer(Duration::from_millis(5 * MINUTE_IN_MS), || {
-                    ic_cdk::spawn(run_async())
+                    ic_cdk::futures::spawn(run_async())
                 });
             }
         }

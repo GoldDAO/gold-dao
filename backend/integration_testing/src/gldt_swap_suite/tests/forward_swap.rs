@@ -19,7 +19,7 @@ use pocket_ic::PocketIc;
 use crate::client::gldt_swap::swap_nft_for_tokens;
 use std::{array::TryFromSliceError, time::Duration};
 
-use canister_time::{timestamp_millis, MINUTE_IN_MS};
+use bity_ic_canister_time::{timestamp_millis, MINUTE_IN_MS};
 use gldt_swap_common::{
     gldt::GldtNumTokens,
     nft::NftID,

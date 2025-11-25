@@ -1,6 +1,6 @@
 use crate::state::mutate_state;
 use bity_ic_canister_time::DAY_IN_MS;
-use canister_time::run_now_then_interval;
+use bity_ic_canister_time::run_now_then_interval;
 use std::time::Duration;
 use tracing::info;
 

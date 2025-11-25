@@ -67,12 +67,15 @@ pub fn create_canister(pic: &PocketIc, controller: Principal) -> CanisterId {
     canister_id
 }
 
-pub fn create_canister_with_id(
+pub fn create_canister_with_id<T: Into<String>>(
     pic: &PocketIc,
     controller: Principal,
-    canister_id: &str,
+    canister_id: T,
 ) -> CanisterId {
-    let canister_id = canister_id.try_into().expect("Invalid canister ID");
+    let canister_id_str = canister_id.into();
+    let canister_id = Principal::from_text(&canister_id_str)
+        .unwrap_or_else(|_| panic!("Invalid canister ID: {}", canister_id_str));
+
     pic.create_canister_with_id(Some(controller), None, canister_id)
         .expect("Create canister with ID failed");
     pic.add_cycles(canister_id, INIT_CYCLES_BALANCE);

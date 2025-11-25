@@ -15,6 +15,9 @@ impl Storable for NftID {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }

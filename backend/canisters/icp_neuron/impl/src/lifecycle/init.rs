@@ -1,6 +1,6 @@
 use crate::lifecycle::init_canister;
 use crate::state::{Data, RuntimeState};
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk_macros::init;
 pub use icp_neuron_api_canister::Args;
 use tracing::info;
@@ -12,7 +12,7 @@ use utils::env::{CanisterEnv, Environment};
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             let env = CanisterEnv::new(
                 init_args.test_mode,

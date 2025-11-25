@@ -7,8 +7,8 @@ use crate::gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv
 use crate::gldt_stake_suite::utils::create_stake_position_util_for_user;
 use crate::gldt_stake_suite::utils::create_user_with_funds;
 use crate::utils::tick_n_blocks;
+use bity_ic_canister_time::MINUTE_IN_MS;
 use candid::Nat;
-use canister_time::MINUTE_IN_MS;
 use gldt_stake_api_canister::manage_stake_position;
 use icrc_ledger_types::icrc3::blocks::GetBlocksRequest;
 use std::time::Duration;

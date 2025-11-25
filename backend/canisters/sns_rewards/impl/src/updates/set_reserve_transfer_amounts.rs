@@ -2,7 +2,7 @@ use crate::{
     guards::caller_is_governance_principal, state::mutate_state,
     utils::validate_set_reserve_transfer_amounts_payload,
 };
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 use ic_cdk::update;
 pub use sns_rewards_api_canister::{
     set_reserve_transfer_amounts::{

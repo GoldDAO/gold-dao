@@ -3,10 +3,16 @@ use crate::jobs::process_rewards::{
 };
 use crate::model::allocated_rewards_pool::calculate_total_weighted_stake;
 use crate::model::processing_rewards_pool::ProcessingRewards;
-use crate::state::{mutate_state, read_state};
+use crate::{
+    queries::{
+        calculate_apy, calculate_daily_reward_per_token_in_usd, calculate_weighted_stake_usd,
+        sum_usd_rewards,
+    },
+    state::{mutate_state, read_state},
+};
+use bity_ic_canister_time::{run_now_then_interval, timestamp_millis, DAY_IN_MS, HOUR_IN_MS};
 use candid::Nat;
 use candid::Principal;
-use canister_time::{run_now_then_interval, timestamp_millis, HOUR_IN_MS};
 use futures::future::join_all;
 use gldt_stake_api_canister::TimestampMillis;
 use gldt_stake_common::stake_position::StakePosition;

@@ -1,16 +1,16 @@
+use bity_ic_canister_state_macros::canister_state;
+use bity_ic_types::BuildVersion;
 use candid::{CandidType, Principal};
-use canister_state_macros::canister_state;
 use ic_stable_structures::{StableBTreeMap, StableVec};
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
-use sns_governance_canister::types::{NeuronId, ProposalId, VecNeurons};
-use super_stats_v3_api::account_tree::HistoryData;
+use sns_governance_canister::types::{ProposalId, VecNeurons};
 use token_metrics_api::token_data::{
     ActiveUsers, DailyVotingMetrics, GovHistoryEntry, GovernanceStats, LockedNeuronsAmount,
     PrincipalBalance, ProposalsMetrics, ProposalsMetricsCalculations, TokenSupplyData,
     VotingHistoryCalculations, WalletEntry, WalletOverview,
 };
-use types::{BuildVersion, CanisterId, TimestampMillis};
+use types::{CanisterId, TimestampMillis};
 use utils::{
     env::{CanisterEnv, Environment},
     memory::MemorySize,

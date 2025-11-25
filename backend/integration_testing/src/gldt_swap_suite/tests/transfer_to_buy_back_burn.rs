@@ -8,7 +8,7 @@ use icrc_ledger_types::icrc1::account::Account;
 mod tests {
     use std::time::Duration;
 
-    use canister_time::HOUR_IN_MS;
+    use bity_ic_canister_time::HOUR_IN_MS;
     use gldt_swap_common::gldt::{GLDT_LEDGER_FEE_ACCOUNT, GLDT_SWAP_FEE_ACCOUNT, GLDT_TX_FEE};
 
     use crate::{

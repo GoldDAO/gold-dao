@@ -1,4 +1,4 @@
-use canister_time::{DAY_IN_MS, HOUR_IN_MS};
+use bity_ic_canister_time::{DAY_IN_MS, HOUR_IN_MS};
 use std::time::{Duration, SystemTime};
 
 use crate::{

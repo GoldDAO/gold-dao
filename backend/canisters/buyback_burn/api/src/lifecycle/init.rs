@@ -1,7 +1,7 @@
 use candid::{CandidType, Principal};
 use ic_ledger_types::Tokens;
 use serde::{Deserialize, Serialize};
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 use types::TokenInfo;
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]

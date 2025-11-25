@@ -3,7 +3,7 @@ use crate::gldt_swap_suite::{init, CanisterIds, PrincipalIds, TestEnv};
 use crate::utils::tick_n_blocks;
 
 use candid::{Nat, Principal};
-use canister_time::timestamp_millis;
+use bity_ic_canister_time::timestamp_millis;
 use gldt_swap_common::gldt::GldtNumTokens;
 use gldt_swap_common::nft::NftID;
 use gldt_swap_common::swap::{SwapDetailForward, SwapInfo, SwapStatusForward};

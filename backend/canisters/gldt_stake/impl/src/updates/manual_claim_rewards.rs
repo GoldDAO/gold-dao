@@ -1,6 +1,6 @@
 use crate::guards::caller_is_governance_principal;
 use crate::jobs::claim_neuron_rewards::claim_rewards;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::manual_claim_rewards::{
     Args as ManualClaimRewardsArgs, Response as ManualClaimRewardsResponse,
 };

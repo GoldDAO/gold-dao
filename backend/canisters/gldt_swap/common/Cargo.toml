@@ -10,7 +10,7 @@ inttest = []
 
 [dependencies]
 candid = { workspace = true }
-canister_time = { path = '../../../libraries/canister_time' }
+bity-ic-canister-time = { workspace = true }
 ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
 ic-ledger-types = { workspace = true }

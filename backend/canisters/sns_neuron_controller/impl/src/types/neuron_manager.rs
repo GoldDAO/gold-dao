@@ -6,10 +6,10 @@ use crate::utils::{
     disburse_neuron_maturity, distribute_rewards, fetch_neurons, ClaimRewardResult,
 };
 use async_trait::async_trait;
+use bity_ic_ledger_utils::compute_neuron_staking_subaccount_bytes;
 use candid::{CandidType, Nat};
 use enum_dispatch::enum_dispatch;
 use icrc_ledger_types::icrc1::{account::Account, transfer::TransferArg};
-use ledger_utils::compute_neuron_staking_subaccount_bytes;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{
     manage_neuron::{
@@ -52,7 +52,7 @@ pub trait NeuronManager: NeuronConfig {
 
         let governance_canister_id = self.get_sns_governance_canister_id();
         let ledger_canister_id = self.get_sns_ledger_canister_id();
-        let principal = ic_cdk::api::id();
+        let principal = ic_cdk::api::canister_self();
 
         let subaccount = compute_neuron_staking_subaccount_bytes(principal, nonce);
 

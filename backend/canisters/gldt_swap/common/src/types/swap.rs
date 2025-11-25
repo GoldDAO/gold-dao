@@ -1,18 +1,24 @@
 use std::borrow::Cow;
 
-use candid::{ CandidType, Decode, Encode, Nat, Principal };
-use canister_time::{ timestamp_millis, HOUR_IN_MS, MINUTE_IN_MS };
-use ic_ledger_types::{ AccountIdentifier, TransferError };
-use ic_stable_structures::{ storable::Bound, Storable };
+use bity_ic_canister_time::{timestamp_millis, HOUR_IN_MS, MINUTE_IN_MS};
+use candid::{CandidType, Decode, Encode, Nat, Principal};
+use ic_ledger_types::{AccountIdentifier, TransferError};
+use ic_stable_structures::{storable::Bound, Storable};
 use icrc_ledger_types::{
-    icrc1::{ account::{ Account, Subaccount }, transfer::TransferError as TransferErrorIcrc },
-    icrc2::{ approve::ApproveError, transfer_from::TransferFromError },
+    icrc1::{
+        account::{Account, Subaccount},
+        transfer::TransferError as TransferErrorIcrc,
+    },
+    icrc2::{approve::ApproveError, transfer_from::TransferFromError},
 };
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 use tracing::debug;
-use types::{ Milliseconds, TimestampMillis };
+use types::{Milliseconds, TimestampMillis};
 
-use crate::{ gldt::{ GldtNumTokens, GLDT_TX_FEE }, nft::NftID };
+use crate::{
+    gldt::{GldtNumTokens, GLDT_TX_FEE},
+    nft::NftID,
+};
 
 #[cfg(feature = "inttest")]
 pub const MAX_SWAP_INFO_BYTES_SIZE: u32 = 28500;
@@ -48,6 +54,9 @@ impl Storable for SwapId {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -72,7 +81,9 @@ pub fn trace(msg: &str) {
 impl SwapInfo {
     pub fn new(swap_type: SwapType) -> Self {
         debug!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}");
-        trace(&format!("//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"));
+        trace(&format!(
+            "//// max swap info size: {MAX_SWAP_INFO_BYTES_SIZE}"
+        ));
         match swap_type {
             SwapType::Forward => Self::Forward(SwapDetailForward::default()),
             SwapType::Reverse => Self::Reverse(SwapDetailReverse::default()),
@@ -142,6 +153,9 @@ impl Storable for SwapInfo {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -161,6 +175,9 @@ impl Storable for SwapType {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
+    // fn into_bytes(self) -> std::vec::Vec<u8> {
+    //     Encode!(&self).unwrap()
+    // }
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
         Decode!(&bytes, Self).unwrap()
     }
@@ -472,8 +489,8 @@ pub enum ArchiveStatus {
 #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ArchiveDownReason {
     NewArchiveError(NewArchiveError), //
-    Upgrading, //
-    UpgradingArchivesFailed(String), //
+    Upgrading,                        //
+    UpgradingArchivesFailed(String),  //
     ActiveSwapCapacityFull,
     NoArchiveCanisters(String), //
     LowOrigynToken(String),

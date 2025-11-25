@@ -1,6 +1,6 @@
 use crate::{guards::caller_is_authorized, state::mutate_state};
 use candid::Nat;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_swap_api_canister::set_base_ogy_swap_fee::{
     Args as SetBaseOgySwapFeeArgs, Response as SetBaseOgySwapFeeResponse,
 };

@@ -12,7 +12,7 @@ use super::init_canister;
 fn init(args: Args) {
     match args {
         Args::Init(init_args) => {
-            canister_logger::init(init_args.test_mode);
+            bity_ic_canister_logger::init(init_args.test_mode);
 
             let env = CanisterEnv::new(
                 init_args.test_mode,

@@ -10,8 +10,8 @@ use crate::{
     utils::tick_n_blocks,
 };
 use assert_matches::assert_matches;
+use bity_ic_canister_time::HOUR_IN_MS;
 use candid::{Encode, Nat, Principal};
-use canister_time::HOUR_IN_MS;
 use gldt_stake_api_canister::manage_stake_position;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;
 use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;

@@ -1,9 +1,9 @@
 use crate::types::ExchangeConfig;
 use crate::types::SwapConfig;
+use anyhow::Result;
 use async_trait::async_trait;
 use candid::CandidType;
 use enum_dispatch::enum_dispatch;
-use ic_cdk::api::call::CallResult;
 use icpswap_client::ICPSwapClient;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
@@ -16,15 +16,11 @@ pub trait SwapClient {
     fn get_config(&self) -> SwapConfig;
     fn clone_box(&self) -> Box<dyn SwapClient>;
     fn set_swap_canister_id(&mut self, swap_canister_id: CanisterId);
-    async fn get_quote(
-        &self,
-        amount: u128,
-        min_amount_out: u128,
-    ) -> CallResult<Result<u128, String>>;
-    async fn deposit_account(&self) -> CallResult<Account>;
-    async fn deposit(&self, amount: u128) -> CallResult<()>;
-    async fn swap(&self, amount: u128, min_amount_out: u128) -> CallResult<Result<u128, String>>;
-    async fn withdraw(&self, successful_swap: bool, amount: u128) -> CallResult<u128>;
+    async fn get_quote(&self, amount: u128, min_amount_out: u128) -> Result<Result<u128, String>>;
+    async fn deposit_account(&self) -> Result<Account>;
+    async fn deposit(&self, amount: u128) -> Result<()>;
+    async fn swap(&self, amount: u128, min_amount_out: u128) -> Result<Result<u128, String>>;
+    async fn withdraw(&self, successful_swap: bool, amount: u128) -> Result<u128>;
 }
 
 impl Clone for Box<dyn SwapClient> {
@@ -54,7 +50,7 @@ impl SwapClientEnum {
 
                 SwapClientEnum::ICPSwapClient(ICPSwapClient::new(
                     config.swap_client_id,
-                    ic_cdk::api::id(),
+                    ic_cdk::api::canister_self(),
                     icpswap.swap_canister_id,
                     token0,
                     token1,

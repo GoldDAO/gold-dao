@@ -1,5 +1,5 @@
 use crate::state::{mutate_state, read_state};
-use canister_time::{timestamp_seconds, DAY_IN_SECONDS};
+use bity_ic_canister_time::{timestamp_seconds, DAY_IN_SECONDS};
 use gldt_stake_common::proposals::VoteType;
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{

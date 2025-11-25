@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_principal;
 use crate::model::allocated_rewards_pool::AllocatedRewards;
 use crate::state::read_state;
-use canister_tracing_macros::trace;
+use bity_ic_canister_tracing_macros::trace;
 pub use gldt_stake_api_canister::allocated_rewards_balance::{
     Args as AllocatedRewardsBalanceArgs, Response as AllocatedRewardsBalanceResponse,
 };

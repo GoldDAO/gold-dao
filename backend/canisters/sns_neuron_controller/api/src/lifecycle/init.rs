@@ -1,7 +1,7 @@
 use candid::Nat;
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
-use types::BuildVersion;
+use bity_ic_types::BuildVersion;
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct InitArgs {
     pub test_mode: bool,
