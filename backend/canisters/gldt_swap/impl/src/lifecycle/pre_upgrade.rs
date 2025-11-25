@@ -1,3 +1,4 @@
+use crate::state::take_icrc3;
 use bity_ic_stable_memory::get_writer;
 use ic_cdk_macros::pre_upgrade;
 use tracing::info;
@@ -9,11 +10,12 @@ fn pre_upgrade() {
     info!("Pre upgrade.");
 
     let runtime_state = take_state();
+    let icrc3 = take_icrc3();
 
     let logs = bity_ic_canister_logger::export_logs();
     let traces = bity_ic_canister_logger::export_traces();
 
-    let stable_state = (runtime_state, logs, traces);
+    let stable_state = (runtime_state, logs, traces, icrc3);
 
     let mut memory = get_upgrades_memory();
     let writer = get_writer(&mut memory);

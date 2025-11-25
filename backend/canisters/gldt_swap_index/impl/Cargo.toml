@@ -1,0 +1,56 @@
+[package]
+name = "gldt_swap_index"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+[features]
+default = []  # Empty default features
+inttest = []
+
+[dependencies]
+candid = { workspace = true}
+futures = { workspace = true}
+hex = { workspace = true}
+ic-cdk = { workspace = true}
+ic-cdk-macros = { workspace = true}
+ic-cdk-timers = { workspace = true}
+ic-ledger-types = { workspace = true}
+ic-stable-structures = { workspace = true}
+ic0 = { workspace = true}
+icrc-ledger-types = { workspace = true}
+rmp-serde = { workspace = true}
+serde = { workspace = true}
+serde_bytes = { workspace = true}
+serde_json = { workspace = true}
+sha2 = { workspace = true}
+tracing = { workspace = true}
+tracing-attributes = { workspace = true}
+tracing-subscriber = { workspace = true}
+num-bigint = { workspace = true}
+time = { workspace = true, features = [
+  "macros",
+  "serde",
+  "parsing",
+  "formatting",
+] }
+minicbor = { workspace = true, features = ["alloc", "derive"] }
+lazy_static = "1.4.0"
+gldt_swap_index_api_canister = { path = "../api"}
+
+bity-ic-canister-logger = { workspace = true}
+bity-ic-canister-state-macros = { workspace = true}
+bity-ic-canister-tracing-macros = { workspace = true}
+bity-ic-canister-time = { workspace = true}
+bity-ic-serializer = { workspace = true}
+bity-ic-stable-memory = { workspace = true}
+bity-ic-types = { workspace = true}
+bity-ic-utils = { workspace = true}
+bity-ic-icrc3-c2c-client = { workspace = true}
+bity-ic-icrc3-archive-c2c-client = { workspace = true}
+http_request = { path = '../../../libraries/http_request' }
+types = { path = '../../../libraries/types' }
+gldt_swap_common = { path = "../../gldt_swap/common"}

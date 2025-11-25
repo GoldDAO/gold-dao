@@ -11,7 +11,7 @@ async fn get_active_swaps_by_user(args: GetActiveSwapsByUserArgs) -> GetActiveSw
     let user_principal = args.unwrap_or(read_state(|s| s.env.caller()));
     read_state(|s| {
         s.data
-            .swaps
+            .swap_system
             .get_active_swaps_by_user_principal(user_principal)
     })
 }

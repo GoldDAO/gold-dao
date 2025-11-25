@@ -1,0 +1,13 @@
+[package]
+name = "origyn_nft_canister_c2c_client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bity-ic-canister-client = { workspace = true }
+origyn_nft_canister = { path = "../api" }
+types = { path = "../../../libraries/types" }
+ic-cdk = { workspace = true }
+candid = { workspace = true }

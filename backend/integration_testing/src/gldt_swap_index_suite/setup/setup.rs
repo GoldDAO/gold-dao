@@ -34,6 +34,7 @@ pub struct TestEnv {
     pub owner_1: Principal,
     pub owner_2: Principal,
     pub index_canister_id: Principal,
+    pub controller: Principal,
 }
 
 pub struct TestEnvBuilder {
@@ -142,23 +143,37 @@ impl TestEnvBuilder {
         constants.tx_window = Duration::from_millis(500);
         constants.max_transactions_in_window = 100;
         constants.max_blocks_per_response = 100;
-        constants.max_transactions_to_purge = 5;
+        constants.max_transactions_to_purge = 100;
         constants.initial_cycles = 5_000_000_000_000;
         constants.reserved_cycles = 5_000_000_000_000;
+        constants.ttl_for_non_archived_transactions = Duration::from_secs(10000);
+        constants.max_unarchived_transactions = 100;
         // INIT ICRC3
 
         let gldt_swap_init_args = gldt_swap_api_canister::Args::Init(InitArgs {
             test_mode: true,
             version: BuildVersion::min(),
             commit_hash: "Test".to_string(),
-            swap_configs: vec![swap_config_1g, swap_config_10g, swap_config_100g, swap_config_1000g],
+            swap_configs: vec![
+                swap_config_1g,
+                swap_config_10g,
+                swap_config_100g,
+                swap_config_1000g,
+            ],
             authorized_principals: vec![self.controller],
-             icrc3_config: ICRC3Config {
+            buyback_burn_canister: None,
+            icrc3_config: ICRC3Config {
                 supported_blocks: vec![SupportedBlockType {
-                    block_type: "reverse_swap".to_string(),
+                    block_type: "forward_swap".to_string(),
                     url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
                 },SupportedBlockType {
-                    block_type: "forward_swap".to_string(),
+                    block_type: "reverse_swap".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                }, SupportedBlockType {
+                    block_type: "forward_swap_old".to_string(),
+                    url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
+                }, SupportedBlockType {
+                    block_type: "reverse_swap_old".to_string(),
                     url: "https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-3/README.md#supported-block-types".to_string(),
                 }],
                 constants,
@@ -171,21 +186,21 @@ impl TestEnvBuilder {
             gldt_swap_init_args,
         );
 
-        // let index_canister_id = setup_index_canister(
-        //     &mut pic,
-        //     self.index_canister_id,
-        //     index_init_args,
-        //     self.controller,
-        // );
-        // let index_init_args = gldt_swap_index_api_canister::Args::Init(
-        //     gldt_swap_index_api_canister::init::InitArgs {
-        //         test_mode: true,
-        //         version: BuildVersion::min(),
-        //         commit_hash: "commit_hash".to_string(),
-        //         authorized_principals: vec![test_env.controller.clone()],
-        //         ledger_canister_id: Principal::anonymous(),
-        //     },
-        // );
+        let index_init_args = gldt_swap_index_api_canister::Args::Init(
+            gldt_swap_index_api_canister::init::InitArgs {
+                test_mode: true,
+                version: BuildVersion::min(),
+                commit_hash: "commit_hash".to_string(),
+                authorized_principals: vec![self.controller.clone()],
+                ledger_canister_id: gldt_swap_canister_id,
+            },
+        );
+        let index_canister_id = setup_index_canister(
+            &pic,
+            self.index_canister_id,
+            index_init_args,
+            self.controller,
+        );
 
         TestEnv {
             pic: Rc::clone(&pic_ref),
@@ -195,9 +210,10 @@ impl TestEnvBuilder {
             gold_1000g_nft_test_env,
             gldt_ledger_canister_id,
             gldt_swap_canister_id,
-            index_canister_id: self.index_canister_id,
+            index_canister_id: index_canister_id,
             owner_1: Principal::from_text("54vkq-taaaa-aaaap-ahqra-cai").unwrap(),
             owner_2: Principal::from_text("s2ryu-oyaaa-aaaap-qhq2q-cai").unwrap(),
+            controller: self.controller,
         }
     }
 }

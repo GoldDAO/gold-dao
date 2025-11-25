@@ -1,30 +1,26 @@
-use candid::{CandidType, Principal};
+use candid::CandidType;
+use gldt_swap_common::general_error::GeneralError;
+use gldt_swap_common::nft::Nft;
+use gldt_swap_common::swap::SwapIndex;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
-use gldt_swap_common::{
-    nft::NftID,
-    swap::{LockError, NftValidationError, ServiceDownReason, SwapId},
-};
-
-#[derive(CandidType, Deserialize, Clone, Debug, PartialEq)]
-pub struct Args {
-    pub nft_id: NftID,
-    pub nft_canister_id: Principal,
-}
-
-pub type Response = Result<SwapId, SwapTokensForNftRequestErrors>;
+pub type Args = HashSet<Nft>;
+pub type Response = Result<Vec<SwapIndex>, SwapTokensForNftErrors>;
 
 #[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
-pub enum SwapTokensForNftRequestErrors {
-    GetNftMetaDetailError(GetNftMetaDetailErrorReason),
-    NftLocked(LockError),
-    NftValidationErrors(Vec<NftValidationError>),
-    CantForgeSwapId,
-    ServiceDown(ServiceDownReason),
+pub enum SwapTokensForNftErrors {
+    Limit(String),
     SwapCreationError,
     NotOwnedBySwapCanister,
-    CantBeAnonymous(String),
     Retry(RetryInMilliseconds),
+    GeneralError(GeneralError),
+}
+
+impl From<GeneralError> for SwapTokensForNftErrors {
+    fn from(err: GeneralError) -> Self {
+        SwapTokensForNftErrors::GeneralError(err)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, CandidType)]

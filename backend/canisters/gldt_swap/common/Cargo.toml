@@ -11,11 +11,9 @@ inttest = []
 [dependencies]
 candid = { workspace = true }
 bity-ic-canister-time = { workspace = true }
-ic-stable-structures = { workspace = true }
 icrc-ledger-types = { workspace = true }
-ic-ledger-types = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-origyn_nft_reference = { path = '../../../external_canisters/origyn_nft_reference/api' }
 types = { path = '../../../libraries/types' }
-tracing = { workspace = true }
-ic0 = "0.23.0"
+origyn_nft_canister_c2c_client = { path = "../../../external_canisters/origyn_nft/c2c_client" }
+minicbor = { workspace = true, features = ["alloc", "derive"] }
+cbor = { path = '../../../libraries/cbor' }

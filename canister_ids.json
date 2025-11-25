@@ -15,6 +15,20 @@
     "ic": "o4yaf-3yaaa-aaaap-abr2a-cai",
     "staging": "o6ihl-oyaaa-aaaal-ac5oa-cai"
   },
+  "gldnft_backend_1000g": {
+    "ic": "7i7jl-6qaaa-aaaam-abjma-cai"
+  },
+  "gldnft_backend_100g": {
+    "ic": "zhfjc-liaaa-aaaal-acgja-cai"
+  },
+  "gldnft_backend_10g": {
+    "ic": "sy3ra-iqaaa-aaaao-aixda-cai",
+    "staging": "qwf5l-cqaaa-aaaad-aapma-cai"
+  },
+  "gldnft_backend_1g": {
+    "ic": "io7gn-vyaaa-aaaak-qcbiq-cai",
+    "staging": "g6yny-dyaaa-aaaab-qb2kq-cai"
+  },
   "gldt_ledger": {
     "ic": "6c7su-kiaaa-aaaar-qaira-cai",
     "staging": "6uad6-fqaaa-aaaam-abovq-cai"
@@ -36,8 +50,13 @@
     "preprod": "wmd7w-pqaaa-aaaai-qplaa-cai",
     "staging": "qfyvj-4qaaa-aaaam-qbfka-cai"
   },
-  "usdg": {
-    "staging": "xmwkz-tiaaa-aaaai-q3kva-cai"
+  "gldt_swap_index": {
+    "staging": "h6ee6-3qaaa-aaaak-quluq-cai",
+    "ic": "jb7af-tiaaa-aaaam-aeyrq-cai"
+  },
+  "gldt_swap_old_archive": {
+    "ic": "van23-gaaaa-aaaar-qajmq-cai",
+    "staging": "yx6zg-byaaa-aaaak-qucpq-cai"
   },
   "icp_ledger": {
     "staging": "ete3q-rqaaa-aaaal-qdlva-cai"
@@ -87,8 +106,7 @@
     "ic": "usw2n-uyaaa-aaaai-aqhzq-cai",
     "staging": "tgkyf-oaaaa-aaaap-qplbq-cai"
   },
-  "token_metrics": {
-    "ic": "teiwz-pqaaa-aaaap-ag7hq-cai",
-    "staging": "yfjcz-3iaaa-aaaap-accjq-cai"
+  "usdg": {
+    "staging": "xmwkz-tiaaa-aaaai-q3kva-cai"
   }
 }
