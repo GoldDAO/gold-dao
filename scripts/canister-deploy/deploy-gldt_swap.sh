@@ -13,7 +13,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
       principal \"465sx-szz6o-idcax-nrjhv-hprrp-qqx5e-7mqwr-wadib-uo7ap-lofbe-dae\";
       principal \"$(dfx canister id --network $NETWORK sns_governance)\";
     }"
-    BUYBACK_BURN_ACCOUNT_OPT="buyback_burn_canister = \"m45be-jaaaa-aaaak-qcgnq-cai.0000000000000000000000000000000000000000000000000000000000000001\""
+    BUYBACK_BURN_ACCOUNT_OPT="buyback_burn_canister = \"m45be-jaaaa-aaaak-qcgnq-cai.0000000000000000000000000000000000000000000000000000000000000001\";"
   elif [[ $NETWORK =~ ^(ic)$ ]]; then
     TESTMODE=false
     AUTHORIZED_PRINCIPALS="vec {
@@ -112,7 +112,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
     version = $BUILD_VERSION;
     swap_configs = $SWAP_CONFIGS;
     authorized_principals = $AUTHORIZED_PRINCIPALS;
-    $BUYBACK_BURN_ACCOUNT_OPT;
+    $BUYBACK_BURN_ACCOUNT_OPT
     icrc3_config = $ICRC3_CONFIG;
   }})"
 
