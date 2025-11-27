@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [2.0.1] - 2025-11-27
+
+#### Change
+
+- Update swap canister config with relevant parameters
+
+
 ### [2.0.0] - 2025-11-25
 
 #### Change
