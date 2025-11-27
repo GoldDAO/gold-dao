@@ -40,6 +40,9 @@ const useSwapNFTForTokens = (
         queryKey: ["FETCH_USER_NFT", collection.canister_id],
       });
       queryClient.invalidateQueries({
+        queryKey: ["FETCH_USER_NFT_COUNT", collection.canister_id],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["FETCH_USER_NFT_METRICS"],
       });
       queryClient.invalidateQueries({

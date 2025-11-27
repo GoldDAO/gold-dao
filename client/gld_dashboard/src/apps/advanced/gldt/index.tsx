@@ -33,7 +33,6 @@ const AdvancedGLDT = () => {
             </div>
           </>
         )}
-        <NFTMaintenanceMode />
       </InnerAppLayout.RightPanel>
     </InnerAppLayout>
   );

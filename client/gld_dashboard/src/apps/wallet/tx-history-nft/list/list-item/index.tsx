@@ -1,16 +1,10 @@
 import clsx from "clsx";
 import Icon from "@shared/ui/icons";
-import { CollectionBlockTxWithMetadata } from "@shared/hooks/useFetchNFTBlocks";
+import { BlockTx } from "@services/nft/utils/interfaces";
 import Address from "@components/strings/Address";
 import NFTValue from "../shared/NFTValue";
 
-const ListItem = ({
-  tx,
-  className,
-}: {
-  tx: CollectionBlockTxWithMetadata;
-  className?: string;
-}) => {
+const ListItem = ({ tx, className }: { tx: BlockTx; className?: string }) => {
   const renderAddress = (address: string | null) => {
     return address ? <Address size="lg">{address}</Address> : "N/A";
   };
@@ -40,7 +34,7 @@ const ListItem = ({
             <div className="text-content/60 text-sm">{tx.created_at}</div>
           </div>
         </div>
-        <NFTValue />
+        <NFTValue tx={tx} />
       </div>
     </div>
   );

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.2.1] - 2025-11-27
+
+#### Fix
+
+- Use correct canisters for NFT collections
+
 ### [2.2.0] - 2025-11-24
 
 #### Changed
