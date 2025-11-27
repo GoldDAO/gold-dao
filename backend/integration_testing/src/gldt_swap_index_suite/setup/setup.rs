@@ -160,6 +160,7 @@ impl TestEnvBuilder {
                 swap_config_100g,
                 swap_config_1000g,
             ],
+            gldt_swap_old_archive: Principal::from_text("yx6zg-byaaa-aaaak-qucpq-cai").unwrap(),
             authorized_principals: vec![self.controller],
             buyback_burn_canister: None,
             icrc3_config: ICRC3Config {

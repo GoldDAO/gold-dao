@@ -30,6 +30,7 @@ fn init(args: Args) {
                 authorized_principals: init_args.authorized_principals,
                 swap_configs: SwapConfigs::from_vec(init_args.swap_configs),
                 buyback_burn_canister: init_args.buyback_burn_canister,
+                old_archive_canister: init_args.gldt_swap_old_archive,
                 ..Default::default()
             };
 
