@@ -14,5 +14,6 @@ pub struct InitArgs {
     pub swap_configs: Vec<SwapCanisterConfig>,
     pub authorized_principals: Vec<Principal>,
     pub buyback_burn_canister: Option<Account>,
+    pub gldt_swap_old_archive: Principal,
     pub icrc3_config: ICRC3Config,
 }

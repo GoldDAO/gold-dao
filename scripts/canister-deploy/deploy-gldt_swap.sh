@@ -25,6 +25,9 @@ if [[ $REINSTALL == "reinstall" ]]; then
     exit 2
   fi
 
+  # Old archive canister
+  OLD_ARCHIVE_CANISTER_ID="$(dfx canister id --network $NETWORK gldt_swap_old_archive)"
+
   # Ledger canisters
   GLDT_LEDGER_ID="$(dfx canister id --network $NETWORK gldt_ledger)"
   OGY_LEDGER_ID="$(dfx canister id --network $NETWORK ogy_ledger)"
@@ -112,6 +115,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
     version = $BUILD_VERSION;
     swap_configs = $SWAP_CONFIGS;
     authorized_principals = $AUTHORIZED_PRINCIPALS;
+    gldt_swap_old_archive = principal \"$OLD_ARCHIVE_CANISTER_ID\";
     $BUYBACK_BURN_ACCOUNT_OPT
     icrc3_config = $ICRC3_CONFIG;
   }})"

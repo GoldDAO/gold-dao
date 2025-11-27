@@ -149,6 +149,7 @@ impl RealDataTestEnvBuilder {
             swap_configs: vec![swap_config_1g, swap_config_10g, swap_config_100g, swap_config_1000g],
             authorized_principals: vec![self.controller],
             buyback_burn_canister: None,
+            gldt_swap_old_archive: Principal::from_text("yx6zg-byaaa-aaaak-qucpq-cai").unwrap(),
             icrc3_config: ICRC3Config {
                 supported_blocks: vec![SupportedBlockType {
                     block_type: "reverse_swap".to_string(),
