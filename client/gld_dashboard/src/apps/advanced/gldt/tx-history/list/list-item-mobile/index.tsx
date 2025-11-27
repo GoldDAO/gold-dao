@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { CollectionBlockTxWithMetadata } from "@shared/hooks/useFetchNFTBlocks";
+import { BlockTx } from "@services/nft/utils/interfaces";
 import Address from "@components/strings/Address";
 import CopyAddressBtn from "@wallet/tx-history-token/list-item-mobile/CopyAddressBtn";
 import NFTValue from "../shared/NFTValue";
@@ -8,7 +8,7 @@ const ListItemMobile = ({
   tx,
   className,
 }: {
-  tx: CollectionBlockTxWithMetadata;
+  tx: BlockTx;
   className?: string;
 }) => {
   const renderAddress = (address: string | null) => {

@@ -1,19 +1,9 @@
 import type { BlockWithId } from "@services/swap_indexer/interfaces";
-import type { MetadataNFT } from "@services/nft/utils/interfaces";
 import { getDateUTC } from "@shared/utils/dates";
 import parseICRC3Value, {
   ICRC3ParsedValue,
 } from "@shared/utils/parsers/ICRC3Value";
 import _capitalize from "lodash/capitalize";
-
-export type BlockTx = {
-  tx_id: bigint;
-  nft_id: bigint;
-  created_at: string | null;
-  from: string | null;
-  to: string | null;
-  type: string | null;
-} & Partial<MetadataNFT>;
 
 const capitalizeType = (type: string | null) => {
   if (!type) return null;

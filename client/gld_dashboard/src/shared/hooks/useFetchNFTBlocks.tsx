@@ -11,7 +11,8 @@ import type { Args, Account, SortBy } from "@services/nft_indexer/interfaces";
 import { Principal } from "@dfinity/principal";
 import icrc7_token_metadata from "@services/nft/icrc7_token_metadata";
 import { parseMetadata } from "@services/nft/utils/index";
-import parseBlockWithId, { BlockTx } from "@shared/utils/parsers/BlockWithId";
+import parseBlockWithId from "@shared/utils/parsers/BlockWithId";
+import { BlockTx } from "@services/nft/utils/interfaces";
 
 export interface FetchNFTBlocksParams {
   data: BlockTx[];

@@ -4,10 +4,9 @@ import { useAuth } from "@auth/index";
 import { NFTCollection } from "@services/nft/utils/interfaces";
 import ListItem from "@wallet/tx-history-nft/list/list-item";
 import ListItemMobile from "@wallet/tx-history-nft/list/list-item-mobile";
-import useFetchSwapBlocks, {
-  CollectionBlockTxWithMetadata,
-} from "@shared/hooks/useFetchSwapBlocks";
+import useFetchSwapBlocks from "@shared/hooks/useFetchSwapBlocks";
 import { SWAP_INDEXER_CANISTER_ID } from "@constants";
+import { BlockTx } from "@services/nft/utils/interfaces";
 
 const List = ({ collection }: { collection: NFTCollection }) => {
   const { unauthenticatedAgent, isConnected, principalId } = useAuth();
@@ -23,7 +22,7 @@ const List = ({ collection }: { collection: NFTCollection }) => {
     enabled: isConnected && !!unauthenticatedAgent,
   });
 
-  const data = useMemo<CollectionBlockTxWithMetadata[]>(
+  const data = useMemo<BlockTx[]>(
     () => (txs.data ? txs.data.pages.flatMap((page) => page.data) : []),
     [txs]
   );
