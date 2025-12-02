@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.9] - 2025-12-02
 
+#### Modified
+
+- Update all libraries to run with bity crates
+  
 ### [1.0.8] - 2025-07-18
 
 #### Added
