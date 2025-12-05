@@ -1,7 +1,7 @@
 // import { useForm } from "react-hook-form";
 
 const socialLinks = [
-  { name: "X (TWITTER)", href: "https://x.com/thegolddao" },
+  { name: "X (TWITTER)", href: "https://x.com/gldtorg" },
   { name: "TELEGRAM", href: "https://t.me/gldrwa" },
   { name: "LINKEDIN", href: "https://www.linkedin.com/showcase/gold-dao" },
   { name: "MEDIUM", href: "https://medium.com/@GoldDAO" },
