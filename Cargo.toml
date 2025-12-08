@@ -99,7 +99,7 @@ lazy_static = "1.4.0"
 anyhow = "1.0.99"
 
 # Bity crates
-bity-ic-icrc3 = { version =  "0.5.0" } # , features = ["debug-logs"]
+bity-ic-icrc3 = { version =  "0.4.7" } # , features = ["debug-logs"]
 bity-ic-icrc3-macros = "0.3.3"
 bity-ic-canister-time = "0.2.1"
 bity-ic-serializer = "0.1.0"

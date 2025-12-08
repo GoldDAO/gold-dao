@@ -51,8 +51,8 @@
     "staging": "qfyvj-4qaaa-aaaam-qbfka-cai"
   },
   "gldt_swap_index": {
-    "staging": "h6ee6-3qaaa-aaaak-quluq-cai",
-    "ic": "jb7af-tiaaa-aaaam-aeyrq-cai"
+    "ic": "jb7af-tiaaa-aaaam-aeyrq-cai",
+    "staging": "h6ee6-3qaaa-aaaak-quluq-cai"
   },
   "gldt_swap_old_archive": {
     "ic": "van23-gaaaa-aaaar-qajmq-cai",
@@ -110,3 +110,4 @@
     "staging": "xmwkz-tiaaa-aaaai-q3kva-cai"
   }
 }
+

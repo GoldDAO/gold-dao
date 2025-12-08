@@ -15,6 +15,6 @@ serde = { workspace = true, features = ["derive"] }
 types = { path = '../../../libraries/types' }
 gldt_swap_common = { path = "../common", features = []}
 utils = { path = '../../../libraries/utils' }
-bity-ic-icrc3 = { workspace = true }
+bity-ic-icrc3 = { version =  "0.5.0" } # , features = ["debug-logs"]
 bity-ic-types = { workspace = true }
 gldt_swap_api_archive = { path = "../../../external_canisters/gldt_swap_archive/api" }
