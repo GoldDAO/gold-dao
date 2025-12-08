@@ -15,7 +15,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_bytes = { workspace = true}
 types = { path = '../../../libraries/types' }
 utils = { path = '../../../libraries/utils' }
-bity-ic-icrc3 = {workspace = true }
+bity-ic-icrc3 = { version =  "0.5.0" } # , features = ["debug-logs"]
 minicbor = { workspace = true, features = ["alloc", "derive"] }
 ic-stable-structures = { workspace = true }
 bity-ic-types = { workspace = true }

@@ -263,11 +263,6 @@
         "env_override": null,
         "output": "backend/canisters/gldt_swap_index/api/declarations"
       },
-      "metadata": [
-        {
-          "name": "candid:service"
-        }
-      ],
       "type": "custom",
       "wasm": "backend/canisters/gldt_swap_index/target/wasm32-unknown-unknown/release/gldt_swap_index_canister.wasm.gz"
     },

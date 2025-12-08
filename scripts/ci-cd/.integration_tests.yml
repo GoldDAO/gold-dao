@@ -41,7 +41,6 @@ integration tests:
       "sns_neuron_controller integration-test build",
       "sns_rewards integration-test build",
       "super_stats_v3 integration-test build",
-      "token_metrics integration-test build",
       "gldt_swap integration-test build",
       "gldt_swap_index integration-test build",
       "gldt_stake integration-test build",

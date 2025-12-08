@@ -10,13 +10,13 @@ pub use gldt_swap_api_canister::Args;
 use ic_cdk_macros::post_upgrade;
 use tracing::info;
 
-use crate::migrations::types::state::RuntimeStateV0;
-use crate::model::swap_configs::SwapConfigs;
-use candid::Nat;
-use candid::Principal;
-use gldt_swap_common::swap_canister_config::FractionalizationConfig;
-use gldt_swap_common::swap_canister_config::GeneralFractionalizationConfig;
-use gldt_swap_common::swap_canister_config::SwapCanisterConfig;
+// use crate::migrations::types::state::RuntimeStateV0;
+// use crate::model::swap_configs::SwapConfigs;
+// use candid::Nat;
+// use candid::Principal;
+// use gldt_swap_common::swap_canister_config::FractionalizationConfig;
+// use gldt_swap_common::swap_canister_config::GeneralFractionalizationConfig;
+// use gldt_swap_common::swap_canister_config::SwapCanisterConfig;
 
 #[post_upgrade]
 #[trace]
@@ -31,9 +31,9 @@ fn post_upgrade(args: Args) {
             let reader = get_reader(&memory);
 
             // uncomment these lines if you want to do a normal upgrade
-            // let (mut state, logs, traces, icrc3): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
-            //     ::deserialize(reader)
-            //     .unwrap();
+            let (mut state, logs, traces, icrc3): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
+                ::deserialize(reader)
+                .unwrap();
 
             // // NOTE: Uncomment to change the configs
             // state.data.swap_configs = SwapConfigs {
@@ -62,10 +62,10 @@ fn post_upgrade(args: Args) {
             //     ],
             // };
             // uncomment these lines if you want to do an upgrade with migration
-            let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
-                ::deserialize(reader)
-                .unwrap();
-            let mut state = RuntimeState::from(runtime_state_v0);
+            // let (runtime_state_v0, logs, traces, icrc3): (RuntimeStateV0, Vec<LogEntry>, Vec<LogEntry>, ICRC3) = bity_ic_serializer
+            //     ::deserialize(reader)
+            //     .unwrap();
+            // let mut state = RuntimeState::from(runtime_state_v0);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
