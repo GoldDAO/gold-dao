@@ -7,7 +7,6 @@ spec:
           "gldt_swap_index",
           "buyback_burn",
           "icp_neuron",
-          "token_metrics",
           "sns_rewards",
           "sns_neuron_controller",
           "integration_testing",

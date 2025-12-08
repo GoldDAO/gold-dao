@@ -57,5 +57,7 @@ utils = { path = '../libraries/utils' }
 
 # Bity crates
 bity-ic-canister-time = { workspace = true }
-bity-ic-icrc3 = { workspace = true }
+bity-ic-icrc3 = { version =  "0.5.0" } # , features = ["debug-logs"]
 bity-ic-types = { workspace = true }
+
+bity-ic-icrc3_old = { package = "bity-ic-icrc3", version = "0.4.7" }  # renamed

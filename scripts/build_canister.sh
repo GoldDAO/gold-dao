@@ -69,9 +69,14 @@ else
   ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
   -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}.wasm \
   shrink --keep-name-section
-  ic-wasm $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm \
-  -o $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
-  optimize --inline-functions-with-loops O3 --keep-name-section
+
+  ic-wasm "$BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/$1.wasm" \
+    -o "$BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm" \
+    metadata candid:service \
+      -f "$BASE_CANISTER_PATH/$1/api/can.did" \
+      -v public \
+      --keep-name-section
+
   gzip --no-name -9 -v -c $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm \
     > $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz
   gzip -v -t $BASE_CANISTER_PATH/$1/target/wasm32-unknown-unknown/release/${1}_canister.wasm.gz

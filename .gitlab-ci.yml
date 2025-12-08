@@ -59,9 +59,6 @@ include:
   #     src-folder: super_stats_v3
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
-      src-folder: token_metrics
-  - local: scripts/ci-cd/.canister_unit_test_coverage.yml
-    inputs:
       src-folder: sns_rewards
   - local: scripts/ci-cd/.canister_unit_test_coverage.yml
     inputs:
@@ -99,9 +96,6 @@ include:
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: super_stats_v3
-  - local: scripts/ci-cd/.canister_builds.yml
-    inputs:
-      src-folder: token_metrics
   - local: scripts/ci-cd/.canister_builds.yml
     inputs:
       src-folder: gldt_swap
@@ -155,9 +149,6 @@ include:
   # - local: scripts/ci-cd/.canister_deploys.yml
   #   inputs:
   #     src-folder: super_stats_v3
-  - local: scripts/ci-cd/.canister_deploys.yml
-    inputs:
-      src-folder: token_metrics
   # Frontend deployments
   - local: scripts/ci-cd/.frontend_deploys.yml
     inputs:
