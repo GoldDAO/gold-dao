@@ -2,7 +2,6 @@ import { Outlet, useNavigation } from "react-router-dom";
 import TopNav from "@shared/components/app-layout/navbars/top-nav";
 import SideNav from "@shared/components/app-layout/navbars/side-nav";
 import BottomNav from "@shared/components/app-layout/navbars/bottom-nav";
-import TransferDialogNFT from "@wallet/transfer-nft";
 
 const NavigationProgress = () => {
   return (
@@ -37,7 +36,6 @@ const AppLayout = () => {
           <BottomNav className="py-5 px-4" />
         </div>
       </div>
-      <TransferDialogNFT />
     </>
   );
 };
