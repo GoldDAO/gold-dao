@@ -199,7 +199,7 @@ export const NFTCollectionSection = ({
   const hasSelected = collection.nfts_selected.length > 0;
 
   return (
-    <div className="mb-6 border border-border rounded-lg p-4">
+    <div className="mb-6 border border-border rounded-lg p-4 @container">
       <Header isOpen={isExpanded} onToggle={() => setIsExpanded(!isExpanded)} />
       {isExpanded && (
         <>
@@ -223,7 +223,7 @@ export const NFTCollectionSection = ({
               </button>
             )}
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="grid gap-2 grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3">
             {allNFTs.map((nft) => {
               const isSelected = collection.nfts_selected.some(
                 (selected) => selected.id.toString() === nft.id.toString()
