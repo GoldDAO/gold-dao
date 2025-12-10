@@ -50,7 +50,7 @@ const NFTsViewer = ({ className }: { className?: string }) => {
           {NFTCollections.map((collection) => (
             <Tab
               key={collection.name}
-              className="cursor-pointer w-full border border-border p-4 rounded-xl focus:not-data-focus:outline-none data-focus:outline data-focus:outline-gold data-hover:border-gold data-selected:border-gold"
+              className="cursor-pointer w-full border-b-2 border-surface-primary bg-surface-primary shadow-sm p-4 rounded-t-lg focus:not-data-focus:outline-none data-focus:outline data-focus:outline-gold data-hover:border-gold data-selected:border-gold"
             >
               <TabCollection key={collection.name} collection={collection} />
             </Tab>

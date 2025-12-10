@@ -16,7 +16,7 @@ const Card = ({ nft }: { nft: NFT }) => {
   return (
     <>
       <div
-        className="border border-border rounded-xl p-4 cursor-pointer hover:opacity-80 transition-colors"
+        className="bg-surface-primary shadow-sm rounded-xl p-4 cursor-pointer hover:opacity-80 transition-colors"
         onClick={handleCardClick}
       >
         {nft.img_preview && (
@@ -26,7 +26,7 @@ const Card = ({ nft }: { nft: NFT }) => {
             className="w-full h-auto rounded-lg mb-2"
           />
         )}
-        {nft.name && <div className="text-content">{nft.name}</div>}
+        {nft.name && <div className="text-content text-center">{nft.name}</div>}
       </div>
       <Details nft={nft} open={isDialogOpen} onClose={handleCloseDialog} />
     </>
