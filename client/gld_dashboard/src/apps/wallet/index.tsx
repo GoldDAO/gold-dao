@@ -5,16 +5,17 @@ import { useAuth } from "@auth/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import WalletList from "@wallet/wallet-list";
 import WalletListDisconnected from "@wallet/wallet-list-disconnected";
-import TxHistoryToken from "@wallet/tx-history-token";
-import TxHistoryNFT from "@wallet/tx-history-nft";
-import TxHistoryDisconnected from "@wallet/tx-history-disconnected";
+import TxHistoryToken from "@wallet/token/tx-history";
+import TxHistoryDisconnected from "@wallet/shared/components/tx-history-disconnected";
 import { TOKENS, TOKEN_WHITELIST, TOKEN_GLDT } from "@shared/utils/tokens";
 import { TokenSelectedAtom } from "@wallet/shared/atoms/WalletAtom";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
-import OverviewSection from "@wallet/overview-section";
+import OverviewToken from "@wallet/token/overview";
+import OverviewNFT from "@wallet/nft/overview";
 import NFTMaintenanceMode from "@shared/components/nft-maintenance-mode";
 import useGetGLDDashboardMaintenanceMode from "@shared/hooks/useGetGLDDashboardMaintenanceMode";
 import { GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID } from "@constants";
+import Tabs from "@wallet/nft/tabs";
 
 const Wallet = () => {
   const { isConnected, unauthenticatedAgent } = useAuth();
@@ -33,14 +34,15 @@ const Wallet = () => {
       !searchParams.get("token") ||
       !TOKEN_WHITELIST.includes(searchParams.get("token")!)
     ) {
-      searchParams.set("token", TOKEN_GLDT.display_name);
       setSelectedToken(TOKEN_GLDT);
-      setSearchParams(searchParams);
+      setSearchParams({ token: TOKEN_GLDT.display_name });
     } else {
       if (searchParams.get("token") !== "GLDNFT") {
         setSelectedToken(
           TOKENS.find((t) => t.display_name === searchParams.get("token"))!
         );
+        // Supprimer tous les autres paramètres sauf "token"
+        setSearchParams({ token: searchParams.get("token")! });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,32 +68,24 @@ const Wallet = () => {
         )}
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
-        {!isConnected ? (
-          <>
-            <OverviewSection />
-            <div className="p-4 xl:p-8 mt-12">
-              <div className="mb-4">Transactions</div>
-              <TxHistoryDisconnected />
-            </div>
-          </>
-        ) : searchParams.get("token") === "GLDNFT" ? (
-          maintenanceMode ? (
+        {searchParams.get("token") === "GLDNFT" &&
+          (maintenanceMode ? (
             <NFTMaintenanceMode />
           ) : (
             <>
-              <OverviewSection />
+              <OverviewNFT />
               <div className="p-4 xl:p-8 mt-12">
-                <div className="mb-4">Transactions</div>
-                <TxHistoryNFT />
+                <Tabs />
               </div>
             </>
-          )
-        ) : (
+          ))}
+
+        {searchParams.get("token") !== "GLDNFT" && (
           <>
-            <OverviewSection />
+            <OverviewToken />
             <div className="p-4 xl:p-8 mt-12">
               <div className="mb-4">Transactions</div>
-              <TxHistoryToken />
+              {isConnected ? <TxHistoryToken /> : <TxHistoryDisconnected />}
             </div>
           </>
         )}

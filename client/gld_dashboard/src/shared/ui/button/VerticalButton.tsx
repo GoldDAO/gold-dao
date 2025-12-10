@@ -12,7 +12,7 @@ const VerticalButton = ({ icon, children, ...props }: ButtonProps) => {
       className={clsx(
         "rounded-xl shrink-0 cursor-pointer disabled:cursor-default",
         "bg-primary",
-        "w-[64px] xl:w-[140px]"
+        "w-[64px] xl:w-[112px]"
       )}
       {...props}
     >

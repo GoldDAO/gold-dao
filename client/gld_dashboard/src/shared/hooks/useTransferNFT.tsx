@@ -41,6 +41,9 @@ const useTransferNFT = (
         queryKey: ["FETCH_USER_NFT", canister_id],
       });
       queryClient.invalidateQueries({
+        queryKey: ["FETCH_USER_NFT_COUNT", canister_id],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["FETCH_USER_NFT_METRICS"],
       });
       queryClient.invalidateQueries({

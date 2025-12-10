@@ -9,6 +9,7 @@ export type TransferNFTState = {
   transfer_tab: "send" | "receive";
   is_open_receive_dialog: boolean;
   is_open_send_dialog_form: boolean;
+  is_open_send_dialog_select: boolean;
   is_open_send_dialog_confirm: boolean;
   is_open_send_dialog_details: boolean;
   send_receive_address: string;
@@ -24,6 +25,7 @@ const initialState: TransferNFTState = {
   transfer_tab: "send",
   is_open_receive_dialog: false,
   is_open_send_dialog_form: false,
+  is_open_send_dialog_select: false,
   is_open_send_dialog_confirm: false,
   is_open_send_dialog_details: false,
   send_receive_address: "",
@@ -43,6 +45,8 @@ const reducer = (
         value: "send" | "receive";
       }
     | { type: "OPEN_TRANSFER_DIALOG" }
+    | { type: "OPEN_SEND_DIALOG_SELECT"; value: string }
+    | { type: "CANCEL_SEND_SELECT" }
     | { type: "OPEN_SEND_DIALOG_CONFIRM"; value: string }
     | { type: "CANCEL_SEND_CONFIRM" }
     | { type: "OPEN_SEND_DIALOG_DETAILS" }
@@ -54,21 +58,34 @@ const reducer = (
         ...prev,
         transfer_tab: action.value,
         is_open_receive_dialog: action.value === "receive",
-        is_open_send_dialog_form: action.value === "send",
+        is_open_send_dialog_select: action.value === "send",
       };
 
     case "OPEN_TRANSFER_DIALOG":
       return {
         ...prev,
         ...initialState,
-        is_open_send_dialog_form: true,
+        is_open_send_dialog_select: true,
+      };
+
+    case "OPEN_SEND_DIALOG_SELECT":
+      return {
+        ...prev,
+        send_receive_address: action.value,
+        is_open_send_dialog_select: true,
+      };
+
+    case "CANCEL_SEND_SELECT":
+      return {
+        ...prev,
+        is_open_send_dialog_select: false,
       };
 
     case "OPEN_SEND_DIALOG_CONFIRM":
       return {
         ...prev,
         send_receive_address: action.value,
-        is_open_send_dialog_form: false,
+        is_open_send_dialog_select: false,
         is_open_send_dialog_confirm: true,
       };
 
@@ -76,7 +93,7 @@ const reducer = (
       return {
         ...prev,
         is_open_send_dialog_confirm: false,
-        is_open_send_dialog_form: true,
+        is_open_send_dialog_select: true,
       };
 
     case "OPEN_SEND_DIALOG_DETAILS":

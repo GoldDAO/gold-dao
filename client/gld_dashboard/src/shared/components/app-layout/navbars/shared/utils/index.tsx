@@ -22,11 +22,11 @@ const navItems: {
     icon: <Icon.Govern />,
   },
   { title: "Wallet", url: "/wallet", icon: <Icon.Wallet width={24} /> },
-  {
-    title: "Advanced",
-    url: "/advanced/gldt",
-    icon: <Icon.Speedometer width={24} />,
-  },
+  // {
+  //   title: "Advanced",
+  //   url: "/advanced/gldt",
+  //   icon: <Icon.Speedometer width={24} />,
+  // },
 ];
 
 export default navItems;
