@@ -24,7 +24,7 @@ const NFTItem = ({
       type="button"
       onClick={onToggle}
       className={clsx(
-        "p-3 border rounded-lg text-left transition-colors flex items-center gap-2 cursor-pointer",
+        "p-3 border rounded-lg text-left transition-colors flex justify-between items-center gap-2 cursor-pointer",
         isSelected
           ? "border-content bg-content/10"
           : "border-border hover:border-primary/50"
@@ -167,19 +167,14 @@ export const NFTCollectionSection = ({
     );
   }
 
-  const selectedIds = new Set(
-    collection.nfts_selected.map((nft) => nft.id.toString())
-  );
-  const uniqueAvailableNfts = collection.nfts.filter(
-    (nft) => !selectedIds.has(nft.id.toString())
-  );
-  const allNFTs = [...collection.nfts_selected, ...uniqueAvailableNfts].sort(
-    (a, b) => {
-      const aSerial = a.serial_number ?? Number(a.id);
-      const bSerial = b.serial_number ?? Number(b.id);
-      return aSerial - bSerial;
-    }
-  );
+  const selectedMap = new Map<string, NFT>();
+  collection.nfts_selected.forEach((nft) => {
+    selectedMap.set(nft.id.toString(), nft);
+  });
+  const allNFTs = collection.all_nfts_original_order.map((nft) => {
+    const id = nft.id.toString();
+    return selectedMap.has(id) ? selectedMap.get(id)! : nft;
+  });
 
   const handleSelectAll = () => {
     dispatchSelectNFTState({

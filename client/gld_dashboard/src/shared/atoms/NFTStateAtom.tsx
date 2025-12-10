@@ -16,6 +16,7 @@ export interface CollectionNFT {
   index: number;
   nfts: NFT[];
   nfts_selected: NFT[];
+  all_nfts_original_order: NFT[];
   is_empty: boolean;
   is_initialized: boolean;
   canister_id: string;
@@ -41,6 +42,7 @@ const initialState: SelectNFTState = {
     is_initialized: false,
     nfts: [],
     nfts_selected: [],
+    all_nfts_original_order: [],
     is_empty: true,
     canister_id: GLD_NFT_1G_CANISTER_ID,
     total_count: 0,
@@ -56,6 +58,7 @@ const initialState: SelectNFTState = {
     is_initialized: false,
     nfts: [],
     nfts_selected: [],
+    all_nfts_original_order: [],
     is_empty: true,
     canister_id: GLD_NFT_10G_CANISTER_ID,
     total_count: 0,
@@ -71,6 +74,7 @@ const initialState: SelectNFTState = {
     is_initialized: false,
     nfts: [],
     nfts_selected: [],
+    all_nfts_original_order: [],
     is_empty: true,
     canister_id: GLD_NFT_100G_CANISTER_ID,
     total_count: 0,
@@ -86,6 +90,7 @@ const initialState: SelectNFTState = {
     is_initialized: false,
     nfts: [],
     nfts_selected: [],
+    all_nfts_original_order: [],
     is_empty: true,
     canister_id: GLD_NFT_1000G_CANISTER_ID,
     total_count: 0,
@@ -129,19 +134,15 @@ const reducer = (
   switch (action.type) {
     case "SET_COLLECTION_NFT": {
       const { name, nfts } = action.value;
-      const sortedNfts = [...nfts].sort((a, b) => {
-        const aSerial = a.serial_number ?? Number(a.id);
-        const bSerial = b.serial_number ?? Number(b.id);
-        return aSerial - bSerial;
-      });
       return {
         ...prev,
         [name]: {
           ...prev[name],
-          nfts: sortedNfts,
-          is_empty: !sortedNfts.length,
+          nfts: [...nfts],
+          all_nfts_original_order: [...nfts],
+          is_empty: !nfts.length,
           is_initialized: true,
-          total_count: sortedNfts.length,
+          total_count: nfts.length,
         },
       };
     }
@@ -198,13 +199,7 @@ const reducer = (
           (nft) => nft.id !== nft_id
         );
         const nft = collection.nfts_selected.find((nft) => nft.id === nft_id);
-        const nfts = nft
-          ? [...collection.nfts, nft].sort((a, b) => {
-              const aSerial = a.serial_number ?? Number(a.id);
-              const bSerial = b.serial_number ?? Number(b.id);
-              return aSerial - bSerial;
-            })
-          : collection.nfts;
+        const nfts = nft ? [...collection.nfts, nft] : collection.nfts;
         const total_count_selected = nfts_selected.length;
         const total_grams_selected = total_count_selected * collection.value;
         const total_gldt_selected = total_grams_selected * GLDT_VALUE_1G_NFT;
@@ -225,13 +220,7 @@ const reducer = (
         if (!nft) return prev;
 
         const nfts = collection.nfts.filter((nft) => nft.id !== nft_id);
-        const nfts_selected = [...collection.nfts_selected, nft].sort(
-          (a, b) => {
-            const aSerial = a.serial_number ?? Number(a.id);
-            const bSerial = b.serial_number ?? Number(b.id);
-            return aSerial - bSerial;
-          }
-        );
+        const nfts_selected = [...collection.nfts_selected, nft];
         const total_count_selected = nfts_selected.length;
         const total_grams_selected = total_count_selected * collection.value;
         const total_gldt_selected = total_grams_selected * GLDT_VALUE_1G_NFT;
@@ -253,13 +242,7 @@ const reducer = (
       const name = action.value;
       const collection = prev[name];
 
-      const allNFTs = [...collection.nfts, ...collection.nfts_selected].sort(
-        (a, b) => {
-          const aSerial = a.serial_number ?? Number(a.id);
-          const bSerial = b.serial_number ?? Number(b.id);
-          return aSerial - bSerial;
-        }
-      );
+      const allNFTs = [...collection.nfts, ...collection.nfts_selected];
 
       const total_count_selected = allNFTs.length;
       const total_grams_selected = total_count_selected * collection.value;
@@ -281,13 +264,7 @@ const reducer = (
       const name = action.value;
       const collection = prev[name];
 
-      const allNFTs = [...collection.nfts, ...collection.nfts_selected].sort(
-        (a, b) => {
-          const aSerial = a.serial_number ?? Number(a.id);
-          const bSerial = b.serial_number ?? Number(b.id);
-          return aSerial - bSerial;
-        }
-      );
+      const allNFTs = [...collection.nfts, ...collection.nfts_selected];
 
       return {
         ...prev,
