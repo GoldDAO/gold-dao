@@ -11,7 +11,7 @@ import Buy from "apps/buy";
 import Earn from "apps/earn";
 import Govern from "apps/govern";
 import Wallet from "apps/wallet";
-import AdvancedGLDT from "apps/advanced/gldt";
+// import AdvancedGLDT from "apps/advanced/gldt";
 
 const router = createBrowserRouter([
   {
@@ -74,19 +74,19 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "advanced/gldt",
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <AdvancedGLDT />
-              </Suspense>
-            ),
-          },
-        ],
-      },
+      // {
+      //   path: "advanced/gldt",
+      //   children: [
+      //     {
+      //       index: true,
+      //       element: (
+      //         <Suspense fallback={<div>Loading...</div>}>
+      //           <AdvancedGLDT />
+      //         </Suspense>
+      //       ),
+      //     },
+      //   ],
+      // },
       {
         path: "*",
         element: <NotFound />,

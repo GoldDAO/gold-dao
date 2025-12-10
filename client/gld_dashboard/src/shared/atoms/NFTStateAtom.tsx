@@ -111,20 +111,37 @@ const reducer = (
         value: CollectionNameNFT;
       }
     | {
+        type: "TOGGLE_NFT_BY_ID";
+        value: { name: CollectionNameNFT; nft_id: bigint };
+      }
+    | {
+        type: "SELECT_ALL_COLLECTION";
+        value: CollectionNameNFT;
+      }
+    | {
+        type: "DESELECT_ALL_COLLECTION";
+        value: CollectionNameNFT;
+      }
+    | {
         type: "RESET";
       }
 ) => {
   switch (action.type) {
     case "SET_COLLECTION_NFT": {
       const { name, nfts } = action.value;
+      const sortedNfts = [...nfts].sort((a, b) => {
+        const aSerial = a.serial_number ?? Number(a.id);
+        const bSerial = b.serial_number ?? Number(b.id);
+        return aSerial - bSerial;
+      });
       return {
         ...prev,
         [name]: {
           ...prev[name],
-          nfts,
-          is_empty: !nfts.length,
+          nfts: sortedNfts,
+          is_empty: !sortedNfts.length,
           is_initialized: true,
-          total_count: nfts.length,
+          total_count: sortedNfts.length,
         },
       };
     }
@@ -165,6 +182,122 @@ const reducer = (
           total_count_selected,
           total_grams_selected,
           total_gldt_selected,
+        },
+      };
+    }
+    case "TOGGLE_NFT_BY_ID": {
+      const { name, nft_id } = action.value;
+      const collection = prev[name];
+
+      const isSelected = collection.nfts_selected.some(
+        (nft) => nft.id === nft_id
+      );
+
+      if (isSelected) {
+        const nfts_selected = collection.nfts_selected.filter(
+          (nft) => nft.id !== nft_id
+        );
+        const nft = collection.nfts_selected.find((nft) => nft.id === nft_id);
+        const nfts = nft
+          ? [...collection.nfts, nft].sort((a, b) => {
+              const aSerial = a.serial_number ?? Number(a.id);
+              const bSerial = b.serial_number ?? Number(b.id);
+              return aSerial - bSerial;
+            })
+          : collection.nfts;
+        const total_count_selected = nfts_selected.length;
+        const total_grams_selected = total_count_selected * collection.value;
+        const total_gldt_selected = total_grams_selected * GLDT_VALUE_1G_NFT;
+
+        return {
+          ...prev,
+          [name]: {
+            ...collection,
+            nfts,
+            nfts_selected,
+            total_count_selected,
+            total_grams_selected,
+            total_gldt_selected,
+          },
+        };
+      } else {
+        const nft = collection.nfts.find((nft) => nft.id === nft_id);
+        if (!nft) return prev;
+
+        const nfts = collection.nfts.filter((nft) => nft.id !== nft_id);
+        const nfts_selected = [...collection.nfts_selected, nft].sort(
+          (a, b) => {
+            const aSerial = a.serial_number ?? Number(a.id);
+            const bSerial = b.serial_number ?? Number(b.id);
+            return aSerial - bSerial;
+          }
+        );
+        const total_count_selected = nfts_selected.length;
+        const total_grams_selected = total_count_selected * collection.value;
+        const total_gldt_selected = total_grams_selected * GLDT_VALUE_1G_NFT;
+
+        return {
+          ...prev,
+          [name]: {
+            ...collection,
+            nfts,
+            nfts_selected,
+            total_count_selected,
+            total_grams_selected,
+            total_gldt_selected,
+          },
+        };
+      }
+    }
+    case "SELECT_ALL_COLLECTION": {
+      const name = action.value;
+      const collection = prev[name];
+
+      const allNFTs = [...collection.nfts, ...collection.nfts_selected].sort(
+        (a, b) => {
+          const aSerial = a.serial_number ?? Number(a.id);
+          const bSerial = b.serial_number ?? Number(b.id);
+          return aSerial - bSerial;
+        }
+      );
+
+      const total_count_selected = allNFTs.length;
+      const total_grams_selected = total_count_selected * collection.value;
+      const total_gldt_selected = total_grams_selected * GLDT_VALUE_1G_NFT;
+
+      return {
+        ...prev,
+        [name]: {
+          ...collection,
+          nfts: [],
+          nfts_selected: allNFTs,
+          total_count_selected,
+          total_grams_selected,
+          total_gldt_selected,
+        },
+      };
+    }
+    case "DESELECT_ALL_COLLECTION": {
+      const name = action.value;
+      const collection = prev[name];
+
+      const allNFTs = [...collection.nfts, ...collection.nfts_selected].sort(
+        (a, b) => {
+          const aSerial = a.serial_number ?? Number(a.id);
+          const bSerial = b.serial_number ?? Number(b.id);
+          return aSerial - bSerial;
+        }
+      );
+
+      return {
+        ...prev,
+        [name]: {
+          ...collection,
+          nfts: allNFTs,
+          nfts_selected: [],
+          total_count_selected: 0,
+          total_grams_selected: 0,
+          total_gldt_selected: 0,
         },
       };
     }
@@ -213,16 +346,9 @@ export const CollectionSelectedAtom = atom((get) => {
   );
 });
 
-export const RandomSelectedNFTIdAtom = atom((get) => {
+export const TotalCollectionSelectedAtom = atom((get) => {
   const state = get(SelectNFTStateReducerAtom);
-  const selectedCollection = Object.values(state).find(
-    (collection) => collection.nfts_selected.length > 0
-  );
-  if (selectedCollection && selectedCollection.nfts_selected[0]) {
-    return {
-      canister: selectedCollection.canister_id,
-      tokenId: selectedCollection.nfts_selected[0],
-    };
-  }
-  return null;
+  return [state["1G"], state["10G"], state["100G"], state["1KG"]].filter(
+    (collection) => collection.total_count_selected > 0
+  ).length;
 });
