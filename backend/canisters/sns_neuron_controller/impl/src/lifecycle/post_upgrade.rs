@@ -5,7 +5,6 @@ use crate::state::RuntimeState;
 use bity_ic_canister_logger::LogEntry;
 use bity_ic_canister_tracing_macros::trace;
 use bity_ic_stable_memory::get_reader;
-use candid::Principal;
 use ic_cdk_macros::post_upgrade;
 pub use sns_neuron_controller_api_canister::Args;
 use tracing::info;
@@ -27,7 +26,7 @@ fn post_upgrade(args: Args) {
                 ::deserialize(reader)
                 .unwrap();
 
-            state.data.authorized_principals.push(Principal::from_text("wmy6h-hcvng-76kf7-uj5m2-tgm3w-nmo7m-avslw-qmsrg-32yuq-uccuk-5ae").unwrap());
+            state.data.neuron_managers.ogy.ogy_rewards_threshold = 10_000_000_000_000_u64.into(); // 100_000 OGY
 
             // uncomment these lines if you want to do an upgrade with migration
             // let (runtime_state_v0, logs, traces): (
