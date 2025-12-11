@@ -6,6 +6,9 @@
   "internal_dashboard": {
     "staging": "7qzkd-uaaaa-aaaap-ahxaq-cai"
   },
+  "gold_dao_chapter_2": {
+    "ic": "fjdhj-uyaaa-aaaai-q4fma-cai"
+  },
   "gld_dashboard": {
     "ic": "rbsh4-yyaaa-aaaal-qdigq-cai",
     "preprod": "pmjzm-tyaaa-aaaan-qmmda-cai",
@@ -110,4 +113,3 @@
     "staging": "xmwkz-tiaaa-aaaai-q3kva-cai"
   }
 }
-
