@@ -4,7 +4,7 @@ NETWORK=$1
 DEPLOYMENT_VIA="proposal"
 
 # Extract commit and version info
-. ./scripts/extract_commit_tag_data_and_commit_sha.sh gldt_swap $NETWORK
+. ./scripts/extract_commit_tag_data_and_commit_sha.sh gldt_swap_index $NETWORK
 
 if [[ ${REINSTALL:-} == "reinstall" ]]; then
 
