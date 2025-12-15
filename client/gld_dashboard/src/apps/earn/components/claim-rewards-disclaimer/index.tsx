@@ -1,11 +1,7 @@
 import clsx from "clsx";
-import { UseQueryResult } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { useAuth } from "@auth/index";
 import { ClaimRewardsStateReducerAtom } from "../claim-rewards/atoms";
 import RewardsAvailable from "./RewardsAvailable";
-import RewardsNotAvailable from "./RewardsNotAvailable";
-import RewardsLoading from "./RewardsLoading";
 import ClaimRewards from "../claim-rewards";
 
 import { Position } from "@earn/interfaces";
@@ -18,15 +14,8 @@ const styles = {
   ),
 };
 
-const ClaimRewardsDisclaimer = ({
-  position,
-}: {
-  position: UseQueryResult<Position, Error>;
-}) => {
-  const { isConnected } = useAuth();
+const ClaimRewardsDisclaimer = ({ position }: { position: Position }) => {
   const [, dispatchClaimRewards] = useAtom(ClaimRewardsStateReducerAtom);
-
-  if (!isConnected) return <RewardsNotAvailable />;
 
   const onOpen = () => {
     dispatchClaimRewards({
@@ -37,25 +26,15 @@ const ClaimRewardsDisclaimer = ({
 
   return (
     <>
-      {!position.isSuccess && <RewardsLoading />}
-      {position.isSuccess && position.data.is_enable_claiming_rewards && (
-        <RewardsAvailable
-          amount={position.data.total_rewards_amount_usd}
-          claimRewardsButton={
-            <button
-              type="button"
-              className={styles.buttonClaim}
-              onClick={onOpen}
-            >
-              Claim rewards
-            </button>
-          }
-        />
-      )}
-      {position.isSuccess && !position.data.is_enable_claiming_rewards && (
-        <RewardsNotAvailable />
-      )}
-      {position.isSuccess && <ClaimRewards />}
+      <RewardsAvailable
+        amount={position.total_rewards_amount_usd}
+        claimRewardsButton={
+          <button type="button" className={styles.buttonClaim} onClick={onOpen}>
+            Claim rewards
+          </button>
+        }
+      />
+      {position.is_enable_claiming_rewards && <ClaimRewards />}
     </>
   );
 };

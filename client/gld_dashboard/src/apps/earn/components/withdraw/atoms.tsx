@@ -7,6 +7,7 @@ type WithdrawState = {
   is_step_confirm: boolean;
   is_step_details: boolean;
 
+  total_amount: number;
   dissolved_data: DissolvedData;
 };
 
@@ -14,6 +15,7 @@ const initialState: WithdrawState = {
   is_open_dialog: false,
   is_step_confirm: false,
   is_step_details: false,
+  total_amount: 0,
 
   dissolved_data: {
     amount: 0,
@@ -39,6 +41,10 @@ const reducer = (
       }
     | {
         type: "SET_IS_STEP_DETAILS";
+      }
+    | {
+        type: "SET_TOTAL_AMOUNT";
+        value: number;
       }
     | {
         type: "RESET";
@@ -94,6 +100,12 @@ const reducer = (
       return {
         ...prev,
         is_step_confirm: true,
+      };
+
+    case "SET_TOTAL_AMOUNT":
+      return {
+        ...prev,
+        total_amount: action.value,
       };
 
     case "SET_IS_STEP_DETAILS":
