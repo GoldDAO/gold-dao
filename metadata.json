@@ -1,0 +1,39 @@
+{
+  "name": "gold-012750",
+  "description": "1g Gold Bullion Bar Origyn Digital Certificate",
+  "image": "https://g6yny-dyaaa-aaaab-qb2kq-cai.raw.icp0.io/preview-1g.png",
+  "attributes": [
+    {
+      "trait_type": "Weight",
+      "value": "1g"
+    },
+    {
+      "trait_type": "Fineness",
+      "value": "99.99%"
+    },
+    {
+      "trait_type": "Dimensions",
+      "value": "8.7 x 15 mm"
+    },
+    {
+      "trait_type": "Hardness",
+      "value": "25 Hv"
+    },
+    {
+      "trait_type": "Manufacturer",
+      "value": "METALOR"
+    },
+    {
+      "trait_type": "Serial Number",
+      "value": 12750
+    },
+    {
+      "trait_type": "front-012750",
+      "value": "https://g6yny-dyaaa-aaaab-qb2kq-cai.raw.icp0.io/gold-012750/front-012750.png"
+    },
+    {
+      "trait_type": "back-012750",
+      "value": "https://g6yny-dyaaa-aaaab-qb2kq-cai.raw.icp0.io/gold-012750/back-012750.png"
+    }
+  ]
+}

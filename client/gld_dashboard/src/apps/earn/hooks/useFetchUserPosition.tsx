@@ -3,7 +3,6 @@ import {
   keepPreviousData,
   UseQueryOptions,
 } from "@tanstack/react-query";
-// import { DateTime } from "luxon";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import {
   KONGSWAP_CANISTER_ID_IC,
@@ -78,7 +77,8 @@ const useFetchUserPosition = (
             dissolve_events_count: 0,
             remaining_dissolve_events: 0,
             max_dissolve_events: MAX_DISSOLVE_EVENTS,
-            is_enable_withdrawing: false,
+            is_enable_withdrawing: true,
+            total_withdrawable_amount: 0,
           } satisfies Position;
 
         const result = result_arr[0];
@@ -161,10 +161,15 @@ const useFetchUserPosition = (
             amount: dissolved_amount,
             amount_usd: priceGLDT.mid_price * dissolved_amount,
             dissolved_date,
-            is_withdrawable: dissolved_date <= date_now,
+            is_withdrawable: true, //dissolved_date <= date_now
             remaining_time: Math.max(dissolved_date - date_now, 0),
           };
         });
+
+        const total_withdrawable_amount = dissolve_events.reduce(
+          (acc, curr) => acc + curr.amount,
+          0
+        );
 
         const dissolve_events_count = dissolve_events.length;
 
@@ -185,9 +190,9 @@ const useFetchUserPosition = (
           (reward) => reward.is_claimable
         );
 
-        const is_enable_withdrawing = dissolve_events.some(
-          (event) => event.is_withdrawable
-        );
+        // const is_enable_withdrawing = dissolve_events.some(
+        //   (event) => event.is_withdrawable
+        // );
 
         const staked_amount = Number(result.staked) / 10 ** decimalsGLDT;
         const instant_dissolve_fee =
@@ -212,7 +217,8 @@ const useFetchUserPosition = (
           remaining_dissolve_events:
             MAX_DISSOLVE_EVENTS - dissolve_events_count,
           max_dissolve_events: MAX_DISSOLVE_EVENTS,
-          is_enable_withdrawing,
+          is_enable_withdrawing: true,
+          total_withdrawable_amount,
         } satisfies Position;
 
         return ret;

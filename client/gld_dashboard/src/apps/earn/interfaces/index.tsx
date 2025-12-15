@@ -44,4 +44,5 @@ export interface Position {
   remaining_dissolve_events: number;
   max_dissolve_events: number;
   is_enable_withdrawing: boolean;
+  total_withdrawable_amount: number;
 }

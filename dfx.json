@@ -2,6 +2,11 @@
   "dfx": "0.27.0",
   "__0": "GLDT.org static website with swap canisters",
   "canisters": {
+    "gold_dao_chapter_2": {
+      "type": "assets",
+      "build": [""],
+      "source": ["sns/gold_dao_chapter_2"]
+    },
     "gldnft_backend_1000g": {
       "candid": "backend/external_canisters/gld_nft/api/can.did",
       "declarations": {

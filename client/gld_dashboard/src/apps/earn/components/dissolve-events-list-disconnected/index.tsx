@@ -3,7 +3,7 @@ import clsx from "clsx";
 const DissolveEventsListDisconnected = () => {
   return (
     <div className="flex flex-col gap-4 relative">
-      {[...Array(2)].map((_, index) => (
+      {[...Array(4)].map((_, index) => (
         <div key={index}>
           <div
             className={clsx(

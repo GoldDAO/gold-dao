@@ -16,13 +16,7 @@ const ConfirmDialogContent = () => {
     <div>
       <div className="text-center">
         You are about to withdraw{" "}
-        <NumberToLocaleString value={state.dissolved_data.amount} /> GLDT{" "}
-        <span className="text-content/60">
-          ($
-          <NumberToLocaleString value={state.dissolved_data.amount_usd} />)
-        </span>{" "}
-        from {state.dissolved_data.position_count} dissolve{" "}
-        {state.dissolved_data.position_count <= 1 ? "position" : "positions"}.
+        <NumberToLocaleString value={state.total_amount} decimals={5} /> GLDT{" "}
       </div>
       <Button className="mt-6 w-full" onClick={handleConfirm}>
         Confirm
