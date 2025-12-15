@@ -1,22 +1,25 @@
 import clsx from "clsx";
-import Icon from "@shared/ui/icons";
 import { GLDT_STAKE_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import InnerAppLayout from "@shared/components/app-layout/inner-app";
 import BtnConnectWallet from "@shared/components/connect-wallet-btn";
 import GradientCard from "@shared/ui/card/GradientCard";
 import { TOKEN_GLDT } from "@shared/utils/tokens";
-import IncreaseStake from "./components/increase-stake";
-import DecreaseStake from "./components/decrease-stake";
 import ClaimRewardsDisclaimer from "./components/claim-rewards-disclaimer";
 import TokenHeaderPrice from "@shared/components/token-header-price";
 import UserTotalStakedAmount from "./components/user-total-staked-amount";
-import DissolveEventsList from "./components/dissolve-events-list";
 import useFetchUserPosition from "@earn/hooks/useFetchUserPosition";
 import Withdraw from "./components/withdraw";
-import StakeAPY from "./components/stake-apy";
-import TotalStakedAmount from "./components/total-staked-amount";
+import { LoaderSpin } from "@components/loaders";
 import DissolveEventsListDisconnected from "./components/dissolve-events-list-disconnected";
+import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+
+const styles = {
+  container: clsx("border border-border bg-surface-primary rounded-xl"),
+  title: clsx("text-content text-center xl:text-left"),
+  totalAmount: clsx("font-semibold text-xl"),
+  description: clsx("text-sm text-content/60"),
+};
 
 const Earn = () => {
   const { isConnected, unauthenticatedAgent, principalId } = useAuth();
@@ -40,24 +43,6 @@ const Earn = () => {
             <span className="font-semibold">earn weekly rewards</span> in
             governance tokens, unlocking passive income from your gold holdings.
           </div>
-          <div className="mt-4">
-            <a
-              href="https://docs.gold-dao.org/resources/gldt-staking/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1"
-            >
-              <div className="text-sm tracking-widest">LEARN MORE</div>
-              <div className="mb-0.5">
-                <Icon.ExternalLink width={16} />
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <div className="mt-4 xl:mt-6 flex flex-col gap-4 w-full">
-          <StakeAPY />
-          <TotalStakedAmount />
         </div>
 
         {!isConnected && (
@@ -68,9 +53,8 @@ const Earn = () => {
         <div>
           <GradientCard
             className={clsx(
-              "px-4 xl:px-8 pt-4 xl:pt-8 pb-24",
-              "rounded-tr-[inherit]",
-              "relative"
+              "px-4 xl:px-8 pt-4 xl:pt-8 pb-8 xl:pb-12",
+              "rounded-tr-[inherit]"
             )}
           >
             <TokenHeaderPrice
@@ -79,28 +63,67 @@ const Earn = () => {
             />
 
             <UserTotalStakedAmount position={position} />
-
-            <div className="flex justify-center gap-2 absolute -bottom-9 left-1/2 -translate-x-1/2">
-              <IncreaseStake position={position} />
-              <DecreaseStake position={position} />
-            </div>
           </GradientCard>
 
-          <div className="flex flex-col gap-4 xl:gap-8 pt-16 px-4 pb-4 xl:px-8 xl:pb-8">
-            <ClaimRewardsDisclaimer position={position} />
-            <div>
-              <div className="flex justify-between gap-4 items-center mt-8">
-                <h2>Unlocking tokens</h2>
-                <Withdraw position={position} />
+          <div className="flex flex-col gap-4 xl:gap-8 pt-8 px-4 pb-4 xl:px-8 xl:pb-8">
+            {!isConnected && <DissolveEventsListDisconnected />}
+            {isConnected && (
+              <div className="rounded-xl border border-orange-500 bg-orange-500/5 text-orange-500 p-4 text-center">
+                GLDT staking has been discontinued. Claim any rewards and then
+                withdraw your stakes.
               </div>
-              <div className="mt-4">
-                {isConnected ? (
-                  <DissolveEventsList position={position} />
-                ) : (
-                  <DissolveEventsListDisconnected />
+            )}
+            {isConnected && (position.isLoading || position.isError) && (
+              <div
+                className={clsx(
+                  "flex flex-col items-center justify-center gap-4",
+                  "border border-border bg-surface-primary",
+                  "rounded-xl p-4"
                 )}
+              >
+                <LoaderSpin size="sm" />
+                <div>Fetching stake positions...</div>
               </div>
-            </div>
+            )}
+
+            {isConnected &&
+              position.isSuccess &&
+              position.data.is_enable_claiming_rewards && (
+                <ClaimRewardsDisclaimer position={position.data} />
+              )}
+
+            {isConnected &&
+              position.isSuccess &&
+              (position.data.total_withdrawable_amount > 0 ||
+                position.data.staked_amount > 0) && (
+                <div className={styles.container}>
+                  <div className="rounded-[inherit] p-4">
+                    <div className={styles.title}>
+                      Tokens available to withdraw
+                    </div>
+                    <div className="flex flex-col xl:flex-row justify-between items-center mt-2 gap-4">
+                      <div className="flex flex-col items-center xl:items-start shrink-0">
+                        <div className={styles.totalAmount}>
+                          <NumberToLocaleString
+                            value={
+                              position.data.staked_amount +
+                              position.data.total_withdrawable_amount
+                            }
+                            decimals={5}
+                          />{" "}
+                          <span className="text-content/60 font-normal">
+                            GLDT
+                          </span>
+                        </div>
+                        <div className={styles.description}>
+                          Total of staked amount and already dissolved events.
+                        </div>
+                      </div>
+                      <Withdraw position={position} />
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </InnerAppLayout.RightPanel>

@@ -6,7 +6,7 @@ import Dialog from "@shared/ui/dialog/DialogV2";
 import { WithdrawStateReducerAtom } from "./atoms";
 import Confirm from "./components/confirm";
 import Details from "./components/details";
-import { DissolveEvent, Position } from "@earn/interfaces";
+import { Position } from "@earn/interfaces";
 import BtnPrimary from "@shared/ui/button/HorizontalButton";
 
 interface WithdrawProps
@@ -31,10 +31,14 @@ const Withdraw = ({ position, ...props }: WithdrawProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.is_open_dialog]);
 
-  const onOpen = (dissolveEvents: DissolveEvent[]) => {
+  const onOpen = (position: Position) => {
     dispatch({
       type: "SET_DISSOLVED_DATA",
-      value: dissolveEvents,
+      value: position.dissolve_events,
+    });
+    dispatch({
+      type: "SET_TOTAL_AMOUNT",
+      value: position.staked_amount + position.total_withdrawable_amount,
     });
     dispatch({
       type: "SET_IS_OPEN_DIALOG",
@@ -57,10 +61,13 @@ const Withdraw = ({ position, ...props }: WithdrawProps) => {
           Withdraw
         </BtnPrimary>
       );
-    if (position.isSuccess && position.data.is_enable_withdrawing) {
-      const dissolveEvents = position.data.dissolve_events;
+    if (
+      position.isSuccess &&
+      position.data.is_enable_withdrawing &&
+      !position.data.is_enable_claiming_rewards
+    ) {
       return (
-        <BtnPrimary onClick={() => onOpen(dissolveEvents)}>Withdraw</BtnPrimary>
+        <BtnPrimary onClick={() => onOpen(position.data)}>Withdraw</BtnPrimary>
       );
     }
     return <BtnPrimary disabled={true}>Withdraw</BtnPrimary>;
