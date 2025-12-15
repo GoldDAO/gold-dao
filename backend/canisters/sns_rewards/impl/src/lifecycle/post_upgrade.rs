@@ -5,9 +5,9 @@ use ic_cdk_macros::post_upgrade;
 use sns_rewards_api_canister::Args;
 use tracing::info;
 
-// use crate::migrations::types::state::RuntimeStateV0;
-
-use crate::{memory::get_upgrades_memory, state::RuntimeState, utils::TimeInterval};
+use crate::{
+    memory::get_upgrades_memory, migrations::types::state::RuntimeStateV0, state::RuntimeState,
+};
 
 use super::init_canister;
 
@@ -24,37 +24,21 @@ fn post_upgrade(args: Args) {
             let reader = get_reader(&memory);
 
             // uncomment these lines if you want to do a normal upgrade
-            let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
-                ::deserialize(reader)
-                .unwrap();
+            // let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
+            //     ::deserialize(reader)
+            //     .unwrap();
 
             // uncomment these lines if you want to do an upgrade with migration
-            // let (runtime_state_v0, logs, traces): (
-            //     RuntimeStateV0,
-            //     Vec<LogEntry>,
-            //     Vec<LogEntry>,
-            // ) = serializer::deserialize(reader).unwrap();
-            // let mut state = RuntimeState::from(runtime_state_v0);
+            let (runtime_state_v0, logs, traces): (
+                RuntimeStateV0,
+                Vec<LogEntry>,
+                Vec<LogEntry>,
+            ) = bity_ic_serializer::deserialize(reader).unwrap();
+            let mut state = RuntimeState::from(runtime_state_v0);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
-            // Migrations
-            // if state.data.reward_distribution_interval.is_none() {
-            //     state.data.reward_distribution_interval = Some(TimeInterval::default());
-            // }
-
-            // if state.data.reward_distribution_in_progress.is_none() {
-            //     state.data.reward_distribution_in_progress = Some(false);
-            // }
-
-            // if state.data.neuron_sync_interval.is_none() {
-            //     state.data.neuron_sync_interval = Some(TimeInterval {
-            //         weekday: None,
-            //         start_hour: 9,
-            //         end_hour: 11,
-            //     });
-            // }
 
             // End migrations
             bity_ic_canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
