@@ -1,9 +1,9 @@
 use bity_ic_canister_state_macros::canister_state;
 use bity_ic_types::BuildVersion;
-use candid::{CandidType, Nat, Principal};
+use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::NeuronId;
-use sns_rewards_api_canister::{ReserveTokenAmounts, TokenRewardTypes};
+use sns_rewards_api_canister::TokenRewardTypes;
 use std::collections::{BTreeMap, HashMap};
 use types::{NeuronInfo, TimestampMillis};
 use utils::{
@@ -45,15 +45,6 @@ impl RuntimeState {
             number_of_neurons: self.data.neuron_maturity.len(),
             sync_info: self.data.sync_info,
             authorized_principals: self.data.authorized_principals.clone(),
-            daily_reserve_transfer: self
-                .data
-                .daily_reserve_transfer
-                .iter()
-                .map(|(token, val)| format!("{:?} - {}", token, val))
-                .collect(),
-            last_daily_reserve_transfer_time: self.data.last_daily_reserve_transfer_time,
-            last_daily_goldao_burn_time: self.data.last_daily_goldao_burn,
-            daily_goldao_burn_amount: self.data.daily_goldao_burn_rate.clone(),
             reward_distribution_interval: self.data.reward_distribution_interval.clone(),
             neuron_sync_interval: self.data.neuron_sync_interval.clone(),
             registered_tokens: self
@@ -91,10 +82,6 @@ pub struct Metrics {
     pub number_of_neurons: usize,
     pub sync_info: SyncInfo,
     pub authorized_principals: Vec<Principal>,
-    pub daily_reserve_transfer: Vec<String>,
-    pub last_daily_reserve_transfer_time: TimestampMillis,
-    pub last_daily_goldao_burn_time: Option<TimestampMillis>,
-    pub daily_goldao_burn_amount: Option<Nat>,
     pub reward_distribution_interval: Option<TimeInterval>,
     pub neuron_sync_interval: Option<TimeInterval>,
     pub registered_tokens: Vec<String>,
@@ -135,14 +122,6 @@ pub struct Data {
     pub authorized_principals: Vec<Principal>,
     /// a boolean check for if we're currently synchronizing neuron data into the canister.
     pub is_synchronizing_neurons: bool,
-    /// The daily amount of tokens to transfer from the reserve pool sub account to the reward pool sub account in e8s for each token type
-    pub daily_reserve_transfer: ReserveTokenAmounts,
-    /// Last time the daily reserve transfer completed - used to make sure we don't transfer multiple times per day after upgrades
-    pub last_daily_reserve_transfer_time: TimestampMillis,
-    /// The daily burn rate of GOLDAO - settable via a proposal
-    pub daily_goldao_burn_rate: Option<Nat>,
-    /// The last time a burn of GOLDAO was done
-    pub last_daily_goldao_burn: Option<TimestampMillis>,
     /// The weekly interval for which a reward distribution occurs
     pub reward_distribution_interval: Option<TimeInterval>,
     /// An internal check if the distribution is running
@@ -162,10 +141,6 @@ impl Default for Data {
             tokens: HashMap::new(),
             authorized_principals: vec![SNS_GOVERNANCE_CANISTER_ID],
             is_synchronizing_neurons: false,
-            daily_reserve_transfer: HashMap::new(),
-            last_daily_reserve_transfer_time: TimestampMillis::default(),
-            daily_goldao_burn_rate: None,
-            last_daily_goldao_burn: None,
             reward_distribution_interval: Some(TimeInterval::default()),
             reward_distribution_in_progress: Some(false),
             neuron_sync_interval: Some(TimeInterval {

@@ -1,8 +1,7 @@
 type Args = record { token : text; neuron_id : NeuronId };
 type Args_1 = record { claim_reward_args : vec ClaimRewardArgs };
-type Args_2 = record { transfer_amounts : vec record { TokenSymbol; nat } };
-type Args_3 = record { token_list : vec record { TokenSymbol; TokenInfo } };
-type Args_4 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
+type Args_2 = record { token_list : vec record { TokenSymbol; TokenInfo } };
+type Args_3 = variant { Upgrade : UpgradeArgs; Init : InitArgs };
 type BuildVersion = record { major : nat32; minor : nat32; patch : nat32 };
 type ClaimRewardArgs = record { token : TokenSymbol; neuron_id : NeuronId };
 type ClaimRewardError = record {
@@ -19,6 +18,38 @@ type ClaimRewardErrorType = variant {
   NeuronDoesNotExist;
   InternalError : text;
 };
+type ConsentInfo = record {
+  metadata : ConsentMessageMetadata;
+  consent_message : ConsentMessage;
+};
+type ConsentMessage = variant {
+  LineDisplayMessage : record { pages : vec LineDisplayPage };
+  GenericDisplayMessage : text;
+};
+type ConsentMessageMetadata = record {
+  utc_offset_minutes : opt int16;
+  language : text;
+};
+type ConsentMessageRequest = record {
+  arg : blob;
+  method : text;
+  user_preferences : ConsentMessageSpec;
+};
+type ConsentMessageSpec = record {
+  metadata : ConsentMessageMetadata;
+  device_spec : opt DisplayMessageType;
+};
+type DisplayMessageType = variant {
+  GenericDisplay;
+  LineDisplay : record { characters_per_line : nat16; lines_per_page : nat16 };
+};
+type ErrorInfo = record { description : text };
+type Icrc21Error = variant {
+  GenericError : record { description : text; error_code : nat };
+  InsufficientPayment : ErrorInfo;
+  UnsupportedCanisterCall : ErrorInfo;
+  ConsentMessageUnavailable : ErrorInfo;
+};
 type InitArgs = record {
   sns_gov_canister_id : principal;
   test_mode : bool;
@@ -28,6 +59,7 @@ type InitArgs = record {
   sns_ledger_canister_id : principal;
   commit_hash : text;
 };
+type LineDisplayPage = record { lines : vec text };
 type NeuronId = record { id : blob };
 type Response = variant {
   Ok : bool;
@@ -40,8 +72,8 @@ type Response = variant {
   InternalError : text;
 };
 type Response_1 = variant { Success; InternalError : text };
-type Response_2 = variant { Success; InternalError : text };
 type Result = variant { Ok; Err : vec ClaimRewardError };
+type Result_1 = variant { Ok : ConsentInfo; Err : Icrc21Error };
 type SupportedStandard = record { url : text; name : text };
 type TokenInfo = record {
   fee : nat64;
@@ -50,52 +82,12 @@ type TokenInfo = record {
 };
 type TokenSymbol = variant { ICP; OGY; WTN; GOLDAO; GLDT };
 type UpgradeArgs = record { version : BuildVersion; commit_hash : text };
-type icrc21_consent_info = record {
-  metadata : icrc21_consent_message_metadata;
-  consent_message : icrc21_consent_message;
-};
-type icrc21_consent_message = record {
-  generic_display_message : text;
-  fields_display_message : icrc21_field_display_message;
-};
-type icrc21_consent_message_metadata = record {
-  utc_offset_minutes : opt int16;
-  language : text;
-};
-type icrc21_consent_message_request = record {
-  arg : blob;
-  method : text;
-  user_preferences : icrc21_consent_message_spec;
-};
-type icrc21_consent_message_response = variant {
-  Ok : icrc21_consent_info;
-  Err : icrc21_error;
-};
-type icrc21_consent_message_spec = record {
-  metadata : icrc21_consent_message_metadata;
-  device_spec : opt icrc21_device_spec;
-};
-type icrc21_device_spec = variant { GenericDisplay; FieldsDisplay };
-type icrc21_error = variant {
-  GenericError : icrc21_error_info;
-  InsufficientPayment : icrc21_generic_error;
-  UnsupportedCanisterCall : icrc21_error_info;
-  ConsentMessageUnavailable : icrc21_error_info;
-};
-type icrc21_error_info = record { description : text };
-type icrc21_field_display_message = record {
-  fields : vec record { text; text };
-  intent : text;
-};
-type icrc21_generic_error = record { description : text; error_code : nat64 };
-service : (Args_4) -> {
+service : (Args_3) -> {
   claim_reward : (Args) -> (Response);
   claim_rewards_batch : (Args_1) -> (Result);
   icrc10_supported_standards : () -> (vec SupportedStandard) query;
-  icrc21_canister_call_consent_message : (icrc21_consent_message_request) -> (
-      icrc21_consent_message_response,
+  icrc21_canister_call_consent_message : (ConsentMessageRequest) -> (
+      Result_1,
     ) query;
-  set_daily_goldao_burn_rate : (nat) -> (Response_1);
-  set_reserve_transfer_amounts : (Args_2) -> (Response_1);
-  set_reward_token_types : (Args_3) -> (Response_2);
+  set_reward_token_types : (Args_2) -> (Response_1);
 }

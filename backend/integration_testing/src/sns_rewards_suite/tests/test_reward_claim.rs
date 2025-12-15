@@ -561,7 +561,7 @@ fn test_neuron_with_no_hotkey() {
     )
     .unwrap();
 
-    let res = claim_rewards_batch(
+    let _res = claim_rewards_batch(
         &pic,
         random_principal(),
         rewards_canister_id,
