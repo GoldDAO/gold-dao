@@ -8,6 +8,4 @@ pub mod get_reserve_transfer_amounts;
 pub mod get_reward_token_types;
 pub mod icrc10;
 pub mod icrc21;
-pub mod set_daily_goldao_burn_rate_validate;
-pub mod set_reserve_transfer_amounts_validate;
 pub mod set_reward_token_types_validate;

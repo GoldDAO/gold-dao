@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.0] - 2025-12-12
+
+#### Changed
+
+- **Deactivate GOLDAO reward distribution**: Deactivate daily GOLDAO reward distribution job from reserve pool.
+
 ### [1.0.13] - 2025-09-16
 
 #### Changed
