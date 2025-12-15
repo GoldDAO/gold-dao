@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.10] - 2025-12-02
+
+#### Modified
+
+- Reduce claiming limit for OGY rewards on SNS neuron controller to 100'000 OGY.
+
 ### [1.0.9] - 2025-12-02
 
 #### Modified

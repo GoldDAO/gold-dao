@@ -29,7 +29,7 @@ impl Default for OgyManager {
             ogy_sns_rewards_canister_id: Principal::from_text("yuijc-oiaaa-aaaap-ahezq-cai")
                 .unwrap(),
             neurons: Neurons::default(),
-            ogy_rewards_threshold: Nat::from(100_000_000_000_000_u64), // 1_000_000 OGY
+            ogy_rewards_threshold: Nat::from(10_000_000_000_000_u64), // 100_000 OGY
         }
     }
 }
