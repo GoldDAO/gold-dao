@@ -25,6 +25,7 @@ generate_pocket_update_call!(manage_stake_position);
 generate_pocket_update_call!(set_apy_limit);
 generate_pocket_update_call!(get_apy_overall);
 generate_pocket_update_call!(_set_position_withdraw_state);
+generate_pocket_update_call!(_add_stake_mock);
 generate_pocket_update_call!(_set_token_usd_values);
 generate_pocket_update_call!(allocated_rewards_balance);
 generate_pocket_update_call!(unallocated_rewards_balance);

@@ -1,9 +1,9 @@
 use crate::model::event_transaction::EventTransaction;
 use crate::model::event_transaction::StakePositionStateChange;
 use crate::state::mutate_state;
+use bity_ic_canister_time::timestamp_millis;
 use candid::Nat;
 use candid::Principal;
-use bity_ic_canister_time::timestamp_millis;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;
 use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;
 use gldt_stake_common::stake_position::DecreaseType;

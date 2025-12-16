@@ -6,7 +6,7 @@ use crate::client::gldt_stake::{
 use crate::gldt_stake_suite::setup::default_test_setup_with_apy_limit;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
 use crate::gldt_stake_suite::utils::add_custom_rewards_to_processing_pool;
-use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
+use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util_mock};
 use crate::utils::wait_1_day;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
 use bity_ic_canister_time::HOUR_IN_MS;
@@ -50,7 +50,7 @@ fn test_process_staking_rewards() {
     // --- Create 10 stake positions ---
     let users: Vec<_> = (0..10)
         .map(|_| {
-            create_stake_position_util(
+            create_stake_position_util_mock(
                 pic,
                 controller,
                 &token_ledgers,
@@ -204,7 +204,7 @@ fn test_process_staking_rewards_with_limited_apy() {
     // --- Create 10 stake positions ---
     let users: Vec<_> = (0..10)
         .map(|_| {
-            create_stake_position_util(
+            create_stake_position_util_mock(
                 pic,
                 controller,
                 &token_ledgers,
@@ -325,7 +325,7 @@ fn test_apy_changes_with_usd_fluctuations() {
     .collect();
     _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
 
-    create_stake_position_util(
+    create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -434,7 +434,7 @@ fn test_apy_stability_over_three_weeks() {
     .collect();
     _set_token_usd_values(pic, controller, gldt_stake_canister_id, &usd_values);
 
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,

@@ -5,6 +5,7 @@ use bity_ic_canister_time::timestamp_millis;
 use bity_ic_canister_tracing_macros::trace;
 use candid::Principal;
 pub use gldt_stake_api_canister::manage_stake_position::Response as ManageStakePositionResponse;
+use gldt_stake_common::manage_stake_position_interface::AddStakePositionErrors;
 use gldt_stake_common::manage_stake_position_interface::GeneralError;
 pub use gldt_stake_common::manage_stake_position_interface::ManageStakePositionArgs;
 use gldt_stake_common::manage_stake_position_interface::ManageStakePositionError;
@@ -24,7 +25,13 @@ async fn manage_stake_position(args: ManageStakePositionArgs) -> ManageStakePosi
 
     // 1. match the operation over position and call the appropriate implementation
     match args {
-        ManageStakePositionArgs::AddStake { amount } => add_stake_impl(caller, amount).await,
+        ManageStakePositionArgs::AddStake { amount: _ } => {
+            Err(ManageStakePositionError::AddStakeError(
+                AddStakePositionErrors::CallError(
+            "GLDT staking has been discontinued. Adding to an existing stake or creating new stakes is no longer supported.".to_string(),
+        ),
+     ))
+        }
 
         other_args => {
             let mut position = load_stake_position(caller)?;

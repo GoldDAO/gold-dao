@@ -4,7 +4,7 @@ use crate::client::gldt_stake::icrc3_get_tip_certificate;
 use crate::client::gldt_stake::icrc3_supported_block_types;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::{default_test_setup, setup::GldtStakeTestEnv};
-use crate::gldt_stake_suite::utils::create_stake_position_util_for_user;
+use crate::gldt_stake_suite::utils::create_stake_position_util_for_user_mock;
 use crate::gldt_stake_suite::utils::create_user_with_funds;
 use crate::utils::tick_n_blocks;
 use bity_ic_canister_time::MINUTE_IN_MS;
@@ -41,7 +41,7 @@ fn icrc3_works() {
 
     // --- Create stake position and add stake to it 9 more times ---
     for _ in 0..10 {
-        let _ = create_stake_position_util_for_user(
+        let _ = create_stake_position_util_for_user_mock(
             pic,
             controller,
             &token_ledgers,
@@ -181,7 +181,7 @@ fn test_icrc3_get_tip_certificate() {
         2_000_000_000u128,
     );
 
-    let _ = create_stake_position_util_for_user(
+    let _ = create_stake_position_util_for_user_mock(
         pic,
         controller,
         &token_ledgers,
@@ -214,7 +214,7 @@ fn test_icrc3_get_tip_certificate() {
         "Hash tree should be the same"
     );
 
-    let _ = create_stake_position_util_for_user(
+    let _ = create_stake_position_util_for_user_mock(
         pic,
         controller,
         &token_ledgers,

@@ -1,7 +1,7 @@
-use crate::client::gldt_stake::manage_stake_position_with_tick;
+use crate::client::gldt_stake::{_add_stake_mock, manage_stake_position_with_tick};
 use crate::client::gldt_stake::{get_position, get_total_staked};
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
-use crate::gldt_stake_suite::utils::create_stake_position_util;
+use crate::gldt_stake_suite::utils::create_stake_position_util_mock;
 use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, add_stake, create_user_with_funds};
 use crate::utils::wait_1_day;
 use crate::{
@@ -22,363 +22,6 @@ use std::time::Duration;
 use types::TokenSymbol;
 
 #[test]
-fn full_user_flow_test() {
-    // --- Setup test environment ---
-    let mut test_env = default_test_setup();
-    let GldtStakeTestEnv {
-        ref mut pic,
-        controller,
-        token_ledgers,
-        gldt_stake_canister_id,
-        gld_rewards_canister_id,
-        neuron_data,
-        ledger_fees,
-        ..
-    } = test_env;
-    let pic = &pic.borrow();
-    let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
-
-    // --- Create user and fund it ---
-    let user = create_user_with_funds(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        gldt_ledger_id,
-        1_000_000_000_000u128,
-    );
-
-    // --- Approve and stake ---
-    let stake_amount = 100_000_000_000u128;
-    let total_approval = stake_amount + GLDT_TX_FEE as u128;
-    let approval_result = icrc2_approve(
-        pic,
-        user,
-        gldt_ledger_id.clone(),
-        &crate::client::icrc1_icrc2_token::icrc2_approve::Args {
-            from_subaccount: None,
-            spender: Account {
-                owner: gldt_stake_canister_id,
-                subaccount: None,
-            },
-            amount: Nat::from(total_approval),
-            expected_allowance: Some(Nat::from(0_u64)),
-            expires_at: None,
-            fee: None,
-            memo: None,
-            created_at_time: None,
-        },
-    );
-    assert!(matches!(
-        approval_result,
-        crate::client::icrc1_icrc2_token::icrc2_approve::Response::Ok(_)
-    ));
-    tick_n_blocks(pic, 2);
-
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::AddStake {
-            amount: Nat::from(total_approval),
-        },
-    )
-    .expect("Failed to add stake");
-    assert_eq!(response.staked, Nat::from(stake_amount));
-    assert_eq!(response.age_bonus_multiplier, 1.0);
-
-    // --- Try to stake too low ---
-    let response = add_stake(
-        pic,
-        user,
-        gldt_ledger_id,
-        gldt_stake_canister_id,
-        1_000_u128,
-    );
-    match response {
-        Ok(_) => panic!("Expected error for low stake amount"),
-        Err(ManageStakePositionError::GeneralError(GeneralError::TransferError(error_message))) => {
-            assert_eq!(
-                error_message,
-                String::from("Transfer fee (10000000) exceeds amount to transfer (1_000).")
-            )
-        }
-        _ => panic!("Unexpected error type"),
-    }
-
-    // --- Try to stake too high ---
-    let response = add_stake(
-        pic,
-        user,
-        gldt_ledger_id,
-        gldt_stake_canister_id,
-        10_000_000_000_000_000u128,
-    );
-    println!("{:?}", response);
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::ModifyStakeError(_)
-        ))
-    ));
-
-    let approval_result = icrc2_approve(
-        pic,
-        user,
-        gldt_ledger_id.clone(),
-        &icrc2_approve::Args {
-            from_subaccount: None,
-            spender: Account {
-                owner: gldt_stake_canister_id,
-                subaccount: None,
-            },
-            amount: Nat::from(0_u64),
-            expected_allowance: Some(Nat::from(0u64)),
-            expires_at: None,
-            fee: None,
-            memo: None,
-            created_at_time: None,
-        },
-    );
-
-    println!("Approval result: {:?} for user: {}", approval_result, user);
-
-    // --- Try to stake zero ---
-    // let response = add_stake(pic, user, gldt_ledger_id, gldt_stake_canister_id, 0u128);
-    // assert!(response.is_ok()); // Depending on your business logic, this may be Ok or Err
-    let _response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::AddStake {
-            amount: Nat::from(0_u64),
-        },
-    );
-
-    // --- Try to stake without allowance ---
-    let user2 = create_user_with_funds(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        gldt_ledger_id,
-        2_000_000_000u128,
-    );
-    let response = manage_stake_position_with_tick(
-        pic,
-        user2,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::AddStake {
-            amount: Nat::from(total_approval),
-        },
-    );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::TransferError(_)
-        ))
-    ));
-
-    // --- Add rewards ---
-    add_rewards_to_neurons(
-        pic,
-        neuron_data.clone(),
-        controller,
-        &token_ledgers,
-        gld_rewards_canister_id,
-        gldt_stake_canister_id,
-        ledger_fees.clone(),
-    );
-    wait_1_day(pic);
-
-    // --- Start dissolving with zero fraction ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 0 },
-    );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::InvalidPercentage(_)
-        ))
-    ));
-
-    // --- Start dissolving with over 100 fraction ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 150 },
-    );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::InvalidPercentage(_)
-        ))
-    ));
-
-    // --- Start dissolving with 20% fraction ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 20 },
-    );
-    println!("Start dissolving response: {:?}", response);
-    assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
-    assert!(position.staked > Nat::from(0u64));
-
-    // --- Start dissolving with 100% fraction ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 100 },
-    );
-    assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
-    assert_eq!(position.staked, Nat::from(0u64));
-
-    // --- Try to dissolve again (already dissolved) ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 100 },
-    );
-    println!("Dissolve again response: {:?}", response);
-
-    match response {
-        Ok(_) => panic!("Expected error for already dissolved position"),
-        Err(ManageStakePositionError::StartDissolvingError(
-            StartDissolvingErrors::InvalidDissolveAmount(error_message),
-        )) => {
-            assert_eq!(
-                error_message,
-                String::from("Cannot start dissolving on a position with zero stake.")
-            );
-        }
-        _ => panic!("Unexpected error type"),
-    }
-
-    // --- Try to dissolve as anonymous ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        Principal::anonymous(),
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 100 },
-    );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::InvalidPrincipal(_)
-        ))
-    ));
-
-    // --- Try to withdraw before dissolve period ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::WithdrawError(_))
-    ));
-
-    // --- Wait for dissolve period and withdraw ---
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    assert!(response.is_ok());
-
-    // --- Try to withdraw again (should fail) ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-
-    // Position is already deleted, since it was withdrawn
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::StakePositionNotFound(_)
-        ))
-    ));
-
-    // --- Try to withdraw as anonymous ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        Principal::anonymous(),
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    println!("Anonymous withdraw response: {:?}", response);
-
-    match response {
-        Err(ManageStakePositionError::GeneralError(GeneralError::InvalidPrincipal(
-            error_message,
-        ))) => {
-            assert_eq!(
-                error_message,
-                String::from("You may not use an anonymous principal")
-            );
-        }
-        _ => panic!("Unexpected error type"),
-    }
-
-    // --- Try to withdraw with insufficient balance ---
-    let user3 = create_user_with_funds(
-        pic,
-        controller,
-        gldt_stake_canister_id,
-        gldt_ledger_id,
-        1_000u128,
-    );
-    let response = manage_stake_position_with_tick(
-        pic,
-        user3,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 100 },
-    );
-    println!("Start dissolving response: {:?}", response);
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::StakePositionNotFound(_)
-        ))
-    ));
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    println!("Withdraw response: {:?}", response);
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::GeneralError(
-            GeneralError::StakePositionNotFound(_)
-        ))
-    ));
-
-    // --- Final state checks ---
-    let position = get_position(pic, user, gldt_stake_canister_id, &user);
-    assert!(position.is_none());
-    let total_staked = get_total_staked(pic, user, gldt_stake_canister_id, &());
-    assert!(total_staked >= Nat::from(0u64));
-}
-
-#[test]
 fn test_can_claim_gldt_stake_rewards() {
     // --- Setup test environment ---
     let mut test_env = default_test_setup();
@@ -397,7 +40,7 @@ fn test_can_claim_gldt_stake_rewards() {
     // --- Create stake positions ---
     let users: Vec<_> = (0..10)
         .map(|_| {
-            create_stake_position_util(
+            create_stake_position_util_mock(
                 pic,
                 controller,
                 &token_ledgers,
@@ -576,7 +219,7 @@ fn dissolve_50_and_dissolve_instantly_50_test() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -695,7 +338,7 @@ fn withdraw_flow_test() {
     ));
     tick_n_blocks(pic, 10);
 
-    let stake_response = manage_stake_position_with_tick(
+    let stake_response = _add_stake_mock(
         pic,
         user,
         gldt_stake_canister_id,
@@ -704,6 +347,7 @@ fn withdraw_flow_test() {
         },
     )
     .expect("Failed to add stake");
+    tick_n_blocks(pic, 10);
     assert_eq!(stake_response.staked, Nat::from(stake_amount));
 
     // --- Start dissolving full stake ---
@@ -713,32 +357,22 @@ fn withdraw_flow_test() {
         gldt_stake_canister_id,
         &manage_stake_position::Args::StartDissolving { fraction: 100 },
     );
+    tick_n_blocks(pic, 10);
+    println!("Start dissolving response: {:?}", response);
     assert!(response.is_ok());
 
-    // --- Attempt to unstake immediately (should fail, not yet dissolvable) ---
+    // --- Attempt to unstake immediately (should not fail, should be already dissolvable) ---
     let response = manage_stake_position_with_tick(
         pic,
         user,
         gldt_stake_canister_id,
         &manage_stake_position::Args::Withdraw {},
     );
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::WithdrawError(_))
-    ));
+    assert!(matches!(response, Ok(_)));
 
     // --- Advance time to complete dissolve period ---
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
     tick_n_blocks(pic, 10);
-
-    // --- Successfully withdraw ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    assert!(response.is_ok());
 
     let logs = pic
         .fetch_canister_logs(gldt_stake_canister_id, controller)
@@ -757,93 +391,6 @@ fn withdraw_flow_test() {
     }
 
     // --- Verify position staked is 0 ---
-    let position =
-        get_position(pic, user, gldt_stake_canister_id, &user).expect("Position should exist");
-    assert_eq!(position.staked, Nat::from(0_u64));
-
-    // --- Try to withdraw again (should fail, nothing to withdraw) ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    println!("Withdraw response: {:?}", response);
-    assert!(matches!(
-        response,
-        Err(ManageStakePositionError::WithdrawError(_))
-    ));
-}
-
-#[test]
-fn partial_then_full_dissolve_flow_test() {
-    // --- Setup test environment ---
-    let mut test_env = default_test_setup();
-    let GldtStakeTestEnv {
-        ref mut pic,
-        controller,
-        token_ledgers,
-        gldt_stake_canister_id,
-        ..
-    } = test_env;
-    let pic = &pic.borrow();
-
-    // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
-        pic,
-        controller,
-        &token_ledgers,
-        gldt_stake_canister_id,
-        100_000_000_000_u128,
-    );
-    pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    tick_n_blocks(pic, 10);
-
-    // --- Start dissolving 50% ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 50 },
-    );
-    assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
-    assert!(position.staked > Nat::from(0u64));
-
-    // Advance time to allow partial dissolve withdrawal
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    assert!(response.is_ok());
-
-    // --- Start dissolving remaining 50% ---
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::StartDissolving { fraction: 100 },
-    );
-    assert!(response.is_ok());
-    let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
-    assert_eq!(position.staked, Nat::from(0u64));
-
-    // Advance time and withdraw remaining
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    let response = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-    assert!(response.is_ok());
-
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 7));
-    tick_n_blocks(pic, 5);
-    // --- Final state check: position shouldn't exist ---
     let position = get_position(pic, user, gldt_stake_canister_id, &user);
     assert!(position.is_none());
 }

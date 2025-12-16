@@ -15,7 +15,7 @@ use types::{TimestampMillis, TokenSymbol};
 use utils::numeric::{Percentage, ScaledArithmetic};
 
 pub const GLDT_STAKE_DISSOLVE_DELAY_MS: u64 = DAY_IN_MS * 7;
-pub const GLDT_STAKE_EARLY_UNSTAKE_FEE_PERCENTAGE: f64 = 0.05;
+pub const GLDT_STAKE_EARLY_UNSTAKE_FEE_PERCENTAGE: f64 = 0.0;
 pub const MINIMUM_STAKE_AMOUNT: u64 = 1_000_000_000; // 10 GLDT
 pub const MINIMUM_STAKE_AMOUNT_WITH_FEE: u64 = MINIMUM_STAKE_AMOUNT + GLDT_TX_FEE;
 pub const MAXIMUM_STAKE_AMOUNT: u64 = 100_000_000_000_000; // 1 million GLDT
@@ -132,15 +132,19 @@ impl StakePosition {
         self.dissolve_events.push(payload)
     }
 
+    // NOTE: all events are considered completed
     pub fn cleanup_completed_dissolve_events(&mut self) -> Vec<DissolveStakeEvent> {
-        let now = timestamp_millis();
-
+        // Partition events: those not completed go into `completed`,
+        // those already completed remain in the list.
         let (completed, remaining): (Vec<_>, Vec<_>) = self
             .dissolve_events
             .drain(..)
-            .partition(|event| !event.completed && event.dissolved_date <= now);
+            .partition(|event| !event.completed);
 
+        // Keep only already-completed events
         self.dissolve_events = remaining;
+
+        // Return all newly completed events
         completed
     }
 
@@ -270,14 +274,8 @@ impl StakePosition {
         // Now check if there's at least one dissolve event ready
         let now = timestamp_millis();
 
-        let has_ready_dissolve_event = self.dissolve_events.iter().any(|event| {
-            matches!(&event,
-                 DissolveStakeEvent { dissolved_date, .. }
-                if now >= *dissolved_date
-            )
-        });
-
-        if !has_ready_dissolve_event {
+        // NOTE: all events are considered completed
+        if self.dissolve_events.is_empty() {
             return Err(WithdrawErrors::NoValidDissolveEvents(
                 "No tokens are currently eligible for unstaking.".to_string(),
             ));
@@ -292,37 +290,17 @@ impl StakePosition {
             .scale_e8s_down()
     }
 
+    // NOTE: all events are considered completed
     pub fn amount_available_for_withdraw(&self) -> Nat {
-        let now = timestamp_millis();
-
         self.dissolve_events
             .iter()
-            .filter_map(|event| match &event {
-                DissolveStakeEvent {
-                    amount,
-                    dissolved_date,
-                    completed,
-                    ..
-                } if !completed && *dissolved_date <= now => Some(amount.clone()),
-                _ => None,
-            })
+            .map(|event| event.amount.clone())
             .fold(Nat::from(0u32), |acc, amount| acc + amount)
     }
 
+    // NOTE: all events are considered completed
     pub fn completed_dissolve_events(&self) -> Vec<DissolveStakeEvent> {
-        let now = timestamp_millis();
-
-        self.dissolve_events
-            .iter()
-            .filter_map(|event| match event {
-                DissolveStakeEvent {
-                    dissolved_date,
-                    completed,
-                    ..
-                } if !completed && *dissolved_date <= now => Some(event.clone()),
-                _ => None,
-            })
-            .collect()
+        self.dissolve_events.clone()
     }
 
     pub fn has_rewards(&self) -> bool {
@@ -663,7 +641,7 @@ mod tests {
         };
 
         let amount_to_dissolve = Nat::from(1_000u64);
-        let expected_fee = Nat::from(50u64); // 5% of the initial stake
+        let expected_fee = Nat::from(0u64); // 0% of the initial stake
         assert_eq!(
             position.calculate_dissolve_instantly_fee(amount_to_dissolve),
             expected_fee
@@ -711,10 +689,7 @@ mod tests {
         position.claimable_rewards.remove(&TokenSymbol::ICP);
 
         // Case 2: Dissolve event not matured yet => still cannot withdraw
-        assert!(matches!(
-            position.can_withdraw(),
-            Err(WithdrawErrors::NoValidDissolveEvents(_))
-        ));
+        assert!(matches!(position.can_withdraw(), Ok(())));
 
         // Simulate time after dissolve has matured by replacing with a past event
         let past_dissolve_date = now - DAY_IN_MS;
@@ -817,7 +792,7 @@ mod tests {
 
         // Only one of the dissolve_events should be marked completed
         position.cleanup_completed_dissolve_events();
-        assert_eq!(position.dissolve_events.len(), 1);
+        assert_eq!(position.dissolve_events.len(), 0);
     }
 
     #[test]

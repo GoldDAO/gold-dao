@@ -13,6 +13,8 @@ import Withdraw from "./components/withdraw";
 import { LoaderSpin } from "@components/loaders";
 import DissolveEventsListDisconnected from "./components/dissolve-events-list-disconnected";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
+import useGetGLDDashboardMaintenanceMode from "@shared/hooks/useGetGLDDashboardMaintenanceMode";
+import { GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID } from "@constants";
 
 const styles = {
   container: clsx("border border-border bg-surface-primary rounded-xl"),
@@ -23,12 +25,85 @@ const styles = {
 
 const Earn = () => {
   const { isConnected, unauthenticatedAgent, principalId } = useAuth();
+  const { data: maintenanceMode } = useGetGLDDashboardMaintenanceMode(
+    GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID,
+    unauthenticatedAgent,
+    {
+      enabled: !!unauthenticatedAgent,
+    }
+  );
 
   const position = useFetchUserPosition(GLDT_STAKE_CANISTER_ID, {
     enabled: isConnected && !!unauthenticatedAgent && !!principalId,
     agent: unauthenticatedAgent,
     owner: principalId,
   });
+
+  const renderEarnContent = () => {
+    if (maintenanceMode) {
+      return (
+        <div className="flex flex-col shadow-md items-center h-full justify-center p-4 xl:p-8 bg-surface-primary rounded-xl">
+          <div className="text-2xl font-bold mb-4">Maintenance mode</div>
+          <div className="text-content/60">
+            We are currently performing maintenance on the GLDT staking system.
+            Please check back later.
+          </div>
+        </div>
+      );
+    }
+    return (
+      <>
+        <div className="rounded-xl border border-orange-500 bg-orange-500/5 text-orange-500 p-4 text-center">
+          GLDT staking has been discontinued. Claim any rewards and then
+          withdraw your stakes.
+        </div>
+        {(position.isLoading || position.isError) && (
+          <div
+            className={clsx(
+              "flex flex-col items-center justify-center gap-4",
+              "border border-border bg-surface-primary",
+              "rounded-xl p-4"
+            )}
+          >
+            <LoaderSpin size="sm" />
+            <div>Fetching stake positions...</div>
+          </div>
+        )}
+
+        {position.isSuccess && position.data.is_enable_claiming_rewards && (
+          <ClaimRewardsDisclaimer position={position.data} />
+        )}
+
+        {position.isSuccess &&
+          (position.data.total_withdrawable_amount > 0 ||
+            position.data.staked_amount > 0) && (
+            <div className={styles.container}>
+              <div className="rounded-[inherit] p-4">
+                <div className={styles.title}>Tokens available to withdraw</div>
+                <div className="flex flex-col xl:flex-row justify-between items-center mt-2 gap-4">
+                  <div className="flex flex-col items-center xl:items-start shrink-0">
+                    <div className={styles.totalAmount}>
+                      <NumberToLocaleString
+                        value={
+                          position.data.staked_amount +
+                          position.data.total_withdrawable_amount
+                        }
+                        decimals={5}
+                      />{" "}
+                      <span className="text-content/60 font-normal">GLDT</span>
+                    </div>
+                    <div className={styles.description}>
+                      Total of staked amount and already dissolved events.
+                    </div>
+                  </div>
+                  <Withdraw position={position} />
+                </div>
+              </div>
+            </div>
+          )}
+      </>
+    );
+  };
 
   return (
     <InnerAppLayout>
@@ -51,79 +126,25 @@ const Earn = () => {
       </InnerAppLayout.LeftPanel>
       <InnerAppLayout.RightPanel>
         <div>
-          <GradientCard
-            className={clsx(
-              "px-4 xl:px-8 pt-4 xl:pt-8 pb-8 xl:pb-12",
-              "rounded-tr-[inherit]"
-            )}
-          >
-            <TokenHeaderPrice
-              className="hidden xl:block mb-8 xl:mb-12"
-              token={TOKEN_GLDT}
-            />
+          {(!isConnected || !maintenanceMode) && (
+            <GradientCard
+              className={clsx(
+                "px-4 xl:px-8 pt-4 xl:pt-8 pb-8 xl:pb-12",
+                "rounded-tr-[inherit]"
+              )}
+            >
+              <TokenHeaderPrice
+                className="hidden xl:block mb-8 xl:mb-12"
+                token={TOKEN_GLDT}
+              />
 
-            <UserTotalStakedAmount position={position} />
-          </GradientCard>
+              <UserTotalStakedAmount position={position} />
+            </GradientCard>
+          )}
 
           <div className="flex flex-col gap-4 xl:gap-8 pt-8 px-4 pb-4 xl:px-8 xl:pb-8">
             {!isConnected && <DissolveEventsListDisconnected />}
-            {isConnected && (
-              <div className="rounded-xl border border-orange-500 bg-orange-500/5 text-orange-500 p-4 text-center">
-                GLDT staking has been discontinued. Claim any rewards and then
-                withdraw your stakes.
-              </div>
-            )}
-            {isConnected && (position.isLoading || position.isError) && (
-              <div
-                className={clsx(
-                  "flex flex-col items-center justify-center gap-4",
-                  "border border-border bg-surface-primary",
-                  "rounded-xl p-4"
-                )}
-              >
-                <LoaderSpin size="sm" />
-                <div>Fetching stake positions...</div>
-              </div>
-            )}
-
-            {isConnected &&
-              position.isSuccess &&
-              position.data.is_enable_claiming_rewards && (
-                <ClaimRewardsDisclaimer position={position.data} />
-              )}
-
-            {isConnected &&
-              position.isSuccess &&
-              (position.data.total_withdrawable_amount > 0 ||
-                position.data.staked_amount > 0) && (
-                <div className={styles.container}>
-                  <div className="rounded-[inherit] p-4">
-                    <div className={styles.title}>
-                      Tokens available to withdraw
-                    </div>
-                    <div className="flex flex-col xl:flex-row justify-between items-center mt-2 gap-4">
-                      <div className="flex flex-col items-center xl:items-start shrink-0">
-                        <div className={styles.totalAmount}>
-                          <NumberToLocaleString
-                            value={
-                              position.data.staked_amount +
-                              position.data.total_withdrawable_amount
-                            }
-                            decimals={5}
-                          />{" "}
-                          <span className="text-content/60 font-normal">
-                            GLDT
-                          </span>
-                        </div>
-                        <div className={styles.description}>
-                          Total of staked amount and already dissolved events.
-                        </div>
-                      </div>
-                      <Withdraw position={position} />
-                    </div>
-                  </div>
-                </div>
-              )}
+            {isConnected && renderEarnContent()}
           </div>
         </div>
       </InnerAppLayout.RightPanel>

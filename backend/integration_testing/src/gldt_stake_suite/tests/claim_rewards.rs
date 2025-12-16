@@ -3,7 +3,7 @@ use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::*;
 use crate::client::pocket::unwrap_response;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
-use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
+use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util_mock};
 use crate::utils::wait_1_day;
 use crate::{
     client::icrc1::client::balance_of, gldt_stake_suite::setup::default_test_setup,
@@ -38,7 +38,7 @@ fn test_can_claim_gldt_stake_rewards() {
     let goldao_tx_fee = ledger_fees.get("GOLDAO").unwrap();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -162,7 +162,7 @@ fn test_claim_rewards_twice() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -228,7 +228,7 @@ fn test_claim_rewards_empty() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -292,7 +292,7 @@ fn test_claim_rewards_concurrent_calls_should_fail() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
