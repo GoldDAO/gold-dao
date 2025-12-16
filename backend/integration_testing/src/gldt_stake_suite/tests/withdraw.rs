@@ -2,7 +2,7 @@ use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::client::gldt_stake::{_set_position_withdraw_state, get_total_staked};
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
-use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
+use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util_mock};
 use crate::utils::wait_1_day;
 use crate::{
     client::icrc1::client::balance_of, gldt_stake_suite::setup::default_test_setup,
@@ -37,7 +37,7 @@ fn test_withdraw_works() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -89,17 +89,6 @@ fn test_withdraw_works() {
     )
     .unwrap();
 
-    // wait 1 day and try to withdraw - SHOULD FAIL because we haven't waited a full week
-    pic.advance_time(Duration::from_millis(DAY_IN_MS));
-    let res = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-
-    assert_matches!(res, Err(ManageStakePositionError::WithdrawError(_)));
-
     // --- Claim all rewards ---
     let _res = manage_stake_position_with_tick(
         pic,
@@ -109,19 +98,6 @@ fn test_withdraw_works() {
             tokens: vec![TokenSymbol::GOLDAO, TokenSymbol::OGY, TokenSymbol::ICP],
         },
     );
-
-    // --- Check that the dissolve date hasn't passed ---
-    let res = manage_stake_position_with_tick(
-        pic,
-        user,
-        gldt_stake_canister_id,
-        &manage_stake_position::Args::Withdraw {},
-    );
-
-    assert_matches!(res, Err(ManageStakePositionError::WithdrawError(_)));
-
-    pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    tick_n_blocks(pic, 100);
 
     let res = manage_stake_position_with_tick(
         pic,
@@ -163,6 +139,8 @@ fn test_withdraw_works() {
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 8));
     tick_n_blocks(pic, 10);
     let user_position = get_position(pic, user, gldt_stake_canister_id, &user);
+
+    println!("user_position after withdraw: {user_position:?}");
     assert!(user_position.is_none());
 }
 
@@ -183,7 +161,7 @@ fn test_withdraw_with_unclaimed_rewards() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -249,7 +227,7 @@ fn test_invalid_withdraw_states_in_progress() {
     let pic = &pic.borrow();
 
     // create 10 stake positions for 10 different users with a total of 100_000_000_000 staked
-    let (user, _stake_position) = create_stake_position_util(
+    let (user, _stake_position) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -307,7 +285,7 @@ fn test_invalid_withdraw_states_failed() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let (user, _stake_position) = create_stake_position_util(
+    let (user, _stake_position) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,

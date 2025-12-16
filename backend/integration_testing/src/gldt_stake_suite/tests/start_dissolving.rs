@@ -1,7 +1,7 @@
 use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
-use crate::gldt_stake_suite::utils::create_stake_position_util;
+use crate::gldt_stake_suite::utils::create_stake_position_util_mock;
 use crate::{gldt_stake_suite::setup::default_test_setup, utils::tick_n_blocks};
 use assert_matches::assert_matches;
 use candid::Nat;
@@ -23,7 +23,7 @@ fn test_start_dissolving() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -59,7 +59,7 @@ fn test_start_dissolving_partial() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -95,7 +95,7 @@ fn test_start_dissolving_limit() {
     let pic = &pic.borrow();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,

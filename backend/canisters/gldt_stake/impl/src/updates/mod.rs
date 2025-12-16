@@ -1,3 +1,4 @@
+pub mod _add_stake_mock;
 pub mod _set_position_withdraw_state;
 pub mod _set_token_usd_values;
 pub mod set_dissolve_event_time;
@@ -16,6 +17,7 @@ pub mod manual_sync_neurons;
 pub mod manual_token_transfer;
 pub mod set_apy_limit;
 
+pub use _add_stake_mock::*;
 pub use _set_position_withdraw_state::*;
 pub use _set_token_usd_values::*;
 pub use set_dissolve_event_time::*;

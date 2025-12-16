@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.17] - 2025-12-11
+
+#### Changed
+
+- **Disable Add Stake feature**: Preparations for the gldt_staking canister discontinuation
+
 ### [1.0.16] - 2025-12-10
 
 #### Changed
