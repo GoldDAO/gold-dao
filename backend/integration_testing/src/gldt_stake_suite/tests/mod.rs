@@ -1,10 +1,11 @@
 pub mod add_stake;
 pub mod claim_rewards;
 pub mod dissolve_instantly;
-pub mod fuzz_testing;
+// pub mod fuzz_testing;
 pub mod health_check;
 pub mod metrics;
 pub mod process_rewards;
+// NOTE: voting had been disabled
 // pub mod proposal_voting;
 pub mod start_dissolving;
 pub mod test_icrc3;

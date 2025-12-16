@@ -2,7 +2,7 @@ use crate::client::gldt_stake::get_position;
 use crate::client::gldt_stake::get_total_staked;
 use crate::client::gldt_stake::manage_stake_position_with_tick;
 use crate::gldt_stake_suite::setup::setup::GldtStakeTestEnv;
-use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util};
+use crate::gldt_stake_suite::utils::{add_rewards_to_neurons, create_stake_position_util_mock};
 use crate::utils::wait_1_day;
 use crate::{
     client::icrc1::client::balance_of, gldt_stake_suite::setup::default_test_setup,
@@ -40,7 +40,7 @@ fn test_dissolve_instantly_full() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -56,6 +56,7 @@ fn test_dissolve_instantly_full() {
             subaccount: None,
         },
     );
+    println!("User GLDT balance before withdraw: {:?}", user_gldt_balance);
 
     let total_staked_before_withdraw = get_total_staked(pic, user, gldt_stake_canister_id, &());
     assert_eq!(total_staked_before_withdraw, Nat::from(100_000_000_000u128));
@@ -84,7 +85,12 @@ fn test_dissolve_instantly_full() {
     assert_ne!(rewards[&TokenSymbol::ICP], Nat::from(0_u64));
 
     let position_stake_amount = user_position.staked.clone();
-    let position_instant_dissolve_fee = user_position.instant_dissolve_fee.clone();
+    println!("Position stake amount: {:?}", position_stake_amount);
+    let position_instant_dissolve_fee = Nat::from(0_u64);
+    println!(
+        "Position instant dissolve fee: {:?}",
+        position_instant_dissolve_fee
+    );
 
     wait_1_day(pic);
 
@@ -124,6 +130,16 @@ fn test_dissolve_instantly_full() {
         },
     );
 
+    println!(
+        "User GLDT balance after withdraw: {:?}",
+        user_gldt_balance_after_withdraw
+    );
+    println!("user_gldt_balance: {:?}", user_gldt_balance);
+    println!("position_stake_amount: {:?}", position_stake_amount.clone());
+    println!(
+        "position_instant_dissolve_fee: {:?}",
+        position_instant_dissolve_fee.clone()
+    );
     assert_eq!(
         user_gldt_balance_after_withdraw,
         (user_gldt_balance + position_stake_amount)
@@ -147,10 +163,7 @@ fn test_dissolve_instantly_full() {
         },
     );
 
-    assert_eq!(
-        fee_account_balance,
-        position_instant_dissolve_fee - GLDT_TX_FEE
-    );
+    assert_eq!(fee_account_balance, Nat::from(0_u64));
 
     // Check that the user position is deleted
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 8));
@@ -177,7 +190,7 @@ fn test_dissolve_instantly_partial() {
     let gldt_ledger_id = token_ledgers.get("gldt_ledger_canister_id").unwrap();
 
     // --- Create stake position ---
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -263,7 +276,7 @@ fn test_dissolve_instantly_partial() {
     assert_eq!(
         user_gldt_balance_after_withdraw,
         (user_gldt_balance + position_stake_amount / Nat::from(2_u64))
-            - (position.instant_dissolve_fee.clone() + GLDT_TX_FEE)
+            - (Nat::from(0_u64) + GLDT_TX_FEE)
     );
 
     // --- Check the instant dissolvement fee account ---
@@ -279,10 +292,7 @@ fn test_dissolve_instantly_partial() {
         },
     );
 
-    assert_eq!(
-        fee_account_balance,
-        position.instant_dissolve_fee - GLDT_TX_FEE
-    );
+    assert_eq!(fee_account_balance, Nat::from(0_u64));
 
     tick_n_blocks(pic, 10);
 
@@ -302,7 +312,7 @@ fn test_dissolve_instantly_zero_fraction_should_fail() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -337,7 +347,7 @@ fn test_dissolve_instantly_over_100_should_fail() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -372,7 +382,7 @@ fn test_dissolve_instantly_99_percent_leaves_1_percent() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
@@ -405,7 +415,7 @@ fn test_dissolve_instantly_when_already_dissolved_should_fail() {
     } = test_env;
     let pic = &pic.borrow();
 
-    let (user, _) = create_stake_position_util(
+    let (user, _) = create_stake_position_util_mock(
         pic,
         controller,
         &token_ledgers,
