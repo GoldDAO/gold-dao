@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.1] - 2025-12-16
+
+#### Added
+
+- **Burn GOLDAO reserve pool call**: Added an update call that allows the GOLDAO reserve pool to be burned via a governance proposal.
+
+
 ### [1.1.0] - 2025-12-12
 
 #### Changed
