@@ -32,6 +32,10 @@ pub fn start_dissolving_impl(
         ));
     }
 
+    if position.staked == Nat::from(0u64) {
+        return Ok((position, timestamp_millis()).into());
+    }
+
     // 1. calculate amounts
     let decrease_amount = percentage.apply_to(&position.staked);
     let dissolve_at = timestamp_millis() + position.dissolve_delay.as_millis() as u64;

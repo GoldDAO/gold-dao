@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.0.18] - 2025-12-17
+
+#### Changed
+
+- **StartDissolving method**: Updated error handling for the start_dissolving call. When a user has 0 staked, no error is returned and the initial position is used instead.
+
 ### [1.0.17] - 2025-12-11
 
 #### Changed

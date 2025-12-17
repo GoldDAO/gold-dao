@@ -1,3 +1,4 @@
+pub mod burn_goldao_reserve_pool_validate;
 pub mod candid;
 pub mod get_active_payment_rounds;
 pub mod get_all_neurons;

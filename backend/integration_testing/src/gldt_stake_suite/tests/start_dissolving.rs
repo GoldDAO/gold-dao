@@ -103,8 +103,8 @@ fn test_start_dissolving_limit() {
         100_000_000_000u128,
     );
 
-    // --- Create 5 legit dissolvements ---
-    for _ in 0..=4 {
+    // --- Create 6 legit dissolvements ---
+    for _ in 0..=5 {
         let response = manage_stake_position_with_tick(
             pic,
             user,
@@ -133,5 +133,5 @@ fn test_start_dissolving_limit() {
     );
 
     let user_position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
-    assert_eq!(user_position.staked, Nat::from(32_768_000_000_u128));
+    assert_eq!(user_position.staked, Nat::from(26_214_400_000_u128));
 }
