@@ -230,11 +230,11 @@ impl StakePosition {
     }
 
     pub fn can_start_dissolving(&self) -> Result<(), StartDissolvingErrors> {
-        if self.staked == 0u64 {
-            return Err(StartDissolvingErrors::InvalidDissolveAmount(
-                "Cannot start dissolving on a position with zero stake.".to_string(),
-            ));
-        }
+        // if self.staked == 0u64 {
+        //     return Err(StartDissolvingErrors::InvalidDissolveAmount(
+        //         "Cannot start dissolving on a position with zero stake.".to_string(),
+        //     ));
+        // }
 
         let active_dissolves = self
             .dissolve_events
