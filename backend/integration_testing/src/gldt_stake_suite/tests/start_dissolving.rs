@@ -103,8 +103,8 @@ fn test_start_dissolving_limit() {
         100_000_000_000u128,
     );
 
-    // --- Create 5 legit dissolvements ---
-    for _ in 0..=4 {
+    // --- Create 6 legit dissolvements ---
+    for _ in 0..=5 {
         let response = manage_stake_position_with_tick(
             pic,
             user,

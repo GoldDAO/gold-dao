@@ -19,7 +19,7 @@ pub const GLDT_STAKE_EARLY_UNSTAKE_FEE_PERCENTAGE: f64 = 0.0;
 pub const MINIMUM_STAKE_AMOUNT: u64 = 1_000_000_000; // 10 GLDT
 pub const MINIMUM_STAKE_AMOUNT_WITH_FEE: u64 = MINIMUM_STAKE_AMOUNT + GLDT_TX_FEE;
 pub const MAXIMUM_STAKE_AMOUNT: u64 = 100_000_000_000_000; // 1 million GLDT
-pub const MAX_ACTIVE_EVENTS_PER_POSITION: usize = 5;
+pub const MAX_ACTIVE_EVENTS_PER_POSITION: usize = 6; // NOTE: adjusted for the users to be able to withdraw all their stake in one go
 pub const DAYS_IN_A_YEAR: f64 = 365.25; // Account for leap years
 pub const BONUS_INCREMENT: f64 = 1.0 / DAYS_IN_A_YEAR; // Daily increment
 
