@@ -30,7 +30,7 @@ impl Clone for Box<dyn SwapClient> {
 }
 
 #[enum_dispatch]
-#[derive(CandidType, Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub enum SwapClientEnum {
     ICPSwapClient(ICPSwapClient),
 }

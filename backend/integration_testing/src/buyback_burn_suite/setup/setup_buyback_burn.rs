@@ -29,3 +29,29 @@ pub fn setup_buyback_burn_canister(
 
     buyback_burn_id
 }
+
+use bity_ic_types::BuildVersion;
+use buyback_burn_api::post_upgrade::UpgradeArgs;
+use buyback_burn_api::Args;
+use pocket_ic::RejectResponse;
+pub fn upgrade_buyback_burn_canister(
+    pic: &PocketIc,
+    canister_id: Principal,
+    controller: &Principal,
+) -> std::result::Result<(), RejectResponse> {
+    let buyback_burn_wasm = crate::wasms::BUYBACK_BURN.clone();
+
+    let upgrade_args = Args::Upgrade(UpgradeArgs {
+        version: BuildVersion::min(),
+        commit_hash: "Test".to_string(),
+    });
+
+    let encoded_args = encode_one(upgrade_args).expect("Failed to encode upgrade args");
+
+    pic.upgrade_canister(
+        canister_id,
+        buyback_burn_wasm,
+        encoded_args,
+        Some(controller.clone()),
+    )
+}
