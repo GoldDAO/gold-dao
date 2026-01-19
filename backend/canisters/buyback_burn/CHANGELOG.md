@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.0] - 2026-01-19
+
+#### Added
+
+- **GLDT distribution job for GOLDAO stakers**: Introduced a new exchange job that continuously converts 33% of ICP rewards into GLDT and routes the acquired GLDT to a reward pool for distribution to GOLDAO stakers.
+- **Multi-job support in buyback & burn canister**: Extended the canister to support multiple exchange jobs with distinct interval and post-swap behaviors (burn vs. reward distribution), enabling future expansion without deploying additional canisters.
 
 ### [1.0.3] - 2025-07-18
 

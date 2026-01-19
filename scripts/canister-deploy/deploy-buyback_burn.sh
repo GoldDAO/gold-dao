@@ -25,26 +25,54 @@ if [[ $REINSTALL == "reinstall" ]]; then
     exit 2
   fi
 
-  BURN_RATE=33
-  MIN_BURN_AMOUNT=30_000_000_000
+  ICPSWAP_POOL_ID_GOLDAO="k46ek-4qaaa-aaaag-qcyzq-cai"
+  ICPSWAP_POOL_ID_GLDT="4omhz-yiaaa-aaaag-qnalq-cai"
+  MIN_SWAP_AMOUNT=10_000_000                # 0.1 tokens
+  # Could be set if needed
+  #MAX_SWAP_AMOUNT=
+
+  EXCHANGE_CONFIG_GOLDAO="variant {
+    ICPSwap = record {
+      swap_canister_id = principal \"$ICPSWAP_POOL_ID_GOLDAO\";
+      zero_for_one = true;
+    }
+  }"
+
+  EXCHANGE_JOB_CONFIG_GOLDAO="record {
+    token_to_sell = variant { ICP };
+    token_to_buy = variant { GOLDAO };
+    exchange = $EXCHANGE_CONFIG_GOLDAO;
+    rate_per_interval = 793_650 : nat64;
+    job_interval_ms = 14400 : nat64;
+    source_subaccount = null;
+    min_amount = record { e8s = $MIN_SWAP_AMOUNT : nat64 };
+    max_amount = null;
+    destination_account = null;
+  }"
+
+  EXCHANGE_CONFIG_GLDT="variant {
+    ICPSwap = record {
+      swap_canister_id = principal \"$ICPSWAP_POOL_ID_GLDT\";
+      zero_for_one = false;
+    }
+  }"
+
+  EXCHANGE_JOB_CONFIG_GLDT="record {
+    token_to_sell = variant { ICP };
+    token_to_buy = variant { GLDT };
+    exchange = $EXCHANGE_CONFIG_GLDT;
+    rate_per_interval = 3_571_428 : nat64;
+    job_interval_ms = 21600 : nat64;
+    source_subaccount = opt blob "'"\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\01"'";
+    min_amount = record { e8s = $MIN_SWAP_AMOUNT : nat64 };
+    max_amount = null;
+    destination_account = opt "'"5aybl-v7aii-duvsu-ztemq-litdi-ly42r-iyf35-2k46p-ovynj-amtow-rae"'";
+  }"
+
+  # Combine all exchange configs into a vector
+  EXCHANGE_CONFIGS="vec { $EXCHANGE_JOB_CONFIG_GOLDAO; $EXCHANGE_JOB_CONFIG_GLDT }"
   ICP_SWAP_CANISTER_ID="7eikv-2iaaa-aaaag-qdgwa-cai"
 
-  # ICP token data + GOLDAO/ICP swap pool
-  GLDGOV_ICP_POOL='record {
-      token = record {
-          fee = 10_000 : nat64;
-          decimals = 8 : nat64;
-          ledger_id = principal "ryjl3-tyaaa-aaaaa-aaaba-cai";
-      };
-      swap_pool_id = principal "k46ek-4qaaa-aaaag-qcyzq-cai";
-  };'
-
-  # Production canister is used for both staging and production
-  GLDGOV_TOKEN_INFO='record {
-      fee = 100_000 : nat64;
-      decimals = 8 : nat64;
-      ledger_id = principal "tyyy3-4aaaa-aaaaq-aab7a-cai";
-  }'
 
   ARGUMENTS="(variant { Init = record {
         test_mode = $TESTMODE;
@@ -54,10 +82,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
           principal \"$AUTHORIZED_PRINCIPAL\";
         };
         icp_swap_canister_id = principal \"$ICP_SWAP_CANISTER_ID\";
-        gldgov_token_info = $GLDGOV_TOKEN_INFO;
-        tokens = vec {$GLDGOV_ICP_POOL};
-        burn_rate = $BURN_RATE : nat8;
-        min_burn_amount = record { e8s = $MIN_BURN_AMOUNT : nat64 };
+        exchange_configs = $EXCHANGE_CONFIGS;
         buyback_interval_in_secs = $BUYBACK_INTERVAL_IN_SECS : nat64;
       }
     }
@@ -71,3 +96,4 @@ else
 fi
 
 . ./scripts/deploy_backend_canister.sh buyback_burn $NETWORK "$ARGUMENTS" $DEPLOYMENT_VIA $VERSION $REINSTALL
+

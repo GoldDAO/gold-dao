@@ -1,4 +1,5 @@
 use crate::state::read_state;
+use crate::types::GOLDAO_BURNING_POOL;
 use crate::utils::retry_with_attempts;
 use crate::utils::{get_token_balance, RETRY_DELAY};
 use bity_ic_canister_time::start_job_daily_at;
@@ -7,6 +8,7 @@ use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::TransferArg;
 use tracing::{error, info};
+use types::TokenSymbol;
 
 const MAX_ATTEMPTS: u8 = 1;
 
@@ -36,23 +38,19 @@ async fn run_async() {
 pub async fn process_token_burn() -> Result<(), String> {
     info!("Starting token burn process");
 
-    let burn_config = read_state(|s| s.data.burn_config.clone());
-    let gldgov_ledger_canister_id = read_state(|s| s.data.gldgov_token_info.ledger_id);
+    let goldao_ledger_canister_id = TokenSymbol::GOLDAO.get_token_info().ledger_id;
 
-    let amount_to_burn = get_token_balance(gldgov_ledger_canister_id).await?;
-    let min_burn_amount: u128 = burn_config.min_burn_amount.e8s().into();
+    let amount_to_burn =
+        get_token_balance(goldao_ledger_canister_id, Some(GOLDAO_BURNING_POOL)).await?;
 
-    if amount_to_burn <= min_burn_amount {
-        let error_message = format!(
-            "Calculated burn amount {} is below the minimum threshold of {}.",
-            amount_to_burn, min_burn_amount
-        );
+    if amount_to_burn == 0u64 {
+        let error_message = "Calculated burn amount is zero.".to_string();
         error!("{}", error_message);
         return Err(error_message);
     }
 
-    let minting_account = get_minting_account(gldgov_ledger_canister_id).await?;
-    burn_tokens(gldgov_ledger_canister_id, minting_account, amount_to_burn).await
+    let minting_account = get_minting_account(goldao_ledger_canister_id).await?;
+    burn_tokens(goldao_ledger_canister_id, minting_account, amount_to_burn).await
 }
 
 async fn burn_tokens(

@@ -144,6 +144,44 @@ impl Div<f64> for Percentage {
     }
 }
 
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, CandidType, Serialize, Deserialize,
+)]
+pub struct Rate {
+    /// Fixed-point value scaled by 1e8. e.g. 30% = 0.3 = 30_000_000 (scaled by 1e8)
+    value: u64,
+}
+
+impl Rate {
+    pub const SCALE: u128 = 100_000_000;
+
+    pub const ZERO: Self = Self { value: 0 };
+    pub const ONE: Self = Self {
+        value: Self::SCALE as u64,
+    }; // 100%
+
+    /// Create from percent (e.g. 30 → 30%)
+    pub fn from_percent(percent: u64) -> Self {
+        Self {
+            value: percent * (Self::SCALE as u64) / 100,
+        }
+    }
+
+    /// Create directly from scaled value
+    pub fn from_scaled(value: u64) -> Self {
+        Self { value }
+    }
+
+    pub fn as_scaled(self) -> u64 {
+        self.value
+    }
+
+    /// Apply rate to Nat amount
+    pub fn apply_to(&self, amount: &Nat) -> Nat {
+        Nat::from((&amount.0 * BigUint::from(self.value)) / BigUint::from(Self::SCALE))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -238,7 +276,108 @@ mod tests {
         ));
     }
 
-    // --- Integration & Cross-Type Tests ---
+    fn nat(value: u128) -> Nat {
+        Nat::from(BigUint::from(value))
+    }
+
+    #[test]
+    fn applies_full_rate_correctly() {
+        let rate = Rate::ONE; // 100%
+        let amount = nat(1_000_000_000);
+
+        let result = rate.apply_to(&amount);
+
+        assert_eq!(result, amount);
+    }
+
+    #[test]
+    fn applies_zero_rate_correctly() {
+        let rate = Rate::ZERO;
+        let amount = nat(1_000_000_000);
+
+        let result = rate.apply_to(&amount);
+
+        assert_eq!(result, nat(0));
+    }
+
+    #[test]
+    fn applies_fractional_percentage_precisely() {
+        // 0.71428571428% ≈ 0.0071428571
+        let rate = Rate::from_scaled(714_286);
+
+        let amount = nat(1_000_000_000); // 10 ICP (e8s)
+        let result = rate.apply_to(&amount);
+
+        // Expected: 1_000_000_000 * 0.00714286 ≈ 7_142_860
+        assert_eq!(result, nat(7_142_860));
+    }
+
+    #[test]
+    fn rounding_is_deterministic() {
+        let rate = Rate::from_scaled(333_333); // ~0.333333%
+        let amount = nat(1);
+
+        let result = rate.apply_to(&amount);
+
+        // Integer math → rounds down
+        assert_eq!(result, nat(0));
+    }
+
+    #[test]
+    fn calculate_value() {
+        let rate = Rate::from_scaled(392_857);
+        let amount = nat(5_000_000_000);
+
+        let result = rate.apply_to(&amount);
+        println!("Result: {}", result);
+    }
+
+    #[test]
+    fn large_amount_does_not_overflow() {
+        let rate = Rate::from_percent(30); // 30%
+        let amount = nat(u128::MAX / 2);
+
+        let result = rate.apply_to(&amount);
+
+        // Should not panic and must be <= amount
+        assert!(result <= amount);
+    }
+
+    #[test]
+    fn simple_check_rate_apply_to_nat() {
+        let rate = Rate::from_percent(30); // 30%
+        let amount = nat(1234);
+
+        let result = rate.apply_to(&amount);
+
+        // Should not panic and must be <= amount
+        assert!(result == Nat::from(370u64));
+    }
+
+    #[test]
+    fn weekly_rate_split_into_intervals() {
+        // 30% weekly
+        let weekly_rate = Rate::from_percent(30);
+
+        // 7 days * 24h / 4h = 42 intervals
+        let intervals = 42;
+
+        let interval_rate = Rate::from_scaled(weekly_rate.as_scaled() / intervals);
+
+        let amount = nat(1_000_000_000);
+        let interval_amount = interval_rate.apply_to(&amount);
+
+        // Applying interval rate 42 times ≈ weekly amount
+        let mut total = BigUint::from(0u8);
+        for _ in 0..intervals {
+            total += interval_amount.0.clone();
+        }
+
+        let weekly_amount = weekly_rate.apply_to(&amount);
+
+        // Allow small dust loss (integer division)
+        assert!(total <= weekly_amount.0);
+    }
 
     #[test]
     fn test_scale_e8s_down_rounding_and_zero() {
