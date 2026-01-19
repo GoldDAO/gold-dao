@@ -1,11 +1,8 @@
-pub mod update_config;
-pub use update_config::*;
-
-pub mod process_swap;
-pub use process_swap::*;
+pub mod update_exchange_config;
+pub use update_exchange_config::*;
 
 pub mod process_burn;
 pub use process_burn::*;
 
-pub mod add_swap_client;
-pub use add_swap_client::*;
+pub mod add_exchange_jobs;
+pub use add_exchange_jobs::*;

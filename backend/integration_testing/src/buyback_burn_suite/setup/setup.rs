@@ -1,14 +1,20 @@
 use crate::buyback_burn_suite::setup::setup_buyback_burn::setup_buyback_burn_canister;
 use crate::utils::random_principal;
+use crate::utils::tick_n_blocks;
+use bity_ic_canister_time::HOUR_IN_MS;
 use bity_ic_types::BuildVersion;
+use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
+use buyback_burn_api::icpswap::ICPSwapConfig;
+use buyback_burn_api::swap_config::ExchangeConfig;
 use buyback_burn_api::Args;
 use candid::CandidType;
 use candid::Deserialize;
 use candid::Principal;
 use ic_ledger_types::Tokens;
 use pocket_ic::{PocketIc, PocketIcBuilder};
+use std::time::Duration;
 use types::CanisterId;
-use types::TokenInfo;
+use types::TokenSymbol;
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct RegisterDappCanisterRequest {
@@ -69,18 +75,23 @@ impl TestEnvBuilder {
         let buyback_burn_init_args = Args::Init(buyback_burn_api::init::InitArgs {
             test_mode: true,
             version: BuildVersion::min(),
-            gldgov_token_info: TokenInfo {
-                ledger_id: Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap(),
-                fee: 10000,
-                decimals: 8,
-            },
-            tokens: vec![],
-            buyback_interval_in_secs: 100000,
-            icp_swap_canister_id: Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap(),
-            burn_rate: 33,
-            min_burn_amount: Tokens::from_e8s(100_000_000),
+            exchange_configs: vec![ExchangeJobConfig {
+                token_to_sell: TokenSymbol::ICP,
+                token_to_buy: TokenSymbol::GLDT,
+                exchange: ExchangeConfig::ICPSwap(ICPSwapConfig {
+                    swap_canister_id: Principal::from_text("k46ek-4qaaa-aaaag-qcyzq-cai").unwrap(),
+                    zero_for_one: true,
+                }),
+                rate_per_interval: 714_286,
+                job_interval_ms: 0,
+                source_subaccount: None,
+                min_amount: Tokens::from_e8s(0),
+                max_amount: Some(Tokens::from_e8s(0)),
+                destination_account: None,
+            }],
+            icp_swap_canister_id: Principal::from_text("7eikv-2iaaa-aaaag-qdgwa-cai").unwrap(),
             commit_hash: "".to_string(),
-            authorized_principals: vec![],
+            authorized_principals: vec![self.controller.clone()],
         });
 
         let buyback_burn_canister_id = setup_buyback_burn_canister(
@@ -89,6 +100,10 @@ impl TestEnvBuilder {
             buyback_burn_init_args,
             self.controller,
         );
+
+        // Tuesday Jun 18, 2024, 9:00:00 AM
+        pic.advance_time(Duration::from_millis(HOUR_IN_MS));
+        tick_n_blocks(&pic, 5);
 
         TestEnv {
             controller: self.controller,

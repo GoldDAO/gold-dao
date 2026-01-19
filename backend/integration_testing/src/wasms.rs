@@ -10,6 +10,7 @@ lazy_static! {
     pub static ref IC_ICRC2_LEDGER: CanisterWasm = get_canister_wasm_gz("icrc_ledger");
     pub static ref ICP_LEDGER: CanisterWasm = get_canister_wasm("ledger");
     pub static ref BURNER: CanisterWasm = get_canister_wasm("cycles_burner");
+    pub static ref BUYBACK_BURN_OLD: CanisterWasm = get_canister_wasm_gz("buyback_burn_old");
 
     // SNS wasms
     pub static ref SNS_SWAP: CanisterWasm = get_canister_wasm_gz("sns_swap");

@@ -4,7 +4,9 @@ use ic_stable_structures::{
 };
 
 const UPGRADES: MemoryId = MemoryId::new(0);
-const SWAP_HISTORY: MemoryId = MemoryId::new(1);
+// Old swap history memory id before migration
+// const SWAP_HISTORY: MemoryId = MemoryId::new(1);
+const SWAP_HISTORY: MemoryId = MemoryId::new(2);
 
 pub type VM = VirtualMemory<DefaultMemoryImpl>;
 

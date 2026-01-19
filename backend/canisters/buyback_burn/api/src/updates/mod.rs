@@ -1,2 +1,2 @@
-pub mod add_swap_client;
-pub mod update_config;
+pub mod add_exchange_jobs;
+pub mod update_exchange_config;
