@@ -74,7 +74,7 @@ const ClaimRewardsBtn = ({ neuronId }: { neuronId: string }) => {
         enableClaim ? (
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
-              <Logo name="goldao" className="h-4 w-4" />
+              <Logo name="gldt" className="h-4 w-4" />
               <Logo name="icp" className="h-4 w-4" />
               <Logo name="ogy" className="h-4 w-4" />
               <Logo name="wtn" className="h-4 w-4" />

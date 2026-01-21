@@ -127,9 +127,16 @@ const Confirm = () => {
   return (
     <>
       <div className="grid grid-cols-1 gap-4 my-8">
-        {claimRewardState.rewards.map((reward) => (
-          <RewardItem key={reward.name} name={reward.name} />
-        ))}
+        {claimRewardState.rewards
+          .filter((reward) => {
+            return (
+              reward.name !== "GOLDAO" ||
+              (reward.name === "GOLDAO" && reward.amount > 0)
+            );
+          })
+          .map((reward) => (
+            <RewardItem key={reward.name} name={reward.name} />
+          ))}
       </div>
 
       <BtnPrimary

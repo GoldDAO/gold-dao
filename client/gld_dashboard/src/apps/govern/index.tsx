@@ -30,7 +30,7 @@ const Govern = () => {
         </div>
         <div className="text-content/60 text-center xl:text-left my-3">
           Stake GOLDAO tokens to participate in the Gold DAO governance and earn
-          rewards in GOLDAO, ICP, OGY and WTN.
+          rewards in GLDT, ICP, OGY and WTN.
         </div>
         {!isConnected && (
           <BtnConnectWallet className="hidden xl:block mt-auto w-full" />
