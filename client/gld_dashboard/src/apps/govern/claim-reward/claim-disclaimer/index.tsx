@@ -11,7 +11,7 @@ import { LoaderSpin } from "@components/loaders";
 const ClaimRewardDisclaimer = () => {
   const { principalId, isConnected, unauthenticatedAgent } = useAuth();
   const [, dispatchClaimReward] = useAtom(ClaimRewardStateReducerAtom);
-  const [enableClaimAll, setEnableClaimAll] = useState(false);
+  const [claimEnabled, setClaimEnabled] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [totalRewards, setTotalRewards] = useState(0);
 
@@ -37,7 +37,7 @@ const ClaimRewardDisclaimer = () => {
         return acc + reward.amount_usd;
       }, 0);
       setTotalRewards(totalRewards);
-      setEnableClaimAll(enabled);
+      setClaimEnabled(enabled);
       setIsSuccess(true);
     }
   }, [rewards.data, rewards.isSuccess, rewardsFee.data, rewardsFee.isSuccess]);
@@ -58,7 +58,7 @@ const ClaimRewardDisclaimer = () => {
                 </span>
               </div>
               <div className="text-sm text-content/60">
-                dispatched in GOLDAO, ICP, OGY and WTN
+                dispatched in GLDT, ICP, OGY and WTN
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@ const ClaimRewardDisclaimer = () => {
   const renderDisclaimer = () => {
     if (isConnected) {
       if (isSuccess) {
-        if (enableClaimAll) {
+        if (claimEnabled) {
           return (
             <div className="border border-success bg-surface-primary rounded-xl">
               <div className="rounded-[inherit] p-4 bg-success/10">
@@ -90,7 +90,7 @@ const ClaimRewardDisclaimer = () => {
                       </span>
                     </div>
                     <div className="text-sm text-content/60">
-                      dispatched in GOLDAO, ICP, OGY and WTN
+                      dispatched in GLDT, ICP, OGY and WTN
                     </div>
                   </div>
                   <button

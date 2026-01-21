@@ -50,7 +50,7 @@ const useGetOneNeuronRewards = (
 
         const data = await Promise.all(
           TOKENS.filter((token) =>
-            ["OGY", "ICP", "GOLDAO", "WTN"].includes(token.name)
+            ["GLDT", "OGY", "ICP", "GOLDAO", "WTN"].includes(token.name)
           ).map(async (token) => {
             const actorLedger = Actor.createActor(idlFactoryLedger, {
               agent,
