@@ -27,5 +27,4 @@ console.log
 .cargo
 proptest-regressions
 .cursor/
-
 backend/canisters/gldt_stake/api/declarations.zip

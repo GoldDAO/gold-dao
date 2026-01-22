@@ -1,10 +1,8 @@
-import { Button } from "@components/ui";
 import { useRef, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
-const SpanBold = ({ children }: { children: React.ReactNode }) => (
-  <span className="font-bold">{children}</span>
-);
+// const SpanBold = ({ children }: { children: React.ReactNode }) => (
+//   <span className="font-bold">{children}</span>
+// );
 
 const UnlockPotentialGold = ({
   className,
@@ -63,12 +61,11 @@ const UnlockPotentialGold = ({
                     <img src="/flower.svg" alt="Flower" className="w-32" />
                   </div>
                   <div className="text-xl md:text-3xl mt-16 mb-4">
-                    <h3>Earn interest</h3>
-                    <h3 className="text-gold font-semibold">while holding</h3>
+                    <h3>Leverage your Gold</h3>
+                    <h3 className="text-gold font-semibold">in DeFi</h3>
                   </div>
                   <div className="">
-                    Earn returns on your Gold without selling it. Stake to{" "}
-                    <SpanBold>{"earn > 3% APY"}</SpanBold>.
+                    Earn yields on gold through lending and other opportunities.
                   </div>
                 </div>
               </div>
@@ -98,7 +95,7 @@ const UnlockPotentialGold = ({
                 </div>
               </div>
             </div>
-            <div className="flex justify-center mt-8">
+            {/* <div className="flex justify-center mt-8">
               <Link
                 to="https://app.gldt.org/earn"
                 target="_blank"
@@ -108,7 +105,7 @@ const UnlockPotentialGold = ({
                   Stake your Gold
                 </Button>
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
