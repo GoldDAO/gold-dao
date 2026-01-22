@@ -50,7 +50,7 @@ const Partners = ({
           </div>
           <div className="">
             <button className="rounded-full bg-surface py-3 px-6 font-semibold text-content">
-              <a href="mailto:info@gold-dao.org">Become a partner</a>
+              <a href="mailto:partnerships@origyn.ch">Become a partner</a>
             </button>
           </div>
         </div>

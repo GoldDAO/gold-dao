@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Button, Skeleton } from "@components/ui";
 // import { useLedgerMetadata } from "@hooks/ledger";
 import { useGLDNFTLocked } from "@hooks/gld_nft/useGLDNFTLocked";
-import useFetchStakeAPY from "@hooks/stake/useFetchStakeAPY";
 
 const Badge = ({
   className,
@@ -31,7 +30,6 @@ const Hero = () => {
   //   useLedgerMetadata({ ledger: "GLDT" });
 
   const { data: NFTLocked, isSuccess: isSuccessNFTLocked } = useGLDNFTLocked();
-  const stakeAPY = useFetchStakeAPY({});
 
   return (
     <div className="container mx-auto flex flex-col flex-grow px-4">
@@ -69,16 +67,6 @@ const Hero = () => {
           value={
             isSuccessNFTLocked ? (
               `${Number(NFTLocked).toFixed(2)} kg`
-            ) : (
-              <Skeleton className="w-32" />
-            )
-          }
-        />
-        <Badge
-          title="Staking interest rates"
-          value={
-            stakeAPY.isSuccess ? (
-              `${Number(stakeAPY.data).toFixed(2)} %`
             ) : (
               <Skeleton className="w-32" />
             )

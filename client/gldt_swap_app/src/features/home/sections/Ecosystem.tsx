@@ -1,6 +1,6 @@
 import GldnftCard from "@assets/cards/gldnft.jpg";
 import UsdgCard from "@assets/cards/usdg.jpg";
-import GoldaoCard from "@assets/cards/goldao.jpg";
+// import GoldaoCard from "@assets/cards/goldao.jpg";
 
 const Card = ({
   badge,
@@ -44,15 +44,15 @@ const Ecosystem = ({
   ...restProps
 }: { className?: string } & React.HTMLAttributes<HTMLElement>) => {
   const Cards = [
-    {
-      badge: "Governance",
-      title: "GOLDAO",
-      subtitle: "Shape decisions through governance",
-      icon: (
-        <img src="/gold_dao.svg" alt="Governance icon" className="w-8 h-8" />
-      ),
-      img: GoldaoCard,
-    },
+    // {
+    //   badge: "Governance",
+    //   title: "GOLDAO",
+    //   subtitle: "Shape decisions through governance",
+    //   icon: (
+    //     <img src="/gold_dao.svg" alt="Governance icon" className="w-8 h-8" />
+    //   ),
+    //   img: GoldaoCard,
+    // },
     {
       badge: "NFT",
       title: "GLD NFTs",

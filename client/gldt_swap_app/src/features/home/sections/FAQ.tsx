@@ -73,12 +73,12 @@ const FAQ = ({
         <div>
           Everybody who owns GLD NFT. See{" "}
           <Link
-            to="https://gold.bity.com"
+            to="https://bity.com/en/gold"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold/80"
           >
-            gold.bity.com
+            bity.com/gold
           </Link>{" "}
           for details of purchasing GLD NFTs.
         </div>
@@ -135,12 +135,12 @@ const FAQ = ({
         <div>
           Go to{" "}
           <Link
-            to="https://gold.bity.com"
+            to="https://bity.com/en/gold"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold/80"
           >
-            gold.bity.com
+            bity.com/gold
           </Link>{" "}
           to learn more about GLD NFTs, which back GLDTs.
         </div>
@@ -157,7 +157,7 @@ const FAQ = ({
             <h2 className="text-gold font-semibold">questions</h2>
           </div>
           <h3 className="text-2xl font-light text-center md:text-left mt-4">
-            Still have questions? We’ve got answers
+            Still have questions? We've got answers
           </h3>
         </div>
         <Accordion transition transitionTimeout={250}>

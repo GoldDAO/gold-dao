@@ -64,9 +64,6 @@ const WhyChooseGLDT = ({
             <div>
               <ul className="flex flex-col gap-4 text-lg text-left text-white/60">
                 <li>
-                  → Earn yield on gold with <SpanBold>&gt;3% APY</SpanBold>
-                </li>
-                <li>
                   → <SpanBold>Redeem</SpanBold> your GLDT for real, physical
                   gold anytime
                 </li>
@@ -78,7 +75,8 @@ const WhyChooseGLDT = ({
                   gold
                 </li>
                 <li>
-                  → Ultra-low transaction <SpanBold>fees from $0.10</SpanBold>
+                  → Ultra-low transaction{" "}
+                  <SpanBold>fees from 0.10 GLDT</SpanBold>
                 </li>
               </ul>
             </div>
