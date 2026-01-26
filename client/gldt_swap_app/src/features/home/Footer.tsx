@@ -2,9 +2,12 @@
 
 const socialLinks = [
   { name: "X (TWITTER)", href: "https://x.com/gldtorg" },
-  { name: "TELEGRAM", href: "https://t.me/gldrwa" },
-  { name: "LINKEDIN", href: "https://www.linkedin.com/showcase/gold-dao" },
-  { name: "MEDIUM", href: "https://medium.com/@GoldDAO" },
+  // { name: "TELEGRAM", href: "https://t.me/gldrwa" },
+  {
+    name: "LINKEDIN",
+    href: "https://www.linkedin.com/company/origyn-foundation",
+  },
+  { name: "MEDIUM", href: "https://origyn.medium.com" },
 ];
 
 const Footer = () => {
@@ -71,7 +74,7 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">MORE</h4>
               <ul className="space-y-3 text-sm">
-                <li>
+                {/* <li>
                   <a
                     href="https://docs.gold-dao.org/legal/terms-of-service"
                     target="_blank"
@@ -88,10 +91,10 @@ const Footer = () => {
                   >
                     Privacy
                   </a>
-                </li>
+                </li> */}
                 <li>
                   <a
-                    href="mailto:info@gold-dao.org"
+                    href="mailto:partnerships@origyn.ch"
                     className="hover:underline"
                   >
                     Contact
@@ -100,10 +103,10 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">THE GOLD DAO</h4>
+              <h4 className="font-semibold mb-4">GLDT</h4>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-2">
-                  <span>&copy; 2025 GOLD DAO</span>
+                  <span>&copy; 2026 GLDT</span>
                 </li>
               </ul>
             </div>

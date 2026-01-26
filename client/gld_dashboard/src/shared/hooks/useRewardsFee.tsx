@@ -6,9 +6,11 @@ import {
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
 import {
+  GLDT_LEDGER_CANISTER_ID,
   GOLDAO_LEDGER_CANISTER_ID,
   ICP_LEDGER_CANISTER_ID,
   OGY_LEDGER_CANISTER_ID,
+  WTN_LEDGER_CANISTER_ID_IC,
 } from "@constants";
 
 import { idlFactory } from "@services/ledger/idlFactory";
@@ -22,6 +24,12 @@ export interface RewardFeeData {
 }
 
 const rewardsData: RewardFeeData[] = [
+  {
+    id: "gldt",
+    name: "GLDT",
+    canister_id: GLDT_LEDGER_CANISTER_ID,
+    fee: 0n,
+  },
   {
     id: "goldao",
     name: "GOLDAO",
@@ -43,7 +51,7 @@ const rewardsData: RewardFeeData[] = [
   {
     id: "wtn",
     name: "WTN",
-    canister_id: OGY_LEDGER_CANISTER_ID,
+    canister_id: WTN_LEDGER_CANISTER_ID_IC,
     fee: 0n,
   },
 ];

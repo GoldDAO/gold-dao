@@ -75,6 +75,7 @@ export const GOLDAO_LEDGER_CANISTER_ID_IC = "tyyy3-4aaaa-aaaaq-aab7a-cai";
 export const GLDT_LEDGER_CANISTER_ID_IC = "6c7su-kiaaa-aaaar-qaira-cai";
 export const ICP_LEDGER_CANISTER_ID_IC = "ryjl3-tyaaa-aaaaa-aaaba-cai";
 export const OGY_LEDGER_CANISTER_ID_IC = "lkwrt-vyaaa-aaaaq-aadhq-cai";
+export const WTN_LEDGER_CANISTER_ID_IC = "jcmow-hyaaa-aaaaq-aadlq-cai";
 export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai";
 export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai";
 export const SNS_GOVERNANCE_CANISTER_ID_IC = "tr3th-kiaaa-aaaaq-aab6q-cai";

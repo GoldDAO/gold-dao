@@ -3,6 +3,7 @@ import { atom } from "jotai";
 import _ from "lodash";
 
 import {
+  GLDT_LEDGER_CANISTER_ID,
   GOLDAO_LEDGER_CANISTER_ID,
   ICP_LEDGER_CANISTER_ID,
   OGY_LEDGER_CANISTER_ID,
@@ -24,6 +25,17 @@ const initialState: ClaimRewardState = {
   is_open_claim_dialog_confirm: false,
   is_open_claim_dialog_details: false,
   rewards: [
+    {
+      id: "gldt",
+      name: "GLDT",
+      label: "GLDT",
+      canister_id: GLDT_LEDGER_CANISTER_ID,
+      is_selected: true,
+      is_claimable: false,
+      amount: 0n,
+      amount_usd: 0,
+      neurons: [],
+    },
     {
       id: "goldao",
       name: "GOLDAO",

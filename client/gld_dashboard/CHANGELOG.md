@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.2.5] - 2026-01-22
+
+#### Changed
+
+- Disable the ability to claim GOLDAO rewards
+- Enable the ability to claim GLDT rewards
+- Minor improvements for better user experience
+
 ### [2.2.4] - 2025-12-11
 
 #### Changed

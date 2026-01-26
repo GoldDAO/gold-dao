@@ -90,8 +90,7 @@ const AddNeuron = ({
           <Card step={4}>
             <Card.Title>It's done!</Card.Title>
             <Card.Text>
-              Refresh your Gold DAO dApp and you will now see your neuron
-              linked.
+              Refresh page and you will now see your neuron linked.
             </Card.Text>
           </Card>
         </div>

@@ -54,12 +54,12 @@ const NavbarTop = () => {
         <div className="flex-shrink-0">
           <a href="/" className="flex items-center space-x-2">
             <img
-              src="/gold_dao.svg"
-              alt="Gold DAO Logo"
+              src="/gldt_logo.svg"
+              alt="GLDT Logo"
               className="w-12 h-12"
             />
             <span className="self-center text-xl font-semibold whitespace-nowrap hidden sm:block">
-              Gold DAO
+              GLDT
             </span>
           </a>
         </div>
