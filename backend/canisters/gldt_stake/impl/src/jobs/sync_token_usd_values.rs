@@ -54,7 +54,7 @@ async fn sync_token_usd_values_impl() {
     ic_cdk::println!("current token_usd_values: {:?}", current_price_map);
 
     for token_symbol in tokens {
-        let ledger_id = token_symbol.get_token_info().ledger_id;
+        let ledger_id = token_symbol.get_prod_token_info().ledger_id;
         info!(
             "fetching USD history for token: {:?}, ledger_id: {:?}",
             token_symbol, ledger_id

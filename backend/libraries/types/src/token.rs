@@ -70,44 +70,82 @@ impl TokenSymbol {
         }
     }
 
-    pub fn get_token_info(self) -> TokenInfo {
-        match self {
-            TokenSymbol::ICP => TokenInfo {
-                fee: 10_000,
-                decimals: 8,
-                ledger_id: Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai")
-                    .expect("Invalid ICP ledger principal"),
+    pub fn get_prod_token_info(self) -> TokenInfo {
+        TokenInfo {
+            ledger_id: self.ledger_id(false),
+            fee: match self {
+                TokenSymbol::ICP => 10_000,
+                TokenSymbol::OGY => 200_000,
+                TokenSymbol::GOLDAO => 100_000,
+                TokenSymbol::WTN => 1_000_000,
+                TokenSymbol::GLDT => 10_000_000,
             },
-            TokenSymbol::OGY => TokenInfo {
-                fee: 200_000,
-                decimals: 8,
-                ledger_id: Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")
-                    .expect("Invalid OGY ledger principal"),
+            decimals: 8,
+        }
+    }
+
+    pub fn get_token_info(self, is_test_mode: bool) -> TokenInfo {
+        TokenInfo {
+            ledger_id: self.ledger_id(is_test_mode),
+            fee: match self {
+                TokenSymbol::ICP => 10_000,
+                TokenSymbol::OGY => 200_000,
+                TokenSymbol::GOLDAO => 100_000,
+                TokenSymbol::WTN => 1_000_000,
+                TokenSymbol::GLDT => 10_000_000,
             },
-            TokenSymbol::GOLDAO => TokenInfo {
-                fee: 100_000,
-                decimals: 8,
-                ledger_id: Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai")
-                    .expect("Invalid GLDGov ledger principal"),
-            },
-            TokenSymbol::WTN => TokenInfo {
-                fee: 1_000_000,
-                decimals: 8,
-                ledger_id: Principal::from_text("jcmow-hyaaa-aaaaq-aadlq-cai")
-                    .expect("Invalid WTN ledger principal"),
-            },
-            TokenSymbol::GLDT => TokenInfo {
-                fee: 10_000_000,
-                decimals: 8,
-                ledger_id: Principal::from_text("6c7su-kiaaa-aaaar-qaira-cai")
-                    .expect("Invalid GLDT ledger principal"),
-            },
+            decimals: 8,
+        }
+    }
+
+    pub fn ledger_id(&self, test_mode: bool) -> Principal {
+        match (self, test_mode) {
+            (TokenSymbol::ICP, false) => Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai")
+                .expect("Invalid ICP ledger principal"),
+            (TokenSymbol::ICP, true) => Principal::from_text("te3q-rqaaa-aaaal-qdlva-cai")
+                .expect("Invalid test ICP ledger principal"),
+
+            (TokenSymbol::OGY, false) => Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")
+                .expect("Invalid OGY ledger principal"),
+            (TokenSymbol::OGY, true) => Principal::from_text("j5naj-nqaaa-aaaal-ajc7q-cai")
+                .expect("Invalid test OGY ledger principal"),
+
+            (TokenSymbol::GOLDAO, false) => Principal::from_text("tyyy3-4aaaa-aaaaq-aab7a-cai")
+                .expect("Invalid GLDGov ledger principal"),
+            (TokenSymbol::GOLDAO, true) => Principal::from_text("irhm6-5yaaa-aaaap-ab24q-cai")
+                .expect("Invalid test GLDGov ledger principal"),
+
+            (TokenSymbol::WTN, false) => Principal::from_text("jcmow-hyaaa-aaaaq-aadlq-cai")
+                .expect("Invalid WTN ledger principal"),
+            (TokenSymbol::WTN, true) => Principal::from_text("jcmow-hyaaa-aaaaq-aadlq-cai")
+                .expect("Invalid test WTN ledger principal"),
+
+            (TokenSymbol::GLDT, false) => Principal::from_text("6c7su-kiaaa-aaaar-qaira-cai")
+                .expect("Invalid GLDT ledger principal"),
+            (TokenSymbol::GLDT, true) => Principal::from_text("6uad6-fqaaa-aaaam-abovq-cai")
+                .expect("Invalid test GLDT ledger principal"),
         }
     }
 
     pub fn is_valid(symbol: &str) -> bool {
         TokenSymbol::parse(symbol).is_ok()
     }
+}
+
+#[macro_export]
+macro_rules! ledger_id {
+    ($symbol:ident) => {{
+        let is_test_mode = crate::state::read_state(|s| s.env.is_test_mode());
+        types::TokenSymbol::$symbol.ledger_id(is_test_mode)
+    }};
+}
+
+#[macro_export]
+macro_rules! token_info {
+    ($symbol:ident) => {{
+        let is_test_mode = crate::state::read_state(|s| s.env.is_test_mode());
+        types::TokenSymbol::$symbol.get_token_info(is_test_mode)
+    }};
 }
 
 #[derive(Debug, PartialEq, Eq)]

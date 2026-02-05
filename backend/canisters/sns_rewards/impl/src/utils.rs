@@ -7,8 +7,10 @@ use icrc_ledger_types::icrc1::{
 };
 use serde::{Deserialize, Serialize};
 use sns_governance_canister::types::{Neuron, NeuronId};
-use time::Weekday;
-use tracing::debug;
+use time::Date;
+use time::UtcOffset;
+use time::{OffsetDateTime, Time, Weekday};
+use tracing::{debug, error, info, warn};
 use types::TimestampMillis;
 
 use crate::state::read_state;
@@ -120,6 +122,7 @@ pub async fn transfer_token(
         Err(error) => Err(format!("Network error: {error:?}")),
     }
 }
+
 pub enum FetchNeuronDataByIdResponse {
     NeuronDoesNotExist,
     Ok(Neuron),
@@ -173,13 +176,191 @@ pub fn authenticate_by_hotkey(
     }
 }
 
+pub fn next_first_wednesday_of_month_seconds(
+    now_seconds: u64,
+    hour: u8,
+) -> Result<u64, NextDistributionError> {
+    if hour > 23 {
+        warn!(hour, "Validation failed: hour must be between 0 and 23");
+        return Err(NextDistributionError::InvalidHour(hour));
+    }
+
+    let now = OffsetDateTime::from_unix_timestamp(now_seconds as i64).map_err(|e| {
+        error!(error = ?e, "Failed to parse timestamp");
+        NextDistributionError::InvalidTimestamp
+    })?;
+
+    let time = Time::MIDNIGHT
+        .replace_hour(hour)
+        .map_err(|_| NextDistributionError::InvalidHour(hour))?;
+
+    let mut year = now.year();
+    let mut month = now.month();
+
+    info!(current_time = ?now, target_hour = hour, "Calculating next first Wednesday");
+
+    loop {
+        debug!(year, ?month, "Checking first Wednesday candidate for month");
+
+        let mut candidate = OffsetDateTime::from_unix_timestamp(0)
+            .map_err(|_| NextDistributionError::DateConstructionFailed)?
+            .replace_year(year)
+            .map_err(|_| NextDistributionError::DateConstructionFailed)?
+            .replace_month(month)
+            .map_err(|_| NextDistributionError::DateConstructionFailed)?
+            .replace_day(1)
+            .map_err(|_| NextDistributionError::DateConstructionFailed)?
+            .replace_time(time);
+
+        // Iterate to find the first Wednesday
+        while candidate.weekday() != Weekday::Wednesday {
+            candidate = candidate.saturating_add(time::Duration::days(1));
+        }
+
+        if candidate > now {
+            let ts = candidate.unix_timestamp() as u64;
+            info!(
+                found_date = ?candidate,
+                timestamp = ts,
+                "Successfully found next first Wednesday"
+            );
+            return Ok(ts);
+        }
+
+        debug!(
+            skipped_date = ?candidate,
+            "First Wednesday of this month has passed, moving to next month"
+        );
+
+        month = match month {
+            time::Month::December => {
+                year += 1;
+                time::Month::January
+            }
+            _ => month.next(),
+        };
+    }
+}
+
+pub fn next_14_feb_seconds(hour: u8) -> Result<u64, NextDistributionError> {
+    use time::{Date, Month};
+
+    let date = Date::from_calendar_date(2026, Month::February, 14)
+        .map_err(|_| NextDistributionError::DateConstructionFailed)?;
+
+    let time = Time::MIDNIGHT
+        .replace_hour(hour)
+        .map_err(|_| NextDistributionError::InvalidHour(hour))?;
+
+    let datetime = date.with_time(time).assume_utc();
+    Ok(datetime.unix_timestamp() as u64)
+}
+
+pub fn next_day_seconds(now_seconds: u64, hour: u8) -> Result<u64, NextDistributionError> {
+    if hour > 23 {
+        warn!(hour, "Attempted to calculate next day with invalid hour");
+        return Err(NextDistributionError::InvalidHour(hour));
+    }
+
+    let now = OffsetDateTime::from_unix_timestamp(now_seconds as i64).map_err(|e| {
+        error!(error = ?e, "Failed to parse now_seconds into OffsetDateTime");
+        NextDistributionError::InvalidTimestamp
+    })?;
+
+    let time = Time::MIDNIGHT
+        .replace_hour(hour)
+        .map_err(|_| NextDistributionError::InvalidHour(hour))?;
+
+    let mut candidate = now.replace_time(time);
+
+    if candidate <= now {
+        debug!(passed_time = ?candidate, "Target hour already passed for today; scheduling for tomorrow");
+        candidate = candidate.saturating_add(time::Duration::days(1));
+    } else {
+        debug!(target_time = ?candidate, "Target hour is later today; scheduling for today");
+    }
+
+    let ts = candidate.unix_timestamp() as u64;
+    info!(scheduled_for = ?candidate, timestamp = ts, "Next daily distribution calculated");
+
+    Ok(ts)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NextDistributionError {
+    InvalidTimestamp,
+    InvalidHour(u8),
+    DateConstructionFailed,
+}
 #[cfg(test)]
 mod tests {
-    use candid::Principal;
-    use sns_governance_canister::types::{Neuron, NeuronId, NeuronPermission};
+    use super::*;
+    use time::macros::datetime;
+
+    #[test]
+    fn test_schedule_later_today() {
+        // Now is 10:00 AM
+        let now = datetime!(2024-06-18 10:00:00 UTC);
+        // Target is 3:00 PM (15:00) today
+        let result = next_day_seconds(now.unix_timestamp() as u64, 15).unwrap();
+
+        let expected = datetime!(2024-06-18 15:00:00 UTC).unix_timestamp() as u64;
+        assert_eq!(result, expected, "Should schedule for later the same day");
+    }
+
+    #[test]
+    fn test_schedule_tomorrow_because_hour_passed() {
+        // Now is 4:00 PM (16:00)
+        let now = datetime!(2024-06-18 16:00:00 UTC);
+        // Target is 9:00 AM today (which already passed)
+        let result = next_day_seconds(now.unix_timestamp() as u64, 9).unwrap();
+
+        // Should be 9:00 AM on June 19th
+        let expected = datetime!(2024-06-19 09:00:00 UTC).unix_timestamp() as u64;
+        assert_eq!(
+            result, expected,
+            "Should schedule for tomorrow if hour has passed"
+        );
+    }
+
+    #[test]
+    fn test_schedule_tomorrow_exact_match() {
+        // Now is exactly 09:00:00
+        let now = datetime!(2026-01-20 23:35:00 UTC);
+        // Target is 09:00:00
+        let result = next_day_seconds(now.unix_timestamp() as u64, 12).unwrap();
+        let duration = result.saturating_sub(now.unix_timestamp() as u64);
+
+        println!("Duration until next distribution: {} seconds", duration);
+    }
+
+    #[test]
+    fn test_invalid_hour_error() {
+        let now = datetime!(2024-06-18 10:00:00 UTC);
+        let result = next_day_seconds(now.unix_timestamp() as u64, 25);
+        assert!(matches!(
+            result,
+            Err(NextDistributionError::InvalidHour(25))
+        ));
+    }
+
+    #[test]
+    fn test_midnight_rollover() {
+        // Now is 11:30 PM
+        let now = datetime!(2024-12-31 23:30:00 UTC);
+        // Target is 01:00 AM
+        let result = next_day_seconds(now.unix_timestamp() as u64, 1).unwrap();
+
+        // Should be 1:00 AM Jan 1st of the next year
+        let expected = datetime!(2025-01-01 01:00:00 UTC).unix_timestamp() as u64;
+        assert_eq!(result, expected, "Should handle year rollover correctly");
+    }
 
     use super::authenticate_by_hotkey;
+    use super::*;
     use crate::utils::{AuthenticateByHotkeyResponse, TimeInterval};
+    use candid::Principal;
+    use sns_governance_canister::types::{Neuron, NeuronId, NeuronPermission};
 
     #[test]
     fn test_authenticate_by_hotkey_with_correct_data() {
@@ -376,5 +557,90 @@ mod tests {
             distribution_interval.is_within_daily_interval(time_now),
             false
         );
+    }
+
+    #[test]
+    fn test_next_first_wednesday_basic() {
+        let now = OffsetDateTime::parse(
+            "2026-03-01T10:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        let res = next_first_wednesday_of_month_seconds(now, 0).unwrap();
+
+        let expected = OffsetDateTime::parse(
+            "2026-03-04T00:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test() {
+        let now = OffsetDateTime::parse(
+            "2024-06-18T08:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        let res = next_first_wednesday_of_month_seconds(now, 0).unwrap();
+
+        println!("res: {}", res);
+    }
+
+    #[test]
+    fn test_next_first_wednesday_rollover() {
+        let now = OffsetDateTime::parse(
+            "2026-03-06T00:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        let res = next_first_wednesday_of_month_seconds(now, 0).unwrap();
+
+        let expected = OffsetDateTime::parse(
+            "2026-04-01T00:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_next_first_wednesday_year_boundary() {
+        let now = OffsetDateTime::parse(
+            "2026-12-31T23:59:59Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        let res = next_first_wednesday_of_month_seconds(now, 0).unwrap();
+
+        let expected = OffsetDateTime::parse(
+            "2027-01-06T00:00:00Z",
+            &time::format_description::well_known::Rfc3339,
+        )
+        .unwrap()
+        .unix_timestamp() as u64;
+
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_next_14_feb() {
+        let result = next_14_feb_seconds(15).unwrap();
+
+        let expected = datetime!(2026-02-14 15:00:00 UTC).unix_timestamp() as u64;
+        assert_eq!(result, expected, "Should schedule for 14 Feb");
     }
 }

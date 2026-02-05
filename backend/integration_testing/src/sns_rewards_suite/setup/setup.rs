@@ -1,12 +1,13 @@
 use super::setup_rewards::setup_rewards_canister;
+use crate::sns_rewards_suite::setup::setup_gldt_ledger::setup_gldt_ledger;
 use crate::sns_test_env::sns_test_env::SnsTestEnv;
 use crate::sns_test_env::utils::generate_neuron_data;
 use crate::{
     client::icrc1::client::transfer, sns_rewards_suite::setup::setup_ledger::setup_ledgers,
     utils::random_principal, wasms,
 };
-use candid::{encode_one, Nat, Principal};
 use bity_ic_canister_time::HOUR_IN_MS;
+use candid::{encode_one, Nat, Principal};
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::{PocketIc, PocketIcBuilder};
 use sns_governance_canister::types::Neuron;
@@ -16,6 +17,7 @@ use std::{
     collections::HashMap,
     time::{Duration, SystemTime},
 };
+use types::TokenSymbol;
 
 pub fn setup_reward_pools(
     mut pic: &PocketIc,
@@ -186,6 +188,7 @@ impl RewardsTestEnvBuilder {
         );
         let rewards_canister_id =
             setup_rewards_canister(&pic, &token_ledgers, &sns_gov_canister_id, &self.controller);
+
         let token_ledger_ids: Vec<Principal> =
             token_ledgers.iter().map(|(_, id)| id.clone()).collect();
         if self.initial_reward_pool_amount > Nat::from(0u64) {
@@ -197,6 +200,22 @@ impl RewardsTestEnvBuilder {
                 self.initial_reward_pool_amount.0.try_into().unwrap(),
             );
         }
+
+        let gldt_ledger_canister_id = setup_gldt_ledger(
+            &pic,
+            self.controller.clone(),
+            TokenSymbol::GLDT.ledger_id(true),
+            sns_gov_canister_id,
+        );
+        transfer(
+            &pic,
+            sns_gov_canister_id.clone(),
+            gldt_ledger_canister_id.clone(),
+            None,
+            rewards_canister_id,
+            100_000_000_000u64.into(),
+        )
+        .unwrap();
         // Tuesday Jun 18, 2024, 9:00:00 AM
         pic.advance_time(Duration::from_millis(HOUR_IN_MS));
         pic.tick();

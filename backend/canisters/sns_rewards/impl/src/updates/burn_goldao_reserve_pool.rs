@@ -9,7 +9,7 @@ pub use sns_rewards_api_canister::burn_goldao_reserve_pool::{
 use sns_rewards_api_canister::subaccounts::RESERVE_POOL_SUB_ACCOUNT;
 use tracing::error;
 use tracing::info;
-use types::TokenSymbol;
+use types::ledger_id;
 
 #[update(guard = "caller_is_governance_principal")]
 #[trace]
@@ -23,7 +23,7 @@ pub async fn burn_goldao_reserve_pool(
 }
 
 pub(crate) async fn burn_goldao_reserve_pool_impl() -> Result<(), String> {
-    let goldao_ledger_id = TokenSymbol::GOLDAO.get_token_info().ledger_id;
+    let goldao_ledger_id = ledger_id!(GOLDAO);
 
     let amount_to_burn = icrc_ledger_canister_c2c_client::icrc1_balance_of(
         goldao_ledger_id,

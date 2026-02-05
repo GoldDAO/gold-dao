@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.2] - 2026-02-04
+
+#### Added
+
+- **GLDT rewards distribution**: Added a scheduled job that distributes GLDT rewards on the first Wednesday of each month.
+
 ### [1.1.1] - 2025-12-16
 
 #### Added

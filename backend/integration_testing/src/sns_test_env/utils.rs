@@ -63,9 +63,7 @@ pub fn create_neuron(
         vesting_period_seconds: Some(100000),
         disburse_maturity_in_progress: vec![],
         dissolve_state: Some(
-            sns_governance_canister::types::neuron::DissolveState::WhenDissolvedTimestampSeconds(
-                100000000000,
-            ),
+            sns_governance_canister::types::neuron::DissolveState::DissolveDelaySeconds(63072000),
         ),
     }
 }

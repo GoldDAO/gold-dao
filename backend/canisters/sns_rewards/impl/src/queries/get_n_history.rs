@@ -7,5 +7,11 @@ use crate::state::read_state;
 
 #[query(hidden = true)]
 fn get_n_history(size: GetNHistoryArgs) -> GetNHistoryResponse {
-    read_state(|state| state.data.maturity_history.get(size.unwrap_or(100)))
+    read_state(|state| {
+        state
+            .data
+            .neuron_system
+            .maturity_history
+            .get(size.unwrap_or(100))
+    })
 }
