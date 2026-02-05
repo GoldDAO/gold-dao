@@ -150,7 +150,7 @@ pub async fn allocate_rewards() -> Result<(), String> {
     let mut reward_types_to_allocate = Vec::new();
 
     for reward_type in &reward_types {
-        let token_info = reward_type.get_token_info();
+        let token_info = reward_type.get_prod_token_info();
         let balance = processing_rewards_pool
             .balance(token_info.ledger_id)
             .await?;

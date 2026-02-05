@@ -46,7 +46,7 @@ pub async fn claim_rewards() {
     for neuron_id in &neuron_ids {
         for token_symbol in &reward_types {
             let token_symbol = *token_symbol;
-            let token_ledger = token_symbol.get_token_info().ledger_id;
+            let token_ledger = token_symbol.get_prod_token_info().ledger_id;
             futures.push(fetch_neuron_reward_balance(neuron_id, token_ledger));
             neuron_token_pairs.push((neuron_id.clone(), token_symbol));
         }

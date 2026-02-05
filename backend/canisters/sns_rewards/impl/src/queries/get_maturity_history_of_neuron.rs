@@ -12,6 +12,7 @@ fn get_maturity_history_of_neuron(
     read_state(|state| {
         state
             .data
+            .neuron_system
             .maturity_history
             .get_maturity_history(args.neuron_id, args.size.unwrap_or(100))
     })

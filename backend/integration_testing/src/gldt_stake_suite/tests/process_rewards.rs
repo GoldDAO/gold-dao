@@ -104,16 +104,16 @@ fn test_process_staking_rewards() {
         let position = get_position(pic, user, gldt_stake_canister_id, &user).unwrap();
         let rewards = &position.claimable_rewards;
         assert_eq!(
-            rewards[&TokenSymbol::GOLDAO].clone() - TokenSymbol::GOLDAO.get_token_info().fee,
+            rewards[&TokenSymbol::GOLDAO].clone() - TokenSymbol::GOLDAO.get_prod_token_info().fee,
             Nat::from(9_206_206_058_u64)
         );
         assert_eq!(
-            rewards[&TokenSymbol::OGY].clone() - TokenSymbol::OGY.get_token_info().fee,
+            rewards[&TokenSymbol::OGY].clone() - TokenSymbol::OGY.get_prod_token_info().fee,
             Nat::from(9_206_085_587_u64)
         );
         assert_eq!(
-            rewards[&TokenSymbol::ICP].clone() - TokenSymbol::OGY.get_token_info().fee,
-            Nat::from(9_206_124_483_u64)
+            rewards[&TokenSymbol::ICP].clone() - TokenSymbol::ICP.get_prod_token_info().fee,
+            Nat::from(9_206_314_483_u64)
         );
     }
 

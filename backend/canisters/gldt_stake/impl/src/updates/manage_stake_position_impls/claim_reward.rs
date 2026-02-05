@@ -104,8 +104,8 @@ pub async fn checked_transfer_rewards(
     position: StakePosition,
     token: TokenSymbol,
 ) -> Result<(TokenSymbol, (Nat, ClaimRewardStatus)), ClaimRewardErrors> {
-    let token_ledger = token.get_token_info().ledger_id;
-    let ledger_fee = token.get_token_info().fee;
+    let token_ledger = token.get_prod_token_info().ledger_id;
+    let ledger_fee = token.get_prod_token_info().fee;
 
     let reward = position.get_reward_by_token(&token);
     position

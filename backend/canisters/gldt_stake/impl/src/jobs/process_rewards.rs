@@ -74,7 +74,7 @@ pub async fn batch_rewards_transfer_with_limit(
 
     let mut rewards: HashMap<TokenSymbol, Nat> = HashMap::new();
     for reward_type in &reward_types {
-        let token_ledger = reward_type.get_token_info().ledger_id;
+        let token_ledger = reward_type.get_prod_token_info().ledger_id;
         let pool_balance = match unallocated_rewards_pool.balance(token_ledger).await {
             Ok(bal) => bal,
             Err(e) => {
@@ -126,8 +126,8 @@ pub async fn batch_rewards_transfer_with_limit(
 
     // --- Proceed normally if scaling_factor > 0 ---
     for reward_type in reward_types {
-        let token_ledger = reward_type.get_token_info().ledger_id;
-        let ledger_fee = reward_type.get_token_info().fee;
+        let token_ledger = reward_type.get_prod_token_info().ledger_id;
+        let ledger_fee = reward_type.get_prod_token_info().fee;
 
         let pool_balance = match unallocated_rewards_pool.balance(token_ledger).await {
             Ok(bal) => bal,
@@ -172,8 +172,8 @@ pub async fn batch_rewards_transfer_unlimited(
     let mut token_symbols = Vec::new();
 
     for reward_type in reward_types {
-        let token_ledger = reward_type.get_token_info().ledger_id;
-        let ledger_fee = reward_type.get_token_info().fee;
+        let token_ledger = reward_type.get_prod_token_info().ledger_id;
+        let ledger_fee = reward_type.get_prod_token_info().fee;
 
         let future = unallocated_rewards_pool.transfer_part_of_rewards(
             token_ledger,

@@ -14,3 +14,4 @@ generate_pocket_update_call!(set_reward_token_types);
 generate_pocket_query_call!(get_historic_payment_round);
 generate_pocket_update_call!(force_payment_round_to_fail);
 generate_pocket_query_call!(get_maturity_history_of_neuron);
+generate_pocket_query_call!(get_all_neurons_maturity);
