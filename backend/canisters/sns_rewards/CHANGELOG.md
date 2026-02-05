@@ -8,11 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
-### [1.1.2] - 2026-02-04
+### [1.1.2] - 2026-02-05
 
 #### Added
 
-- **GLDT rewards distribution**: Added a scheduled job that distributes GLDT rewards on the first Wednesday of each month.
+- **GLDT rewards distribution**: Added a scheduled job that distributes GLDT rewards on the first Wednesday of each month and the first distribution on February 14th.
+- **Reward eligibility adjustment**: Adjusted the criteria for staking reward eligibility for all rewards to only 2 year non-dissolving neurons, according to proposal 337.
 
 ### [1.1.1] - 2025-12-16
 
