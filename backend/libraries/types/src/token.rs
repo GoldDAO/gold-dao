@@ -3,7 +3,6 @@ use std::{borrow::Cow, fmt::Display};
 use candid::{CandidType, Principal};
 use ic_stable_structures::{storable::Bound, Storable};
 
-use candid::Decode;
 use serde::{Deserialize, Serialize};
 
 /// Compact enum for token identity (for keys, matching, etc.)
@@ -102,7 +101,7 @@ impl TokenSymbol {
         match (self, test_mode) {
             (TokenSymbol::ICP, false) => Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai")
                 .expect("Invalid ICP ledger principal"),
-            (TokenSymbol::ICP, true) => Principal::from_text("te3q-rqaaa-aaaal-qdlva-cai")
+            (TokenSymbol::ICP, true) => Principal::from_text("ete3q-rqaaa-aaaal-qdlva-cai")
                 .expect("Invalid test ICP ledger principal"),
 
             (TokenSymbol::OGY, false) => Principal::from_text("lkwrt-vyaaa-aaaaq-aadhq-cai")

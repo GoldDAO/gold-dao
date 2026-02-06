@@ -19,16 +19,15 @@ use crate::jobs::distribute_rewards::fetch_reward_pool_balance;
 use crate::jobs::distribute_rewards::finalize_distribution;
 use crate::jobs::distribute_rewards::process_payment_round;
 use crate::jobs::distribute_rewards::should_retry_distribution;
+use crate::jobs::distribute_rewards::transfer_funds_to_payment_round_account;
 use crate::jobs::distribute_rewards::MAX_RETRIES;
 use crate::state::{mutate_state, read_state};
 use crate::utils::next_14_feb_seconds;
 use crate::utils::next_first_wednesday_of_month_seconds;
 use bity_ic_canister_time::timestamp_seconds;
-use futures::FutureExt;
+use sns_rewards_api_canister::payment_round::PaymentRound;
 use std::time::Duration;
 use tracing::{error, info};
-use types::ledger_id;
-use types::token_info;
 use types::TokenSymbol;
 
 pub fn start_job() {
@@ -141,12 +140,16 @@ fn schedule_retry(delay: Duration) {
         run_once();
     });
 }
+
 pub async fn distribute_gldt_rewards(retry_attempt: u8) {
     let pending_payment_rounds =
         read_state(|state| state.data.payment_processor.get_active_rounds());
 
     if pending_payment_rounds.is_empty() && retry_attempt == 0 {
-        create_new_gldt_payment_round().await;
+        if create_new_gldt_payment_round().await.is_err() {
+            error!("[GLDT_REWARDS] Failed to create new GLDT payment round");
+            return;
+        }
     }
 
     let active_rounds = read_state(|state| state.data.payment_processor.get_active_rounds());
@@ -169,13 +172,11 @@ pub async fn distribute_gldt_rewards(retry_attempt: u8) {
     }
 }
 
-use crate::jobs::distribute_rewards::transfer_funds_to_payment_round_account;
-use sns_rewards_api_canister::payment_round::PaymentRound;
-pub async fn create_new_gldt_payment_round() {
+pub async fn create_new_gldt_payment_round() -> Result<(), String> {
     let gldt_token = TokenSymbol::GLDT;
-    let mut gldt_token_info = token_info!(GLDT);
-    let gldt_ledger_id = ledger_id!(GLDT);
-    gldt_token_info.ledger_id = gldt_ledger_id;
+    let gldt_token_info = read_state(|s| s.data.tokens.get(&gldt_token).copied())
+        .ok_or_else(|| format!("Token info for type {gldt_token:?} not found in state"))?;
+    let gldt_ledger_id = gldt_token_info.ledger_id;
 
     let new_round_key = read_state(|state| state.data.payment_processor.next_key());
 
@@ -183,7 +184,7 @@ pub async fn create_new_gldt_payment_round() {
 
     if reward_pool_balance == 0u64 {
         info!("[GLDT_REWARDS] No rewards available. Round will not be created with 0 balance.");
-        return;
+        return Ok(());
     }
 
     let neuron_data = read_state(|state| state.data.neuron_system.neuron_maturity.clone());
@@ -216,5 +217,7 @@ pub async fn create_new_gldt_payment_round() {
                 new_round_key, s
             );
         }
-    }
+    };
+
+    Ok(())
 }

@@ -4,8 +4,8 @@ use ic_ledger_types::Subaccount;
 use icpswap_swap_pool_canister::ICPSwapResult;
 use icrc_ledger_types::icrc1::account::Account;
 use serde::{Deserialize, Serialize};
+use types::CanisterId;
 use types::TokenSymbol;
-use types::{CanisterId, TokenInfo};
 
 // NOTE: we use one ICPSwapClient to swap concrete token pair
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -65,9 +65,9 @@ impl ICPSwapClient {
     pub async fn deposit(&self, amount: u128) -> Result<u128> {
         let token = self.input_token();
         let args = icpswap_swap_pool_canister::deposit::Args {
-            token: token.get_token_info().ledger_id.to_string(),
+            token: token.get_prod_token_info().ledger_id.to_string(),
             amount: amount.into(),
-            fee: token.get_token_info().fee.into(),
+            fee: token.get_prod_token_info().fee.into(),
         };
         match icpswap_swap_pool_canister_c2c_client::deposit(self.swap_canister_id, &args).await? {
             ICPSwapResult::Ok(amount_deposited) => Ok(nat_to_u128(amount_deposited)),
@@ -95,9 +95,9 @@ impl ICPSwapClient {
             self.input_token()
         };
         let args = icpswap_swap_pool_canister::withdraw::Args {
-            token: token.get_token_info().ledger_id.to_string(),
+            token: token.get_prod_token_info().ledger_id.to_string(),
             amount: amount.into(),
-            fee: token.get_token_info().fee.into(),
+            fee: token.get_prod_token_info().fee.into(),
         };
         match icpswap_swap_pool_canister_c2c_client::withdraw(self.swap_canister_id, &args).await? {
             ICPSwapResult::Ok(amount_out) => Ok(nat_to_u128(amount_out)),

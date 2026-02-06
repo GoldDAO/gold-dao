@@ -128,6 +128,10 @@ pub async fn create_new_payment_rounds() {
     let reward_tokens = read_state(|s| s.data.tokens.clone());
 
     for (token, token_info) in reward_tokens.into_iter() {
+        if token == TokenSymbol::GLDT {
+            continue;
+        }
+
         let new_round_key = read_state(|state| state.data.payment_processor.next_key());
 
         let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;

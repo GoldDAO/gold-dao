@@ -115,7 +115,7 @@ async fn transfer_to_destination(exchange_job: &ExchangeJob) -> Result<Nat, Stri
         .exchange
         .get_config()
         .output_token
-        .get_token_info();
+        .get_prod_token_info();
     let available_amount = get_token_balance(output_token_info.ledger_id, None)
         .await
         .map_err(|e| format!("Error calculating available amount: {}", e))?;
@@ -189,8 +189,8 @@ async fn create_token_swap_if_possible(
 
     let args = exchange_job.exchange.get_config();
     let swap_client = exchange_job.exchange.clone();
-    let input_token_info = args.input_token.get_token_info();
-    let output_token_info = args.output_token.get_token_info();
+    let input_token_info = args.input_token.get_prod_token_info();
+    let output_token_info = args.output_token.get_prod_token_info();
 
     let available_amount =
         match get_token_balance(input_token_info.ledger_id, exchange_job.source_subaccount).await {
@@ -278,8 +278,8 @@ pub(crate) async fn process_token_swap(
 ) -> Result<(), String> {
     let swap_client = exchange_job.exchange.clone();
     let swap_config = swap_client.get_config();
-    let input_token_info = swap_config.input_token.get_token_info();
-    let output_token_info = swap_config.output_token.get_token_info();
+    let input_token_info = swap_config.input_token.get_prod_token_info();
+    let output_token_info = swap_config.output_token.get_prod_token_info();
     let min_output_amount = exchange_job.min_amount.e8s() as u128;
 
     // Get the deposit account

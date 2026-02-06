@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
+use crate::wasms;
 use bity_ic_types::BuildVersion;
 use candid::{encode_one, Principal};
 use pocket_ic::PocketIc;
 use sns_rewards_api_canister::init::InitArgs;
 use sns_rewards_api_canister::post_upgrade::UpgradeArgs;
 use sns_rewards_api_canister::Args;
-
-use crate::wasms;
+use std::collections::HashMap;
 
 pub fn setup_rewards_canister(
     pic: &PocketIc,

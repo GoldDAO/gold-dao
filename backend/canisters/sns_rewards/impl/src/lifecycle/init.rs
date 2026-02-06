@@ -54,6 +54,11 @@ fn init(args: Args) {
                     },
                 );
 
+                data.tokens.insert(
+                    types::TokenSymbol::GLDT,
+                    types::TokenSymbol::GLDT.get_token_info(env.is_test_mode()),
+                );
+
                 data.authorized_principals = vec![init_args.sns_gov_canister_id];
                 data.sns_governance_canister = init_args.sns_gov_canister_id;
             }
