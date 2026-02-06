@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
+use crate::client::pocket::create_canister_with_id;
+use crate::wasms;
 use candid::{encode_one, Nat, Principal};
 use icrc_ledger_canister::init::{ArchiveOptions as ArchiveOptionsIcrc, InitArgs, LedgerArgument};
 use icrc_ledger_types::icrc1::account::Account;
 use pocket_ic::PocketIc;
-
-use crate::wasms;
+use std::collections::HashMap;
 
 pub fn setup_ledgers(
     pic: &PocketIc,
@@ -14,12 +13,21 @@ pub fn setup_ledgers(
     initial_ledger_accounts: Vec<(Account, Nat)>,
     ledger_fees: HashMap<String, Nat>,
 ) -> HashMap<String, Principal> {
-    let app_subnet_id = pic.topology().get_app_subnets()[0];
     let mut token_ledgers: HashMap<String, Principal> = HashMap::new();
     let icrc1_ledger_wasm = wasms::IC_ICRC1_LEDGER.clone();
 
     for symbol in token_symbols {
-        let canister_id = pic.create_canister_on_subnet(None, None, app_subnet_id);
+        let lower_case_symbol = symbol.to_lowercase();
+        let canister_id_str = match lower_case_symbol.as_str() {
+            "icp" => "ete3q-rqaaa-aaaal-qdlva-cai",
+            "ogy" => "j5naj-nqaaa-aaaal-ajc7q-cai",
+            "goldao" => "irhm6-5yaaa-aaaap-ab24q-cai",
+            "wtn" => "jcmow-hyaaa-aaaaq-aadlq-cai",
+            "gldt" => "6uad6-fqaaa-aaaam-abovq-cai",
+            other => panic!("Unknown token symbol: {other}"),
+        };
+
+        let canister_id = create_canister_with_id(pic, controller, canister_id_str);
         let transaction_fee = ledger_fees.get(&symbol).unwrap();
         pic.add_cycles(canister_id, 100_000_000_000_000_000);
         pic.install_canister(
@@ -32,9 +40,8 @@ pub fn setup_ledgers(
                 transaction_fee,
             ))
             .unwrap(),
-            None,
+            Some(controller),
         );
-        let lower_case_symbol = symbol.to_lowercase();
         token_ledgers.insert(
             format!("{lower_case_symbol}_ledger_canister_id"),
             canister_id,

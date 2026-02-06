@@ -236,6 +236,36 @@ pub struct Neuron {
     /// (b) `when_dissolved_timestamp_seconds` is set to zero, (c) neither value is set.
     pub dissolve_state: Option<neuron::DissolveState>,
 }
+
+use tracing::warn;
+use types::Maturity;
+// Taken from SNS governance canister (1 year delay 31_536_000)
+
+const TWO_YEARS_IN_SECONDS: u64 = 63072000;
+impl Neuron {
+    pub fn is_reward_eligible(&self) -> bool {
+        match self.dissolve_state {
+            Some(crate::types::neuron::DissolveState::WhenDissolvedTimestampSeconds { .. }) => {
+                false
+            }
+            Some(crate::types::neuron::DissolveState::DissolveDelaySeconds(
+                dissolve_delay_seconds,
+            )) => dissolve_delay_seconds >= TWO_YEARS_IN_SECONDS,
+            None => false,
+        }
+    }
+
+    pub fn calculate_total_maturity(&self) -> Maturity {
+        self.maturity_e8s_equivalent
+            .checked_add(self.staked_maturity_e8s_equivalent.unwrap_or(0))
+            .unwrap_or_else(|| {
+                let id = self.id.clone().unwrap_or_default();
+                warn!("Unexpected overflow when calculating total maturity of neuron {id}");
+                0
+            })
+    }
+}
+
 /// Nested message and enum types in `Neuron`.
 pub mod neuron {
     /// A list of a neuron's followees for a specific function.

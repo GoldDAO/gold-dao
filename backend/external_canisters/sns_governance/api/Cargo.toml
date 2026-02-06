@@ -13,3 +13,4 @@ hex = { workspace = true }
 ic-stable-structures = { workspace = true }
 serde = { workspace = true }
 types = { path = "../../../libraries/types" }
+tracing = { workspace = true }

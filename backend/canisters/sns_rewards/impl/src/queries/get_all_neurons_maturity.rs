@@ -1,0 +1,9 @@
+use ic_cdk_macros::query;
+pub use sns_rewards_api_canister::get_all_neurons_maturity::Response as GetAllNeuronsMaturityResponse;
+
+use crate::state::read_state;
+
+#[query(hidden = true)]
+fn get_all_neurons_maturity() -> GetAllNeuronsMaturityResponse {
+    read_state(|state| state.data.neuron_system.neuron_maturity.clone())
+}

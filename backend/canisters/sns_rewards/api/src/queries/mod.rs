@@ -1,6 +1,7 @@
 pub mod burn_goldao_reserve_pool_validate;
 pub mod get_active_payment_rounds;
 pub mod get_all_neurons;
+pub mod get_all_neurons_maturity;
 pub mod get_historic_payment_round;
 pub mod get_maturity_history_of_neuron;
 pub mod get_n_history;

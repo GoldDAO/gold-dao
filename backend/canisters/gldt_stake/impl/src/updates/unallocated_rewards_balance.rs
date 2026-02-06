@@ -20,7 +20,7 @@ async fn unallocated_rewards_balance(
     let mut result = HashMap::new();
 
     for reward_token in reward_types {
-        let token_ledger = reward_token.get_token_info().ledger_id;
+        let token_ledger = reward_token.get_prod_token_info().ledger_id;
         match unallocated_rewards_pool.balance(token_ledger).await {
             Ok(balance) => {
                 result.insert(reward_token, Ok(balance));

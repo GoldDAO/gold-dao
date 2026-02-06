@@ -40,3 +40,4 @@ ic0 = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
 bity-ic-types = { workspace = true }
+num-bigint = {workspace = true}

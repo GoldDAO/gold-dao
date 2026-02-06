@@ -1,5 +1,5 @@
-use candid::{Nat, Principal};
 use bity_ic_canister_time::{DAY_IN_MS, HOUR_IN_MS, MINUTE_IN_MS};
+use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Account;
 use sns_rewards_api_canister::{
     get_historic_payment_round::{self, Args as GetHistoricPaymentRoundArgs},
@@ -393,8 +393,10 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         .clone();
     let rewards_canister_id = test_env.rewards_canister_id;
     tick_n_blocks(&pic, 10);
-    let icp_token = TokenSymbol::parse("ICP").unwrap();
-    let ogy_token = TokenSymbol::OGY;
+    let icp_token = TokenSymbol::ICP;
+    // let ogy_token = TokenSymbol::OGY;
+    let gldt_token = TokenSymbol::GLDT;
+    let goldao_token = TokenSymbol::GOLDAO;
 
     pic.advance_time(Duration::from_millis(MINUTE_IN_MS)); //
     tick_n_blocks(&pic, 10);
@@ -506,25 +508,44 @@ fn test_distribute_rewards_adds_to_history_correctly() {
 
     pic.advance_time(Duration::from_millis(DAY_IN_MS + HOUR_IN_MS)); // 9am
     tick_n_blocks(&pic, 30);
-    // let n = test_env.pic.get_time();
-    // println!("now is : {n:?}"); // next day at 10:00
+    let n = pic.get_time();
+    println!("now is : {n:?}"); // next day at 10:00
 
-    // TRIGGER - distribution
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 5)); // 3pm
+    // TRIGGER - GLDT distribution
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3 + DAY_IN_MS * 5)); // 12am
     tick_n_blocks(&pic, 30);
-    // let n = test_env.pic.get_time();
-    // println!("now is : {n:?}"); // wednesday at 3
+    // TRIGGER - ICP distribution
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 2)); // 3pm
+    tick_n_blocks(&pic, 30);
+
+    let n = pic.get_time();
+    println!("now is : {n:?}"); // next day at 10:00
+
     // ********************************
     // 6. Check the history
     // ********************************
 
+    // NOTE: one round is GLDT distribution
+    let historic_icp_rounds = get_historic_payment_round(
+        &pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: gldt_token.clone(),
+            round_id: 3,
+        }),
+    );
+    assert_eq!(historic_icp_rounds.len(), 1);
+    pic.tick();
+
+    // NOTE: the second distribution is for other tokens
     let historic_icp_rounds = get_historic_payment_round(
         &pic,
         Principal::anonymous(),
         test_env.rewards_canister_id,
         &(GetHistoricPaymentRoundArgs {
             token: icp_token.clone(),
-            round_id: 3,
+            round_id: 4,
         }),
     );
     assert_eq!(historic_icp_rounds.len(), 1);
@@ -623,11 +644,23 @@ fn test_distribute_rewards_adds_to_history_correctly() {
         Principal::anonymous(),
         test_env.rewards_canister_id,
         &(GetHistoricPaymentRoundArgs {
-            token: ogy_token.clone(),
+            token: icp_token.clone(),
             round_id: 5,
         }),
     );
     assert_eq!(historic_icp_rounds.len(), 1);
+    pic.tick();
+
+    let historic_goldao_rounds = get_historic_payment_round(
+        &pic,
+        Principal::anonymous(),
+        test_env.rewards_canister_id,
+        &(GetHistoricPaymentRoundArgs {
+            token: goldao_token.clone(),
+            round_id: 5,
+        }),
+    );
+    assert_eq!(historic_goldao_rounds.len(), 1);
     pic.tick();
 }
 
@@ -636,7 +669,8 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     let test_env = default_test_setup();
     let pic = test_env.pic.borrow();
     let rewards_canister_id = test_env.rewards_canister_id;
-    let icp_token = TokenSymbol::parse("ICP").unwrap();
+    let icp_token = TokenSymbol::ICP;
+    let gldt_token = TokenSymbol::GLDT;
     // ********************************
     // 2. Distribute rewards - first week
     // ********************************
@@ -655,6 +689,7 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 15:00
     tick_n_blocks(&pic, 20);
+    println!("First distribution done at {:?}", pic.get_time());
 
     // ********************************
     // 2. Distribute rewards - second week
@@ -677,6 +712,7 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 6)); // 2pm
     tick_n_blocks(&pic, 30);
+    println!("Second distribution done at {:?}", pic.get_time());
 
     // ********************************
     // 3. Verify more than 7 days passed between both historic payment rounds
@@ -711,7 +747,7 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     ));
 
     // *********************************
-    // 3. Test distributions didn't occur between the 7 days
+    // 4. Test distributions didn't occur between the 7 days
     // *********************************
 
     setup_reward_pools(
@@ -731,16 +767,17 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     tick_n_blocks(&pic, 10);
 
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
-    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5));
+    pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3));
+    println!("Third distribution done at {:?}", pic.get_time());
 
     tick_n_blocks(&pic, 30);
-    // check for a distribution 1 day in
+    // NOTE: GLDT distribution would have occurred here
     let distribution_3_record = get_historic_payment_round(
         &pic,
         Principal::anonymous(),
         rewards_canister_id,
         &(get_historic_payment_round::Args {
-            token: icp_token.clone(),
+            token: gldt_token.clone(),
             round_id: 3,
         }),
     );
