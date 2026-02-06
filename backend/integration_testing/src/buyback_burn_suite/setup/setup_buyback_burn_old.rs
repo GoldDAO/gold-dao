@@ -55,7 +55,7 @@ pub fn setup_old_buyback_burn_canister(
         version: BuildVersion::default(),
         commit_hash: String::new(),
         authorized_principals: vec![],
-        gldgov_token_info: TokenSymbol::GOLDAO.get_token_info(),
+        gldgov_token_info: TokenSymbol::GOLDAO.get_prod_token_info(),
         tokens: vec![],
         buyback_interval_in_secs: 0,
         icp_swap_canister_id: Principal::anonymous(),

@@ -36,6 +36,8 @@ fn post_upgrade(args: Args) {
             ) = bity_ic_serializer::deserialize(reader).unwrap();
             let mut state = RuntimeState::from(runtime_state_v0);
 
+            state.data.tokens.insert(types::TokenSymbol::GLDT, types::TokenSymbol::GLDT.get_token_info(state.env.is_test_mode()));
+
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 

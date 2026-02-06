@@ -38,7 +38,7 @@ async fn run_async() {
 pub async fn process_token_burn() -> Result<(), String> {
     info!("Starting token burn process");
 
-    let goldao_ledger_canister_id = TokenSymbol::GOLDAO.get_token_info().ledger_id;
+    let goldao_ledger_canister_id = TokenSymbol::GOLDAO.get_prod_token_info().ledger_id;
 
     let amount_to_burn =
         get_token_balance(goldao_ledger_canister_id, Some(GOLDAO_BURNING_POOL)).await?;
