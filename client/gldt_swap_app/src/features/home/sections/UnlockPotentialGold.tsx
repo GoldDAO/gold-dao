@@ -65,7 +65,8 @@ const UnlockPotentialGold = ({
                     <h3 className="text-gold font-semibold">in DeFi</h3>
                   </div>
                   <div className="">
-                    Earn yields on gold through lending and other opportunities.
+                    Enter the world of DeFi and use the token in independent
+                    borrow/lending protocols and more.
                   </div>
                 </div>
               </div>

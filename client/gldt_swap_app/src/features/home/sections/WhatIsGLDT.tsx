@@ -127,7 +127,7 @@ const WhatIsGLDT = ({
             <SpanBold>no storage fees</SpanBold>.
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8 my-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8 mt-8">
             {BADGES.map((badge, index) => (
               <Badge
                 key={index}
@@ -136,17 +136,6 @@ const WhatIsGLDT = ({
                 icon={badge.icon}
               />
             ))}
-          </div>
-
-          <div>
-            <video
-              src="https://sos-ch-gva-2.exo.io/daolink-gold-dao-website-medias/landing_page/video_gldt.mp4"
-              muted
-              playsInline
-              controls
-              className="w-full h-auto rounded-xl object-cover"
-              aria-label="Preview GLDT"
-            />
           </div>
         </div>
       </div>
