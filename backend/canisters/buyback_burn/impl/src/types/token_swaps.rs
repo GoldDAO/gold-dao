@@ -11,9 +11,10 @@ use types::TimestampMillis;
 
 #[derive(Serialize, Deserialize)]
 pub struct TokenSwaps {
-    swaps: HashMap<u128, TokenSwap>,
+    pub next_id: u128,
+    pub swaps: HashMap<u128, TokenSwap>,
     #[serde(skip, default = "init_map")]
-    history: StableBTreeMap<u128, TokenSwap, VM>,
+    pub history: StableBTreeMap<u128, TokenSwap, VM>,
 }
 
 fn init_map() -> StableBTreeMap<u128, TokenSwap, VM> {
@@ -24,6 +25,7 @@ fn init_map() -> StableBTreeMap<u128, TokenSwap, VM> {
 impl Default for TokenSwaps {
     fn default() -> Self {
         Self {
+            next_id: 0,
             swaps: HashMap::new(),
             history: init_map(),
         }
@@ -32,9 +34,12 @@ impl Default for TokenSwaps {
 
 impl TokenSwaps {
     pub fn push_new(&mut self, swap_config: SwapConfig, now: TimestampMillis) -> TokenSwap {
-        let id = self.get_next_id();
+        let id = self.next_id;
+        self.next_id += 1;
+
         let token_swap = TokenSwap::new(id, swap_config.swap_client_id, now);
-        self.upsert(token_swap.clone());
+        self.swaps.insert(id, token_swap.clone());
+
         token_swap
     }
 
@@ -51,9 +56,7 @@ impl TokenSwaps {
     }
 
     pub fn get_next_id(&self) -> u128 {
-        let swaps_len: u128 = self.swaps.len().try_into().unwrap();
-        let history_len: u128 = self.history.len().into();
-        swaps_len + history_len + 1
+        self.next_id
     }
 
     pub fn get_swap_info(&self, swap_id: u128) -> Option<TokenSwap> {

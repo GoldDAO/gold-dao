@@ -7,6 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.2.0] - 2026-03-03
+
+#### Removed
+
+- **ICP-GOLDAO exchange job**: The automated GOLDAO buyback mechanism has been permanently disabled.
+- **GOLDAO token burn**: The final canister-initiated GOLDAO burn is executed immediately after post_upgrade, ensuring the canister’s GOLDAO balance is reduced to zero.
+
+
+### [unreleased]
+
 ### [1.1.0] - 2026-01-19
 
 #### Added

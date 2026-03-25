@@ -6,3 +6,6 @@ pub use process_burn::*;
 
 pub mod add_exchange_jobs;
 pub use add_exchange_jobs::*;
+
+pub mod remove_exchange_jobs;
+pub use remove_exchange_jobs::*;
