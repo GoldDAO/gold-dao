@@ -6,6 +6,7 @@ use bity_ic_canister_tracing_macros::trace;
 use bity_ic_stable_memory::get_reader;
 pub use buyback_burn_api::Args;
 use ic_cdk_macros::post_upgrade;
+use crate::migrations::types::state::RuntimeStateV0;
 use tracing::info;
 // use crate::migrations::types::state::RuntimeStateV0;
 // use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
@@ -31,17 +32,17 @@ fn post_upgrade(args: Args) {
             let reader = get_reader(&memory);
 
             // NOTE: uncomment these lines if you want to do a normal upgrade
-            let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
-                ::deserialize(reader)
-                .unwrap();
+            // let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
+            //     ::deserialize(reader)
+            //     .unwrap();
 
             // NOTE: uncomment these lines if you want to do an upgrade with migration
-            // let (runtime_state_v0, logs, traces): (
-            //     RuntimeStateV0,
-            //     Vec<LogEntry>,
-            //     Vec<LogEntry>,
-            // ) = bity_ic_serializer::deserialize(reader).unwrap();
-            // let mut state = RuntimeState::from(runtime_state_v0);
+            let (runtime_state_v0, logs, traces): (
+                RuntimeStateV0,
+                Vec<LogEntry>,
+                Vec<LogEntry>,
+            ) = bity_ic_serializer::deserialize(reader).unwrap();
+            let mut state = RuntimeState::from(runtime_state_v0);
 
             // NOTE: init exchange configs
             // let mut exchange_configs: Vec<ExchangeJobConfig> = Vec::new();
@@ -81,14 +82,17 @@ fn post_upgrade(args: Args) {
             // for exchange_job_config in exchange_configs {
             //     let _ = state.data.exchange_jobs.add_exchange_job(exchange_job_config);
             // }
-
             // end of migration code
+            
+            // NOTE: remove the GOLDAO exchange job & burn all the left balance
+            state.data.exchange_jobs.exchange_jobs.remove(&1);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
 
             bity_ic_canister_logger::init_with_logs(state.env.is_test_mode(), logs, traces);
             init_canister(state);
+            crate::jobs::burn_tokens::run_once();
 
             info!(version = %upgrade_args.version, "Post-upgrade complete");
         }

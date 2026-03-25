@@ -15,7 +15,7 @@ impl From<RuntimeStateV0> for RuntimeState {
                 icp_swap_canister_id: old_state.data.icp_swap_canister_id,
                 exchange_jobs: Default::default(),
                 exchange_job_guards: Default::default(),
-                token_swaps: old_state.data.token_swaps,
+                token_swaps: old_state.data.token_swaps.into(),
             },
         }
     }
