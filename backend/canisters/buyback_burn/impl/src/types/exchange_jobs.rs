@@ -79,6 +79,20 @@ impl ExchangeJobs {
         Ok(())
     }
 
+    pub fn remove_exchange_job(&mut self, exchange_job_id: u128) -> Result<(), String> {
+        let job_opt = self.exchange_jobs.remove(&exchange_job_id);
+
+        if let Some(job) = job_opt {
+            if let Some(timer_id) = job.timer_id {
+                ic_cdk_timers::clear_timer(timer_id);
+            }
+            info!("Cleared timer for exchange job {}", exchange_job_id);
+        }
+
+        info!("Removed exchange job {}", exchange_job_id);
+        Ok(())
+    }
+
     pub fn clear_exchange_jobs(&mut self) {
         self.exchange_jobs.clear();
         self.last_used_id = 0;
@@ -139,13 +153,14 @@ impl ExchangeJobs {
                 ic_cdk_timers::clear_timer(timer_id);
             }
 
+            job.job_interval = Duration::from_millis(job_interval_ms);
+
             // Start new timer with updated configuration
             let timer_id = run_now_then_interval_with_args(job.job_interval, move || {
                 crate::jobs::swap_tokens::run(update.exchange_job_id);
             });
 
             job.timer_id = Some(timer_id);
-            job.job_interval = Duration::from_millis(job_interval_ms);
         }
 
         Ok(())
