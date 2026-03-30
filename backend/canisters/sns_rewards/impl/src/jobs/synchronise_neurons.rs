@@ -24,14 +24,21 @@ async fn run_async() {
 }
 
 pub async fn synchronise_neuron_data() {
+    ic_cdk::println!("[synchronise_neuron_data] Starting neuron synchronisation");
     if read_state(|s| s.get_is_synchronizing_neurons()) {
+        ic_cdk::println!("[synchronise_neuron_data] Already synchronizing neurons, skipping");
         return;
     }
     let canister_id = read_state(|state| state.data.sns_governance_canister);
     let is_test_mode = read_state(|s| s.env.is_test_mode());
+    ic_cdk::println!(
+        "[synchronise_neuron_data] Canister ID: {:?}, test mode: {}",
+        canister_id,
+        is_test_mode
+    );
     mutate_state(|state| {
         state.data.neuron_system.sync_info.last_synced_start = timestamp_millis();
-        state.set_is_synchronizing_neurons(false);
+        state.set_is_synchronizing_neurons(true);
     });
 
     let mut number_of_scanned_neurons = 0;
@@ -48,19 +55,28 @@ pub async fn synchronise_neuron_data() {
     while continue_scanning {
         continue_scanning = false;
 
+        ic_cdk::println!(
+            "[synchronise_neuron_data] Fetching neuron page, scanned so far: {}",
+            number_of_scanned_neurons
+        );
         debug!("Fetching neuron data");
         match sns_governance_canister_c2c_client::list_neurons(canister_id, &args).await {
             Ok(response) => {
+                let number_of_received_neurons = response.neurons.len();
+                ic_cdk::println!(
+                    "[synchronise_neuron_data] Received {} neurons",
+                    number_of_received_neurons
+                );
                 mutate_state(|state| {
                     debug!("Updating neurons");
                     response.neurons.iter().for_each(|neuron| {
                         state.data.neuron_system.upsert_neuron(neuron);
                     });
                 });
-                let number_of_received_neurons = response.neurons.len();
                 if (number_of_received_neurons as u32) == limit {
                     args.start_page_at = response.neurons.last().map_or_else(
                         || {
+                            ic_cdk::println!("[synchronise_neuron_data] ERROR: Missing last neuron to continue iterating, stopping loop");
                             error!(
                                 "Missing last neuron to continue iterating.
                                 This should not be possible as the limits are checked. Stopping loop here."
@@ -70,6 +86,7 @@ pub async fn synchronise_neuron_data() {
                         |n| {
                             continue_scanning = true;
                             if is_test_mode && number_of_scanned_neurons >= 400 {
+                                ic_cdk::println!("[synchronise_neuron_data] Test mode limit reached at {} neurons, stopping", number_of_scanned_neurons);
                                 continue_scanning = false;
                             }
                             n.id.clone()
@@ -80,10 +97,18 @@ pub async fn synchronise_neuron_data() {
             }
             Err(err) => {
                 let error_message = format!("{err:?}");
+                ic_cdk::println!(
+                    "[synchronise_neuron_data] ERROR fetching neuron data: {}",
+                    error_message
+                );
                 error!(?error_message, "Error fetching neuron data");
             }
         }
     }
+    ic_cdk::println!(
+        "[synchronise_neuron_data] Completed. Total neurons scanned: {}",
+        number_of_scanned_neurons
+    );
     info!("Successfully scanned {number_of_scanned_neurons} neurons.");
     mutate_state(|state| {
         state.data.neuron_system.sync_info.last_synced_end = timestamp_millis();

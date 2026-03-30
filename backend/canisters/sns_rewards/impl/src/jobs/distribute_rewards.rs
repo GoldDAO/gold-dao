@@ -51,27 +51,35 @@ async fn run_async() {
 }
 
 pub fn run_distribution(initial_run_time: TimestampMillis) {
+    ic_cdk::println!("[REWARD_DISTRIBUTION] run_distribution started");
     if read_state(|s| s.get_is_synchronizing_neurons()) {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] Neurons are syncing, retrying in 5 minutes");
         schedule_retry(initial_run_time, Duration::from_secs(60 * 5));
         return;
     }
 
     if read_state(|s| s.data.reward_distribution_in_progress.unwrap_or(false)) {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] Distribution already in progress, skipping");
         info!("Rewards distribution already in progress. Skipping.");
         return;
     }
 
     if read_state(|s| s.data.gldt_distribution_in_progress.unwrap_or(false)) {
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] GLDT distribution in progress, retrying in 5 minutes"
+        );
         info!("GLDT reward distribution is in progress. Retrying in 5 minutes.");
         schedule_retry(initial_run_time, Duration::from_secs(60 * 5));
         return;
     }
 
+    ic_cdk::println!("[REWARD_DISTRIBUTION] Acquiring global distribution lock");
     mutate_state(|s| {
         s.data.reward_distribution_in_progress = Some(true);
     });
 
     ic_cdk::futures::spawn(distribute_rewards(0).then(move |_| {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] Releasing global distribution lock");
         mutate_state(|s| {
             s.data.reward_distribution_in_progress = Some(false);
         });
@@ -84,14 +92,28 @@ fn schedule_retry(initial_run_time: TimestampMillis, delay: Duration) {
 }
 
 pub fn finalize_distribution(processed_payment_rounds: Vec<PaymentRound>) {
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] finalize_distribution started, rounds to finalize: {}",
+        processed_payment_rounds.len()
+    );
     for payment_round in processed_payment_rounds {
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Finalizing round id: {}, token: {:?}",
+            payment_round.id,
+            payment_round.token
+        );
         update_neuron_rewards(&payment_round);
         move_payment_round_to_history(&payment_round);
         log_payment_round_metrics(&payment_round);
     }
+    ic_cdk::println!("[REWARD_DISTRIBUTION] finalize_distribution completed");
 }
 
 pub async fn distribute_rewards(retry_attempt: u8) {
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] distribute_rewards started, retry_attempt: {}",
+        retry_attempt
+    );
     info!(
         "REWARD_DISTRIBUTION - START - retry attempt : {}",
         retry_attempt
@@ -99,44 +121,85 @@ pub async fn distribute_rewards(retry_attempt: u8) {
 
     let pending_payment_rounds =
         read_state(|state| state.data.payment_processor.get_active_rounds());
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Pending payment rounds: {}",
+        pending_payment_rounds.len()
+    );
 
     if pending_payment_rounds.is_empty() && retry_attempt == 0 {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] No pending rounds, creating new payment rounds");
         create_new_payment_rounds().await;
     }
 
     let active_rounds = read_state(|state| state.data.payment_processor.get_active_rounds());
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Active rounds after creation attempt: {}",
+        active_rounds.len()
+    );
     if active_rounds.is_empty() {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] No active rounds to process, exiting");
         return;
     }
 
     for payment_round in active_rounds {
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Processing payment round id: {}, token: {:?}",
+            payment_round.id,
+            payment_round.token
+        );
         process_payment_round(payment_round.clone(), retry_attempt).await;
     }
 
     let processed_payment_rounds =
         read_state(|state| state.data.payment_processor.get_active_rounds());
     if should_retry_distribution(&processed_payment_rounds) && retry_attempt < MAX_RETRIES {
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Retrying distribution, attempt: {}",
+            retry_attempt + 1
+        );
         ic_cdk::futures::spawn(distribute_rewards(retry_attempt + 1));
     } else {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] Finalizing distribution");
         finalize_distribution(processed_payment_rounds);
     }
 
+    ic_cdk::println!("[REWARD_DISTRIBUTION] distribute_rewards finished");
     info!("REWARD_DISTRIBUTION - FINISH");
 }
 
 pub async fn create_new_payment_rounds() {
+    ic_cdk::println!("[REWARD_DISTRIBUTION] create_new_payment_rounds started");
     let reward_tokens = read_state(|s| s.data.tokens.clone());
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Total tokens to process: {}",
+        reward_tokens.len()
+    );
 
     for (token, token_info) in reward_tokens.into_iter() {
         if token == TokenSymbol::GLDT {
+            ic_cdk::println!("[REWARD_DISTRIBUTION] Skipping GLDT token (handled separately)");
             continue;
         }
 
         let new_round_key = read_state(|state| state.data.payment_processor.next_key());
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Token: {:?}, new round key: {:?}",
+            token,
+            new_round_key
+        );
 
         let reward_pool_balance = fetch_reward_pool_balance(token_info.ledger_id).await;
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Token: {:?}, reward pool balance: {}",
+            token,
+            reward_pool_balance
+        );
 
         if reward_pool_balance == 0u64 {
+            ic_cdk::println!(
+                "[REWARD_DISTRIBUTION] Token: {:?}, no rewards available, skipping round creation",
+                token
+            );
             info!(
                 "ROUND ID : {} & TOKEN :{:?} - has no rewards for distribution",
                 new_round_key, token
@@ -145,6 +208,11 @@ pub async fn create_new_payment_rounds() {
         }
 
         let neuron_data = read_state(|state| state.data.neuron_system.neuron_maturity.clone());
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Token: {:?}, neuron count: {}",
+            token,
+            neuron_data.len()
+        );
 
         let new_round = PaymentRound::new(
             new_round_key,
@@ -154,23 +222,37 @@ pub async fn create_new_payment_rounds() {
             neuron_data,
         );
         match new_round {
-            Ok(valid_round) => match transfer_funds_to_payment_round_account(&valid_round).await {
-                Ok(()) => {
-                    mutate_state(|state| {
-                        state
-                            .data
-                            .payment_processor
-                            .add_active_payment_round(valid_round);
-                    });
+            Ok(valid_round) => {
+                ic_cdk::println!(
+                    "[REWARD_DISTRIBUTION] Token: {:?}, payment round created, transferring funds",
+                    token
+                );
+                match transfer_funds_to_payment_round_account(&valid_round).await {
+                    Ok(()) => {
+                        ic_cdk::println!("[REWARD_DISTRIBUTION] Token: {:?}, funds transferred, adding to active rounds", token);
+                        mutate_state(|state| {
+                            state
+                                .data
+                                .payment_processor
+                                .add_active_payment_round(valid_round);
+                        });
+                    }
+                    Err(e) => {
+                        ic_cdk::println!("[REWARD_DISTRIBUTION] ERROR: Token: {:?}, transfer to payment round failed: {}", token, e);
+                        info!(
+                            "ERROR - transferring funds to payment round sub account : {}",
+                            e
+                        );
+                    }
                 }
-                Err(e) => {
-                    info!(
-                        "ERROR - transferring funds to payment round sub account : {}",
-                        e
-                    );
-                }
-            },
+            }
             Err(s) => {
+                ic_cdk::println!(
+                    "[REWARD_DISTRIBUTION] ERROR: Token: {:?}, invalid round {}: {}",
+                    token,
+                    new_round_key,
+                    s
+                );
                 info!(
                     "ROUND ID : {} & TOKEN :{:?} - Invalid round : {}",
                     new_round_key, token, s
@@ -179,6 +261,7 @@ pub async fn create_new_payment_rounds() {
             }
         }
     }
+    ic_cdk::println!("[REWARD_DISTRIBUTION] create_new_payment_rounds finished");
 }
 
 pub fn should_retry_distribution(payment_rounds: &Vec<PaymentRound>) -> bool {
@@ -205,12 +288,19 @@ pub fn should_retry_distribution(payment_rounds: &Vec<PaymentRound>) -> bool {
 
 pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
     let status = determine_payment_round_status(payment_round);
+    ic_cdk::println!("[REWARD_DISTRIBUTION] move_payment_round_to_history - round id: {}, token: {:?}, status: {:?}", payment_round.id, payment_round.token, status);
 
     // only payment rounds that are fully completed may move to history
     if status != PaymentRoundStatus::CompletedFull {
+        ic_cdk::println!("[REWARD_DISTRIBUTION] Round id: {}, token: {:?} not fully completed, skipping history move", payment_round.id, payment_round.token);
         return;
     }
 
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Moving round id: {}, token: {:?} to history",
+        payment_round.id,
+        payment_round.token
+    );
     // insert to history
     mutate_state(|state| {
         state
@@ -226,6 +316,11 @@ pub fn move_payment_round_to_history(payment_round: &PaymentRound) {
             .payment_processor
             .delete_active_round(payment_round.token)
     });
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Round id: {}, token: {:?} moved to history and removed from active",
+        payment_round.id,
+        payment_round.token
+    );
 }
 
 pub fn log_payment_round_metrics(payment_round: &PaymentRound) -> String {
@@ -274,6 +369,11 @@ pub async fn transfer_funds_to_payment_round_account(round: &PaymentRound) -> Re
 }
 
 pub fn update_neuron_rewards(payment_round: &PaymentRound) {
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] update_neuron_rewards started - round id: {}, token: {:?}",
+        payment_round.id,
+        payment_round.token
+    );
     let payments: Vec<(&NeuronId, &Payment)> = payment_round.payments.iter().collect();
 
     let successful_neuron_transfers: Vec<(&NeuronId, &MaturityDelta, &TokenSymbol)> = payments
@@ -282,21 +382,38 @@ pub fn update_neuron_rewards(payment_round: &PaymentRound) {
         .map(|(neuron_id, (_, _, maturity))| (*neuron_id, maturity, &payment_round.token))
         .collect();
 
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Round id: {}, updating rewards for {} neurons",
+        payment_round.id,
+        successful_neuron_transfers.len()
+    );
     for (neuron_id, maturity_delta, token) in successful_neuron_transfers {
         mutate_state(|state| {
             if let Some(neuron) = state.data.neuron_system.neuron_maturity.get_mut(neuron_id) {
                 if let Some(rewarded_maturity) = neuron.rewarded_maturity.get_mut(&token.clone()) {
                     let new_maturity = *rewarded_maturity + *maturity_delta;
+                    ic_cdk::println!("[REWARD_DISTRIBUTION] Neuron {:?}, token: {:?}, rewarded maturity updated: {} -> {}", neuron_id, token, rewarded_maturity, new_maturity);
                     *rewarded_maturity = new_maturity;
                 } else {
+                    ic_cdk::println!("[REWARD_DISTRIBUTION] Neuron {:?}, token: {:?}, inserting initial rewarded maturity: {}", neuron_id, token, maturity_delta);
                     neuron.rewarded_maturity.insert(*token, *maturity_delta);
                 }
+            } else {
+                ic_cdk::println!("[REWARD_DISTRIBUTION] WARNING: Neuron {:?} not found in neuron_maturity, skipping reward update", neuron_id);
             }
         });
     }
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] update_neuron_rewards finished - round id: {}",
+        payment_round.id
+    );
 }
 
 pub async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Fetching reward pool balance for ledger: {:?}",
+        ledger_canister_id
+    );
     match icrc_ledger_canister_c2c_client::icrc1_balance_of(
         ledger_canister_id,
         &(Account {
@@ -306,8 +423,20 @@ pub async fn fetch_reward_pool_balance(ledger_canister_id: Principal) -> Nat {
     )
     .await
     {
-        Ok(t) => t,
+        Ok(t) => {
+            ic_cdk::println!(
+                "[REWARD_DISTRIBUTION] Reward pool balance for ledger {:?}: {}",
+                ledger_canister_id,
+                t
+            );
+            t
+        }
         Err(e) => {
+            ic_cdk::println!(
+                "[REWARD_DISTRIBUTION] ERROR: Failed to fetch balance for ledger {:?}: {:?}",
+                ledger_canister_id,
+                e
+            );
             error!(
                 "Fail - to fetch token balance of ledger canister id {ledger_canister_id} with ERROR_CODE : {} . MESSAGE",
                 e
@@ -347,6 +476,7 @@ fn determine_payment_round_status(payment_round: &PaymentRound) -> PaymentRoundS
 }
 
 pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u8) {
+    ic_cdk::println!("[REWARD_DISTRIBUTION] process_payment_round started - round id: {}, token: {:?}, retry: {}", payment_round.id, payment_round.token, retry_attempt);
     info!(
         "ROUND ID : {} & TOKEN :{:?} - STARTING PAYMENTS",
         payment_round.id, payment_round.token
@@ -362,6 +492,13 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
         .collect();
     let payment_chunks = payments.chunks(batch_limit);
 
+    ic_cdk::println!(
+        "[REWARD_DISTRIBUTION] Round id: {}, token: {:?}, payments to process: {}",
+        payment_round.id,
+        payment_round.token,
+        payments.len()
+    );
+
     // update retry count
     mutate_state(|s| {
         s.data
@@ -373,6 +510,11 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
     let mut processed_count = 0;
 
     for batch in payment_chunks {
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Round id: {}, processing batch of {} payments",
+            payment_round.id,
+            batch.len()
+        );
         let (transfer_futures, neuron_ids): (Vec<_>, Vec<_>) = batch
             .iter()
             .map(|(neuron_id, (reward, _, _))| {
@@ -400,6 +542,11 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
             processed_count += 1;
             match result {
                 Ok(_) => {
+                    ic_cdk::println!(
+                        "[REWARD_DISTRIBUTION] Round id: {}, neuron {:?} payment completed",
+                        payment_round.id,
+                        neuron_id
+                    );
                     mutate_state(|state| {
                         state.data.payment_processor.set_active_payment_status(
                             &payment_round.token,
@@ -409,6 +556,12 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                     });
                 }
                 Err(e) => {
+                    ic_cdk::println!(
+                        "[REWARD_DISTRIBUTION] Round id: {}, neuron {:?} payment failed: {}",
+                        payment_round.id,
+                        neuron_id,
+                        e
+                    );
                     mutate_state(|state| {
                         state.data.payment_processor.set_active_payment_status(
                             &payment_round.token,
@@ -419,11 +572,18 @@ pub async fn process_payment_round(payment_round: PaymentRound, retry_attempt: u
                 }
             }
         }
+        ic_cdk::println!(
+            "[REWARD_DISTRIBUTION] Round id: {}, processed {} out of {}",
+            payment_round.id,
+            processed_count,
+            total_to_process
+        );
         debug!(
             "ROUND ID : {} & TOKEN :{:?} - processed count {} out of {} ",
             payment_round.id, payment_round.token, processed_count, total_to_process
         );
     }
+    ic_cdk::println!("[REWARD_DISTRIBUTION] process_payment_round finished - round id: {}, token: {:?}, total processed: {}", payment_round.id, payment_round.token, processed_count);
     info!(
         "ROUND ID : {} & TOKEN :{:?} - FINISHED PAYMENTS",
         payment_round.id, payment_round.token
