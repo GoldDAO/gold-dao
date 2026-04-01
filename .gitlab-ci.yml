@@ -1,5 +1,5 @@
 default:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters:0.27.0@sha256:dbbe973060737fb4e515ddd44565940d96c6e5137339a43a30a18332f53999a9
+  image: registry.bity.com/runners-images/dfinity-canisters:0.29.2@sha256:f68a1ad63ab884cdc1555a05f8dcc9f371fa097d911af97c551350d1e955b5da
   interruptible: true
   before_script:
     - dfx --version
