@@ -31,7 +31,7 @@ pub async fn synchronise_neuron_data() {
     let is_test_mode = read_state(|s| s.env.is_test_mode());
     mutate_state(|state| {
         state.data.neuron_system.sync_info.last_synced_start = timestamp_millis();
-        state.set_is_synchronizing_neurons(false);
+        state.set_is_synchronizing_neurons(true);
     });
 
     let mut number_of_scanned_neurons = 0;

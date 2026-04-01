@@ -59,6 +59,8 @@ fn test_distribute_rewards_happy_path() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 14:00
     tick_n_blocks(&pic, 40);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     // ********************************
     // 2. Check Neuron sub account got paid correctly
@@ -99,6 +101,8 @@ fn test_distribute_rewards_happy_path() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 6)); // 2pm
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     let neuron_sub_account = Account {
         owner: rewards_canister_id,
@@ -190,6 +194,8 @@ fn test_distribute_rewards_with_no_rewards() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6)); // 15:00
     tick_n_blocks(&pic, 20);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     // there should be no historic or active rounds for ICP because it didn't have any rewards to pay out
     let res = get_historic_payment_round(
@@ -239,6 +245,8 @@ fn test_distribute_rewards_with_no_rewards() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     // test historic rounds - note, payment round id's always go up by 1 if any rewards from any token are distributed so we get ("ICP".to_string(), 1)
     let res = get_historic_payment_round(
@@ -448,6 +456,8 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 6 + DAY_IN_MS * 6)); // 3pm
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     // ********************************
     // 4. Check the history
@@ -514,9 +524,13 @@ fn test_distribute_rewards_adds_to_history_correctly() {
     // TRIGGER - GLDT distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3 + DAY_IN_MS * 5)); // 12am
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
     // TRIGGER - ICP distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 2)); // 3pm
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
 
     let n = pic.get_time();
     println!("now is : {n:?}"); // next day at 10:00
@@ -689,6 +703,8 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5)); // 15:00
     tick_n_blocks(&pic, 20);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
     println!("First distribution done at {:?}", pic.get_time());
 
     // ********************************
@@ -712,6 +728,8 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     // TRIGGER - distribution
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 5 + DAY_IN_MS * 6)); // 2pm
     tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
     println!("Second distribution done at {:?}", pic.get_time());
 
     // ********************************
@@ -763,14 +781,15 @@ fn test_distribution_occurs_within_correct_time_intervals() {
     tick_n_blocks(&pic, 10);
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 19));
     pic.advance_time(Duration::from_millis(DAY_IN_MS));
-
     tick_n_blocks(&pic, 10);
 
     pic.advance_time(Duration::from_millis(DAY_IN_MS * 6));
     pic.advance_time(Duration::from_millis(HOUR_IN_MS * 3));
+    tick_n_blocks(&pic, 30);
+    pic.advance_time(Duration::from_millis(MINUTE_IN_MS * 6)); // > 5 min retry window
+    tick_n_blocks(&pic, 100);
     println!("Third distribution done at {:?}", pic.get_time());
 
-    tick_n_blocks(&pic, 30);
     // NOTE: GLDT distribution would have occurred here
     let distribution_3_record = get_historic_payment_round(
         &pic,
