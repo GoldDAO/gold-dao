@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.1.3] - 2026-03-30
+
+#### FIXED
+
+- **Daily SNS Neurons Synchronization** : The flag is_synchronizing_neurons was not set to the "false" value while job init. Now it's changed to "true".
+
 ### [1.1.2] - 2026-02-05
 
 #### Added

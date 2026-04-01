@@ -1,7 +1,7 @@
 # Rust / Cargo (for wasm builds) template
 
 .rust template:
-  image: registry.bochslerfinance.com/runners-images/dfinity-canisters/rust-dfinity-build-ci:latest@sha256:2cf54ad0b0929a80da25218cd2e05b7a327ed5d038957511fceffe337c2af525
+  image: dckreg.bity.com/bity/dev/runners_images/rust-dfinity-build-ci:latest
   before_script:
     - cargo --version
     - rustc --version
