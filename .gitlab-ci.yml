@@ -1,5 +1,5 @@
 default:
-  image: dckreg.bity.com/runners-images/dfinity-canisters:0.29.2@sha256:f68a1ad63ab884cdc1555a05f8dcc9f371fa097d911af97c551350d1e955b5da
+  image: dckreg.bity.com/bity/runners_images/dfinity-canisters:0.29.2@sha256:f68a1ad63ab884cdc1555a05f8dcc9f371fa097d911af97c551350d1e955b5da
   interruptible: true
   before_script:
     - dfx --version
