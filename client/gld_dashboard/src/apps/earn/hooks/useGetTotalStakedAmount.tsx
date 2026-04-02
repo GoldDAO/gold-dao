@@ -4,13 +4,13 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { KONGSWAP_CANISTER_ID_IC, GLDT_LEDGER_CANISTER_ID } from "@constants";
+import { ICPSWAP_CANISTER_ID, GLDT_LEDGER_CANISTER_ID } from "@constants";
 import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import get_total_staked from "@services/stake/get_total_staked";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
-import swap_amounts from "@services/kongswap/swap_amounts";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 import { TOKEN_GLDT } from "@shared/utils/tokens";
 
 const useGetTotalStakedAmount = (
@@ -41,9 +41,9 @@ const useGetTotalStakedAmount = (
           canisterId: canister_id,
         });
 
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
 
         const actorLedgerGLDT = Actor.createActor(idlFactoryLedger, {
@@ -53,18 +53,18 @@ const useGetTotalStakedAmount = (
 
         const total_amount_staked = await get_total_staked(actor);
         const decimals = await icrc1_decimals(actorLedgerGLDT);
-        const price = await swap_amounts(actorKongswap, {
-          from: TOKEN_GLDT.name,
-          to: "ckUSDT",
-          amount: 1n,
-        });
+        const price_usd = await get_token_price_usd(
+          actorIcpswap,
+          TOKEN_GLDT.canister_id,
+          TOKEN_GLDT.name
+        );
 
         const amount = Number(total_amount_staked) / 10 ** decimals;
 
         return {
           amount,
           amount_e8s: total_amount_staked,
-          amount_usd: price.mid_price * amount,
+          amount_usd: price_usd * amount,
         };
       } catch (err) {
         console.error(err);

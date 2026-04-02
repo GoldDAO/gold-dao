@@ -13,10 +13,8 @@ import {
   TransferTokenStateAtom,
   SendTokenStateAtom,
 } from "@wallet/shared/atoms/TransferTokenAtom";
-import { SwapStateReducerAtom } from "@wallet/token/swap/atoms";
 import TransferDialogToken from "@wallet/token/transfer";
 import AppFeatureBtn from "@shared/components/app-feature-btn";
-import Swap from "@wallet/token/swap";
 import BurnNFT from "@wallet/nft/mint-burn/burn";
 import MintNFT from "@wallet/nft/mint-burn/mint";
 import SwapNFTReducerAtom from "@wallet/nft/mint-burn/atoms/SwapNFTAtom";
@@ -27,7 +25,6 @@ const Overview = () => {
   const token = useAtomValue(TokenSelectedAtom);
   const setTransferTokenState = useSetAtom(TransferTokenStateAtom);
   const setSendTokenState = useSetAtom(SendTokenStateAtom);
-  const [, dispatchSwapState] = useAtom(SwapStateReducerAtom);
   const [, dispatchSwapNFT] = useAtom(SwapNFTReducerAtom);
 
   const balance = useFetchLedgerBalance(
@@ -46,13 +43,6 @@ const Overview = () => {
       ...state,
       is_open_transfer_dialog: true,
     }));
-  };
-
-  const onOpenSwap = () => {
-    dispatchSwapState({
-      type: "OPEN_DIALOG_FORM",
-      value: { send_token: token },
-    });
   };
 
   const renderUserBalance = () => {
@@ -85,16 +75,10 @@ const Overview = () => {
     if (token.id === "gldt") {
       return (
         <>
-          <AppFeatureBtn action="buy" handleOnClick={() => navigate("/buy")} />
-          <AppFeatureBtn
-            action="earn"
-            handleOnClick={() => navigate("/earn")}
-          />
           <AppFeatureBtn
             action="transfer"
             handleOnClick={handleOpenTransferTokenDialog}
           />
-          <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
           <AppFeatureBtn
             action="burn-nft"
             handleOnClick={() => {
@@ -110,7 +94,6 @@ const Overview = () => {
             action="transfer"
             handleOnClick={handleOpenTransferTokenDialog}
           />
-          <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
           <AppFeatureBtn
             action="govern"
             handleOnClick={() => navigate("/govern")}
@@ -124,7 +107,6 @@ const Overview = () => {
             action="transfer"
             handleOnClick={handleOpenTransferTokenDialog}
           />
-          <AppFeatureBtn action="swap" handleOnClick={onOpenSwap} />
         </>
       );
     }
@@ -152,7 +134,6 @@ const Overview = () => {
         </div>
       </GradientCard>
       <TransferDialogToken />
-      <Swap />
       <BurnNFT />
       <MintNFT />
     </>

@@ -5,13 +5,13 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { KONGSWAP_CANISTER_ID_IC } from "@constants";
+import { ICPSWAP_CANISTER_ID } from "@constants";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
-import swap_amounts from "@services/kongswap/swap_amounts";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 
 interface LedgerBalanceData {
   balance: number;
@@ -62,21 +62,17 @@ const useFetchLedgerBalance = (
         actor: actorLedger,
         owner,
       });
-      const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+      const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
         agent,
-        canisterId: KONGSWAP_CANISTER_ID_IC,
+        canisterId: ICPSWAP_CANISTER_ID,
       });
       const fee_e8s = await icrc1_fee(actorLedger);
       const decimals = await icrc1_decimals(actorLedger);
 
-      const price = await swap_amounts(actorKongswap, {
-        from: ledger,
-        to: "ckUSDT",
-        amount: BigInt(1 * 10 ** decimals),
-      });
+      const price_usd = await get_token_price_usd(actorIcpswap, canisterId, ledger);
       const fee = Number(fee_e8s) / 10 ** decimals;
       const balance = Number(balance_e8s) / 10 ** decimals;
-      const balance_usd = balance * price.mid_price;
+      const balance_usd = balance * price_usd;
 
       return {
         balance,
@@ -85,8 +81,8 @@ const useFetchLedgerBalance = (
         decimals,
         fee,
         fee_e8s,
-        fee_usd: fee * price.mid_price,
-        price_usd: price.mid_price,
+        fee_usd: fee * price_usd,
+        price_usd,
       };
     },
     placeholderData,

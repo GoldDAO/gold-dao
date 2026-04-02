@@ -7,7 +7,6 @@ import {
 import AppLayout from "@shared/components/app-layout";
 import LoadingNavigation from "@shared/components/LoadingNavigation";
 import NotFound from "@shared/components/NotFound";
-import Buy from "apps/buy";
 import Earn from "apps/earn";
 import Govern from "apps/govern";
 import Wallet from "apps/wallet";
@@ -20,20 +19,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/buy" replace />,
+        element: <Navigate to="/govern" replace />,
       },
       {
         path: "buy",
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <Buy />
-              </Suspense>
-            ),
-          },
-        ],
+        element: <Navigate to="/govern" replace />,
       },
       {
         path: "earn",

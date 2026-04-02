@@ -1,9 +1,15 @@
-import { KONGSWAP_CANISTER_ID_IC } from "@constants";
+import { ICPSWAP_CANISTER_ID } from "@constants";
 import { useAuth } from "@auth/index";
 import { Logo } from "@components/index";
 import NumberToLocaleString from "@shared/components/numbers/NumberToLocaleString";
 import { Token } from "@shared/utils/tokens";
-import useFetchSwapAmount from "@shared/hooks/useFetchSwapAmount";
+import {
+  useQuery,
+  keepPreviousData,
+} from "@tanstack/react-query";
+import { Actor } from "@dfinity/agent";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 
 const TokenHeaderPrice = ({
   token,
@@ -14,17 +20,19 @@ const TokenHeaderPrice = ({
 }) => {
   const { unauthenticatedAgent } = useAuth();
 
-  const price = useFetchSwapAmount(
-    KONGSWAP_CANISTER_ID_IC,
-    unauthenticatedAgent,
-    {
-      from: token.name,
-      from_canister_id: token.canister_id,
-      to: "ckUSDT",
-      amount: 1,
-      enabled: !!unauthenticatedAgent,
-    }
-  );
+  const price = useQuery({
+    queryKey: [`FETCH_TOKEN_HEADER_PRICE`, token.canister_id],
+    queryFn: async () => {
+      const actor = Actor.createActor(idlFactoryIcpswap, {
+        agent: unauthenticatedAgent,
+        canisterId: ICPSWAP_CANISTER_ID,
+      });
+      return get_token_price_usd(actor, token.canister_id, token.name);
+    },
+    placeholderData: keepPreviousData,
+    enabled: !!unauthenticatedAgent,
+    staleTime: 60 * 1000,
+  });
 
   return (
     <div className={className}>
@@ -37,7 +45,7 @@ const TokenHeaderPrice = ({
           {price.isSuccess && !price.isFetching ? (
             <>
               1 {token.name} ≈ $
-              <NumberToLocaleString value={price.data.mid_price} decimals={5} />
+              <NumberToLocaleString value={price.data} decimals={5} />
             </>
           ) : (
             <div className="animate-pulse">

@@ -7,15 +7,15 @@ import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import {
   SNS_REWARDS_CANISTER_ID,
   SNS_GOVERNANCE_CANISTER_ID,
-  KONGSWAP_CANISTER_ID_IC,
+  ICPSWAP_CANISTER_ID,
 } from "@constants";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
 import { idlFactory as idlFactoryGovernance } from "@services/sns_governance/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import { icrc1_balance_of } from "@services/ledger/icrc1_balance_of";
 import list_neurons from "@services/sns_governance/list_neurons";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
-import swap_amounts from "@services/kongswap/swap_amounts";
+import { fetch_all_tokens, find_token_price_usd } from "@services/icpswap/get_token_price_usd";
 import { TOKENS } from "@shared/utils/tokens";
 import { Neuron } from "./index";
 
@@ -52,9 +52,9 @@ const useGetAllNeuronsRewards = (
           canisterId: SNS_GOVERNANCE_CANISTER_ID,
         });
 
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
 
         const neurons = await list_neurons(actor, {
@@ -62,6 +62,8 @@ const useGetAllNeuronsRewards = (
           start_page_at: null,
           owner,
         });
+
+        const allTokens = await fetch_all_tokens(actorIcpswap);
 
         const data = await Promise.all(
           TOKENS.filter((token) =>
@@ -72,6 +74,11 @@ const useGetAllNeuronsRewards = (
               canisterId: token.canister_id,
             });
             const decimals = await icrc1_decimals(actorLedger);
+            const price_usd = find_token_price_usd(
+              allTokens,
+              token.canister_id,
+              token.name
+            );
             const neuronData = await Promise.all(
               neurons.map(async (neuron) => {
                 const reward = await icrc1_balance_of({
@@ -80,17 +87,11 @@ const useGetAllNeuronsRewards = (
                   subaccount: neuron.id,
                 });
 
-                const price = await swap_amounts(actorKongswap, {
-                  from: token.name,
-                  to: "ckUSDC",
-                  amount: reward,
-                });
-
                 return {
                   id: neuron.id,
                   reward,
                   reward_usd:
-                    price.mid_price * (Number(reward) / 10 ** decimals),
+                    price_usd * (Number(reward) / 10 ** decimals),
                 };
               })
             );
