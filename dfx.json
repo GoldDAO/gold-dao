@@ -1,5 +1,5 @@
 {
-  "dfx": "0.27.0",
+  "dfx": "0.31.0",
   "__0": "GLDT.org static website with swap canisters",
   "canisters": {
     "gold_dao_chapter_2": {
