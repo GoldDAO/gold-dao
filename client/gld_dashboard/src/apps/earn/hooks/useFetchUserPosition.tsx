@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 import {
-  KONGSWAP_CANISTER_ID_IC,
+  ICPSWAP_CANISTER_ID,
   GLDT_LEDGER_CANISTER_ID,
   MAX_DISSOLVE_EVENTS,
   INSTANT_DISSOLVE_FEE_PERCENTAGE,
@@ -13,11 +13,11 @@ import {
 import { TOKEN_GLDT, TOKEN_GOLDAO_IC } from "@shared/utils/tokens";
 import { idlFactory as idlFactoryStake } from "@services/stake/idlFactory";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import get_position from "@services/stake/get_position";
 import icrc1_fee from "@services/ledger/icrc1_fee";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
-import swap_amounts from "@services/kongswap/swap_amounts";
+import { fetch_all_tokens, find_token_price_usd } from "@services/icpswap/get_token_price_usd";
 import { Position, Reward } from "@earn/interfaces";
 
 const useFetchUserPosition = (
@@ -47,9 +47,9 @@ const useFetchUserPosition = (
           agent: agent,
           canisterId: canister_id,
         });
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent: agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
         const actorLedgerGLDT = Actor.createActor(idlFactoryLedger, {
           agent: agent,
@@ -84,11 +84,12 @@ const useFetchUserPosition = (
         const result = result_arr[0];
 
         const decimalsGLDT = await icrc1_decimals(actorLedgerGLDT);
-        const priceGLDT = await swap_amounts(actorKongswap, {
-          from: TOKEN_GLDT.name,
-          to: "ckUSDT",
-          amount: 1n,
-        });
+        const allTokens = await fetch_all_tokens(actorIcpswap);
+        const priceGLDT = find_token_price_usd(
+          allTokens,
+          TOKEN_GLDT.canister_id,
+          TOKEN_GLDT.name
+        );
 
         const claimable_rewards = result.claimable_rewards.map(
           ([tokenSymbol, amount]) => {
@@ -131,11 +132,11 @@ const useFetchUserPosition = (
             const is_amount_below_fee =
               token_reward.amount <= fee && token_reward.amount > 0n;
 
-            const price = await swap_amounts(actorKongswap, {
-              from: token.name,
-              to: "ckUSDT",
-              amount: 1n,
-            });
+            const price_usd = find_token_price_usd(
+              allTokens,
+              token.canister_id,
+              token.name
+            );
             const amount = Number(token_reward.amount) / 10 ** decimals;
 
             return {
@@ -145,7 +146,7 @@ const useFetchUserPosition = (
               is_amount_below_fee,
               amount,
               amount_e8s: token_reward.amount,
-              amount_usd: price.mid_price * amount,
+              amount_usd: price_usd * amount,
             };
           })
         );
@@ -159,7 +160,7 @@ const useFetchUserPosition = (
             ...event,
             amount_e8s: amount,
             amount: dissolved_amount,
-            amount_usd: priceGLDT.mid_price * dissolved_amount,
+            amount_usd: priceGLDT * dissolved_amount,
             dissolved_date,
             is_withdrawable: true, //dissolved_date <= date_now
             remaining_time: Math.max(dissolved_date - date_now, 0),
@@ -207,7 +208,7 @@ const useFetchUserPosition = (
           age_bonus_multiplier: result.age_bonus_multiplier,
           staked_amount,
           staked_amount_e8s: result.staked,
-          staked_amount_usd: priceGLDT.mid_price * staked_amount,
+          staked_amount_usd: priceGLDT * staked_amount,
           total_rewards_amount,
           total_rewards_amount_e8s,
           total_rewards_amount_usd,
