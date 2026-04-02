@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Versions
 
+### [2.3.0] - 2026-04-02
+
+#### Changed
+
+- Prepare for KongSwap shutdown
+- Replaced all KongSwap canister calls with ICPSwap's getAllTokens API for USD price lookups across the app (govern, earn, wallet)
+- Made /govern the default route, with /buy redirecting to it
+- Minor fix regarding the position of the $ sign
+
+#### Removed
+
+- Removed the buy page and swap feature from the wallet
+- Removed KongSwap service files, useFetchSwapAmount hook, and KONGSWAP_CANISTER_ID_IC constant
+
 ### [2.2.5] - 2026-01-22
 
 #### Changed

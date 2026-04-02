@@ -7,19 +7,14 @@ const navItems: {
   icon: ReactNode;
 }[] = [
   {
-    title: "Buy",
-    url: "/buy",
-    icon: <Icon.Redeem />,
+    title: "Govern",
+    url: "/govern",
+    icon: <Icon.Govern />,
   },
   {
     title: "Earn",
     url: "/earn",
     icon: <Icon.Earn />,
-  },
-  {
-    title: "Govern",
-    url: "/govern",
-    icon: <Icon.Govern />,
   },
   { title: "Wallet", url: "/wallet", icon: <Icon.Wallet width={24} /> },
   // {

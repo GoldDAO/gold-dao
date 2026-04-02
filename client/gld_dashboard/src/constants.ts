@@ -83,7 +83,6 @@ export const ROOT_ACCOUNT_GLDGOV =
   "tr3th-kiaaa-aaaaq-aab6q-cai-nif4qry.7776d299b4a804a14862b02bff7b74d1b956e431f5f832525d966d67ff3d7ce8";
 export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
 export const SWAP_POOL_ICP_GLDT_CANISTER_ID_IC = "4omhz-yiaaa-aaaag-qnalq-cai";
-export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
 
 export const GLD_DASHBOARD_MAINTENANCE_MODE_CANISTER_ID =
   "g5je6-yaaaa-aaaap-ahkza-cai";

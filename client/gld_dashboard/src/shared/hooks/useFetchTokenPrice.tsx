@@ -4,12 +4,12 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
-import { KONGSWAP_CANISTER_ID_IC } from "@constants";
+import { ICPSWAP_CANISTER_ID } from "@constants";
 import { idlFactory as idlFactoryLedger } from "@services/ledger/idlFactory";
-import { idlFactory as idlFactoryKongswap } from "@services/kongswap/idlFactory";
+import { idlFactory as idlFactoryIcpswap } from "@services/icpswap/idls/swap_pool";
 import icrc1_decimals from "@services/ledger/icrc1_decimals";
 import icrc1_fee from "@services/ledger/icrc1_fee";
-import swap_amounts from "@services/kongswap/swap_amounts";
+import get_token_price_usd from "@services/icpswap/get_token_price_usd";
 
 const useFetchTokenPrice = (
   agent: Agent | HttpAgent | undefined,
@@ -59,18 +59,18 @@ const useFetchTokenPrice = (
           agent,
           canisterId: from_canister_id,
         });
-        const actorKongswap = Actor.createActor(idlFactoryKongswap, {
+        const actorIcpswap = Actor.createActor(idlFactoryIcpswap, {
           agent,
-          canisterId: KONGSWAP_CANISTER_ID_IC,
+          canisterId: ICPSWAP_CANISTER_ID,
         });
         const fee = await icrc1_fee(actorTokenLedger);
         const decimals = await icrc1_decimals(actorTokenLedger);
 
-        const price = await swap_amounts(actorKongswap, {
-          from: from,
-          to: "ckUSDC",
-          amount: 1n,
-        });
+        const priceUSD = await get_token_price_usd(
+          actorIcpswap,
+          from_canister_id,
+          from
+        );
 
         return {
           from: from,
@@ -78,7 +78,7 @@ const useFetchTokenPrice = (
           amount,
           decimals,
           fee,
-          amount_usd: (amount_number / 10 ** decimals) * price.mid_price,
+          amount_usd: (amount_number / 10 ** decimals) * priceUSD,
         };
       } catch (err) {
         console.log(err);
