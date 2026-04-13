@@ -75,7 +75,7 @@ fn post_upgrade(args: Args) {
             // end of migration code
             
             // NOTE: remove the GOLDAO exchange job & burn all the left balance
-            state.data.exchange_jobs.exchange_jobs.remove(&1);
+            // state.data.exchange_jobs.exchange_jobs.remove(&1);
 
             state.env.set_version(upgrade_args.version);
             state.env.set_commit_hash(upgrade_args.commit_hash);
