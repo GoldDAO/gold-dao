@@ -6,17 +6,7 @@ use bity_ic_canister_tracing_macros::trace;
 use bity_ic_stable_memory::get_reader;
 pub use buyback_burn_api::Args;
 use ic_cdk_macros::post_upgrade;
-use crate::migrations::types::state::RuntimeStateV0;
 use tracing::info;
-// use crate::migrations::types::state::RuntimeStateV0;
-// use buyback_burn_api::exchange_job_config::ExchangeJobConfig;
-// use buyback_burn_api::icpswap::ICPSwapConfig;
-// use buyback_burn_api::swap_config::ExchangeConfig;
-// use candid::Principal;
-// use ic_ledger_types::Tokens;
-// use icrc_ledger_types::icrc1::account::Account;
-// use std::time::Duration;
-// use types::TokenSymbol;
 
 #[post_upgrade]
 #[trace]
@@ -32,17 +22,17 @@ fn post_upgrade(args: Args) {
             let reader = get_reader(&memory);
 
             // NOTE: uncomment these lines if you want to do a normal upgrade
-            // let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
-            //     ::deserialize(reader)
-            //     .unwrap();
+            let (mut state, logs, traces): (RuntimeState, Vec<LogEntry>, Vec<LogEntry>) = bity_ic_serializer
+                ::deserialize(reader)
+                .unwrap();
 
             // NOTE: uncomment these lines if you want to do an upgrade with migration
-            let (runtime_state_v0, logs, traces): (
-                RuntimeStateV0,
-                Vec<LogEntry>,
-                Vec<LogEntry>,
-            ) = bity_ic_serializer::deserialize(reader).unwrap();
-            let mut state = RuntimeState::from(runtime_state_v0);
+            // let (runtime_state_v0, logs, traces): (
+            //     RuntimeStateV0,
+            //     Vec<LogEntry>,
+            //     Vec<LogEntry>,
+            // ) = bity_ic_serializer::deserialize(reader).unwrap();
+            // let mut state = RuntimeState::from(runtime_state_v0);
 
             // NOTE: init exchange configs
             // let mut exchange_configs: Vec<ExchangeJobConfig> = Vec::new();
