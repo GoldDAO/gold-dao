@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### [unreleased]
 
+### [1.2.0] - 2026-04-16
+
+#### Fixed
+
+- **ICP-GOLDAO exchange job**: Add exchange job fix that allows timer to run immediately
+
 ### [1.2.0] - 2026-03-03
 
 #### Removed

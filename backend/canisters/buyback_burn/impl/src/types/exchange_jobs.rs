@@ -65,17 +65,50 @@ impl ExchangeJobs {
         }
     }
 
-    pub fn add_exchange_job(
-        &mut self,
-        exchange_job_config: ExchangeJobConfig,
-    ) -> Result<(), String> {
-        let exchange_job_id = self.get_next_id();
-        let exchange_job = (exchange_job_id, exchange_job_config).try_into()?;
+    // pub fn add_exchange_job(
+    //     &mut self,
+    //     exchange_job_config: ExchangeJobConfig,
+    // ) -> Result<(), String> {
+    //     let exchange_job_id = self.get_next_id();
+    //     let exchange_job: ExchangeJob = (exchange_job_id, exchange_job_config).try_into()?;
 
-        self.exchange_jobs.insert(exchange_job_id, exchange_job);
+    //     self.exchange_jobs
+    //         .insert(exchange_job_id, exchange_job.clone());
 
-        self.last_used_id = exchange_job_id;
-        info!("Added exchange job {}", exchange_job_id);
+    //     let timer_id = run_now_then_interval_with_args(exchange_job.job_interval, move || {
+    //         crate::jobs::swap_tokens::run(exchange_job_id);
+    //     });
+
+    //     let job = self
+    //         .exchange_jobs
+    //         .get_mut(&exchange_job_id)
+    //         .ok_or(String::from("Job not found"))?;
+    //     job.timer_id = Some(timer_id);
+
+    //     self.last_used_id = exchange_job_id;
+    //     info!("Added exchange job {}", exchange_job_id);
+    //     Ok(())
+    // }
+
+    pub fn add_exchange_job(&mut self, config: ExchangeJobConfig) -> Result<(), String> {
+        let id = self.get_next_id();
+        let mut job: ExchangeJob = (id, config).try_into()?;
+
+        // 1. Insert into state FIRST so 'run(id)' can find it
+        self.exchange_jobs.insert(id, job.clone());
+        self.last_used_id = id;
+
+        // 2. Start the timer
+        let timer_id = run_now_then_interval_with_args(job.job_interval, move || {
+            crate::jobs::swap_tokens::run(id);
+        });
+
+        // 3. Update the stored job with the timer_id
+        if let Some(stored_job) = self.exchange_jobs.get_mut(&id) {
+            stored_job.timer_id = Some(timer_id);
+        }
+
+        info!("Added exchange job {}", id);
         Ok(())
     }
 
