@@ -43,7 +43,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
     token_to_buy = variant { GOLDAO };
     exchange = $EXCHANGE_CONFIG_GOLDAO;
     rate_per_interval = 793_650 : nat64;
-    job_interval_ms = 14400 : nat64;
+    job_interval_ms = 14400000 : nat64;
     source_subaccount = null;
     min_amount = record { e8s = $MIN_SWAP_AMOUNT : nat64 };
     max_amount = null;
@@ -62,7 +62,7 @@ if [[ $REINSTALL == "reinstall" ]]; then
     token_to_buy = variant { GLDT };
     exchange = $EXCHANGE_CONFIG_GLDT;
     rate_per_interval = 3_571_428 : nat64;
-    job_interval_ms = 21600 : nat64;
+    job_interval_ms = 21600000 : nat64;
     source_subaccount = opt blob "'"\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\01"'";
     min_amount = record { e8s = $MIN_SWAP_AMOUNT : nat64 };
     max_amount = null;
