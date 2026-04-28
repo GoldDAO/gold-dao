@@ -13,7 +13,7 @@ impl From<RuntimeStateV0> for RuntimeState {
             data: Data {
                 authorized_principals: old_state.data.authorized_principals,
                 icp_swap_canister_id: old_state.data.icp_swap_canister_id,
-                exchange_jobs: Default::default(),
+                exchange_jobs: old_state.data.exchange_jobs,
                 exchange_job_guards: Default::default(),
                 token_swaps: old_state.data.token_swaps.into(),
             },
