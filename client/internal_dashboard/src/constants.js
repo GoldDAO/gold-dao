@@ -14,7 +14,21 @@ export const GLDT_STAKE_CANISTER_ID_IC = "sqpxs-piaaa-aaaaj-qneva-cai";
 
 export const SNS_ROOT_CANISTER_ID_IC = "tw2vt-hqaaa-aaaaq-aab6a-cai";
 
-export const KONGSWAP_CANISTER_ID_IC = "2ipq2-uqaaa-aaaar-qailq-cai";
+export const ICPSWAP_CANISTER_ID = "moe7a-tiaaa-aaaag-qclfq-cai";
+export const CKUSDT_LEDGER_CANISTER_ID_IC = "cngnf-vqaaa-aaaar-qag4q-cai";
+export const CK_USDC_LEDGER_CANISTER_ID_IC = "xevnm-gaaaa-aaaar-qafnq-cai";
+
+// ICPSwap pool canister IDs (mainnet)
+export const ICPSWAP_GLDT_CKUSDT_POOL_CANISTER_ID_IC =
+  "4jnbn-vqaaa-aaaag-qnala-cai";
+export const ICPSWAP_ICP_CKUSDC_POOL_CANISTER_ID_IC =
+  "mohjv-bqaaa-aaaag-qjyia-cai";
+export const ICPSWAP_OGY_ICP_POOL_CANISTER_ID_IC =
+  "ttnzy-lyaaa-aaaag-qj2bq-cai";
+export const ICPSWAP_GOLDAO_ICP_POOL_CANISTER_ID_IC =
+  "k46ek-4qaaa-aaaag-qcyzq-cai";
+export const ICPSWAP_WTN_ICP_POOL_CANISTER_ID_IC =
+  "oqn67-kaaaa-aaaag-qj72q-cai";
 
 export const UNALLOCATED_REWARDS_SUBACCOUNT =
   "0000000000000000000000000000000000000000000000000000000000000000";
